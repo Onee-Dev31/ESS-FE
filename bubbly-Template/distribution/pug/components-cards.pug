@@ -1,0 +1,194 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var components = true;
+    - var current = 'components-cards.html';   
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Cards'}) 
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Cards') 
+            
+    section
+
+        .row
+            .col-md-6.col-lg-3
+                // Simple card
+                .card.mb-4
+                    img.card-img-top.img-fluid(src='img/mockup1.jpg', alt='Card image cap')
+                    .card-body
+                        h5.card-title Card title
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                        a.btn.btn-primary(href='#') Button
+            // end col
+            .col-md-6.col-lg-3
+                .card.mb-4
+                    img.card-img-top.img-fluid(src='img/mockup3.jpg', alt='Card image cap')
+                    .card-body
+                        h5.card-title Card title
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                    ul.list-group.list-group-flush
+                        li.list-group-item.text-muted Vice tote bag shabby chic  
+                        li.list-group-item.text-muted Portland Etsy craft beer
+                    .card-body
+                        a.card-link(href='#') Card link
+                        a.card-link(href='#') Another link here
+            // end col
+            .col-md-6.col-lg-3
+                .card.mb-4
+                    img.card-img-top.img-fluid(src='img/mockup4.jpg', alt='Card image cap')
+                    .card-body
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+            // end col
+            .col-md-6.col-lg-3
+                .card.mb-4
+                    .card-body
+                        h5.card-title Card title
+                        h6.card-subtitle.text-muted Support card subtitle
+                    img.img-fluid(src='img/mockup5.jpg', alt='Card image cap')
+                    .card-body
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                        a.card-link(href='#') Card link
+                        a.card-link(href='#') Another link
+            // end col
+        // end row
+        .row
+            .col-md-4
+                .card.mb-4
+                    .card-header 
+                        .card-heading Featured
+                    .card-body
+                        h4.card-title Special title treatment
+                        p.card-text With supporting text below as a natural lead-in to additional content.
+                        a.btn.btn-primary(href='#') Go somewhere
+            .col-md-4
+                .card.mb-4
+                    .card-body
+                        h4.card-title Special title treatment
+                        p.card-text With supporting text below as a natural lead-in to additional content.
+                        a.btn.btn-outline-primary(href='#') Go somewhere
+                    .card-footer.text-muted 2 days ago
+            .col-md-4
+                .card.mb-4
+                    .card-header Featured
+                    .card-body
+                        h4.card-title Special title treatment
+                        p.card-text With supporting text below as a natural lead-in to additional content.
+                        a.btn.btn-dark(href='#') Go somewhere
+                    .card-footer.text-muted 2 days ago
+                        
+        // end row
+        .row
+            .col-md-4
+                .card.mb-4
+                    img.card-img-top.img-fluid(src='img/mockup6.jpg', alt='Card image cap')
+                    .card-body
+                        h5.card-title Card title
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                        p.card-text
+                            small.text-muted Last updated 3 mins ago
+            .col-md-4
+                .card.mb-4
+                    .card-body
+                        h5.card-title Card title
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                        p.card-text
+                            small.text-muted Last updated 3 mins ago
+                    img.card-img-bottom.img-fluid(src='img/mockup7.jpg', alt='Card image cap')
+            .col-md-4
+                .card.card-inverse.text-white.mb-4
+                    img.card-img.img-fluid(src='img/mockup4.jpg', alt='Card image')
+                    .card-img-overlay.card-img-overlay-opacity
+                        h5.card-title.text-white Card title
+                        p.card-text Some quick example text to build on the card title and make up the bulk of the card's content.
+                        p.card-text
+                            small Last updated 3 mins ago
+        // end row
+        h4.mt-5.mb-4 Background variants
+        .row
+
+            - var backgroundVariants = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark']
+
+            each val in backgroundVariants
+                .col-md-4
+                    .card.mb-4(class=`bg-${val}`, class= (val == 'light') ? null : 'text-white' )
+                        .card-header.card-header-transparent.card-heading #{val} card
+                        .card-body
+                            h5.card-title Some additional title here
+                            p.card-text
+                                | Some quick example text to build on the card title and make up the bulk of the card's content.
+            
+
+        // end row
+        h4.mt-5.mb-4 Groups
+        .row
+            .col-12
+                .card-group.mb-4
+                    .card
+                        img.card-img-top.img-fluid(src='img/mockup4.jpg', alt='Card image cap')
+                        .card-body
+                            h5.card-title Card title
+                            p.card-text This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
+                            p.card-text
+                                small.text-muted Last updated 3 mins ago
+                    .card
+                        img.card-img-top.img-fluid(src='img/mockup3.jpg', alt='Card image cap')
+                        .card-body
+                            h5.card-title Card title
+                            p.card-text This card has supporting text below as a natural lead-in to additional content.
+                            p.card-text
+                                small.text-muted Last updated 3 mins ago
+                    .card
+                        img.card-img-top.img-fluid(src='img/mockup1.jpg', alt='Card image cap')
+                        .card-body
+                            h5.card-title Card title
+                            p.card-text This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.
+                            p.card-text
+                                small.text-muted Last updated 3 mins ago
+        // end row
+
+        h4.mt-5.mb-4 Navigation
+        .row
+            .col-md-6
+                .card.text-center.mb-4
+                    .card-header
+                        ul.nav.nav-tabs.card-header-tabs
+                            li.nav-item
+                                a.nav-link.active(href='#') Active
+                            li.nav-item
+                                a.nav-link(href='#') Link
+                            li.nav-item
+                                a.nav-link.disabled(href='#') Disabled
+                    .card-body
+                        h5.card-title Special title treatment
+                        p.card-text With supporting text below as a natural lead-in to additional content.
+                        a.btn.btn-primary(href='#') Go somewhere
+
+            .col-md-6
+                .card.text-center.mb-4
+                    .card-header.py-3
+                        ul.nav.nav-pills.card-header-pills
+                            li.nav-item
+                                a.nav-link.active(href='#') Active
+                            li.nav-item
+                                a.nav-link(href='#') Link
+                            li.nav-item
+                                a.nav-link.disabled(href='#') Disabled
+                    .card-body
+                        h5.card-title Special title treatment
+                        p.card-text With supporting text below as a natural lead-in to additional content.
+                        a.btn.btn-secondary(href='#') Go somewhere
+
+        // end row        
+        .card.mb-4
+            .card-header
+                h5 Mockups Used here
+            .card-body
+                - var mockups = ['https://dribbble.com/shots/2862026-Beauty-Cosmetics-Stationery-Wedding', 'https://dribbble.com/shots/1155962-Free-Stationery-Mockup-PSD', 'https://dribbble.com/shots/2569937-Brandminute-Scene-02', 'https://dribbble.com/shots/1468064-Another-Branding-Mock-Up-Free-PSD', 'https://dribbble.com/shots/3684230-Letterhead-Mockup', 'https://dribbble.com/shots/2584869-Brandminute-Scene-07']
+
+                ul
+                    each val in mockups
+                        li 
+                            a(href=val) #{val}

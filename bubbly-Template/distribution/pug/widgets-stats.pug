@@ -1,0 +1,122 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var widgets = true;
+    - var current = 'widgets-stats.html';   
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Stats Widgets'}) 
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Stats Widgets') 
+            
+    section
+
+        include _pug-includes/inc-data-widget.pug
+
+        .row.mb-5
+            each val, index in widget1
+                +widgetStats1(val, index, 'col-sm-6 col-lg-3')
+               
+        .row.mb-5
+            each val in widget2
+                +widgetStats4(val, index, 'col-sm-6 col-md-4 mb-4')
+
+        .row.mb-5
+            each val in widget1 
+                +widgetStats5(val, index, 'col-6 col-md-3 mb-4')                
+                    
+
+        .row.mb-5
+            each val in widget3 
+                +widgetStats6(val, index, 'col-md-4 mb-4')   
+
+        .row.mb-5
+            each val, index in projects 
+                if (index < 2)
+                    +widgetStats7(val, index, 'col-md-6 mb-4')   
+
+        .row.mb-5
+            +widgetStats12('col-md-6 mb-4')   
+
+            +widgetStats13('col-md-6 mb-4')  
+
+        .row.mb-5
+            .col-md-6.col-lg-3.mb-4
+                .card.h-100
+                    .card-header.py-4
+                        h6.card-heading Lines of code
+                    .card-body
+                        .display-4.text-center.mb-4 828
+                        .row
+                            .col-sm-6.text-center.h-100
+                                p.text-muted.text-sm Tabs
+                                .h4.mb-0.text-green 456
+                            .col-sm-6.text-center.h-100.align-items-end
+                                p.text-muted.text-sm Spaces
+                                .h4.mb-0.text-indigo 125
+            .col-md-6.col-lg-3.mb-4
+                .card.h-100
+                    .card-header.py-4
+                        h6.card-heading Customers                
+                    .card-body.pt-3
+                        .icon.icon-xl.bg-primary-light.mx-auto.mb-3
+                            +svgIcon('chart-1', 'text-primary')
+                        .row.position-relative(style='top: 10px;')
+                            .col-6.text-center
+                                p.text-muted.text-sm Happy
+                                .h4.mb-0.text-pink 456
+                            .col-6.text-center
+                                p.text-muted.text-sm Ecstatic
+                                .h4.mb-0.text-cyan 125
+
+            .col-lg-6.mb-4
+                .card.h-100
+                    .card-header.py-4
+                        h6.card-heading Plan
+                    .card-body.pt-3
+                        .h2.mb-3 
+                            | 78.2% 
+                           
+
+                        - const plan = []
+                        - plan.push({title: 'Sales', value: 78, class: 'primary' })
+                        - plan.push({title: 'Ads', value: 48, class: 'success' })
+                        - plan.push({title: 'Campaigns', value: 88, class: 'pink' })
+                        - plan.push({title: 'Subscribers', value: 98, class: 'indigo' })
+
+                        each val, index in plan
+                            .row.align-items-center(class=`${index + 1 != plan.length ? 'mb-3' : ''}`)
+                                .col-sm-3.text-muted.text-sm #{val.title}
+                                .col-sm-7
+                                    .progress
+                                        .progress-bar(role="progressbar",  aria-valuenow=val.value, aria-valuemin="0",aria-valuemax="100", style=`width:${val.value}%`, class=`bg-${val.class}`)
+                                .col-sm-2.text-muted.text-sm #{val.value}%
+                                
+        .row.mb-5
+            each val in widget4 
+                +widgetStats8(val, index, 'col-md-4 mb-4')               
+
+        .row.mb-5
+            each val in widget1
+                +widgetStats11(val, index, 'col-md-6 col-xl-3 mb-4')                
+
+        .row.mb-5
+            each val in widget1
+                +widgetStats9(val, index, 'col-md-6 col-xl-3 mb-4')                
+
+        .row.mb-5
+            each val in widget1
+                +widgetStats10(val, index, 'col-md-6 col-lg-3 mb-4')                 
+
+        .row.mb-5
+            each val in widget1
+                +widgetStats3(val, index, 'col-md-6 col-lg-3')
+
+        .pb-5
+            .card.mb-4
+                .card-body
+                    .row.g-5
+                        each val, index in widget1
+                            +widgetStats2(val, index, 'col-md-6 col-xl-3')

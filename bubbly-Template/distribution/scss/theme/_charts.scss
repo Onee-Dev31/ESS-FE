@@ -1,0 +1,76 @@
+/*
+* ==========================================================
+*     CHARTS
+* ==========================================================
+*/
+
+
+.gauge-container {
+  position: relative;
+}
+
+.gauge-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto !important;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.gauge-label {
+  display: inline-block;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+}
+
+
+*[hidden] {
+  display: none;
+}
+
+.sparkline--tooltip {
+  position: absolute;
+  padding: 2px 5px;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(0, 0, 0, .7);
+  font-size: 12px;
+  z-index: 9999;
+}
+
+.sparkline--cursor {
+  stroke: orange;
+}
+
+.sparkline--spot {
+  fill: red;
+  stroke: red;
+}
+
+
+$sparklineColors: (red: #dc2b33,
+  blue: #3d85de,
+  green: #4c9b4c,
+  gray: #777,
+  orange: #e36023,
+  purple: #573585,
+  yellow: #fdd700,
+  pink: #db3b9e);
+
+.sparkline {
+  fill: none;
+}
+
+@each $name,
+$color in $sparklineColors {
+  .sparkline--#{"" + $name} {
+    stroke: $color;
+  }
+
+  .sparkline--#{"" + $name}.sparkline--filled {
+    fill: rgba($color, .3);
+  }
+}

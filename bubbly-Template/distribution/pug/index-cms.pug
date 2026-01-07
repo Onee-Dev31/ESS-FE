@@ -1,0 +1,165 @@
+extends _pug-includes/layout.pug
+
+
+block vars 
+    - var home = true; 
+    - var current = "index-cms.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'CMS Dashboard'})   
+
+block content
+
+    include _pug-includes/inc-datatable-data.pug
+
+    include _pug-includes/inc-post-data
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-data-tickets.pug
+    
+    include _pug-includes/inc-data-widget.pug
+
+    +pageHeader('CMS Dashboard')
+
+    section.mb-3.mb-lg-5
+
+        .row.mb-3
+            each val, index in widget1
+                +widgetStats9(val, index, 'col-sm-6 col-lg-3 mb-4')
+
+        .row.mb-3
+            // <At a glance>
+            .col-lg-5
+                .card.mb-4
+                    .card-header
+                        h5.card-heading At a glance
+                        +cardOptions
+                        
+                    .card-body
+
+                        - var atGlance = []
+                        - atGlance.push({name: '<strong>112</strong> Posts', icon: 'reading-1', textClass: 'blue', bgClass: 'blue'})
+                        - atGlance.push({name: '<strong>5</strong> Pages', icon: 'news-1',  textClass: 'blue', bgClass: 'blue'})
+                        - atGlance.push({name: '<strong>283</strong> Comments', icon: 'chat-bubble-1',  textClass: 'blue', bgClass: 'blue'})
+                        - atGlance.push({name: '<strong>4</strong> Comments in moderation', icon: 'time-1',  textClass: 'blue',  bgClass: 'blue'})
+
+                        ul.row.list-unstyled.card-text.gy-4
+                            each val, index in atGlance
+                                li.col-sm-6.d-flex.align-items-center
+                                    .icon.icon-md.me-2(class=`bg-${val.bgClass}-light`)
+                                        +svgIcon(val.icon, 'text-' + val.textClass + ' svg-icon-sm') 
+                                    a.text-dark.text-sm(href="#!") !{val.name}
+
+                        - var atGlance = []
+                        - atGlance.push({name: '112 Posts', icon: 'reading-1'})
+                        - atGlance.push({name: '5 Pages', icon: 'news-1'})
+                        - atGlance.push({name: '283 Comments', icon: 'chat-bubble-1'})
+                        - atGlance.push({name: '4 Comments in moderation', icon: 'time-1'})
+                    
+                    .card-footer.py-4
+                        p.text-muted.card-text.text-sm WordPress 5.9 running <a href="#!">Bubbly theme</a>.
+                
+                .card
+                    .card-header
+                        h5.card-heading Site health status
+                        +cardOptions                    
+                    .card-body
+                        .d-md-flex.align-items-center
+                            .icon.icon-xl.bg-orange-light.mx-auto.me-3
+                                +svgIcon('first-aid-kit-1', 'text-orange')
+                            .text-muted
+                                p.card-text Your site has critical issues that should be addressed as soon as possible to improve its performance and security.
+                                p.card-text Take a look at the 8 items on the <a href="#!">Site Health screen</a>.
+                                    
+            // </At a glance>
+
+            .col-lg-7.mb-5
+                .card
+                    .card-header
+                        h5.card-heading Quick Draft
+                        +cardOptions                
+                    .card-body
+                        .mb-4
+                            label.form-label(for="quickDraftTitle") Title
+                            input.form-control#quickDraftTitle(type="text")
+                            .form-text The title is how it appears on your site.
+                                
+                        .mb-4
+                            label.form-label(for="quickDraftText") Content
+                            textarea#quickDraftText.form-control(name="quickDraftText", rows=5, placeholder="What's on your mind?")
+                            .form-text The description is not prominent by default; however, some themes may show it.
+
+                        
+                        button.btn.btn-primary Save draft
+
+                    .card-footer.py-4
+                        h6 Your Recent Drafts
+                        
+                        ul.list-unstyled.text-sm.card-text
+                            li.mb-2
+                                a(href="#!") Gear
+                                time.text-muted January 5, 2022
+                            li 
+                                a(href="#!") Stories
+                                time.text-muted January 2, 2022
+
+            .col-lg-8 
+                .card.card-table
+                    .card-header
+                        h5.card-heading  Latest Posts
+                        +cardOptions
+                    .preload-wrapper.text-sm
+                        table#postDatatable.table.table-hover.align-middle.mb-0
+                            thead
+                                tr
+                                    th 
+                                    th Title
+                                    th Author
+                                    th Categories
+                                    th Date
+                
+                            tbody
+                                each val, index in dataTable
+
+                                    if index < 20
+                                    
+                                        - imageIndex = index % imageCount;
+                                        - categoryIndex = index % categoryCount;
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+
+                                        tr
+                                            td <span class="form-check"><input class="form-check-input" type="checkbox"></span>
+                                            td 
+                                                a.text-reset.text-decoration-none(href="cms-post-new.html")
+                                                    img.img-fluid.rounded.me-3(src='img/photos/w-100/' + images[imageIndex], alt=val.company, width="75")
+                                                    strong #{val.company}
+                                            td #{val.person}
+                                            td #{categories[categoryIndex].name}
+                                            td 2021/#{month}/#{day}
+
+                        span#categoryBulkAction.me-2
+                            select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                                option Bulk Actions
+                                option Delete
+                            button.btn.btn-sm.btn-outline-primary.align-top Apply
+
+            // <Authors>
+            .col-lg-4
+                .card.h-100
+                    .card-header
+                        h5.card-heading  Popular Authors
+                        +cardOptions
+                    .card-body.pb-2
+                        each val, index in dataTable
+                            if (index < 8)                    
+                                .d-flex.align-items-center.mb-3
+                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                    .mt-1
+                                       a.text-dark.fw-bold.text-decoration-none(href='#!') #{val.person}
+                                       p.text-muted.text-sm.mb-0 #{val.company}
+                        
+                    .card-footer.text-end
+                        a.btn.btn-outline-primary(href='#!') View all people
+            // </Authors>

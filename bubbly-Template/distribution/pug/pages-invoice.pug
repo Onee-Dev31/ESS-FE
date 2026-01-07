@@ -1,0 +1,109 @@
+extends _pug-includes/layout
+
+block vars 
+    - var pages = true;
+    - var current = 'pages-invoice.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Invoice'})   
+
+block content
+        +breadcrumbs(breadcrumbs)
+        +pageHeader('Invoice')
+        
+        section
+
+                    // Invoice heading
+                    .row.mb-5
+                        .col-sm-6.d-sm-flex.align-items-center
+                            h2.h4.display.mb-4.mb-sm-0  Invoice #20190204
+                        .col-sm-6
+                            p.text-sm-end.mb-0
+                                button.btn.btn-outline-secondary.mb-2.mb-sm-0 Download
+                                button.btn.btn-primary.mb-2.mb-sm-0 Pay
+
+                    // Invoice
+                    .card.card-body.p-5.mb-5
+                        .row
+                            .col.text-end
+                                // Badge
+                                .badge.bg-danger
+                                    | Overdue
+                        .text-center.mb-5
+                            // Logo
+                            img.img-fluid.mb-4(src='img/brand/brand-1.svg', alt='...', style='max-width: 6rem;')
+                            // Heading
+                            h2.mb-2
+                                | Invoice from Vintage, Ltd.
+                            p.text-muted
+                                | Invoice #20190204
+                        .row
+                            .col-12.col-md-6
+                                h6.text-uppercase.text-muted
+                                    | Invoiced from
+                                p.text-muted.mb-4
+                                    strong.text-body Franz Kafka
+                                    br
+                                    |  Bank Clerk
+                                    br
+                                    |  Nerudova 23
+                                    br
+                                    | 111 50 Praha
+                                h6.text-uppercase.text-muted
+                                    | Invoiced ID
+                                p.mb-4
+                                    | #20190204
+                            .col-12.col-md-6.text-md-right
+                                h6.text-uppercase.text-muted
+                                    | Invoiced to
+                                p.text-muted.mb-4
+                                    strong.text-body Jack London
+                                    br
+                                    |  Lonely Wolf
+                                    br
+                                    | 1150 Lost St.
+                                    br
+                                    |   Middle of Nowhere
+                                h6.text-uppercase.text-muted
+                                    | Due date
+                                p.mb-4
+                                    time(datetime='2018-04-23') Feb 23, 2021
+                        .row
+                            .col-12
+                                // Table
+                                .table-responsive
+                                    table.table.my-4
+                                        thead
+                                            tr
+                                                th.px-0.bg-transparent.border-top-0
+                                                    span.h6 Description
+                                                th.px-0.bg-transparent.border-top-0
+                                                    span.h6 Hours
+                                                th.px-0.bg-transparent.border-top-0.text-end
+                                                    span.h6 Cost
+                                        tbody
+                                            tr
+                                                td.px-0
+                                                    | Novel proofreading
+                                                td.px-0
+                                                    | 50
+                                                td.px-0.text-end
+                                                    | $9230
+                                            tr
+                                                td.px-0
+                                                    | Consulting
+                                                td.px-0
+                                                    | 3
+                                                td.px-0.text-end
+                                                    | $333
+                                            tr
+                                                td.px-0.border-top
+                                                    strong Total amount due
+                                                td.px-0.text-end.border-top(colspan='2')
+                                                    span.h3
+                                                        | $9533
+                                hr.my-5
+                                h6.text-uppercase
+                                    | Note
+                                p.text-muted.text-sm.mb-0 #{dummyText[0]}
+

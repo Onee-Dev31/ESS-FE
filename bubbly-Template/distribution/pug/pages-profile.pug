@@ -1,0 +1,156 @@
+extends _pug-includes/layout
+
+block vars 
+    - var pages = true;
+    - var current = 'pages-profile.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Profile'})   
+
+block content
+        +breadcrumbs(breadcrumbs)
+        +pageHeader('Profile')
+        
+        section
+            .row
+                .col-lg-4
+                    .card.card-profile.mb-4
+                        .card-header(style='background-image: url(img/photos/paul-morris-116514-unsplash.jpg);') 
+                        .card-body.text-center
+                            img.card-profile-img(src='img/avatar-7.jpg', alt="Nathan Andrews")
+                            h3.mb-3 Nathan Andrews
+                            p.mb-4
+                                | #{dummyText[0].substring(0,50)}
+                            button.btn.btn-outline-dark.btn-sm
+                                span.fab.fa-twitter
+                                |  Follow
+                    .card.mb-4
+                        .card-body
+                            .d-flex.align-items-center
+                                .flex-shrink-0
+                                    img.avatar.avatar-lg.p-1(src="img/avatar-7.jpg", alt="Nathan Andrews")
+                                .flex-grow-1.ps-3
+                                    h4 Nathan Andrews
+                                    p.text-muted.mb-0 Coder
+                                    ul.social-links.list-inline.mb-0.mt-2
+                                        li.list-inline-item
+                                            a(href='javascript:void(0)', data-bs-toggle='tooltip', data-placement="top", title="Nathan's Facebook")
+                                                i.fab.fa-facebook
+                                        li.list-inline-item
+                                            a(href='javascript:void(0)', data-bs-toggle='tooltip',  data-placement="top", title='@nathan_andrews')
+                                                i.fab.fa-twitter
+                                        li.list-inline-item
+                                            a(href='javascript:void(0)', data-bs-toggle='tooltip',  data-placement="top", title='+420777555987')
+                                                i.fa.fa-phone
+                                        li.list-inline-item
+                                            a(href='javascript:void(0)', data-bs-toggle='tooltip',  data-placement="top", title='@nathan')
+                                                i.fab.fa-skype
+                    form.card.mb-4
+                        .card-header
+                            h4.card-heading My Profile
+                        .card-body
+                                .row.mb-3
+                                    .col-auto.d-flex.align-items-center
+                                        img.avatar.avatar-lg.p-1(src='img/avatar-7.jpg', alt="Avatar")
+                                    .col
+                                        
+                                            label.form-label Name
+                                            input.form-control(placeholder='Your name')
+                                .mb-3 
+                                    label.form-label Bio
+                                    textarea.form-control(rows='8') #{dummyText[1]}
+                                .mb-3 
+                                    label.form-label Email
+                                    input.form-control(placeholder='you@domain.com')
+                                
+                                label.form-label Password
+                                input.form-control(type='password', value='password')
+
+                        .card-footer.text-end
+                            button.btn.btn-primary Save
+                .col-lg-8
+
+                    - var chat = []
+                    - chat.push({author: 'Nathan Andrews', time: '10 mins ago', avatar: "img/avatar-7.jpg", text: dummyText[0], answers: [{author: 'Serenity Mitchelle', avatar: "img/avatar-3.jpg", text: dummyText[1]}, {author: 'Tony O\'Brian', avatar: "img/avatar-1.jpg", text: dummyText[2]}]})
+                    - chat.push({author: 'Nathan Andrews', time: '12 mins ago', avatar: "img/avatar-7.jpg", text: dummyText[3]})
+                    - chat.push({author: 'Nathan Andrews', time: '34 mins ago', avatar: "img/avatar-7.jpg", text: dummyText[4], answers: [{author: 'Javier Gregory', avatar: "img/avatar-6.jpg", text: dummyText[5]}]})                        
+
+
+                    .card.overflow-hidden.mb-4
+                        .card-header
+                            .input-group
+                                input.form-control(type='text', placeholder='Message')
+                                button.btn.btn-outline-secondary(type='button')
+                                    i.fa.fa-paper-plane
+                        
+                        .list-group.rounded-0
+                            each val, index in chat
+                                .list-group-item.border-start-0.border-end-0.py-5(class=(index == 0)? "border-top-0" : "")
+                                    .d-flex
+                                        .flex-shrink-0
+                                            img.avatar.avatar-lg.p-1(src=val.avatar, alt=val.author)
+                                        .flex-grow-1.ps-3
+                                            small.float-right #{val.time}
+                                            h5.fw-bold #{val.author}
+                                            .text-muted.text-sm  #{val.text}
+                                                
+                                            if val.answers
+                                                each answer in val.answers
+                                                    .d-flex.mt-4
+                                                        .flex-shrink-0
+                                                            img.avatar.avatar-md.p-1(src=answer.avatar, alt=answer.author)
+                                                        .flex-grow-1.ps-3.text-sm.text-muted
+                                                            strong.text-dark #{answer.author}: 
+                                                            | #{answer.text}
+                            
+                    form.card.mb-4
+                        .card-header
+                            h4.card-heading Edit Profile
+                        .card-body
+                            .row
+                                .col-md-5
+                                    .mb-4
+                                        label.form-label Company
+                                        input.form-control(type='text', placeholder='Company', value='Nathan & Nathan')
+                                .col-sm-6.col-md-3
+                                    .mb-4
+                                        label.form-label Username
+                                        input.form-control(type='text', placeholder='Username', value='nathan')
+                                .col-sm-6.col-md-4
+                                    .mb-4
+                                        label.form-label Email address
+                                        input.form-control(type='email', placeholder='Email')
+                                .col-sm-6.col-md-6
+                                    .mb-4
+                                        label.form-label First Name
+                                        input.form-control(type='text', placeholder='First name')
+                                .col-sm-6.col-md-6
+                                    .mb-4
+                                        label.form-label Last Name
+                                        input.form-control(type='text', placeholder='Last Name')
+                                .col-md-12
+                                    .mb-4
+                                        label.form-label Address
+                                        input.form-control(type='text', placeholder='Home Address')
+                                .col-sm-6.col-md-4
+                                    .mb-4
+                                        label.form-label City
+                                        input.form-control(type='text', placeholder='City')
+                                .col-sm-6.col-md-3
+                                    .mb-4
+                                        label.form-label ZIP
+                                        input.form-control(type='number', placeholder='ZIP')
+                                .col-md-5
+                                    .mb-4
+                                        label.form-label Country
+                                        select.form-control.custom-select
+                                            option(value='') UK
+                                            option(value='') US
+                                .col-md-12
+                                    .mb-0
+                                        label.form-label About Me
+                                        textarea.form-control(rows='5', placeholder='Here can be your description') #{dummyText[1]}
+                                            
+                        .card-footer.text-end
+                            button.btn.btn-primary(type='submit') Update Profile
+

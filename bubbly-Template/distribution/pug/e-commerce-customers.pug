@@ -1,0 +1,88 @@
+extends _pug-includes/layout
+
+block vars 
+    - var eCommerce = true;
+    - var current = 'e-commerce-customers.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Customers'}) 
+
+block content
+
+        +breadcrumbs(breadcrumbs)
+
+        // Page Header
+        .page-header
+            h1.page-heading Customers
+            ul.list-inline.text-sm
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-upload.me-2 
+                        | Import
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-download.me-2 
+                        | Export
+
+
+        include _pug-includes/inc-datatable-data.pug
+
+        include _pug-includes/inc-data-badges.pug
+
+        .card.card-table.mb-4
+
+            .card-body
+                .preload-wrapper
+                    .table-responsive
+                        table#customersDatatable.table.table-hover.mb-0
+                            thead
+                                tr
+                                    th Customer
+                                    th City
+                                    th Email
+                                    th Phone
+                                    th Status
+                                    th Orders
+                                    th Spent
+                            tbody
+                                each val, index in dataTable
+                                    if (index < 20)
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                        - price = Math.floor((Math.random() * 90) + 1) + Math.random().toFixed(2);
+                                        - badgeIndex  = index % badges.length
+                                        - avatarIndex = index % 11
+                                        - badgeClass = 'badge-success-light'
+                                        - badgeText = 'Active'
+                                        - avatarTextClass = 'avatar-primary-light'
+                                        if (index % 2)
+                                            - avatarTextClass = 'avatar-warning-light'
+                                        if (!val.isActive) 
+                                            - badgeClass = 'badge-danger-light'
+                                            - badgeText = 'Inactive'                                        
+
+                                        tr.align-middle.text-muted.text-sm
+                                            td.text-dark.text-base(style='min-width: 250px;')
+                                                input.me-2.mt-3.form-check-input(type="checkbox", id="check" + index)
+                                                a.text-reset.text-decoration-none(href="#!")
+                                                    if (avatarIndex % 3 == 0)
+                                                        if (index % 2)
+                                                        span.avatar.p-1.me-2
+                                                            span.avatar-text(class=avatarTextClass)
+                                                                | #{val.person.substr(0,1)}
+                                                    else
+                                                        img.avatar.p-1.me-2(src=`img/avatar-${avatarIndex}.jpg` alt=dataTable[index].person)
+                                                    strong #{val.person}
+                                            td #{val.city}
+                                            td #{val.email}
+                                            td #{val.phone}
+                                            td.text-base 
+                                                span.badge(class=badgeClass) #{badgeText}
+                                            td #{val.orders + 2}
+                                            td $#{price}
+                                            
+                    span#categoryBulkAction.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply

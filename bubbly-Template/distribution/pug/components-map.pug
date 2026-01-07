@@ -1,0 +1,73 @@
+extends _pug-includes/layout
+
+block vars
+    - var components = true;
+    - var current = 'components-map.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Maps'})    
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Maps') 
+            
+    section
+        .row
+            .col-xl-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Basic Map - One marker 
+                    .card-body 
+                        p This is a basic Leaflet map implementation with a custom marker. Everything is for you and this map can be created by calling a simple function.
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample">Show code sample</a>
+                        .collapse#codeSample
+                            pre
+                                code.language-js.
+                                    // coordinates for the center of the map and the marker
+                                    var lat = 40.732346;
+                                    var long = -74.0014247;
+                                    var markerImage = 'img/map-marker-default.svg';
+                                    // id of the map DOM element
+                                    var id = 'map-3';
+                                    createBasicMap(id, lat, long, markerImage);
+
+                        #map-3.map(style="height: 400px;")                                                                       
+            .col-xl-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Styled Map - One marker
+                    .card-body
+                        p An example of the styled Leaflet map with a custom marker. You can easily replace the look by changin to another theme from <a href="https://leaflet-extras.github.io/leaflet-providers/preview/">Leaflet Providers</a>.
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample2">Show code sample</a>
+                        .collapse#codeSample2                       
+                            pre
+                                code.language-js.
+                                    // coordinates for the center of the map and the marker
+                                    var lat = 40.732346;
+                                    var long = -74.0014247;
+                                    var markerImage = 'img/map-marker-default.svg';
+                                    // id of the map DOM element
+                                    var id = 'map-1';
+                                    createSimpleMap(id, lat, long, markerImage);
+
+                        #map-1.map(style="height: 400px;")                                                                       
+        .card.mb-4
+            .card-header
+                h4.card-heading Styled Map - Multiple markers with infobox, images and structured content from JSON
+            .card-body
+                p More complex implementation: data are loaded from a JSON file and custom infobox with an image is used in this example. Again, everything's prepared for you.
+
+                p.show-code-sample
+                    a(data-bs-toggle="collapse" href="#codeSample3") Show code sample
+                .collapse#codeSample3      
+                    pre
+                        code.language-js.
+                            var options = {
+                                jsonFile: 'data/restaurants-geojson.json',
+                                markerPath: 'img/map-marker-default.png',
+                                mapId: 'map-2'
+                            }
+
+                            createAdvancedMap(options);
+
+                #map-2.map(style="height: 600px;")        

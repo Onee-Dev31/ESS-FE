@@ -1,0 +1,65 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var components = true;
+    - var current = 'components-notifications.html';   
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Notifications'})    
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Notifications') 
+
+    section
+        .card
+            .card-header
+                h4.card-heading Notifications
+
+            .card-body
+
+                p.text-muted  Toasts are lightweight notifications designed to mimic the push notifications that have been popularized by mobile and desktop operating systems. They’re built with flexbox, so they’re easy to align and position.
+                p.text-muted Read more about toast in the official <a href="https://getbootstrap.com/docs/5.0/components/toasts/">Bootstrap Docs</a>. 
+                p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample">Show code sample</a>
+
+                .collapse#codeSample
+                    pre.code-sample
+                        code.language-js
+                            +escape
+                                include js/components-notifications.js
+
+                p 
+                    button.btn.btn-success.toast-btn(type='button', data-target="liveToast") Success Message
+                p
+                    button.btn.btn-danger.toast-btn(type='button', data-target="liveToast2") Error Message
+                p
+                    button.btn.btn-info.toast-btn(type='button', data-target="liveToast3") Info Message
+
+                .toast-container.position-fixed.z-index-50.bottom-0.end-0.p-3
+                    #liveToast.toast.hide(role='alert', aria-live='assertive', aria-atomic='true')
+                        .toast-header
+                            span.dot.bg-success.me-2
+                            .card-heading.text-dark.me-auto Bubbly 
+                            small 11 mins ago
+                            button.btn-close(type='button' data-bs-dismiss='toast' aria-label='Close')
+                        .toast-body.text-muted
+                            | Hello, world! This is a toast message.
+
+                    #liveToast2.toast.hide(role='alert', aria-live='assertive', aria-atomic='true')
+                        .toast-header
+                            span.dot.bg-danger.me-2
+                            .card-heading.text-dark.me-auto Bubbly 
+                            small 11 mins ago
+                            button.btn-close(type='button' data-bs-dismiss='toast' aria-label='Close')
+                        .toast-body.text-muted
+                            | Hello, world! This is a toast message.
+
+                    #liveToast3.toast.hide(role='alert', aria-live='assertive', aria-atomic='true')
+                        .toast-header
+                            span.dot.bg-info.me-2
+                            .card-heading.text-dark.me-auto Bubbly 
+                            small 11 mins ago
+                            button.btn-close(type='button' data-bs-dismiss='toast' aria-label='Close')
+                        .toast-body.text-muted
+                            | Hello, world! This is a toast message.

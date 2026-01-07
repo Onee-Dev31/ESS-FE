@@ -1,0 +1,225 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var forms = true;
+    - var current = 'forms-advanced.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Advanced forms'})   
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Advanced forms')  
+
+    section
+        .row
+            .col-lg-6
+                // No UI Slider
+                .card.mb-4
+                    .card-header
+                        h4.card-heading No UI Slider
+                    .card-body.text-muted 
+                        p noUiSlider is a lightweight range slider with multi-touch support and a ton of features. It supports non-linear ranges, requires no external dependencies, has keyboard support, and it works great in responsive designs. 
+                        p Read more about this component at <a href="https://refreshless.com/nouislider/">GitHub</a>.
+
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample">Show code sample</a>
+
+                        .collapse#codeSample
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        var basicNoUISlider = document.getElementById("basicNoUISlider");
+                                        if (basicNoUISlider) {
+                                            noUiSlider.create(basicNoUISlider, {
+                                                start: [20, 80],
+                                                snap: false,
+                                                connect: true,
+                                                range: {
+                                                    min: [0],
+                                                    max: [100],
+                                                },
+                                            });
+                                        }
+                        form
+                            .nouislider.text-primary
+                                #basicNoUISlider
+
+                            .nouislider.mt-5
+                                #stepNoUISlider
+
+                // Choices.js
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Choices.js
+                    .card-body.text-muted
+                        p A vanilla, lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the jQuery dependency.
+                        p Read more about Choices.js on <a href="https://github.com/jshjohnson/Choices">GitHub</a>.
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample3">Show code sample</a>
+
+                        .collapse#codeSample3
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const choices = new Choices(document.querySelector(".choices-1"), {
+                                            placeholder: true,
+                                            searchPlaceholderValue: "Search",
+                                            itemSelectText: "Select",
+                                        });
+
+                                        const textRemove = new Choices(document.getElementById("choices-text-remove-button"), {
+                                            delimiter: ",",
+                                            editItems: true,
+                                            maxItemCount: 5,
+                                            removeItemButton: true,
+                                        });
+
+                                        const multipleChoices = new Choices("#choices-multiple", {
+                                            removeItemButton: true,
+                                        });
+                                        
+                        form.form-horizontal.mt-5
+                            .row.mb-4
+                                label.col-sm-3.form-label Select with search field
+                                .col-sm-9
+                                    select.choices-1
+                                        option Mustard
+                                        option Ketchup
+                                        option Relish
+                            .row.mb-4
+                                label.col-sm-3.form-label Text Tags
+                                .col-sm-9
+                                    input#choices-text-remove-button.form-control(type='text' value='preset-1,preset-2' placeholder='Enter something')
+
+                            .row.mb-4
+                                label.col-sm-3.form-label Select displayed as tags - multiple choice
+                                .col-sm-9
+                                    select#choices-multiple.form-control(name='choices-multiple' multiple)
+                                        option(value='Choice 1' selected='') Choice 1
+                                        option(value='Choice 2') Choice 2
+                                        option(value='Choice 3') Choice 3
+                                        option(value='Choice 4') Choice 4
+
+            
+            .col-lg-6
+                // Datepickers
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Datepicker
+                    .card-body.text-muted
+                        p VanillaJS Datepicker is a vanilla JavaScript remake of bootstrap-datepicker.
+                        p.mb-4 Read more about VanillaJS Datepicker on <a href="https://github.com/mymth/vanillajs-datepicker">GitHub</a>.
+
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample2">Show code sample</a>
+
+                        .collapse#codeSample2
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const datepicker = new Datepicker(document.querySelector(".input-datepicker"), {
+                                            buttonClass: "btn",
+                                            format: "mm/dd/yyyy",
+                                        });
+
+                                        const datepickerAutoClose = new Datepicker(document.querySelector(".input-datepicker-autoclose"), {
+                                            buttonClass: "btn",
+                                            autohide: true,
+                                        });
+
+                                        const datepickerMultiple = new Datepicker(document.querySelector(".input-datepicker-multiple"), {
+                                            buttonClass: "btn",
+                                            maxNumberOfDates: 3,
+                                        });
+
+                                        const datepickerRange = new DateRangePicker(document.querySelector(".datepicker-range"), {
+                                            buttonClass: "btn",
+                                        });                   
+                        form
+                            .mb-3
+                                label.form-label Variant 1 - Date
+                                input.form-control.input-datepicker(type='text', value='10/20/2017') 
+                            .mb-3
+                                label.form-label Variant 2 - Autoclose
+                                input.form-control.input-datepicker-autoclose(type='text', value='06/22/1980') 
+                            .mb-3
+                                label.form-label Variant 3 - Multiple dates
+                                input.form-control.input-datepicker-multiple(type='text') 
+                            .mb-3
+                                label.form-label Variant 4 - DateRange
+                                .input-group.datepicker-range
+                                    input.form-control(type='text') 
+                                    span.input-group-text To
+                                    input.form-control(type='text') 
+        // imask Input maps
+        .card.mb-4
+            .card-header
+                h4.card-heading imask Input maps
+            .card-body
+                p.text-muted Input masks can be used to force the user to enter data conform a specific format. Unlike validation, the user can't enter any other key than the ones specified by the mask.
+                p.text-muted.mb-4 Read more about imask at <a href="https://imask.js.org/">project's homepage</a>.
+                p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample4">Show code sample</a>
+
+                .collapse#codeSample4
+                    pre.code-sample
+                        code.language-js
+                            +escape.
+                                var element = document.getElementById("isbn1");
+                                if (element) {
+                                    var maskOptions = {
+                                        mask: "000-00-000-0000-0",
+                                    };
+                                    var mask = IMask(element, maskOptions);
+                                }
+
+                                var element = document.getElementById("currency");
+                                if (element) {
+                                    var maskOptions = {
+                                        mask: "$ num",
+                                        blocks: {
+                                            num: {
+                                                // nested masks are available!
+                                                mask: Number,
+                                                thousandsSeparator: ",",
+                                                radix: ".",
+                                            },
+                                        },
+                                    };
+                                    var mask = IMask(element, maskOptions);
+                                }
+                .row
+                    .col-lg-6
+                        .mb-3   
+                            label.form-label ISBN 1
+                            input.form-control#isbn1(type='text')
+                            small.help-block-none e.g &quot;999-99-999-9999-9&quot;
+                        .mb-3
+                            label.form-label ISBN 2
+                            input.form-control#isbn2(type='text')
+                            small.help-block-none 999 99 999 9999 9
+                        .mb-3
+                            label.form-label ISBN 3
+                            input.form-control#isbn3(type='text')
+                            small.help-block-none 999/99/999/9999/9
+                        .mb-3
+                            label.form-label IPV4
+                            input.form-control#ip4(type='text')
+                            small.help-block-none 192.168.110.310
+                    .col-lg-6
+                        .mb-3
+                            label.form-label Tax ID
+                            input.form-control#taxId(type='text')
+                            span.font-13.text-muted 99-123456
+                        .mb-3
+                            label.form-label Phone
+                            input.form-control#phone(type='text')
+                            span.font-13.text-muted +1-907-555-0165
+                        .mb-3
+                            label.form-label Currency
+                            input.form-control#currency(type='text')
+                            span.font-13.text-muted $ 999,999,999.99
+                        .mb-3
+                            label.form-label Date
+                            input.form-control#date(type='text')
+                            span.font-13.text-muted 1980-06-22
+            
+            

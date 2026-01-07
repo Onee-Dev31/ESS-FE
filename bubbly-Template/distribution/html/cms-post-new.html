@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bubbly - Boootstrap 5 Admin template by Bootstrapious.com</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Google fonts - Popppins for copy-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+    <!-- Quill Themes-->
+    <link rel="stylesheet" href="vendor/quill/quill.snow.css">
+    <!-- VanillaJs Datepicker CSS-->
+    <link rel="stylesheet" href="vendor/vanillajs-datepicker/css/datepicker-bs4.min.css">
+    <!-- Prism Syntax Highlighting-->
+    <link rel="stylesheet" href="vendor/prismjs/plugins/toolbar/prism-toolbar.css">
+    <link rel="stylesheet" href="vendor/prismjs/themes/prism-okaidia.css">
+    <!-- The Main Theme stylesheet (Contains also Bootstrap CSS)-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/favicon.png">
+  </head>
+  <body>
+    <!-- navbar-->
+    <header class="header">
+      <nav class="navbar navbar-expand-lg px-4 py-2 bg-white shadow"><a class="sidebar-toggler text-gray-500 me-4 me-lg-5 lead" href="#"><i class="fas fa-align-left"></i></a><a class="navbar-brand fw-bold text-uppercase text-base" href="index.html"><span class="d-none d-brand-partial">Bubbly </span><span class="d-none d-sm-inline">Dashboard</span></a>
+        <ul class="ms-auto d-flex align-items-center list-unstyled mb-0">
+          <li class="nav-item dropdown">
+            <form class="ms-auto me-4 d-none d-lg-block" id="searchForm">
+              <div class="input-group input-group-sm input-group-navbar">
+                <input class="form-control" id="searchInput" type="search" placeholder="Search">
+                <button class="btn" type="button"> <i class="fas fa-search"></i></button>
+              </div>
+            </form>
+            <div class="dropdown-menu dropdown-menu-animated text-sm" id="searchDropdownMenu">
+              <h6 class="dropdown-header text-uppercase fw-normal">Recent pages</h6><a class="dropdown-item py-1" href="cms-post.html"> <i class="far fa-file me-2"> </i>Posts</a><a class="dropdown-item py-1" href="widgets-stats.html"> <i class="far fa-file me-2"> </i>Widgets</a><a class="dropdown-item py-1" href="pages-profile.html"> <i class="far fa-file me-2"> </i>Profile</a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Users</h6><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe"><span>Jason Doe</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams"><span>Frank Williams</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood"><span>Ashley Wood</span></a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Filters</h6><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-success-light">Posts</span><span class="text-xs">Search all posts</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-danger-light">Users</span><span class="text-xs">Only in users</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-warning-light">Campaigns</span><span class="text-xs">Only in campaigns</span></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown me-2"><a class="nav-link nav-link-icon text-gray-400 px-1" id="notifications" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#sales-up-1"> </use>
+                  </svg><span class="notification-badge bg-green"></span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="notifications"><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#"> 
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-green text-white"><i class="fas fa-envelope"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 6 new messages</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-blue text-white"><i class="fas fa-upload"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">Server rebooted</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"><small class="fw-bold text-uppercase">View all notifications</small></a>
+            </div>
+          </li>
+          <!-- Messages                        -->
+          <li class="nav-item dropdown me-2 me-lg-3"> <a class="nav-link nav-link-icon text-gray-400 px-1" id="messages" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#paper-plane-1"> </use>
+                  </svg><span class="notification-badge notification-badge-number bg-primary">10</span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="messages"><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Jason Doe</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Frank Williams</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Ashley Wood</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"> <small class="fw-bold text-uppercase">View all messages                          </small></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown ms-auto"><a class="nav-link pe-0" id="userInfo" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="avatar p-1" src="img/avatar-6.jpg" alt="Jason Doe"></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated" aria-labelledby="userInfo">
+              <div class="dropdown-header text-gray-700">
+                <h6 class="text-uppercase font-weight-bold">Mark Stephen</h6><small>Web Developer</small>
+              </div>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="#">Settings</a><a class="dropdown-item" href="#">Activity log       </a>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="login.html">Logout</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="d-flex align-items-stretch">
+      <div class="sidebar py-3" id="sidebar">
+        <h6 class="sidebar-heading">Main</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#dashboardsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#real-estate-1"> </use>
+                      </svg><span class="sidebar-link-title">Dashboards </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="dashboardsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index.html">Default</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-cms.html">CMS</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-e-commerce.html">E-commerce</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-projects.html">Projects</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-charts.html">Charts</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted active" href="#" data-bs-target="#cmsDropdown" role="button" aria-expanded="true" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#reading-1"> </use>
+                      </svg><span class="sidebar-link-title">CMS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse show" id="cmsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-post.html">Posts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link active text-muted" href="cms-post-new.html">Add new post</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-category.html">Categories</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-media.html">Media library</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#widgetsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#statistic-1"> </use>
+                      </svg><span class="sidebar-link-title">Widgets </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="widgetsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-stats.html">Stats</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-data.html">Data</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#e-commerceDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#delivery-truck-1"> </use>
+                      </svg><span class="sidebar-link-title">E-commerce </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="e-commerceDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-products.html">Products</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-product-new.html">Products - New</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-orders.html">Orders</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-order.html">Order - Detail</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-customers.html">Customers</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#pagesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#paper-stack-1"> </use>
+                      </svg><span class="sidebar-link-title">Pages </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="pagesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-profile.html">Profile</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-pricing.html">Pricing table</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-contacts.html">Contacts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-invoice.html">Invoice</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base.html">Knowledge base</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base-topic.html">Knowledge base - Topic</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#userDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#man-1"> </use>
+                      </svg><span class="sidebar-link-title">User </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="userDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login.html">Login page</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register.html">Register</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login-2.html">Login v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register-2.html">Register v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#componentsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#sorting-1"> </use>
+                      </svg><span class="sidebar-link-title">Components </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="componentsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-cards.html">Cards</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-calendar.html">Calendar</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-gallery.html">Gallery</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-loading-buttons.html">Loading buttons</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-map.html">Maps</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-notifications.html">Notifications</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-preloader.html">Preloaders</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#chartsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#pie-chart-1"> </use>
+                      </svg><span class="sidebar-link-title">Charts </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="chartsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts.html">Charts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts-gauge-sparkline.html">Gauge + Sparkline</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#formsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#file-storage-1"> </use>
+                      </svg><span class="sidebar-link-title">Forms </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="formsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms.html">Basic forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-advanced.html">Advanced forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-dropzone.html">Files upload</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-texteditor.html">Text editor</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-validation.html">Validation</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#tablesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#grid-1"> </use>
+                      </svg><span class="sidebar-link-title">Tables </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="tablesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables.html">Bootstrap tables</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables-datatable.html">Datatable</a></li>
+                </ul>
+              </li>
+        </ul>
+        <h6 class="sidebar-heading">Docs</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/introduction.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#angle-brackets-1"> </use>
+                      </svg><span class="sidebar-link-title">Introduction</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/directory-structure.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#table-content-1"> </use>
+                      </svg><span class="sidebar-link-title">Directory structure</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/gulp.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#keyboard-1"> </use>
+                      </svg><span class="sidebar-link-title">Gulp.js</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#cssDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#design-1"> </use>
+                      </svg><span class="sidebar-link-title">CSS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="cssDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/components-theme.html">CSS Components</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/customizing-css.html">Customizing CSS</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/credits.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#star-medal-1"> </use>
+                      </svg><span class="sidebar-link-title">Credits</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/changelog.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#new-1"> </use>
+                      </svg><span class="sidebar-link-title">Changelog</span></a></li>
+        </ul>
+      </div>
+      <div class="page-holder bg-gray-100">
+        <div class="container-fluid px-lg-4 px-xl-5">
+              <!-- Page Header-->
+              <div class="page-header">
+                <h1 class="page-heading">Add new post</h1>
+              </div>
+          <section>
+            <div class="row mb-5">
+              <div class="col-lg-8 col-xxl-9 mb-4 mb-lg-0">
+                <div class="card">
+                  <div class="card-body">
+                    <label class="form-label" for="postTitle">Title</label>
+                    <input class="form-control mb-4" id="postTitle" type="text">
+                    <button class="btn btn-outline-primary mb-4">Add Media</button>
+                    <div id="editorWithToolbar">
+                      <div id="toolbar-container"><span class="ql-formats">
+                          <select class="ql-font"></select>
+                          <select class="ql-size"></select></span><span class="ql-formats">
+                          <button class="ql-bold"></button>
+                          <button class="ql-italic"></button>
+                          <button class="ql-underline"></button>
+                          <button class="ql-strike"></button></span><span class="ql-formats">
+                          <select class="ql-color"></select>
+                          <select class="ql-background"></select></span><span class="ql-formats">
+                          <button class="ql-script" value="sub"></button>
+                          <button class="ql-script" value="super"></button></span><span class="ql-formats">
+                          <button class="ql-header" value="1"></button>
+                          <button class="ql-header" value="2"></button>
+                          <button class="ql-blockquote"></button>
+                          <button class="ql-code-block"></button></span><span class="ql-formats">
+                          <button class="ql-list" value="ordered"></button>
+                          <button class="ql-list" value="bullet"></button>
+                          <button class="ql-indent" value="-1"></button>
+                          <button class="ql-indent" value="+1"></button></span><span class="ql-formats">
+                          <button class="ql-direction" value="rtl"></button>
+                          <select class="ql-align"></select></span><span class="ql-formats">
+                          <button class="ql-link"></button></span><span class="ql-formats">
+                          <button class="ql-clean"></button></span></div>
+                      <div class="bg-white" id="editor-container" style="min-height: 300px; max-height: 1000px;overflow-y: auto;">
+                        <h2>Minas Tirith</h2>
+                        <p><br></p>
+                        <p>Pippin looked out from the shelter of Gandalf"s cloak. He wondered if he was awake or still sleeping, still in the swift-moving dream in which he had been wrapped so long since the great ride began. The dark world was rushing by and the wind sang loudly in his ears. He could see nothing but the wheeling stars, and away to his right vast shadows against the sky where the mountains of the South marched past. Sleepily he tried to reckon the times and stages of their journey, but his memory was drowsy and uncertain.</p>
+                        <p><br></p>
+                        <p>There had been the first ride at terrible speed without a halt, and then in the dawn he had seen a pale gleam of gold, and they had come to the silent town and the great empty house on the hill. And hardly had they reached its shelter when the winged shadow had passed over once again, and men wilted with fear. But Gandalf had spoken soft words to him, and he had slept in a corner, tired but uneasy, dimly aware of comings and goings and of men talking and Gandalf giving orders. And then again riding, riding in the night. This was the second, no, the third night since he had looked in the Stone. And with that hideous memory he woke fully, and shivered, and the noise of the wind became filled with menacing voices.</p>
+                        <p><br></p>
+                        <p>A light kindled in the sky, a blaze of yellow fire behind dark barriers Pippin cowered back, afraid for a moment, wondering into what dreadful country Gandalf was bearing him. He rubbed his eyes, and then he saw that it was the moon rising above the eastern shadows, now almost at the full. So the night was not yet old and for hours the dark journey would go on. He stirred and spoke.</p>
+                        <p><br></p>
+                        <p>"Where are we, Gandalf?" he asked.</p>
+                        <p><br></p>
+                        <p>"In the realm of Gondor," the wizard answered. "The land of Anórien is still passing by."</p>
+                        <p><br></p>
+                        <p>There was a silence again for a while. Then, "What is that?" cried Pippin suddenly, clutching at Gandalf"s cloak. "Look! Fire, red fire! Are there dragons in this land? Look, there is another!"</p>
+                        <p><br></p>
+                        <p>For answer Gandalf cried aloud to his horse. "On, Shadowfax! We must hasten. Time is short. See! The beacons of Gondor are alight, calling for aid. War is kindled. See, there is the fire on Amon Dîn, and flame on Eilenach; and there they go speeding west: Nardol, Erelas, Min-Rimmon, Calenhad, and the Halifirien on the borders of Rohan."</p>
+                        <p><br></p>
+                        <p>But Shadowfax paused in his stride, slowing to a walk, and then he lifted up his head and neighed. And out of the darkness the answering neigh of other horses came; and presently the thudding of hoofs was heard, and three riders swept up and passed like flying ghosts in the moon and vanished into the West. Then Shadowfax gathered himself together and sprang away, and the night flowed over him like a roaring wind.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-xxl-3">
+                <div class="card card-sm shadow-sm mb-4">
+                  <div class="card-header py-4">
+                    <h4 class="card-heading">Publish</h4>
+                  </div>
+                  <div class="card-body text-gray-700">
+                    <div class="d-flex mb-4 justify-content-between">
+                      <button class="btn btn-sm btn-outline-secondary">Save Draft</button>
+                      <button class="btn btn-sm btn-outline-secondary">Preview</button>
+                    </div>
+                    <hr class="bg-gray-500">
+                    <div class="mb-3">
+                       Status: <strong>Draft </strong><a class="ms-2 text-sm" data-bs-toggle="collapse" href="#collapseStatus" role="button" aria-expanded="false" aria-controls="collapseStatus">Edit</a>
+                      <div class="collapse" id="collapseStatus">
+                        <div class="py-2">
+                          <select class="form-select form-select-sm" aria-label="Default select example">
+                            <option>Draft</option>
+                            <option>Pending Review</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                       Visibility: <strong>Public </strong><a class="ms-2 text-sm" data-bs-toggle="collapse" href="#collapseVisibility" role="button" aria-expanded="false" aria-controls="collapseVisibility">Edit</a>
+                      <div class="collapse" id="collapseVisibility">
+                        <div class="py-2">
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="visibility" id="visibility1">
+                            <label class="form-check-label" for="visibility1">Public</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="visibility" id="visibility2">
+                            <label class="form-check-label" for="visibility2">Password protected</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="visibility" id="visibility3">
+                            <label class="form-check-label" for="visibility3">Private</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                       Publish <strong>immediately </strong><a class="ms-2 text-sm" data-bs-toggle="collapse" href="#collapsePublish" role="button" aria-expanded="false" aria-controls="collapsePublish">Edit</a>
+                      <div class="collapse" id="collapsePublish">
+                        <div class="py-3">
+                          <div class="row g-2">
+                            <div class="col-lg-6">    
+                              <input class="form-control form-control-sm" id="datePublished" value="10/20/2017">
+                            </div>
+                            <div class="col-lg-6">
+                              <div class="d-flex align-items-center text-sm"><span class="me-1">at</span>
+                                <input class="form-control form-control-sm text-center" id="hoursPublished" type="text" value="8"><span class="mx-1">:</span>
+                                <input class="form-control form-control-sm text-center" id="minutesPublished" type="text" value="00">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer text-end">
+                    <button class="btn btn-primary">Publish</button>
+                  </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                  <div class="card-header py-4">
+                    <h4 class="card-heading">Format</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format0" checked>
+                      <label class="form-check-label" for="format0">Standard</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format1">
+                      <label class="form-check-label" for="format1">Aside</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format2">
+                      <label class="form-check-label" for="format2">Image</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format3">
+                      <label class="form-check-label" for="format3">Video</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format4">
+                      <label class="form-check-label" for="format4">Quote</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="format" id="format5">
+                      <label class="form-check-label" for="format5">Link</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                  <div class="card-header py-4">
+                    <h4 class="card-heading">Categories</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-4">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category0">
+                        <label class="form-check-label" for="category0">Gear</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category1">
+                        <label class="form-check-label" for="category1">Stories</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category2">
+                        <label class="form-check-label" for="category2">Tips &amp; Tricks</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category3">
+                        <label class="form-check-label" for="category3">Trips</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="category" id="category4">
+                        <label class="form-check-label" for="category4">Uncategorized</label>
+                      </div>
+                    </div><a class="btn-link" href="#">+ Add New Category</a>
+                  </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                  <div class="card-header py-4">
+                    <h4 class="card-heading">Tags</h4>
+                  </div>
+                  <div class="card-body">
+                    <input class="form-control" id="tags" type="text" value="Tag 1, Tag 2" placeholder="Enter something">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6 text-center text-md-start fw-bold">
+                <p class="mb-2 mb-md-0 fw-bold">Your company &copy; 2023</p>
+              </div>
+              <div class="col-md-6 text-center text-md-end text-gray-400">
+                <p class="mb-0">Version 1.3.2</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- Choices.js-->
+    <script src="vendor/choices.js/public/assets/scripts/choices.min.js"></script>
+    <!-- VanillaJs DatePicker-->
+    <script src="vendor/vanillajs-datepicker/js/datepicker-full.min.js"></script>
+    <!-- Quill-->
+    <script src="vendor/quill/quill.min.js"></script>
+    <!-- Add New Post JS-->
+    <script src="js/cms-post-new.js"></script>
+    <!-- Main Theme JS File-->
+    <script src="js/theme.js"></script>
+    <!-- Prism for syntax highlighting-->
+    <script src="vendor/prismjs/prism.js"></script>
+    <script src="vendor/prismjs/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+    <script src="vendor/prismjs/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="vendor/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script type="text/javascript">
+      // Optional
+      Prism.plugins.NormalizeWhitespace.setDefaults({
+      'remove-trailing': true,
+      'remove-indent': true,
+      'left-trim': true,
+      'right-trim': true,
+      });
+          
+    </script>
+    <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  </body>
+</html>

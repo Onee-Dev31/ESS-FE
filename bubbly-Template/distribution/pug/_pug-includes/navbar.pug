@@ -1,0 +1,113 @@
+// navbar
+header.header
+    nav.navbar.navbar-expand-lg.px-4.py-2.bg-white.shadow
+        a.sidebar-toggler.text-gray-500.me-4.me-lg-5.lead(href="#")
+            i.fas.fa-align-left
+        a.navbar-brand.fw-bold.text-uppercase.text-base(href=`${path}index.html`)
+            span.d-none.d-brand-partial Bubbly 
+            span.d-none.d-sm-inline Dashboard
+                            
+                
+        ul.ms-auto.d-flex.align-items-center.list-unstyled.mb-0
+            li.nav-item.dropdown
+                form#searchForm.ms-auto.me-4.d-none.d-lg-block
+                    .input-group.input-group-sm.input-group-navbar
+                        input.form-control#searchInput(type="search", placeholder='Search')  
+                        button.btn(type='button') 
+                            i.fas.fa-search
+
+                .dropdown-menu.dropdown-menu-animated.text-sm#searchDropdownMenu
+                    h6.dropdown-header.text-uppercase.fw-normal Recent pages
+                    - recentPages = []
+                    - recentPages.push({title: 'Posts', url: 'cms-post.html'})
+                    - recentPages.push({title: 'Widgets', url: 'widgets-stats.html'})
+                    - recentPages.push({title: 'Profile', url: 'pages-profile.html'})
+                    each val, index in recentPages
+                        a.dropdown-item.py-1(href=val.url) 
+                            i.far.fa-file.me-2 
+                            | #{val.title}
+                    .dropdown-divider
+                    h6.dropdown-header.text-uppercase.fw-normal Users
+                    each val, index in ['Jason Doe', 'Frank Williams', 'Ashley Wood']
+                        a.dropdown-item.py-1(href="pages-profile.html") 
+                            img.avatar.avatar-xs.p-1.me-2(src=`${path}img/avatar-${index}.jpg`, alt=val)
+                            span #{val}
+                    .dropdown-divider
+                    h6.dropdown-header.text-uppercase.fw-normal Filters
+                    - filters = []
+                    - filters.push({title: 'Posts', target: 'Search all posts', badgeClass: 'badge-success-light'})
+                    - filters.push({title: 'Users', target: 'Only in users', badgeClass: 'badge-danger-light'})
+                    - filters.push({title: 'Campaigns', target: 'Only in campaigns', badgeClass: 'badge-warning-light'})
+                    each val, index in filters
+                        a.dropdown-item.py-1(href="#!") 
+                            span.badge.me-2(class=val.badgeClass) #{val.title}
+                            span.text-xs #{val.target}
+                        
+            li.nav-item.dropdown.me-2
+                a#notifications.nav-link.nav-link-icon.text-gray-400.px-1(href='#', data-bs-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                    +svgIcon('sales-up-1', 'svg-icon-md svg-icon-heavy')
+                    span.notification-badge.bg-green
+                .dropdown-menu.dropdown-menu-end.dropdown-menu-animated.text-sm(aria-labelledby='notifications')
+                    a.dropdown-item(href='#')
+                        .d-flex.align-items-center
+                            .icon.icon-sm.bg-indigo.text-white
+                                i.fab.fa-twitter
+                            .text.ms-2
+                                p.mb-0 You have 2 followers
+                                
+                    a.dropdown-item(href='#') 
+                        .d-flex.align-items-center
+                            .icon.icon-sm.bg-green.text-white
+                                i.fas.fa-envelope
+                            .text.ms-2
+                                p.mb-0 You have 6 new messages
+                                
+                    a.dropdown-item(href='#')
+                        .d-flex.align-items-center
+                            .icon.icon-sm.bg-blue.text-white
+                                i.fas.fa-upload
+                            .text.ms-2
+                                p.mb-0 Server rebooted
+                                
+                    a.dropdown-item(href='#')
+                        .d-flex.align-items-center
+                            .icon.icon-sm.bg-indigo.text-white
+                                i.fab.fa-twitter
+                            .text.ms-2
+                                p.mb-0 You have 2 followers
+                    .dropdown-divider
+                    a.dropdown-item.text-center(href='#')
+                        small.fw-bold.text-uppercase View all notifications
+
+            // Messages                        
+            li.nav-item.dropdown.me-2.me-lg-3 
+                a#messages.nav-link.nav-link-icon.text-gray-400.px-1(href='#', data-bs-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                    +svgIcon('paper-plane-1', 'svg-icon-md svg-icon-heavy')
+                    span.notification-badge.notification-badge-number.bg-primary 10
+                
+                - var messages = ['Jason Doe', 'Frank Williams', 'Ashley Wood']
+                
+                .dropdown-menu.dropdown-menu-end.dropdown-menu-animated.text-sm(aria-labelledby='messages')
+                    each val, index in messages
+                        a.dropdown-item.d-flex.align-items-center.p-3(href='#') 
+                            img.avatar.avatar-sm.p-1.me-2(src=`${path}img/avatar-${index}.jpg`, alt=val)
+                            .pt-1
+                                h6.fw-bold.mb-0 #{val}
+                                span.text-muted.text-sm Sent you a message
+                    .dropdown-divider
+                    a.dropdown-item.text-center(href='#') 
+                        small.fw-bold.text-uppercase View all messages                          
+    
+            li.nav-item.dropdown.ms-auto
+                a#userInfo.nav-link.pe-0(href='#', data-bs-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                    img.avatar.p-1(src=`${path}img/avatar-6.jpg`, alt="Jason Doe")
+                .dropdown-menu.dropdown-menu-end.dropdown-menu-animated(aria-labelledby='userInfo')
+                    .dropdown-header.text-gray-700
+                        h6.text-uppercase.font-weight-bold Mark Stephen
+                        small Web Developer
+                    .dropdown-divider
+                    a.dropdown-item(href='#') Settings
+                    a.dropdown-item(href='#') Activity log       
+                    .dropdown-divider
+                    a.dropdown-item(href=`${path}login.html`) Logout
+            

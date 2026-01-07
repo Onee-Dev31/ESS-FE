@@ -1,0 +1,188 @@
+/*
+*
+* =====================
+* Other
+* =====================
+*
+*/
+
+.dropdown-menu {
+    box-shadow: $box-shadow;
+}
+
+/* Notification badges for avatars, etc. */
+.notification-badge {
+    position: absolute;
+    top: 0.4rem;
+    right: -.2rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    text-align: center;
+    color: $white;
+    border-radius: 50%;
+
+    &.notification-badge-number {
+        top: 0rem;
+        right: -.4rem;
+        width: 1.2rem;
+        height: 1.2rem;
+        vertical-align: middle;
+        font-size: .7rem;
+        line-height: 1.2rem;
+    }
+
+}
+
+/* Notification dot */
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    &.dot-sm {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* To-do checked item */
+
+.todo .form-check-input:checked+.form-check-label {
+    text-decoration: line-through;
+    color: $gray-500;
+}
+
+/* Minor Nav tabs styling */
+
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
+    margin-bottom: -3px;
+    border-bottom-width: 5px;
+}
+
+.nav-tabs .nav-link {
+    border-right-width: 0;
+    border-left-width: 0;
+}
+
+/* Display content only on hover */ 
+
+.display-hover {
+    .display-hover-content {
+        opacity: 0;
+        @include ondrTransition;
+    }
+
+    &:hover,
+    &:focus {
+        .display-hover-content {
+            opacity: 1;
+        }
+    }
+}
+
+/* Divider in inline list */ 
+
+.list-inline-item.divider {
+    margin-left: $spacer;
+    padding-left: $spacer * 1.5;
+    border-left: solid 1px $gray-400;
+}
+
+/* Timeline listgroup */ 
+
+.list-group-timeline .list-group-item {
+    position: relative;
+    border: 0;
+    background-color: transparent;
+
+    &::before {
+        position: absolute;
+
+        left: 1.5rem;
+        height: 100%;
+        content: "";
+        border-left: 1px solid $gray-300;
+    }
+
+    &:first-child {
+        &::before {
+            top: 1.5rem;
+        }
+    }
+
+    &:last-child {
+        &::before {
+            height: 50%;
+        }
+    }
+
+}
+
+/* Button with three dots that triggers More options dropdown */ 
+
+.btn-header-more {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: $transition-base;
+    text-align: center;
+    vertical-align: middle;
+    color: $gray-500;
+    border-color: transparent;
+    border-radius: 1rem;
+    background-color: transparent;
+    font-weight: 400;
+    line-height: 1;
+
+    &:hover,
+    &:focus {
+        color: $primary;
+        background-color: tint-color($primary, 80%);
+    }
+}
+
+/* Scrollbars in Webkit - slim & rounded corners  */ 
+
+body *::-webkit-scrollbar {
+    width: 0.4rem;
+    height: .4rem;
+}
+
+body *::-webkit-scrollbar-thumb {
+    border-radius: 1rem;
+    background-color: $gray-400;
+
+}
+
+/* Dot indicator - used for chart legends and status indicators in badges */ 
+
+.indicator {
+    display: inline-block;
+    width: .6em;
+    height: .6em;
+    margin-right: .5em;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.badge .indicator {
+    width: 6px;
+    height: 6px;
+}
+
+/* Progress bar in tables */ 
+
+.progress-table {
+    flex-grow: 1;
+    height: $progress-height / 2;
+}
+
+.table-hover>tbody>tr:hover .progress-table {
+    background: $white;
+    transition: $transition-base;
+}

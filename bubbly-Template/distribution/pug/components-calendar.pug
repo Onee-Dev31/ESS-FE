@@ -1,0 +1,28 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var components = true;
+    - var current = 'components-calendar.html';    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Calendar'})
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Calendar') 
+            
+    section
+        .card.mb-4
+            .card-header
+                h4.card-heading Calendar
+            .card-body
+                p A JavaScript event calendar. Customizable and open source. Display a full-size drag-n-drop event calendar.
+                p FullCalendar is great for displaying events, but it isn't a complete solution for event content-management. See more about this great plugin at <a href="https://fullcalendar.io/">fullcalendar.io</a>.
+
+                p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample">Show code sample</a>
+                .collapse#codeSample
+                    pre.code-sample
+                        code.language-js
+                            +escape
+                                include js/components-calendar.js
+                #calendar

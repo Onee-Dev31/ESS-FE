@@ -1,0 +1,101 @@
+extends _pug-includes/layout
+
+block vars 
+    - var pages = true;
+    - var current = 'pages-knowledge-base.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Knowledge Base'})   
+
+block content
+        +breadcrumbs(breadcrumbs)
+        +pageHeader('Knowledge Base')
+        
+        .row.mb-3 
+            .col-lg-6
+                p #{dummyText[0]}
+        .row.mb-5
+            .col-lg-5
+                .input-group
+                    input.form-control(type='text' placeholder='Search Something ... ')
+                    button.btn.btn-outline-primary(type='submit')
+                        i.fa.fa-search
+
+        - var advantages = []
+        - advantages.push({name: 'Help & Documentation', icon:'destination-map-1', color: 'primary'})
+        - advantages.push({name: 'Developer Resources', icon:'laptop-screen-1', color: 'pink' })
+        - advantages.push({name: 'Chat With Us', icon:'chat-bubble-1', color: 'indigo'})
+        - advantages.push({name: 'FAQ', icon:'arrow-target-1', color: 'blue'})
+
+
+        .row.py-5.gy-4
+            each val, index in advantages
+                .col-sm-6.col-xl-4.col-xxl-3.mb-3.mb-lg-0.text-center
+                    .card.shadow-sm.hover-animate.h-100
+                        .card-body
+                            .icon.icon-xl.mx-auto.mb-4(class="bg-" + val.color + "-light")
+                                +svgIcon(val.icon, 'text-' + val.color)
+                            h3.h5 #{val.name}
+                            p.text-muted.text-sm.card-text #{dummyText[index].substr(0, 100)}
+                            a.stretched-link(href="pages-knowledge-base-topic.html") 
+                                span.sr-only See Topic        
+
+
+
+        .bg-white.py-5.mx-n3.mx-lg-n4.mx-xl-n5.px-3.px-lg-4.px-xl-5
+            .row.my-5.px-xl-5
+                .col-md-8
+                    p.subtitle.text-primary What do you need to know?  
+                    h2 Choose Your Topic
+                .col-md-4.d-lg-flex.align-items-center.justify-content-end
+                    a.text-muted.text-sm(href="#") 
+                        | See all topics
+                        i.fas.fa-angle-double-right.ms-2    
+
+            - topics = ['Introduction', 'Usage', 'Renting', 'Fees', 'Other']
+                
+            .row.gy-4.px-xl-5
+                each val in topics
+                    .col-lg-4.col-xxl-3
+                        h3.h5.text-dark.d-flex.align-items-center.mb-4
+                            a.text-reset(href='knowledge-base-topic.html')
+                                span.badge.badge-primary-light.py-1.me-1 #{val.length}
+                                | #{val}
+                            
+                        - subtopics = ['Sint consequat aliquip?', 'Adipisicing voluptate magna quis sunt dolor velit.', 'Ad pariatur anim magna?', 'officia aliqua fugiat ex?']
+
+                        ul.list-unstyled.ms-3.text-sm
+                            each subtopic in subtopics
+                                li.mb-2
+                                    a.text-muted(href='knowledge-base-topic.html') 
+                                        i.far.fa-file.me-2
+                                        | #{subtopic}
+
+
+        .row.bg-gray-200.py-5.mx-n3.mx-lg-n4.mx-xl-n5.px-3.px-lg-4.px-xl-5
+            .col-lg-10.col-xl-8.mx-auto.text-center.py-5
+                h4.subtitle.text-primary.mb-4 Get Support From Real People
+                p.text-muted.mb-5 #{dummyText[3]}
+
+                - support = [1, 2, 3, 4, 5]
+
+                ul.list-unstyled.d-flex.flex-wrap.justify-content-center
+                    each supportPerson in support
+                        li
+                            a(href="#")
+                                img.avatar.avatar-lg.p-1.hover-animate.mx-2(src=`${path}img/avatar-${supportPerson}.jpg`, alt='')
+
+        .row
+            .col-md-8.col-lg-6.col-xxl-4.mx-auto
+                .card.border-0.shadow.mt-n5.mb-5
+                    .card-header.bg-primary-100.py-4.border-0
+                        .d-flex.align-items-center.justify-content-between
+                                div
+                                    p.subtitle.text-sm.text-primary.mb-1 Drop Us a Line
+                                    h4.mb-0 Contact
+                                +svgIcon('ballpoint-pen-1', 'svg-icon svg-icon-light ms-3 text-primary flex-shrink-0 svg-icon-lg')
+
+                    .card-body
+                        p.text-muted.card-text #{dummyText[4]}
+                    .card-footer
+                        a.btn.btn-outline-primary(href='#') Let us know                                

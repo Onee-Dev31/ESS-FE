@@ -1,0 +1,82 @@
+extends _pug-includes/layout
+
+block vars 
+    - var eCommerce = true;
+    - var current = 'e-commerce-orders.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Orders'}) 
+
+block content
+
+        +breadcrumbs(breadcrumbs)
+
+        // Page Header
+        .page-header
+            h1.page-heading Orders
+            ul.list-inline.text-sm
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-upload.me-2 
+                        | Import
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-download.me-2 
+                        | Export
+
+
+        include _pug-includes/inc-datatable-data.pug
+
+        include _pug-includes/inc-data-badges.pug
+
+        .card.card-table.mb-4
+
+            .card-body
+                .preload-wrapper
+                    .table-responsive
+                        table#ordersDatatable.table.table-hover.mb-0
+                            thead
+                                tr
+                                    th Order Id
+                                    th Name
+                                    th Date
+                                    th Total Price
+                                    th Status
+                                    th Review
+                            tbody
+                                each val, index in dataTable
+                                    if (index < 20)
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                        - price = Math.floor((Math.random() * 90) + 1) + Math.random().toFixed(2);
+                                        - badgeIndex  = index % badges.length
+
+                                        tr.align-middle
+                                            td 
+                                                span.form-check
+                                                    input.form-check-input(type="checkbox", id="check" + index)
+                                                    label.form-check-label(for="check" + index) ##{index + 2458}
+                                            td 
+                                                strong #{val.person}
+                                                br
+                                                span.text-muted.text-sm #{val.email}
+                                            td 2021/#{month}/#{day}
+                                            td $#{price}
+                                            td
+                                                span.badge(class=badges[badgeIndex].badgeClass) #{badges[badgeIndex].title}
+                                            td.text-end(style="min-width: 125px;")
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-warning
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-warning
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-warning
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-warning
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-gray-500
+                    span#categoryBulkAction.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply

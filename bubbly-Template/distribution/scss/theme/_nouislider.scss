@@ -1,0 +1,74 @@
+/*
+* ===================================================
+*     NoUI Slider theming
+* ===================================================
+*/
+
+.nouislider {
+    min-height: 3rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.noUi-target {
+    height: 3px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 0;
+    background: #ddd;
+    box-shadow: none;
+}
+
+.noUi-horizontal .noUi-handle {
+    top: -5px;
+    right: -2px !important;
+    width: 3px;
+    height: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    background: $dark;
+    box-shadow: none;
+}
+
+.noUi-horizontal .noUi-handle::before,
+.noUi-horizontal .noUi-handle::after {
+    display: none;
+}
+
+.noUi-connect {
+    background: $dark;
+}
+
+.text-primary {
+
+    .noUi-handle,
+    .noUi-connect {
+        background: $primary;
+    }
+}
+
+.text-secondary {
+
+    .noUi-handle,
+    .noUi-connect {
+        background: $secondary;
+    }
+}
+
+.nouislider-values {
+    display: flex;
+    margin-top: 1rem;
+    color: $gray-600;
+    font-size: $font-size-sm;
+    justify-content: space-between;
+}
+
+.noUi-tooltip {
+    padding: .5rem;
+    border-color: $gray-300;
+    background: $gray-200;
+    font-size: $font-size-sm;
+
+}

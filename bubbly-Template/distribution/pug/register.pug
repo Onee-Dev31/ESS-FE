@@ -1,0 +1,40 @@
+extends _pug-includes/layout-login
+
+block content
+    .page-holder.align-items-center.py-4.bg-gray-100.vh-100
+        .container
+                
+            .row.align-items-center
+                   
+                .col-lg-6.px-lg-4
+                    .card
+                        .card-header.px-lg-5
+                            .card-heading.text-primary Bubbly Dashboard
+                        .card-body.p-lg-5
+                            h3.mb-4 Get started with Bubbly
+                            p.text-muted.text-sm.mb-5 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.
+
+                            form(action="index.html")
+                                .form-floating.mb-3
+                                    input#username.form-control(type='email' placeholder='name@example.com')
+                                    label(for='username') Username
+                                .form-floating.mb-3
+                                    input#floatingInput.form-control(type='email' placeholder='name@example.com')
+                                    label(for='floatingInput') Email address
+                                .form-floating.mb-3
+                                    input#floatingPassword.form-control(type='password' placeholder='Password')
+                                    label(for='floatingPassword') Password
+                                .form-check.mb-3
+                                    input.form-check-input(type='checkbox' name='agree', id='agree')
+                                    label.form-check-label(for='agree') I agree with the <a href="#">Terms & Conditions</a>.
+                                .form-group
+                                    button#regidter.btn.btn-primary(type="submit", name="registerSubmit") Register
+                        .card-footer.px-lg-5.py-lg-4
+                            .text-sm.text-muted
+                                | Already have an account? 
+                                a(href='login.html') Login
+                                | .
+                .col-lg-6.col-xl-5.ms-xl-auto.px-lg-4.text-center.text-primary
+                    img.img-fluid.mb-4(width="300", src="img/drawkit-illustration.svg", alt="", style="transform: rotate(10deg)")
+                    h1.mb-4 Start saving <br class="d-none d-lg-inline">your time & money
+                    p.lead.text-muted #{dummyText[0].substr(0,100)}

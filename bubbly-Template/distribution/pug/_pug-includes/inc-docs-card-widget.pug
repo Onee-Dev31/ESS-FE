@@ -1,0 +1,34 @@
+- var widgets = []
+- widgets.push({title: 'Completed cases', text: '127 new cases', bgColor: 'bg-indigo', icon: 'fa-clipboard-check'})
+- widgets.push({title: 'New Quotes', text: '214 new quotes', bgColor: 'bg-green', icon: 'fa-dollar-sign'})
+- widgets.push({title: 'New clients', text: '25 new clients', bgColor: 'bg-blue', icon: 'fa-user-friends'})
+
+p.show-code-sample <a data-bs-toggle="collapse" href="#codeSampleWidget">Show code sample</a>
+
+.collapse#codeSampleWidget
+    pre.code-sample
+        code.language-html
+            +escape
+                each val, index in widgets
+                    if (index == 0)
+                        .col-lg-4
+                            .card-widget.mb-4
+                                .card-widget-body
+                                    .dot.me-3(class=val.bgColor)
+                                    .text
+                                        h6.mb-0 #{val.title}
+                                        span.text-gray-500 #{val.text}
+                                .icon.text-white(class=val.bgColor)
+                                    i.fas(class=val.icon)  
+
+.row.mt-5
+    each val in widgets
+        .col-lg-4
+            .card-widget.mb-4
+                .card-widget-body
+                    .dot.me-3(class=val.bgColor)
+                    .text
+                        h6.mb-0 #{val.title}
+                        span.text-gray-500 #{val.text}
+                .icon.text-white(class=val.bgColor)
+                    i.fas(class=val.icon)                            

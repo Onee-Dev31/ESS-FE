@@ -1,0 +1,72 @@
+extends _pug-includes/layout
+
+block vars 
+    - var cms = true;
+    - var current = 'cms-media.html';  
+
+block content
+        // Page Header
+        .page-header.d-flex.justify-content-between.align-items-center
+            h1.page-heading.mb-0 Media Library
+            div
+                a.btn.btn-primary.text-uppercase.text-nowrap(data-bs-toggle='collapse' href='#collapseMedia' role='button' aria-expanded='false' aria-controls='collapseMedia')
+                    i.fa.fa-plus.me-2 
+                    | Add new
+
+        #collapseMedia.collapse
+            .py-2
+                 form#demo-upload.dropzone.bg-transparent.rounded-4.mb-5(action='#')
+                    .dz-message
+                        p Drop files here or click to upload.
+                        p
+                            span.note (This is just a demo dropzone. Selected files are <STRONG>not</STRONG> actually uploaded.)
+
+        - var images = ['soroush-zargar-zFSUhqGual8-unsplash.jpg', 'faruk-kaymak-CNVvDjVDiVI-unsplash.jpg',  'aron-visuals-3jBU9TbKW7o-unsplash.jpg', 'elizabeth-gottwald-dnIWYrliZfU-unsplash.jpg',  'willian-justen-de-vasconcellos-4hMET7vYTAQ-unsplash.jpg', 'sorasak-_UIN-pFfJ7c-unsplash.jpg', 'montylov-ktZZiHb-GoI-unsplash.jpg', 'joseph-barrientos-Ji_G7Bu1MoM-unsplash.jpg', 'henrique-ferreira-RKsLQoSnuTc-unsplash.jpg','luca-bravo-O453M2Liufs-unsplash.jpg', 'mesut-kaya-eOcyhe5-9sQ-unsplash.jpg', 'stefan-stefancik-0wMmxNB6Xzc-unsplash.jpg', 'soroush-zargar-zFSUhqGual8-unsplash.jpg', 'faruk-kaymak-CNVvDjVDiVI-unsplash.jpg',  'aron-visuals-3jBU9TbKW7o-unsplash.jpg', 'elizabeth-gottwald-dnIWYrliZfU-unsplash.jpg',  'willian-justen-de-vasconcellos-4hMET7vYTAQ-unsplash.jpg', 'sorasak-_UIN-pFfJ7c-unsplash.jpg', 'montylov-ktZZiHb-GoI-unsplash.jpg', 'joseph-barrientos-Ji_G7Bu1MoM-unsplash.jpg', 'henrique-ferreira-RKsLQoSnuTc-unsplash.jpg','luca-bravo-O453M2Liufs-unsplash.jpg', 'mesut-kaya-eOcyhe5-9sQ-unsplash.jpg', 'stefan-stefancik-0wMmxNB6Xzc-unsplash.jpg']
+
+        - var imageCount = images.length; 
+
+        section.mb-5
+
+            .card.mb-5
+                .card-body
+                    .row 
+                        .col-sm-6
+                            select.form-select.d-inline-block.w-auto.me-3.mb-1.mb-lg-0
+                                option(value='all') All media items
+                                option(value='image') Images
+                                option(value='audio') Audio
+                                option(value='video') Video
+                                option(value='application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-word.document.macroEnabled.12,application/vnd.ms-word.template.macroEnabled.12,application/vnd.oasis.opendocument.text,application/vnd.apple.pages,application/pdf,application/vnd.ms-xpsdocument,application/oxps,application/rtf,application/wordperfect,application/octet-stream') Documents
+                                option(value='application/vnd.apple.numbers,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.ms-excel.sheet.binary.macroEnabled.12') Spreadsheets
+                                option(value='application/x-gzip,application/rar,application/x-tar,application/zip,application/x-7z-compressed') Archives
+                                option(value='unattached') Unattached
+                                option(value='mine') Mine
+                            select.form-select.d-inline-block.w-auto.mb-1.mb-lg-0
+                                option(value='all') All dates
+                                option(value='0') February 2021
+                                option(value='1') January 2021
+                                option(value='2') December 2020
+                                option(value='3') November 2020
+                                option(value='4') September 2020
+                                option(value='5') August 2020
+                                option(value='6') July 2020
+                                option(value='7') June 2020
+                                option(value='8') May 2020
+                                option(value='9') April 2020
+                                option(value='10') March 2020
+                        .col-sm-6.text-md-end
+                            label.form-label.text-muted.text-sm.me-2.d-none.d-lg-inline-block(for="media_search") Search
+                            input.form-control.d-inline-block.w-auto#media_search(type="search", placeholder="Fulltext search")
+                        
+
+            .row
+                each val, index in images
+                    - var photoNo = index + 1
+
+                    .col-6.col-md-4.col-lg-3.col-xl-2
+                        .card.position-relative.mb-4
+                            img.card-img-top(src='img/photos/w-600/' + val, alt="Image " + photoNo)
+                            .card-body.py-2.px-4
+                                p.card-text.text-muted.text-sm Image #{photoNo}
+                            a.glightbox.stretched-link(href='img/photos/' + val, data-gallery='gallery', data-title="Image " + photoNo)
+    

@@ -1,0 +1,86 @@
+extends ../_pug-includes/layout
+
+block vars
+    - var active = 'docs'  
+    - docsCss = true         
+    - var bodyAttrs = {'data-spy': "scroll", 'data-target': "#components-nav", 'data-offset':"80"}
+    - var path = '../'    
+    - var mapUsed = true 
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: '../index.html'})
+    - breadcrumbs.push({name: 'CSS Components'})
+    - var heroHeading = 'Theme CSS Components'
+    - var current = 'docs/components-theme.html'    
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader(heroHeading) 
+
+    section.mb-5 
+        .row
+            .col-xl-10
+                .card.mb-5
+                    .card-header 
+                        h5.card-heading CSS Components
+                    .card-body 
+
+                        +componentDocItem('Avatar', '<p>Classes to format your user images. You can combine avatar classes with padding utility class to give to the image a nice white border.</p>')
+                            include ../_pug-includes/inc-docs-avatar.pug
+
+                        +componentDocItem('Badges', '<p>Small count and labeling component.</p>')
+                            include ../_pug-includes/inc-docs-badge.pug
+
+                        +componentDocItem('Card Widget', '<p>Card widget, similar to Bootstrap\'s <code>.card</code>. </p>')
+                            include ../_pug-includes/inc-docs-card-widget.pug
+
+                        +componentDocItem('Icons - Bubbly', '<p>This theme also comes with a <strong>150+ Premium SVG icons</strong> with appropriate license. No additional purchase is necessary.</p><p class="text-muted text-large">For a complete icon reference, see <a href="../icons/demo.html">here</a>.</p>')
+
+                            include ../_pug-includes/inc-docs-icons.pug    
+
+                        +componentDocItem('Icons - Font Awesome', '<p>Vector icons and social logos on your website with Font Awesome, the web’s most popular icon set and toolkit.</p><p>These icons are mostly used in buttons or for social network links. For a complete icon reference, see <a href="https://fontawesome.com/icons?d=gallery">here</a>.</p>')
+                            include ../_pug-includes/inc-docs-icons-fa.pug                   
+
+                .card
+                    .card-header 
+                        h5.card-heading CSS Utilities
+                    .card-body 
+                        +componentDocItem('Background image', '<p>Utility class that turns a <code>&lt;img class=&quot;bg-image&quot;&gt;</code> into a background image for its parent. Useful e.g. for carousels. Make sure that image\'s parent container and the content that should be placed over the image are relatively positioned.</p>')  
+                            include ../_pug-includes/inc-docs-image.pug
+
+                        +componentDocItem('Image overlay', '<p>Utility class that darkens or lightens the backround image of the element to enhance the legibility. It can be used with cards, carousel slides, etc.</p><p>Gradient overlay adds vertical gradient that\'s darkest on the bottom third of the element.</p>')  
+                            include ../_pug-includes/inc-docs-overlay.pug
+
+                            .p-3.bg-gray-200.rounded
+                                h6.text-muted.text-uppercase.font-weight-normal.mb-3 Class reference
+                                p.card-text <code>.dark-overlay</code>, <code>.light-overlay</code>,  <code>.gradient-overlay</code>  - CSS class to be used on the element
+                                p.card-text <code>.overlay-content</code> - use this class on the element's content to increase its Z-index and move it above the overlay layer
+
+                        +componentDocItem('Responsive borders', '<p>Responsive borders as an addition to Bootstrap\'s <a href="https://getbootstrap.com/docs/4.1/utilities/borders/">border utilities</a>.</p>')    
+
+                            .p-3.bg-gray-200.rounded
+                                h6.text-muted.text-uppercase.font-weight-normal.mb-3 Class reference
+                                p.card-text <code>.border-sm</code>, <code>.border-md</code>, etc.
+
+                        +componentDocItem('Block utilities', '<p>Additional utility classes, for block elements mostly.</p>')    
+
+                            .p-3.bg-gray-200.rounded
+                                h6.text-muted.text-uppercase.font-weight-normal.mb-3 Class reference
+                                p.card-text <code>.bg-gray-100</code> to <code>.bg-gray-900</code> - grayscale backgrounds
+                                p.card-text <code>.bg-primary-light</code>, <code>.bg-secondary-light</code> - lighter backgrounds for the theme colours
+                                p.card-text <code>.opacity-1</code> to <code>.opacity-9</code> - opacity helper
+                                p.card-text <code>.hover-scale</code> - scale element on hover
+                                p.card-text <code>.hover-animate</code> - move element up by few pixels on hover
+                                p.card-text <code>.hover-scale-bg-image</code> - scale element's background picture on hover
+                        
+                        +componentDocItem('Text utilities', '<p>Text utility classes to control text size and more.</p>')    
+
+                            .p-3.bg-gray-200.rounded
+                                h6.text-muted.text-uppercase.font-weight-normal.mb-3 Class reference
+                                p.card-text <code>.text-gray-100</code> to <code>.text-gray-900</code> - grayscale text colours
+                                p.card-text <code>.text-sm</code>, <code>.text-lg</code>, <code>.text-xl</code> - text sizes
+                                p.card-text <code>.letter-spacing-1</code> to <code>.letter-spacing-5</code> - letter spacing 0.1em to 0.5em
+                                p.card-text <code>.z-index-1</code> to <code>.z-index-5</code> - z-index from 10 to 50
+                                p.card-text <code>.text-hover-primary</code>, etc. - text colour on hover/focus for theme colours
+                                p.card-text <code>.overflow-visible</code> and <code>.overflow-hidden</code> - overflow control                                                            
+

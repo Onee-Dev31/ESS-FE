@@ -1,0 +1,143 @@
+extends ../_pug-includes/layout
+
+block vars
+    - var active = 'docs'  
+    - var bodyAttrs = {'data-spy': "scroll", 'data-target': "#components-nav", 'data-offset':"80"}
+    - var path = '../'    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: '../index.html'})
+    - breadcrumbs.push({name: 'Documentation', link: 'introduction.html'})
+    - breadcrumbs.push({name: 'Changelog'})
+    - var heroHeading = 'Changelog'
+    - var current = 'docs/changelog.html'
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader(heroHeading) 
+
+    section.mb-5 
+        .row
+            .col-xl-10
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2023-01-13
+                        h6.card-heading Version 1.3.2
+                    .card-body
+                        pre.card-text.
+                            - <strong>Fixed:</strong> Replaced CDN version of Simple DataTables with a local one (vendor folder)
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2023-01-07
+                        h6.card-heading Version 1.3.1
+                    .card-body
+                        pre.card-text.
+                            - <strong>Fixed:</strong> Issue with custom DataTables Columns
+                            - <strong>Updated:</strong> updated dependencies (Choices.js, Dropzone, FullCalendar, Glightbox, iMask, Moment, Prism, Simple DataTables, VanillaJS Datepicker)
+                        a.btn.btn-sm.btn-outline-primary(data-bs-toggle='collapse', data-bs-target='#v1_3_1') Show a complete list of changed files
+                        .collapse#v1_3_1
+                            .bg-gray-100.p-3.rounded
+                                ul.list-unstyled.text-sm.mb-0
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> package-lock.json
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> package.json
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/footer.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/docs/changelog.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/cms-category.js
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/cms-post.js
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/e-commerce-products.js
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/index-cms.js
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/tables-datatable.jsß
+                .card.mb-4
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2022-03-08
+                        h6.card-heading Version 1.3
+                    .card-body
+                        pre.card-text.
+                            - <strong>New:</strong> 4 New dashboards (New default dashboard, E-commerce, CMS, Projects. 
+                              The original dashboard is now called index-charts.html)
+                            - <strong>New:</strong> Added new chart styles
+                            - <strong>New:</strong> Added timeline widget
+                            - <strong>Improved:</strong> Added additional chart defaults to js/chart-defaults.js
+                            - <strong>Improved:</strong> Stats widges now as Pug mixins (mixins-widgets.pug)
+                            - <strong>Fixed:</strong> Overflow issue (login-2.pug, register-2.pug and their HTML counterparts)
+                            - <strong>Fixed:</strong> Theming issue fixed (remvoved $primary: false; from variables.scss)
+                            - <strong>Updated:</strong> updated dependencies (Choices.js 10.0.0, Gulp Sass (5.1.0), added Dart Sass(1.25.0))
+                        a.btn.btn-sm.btn-outline-primary(data-bs-toggle='collapse', data-bs-target='#v1_3') Show a complete list of changed files
+                        .collapse#v1_3 
+                            .bg-gray-100.p-3.rounded
+                                ul.list-unstyled.text-sm.mb-0
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> package-lock.json
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> package.json
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> gulpfile.js                            
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/footer.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/_pug-includes/inc-data-widget.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/inc-docs-avatar.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/layout.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/_pug-includes/mixins-widgets.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/mixins.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/scripts.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/_pug-includes/sidebar.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/docs/changelog.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/e-commerce-order.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/e-commerce-products.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/img/avatar-12.jpg
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/img/favicon.png
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/index-charts.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/index-cms.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/index-e-commerce.pug
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/index-projects.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/index.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/js/charts-defaults.js
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/js/index-cms.js
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/js/index-default.js
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/js/index-e-commerce.js
+                                    li.mb-1 <span class="badge badge-success-light">A</span> src/js/index-projects.js
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/login-2.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/package.json
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/readme.md
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/register-2.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_avatar.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_card.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_charts.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_other.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_utilities.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_utils.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/scss/theme/_variables.scss
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/widgets-data.pug
+                                    li.mb-1 <span class="badge badge-warning-light">M</span> src/widgets-stats.pug
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2021-08-14
+                        h6.card-heading Version 1.2
+                    .card-body
+                        pre.card-text.
+                            - <strong>New:</strong> 5 E-commerce pages 
+                            - <strong>New:</strong> 2 Knowledge base pages
+                            - <strong>Improved:</strong> Added light card table header (theme/_card.scss)
+                            - <strong>Improved:</strong> Added avatar flag, avatar text, avatar xxs (theme/_avatar.scss)
+                            - <strong>Updated:</strong> updated dependencies (Bootstrap 5.1.0, iMask 6.1.0, PrismJs 1.24.1, FullCalendar 5.9.0)
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2021-06-10
+                        h6.card-heading Version 1.1
+                    .card-body
+                        pre.card-text.
+                            - <strong>New:</strong> 26+ new widgets to display your data - showcased on widgets-stats.html, and widgets-data.html
+                            - <strong>Improved:</strong> Added additional styling option for DataTables - tables-datatable.html 
+                            - <strong>Improved:</strong> Added fade-in effect for Data Tables on CMS Category (cms-category.html) and CMS Post (cms-post.html)
+                            - <strong>Improved:</strong> Added Flag SVGs 
+                            - <strong>Improved:</strong> Nicer search field + suggestions dropdown (navbar.pug, navbar.scss, theme.js)
+                            - <strong>Improved:</strong> Animated dropdown class (dropdown.scss, theme.scss)
+                            - <strong>Improved:</strong> Added more styling options to the basic tables showcase - tables.html
+                            - <strong>Improved:</strong> removed expand FA icons from sidebar CSS, now solved by inlined svgs 
+                            - <strong>Updated:</strong> updated dependencies (Bootstrap 5.0.1, FullCalendar 5.7.0, Glightbox 3.0.9)
+            
+                .card.mb-4
+                    .card-header
+                        span.badge.badge-primary-light.rounded-pill.float-end 2021-05-20
+                        h6.card-heading Version 1.0
+                    .card-body
+                        pre.card-text.
+                            Initial release
+            

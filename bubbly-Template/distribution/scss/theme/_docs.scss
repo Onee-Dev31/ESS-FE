@@ -1,0 +1,76 @@
+/*
+* ===================================================
+*     Docs
+* ===================================================
+*/
+
+.show-code-sample {
+    margin-bottom: 0;
+    padding-bottom: 1rem;
+}
+
+.code-sample-collapse {
+    padding-bottom: 1rem;
+}
+
+.code-sample {
+    max-height: 200px;
+}
+
+.docs-item {
+    padding: 2.5rem 0;
+    border-bottom: 1px solid $gray-300;
+    margin-bottom: .5rem;
+
+    &:first-of-type {
+        padding-top: 0;
+    }
+
+    &:last-of-type {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .docs-desc {
+        color: $gray-600;
+
+        p.lead {
+            color: $body-color;
+        }
+    }
+}
+
+.sidebar-block {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid $gray-200;
+
+    &:last-of-type {
+        border-bottom: none;
+    }
+
+    &:first-of-type {
+        padding-top: 0;
+    }
+}
+
+/* Prism additional styling */
+div.code-toolbar>.toolbar {
+    top: .3em;
+    right: 20px;
+}
+
+div.code-toolbar>.toolbar a,
+div.code-toolbar>.toolbar button,
+div.code-toolbar>.toolbar span {
+    padding: .5em 1em;
+}
+
+div.code-toolbar>.toolbar a:hover,
+div.code-toolbar>.toolbar a:focus,
+div.code-toolbar>.toolbar button:hover,
+div.code-toolbar>.toolbar button:focus,
+div.code-toolbar>.toolbar span:hover,
+div.code-toolbar>.toolbar span:focus {
+    color: $white;
+}

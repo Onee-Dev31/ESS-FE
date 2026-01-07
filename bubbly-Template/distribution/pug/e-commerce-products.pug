@@ -1,0 +1,90 @@
+extends _pug-includes/layout
+
+block vars 
+    - var eCommerce = true;
+    - var current = 'e-commerce-products.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Products'}) 
+
+block content
+
+        +breadcrumbs(breadcrumbs)
+
+        // Page Header
+        .page-header.d-flex.justify-content-between.align-items-center
+            div
+                h1.page-heading Products
+                ul.list-inline.text-sm
+                    li.list-inline-item
+                        a.text-gray-600(href="#!")
+                            i.fas.fa-upload.me-2 
+                            | Import
+                    li.list-inline-item
+                        a.text-gray-600(href="#!")
+                            i.fas.fa-download.me-2 
+                            | Export
+
+            div
+                a.btn.btn-primary.text-uppercase(href="e-commerce-product-new.html") 
+                    i.fa.fa-plus.me-2 
+                    | Add new
+
+        include _pug-includes/inc-datatable-data
+
+        include _pug-includes/inc-products-data
+
+        section.mb-5
+
+            ul.nav.nav-tabs.mb-5(role='tablist')
+                li.nav-item
+                    a.nav-link.active(href='#') All products
+                li.nav-item
+                    a.nav-link.text-reset(href='#!') Archived
+                li.nav-item
+                    a.nav-link.disabled(href='#' tabindex='-1' aria-disabled='true') Drafts
+                li.nav-item
+                    a.nav-link.disabled(href='#' tabindex='-1' aria-disabled='true') Out of stock
+
+
+            .card.card-table
+                .preload-wrapper
+                    table#productsDatatable.table.table-hover.table-borderless.align-middle.mb-0
+                        thead
+                            tr
+                                th Product Id
+                                th(style='min-width: 300px;') Name
+                                th Price
+                                th In Stock
+                                th Last Ordered
+                                th Status
+                                th Action
+                        tbody
+                            each val, index in products
+                                - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                tr.align-middle
+                                    td ##{index + 2568}
+                                    td.d-flex.align-items-center
+                                        img.card-table-img.img-fluid.rounded.me-3(src='img/product/' + val.img, alt='', width='70')
+                                        a.text-reset.text-decoration-none(href='#!')
+                                            strong #{val.title}
+                                    td #{val.price}
+                                    td #{index + 43}
+                                    td.text-muted 2021/#{month}/#{day}
+                                    td
+                                        if (val.badge != '')
+                                            label.badge(class='badge-' + val.badge) #{val.badgeContent}
+                                    td
+                                        a(href='#!').me-3.text-lg.text-success
+                                            i.far.fa-edit
+
+                                        a(href='#!').text-lg.text-danger
+                                            i.far.fa-trash-alt
+
+                    span#categoryBulkAction.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply
+    

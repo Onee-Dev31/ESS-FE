@@ -1,0 +1,220 @@
+extends _pug-includes/layout.pug
+
+
+block vars 
+    - var home = true; 
+    - var current = "index-charts.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Calendar'})   
+
+block content
+    
+    +pageHeader('Charts & Finances Dashboard')
+
+    section.mb-3.mb-lg-5
+        - var stats = []
+        - stats.push({'title': 'Data consumed', 'value': '145,14 GB', 'color': 'indigo', 'icon': 'fas fa-server'})
+        - stats.push({'title': 'Open cases', 'value': '32', 'color': 'green', 'icon': 'far fa-clipboard'})
+        - stats.push({'title': 'Work orders', 'value': '400', 'color': 'blue', 'icon': 'fa fa-dolly-flatbed'})
+        - stats.push({'title': 'New invoices', 'value': '123', 'color': 'red', 'icon': 'fas fa-receipt'})
+        .row
+            each val in stats 
+                .col-xl-3.col-md-6.mb-4
+                    .card-widget.h-100
+                        .card-widget-body
+                            .dot.me-3(class='bg-' + val.color)
+                            .text
+                                h6.mb-0 #{val.title}
+                                span.text-gray-500 #{val.value}
+                        .icon.text-white(class='bg-' + val.color)
+                            i(class=val.icon)
+    
+    section.mb-4.mb-lg-5
+        h2.section-heading.section-heading-ms.mb-4.mb-lg-5 Finances 💰
+        .row
+            .col-lg-7.mb-4.mb-lg-0
+                .card.h-100
+                    .card-header
+                        h4.card-heading Your Account Balance
+                    .card-body
+                        .chart-holder.w-100
+                            canvas#lineChart1
+            
+            .col-lg-5.mb-4.mb-lg-0
+                .h-50.pb-4.pb-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span 86.4
+                                        span.dot.bg-green.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small Work hours
+                                    hr
+                                    small.text-muted Hours worked this month
+                                .col-sm-7
+                                    canvas#pieChartHome1
+                            
+                .h-50.pt-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span 325
+                                        span.dot.bg-indigo.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small Tasks Completed
+                                    hr
+                                    small.text-muted Tasks Completed this months
+                                .col-sm-7
+                                    canvas#pieChartHome2
+    section.mb-4.mb-lg-5
+        h2.section-heading.section-heading-ms.mb-4.mb-lg-5 Usage 📈   
+        .row
+            .col-lg-5.mb-4.mb-lg-0
+                .h-50.pb-4.pb-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span 86%
+                                        span.dot.bg-pink.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small Monthly Usage
+                                    hr
+                                    small.text-muted Monthly allowed usage
+                                .col-sm-7
+                                    canvas#pieChartHome3
+                .h-50.pt-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span $126,41
+                                        span.dot.bg-green.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small All Income
+                                    hr
+                                    small.text-muted Lorem ipsum dolor sit
+                                .col-sm-7
+                                    canvas#pieChartHome4
+            .col-lg-7
+                .card
+                    .card-header
+                        h4.card-heading Your referrals
+                    .card-body
+                        .chart-holder
+                            canvas#lineChart2
+    
+    section.mb-4.mb-lg-5
+        h2.section-heading.section-heading-ms.mb-4.mb-lg-5 Linked Cards 💳 
+        - var cards = []
+        - cards.push({'number': '1245 1478 1362 6985', 'credit': '$417.78', 'icon': 'fab fa-cc-visa', 'color': 'indigo'})
+        - cards.push({'number': '1245 1478 1362 6985', 'credit': '$224.17', 'icon': 'fab fa-cc-mastercard', 'color': 'blue'})
+        - cards.push({'number': '1245 1478 1362 6985', 'credit': '$568.00', 'icon': 'fab fa-cc-discover', 'color': 'green'})
+        
+        .row.text-dark
+            
+            each val in cards
+                .col-md-6.col-xl-4.mb-4
+                    .card.credit-card(class=`bg-hover-gradient-${val.color}`)
+                        .credict-card-content
+                            .h1.mb-3.mb-lg-1
+                                i(class=val.icon)
+                            
+                            .credict-card-bottom
+                                .text-uppercase.flex-shrink-0.me-1.mb-1
+                                    .fw-bold Card Number
+                                    small.text-gray-500 #{val.number}
+                                
+                                h4.mb-1 #{val.credit}
+                        a.stretched-link(href="#")
+        
+    
+    section.mb-4.mb-lg-5
+        h2.section-heading.section-heading-ms.mb-4.mb-lg-5 Updates 🆕 
+        - var transactions = []
+        - transactions.push({'title': 'Dropbox Inc.', 'description': 'Account renewal', 'credit': '-$20', 'icon': 'fab fa-dropbox', 'color': 'indigo'})
+        - transactions.push({'title': 'App Store.', 'description': 'Software cost', 'credit': '-$20', 'icon': 'fab fa-apple', 'color': 'green'})
+        - transactions.push({'title': 'Supermarket.', 'description': 'Shopping', 'credit': '-$20', 'icon': 'fas fa-shopping-basket', 'color': 'blue'})
+        - transactions.push({'title': 'Play Store.', 'description': 'Software cost', 'credit': '-$20', 'icon': 'fab fa-android', 'color': 'red'})
+         - transactions.push({'title': 'Dropbox Inc.', 'description': 'Account renewal', 'credit': '-$20', 'icon': 'fab fa-dropbox', 'color': 'primary'})
+        - transactions.push({'title': 'App Store.', 'description': 'Software cost', 'credit': '-$20', 'icon': 'fab fa-apple', 'color': 'blue'})
+        .row
+            .col-lg-7.col-xl-6.mb-5.mb-lg-0    
+                .card.h-100 
+                    .card-header
+                        h4.card-heading Transaction history
+                    .card-body
+                        p.text-gray-500.mb-5 Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                        
+                        each val in transactions                                
+                            .d-flex.justify-content-between.align-items-start.align-items-sm-center.mb-4.flex-column.flex-sm-row
+                                .left.d-flex.align-items-center
+                                    .icon.icon-lg.shadow.me-3.text-gray-700
+                                        i(class=val.icon)
+                                    .text
+                                        h6.mb-0.d-flex.align-items-center 
+                                            span #{val.title}
+                                            span.dot.dot-sm.ms-2(class='bg-' + val.color)
+                                        small.text-gray-500 #{val.description}
+                            
+                                .right.ms-5.ms-sm-0.ps-3.ps-sm-0
+                                    h5 #{val.credit}
+                                
+            .col-lg-5.col-xl-6
+                .row.h-100
+
+                    - var widgets = []
+                    - widgets.push({title: 'Completed cases', text: '127 new cases', bgColor: 'bg-indigo', icon: 'fa-clipboard-check'})
+                    - widgets.push({title: 'New Quotes', text: '214 new quotes', bgColor: 'bg-green', icon: 'fa-dollar-sign'})
+                    - widgets.push({title: 'New clients', text: '25 new clients', bgColor: 'bg-blue', icon: 'fa-user-friends'})
+
+                    each val in widgets
+                        .col-xxl-6
+                            .card-widget.mb-4
+                                .card-widget-body
+                                    .dot.me-3(class=val.bgColor)
+                                    .text
+                                        h6.mb-0 #{val.title}
+                                        span.text-gray-500 #{val.text}
+                                .icon.text-white(class=val.bgColor)
+                                    i.fas(class=val.icon)
+                
+                    
+                    .col-12.order-xxl-1
+                        .card.h-100
+                            .card-body
+                                h2.mb-0.d-flex.align-items-center
+                                    span 86.4
+                                    span.dot.bg-red.d-inline-block.ms-3
+                                span.text-muted Daily Profile Visitors
+                                
+                                .chart-holder.w-100
+                                    canvas#lineChart3
+        
+    
+    - var messages = []    
+    - messages.push({'userName': 'Jason Maxwell', 'userImage': 'avatar-1.jpg', 'dateDay': '24', 'dateMonth': 'Apr', 'userTitle': 'User testing', 'messageContent': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.'})
+    - messages.push({'userName': 'Sam Andy', 'userImage': 'avatar-2.jpg', 'dateDay': '24', 'dateMonth': 'Nov', 'userTitle': 'Web Developer', 'messageContent': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit..'})
+    - messages.push({'userName': 'Margret Peter', 'userImage': 'avatar-3.jpg', 'dateDay': '17', 'dateMonth': 'Aug', 'userTitle': 'Analysis Agent', 'messageContent': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit..'})
+    - messages.push({'userName': 'Jason Doe', 'userImage': 'avatar-4.jpg', 'dateDay': '15', 'dateMonth': 'Sep', 'userTitle': 'User testing', 'messageContent': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit..'})
+    
+    section.mb-4
+        h2.section-heading.section-heading-ms.mb-4.mb-lg-5 People 👩‍💻
+        .row
+            
+            each val in messages
+                .col-sm-6.col-xl-12
+                    a.message.card.px-5.py-3.mb-4.bg-hover-gradient-primary.text-decoration-none.text-reset(href="#")
+                        .row
+                            .col-xl-3.d-flex.align-items-center.flex-column.flex-xl-row.text-center.text-md-left
+                                strong.h5.mb-0 #{val.dateDay}
+                                    sup.text-xs.text-gray-500.font-weight-normal.ms-1 #{val.dateMonth}
+                                img.avatar.avatar-md.p-1.mx-3.my-2.my-xl-0(src=`img/${val.userImage}`, alt="...", style='max-width: 3rem')
+                                h6.mb-0 #{val.userName}
+                            
+                            .col-xl-9.d-flex.align-items-center.flex-column.flex-xl-row.text-center.text-md-left
+                                .bg-gray-200.rounded-pill.px-4.py-1.me-0.me-xl-3.mt-3.mt-xl-0.text-sm.text-dark.exclude #{val.userTitle}
+                                p.mb-0.mt-3.mt-lg-0 #{val.messageContent}

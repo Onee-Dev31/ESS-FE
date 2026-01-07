@@ -1,0 +1,74 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var tables = true;
+    - var current = 'tables-datatable.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Data Table'})
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Data Table')
+      
+    section
+        .card.mb-4
+            .card-header
+                .card-heading Data Table - Classic
+            .card-body.text-muted
+                
+                p A lightweight, extendable, dependency-free javascript HTML table plugin. Similar to jQuery DataTables for use in modern browsers, but without the jQuery dependency.
+                p Check out more at <a href="https://github.com/fiduswriter/Simple-DataTables">Project's GitHub</a>.
+
+            
+                p How easy is it to use DataTables? Take a peek at the code below: a single function call to initialise the table is all it takes!
+
+                pre
+                    code.language-js
+                        +escape.
+                            const dataTable = new simpleDatatables.DataTable("#datatable1", {});
+
+                include _pug-includes/inc-datatable-data.pug
+
+                table.table#datatable1
+                    thead
+                        tr
+                            th Name
+                            th Company
+                            th Email
+                            th Phone
+                            th City
+                            th Orders
+                    tbody
+                        each val in dataTable
+                            tr
+                                td <a href="javascript:void(0)" class="text-muted">#{val.person}</a>
+                                td #{val.company}
+                                td #{val.email}
+                                td #{val.phone}
+                                td #{val.city}
+                                td #{val.orders}   
+
+        .card.card-table.mb-4
+            .card-header
+                .card-heading Data Table - Card Table
+
+            table#datatable2.table.table-hover.mb-0
+                thead
+                    tr
+                        th Name
+                        th Company
+                        th Email
+                        th Phone
+                        th City
+                        th Orders
+                tbody
+                    each val in dataTable
+                        tr
+                            td <a href="javascript:void(0)" class="text-muted">#{val.person}</a>
+                            td #{val.company}
+                            td #{val.email}
+                            td #{val.phone}
+                            td #{val.city}
+                            td #{val.orders}                                                                       

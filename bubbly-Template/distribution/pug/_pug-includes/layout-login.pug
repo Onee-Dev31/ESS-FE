@@ -1,0 +1,21 @@
+doctype
+html
+  block vars
+    - var enhancedForm = false
+    - var clientZone = false
+  if (!path)
+    - var path = ''
+  head
+    include head.pug
+
+  body
+      
+    include mixins.pug
+    include dummyText.pug
+    
+    block content
+
+    if (locals.styleSwitcher)
+      include style-switcher.pug
+
+    include scripts.pug

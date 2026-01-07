@@ -1,0 +1,54 @@
+// Maps Integration
+
+// LeafletJS CDN
+script(src='https://unpkg.com/leaflet@1.7.1/dist/leaflet.js' integrity='sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==' crossorigin='')
+
+// Map functions
+script(src="js/components-map.js") 
+
+// Basic map init + 1 marker
+script.
+    document.addEventListener("DOMContentLoaded", function() {
+        // coordinates for the center of the map and the marker
+        var lat = 40.732346;
+        var long = -74.0014247;
+        // if using with other than default style, change the path to the colour variant 
+        // of the marker. E.g. to img/map-marker-violet.svg.
+        var markerImage = 'img/map-marker-default.svg';
+        // id of the map DOM element
+        var id = 'map-3';
+
+        map = createBasicMap(id, lat, long, markerImage);
+    });      
+
+// Styled map init + 1 marker
+script.
+    document.addEventListener("DOMContentLoaded", function() {
+        // coordinates for the center of the map and the marker
+        var lat = 40.732346;
+        var long = -74.0014247;
+        // if using with other than default style, change the path to the colour variant 
+        // of the marker. E.g. to img/map-marker-violet.svg.
+        var markerImage = 'img/map-marker-default.svg';
+        // id of the map DOM element
+        var id = 'map-1';
+
+        map = createSimpleMap(id, lat, long, markerImage);
+    });      
+
+//  Styled Google map init + multiple markers + infobox
+script.
+    document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+            // json file path with the markers to display on the map
+            jsonFile: 'data/restaurants-geojson.json',
+            // if using with other than default style, change the path to the colour variant 
+            // of the marker. E.g. to img/map-marker-violet.svg.                
+            markerPath: 'img/map-marker-default.svg',
+            markerPathHighlight: 'img/map-marker-default.svg',
+            // id of the map DOM element
+            mapId: 'map-2'
+        }
+
+        createAdvancedMap(options);
+    });   

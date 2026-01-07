@@ -1,0 +1,49 @@
+/*
+* ===================================================
+*    Typography
+* ===================================================
+*/
+a {
+    transition: all 0.3s;
+}
+
+.subtitle {
+    font-size: $font-size-base;
+    @include uppercase;
+}
+
+.section-heading {
+    font-size: $font-size-base;
+    font-weight: bold;
+    @include uppercase;
+
+    &.section-heading-ms {
+        margin-left: 1rem;
+
+        @include media-breakpoint-up(lg) {
+            margin-left: 2rem;
+        }
+    }
+}
+
+.text-content {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ul,
+    ol,
+    blockquote {
+        margin-bottom: 2rem;
+    }
+
+    p,
+    ul,
+    ol {
+        color: $gray-600;
+    }
+}

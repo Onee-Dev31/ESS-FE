@@ -1,0 +1,69 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var forms = true;
+    - var current = 'forms-texteditor.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Text editor'})   
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Text editor')
+                    
+    section
+        .card.mb-4
+            .card-header
+                h4.card-heading Text Editor - Quill
+            .card-body   
+                .row
+                    .col-xl-10         
+                        p.text-muted Your powerful rich text editor.  Supports all modern browsers on desktops, tablets and phones. Experience the same consistent behavior and produced HTML across platforms. Read more at <a href="https://quilljs.com/">https://quilljs.com/</a>.
+                        
+                        p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample4">Show code sample</a>
+
+                        .collapse#codeSample4
+                            pre.code-sample
+                                code.language-js
+                                    +escape
+                                        include js/forms-texteditor.js                                    
+
+                        #editorWithToolbar.my-4
+                            #toolbar-container
+                                span.ql-formats
+                                    select.ql-font
+                                    select.ql-size
+                                span.ql-formats
+                                    button.ql-bold
+                                    button.ql-italic
+                                    button.ql-underline
+                                    button.ql-strike
+                                span.ql-formats
+                                    select.ql-color
+                                    select.ql-background
+                                span.ql-formats
+                                    button.ql-script(value='sub')
+                                    button.ql-script(value='super')
+                                span.ql-formats
+                                    button.ql-header(value='1')
+                                    button.ql-header(value='2')
+                                    button.ql-blockquote
+                                    button.ql-code-block
+                                span.ql-formats
+                                    button.ql-list(value='ordered')
+                                    button.ql-list(value='bullet')
+                                    button.ql-indent(value='-1')
+                                    button.ql-indent(value='+1')
+                                span.ql-formats
+                                    button.ql-direction(value='rtl')
+                                    select.ql-align
+                                span.ql-formats
+                                    button.ql-link
+                                span.ql-formats
+                                    button.ql-clean
+                            #editor-container(style="height: 300px;")
+
+                        #editorBubble.border(style="height: 300px;")
+
+                                    
+

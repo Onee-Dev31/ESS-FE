@@ -1,0 +1,34 @@
+doctype
+html
+  block vars
+    - var enhancedForm = false
+    - var clientZone = false
+  if (!path)
+    - var path = ''    
+  head
+    include head.pug
+
+  body
+      
+    include mixins.pug
+    include mixins-widgets.pug
+    include dummyText.pug
+    
+    if (current=='components-preloader.html')
+      include inc-preloader  
+
+
+    include navbar.pug
+
+    .d-flex.align-items-stretch
+        include sidebar.pug
+        .page-holder.bg-gray-100
+          .container-fluid.px-lg-4.px-xl-5
+            block content
+
+          include footer.pug
+
+    if (locals.styleSwitcher)
+      include style-switcher.pug
+
+    include scripts.pug

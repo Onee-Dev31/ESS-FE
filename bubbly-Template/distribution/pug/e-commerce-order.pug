@@ -1,0 +1,130 @@
+extends _pug-includes/layout
+
+block vars 
+    - var eCommerce = true;
+    - var current = 'e-commerce-order.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Orders', link: 'e-commerce-orders.html'}) 
+    - breadcrumbs.push({name: 'Order #25646'}) 
+
+block content
+
+        include _pug-includes/inc-datatable-data.pug
+
+        include _pug-includes/inc-data-badges.pug
+
+        include _pug-includes/inc-products-data.pug
+
+        +breadcrumbs(breadcrumbs)
+
+        // Page Header
+        .page-header.d-md-flex.justify-content-between
+            div
+                h1.page-heading Order #25646
+                ul.list-inline.text-sm
+                    li.list-inline-item
+                        a.text-gray-600(href="#!")
+                            i.fas.fa-download.me-2 
+                            | Export
+                    li.list-inline-item
+                        a.text-gray-600(href="#!")
+                            i.fas.fa-print.me-2 
+                            | Print                        
+                    li.list-inline-item
+                        .dropdown
+                            a#moreActions.text-gray-600(href='#!' data-bs-toggle='dropdown' aria-expanded='false')
+                                i.fas.fa-plus-circle.me-2 
+                                | More actions <i class="fas fa-angle-down"></i>
+                            ul.dropdown-menu.text-sm(aria-labelledby='moreActions')
+                                li
+                                    a.dropdown-item.text-muted(href='#') Action
+                                li
+                                    a.dropdown-item.text-muted(href='#') Another action
+                                li
+                                    a.dropdown-item.text-muted(href='#') Something else here 
+            .mt-2 
+                p.mb-2 
+                    span.badge.badge-success-light.me-2.mb-2
+                        span.indicator 
+                        | Paid
+                    span.badge.badge-warning-light 
+                        span.indicator 
+                        | Being Processed
+                p.text-end.text-muted.text-sm <i class="far fa-calendar me-2"></i> Jun 22, 2021 &mdash; 10:25 AM
+
+        .row.mb-5
+            .col-lg-8
+
+                .card.card-table.mb-4
+                    .card-header
+                        h5.card-heading  Order details
+                        +cardOptions
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.table-borderless.mb-0
+                                thead.light
+                                    tr
+                                        th(style='min-width: 300px;') Product
+                                        th Items
+                                        th Price
+                                        th.text-end Total
+                                tbody
+                                    each val, index in products
+                                        if (index < 4)
+                                            - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                            - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                            tr.align-middle
+                                                td 
+                                                    img.card-table-img.img-fluid.me-3(src='img/product/' + val.img, alt='', width='80')
+                                                    span.card-table-text
+                                                        a.text-reset.text-decoration-none(href='#!')
+                                                            strong #{val.title}
+                                                            if (val.variant)
+                                                                <br>
+                                                                span.text-muted #{val.variant}
+
+                                                td 1 
+                                                td #{val.price}
+                                                td.text-end #{val.price}
+
+                .row.gy-4
+                    .col-lg-6
+                        .card
+                            .card-header
+                                h5.card-heading  Invoice address
+                                +cardOptions
+                            .card-body
+                                p.card-text.text-muted John Brown<br>13/25 New Avenue<br>New Heaven<br>45Y 73J<br>England<br>
+                                    strong Great Britain
+                                    span.ms-2.align-middle.mt-n1.avatar.avatar-xxs.bg-cover(style="background-image: url(img/flag/gb.svg)")
+
+                    .col-lg-6
+                        .card
+                            .card-header
+                                h5.card-heading  Shipping address
+                                +cardOptions
+                            .card-body
+                                p.card-text.text-muted John Brown<br>13/25 New Avenue<br>New Heaven<br>45Y 73J<br>England<br>
+                                    strong Great Britain
+                                    span.ms-2.align-middle.mt-n1.avatar.avatar-xxs.bg-cover(style="background-image: url(img/flag/gb.svg)")
+            .col-lg-4
+                .card.card-table
+                    .card-header
+                        h5.card-heading Finance
+                        +cardOptions
+                    .card-body
+                        .table-responsive.my-3
+                            table.table.table-borderless.card-text
+                                tr.text-muted 
+                                    th.fw-normal Products
+                                    td.text-end $165.00
+                                tr.text-muted
+                                    th.fw-normal Shipping Fee
+                                    td.text-end $5.00
+                                tr.text-muted
+                                    th.fw-normal Sales Tax
+                                    td.text-end $7.00
+                                tr
+                                    th Total
+                                    td.text-end $177.00

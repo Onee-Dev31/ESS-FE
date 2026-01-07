@@ -1,0 +1,101 @@
+.sidebar.py-3#sidebar
+    
+    h6.sidebar-heading Main
+    
+    ul.list-unstyled
+
+        - var dashboardSidebar = []
+        - dashboardSidebar.push({name: 'Default', link: 'index.html'})
+        - dashboardSidebar.push({name: 'CMS', link: 'index-cms.html'})
+        - dashboardSidebar.push({name: 'E-commerce', link: 'index-e-commerce.html'})
+        - dashboardSidebar.push({name: 'Projects', link: 'index-projects.html'})
+        - dashboardSidebar.push({name: 'Charts', link: 'index-charts.html'})
+
+        +sidebarDropdown(dashboardSidebar, home, 'Dashboards', 'real-estate-1', current)
+
+        - var cmsSidebar = []
+        - cmsSidebar.push({name: 'Posts', link: 'cms-post.html'})
+        - cmsSidebar.push({name: 'Add new post', link: 'cms-post-new.html'})
+        - cmsSidebar.push({name: 'Categories', link: 'cms-category.html'})
+        - cmsSidebar.push({name: 'Media library', link: 'cms-media.html'})
+
+        +sidebarDropdown(cmsSidebar, cms, 'CMS', 'reading-1', current) 
+
+        - var widgetsSidebar = []
+        - widgetsSidebar.push({name: 'Stats', link: 'widgets-stats.html'})
+        - widgetsSidebar.push({name: 'Data', link: 'widgets-data.html'})
+        +sidebarDropdown(widgetsSidebar, widgets, 'Widgets', 'statistic-1', current)     
+
+        - var eCommerceSidebar = []
+        - eCommerceSidebar.push({name: 'Products', link: 'e-commerce-products.html'})
+        - eCommerceSidebar.push({name: 'Products - New', link: 'e-commerce-product-new.html'})
+        - eCommerceSidebar.push({name: 'Orders', link: 'e-commerce-orders.html'})
+        - eCommerceSidebar.push({name: 'Order - Detail', link: 'e-commerce-order.html'})
+        - eCommerceSidebar.push({name: 'Customers', link: 'e-commerce-customers.html'})
+        +sidebarDropdown(eCommerceSidebar, eCommerce, 'E-commerce', 'delivery-truck-1', current)     
+
+        - var pagesSidebar = []
+        - pagesSidebar.push({name: 'Profile', link: 'pages-profile.html'})
+        - pagesSidebar.push({name: 'Pricing table', link: 'pages-pricing.html'})
+        - pagesSidebar.push({name: 'Contacts', link: 'pages-contacts.html'})
+        - pagesSidebar.push({name: 'Invoice', link: 'pages-invoice.html'})
+        - pagesSidebar.push({name: 'Knowledge base', link: 'pages-knowledge-base.html'})
+        - pagesSidebar.push({name: 'Knowledge base - Topic', link: 'pages-knowledge-base-topic.html'})
+
+        +sidebarDropdown(pagesSidebar, pages, 'Pages', 'paper-stack-1',current) 
+
+        - var userSidebar = []
+        - userSidebar.push({name: 'Login page', link: 'login.html'})
+        - userSidebar.push({name: 'Register', link: 'register.html'})
+        - userSidebar.push({name: 'Login v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span>', link: 'login-2.html'})
+        - userSidebar.push({name: 'Register v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span>', link: 'register-2.html'})
+
+        +sidebarDropdown(userSidebar, user, 'User', 'man-1',current) 
+
+        - var componentsSidebar = []
+        - componentsSidebar.push({name: 'Cards', link: 'components-cards.html'})            
+        - componentsSidebar.push({name: 'Calendar', link: 'components-calendar.html'})
+        - componentsSidebar.push({name: 'Gallery', link: 'components-gallery.html'})
+        - componentsSidebar.push({name: 'Loading buttons', link: 'components-loading-buttons.html'})
+        - componentsSidebar.push({name: 'Maps', link: 'components-map.html'})
+        - componentsSidebar.push({name: 'Notifications', link: 'components-notifications.html'})
+        - componentsSidebar.push({name: 'Preloaders', link: 'components-preloader.html'})
+        
+        +sidebarDropdown(componentsSidebar, components, 'Components', 'sorting-1',current)
+
+        - var chartsSidebar = []
+        - chartsSidebar.push({name: 'Charts', link: 'charts.html'})
+        - chartsSidebar.push({name: 'Gauge + Sparkline', link: 'charts-gauge-sparkline.html'})
+
+        +sidebarDropdown(chartsSidebar, charts, 'Charts', 'pie-chart-1', current)             
+
+        - var formsSidebar = []
+        - formsSidebar.push({name: 'Basic forms', link: 'forms.html'})
+        - formsSidebar.push({name: 'Advanced forms', link: 'forms-advanced.html'})
+        - formsSidebar.push({name: 'Files upload', link: 'forms-dropzone.html'})   
+        - formsSidebar.push({name: 'Text editor', link: 'forms-texteditor.html'})   
+        - formsSidebar.push({name: 'Validation', link: 'forms-validation.html'})   
+
+        +sidebarDropdown(formsSidebar, forms, 'Forms', 'file-storage-1',current)
+
+        - var tablesSidebar = []
+        - tablesSidebar.push({name: 'Bootstrap tables', link: 'tables.html'})
+        - tablesSidebar.push({name: 'Datatable', link: 'tables-datatable.html'})
+
+        +sidebarDropdown(tablesSidebar, tables, 'Tables', 'grid-1', current)      
+                        
+    h6.sidebar-heading Docs
+    
+    ul.list-unstyled
+        +sidebarLink('docs/introduction.html', "Introduction", "angle-brackets-1")
+        +sidebarLink('docs/directory-structure.html', "Directory structure", "table-content-1")
+        +sidebarLink('docs/gulp.html', "Gulp.js", "keyboard-1")
+
+        - var cssSidebar = []
+        - cssSidebar.push({name: 'CSS Components', link: 'docs/components-theme.html'})
+        - cssSidebar.push({name: 'Customizing CSS', link: 'docs/customizing-css.html'})
+
+        +sidebarDropdown(cssSidebar, docsCss, 'CSS', 'design-1', current)   
+
+        +sidebarLink('docs/credits.html', "Credits", "star-medal-1")
+        +sidebarLink('docs/changelog.html', "Changelog", "new-1")

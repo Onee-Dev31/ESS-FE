@@ -1,0 +1,59 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var components = true;
+    - var current = 'components-loading-buttons.html';    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Loading buttons'}) 
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Loading buttons') 
+
+    section
+        .card
+            .card-header
+                h4.card-heading Loading Buttons - Ladda
+            .card-body
+                p A UI concept which merges loading indicators into the action that invoked them. Primarily intended for use with forms where it gives users immediate feedback upon submit rather than leaving them wondering while the browser does its thing.
+                p
+                    button.btn.btn-primary.ladda-button.mb-1(data-style='expand-left')
+                        span.ladda-label expand-left
+                    button.btn.btn-primary.ladda-button.mb-1(data-style='expand-right')
+                        span.ladda-label expand-right
+                    button.btn.btn-primary.ladda-button.mb-1(data-style='expand-up')
+                        span.ladda-label expand-up
+                    button.btn.btn-primary.ladda-button.mb-1(data-style='expand-down')
+                        span.ladda-label expand-down
+                p
+                    button.btn.btn-info.ladda-button.mb-1(data-style='zoom-in')
+                        span.ladda-label zoom-in
+                    button.btn.btn-info.ladda-button.mb-1(data-style='zoom-out')
+                        span.ladda-label zoom-out
+                p
+                    button.btn.btn-warning.ladda-button.mb-1(data-style='slide-left')
+                        span.ladda-label slide-left
+                    button.btn.btn-warning.ladda-button.mb-1(data-style='slide-right')
+                        span.ladda-label slide-right
+                    button.btn.btn-warning.ladda-button.mb-1(data-style='slide-up')
+                        span.ladda-label slide-up
+                    button.btn.btn-warning.ladda-button(data-style='slide-down')
+                        span.ladda-label slide-down
+
+                h5 Built-in progress bar
+                p.ladda-progress-demo
+                    button.btn.btn-danger.ladda-button.ladda-button-progress.mb-1(data-style='expand-right')
+                        span.ladda-label expand-right
+                    button.btn.btn-danger.ladda-button.ladda-button-progress.mb-1(data-style='expand-left')
+                        span.ladda-label expand-left
+                    button.btn.btn-danger.ladda-button.ladda-button-progress.mb-1(data-style='slide-right')
+                        span.ladda-label slide-right
+                h5 Sizes
+                p.card-text
+                    button.btn.btn-primary.btn-sm.ladda-button.mb-1(data-style='expand-right', data-size='s')
+                        span.ladda-label small
+                    button.btn.btn-primary.ladda-button.mb-1(data-style='expand-right', data-size='s')
+                        span.ladda-label normal
+                    button.btn.btn-primary.btn-lg.ladda-button.mb-1(data-style='expand-right', data-size='l')
+                            span.ladda-label large
