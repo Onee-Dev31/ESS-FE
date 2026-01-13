@@ -1,0 +1,316 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-y: auto;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(-45deg, #7179e1, #4650dd, #1f277d,#1666a3);
+  background-size: 400% 400%;
+  box-sizing: border-box;
+  animation: gradientBG 10s ease infinite;
+  padding: 20px;
+}
+
+/* ================= Main Container ================= */
+
+.main-container {
+  display: flex;
+  width: 100%;
+  max-width: 1300px;
+  min-height: 800px;
+  height: 85vh;
+  max-height: 900px;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+/* ================= Login Panel (Left) ================= */
+
+.login-panel {
+  flex: 1;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 2;
+  overflow-y: auto;
+
+  .brand-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 3.5rem; 
+
+    .logoEss-img {
+      max-width: 150px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    p {
+      margin: 5px 0 0 0;
+      color: #666;
+      font-size: 0.95rem;
+      font-weight: 400;
+    }
+  }
+
+  .input-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #666;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      border-bottom: 2px solid #eee;
+      padding: 12px 0;
+      font-size: 1rem;
+      outline: none;
+      background: transparent;
+      transition: border-color 0.3s ease;
+      font-size: 16px;
+
+      &::-ms-reveal {
+        display: none;
+      }
+
+      &:focus {
+        border-color: #4650dd;
+      }
+
+      &::placeholder {
+        color: #ccc;
+      }
+    }
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #ccc;
+
+    &:hover {
+      color: #4650dd;
+    }
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 20px;
+    background: #4650dd;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 2rem;
+    box-shadow: 0 4px 12px rgba(70, 80, 221, 0.2);
+    transition: all 0.3s ease;
+    font-size: large;
+
+    &:hover:not(:disabled) {
+      background: #3942b8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(70, 80, 221, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: #a5aaf0;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  .signup-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .signup-button {
+      background: #f0f2f5;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #4650dd;
+      cursor: pointer;
+      transition: background 0.3s;
+
+      &:hover {
+        background: #e2e5e9;
+        color: #3942b8;
+      }
+    }
+  }
+}
+
+/* ================= Welcome Panel (Right) ================= */
+
+.welcome-panel {
+  flex: 1.2;
+  background-color: #5a5a5c;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+.illustration-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.people-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* ================= RESPONSIVE MEDIA QUERIES ================= */
+
+@media (max-width: 1200px) {
+  .main-container {
+    max-width: 95%;
+    height: 80vh;
+  }
+
+  .login-panel {
+    padding: 3rem;
+  }
+}
+
+@media (max-width: 900px) {
+  :host {
+    height: auto;
+    padding: 0;
+  }
+
+  .main-container {
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .welcome-panel {
+    display: none;
+  }
+
+  .login-panel {
+    padding: 2rem;
+    justify-content: center;
+
+  }
+}
+
+@media (max-width: 480px) {
+  .login-panel {
+    padding: 1.5rem;
+
+    .input-group input {
+      padding: 10px 0;
+    }
+
+    .login-button {
+      padding: 14px;
+      margin-top: 1rem;
+    }
+  }
+}
+
+/* ================= Alert & Loader ================= */
+
+.alert {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.error-msg {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.success-msg {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

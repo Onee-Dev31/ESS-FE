@@ -1,0 +1,47 @@
+<nav class="navbar">
+  <div class="nav-left">
+    <button class="icon-btn menu-trigger" (click)="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <div class="nav-center">
+    <h1 class="nav-title">EES DASHBOARD</h1>
+  </div>
+
+  <div class="nav-right">
+    <div class="search-box">
+      <input type="text" placeholder="Search">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+
+    <div class="nav-actions">
+      <button class="icon-btn">
+        <i class="fas fa-chart-line"></i>
+        <span class="status-dot"></span>
+      </button>
+
+      <button class="icon-btn">
+        <i class="fas fa-paper-plane"></i>
+        <span class="badge">10</span>
+      </button>
+
+      <div class="user-profile">
+        <img src="assets/avatar.jpg" class="avatar" (click)="toggleDropdown()">
+
+        <div class="profile-dropdown" *ngIf="isDropdownOpen">
+          <div class="dropdown-user-info">
+            <div class="name">{{ userName }}</div>
+            <div class="role">{{ userRole }}</div>
+          </div>
+          <ul class="dropdown-menu">
+            <li (click)="isDropdownOpen = false">Settings</li>
+            <li (click)="isDropdownOpen = false">Activity log</li>
+            <li class="divider"></li>
+            <li class="logout" (click)="logout()">Logout</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

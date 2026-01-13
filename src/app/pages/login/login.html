@@ -1,0 +1,52 @@
+  <div class="main-container">
+
+    <div class="login-panel">
+
+      <div class="brand-header">
+        <img src="./02.png" alt="logo-Ess" class="logoEss-img">
+        <h1>ESS</h1>
+        <p>Employee Self-Service System</p>
+      </div>
+
+      <div *ngIf="loginMessage" [ngClass]="{'error-msg': isError, 'success-msg': !isError}" class="alert">
+        {{ loginMessage }}
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" formControlName="email" placeholder="Enter your username">
+        </div>
+
+        <div class="input-group password-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input [type]="passwordFieldType" id="password" formControlName="password" placeholder="Enter your password">
+            <span class="password-toggle" (click)="togglePasswordVisibility()">
+              <i [class]="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <a href="#" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="!loginForm.valid || isLoading">
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading" class="loader"></span>
+        </button>
+      </form>
+
+      <div class="signup-section">
+        <p>Don't have an account?</p>
+        <button class="signup-button">Sign up</button>
+      </div>
+    </div>
+
+    <div class="welcome-panel">
+      <div class="illustration-container">
+        <img src="./people.png" alt="Team onee" class="people-img">
+      </div>
+    </div>
+  </div>

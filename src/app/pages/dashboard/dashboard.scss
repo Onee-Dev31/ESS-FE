@@ -1,0 +1,855 @@
+@use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
+// --- 1. Variables ---
+$primary: #4650dd;
+$dark: #0f172a;
+$muted: #64748b;
+$border-color: #e2e8f0;
+$radius: 12px;
+$shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+$success: #22c55e;
+$warning: #f97316;
+$danger: #ef4444;
+$bg-light: #f8fafc;
+
+// --- 2. Global Reset & Body ---
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f1f5f9;
+  margin: 0;
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  color: $dark;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dashboard-wrapper {
+  padding: 15px;
+  max-width: 1440px;
+  margin: 0 auto;
+
+  @media (min-width: 768px) {
+    padding: 25px;
+  }
+}
+
+.page-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: $dark;
+}
+
+// --- 3. Main Grid Layout ---
+.main-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 340px 1fr;
+  }
+}
+
+// --- 4. Card Component ---
+.card {
+  background: white;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 16px 20px 8px;
+  background: transparent;
+
+  .card-heading {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-footer {
+  padding: 12px 20px;
+  border-top: 1px solid $border-color;
+  border-radius: 0 0 $radius $radius;
+}
+
+// --- 5. Profile Card ---
+.profile-card {
+  .profile-header-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding: 5px;
+
+    .avatar-wrapper {
+      flex-shrink: 0;
+
+      .profile-avatar {
+        width: 75px;
+        height: 75px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: cover;
+      }
+    }
+
+    .profile-content {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+
+      .user-name {
+        margin: 0 0 4px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #000;
+        line-height: 1.3;
+      }
+
+      .user-role {
+        margin: 0 0 6px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #312e81;
+      }
+
+      .user-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        span {
+          font-size: 13px;
+          color: #4338ca;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .divider {
+    margin: 0 0 20px;
+    border-top: 1px dashed $border-color;
+  }
+
+  .profile-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .profile-display-group {
+    .display-label {
+      font-size: 12px;
+      color: $muted;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        color: $primary;
+        font-size: 12px;
+        width: 16px;
+        text-align: center;
+      }
+    }
+
+    .display-value {
+      font-size: 14px;
+      font-weight: 600;
+      padding-left: 22px;
+      word-break: break-word;
+    }
+  }
+}
+
+// --- 6. Stats Grid (Medical) ---
+.stats-grid-card {
+  padding: 20px;
+  background: white;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  margin-bottom: 20px;
+
+  .stats-group-header {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      color: $primary;
+    }
+  }
+}
+
+.stat-items-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  padding: 14px;
+  border-radius: 10px;
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $dark;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label-small {
+      font-weight: 400;
+      color: $muted;
+      font-size: 11px;
+    }
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .stat-progress {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 10px;
+    }
+  }
+}
+
+// --- 7. Mini Stat Cards (Welfare) & Leave Grid ---
+.section-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 15px;
+  color: $dark;
+
+  &.mt-spaced {
+    margin-top: 30px;
+  }
+}
+
+// รวม Grid ของ Welfare กับ Leave ไว้ด้วยกันเพราะใช้เหมือนกันเป๊ะ
+.bottom-stats-grid,
+.leave-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.mini-stat-card {
+  position: relative;
+  height: 100%;
+  min-height: 100px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: none;
+  overflow: hidden;
+
+  .card-body {
+    padding: 16px;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .mini-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .card-info {
+    padding-right: 50px;
+    text-align: left;
+
+    h6 {
+      margin: 0 0 4px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      font-weight: 500;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+  }
+
+  .card-arrow {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+
+    .card-arrow {
+      background: white;
+      color: $primary;
+      transform: scale(1.1);
+    }
+  }
+
+  // เก็บไว้เฉพาะสีที่ใช้จริง
+  &.card-green {
+    background-color: #c9e3ca;
+
+    .mini-icon {
+      color: #698f6a;
+    }
+  }
+
+  &.card-blue {
+    background-color: #d0dee7;
+
+    .mini-icon {
+      color: #7b8c96;
+    }
+  }
+
+  &.card-yellow {
+    background-color: #edd9ce;
+
+    .mini-icon {
+      color: #bd8d73;
+    }
+  }
+}
+
+// --- 8. My IT Story Card ---
+.it-story-card {
+  margin-top: 24px;
+
+  .profile-display-group {
+    margin-bottom: 12px;
+  }
+
+  .display-label {
+    font-size: 12px;
+    color: $muted;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .display-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: $dark;
+    word-break: break-word;
+  }
+}
+
+// --- 9. Leave Card ---
+.leave-card {
+  border: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 130px;
+  transition: transform 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  .leave-body {
+    padding: 18px;
+    background: white;
+    flex-grow: 1;
+
+    .leave-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+
+      .leave-count {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+
+      .leave-icon {
+        font-size: 20px;
+        opacity: 0.8;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 8px;
+      }
+    }
+
+    .leave-label {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .leave-footer {
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+
+    i {
+      font-size: 10px;
+      opacity: 0.6;
+    }
+  }
+
+  // Theme Colors
+  &.theme-green {
+    .leave-icon {
+      color: #35b653;
+    }
+
+    .leave-footer {
+      background-color: #d7f0dd;
+      color: #35b653;
+    }
+  }
+
+  &.theme-purple {
+    .leave-icon {
+      color: #4650dd;
+    }
+
+    .leave-footer {
+      background-color: #dadcf8;
+      color: #4650dd;
+    }
+  }
+
+  &.theme-blue {
+    .leave-icon {
+      color: #0d6efd;
+    }
+
+    .leave-footer {
+      background-color: #cfe2ff;
+      color: #0d6efd;
+    }
+  }
+
+  &.theme-pink {
+    .leave-icon {
+      color: #dc3545;
+    }
+
+    .leave-footer {
+      background-color: #f8d7da;
+      color: #dc3545;
+    }
+  }
+}
+
+// --- 10. Buttons & Utility ---
+.action-btn {
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: color.adjust($primary, $lightness: -5%);
+  }
+}
+
+.action-btn-sm {
+  @extend .action-btn;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.text-red {
+  color: #ef4444;
+}
+
+.bg-red {
+  background: #ef4444;
+}
+
+.text-blue {
+  color: #3b82f6;
+}
+
+.bg-blue {
+  background: #3b82f6;
+}
+
+.text-green {
+  color: #22c55e;
+}
+
+.bg-green {
+  background: #22c55e;
+}
+
+.text-indigo {
+  color: #6366f1;
+}
+
+.bg-indigo {
+  background: #6366f1;
+}
+
+.text-end {
+  text-align: right;
+}
+
+// --- 11. Schedule Card ---
+.schedule-card {
+  background: white;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  border: 1px solid white;
+  overflow: hidden;
+  margin-top: 24px;
+
+  .schedule-body {
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 1024px) {
+      flex-direction: row;
+    }
+  }
+}
+
+.holiday-list-panel {
+  background-color: $bg-light;
+  padding: 24px;
+  width: 100%;
+  border-bottom: 1px solid $border-color;
+
+  @media (min-width: 1024px) {
+    width: 280px;
+    flex-shrink: 0;
+    border-bottom: none;
+    border-right: 1px solid $border-color;
+  }
+
+  .panel-title {
+    margin: 0 0 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: $primary;
+  }
+
+  .holiday-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .holiday-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 5px;
+        flex-shrink: 0;
+        background-color: $success;
+
+        &.dot-green {
+          background-color: $success;
+        }
+
+        // เหลือแค่สีเขียวที่ใช้จริง
+      }
+
+      .holiday-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .h-date {
+          font-weight: 700;
+          color: $dark;
+          font-size: 13px;
+        }
+
+        .h-name {
+          color: color.adjust($success, $lightness: -10%);
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+.calendar-panel {
+  flex-grow: 1;
+  padding: 20px;
+  background: white;
+  min-width: 0;
+}
+
+.schedule-footer {
+  background: white;
+  padding: 16px 24px;
+  border-top: 1px solid $border-color;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: $muted;
+
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+
+      &.box-gray {
+        background: #94a3b8;
+      }
+
+      &.box-red {
+        background: $danger;
+      }
+
+      &.box-green {
+        background: $success;
+      }
+
+      &.box-orange {
+        background: $warning;
+      }
+
+      &.box-blue {
+        background: #3b82f6;
+      }
+    }
+  }
+}
+
+// --- 12. FullCalendar Overrides ---
+.fc {
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  --fc-border-color: #f1f5f9;
+
+  .fc-toolbar-title {
+    font-size: 18px !important;
+    font-weight: 700;
+    color: $primary;
+  }
+
+  .fc-button-primary {
+    background: transparent;
+    border: none;
+    color: $muted;
+    box-shadow: none !important;
+
+    &:hover,
+    &:active {
+      background: color.adjust($primary, $lightness: 40%) !important;
+      color: $primary !important;
+    }
+
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+
+  .fc-col-header-cell-cushion {
+    color: $dark;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 0;
+    text-decoration: none;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 90px;
+    padding: 6px;
+    display: flex;
+    justify-content: center;
+  }
+
+  td,
+  th {
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .fc-scrollgrid {
+    border: none;
+  }
+}
+
+// --- 13. Custom Date Cell (Injected) ---
+.date-cell-custom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  .date-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: $muted;
+    border: 1px solid transparent;
+
+    &.circle-red-outline {
+      border-color: $danger;
+      color: $danger;
+      background-color: rgba($danger, 0.05);
+    }
+
+    &.circle-green-outline {
+      border-color: $success;
+      color: $success;
+      background-color: rgba($success, 0.05);
+    }
+
+    &.circle-orange-outline {
+      border-color: $warning;
+      color: $warning;
+      background-color: rgba($warning, 0.05);
+    }
+  }
+
+  .date-code {
+    font-size: 10px;
+    color: #94a3b8;
+    line-height: 1;
+    margin-bottom: 2px;
+
+    &.text-red {
+      color: $danger;
+    }
+
+    &.text-green {
+      color: $success;
+    }
+
+    &.text-orange {
+      color: $warning;
+    }
+  }
+
+  .date-note {
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    &.text-green {
+      color: color.adjust($success, $lightness: -5%);
+    }
+
+    &.text-orange {
+      color: color.adjust($warning, $lightness: -5%);
+    }
+  }
+}

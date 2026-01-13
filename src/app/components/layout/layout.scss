@@ -1,0 +1,68 @@
+// layout.scss
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+
+  .main-wrapper {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+
+    // --- ส่วนกล่องแม่ของ Sidebar ---
+    .sidebar-container {
+      height: 100%;
+      background: #ffffff;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); // ปรับเวลาให้ตรงกับ sidebar
+      flex-shrink: 0; // ห้ามหดอัตโนมัติ ให้เชื่อ width ที่เรากำหนด
+      z-index: 1000;
+      
+      // 1. ค่าเริ่มต้น (จอใหญ่ > 1024px)
+      width: 230px;
+
+      // 2. จอ Tablet (<= 1024px) 
+      // เริ่มต้นมาให้เป็นโหมดไอคอน (80px) เลย
+      @media (max-width: 1024px) {
+        width: 80px; 
+      }
+    }
+
+    // --- ส่วนเนื้อหา Dashboard ---
+    .content-container {
+      flex: 1; // สั่งให้ยืดเต็มพื้นที่ที่เหลือ (นี่คือตัวแก้พื้นที่ขาว)
+      height: 100%;
+      overflow-y: auto;
+      background: #f8fafc;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      
+      // ไม่ต้องใส่ margin-left แล้ว เพราะ flex: 1 จะจัดการให้เอง
+    }
+  }
+
+  // --- Logic เมื่อกดปุ่ม Hamburger (Collapsed) ---
+  &.collapsed {
+    
+    // กรณีจอใหญ่ (> 1024px) -> ยุบเหลือ 80px
+    @media (min-width: 1025px) {
+      .sidebar-container {
+        width: 80px !important;
+      }
+    }
+
+    // กรณีจอ Tablet (<= 1024px) -> ยุบแล้วหายไปเลย (0px)
+    @media (max-width: 1024px) {
+      .sidebar-container {
+        width: 0px !important;
+        border-right: none; // ซ่อนเส้นขอบด้วย
+      }
+    }
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
