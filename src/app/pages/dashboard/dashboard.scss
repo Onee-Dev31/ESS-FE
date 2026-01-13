@@ -288,7 +288,8 @@ body {
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
   border: none;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 1;
 
   .card-body {
     padding: 16px;
@@ -852,4 +853,54 @@ body {
       color: color.adjust($warning, $lightness: -5%);
     }
   }
+}
+
+/* Container ของ Tooltip */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+/* ตัวกล่องข้อความที่จะแสดง */
+.tooltip-text {
+  visibility: hidden;
+  width: 220px; /* ความกว้างของกล่อง */
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 100;
+  bottom: 125%; /* ให้ลอยอยู่ด้านบน */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  font-weight: normal;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* ลูกศรชี้ลงมาที่ไอคอน */
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* เมื่อ Hover หรือ Click (Focus) ให้แสดงกล่อง */
+.tooltip-container:hover .tooltip-text,
+.tooltip-container:focus .tooltip-text,
+.tooltip-container:active .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }

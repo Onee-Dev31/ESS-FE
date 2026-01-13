@@ -2,19 +2,17 @@
   <div class="sidebar-scroll">
     <div class="menu-section">
       <h3 class="section-title">Main</h3>
-      
+
       <ul class="nav-list">
         <li class="nav-item" [class.open]="openMenu === 'Dashboards'">
-          <div class="nav-link" 
-               (click)="toggleMenu('Dashboards')" 
-               [class.active]="openMenu === 'Dashboards'">
+          <div class="nav-link" (click)="toggleMenu('Dashboards')" [class.active]="openMenu === 'Dashboards'">
             <div class="link-content">
               <i class="fas fa-home nav-icon"></i>
               <span class="link-text">Dashboards</span>
               <i class="fas fa-chevron-down arrow-icon"></i>
             </div>
           </div>
-          
+
           <ul class="sub-menu" [class.expanded]="openMenu === 'Dashboards'">
             <li class="sub-item" routerLink="/dashboard/default" routerLinkActive="active">Default</li>
             <li class="sub-item" routerLink="/dashboard/cms" routerLinkActive="active">CMS</li>
@@ -23,9 +21,7 @@
         </li>
 
         <li class="nav-item" *ngFor="let item of menuItems" [class.open]="openMenu === item.name">
-          <div class="nav-link" 
-               (click)="toggleMenu(item.name)"
-               [class.active]="openMenu === item.name">
+          <div class="nav-link" (click)="toggleMenu(item.name)" [class.active]="openMenu === item.name">
             <div class="link-content">
               <i [class]="'fas ' + item.icon + ' nav-icon'"></i>
               <span class="link-text">{{ item.name }}</span>
@@ -47,17 +43,17 @@
     </div>
 
     <div class="menu-section">
-        <h3 class="section-title">Docs</h3>
-        <ul class="nav-list">
-            <li class="nav-item">
-                <div class="nav-link">
-                    <div class="link-content">
-                        <i class="fas fa-book nav-icon"></i>
-                        <span class="link-text">คู่มือการใช้งาน</span>
-                    </div>
-                </div>
-            </li>
-        </ul>
+      <h3 class="section-title">Docs</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <div class="nav-link">
+            <div class="link-content">
+              <i class="fas fa-book nav-icon"></i>
+              <span class="link-text">คู่มือการใช้งาน</span>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </aside>
