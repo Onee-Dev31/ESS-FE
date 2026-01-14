@@ -5,7 +5,6 @@
 
   <main class="content-body">
     <div class="top-profile-grid">
-      
       <div class="banner-avatar-section">
         <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
           <i class="fas fa-pen"></i>
@@ -33,7 +32,7 @@
                 <h3 class="user-name">แพรวนภา บุตรโคษา</h3>
                 <p class="user-role">JC01-เจ้าหน้าที่ตรวจสอบคำบรรยายแทนเสียง</p>
                 <div class="user-meta">
-                  <span>รหัสกะ : O01 - 09.00-18.00</span><br>
+                  <span>รหัสกะ : O01 - 09.00-18.00</span><br />
                   <span>เวลาตั้งแต่ : 09:00 - 18:00</span>
                 </div>
               </div>
@@ -45,7 +44,7 @@
           <div class="profile-info-list">
             <div class="profile-display-group" *ngFor="let item of profileList">
               <label class="display-label">
-                <i [class]="item.icon"></i> {{ item.label }}
+                <i [class]="item.icon" [style.color]="item.iconColor"></i> {{ item.label }}
               </label>
               <div class="display-value">{{ item.value }}</div>
             </div>
@@ -75,7 +74,6 @@
       </section>
 
       <aside class="content-sidebar">
-        
         <section class="stats-grid-card">
           <div class="stats-group-header">
             <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
@@ -93,7 +91,11 @@
                 </span>
               </div>
               <div class="stat-progress">
-                <div class="progress-bar" [ngClass]="stat.progressColor" [style.width.%]="stat.percent"></div>
+                <div
+                  class="progress-bar"
+                  [ngClass]="stat.progressColor"
+                  [style.width.%]="stat.percent"
+                ></div>
               </div>
             </div>
           </div>
@@ -105,11 +107,11 @@
 
         <p class="section-title">สวัสดิการ</p>
         <div class="bottom-stats-grid">
-          <div 
-            class="card mini-stat-card" 
-            *ngFor="let item of welfareStats" 
-            [ngClass]="item.cardClass || ''">
-            
+          <div
+            class="card mini-stat-card"
+            *ngFor="let item of welfareStats"
+            [ngClass]="item.cardClass || ''"
+          >
             <div class="card-body">
               <div class="mini-icon">
                 <i [class]="item.iconName"></i>
@@ -135,7 +137,9 @@
             <div class="leave-body">
               <div class="leave-header">
                 <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
-                <div class="leave-icon"><i [class]="leave.iconClass"></i></div>
+                <div class="leave-icon">
+                  <i [class]="leave.iconClass" [style.color]="leave.iconColor || '#888'"></i>
+                </div>
               </div>
               <p class="leave-label">{{ leave.label }}</p>
             </div>
@@ -154,7 +158,7 @@
       <div class="schedule-body">
         <div class="holiday-list-panel">
           <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-          <ul class="holiday-list" style="padding: 0; list-style: none;">
+          <ul class="holiday-list" style="padding: 0; list-style: none">
             <li class="holiday-item" *ngFor="let h of holidays">
               <span class="status-dot dot-green"></span>
               <div class="holiday-info">

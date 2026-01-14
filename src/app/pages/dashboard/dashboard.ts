@@ -7,12 +7,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 // Interfaces
-interface ProfileItem { label: string; value: string; icon?: string; }
+interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
 interface WelfareItem { 
   title: string; 
   amount: string; 
-  iconName: string; // ใช้เก็บ Class ของ FontAwesome
+  iconName: string; 
   cardClass?: string;
   titleColor?: string;
   amountColor?: string;
@@ -23,6 +23,7 @@ interface LeaveItem {
   count: string;
   countColor: string;
   iconClass: string;
+  iconColor?: string; // <--- เพิ่มตรงนี้สำหรับส่วนการลา
   theme: string;
   balance: number;
 }
@@ -33,10 +34,10 @@ interface HolidayItem { date: string; name: string; }
   standalone: true,
   imports: [
     CommonModule,
-    FullCalendarModule, // เอา NgIconsModule ออกแล้ว
+    FullCalendarModule, 
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss', // ตรวจสอบชื่อไฟล์ SCSS ให้ตรงกับโปรเจกต์จริง
+  styleUrl: './dashboard.scss', 
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent {
@@ -47,11 +48,11 @@ export class DashboardComponent {
 
   // 1. Profile Data
   profileList: ProfileItem[] = [
-    { label: 'Email', value: 'praewnapa.boo@onee.one', icon: 'fas fa-envelope' },
-    { label: 'เบอร์โทรศัพท์', value: '9409', icon: 'fas fa-phone-alt' },
-    { label: 'ชั้น', value: '15', icon: 'fas fa-layer-group' },
-    { label: 'แผนก', value: '11206 - Program Development', icon: 'fas fa-sitemap' },
-    { label: 'บริษัท', value: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด', icon: 'fas fa-building' }
+    { label: 'Email', value: 'praewnapa.boo@onee.one', icon: 'fas fa-envelope', iconColor: '#ffffff' },
+    { label: 'เบอร์โทรศัพท์', value: '9409', icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
+    { label: 'ชั้น', value: '15', icon: 'fas fa-layer-group', iconColor: '#ffffff' },
+    { label: 'แผนก', value: '11206 - Program Development', icon: 'fas fa-sitemap', iconColor: '#ffffff' },
+    { label: 'บริษัท', value: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด', icon: 'fas fa-building', iconColor: '#ffffff' }
   ];
 
   // 2. IT Story Data
@@ -71,12 +72,12 @@ export class DashboardComponent {
     { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-green', progressColor: 'bg-green', percent: 7.5 },
   ];
 
-  // 4. Welfare Data (Modified to use FontAwesome)
+  // 4. Welfare Data
   welfareStats: WelfareItem[] = [
     { 
       title: 'ค่าเบี้ยเลี้ยง', 
       amount: '10,500', 
-      iconName: 'fas fa-dollar-sign', // เปลี่ยนเป็น FA
+      iconName: 'fas fa-dollar-sign', 
       cardClass: 'card-green',
       titleColor: '#15803d',
       amountColor: '#15803d'
@@ -84,7 +85,7 @@ export class DashboardComponent {
     { 
       title: 'ค่ารถ', 
       amount: '584', 
-      iconName: 'fas fa-car', // เปลี่ยนเป็น FA
+      iconName: 'fas fa-car', 
       cardClass: 'card-blue',
       tooltip: `<strong>เงื่อนไข:</strong><br />- ก่อน 06:00 น. หรือ หลัง 22:00 น.<br />- เบิกได้ไม่เกิน 120 บาท/ครั้ง`,
       titleColor: '#1e40af',
@@ -93,7 +94,7 @@ export class DashboardComponent {
     { 
       title: 'ค่าแท็กซี่', 
       amount: '876', 
-      iconName: 'fas fa-taxi', // เปลี่ยนเป็น FA
+      iconName: 'fas fa-taxi', 
       cardClass: 'card-yellow',
       tooltip: `<strong>เงื่อนไข:</strong><br />- วงเงิน 1,000 บาท / ปี<br />- เฉพาะเดินทางไป-กลับ สนง. เท่านั้น`,
       titleColor: '#9a3412',
@@ -126,16 +127,88 @@ export class DashboardComponent {
   ];
 
   // 5. Leave Stats
-leaveStats: LeaveItem[] = [
-    { label: 'ลาพักร้อน', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-plane-departure', theme: 'theme-pink', balance: 8 },
-    { label: 'ลากิจ', count: '03/06', countColor: '#0d6efd', iconClass: 'fas fa-briefcase', theme: 'theme-blue', balance: 3 },
-    { label: 'ลาป่วย', count: '10/30', countColor: '#4650dd', iconClass: 'fas fa-stethoscope', theme: 'theme-purple', balance: 20 },
-    { label: 'ลาเพื่อประกอบพิธีสมรส', count: '0/5', countColor: '#35b653', iconClass: 'fas fa-ring', theme: 'theme-green', balance: 5 },
-    { label: 'ลาคลอด', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-baby-carriage', theme: 'theme-pink', balance: 8 },
-    { label: 'ลาต่อเนื่องจากลาคลอด (บุตรเจ็บป่วย)', count: '03/06', countColor: '#0d6efd', iconClass: 'fas fa-hand-holding-heart', theme: 'theme-blue', balance: 3 },
-    { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', theme: 'theme-purple', balance: 3 },
-    { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', theme: 'theme-green', balance: 3 },
-    { label: 'ลาป่วยเกิน 30 วัน', count: '03/06', countColor: '#dc3545', iconClass: 'fas fa-procedures', theme: 'theme-pink', balance: 3 },
+  leaveStats: LeaveItem[] = [
+    { 
+      label: 'ลาพักร้อน', 
+      count: '01/09', 
+      countColor: '#dc3545', 
+      iconClass: 'fas fa-plane-departure', 
+      iconColor: '#ef4444', 
+      theme: 'theme-pink', 
+      balance: 8 
+    },
+    { 
+      label: 'ลากิจ', 
+      count: '03/06', 
+      countColor: '#0d6efd', 
+      iconClass: 'fas fa-briefcase', 
+      iconColor: '#3b82f6',
+      theme: 'theme-blue', 
+      balance: 3 
+    },
+    { 
+      label: 'ลาป่วย', 
+      count: '10/30', 
+      countColor: '#4650dd', 
+      iconClass: 'fas fa-stethoscope', 
+      iconColor: '#4049c7',
+      theme: 'theme-purple', 
+      balance: 20 
+    },
+    { 
+      label: 'ลาเพื่อประกอบพิธีสมรส', 
+      count: '0/5', 
+      countColor: '#35b653', 
+      iconClass: 'fas fa-ring', 
+      iconColor: '#35b653',
+      theme: 'theme-green', 
+      balance: 5 
+    },
+    { 
+      label: 'ลาคลอด', 
+      count: '01/09', 
+      countColor: '#dc3545', 
+      iconClass: 'fas fa-baby-carriage', 
+      iconColor: '#ef4444',
+      theme: 'theme-pink', 
+      balance: 8 
+    },
+    { 
+      label: 'ลาต่อเนื่องจากลาคลอด (บุตรเจ็บป่วย)', 
+      count: '03/06', 
+      countColor: '#0d6efd', 
+      iconClass: 'fas fa-hand-holding-heart', 
+      iconColor: '#3b82f6', 
+      theme: 'theme-blue', 
+      balance: 3 
+    },
+    { 
+      label: 'ลาทำหมัน', 
+      count: '03/06', 
+      countColor: '#4650dd', 
+      iconClass: 'fas fa-user-md', 
+      iconColor: '#4049c7',
+      theme: 'theme-purple', 
+      balance: 3 
+    },
+    { 
+      label: 'ลาเพื่อจัดการงานศพ', 
+      count: '03/06', 
+      countColor: '#35b653', 
+      iconClass: 'fas fa-ribbon', 
+      iconColor: '#35b653',
+      theme: 'theme-green', 
+      balance: 3 
+    },
+    { 
+      label: 'ลาป่วยเกิน 30 วัน', 
+      count: '03/06', 
+      countColor: '#dc3545', 
+      iconClass: 'fas fa-procedures', 
+      iconColor: '#ef4444',
+      theme: 'theme-pink', 
+      balance: 3 
+    },
   ];
 
   // 6. Holidays
