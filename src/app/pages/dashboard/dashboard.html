@@ -4,93 +4,67 @@
   </header>
 
   <main class="content-body">
-    <div class="main-layout-grid">
-      <section class="content-main">
-        <div class="card profile-card">
-          <div class="card-header border-0">
-            <h4 class="card-heading">My Profile</h4>
-          </div>
-          <div class="card-body">
-            <div class="profile-header-card mb-4">
-              <div class="avatar-wrapper">
-                <img class="profile-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Avatar" />
-              </div>
+    <div class="top-profile-grid">
+      
+      <div class="banner-avatar-section">
+        <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
+          <i class="fas fa-pen"></i>
+        </button>
 
+        <div class="avatar-frame">
+          <img
+            src="https://randomuser.me/api/portraits/women/44.jpg"
+            alt="Profile Avatar"
+            class="avatar-img"
+          />
+        </div>
+      </div>
+
+      <div class="card profile-card">
+        <button type="button" class="action-btn-outline top-right-pos">
+          <i class="fas fa-edit"></i> ขอแก้ไขข้อมูล
+        </button>
+
+        <div class="card-body">
+          <div class="profile-left-section">
+            <div class="profile-header-card">
               <div class="profile-content">
-                <h3 class="user-name">OTD01030 แพรวนภา บุตรโคษา</h3>
+                <h3 class="user-id">OTD01030</h3>
+                <h3 class="user-name">แพรวนภา บุตรโคษา</h3>
                 <p class="user-role">JC01-เจ้าหน้าที่ตรวจสอบคำบรรยายแทนเสียง</p>
                 <div class="user-meta">
-                  <span>รหัสกะ : O01 - 09.00-18.00</span>
+                  <span>รหัสกะ : O01 - 09.00-18.00</span><br>
                   <span>เวลาตั้งแต่ : 09:00 - 18:00</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <hr class="divider mb-4" />
+          <hr class="divider" />
 
-            <div class="profile-info-list">
-              <div class="profile-display-group">
-                <label class="display-label"><i class="fas fa-envelope"></i> Email</label>
-                <div class="display-value">praewnapa.boo@onee.one</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์</label>
-                <div class="display-value">9409</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label"><i class="fas fa-layer-group"></i> ชั้น</label>
-                <div class="display-value">15</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label"><i class="fas fa-sitemap"></i> แผนก</label>
-                <div class="display-value">11206 - Program Development & Commercial Op</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label"><i class="fas fa-building"></i> บริษัท</label>
-                <div class="display-value">OTV-บริษัท วัน สามสิบเอ็ด จำกัด</div>
-              </div>
+          <div class="profile-info-list">
+            <div class="profile-display-group" *ngFor="let item of profileList">
+              <label class="display-label">
+                <i [class]="item.icon"></i> {{ item.label }}
+              </label>
+              <div class="display-value">{{ item.value }}</div>
             </div>
           </div>
-          <div class="card-footer text-end">
-            <button type="button" class="action-btn">ขอแก้ไขข้อมูล</button>
-          </div>
         </div>
+      </div>
+    </div>
 
+    <div class="main-layout-grid mt-4">
+      <section class="content-main">
         <div class="card it-story-card">
           <div class="card-header border-0">
             <h4 class="card-heading">My IT Story</h4>
           </div>
           <div class="card-body">
             <div class="profile-info-list">
-              <div class="profile-display-group">
-                <label class="display-label"
-                  >Account เข้าเครื่องคอม, Email, Wifi, ระบบภายในต่างๆ</label
-                >
-                <div class="display-value">praewnapaboo</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label">Account expire date</label>
-                <div class="display-value">16-Jul-2026</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label">Laptop</label>
-                <div class="display-value">Dell 555 Asset No. 44545sf45dfd86</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label">PC</label>
-                <div class="display-value">Dell 888 Asset No. 415v489dfg7df/9</div>
-              </div>
-
-              <div class="profile-display-group">
-                <label class="display-label">Monitor</label>
-                <div class="display-value">Dell 999 Asset No. 415v489dfg7df/9</div>
+              <div class="profile-display-group" *ngFor="let item of itList">
+                <label class="display-label">{{ item.label }}</label>
+                <div class="display-value">{{ item.value }}</div>
               </div>
             </div>
           </div>
@@ -101,53 +75,25 @@
       </section>
 
       <aside class="content-sidebar">
+        
         <section class="stats-grid-card">
           <div class="stats-group-header">
             <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
           </div>
 
           <div class="stat-items-grid">
-            <div class="stat-item">
-              <div class="stat-label">ผู้ป่วยนอก <span class="label-small">(15,000/ปี)</span></div>
+            <div class="stat-item" *ngFor="let stat of medicalStats">
+              <div class="stat-label">
+                {{ stat.label }} <span class="label-small">{{ stat.subLabel }}</span>
+              </div>
               <div class="stat-row">
-                <span class="stat-value">ใช้ไป 3,000</span>
-                <span class="stat-percent text-red">คงเหลือ 12,000</span>
+                <span class="stat-value">ใช้ไป {{ stat.used }}</span>
+                <span class="stat-percent" [ngClass]="stat.balanceColor">
+                  คงเหลือ {{ stat.balance }}
+                </span>
               </div>
               <div class="stat-progress">
-                <div class="progress-bar bg-red" style="width: 20%"></div>
-              </div>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-label">ทันตกรรม <span class="label-small">(1,000/ปี)</span></div>
-              <div class="stat-row">
-                <span class="stat-value">ใช้ไป 1,000</span>
-                <span class="stat-percent text-blue">คงเหลือ 0</span>
-              </div>
-              <div class="stat-progress">
-                <div class="progress-bar bg-blue" style="width: 100%"></div>
-              </div>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-label">สายตา <span class="label-small">(1,000/ปี)</span></div>
-              <div class="stat-row">
-                <span class="stat-value">ใช้ไป 1,000</span>
-                <span class="stat-percent text-indigo">คงเหลือ 0</span>
-              </div>
-              <div class="stat-progress">
-                <div class="progress-bar bg-indigo" style="width: 100%"></div>
-              </div>
-            </div>
-
-            <div class="stat-item">
-              <div class="stat-label">ผู้ป่วยใน <span class="label-small">(40,000/ปี)</span></div>
-              <div class="stat-row">
-                <span class="stat-value">ใช้ไป 3,000</span>
-                <span class="stat-percent text-green">คงเหลือ 3.7หมื่น</span>
-              </div>
-              <div class="stat-progress">
-                <div class="progress-bar bg-green" style="width: 7.5%"></div>
+                <div class="progress-bar" [ngClass]="stat.progressColor" [style.width.%]="stat.percent"></div>
               </div>
             </div>
           </div>
@@ -159,143 +105,24 @@
 
         <p class="section-title">สวัสดิการ</p>
         <div class="bottom-stats-grid">
-          <div class="card mini-stat-card card-green">
+          <div 
+            class="card mini-stat-card" 
+            *ngFor="let item of welfareStats" 
+            [ngClass]="item.cardClass || ''">
+            
             <div class="card-body">
               <div class="mini-icon">
-                <ng-icon name="heroCurrencyDollarSolid" size="20px"></ng-icon>
+                <i [class]="item.iconName"></i>
               </div>
               <div class="card-info">
-                <h6 style="color: #698f6a">ค่าเบี้ยเลี้ยง</h6>
-                <h3 style="color: #698f6a">10,500</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card card-blue">
-            <div class="card-body">
-              <div class="mini-icon"><ng-icon name="tablerCar" size="20px"></ng-icon></div>
-              <div class="card-info">
-                <h6>
-                  ค่ารถ
-                  <div class="tooltip-container" tabindex="0">
+                <h6 [style.color]="item.titleColor">
+                  {{ item.title }}
+                  <div class="tooltip-container" tabindex="0" *ngIf="item.tooltip">
                     <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข:</strong><br />
-                      - ค่ารถก่อน 06:00 น. ต้องเข้างานก่อน 06:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />
-                      - ค่ารถหลัง 22:00 น. ต้องเข้างานเกิน 22:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />
-                    </span>
+                    <span class="tooltip-text" [innerHTML]="item.tooltip"></span>
                   </div>
                 </h6>
-                <h3>584</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card card-yellow">
-            <div class="card-body">
-              <div class="mini-icon">
-                <ng-icon name="bootstrapTaxiFrontFill" size="20px"></ng-icon>
-              </div>
-              <div class="card-info">
-                <h6>
-                  ค่าแท็กซี่
-                  <div class="tooltip-container" tabindex="0">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข:</strong><br />
-                      - วงเงิน 1,000 บาท / ปี<br />
-                      - เฉพาะเดินทางไป-กลับ สนง. เท่านั้น
-                    </span>
-                  </div>
-                </h6>
-                <h3>876</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card">
-            <div class="card-body">
-              <div class="mini-icon"><ng-icon name="tablerFriends" size="20px"></ng-icon></div>
-              <div class="card-info">
-                <h6>
-                  ค่าสมรส
-                  <div class="tooltip-container" tabindex="0">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข:</strong><br />
-                      - อายุงานครบ 1 ปี<br />
-                      - เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน
-                    </span>
-                  </div>
-                </h6>
-                <h3>3,500</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card">
-            <div class="card-body">
-              <div class="mini-icon"><ng-icon name="matSelfImprovement" size="20px"></ng-icon></div>
-              <div class="card-info">
-                <h6>
-                  ค่าอุปสมบท
-                  <div class="tooltip-container" tabindex="0">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข:</strong><br />
-                      - อายุงาน 1 ปี เพศชาย<br />
-                      - เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน
-                    </span>
-                  </div>
-                </h6>
-                <h3>10,500</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card">
-            <div class="card-body">
-              <div class="mini-icon"><ng-icon name="tablerGrave2" size="20px"></ng-icon></div>
-              <div class="card-info">
-                <h6>
-                  ค่าฌาปนกิจ
-                  <div class="tooltip-container" tabindex="0">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข :</strong><br />
-                      - เบิกได้ 80,000 บาท/ตลอดอายุงาน<br />
-                      - พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000
-                      บาท/คน
-                    </span>
-                  </div>
-                </h6>
-                <h3>584</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-
-          <div class="card mini-stat-card">
-            <div class="card-body">
-              <div class="mini-icon"><ng-icon name="tablerFlower" size="20px"></ng-icon></div>
-              <div class="card-info">
-                <h6>
-                  ค่าพวงหรีด
-                  <div class="tooltip-container" tabindex="0">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text">
-                      <strong>เงื่อนไข :</strong><br />
-                      - เบิกได้ 12,000 บาท/ตลอดอายุงาน<br />
-                      - พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน
-                    </span>
-                  </div>
-                </h6>
-                <h3>876</h3>
+                <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
               </div>
               <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </div>
@@ -304,160 +131,35 @@
 
         <p class="section-title mt-spaced">ลาหยุดงาน</p>
         <div class="leave-stats-grid">
-          <div class="card leave-card theme-pink">
+          <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
             <div class="leave-body">
               <div class="leave-header">
-                <h3 class="leave-count" style="color: #dc3545">01/09</h3>
-                <div class="leave-icon"><i class="fas fa-plane-departure"></i></div>
+                <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
+                <div class="leave-icon"><i [class]="leave.iconClass"></i></div>
               </div>
-              <p class="leave-label">ลาพักร้อน</p>
+              <p class="leave-label">{{ leave.label }}</p>
             </div>
             <div class="leave-footer">
-              <span class="">คงเหลือ 8 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-blue">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #0d6efd">03/06</h3>
-                <div class="leave-icon"><i class="fas fa-briefcase"></i></div>
-              </div>
-              <p class="leave-label">ลากิจ</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 3 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-purple">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #4650dd">10/30</h3>
-                <div class="leave-icon"><i class="fas fa-stethoscope"></i></div>
-              </div>
-              <p class="leave-label">ลาป่วย</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 20 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-green">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #35b653">0/5</h3>
-                <div class="leave-icon"><i class="fas fa-ring"></i></div>
-              </div>
-              <p class="leave-label">ลาเพื่อประกอบพิธีสมรส</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 5 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-pink">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #dc3545">01/09</h3>
-                <div class="leave-icon"><i class="fas fa-baby-carriage"></i></div>
-              </div>
-              <p class="leave-label">ลาคลอด</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 8 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-blue">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #0d6efd">03/06</h3>
-                <div class="leave-icon"><i class="fas fa-hand-holding-heart"></i></div>
-              </div>
-              <p class="leave-label">ลาต่อเนื่องจากลาคลอด (บุตรเจ็บป่วย)</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 3 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-purple">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #4650dd">03/06</h3>
-                <div class="leave-icon"><i class="fas fa-user-md"></i></div>
-              </div>
-              <p class="leave-label">ลาทำหมัน</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 3 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-green">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #35b653">03/06</h3>
-                <div class="leave-icon"><i class="fas fa-ribbon"></i></div>
-              </div>
-              <p class="leave-label">ลาเพื่อจัดการงานศพ</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 3 วัน</span>
-              <i class="fas fa-chevron-right"></i>
-            </div>
-          </div>
-
-          <div class="card leave-card theme-pink">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" style="color: #dc3545">03/06</h3>
-                <div class="leave-icon"><i class="fas fa-procedures"></i></div>
-              </div>
-              <p class="leave-label">ลาป่วยเกิน 30 วัน</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ 3 วัน</span>
+              <span class="">คงเหลือ {{ leave.balance }} วัน</span>
               <i class="fas fa-chevron-right"></i>
             </div>
           </div>
         </div>
       </aside>
     </div>
+
     <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
 
     <div class="card schedule-card">
       <div class="schedule-body">
         <div class="holiday-list-panel">
           <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-          <ul class="holiday-list">
-            <li class="holiday-item">
+          <ul class="holiday-list" style="padding: 0; list-style: none;">
+            <li class="holiday-item" *ngFor="let h of holidays">
               <span class="status-dot dot-green"></span>
               <div class="holiday-info">
-                <span class="h-date">05/12/2569</span>
-                <span class="h-name">วันคล้ายวันพระบรมราชสมภพ...</span>
-              </div>
-            </li>
-            <li class="holiday-item">
-              <span class="status-dot dot-green"></span>
-              <div class="holiday-info">
-                <span class="h-date">10/12/2569</span>
-                <span class="h-name">วันรัฐธรรมนูญ</span>
-              </div>
-            </li>
-            <li class="holiday-item">
-              <span class="status-dot dot-green"></span>
-              <div class="holiday-info">
-                <span class="h-date">31/12/2569</span>
-                <span class="h-name">วันสิ้นปี</span>
+                <span class="h-date">{{ h.date }}</span>
+                <span class="h-name">{{ h.name }}</span>
               </div>
             </li>
           </ul>
