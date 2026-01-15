@@ -176,6 +176,7 @@ body {
       grid-column: 2;
       display: flex;
       flex-direction: column;
+
     }
 
     .banner-avatar-section,
@@ -324,8 +325,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-
-    // [แก้ไข] กำหนดความสูงให้เท่ากับฝั่งซ้าย
     min-height: 250px;
   }
 
@@ -408,7 +407,7 @@ body {
       flex-direction: column;
       align-items: flex-start;
       font-weight: 500;
-      width: 100%; // Mobile full width
+      width: 100%;
       @media (min-width: 992px) {
         width: auto;
         max-width: 280px;
@@ -614,7 +613,7 @@ body {
   cursor: pointer;
   transition: 0.2s;
   box-shadow: 0 2px 4px rgba($primary, 0.2);
-  white-space: nowrap; // ป้องกันปุ่มเบี้ยว
+  white-space: nowrap;
   &:hover {
     background: color.adjust($primary, $lightness: -5%);
     transform: translateY(-1px);
