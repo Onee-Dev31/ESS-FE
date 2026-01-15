@@ -13,6 +13,7 @@ $radius-lg: 20px;
 $shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 $bg-light: #f8fafc;
 $success: #22c55e;
+$balance: #15803d;
 $warning: #f97316;
 $danger: #ef4444;
 
@@ -44,7 +45,6 @@ html, body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden; 
-  /* ป้องกัน Text ล้นจอในทุกกรณี */
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
@@ -62,7 +62,7 @@ html, body {
 
 .page-title {
   margin: 0 0 20px;
-  font-size: 18px; // ปรับลดเล็กน้อยบนมือถือ
+  font-size: 18px;
   font-weight: 700;
   color: $dark;
   
@@ -76,6 +76,7 @@ html, body {
 .text-end { text-align: right; }
 .text-red { color: $danger; }
 .text-green { color: $success; }
+.text-balance {color: $balance;}
 .text-blue { color: #3b82f6; }
 .text-indigo { color: #6366f1; }
 .bg-red { background: $danger; }
@@ -130,8 +131,11 @@ html, body {
   // Height Settings
   height: auto; 
   min-height: 200px; 
+  
+  // [แก้ไข] กำหนดความสูงให้เท่ากับฝั่งขวาเมื่อจอใหญ่
   @media (min-width: 1200px) {
-      height: 100%;
+      min-height: 250px; 
+      height: auto;
   }
   
   // Clip Decoration
@@ -188,7 +192,9 @@ html, body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 220px;
+    
+    // [แก้ไข] กำหนดความสูงให้เท่ากับฝั่งซ้าย
+    min-height: 250px; 
   }
   
   @media (min-width: 1400px) {
@@ -218,11 +224,11 @@ html, body {
     .profile-left-section {
       flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; font-weight: 500;
       width: 100%; // Mobile full width
-      @media (min-width: 992px) { width: auto; max-width: 250px; }
+      @media (min-width: 992px) { width: auto; max-width: 280px; }
 
-      .user-id-badge { background: rgba(255, 255, 255, 0.2); border-radius: 6px; font-weight: 700; font-size: 13px; line-height: 1.5; padding: 4px 12px; margin-bottom: 12px; margin-top: 0 !important; }
-      .user-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; @media(min-width:768px){ font-size: 20px; } }
-      .user-role, .user-meta { font-size: 13px !important; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; font-weight: 400; line-height: 1.5; @media(min-width:768px){ font-size: 14px; } }
+      .user-id-badge { background: rgba(255, 255, 255, 0.2); border-radius: 6px; font-weight: 700; font-size: 20px; line-height: 1.5; padding: 4px 12px; margin-bottom: 12px; margin-top: 0 !important; }
+      .user-name { font-size: 18px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; @media(min-width:768px){ font-size: 20px; } }
+      .user-role, .user-meta { font-size: 13px !important; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; font-weight: 500; line-height: 1.5; @media(min-width:768px){ font-size: 14px; } }
     }
 
     .profile-info-list {
@@ -231,7 +237,7 @@ html, body {
       
       @media (min-width: 992px) { 
         border-left: 1px solid rgba(255, 255, 255, 0.2); 
-        padding-left: 40px; 
+        padding-left: 60px; 
         padding-top: 4px; 
         margin-top: 0 !important; 
       }
@@ -382,25 +388,29 @@ html, body {
 }
 .action-btn-sm {
   @extend .action-btn;
-  padding: 6px 14px;
-  font-size: 12px;
+  padding: 10px 15px;
+  font-size: 15px;
+  font-weight: 400;
 }
-// ========================================
+
+// =========================================
 // 5. Stats Grid (Medical)
 // =========================================
 .stats-grid-card {
-  
   background: white;
   border-radius: $radius;
   box-shadow: $shadow;
   margin-bottom: 25px;
   border: none;
   overflow: visible !important;
-  padding: 15px;
+  
+  // [แก้ไข] เอา padding-bottom ออกเพื่อให้ footer ติดล่างสุด (หรือใช้ negative margin)
+  padding: 15px; 
 
   @media (min-width: 768px) {
     padding: 24px;
   }
+
   .stats-group-header {
     font-size: 16px;
     font-weight: 700;
@@ -413,12 +423,31 @@ html, body {
       color: $primary;
     }
   }
-}
 
-.stat-items-grid {
-  display: grid;
-  gap: 15px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .stat-items-grid {
+      margin-bottom: 20px; // ดันเนื้อหาออกจาก footer
+      display: grid;
+      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  // [แก้ไข] เพิ่มสไตล์สำหรับ footer ภายใน stats card นี้โดยเฉพาะ
+  // ใช้ Negative Margin เพื่อลบล้าง padding ของตัวแม่ ทำให้สีเทาเต็มขอบ
+  .stats-action-area.card-footer {
+    background: #fafafa;
+    border-radius: 0 0 $radius $radius;
+    padding: 12px 15px;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: -15px; // ดึงให้ชิดขอบล่างสุด
+    
+    @media (min-width: 768px) {
+        padding: 12px 24px;
+        margin-left: -24px;
+        margin-right: -24px;
+        margin-bottom: -24px;
+    }
+  }
 }
 
 .stat-item {
