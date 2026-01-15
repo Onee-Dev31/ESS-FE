@@ -5,7 +5,7 @@
 
   <main class="content-body">
     <div class="main-layout-grid">
-      <div class="left-col-wrapper" style="display: flex; flex-direction: column; gap: 24px">
+      <div class="left-col-wrapper">
         <div class="banner-avatar-section">
           <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
             <i class="fas fa-pen"></i>
@@ -102,7 +102,7 @@
           </div>
         </div>
       </div>
-      <div class="right-col-wrapper" style="display: flex; flex-direction: column">
+      <div class="right-col-wrapper">
         <div class="card profile-card">
           <button type="button" class="action-btn-outline top-right-pos">
             <i class="fas fa-pen"></i>
@@ -164,10 +164,8 @@
           </div>
         </section>
 
-        <div>
-          <p class="section-title">
-            สวัสดิการ
-          </p>
+        <div class="welfare-section">
+          <p class="section-title">สวัสดิการ</p>
           <div class="bottom-stats-grid">
             <div
               class="card mini-stat-card"
@@ -194,10 +192,8 @@
           </div>
         </div>
 
-        <div>
-          <p class="section-title mt-spaced" >
-            ลาหยุดงาน
-          </p>
+        <div class="leave-section">
+          <p class="section-title mt-spaced">ลาหยุดงาน</p>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
               <div class="leave-body">
@@ -216,39 +212,40 @@
             </div>
           </div>
         </div>
-        <div>
+        <div class="schedule-section">
           <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
-    <div class="card schedule-card">
-      <div class="schedule-body">
-        <div class="holiday-list-panel">
-          <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-          <ul class="holiday-list" style="padding: 0; list-style: none">
-            <li class="holiday-item" *ngFor="let h of holidays">
-              <span class="status-dot dot-green"></span>
-              <div class="holiday-info">
-                <span class="h-date">{{ h.date }}</span>
-                <span class="h-name">{{ h.name }}</span>
+          <div class="card schedule-card">
+            <div class="schedule-body">
+              <div class="holiday-list-panel">
+                <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
+                <ul class="holiday-list" style="padding: 0; list-style: none">
+                  <li class="holiday-item" *ngFor="let h of holidays">
+                    <span class="status-dot dot-green"></span>
+                    <div class="holiday-info">
+                      <span class="h-date">{{ h.date }}</span>
+                      <span class="h-name">{{ h.name }}</span>
+                    </div>
+                  </li>
+                </ul>
               </div>
-            </li>
-          </ul>
-        </div>
 
-        <div class="calendar-panel">
-          <full-calendar [options]="calendarOptions"></full-calendar>
-        </div>
-      </div>
+              <div class="calendar-panel">
+                <full-calendar [options]="calendarOptions"></full-calendar>
+              </div>
+            </div>
 
-      <div class="schedule-footer">
-        <div class="legend-item"><span class="legend-box box-gray"></span> เวลาทำงานปกติ</div>
-        <div class="legend-item"><span class="legend-box box-red"></span> วันหยุด</div>
-        <div class="legend-item"><span class="legend-box box-green"></span> วันหยุดประเพณี</div>
-        <div class="legend-item"><span class="legend-box box-orange"></span> การลา</div>
-        <div class="legend-item"><span class="legend-box box-blue"></span> Shut down</div>
+            <div class="schedule-footer">
+              <div class="legend-item"><span class="legend-box box-gray"></span> เวลาทำงานปกติ</div>
+              <div class="legend-item"><span class="legend-box box-red"></span> วันหยุด</div>
+              <div class="legend-item">
+                <span class="legend-box box-green"></span> วันหยุดประเพณี
+              </div>
+              <div class="legend-item"><span class="legend-box box-orange"></span> การลา</div>
+              <div class="legend-item"><span class="legend-box box-blue"></span> Shut down</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-        </div>
-      </div>
-    </div>
-    
   </main>
 </div>
