@@ -315,6 +315,19 @@ html, body {
 }
 
 // IT Story List
+.it-story-card {
+
+  .card-header {
+    background: #fafafa;          // ใส่สีพื้นหลัง
+    border-radius: 12px 12px 0 0; // เก็บมุมมนด้านบน (สำคัญมาก ไม่งั้นสีเทาจะทับมุมโค้ง)
+    padding: 15px 20px;           // จัดระยะห่างภายใน
+    margin-bottom: 0;
+  }
+  .card-body {
+    padding-top: 20px;
+  }
+
+}
 .it-story-card .profile-display-group {
   margin-bottom: 15px;
   border-bottom: 1px dashed #f1f5f9;
@@ -345,6 +358,8 @@ html, body {
     overflow-wrap: break-word; 
     line-height: 1.5;
   }
+
+  
 }
 // =========================================
 // 4. Buttons
@@ -500,6 +515,7 @@ html, body {
   padding-left: 10px;
   border-left: 4px solid $primary;
 }
+
 
 .bottom-stats-grid,
 .leave-stats-grid {
@@ -853,5 +869,161 @@ html, body {
     margin-left: -5px;
     border: 5px solid transparent;
     border-top-color: #333;
+  }
+}
+
+// =========================================
+// 8. Attendance Card
+// =========================================
+.attendance-card {
+  .card-header {
+    background: #fafafa;
+    border-radius: 12px 12px 0 0;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    
+    .card-heading {
+      color: #1e293b; 
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .date-range-section {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label-date {
+      font-size: 13px;
+      color: $muted;
+      font-weight: 500;
+    }
+    .value-date {
+      font-size: 16px;
+      color: $dark;
+      font-weight: 700; // หนาขึ้นเพื่อให้เด่น
+      font-family: 'Inter', sans-serif;
+    }
+  }
+
+  .attendance-list-clean {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .att-clean-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      padding-bottom: 8px;
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .att-label {
+        color: #334155;
+        font-weight: 500;
+      }
+
+      .att-value {
+        color: $dark;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif; // ใช้ฟอนต์ตัวเลขสวยๆ
+      }
+    }
+  }
+}
+
+// =========================================
+// 9. Performance Card (Fixed Alignment)
+// =========================================
+.performance-card {
+  .card-header {
+    background: #fafafa;
+    border-radius: 12px 12px 0 0;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+
+    .card-heading {
+      color: $primary; // **สีน้ำเงินตามรูป**
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  // --- ส่วนข้อมูลเริ่มงาน/อายุงาน ---
+  .work-meta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9; // เส้นคั่นระหว่างส่วนบนกับส่วนล่าง
+
+    .meta-row {
+      display: flex;
+      align-items: baseline; // จัดให้ตัวหนังสือตรงกันแนวบรรทัด
+      
+      .meta-label {
+        min-width: 150px; // **จุดสำคัญ: ล็อคความกว้างให้กว้างพอ**
+        font-weight: 500;
+        color: #64748b; // สีเทากลางๆ
+        font-size: 14px;
+      }
+      
+      .meta-value {
+        font-size: 15px;
+        color: $dark;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // --- ส่วนประวัติ ---
+  .perf-subtitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: $dark;
+    margin-bottom: 16px;
+  }
+
+  .performance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    .perf-item {
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      
+      .perf-year {
+        min-width: 150px; // **ต้องเท่ากับ meta-label ด้านบน**
+        color: #64748b;
+        font-weight: 500;
+      }
+      
+      .perf-grade {
+        font-weight: 700;
+        color: $dark; // สีเข้ม
+        background: #f1f5f9; // (Option) ใส่พื้นหลังให้เกรดดูเด่นขึ้น
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+    }
   }
 }

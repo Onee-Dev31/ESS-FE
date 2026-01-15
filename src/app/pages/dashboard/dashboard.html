@@ -4,11 +4,8 @@
   </header>
 
   <main class="content-body">
-    
     <div class="main-layout-grid">
-      
-      <div class="left-col-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
-        
+      <div class="left-col-wrapper" style="display: flex; flex-direction: column; gap: 24px">
         <div class="banner-avatar-section">
           <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
             <i class="fas fa-pen"></i>
@@ -19,6 +16,70 @@
               alt="Profile Avatar"
               class="avatar-img"
             />
+          </div>
+        </div>
+
+        <div class="card attendance-card">
+          <div class="card-header border-0 pb-0">
+            <h4 class="card-heading">My Time Attendance</h4>
+          </div>
+
+          <div class="card-body">
+            <div class="date-range-section">
+              <span class="label-date">ช่วงวันที่</span>
+              <span class="value-date">01/01/2026 - 31/01/2026</span>
+            </div>
+
+            <div class="attendance-list-clean">
+              <div class="att-clean-item" *ngFor="let item of attendanceList">
+                <span class="att-label">{{ item.label }}</span>
+                <span class="att-value">{{ item.value }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer text-end">
+            <button
+              type="button"
+              class="action-btn"
+              style="min-width: 140px; justify-content: center"
+            >
+              ดูเวลาเข้า-ออก
+            </button>
+          </div>
+        </div>
+
+        <div class="card performance-card mt-4">
+          <div class="card-header border-0">
+            <h4 class="card-heading">My Performance</h4>
+          </div>
+
+          <div class="card-body">
+            <div class="work-meta-group">
+              <div class="meta-row">
+                <span class="meta-label">วันที่เริ่มงาน</span>
+                <span class="meta-value">10 July 2021</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">อายุงาน</span>
+                <span class="meta-value">7 ปี</span>
+              </div>
+            </div>
+
+            <h6 class="perf-subtitle">ประวัติผลการประเมินการทำงาน</h6>
+
+            <div class="performance-list">
+              <div class="perf-item" *ngFor="let p of performanceList">
+                <span class="perf-year">{{ p.year }}</span>
+                <span class="perf-grade">{{ p.grade }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer text-end">
+            <button type="button" class="action-btn">
+              <i class="fas fa-clipboard-check"></i> ประเมินประจำปี
+            </button>
           </div>
         </div>
 
@@ -36,13 +97,12 @@
           </div>
           <div class="card-footer text-end">
             <button type="button" class="action-btn">
-              <i class="fas fa-tools" style="margin-right: 6px;"></i>ขอใช้บริการ
+              <i class="fas fa-tools" style="margin-right: 6px"></i>ขอใช้บริการ
             </button>
           </div>
         </div>
-
-      </div> <div class="right-col-wrapper" style="display: flex; flex-direction: column;">
-        
+      </div>
+      <div class="right-col-wrapper" style="display: flex; flex-direction: column">
         <div class="card profile-card">
           <button type="button" class="action-btn-outline top-right-pos">
             <i class="fas fa-pen"></i>
@@ -99,13 +159,15 @@
 
           <div class="stats-action-area text-end card-footer">
             <button type="button" class="action-btn-sm">
-              <i class="fas fa-plus" style="margin-right: 6px;"></i>เบิก
+              <i class="fas fa-plus" style="margin-right: 6px"></i>เบิก
             </button>
           </div>
         </section>
 
         <div>
-          <p class="section-title" style="margin-left: 0; padding-left: 0; border: none;">สวัสดิการ</p>
+          <p class="section-title">
+            สวัสดิการ
+          </p>
           <div class="bottom-stats-grid">
             <div
               class="card mini-stat-card"
@@ -133,7 +195,9 @@
         </div>
 
         <div>
-          <p class="section-title mt-spaced" style="margin-left: 0; padding-left: 0; border: none;">ลาหยุดงาน</p>
+          <p class="section-title mt-spaced" >
+            ลาหยุดงาน
+          </p>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
               <div class="leave-body">
@@ -152,8 +216,8 @@
             </div>
           </div>
         </div>
-
-      </div> </div> <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
+        <div>
+          <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
     <div class="card schedule-card">
       <div class="schedule-body">
         <div class="holiday-list-panel">
@@ -182,6 +246,9 @@
         <div class="legend-item"><span class="legend-box box-blue"></span> Shut down</div>
       </div>
     </div>
-
+        </div>
+      </div>
+    </div>
+    
   </main>
 </div>

@@ -245,6 +245,23 @@ export class DashboardComponent {
     '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
   };
 
+  attendanceList = [
+  { label: 'ลาป่วย', value: '10 วัน' },
+  { label: 'ลาพักร้อน', value: '5 วัน' },
+  { label: 'ลากิจ', value: '5 วัน' },
+  { label: 'มาสาย', value: '5 ครั้ง' },
+  { label: 'ขาดงาน', value: '5 ครั้ง' }
+];
+
+performanceList = [
+  { year: 'ปี 2026', grade: 'เกรด A+' },
+  { year: 'ปี 2025', grade: 'เกรด A' },
+  { year: 'ปี 2024', grade: 'เกรด B+' },
+  { year: 'ปี 2023', grade: 'เกรด B' },
+  { year: 'ปี 2022', grade: 'เกรด C+' },
+  { year: 'ปี 2021', grade: 'เกรด C' }
+];
+
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
