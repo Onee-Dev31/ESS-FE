@@ -108,7 +108,7 @@ html, body {
   display: flex;
   flex-direction: column; 
   width: 100%;
-  min-width: 0; // Fix Grid Overflow issue
+  min-width: 0; 
 }
 
 // --- Left: Avatar ---
@@ -128,7 +128,7 @@ html, body {
   width: 100%;
 
   // Height Settings
-  height: auto; // ปรับเป็น auto เพื่อความยืดหยุ่น
+  height: auto; 
   min-height: 200px; 
   @media (min-width: 1200px) {
       height: 100%;
@@ -184,16 +184,15 @@ html, body {
   padding: 20px; 
   
   @media (min-width: 992px) { 
-    // ลด Padding ด้านข้างลงเพื่อให้ Fit กับหน้าจอ Laptop ทั่วไป (1366px)
     padding: 30px 40px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 220px; // เพิ่มความสูงขั้นต่ำ
+    min-height: 220px;
   }
   
   @media (min-width: 1400px) {
-    padding: 35px 80px; // จอใหญ่ค่อยขยาย Padding
+    padding: 0px 80px; 
   }
 
   // Decorations
@@ -202,13 +201,11 @@ html, body {
   
   .action-btn-outline.top-right-pos {
     position: absolute; top: 15px; right: 15px; z-index: 10;
-    background: #ffffff !important; border: 1px solid #ffffff !important; color: $primary !important;
-    border-radius: 6px; padding: 6px 12px;
-    font-size: 12px;
-    @media (min-width: 768px) {
-       top: 20px; right: 20px;
-       font-size: 13px;
-    }
+    width:  32px; height:  32px;
+    border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white; @include flex-center; cursor: pointer; transition: all 0.2s; font-size: 14px; z-index: 10;
+    &:hover { background: white; color: $primary; border-color: white; }
+
   }
 
   // Layout Main
@@ -242,14 +239,13 @@ html, body {
       .profile-display-group {
         display: flex; flex-direction: row; align-items: flex-start; gap: 15px; font-size: 14px !important; margin-top: 0!important;
         
-        // Responsive Mobile: ถ้าจอเล็กมาก (<500px) ให้ Label กับ Value ซ้อนกัน หรือ Label เล็กลง
         @media (max-width: 576px) {
            flex-wrap: wrap; 
            gap: 4px;
         }
 
         .display-label { 
-            flex: 0 0 120px; // ลดความกว้าง Label บนจอเล็ก
+            flex: 0 0 120px;
             @media (min-width: 768px) { flex: 0 0 140px; }
             @media (max-width: 576px) { flex: 0 0 100%; width: 100%; color: rgba(255,255,255,0.6); font-size: 12px; }
 
@@ -277,7 +273,7 @@ html, body {
   border: none;
   position: relative;
   overflow: visible !important;
-  width: 100%; // Ensure fit
+  width: 100%;
 
   .card-header {
     padding: 15px 20px;
@@ -327,9 +323,8 @@ html, body {
     margin-bottom: 0;
   }
   .display-label {
-    font-size: 12px;
+    font-size: 10px;
     color: $muted;
-    font-weight: 600;
     width: 100%;
   }
   .display-value {
@@ -339,14 +334,12 @@ html, body {
     text-align: left;
     width: 100%;
 
-    // ป้องกันข้อความล้น
     white-space: normal;
     word-break: break-word;   
     overflow-wrap: break-word; 
     line-height: 1.5;
   }
 }
-
 // =========================================
 // 4. Buttons
 // =========================================
@@ -392,8 +385,7 @@ html, body {
   padding: 6px 14px;
   font-size: 12px;
 }
-
-// =========================================
+// ========================================
 // 5. Stats Grid (Medical)
 // =========================================
 .stats-grid-card {
@@ -426,7 +418,6 @@ html, body {
 .stat-items-grid {
   display: grid;
   gap: 15px;
-  // ปรับ minmax ให้รองรับจอมือถือเล็ก (ต่ำกว่า 350px)
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
@@ -434,6 +425,7 @@ html, body {
   padding: 15px;
   border: none;
   border-radius: 8px;
+
   .stat-label {
     font-size: 13px;
     font-weight: 600;
@@ -485,8 +477,7 @@ html, body {
   display: grid;
   gap: 20px;
   margin-bottom: 30px;
-  // Responsive Grid
-  grid-template-columns: 1fr; // Mobile First
+  grid-template-columns: 1fr; 
   
   @media (min-width: 480px) {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
