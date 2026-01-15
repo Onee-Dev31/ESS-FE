@@ -4,57 +4,24 @@
   </header>
 
   <main class="content-body">
-    <div class="top-profile-grid">
-      <div class="banner-avatar-section">
-        <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
-          <i class="fas fa-pen"></i>
-        </button>
-
-        <div class="avatar-frame">
-          <img
-            src="https://randomuser.me/api/portraits/women/44.jpg"
-            alt="Profile Avatar"
-            class="avatar-img"
-          />
-        </div>
-      </div>
-
-      <div class="card profile-card">
-        <button type="button" class="action-btn-outline top-right-pos">
-          <i class="fas fa-edit"></i> ขอแก้ไขข้อมูล
-        </button>
-
-        <div class="card-body">
-          <div class="profile-left-section">
-            <div class="profile-header-card">
-              <div class="profile-content">
-                <h3 class="user-id">OTD01030</h3>
-                <h3 class="user-name">แพรวนภา บุตรโคษา</h3>
-                <p class="user-role">JC01-เจ้าหน้าที่ตรวจสอบคำบรรยายแทนเสียง</p>
-                <div class="user-meta">
-                  <span>รหัสกะ : O01 - 09.00-18.00</span><br />
-                  <span>เวลาตั้งแต่ : 09:00 - 18:00</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <hr class="divider" />
-
-          <div class="profile-info-list">
-            <div class="profile-display-group" *ngFor="let item of profileList">
-              <label class="display-label">
-                <i [class]="item.icon" [style.color]="item.iconColor"></i> {{ item.label }}
-              </label>
-              <div class="display-value">{{ item.value }}</div>
-            </div>
+    
+    <div class="main-layout-grid">
+      
+      <div class="left-col-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <div class="banner-avatar-section">
+          <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
+            <i class="fas fa-pen"></i>
+          </button>
+          <div class="avatar-frame">
+            <img
+              src="https://randomuser.me/api/portraits/women/44.jpg"
+              alt="Profile Avatar"
+              class="avatar-img"
+            />
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="main-layout-grid mt-4">
-      <section class="content-main">
         <div class="card it-story-card">
           <div class="card-header border-0">
             <h4 class="card-heading">My IT Story</h4>
@@ -71,9 +38,37 @@
             <button type="button" class="action-btn">ขอใช้บริการ</button>
           </div>
         </div>
-      </section>
 
-      <aside class="content-sidebar">
+      </div> <div class="right-col-wrapper" style="display: flex; flex-direction: column;">
+        
+        <div class="card profile-card">
+          <button type="button" class="action-btn-outline top-right-pos">
+            <i class="fas fa-edit"></i>
+          </button>
+
+          <div class="card-body profile-layout">
+            <div class="profile-left-section">
+              <div class="user-id-badge">OTD01030</div>
+              <div class="user-name">แพรวนภา บุตรโคษา</div>
+              <div class="user-role">JC01-เจ้าหน้าที่ตรวจสอบคำบรรยายแทนเสียง</div>
+              <div class="user-meta"><span>รหัสกะ : O01 - 09.00-18.00</span></div>
+              <div class="user-meta"><span>เวลาตั้งแต่ : 09:00 - 18:00</span></div>
+            </div>
+
+            <hr class="section-divider" />
+
+            <div class="profile-info-list">
+              <div class="profile-display-group" *ngFor="let item of profileList">
+                <label class="display-label">
+                  <i [class]="item.icon" [style.color]="item.iconColor"></i>
+                  {{ item.label }}
+                </label>
+                <div class="display-value">{{ item.value }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <section class="stats-grid-card">
           <div class="stats-group-header">
             <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
@@ -105,55 +100,56 @@
           </div>
         </section>
 
-        <p class="section-title">สวัสดิการ</p>
-        <div class="bottom-stats-grid">
-          <div
-            class="card mini-stat-card"
-            *ngFor="let item of welfareStats"
-            [ngClass]="item.cardClass || ''"
-          >
-            <div class="card-body">
-              <div class="mini-icon">
-                <i [class]="item.iconName"></i>
-              </div>
-              <div class="card-info">
-                <h6 [style.color]="item.titleColor">
-                  {{ item.title }}
-                  <div class="tooltip-container" tabindex="0" *ngIf="item.tooltip">
-                    <i class="fas fa-info-circle" style="color: #888"></i>
-                    <span class="tooltip-text" [innerHTML]="item.tooltip"></span>
-                  </div>
-                </h6>
-                <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
-              </div>
-              <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </div>
-          </div>
-        </div>
-
-        <p class="section-title mt-spaced">ลาหยุดงาน</p>
-        <div class="leave-stats-grid">
-          <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
-            <div class="leave-body">
-              <div class="leave-header">
-                <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
-                <div class="leave-icon">
-                  <i [class]="leave.iconClass" [style.color]="leave.iconColor || '#888'"></i>
+        <div>
+          <p class="section-title" style="margin-left: 0; padding-left: 0; border: none;">สวัสดิการ</p>
+          <div class="bottom-stats-grid">
+            <div
+              class="card mini-stat-card"
+              *ngFor="let item of welfareStats"
+              [ngClass]="item.cardClass || ''"
+            >
+              <div class="card-body">
+                <div class="mini-icon">
+                  <i [class]="item.iconName"></i>
                 </div>
+                <div class="card-info">
+                  <h6 [style.color]="item.titleColor">
+                    {{ item.title }}
+                    <div class="tooltip-container" tabindex="0" *ngIf="item.tooltip">
+                      <i class="fas fa-info-circle" style="color: #888"></i>
+                      <span class="tooltip-text" [innerHTML]="item.tooltip"></span>
+                    </div>
+                  </h6>
+                  <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
               </div>
-              <p class="leave-label">{{ leave.label }}</p>
-            </div>
-            <div class="leave-footer">
-              <span class="">คงเหลือ {{ leave.balance }} วัน</span>
-              <i class="fas fa-chevron-right"></i>
             </div>
           </div>
         </div>
-      </aside>
-    </div>
 
-    <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
+        <div>
+          <p class="section-title mt-spaced" style="margin-left: 0; padding-left: 0; border: none;">ลาหยุดงาน</p>
+          <div class="leave-stats-grid">
+            <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
+              <div class="leave-body">
+                <div class="leave-header">
+                  <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
+                  <div class="leave-icon">
+                    <i [class]="leave.iconClass" [style.color]="leave.iconColor || '#888'"></i>
+                  </div>
+                </div>
+                <p class="leave-label">{{ leave.label }}</p>
+              </div>
+              <div class="leave-footer">
+                <span class="">คงเหลือ {{ leave.balance }} วัน</span>
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
 
+      </div> </div> <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
     <div class="card schedule-card">
       <div class="schedule-body">
         <div class="holiday-list-panel">
@@ -182,5 +178,6 @@
         <div class="legend-item"><span class="legend-box box-blue"></span> Shut down</div>
       </div>
     </div>
+
   </main>
 </div>

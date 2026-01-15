@@ -22,8 +22,6 @@ $danger: #ef4444;
   justify-content: center;
 }
 
-// Mixin นี้ใช้เฉพาะจุดที่ต้องการตัดขอบภาพกราฟิกจริงๆ (Profile)
-// ห้ามใช้กับ Card ทั่วไปที่มี Tooltip เด็ดขาด
 @mixin smooth-corners {
   overflow: hidden;
   transform: translateZ(0);
@@ -34,17 +32,28 @@ $danger: #ef4444;
   box-sizing: border-box;
 }
 
-body {
+// [แก้จุดที่ 1] บังคับ html และ body ไม่ให้เกินขอบเขตหน้าจอเด็ดขาด
+html, body {
   background: #f1f5f9;
   margin: 0;
+  padding: 0;
   font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   color: $dark;
   font-size: 14px;
   line-height: 1.6;
+  
+  width: 100%;
+  max-width: 100vw; /* ห้ามกว้างเกิน Viewport */
+  overflow-x: hidden; /* ซ่อนส่วนเกินแนวนอนทั้งหมด */
 }
 
+// [แก้จุดที่ 2] Wrapper ต้องยืดหยุ่นและซ่อนส่วนเกินถ้า Sidebar ดันเข้ามา
 .dashboard-wrapper {
   padding: 15px;
+  width: 100%;
+  max-width: 100%; /* การันตีไม่ให้เกิน Container แม่ */
+  overflow-x: hidden; /* ถ้า Sidebar ดันมา ให้ตัดส่วนเกินทิ้ง ไม่ต้องสร้าง Scrollbar */
+  
   @media (min-width: 768px) {
     padding: 25px;
   }
@@ -58,54 +67,46 @@ body {
 }
 
 // Utilities
-.mt-4 {
-  margin-top: 24px;
-}
-.text-end {
-  text-align: right;
-}
-.text-red {
-  color: $danger;
-}
-.text-green {
-  color: $success;
-}
-.text-blue {
-  color: #3b82f6;
-}
-.text-indigo {
-  color: #6366f1;
-}
-.bg-red {
-  background: $danger;
-}
-.bg-green {
-  background: $success;
-}
-.bg-blue {
-  background: #3b82f6;
-}
-.bg-indigo {
-  background: #6366f1;
-}
+.mt-4 { margin-top: 24px; }
+.text-end { text-align: right; }
+.text-red { color: $danger; }
+.text-green { color: $success; }
+.text-blue { color: #3b82f6; }
+.text-indigo { color: #6366f1; }
+.bg-red { background: $danger; }
+.bg-green { background: $success; }
+.bg-blue { background: #3b82f6; }
+.bg-indigo { background: #6366f1; }
 
 // =========================================
-// 2. Top Profile Grid
+// 2. Layout & Grid System
 // =========================================
-.top-profile-grid {
+
+// Grid หลักสำหรับแบ่งหน้าจอ ซ้าย-ขวา
+.main-layout-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  margin-bottom: 24px;
+  gap: 24px;
+  align-items: start;
+  width: 100%; 
+  max-width: 100%; // กันเหนียว
+  
   @media (min-width: 1200px) {
     grid-template-columns: 280px 1fr;
-    align-items: stretch;
   }
 }
 
-// --- Left: Avatar (ยังคงใช้ smooth-corners เพราะมีกราฟิกเยอะ) ---
+// Wrapper สำหรับจัดเรียงการ์ดในแนวตั้ง
+.left-col-wrapper,
+.right-col-wrapper {
+  display: flex;
+  flex-direction: column; 
+  width: 100%;
+  min-width: 0; // Fix Flexbox overflow issue (สำคัญมากสำหรับ Flex)
+}
+
+// --- Left: Avatar ---
 .banner-avatar-section {
-  // [แก้ไข] เปลี่ยน darken เป็น color.adjust
   background: linear-gradient(
     135deg,
     $primary,
@@ -119,285 +120,122 @@ body {
   box-shadow: $shadow;
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 250px;
 
-  // เก็บไว้ที่นี่ (ไม่มี Tooltip)
+  // Height Settings
+  height: 100%; 
+  min-height: 200px; 
+  
+  // Clip Decoration
   @include smooth-corners;
+  overflow: hidden;
 
+  // Background Decorations
   &::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    left: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
+    content: ''; position: absolute; top: -50px; left: -50px; 
+    width: 200px; height: 200px; 
+    background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; z-index: 1;
   }
   &::after {
-    content: '';
-    position: absolute;
-    bottom: -30px;
-    right: -20px;
-    width: 140px;
-    height: 140px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
+    content: ''; position: absolute; bottom: -30px; right: -20px; 
+    width: 140px; height: 140px; 
+    background: rgba(255, 255, 255, 0.05); border-radius: 50%; pointer-events: none; z-index: 1;
   }
 
   .edit-icon-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    @include flex-center;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 14px;
-    z-index: 10;
-    &:hover {
-      background: white;
-      color: $primary;
-      border-color: white;
-    }
+    position: absolute; top: 15px; right: 15px; 
+    width: 32px; height: 32px; 
+    border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white; @include flex-center; cursor: pointer; transition: all 0.2s; font-size: 14px; z-index: 10;
+    &:hover { background: white; color: $primary; border-color: white; }
   }
 
   .avatar-frame {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    padding: 6px;
-    @include flex-center;
-    position: relative;
-    z-index: 5;
-    @media (min-width: 768px) {
-      width: 160px;
-      height: 160px;
+    width: 140px; height: 140px; 
+    border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.2); padding: 5px; @include flex-center; position: relative; z-index: 5;
+    
+    @media (min-width: 768px) { 
+      width: 180px; height: 180px; 
     }
-    .avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 4px solid #fff;
-    }
+    
+    .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid #fff; }
   }
 }
 
 // --- Right: Card (Profile Info) ---
-.top-profile-grid > .card,
 .profile-card {
-  // [แก้ไข] เปลี่ยน darken เป็น color.adjust
-  background: linear-gradient(
-    135deg,
-    $primary,
-    color.adjust($primary, $lightness: -10%)
-  ) !important;
+  background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%)) !important;
   color: white !important;
   border-radius: $radius-lg !important;
   box-shadow: $shadow;
-  padding: 20px;
   border: none !important;
   width: 100%;
-  height: 100%;
   position: relative;
+  
+  // Height Settings
+  height: 100%; 
 
-  // เก็บไว้ที่นี่ (ไม่มี Tooltip)
-  @include smooth-corners;
+  // ตัดส่วนเกินที่ล้นออกไป
+  overflow: hidden; 
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
-  }
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -30px;
-    left: -20px;
-    width: 140px;
-    height: 140px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  @media (min-width: 1200px) {
-    padding: 30px;
-  }
-  .card-header,
-  .divider {
-    display: none;
-  }
-
-  .action-btn-outline.top-right-pos {
-    width: 100%;
-    margin-bottom: 20px;
-    position: relative;
-    z-index: 10;
-    @media (min-width: 576px) {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: auto;
-      margin-bottom: 0;
-    }
-    background: #ffffff !important;
-    border: 1px solid #ffffff !important;
-    color: $primary !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    padding: 8px 16px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: center;
-    i {
-      color: $primary !important;
-    }
-    &:hover {
-      background: #f1f5f9 !important;
-      transform: translateY(-2px);
-    }
-  }
-
-  .card-body {
-    padding: 0 !important;
+  // Padding
+  padding: 20px; 
+  @media (min-width: 992px) { 
+    padding: 35px 100px; 
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    text-align: center;
-    width: 100%;
-    position: relative;
-    z-index: 2;
-    @media (min-width: 992px) {
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
-      text-align: left;
-      gap: 40px;
-    }
+    justify-content: center;
+  }
+
+  // Decorations
+  &::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; }
+  &::after { content: ''; position: absolute; bottom: -30px; left: -20px; width: 140px; height: 140px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; pointer-events: none; }
+  
+  .action-btn-outline.top-right-pos {
+    position: absolute; top: 20px; right: 20px; z-index: 10;
+    background: #ffffff !important; border: 1px solid #ffffff !important; color: $primary !important;
+    border-radius: 6px; padding: 6px 12px;
+  }
+
+  // Layout Main
+  .card-body.profile-layout {
+    padding: 0 !important; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 5;
+    @media (min-width: 992px) { flex-direction: row; align-items: flex-start; gap: 60px; }
+    .section-divider { border-top: 1px solid rgba(255,255,255,0.2); margin: 5px 0; @media (min-width: 992px) { display: none; } }
+
     .profile-left-section {
-      min-width: 200px;
-      .user-id {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        font-weight: 800;
-        font-size: 14px;
-        padding: 4px 12px;
-        display: inline-block;
-        margin-bottom: 10px;
-        border-radius: 6px;
-      }
-      .user-name {
-        margin: 0 0 5px;
-        font-size: 22px;
-        font-weight: 700;
-        color: white;
-        @media (min-width: 768px) {
-          font-size: 24px;
-        }
-      }
-      .user-role {
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.8);
-      }
+      flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; font-weight: 500;
+      .user-id-badge { background: rgba(255, 255, 255, 0.2); border-radius: 6px; font-weight: 700; font-size: 13px; line-height: 1.5; padding: 4px 12px; margin-bottom: 12px; margin-top: 0 !important; }
+      .user-name { font-size: 20px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+      .user-role, .user-meta { font-size: 14px !important; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; font-weight: 400; line-height: 1.5; }
     }
+
     .profile-info-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      @media (min-width: 992px) {
-        padding-left: 40px;
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
-        width: auto;
+      flex: 1; display: flex; flex-direction: column; gap: 12px;
+      @media (min-width: 992px) { 
+        border-left: 1px solid rgba(255, 255, 255, 0.2); padding-left: 60px; 
+        padding-top: 4px; margin-top: 0 !important; 
       }
       .profile-display-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-        font-size: 14px;
-        @media (min-width: 576px) {
-          flex-direction: row;
-          align-items: flex-start;
-          gap: 15px;
-        }
-        .display-label {
-          min-width: 100px;
-          color: rgba(255, 255, 255, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          @media (min-width: 576px) {
-            justify-content: flex-start;
-          }
-          i {
-            font-size: 16px;
-            color: white;
-          }
-        }
-        .display-value {
-          color: white;
-          font-weight: 500;
-          word-break: break-all;
-        }
+        display: flex; flex-direction: row; align-items: flex-start; gap: 15px; font-size: 14px !important; margin-top: 0!important;
+        .display-label { flex: 0 0 140px; color: rgba(255, 255, 255, 0.75); font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px; height: 100%; line-height: 1.4; i { width: 20px; text-align: center; } }
+        .display-value { color: white; font-weight: 500; word-break: break-word; line-height: 1.4; }
       }
     }
   }
 }
 
 // =========================================
-// 3. Main Layout & Cards
+// 3. General Cards
 // =========================================
-.main-layout-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: start;
-  @media (min-width: 1200px) {
-    grid-template-columns: 280px 1fr;
-  }
-}
-
-// General Card
-// [แก้ไข] ลบ smooth-corners และเพิ่ม overflow: visible
 .card:not(.profile-card) {
   background: white;
-  border-radius: $radius; // ✅ แก้กลับเป็น $radius (ไม่เอา 0 0)
+  border-radius: $radius;
   box-shadow: $shadow;
   display: flex;
   flex-direction: column;
   border: none;
   position: relative;
-
-  overflow: visible !important; // <<<< สำคัญ: บังคับให้ Tooltip ลอย
+  overflow: visible !important;
 
   .card-header {
     padding: 15px 20px;
@@ -412,41 +250,36 @@ body {
       color: $primary;
     }
   }
-
   .card-body {
     padding: 20px;
     @media (min-width: 768px) {
       padding: 24px;
     }
   }
-
   .card-footer {
     padding: 12px 20px;
     border-top: none;
     background: #fafafa;
-
-    // ✅ สั่งให้ Footer โค้งตามแม่เฉพาะด้านล่าง
     border-radius: 0 0 $radius $radius;
-
     @media (min-width: 768px) {
       padding: 12px 24px;
     }
   }
-
   &:hover {
     z-index: 5;
   }
 }
 
-// IT Story List Specific Style
+// IT Story List
 .it-story-card .profile-display-group {
   margin-bottom: 15px;
   border-bottom: 1px dashed #f1f5f9;
   padding-bottom: 15px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 5px;
   &:last-child {
     border-bottom: none;
     margin-bottom: 0;
@@ -455,12 +288,19 @@ body {
     font-size: 12px;
     color: $muted;
     font-weight: 600;
+    width: 100%;
   }
   .display-value {
     font-size: 13px;
     color: $dark;
     font-weight: 600;
-    text-align: right;
+    text-align: left;
+    width: 100%;
+
+    white-space: normal;
+    word-break: break-word;   
+    overflow-wrap: break-word; 
+    line-height: 1.5;
   }
 }
 
@@ -479,13 +319,11 @@ body {
   transition: 0.2s;
   box-shadow: 0 2px 4px rgba($primary, 0.2);
   &:hover {
-    // อันนี้ถูกต้องอยู่แล้วครับ (color.adjust)
     background: color.adjust($primary, $lightness: -5%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba($primary, 0.3);
   }
 }
-
 .action-btn-outline {
   background: transparent;
   border: 1px solid $primary;
@@ -504,7 +342,6 @@ body {
     color: white;
   }
 }
-
 .action-btn-sm {
   @extend .action-btn;
   padding: 6px 14px;
@@ -512,23 +349,19 @@ body {
 }
 
 // =========================================
-// 5. Stats Grid
+// 5. Stats Grid (Medical)
 // =========================================
-// [แก้ไข] ลบ smooth-corners และเพิ่ม overflow: visible
 .stats-grid-card {
-  padding: 20px;
+  
   background: white;
   border-radius: $radius;
   box-shadow: $shadow;
   margin-bottom: 25px;
   border: none;
-
-  overflow: visible !important; // <<<< สำคัญ
-
+  overflow: visible !important;
   @media (min-width: 768px) {
     padding: 24px;
   }
-
   .stats-group-header {
     font-size: 16px;
     font-weight: 700;
@@ -545,24 +378,14 @@ body {
 
 .stat-items-grid {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 15px;
-  @media (min-width: 576px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 992px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 1400px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .stat-item {
   padding: 15px;
   border: none;
   border-radius: 8px;
-
   .stat-label {
     font-size: 13px;
     font-weight: 600;
@@ -614,16 +437,17 @@ body {
   display: grid;
   gap: 20px;
   margin-bottom: 30px;
-  grid-template-columns: 1fr;
-  @media (min-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  // 3. Desktop (จอคอม): แสดง 4 ใบต่อแถว (ตามที่ต้องการ)
   @media (min-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-// [แก้ไข] ลบ smooth-corners และเพิ่ม overflow: visible
 .mini-stat-card {
   position: relative;
   min-height: 100px;
@@ -632,9 +456,8 @@ body {
   background: white;
   border-radius: $radius;
   box-shadow: $shadow;
-
-  overflow: visible !important; // <<<< สำคัญ
-
+  overflow: hidden !important;
+  transform-style: preserve-3d;
   .card-body {
     padding: 20px;
     display: flex;
@@ -660,8 +483,10 @@ body {
       font-size: 13px;
       color: $muted;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       white-space: nowrap;
-      overflow: visible;
     }
     h3 {
       margin: 0;
@@ -673,13 +498,11 @@ body {
       color: $dark;
     }
   }
-
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     z-index: 100;
   }
-
   &.card-green {
     .mini-icon {
       background: #dcfce7;
@@ -704,7 +527,6 @@ body {
   }
 }
 
-// [แก้ไข] ลบ smooth-corners และเพิ่ม overflow: visible
 .leave-card {
   border: none;
   display: flex;
@@ -712,19 +534,15 @@ body {
   justify-content: space-between;
   min-height: 150px;
   background: white;
-
-  border-radius: $radius; // ✅ แก้กลับเป็น $radius (ไม่เอา 0 0)
-
+  border-radius: $radius;
   box-shadow: $shadow;
   transition: transform 0.2s;
-  overflow: visible !important; // <<<< สำคัญ
-
+  overflow: visible !important;
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     z-index: 10;
   }
-
   .leave-body {
     padding: 20px;
     flex-grow: 1;
@@ -754,7 +572,6 @@ body {
       font-weight: 500;
     }
   }
-
   .leave-footer {
     padding: 10px 20px;
     font-size: 12px;
@@ -762,11 +579,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    // ✅ เพิ่มตรงนี้เพื่อให้ขอบล่างโค้งตามแม่ (แก้เรื่องติ่ง)
     border-radius: 0 0 $radius $radius;
   }
-
   $leave-themes: (
     'green': #22c55e,
     'purple': #4650dd,
@@ -793,15 +607,18 @@ body {
 // =========================================
 // 7. Calendar & Schedule
 // =========================================
-// [แก้ไข] ลบ smooth-corners และเพิ่ม overflow: visible
 .schedule-card {
   margin-top: 20px;
-  overflow: visible !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   .schedule-body {
     display: flex;
     flex-direction: column;
+    width: 100%;
     @media (min-width: 1024px) {
       flex-direction: row;
+      align-items: stretch;
     }
   }
 }
@@ -816,6 +633,8 @@ body {
     border-bottom: none;
     border-right: 1px solid #f1f5f9;
     padding: 25px;
+    overflow-y: auto;
+    max-height: 600px;
   }
   .panel-title {
     margin: 0 0 20px;
@@ -848,11 +667,20 @@ body {
 }
 .calendar-panel {
   flex-grow: 1;
+  flex-basis: 0;
+  min-width: 0;
+  width: 100%;
   padding: 20px;
   background: white;
-  min-height: 300px;
+  min-height: 400px;
+  position: relative;
   @media (min-width: 768px) {
     padding: 25px;
+  }
+  full-calendar {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
 .schedule-footer {
@@ -862,10 +690,16 @@ body {
   gap: 15px;
   font-size: 12px;
   color: $muted;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
   @media (min-width: 768px) {
     padding: 15px 25px;
     font-size: 13px;
     gap: 20px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
   }
   .legend-box {
     width: 12px;
@@ -873,7 +707,6 @@ body {
     border-radius: 3px;
     display: inline-block;
     margin-right: 6px;
-    vertical-align: middle;
   }
   .box-gray {
     background: #94a3b8;
@@ -899,18 +732,15 @@ body {
   margin-left: 5px;
   cursor: help;
   z-index: 101;
-
   &:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
   }
 }
-
 .tooltip-text {
   visibility: hidden;
   width: max-content;
   max-width: 280px;
-
   background: #333;
   color: #fff;
   border-radius: 6px;
@@ -927,7 +757,6 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   white-space: normal;
-
   &::after {
     content: '';
     position: absolute;
