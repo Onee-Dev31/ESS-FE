@@ -32,7 +32,6 @@ $danger: #ef4444;
   box-sizing: border-box;
 }
 
-// [แก้จุดที่ 1] บังคับ html และ body ไม่ให้เกินขอบเขตหน้าจอเด็ดขาด
 html, body {
   background: #f1f5f9;
   margin: 0;
@@ -43,16 +42,15 @@ html, body {
   line-height: 1.6;
   
   width: 100%;
-  max-width: 100vw; /* ห้ามกว้างเกิน Viewport */
-  overflow-x: hidden; /* ซ่อนส่วนเกินแนวนอนทั้งหมด */
+  max-width: 100vw;
+  overflow-x: hidden; 
 }
 
-// [แก้จุดที่ 2] Wrapper ต้องยืดหยุ่นและซ่อนส่วนเกินถ้า Sidebar ดันเข้ามา
 .dashboard-wrapper {
   padding: 15px;
   width: 100%;
-  max-width: 100%; /* การันตีไม่ให้เกิน Container แม่ */
-  overflow-x: hidden; /* ถ้า Sidebar ดันมา ให้ตัดส่วนเกินทิ้ง ไม่ต้องสร้าง Scrollbar */
+  max-width: 100%;
+  overflow-x: hidden; 
   
   @media (min-width: 768px) {
     padding: 25px;
@@ -77,32 +75,28 @@ html, body {
 .bg-green { background: $success; }
 .bg-blue { background: #3b82f6; }
 .bg-indigo { background: #6366f1; }
-
 // =========================================
 // 2. Layout & Grid System
 // =========================================
-
-// Grid หลักสำหรับแบ่งหน้าจอ ซ้าย-ขวา
 .main-layout-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
   width: 100%; 
-  max-width: 100%; // กันเหนียว
+  max-width: 100%;
   
   @media (min-width: 1200px) {
     grid-template-columns: 280px 1fr;
   }
 }
 
-// Wrapper สำหรับจัดเรียงการ์ดในแนวตั้ง
 .left-col-wrapper,
 .right-col-wrapper {
   display: flex;
   flex-direction: column; 
   width: 100%;
-  min-width: 0; // Fix Flexbox overflow issue (สำคัญมากสำหรับ Flex)
+  min-width: 0;
 }
 
 // --- Left: Avatar ---
@@ -156,7 +150,6 @@ html, body {
     @media (min-width: 768px) { 
       width: 180px; height: 180px; 
     }
-    
     .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 4px solid #fff; }
   }
 }
@@ -170,14 +163,8 @@ html, body {
   border: none !important;
   width: 100%;
   position: relative;
-  
-  // Height Settings
   height: 100%; 
-
-  // ตัดส่วนเกินที่ล้นออกไป
   overflow: hidden; 
-
-  // Padding
   padding: 20px; 
   @media (min-width: 992px) { 
     padding: 35px 100px; 
@@ -442,7 +429,6 @@ html, body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  // 3. Desktop (จอคอม): แสดง 4 ใบต่อแถว (ตามที่ต้องการ)
   @media (min-width: 1200px) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
