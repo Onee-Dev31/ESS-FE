@@ -44,10 +44,13 @@ html, body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden; 
+  /* ป้องกัน Text ล้นจอในทุกกรณี */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .dashboard-wrapper {
-  padding: 15px;
+  padding: 15px; // Mobile padding
   width: 100%;
   max-width: 100%;
   overflow-x: hidden; 
@@ -59,9 +62,13 @@ html, body {
 
 .page-title {
   margin: 0 0 20px;
-  font-size: 20px;
+  font-size: 18px; // ปรับลดเล็กน้อยบนมือถือ
   font-weight: 700;
   color: $dark;
+  
+  @media (min-width: 768px) {
+    font-size: 20px;
+  }
 }
 
 // Utilities
@@ -75,17 +82,22 @@ html, body {
 .bg-green { background: $success; }
 .bg-blue { background: #3b82f6; }
 .bg-indigo { background: #6366f1; }
+
 // =========================================
 // 2. Layout & Grid System
 // =========================================
 .main-layout-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 20px;
   align-items: start;
   width: 100%; 
   max-width: 100%;
   
+  @media (min-width: 768px) {
+    gap: 24px;
+  }
+
   @media (min-width: 1200px) {
     grid-template-columns: 280px 1fr;
   }
@@ -96,7 +108,7 @@ html, body {
   display: flex;
   flex-direction: column; 
   width: 100%;
-  min-width: 0;
+  min-width: 0; // Fix Grid Overflow issue
 }
 
 // --- Left: Avatar ---
@@ -116,8 +128,11 @@ html, body {
   width: 100%;
 
   // Height Settings
-  height: 100%; 
+  height: auto; // ปรับเป็น auto เพื่อความยืดหยุ่น
   min-height: 200px; 
+  @media (min-width: 1200px) {
+      height: 100%;
+  }
   
   // Clip Decoration
   @include smooth-corners;
@@ -144,7 +159,7 @@ html, body {
   }
 
   .avatar-frame {
-    width: 140px; height: 140px; 
+    width: 120px; height: 120px; // เล็กลงนิดหน่อยบนมือถือ
     border-radius: 50%; border: 4px solid rgba(255, 255, 255, 0.2); padding: 5px; @include flex-center; position: relative; z-index: 5;
     
     @media (min-width: 768px) { 
@@ -163,49 +178,88 @@ html, body {
   border: none !important;
   width: 100%;
   position: relative;
-  height: 100%; 
+  
+  height: auto; 
   overflow: hidden; 
   padding: 20px; 
+  
   @media (min-width: 992px) { 
-    padding: 35px 100px; 
+    // ลด Padding ด้านข้างลงเพื่อให้ Fit กับหน้าจอ Laptop ทั่วไป (1366px)
+    padding: 30px 40px; 
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-height: 220px; // เพิ่มความสูงขั้นต่ำ
+  }
+  
+  @media (min-width: 1400px) {
+    padding: 35px 80px; // จอใหญ่ค่อยขยาย Padding
   }
 
   // Decorations
-  &::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; }
-  &::after { content: ''; position: absolute; bottom: -30px; left: -20px; width: 140px; height: 140px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; pointer-events: none; }
+  &::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; }
+  &::after { content: ''; position: absolute; bottom: -30px; left: -20px; width: 100px; height: 100px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; pointer-events: none; }
   
   .action-btn-outline.top-right-pos {
-    position: absolute; top: 20px; right: 20px; z-index: 10;
+    position: absolute; top: 15px; right: 15px; z-index: 10;
     background: #ffffff !important; border: 1px solid #ffffff !important; color: $primary !important;
     border-radius: 6px; padding: 6px 12px;
+    font-size: 12px;
+    @media (min-width: 768px) {
+       top: 20px; right: 20px;
+       font-size: 13px;
+    }
   }
 
   // Layout Main
   .card-body.profile-layout {
     padding: 0 !important; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 5;
-    @media (min-width: 992px) { flex-direction: row; align-items: flex-start; gap: 60px; }
+    @media (min-width: 992px) { flex-direction: row; align-items: flex-start; gap: 40px; }
+    
     .section-divider { border-top: 1px solid rgba(255,255,255,0.2); margin: 5px 0; @media (min-width: 992px) { display: none; } }
 
     .profile-left-section {
       flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; font-weight: 500;
+      width: 100%; // Mobile full width
+      @media (min-width: 992px) { width: auto; max-width: 250px; }
+
       .user-id-badge { background: rgba(255, 255, 255, 0.2); border-radius: 6px; font-weight: 700; font-size: 13px; line-height: 1.5; padding: 4px 12px; margin-bottom: 12px; margin-top: 0 !important; }
-      .user-name { font-size: 20px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
-      .user-role, .user-meta { font-size: 14px !important; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; font-weight: 400; line-height: 1.5; }
+      .user-name { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; @media(min-width:768px){ font-size: 20px; } }
+      .user-role, .user-meta { font-size: 13px !important; color: rgba(255, 255, 255, 0.9); margin-bottom: 4px; font-weight: 400; line-height: 1.5; @media(min-width:768px){ font-size: 14px; } }
     }
 
     .profile-info-list {
       flex: 1; display: flex; flex-direction: column; gap: 12px;
+      width: 100%;
+      
       @media (min-width: 992px) { 
-        border-left: 1px solid rgba(255, 255, 255, 0.2); padding-left: 60px; 
-        padding-top: 4px; margin-top: 0 !important; 
+        border-left: 1px solid rgba(255, 255, 255, 0.2); 
+        padding-left: 40px; 
+        padding-top: 4px; 
+        margin-top: 0 !important; 
       }
+
       .profile-display-group {
         display: flex; flex-direction: row; align-items: flex-start; gap: 15px; font-size: 14px !important; margin-top: 0!important;
-        .display-label { flex: 0 0 140px; color: rgba(255, 255, 255, 0.75); font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px; height: 100%; line-height: 1.4; i { width: 20px; text-align: center; } }
-        .display-value { color: white; font-weight: 500; word-break: break-word; line-height: 1.4; }
+        
+        // Responsive Mobile: ถ้าจอเล็กมาก (<500px) ให้ Label กับ Value ซ้อนกัน หรือ Label เล็กลง
+        @media (max-width: 576px) {
+           flex-wrap: wrap; 
+           gap: 4px;
+        }
+
+        .display-label { 
+            flex: 0 0 120px; // ลดความกว้าง Label บนจอเล็ก
+            @media (min-width: 768px) { flex: 0 0 140px; }
+            @media (max-width: 576px) { flex: 0 0 100%; width: 100%; color: rgba(255,255,255,0.6); font-size: 12px; }
+
+            color: rgba(255, 255, 255, 0.75); font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px; height: 100%; line-height: 1.4; 
+            i { width: 20px; text-align: center; } 
+        }
+        .display-value { 
+            color: white; font-weight: 500; word-break: break-word; line-height: 1.4; 
+            flex: 1; 
+        }
       }
     }
   }
@@ -223,6 +277,7 @@ html, body {
   border: none;
   position: relative;
   overflow: visible !important;
+  width: 100%; // Ensure fit
 
   .card-header {
     padding: 15px 20px;
@@ -238,13 +293,13 @@ html, body {
     }
   }
   .card-body {
-    padding: 20px;
+    padding: 15px;
     @media (min-width: 768px) {
       padding: 24px;
     }
   }
   .card-footer {
-    padding: 12px 20px;
+    padding: 12px 15px;
     border-top: none;
     background: #fafafa;
     border-radius: 0 0 $radius $radius;
@@ -284,6 +339,7 @@ html, body {
     text-align: left;
     width: 100%;
 
+    // ป้องกันข้อความล้น
     white-space: normal;
     word-break: break-word;   
     overflow-wrap: break-word; 
@@ -305,6 +361,7 @@ html, body {
   cursor: pointer;
   transition: 0.2s;
   box-shadow: 0 2px 4px rgba($primary, 0.2);
+  white-space: nowrap; // ป้องกันปุ่มเบี้ยว
   &:hover {
     background: color.adjust($primary, $lightness: -5%);
     transform: translateY(-1px);
@@ -324,6 +381,7 @@ html, body {
   align-items: center;
   gap: 6px;
   transition: 0.2s;
+  white-space: nowrap;
   &:hover {
     background: $primary;
     color: white;
@@ -346,6 +404,8 @@ html, body {
   margin-bottom: 25px;
   border: none;
   overflow: visible !important;
+  padding: 15px;
+
   @media (min-width: 768px) {
     padding: 24px;
   }
@@ -366,7 +426,8 @@ html, body {
 .stat-items-grid {
   display: grid;
   gap: 15px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  // ปรับ minmax ให้รองรับจอมือถือเล็ก (ต่ำกว่า 350px)
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .stat-item {
@@ -424,12 +485,14 @@ html, body {
   display: grid;
   gap: 20px;
   margin-bottom: 30px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  // Responsive Grid
+  grid-template-columns: 1fr; // Mobile First
+  
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: 1440px) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
@@ -598,9 +661,11 @@ html, body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 100%;
+
   .schedule-body {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; // Mobile Stack
     width: 100%;
     @media (min-width: 1024px) {
       flex-direction: row;
@@ -613,6 +678,7 @@ html, body {
   padding: 20px;
   width: 100%;
   border-bottom: 1px solid #f1f5f9;
+  
   @media (min-width: 1024px) {
     width: 300px;
     flex-shrink: 0;
@@ -656,10 +722,14 @@ html, body {
   flex-basis: 0;
   min-width: 0;
   width: 100%;
-  padding: 20px;
+  padding: 15px;
   background: white;
   min-height: 400px;
   position: relative;
+  
+  // สำคัญ: เพิ่ม scroll แนวนอนสำหรับปฏิทินในมือถือ
+  overflow-x: auto; 
+  
   @media (min-width: 768px) {
     padding: 25px;
   }
@@ -667,17 +737,19 @@ html, body {
     width: 100%;
     height: 100%;
     display: block;
+    min-width: 300px; // ป้องกันปฏิทินบีบจนพัง
   }
 }
 .schedule-footer {
-  padding: 15px 20px;
+  padding: 15px;
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
   font-size: 12px;
   color: $muted;
   background: #fff;
   border-top: 1px solid #f1f5f9;
+  
   @media (min-width: 768px) {
     padding: 15px 25px;
     font-size: 13px;
@@ -726,11 +798,13 @@ html, body {
 .tooltip-text {
   visibility: hidden;
   width: max-content;
-  max-width: 280px;
+  max-width: 200px; // ลดความกว้างบน mobile
+  @media (min-width: 768px) { max-width: 280px; }
+  
   background: #333;
   color: #fff;
   border-radius: 6px;
-  padding: 12px;
+  padding: 10px;
   position: absolute;
   z-index: 9999;
   bottom: 140%;
@@ -743,6 +817,14 @@ html, body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   pointer-events: none;
   white-space: normal;
+  
+  // ปรับตำแหน่งถ้าตกขอบซ้าย
+  @media (max-width: 480px) {
+     left: 0;
+     transform: translateX(-10px);
+     &::after { left: 20px; }
+  }
+
   &::after {
     content: '';
     position: absolute;
