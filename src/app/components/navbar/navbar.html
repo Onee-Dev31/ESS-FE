@@ -25,22 +25,58 @@
         <span class="status-dot"></span>
       </button>
 
-      <button class="icon-btn">
-        <i class="fas fa-paper-plane"></i>
-        <span class="badge">10</span>
-      </button>
+      <div class="notification-dropdown" (click)="$event.stopPropagation()">
+        <button class="icon-btn" (click)="toggleNotification()">
+          <i class="fas fa-paper-plane"></i>
+          <span class="badge">{{ notifications.length }}</span>
+        </button>
 
-      <div class="user-profile">
-        <img src="assets/avatar.jpg" class="avatar" (click)="toggleDropdown()" />
+        <div class="dropdown-menu" *ngIf="isNotificationOpen">
+          <div class="dropdown-header">การแจ้งเตือนล่าสุด</div>
 
-        <div class="profile-dropdown" *ngIf="isDropdownOpen">
+          <a href="javascript:void(0)" class="dropdown-item" *ngFor="let item of notifications">
+            <div
+              class="icon-circle"
+              [ngClass]="{
+                orange: item.status === 'pending',
+                green: item.status === 'approved',
+                red: item.status === 'rejected'
+              }"
+            >
+              <i
+                class="fas"
+                [ngClass]="{
+                  'fa-hourglass-half': item.status === 'pending',
+                  'fa-check': item.status === 'approved',
+                  'fa-times': item.status === 'rejected'
+                }"
+              ></i>
+            </div>
+
+            <div class="content">
+              <p class="title">{{ item.title }}</p>
+              <p class="message">{{ item.message }}</p>
+              <span class="time">{{ item.time }}</span>
+            </div>
+          </a>
+
+          <div class="dropdown-footer">
+            <a href="javascript:void(0)">ดูทั้งหมด</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-profile" (click)="$event.stopPropagation()">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar" (click)="toggleProfile()" />
+
+        <div class="profile-dropdown" *ngIf="isProfileOpen">
           <div class="dropdown-user-info">
             <div class="name">{{ userName }}</div>
             <div class="role">{{ userRole }}</div>
           </div>
-          <ul class="dropdown-menu">
-            <li (click)="isDropdownOpen = false">Settings</li>
-            <li (click)="isDropdownOpen = false">Activity log</li>
+          <ul class="dropdown-menu-list">
+            <li (click)="isProfileOpen = false">Settings</li>
+            <li (click)="isProfileOpen = false">Activity log</li>
             <li class="divider"></li>
             <li class="logout" (click)="logout()">Logout</li>
           </ul>
