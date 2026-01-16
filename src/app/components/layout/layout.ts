@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router'; // 1. Import ตัวนี้เข้ามา
-import { NavbarComponent } from '../navbar/navbar'; // Import Navbar ที่คุณสร้าง
-import { Sidebar } from '../sidebar/sidebar'; // Import Sidebar ที่คุณสร้าง
+import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from '../navbar/navbar';
+import { Sidebar } from '../sidebar/sidebar';
 import { SidebarService } from '../../services/sidebar';
 
 @Component({

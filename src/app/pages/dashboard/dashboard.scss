@@ -44,17 +44,15 @@ body {
   line-height: 1.6;
 
   width: 100%;
-  max-width: 100vw;
   overflow-x: hidden;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
+  position: relative;
 }
 
 .dashboard-wrapper {
-  padding: 15px; // Mobile padding
+  padding: 15px;
   width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  min-width: 0;
+  box-sizing: border-box;
 
   @media (min-width: 768px) {
     padding: 25px;
@@ -113,14 +111,25 @@ body {
 .main-layout-grid {
   display: grid;
   gap: 20px;
+  width: 100%;
 
   @media (max-width: 1199px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100%;
     .left-col-wrapper,
     .right-col-wrapper {
       display: contents;
     }
 
+    grid-template-areas:
+      'avatar'
+      'profile'
+      'attendance'
+      'performance'
+      'it-story'
+      'medical'
+      'welfare'
+      'leave'
+      'schedule';
 
     .banner-avatar-section {
       grid-area: avatar;
@@ -149,22 +158,11 @@ body {
     .schedule-section {
       grid-area: schedule;
     }
-
-    grid-template-areas:
-      'avatar'
-      'profile'
-      'attendance'
-      'performance'
-      'it-story'
-      'medical'
-      'welfare'
-      'leave'
-      'schedule';
   }
 
   @media (min-width: 1200px) {
     grid-template-columns: 280px 1fr;
-    grid-template-areas: none; 
+    grid-template-areas: none;
 
     .left-col-wrapper {
       grid-column: 1;
@@ -176,7 +174,6 @@ body {
       grid-column: 2;
       display: flex;
       flex-direction: column;
-
     }
 
     .banner-avatar-section,
@@ -216,21 +213,16 @@ body {
   box-shadow: $shadow;
   position: relative;
   width: 100%;
-
-  // Height Settings
   height: auto;
   min-height: 200px;
 
   @media (min-width: 1200px) {
     min-height: 250px;
-    height: auto;
   }
 
-  // Clip Decoration
   @include smooth-corners;
   overflow: hidden;
 
-  // Background Decorations
   &::before {
     content: '';
     position: absolute;
@@ -312,7 +304,7 @@ body {
   color: white !important;
   border-radius: $radius-lg !important;
   box-shadow: $shadow;
-  border: none !important;
+  border: none;
   width: 100%;
   position: relative;
 
@@ -332,7 +324,6 @@ body {
     padding: 0px 80px;
   }
 
-  // Decorations
   &::before {
     content: '';
     position: absolute;
@@ -379,7 +370,6 @@ body {
     }
   }
 
-  // Layout Main
   .card-body.profile-layout {
     padding: 0 !important;
     display: flex;
@@ -526,9 +516,6 @@ body {
   .card-header {
     padding: 15px 20px;
     border-bottom: none;
-    @media (min-width: 768px) {
-      padding: 18px 24px;
-    }
     .card-heading {
       margin: 0;
       font-size: 16px;
@@ -538,19 +525,26 @@ body {
   }
   .card-body {
     padding: 15px;
-    @media (min-width: 768px) {
-      padding: 24px;
-    }
   }
   .card-footer {
     padding: 12px 15px;
     border-top: none;
     background: #fafafa;
     border-radius: 0 0 $radius $radius;
-    @media (min-width: 768px) {
+  }
+
+  @media (min-width: 768px) {
+    .card-header {
+      padding: 18px 24px;
+    }
+    .card-body {
+      padding: 24px;
+    }
+    .card-footer {
       padding: 12px 24px;
     }
   }
+
   &:hover {
     z-index: 5;
   }
@@ -599,6 +593,7 @@ body {
     line-height: 1.5;
   }
 }
+
 // =========================================
 // 4. Buttons
 // =========================================
@@ -745,7 +740,7 @@ body {
   font-size: 16px;
   font-weight: 700;
   color: $dark;
-  margin: 30px 0 15px;
+  margin: 0 0 15px;
   padding-left: 10px;
   border-left: 4px solid $primary;
 }
@@ -934,7 +929,7 @@ body {
 
   .schedule-body {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     width: 100%;
     @media (min-width: 1024px) {
       flex-direction: row;
@@ -989,7 +984,8 @@ body {
 .calendar-panel {
   flex-grow: 1;
   flex-basis: 0;
-  min-width: 0;
+
+  max-width: 100%;
   width: 100%;
   padding: 15px;
   background: white;
@@ -1004,7 +1000,7 @@ body {
     width: 100%;
     height: 100%;
     display: block;
-    min-width: 300px;
+    min-width: 250px;
   }
 }
 .schedule-footer {
@@ -1115,6 +1111,8 @@ body {
     border-radius: 12px 12px 0 0;
     padding: 16px 24px;
     border-bottom: 1px solid #f1f5f9;
+    justify-content: space-between;
+    width: 100%;
 
     .card-heading {
       color: #1e293b;
@@ -1177,7 +1175,7 @@ body {
 }
 
 // =========================================
-// 9. Performance Card (Fixed Alignment)
+// 9. Performance Card
 // =========================================
 .performance-card {
   .card-header {
@@ -1198,11 +1196,10 @@ body {
     padding: 24px;
   }
 
-  // --- ส่วนข้อมูลเริ่มงาน/อายุงาน ---
   .work-meta-group {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     margin-bottom: 24px;
     padding-bottom: 20px;
     border-bottom: 1px solid #f1f5f9;
@@ -1210,9 +1207,11 @@ body {
     .meta-row {
       display: flex;
       align-items: baseline;
+      justify-content: space-between;
+      width: 100%;
 
       .meta-label {
-        min-width: 150px;
+        min-width: 100px;
         font-weight: 500;
         color: #64748b;
         font-size: 14px;
@@ -1243,6 +1242,7 @@ body {
       display: flex;
       align-items: center;
       font-size: 15px;
+      justify-content: space-between;
 
       .perf-year {
         min-width: 150px;
@@ -1258,6 +1258,147 @@ body {
         border-radius: 4px;
         font-size: 14px;
       }
+    }
+  }
+}
+
+// =========================================
+// 10. Responsive Mobile Optimization (Cleaned)
+// =========================================
+
+// 10.1 Mobile S (Small) - < 375px
+@media (max-width: 374px) {
+  .dashboard-wrapper {
+    padding: 10px;
+  }
+  .page-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+
+  .banner-avatar-section {
+    min-height: 160px;
+    padding: 15px;
+    .avatar-frame {
+      width: 100px;
+      height: 100px;
+      border-width: 3px;
+    }
+    .edit-icon-btn {
+      width: 28px;
+      height: 28px;
+      top: 10px;
+      right: 10px;
+    }
+  }
+
+  .profile-card {
+    padding: 15px;
+    .card-body.profile-layout {
+      gap: 15px;
+      .profile-info-list {
+        padding-left: 0;
+        .profile-display-group {
+          flex-direction: column;
+          gap: 2px;
+          margin-bottom: 8px;
+          .display-label {
+            flex: 0 0 auto;
+            width: 100%;
+            font-size: 11px;
+            i {
+              width: 16px;
+            }
+          }
+          .display-value {
+            font-size: 13px;
+            padding-left: 24px;
+          }
+        }
+      }
+    }
+  }
+
+  .performance-card .card-body {
+    .work-meta-group .meta-row,
+    .performance-list .perf-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      .meta-label,
+      .perf-year {
+        font-size: 12px;
+      }
+      .meta-value,
+      .perf-grade {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+    .fc-toolbar-chunk {
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
+
+// 10.2 Mobile M (Medium) - 375px to 424px
+@media (min-width: 375px) and (max-width: 424px) {
+  .banner-avatar-section {
+    min-height: 180px;
+    .avatar-frame {
+      width: 130px;
+      height: 130px;
+    }
+  }
+  .profile-card .card-body.profile-layout .profile-info-list .profile-display-group {
+    .display-label {
+      flex: 0 0 110px;
+    }
+  }
+}
+
+// 10.3 Mobile L (Large) - 425px to 767px
+@media (min-width: 425px) and (max-width: 767px) {
+  .profile-card .card-body.profile-layout .profile-info-list .profile-display-group {
+    .display-label {
+      flex: 0 0 130px;
+    }
+  }
+
+  .stats-grid-card .stat-items-grid,
+  .bottom-stats-grid,
+  .leave-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// 10.4 Global Mobile Fixes (< 768px)
+@media (max-width: 767px) {
+  .main-layout-grid {
+    gap: 16px;
+  }
+
+  .card-footer .action-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .schedule-card .schedule-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    justify-content: start;
+  }
+  .leave-card {
+    min-height: auto;
+    .leave-body {
+      padding: 15px;
     }
   }
 }

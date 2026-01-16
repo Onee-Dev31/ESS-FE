@@ -5,23 +5,34 @@
 
       <ul class="nav-list">
         <li class="nav-item" [class.open]="openMenu === 'Dashboards'">
-          <div class="nav-link" (click)="toggleMenu('Dashboards')" [class.active]="openMenu === 'Dashboards'">
+          <div
+            class="nav-link"
+            (click)="toggleMenu('Dashboards')"
+            [class.active]="openMenu === 'Dashboards'"
+          >
             <div class="link-content">
               <i class="fas fa-home nav-icon"></i>
               <span class="link-text">Dashboards</span>
               <i class="fas fa-chevron-down arrow-icon"></i>
             </div>
           </div>
-
           <ul class="sub-menu" [class.expanded]="openMenu === 'Dashboards'">
-            <li class="sub-item" routerLink="/dashboard/default" routerLinkActive="active">Default</li>
+            <li class="sub-item" routerLink="/dashboard/default" routerLinkActive="active">
+              Default
+            </li>
             <li class="sub-item" routerLink="/dashboard/cms" routerLinkActive="active">CMS</li>
-            <li class="sub-item" routerLink="/dashboard/e-commerce" routerLinkActive="active">E-commerce</li>
+            <li class="sub-item" routerLink="/dashboard/e-commerce" routerLinkActive="active">
+              E-commerce
+            </li>
           </ul>
         </li>
 
         <li class="nav-item" *ngFor="let item of menuItems" [class.open]="openMenu === item.name">
-          <div class="nav-link" (click)="toggleMenu(item.name)" [class.active]="openMenu === item.name">
+          <div
+            class="nav-link"
+            (click)="toggleMenu(item.name)"
+            [class.active]="openMenu === item.name"
+          >
             <div class="link-content">
               <i [class]="'fas ' + item.icon + ' nav-icon'"></i>
               <span class="link-text">{{ item.name }}</span>
@@ -30,7 +41,12 @@
           </div>
 
           <ul class="sub-menu" [class.expanded]="openMenu === item.name">
-            <li class="sub-item" *ngFor="let sub of item.subItems" [routerLink]="sub.path" routerLinkActive="active">
+            <li
+              class="sub-item"
+              *ngFor="let sub of item.subItems"
+              [routerLink]="sub.path"
+              routerLinkActive="active"
+            >
               {{ sub.label }}
             </li>
             <ng-container *ngIf="!item.subItems">

@@ -10,12 +10,16 @@
   </div>
 
   <div class="nav-right">
-    <div class="search-box">
-      <input type="text" placeholder="Search">
+    <div class="search-box desktop-search">
+      <input type="text" placeholder="Search..." />
       <i class="fas fa-search search-icon"></i>
     </div>
 
     <div class="nav-actions">
+      <button class="icon-btn mobile-search-btn">
+        <i class="fas fa-search"></i>
+      </button>
+
       <button class="icon-btn">
         <i class="fas fa-chart-line"></i>
         <span class="status-dot"></span>
@@ -27,7 +31,7 @@
       </button>
 
       <div class="user-profile">
-        <img src="assets/avatar.jpg" class="avatar" (click)="toggleDropdown()">
+        <img src="assets/avatar.jpg" class="avatar" (click)="toggleDropdown()" />
 
         <div class="profile-dropdown" *ngIf="isDropdownOpen">
           <div class="dropdown-user-info">

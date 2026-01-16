@@ -20,8 +20,8 @@
         </div>
 
         <div class="card attendance-card">
-          <div class="card-header border-0 pb-0">
-            <h4 class="card-heading">My Time Attendance</h4>
+          <div class="card-header border-0">
+            <h4 class="card-heading"><i class="fas fa-calendar-check" style="padding-right:5px;"></i>My Time Attendance</h4>
           </div>
 
           <div class="card-body">
@@ -50,9 +50,9 @@
           </div>
         </div>
 
-        <div class="card performance-card mt-4">
+        <div class="card performance-card">
           <div class="card-header border-0">
-            <h4 class="card-heading">My Performance</h4>
+            <h4 class="card-heading"><i class="fas fa-tachometer-alt" style="padding-right: 5px;"></i>My Performance</h4>
           </div>
 
           <div class="card-body">
@@ -86,7 +86,7 @@
 
         <div class="card it-story-card">
           <div class="card-header border-0">
-            <h4 class="card-heading">My IT Story</h4>
+            <h4 class="card-heading"><i class="fas fa-laptop-code" style="padding-right: 25px;"></i>My IT Story</h4>
           </div>
           <div class="card-body">
             <div class="profile-info-list">
@@ -194,7 +194,7 @@
         </div>
 
         <div class="leave-section">
-          <p class="section-title mt-spaced">ลาหยุดงาน</p>
+          <p class="section-title">ลาหยุดงาน</p>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
               <div class="leave-body">
@@ -214,7 +214,7 @@
           </div>
         </div>
         <div class="schedule-section">
-          <p class="section-title mt-spaced">ตารางการปฏิบัติงาน</p>
+          <p class="section-title">ตารางการปฏิบัติงาน</p>
           <div class="card schedule-card">
             <div class="schedule-body">
               <div class="holiday-list-panel">
