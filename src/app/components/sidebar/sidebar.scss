@@ -8,22 +8,19 @@
   min-width: 230px;
   height: 100%;
   background: #ffffff;
-
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    padding 0.3s ease;
-
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.3s ease;
   font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   display: flex;
   flex-direction: column;
-
   border-right: 1px solid #f1f5f9;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
   position: relative;
   z-index: 10;
   overflow-x: hidden;
 
-  ul,
-  li {
+  ul, li {
     list-style: none !important;
     padding: 0;
     margin: 0;
@@ -35,45 +32,36 @@
     overflow-x: hidden;
     padding: 2px 0;
 
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
+    &::-webkit-scrollbar { width: 4px; }
     &::-webkit-scrollbar-thumb {
       background: #e2e8f0;
       border-radius: 10px;
     }
   }
 
+  // --- Mixin: Mobile/Collapsed View ---
   @mixin vertical-mode {
     width: 80px;
     min-width: 80px;
 
+    // --- แก้ไขตรงนี้: ให้โชว์ Title แบบตัวเล็กๆ ตรงกลาง ---
     .section-title {
-      display: block;
-      opacity: 1;
-      visibility: visible;
-      height: auto;
-
-      padding: 15px 0 8px 0 !important;
-
-      width: 100%;
-      box-sizing: border-box;
-
-      text-align: center;
-      font-size: 9px;
-      font-weight: 600;
-      color: #cbd5e1;
-      margin-bottom: 8px;
-
+      display: block !important;    /* บังคับโชว์ */
+      text-align: center;           /* จัดกึ่งกลาง */
+      padding: 15px 0 5px 0 !important; /* จัดระยะห่าง */
+      font-size: 9px;               /* ตัวอักษรเล็กจิ๋ว */
+      font-weight: 700;
+      color: #cbd5e1;               /* สีจางๆ หน่อย */
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;      /* ถ้าชื่อยาวเกินให้เป็น ... */
     }
 
     .nav-link {
       padding: 14px 0;
       justify-content: center;
       border-left: 0;
+      flex-direction: column; 
 
       &:hover:not(.active) {
         padding-left: 0;
@@ -100,15 +88,8 @@
       }
     }
 
-    .nav-icon {
-      margin: 0 0 4px 0;
-      font-size: 1.3rem;
-      min-width: auto;
-      width: auto;
-      display: flex;
-      justify-content: center;
-    }
-
+    .nav-icon { margin: 0 0 4px 0; font-size: 1.3rem; }
+    
     .link-text {
       font-size: 9px;
       width: 100%;
@@ -120,31 +101,35 @@
       padding: 0 2px;
       opacity: 0.8;
     }
-
-    .arrow-icon {
-      display: none !important;
-    }
-
+    
+    .arrow-icon { display: none !important; }
+    
+    // Submenu (โหมดพับ -> เลื่อนลง)
     .sub-menu {
-      background: #f8fafc;
-      border-top: 1px solid #f1f5f9;
-      border-bottom: 1px solid #f1f5f9;
-    }
+      background: #f8fafc; 
 
-    .sub-item {
-      padding: 8px 5px !important;
-      text-align: center;
-      font-size: 10px !important;
+      .sub-item {
+        padding: 8px 4px;
+        text-align: center;
+        font-size: 10px;
+        padding-left: 0;
+        
+        &.active::before {
+          display: none;
+        }
 
-      &::before {
-        display: none !important;
+        &.active {
+          color: #4650dd;
+          font-weight: 700;
+          background: rgba(70, 80, 221, 0.05);
+        }
       }
     }
   }
 
+  // --- Section Styles (โหมดปกติ) ---
   .menu-section {
     margin-bottom: 24px;
-
     .section-title {
       padding: 0 20px;
       font-size: 14px;
@@ -156,6 +141,7 @@
     }
   }
 
+  // --- Nav Link (Parent) ---
   .nav-link {
     display: flex;
     align-items: center;
@@ -177,20 +163,13 @@
       color: #4650dd !important;
       border-left-color: #4650dd;
 
-      .nav-icon,
-      .link-text,
-      .arrow-icon {
-        color: #4650dd !important;
-      }
+      .nav-icon, .link-text, .arrow-icon { color: #4650dd !important; }
     }
 
     &:hover:not(.active) {
       background: #f8fafc;
       color: #4650dd;
-
-      .nav-icon {
-        color: #4650dd;
-      }
+      .nav-icon { color: #4650dd; }
     }
   }
 
@@ -217,28 +196,26 @@
     transition: transform 0.3s ease;
   }
 
-  .nav-item.open {
-    .arrow-icon {
-      transform: rotate(180deg);
-    }
-  }
+  .nav-item.open .arrow-icon { transform: rotate(180deg); }
 
-  // --- Sub-menu Animation ---
+  // --- Sub Menu (โหมดปกติ) ---
   .sub-menu {
     overflow: hidden;
     max-height: 0;
     opacity: 0;
-    background: transparent;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.3s ease;
+    background: #f8fafc;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 
     &.expanded {
       max-height: 500px;
       opacity: 1;
       padding: 4px 0;
+      border-top: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f1f5f9;
     }
 
     .sub-item {
-      padding: 8px 24px 8px 64px;
+      padding: 10px 24px 10px 64px;
       color: #64748b;
       font-size: 13px;
       cursor: pointer;
@@ -247,13 +224,12 @@
       display: block;
       text-decoration: none;
 
-      &:hover {
-        color: #4650dd;
-      }
+      &:hover { color: #4650dd; }
 
       &.active {
         color: #4650dd;
         font-weight: 600;
+        background: rgba(70, 80, 221, 0.05);
 
         &::before {
           content: '';
@@ -261,8 +237,8 @@
           left: 42px;
           top: 50%;
           transform: translateY(-50%);
-          width: 4px;
-          height: 4px;
+          width: 6px;
+          height: 6px;
           background: #4650dd;
           border-radius: 50%;
         }
@@ -270,22 +246,16 @@
     }
   }
 
-  &.collapsed {
-    @include vertical-mode;
-  }
+  // --- Responsive States ---
+  &.collapsed { @include vertical-mode; }
 
   @media (max-width: 1100px) {
     @include vertical-mode;
-
     &.collapsed {
       width: 0 !important;
       min-width: 0 !important;
       border: none;
-
-      * {
-        opacity: 0;
-        visibility: hidden;
-      }
+      * { opacity: 0; visibility: hidden; }
     }
   }
 
