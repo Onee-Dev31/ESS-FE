@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { DashboardComponent } from './pages/dashboard/dashboard';
-import { LayoutComponent } from './components/layout/layout'; 
-// import { authGuard } from './guards/auth-guard'; // ไม่ต้อง import ก็ได้ถ้ายังไม่ใช้
+import { LayoutComponent } from './components/layout/layout';
+import { VehicleComponent } from './pages/vehicle/vehicle'; 
+
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -10,22 +11,20 @@ export const routes: Routes = [
     {
         path: '',
         component: LayoutComponent,
-        // canActivate: [authGuard], // ปิดไว้ถูกแล้วครับสำหรับการเทส
         children: [
             { 
                 path: 'dashboard', 
-                // เพิ่ม Children เพื่อรองรับ /dashboard/default ตามที่ Sidebar เรียก
                 children: [
-                    { path: '', component: DashboardComponent }, // /dashboard/default
-                    { path: 'cms', component: DashboardComponent },     // /dashboard/cms (ใส่ component เดิมไปก่อนกัน Error)
-                    { path: 'e-commerce', component: DashboardComponent }, // /dashboard/e-commerce
-                    
-                    // ถ้าเข้า /dashboard เฉยๆ ให้เด้งไป default
-                    { path: '', redirectTo: 'default', pathMatch: 'full' }
+                    { path: '', component: DashboardComponent }, 
+                    { path: 'default', component: DashboardComponent },
+                    { path: 'cms', component: DashboardComponent },     
+                    { path: 'e-commerce', component: DashboardComponent }, 
                 ]
             },
 
-            // หน้าแรกสุด ให้เด้งเข้า dashboard/default
+            // กลับมาใช้แบบบรรทัดเดียวเหมือนเดิม ไม่ต้องมี children
+            { path: 'vehicle', component: VehicleComponent },
+
             { 
                 path: '', 
                 redirectTo: 'dashboard', 
@@ -34,6 +33,5 @@ export const routes: Routes = [
         ]
     },
 
-    // ถ้าหาหน้าไหนไม่เจอ ให้เด้งไป login (ตัวการที่ทำให้เด้งเมื่อกี้)
     { path: '**', redirectTo: 'login' }
 ];

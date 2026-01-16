@@ -9,6 +9,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 // Interfaces
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
+
+// ✅ แก้ไข Interface: เพิ่ม route
 interface WelfareItem { 
   title: string; 
   amount: string; 
@@ -17,13 +19,15 @@ interface WelfareItem {
   titleColor?: string;
   amountColor?: string;
   tooltip?: string;
+  route?: string; // เพิ่มฟิลด์นี้
 }
+
 interface LeaveItem {
   label: string;
   count: string;
   countColor: string;
   iconClass: string;
-  iconColor?: string; // <--- เพิ่มตรงนี้สำหรับส่วนการลา
+  iconColor?: string;
   theme: string;
   balance: number;
 }
@@ -89,7 +93,8 @@ export class DashboardComponent {
       cardClass: 'card-blue',
       tooltip: `<strong>เงื่อนไข:</strong><br />- ค่ารถก่อน 06:00 น. ต้องเข้างานก่อน 06:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />- ค่ารถหลัง 22:00 น. ต้องเข้างานเกิน 22:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง`,
       titleColor: '#1e40af',
-      amountColor: '#1e40af'
+      amountColor: '#1e40af',
+      route: '/vehicle' // ✅ ใส่ Path ตรงนี้
     },
     { 
       title: 'ค่าแท็กซี่', 
@@ -319,6 +324,13 @@ performanceList = [
   };
 
   constructor(private router: Router) { }
+
+  // ✅ เพิ่มฟังก์ชันสำหรับเปลี่ยนหน้า
+  navigateTo(path: string | undefined) {
+    if (path) {
+      this.router.navigate([path]);
+    }
+  }
 
   logout() {
     this.router.navigate(['/login']);

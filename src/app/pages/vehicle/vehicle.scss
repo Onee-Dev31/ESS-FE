@@ -1,0 +1,148 @@
+// Variables
+$header-bg: #343a40;
+$btn-create-bg: #28a745;
+$btn-search-bg: #003e6d;
+$text-header: #ffffff;
+$border-color: #e9ecef;
+$bg-page: #f8f9fa;
+
+.vehicle-page {
+  padding: 20px;
+  background-color: $bg-page;
+  font-family: 'Sarabun', sans-serif;
+  min-height: 100vh;
+
+  .top-header-strip {
+    background-color: #e2e6ea; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px;
+    h2 { margin: 0; font-size: 1.2rem; font-weight: 700; color: #000; }
+  }
+
+  .content-card {
+    background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding-bottom: 20px;
+  }
+
+  .card-header-title { padding: 20px; font-size: 1.1rem; font-weight: 600; color: #333; }
+
+  .toolbar-container {
+    padding: 0 20px 20px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+    .left-action .btn-create {
+      background-color: $btn-create-bg; color: white; border: none; padding: 8px 20px;
+      border-radius: 4px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+      &:hover { background-color: darken($btn-create-bg, 5%); }
+    }
+    .right-filters {
+      display: flex; align-items: center; gap: 10px;
+      .filter-label { font-weight: 500; font-size: 0.9rem; color: #333; }
+      .form-control {
+        padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; color: #495057; font-size: 0.9rem; outline: none;
+        &:focus { border-color: $btn-search-bg; }
+      }
+      .btn-search {
+        background-color: $btn-search-bg; color: white; border: none; padding: 7px 20px; border-radius: 4px; font-weight: 500; cursor: pointer;
+        &:hover { background-color: lighten($btn-search-bg, 5%); }
+      }
+    }
+  }
+
+  .table-responsive { width: 100%; overflow-x: auto; }
+
+  .modern-table {
+    width: 100%; border-collapse: collapse;
+    thead {
+      background-color: $header-bg;
+      tr th { color: $text-header; font-weight: 600; font-size: 0.85rem; padding: 15px 12px; border: none; text-align: left; white-space: nowrap; }
+    }
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-color; background-color: #fff;
+        td { padding: 12px 12px; vertical-align: middle; color: #495057; font-size: 0.9rem; }
+        .top-align { vertical-align: top; }
+        .id-text { font-weight: 700; color: #0056b3; }
+        .text-muted { color: #adb5bd; }
+        .action-btns {
+          display: flex; justify-content: center; gap: 8px;
+          .btn-icon { background: none; border: none; cursor: pointer; font-size: 1.1rem; &.edit { color: #17a2b8; } &.delete { color: #dc3545; } &:hover { transform: scale(1.1); } }
+        }
+        .status-badge {
+          display: inline-block; padding: 5px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; min-width: 100px; text-align: center;
+          &.status-pending { background-color: rgba(255, 193, 7, 0.15); color: #f1b44c; }
+          &.status-dept { background-color: rgba(23, 162, 184, 0.15); color: #17a2b8; }
+          &.status-hr { background-color: rgba(0, 123, 255, 0.15); color: #007bff; }
+          &.status-ceo { background-color: rgba(111, 66, 193, 0.15); color: #6f42c1; }
+          &.status-success { background-color: rgba(40, 167, 69, 0.15); color: #28a745; }
+        }
+        .merged-col { background-color: #fff; border-bottom: none; }
+        &.group-end { border-bottom: 2px solid #dee2e6; .merged-col { border-bottom: 2px solid #dee2e6; } }
+      }
+    }
+  }
+}
+
+// ... (ส่วน Variables และ CSS ของหน้าหลักด้านบนคงเดิม) ...
+
+// ==========================================
+// ส่วน Modal Popup (Floating Box Style)
+// ==========================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65); // สีพื้นหลังเข้มขึ้นอีกนิดเพื่อขับให้กล่องเด่น
+  z-index: 9999; // ทับทุกอย่างรวมถึง Navbar
+  
+  // จัดกึ่งกลางแกนตั้งและแกนนอน
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  backdrop-filter: blur(4px); // เบลอฉากหลังให้สวยงาม
+
+  .modal-container {
+    background: white;
+    
+    // --- ปรับขนาดให้ลอย ไม่ชิดขอบ ---
+    width: 90%;             // กว้าง 90% ของจอ (เหลือขอบซ้ายขวาข้างละ 5%)
+    max-width: 1100px;      // กว้างสุดไม่เกิน 1100px (สำหรับจอใหญ่)
+    max-height: 85vh;       // สูงแค่ 85% ของจอ (เหลือขอบบนล่างรวม 15%)
+    // ----------------------------------
+
+    border-radius: 12px;    // มุมโค้งมนสวยๆ
+    
+    // เงาฟุ้งๆ ให้ดูลอยมีมิติ
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
+    
+    // จัดการ Scrollbar
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; // บังคับให้มุมโค้งตัดเนื้อหาข้างใน
+    position: relative; // เพื่อรองรับ animation
+
+    // ส่วนเนื้อหาข้างใน (Component ลูก) ให้ Scroll ได้ถ้าเนื้อหายาว
+    app-vehicle-form {
+      flex: 1;
+      overflow-y: auto; // สกรอลล์เฉพาะในกล่องนี้
+      
+      // ปรับ Scrollbar ให้สวยงาม (Chrome/Safari)
+      &::-webkit-scrollbar { width: 8px; }
+      &::-webkit-scrollbar-track { background: #f1f1f1; }
+      &::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+      &::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    }
+    
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // เอฟเฟกต์เด้งดึ๋งเล็กน้อยตอนโผล่
+  }
+}
+
+// Animation ตอนเด้งขึ้นมา
+@keyframes popIn {
+  from { 
+    transform: scale(0.9) translateY(20px); 
+    opacity: 0; 
+  }
+  to { 
+    transform: scale(1) translateY(0); 
+    opacity: 1; 
+  }
+}

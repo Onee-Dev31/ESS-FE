@@ -172,6 +172,8 @@
               class="card mini-stat-card"
               *ngFor="let item of welfareStats"
               [ngClass]="item.cardClass || ''"
+              (click)="navigateTo(item.route)"
+              [style.cursor]="item.route ? 'pointer' : 'default'"
             >
               <div class="card-body">
                 <div class="mini-icon">
@@ -187,7 +189,8 @@
                   </h6>
                   <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
                 </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+                <div class="card-arrow" *ngIf="item.route"><i class="fas fa-chevron-right"></i></div>
+                <div class="card-arrow" *ngIf="!item.route" style="opacity: 0.3"><i class="fas fa-chevron-right"></i></div>
               </div>
             </div>
           </div>

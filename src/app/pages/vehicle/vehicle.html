@@ -1,0 +1,97 @@
+<div class="vehicle-page">
+  
+  <div class="top-header-strip">
+    <h2>เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)</h2>
+  </div>
+
+  <div class="content-card">
+    
+    <div class="card-header-title">
+      รายการเบิกของฉัน
+    </div>
+
+    <div class="toolbar-container">
+      <div class="left-action">
+        <button class="btn-create" (click)="openCreateModal()">
+          <i class="fas fa-plus"></i> สร้างรายการเบิก
+        </button>
+      </div>
+
+      <div class="right-filters">
+        <span class="filter-label">วันที่สร้างรายการ</span>
+        <div class="date-input-group">
+          <input type="date" class="form-control" placeholder="Date from">
+        </div>
+        <div class="date-input-group">
+          <input type="date" class="form-control" placeholder="Date to">
+        </div>
+        <button class="btn-search">ค้นหา</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th style="width: 12%;">เลขที่การเบิก</th>
+            <th style="width: 12%;">วันที่สร้างรายการ</th>
+            <th style="width: 12%;">วันที่ขอเบิก</th>
+            <th>รายละเอียด</th>
+            <th style="width: 10%; text-align: right;">จำนวนเงิน</th>
+            <th style="width: 12%; text-align: center;">สถานะ</th>
+            <th style="width: 10%; text-align: center;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let req of requests">
+            
+            <tr *ngFor="let item of req.items; let i = index" 
+                [class.group-end]="i === req.items.length - 1">
+              
+              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col top-align">
+                <span class="id-text">{{ req.id }}</span>
+              </td>
+
+              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col top-align">
+                {{ req.createDate }}
+              </td>
+
+              <td class="item-col">{{ item.date }}</td>
+
+              <td class="item-col">
+                <div class="desc-wrapper">
+                  <i class="fas fa-car-side text-muted" style="margin-right: 8px;"></i>
+                  {{ item.desc }}
+                </div>
+              </td>
+
+              <td class="item-col" style="text-align: right; font-family: monospace; font-weight: 600;">
+                {{ item.amount | number:'1.2-2' }}
+              </td>
+
+              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col text-center top-align">
+                <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+                  {{ req.status }}
+                </span>
+              </td>
+
+              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col text-center top-align">
+                <div class="action-btns">
+                  <button class="btn-icon edit" title="แก้ไข"><i class="far fa-edit"></i></button>
+                  <button class="btn-icon delete" title="ลบ"><i class="far fa-trash-alt"></i></button>
+                </div>
+              </td>
+            </tr>
+
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container">
+    <app-vehicle-form (onClose)="closeCreateModal()"></app-vehicle-form>
+  </div>
+</div>
