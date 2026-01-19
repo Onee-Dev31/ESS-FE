@@ -2,6 +2,7 @@ import { Component, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SidebarService } from '../../services/sidebar';
+import { RouterLink } from '@angular/router';
 
 interface NotificationItem {
   id: number;
@@ -14,7 +15,7 @@ interface NotificationItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
