@@ -1,4 +1,6 @@
 @use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 // Variables
 $header-bg: #343a40;
 $btn-create-bg: #28a745;
@@ -10,7 +12,7 @@ $bg-page: #f8f9fa;
 .vehicle-page {
   padding: 20px;
   background-color: $bg-page;
-  font-family: 'Sarabun', sans-serif;
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   min-height: 100vh;
 
   .top-header-strip {
@@ -23,6 +25,7 @@ $bg-page: #f8f9fa;
       font-size: 1.2rem;
       font-weight: 700;
       color: #000;
+      font-family: inherit;
     }
   }
 
@@ -38,6 +41,7 @@ $bg-page: #f8f9fa;
     font-size: 1.1rem;
     font-weight: 600;
     color: #333;
+    font-family: inherit;
   }
 
   .toolbar-container {
@@ -54,6 +58,7 @@ $bg-page: #f8f9fa;
       padding: 8px 20px;
       border-radius: 4px;
       font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -67,29 +72,32 @@ $bg-page: #f8f9fa;
       align-items: center;
       gap: 10px;
 
-      .ml-2 { margin-left:8px;}
+      .ml-2 {
+        margin-left: 8px;
+      }
       .select-input-group {
-      .select-status {
-        padding: 6px 12px;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        background-color: white;
-        font-family: 'Sarabun', sans-serif;
-        cursor: pointer;
-        min-width: 150px;
+        .select-status {
+          padding: 6px 12px;
+          border: 1px solid #dee2e6;
+          border-radius: 6px;
+          background-color: white;
+          font-family: inherit;
+          cursor: pointer;
+          min-width: 150px;
 
-        &:focus {
-          border-color: #1a73e8;
-          outline: none;
-          box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+          &:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+          }
         }
       }
-    }
-    
+
       .filter-label {
         font-weight: 500;
         font-size: 0.9rem;
         color: #333;
+        font-family: inherit;
       }
       .form-control {
         padding: 6px 10px;
@@ -98,6 +106,7 @@ $bg-page: #f8f9fa;
         color: #495057;
         font-size: 0.9rem;
         outline: none;
+        font-family: inherit;
         &:focus {
           border-color: $btn-search-bg;
         }
@@ -109,6 +118,7 @@ $bg-page: #f8f9fa;
         padding: 7px 20px;
         border-radius: 4px;
         font-weight: 500;
+        font-family: inherit;
         cursor: pointer;
         &:hover {
           background-color: color.adjust($btn-search-bg, $lightness: 5%);
@@ -135,6 +145,7 @@ $bg-page: #f8f9fa;
         border: none;
         text-align: left;
         white-space: nowrap;
+        font-family: inherit;
       }
     }
     tbody {
@@ -146,6 +157,7 @@ $bg-page: #f8f9fa;
           vertical-align: middle;
           color: #495057;
           font-size: 0.9rem;
+          font-family: inherit;
         }
         .top-align {
           vertical-align: top;
@@ -186,6 +198,7 @@ $bg-page: #f8f9fa;
           white-space: nowrap;
           min-width: 100px;
           text-align: center;
+          font-family: inherit;
           &.status-pending {
             background-color: rgba(255, 193, 7, 0.15);
             color: #f1b44c;
@@ -263,7 +276,6 @@ $bg-page: #f8f9fa;
         background: #a8a8a8;
       }
     }
-
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }
@@ -278,5 +290,3 @@ $bg-page: #f8f9fa;
     opacity: 1;
   }
 }
-
-
