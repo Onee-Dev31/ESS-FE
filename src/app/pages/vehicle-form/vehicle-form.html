@@ -7,7 +7,7 @@
   <div class="content-card">
     <div class="filter-section">
       <div class="month-selector">
-        <label>งวดประจำเดือน :</label>
+        <label>ประจำเดือน :</label>
         <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
           <option *ngFor="let m of thaiMonths; let i = index" [value]="i">{{ m }}</option>
         </select>

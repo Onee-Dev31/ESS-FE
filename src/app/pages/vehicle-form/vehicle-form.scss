@@ -6,109 +6,264 @@ $text-main: #202124;
 $text-secondary: #5f6368;
 
 .vehicle-form-page {
-  display: flex; flex-direction: column; height: 100%;
-  background-color: #ffffff; color: $text-main; font-family: 'Sarabun', sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  color: $text-main;
+  font-family: 'Sarabun', sans-serif;
 
   .top-header-strip {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 24px; background: #fff; border-bottom: 1px solid $border-color;
-    h2 { font-size: 1.1rem; margin: 0; font-weight: 600; color: $primary-blue; display: flex; align-items: center; gap: 10px;
-      &::before { content: ''; width: 4px; height: 20px; background: $primary-blue; border-radius: 10px; }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: #fff;
+    border-bottom: 1px solid $border-color;
+    h2 {
+      font-size: 1.1rem;
+      margin: 0;
+      font-weight: 600;
+      color: $primary-blue;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      &::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: $primary-blue;
+        border-radius: 10px;
+      }
     }
-    .btn-close-modal { border: none; background: #f1f3f4; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s;
-      &:hover { background: #e8eaed; transform: rotate(90deg); }
+    .btn-close-modal {
+      border: none;
+      background: #f1f3f4;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+      &:hover {
+        background: #e8eaed;
+        transform: rotate(90deg);
+      }
     }
   }
 
-  .content-card { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; overflow: hidden; }
+  .content-card {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
   .filter-section {
-    margin-bottom: 16px; padding: 16px 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid $border-color;
+    margin-bottom: 16px;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid $border-color;
     .month-selector {
-      display: flex; align-items: center; gap: 15px;
-      label { font-weight: 600; color: $text-secondary; font-size: 0.9rem; }
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      label {
+        font-weight: 600;
+        color: $text-secondary;
+        font-size: 0.9rem;
+      }
       .form-control {
-        padding: 8px 12px; border: 1px solid $border-color; border-radius: 6px; background: #fff;
-        min-width: 140px; outline: none; transition: 0.2s;
-        &:hover { border-color: $primary-blue; }
-        &:focus { border-color: $primary-blue; box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1); }
+        padding: 8px 12px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background: #fff;
+        min-width: 140px;
+        outline: none;
+        transition: 0.2s;
+        &:hover {
+          border-color: $primary-blue;
+        }
+        &:focus {
+          border-color: $primary-blue;
+          box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
       }
       .btn-search {
-        background: #fff; color: $primary-blue; border: 1.5px solid $primary-blue;
-        padding: 7px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;
-        &:hover { background: $primary-blue; color: #fff; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+        background: #fff;
+        color: $primary-blue;
+        border: 1.5px solid $primary-blue;
+        padding: 7px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        &:hover {
+          background: $primary-blue;
+          color: #fff;
+          box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
       }
     }
   }
 
   .action-bar {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-    .btn-submit { background: $success-green; color: white; border: none; padding: 10px 30px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;
-      &:hover { background: darken($success-green, 5%); box-shadow: 0 4px 10px rgba(30, 142, 62, 0.2); }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    .btn-submit {
+      background: $success-green;
+      color: white;
+      border: none;
+      padding: 10px 30px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      &:hover {
+        background: darken($success-green, 5%);
+        box-shadow: 0 4px 10px rgba(30, 142, 62, 0.2);
+      }
     }
-    .right-info { font-size: 0.85rem; font-weight: 600; color: $primary-blue; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; }
+    .right-info {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $primary-blue;
+      background: #e8f0fe;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
   }
 
   .table-container {
-    flex: 1; overflow: auto; border: 1px solid $border-color; border-radius: 8px;
+    flex: 1;
+    overflow: auto;
+    border: 1px solid $border-color;
+    border-radius: 8px;
     .excel-table {
-      width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
       th {
-        background: #f8f9fa; border-bottom: 1px solid $border-color; border-right: 1px solid $border-color;
-        padding: 10px 4px; font-size: 0.85rem; font-weight: 600; color: $text-secondary;
-        position: sticky; top: 0; z-index: 10; text-align: center;
-        &.col-time-header { background: #eff4ff; color: #1967d2; }
+        background: #f8f9fa;
+        border-bottom: 1px solid $border-color;
+        border-right: 1px solid $border-color;
+        padding: 10px 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-secondary;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        text-align: center;
+        &.col-time-header {
+          background: #eff4ff;
+          color: #1967d2;
+        }
       }
-      .sub-header th { top: 41px; font-size: 0.75rem; }
-      td { border-bottom: 1px solid $border-color; border-right: 1px solid $border-color; height: 42px; vertical-align: middle; }
-      
-      .text-center { text-align: center; }
-      .p-0 { padding: 0 !important; }
-      .bg-gray { background-color: #fcfcfc; }
-      .highlight-row { background-color: #fffdef; }
+      .sub-header th {
+        top: 41px;
+        font-size: 0.75rem;
+      }
+      td {
+        border-bottom: 1px solid $border-color;
+        border-right: 1px solid $border-color;
+        height: 42px;
+        vertical-align: middle;
+        padding: 0;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+      .p-0 {
+        padding: 0 !important;
+      }
+      .bg-gray {
+        background-color: #fcfcfc;
+      }
+      .highlight-row {
+        background-color: #fffdef;
+      }
 
       .time-input {
-        width: 100%; height: 100%; border: none; text-align: center; background: transparent;
-        font-family: 'Roboto Mono', monospace; font-size: 1rem; outline: none;
-        &:focus { background: #fff; box-shadow: inset 0 0 0 2px $primary-blue; }
-        &:disabled { color: #bdc1c6; cursor: not-allowed; background: rgba(0,0,0,0.02); }
+        width: 100%;
+        height: 100%;
+        border: none;
+        text-align: center;
+        background: transparent;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1rem;
+        outline: none;
+        &:focus {
+          background: #fff;
+          box-shadow: inset 0 0 0 2px $primary-blue;
+        }
+        &:disabled {
+          color: #bdc1c6;
+          cursor: not-allowed;
+          background: rgba(0, 0, 0, 0.02);
+        }
       }
 
       // --- ส่วนที่แก้ไข: เปลี่ยนเป็นกล่องแดง ---
       .desc-cell {
-        padding: 4px 8px;
-        display: flex;       // ใช้ flex ช่วยจัดวาง
-        align-items: center; 
-        height: 100%;
-        .table-input {
-          width: 100%; 
-          height: 32px; // กำหนดความสูงให้พอดี
-          border: 1px solid transparent; 
-          padding: 4px 10px; 
-          background: transparent; 
-          outline: none;
-          border-radius: 4px;
-          transition: all 0.2s;
-          
+  padding: 0; // ล้าง padding ของเซลล์ออกเพื่อให้กล่องข้างในคุมพื้นที่เอง
+  height: 42px; 
+  vertical-align: middle;
 
-          &:focus { 
-            border: 1px solid $primary-blue;
-            background: #fff;
-          }
+  .input-wrapper {
+    display: flex;      // ทำให้ wrapper เป็น flex
+    align-items: center;
+    width: 100%;        // ให้ wrapper เต็มช่อง td
+    height: 100%;
+    padding: 4px 8px;     // ใส่ padding ที่นี่เพื่อให้ input ไม่ชิดขอบเส้นตาราง
+    box-sizing: border-box;
 
-          &.is-invalid { 
-            border: 1px solid $danger-red; // ขอบแดงล้อมรอบ
-            background-color: #fff5f5;    // พื้นหลังแดงระเรื่อ
-            color: $danger-red;           // ตัวอักษรสีแดง
-            
-            &::placeholder {
-              color: rgba($danger-red, 0.5);
-            }
-          }
-        }
+    .table-input {
+      flex: 1;          // หัวใจสำคัญ: สั่งให้ input ยืดเต็มพื้นที่ wrapper
+      width: 100%;      // กันเหนียวสำหรับบาง Browser
+      height: 32px; 
+      border: 1px solid transparent; 
+      padding: 4px 10px; 
+      background: transparent; 
+      outline: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+
+      &:focus { 
+        border: 1px solid $primary-blue;
+        background: #fff;
       }
 
-      .total-val { background: #e6f4ea; font-weight: 700; color: $success-green; text-align: center; font-size: 1.1rem; }
+      &.is-invalid { 
+        border: 1px solid $danger-red;
+        background-color: #fff5f5;
+        color: $danger-red;
+        
+        &::placeholder {
+          color: rgba($danger-red, 0.5);
+        }
+      }
+      
+      &:disabled {
+        background: transparent;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+      .total-val {
+        background: #e6f4ea;
+        font-weight: 700;
+        color: $success-green;
+        text-align: center;
+        font-size: 1.1rem;
+      }
     }
   }
 }
