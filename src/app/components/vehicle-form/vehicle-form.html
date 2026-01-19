@@ -20,45 +20,79 @@
 
     <div class="action-bar">
       <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
-      <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
+      <div class="info-badges">
+        <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span>
+        <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
+      </div>
     </div>
 
     <div class="table-container">
       <table class="excel-table">
         <colgroup>
-          <col style="width: 50px"> <col style="width: 110px"> <col style="width: 85px">
-          <col style="width: 80px"> <col style="width: 80px"> <col style="width: 110px">
-          <col style="width: auto">
+          <col style="width: 50px" />
+          <col style="width: 110px" />
+          <col style="width: 85px" />
+          <col style="width: 80px" />
+          <col style="width: 80px" />
+          <col style="width: 110px" />
+          <col style="width: auto" />
         </colgroup>
         <thead>
           <tr>
-            <th rowspan="2">เลือก</th> <th rowspan="2">วันที่</th> <th rowspan="2">ประเภท</th>
+            <th rowspan="2">เลือก</th>
+            <th rowspan="2">วันที่</th>
+            <th rowspan="2">ประเภท</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
-            <th rowspan="2">จำนวนเงิน</th> <th rowspan="2">รายละเอียดการเบิก</th>
+            <th rowspan="2">จำนวนเงิน</th>
+            <th rowspan="2">รายละเอียดการเบิก</th>
           </tr>
           <tr class="sub-header">
-            <th class="col-time-header">เข้า</th> <th class="col-time-header">ออก</th>
+            <th class="col-time-header">เข้า</th>
+            <th class="col-time-header">ออก</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let log of logs" [class.highlight-row]="log.selected">
             <td class="text-center">
-              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)">
+              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
             </td>
             <td class="text-center bg-gray">{{ log.date }}</td>
-            <td class="text-center bg-gray font-bold" [style.color]="log.dayType === 'H' ? '#d93025' : '#3c4043'">
+            <td
+              class="text-center bg-gray font-bold"
+              [style.color]="log.dayType === 'H' ? '#d93025' : '#3c4043'"
+            >
               {{ log.dayType }}
             </td>
             <td class="p-0">
-              <input type="text" class="time-input" [(ngModel)]="log.timeIn" placeholder="--" maxlength="5" [disabled]="!log.selected">
+              <input
+                type="text"
+                class="time-input"
+                [(ngModel)]="log.timeIn"
+                placeholder="--"
+                maxlength="5"
+                [disabled]="!log.selected"
+              />
             </td>
             <td class="p-0">
-              <input type="text" class="time-input" [(ngModel)]="log.timeOut" placeholder="--" maxlength="5" [disabled]="!log.selected">
+              <input
+                type="text"
+                class="time-input"
+                [(ngModel)]="log.timeOut"
+                placeholder="--"
+                maxlength="5"
+                [disabled]="!log.selected"
+              />
             </td>
             <td class="text-center">{{ log.amount }}</td>
             <td class="desc-cell">
-              <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-                [class.is-invalid]="log.selected && !log.description" [disabled]="!log.selected">
+              <input
+                type="text"
+                class="table-input"
+                [(ngModel)]="log.description"
+                placeholder="ระบุรายละเอียด..."
+                [class.is-invalid]="log.selected && !log.description"
+                [disabled]="!log.selected"
+              />
             </td>
           </tr>
         </tbody>

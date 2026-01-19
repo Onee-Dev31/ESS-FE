@@ -205,15 +205,15 @@ export class DashboardComponent {
       theme: 'theme-green', 
       balance: 3 
     },
-    { 
-      label: 'ลาป่วยเกิน 30 วัน', 
-      count: '03/06', 
-      countColor: '#dc3545', 
-      iconClass: 'fas fa-procedures', 
-      iconColor: '#ef4444',
-      theme: 'theme-pink', 
-      balance: 3 
-    },
+    // { 
+    //   label: 'ลาป่วยเกิน 30 วัน', 
+    //   count: '03/06', 
+    //   countColor: '#dc3545', 
+    //   iconClass: 'fas fa-procedures', 
+    //   iconColor: '#ef4444',
+    //   theme: 'theme-pink', 
+    //   balance: 3 
+    // },
   ];
 
   // 6. Holidays

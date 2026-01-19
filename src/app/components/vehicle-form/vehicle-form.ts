@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -22,6 +22,7 @@ interface DailyLog {
 })
 export class VehicleFormComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
+  @Input() requestId: string = '';
 
   selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
@@ -45,7 +46,6 @@ export class VehicleFormComponent implements OnInit {
       if (day === 13 || day === 23) dayType = 'T'; 
       if (day === 24) dayType = 'L'; 
 
-      // Mock เวลาเฉพาะวันทำงาน (W) บางวัน
       let timeIn = '';
       let timeOut = '';
       if (dayType === 'W' && day < 15) {

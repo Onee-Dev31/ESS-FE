@@ -44,17 +44,16 @@
     width: 80px;
     min-width: 80px;
 
-    // --- แก้ไขตรงนี้: ให้โชว์ Title แบบตัวเล็กๆ ตรงกลาง ---
     .section-title {
-      display: block !important;    /* บังคับโชว์ */
-      text-align: center;           /* จัดกึ่งกลาง */
-      padding: 15px 0 5px 0 !important; /* จัดระยะห่าง */
-      font-size: 9px;               /* ตัวอักษรเล็กจิ๋ว */
+      display: block !important;
+      text-align: center;
+      padding: 15px 0 5px 0 !important;
+      font-size: 9px; 
       font-weight: 700;
-      color: #cbd5e1;               /* สีจางๆ หน่อย */
+      color: #cbd5e1;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;      /* ถ้าชื่อยาวเกินให้เป็น ... */
+      text-overflow: ellipsis;
     }
 
     .nav-link {
@@ -209,7 +208,7 @@
     &.expanded {
       max-height: 500px;
       opacity: 1;
-      padding: 4px 0;
+      padding: 0 0;
       border-top: 1px solid #f1f5f9;
       border-bottom: 1px solid #f1f5f9;
     }

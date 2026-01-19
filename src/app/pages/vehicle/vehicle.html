@@ -8,7 +8,7 @@
 
     <div class="toolbar-container">
       <div class="left-action">
-        <button class="btn-create" (click)="openCreateModal()">
+        <button class="btn-create" (click)="openCreateModal('')">
           <i class="fas fa-plus"></i> สร้างรายการเบิก
         </button>
       </div>
@@ -16,12 +16,25 @@
       <div class="right-filters">
         <span class="filter-label">วันที่สร้างรายการ</span>
         <div class="date-input-group">
-          <input type="date" class="form-control" placeholder="Date from" />
+          <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
         </div>
         <div class="date-input-group">
-          <input type="date" class="form-control" placeholder="Date to" />
+          <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
         </div>
-        <button class="btn-search">ค้นหา</button>
+
+        <span class="filter-label ml-2">สถานะ</span>
+        <div class="select-input-group">
+          <select class="form-control select-status" [(ngModel)]="filterStatus">
+            <option value="">ทั้งหมด</option>
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="ต้นสังกัดอนุมัติ">ต้นสังกัดอนุมัติ</option>
+            <option value="HR อนุมัติ">HR อนุมัติ</option>
+            <option value="CEO อนุมัติ">CEO อนุมัติ</option>
+            <option value="ACC อนุมัติ">ACC อนุมัติ</option>
+          </select>
+        </div>
+
+        <button class="btn-search" (click)="onSearch()">ค้นหา</button>
       </div>
     </div>
 
@@ -29,7 +42,12 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 12%">เลขที่การเบิก</th>
+            <th style="width: 14%; cursor: pointer;" (click)="sortByRequestId()">
+              เลขที่การเบิก
+              <i class="fas ml-1" 
+                 [ngClass]="table.getColumn('id')?.getIsSorted() === 'asc' ? 'fa-sort-amount-up' : 'fa-sort-amount-down-alt'">
+              </i>
+            </th>
             <th style="width: 12%">วันที่สร้างรายการ</th>
             <th style="width: 12%">วันที่ขอเบิก</th>
             <th>รายละเอียด</th>
@@ -39,59 +57,50 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let req of requests">
-            <tr
-              *ngFor="let item of req.items; let i = index"
-              [class.group-end]="i === req.items.length - 1"
-            >
-              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col top-align">
-                <span class="id-text">{{ req.id }}</span>
+          <ng-container *ngFor="let row of table.getRowModel().rows">
+            <tr *ngFor="let item of row.original.items; let i = index" 
+                [class.group-end]="i === row.original.items.length - 1">
+              
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
+                <span class="id-text">{{ row.original.id }}</span>
+              </td>
+              
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
+                {{ row.original.createDate | date: 'dd/MM/yyyy' }}
               </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="merged-col top-align">
-                {{ req.createDate }}
-              </td>
-
-              <td class="item-col">{{ item.date }}</td>
-
-              <td class="item-col">
+              <td>{{ item.date }}</td>
+              <td>
                 <div class="desc-wrapper">
                   <i class="fas fa-car-side text-muted" style="margin-right: 8px"></i>
                   {{ item.desc }}
                 </div>
               </td>
-
-              <td
-                class="item-col"
-                style="text-align: right; font-family: monospace; font-weight: 600"
-              >
+              <td style="text-align: right; font-family: monospace; font-weight: 600">
                 {{ item.amount | number : '1.2-2' }}
               </td>
 
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="req.items.length"
-                class="merged-col text-center top-align"
-              >
-                <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                  {{ req.status }}
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center top-align">
+                <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                  {{ row.original.status }}
                 </span>
               </td>
 
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="req.items.length"
-                class="merged-col text-center top-align"
-              >
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center top-align">
                 <div class="action-btns">
-                  <button class="btn-icon edit" title="แก้ไข"><i class="far fa-edit"></i></button>
-                  <button class="btn-icon delete" title="ลบ">
+                  <button class="btn-icon edit" (click)="openCreateModal(row.original.id)">
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
                     <i class="far fa-trash-alt"></i>
                   </button>
                 </div>
               </td>
             </tr>
           </ng-container>
+          <tr *ngIf="data().length === 0">
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">ไม่พบรายการที่ตรงตามเงื่อนไข</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -100,6 +109,6 @@
 
 <div class="modal-overlay" *ngIf="isModalOpen">
   <div class="modal-container">
-    <app-vehicle-form (onClose)="closeCreateModal()"></app-vehicle-form>
+    <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeCreateModal()"></app-vehicle-form>
   </div>
 </div>
