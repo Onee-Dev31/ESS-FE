@@ -1,0 +1,113 @@
+@use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
+$primary: #1a73e8;
+$success: #1e8e3e;
+$danger: #d93025;
+$border: #dee2e6;
+$text: #202124;
+$text-sub: #5f6368;
+
+.allowance-form-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // ใช้ความสูงเต็มหน้าจอ
+  background: #fff;
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  overflow: hidden;
+
+  .top-header-strip {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid $border;
+    h2 { font-size: 1.15rem; margin: 0; font-weight: 600; color: $primary; }
+    .btn-close-modal {
+      border: none; background: #f1f3f4; width: 32px; height: 32px; border-radius: 50%;
+      cursor: pointer; font-size: 1.1rem; line-height: 1;
+      &:hover { background: #e8eaed; color: $danger; }
+    }
+  }
+
+  .content-card {
+    flex: 1; // กินพื้นที่เหลือ
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .filter-section {
+    flex-shrink: 0;
+    margin-bottom: 16px; padding: 16px 20px;
+    background: #f8f9fa; border-radius: 12px; border: 1px solid $border;
+    .month-selector {
+      display: flex; align-items: center; gap: 15px;
+      label { font-weight: 600; color: $text-sub; font-size: 0.95rem; }
+      .form-control { padding: 8px 12px; border: 1px solid $border; border-radius: 6px; }
+      .btn-search { background: #fff; color: $primary; border: 1.5px solid $primary; padding: 7px 20px; border-radius: 6px; cursor: pointer; }
+    }
+  }
+
+  .action-bar {
+    flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 20px;
+    .btn-submit { background: $success; color: #fff; border: none; padding: 10px 30px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .allowance-policy-note {
+      flex: 1; background: #fcfcfc; border: 1px dashed #d1d3d4; border-radius: 8px; padding: 10px 16px;
+      .policy-title { font-size: 0.85rem; font-weight: 700; color: $primary; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+      .policy-content {
+        p { margin: 0 0 6px 0; font-size: 0.8rem; color: #444; }
+        .rate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 12px;
+          span { font-size: 0.78rem; color: #555; white-space: nowrap; strong { color: $danger; font-weight: 600; } }
+        }
+      }
+    }
+    .info-badges {
+      display: flex; gap: 8px; flex-shrink: 0;
+      .right-info, .request-id-badge { font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; }
+      .right-info { background: #e8f0fe; color: $primary; }
+      .request-id-badge { background: #eed686; color: #4e342e; }
+    }
+  }
+
+  .table-container {
+    flex: 1; // ให้ตารางยืดจนสุด
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $border;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .table-responsive {
+      flex: 1;
+      overflow-y: auto; // ทำให้เลื่อนขึ้นลงได้ที่นี่
+      .excel-table {
+        width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+        th, td { border-bottom: 1px solid $border; border-right: 1px solid $border; height: 44px; vertical-align: middle; box-sizing: border-box; }
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; text-align: center; color: $text-sub; border-top: 1px solid $border; }
+        .sub-header th { top: 44px; font-size: 0.8rem; z-index: 9; }
+      }
+    }
+
+    .total-footer-bar {
+      display: flex; flex-shrink: 0; background: #fff; border-top: 2px solid $border;
+      .total-label { flex: 1; text-align: right; padding-right: 20px; font-weight: 600; line-height: 44px; }
+      .total-val { width: 120px; background: #e6f4ea; color: $success; font-weight: 700; text-align: center; line-height: 44px; border-right: 1px solid $border; }
+      .spacer { width: 110px; background: #fcfcfc; }
+    }
+  }
+
+  .text-center { text-align: center; input[type='checkbox'] { cursor: pointer; margin: 0 auto; display: block; } }
+  .bg-gray { background-color: #fcfcfc; }
+  .font-bold { font-weight: 700; }
+  .highlight-row td { background-color: #fffdef !important; }
+  .desc-cell {
+    padding: 0 8px; position: relative;
+    .table-input { width: 100%; height: 32px; border: 1px solid transparent; border-radius: 4px; padding: 0 8px; background: transparent;
+      &:focus:not(:disabled) { background: #fff; border: 1px solid $primary; outline: none; }
+    }
+  }
+}

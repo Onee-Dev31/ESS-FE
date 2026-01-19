@@ -1,0 +1,262 @@
+@use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
+// Variables (ดึงมาจากไฟล์ต้นฉบับเพื่อให้สีตรงกัน)
+$header-bg: #343a40;
+$btn-create-bg: #28a745;
+$btn-search-bg: #003e6d;
+$text-header: #ffffff;
+$border-color: #e9ecef;
+$bg-page: #f8f9fa;
+
+.vehicle-taxi-page {
+  padding: 20px;
+  background-color: $bg-page;
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+
+  .top-header-strip {
+    background-color: #e2e6ea;
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #000;
+      font-family: inherit;
+    }
+  }
+
+  .content-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding-bottom: 20px;
+    width: 100%;
+  }
+
+  .card-header-title {
+    padding: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    font-family: inherit;
+  }
+
+  .toolbar-container {
+    padding: 0 20px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    .btn-create {
+      background-color: $btn-create-bg;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      &:hover {
+        background-color: color.adjust($btn-create-bg, $lightness: -5%);
+      }
+    }
+
+    .right-filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .filter-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: #333;
+        font-family: inherit;
+      }
+
+      .form-control {
+        padding: 6px 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        color: #495057;
+        font-size: 0.9rem;
+        outline: none;
+        font-family: inherit;
+        &:focus {
+          border-color: $btn-search-bg;
+        }
+      }
+
+      .btn-search {
+        background-color: $btn-search-bg;
+        color: white;
+        border: none;
+        padding: 7px 20px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-family: inherit;
+        cursor: pointer;
+        &:hover {
+          background-color: color.adjust($btn-search-bg, $lightness: 5%);
+        }
+      }
+    }
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    thead {
+      background-color: $header-bg;
+      tr th {
+        color: $text-header;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 15px 12px;
+        border: none;
+        text-align: center; // ปรับให้ Center ตามรูปภาพ
+        white-space: nowrap;
+        font-family: inherit;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-color;
+        background-color: #fff;
+
+        td {
+          padding: 12px;
+          vertical-align: middle;
+          color: #495057;
+          font-size: 0.9rem;
+          font-family: inherit;
+          
+          &.top-align { vertical-align: top; }
+          &.text-center { text-align: center; }
+          &.text-right { text-align: right; }
+        }
+
+        .id-text {
+          font-weight: 700;
+          color: #0056b3;
+        }
+
+        &.group-end {
+          border-bottom: 2px solid #dee2e6;
+          .merged-col { border-bottom: 2px solid #dee2e6; }
+        }
+
+        .action-btns {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            &.edit { color: #17a2b8; }
+            &.delete { color: #dc3545; }
+            &.folder { color: #6f42c1; } // สีม่วงสำหรับไอคอนแฟ้ม
+            &:hover { transform: scale(1.1); }
+          }
+        }
+
+        // ในไฟล์ vehicle-taxi.scss 
+// (ต่อจากส่วนของ tbody tr)
+
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  min-width: 110px;
+  text-align: center;
+  font-family: inherit;
+  border: 1px solid transparent; // เพิ่มเพื่อให้ดูมีมิติเหมือนหน้า allowance
+
+  &.status-pending {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #f1b44c;
+    border-color: rgba(255, 193, 7, 0.2);
+  }
+  
+  &.status-dept {
+    background-color: rgba(23, 162, 184, 0.15);
+    color: #17a2b8;
+    border-color: rgba(23, 162, 184, 0.2);
+  }
+  
+  &.status-hr {
+    background-color: rgba(0, 123, 255, 0.15);
+    color: #007bff;
+    border-color: rgba(0, 123, 255, 0.2);
+  }
+  
+  &.status-ceo {
+    background-color: rgba(111, 66, 193, 0.15);
+    color: #6f42c1;
+    border-color: rgba(111, 66, 193, 0.2);
+  }
+  
+  &.status-success {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: #28a745;
+    border-color: rgba(40, 167, 69, 0.2);
+  }
+}
+      }
+    }
+  }
+}
+
+// Modal Styles (ผสมผสาน Animation ของทั้งสองหน้า)
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+
+  .modal-container {
+    background: white;
+    width: 95vw;
+    max-width: 1600px;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: taxiPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
+@keyframes taxiPop {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}

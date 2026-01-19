@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
-import { VehicleFormComponent } from '../../components/vehicle-form/vehicle-form';
+import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import {
   ColumnDef,
   getCoreRowModel,

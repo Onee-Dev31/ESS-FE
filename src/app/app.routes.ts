@@ -3,6 +3,8 @@ import { LoginComponent } from './pages/login/login';
 import { DashboardComponent } from './pages/dashboard/dashboard';
 import { LayoutComponent } from './components/layout/layout';
 import { VehicleComponent } from './pages/vehicle/vehicle'; 
+import { AllowanceComponent } from './pages/allowance/allowance'
+import { VehicleTaxiComponent } from './pages/vehicle-taxi/vehicle-taxi'
 
 
 export const routes: Routes = [
@@ -22,8 +24,10 @@ export const routes: Routes = [
                 ]
             },
 
-            // กลับมาใช้แบบบรรทัดเดียวเหมือนเดิม ไม่ต้องมี children
+            
             { path: 'vehicle', component: VehicleComponent },
+            { path: 'allowance' , component: AllowanceComponent},
+            { path: 'vehicle-taxi', component: VehicleTaxiComponent},
 
             { 
                 path: '', 

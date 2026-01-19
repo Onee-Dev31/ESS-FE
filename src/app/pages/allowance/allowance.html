@@ -1,0 +1,90 @@
+<div class="allowance-page">
+  <div class="top-header-strip">
+    <h2>ค่าเบี้ยเลี้ยง</h2>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+
+    <div class="toolbar-container">
+      <div class="left-action">
+        <button class="btn-create" (click)="openModal()">
+          <i class="fas fa-plus"></i> สร้างรายการเบิก
+        </button>
+      </div>
+
+      <div class="right-filters">
+        <span class="filter-label">วันที่สร้างรายการ</span>
+        <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
+        <span class="filter-label">ถึง</span>
+        <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+
+        <span class="filter-label ml-2">สถานะ</span>
+        <div class="select-input-group">
+          <select class="form-control select-status" [(ngModel)]="filterStatus">
+            <option value="">ทั้งหมด</option>
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="ต้นสังกัดอนุมัติ">ต้นสังกัดอนุมัติ</option>
+            <option value="รอจ่าย">รอจ่าย</option>
+            <option value="จ่ายแล้ว">จ่ายแล้ว</option>
+          </select>
+        </div>
+        <button class="btn-search" (click)="onSearch()">ค้นหา</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th style="width: 14%; cursor: pointer; text-align: center;" (click)="sortByRequestId()">
+              เลขที่การเบิก
+              <i class="fas ml-1" [ngClass]="{
+                  'fa-sort-amount-up': table.getColumn('requestId')?.getIsSorted() === 'asc',
+                  'fa-sort-amount-down-alt': table.getColumn('requestId')?.getIsSorted() === 'desc',
+                  'fa-sort': !table.getColumn('requestId')?.getIsSorted()
+                }">
+              </i>
+            </th>
+            <th style="width: 10%; text-align: center;">วันที่สร้างรายการ</th>
+            <th style="width: 10%; text-align: center;">วันที่ขอเบิก</th>
+            <th style="width: 20%; text-align: center;">รายละเอียด</th>
+            <th style="width: 14%; text-align: center">จำนวนชั่วโมง</th>
+            <th style="width: 10%; text-align: center">จำนวนเงิน</th>
+            <th style="width: 15%; text-align: center">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of table.getRowModel().rows">
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="text-center top-align">
+              <span class="id-text">{{ row.original.requestId }}</span>
+            </td>
+
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="text-center top-align">
+              {{ row.original.createDate | date: 'dd/MM/yyyy' }}
+            </td>
+
+            <td class="text-center top-align">{{ row.original.date }}</td>
+            <td class="desc-cell top-align text-center">{{ row.original.desc }}</td>
+            <td class="text-center top-align">{{ row.original.hours }}</td>
+            <td class="text-center font-bold">
+              {{ row.original.amount | number: '1.2-2' }}
+            </td>
+
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="v-middle text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                {{ row.original.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container">
+    <app-allowance-form (onClose)="closeModal()"></app-allowance-form>
+  </div>
+</div>

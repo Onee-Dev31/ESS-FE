@@ -1,0 +1,87 @@
+<div class="vehicle-taxi-page">
+  <div class="top-header-strip">
+    <h2>เบิกค่ารถแท็กซี่</h2>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-title">รายการเบิกแท็กซี่ของฉัน</div>
+
+    <div class="toolbar-container">
+      <div class="left-action">
+        <button class="btn-create" (click)="openModal()">
+          <i class="fas fa-plus"></i> สร้างรายการเบิก
+        </button>
+      </div>
+
+      <div class="right-filters">
+        <span class="filter-label">วันที่สร้างรายการ</span>
+        <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
+        <span class="to-text">ถึง</span>
+        <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+        <span class="filter-label ml-2">สถานะ</span>
+        <div class="select-input-group">
+          <select class="form-control select-status" [(ngModel)]="filterStatus">
+            <option value="">ทั้งหมด</option>
+            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
+            <option value="ต้นสังกัดอนุมัติ">ต้นสังกัดอนุมัติ</option>
+            <option value="HR อนุมัติ">HR อนุมัติ</option>
+            <option value="CEO อนุมัติ">CEO อนุมัติ</option>
+            <option value="ACC อนุมัติ">ACC อนุมัติ</option>
+          </select>
+        </div>
+        <button class="btn-search">ค้นหา</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th style="width: 12%;">เลขที่การเบิก</th>
+            <th style="width: 10%;">วันที่สร้าง</th>
+            <th style="width: 10%;">วันที่ขอเบิก</th>
+            <th>รายละเอียด</th>
+            <th style="width: 12%;">จุดหมาย</th>
+            <th style="width: 8%;">ระยะทาง(Km.)</th>
+            <th style="width: 8%;">จำนวนเงิน</th>
+            <th style="width: 12%;">สถานะ</th>
+            <th style="width: 10%;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let row of tableData">
+            <tr *ngFor="let item of row.items; let i = index" [class.group-end]="i === row.items.length - 1">
+              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align id-text">
+                {{ row.id }}
+              </td>
+              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
+                {{ row.createDate }}
+              </td>
+              <td class="text-center">{{ item.requestDate }}</td>
+              <td>{{ item.desc }}</td>
+              <td>{{ item.destination }}</td>
+              <td class="text-center">{{ item.distance | number:'1.2-2' }}</td>
+              <td class="text-right font-bold">{{ item.amount | number }}</td>
+              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
+                <span class="status-badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span>
+              </td>
+              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
+                <div class="action-btns">
+                  <button class="btn-icon edit"><i class="far fa-edit"></i></button>
+                  <button class="btn-icon delete"><i class="far fa-trash-alt"></i></button>
+                  <button class="btn-icon folder"><i class="far fa-folder-open"></i></button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-container">
+    <app-vehicle-taxi-form (onClose)="closeModal()"></app-vehicle-taxi-form>
+  </div>
+</div>

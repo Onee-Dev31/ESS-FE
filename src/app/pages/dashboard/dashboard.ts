@@ -10,7 +10,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
 
-// ✅ แก้ไข Interface: เพิ่ม route
 interface WelfareItem { 
   title: string; 
   amount: string; 
@@ -19,7 +18,7 @@ interface WelfareItem {
   titleColor?: string;
   amountColor?: string;
   tooltip?: string;
-  route?: string; // เพิ่มฟิลด์นี้
+  route?: string;
 }
 
 interface LeaveItem {
@@ -84,7 +83,8 @@ export class DashboardComponent {
       iconName: 'fas fa-dollar-sign', 
       cardClass: 'card-green',
       titleColor: '#15803d',
-      amountColor: '#15803d'
+      amountColor: '#15803d',
+      route: '/allowance'
     },
     { 
       title: 'ค่ารถ', 
@@ -94,7 +94,7 @@ export class DashboardComponent {
       tooltip: `<strong>เงื่อนไข:</strong><br />- ค่ารถก่อน 06:00 น. ต้องเข้างานก่อน 06:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />- ค่ารถหลัง 22:00 น. ต้องเข้างานเกิน 22:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง`,
       titleColor: '#1e40af',
       amountColor: '#1e40af',
-      route: '/vehicle' // ✅ ใส่ Path ตรงนี้
+      route: '/vehicle'
     },
     { 
       title: 'ค่าแท็กซี่', 
@@ -103,7 +103,8 @@ export class DashboardComponent {
       cardClass: 'card-yellow',
       tooltip: `<strong>เงื่อนไข:</strong><br />- 1,000 บาท/ปี / ปี<br />- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น`,
       titleColor: '#9a3412',
-      amountColor: '#9a3412'
+      amountColor: '#9a3412',
+      route: '/vehicle-taxi'
     },
     { 
       title: 'ค่าสมรส', 
