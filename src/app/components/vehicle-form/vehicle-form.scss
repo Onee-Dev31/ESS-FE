@@ -1,16 +1,18 @@
-$primary-blue: #1a73e8;
-$success-green: #1e8e3e;
-$danger-red: #d93025;
-$border-color: #dee2e6;
-$text-main: #202124;
-$text-secondary: #5f6368;
+@use 'sass:color';
+
+$primary: #1a73e8;
+$success: #1e8e3e;
+$danger: #d93025;
+$border: #dee2e6;
+$text: #202124;
+$text-sub: #5f6368;
 
 .vehicle-form-page {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #ffffff;
-  color: $text-main;
+  background: #fff;
+  color: $text;
   font-family: 'Sarabun', sans-serif;
 
   .top-header-strip {
@@ -18,13 +20,12 @@ $text-secondary: #5f6368;
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    background: #fff;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid $border;
     h2 {
       font-size: 1.1rem;
       margin: 0;
       font-weight: 600;
-      color: $primary-blue;
+      color: $primary;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -32,7 +33,7 @@ $text-secondary: #5f6368;
         content: '';
         width: 4px;
         height: 20px;
-        background: $primary-blue;
+        background: $primary;
         border-radius: 10px;
       }
     }
@@ -64,45 +65,38 @@ $text-secondary: #5f6368;
     padding: 16px 20px;
     background: #f8f9fa;
     border-radius: 12px;
-    border: 1px solid $border-color;
+    border: 1px solid $border;
     .month-selector {
       display: flex;
       align-items: center;
       gap: 15px;
       label {
         font-weight: 600;
-        color: $text-secondary;
+        color: $text-sub;
         font-size: 0.9rem;
       }
       .form-control {
         padding: 8px 12px;
-        border: 1px solid $border-color;
+        border: 1px solid $border;
         border-radius: 6px;
-        background: #fff;
-        min-width: 140px;
         outline: none;
-        transition: 0.2s;
-        &:hover {
-          border-color: $primary-blue;
-        }
         &:focus {
-          border-color: $primary-blue;
-          box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
         }
       }
       .btn-search {
         background: #fff;
-        color: $primary-blue;
-        border: 1.5px solid $primary-blue;
+        color: $primary;
+        border: 1.5px solid $primary;
         padding: 7px 20px;
         border-radius: 6px;
         font-weight: 600;
         cursor: pointer;
-        transition: 0.2s;
         &:hover {
-          background: $primary-blue;
+          background: $primary;
           color: #fff;
-          box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+          box-shadow: 0 4px 12px rgba($primary, 0.2);
         }
       }
     }
@@ -114,23 +108,21 @@ $text-secondary: #5f6368;
     align-items: center;
     margin-bottom: 12px;
     .btn-submit {
-      background: $success-green;
-      color: white;
+      background: $success;
+      color: #fff;
       border: none;
       padding: 10px 30px;
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
       &:hover {
-        background: darken($success-green, 5%);
-        box-shadow: 0 4px 10px rgba(30, 142, 62, 0.2);
+        background: color.adjust($success, $lightness: -5%);
       }
     }
     .right-info {
       font-size: 0.85rem;
       font-weight: 600;
-      color: $primary-blue;
+      color: $primary;
       background: #e8f0fe;
       padding: 6px 14px;
       border-radius: 20px;
@@ -140,21 +132,26 @@ $text-secondary: #5f6368;
   .table-container {
     flex: 1;
     overflow: auto;
-    border: 1px solid $border-color;
+    border: 1px solid $border;
     border-radius: 8px;
     .excel-table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       table-layout: fixed;
+      th,
+      td {
+        border-bottom: 1px solid $border;
+        border-right: 1px solid $border;
+        vertical-align: middle;
+        height: 40px;
+      }
       th {
         background: #f8f9fa;
-        border-bottom: 1px solid $border-color;
-        border-right: 1px solid $border-color;
         padding: 10px 4px;
         font-size: 0.85rem;
         font-weight: 600;
-        color: $text-secondary;
+        color: $text-sub;
         position: sticky;
         top: 0;
         z-index: 10;
@@ -168,19 +165,9 @@ $text-secondary: #5f6368;
         top: 41px;
         font-size: 0.75rem;
       }
-      td {
-        border-bottom: 1px solid $border-color;
-        border-right: 1px solid $border-color;
-        height: 42px;
-        vertical-align: middle;
-        padding: 0;
-      }
 
       .text-center {
         text-align: center;
-      }
-      .p-0 {
-        padding: 0 !important;
       }
       .bg-gray {
         background-color: #fcfcfc;
@@ -189,18 +176,16 @@ $text-secondary: #5f6368;
         background-color: #fffdef;
       }
 
-      .time-input {
+      .time-input,
+      .table-input {
         width: 100%;
         height: 100%;
         border: none;
-        text-align: center;
         background: transparent;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 1rem;
         outline: none;
         &:focus {
           background: #fff;
-          box-shadow: inset 0 0 0 2px $primary-blue;
+          box-shadow: inset 0 0 0 2px $primary;
         }
         &:disabled {
           color: #bdc1c6;
@@ -209,58 +194,47 @@ $text-secondary: #5f6368;
         }
       }
 
-      // --- ส่วนที่แก้ไข: เปลี่ยนเป็นกล่องแดง ---
-      .desc-cell {
-  padding: 0; // ล้าง padding ของเซลล์ออกเพื่อให้กล่องข้างในคุมพื้นที่เอง
-  height: 42px; 
-  vertical-align: middle;
-
-  .input-wrapper {
-    display: flex;      // ทำให้ wrapper เป็น flex
-    align-items: center;
-    width: 100%;        // ให้ wrapper เต็มช่อง td
-    height: 100%;
-    padding: 4px 8px;     // ใส่ padding ที่นี่เพื่อให้ input ไม่ชิดขอบเส้นตาราง
-    box-sizing: border-box;
-
-    .table-input {
-      flex: 1;          // หัวใจสำคัญ: สั่งให้ input ยืดเต็มพื้นที่ wrapper
-      width: 100%;      // กันเหนียวสำหรับบาง Browser
-      height: 32px; 
-      border: 1px solid transparent; 
-      padding: 4px 10px; 
-      background: transparent; 
-      outline: none;
-      border-radius: 4px;
-      transition: all 0.2s;
-
-      &:focus { 
-        border: 1px solid $primary-blue;
-        background: #fff;
+      .time-input {
+        text-align: center;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1rem !important;
       }
 
-      &.is-invalid { 
-        border: 1px solid $danger-red;
-        background-color: #fff5f5;
-        color: $danger-red;
-        
-        &::placeholder {
-          color: rgba($danger-red, 0.5);
+      .desc-cell {
+        padding: 4px 8px;
+        .table-input {
+          height: 40px;
+          border-radius: 4px;
+          padding: 4px 10px;
+          width: 100%;
+          box-sizing: border-box;
+          border: 1px solid transparent;
+          &.is-invalid {
+            border: 1px solid $danger;
+            background: #fff5f5;
+            color: $danger;
+            &::placeholder {
+              color: rgba($danger, 0.5);
+            }
+            &:focus {
+      border: 1px solid $primary;
+      background: #fff;
+      box-shadow: none;
+    }
+          }
         }
       }
-      
-      &:disabled {
-        background: transparent;
-        cursor: not-allowed;
-      }
-    }
-  }
-}
 
+      .total-label {
+        text-align: right;
+        padding-right: 20px;
+        font-weight: bold;
+        color: $text-sub;
+      }
       .total-val {
         background: #e6f4ea;
         font-weight: 700;
-        color: $success-green;
+        color: $success;
         text-align: center;
         font-size: 1.1rem;
       }

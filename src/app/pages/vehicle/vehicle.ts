@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { VehicleFormComponent } from '../vehicle-form/vehicle-form'; // Import หน้าลูก
+import { VehicleFormComponent } from '../../components/vehicle-form/vehicle-form'; // Import หน้าลูก
 
 interface RequestItem {
   date: string;
@@ -18,13 +18,12 @@ interface VehicleRequest {
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, VehicleFormComponent], // อย่าลืมใส่ VehicleFormComponent ตรงนี้
+  imports: [CommonModule, VehicleFormComponent], 
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss'
 })
 export class VehicleComponent {
 
-  // ตัวแปรควบคุมการเปิดปิด Modal
   isModalOpen: boolean = false;
 
   requests: VehicleRequest[] = [
@@ -54,12 +53,10 @@ export class VehicleComponent {
 
   constructor() {}
 
-  // เปิด Modal
   openCreateModal() {
     this.isModalOpen = true;
   }
 
-  // ปิด Modal
   closeCreateModal() {
     this.isModalOpen = false;
   }

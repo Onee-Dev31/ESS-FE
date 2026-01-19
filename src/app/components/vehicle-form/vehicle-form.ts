@@ -23,7 +23,7 @@ interface DailyLog {
 export class VehicleFormComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
 
-  selectedMonthIndex: number = 9; // ตุลาคม
+  selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน','กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2567, 2568, 2569];
@@ -40,11 +40,10 @@ export class VehicleFormComponent implements OnInit {
       const currentDate = new Date(yearAD, this.selectedMonthIndex, day);
       const dayOfWeek = currentDate.getDay(); 
       
-      // Mock ประเภทวันตามเงื่อนไข
-      let dayType = 'W'; // วันทำงานปกติ
-      if (dayOfWeek === 0 || dayOfWeek === 6) dayType = 'H'; // เสาร์-อาทิตย์
-      if (day === 13 || day === 23) dayType = 'T'; // วันหยุดพิเศษ (ตามรูป)
-      if (day === 24) dayType = 'L'; // วันลา (ตามรูป)
+      let dayType = 'W';
+      if (dayOfWeek === 0 || dayOfWeek === 6) dayType = 'H'; 
+      if (day === 13 || day === 23) dayType = 'T'; 
+      if (day === 24) dayType = 'L'; 
 
       // Mock เวลาเฉพาะวันทำงาน (W) บางวัน
       let timeIn = '';
@@ -60,7 +59,7 @@ export class VehicleFormComponent implements OnInit {
         dayType: dayType,
         timeIn: timeIn,
         timeOut: timeOut,
-        selected: day === 1 || day === 2 || day === 27, // เลือกไว้บางวันตามรูป
+        selected: day === 1 || day === 2 || day === 27,
         amount: (day === 1 || day === 2 || day === 27) ? 120 : null,
         description: day === 1 ? 'ถ่ายงานหลังรายการแจ' : (day === 2 ? 'สแตนด์บายงาน' : (day === 27 ? 'ทดสอบการเบิก' : ''))
       });
