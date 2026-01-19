@@ -18,6 +18,7 @@
         <div class="date-input-group">
           <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
         </div>
+        <span class="to-text">ถึง</span><div class="date-input-group"></div>
         <div class="date-input-group">
           <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
         </div>
@@ -42,10 +43,16 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 14%; cursor: pointer;" (click)="sortByRequestId()">
+            <th style="width: 14%; cursor: pointer" (click)="sortByRequestId()">
               เลขที่การเบิก
-              <i class="fas ml-1" 
-                 [ngClass]="table.getColumn('id')?.getIsSorted() === 'asc' ? 'fa-sort-amount-up' : 'fa-sort-amount-down-alt'">
+              <i
+                class="fas ml-1"
+                [ngClass]="{
+                  'fa-sort-amount-up': table.getColumn('id')?.getIsSorted() === 'asc',
+                  'fa-sort-amount-down-alt': table.getColumn('id')?.getIsSorted() === 'desc',
+                  'fa-sort': !table.getColumn('id')?.getIsSorted()
+                }"
+              >
               </i>
             </th>
             <th style="width: 12%">วันที่สร้างรายการ</th>
@@ -58,15 +65,24 @@
         </thead>
         <tbody>
           <ng-container *ngFor="let row of table.getRowModel().rows">
-            <tr *ngFor="let item of row.original.items; let i = index" 
-                [class.group-end]="i === row.original.items.length - 1">
-              
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
+            <tr
+              *ngFor="let item of row.original.items; let i = index"
+              [class.group-end]="i === row.original.items.length - 1"
+            >
+              <td
+                *ngIf="i === 0"
+                [attr.rowspan]="row.original.items.length"
+                class="merged-col top-align"
+              >
                 <span class="id-text">{{ row.original.id }}</span>
               </td>
-              
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
-                {{ row.original.createDate | date: 'dd/MM/yyyy' }}
+
+              <td
+                *ngIf="i === 0"
+                [attr.rowspan]="row.original.items.length"
+                class="merged-col top-align"
+              >
+                {{ row.original.createDate | date : 'dd/MM/yyyy' }}
               </td>
 
               <td>{{ item.date }}</td>
@@ -80,13 +96,21 @@
                 {{ item.amount | number : '1.2-2' }}
               </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center top-align">
+              <td
+                *ngIf="i === 0"
+                [attr.rowspan]="row.original.items.length"
+                class="merged-col text-center top-align"
+              >
                 <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                   {{ row.original.status }}
                 </span>
               </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center top-align">
+              <td
+                *ngIf="i === 0"
+                [attr.rowspan]="row.original.items.length"
+                class="merged-col text-center top-align"
+              >
                 <div class="action-btns">
                   <button class="btn-icon edit" (click)="openCreateModal(row.original.id)">
                     <i class="far fa-edit"></i>
@@ -99,7 +123,9 @@
             </tr>
           </ng-container>
           <tr *ngIf="data().length === 0">
-            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">ไม่พบรายการที่ตรงตามเงื่อนไข</td>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999">
+              ไม่พบรายการที่ตรงตามเงื่อนไข
+            </td>
           </tr>
         </tbody>
       </table>
@@ -109,6 +135,9 @@
 
 <div class="modal-overlay" *ngIf="isModalOpen">
   <div class="modal-container">
-    <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeCreateModal()"></app-vehicle-form>
+    <app-vehicle-form
+      [requestId]="selectedRequestId"
+      (onClose)="closeCreateModal()"
+    ></app-vehicle-form>
   </div>
 </div>

@@ -39,7 +39,7 @@ export class VehicleComponent implements OnInit {
   filterEndDate: string = '';
   filterStatus: string = '';
   
-  // ข้อมูล Mockup ทั้งหมด (ห้ามลบ)
+  // ข้อมูล Mockup ทั้งหมด
   allRequests: VehicleRequest[] = [
     {
       id: '2701#001',
@@ -77,10 +77,14 @@ export class VehicleComponent implements OnInit {
   table = createAngularTable(() => ({
     data: this.data(),
     columns: this.columns,
-    state: { sorting: this.sorting() },
+    state: {
+      sorting: this.sorting(),
+    },
     onSortingChange: (updaterOrValue) => {
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
-      this.sorting.set(next);
+      const nextSorting = typeof updaterOrValue === 'function' 
+        ? updaterOrValue(this.sorting()) 
+        : updaterOrValue;
+      this.sorting.set(nextSorting);
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -112,7 +116,11 @@ export class VehicleComponent implements OnInit {
   }
 
   sortByRequestId() {
-    this.table.getColumn('id')?.toggleSorting();
+    const column = this.table.getColumn('id');
+    if (column) {
+      // Toggle ระหว่าง asc -> desc -> clear
+      column.toggleSorting(column.getIsSorted() === 'asc');
+    }
   }
 
   openCreateModal(id: string = '') {
