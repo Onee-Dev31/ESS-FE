@@ -1,9 +1,6 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// =========================================
-// 1. Variables & Global Settings
-// =========================================
 $primary: #4650dd;
 $dark: #0f172a;
 $muted: #64748b;
@@ -70,7 +67,6 @@ body {
   }
 }
 
-// Utilities
 .mt-4 {
   margin-top: 24px;
 }
@@ -105,9 +101,6 @@ body {
   background: #6366f1;
 }
 
-// =========================================
-// 2. Layout & Grid System
-// =========================================
 .main-layout-grid {
   display: grid;
   gap: 20px;
@@ -198,7 +191,6 @@ body {
   min-width: 0;
 }
 
-// --- Left: Avatar ---
 .banner-avatar-section {
   background: linear-gradient(
     135deg,
@@ -294,7 +286,6 @@ body {
   }
 }
 
-// --- Right: Card (Profile Info) ---
 .profile-card {
   background: linear-gradient(
     135deg,
@@ -499,9 +490,6 @@ body {
   }
 }
 
-// =========================================
-// 3. General Cards
-// =========================================
 .card:not(.profile-card) {
   background: white;
   border-radius: $radius;
@@ -550,7 +538,6 @@ body {
   }
 }
 
-// IT Story List
 .it-story-card {
   .card-header {
     background: #fafafa;
@@ -594,9 +581,6 @@ body {
   }
 }
 
-// =========================================
-// 4. Buttons
-// =========================================
 .action-btn {
   background: $primary;
   color: white;
@@ -641,9 +625,6 @@ body {
   font-weight: 400;
 }
 
-// =========================================
-// 5. Stats Grid (Medical)
-// =========================================
 .stats-grid-card {
   background: white;
   border-radius: $radius;
@@ -674,7 +655,15 @@ body {
     margin-bottom: 20px;
     display: grid;
     gap: 15px;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
+
+    @media (max-width: 991px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   .stats-action-area.card-footer {
@@ -696,52 +685,78 @@ body {
 
 .stat-item {
   padding: 15px;
-  border: none;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
 
-  .stat-percent {
-    font-size: 16px;
-    font-weight: 700; 
-
-  }
-
-  .stat-label {
-    font-size: 15px;
-    font-weight: 600;
-    color: $dark;
-    margin-bottom: 10px;
+  .stat-header {
+    margin-bottom: 12px;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 5px;
-    .label-small {
+    align-items: center;
+
+    .stat-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: $dark;
+    }
+    .stat-limit {
+      font-size: 13px;
       color: $muted;
-      font-weight: 300;
-      font-size: 14px;
+      font-weight: 400;
     }
   }
-  .stat-row {
+
+  .stat-content-row {
     display: flex;
     justify-content: space-between;
-    font-size: 15px;
+    align-items: flex-end;
     margin-bottom: 8px;
-    font-weight: 500;
+
+    .stat-data-group {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+
+      .inline-label {
+        font-size: 13px;
+        color: $muted; 
+        font-weight: 500;
+      }
+
+      .inline-value {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        font-family: 'Inter', sans-serif;
+        color: $muted;
+      }
+      &.text-end {
+        .inline-value {
+          color: $balance; 
+        }
+      }
+    }
   }
+
   .stat-progress {
     height: 6px;
     background: #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
+    width: 100%;
+    margin-top: auto;
+    
     .progress-bar {
       height: 100%;
       border-radius: 10px;
+      transition: width 0.3s ease;
     }
   }
 }
 
-// =========================================
-// 6. Mini Cards (Welfare / Leave)
-// =========================================
 .section-title {
   font-size: 16px;
   font-weight: 700;
@@ -923,9 +938,6 @@ body {
   }
 }
 
-// =========================================
-// 7. Calendar & Schedule
-// =========================================
 .schedule-card {
   margin-top: 20px;
   overflow: hidden;
@@ -1052,7 +1064,6 @@ body {
   }
 }
 
-// Tooltip Logic
 .tooltip-container {
   position: relative;
   display: inline-block;
@@ -1108,9 +1119,6 @@ body {
   }
 }
 
-// =========================================
-// 8. Attendance Card
-// =========================================
 .attendance-card {
   .card-header {
     background: #fafafa;
@@ -1180,9 +1188,6 @@ body {
   }
 }
 
-// =========================================
-// 9. Performance Card
-// =========================================
 .performance-card {
   .card-header {
     background: #fafafa;
@@ -1231,7 +1236,6 @@ body {
     }
   }
 
-  // --- ส่วนประวัติ ---
   .perf-subtitle {
     font-size: 15px;
     font-weight: 700;
@@ -1268,11 +1272,6 @@ body {
   }
 }
 
-// =========================================
-// 10. Responsive Mobile Optimization (Cleaned)
-// =========================================
-
-// 10.1 Mobile S (Small) - < 375px
 @media (max-width: 374px) {
   .dashboard-wrapper {
     padding: 10px;
@@ -1352,7 +1351,6 @@ body {
   }
 }
 
-// 10.2 Mobile M (Medium) - 375px to 424px
 @media (min-width: 375px) and (max-width: 424px) {
   .banner-avatar-section {
     min-height: 180px;
@@ -1368,7 +1366,6 @@ body {
   }
 }
 
-// 10.3 Mobile L (Large) - 425px to 767px
 @media (min-width: 425px) and (max-width: 767px) {
   .profile-card .card-body.profile-layout .profile-info-list .profile-display-group {
     .display-label {
@@ -1383,7 +1380,6 @@ body {
   }
 }
 
-// 10.4 Global Mobile Fixes (< 768px)
 @media (max-width: 767px) {
   .main-layout-grid {
     gap: 16px;

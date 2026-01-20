@@ -21,7 +21,9 @@
 
         <div class="card attendance-card">
           <div class="card-header border-0">
-            <h4 class="card-heading"><i class="fas fa-calendar-check" style="padding-right:5px;"></i>My Time Attendance</h4>
+            <h4 class="card-heading">
+              <i class="fas fa-calendar-check" style="padding-right: 5px"></i>My Time Attendance
+            </h4>
           </div>
 
           <div class="card-body">
@@ -52,7 +54,9 @@
 
         <div class="card performance-card">
           <div class="card-header border-0">
-            <h4 class="card-heading"><i class="fas fa-tachometer-alt" style="padding-right: 5px;"></i>My Performance</h4>
+            <h4 class="card-heading">
+              <i class="fas fa-tachometer-alt" style="padding-right: 5px"></i>My Performance
+            </h4>
           </div>
 
           <div class="card-body">
@@ -86,7 +90,9 @@
 
         <div class="card it-story-card">
           <div class="card-header border-0">
-            <h4 class="card-heading"><i class="fas fa-laptop-code" style="padding-right: 25px;"></i>My IT Story</h4>
+            <h4 class="card-heading">
+              <i class="fas fa-laptop-code" style="padding-right: 25px"></i>My IT Story
+            </h4>
           </div>
           <div class="card-body">
             <div class="profile-info-list">
@@ -139,15 +145,25 @@
 
           <div class="stat-items-grid">
             <div class="stat-item" *ngFor="let stat of medicalStats">
-              <div class="stat-label">
-                {{ stat.label }} <span class="label-small">{{ stat.subLabel }}</span>
+              <div class="stat-header">
+                <div class="stat-title">{{ stat.label }}</div>
+                <div class="stat-limit">{{ stat.subLabel }}</div>
               </div>
-              <div class="stat-row">
-                <span class="stat-value">ใช้ไป {{ stat.used }}</span>
-                <span class="stat-percent" [ngClass]="stat.balanceColor">
-                  คงเหลือ {{ stat.balance }}
-                </span>
+
+              <div class="stat-content-row">
+                <div class="stat-data-group">
+                  <span class="inline-label">ใช้ไป</span>
+                  <span class="inline-value">{{ stat.used }}</span>
+                </div>
+
+                <div class="stat-data-group text-end">
+                  <span class="inline-label">คงเหลือ</span>
+                  <span class="inline-value bold-value" [ngClass]="stat.balanceColor">
+                    {{ stat.balance }}
+                  </span>
+                </div>
               </div>
+
               <div class="stat-progress">
                 <div
                   class="progress-bar"
@@ -189,8 +205,12 @@
                   </h6>
                   <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
                 </div>
-                <div class="card-arrow" *ngIf="item.route"><i class="fas fa-chevron-right"></i></div>
-                <div class="card-arrow" *ngIf="!item.route" style="opacity: 0.3"><i class="fas fa-chevron-right"></i></div>
+                <div class="card-arrow" *ngIf="item.route">
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="card-arrow" *ngIf="!item.route" style="opacity: 0.3">
+                  <i class="fas fa-chevron-right"></i>
+                </div>
               </div>
             </div>
           </div>

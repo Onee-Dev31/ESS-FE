@@ -208,6 +208,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
       input[type=number] {
         -moz-appearance: textfield; 
+        appearance: textfield;
       }
 
       .time-input {
