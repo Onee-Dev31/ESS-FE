@@ -20,14 +20,12 @@ interface NotificationItem {
   styleUrl: './navbar.scss',
 })
 export class NavbarComponent {
-  // --- State Variables ---
   isProfileOpen = false;
   isNotificationOpen = false;
   
   userName = 'MARK STEPHEN';
   userRole = 'Web Developer';
 
-  // --- Mock Data ---
   notifications: NotificationItem[] = [
     { 
       id: 1, 
@@ -76,7 +74,6 @@ export class NavbarComponent {
     this.sidebarService.toggle();
   }
 
-  // --- Toggle Logic (สลับกันปิด) ---
   toggleNotification() {
     this.isNotificationOpen = !this.isNotificationOpen;
     if (this.isNotificationOpen) this.isProfileOpen = false;
@@ -87,7 +84,6 @@ export class NavbarComponent {
     if (this.isProfileOpen) this.isNotificationOpen = false;
   }
 
-  // --- Click Outside to Close ---
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
     if (!this.eRef.nativeElement.contains(event.target)) {

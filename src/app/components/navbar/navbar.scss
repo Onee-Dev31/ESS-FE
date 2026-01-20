@@ -64,7 +64,6 @@ $warning: #f59e0b;
     justify-content: flex-end;
     gap: 12px;
 
-    // Search Box
     .search-box {
       position: relative;
       display: flex;
@@ -100,7 +99,6 @@ $warning: #f59e0b;
       }
     }
 
-    // Actions
     .nav-actions {
       display: flex;
       align-items: center;
@@ -110,7 +108,6 @@ $warning: #f59e0b;
         display: none;
       }
 
-      // Common Icon Button
       .icon-btn {
         position: relative;
         font-size: 18px;
@@ -156,7 +153,6 @@ $warning: #f59e0b;
         }
       }
 
-      // 🟢 Notification Dropdown
       .notification-dropdown {
         position: relative;
 
@@ -267,7 +263,6 @@ $warning: #f59e0b;
         }
       }
 
-      // 🟢 User Profile
       .user-profile {
         margin-left: 8px;
         position: relative;
@@ -349,7 +344,6 @@ $warning: #f59e0b;
   }
 }
 
-// Responsive
 @media (min-width: 992px) {
   .navbar .nav-center {
     display: flex;

@@ -22,7 +22,6 @@ export class AllowanceFormComponent implements OnInit {
   logs: any[] = [];
 
   ngOnInit(): void {
-    // ถ้าไม่มี requestId ส่งมาจากหน้าหลัก (กรณีสร้างใหม่) ให้รันเลขใหม่
     if (!this.requestId) {
       this.requestId = this.generateNextRequestId();
     }
@@ -126,7 +125,7 @@ export class AllowanceFormComponent implements OnInit {
       else if (extraHoursDecimal <= 16) log.amount = 375;
       else if (extraHoursDecimal <= 20) log.amount = 450;
       else if (extraHoursDecimal <= 24) log.amount = 525;
-      else log.amount = 525; // เพดานสูงสุดตามที่ระบุ
+      else log.amount = 525;
     } else {
       log.amount = 0;
     }

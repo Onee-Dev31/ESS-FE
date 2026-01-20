@@ -1,33 +1,54 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// Variables
 $header-bg: #343a40;
 $btn-create-bg: #28a745;
 $btn-search-bg: #003e6d;
 $text-header: #ffffff;
 $border-color: #e9ecef;
 $bg-page: #f8f9fa;
-// Font Stack
+
 $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+
+@mixin mobile {
+  @media (max-width: 575.98px) { @content; }
+}
+@mixin tablet {
+  @media (max-width: 991.98px) { @content; }
+}
 
 .allowance-page {
   padding: 20px;
   background-color: $bg-page;
   font-family: $font-stack;
   min-height: 100vh;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: 10px;
+  }
 
   .top-header-strip {
     background-color: #e2e6ea;
     padding: 15px 20px;
     border-radius: 4px;
     margin-bottom: 20px;
+
     h2 {
       margin: 0;
       font-size: 1.2rem;
       font-weight: 700;
       color: #000;
       font-family: $font-stack;
+
+      @include mobile {
+        font-size: 1.1rem;
+      }
+    }
+
+    @include mobile {
+      padding: 12px 15px;
+      margin-bottom: 15px;
     }
   }
 
@@ -36,6 +57,8 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding-bottom: 20px;
+    width: 100%;
+    overflow: hidden;
   }
 
   .card-header-title {
@@ -44,6 +67,11 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     font-weight: 600;
     color: #333;
     font-family: $font-stack;
+
+    @include mobile {
+      padding: 15px;
+      font-size: 1rem;
+    }
   }
 
   .toolbar-container {
@@ -53,6 +81,13 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
+
+    @include mobile {
+      padding: 0 15px 15px 15px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
 
     .btn-create {
       background-color: $btn-create-bg;
@@ -65,9 +100,18 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       cursor: pointer;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      white-space: nowrap;
+
       &:hover {
         background-color: color.adjust($btn-create-bg, $lightness: -5%);
+      }
+
+      @include mobile {
+        width: 100%;
+        padding: 12px;
+        order: 2;
       }
     }
 
@@ -75,12 +119,29 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
+
+      @include tablet {
+        flex: 1;
+      }
+
+      @include mobile {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        order: 1;
+      }
 
       .filter-label {
         font-weight: 500;
         font-size: 0.9rem;
         color: #333;
         font-family: $font-stack;
+        
+        @include mobile {
+           display: none;
+        }
       }
 
       .form-control, .select-status {
@@ -92,8 +153,15 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         outline: none;
         font-family: $font-stack;
         background-color: white;
+
         &:focus {
           border-color: $btn-search-bg;
+        }
+
+        @include mobile {
+          width: 100%;
+          padding: 10px; 
+          height: 40px;
         }
       }
       
@@ -106,8 +174,15 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-weight: 500;
         font-family: $font-stack;
         cursor: pointer;
+
         &:hover {
           background-color: color.adjust($btn-search-bg, $lightness: 5%);
+        }
+
+        @include mobile {
+          width: 100%;
+          padding: 10px;
+          margin-top: 5px;
         }
       }
     }
@@ -116,11 +191,14 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   .table-responsive {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; 
+    border-top: 1px solid $border-color;
   }
 
   .modern-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 900px; 
 
     thead {
       background-color: $header-bg;
@@ -133,6 +211,10 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         text-align: center; 
         white-space: nowrap;
         font-family: $font-stack;
+
+        @include mobile {
+          padding: 12px 8px;
+        }
       }
     }
 
@@ -146,10 +228,12 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           vertical-align: middle;
           color: #495057;
           font-size: 0.9rem;
-          font-family: $font-stack; // ใช้ Font Stack ที่นี่
+          font-family: $font-stack;
           word-break: break-word;
-          
-          // ลบ * { font-family: inherit; } ออกแล้วครับ Icon จะกลับมาปกติ
+
+          @include mobile {
+            padding: 10px 8px;
+          }
 
           &.top-align { vertical-align: top; }
           &.text-center { text-align: center; }
@@ -173,6 +257,12 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           min-width: 100px;
           text-align: center;
           font-family: $font-stack;
+
+          @include mobile {
+            min-width: auto;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+          }
 
           &.status-success,
           &.status-จ่ายแล้ว {
@@ -200,7 +290,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   }
 }
 
-// Modal Style (คงเดิม)
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -213,6 +302,11 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(4px);
+  
+  @include mobile {
+    padding: 0;
+    align-items: flex-end;
+  }
 
   .modal-container {
     background: white;
@@ -227,6 +321,13 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     position: relative;
     font-family: $font-stack;
     
+    @include mobile {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+
     app-allowance-form {
       flex: 1;
       overflow-y: auto;
@@ -235,6 +336,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
        &::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
        &::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     }
+    
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }

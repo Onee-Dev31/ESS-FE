@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-// =========================================
-// 1. Variables
-// =========================================
 $primary-color: #4650dd;
 $primary-hover: #3942b8;
 $text-dark: #333;
@@ -11,9 +8,6 @@ $text-label: #555;
 $bg-light: #f1f5f9;
 $font-stack: 'Poppins', sans-serif;
 
-// =========================================
-// 2. Host & Global Styles
-// =========================================
 :host {
   display: flex;
   justify-content: center;
@@ -31,9 +25,6 @@ $font-stack: 'Poppins', sans-serif;
   padding: 20px;
 }
 
-// =========================================
-// 3. Main Layout
-// =========================================
 .main-container {
   display: flex;
   width: 100%;
@@ -50,9 +41,6 @@ $font-stack: 'Poppins', sans-serif;
   transition: all 0.3s ease;
 }
 
-// =========================================
-// 4. Login Panel (Left)
-// =========================================
 .login-panel {
   flex: 1;
   padding: 3.5rem;
@@ -217,9 +205,6 @@ $font-stack: 'Poppins', sans-serif;
   }
 }
 
-// =========================================
-// 5. Welcome Panel (Right)
-// =========================================
 .welcome-panel {
   flex: 1.3;
   background-color: $bg-light;
@@ -245,9 +230,6 @@ $font-stack: 'Poppins', sans-serif;
   }
 }
 
-// =========================================
-// 6. Alerts & Utilities
-// =========================================
 .alert {
   padding: 10px 14px;
   border-radius: 8px;
@@ -286,9 +268,6 @@ $font-stack: 'Poppins', sans-serif;
   animation: rotation 1s linear infinite;
 }
 
-// =========================================
-// 7. Animations
-// =========================================
 @keyframes rotation {
   to {
     transform: rotate(360deg);
@@ -306,10 +285,6 @@ $font-stack: 'Poppins', sans-serif;
     background-position: 0% 50%;
   }
 }
-
-// =========================================
-// 8. Responsive Media Queries
-// =========================================
 
 @media (max-width: 1366px) {
   .login-panel {
@@ -359,7 +334,7 @@ $font-stack: 'Poppins', sans-serif;
   }
 }
 
-/* Small Mobile (< 380px) */
+
 @media (max-width: 380px) {
   :host {
     padding: 10px !important;
@@ -378,7 +353,6 @@ $font-stack: 'Poppins', sans-serif;
   }
 }
 
-/* Landscape Mobile */
 @media (max-height: 600px) and (orientation: landscape) {
   :host {
     padding: 10px;

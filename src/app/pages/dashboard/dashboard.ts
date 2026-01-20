@@ -6,7 +6,6 @@ import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-// Interfaces
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
 
@@ -45,11 +44,6 @@ interface HolidayItem { date: string; name: string; }
 })
 export class DashboardComponent {
 
-  // =========================================================
-  // DATA SECTION
-  // =========================================================
-
-  // 1. Profile Data
   profileList: ProfileItem[] = [
     { label: 'Email', value: 'praewnapa.boo@onee.one', icon: 'fas fa-envelope', iconColor: '#ffffff' },
     { label: 'เบอร์โทรศัพท์', value: '9409', icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
@@ -58,7 +52,6 @@ export class DashboardComponent {
     { label: 'บริษัท', value: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด', icon: 'fas fa-building', iconColor: '#ffffff' }
   ];
 
-  // 2. IT Story Data
   itList: ProfileItem[] = [
     { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: 'praewnapaboo' },
     { label: 'Account expire date', value: '16-Jul-2026' },
@@ -67,7 +60,6 @@ export class DashboardComponent {
     { label: 'Monitor', value: 'Dell 999 Asset No. 415v489dfg7df/9' }
   ];
 
-  // 3. Medical Stats
   medicalStats: MedicalStat[] = [
     { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },
     { label: 'ทันตกรรม', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-blue', percent: 100 },
@@ -75,7 +67,6 @@ export class DashboardComponent {
     { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
   ];
 
-  // 4. Welfare Data
   welfareStats: WelfareItem[] = [
     { 
       title: 'ค่าเบี้ยเลี้ยง', 
@@ -132,7 +123,6 @@ export class DashboardComponent {
     }
   ];
 
-  // 5. Leave Stats
   leaveStats: LeaveItem[] = [
     { 
       label: 'ลาพักร้อน', 
@@ -217,16 +207,11 @@ export class DashboardComponent {
     // },
   ];
 
-  // 6. Holidays
   holidays: HolidayItem[] = [
     { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ...' },
     { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
     { date: '31/12/2569', name: 'วันสิ้นปี' }
   ];
-
-  // =========================================================
-  // CALENDAR LOGIC
-  // =========================================================
 
   specialDates: Record<string, any> = {
     '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
@@ -325,8 +310,6 @@ performanceList = [
   };
 
   constructor(private router: Router) { }
-
-  // ✅ เพิ่มฟังก์ชันสำหรับเปลี่ยนหน้า
   navigateTo(path: string | undefined) {
     if (path) {
       this.router.navigate([path]);

@@ -10,10 +10,8 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./vehicle-form.scss']
 })
 export class VehicleFormComponent implements OnInit {
-  // รับค่ามาจากหน้ารายการ (Vehicle Page)
   @Input() requestId: string = '';
 
-  // ส่ง Event กลับไปเพื่อปิด Modal (ชื่อต้องตรงกับใน HTML ที่คุณส่งมาคือ onClose)
   @Output() onClose = new EventEmitter<void>();
 
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
@@ -25,7 +23,6 @@ export class VehicleFormComponent implements OnInit {
   logs: any[] = [];
 
   ngOnInit(): void {
-    // หากไม่มี requestId ส่งมา ให้กำหนดเป็น 'ใหม่' หรือ Generate เบื้องต้น
     if (!this.requestId) {
       this.requestId = 'VHC-NEW-' + new Date().getTime().toString().slice(-4);
     }
@@ -33,7 +30,6 @@ export class VehicleFormComponent implements OnInit {
   }
 
   generateCalendar() {
-    // ข้อมูล Mockup 31 วัน
     const mockupData = [
       { d: '01/10/2025', t: 'W', in: '09:14', out: '23:30', s: true, desc: 'แชร์ค่าแท็กซี่กลับบ้าน (เลิกงานดึก)' },
       { d: '02/10/2025', t: 'W', in: '05:30', out: '18:00', s: true, desc: 'เรียก Grab มาทำงาน (เข้างานเช้า)' },
@@ -61,7 +57,7 @@ export class VehicleFormComponent implements OnInit {
       { d: '24/10/2025', t: 'L', in: '', out: '', s: false, desc: '' },
       { d: '25/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
       { d: '26/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '27/10/2025', t: 'W', in: '09:31', out: '22:15', s: true, desc: '' }, // แถวนี้จะติดขอบแดงเพราะ s: true แต่ไม่มี desc
+      { d: '27/10/2025', t: 'W', in: '09:31', out: '22:15', s: true, desc: '' },
       { d: '28/10/2025', t: 'W', in: '09:52', out: '18:39', s: false, desc: '' },
       { d: '29/10/2025', t: 'W', in: '09:37', out: '18:13', s: false, desc: '' },
       { d: '30/10/2025', t: 'W', in: '09:44', out: '18:51', s: false, desc: '' },
@@ -78,11 +74,10 @@ export class VehicleFormComponent implements OnInit {
       description: item.desc
     }));
 
-    // คำนวณเงินครั้งแรกสำหรับค่า Mockup
+
     this.logs.forEach(log => this.calculateVehicleAmount(log));
   }
 
-  // คำนวณเงิน: ก่อน 06:00 หรือ หลัง 22:00
   calculateVehicleAmount(log: any) {
     if (!log.selected || !log.timeIn || !log.timeOut) {
       log.amount = 0;
@@ -112,7 +107,6 @@ export class VehicleFormComponent implements OnInit {
   }
 
   onSubmit() {
-    // ตรวจสอบว่ามีแถวที่เลือกแต่ไม่ได้กรอกรายละเอียดหรือไม่
     const invalidLogs = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     
     if (invalidLogs.length > 0) {
@@ -130,6 +124,6 @@ export class VehicleFormComponent implements OnInit {
   }
 
   closeModal() {
-    this.onClose.emit(); // แจ้ง Parent ให้ปิด Modal
+    this.onClose.emit(); 
   }
 }

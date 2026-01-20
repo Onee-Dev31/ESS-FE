@@ -43,7 +43,6 @@ export class AllowanceComponent implements OnInit {
   filterEndDate = '';
   filterStatus = '';
 
-  // Data ต้นทาง (เป็น Group)
   allRequests = signal<AllowanceRequest[]>([
     {
       id: '2701-001',
@@ -83,19 +82,15 @@ export class AllowanceComponent implements OnInit {
     },
   ]);
 
-  // Sorting State
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  // Computed: ทำหน้าที่ Filter -> Sort Group -> Flatten
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
-    // 1. Filtering
     if (this.filterStatus) filtered = filtered.filter((r) => r.status === this.filterStatus);
     if (this.filterStartDate) filtered = filtered.filter((r) => r.createDate >= this.filterStartDate);
     if (this.filterEndDate) filtered = filtered.filter((r) => r.createDate <= this.filterEndDate);
 
-    // 2. Sorting Groups (Logic สำคัญ: เรียงทั้งก้อน Group)
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -112,20 +107,16 @@ export class AllowanceComponent implements OnInit {
           case 'status':
             return a.status.localeCompare(b.status) * direction;
           case 'amount':
-            // ถ้า Sort จำนวนเงิน: เอา "ยอดรวม" หรือ "ยอดสูงสุด" ใน Group มาเทียบกัน
             valA = a.items.reduce((sum, item) => sum + item.amount, 0);
             valB = b.items.reduce((sum, item) => sum + item.amount, 0);
             return (valA - valB) * direction;
           case 'hours':
-             // Sort ชั่วโมง: เอาผลรวมชั่วโมงมาเทียบ
             valA = a.items.reduce((sum, item) => sum + item.hours, 0);
             valB = b.items.reduce((sum, item) => sum + item.hours, 0);
             return (valA - valB) * direction;
-          case 'date': // วันที่ขอเบิก
-             // ใช้วันที่ของรายการแรกสุดใน Group มาเทียบ
+          case 'date':
              valA = a.items[0]?.date || '';
              valB = b.items[0]?.date || '';
-             // แปลง dd/MM/yyyy เป็น yyyyMMdd เพื่อ sort string
              const dateA = valA.split('/').reverse().join('');
              const dateB = valB.split('/').reverse().join('');
              return dateA.localeCompare(dateB) * direction;
@@ -139,11 +130,8 @@ export class AllowanceComponent implements OnInit {
       });
     }
 
-    // 3. Flattening (แตกเป็นแถวเพื่อแสดงผล แต่ลำดับ Group ถูกจัดไว้แล้ว)
     const rows: FlatAllowanceRow[] = [];
     filtered.forEach((req) => {
-      // (Optional) อยาก Sort Items ภายใน Group ด้วยไหม? ถ้าอยากเพิ่มตรงนี้ได้
-      // req.items.sort(...) 
 
       req.items.forEach((item, index) => {
         rows.push({
@@ -159,7 +147,6 @@ export class AllowanceComponent implements OnInit {
     return rows;
   });
 
-  // Table Config (ใช้ data ที่ sort แล้วจาก processedData เลย ไม่ต้องใช้ getSortedRowModel)
   table = createAngularTable(() => ({
     data: this.processedData(),
     columns: [
@@ -177,7 +164,6 @@ export class AllowanceComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    // getSortedRowModel: undefined, // *สำคัญ* ปิดการ Sort อัตโนมัติของ Lib เพื่อให้ Group ไม่แตก
   }));
 
   ngOnInit() {}

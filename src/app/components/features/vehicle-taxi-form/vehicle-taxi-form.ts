@@ -72,7 +72,6 @@ export class VehicleTaxiFormComponent implements OnInit {
   }
 
   save() {
-  // 1. กรองเฉพาะแถวที่เลือก
   const selectedItems = this.items.filter(i => i.selected);
 
   if (selectedItems.length === 0) {
@@ -80,17 +79,14 @@ export class VehicleTaxiFormComponent implements OnInit {
     return;
   }
 
-  // 2. ตรวจสอบว่ามีช่องไหนว่างไหม (รายละเอียด, จุดหมาย, จำนวนเงิน)
   const invalidItem = selectedItems.find(i => !i.desc || !i.destination || !i.amount);
 
   if (invalidItem) {
     alert('กรุณากรอกข้อมูลให้ครบถ้วนในรายการที่เลือก (ช่องสีแดง)');
-    return; // หยุดการทำงาน ไม่ให้บันทึก
+    return;
   }
 
-  // 3. ถ้าผ่านหมด ก็บันทึกได้เลย
   console.log('บันทึกสำเร็จ', selectedItems);
-  // this.service.save(selectedItems)...
 }
 
   cancel() {

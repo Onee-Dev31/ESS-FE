@@ -37,7 +37,6 @@ export class VehicleTaxiComponent {
   isModalOpen: boolean = false;
   selectedRequestId: string = '';
 
-  // Data Mockup
   allRequests = signal<TaxiRequest[]>([
     {
       id: '2701#001',
@@ -65,18 +64,14 @@ export class VehicleTaxiComponent {
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  // Computed Logic สำหรับ Filter และ Sort
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
-
-    // 1. Filter
     if (this.filterStatus) filtered = filtered.filter(r => r.status === this.filterStatus);
     
-    // Note: วันที่ใน mock เป็น dd/MM/yyyy ต้องแปลง format ก่อนเทียบ
     if (this.filterStartDate || this.filterEndDate) {
       filtered = filtered.filter(r => {
         const [day, month, year] = r.createDate.split('/');
-        const isoDate = `${year}-${month}-${day}`; // yyyy-MM-dd
+        const isoDate = `${year}-${month}-${day}`;
         
         let passStart = true;
         let passEnd = true;
@@ -86,7 +81,6 @@ export class VehicleTaxiComponent {
       });
     }
 
-    // 2. Sort Groups
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -100,7 +94,6 @@ export class VehicleTaxiComponent {
             return a.id.localeCompare(b.id) * direction;
             
           case 'createDate':
-             // แปลง dd/MM/yyyy -> yyyyMMdd เพื่อ sort
             valA = a.createDate.split('/').reverse().join('');
             valB = b.createDate.split('/').reverse().join('');
             return valA.localeCompare(valB) * direction;
@@ -109,19 +102,16 @@ export class VehicleTaxiComponent {
             return a.status.localeCompare(b.status) * direction;
 
           case 'amount':
-            // Sort ด้วยยอดเงินรวม
             valA = a.items.reduce((sum, i) => sum + i.amount, 0);
             valB = b.items.reduce((sum, i) => sum + i.amount, 0);
             return (valA - valB) * direction;
 
           case 'distance':
-            // Sort ด้วยระยะทางรวม
             valA = a.items.reduce((sum, i) => sum + i.distance, 0);
             valB = b.items.reduce((sum, i) => sum + i.distance, 0);
             return (valA - valB) * direction;
 
           case 'requestDate':
-            // ใช้วันที่แรกสุดของรายการ
             valA = a.items[0]?.requestDate.split('/').reverse().join('') || '';
             valB = b.items[0]?.requestDate.split('/').reverse().join('') || '';
             return valA.localeCompare(valB) * direction;

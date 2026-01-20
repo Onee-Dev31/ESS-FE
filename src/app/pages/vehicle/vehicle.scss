@@ -1,33 +1,53 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// Variables
 $header-bg: #343a40;
 $btn-create-bg: #28a745;
 $btn-search-bg: #003e6d;
 $text-header: #ffffff;
 $border-color: #e9ecef;
 $bg-page: #f8f9fa;
-// Font Stack
 $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+
+@mixin mobile {
+  @media (max-width: 575.98px) { @content; }
+}
+@mixin tablet {
+  @media (max-width: 991.98px) { @content; }
+}
 
 .vehicle-page {
   padding: 20px;
   background-color: $bg-page;
   font-family: $font-stack;
   min-height: 100vh;
+  box-sizing: border-box;
+
+  @include mobile {
+    padding: 10px;
+  }
 
   .top-header-strip {
     background-color: #e2e6ea;
     padding: 15px 20px;
     border-radius: 4px;
     margin-bottom: 20px;
+
     h2 {
       margin: 0;
       font-size: 1.2rem;
       font-weight: 700;
       color: #000;
       font-family: $font-stack;
+
+      @include mobile {
+        font-size: 1.1rem;
+      }
+    }
+
+    @include mobile {
+      padding: 12px 15px;
+      margin-bottom: 15px;
     }
   }
 
@@ -36,6 +56,8 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding-bottom: 20px;
+    width: 100%;
+    overflow: hidden;
   }
 
   .card-header-title {
@@ -44,6 +66,11 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     font-weight: 600;
     color: #333;
     font-family: $font-stack;
+
+    @include mobile {
+      padding: 15px;
+      font-size: 1rem;
+    }
   }
 
   .toolbar-container {
@@ -53,6 +80,14 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
+
+    @include mobile {
+      padding: 0 15px 15px 15px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
     .left-action .btn-create {
       background-color: $btn-create-bg;
       color: white;
@@ -64,18 +99,47 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       cursor: pointer;
       display: flex;
       align-items: center;
+      justify-content: center; 
       gap: 8px;
+      white-space: nowrap;
+
       &:hover {
         background-color: color.adjust($btn-create-bg, $lightness: -5%);
       }
+
+      @include mobile {
+        width: 100%;
+        padding: 12px;
+        order: 2;
+      }
     }
+
     .right-filters {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
 
-      .ml-2 { margin-left: 8px; }
+      @include tablet {
+        flex: 1;
+      }
+
+      @include mobile {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        order: 1;
+      }
+
+      .ml-2 { 
+        margin-left: 8px;
+        @include mobile { margin-left: 0; }
+      }
+
       .select-input-group {
+        @include mobile { width: 100%; }
+
         .select-status {
           padding: 6px 10px;
           border: 1px solid #ced4da;
@@ -84,10 +148,16 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           font-family: $font-stack;
           cursor: pointer;
           min-width: 150px;
+          
           &:focus {
             border-color: #1a73e8;
             outline: none;
             box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+          }
+
+          @include mobile {
+            width: 100%;
+            height: 40px;
           }
         }
       }
@@ -97,7 +167,10 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 0.9rem;
         color: #333;
         font-family: $font-stack;
+        
+        @include mobile { display: none; }
       }
+
       .form-control {
         padding: 6px 10px;
         border: 1px solid #ced4da;
@@ -106,10 +179,17 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 0.9rem;
         outline: none;
         font-family: $font-stack;
+        
         &:focus {
           border-color: $btn-search-bg;
         }
+
+        @include mobile {
+          width: 100%;
+          height: 40px;
+        }
       }
+
       .btn-search {
         background-color: $btn-search-bg;
         color: white;
@@ -119,8 +199,15 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-weight: 500;
         font-family: $font-stack;
         cursor: pointer;
+
         &:hover {
           background-color: color.adjust($btn-search-bg, $lightness: 5%);
+        }
+
+        @include mobile {
+          width: 100%;
+          padding: 10px;
+          margin-top: 5px;
         }
       }
     }
@@ -129,11 +216,15 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   .table-responsive {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; 
+    border-top: 1px solid $border-color;
   }
 
   .modern-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 1000px; 
+
     thead {
       background-color: $header-bg;
       tr th {
@@ -148,6 +239,8 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         
         &.text-center { text-align: center !important; }
         &.text-right { text-align: right !important; }
+
+        @include mobile { padding: 12px 8px; }
       }
     }
     tbody {
@@ -161,7 +254,10 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           font-size: 0.9rem;
           font-family: $font-stack;
           
-          // เอาตัว force inherit ออก เพื่อไม่ให้ทับ Icon
+          @include mobile {
+            padding: 10px 8px;
+            font-size: 0.85rem;
+          }
           
           &.text-center { text-align: center !important; }
           &.text-right { text-align: right !important; }
@@ -216,6 +312,12 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           font-family: $font-stack;
           margin: 0 auto;
 
+          @include mobile {
+            min-width: auto;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+          }
+
           &.status-pending { background-color: rgba(255, 193, 7, 0.15); color: #f1b44c; }
           &.status-dept { background-color: rgba(23, 162, 184, 0.15); color: #17a2b8; }
           &.status-hr { background-color: rgba(0, 123, 255, 0.15); color: #007bff; }
@@ -247,6 +349,11 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   align-items: center;
   backdrop-filter: blur(4px);
 
+  @include mobile {
+    padding: 0;
+    align-items: flex-end;
+  }
+
   .modal-container {
     background: white;
     width: 95%;
@@ -259,6 +366,13 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     overflow: hidden;
     position: relative;
     font-family: $font-stack;
+
+    @include mobile {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+    }
 
     app-vehicle-form {
       flex: 1;

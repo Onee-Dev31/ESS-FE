@@ -32,13 +32,10 @@ interface VehicleRequest {
 export class VehicleComponent implements OnInit {
   isModalOpen: boolean = false;
   selectedRequestId: string = '';
-
-  // สำหรับฟังก์ชันค้นหา
   filterStartDate: string = '';
   filterEndDate: string = '';
   filterStatus: string = '';
   
-  // ข้อมูล Mockup
   allRequests = signal<VehicleRequest[]>([
     {
       id: '2701#001',
@@ -66,11 +63,9 @@ export class VehicleComponent implements OnInit {
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  // --- Logic การ Filter และ Sort Group ---
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
-    // 1. Filter
     if (this.filterStatus) {
       filtered = filtered.filter(r => r.status === this.filterStatus);
     }
@@ -81,7 +76,6 @@ export class VehicleComponent implements OnInit {
       filtered = filtered.filter(r => r.createDate <= this.filterEndDate);
     }
 
-    // 2. Sort Groups
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -98,20 +92,16 @@ export class VehicleComponent implements OnInit {
           case 'status':
             return a.status.localeCompare(b.status) * direction;
           case 'amount':
-            // รวมยอดเงินทั้งหมดใน Group แล้วเทียบกัน
             valA = a.items.reduce((sum, item) => sum + item.amount, 0);
             valB = b.items.reduce((sum, item) => sum + item.amount, 0);
             return (valA - valB) * direction;
           case 'date': 
-            // ใช้วันที่ของรายการแรกสุดใน Group
             valA = a.items[0]?.date || '';
             valB = b.items[0]?.date || '';
-            // แปลง dd/MM/yyyy -> yyyyMMdd เพื่อเทียบ String
             const dA = valA.split('/').reverse().join('');
             const dB = valB.split('/').reverse().join('');
             return dA.localeCompare(dB) * direction;
           case 'desc':
-             // ใช้ Description ของรายการแรก
              valA = a.items[0]?.desc || '';
              valB = b.items[0]?.desc || '';
              return valA.localeCompare(valB) * direction;
@@ -124,13 +114,12 @@ export class VehicleComponent implements OnInit {
     return filtered;
   });
 
-  // Table Configuration
   table = createAngularTable(() => ({
     data: this.processedData(),
     columns: [
       { accessorKey: 'id', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
-      { accessorKey: 'items', header: 'รายละเอียด' }, // Placeholder fields
+      { accessorKey: 'items', header: 'รายละเอียด' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
     state: {
@@ -143,7 +132,6 @@ export class VehicleComponent implements OnInit {
       this.sorting.set(nextSorting);
     },
     getCoreRowModel: getCoreRowModel(),
-    // ไม่ใช้ getSortedRowModel() เพราะเรา Sort ที่ processedData เองแล้ว
   }));
 
   ngOnInit() {}
@@ -158,15 +146,11 @@ export class VehicleComponent implements OnInit {
     }
   }
 
-  // --- Sort Helper Functions ---
-
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) {
       column.toggleSorting(column.getIsSorted() === 'asc');
     } else {
-        // Fallback ถ้า column ไม่ได้ define ใน columns definition ตรงๆ
-        // เราสามารถ set sorting signal ได้โดยตรง
         const currentSort = this.sorting()[0];
         if (currentSort?.id === columnId) {
             this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);

@@ -1,7 +1,6 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// Variables
 $primary: #1a73e8;
 $success: #1e8e3e;
 $danger: #d93025;
@@ -9,20 +8,16 @@ $border: #dee2e6;
 $text: #202124;
 $text-sub: #5f6368;
 
-// Font Variable
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
-.vehicle-form-page { // เปลี่ยนชื่อ Class ตรงนี้
+.vehicle-form-page {
   display: flex;
   flex-direction: column;
   height: 100%;
   background: #fff;
-  
-  // เรียกใช้ Font
   font-family: $font-main;
   overflow: hidden;
 
-  // Force Font
   input, button, select, textarea {
     font-family: $font-main;
   }

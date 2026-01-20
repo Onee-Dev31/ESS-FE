@@ -1,7 +1,6 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// Variables
 $primary: #1a73e8;
 $success: #1e8e3e;
 $danger: #d93025;
@@ -9,7 +8,6 @@ $border: #dee2e6;
 $text: #202124;
 $text-sub: #5f6368;
 
-// Font Variable
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 .allowance-form-page {
@@ -17,8 +15,6 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   flex-direction: column;
   height: 100%;
   background: #fff;
-  
-  // เรียกใช้ Font จากตัวแปร
   font-family: $font-main;
   overflow: hidden;
 
@@ -95,23 +91,20 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     }
   }
 
-  // --- ส่วน Policy Note (แก้ปัญหา: แถวเดียว + ไม่ล้นจอ) ---
   .allowance-policy-note {
-    box-sizing: border-box; // ป้องกัน padding ดันกรอบล้น
+    box-sizing: border-box;
     width: 100%;
-    max-width: 100%; // กันเหนียวไม่ให้เกินแม่
+    max-width: 100%;
 
     margin-bottom: 16px;
     background: #fcfcfc;
     border: 1px dashed #d1d3d4;
     border-radius: 8px;
     padding: 10px 16px;
-    
-    // Flex Layout: เรียงต่อกัน และยอมให้ปัดตกบรรทัด (Wrap)
     display: flex;
     flex-wrap: wrap; 
     align-items: center;
-    gap: 4px 8px; // ระยะห่างแนวตั้ง 4px, แนวนอน 8px
+    gap: 4px 8px; 
 
     font-size: 0.8rem;
     color: #444;
@@ -123,7 +116,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       align-items: center;
       gap: 6px;
       font-weight: 600;
-      white-space: nowrap; // หัวข้อห้ามตัดคำ
+      white-space: nowrap;
       margin-right: 4px;
       i { font-size: 0.9rem; }
     }
@@ -131,7 +124,6 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     .note-desc {
       display: inline;
       margin-right: 4px;
-      // ปล่อยให้ตัดคำได้ตามปกติ (default)
     }
 
     .note-rates {
@@ -141,7 +133,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       gap: 6px 10px;
       
       span {
-        white-space: nowrap; // เรทราคาแต่ละอันห้ามขาด
+        white-space: nowrap;
         strong {
           color: $danger;
           font-weight: 600;
