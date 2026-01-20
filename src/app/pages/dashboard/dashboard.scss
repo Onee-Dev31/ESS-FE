@@ -699,27 +699,33 @@ body {
   border: none;
   border-radius: 8px;
 
+  .stat-percent {
+    font-size: 16px;
+    font-weight: 700; 
+
+  }
+
   .stat-label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: $dark;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 5px;
     .label-small {
       color: $muted;
-      font-weight: 400;
-      font-size: 11px;
+      font-weight: 300;
+      font-size: 14px;
     }
   }
   .stat-row {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 15px;
     margin-bottom: 8px;
-    font-weight: 600;
+    font-weight: 500;
   }
   .stat-progress {
     height: 6px;
@@ -805,7 +811,7 @@ body {
       margin: 0;
       font-size: 20px;
       @media (min-width: 768px) {
-        font-size: 22px;
+        font-size: 20px;
       }
       font-weight: 700;
       color: $dark;
@@ -866,7 +872,7 @@ body {
       margin-bottom: 10px;
       .leave-count {
         margin: 0;
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 700;
       }
       .leave-icon {

@@ -43,74 +43,72 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 14%; cursor: pointer" (click)="sortByRequestId()">
+            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('id')">
               เลขที่การเบิก
-              <i
-                class="fas ml-1"
-                [ngClass]="{
-                  'fa-sort-amount-up': table.getColumn('id')?.getIsSorted() === 'asc',
-                  'fa-sort-amount-down-alt': table.getColumn('id')?.getIsSorted() === 'desc',
-                  'fa-sort': !table.getColumn('id')?.getIsSorted()
-                }"
-              >
-              </i>
+              <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
             </th>
-            <th style="width: 12%">วันที่สร้างรายการ</th>
-            <th style="width: 12%">วันที่ขอเบิก</th>
-            <th>รายละเอียด</th>
-            <th style="width: 10%; text-align: right">จำนวนเงิน</th>
-            <th style="width: 12%; text-align: center">สถานะ</th>
-            <th style="width: 10%; text-align: center">Action</th>
+
+            <th style="width: 12%; cursor: pointer" (click)="toggleSort('createDate')">
+              วันที่สร้างรายการ
+              <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
+            </th>
+
+            <th style="width: 12%; cursor: pointer" (click)="toggleSort('date')">
+              วันที่ขอเบิก
+              <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
+            </th>
+
+            <th style="cursor: pointer" (click)="toggleSort('desc')">
+              รายละเอียด
+              <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
+            </th>
+
+            <th style="width: 10%; cursor: pointer" class="text-right" (click)="toggleSort('amount')">
+              จำนวนเงิน
+              <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+
+            <th style="width: 15%; cursor: pointer" class="text-center" (click)="toggleSort('status')">
+              สถานะ
+              <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            </th>
+
+            <th style="width: 10%" class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
           <ng-container *ngFor="let row of table.getRowModel().rows">
-            <tr
-              *ngFor="let item of row.original.items; let i = index"
-              [class.group-end]="i === row.original.items.length - 1"
-            >
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="row.original.items.length"
-                class="merged-col top-align"
-              >
+            <tr *ngFor="let item of row.original.items; let i = index"
+              [class.group-end]="i === row.original.items.length - 1">
+              
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
                 <span class="id-text">{{ row.original.id }}</span>
               </td>
 
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="row.original.items.length"
-                class="merged-col top-align"
-              >
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
                 {{ row.original.createDate | date : 'dd/MM/yyyy' }}
               </td>
 
               <td>{{ item.date }}</td>
+              
               <td>
                 <div class="desc-wrapper">
                   <i class="fas fa-car-side text-muted" style="margin-right: 8px"></i>
                   {{ item.desc }}
                 </div>
               </td>
-              <td style="text-align: right; font-family: monospace; font-weight: 600">
+              
+              <td class="text-right" style="font-weight: 600">
                 {{ item.amount | number : '1.2-2' }}
               </td>
 
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="row.original.items.length"
-                class="merged-col text-center top-align"
-              >
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
                 <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                   {{ row.original.status }}
                 </span>
               </td>
 
-              <td
-                *ngIf="i === 0"
-                [attr.rowspan]="row.original.items.length"
-                class="merged-col text-center top-align"
-              >
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
                 <div class="action-btns">
                   <button class="btn-icon edit" (click)="openCreateModal(row.original.id)">
                     <i class="far fa-edit"></i>
@@ -122,7 +120,7 @@
               </td>
             </tr>
           </ng-container>
-          <tr *ngIf="data().length === 0">
+          <tr *ngIf="table.getRowModel().rows.length === 0">
             <td colspan="7" style="text-align: center; padding: 40px; color: #999">
               ไม่พบรายการที่ตรงตามเงื่อนไข
             </td>

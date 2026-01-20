@@ -8,11 +8,13 @@ $btn-search-bg: #003e6d;
 $text-header: #ffffff;
 $border-color: #e9ecef;
 $bg-page: #f8f9fa;
+// Font Stack
+$font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 .vehicle-page {
   padding: 20px;
   background-color: $bg-page;
-  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  font-family: $font-stack;
   min-height: 100vh;
 
   .top-header-strip {
@@ -25,7 +27,7 @@ $bg-page: #f8f9fa;
       font-size: 1.2rem;
       font-weight: 700;
       color: #000;
-      font-family: inherit;
+      font-family: $font-stack;
     }
   }
 
@@ -41,7 +43,7 @@ $bg-page: #f8f9fa;
     font-size: 1.1rem;
     font-weight: 600;
     color: #333;
-    font-family: inherit;
+    font-family: $font-stack;
   }
 
   .toolbar-container {
@@ -58,7 +60,7 @@ $bg-page: #f8f9fa;
       padding: 8px 20px;
       border-radius: 4px;
       font-weight: 600;
-      font-family: inherit;
+      font-family: $font-stack;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -72,19 +74,16 @@ $bg-page: #f8f9fa;
       align-items: center;
       gap: 10px;
 
-      .ml-2 {
-        margin-left: 8px;
-      }
+      .ml-2 { margin-left: 8px; }
       .select-input-group {
         .select-status {
           padding: 6px 10px;
           border: 1px solid #ced4da;
           border-radius: 6px;
           background-color: white;
-          font-family: inherit;
+          font-family: $font-stack;
           cursor: pointer;
           min-width: 150px;
-
           &:focus {
             border-color: #1a73e8;
             outline: none;
@@ -97,7 +96,7 @@ $bg-page: #f8f9fa;
         font-weight: 500;
         font-size: 0.9rem;
         color: #333;
-        font-family: inherit;
+        font-family: $font-stack;
       }
       .form-control {
         padding: 6px 10px;
@@ -106,7 +105,7 @@ $bg-page: #f8f9fa;
         color: #495057;
         font-size: 0.9rem;
         outline: none;
-        font-family: inherit;
+        font-family: $font-stack;
         &:focus {
           border-color: $btn-search-bg;
         }
@@ -118,7 +117,7 @@ $bg-page: #f8f9fa;
         padding: 7px 20px;
         border-radius: 4px;
         font-weight: 500;
-        font-family: inherit;
+        font-family: $font-stack;
         cursor: pointer;
         &:hover {
           background-color: color.adjust($btn-search-bg, $lightness: 5%);
@@ -143,9 +142,12 @@ $bg-page: #f8f9fa;
         font-size: 0.85rem;
         padding: 15px 12px;
         border: none;
-        text-align: left;
+        text-align: left; 
         white-space: nowrap;
-        font-family: inherit;
+        font-family: $font-stack;
+        
+        &.text-center { text-align: center !important; }
+        &.text-right { text-align: right !important; }
       }
     }
     tbody {
@@ -154,41 +156,54 @@ $bg-page: #f8f9fa;
         background-color: #fff;
         td {
           padding: 12px 12px;
-          vertical-align: middle;
+          vertical-align: middle; 
           color: #495057;
           font-size: 0.9rem;
-          font-family: inherit;
+          font-family: $font-stack;
+          
+          // เอาตัว force inherit ออก เพื่อไม่ให้ทับ Icon
+          
+          &.text-center { text-align: center !important; }
+          &.text-right { text-align: right !important; }
         }
+        
+        .merged-col {
+          background-color: #fff;
+          border-bottom: none;
+          vertical-align: middle !important; 
+        }
+
         .top-align {
-          vertical-align: top;
+          vertical-align: top !important;
         }
+        
         .id-text {
           font-weight: 700;
           color: #0056b3;
+          font-family: $font-stack;
         }
         .text-muted {
           color: #adb5bd;
         }
+
         .action-btns {
           display: flex;
           justify-content: center;
+          align-items: center;
           gap: 8px;
+          margin: 0 auto;
+          
           .btn-icon {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 1.1rem;
-            &.edit {
-              color: #17a2b8;
-            }
-            &.delete {
-              color: #dc3545;
-            }
-            &:hover {
-              transform: scale(1.1);
-            }
+            &.edit { color: #17a2b8; }
+            &.delete { color: #dc3545; }
+            &:hover { transform: scale(1.1); }
           }
         }
+
         .status-badge {
           display: inline-block;
           padding: 5px 10px;
@@ -198,32 +213,16 @@ $bg-page: #f8f9fa;
           white-space: nowrap;
           min-width: 100px;
           text-align: center;
-          font-family: inherit;
-          &.status-pending {
-            background-color: rgba(255, 193, 7, 0.15);
-            color: #f1b44c;
-          }
-          &.status-dept {
-            background-color: rgba(23, 162, 184, 0.15);
-            color: #17a2b8;
-          }
-          &.status-hr {
-            background-color: rgba(0, 123, 255, 0.15);
-            color: #007bff;
-          }
-          &.status-ceo {
-            background-color: rgba(111, 66, 193, 0.15);
-            color: #6f42c1;
-          }
-          &.status-success {
-            background-color: rgba(40, 167, 69, 0.15);
-            color: #28a745;
-          }
+          font-family: $font-stack;
+          margin: 0 auto;
+
+          &.status-pending { background-color: rgba(255, 193, 7, 0.15); color: #f1b44c; }
+          &.status-dept { background-color: rgba(23, 162, 184, 0.15); color: #17a2b8; }
+          &.status-hr { background-color: rgba(0, 123, 255, 0.15); color: #007bff; }
+          &.status-ceo { background-color: rgba(111, 66, 193, 0.15); color: #6f42c1; }
+          &.status-success { background-color: rgba(40, 167, 69, 0.15); color: #28a745; }
         }
-        .merged-col {
-          background-color: #fff;
-          border-bottom: none;
-        }
+
         &.group-end {
           border-bottom: 2px solid #dee2e6;
           .merged-col {
@@ -259,34 +258,21 @@ $bg-page: #f8f9fa;
     flex-direction: column;
     overflow: hidden;
     position: relative;
+    font-family: $font-stack;
+
     app-vehicle-form {
       flex: 1;
       overflow-y: auto;
-      &::-webkit-scrollbar {
-        width: 8px;
-      }
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-      }
-      &::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-      }
+      &::-webkit-scrollbar { width: 8px; }
+      &::-webkit-scrollbar-track { background: #f1f1f1; }
+      &::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+      &::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
     }
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }
 
 @keyframes popIn {
-  from {
-    transform: scale(0.9) translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }

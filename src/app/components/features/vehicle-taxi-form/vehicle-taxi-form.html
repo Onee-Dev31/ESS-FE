@@ -1,14 +1,15 @@
-<div class="allowance-form-page">
-  <div class="top-header-strip">
-    <h2>รายละเอียดการเบิกค่าแท็กซี่</h2>
-    <button class="btn-close-modal" (click)="cancel()">×</button>
-  </div>
+<div class="vehicle-taxi-form-page">
+  <header class="top-header-strip">
+    <h2>บันทึกข้อมูลค่าเดินทาง (Taxi)</h2>
+    <button class="btn-close-modal" (click)="cancel()">✕</button>
+  </header>
 
-  <div class="content-card">
-    <div class="filter-section">
+  <main class="content-card">
+    
+    <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
-        <select class="form-control" style="width: 120px;">
+        <select class="form-control" style="width: 140px;">
           <option>ตุลาคม</option>
         </select>
         <select class="form-control" style="width: 100px;">
@@ -16,82 +17,100 @@
         </select>
         <button class="btn-search">ค้นหาข้อมูล</button>
       </div>
-    </div>
+    </section>
 
     <div class="action-bar">
       <button class="btn-submit" (click)="save()">ยืนยันการเบิก</button>
-
+      
       <!-- <div class="allowance-policy-note">
         <div class="policy-title">
-          <i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณค่าพาหนะ (แท็กซี่)
+          <i class="fas fa-info-circle"></i> หมายเหตุ
         </div>
         <div class="policy-content">
-          <p>ทำงานหลังเวลา 20:30 น. หรือตามที่ได้รับอนุมัติพิเศษ อัตราการจ่ายตามจริง:</p>
-          <div class="rate-grid">
-            <span>ไม่เกิน <strong>500.-</strong> / เที่ยว</span>
-            <span>ต้องแนบ <strong>หลักฐาน/ใบเสร็จ</strong></span>
-            <span>ระยะทางอ้างอิง <strong>Google Maps</strong></span>
-          </div>
+          <p style="margin:0;">กรุณาแนบไฟล์ใบเสร็จให้ครบถ้วนทุกรายการที่มีการเบิก</p>
         </div>
       </div> -->
 
       <div class="info-badges">
-        <div class="request-id-badge">เลขที่การเบิก : 2601-005</div>
-        <div class="right-info">รหัสกะ : 001 | 09:00 - 18:00</div>
+        <span class="request-id-badge">เลขที่การเบิก : 2601-005</span>
+        <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
       </div>
     </div>
 
     <div class="table-container">
-      <div class="table-responsive">
-        <table class="excel-table">
-          <thead>
-            <tr>
-              <th rowspan="2" style="width: 45px;"><input type="checkbox"></th>
-              <th rowspan="2" style="width: 100px;">วันที่</th>
-              <th rowspan="2" style="width: 60px;">ประเภท</th>
-              <th colspan="2">เวลาทำงาน</th>
-              <th rowspan="2">รายละเอียดการเบิก</th>
-              <th rowspan="2">จุดหมาย</th>
-              <th rowspan="2" style="width: 100px;">ระยะทาง(Km.)</th>
-              <th rowspan="2" style="width: 110px;">จำนวนเงิน</th>
-              <th rowspan="2" style="width: 110px;">Action</th>
-            </tr>
-            <tr class="sub-header">
-              <th style="width: 80px;">เข้า</th>
-              <th style="width: 80px;">ออก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items" [class.highlight-row]="item.selected" [class.bg-gray]="item.type === 'H'">
-              <td class="text-center"><input type="checkbox" [(ngModel)]="item.selected"></td>
-              <td class="text-center">{{ item.date }}</td>
-              <td class="text-center">{{ item.type }}</td>
-              <td class="text-center">{{ item.checkIn || '-' }}</td>
-              <td class="text-center">{{ item.checkOut || '-' }}</td>
-              <td class="desc-cell"><input type="text" class="table-input" [(ngModel)]="item.desc" [disabled]="!item.selected"></td>
-              <td class="desc-cell"><input type="text" class="table-input" [(ngModel)]="item.destination" [disabled]="!item.selected"></td>
-              <td class="desc-cell"><input type="number" class="table-input text-center" [(ngModel)]="item.distance" [disabled]="!item.selected"></td>
-              <td class="desc-cell"><input type="number" class="table-input text-right font-bold" [(ngModel)]="item.amount" [disabled]="!item.selected"></td>
-              <td class="text-center">
-                <div style="display: flex; justify-content: center; gap: 8px;">
-                  <i class="fas fa-folder-open" style="color: #9575cd; cursor: pointer;"></i>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <table class="excel-table total-footer">
-        <tfoot>
+      <table class="excel-table">
+        <colgroup>
+          <col style="width: 50px" />
+          <col style="width: 100px" />
+          <col style="width: 70px" />
+          <col style="width: 70px" />
+          <col style="width: 70px" />
+          <col style="width: auto" /> <col style="width: auto" /> <col style="width: 80px" /> <col style="width: 100px" /> <col style="width: 60px" /> </colgroup>
+
+        <thead>
           <tr>
-            <td style="border-top: 2px solid #dee2e6; text-align: right; padding-right: 20px; font-weight: 600;">ยอดรวม</td>
-            <td style="width: 110px; border-top: 2px solid #dee2e6; background: #e6f4ea; color: #1e8e3e; font-weight: 700; text-align: center;">
-              {{ getTotalAmount() | number:'1.0-0' }}
+            <th rowspan="2">เลือก</th>
+            <th rowspan="2">วันที่</th>
+            <th rowspan="2">ประเภท</th>
+            <th colspan="2" class="col-time-header">เวลาทำงาน</th>
+            <th rowspan="2">รายละเอียดการเบิก</th>
+            <th rowspan="2">จุดหมาย</th>
+            <th rowspan="2">ระยะทาง<br>(Km.)</th>
+            <th rowspan="2">จำนวนเงิน</th>
+            <th rowspan="2">ไฟล์</th>
+          </tr>
+          <tr class="sub-header">
+            <th class="col-time-header">เข้า</th>
+            <th class="col-time-header">ออก</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let item of items" [class.highlight-row]="item.selected">
+            <td class="text-center">
+              <input type="checkbox" [(ngModel)]="item.selected" />
             </td>
-            <td style="width: 110px; border-top: 2px solid #dee2e6; background: #fcfcfc;"></td>
+            <td class="text-center bg-gray">{{ item.date }}</td>
+            <td class="text-center bg-gray font-bold" [style.color]="item.type === 'H' ? '#d93025' : '#3c4043'">
+              {{ item.type }}
+            </td>
+            <td class="p-0"><input type="text" class="time-input" [ngModel]="item.checkIn || '-'" readonly /></td>
+            <td class="p-0"><input type="text" class="time-input" [ngModel]="item.checkOut || '-'" readonly /></td>
+            
+            <td class="desc-cell">
+              <div class="input-container">
+                <input type="text" class="table-input" [(ngModel)]="item.desc" [disabled]="!item.selected" placeholder="รายละเอียด..." />
+              </div>
+            </td>
+            <td class="desc-cell">
+              <div class="input-container">
+                <input type="text" class="table-input" [(ngModel)]="item.destination" [disabled]="!item.selected" placeholder="ระบุจุดหมาย" />
+              </div>
+            </td>
+            <td class="desc-cell">
+              <div class="input-container">
+                <input type="number" class="table-input text-center" [(ngModel)]="item.distance" [disabled]="!item.selected" />
+              </div>
+            </td>
+            <td class="desc-cell">
+              <div class="input-container">
+                <input type="number" class="table-input text-right font-bold" [(ngModel)]="item.amount" [disabled]="!item.selected" />
+              </div>
+            </td>
+            <td class="text-center">
+              <button class="btn-icon-folder"><i class="fas fa-solid fa-file-arrow-up"></i></button>
+            </td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr class="footer-row">
+            <td colspan="8" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
+            <td class="total-val text-center">{{ getTotalAmount() | number }}</td>
+            <td class="bg-white"></td>
           </tr>
         </tfoot>
       </table>
     </div>
-  </div>
+  </main>
 </div>

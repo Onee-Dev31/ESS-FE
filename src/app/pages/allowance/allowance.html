@@ -15,9 +15,13 @@
 
       <div class="right-filters">
         <span class="filter-label">วันที่สร้างรายการ</span>
-        <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
-        <span class="filter-label">ถึง</span>
-        <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+        <div class="date-input-group">
+          <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
+        </div>
+        <span class="filter-label ml-2">ถึง</span>
+        <div class="date-input-group">
+          <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+        </div>
 
         <span class="filter-label ml-2">สถานะ</span>
         <div class="select-input-group">
@@ -37,44 +41,63 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 14%; cursor: pointer; text-align: center;" (click)="sortByRequestId()">
-              เลขที่การเบิก
-              <i class="fas ml-1" [ngClass]="{
-                  'fa-sort-amount-up': table.getColumn('requestId')?.getIsSorted() === 'asc',
-                  'fa-sort-amount-down-alt': table.getColumn('requestId')?.getIsSorted() === 'desc',
-                  'fa-sort': !table.getColumn('requestId')?.getIsSorted()
-                }">
-              </i>
+            <th style="width: 12%; cursor: pointer; text-align: center;" (click)="toggleSort('requestId')">
+              เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
             </th>
-            <th style="width: 10%; text-align: center;">วันที่สร้างรายการ</th>
-            <th style="width: 10%; text-align: center;">วันที่ขอเบิก</th>
-            <th style="width: 20%; text-align: center;">รายละเอียด</th>
-            <th style="width: 14%; text-align: center">จำนวนชั่วโมง</th>
-            <th style="width: 10%; text-align: center">จำนวนเงิน</th>
-            <th style="width: 15%; text-align: center">สถานะ</th>
+            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('createDate')">
+              วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
+            </th>
+            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('date')">
+              วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
+            </th>
+            <th style="width: 20%; cursor: pointer; text-align: center;" (click)="toggleSort('desc')">
+              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
+            </th>
+            <th style="width: 14%; cursor: pointer; text-align: center;" (click)="toggleSort('hours')">
+              จำนวนชั่วโมง <i class="fas ml-1" [ngClass]="getSortIcon('hours')"></i>
+            </th>
+            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('amount')">
+              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+            <th style="width: 15%; cursor: pointer; text-align: center;" (click)="toggleSort('status')">
+              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of table.getRowModel().rows">
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="text-center top-align">
+            
+            <td *ngIf="row.original.isFirstInGroup" 
+                [attr.rowspan]="row.original.groupLength" 
+                class="text-center top-align merged-col">
               <span class="id-text">{{ row.original.requestId }}</span>
             </td>
 
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="text-center top-align">
+            <td *ngIf="row.original.isFirstInGroup" 
+                [attr.rowspan]="row.original.groupLength" 
+                class="text-center top-align merged-col">
               {{ row.original.createDate | date: 'dd/MM/yyyy' }}
             </td>
 
             <td class="text-center top-align">{{ row.original.date }}</td>
-            <td class="desc-cell top-align text-center">{{ row.original.desc }}</td>
+            <td class="desc-cell top-align text-left">{{ row.original.desc }}</td>
             <td class="text-center top-align">{{ row.original.hours }}</td>
             <td class="text-center font-bold">
               {{ row.original.amount | number: '1.2-2' }}
             </td>
 
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength" class="v-middle text-center">
+            <td *ngIf="row.original.isFirstInGroup" 
+                [attr.rowspan]="row.original.groupLength" 
+                class="v-middle text-center merged-col">
               <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                 {{ row.original.status }}
               </span>
+            </td>
+
+          </tr>
+           <tr *ngIf="table.getRowModel().rows.length === 0">
+            <td colspan="7" style="text-align: center; padding: 40px; color: #999">
+              ไม่พบรายการที่ตรงตามเงื่อนไข
             </td>
           </tr>
         </tbody>

@@ -15,9 +15,14 @@
 
       <div class="right-filters">
         <span class="filter-label">วันที่สร้างรายการ</span>
-        <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
+        <div class="date-input-group">
+          <input type="date" class="form-control" [(ngModel)]="filterStartDate" />
+        </div>
         <span class="to-text">ถึง</span>
-        <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+        <div class="date-input-group">
+          <input type="date" class="form-control" [(ngModel)]="filterEndDate" />
+        </div>
+
         <span class="filter-label ml-2">สถานะ</span>
         <div class="select-input-group">
           <select class="form-control select-status" [(ngModel)]="filterStatus">
@@ -29,7 +34,8 @@
             <option value="ACC อนุมัติ">ACC อนุมัติ</option>
           </select>
         </div>
-        <button class="btn-search">ค้นหา</button>
+
+        <button class="btn-search" (click)="onSearch()">ค้นหา</button>
       </div>
     </div>
 
@@ -37,43 +43,101 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 12%;">เลขที่การเบิก</th>
-            <th style="width: 10%;">วันที่สร้าง</th>
-            <th style="width: 10%;">วันที่ขอเบิก</th>
-            <th>รายละเอียด</th>
-            <th style="width: 12%;">จุดหมาย</th>
-            <th style="width: 8%;">ระยะทาง(Km.)</th>
-            <th style="width: 8%;">จำนวนเงิน</th>
-            <th style="width: 12%;">สถานะ</th>
-            <th style="width: 10%;">Action</th>
+            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('id')">
+              เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+            </th>
+
+            <th style="width: 10%; cursor: pointer" (click)="toggleSort('createDate')">
+              วันที่สร้าง <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
+            </th>
+
+            <th style="width: 10%; cursor: pointer" (click)="toggleSort('requestDate')">
+              วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+            </th>
+
+            <th style="cursor: pointer" (click)="toggleSort('desc')">
+              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
+            </th>
+
+            <th style="width: 12%; cursor: pointer" (click)="toggleSort('destination')">
+              จุดหมาย <i class="fas ml-1" [ngClass]="getSortIcon('destination')"></i>
+            </th>
+
+            <th style="width: 8%; cursor: pointer" class="text-center" (click)="toggleSort('distance')">
+              ระยะทาง(Km.) <i class="fas ml-1" [ngClass]="getSortIcon('distance')"></i>
+            </th>
+
+            <th style="width: 8%; cursor: pointer" class="text-right" (click)="toggleSort('amount')">
+              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+
+            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('status')">
+              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            </th>
+
+            <th style="width: 10%;" class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let row of tableData">
-            <tr *ngFor="let item of row.items; let i = index" [class.group-end]="i === row.items.length - 1">
-              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align id-text">
-                {{ row.id }}
+          <ng-container *ngFor="let row of table.getRowModel().rows">
+            <tr *ngFor="let item of row.original.items; let i = index" 
+                [class.group-end]="i === row.original.items.length - 1">
+              
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" 
+                  class="merged-col top-align text-center">
+                <span class="id-text">{{ row.original.id }}</span>
               </td>
-              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
-                {{ row.createDate }}
+
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" 
+                  class="merged-col top-align">
+                {{ row.original.createDate }}
               </td>
+
               <td class="text-center">{{ item.requestDate }}</td>
-              <td>{{ item.desc }}</td>
-              <td>{{ item.destination }}</td>
-              <td class="text-center">{{ item.distance | number:'1.2-2' }}</td>
-              <td class="text-right font-bold">{{ item.amount | number }}</td>
-              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
-                <span class="status-badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span>
+              
+              <td>
+                 <div class="desc-wrapper">
+                  <i class="fas fa-taxi text-muted" style="margin-right: 8px;"></i>
+                  {{ item.desc }}
+                 </div>
               </td>
-              <td *ngIf="i === 0" [attr.rowspan]="row.items.length" class="merged-col text-center top-align">
+
+              <td>{{ item.destination }}</td>
+
+              <td class="text-center">{{ item.distance | number:'1.2-2' }}</td>
+
+              <td class="text-right" style="font-weight: 600;">
+                {{ item.amount | number:'1.2-2' }}
+              </td>
+
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" 
+                  class="merged-col text-center">
+                <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                  {{ row.original.status }}
+                </span>
+              </td>
+
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" 
+                  class="merged-col text-center">
                 <div class="action-btns">
-                  <button class="btn-icon edit"><i class="far fa-edit"></i></button>
-                  <button class="btn-icon delete"><i class="far fa-trash-alt"></i></button>
-                  <button class="btn-icon folder"><i class="far fa-folder-open"></i></button>
+                  <button class="btn-icon edit" (click)="openModal(row.original.id)">
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                  <button class="btn-icon folder">
+                    <i class="far fa-folder-open"></i>
+                  </button>
                 </div>
               </td>
             </tr>
           </ng-container>
+           <tr *ngIf="table.getRowModel().rows.length === 0">
+            <td colspan="9" style="text-align: center; padding: 40px; color: #999">
+              ไม่พบรายการที่ตรงตามเงื่อนไข
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

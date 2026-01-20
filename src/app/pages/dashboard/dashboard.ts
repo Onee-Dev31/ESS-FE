@@ -101,7 +101,7 @@ export class DashboardComponent {
       amount: '876', 
       iconName: 'fas fa-taxi', 
       cardClass: 'card-yellow',
-      tooltip: `<strong>เงื่อนไข:</strong><br />- 1,000 บาท/ปี / ปี<br />- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น`,
+      tooltip: `<strong>เงื่อนไข:</strong><br />- 1,000 บาท/ปี<br />- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น`,
       titleColor: '#9a3412',
       amountColor: '#9a3412',
       route: '/vehicle-taxi'

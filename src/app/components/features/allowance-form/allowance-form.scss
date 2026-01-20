@@ -1,6 +1,7 @@
 @use 'sass:color';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
+// Variables
 $primary: #1a73e8;
 $success: #1e8e3e;
 $danger: #d93025;
@@ -8,13 +9,22 @@ $border: #dee2e6;
 $text: #202124;
 $text-sub: #5f6368;
 
+// Font Variable
+$font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+
 .allowance-form-page {
   display: flex;
   flex-direction: column;
   height: 100%;
   background: #fff;
-  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  
+  // เรียกใช้ Font จากตัวแปร
+  font-family: $font-main;
   overflow: hidden;
+
+  input, button, select, textarea {
+    font-family: $font-main;
+  }
 
   .top-header-strip {
     display: flex;
@@ -85,12 +95,74 @@ $text-sub: #5f6368;
     }
   }
 
+  // --- ส่วน Policy Note (แก้ปัญหา: แถวเดียว + ไม่ล้นจอ) ---
+  .allowance-policy-note {
+    box-sizing: border-box; // ป้องกัน padding ดันกรอบล้น
+    width: 100%;
+    max-width: 100%; // กันเหนียวไม่ให้เกินแม่
+
+    margin-bottom: 16px;
+    background: #fcfcfc;
+    border: 1px dashed #d1d3d4;
+    border-radius: 8px;
+    padding: 10px 16px;
+    
+    // Flex Layout: เรียงต่อกัน และยอมให้ปัดตกบรรทัด (Wrap)
+    display: flex;
+    flex-wrap: wrap; 
+    align-items: center;
+    gap: 4px 8px; // ระยะห่างแนวตั้ง 4px, แนวนอน 8px
+
+    font-size: 0.8rem;
+    color: #444;
+    line-height: 1.5;
+
+    .note-header {
+      color: $primary;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      white-space: nowrap; // หัวข้อห้ามตัดคำ
+      margin-right: 4px;
+      i { font-size: 0.9rem; }
+    }
+    
+    .note-desc {
+      display: inline;
+      margin-right: 4px;
+      // ปล่อยให้ตัดคำได้ตามปกติ (default)
+    }
+
+    .note-rates {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      
+      span {
+        white-space: nowrap; // เรทราคาแต่ละอันห้ามขาด
+        strong {
+          color: $danger;
+          font-weight: 600;
+        }
+      }
+      .divider {
+        color: #ccc;
+        font-weight: 300;
+        @media (max-width: 600px) { display: none; }
+      }
+    }
+  }
+
   .action-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
     gap: 20px;
+    flex-shrink: 0;
+
     .btn-submit {
       background: $success;
       color: #fff;
@@ -99,57 +171,11 @@ $text-sub: #5f6368;
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    // --- ส่วนที่แต่งเพิ่มตรง policy ---
-    .allowance-policy-note {
-      flex: 1;
-      background: #fcfcfc;
-      border: 1px dashed #d1d3d4;
-      border-radius: 8px;
-      padding: 10px 16px;
-
-      .policy-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: $primary;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        i {
-          font-size: 0.9rem;
-        }
-      }
-
-      .policy-content {
-        p {
-          margin: 0 0 6px 0;
-          font-size: 0.8rem;
-          color: #444;
-        }
-        .rate-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 4px 12px;
-          span {
-            font-size: 0.78rem;
-            color: #555;
-            white-space: nowrap;
-            strong {
-              color: $danger;
-              font-weight: 600;
-            }
-          }
-        }
-      }
     }
 
     .info-badges {
       display: flex;
       gap: 8px;
-      flex-shrink: 0;
       .right-info,
       .request-id-badge {
         font-size: 0.85rem;
@@ -189,14 +215,14 @@ $text-sub: #5f6368;
       th {
         background: #f8f9fa;
         position: sticky;
-        top: 0; // แถวแรกติดขอบบนสุด
+        top: 0; 
         z-index: 10;
         text-align: center;
         color: $text-sub;
-        border-top: 1px solid $border; // เพิ่มเส้นขอบบนให้ Header
+        border-top: 1px solid $border; 
       }
       .sub-header th {
-        top: 44px; // ต้องเท่ากับความสูง (height) ของ th แถวแรก เพื่อให้มันต่อกันพอดี
+        top: 44px; 
         font-size: 0.8rem;
         z-index: 9;
       }

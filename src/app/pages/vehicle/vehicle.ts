@@ -1,11 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import {
   ColumnDef,
   getCoreRowModel,
-  getSortedRowModel,
   createAngularTable,
   SortingState,
 } from '@tanstack/angular-table';
@@ -39,8 +38,8 @@ export class VehicleComponent implements OnInit {
   filterEndDate: string = '';
   filterStatus: string = '';
   
-  // ข้อมูล Mockup ทั้งหมด
-  allRequests: VehicleRequest[] = [
+  // ข้อมูล Mockup
+  allRequests = signal<VehicleRequest[]>([
     {
       id: '2701#001',
       createDate: '2026-01-15', 
@@ -63,20 +62,77 @@ export class VehicleComponent implements OnInit {
         { date: '30/10/2026', desc: 'ทดสอบ 4', amount: 120 },
       ],
     }
-  ];
+  ]);
 
-  data = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  columns: ColumnDef<VehicleRequest>[] = [
-    { accessorKey: 'id', header: 'เลขที่การเบิก' },
-    { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
-    { accessorKey: 'status', header: 'สถานะ' },
-  ];
+  // --- Logic การ Filter และ Sort Group ---
+  processedData = computed(() => {
+    let filtered = [...this.allRequests()];
 
+    // 1. Filter
+    if (this.filterStatus) {
+      filtered = filtered.filter(r => r.status === this.filterStatus);
+    }
+    if (this.filterStartDate) {
+      filtered = filtered.filter(r => r.createDate >= this.filterStartDate);
+    }
+    if (this.filterEndDate) {
+      filtered = filtered.filter(r => r.createDate <= this.filterEndDate);
+    }
+
+    // 2. Sort Groups
+    const sortState = this.sorting()[0];
+    if (sortState) {
+      const { id, desc } = sortState;
+      const direction = desc ? -1 : 1;
+
+      filtered.sort((a, b) => {
+        let valA: any, valB: any;
+
+        switch (id) {
+          case 'id':
+            return a.id.localeCompare(b.id) * direction;
+          case 'createDate':
+            return a.createDate.localeCompare(b.createDate) * direction;
+          case 'status':
+            return a.status.localeCompare(b.status) * direction;
+          case 'amount':
+            // รวมยอดเงินทั้งหมดใน Group แล้วเทียบกัน
+            valA = a.items.reduce((sum, item) => sum + item.amount, 0);
+            valB = b.items.reduce((sum, item) => sum + item.amount, 0);
+            return (valA - valB) * direction;
+          case 'date': 
+            // ใช้วันที่ของรายการแรกสุดใน Group
+            valA = a.items[0]?.date || '';
+            valB = b.items[0]?.date || '';
+            // แปลง dd/MM/yyyy -> yyyyMMdd เพื่อเทียบ String
+            const dA = valA.split('/').reverse().join('');
+            const dB = valB.split('/').reverse().join('');
+            return dA.localeCompare(dB) * direction;
+          case 'desc':
+             // ใช้ Description ของรายการแรก
+             valA = a.items[0]?.desc || '';
+             valB = b.items[0]?.desc || '';
+             return valA.localeCompare(valB) * direction;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filtered;
+  });
+
+  // Table Configuration
   table = createAngularTable(() => ({
-    data: this.data(),
-    columns: this.columns,
+    data: this.processedData(),
+    columns: [
+      { accessorKey: 'id', header: 'เลขที่การเบิก' },
+      { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
+      { accessorKey: 'items', header: 'รายละเอียด' }, // Placeholder fields
+      { accessorKey: 'status', header: 'สถานะ' },
+    ],
     state: {
       sorting: this.sorting(),
     },
@@ -87,45 +143,54 @@ export class VehicleComponent implements OnInit {
       this.sorting.set(nextSorting);
     },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // ไม่ใช้ getSortedRowModel() เพราะเรา Sort ที่ processedData เองแล้ว
   }));
 
-  ngOnInit() {
-    this.data.set([...this.allRequests]);
-  }
+  ngOnInit() {}
 
   onSearch() {
-    let filtered = [...this.allRequests];
-    if (this.filterStatus) {
-      filtered = filtered.filter(r => r.status === this.filterStatus);
-    }
-    if (this.filterStartDate) {
-      filtered = filtered.filter(r => r.createDate >= this.filterStartDate);
-    }
-    if (this.filterEndDate) {
-      filtered = filtered.filter(r => r.createDate <= this.filterEndDate);
-    }
-    this.data.set(filtered);
+    this.allRequests.set([...this.allRequests()]);
   }
 
   deleteRequest(id: string) {
     if(confirm(`ยืนยันการลบรายการ ${id}?`)) {
-      this.allRequests = this.allRequests.filter(r => r.id !== id);
-      this.onSearch();
+      this.allRequests.update(reqs => reqs.filter(r => r.id !== id));
     }
   }
 
-  sortByRequestId() {
-    const column = this.table.getColumn('id');
+  // --- Sort Helper Functions ---
+
+  toggleSort(columnId: string) {
+    const column = this.table.getColumn(columnId);
     if (column) {
-      // Toggle ระหว่าง asc -> desc -> clear
       column.toggleSorting(column.getIsSorted() === 'asc');
+    } else {
+        // Fallback ถ้า column ไม่ได้ define ใน columns definition ตรงๆ
+        // เราสามารถ set sorting signal ได้โดยตรง
+        const currentSort = this.sorting()[0];
+        if (currentSort?.id === columnId) {
+            this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);
+        } else {
+            this.sorting.set([{ id: columnId, desc: false }]);
+        }
     }
+  }
+
+  getSortIcon(columnId: string) {
+    const sortState = this.sorting()[0];
+    const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
+    
+    return {
+      'fa-sort-amount-up': isSorted === 'asc',
+      'fa-sort-amount-down-alt': isSorted === 'desc',
+      'fa-sort': !isSorted,
+      'text-muted': !isSorted
+    };
   }
 
   openCreateModal(id: string = '') {
     if (id === '') {
-      const lastIdNum = this.allRequests.reduce((max, item) => {
+      const lastIdNum = this.allRequests().reduce((max, item) => {
         const num = parseInt(item.id.split('#')[1] || '0');
         return num > max ? num : max;
       }, 0);

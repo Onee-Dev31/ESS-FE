@@ -18,24 +18,28 @@
       </div>
     </section>
 
+    <div class="allowance-policy-note">
+      <span class="note-header">
+        <i class="fas fa-info-circle"></i> <strong>เงื่อนไขการคำนวณเบี้ยเลี้ยง :</strong>
+      </span>
+      <span class="note-desc">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</span>
+      <span class="note-rates">
+        <span><strong>2-4 ชม. :</strong> 150 บาท</span>
+        <span class="divider">|</span>
+        <span><strong>5-8 ชม. :</strong> 225 บาท</span>
+        <span class="divider">|</span>
+        <span><strong>9-12 ชม. :</strong> 300 บาท</span>
+        <span class="divider">|</span>
+        <span><strong>13-16 ชม. :</strong> 375 บาท</span>
+        <span class="divider">|</span>
+        <span><strong>17-20 ชม. :</strong> 450 บาท</span>
+        <span class="divider">|</span>
+        <span><strong>21-24 ชม. :</strong> 525 บาท</span>
+      </span>
+    </div>
+
     <div class="action-bar">
       <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
-      <div class="allowance-policy-note">
-        <div class="policy-title">
-          <i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณเบี้ยเลี้ยง
-        </div>
-        <div class="policy-content">
-          <p>ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา:</p>
-          <div class="rate-grid">
-            <span><strong>2-4 ชม. :</strong> 150 บาท</span>
-            <span><strong>5-8 ชม. :</strong> 225 บาท</span>
-            <span><strong>9-12 ชม. :</strong> 300 บาท</span>
-            <span><strong>13-16 ชม. :</strong> 375 บาท</span>
-            <span><strong>17-20 ชม. :</strong> 450 บาท</span>
-            <span><strong>21-24 ชม. :</strong> 525 บาท</span>
-          </div>
-        </div>
-      </div>
       <div class="info-badges">
         <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span>
         <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
