@@ -22,15 +22,6 @@
     <div class="action-bar">
       <button class="btn-submit" (click)="save()">ยืนยันการเบิก</button>
       
-      <!-- <div class="allowance-policy-note">
-        <div class="policy-title">
-          <i class="fas fa-info-circle"></i> หมายเหตุ
-        </div>
-        <div class="policy-content">
-          <p style="margin:0;">กรุณาแนบไฟล์ใบเสร็จให้ครบถ้วนทุกรายการที่มีการเบิก</p>
-        </div>
-      </div> -->
-
       <div class="info-badges">
         <span class="request-id-badge">เลขที่การเบิก : 2601-005</span>
         <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
@@ -45,7 +36,12 @@
           <col style="width: 70px" />
           <col style="width: 70px" />
           <col style="width: 70px" />
-          <col style="width: auto" /> <col style="width: auto" /> <col style="width: 80px" /> <col style="width: 100px" /> <col style="width: 60px" /> </colgroup>
+          <col style="width: auto" /> 
+          <col style="width: auto" /> 
+          <col style="width: 80px" /> 
+          <col style="width: 80px" /> 
+          <col style="width: 60px" /> 
+        </colgroup>
 
         <thead>
           <tr>
@@ -53,11 +49,12 @@
             <th rowspan="2">วันที่</th>
             <th rowspan="2">ประเภท</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
-            <th rowspan="2">รายละเอียดการเบิก</th>
-            <th rowspan="2">จุดหมาย</th>
+            
+            <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
+            <th rowspan="2">จุดหมาย <span style="color:red">*</span></th>
+            
             <th rowspan="2">ระยะทาง<br>(Km.)</th>
-            <th rowspan="2">จำนวนเงิน</th>
-            <th rowspan="2">ไฟล์</th>
+            <th rowspan="2">จำนวนเงิน</th> <th rowspan="2">ไฟล์</th>
           </tr>
           <tr class="sub-header">
             <th class="col-time-header">เข้า</th>
@@ -79,24 +76,40 @@
             
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.desc" [disabled]="!item.selected" placeholder="รายละเอียด..." />
+                <input type="text" class="table-input" 
+                       [(ngModel)]="item.desc" 
+                       [disabled]="!item.selected" 
+                       [class.is-invalid]="item.selected && !item.desc"
+                       placeholder="รายละเอียด..." />
               </div>
             </td>
+
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.destination" [disabled]="!item.selected" placeholder="ระบุจุดหมาย" />
+                <input type="text" class="table-input" 
+                       [(ngModel)]="item.destination" 
+                       [disabled]="!item.selected" 
+                       [class.is-invalid]="item.selected && !item.destination"
+                       placeholder="ระบุจุดหมาย" />
               </div>
             </td>
+
             <td class="desc-cell">
               <div class="input-container">
-                <input type="number" class="table-input text-center" [(ngModel)]="item.distance" [disabled]="!item.selected" />
+                <input type="number" class="table-input text-center" 
+                       [(ngModel)]="item.distance" 
+                       [disabled]="!item.selected" />
               </div>
             </td>
+
             <td class="desc-cell">
               <div class="input-container">
-                <input type="number" class="table-input text-right font-bold" [(ngModel)]="item.amount" [disabled]="!item.selected" />
+                <input type="number" class="table-input text-center font-bold" 
+                       [(ngModel)]="item.amount" 
+                       [disabled]="!item.selected" />
               </div>
             </td>
+
             <td class="text-center">
               <button class="btn-icon-folder"><i class="fas fa-solid fa-file-arrow-up"></i></button>
             </td>

@@ -31,7 +31,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     align-items: center;
     padding: 12px 24px;
     border-bottom: 1px solid $border;
-    flex-shrink: 0; // ห้ามหด
+    flex-shrink: 0;
 
     h2 {
       font-size: 1.15rem;
@@ -55,13 +55,13 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     }
   }
 
-  // Content Wrapper (เหมือน Allowance)
+  // Content Wrapper
   .content-card {
-    flex: 1; // ยืดจนสุดพื้นที่
+    flex: 1;
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    overflow: hidden; // ห้าม Scroll ตรงนี้
+    overflow: hidden;
   }
 
   // Filter
@@ -120,27 +120,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       cursor: pointer;
       flex-shrink: 0;
     }
-    .allowance-policy-note {
-      flex: 1;
-      background: #fcfcfc;
-      border: 1px dashed #d1d3d4;
-      border-radius: 8px;
-      padding: 10px 16px;
-      .policy-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: $primary;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .policy-content p {
-        margin: 0;
-        font-size: 0.8rem;
-        color: #444;
-      }
-    }
+    
     .info-badges {
       display: flex;
       gap: 8px;
@@ -163,10 +143,10 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     }
   }
 
-  // Table Container (Scrollable Area)
+  // Table Container
   .table-container {
-    flex: 1; // ยืดพื้นที่ที่เหลือ
-    overflow: auto; // Scrollbar เกิดที่นี่
+    flex: 1;
+    overflow: auto;
     border: 1px solid $border;
     border-radius: 8px;
 
@@ -185,7 +165,6 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         box-sizing: border-box;
       }
 
-      // Sticky Header
       th {
         background: #f8f9fa;
         position: sticky;
@@ -201,7 +180,6 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         z-index: 9;
       }
 
-      // Styles
       .text-center {
         text-align: center;
         input[type='checkbox'] {
@@ -221,6 +199,15 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
       .highlight-row td {
         background-color: #fffdef !important;
+      }
+
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      input[type=number] {
+        -moz-appearance: textfield; 
       }
 
       .time-input {
@@ -245,9 +232,14 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           border-radius: 4px;
           padding: 0 8px;
           background: transparent;
+          
+          // --- Highlight Red Box ---
           &.is-invalid {
             border: 1px solid $danger !important;
+            background-color: rgba($danger, 0.05); // เพิ่มพื้นหลังสีแดงจางๆ
           }
+          // -------------------------
+
           &:focus:not(:disabled) {
             background: #fff;
             border: 1px solid $primary;

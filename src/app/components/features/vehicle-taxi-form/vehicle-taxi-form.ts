@@ -72,9 +72,26 @@ export class VehicleTaxiFormComponent implements OnInit {
   }
 
   save() {
-    console.log('Data saved:', this.items.filter(i => i.selected));
-    this.onClose.emit();
+  // 1. กรองเฉพาะแถวที่เลือก
+  const selectedItems = this.items.filter(i => i.selected);
+
+  if (selectedItems.length === 0) {
+    alert('กรุณาเลือกรายการที่ต้องการเบิก');
+    return;
   }
+
+  // 2. ตรวจสอบว่ามีช่องไหนว่างไหม (รายละเอียด, จุดหมาย, จำนวนเงิน)
+  const invalidItem = selectedItems.find(i => !i.desc || !i.destination || !i.amount);
+
+  if (invalidItem) {
+    alert('กรุณากรอกข้อมูลให้ครบถ้วนในรายการที่เลือก (ช่องสีแดง)');
+    return; // หยุดการทำงาน ไม่ให้บันทึก
+  }
+
+  // 3. ถ้าผ่านหมด ก็บันทึกได้เลย
+  console.log('บันทึกสำเร็จ', selectedItems);
+  // this.service.save(selectedItems)...
+}
 
   cancel() {
     this.onClose.emit();
