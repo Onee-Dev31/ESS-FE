@@ -53,8 +53,8 @@
             <th rowspan="2">ประเภท</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
             
-            <th rowspan="2">รายละเอียดการเบิก</th>
-            <th rowspan="2">จุดหมาย</th>
+            <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
+            <th rowspan="2">จุดหมาย <span style="color:red">*</span></th>
             
             <th rowspan="2">ระยะทาง<br>(Km.)</th>
             <th rowspan="2">จำนวนเงิน</th> <th rowspan="2">ไฟล์</th>
@@ -114,7 +114,11 @@
             </td>
 
             <td class="text-center">
-              <button class="btn-icon-folder"><i class="fas fa-solid fa-file-arrow-up"></i></button>
+              <button class="btn-icon-folder" 
+                      (click)="openUploadModal(item)"
+                      [class.has-file]="item.attachedFile">
+                <i class="fas fa-solid fa-file-arrow-up"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -129,4 +133,38 @@
       </table>
     </div>
   </main>
+
+  <div class="upload-modal-overlay" *ngIf="isShowUploadModal">
+    <div class="upload-modal-content">
+      <div class="modal-header">
+        <h3>แนบไฟล์เอกสาร</h3>
+        <button class="close-btn" (click)="closeUploadModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="date-label">สำหรับวันที่: <strong>{{ currentUploadItem?.date }}</strong></p>
+        
+        <div class="upload-box">
+          <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
+          
+          <label for="fileInput" class="upload-trigger" *ngIf="!tempFileName">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>คลิกเพื่อเลือกไฟล์</span>
+          </label>
+
+          <div class="file-preview" *ngIf="tempFileName">
+             <i class="fas fa-file-alt file-icon"></i>
+             <span class="filename">{{ tempFileName }}</span>
+             <button class="btn-remove-file" (click)="deleteAttachedFile()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeUploadModal()">ยกเลิก</button>
+        <button class="btn-confirm" (click)="confirmUpload()" [disabled]="!tempFileName">บันทึกแนบไฟล์</button>
+      </div>
+    </div>
+  </div>
+
 </div>

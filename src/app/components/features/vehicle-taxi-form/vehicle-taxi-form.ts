@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 export class VehicleTaxiFormComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
   items: any[] = [];
+  
   thaiMonths = [
     'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
@@ -20,6 +21,9 @@ export class VehicleTaxiFormComponent implements OnInit {
 
   selectedMonth: string = 'ตุลาคม';
   selectedYear: number = 2568;
+  isShowUploadModal: boolean = false;
+  currentUploadItem: any = null;
+  tempFileName: string = '';
 
   ngOnInit() {
     this.generateMockData();
@@ -71,7 +75,8 @@ export class VehicleTaxiFormComponent implements OnInit {
       desc: row.desc,
       destination: row.dest,
       distance: row.dist,
-      amount: row.amt
+      amount: row.amt,
+      attachedFile: null
     }));
   }
 
@@ -102,5 +107,36 @@ export class VehicleTaxiFormComponent implements OnInit {
 
   cancel() {
     this.onClose.emit();
+  }
+  
+  openUploadModal(item: any) {
+    this.currentUploadItem = item;
+    this.tempFileName = item.attachedFile ? item.attachedFile : '';
+    this.isShowUploadModal = true;
+  }
+
+  closeUploadModal() {
+    this.isShowUploadModal = false;
+    this.currentUploadItem = null;
+    this.tempFileName = '';
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.tempFileName = file.name;
+    }
+  }
+
+  confirmUpload() {
+    if (this.currentUploadItem) {
+      this.currentUploadItem.attachedFile = this.tempFileName;
+      this.currentUploadItem.selected = true; 
+    }
+    this.closeUploadModal();
+  }
+  
+  deleteAttachedFile() {
+      this.tempFileName = '';
   }
 }
