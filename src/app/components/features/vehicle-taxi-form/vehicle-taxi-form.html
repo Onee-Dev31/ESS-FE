@@ -64,7 +64,7 @@
             <th class="col-time-header">ออก</th>
           </tr>
         </thead>
-
+        
         <tbody>
           <tr *ngFor="let item of items" [class.highlight-row]="item.selected">
             <td class="text-center">
@@ -90,9 +90,9 @@
             <td class="desc-cell">
               <div class="input-container">
                 <input type="text" class="table-input" 
-                       [(ngModel)]="item.destination" 
+                       [(ngModel)]="item.dest" 
                        [disabled]="!item.selected" 
-                       [class.is-invalid]="item.selected && !item.destination"
+                       [class.is-invalid]="item.selected && !item.dest"
                        placeholder="ระบุจุดหมาย" />
               </div>
             </td>
@@ -134,37 +134,12 @@
     </div>
   </main>
 
-  <div class="upload-modal-overlay" *ngIf="isShowUploadModal">
-    <div class="upload-modal-content">
-      <div class="modal-header">
-        <h3>แนบไฟล์เอกสาร</h3>
-        <button class="close-btn" (click)="closeUploadModal()">✕</button>
-      </div>
-      
-      <div class="modal-body">
-        <p class="date-label">สำหรับวันที่: <strong>{{ currentUploadItem?.date }}</strong></p>
-        
-        <div class="upload-box">
-          <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
-          
-          <label for="fileInput" class="upload-trigger" *ngIf="!tempFileName">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span>คลิกเพื่อเลือกไฟล์</span>
-          </label>
-
-          <div class="file-preview" *ngIf="tempFileName">
-             <i class="fas fa-file-alt file-icon"></i>
-             <span class="filename">{{ tempFileName }}</span>
-             <button class="btn-remove-file" (click)="deleteAttachedFile()">✕</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeUploadModal()">ยกเลิก</button>
-        <button class="btn-confirm" (click)="confirmUpload()" [disabled]="!tempFileName">บันทึกแนบไฟล์</button>
-      </div>
-    </div>
-  </div>
+  <app-file-upload-modal
+    *ngIf="isShowUploadModal"
+    [currentFileName]="currentUploadItem?.attachedFile"
+    [dateLabel]="currentUploadItem?.date"
+    (onSave)="handleFileSave($event)"
+    (onClose)="closeUploadModal()">
+  </app-file-upload-modal>
 
 </div>

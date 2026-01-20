@@ -8,7 +8,7 @@
 
     <div class="toolbar-container">
       <div class="left-action">
-        <button class="btn-create" (click)="openCreateModal('')">
+        <button class="btn-create" (click)="openModal('')">
           <i class="fas fa-plus"></i> สร้างรายการเบิก
         </button>
       </div>
@@ -80,7 +80,7 @@
           <ng-container *ngFor="let row of table.getRowModel().rows">
             <tr *ngFor="let item of row.original.items; let i = index"
               [class.group-end]="i === row.original.items.length - 1">
-              
+
               <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
                 <span class="id-text">{{ row.original.id }}</span>
               </td>
@@ -90,14 +90,14 @@
               </td>
 
               <td>{{ item.date }}</td>
-              
+
               <td>
                 <div class="desc-wrapper">
                   <i class="fas fa-car-side text-muted" style="margin-right: 8px"></i>
                   {{ item.desc }}
                 </div>
               </td>
-              
+
               <td class="text-right" style="font-weight: 600">
                 {{ item.amount | number : '1.2-2' }}
               </td>
@@ -110,7 +110,7 @@
 
               <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
                 <div class="action-btns">
-                  <button class="btn-icon edit" (click)="openCreateModal(row.original.id)">
+                  <button class="btn-icon edit" (click)="openModal(row.original.id)">
                     <i class="far fa-edit"></i>
                   </button>
                   <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
@@ -133,9 +133,6 @@
 
 <div class="modal-overlay" *ngIf="isModalOpen">
   <div class="modal-container">
-    <app-vehicle-form
-      [requestId]="selectedRequestId"
-      (onClose)="closeCreateModal()"
-    ></app-vehicle-form>
+    <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-form>
   </div>
 </div>

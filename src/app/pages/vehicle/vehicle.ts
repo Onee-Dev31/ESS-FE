@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import {
   ColumnDef,
@@ -35,11 +35,11 @@ export class VehicleComponent implements OnInit {
   filterStartDate: string = '';
   filterEndDate: string = '';
   filterStatus: string = '';
-  
+
   allRequests = signal<VehicleRequest[]>([
     {
       id: '2701#001',
-      createDate: '2026-01-15', 
+      createDate: '2026-01-15',
       status: 'รอตรวจสอบ',
       items: [
         { date: '27/10/2026', desc: 'ถ่ายงานหลังรายการแฉ', amount: 120 },
@@ -95,16 +95,16 @@ export class VehicleComponent implements OnInit {
             valA = a.items.reduce((sum, item) => sum + item.amount, 0);
             valB = b.items.reduce((sum, item) => sum + item.amount, 0);
             return (valA - valB) * direction;
-          case 'date': 
+          case 'date':
             valA = a.items[0]?.date || '';
             valB = b.items[0]?.date || '';
             const dA = valA.split('/').reverse().join('');
             const dB = valB.split('/').reverse().join('');
             return dA.localeCompare(dB) * direction;
           case 'desc':
-             valA = a.items[0]?.desc || '';
-             valB = b.items[0]?.desc || '';
-             return valA.localeCompare(valB) * direction;
+            valA = a.items[0]?.desc || '';
+            valB = b.items[0]?.desc || '';
+            return valA.localeCompare(valB) * direction;
           default:
             return 0;
         }
@@ -126,22 +126,22 @@ export class VehicleComponent implements OnInit {
       sorting: this.sorting(),
     },
     onSortingChange: (updaterOrValue) => {
-      const nextSorting = typeof updaterOrValue === 'function' 
-        ? updaterOrValue(this.sorting()) 
+      const nextSorting = typeof updaterOrValue === 'function'
+        ? updaterOrValue(this.sorting())
         : updaterOrValue;
       this.sorting.set(nextSorting);
     },
     getCoreRowModel: getCoreRowModel(),
   }));
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   onSearch() {
     this.allRequests.set([...this.allRequests()]);
   }
 
   deleteRequest(id: string) {
-    if(confirm(`ยืนยันการลบรายการ ${id}?`)) {
+    if (confirm(`ยืนยันการลบรายการ ${id}?`)) {
       this.allRequests.update(reqs => reqs.filter(r => r.id !== id));
     }
   }
@@ -151,19 +151,19 @@ export class VehicleComponent implements OnInit {
     if (column) {
       column.toggleSorting(column.getIsSorted() === 'asc');
     } else {
-        const currentSort = this.sorting()[0];
-        if (currentSort?.id === columnId) {
-            this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);
-        } else {
-            this.sorting.set([{ id: columnId, desc: false }]);
-        }
+      const currentSort = this.sorting()[0];
+      if (currentSort?.id === columnId) {
+        this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);
+      } else {
+        this.sorting.set([{ id: columnId, desc: false }]);
+      }
     }
   }
 
   getSortIcon(columnId: string) {
     const sortState = this.sorting()[0];
     const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
-    
+
     return {
       'fa-sort-amount-up': isSorted === 'asc',
       'fa-sort-amount-down-alt': isSorted === 'desc',
@@ -172,7 +172,7 @@ export class VehicleComponent implements OnInit {
     };
   }
 
-  openCreateModal(id: string = '') {
+  openModal(id: string = '') {
     if (id === '') {
       const lastIdNum = this.allRequests().reduce((max, item) => {
         const num = parseInt(item.id.split('#')[1] || '0');
@@ -183,11 +183,11 @@ export class VehicleComponent implements OnInit {
     } else {
       this.selectedRequestId = id;
     }
-    this.isModalOpen = true; 
+    this.isModalOpen = true;
   }
-  
-  closeCreateModal() { 
-    this.isModalOpen = false; 
+
+  closeModal() {
+    this.isModalOpen = false;
     this.selectedRequestId = '';
   }
 

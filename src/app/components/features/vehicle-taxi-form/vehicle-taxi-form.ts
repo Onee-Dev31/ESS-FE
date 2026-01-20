@@ -1,11 +1,12 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal'; 
 
 @Component({
   selector: 'app-vehicle-taxi-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FileUploadModal], 
   templateUrl: './vehicle-taxi-form.html',
   styleUrl: './vehicle-taxi-form.scss'
 })
@@ -21,18 +22,20 @@ export class VehicleTaxiFormComponent implements OnInit {
 
   selectedMonth: string = 'ตุลาคม';
   selectedYear: number = 2568;
+  
+  // Variables สำหรับ Modal
   isShowUploadModal: boolean = false;
   currentUploadItem: any = null;
-  tempFileName: string = '';
 
   ngOnInit() {
     this.generateMockData();
   }
 
   generateMockData() {
-    console.log(`Searching data for: ${this.selectedMonth} ${this.selectedYear}`);
 
+    console.log(`Searching data for: ${this.selectedMonth} ${this.selectedYear}`);
     const mockRows = [
+
       { date: '01/10/2025', type: 'W', checkIn: '09:14', checkOut: '17:56', desc: 'ถ่ายงานหลังรายการแฉ', dest: 'Bravo Studio', dist: 120, amt: 120, selected: true },
       { date: '02/10/2025', type: 'W', checkIn: '09:16', checkOut: '18:16', desc: 'สแตนด์บายงาน', dest: 'GMM Studio', dist: 120, amt: 120, selected: true },
       { date: '03/10/2025', type: 'W', checkIn: '09:34', checkOut: '18:15', desc: '', dest: '', dist: 0, amt: 0, selected: false },
@@ -64,18 +67,11 @@ export class VehicleTaxiFormComponent implements OnInit {
       { date: '29/10/2025', type: 'W', checkIn: '09:37', checkOut: '18:13', desc: '', dest: '', dist: 0, amt: 0, selected: false },
       { date: '30/10/2025', type: 'W', checkIn: '09:44', checkOut: '18:51', desc: '', dest: '', dist: 0, amt: 0, selected: false },
       { date: '31/10/2025', type: 'W', checkIn: '09:39', checkOut: '18:09', desc: '', dest: '', dist: 0, amt: 0, selected: false }
+
     ];
 
     this.items = mockRows.map(row => ({
-      selected: row.selected,
-      date: row.date,
-      type: row.type,
-      checkIn: row.checkIn,
-      checkOut: row.checkOut,
-      desc: row.desc,
-      destination: row.dest,
-      distance: row.dist,
-      amount: row.amt,
+      ...row,
       attachedFile: null
     }));
   }
@@ -109,34 +105,28 @@ export class VehicleTaxiFormComponent implements OnInit {
     this.onClose.emit();
   }
   
+  // --- Modal Logic ใหม่ ---
+
   openUploadModal(item: any) {
     this.currentUploadItem = item;
-    this.tempFileName = item.attachedFile ? item.attachedFile : '';
     this.isShowUploadModal = true;
   }
 
   closeUploadModal() {
     this.isShowUploadModal = false;
     this.currentUploadItem = null;
-    this.tempFileName = '';
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.tempFileName = file.name;
-    }
-  }
-
-  confirmUpload() {
+  // ฟังก์ชันรับค่าเมื่อ Modal กด Save ส่งกลับมา
+  handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
-      this.currentUploadItem.attachedFile = this.tempFileName;
-      this.currentUploadItem.selected = true; 
+      this.currentUploadItem.attachedFile = fileName;
+      
+      // Auto select ถ้ามีการแนบไฟล์
+      if (fileName) {
+        this.currentUploadItem.selected = true; 
+      }
     }
     this.closeUploadModal();
-  }
-  
-  deleteAttachedFile() {
-      this.tempFileName = '';
   }
 }
