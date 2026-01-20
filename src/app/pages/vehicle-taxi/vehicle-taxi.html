@@ -122,7 +122,7 @@
                   <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
                     <i class="far fa-trash-alt"></i>
                   </button>
-                  <button class="btn-icon folder">
+                  <button class="btn-icon folder" (click)="openPreviewModal(row.original.items)">
                     <i class="far fa-folder-open"></i>
                   </button>
                 </div>
@@ -142,6 +142,9 @@
 
 <div class="modal-overlay" *ngIf="isModalOpen">
   <div class="modal-container">
-    <app-vehicle-taxi-form (onClose)="closeModal()"></app-vehicle-taxi-form>
+    <app-vehicle-taxi-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-taxi-form>
   </div>
 </div>
+
+<app-file-preview-modal *ngIf="isPreviewModalOpen" [files]="previewFiles" (onClose)="closePreviewModal()">
+</app-file-preview-modal>

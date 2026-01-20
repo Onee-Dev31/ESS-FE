@@ -1,0 +1,50 @@
+<div class="file-preview-modal-overlay">
+    <div class="preview-card">
+        <header class="modal-header">
+            <h3>รายการไฟล์แนบ</h3>
+            <button class="btn-close" (click)="close()">✕</button>
+        </header>
+
+        <div class="modal-body">
+            <!-- Left: File List -->
+            <div class="file-list-panel">
+                <div *ngIf="files.length === 0" class="no-files">
+                    <i class="fas fa-file-excel text-muted"></i>
+                    <p>ไม่มีไฟล์แนบในรายการนี้</p>
+                </div>
+
+                <ul class="file-list" *ngIf="files.length > 0">
+                    <li *ngFor="let file of files" (click)="selectFile(file)" [class.active]="selectedFile === file">
+                        <div class="file-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name">{{ file.fileName }}</span>
+                            <span class="file-date">วันที่: {{ file.date }}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right: Preview Area -->
+            <div class="preview-panel">
+                <div *ngIf="!selectedFile" class="empty-state">
+                    <p>เลือกไฟล์เพื่อดูตัวอย่าง</p>
+                </div>
+
+                <div *ngIf="selectedFile" class="preview-content">
+                    <div class="preview-header">
+                        <h4>{{ selectedFile.fileName }}</h4>
+                    </div>
+                    <div class="image-box">
+                        <!-- Placeholder for image since we don't have real backend storage -->
+                        <div class="mock-image">
+                            <i class="fas fa-image fa-3x"></i>
+                            <span>Review: {{ selectedFile.fileName }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

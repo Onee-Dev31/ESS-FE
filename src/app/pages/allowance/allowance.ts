@@ -1,26 +1,13 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
+import { VehicleService, AllowanceRequest, AllowanceItem } from '../../services/vehicle.service';
 import {
   createAngularTable,
   getCoreRowModel,
   SortingState,
 } from '@tanstack/angular-table';
-
-interface AllowanceItem {
-  date: string;
-  desc: string;
-  hours: number;
-  amount: number;
-}
-
-interface AllowanceRequest {
-  id: string;
-  createDate: string;
-  status: string;
-  items: AllowanceItem[];
-}
 
 interface FlatAllowanceRow extends AllowanceItem {
   requestId: string;
@@ -38,49 +25,16 @@ interface FlatAllowanceRow extends AllowanceItem {
   styleUrl: './allowance.scss',
 })
 export class AllowanceComponent implements OnInit {
+  private vehicleService = inject(VehicleService);
+
   isModalOpen = false;
+  selectedRequestId = ''; // For passing to modal
   filterStartDate = '';
   filterEndDate = '';
   filterStatus = '';
 
-  allRequests = signal<AllowanceRequest[]>([
-    {
-      id: '2701-001',
-      createDate: '2026-01-15',
-      status: 'รอตรวจสอบ',
-      items: [
-        { date: '27/10/2025', desc: 'ถ่ายงาน A', hours: 2, amount: 150 },
-        { date: '27/10/2025', desc: 'ถ่ายงาน B', hours: 2, amount: 150 },
-        { date: '27/10/2025', desc: 'ถ่ายงาน C', hours: 2, amount: 150 },
-      ],
-    },
-    {
-      id: '2701-002',
-      createDate: '2026-01-16',
-      status: 'ต้นสังกัดอนุมัติ',
-      items: [
-        { date: '22/10/2025', desc: 'สแตนด์บายงาน', hours: 5, amount: 500 }, // ยอดสูง
-        { date: '27/10/2025', desc: 'ถ่ายงาน D', hours: 2, amount: 150 },
-      ],
-    },
-    {
-      id: '2701-003',
-      createDate: '2026-01-17',
-      status: 'รอจ่าย',
-      items: [
-        { date: '15/10/2025', desc: 'ทดสอบการเบิก', hours: 1, amount: 100 },
-      ],
-    },
-    {
-      id: '2701-004',
-      createDate: '2026-01-16',
-      status: 'จ่ายแล้ว',
-      items: [
-        { date: '10/01/2025', desc: 'Test 1', hours: 2, amount: 150 },
-        { date: '27/10/2025', desc: 'Test 2', hours: 2, amount: 150 },
-      ],
-    },
-  ]);
+  // Use signal from service
+  allRequests = this.vehicleService.getAllowanceRequests();
 
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
@@ -115,15 +69,15 @@ export class AllowanceComponent implements OnInit {
             valB = b.items.reduce((sum, item) => sum + item.hours, 0);
             return (valA - valB) * direction;
           case 'date':
-             valA = a.items[0]?.date || '';
-             valB = b.items[0]?.date || '';
-             const dateA = valA.split('/').reverse().join('');
-             const dateB = valB.split('/').reverse().join('');
-             return dateA.localeCompare(dateB) * direction;
+            valA = a.items[0]?.date || '';
+            valB = b.items[0]?.date || '';
+            const dateA = valA.split('/').reverse().join('');
+            const dateB = valB.split('/').reverse().join('');
+            return dateA.localeCompare(dateB) * direction;
           case 'desc':
-             valA = a.items[0]?.desc || '';
-             valB = b.items[0]?.desc || '';
-             return valA.localeCompare(valB) * direction;
+            valA = a.items[0]?.description || '';
+            valB = b.items[0]?.description || '';
+            return valA.localeCompare(valB) * direction;
           default:
             return 0;
         }
@@ -166,9 +120,16 @@ export class AllowanceComponent implements OnInit {
     getCoreRowModel: getCoreRowModel(),
   }));
 
-  ngOnInit() {}
+  ngOnInit() { }
 
-  openModal() { this.isModalOpen = true; }
+  openModal(id: string = '') {
+    if (id === '') {
+      this.selectedRequestId = this.vehicleService.generateNextAllowanceId();
+    } else {
+      this.selectedRequestId = id;
+    }
+    this.isModalOpen = true;
+  }
   closeModal() { this.isModalOpen = false; }
   onSearch() { this.allRequests.set([...this.allRequests()]); }
 

@@ -1,6 +1,17 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { VehicleService, RequestItem, VehicleRequest } from '../../../services/vehicle.service';
+
+interface LogItem {
+  date: string;
+  dayType: string;
+  timeIn: string;
+  timeOut: string;
+  amount: number;
+  selected: boolean;
+  description: string;
+}
 
 @Component({
   selector: 'app-vehicle-form',
@@ -14,72 +25,65 @@ export class VehicleFormComponent implements OnInit {
 
   @Output() onClose = new EventEmitter<void>();
 
+  private vehicleService = inject(VehicleService);
+
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2568, 2569, 2570];
 
-  selectedMonthIndex: number = 9; 
+  selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
   totalAmount: number = 0;
-  logs: any[] = [];
+  logs: LogItem[] = [];
 
   ngOnInit(): void {
-    if (!this.requestId) {
-      this.requestId = 'VHC-NEW-' + new Date().getTime().toString().slice(-4);
+    // Determine if it's a new request or edit
+    // Note: The parent passes a generated ID for new requests, so we need to check if it exists in service
+    const existingRequest = this.vehicleService.getRequestById(this.requestId);
+
+    this.generateCalendar(existingRequest);
+  }
+
+  generateCalendar(existingRequest?: VehicleRequest) {
+    // In a real app, use selectedMonthIndex and selectedYearBE to fetch
+    // For now, get static mock data from service
+    const rawLogs: any[] = this.vehicleService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE);
+
+    this.logs = rawLogs.map((item: any) => {
+      // Check if this date was selected in the existing request
+      const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.d);
+
+      return {
+        date: item.d,
+        dayType: item.t,
+        timeIn: matchTime(item.in),
+        timeOut: matchTime(item.out),
+        amount: matchingItem ? matchingItem.amount : 0, // Use saved amount if available, will be recalc'd anyway if strictly logic based
+        selected: !!matchingItem,
+        description: matchingItem ? matchingItem.desc : item.desc
+      };
+    });
+
+    // Recalculate amounts based on time rules to ensure consistency
+    this.logs.forEach(log => {
+      // If we are loading an existing request, we might trust the saved amount or consistency check.
+      // Here we re-run logic.
+      if (log.selected) {
+        this.calculateVehicleAmount(log);
+      }
+    });
+    this.updateTotal();
+  }
+
+  calculateVehicleAmount(log: LogItem) {
+    if (!log.selected) {
+      log.amount = 0;
+      this.updateTotal();
+      return;
     }
-    this.generateCalendar();
-  }
 
-  generateCalendar() {
-    const mockupData = [
-      { d: '01/10/2025', t: 'W', in: '09:14', out: '23:30', s: true, desc: 'แชร์ค่าแท็กซี่กลับบ้าน (เลิกงานดึก)' },
-      { d: '02/10/2025', t: 'W', in: '05:30', out: '18:00', s: true, desc: 'เรียก Grab มาทำงาน (เข้างานเช้า)' },
-      { d: '03/10/2025', t: 'W', in: '09:34', out: '18:15', s: false, desc: '' },
-      { d: '04/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '05/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '06/10/2025', t: 'W', in: '09:20', out: '18:10', s: false, desc: '' },
-      { d: '07/10/2025', t: 'W', in: '09:15', out: '18:22', s: false, desc: '' },
-      { d: '08/10/2025', t: 'W', in: '09:26', out: '18:22', s: false, desc: '' },
-      { d: '09/10/2025', t: 'W', in: '09:22', out: '18:13', s: false, desc: '' },
-      { d: '10/10/2025', t: 'W', in: '08:58', out: '18:14', s: false, desc: '' },
-      { d: '11/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '12/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '13/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-      { d: '14/10/2025', t: 'W', in: '09:24', out: '18:39', s: false, desc: '' },
-      { d: '15/10/2025', t: 'W', in: '09:12', out: '17:40', s: false, desc: '' },
-      { d: '16/10/2025', t: 'W', in: '09:17', out: '18:27', s: false, desc: '' },
-      { d: '17/10/2025', t: 'W', in: '11:19', out: '16:59', s: false, desc: '' },
-      { d: '18/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '19/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '20/10/2025', t: 'W', in: '09:19', out: '15:55', s: false, desc: '' },
-      { d: '21/10/2025', t: 'W', in: '09:17', out: '18:36', s: false, desc: '' },
-      { d: '22/10/2025', t: 'W', in: '09:46', out: '18:05', s: false, desc: '' },
-      { d: '23/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-      { d: '24/10/2025', t: 'L', in: '', out: '', s: false, desc: '' },
-      { d: '25/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '26/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '27/10/2025', t: 'W', in: '09:31', out: '22:15', s: true, desc: '' },
-      { d: '28/10/2025', t: 'W', in: '09:52', out: '18:39', s: false, desc: '' },
-      { d: '29/10/2025', t: 'W', in: '09:37', out: '18:13', s: false, desc: '' },
-      { d: '30/10/2025', t: 'W', in: '09:44', out: '18:51', s: false, desc: '' },
-      { d: '31/10/2025', t: 'W', in: '09:39', out: '18:09', s: false, desc: '' }
-    ];
-
-    this.logs = mockupData.map(item => ({
-      date: item.d,
-      dayType: item.t,
-      timeIn: item.in,
-      timeOut: item.out,
-      amount: 0,
-      selected: item.s,
-      description: item.desc
-    }));
-
-
-    this.logs.forEach(log => this.calculateVehicleAmount(log));
-  }
-
-  calculateVehicleAmount(log: any) {
-    if (!log.selected || !log.timeIn || !log.timeOut) {
+    // Basic logic moved from previous version
+    // If no time data, can't calc (unless manual override allowed?)
+    if (!log.timeIn || !log.timeOut || log.timeIn === '' || log.timeOut === '') {
       log.amount = 0;
       this.updateTotal();
       return;
@@ -89,15 +93,20 @@ export class VehicleFormComponent implements OnInit {
     const [outH] = log.timeOut.split(':').map(Number);
 
     if (inH < 6 || outH >= 22) {
-      log.amount = 150;
+      log.amount = 150; // Hardcoded rate
     } else {
       log.amount = 0;
     }
     this.updateTotal();
   }
 
-  onToggleCheck(log: any) {
-    this.calculateVehicleAmount(log);
+  onToggleCheck(log: LogItem) {
+    if (log.selected) {
+      this.calculateVehicleAmount(log);
+    } else {
+      log.amount = 0;
+      this.updateTotal();
+    }
   }
 
   updateTotal() {
@@ -107,23 +116,62 @@ export class VehicleFormComponent implements OnInit {
   }
 
   onSubmit() {
-    const invalidLogs = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
-    
+    const selectedLogs = this.logs.filter(l => l.selected);
+
+    // Validate that if selected, description must be provided
+    const invalidLogs = selectedLogs.filter(l => {
+      const desc = l.description ? String(l.description).trim() : '';
+      return desc === '';
+    });
+
     if (invalidLogs.length > 0) {
-      alert('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนในช่องที่ระบบแจ้งเตือน (ขอบแดง)');
+      const invalidDates = invalidLogs.map(l => l.date).join(', ');
+      alert(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
       return;
     }
 
-    if (this.totalAmount === 0) {
+    if (selectedLogs.length === 0 || this.totalAmount === 0) {
       alert('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
       return;
     }
 
-    alert(`บันทึกข้อมูลการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
+    // Map logs back to RequestItems
+    const requestItems: RequestItem[] = selectedLogs.map(l => ({
+      date: l.date,
+      desc: l.description,
+      amount: l.amount
+    }));
+
+    const existing = this.vehicleService.getRequestById(this.requestId);
+
+    if (existing) {
+      // Update
+      const updated: VehicleRequest = {
+        ...existing,
+        items: requestItems
+      };
+      this.vehicleService.updateRequest(this.requestId, updated);
+      alert(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
+    } else {
+      // Create New
+      const newReq: VehicleRequest = {
+        id: this.requestId,
+        createDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
+        status: 'รอตรวจสอบ',
+        items: requestItems
+      };
+      this.vehicleService.addRequest(newReq);
+      alert(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
+    }
+
     this.closeModal();
   }
 
   closeModal() {
-    this.onClose.emit(); 
+    this.onClose.emit();
   }
+}
+
+function matchTime(t: any): string {
+  return t ? String(t) : '';
 }

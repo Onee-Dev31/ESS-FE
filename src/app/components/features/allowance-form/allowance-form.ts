@@ -1,6 +1,7 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { VehicleService, AllowanceRequest, AllowanceItem } from '../../../services/vehicle.service';
 
 @Component({
   selector: 'app-allowance-form',
@@ -13,9 +14,11 @@ export class AllowanceFormComponent implements OnInit {
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
 
+  private vehicleService = inject(VehicleService);
+
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2568, 2569, 2570];
-  selectedMonthIndex: number = 9; 
+  selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
   totalAmount: number = 0;
   totalHoursStr: string = '0.00';
@@ -23,58 +26,24 @@ export class AllowanceFormComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.requestId) {
-      this.requestId = this.generateNextRequestId();
+      this.requestId = this.vehicleService.generateNextAllowanceId();
     }
-    this.generateCalendar();
+    const existing = this.vehicleService.getAllowanceRequestById(this.requestId);
+    this.generateCalendar(existing);
   }
 
-  generateNextRequestId(): string {
-    const now = new Date();
-    const year = (now.getFullYear()).toString().slice(-2); // 27
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 01
-    
-    const prefix = `${year}${month}`;
-    const nextNumber = '005'; 
-    
-    return `${prefix}-${nextNumber}`;
-  }
-
-  generateCalendar() {
-    const rawData = [
-      { d: '01/10/2025', t: 'W', in: '09:14', out: '20:00', s: true, desc: 'ถ่ายงานหลังรายการแฉ' },
-      { d: '02/10/2025', t: 'W', in: '09:16', out: '23:00', s: true, desc: 'สแตนด์บายงาน' },
-      { d: '03/10/2025', t: 'W', in: '09:34', out: '18:15', s: false, desc: '' },
-      { d: '04/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '05/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '06/10/2025', t: 'W', in: '09:20', out: '18:10', s: false, desc: '' },
-      { d: '07/10/2025', t: 'W', in: '09:15', out: '18:22', s: false, desc: '' },
-      { d: '08/10/2025', t: 'W', in: '09:26', out: '18:22', s: false, desc: '' },
-      { d: '09/10/2025', t: 'W', in: '09:22', out: '18:13', s: false, desc: '' },
-      { d: '10/10/2025', t: 'W', in: '08:58', out: '18:14', s: false, desc: '' },
-      { d: '11/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '12/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '13/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-      { d: '14/10/2025', t: 'W', in: '09:24', out: '18:39', s: false, desc: '' },
-      { d: '15/10/2025', t: 'W', in: '09:12', out: '17:40', s: false, desc: '' },
-      { d: '16/10/2025', t: 'W', in: '09:17', out: '18:27', s: false, desc: '' },
-      { d: '17/10/2025', t: 'W', in: '11:19', out: '16:59', s: false, desc: '' },
-      { d: '18/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '19/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '20/10/2025', t: 'W', in: '09:19', out: '15:55', s: false, desc: '' },
-      { d: '21/10/2025', t: 'W', in: '09:17', out: '18:36', s: false, desc: '' },
-      { d: '22/10/2025', t: 'W', in: '09:46', out: '18:05', s: false, desc: '' },
-      { d: '23/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-      { d: '24/10/2025', t: 'L', in: '', out: '', s: false, desc: '' },
-      { d: '25/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '26/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-      { d: '27/10/2025', t: 'W', in: '09:31', out: '18:15', s: true, desc: 'ทดสอบการเบิก' },
-      { d: '28/10/2025', t: 'W', in: '09:52', out: '18:39', s: false, desc: '' },
-      { d: '29/10/2025', t: 'W', in: '09:37', out: '18:13', s: false, desc: '' },
-      { d: '30/10/2025', t: 'W', in: '09:44', out: '18:51', s: false, desc: '' },
-      { d: '31/10/2025', t: 'W', in: '09:39', out: '18:09', s: false, desc: '' }
-    ];
+  generateCalendar(existing?: AllowanceRequest) {
+    // In real app, pass month/year to service
+    const rawData = this.vehicleService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE);
 
     this.logs = rawData.map(item => {
+      // Find matching item in existing request
+      const match = existing?.items.find(i => i.date === item.d); // Mock logs use 'd', service items use 'date'
+
+      // If match found, use its values. Else use defaults from rawData
+      // Note: rawData uses 'd', 't', 'in', 'out', 's', 'desc'
+      // AllowanceItem uses 'date', 'dayType', 'timeIn', 'timeOut', 'description'
+
       const log = {
         date: item.d,
         dayType: item.t,
@@ -86,7 +55,20 @@ export class AllowanceFormComponent implements OnInit {
         selected: item.s,
         description: item.desc
       };
+
+      if (match) {
+        log.timeIn = match.timeIn;
+        log.timeOut = match.timeOut;
+        log.amount = match.amount;
+        log.selected = match.selected;
+        log.description = match.description;
+        // hours logic re-calc below
+      }
+
       this.autoCalculate(log);
+      // If match, ensure we use the saved amount/hours if possible, 
+      // but autoCalculate should yield same result if inputs are same.
+
       return log;
     });
   }
@@ -102,10 +84,9 @@ export class AllowanceFormComponent implements OnInit {
 
     const [sh, sm] = log.timeIn.split(':').map(Number);
     const [eh, em] = log.timeOut.split(':').map(Number);
-    
-    let totalMins = (eh * 60 + em) - (sh * 60 + sm);
-    if (totalMins < 0) totalMins += 1440; 
 
+    let totalMins = (eh * 60 + em) - (sh * 60 + sm);
+    if (totalMins < 0) totalMins += 1440;
 
     let extraMins = totalMins - 540;
     if (extraMins < 0) extraMins = 0;
@@ -149,12 +130,49 @@ export class AllowanceFormComponent implements OnInit {
   }
 
   onSubmit() {
-    const invalid = this.logs.filter(l => l.selected && !l.description);
+    const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {
       alert('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
       return;
     }
-    alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+
+    // Convert to AllowanceItem[]
+    const items: AllowanceItem[] = this.logs
+      .filter(l => l.selected)
+      .map(l => ({
+        date: l.date,
+        dayType: l.dayType,
+        timeIn: l.timeIn,
+        timeOut: l.timeOut,
+        description: l.description,
+        hours: parseFloat(l.displayHours), // approx
+        amount: l.amount,
+        selected: true
+      }));
+
+    if (items.length === 0) {
+      alert('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
+      return;
+    }
+
+    const existing = this.vehicleService.getAllowanceRequestById(this.requestId);
+    if (existing) {
+      this.vehicleService.updateAllowanceRequest(this.requestId, {
+        ...existing,
+        items: items
+      });
+      alert(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
+    } else {
+      const newReq: AllowanceRequest = {
+        id: this.requestId,
+        createDate: new Date().toISOString().split('T')[0], // yyyy-mm-dd
+        status: 'รอตรวจสอบ',
+        items: items
+      };
+      this.vehicleService.addAllowanceRequest(newReq);
+      alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+    }
+
     this.closeModal();
   }
 

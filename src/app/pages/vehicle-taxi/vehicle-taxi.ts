@@ -1,66 +1,37 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
+import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { VehicleService, TaxiRequest, TaxiItem } from '../../services/vehicle.service';
 import {
   createAngularTable,
   getCoreRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 
-interface TaxiItem {
-  date: string;
-  desc: string;
-  destination: string;
-  distance: number;
-  amount: number;
-}
-
-interface TaxiRequest {
-  id: string;
-  createDate: string;
-  status: string;
-  items: TaxiItem[];
-}
-
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent],
+  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })
 export class VehicleTaxiComponent {
+  private vehicleService = inject(VehicleService);
+
   filterStartDate: string = '';
   filterEndDate: string = '';
   filterStatus: string = '';
+
+  // Modal States
   isModalOpen: boolean = false;
   selectedRequestId: string = '';
 
-  allRequests = signal<TaxiRequest[]>([
-    {
-      id: '2701#001',
-      createDate: '15/01/2026',
-      status: 'รอตรวจสอบ',
-      items: [
-        { date: '27/10/2026', desc: 'ถ่ายงานหลังรายการแฉ', destination: 'Bravo Studio', distance: 10.00, amount: 120 },
-        { date: '22/10/2026', desc: 'สแตนด์บายงาน', destination: 'GMM Studio', distance: 4.50, amount: 120 },
-        { date: '15/10/2026', desc: 'ทดสอบการเบิก', destination: 'สักที่', distance: 2.00, amount: 120 },
-        { date: '01/10/2026', desc: 'ทดสอบการเบิก', destination: 'สักแห่ง', distance: 5.00, amount: 120 }
-      ]
-    },
-    {
-      id: '2701#002',
-      createDate: '17/01/2026',
-      status: 'ต้นสังกัดอนุมัติ',
-      items: [
-        { date: '27/10/2026', desc: 'ทดสอบ1', destination: 'สักหน', distance: 6.25, amount: 120 },
-        { date: '28/10/2026', desc: 'ทดสอบ2', destination: 'Some where', distance: 7.75, amount: 120 },
-        { date: '29/10/2026', desc: 'ทดสอบ3', destination: 'ไปห้าง', distance: 100.00, amount: 120 },
-        { date: '30/10/2026', desc: 'ทดสอบ4', destination: 'ไปสวนสัตว์', distance: 1.00, amount: 120 }
-      ]
-    }
-  ]);
+  isPreviewModalOpen: boolean = false;
+  previewFiles: FilePreviewItem[] = [];
+
+  allRequests = this.vehicleService.getTaxiRequests();
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
@@ -140,7 +111,6 @@ export class VehicleTaxiComponent {
       { accessorKey: 'id', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้าง' },
       { accessorKey: 'status', header: 'สถานะ' },
-      // Column อื่นๆ จัดการ manual ใน html
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updater) => {
@@ -151,10 +121,7 @@ export class VehicleTaxiComponent {
   }));
 
   onSearch() {
-    this.allRequests.set([...this.allRequests()]);
   }
-
-  // --- Helpers ---
 
   toggleSort(columnId: string) {
     const currentSort = this.sorting()[0];
@@ -188,7 +155,11 @@ export class VehicleTaxiComponent {
   }
 
   openModal(id: string = '') {
-    this.selectedRequestId = id;
+    if (id === '') {
+      this.selectedRequestId = this.vehicleService.generateNextTaxiId();
+    } else {
+      this.selectedRequestId = id;
+    }
     this.isModalOpen = true;
   }
 
@@ -199,7 +170,30 @@ export class VehicleTaxiComponent {
 
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการ ' + id)) {
-      this.allRequests.update(reqs => reqs.filter(r => r.id !== id));
+      this.vehicleService.deleteTaxiRequest(id);
     }
+  }
+
+  openPreviewModal(items: TaxiItem[]) {
+    // Extract files
+    const files = items
+      .filter(i => i.attachedFile)
+      .map(i => ({
+        fileName: i.attachedFile || '',
+        date: i.date
+      }));
+
+    if (files.length === 0) {
+      alert('ไม่มีไฟล์แนบในรายการนี้');
+      return;
+    }
+
+    this.previewFiles = files;
+    this.isPreviewModalOpen = true;
+  }
+
+  closePreviewModal() {
+    this.isPreviewModalOpen = false;
+    this.previewFiles = [];
   }
 }

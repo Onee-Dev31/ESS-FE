@@ -1,85 +1,68 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal'; 
+import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
+import { VehicleService, TaxiRequest, TaxiItem } from '../../../services/vehicle.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FileUploadModal], 
+  imports: [CommonModule, FormsModule, FileUploadModal],
   templateUrl: './vehicle-taxi-form.html',
   styleUrl: './vehicle-taxi-form.scss'
 })
 export class VehicleTaxiFormComponent implements OnInit {
+  @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
+
+  private vehicleService = inject(VehicleService);
+
   items: any[] = [];
-  
+
   thaiMonths = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
   ];
   years = [2568, 2569, 2570];
 
   selectedMonth: string = 'ตุลาคม';
   selectedYear: number = 2568;
-  
+
   // Variables สำหรับ Modal
   isShowUploadModal: boolean = false;
   currentUploadItem: any = null;
 
   ngOnInit() {
-    this.generateMockData();
+    const existingRequest = this.vehicleService.getTaxiRequestById(this.requestId);
+    this.generateMockData(existingRequest);
   }
 
-  generateMockData() {
+  generateMockData(existingRequest?: TaxiRequest) {
+    // In real app, convert selectedMonth string to index if needed, or pass string
+    // Simplified mapping for mock
 
-    console.log(`Searching data for: ${this.selectedMonth} ${this.selectedYear}`);
-    const mockRows = [
+    // Get base calendar from service
+    const mockRows = this.vehicleService.getMockTaxiLogs(9, this.selectedYear); // 9 = October
 
-      { date: '01/10/2025', type: 'W', checkIn: '09:14', checkOut: '17:56', desc: 'ถ่ายงานหลังรายการแฉ', dest: 'Bravo Studio', dist: 120, amt: 120, selected: true },
-      { date: '02/10/2025', type: 'W', checkIn: '09:16', checkOut: '18:16', desc: 'สแตนด์บายงาน', dest: 'GMM Studio', dist: 120, amt: 120, selected: true },
-      { date: '03/10/2025', type: 'W', checkIn: '09:34', checkOut: '18:15', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '04/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '05/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '06/10/2025', type: 'W', checkIn: '09:20', checkOut: '18:10', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '07/10/2025', type: 'W', checkIn: '09:15', checkOut: '18:22', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '08/10/2025', type: 'W', checkIn: '09:26', checkOut: '18:22', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '09/10/2025', type: 'W', checkIn: '09:22', checkOut: '18:13', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '10/10/2025', type: 'W', checkIn: '08:58', checkOut: '18:14', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '11/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '12/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '13/10/2025', type: 'T', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '14/10/2025', type: 'W', checkIn: '09:24', checkOut: '18:39', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '15/10/2025', type: 'W', checkIn: '09:12', checkOut: '17:40', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '16/10/2025', type: 'W', checkIn: '09:17', checkOut: '18:27', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '17/10/2025', type: 'W', checkIn: '11:19', checkOut: '16:59', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '18/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '19/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '20/10/2025', type: 'W', checkIn: '09:19', checkOut: '15:55', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '21/10/2025', type: 'W', checkIn: '09:17', checkOut: '18:36', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '22/10/2025', type: 'W', checkIn: '09:46', checkOut: '18:05', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '23/10/2025', type: 'T', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '24/10/2025', type: 'L', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '25/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '26/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '27/10/2025', type: 'W', checkIn: '09:31', checkOut: '18:15', desc: 'ทดสอบการเบิก', dest: 'ทดสอบการเบิก', dist: 0, amt: 0, selected: true },
-      { date: '28/10/2025', type: 'W', checkIn: '09:52', checkOut: '18:39', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '29/10/2025', type: 'W', checkIn: '09:37', checkOut: '18:13', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '30/10/2025', type: 'W', checkIn: '09:44', checkOut: '18:51', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-      { date: '31/10/2025', type: 'W', checkIn: '09:39', checkOut: '18:09', desc: '', dest: '', dist: 0, amt: 0, selected: false }
+    this.items = mockRows.map((row: any) => {
+      const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
 
-    ];
-
-    this.items = mockRows.map(row => ({
-      ...row,
-      attachedFile: null
-    }));
+      return {
+        ...row,
+        desc: matchingItem ? matchingItem.desc : row.desc,
+        dest: matchingItem ? matchingItem.destination : row.dest,
+        dist: matchingItem ? matchingItem.distance : row.dist,
+        amt: matchingItem ? matchingItem.amount : row.amt,
+        selected: !!matchingItem,
+        attachedFile: matchingItem?.attachedFile || null
+      };
+    });
   }
 
   getTotalAmount() {
     return this.items
       .filter(i => i.selected)
-      .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+      .reduce((sum, i) => sum + (Number(i.amt) || 0), 0);
   }
 
   save() {
@@ -90,21 +73,54 @@ export class VehicleTaxiFormComponent implements OnInit {
       return;
     }
 
-    const invalidItem = selectedItems.find(i => !i.desc || !i.destination || !i.amount);
+    const invalidItem = selectedItems.find(i =>
+      !i.desc || i.desc.trim() === '' ||
+      !i.dest || i.dest.trim() === '' ||
+      i.amt === null || i.amt === undefined || i.amt <= 0
+    );
 
     if (invalidItem) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วนในรายการที่เลือก (ช่องสีแดง)');
+      alert(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`);
       return;
     }
 
-    console.log('บันทึกสำเร็จ', selectedItems);
-    console.log('ประจำเดือน:', this.selectedMonth, this.selectedYear);
+    // Convert UI items back to TaxiItems
+    const taxiItems: TaxiItem[] = selectedItems.map(i => ({
+      date: i.date,
+      desc: i.desc,
+      destination: i.dest,
+      distance: Number(i.dist),
+      amount: Number(i.amt),
+      attachedFile: i.attachedFile
+    }));
+
+    const existing = this.vehicleService.getTaxiRequestById(this.requestId);
+
+    if (existing) {
+      const updated: TaxiRequest = {
+        ...existing,
+        items: taxiItems
+      };
+      this.vehicleService.updateTaxiRequest(this.requestId, updated);
+      alert('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+    } else {
+      const newReq: TaxiRequest = {
+        id: this.requestId,
+        createDate: new Date().toLocaleDateString('en-GB'), // dd/mm/yyyy
+        status: 'รอตรวจสอบ',
+        items: taxiItems
+      };
+      this.vehicleService.addTaxiRequest(newReq);
+      alert(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
+    }
+
+    this.onClose.emit();
   }
 
   cancel() {
     this.onClose.emit();
   }
-  
+
   // --- Modal Logic ใหม่ ---
 
   openUploadModal(item: any) {
@@ -121,10 +137,10 @@ export class VehicleTaxiFormComponent implements OnInit {
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;
-      
+
       // Auto select ถ้ามีการแนบไฟล์
       if (fileName) {
-        this.currentUploadItem.selected = true; 
+        this.currentUploadItem.selected = true;
       }
     }
     this.closeUploadModal();
