@@ -12,12 +12,22 @@ import { FormsModule } from '@angular/forms';
 export class VehicleTaxiFormComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
   items: any[] = [];
+  thaiMonths = [
+    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+  ];
+  years = [2568, 2569, 2570];
+
+  selectedMonth: string = 'ตุลาคม';
+  selectedYear: number = 2568;
 
   ngOnInit() {
     this.generateMockData();
   }
 
   generateMockData() {
+    console.log(`Searching data for: ${this.selectedMonth} ${this.selectedYear}`);
+
     const mockRows = [
       { date: '01/10/2025', type: 'W', checkIn: '09:14', checkOut: '17:56', desc: 'ถ่ายงานหลังรายการแฉ', dest: 'Bravo Studio', dist: 120, amt: 120, selected: true },
       { date: '02/10/2025', type: 'W', checkIn: '09:16', checkOut: '18:16', desc: 'สแตนด์บายงาน', dest: 'GMM Studio', dist: 120, amt: 120, selected: true },
@@ -72,22 +82,23 @@ export class VehicleTaxiFormComponent implements OnInit {
   }
 
   save() {
-  const selectedItems = this.items.filter(i => i.selected);
+    const selectedItems = this.items.filter(i => i.selected);
 
-  if (selectedItems.length === 0) {
-    alert('กรุณาเลือกรายการที่ต้องการเบิก');
-    return;
+    if (selectedItems.length === 0) {
+      alert('กรุณาเลือกรายการที่ต้องการเบิก');
+      return;
+    }
+
+    const invalidItem = selectedItems.find(i => !i.desc || !i.destination || !i.amount);
+
+    if (invalidItem) {
+      alert('กรุณากรอกข้อมูลให้ครบถ้วนในรายการที่เลือก (ช่องสีแดง)');
+      return;
+    }
+
+    console.log('บันทึกสำเร็จ', selectedItems);
+    console.log('ประจำเดือน:', this.selectedMonth, this.selectedYear);
   }
-
-  const invalidItem = selectedItems.find(i => !i.desc || !i.destination || !i.amount);
-
-  if (invalidItem) {
-    alert('กรุณากรอกข้อมูลให้ครบถ้วนในรายการที่เลือก (ช่องสีแดง)');
-    return;
-  }
-
-  console.log('บันทึกสำเร็จ', selectedItems);
-}
 
   cancel() {
     this.onClose.emit();

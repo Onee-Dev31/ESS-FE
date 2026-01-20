@@ -9,13 +9,16 @@
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
-        <select class="form-control" style="width: 140px;">
-          <option>ตุลาคม</option>
+        
+        <select class="form-control" style="width: 140px;" [(ngModel)]="selectedMonth">
+          <option *ngFor="let m of thaiMonths" [value]="m">{{ m }}</option>
         </select>
-        <select class="form-control" style="width: 100px;">
-          <option>2568</option>
+
+        <select class="form-control" style="width: 100px;" [(ngModel)]="selectedYear">
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
         </select>
-        <button class="btn-search">ค้นหาข้อมูล</button>
+
+        <button class="btn-search" (click)="generateMockData()">ค้นหาข้อมูล</button>
       </div>
     </section>
 
@@ -50,8 +53,8 @@
             <th rowspan="2">ประเภท</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
             
-            <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
-            <th rowspan="2">จุดหมาย <span style="color:red">*</span></th>
+            <th rowspan="2">รายละเอียดการเบิก</th>
+            <th rowspan="2">จุดหมาย</th>
             
             <th rowspan="2">ระยะทาง<br>(Km.)</th>
             <th rowspan="2">จำนวนเงิน</th> <th rowspan="2">ไฟล์</th>
