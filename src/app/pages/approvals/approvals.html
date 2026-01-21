@@ -3,119 +3,177 @@
     <div class="page-header">
       <h1 class="main-title">My Approvals</h1>
       <div class="utility-btns">
-        <button class="btn-outline"><span class="icon">📥</span> Export</button>
-        <button class="btn-outline" (click)="refresh()">
-          <span class="icon">🔄</span> Refresh
-        </button>
+        <button class="btn-outline">📥 Export</button>
+        <button class="btn-outline" (click)="refresh()">🔄 Refresh</button>
       </div>
     </div>
 
     <div class="table-controls">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input
-          type="text"
-          placeholder="ค้นหา Request No, ชื่อ, ประเภท..."
-          [value]="searchText()"
-          (input)="onSearch($event)"
-        />
+        <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="searchText()" (input)="onSearch($event)" />
       </div>
 
       <div class="tab-navigation">
-        <button
-          *ngFor="let tab of tabs"
-          class="tab-item"
-          [class.active]="activeTab() === tab"
-          (click)="setActiveTab(tab)"
-        >
-          {{ tab }}
-          <span class="badge">{{ getTabCount(tab) }}</span>
+        @for (tab of tabs; track tab) {
+        <button class="tab-item" [class.active]="activeTab() === tab" (click)="setActiveTab(tab)">
+          {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
         </button>
+        }
       </div>
     </div>
 
     <table class="data-grid">
       <thead>
         <tr>
-          <th style="width: 120px">Request No</th>
-          <th style="width: 110px">Request Date</th>
-          <th style="width: 280px">Request By</th>
-          <th style="width: 140px">Request Type</th>
-          <th>Request Detail</th>
-          <th style="width: 100px">Amount</th>
-          <th style="width: 100px">Status</th>
-          <th style="width: 150px">Actions</th>
+          <th>Request No</th>
+          <th>Date Created</th> 
+          <th>Requester Info</th> 
+          <th>Type</th>
+          <th>Description</th> <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of filteredData()">
-          <td class="text-center font-inter">{{ row.requestNo }}</td>
-          <td class="text-center font-inter">{{ row.requestDate }}</td>
+        @for (row of filteredData(); track row.requestNo) {
+        <tr>
+          <td class="text-center font-inter" (click)="viewDetail(row)" style="cursor: pointer; color: #008ebc; font-weight: 600;">
+            {{ row.requestNo }}
+          </td>
+          <td class="text-center text-muted">{{ row.requestDate }}</td>
           <td>
             <div class="requester-info">
               <div class="name">{{ row.requestBy.name }}</div>
               <div class="details-box">
-                <div class="detail-row">
-                  <span class="label">รหัส:</span>
-                  <span class="font-inter">{{ row.requestBy.employeeId }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="label">แผนก:</span>
-                  <span>{{ row.requestBy.department }}</span>
-                </div>
-                <div class="detail-row">
-                  <span>{{ row.requestBy.company }}</span>
-                </div>
+                <span>{{ row.requestBy.employeeId }}</span>
+                <span class="divider">|</span>
+                <span>{{ row.requestBy.department }}</span>
+                <span class="divider">|</span>
+                <span>{{ row.requestBy.company }}</span>
               </div>
             </div>
           </td>
-          <td>{{ row.requestType }}</td>
-          <td>{{ row.requestDetail }}</td>
+          <td class="text-center">{{ row.requestType }}</td>
+          <td class="text-left description-cell"> <div class="truncate-text">{{ row.requestDetail }}</div>
+          </td>
           <td class="amount-cell">{{ row.amount | number }}</td>
           <td class="text-center">
-            <span
-              class="status-badge"
-              [ngClass]="{
-                pending: row.status === 'Pending',
-                approved: row.status === 'Approved',
-                rejected: row.status === 'Rejected',
-                referred: row.status === 'Referred Back',
-              }"
-            >
-              {{ row.status }}
-            </span>
+            <span class="status-badge" [ngClass]="row.status.toLowerCase().replace(' ', '-')">{{ row.status }}</span>
           </td>
           <td>
             <div class="action-cell">
-              <div class="tooltip-container">
-                <button class="act-btn v-btn" (click)="viewDetail(row)">👁</button>
-                <span class="tooltip-text">View Detail</span>
-              </div>
-              <div class="tooltip-container">
-                <button class="act-btn a-btn" (click)="approve(row)">✓</button>
-                <span class="tooltip-text">Approve</span>
-              </div>
-              <div class="tooltip-container">
-                <button class="act-btn r-btn" (click)="reject(row)">✕</button>
-                <span class="tooltip-text">Reject</span>
-              </div>
-              <div class="tooltip-container">
-                <button class="act-btn b-btn" (click)="referBack(row)">↩</button>
-                <span class="tooltip-text">Refer Back</span>
-              </div>
+              <button class="act-btn v-btn" title="View" (click)="viewDetail(row)">👁</button>
+              <button class="act-btn a-btn" title="Approve" (click)="updateStatus(row, 'Approved')">✓</button>
+              <button class="act-btn r-btn" title="Reject" (click)="updateStatus(row, 'Rejected')">✕</button>
+              <button class="act-btn b-btn" title="Refer Back" (click)="updateStatus(row, 'Referred Back')">↩</button>
             </div>
           </td>
         </tr>
-
-        <tr *ngIf="filteredData().length === 0">
-          <td colspan="8">
-            <div class="empty-state">
-              <div class="icon">📋</div>
-              <div class="message">ไม่พบรายการที่ต้องการค้นหาในหน้านี้</div>
-            </div>
-          </td>
-        </tr>
+        }
       </tbody>
     </table>
   </div>
 </div>
+
+@if (isModalOpen() && selectedItem()) {
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-container-large" (click)="$event.stopPropagation()">
+    <div class="modal-header-modern">
+      <div class="header-info">
+        <h2 class="request-title">{{ selectedItem()?.requestNo }}: {{ selectedItem()?.requestType }}</h2>
+        <div class="requester-line">Created on: <span class="highlight">{{ selectedItem()?.requestDate }}</span></div>
+      </div>
+      <div class="header-actions-group">
+        <button class="btn-action-green" (click)="updateStatus(selectedItem()!, 'Approved')">Approve</button>
+        <button class="btn-action-red" (click)="updateStatus(selectedItem()!, 'Rejected')">Reject</button>
+        <button class="btn-action-orange" (click)="updateStatus(selectedItem()!, 'Referred Back')">Refer Back</button>
+        <button class="btn-close-x" (click)="closeModal()">&times;</button>
+      </div>
+    </div>
+
+    <div class="modal-layout-body">
+      <div class="main-panel">
+        <div class="summary-cards-grid">
+          <div class="summary-card">
+            <div class="s-data"><label>Status</label><div class="s-value">{{ selectedItem()?.status }}</div></div>
+          </div>
+          <div class="summary-card">
+            <div class="s-data"><label>Main Amount</label><div class="s-value">{{ selectedItem()?.amount | number }} THB</div></div>
+          </div>
+        </div>
+
+        <div class="content-tabs">
+          <button class="tab-link" [class.active]="modalActiveTab() === 'Items'" (click)="modalActiveTab.set('Items')">รายการเบิก</button>
+          <button class="tab-link" [class.active]="modalActiveTab() === 'Comments'" (click)="modalActiveTab.set('Comments')">Comments</button>
+        </div>
+
+        <div class="tab-view">
+          @if (modalActiveTab() === 'Items') {
+            @if (selectedRequestDetails()) {
+              <div class="detail-table-wrapper">
+                <table class="detail-table">
+                  <thead>
+                    <tr>
+                      <th>วันที่</th>
+                      <th>รายละเอียด</th>
+                      @if (selectedRequestDetails()?.type === 'allowance') {
+                        <th class="text-center">เวลา In-Out</th>
+                      } @else {
+                        <th>ปลายทาง</th>
+                      }
+                      <th class="text-right">จำนวนเงิน</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of selectedRequestDetails()?.items; track $index) {
+                      <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.description || item.desc }}</td>
+                        @if (selectedRequestDetails()?.type === 'allowance') {
+                          <td class="text-center">{{ item.timeIn }} - {{ item.timeOut }}</td>
+                        } @else {
+                          <td>{{ item.destination }}</td>
+                        }
+                        <td class="text-right font-bold">{{ item.amount | number }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                  <tfoot>
+                    <tr class="modal-total-row">
+                      <td colspan="3" class="text-right"><strong>Grand Total (Check):</strong></td>
+                      <td class="text-right total-val">{{ modalItemsTotal() | number }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              
+              @if (modalItemsTotal() !== selectedItem()?.amount) {
+                <div class="alert-warning">⚠️ ยอดรวมรายการย่อยไม่ตรงกับยอดเบิกหลัก ({{ selectedItem()?.amount | number }})</div>
+              }
+            }
+          }
+
+          @if (modalActiveTab() === 'Comments') {
+            <div class="comment-thread">
+              <div class="avatar-circle">{{ selectedItem()?.requestBy?.name?.charAt(0) }}</div>
+              <div class="comment-bubble">
+                <div class="comment-top"><strong>Request Detail :</strong></div>
+                <p>{{ selectedItem()?.requestDetail }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <h3 class="side-title">Requester Info</h3>
+        <div class="side-group"><label>Name</label><div class="side-val">{{ selectedItem()?.requestBy?.name }}</div></div>
+        <div class="side-group"><label>Employee ID</label><div class="side-val">{{ selectedItem()?.requestBy?.employeeId }}</div></div>
+        <div class="side-group"><label>Department</label><div class="side-val">{{ selectedItem()?.requestBy?.department }}</div></div>
+        <div class="side-group"><label>Company</label><div class="side-val">{{ selectedItem()?.requestBy?.company }}</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+}

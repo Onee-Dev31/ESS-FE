@@ -49,6 +49,7 @@ export class VehicleService {
                 { date: '28/10/2026', desc: 'ทดสอบ 2', amount: 120 },
                 { date: '29/10/2026', desc: 'ทดสอบ 3', amount: 120 },
                 { date: '30/10/2026', desc: 'ทดสอบ 4', amount: 120 },
+                { date: '31/10/2026', desc: 'ทดสอบ 5', amount: 120 },
             ],
         }
     ]);
@@ -220,26 +221,29 @@ export class VehicleService {
 
     private allowanceRequests = signal<AllowanceRequest[]>([
         {
-            id: '2701-001',
+            id: '2701#001',
             createDate: '2026-01-15',
             status: 'รอตรวจสอบ',
             items: [
                 { date: '27/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน A', hours: 2, amount: 150, selected: true },
                 { date: '28/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน B', hours: 2, amount: 150, selected: true },
                 { date: '29/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน C', hours: 2, amount: 150, selected: true },
+                { date: '30/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน D', hours: 2, amount: 150, selected: true },
             ],
         },
         {
-            id: '2701-002',
+            id: '2701#002',
             createDate: '2026-01-16',
             status: 'ต้นสังกัดอนุมัติ',
             items: [
                 { date: '22/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '23:00', description: 'สแตนด์บายงาน', hours: 5, amount: 500, selected: true },
                 { date: '27/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน D', hours: 2, amount: 150, selected: true },
+                { date: '28/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน E', hours: 2, amount: 150, selected: true },
+                { date: '29/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน F', hours: 2, amount: 150, selected: true },
             ],
         },
         {
-            id: '2701-003',
+            id: '2701#003',
             createDate: '2026-01-17',
             status: 'รอจ่าย',
             items: [
@@ -247,7 +251,7 @@ export class VehicleService {
             ],
         },
         {
-            id: '2701-004',
+            id: '2701#004',
             createDate: '2026-01-16',
             status: 'จ่ายแล้ว',
             items: [
@@ -281,14 +285,14 @@ export class VehicleService {
         const prefix = '2701';
         const lastIdNum = this.allowanceRequests().reduce((max, item) => {
             if (item.id.startsWith(prefix)) {
-                const parts = item.id.split('-');
+                const parts = item.id.split('#');
                 const num = parseInt(parts[1] || '0');
                 return num > max ? num : max;
             }
             return max;
         }, 0);
 
-        return `${prefix}-${(lastIdNum + 1).toString().padStart(3, '0')}`;
+        return `${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`;
     }
 
     getMockAllowanceLogs(month: number, year: number): any[] {
@@ -357,7 +361,7 @@ export interface AllowanceItem {
 }
 
 export interface AllowanceRequest {
-    id: string; // 2701-xxx
+    id: string; // 2701#xxx
     createDate: string;
     status: string;
     items: AllowanceItem[];

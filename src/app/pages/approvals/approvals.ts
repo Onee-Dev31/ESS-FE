@@ -1,6 +1,17 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { VehicleService } from '../../services/vehicle.service';
+
+interface UnifiedItem {
+  date: string;
+  description?: string;
+  desc?: string;
+  timeIn?: string;
+  timeOut?: string;
+  amount: number;
+  destination?: string;
+}
 
 interface ApprovalItem {
   requestNo: string;
@@ -11,7 +22,7 @@ interface ApprovalItem {
     department: string;
     company: string;
   };
-  requestType: string;
+  requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่';
   requestDetail: string;
   amount: number;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
@@ -23,178 +34,111 @@ interface ApprovalItem {
   imports: [CommonModule, FormsModule],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
+  encapsulation: ViewEncapsulation.None
 })
-export class ApprovalsComponent {
+export class ApprovalsComponent implements OnInit {
+  private vehicleService = inject(VehicleService);
+  
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
   activeTab = signal<string>('Pending');
   searchText = signal<string>('');
+  
+  isModalOpen = signal<boolean>(false);
+  selectedItem = signal<ApprovalItem | null>(null);
+  modalActiveTab = signal<'Items' | 'Comments'>('Items');
 
-  approvals = signal<ApprovalItem[]>([
-    {
-      requestNo: '2701#001',
-      requestDate: '21-Jan-2026',
-      requestBy: {
-        name: 'แพรวนภา บุตรโคษา (แพรว)',
-        employeeId: 'OTD01050',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
+  approvals = signal<ApprovalItem[]>([]);
+
+  ngOnInit() {
+    this.refresh();
+  }
+
+  refresh() {
+    const allowances = this.vehicleService.getAllowanceRequests()();
+    const taxis = this.vehicleService.getTaxiRequests()();
+    
+    const mockUser = {
+      name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
+      employeeId: 'OTD01054',
+      department: '10806-IT Department',
+      company: 'บริษัท OTD'
+    };
+
+    const mappedAllowances: ApprovalItem[] = allowances.map(a => ({
+      requestNo: a.id,
+      requestDate: a.createDate,
+      requestBy: mockUser,
       requestType: 'ค่าเบี้ยเลี้ยง',
-      requestDetail: 'มา Stand by วันหยุด',
-      amount: 500,
-      status: 'Pending',
-    },
-    {
-      requestNo: '2701#002',
-      requestDate: '20-Jan-2026',
-      requestBy: {
-        name: 'พิมชนารถ ประเสริฐศรี(พิม)',
-        employeeId: 'OTD01051',
-        department: '10807-HR Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่ารถ',
-      requestDetail: 'OT วันเสาร์',
-      amount: 1200,
-      status: 'Pending',
-    },
-    {
-      requestNo: '2701#003',
-      requestDate: '19-Jan-2026',
-      requestBy: {
-        name: 'อภิเชษฐ์ ประภาสปิยากร(เบนซ์)',
-        employeeId: 'OTD01052',
-        department: '10808-Finance',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่าแท็กซี่',
-      requestDetail: 'เดินทางไปประชุมลูกค้า',
-      amount: 850,
-      status: 'Pending',
-    },
-    {
-      requestNo: '2701#004',
-      requestDate: '18-Jan-2026',
-      requestBy: {
-        name: 'ศตวรรต เสนาจันทร์า(บูม)',
-        employeeId: 'OTD01053',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่าสมรส',
-      requestDetail: 'ซื้อ Keyboard ใหม่',
-      amount: 2500,
-      status: 'Pending',
-    },
-    {
-      requestNo: '2701#005',
-      requestDate: '18-Jan-2026',
-      requestBy: {
-        name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
-        employeeId: 'OTD01053',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ผู้ป่วยนอก',
-      requestDetail: 'ซื้อ Keyboard ใหม่',
-      amount: 5000,
-      status: 'Pending',
-    },
-    {
-      requestNo: '2701#006',
-      requestDate: '18-Jan-2026',
-      requestBy: {
-        name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
-        employeeId: 'OTD01053',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่าอุปกรณ์',
-      requestDetail: 'ซื้อ Keyboard ใหม่',
-      amount: 5000,
-      status: 'Approved',
-    },
-    {
-      requestNo: '2701#007',
-      requestDate: '18-Jan-2026',
-      requestBy: {
-        name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
-        employeeId: 'OTD01053',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่าอุปกรณ์',
-      requestDetail: 'ซื้อ Keyboard ใหม่',
-      amount: 5000,
-      status: 'Referred Back',
-    },
-    {
-      requestNo: '2701#008',
-      requestDate: '18-Jan-2026',
-      requestBy: {
-        name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
-        employeeId: 'OTD01053',
-        department: '10806-IT Department',
-        company: 'บริษัท OTD',
-      },
-      requestType: 'ค่าอุปกรณ์',
-      requestDetail: 'ซื้อ Keyboard ใหม่',
-      amount: 5000,
-      status: 'Rejected',
-    },
-  ]);
+      requestDetail: a.items[0]?.description || 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน',
+      amount: a.items.reduce((sum, i) => sum + i.amount, 0),
+      status: this.mapStatus(a.status)
+    }));
+
+    const mappedTaxis: ApprovalItem[] = taxis.map(t => ({
+      requestNo: t.id,
+      requestDate: t.createDate,
+      requestBy: { ...mockUser, name: 'แพรวนภา บุตรโคษา (แพรว)' },
+      requestType: t.items[0]?.desc?.includes('แท็กซี่') ? 'ค่าแท็กซี่' : 'ค่ารถ',
+      requestDetail: t.items[0]?.desc || 'เบิกค่าเดินทางไปพบลูกค้า',
+      amount: t.items.reduce((sum, i) => sum + i.amount, 0),
+      status: this.mapStatus(t.status)
+    }));
+
+    const combined = [...mappedAllowances, ...mappedTaxis].sort((a, b) => b.requestNo.localeCompare(a.requestNo));
+    this.approvals.set(combined);
+  }
+
+  private mapStatus(status: string): any {
+    if (status.includes('รอตรวจสอบ')) return 'Pending';
+    if (status.includes('อนุมัติ')) return 'Approved';
+    if (status.includes('ไม่อนุมัติ')) return 'Rejected';
+    return 'Pending';
+  }
 
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();
-
-    return this.approvals().filter((item) => {
-      const matchesTab = item.status === statusFilter;
-      const matchesSearch =
-        item.requestNo.toLowerCase().includes(searchFilter) ||
+    return this.approvals().filter(item =>
+      item.status === statusFilter &&
+      (item.requestNo.toLowerCase().includes(searchFilter) ||
         item.requestBy.name.toLowerCase().includes(searchFilter) ||
-        item.requestType.toLowerCase().includes(searchFilter) ||
-        item.requestDetail.toLowerCase().includes(searchFilter);
-
-      return matchesTab && matchesSearch;
-    });
+        item.requestDetail.toLowerCase().includes(searchFilter))
+    );
   });
 
-  setActiveTab(tab: string): void {
-    this.activeTab.set(tab);
+  selectedRequestDetails = computed(() => {
+    const item = this.selectedItem();
+    if (!item) return null;
+    if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
+      const data = this.vehicleService.getAllowanceRequestById(item.requestNo);
+      return data ? { type: 'allowance', items: data.items as UnifiedItem[] } : null;
+    } 
+    const data = this.vehicleService.getTaxiRequestById(item.requestNo);
+    return data ? { type: 'taxi', items: data.items as UnifiedItem[] } : null;
+  });
+
+  modalItemsTotal = computed(() => {
+    const details = this.selectedRequestDetails();
+    return details?.items?.reduce((sum, item) => sum + item.amount, 0) || 0;
+  });
+
+  setActiveTab(tab: string) { this.activeTab.set(tab); }
+  getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
+  onSearch(event: any) { this.searchText.set(event.target.value); }
+
+  viewDetail(item: ApprovalItem) {
+    this.selectedItem.set(item);
+    this.modalActiveTab.set('Items');
+    this.isModalOpen.set(true);
   }
 
-  getTabCount(tab: string): number {
-    return this.approvals().filter((item) => item.status === tab).length;
+  closeModal() {
+    this.isModalOpen.set(false);
+    this.selectedItem.set(null);
   }
 
-  onSearch(event: any): void {
-    this.searchText.set(event.target.value);
-  }
-
-  approve(item: ApprovalItem): void {
-    this.updateStatus(item, 'Approved');
-  }
-
-  reject(item: ApprovalItem): void {
-    this.updateStatus(item, 'Rejected');
-  }
-
-  referBack(item: ApprovalItem): void {
-    this.updateStatus(item, 'Referred Back');
-  }
-
-  private updateStatus(item: ApprovalItem, newStatus: ApprovalItem['status']): void {
-    this.approvals.update((items) =>
-      items.map((i) => (i.requestNo === item.requestNo ? { ...i, status: newStatus } : i))
-    );
-  }
-
-  refresh(): void {
-    console.log('Refreshing data...');
-  }
-
-  viewDetail(item: ApprovalItem): void {
-    console.log('View detail:', item);
+  updateStatus(item: ApprovalItem, newStatus: any) {
+    this.approvals.update(items => items.map(i => i.requestNo === item.requestNo ? { ...i, status: newStatus } : i));
+    this.closeModal();
   }
 }
