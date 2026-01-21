@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
+// Variables
+$primary-blue: #2563eb;
+$primary-light: #eff6ff;
+$border-color: #e5e7eb;
+$bg-header: #f9fafb;
+$text-dark: #1f2937;
+$text-muted: #6b7280;
+$success: #22c55e;
+$danger: #ef4444;
+$warning: #f97316;
+$radius: 8px;
+$font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+
+.approvals-wrapper {
+  padding: 24px;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  font-family: $font-family;
+
+  .card {
+    background: #ffffff;
+    border-radius: $radius;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .main-title {
+      color: $text-dark;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .utility-btns {
+      display: flex;
+      gap: 12px;
+
+      .btn-outline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background: #ffffff;
+        color: $text-dark;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: $font-family;
+
+        &:hover {
+          background: $bg-header;
+          border-color: $primary-blue;
+          color: $primary-blue;
+        }
+      }
+    }
+  }
+
+  .table-controls {
+    margin-bottom: 20px;
+
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+
+      input {
+        border: 1px solid $border-color;
+        padding: 10px 12px 10px 40px;
+        width: 320px;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+        font-family: $font-family;
+
+        &:focus {
+          border-color: $primary-blue;
+          box-shadow: 0 0 0 3px rgba($primary-blue, 0.1);
+        }
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+      }
+    }
+
+    .tab-navigation {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid $border-color;
+
+      .tab-item {
+        background: none;
+        border: none;
+        padding: 12px 20px;
+        color: $text-muted;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: $font-family;
+        position: relative;
+
+        &.active {
+          color: $primary-blue;
+          background: $primary-light;
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: $primary-blue;
+          }
+        }
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 20px;
+          height: 20px;
+          padding: 0 6px;
+          margin-left: 8px;
+          font-size: 12px;
+          border-radius: 10px;
+          background: $border-color;
+          color: $text-muted;
+        }
+
+        &.active .badge {
+          background: $primary-blue;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  .data-grid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid $border-color;
+    border-radius: $radius;
+    overflow: hidden;
+
+    th {
+      background-color: $bg-header;
+      padding: 14px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid $border-color;
+      &:not(:last-child) {
+        border-right: 1px solid $border-color;
+      }
+    }
+
+    td {
+      padding: 16px;
+      font-size: 14px;
+      border-bottom: 1px solid $border-color;
+      &:not(:last-child) {
+        border-right: 1px solid $border-color;
+      }
+    }
+
+    .requester-info {
+      .name {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 15px;
+      }
+      .details-box {
+        background: $bg-header;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 13px;
+        color: $text-muted;
+        line-height: 1.6;
+      }
+    }
+
+    .amount-cell {
+      text-align: center;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+    .text-center {
+      text-align: center;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      &.pending {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      &.approved {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      &.rejected {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      &.referred {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+    }
+  }
+
+  .action-cell {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    .act-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &.v-btn {
+        background: #e5e7eb;
+        color: #4b5563;
+      }
+      &.a-btn {
+        background: $success;
+      }
+      &.r-btn {
+        background: $danger;
+      }
+      &.b-btn {
+        background: $warning;
+      }
+    }
+  }
+
+  .tooltip-container {
+    position: relative;
+    .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      background: #1f2937;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      position: absolute;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    &:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
