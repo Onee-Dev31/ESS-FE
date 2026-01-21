@@ -26,10 +26,10 @@ interface ApprovalItem {
 })
 export class ApprovalsComponent {
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
-  activeTab = signal<string>('Pending'); 
+  activeTab = signal<string>('Pending');
   searchText = signal<string>('');
 
-  data = signal<ApprovalItem[]>([
+  approvals = signal<ApprovalItem[]>([
     {
       requestNo: '2701#001',
       requestDate: '21-Jan-2026',
@@ -147,15 +147,15 @@ export class ApprovalsComponent {
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();
-    
-    return this.data().filter((item) => {
+
+    return this.approvals().filter((item) => {
       const matchesTab = item.status === statusFilter;
-      const matchesSearch = 
+      const matchesSearch =
         item.requestNo.toLowerCase().includes(searchFilter) ||
         item.requestBy.name.toLowerCase().includes(searchFilter) ||
         item.requestType.toLowerCase().includes(searchFilter) ||
         item.requestDetail.toLowerCase().includes(searchFilter);
-      
+
       return matchesTab && matchesSearch;
     });
   });
@@ -165,7 +165,7 @@ export class ApprovalsComponent {
   }
 
   getTabCount(tab: string): number {
-    return this.data().filter((item) => item.status === tab).length;
+    return this.approvals().filter((item) => item.status === tab).length;
   }
 
   onSearch(event: any): void {
@@ -185,7 +185,7 @@ export class ApprovalsComponent {
   }
 
   private updateStatus(item: ApprovalItem, newStatus: ApprovalItem['status']): void {
-    this.data.update((items) =>
+    this.approvals.update((items) =>
       items.map((i) => (i.requestNo === item.requestNo ? { ...i, status: newStatus } : i))
     );
   }
