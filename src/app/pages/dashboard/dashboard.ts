@@ -1,221 +1,68 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import { UserService, UserProfile } from '../../services/user.service';
+import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../services/dashboard.service';
+import { VehicleService } from '../../services/vehicle.service';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
-interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
-
-interface WelfareItem { 
-  title: string; 
-  amount: string; 
-  iconName: string; 
-  cardClass?: string;
-  titleColor?: string;
-  amountColor?: string;
-  tooltip?: string;
-  route?: string;
-}
-
-interface LeaveItem {
-  label: string;
-  count: string;
-  countColor: string;
-  iconClass: string;
-  iconColor?: string;
-  theme: string;
-  balance: number;
-}
-interface HolidayItem { date: string; name: string; }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    FullCalendarModule, 
+    FullCalendarModule,
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss', 
+  styleUrl: './dashboard.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private dashboardService = inject(DashboardService);
+  private vehicleService = inject(VehicleService);
 
-  profileList: ProfileItem[] = [
-    { label: 'Email', value: 'praewnapa.boo@onee.one', icon: 'fas fa-envelope', iconColor: '#ffffff' },
-    { label: 'เบอร์โทรศัพท์', value: '9409', icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
-    { label: 'ชั้น', value: '15', icon: 'fas fa-layer-group', iconColor: '#ffffff' },
-    { label: 'แผนก', value: '11206 - Program Development', icon: 'fas fa-sitemap', iconColor: '#ffffff' },
-    { label: 'บริษัท', value: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด', icon: 'fas fa-building', iconColor: '#ffffff' }
+  // Observables for Async Data
+  userProfile$!: Observable<UserProfile>;
+  medicalStats$!: Observable<MedicalStat[]>;
+  welfareStats$!: Observable<WelfareItem[]>;
+  leaveStats$!: Observable<LeaveItem[]>;
+  holidays$!: Observable<HolidayItem[]>;
+  pendingCount$!: Observable<number>; // ตัวแปรแสดงจำนวนรายการรออนุมัติ
+
+  // ข้อมูลจำลอง (Static)
+  profileList: ProfileItem[] = [];
+  itList: ProfileItem[] = [];
+
+  attendanceList = [
+    { label: 'ลาป่วย', value: '10 วัน' },
+    { label: 'ลาพักร้อน', value: '5 วัน' },
+    { label: 'ลากิจ', value: '5 วัน' },
+    { label: 'มาสาย', value: '5 ครั้ง' },
+    { label: 'ขาดงาน', value: '5 ครั้ง' }
   ];
 
-  itList: ProfileItem[] = [
-    { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: 'praewnapaboo' },
-    { label: 'Account expire date', value: '16-Jul-2026' },
-    { label: 'Laptop', value: 'Dell 555 Asset No. 44545sf45dfd86' },
-    { label: 'PC', value: 'Dell 888 Asset No. 415v489dfg7df/9' },
-    { label: 'Monitor', value: 'Dell 999 Asset No. 415v489dfg7df/9' }
-  ];
-
-  medicalStats: MedicalStat[] = [
-    { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },
-    { label: 'ทันตกรรม', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-blue', percent: 100 },
-    { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-indigo', percent: 100 },
-    { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
-  ];
-
-  welfareStats: WelfareItem[] = [
-    { 
-      title: 'ค่าเบี้ยเลี้ยง', 
-      amount: '10,500', 
-      iconName: 'fas fa-dollar-sign', 
-      cardClass: 'card-green',
-      titleColor: '#15803d',
-      amountColor: '#15803d',
-      route: '/allowance'
-    },
-    { 
-      title: 'ค่ารถ', 
-      amount: '584', 
-      iconName: 'fas fa-car', 
-      cardClass: 'card-blue',
-      tooltip: `<strong>เงื่อนไข:</strong><br />- ค่ารถก่อน 06:00 น. ต้องเข้างานก่อน 06:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />- ค่ารถหลัง 22:00 น. ต้องเข้างานเกิน 22:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง`,
-      titleColor: '#1e40af',
-      amountColor: '#1e40af',
-      route: '/vehicle'
-    },
-    { 
-      title: 'ค่าแท็กซี่', 
-      amount: '876', 
-      iconName: 'fas fa-taxi', 
-      cardClass: 'card-yellow',
-      tooltip: `<strong>เงื่อนไข:</strong><br />- 1,000 บาท/ปี<br />- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น`,
-      titleColor: '#9a3412',
-      amountColor: '#9a3412',
-      route: '/vehicle-taxi'
-    },
-    { 
-      title: 'ค่าสมรส', 
-      amount: '3,500', 
-      iconName: 'fas fa-heart', 
-      tooltip: `<strong>เงื่อนไข:</strong><br />- อายุงานครบ 1 ปี<br />- เบิกได้ 5,000 บาท 1 ครั้งตลอดอายุงาน`
-    },
-    { 
-      title: 'ค่าอุปสมบท', 
-      amount: '10,500', 
-      iconName: 'fas fa-hands-praying', 
-      tooltip: `<strong>เงื่อนไข:</strong><br />- อายุงาน 1 ปี เพศชาย<br />- เบิกได้ 5,000 บาท 1 ครั้งตลอดอายุงาน`
-    },
-    { 
-      title: 'ค่าฌาปนกิจ', 
-      amount: '584', 
-      iconName: 'fas fa-church', 
-      tooltip: `<strong>เงื่อนไข :</strong><br />- เบิกได้ 80,000 บาท/ตลอดอายุงาน<br />- พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000 บาท/คน`
-    },
-    { 
-      title: 'ค่าพวงหรีด', 
-      amount: '876', 
-      iconName: 'fas fa-spa', 
-      tooltip: `<strong>เงื่อนไข :</strong><br />- เบิกได้ 12,000 บาท/ตลอดอายุงาน<br />- พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน`
-    }
-  ];
-
-  leaveStats: LeaveItem[] = [
-    { 
-      label: 'ลาพักร้อน', 
-      count: '01/09', 
-      countColor: '#dc3545', 
-      iconClass: 'fas fa-plane-departure', 
-      iconColor: '#ef4444', 
-      theme: 'theme-pink', 
-      balance: 8 
-    },
-    { 
-      label: 'ลากิจ', 
-      count: '03/06', 
-      countColor: '#0d6efd', 
-      iconClass: 'fas fa-briefcase', 
-      iconColor: '#3b82f6',
-      theme: 'theme-blue', 
-      balance: 3 
-    },
-    { 
-      label: 'ลาป่วย', 
-      count: '10/30', 
-      countColor: '#4650dd', 
-      iconClass: 'fas fa-stethoscope', 
-      iconColor: '#4049c7',
-      theme: 'theme-purple', 
-      balance: 20 
-    },
-    { 
-      label: 'ลาเพื่อประกอบพิธีสมรส', 
-      count: '0/5', 
-      countColor: '#35b653', 
-      iconClass: 'fas fa-ring', 
-      iconColor: '#35b653',
-      theme: 'theme-green', 
-      balance: 5 
-    },
-    { 
-      label: 'ลาคลอด', 
-      count: '01/09', 
-      countColor: '#dc3545', 
-      iconClass: 'fas fa-baby-carriage', 
-      iconColor: '#ef4444',
-      theme: 'theme-pink', 
-      balance: 8 
-    },
-    { 
-      label: 'ลาต่อเนื่องจากลาคลอด (บุตรเจ็บป่วย)', 
-      count: '03/06', 
-      countColor: '#0d6efd', 
-      iconClass: 'fas fa-hand-holding-heart', 
-      iconColor: '#3b82f6', 
-      theme: 'theme-blue', 
-      balance: 3 
-    },
-    { 
-      label: 'ลาทำหมัน', 
-      count: '03/06', 
-      countColor: '#4650dd', 
-      iconClass: 'fas fa-user-md', 
-      iconColor: '#4049c7',
-      theme: 'theme-purple', 
-      balance: 3 
-    },
-    { 
-      label: 'ลาเพื่อจัดการงานศพ', 
-      count: '03/06', 
-      countColor: '#35b653', 
-      iconClass: 'fas fa-ribbon', 
-      iconColor: '#35b653',
-      theme: 'theme-green', 
-      balance: 3 
-    },
-    // { 
-    //   label: 'ลาป่วยเกิน 30 วัน', 
-    //   count: '03/06', 
-    //   countColor: '#dc3545', 
-    //   iconClass: 'fas fa-procedures', 
-    //   iconColor: '#ef4444',
-    //   theme: 'theme-pink', 
-    //   balance: 3 
-    // },
-  ];
-
-  holidays: HolidayItem[] = [
-    { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ...' },
-    { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
-    { date: '31/12/2569', name: 'วันสิ้นปี' }
+  performanceList = [
+    { year: 'ปี 2026', grade: 'เกรด A+' },
+    { year: 'ปี 2025', grade: 'เกรด A' },
+    { year: 'ปี 2024', grade: 'เกรด B+' },
+    { year: 'ปี 2023', grade: 'เกรด B' },
+    { year: 'ปี 2022', grade: 'เกรด C+' },
+    { year: 'ปี 2021', grade: 'เกรด C' }
   ];
 
   specialDates: Record<string, any> = {
     '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
-    '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' }, 
+    '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' },
     '2026-04-06': { type: 'holiday', note: 'วันจักรี', code: 'HOL' },
     '2026-04-13': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
     '2026-04-14': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
@@ -235,23 +82,6 @@ export class DashboardComponent {
     '2026-12-31': { type: 'holiday', note: 'วันสิ้นปี', code: 'HOL' },
     '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
   };
-
-  attendanceList = [
-  { label: 'ลาป่วย', value: '10 วัน' },
-  { label: 'ลาพักร้อน', value: '5 วัน' },
-  { label: 'ลากิจ', value: '5 วัน' },
-  { label: 'มาสาย', value: '5 ครั้ง' },
-  { label: 'ขาดงาน', value: '5 ครั้ง' }
-];
-
-performanceList = [
-  { year: 'ปี 2026', grade: 'เกรด A+' },
-  { year: 'ปี 2025', grade: 'เกรด A' },
-  { year: 'ปี 2024', grade: 'เกรด B+' },
-  { year: 'ปี 2023', grade: 'เกรด B' },
-  { year: 'ปี 2022', grade: 'เกรด C+' },
-  { year: 'ปี 2021', grade: 'เกรด C' }
-];
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -309,7 +139,53 @@ performanceList = [
     }
   };
 
-  constructor(private router: Router) { }
+  constructor() { }
+
+  ngOnInit() {
+    this.userProfile$ = this.userService.getUserProfile();
+    this.medicalStats$ = this.dashboardService.getMedicalStats();
+    this.welfareStats$ = this.dashboardService.getWelfareStats();
+    this.leaveStats$ = this.dashboardService.getLeaveStats();
+    this.holidays$ = this.dashboardService.getHolidays();
+
+    // คำนวณยอดรออนุมัติทั้งหมด
+    this.pendingCount$ = forkJoin({
+      allowances: this.vehicleService.getAllowanceRequests(),
+      taxis: this.vehicleService.getTaxiRequests(),
+      vehicles: this.vehicleService.getRequests()
+    }).pipe(
+      map(({ allowances, taxis, vehicles }) => {
+        const p1 = allowances.filter(a => a.status.includes('รอตรวจสอบ')).length;
+        const p2 = taxis.filter(t => t.status.includes('รอตรวจสอบ')).length;
+        const p3 = vehicles.filter(v => v.status.includes('รอตรวจสอบ')).length;
+        return p1 + p2 + p3;
+      })
+    );
+
+    // แปลงข้อมูล Profile ให้แสดงผลได้ง่ายขึ้น
+    this.userProfile$.subscribe(profile => {
+      this.profileList = [
+        { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
+        { label: 'เบอร์โทรศัพท์', value: profile.phone, icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
+        { label: 'ชั้น', value: profile.floor, icon: 'fas fa-layer-group', iconColor: '#ffffff' },
+        { label: 'แผนก', value: profile.department, icon: 'fas fa-sitemap', iconColor: '#ffffff' },
+        { label: 'บริษัท', value: profile.company, icon: 'fas fa-building', iconColor: '#ffffff' }
+      ];
+
+      if (profile.itAssets) {
+        this.itList = [
+          { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
+          { label: 'Account expire date', value: profile.itAssets.expireDate },
+          { label: 'Laptop', value: profile.itAssets.laptop },
+          { label: 'PC', value: profile.itAssets.pc },
+          { label: 'Monitor', value: profile.itAssets.monitor }
+        ];
+      }
+    });
+
+    // หมายเหตุ: ข้อมูลวันหยุดปัจจุบันยังเป็น Hardcoded
+  }
+
   navigateTo(path: string | undefined) {
     if (path) {
       this.router.navigate([path]);

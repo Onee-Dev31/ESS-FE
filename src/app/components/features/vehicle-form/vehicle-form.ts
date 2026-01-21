@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input, inject } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleService, RequestItem, VehicleRequest } from '../../../services/vehicle.service';
@@ -11,6 +11,7 @@ interface LogItem {
   amount: number;
   selected: boolean;
   description: string;
+  shiftCode?: string;
 }
 
 @Component({
@@ -20,12 +21,15 @@ interface LogItem {
   templateUrl: './vehicle-form.html',
   styleUrls: ['./vehicle-form.scss']
 })
-export class VehicleFormComponent implements OnInit {
+export class VehicleFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
 
   @Output() onClose = new EventEmitter<void>();
 
   private vehicleService = inject(VehicleService);
+  private cdr = inject(ChangeDetectorRef);
+
+  loadedRequest?: VehicleRequest;
 
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2568, 2569, 2570];
@@ -36,42 +40,50 @@ export class VehicleFormComponent implements OnInit {
   logs: LogItem[] = [];
 
   ngOnInit(): void {
-    // Determine if it's a new request or edit
-    // Note: The parent passes a generated ID for new requests, so we need to check if it exists in service
-    const existingRequest = this.vehicleService.getRequestById(this.requestId);
-
-    this.generateCalendar(existingRequest);
+    this.loadData();
   }
 
-  generateCalendar(existingRequest?: VehicleRequest) {
-    // In a real app, use selectedMonthIndex and selectedYearBE to fetch
-    // For now, get static mock data from service
-    const rawLogs: any[] = this.vehicleService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE);
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['requestId'] && !changes['requestId'].firstChange) {
+      this.loadData();
+    }
+  }
 
-    this.logs = rawLogs.map((item: any) => {
-      // Check if this date was selected in the existing request
-      const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.d);
-
-      return {
-        date: item.d,
-        dayType: item.t,
-        timeIn: matchTime(item.in),
-        timeOut: matchTime(item.out),
-        amount: matchingItem ? matchingItem.amount : 0, // Use saved amount if available, will be recalc'd anyway if strictly logic based
-        selected: !!matchingItem,
-        description: matchingItem ? matchingItem.desc : item.desc
-      };
+  loadData() {
+    this.vehicleService.getRequestById(this.requestId).subscribe(existingRequest => {
+      this.loadedRequest = existingRequest;
+      this.generateCalendar();
+      this.cdr.markForCheck();
     });
+  }
 
-    // Recalculate amounts based on time rules to ensure consistency
-    this.logs.forEach(log => {
-      // If we are loading an existing request, we might trust the saved amount or consistency check.
-      // Here we re-run logic.
-      if (log.selected) {
-        this.calculateVehicleAmount(log);
-      }
+  generateCalendar() {
+    const existingRequest = this.loadedRequest;
+
+    this.vehicleService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
+      this.logs = rawLogs.map((item: any) => {
+        const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.d);
+
+        return {
+          date: item.d,
+          dayType: item.t,
+          timeIn: matchTime(item.in),
+          timeOut: matchTime(item.out),
+          amount: matchingItem ? matchingItem.amount : 0,
+          selected: !!matchingItem,
+          description: matchingItem ? matchingItem.desc : item.desc,
+          shiftCode: item.shiftCode
+        };
+      });
+
+      this.logs.forEach(log => {
+        if (log.selected) {
+          this.calculateVehicleAmount(log);
+        }
+      });
+      this.updateTotal();
+      this.cdr.markForCheck();
     });
-    this.updateTotal();
   }
 
   calculateVehicleAmount(log: LogItem) {
@@ -81,8 +93,6 @@ export class VehicleFormComponent implements OnInit {
       return;
     }
 
-    // Basic logic moved from previous version
-    // If no time data, can't calc (unless manual override allowed?)
     if (!log.timeIn || !log.timeOut || log.timeIn === '' || log.timeOut === '') {
       log.amount = 0;
       this.updateTotal();
@@ -93,7 +103,7 @@ export class VehicleFormComponent implements OnInit {
     const [outH] = log.timeOut.split(':').map(Number);
 
     if (inH < 6 || outH >= 22) {
-      log.amount = 150; // Hardcoded rate
+      log.amount = 150; // เรทคงที่ 150 บาท
     } else {
       log.amount = 0;
     }
@@ -118,7 +128,6 @@ export class VehicleFormComponent implements OnInit {
   onSubmit() {
     const selectedLogs = this.logs.filter(l => l.selected);
 
-    // Validate that if selected, description must be provided
     const invalidLogs = selectedLogs.filter(l => {
       const desc = l.description ? String(l.description).trim() : '';
       return desc === '';
@@ -135,36 +144,35 @@ export class VehicleFormComponent implements OnInit {
       return;
     }
 
-    // Map logs back to RequestItems
     const requestItems: RequestItem[] = selectedLogs.map(l => ({
       date: l.date,
       desc: l.description,
       amount: l.amount
     }));
 
-    const existing = this.vehicleService.getRequestById(this.requestId);
-
-    if (existing) {
-      // Update
-      const updated: VehicleRequest = {
-        ...existing,
-        items: requestItems
-      };
-      this.vehicleService.updateRequest(this.requestId, updated);
-      alert(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
-    } else {
-      // Create New
-      const newReq: VehicleRequest = {
-        id: this.requestId,
-        createDate: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
-        status: 'รอตรวจสอบ',
-        items: requestItems
-      };
-      this.vehicleService.addRequest(newReq);
-      alert(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
-    }
-
-    this.closeModal();
+    this.vehicleService.getRequestById(this.requestId).subscribe(existing => {
+      if (existing) {
+        const updated: VehicleRequest = {
+          ...existing,
+          items: requestItems
+        };
+        this.vehicleService.updateRequest(this.requestId, updated).subscribe(() => {
+          alert(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
+          this.closeModal();
+        });
+      } else {
+        const newReq: VehicleRequest = {
+          id: this.requestId,
+          createDate: new Date().toISOString().split('T')[0], // วันที่วันนี้ (YYYY-MM-DD)
+          status: 'รอตรวจสอบ',
+          items: requestItems
+        };
+        this.vehicleService.addRequest(newReq).subscribe(() => {
+          alert(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
+          this.closeModal();
+        });
+      }
+    });
   }
 
   closeModal() {

@@ -1,12 +1,14 @@
 import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService } from '../../services/vehicle.service';
+import { VehicleService, VehicleRequest, TaxiRequest, AllowanceRequest } from '../../services/vehicle.service';
+import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 interface UnifiedItem {
   date: string;
-  description?: string;
-  desc?: string;
+  description?: string; // Allowance description (optional in taxi)
+  desc?: string; // Taxi description (optional in allowance)
   timeIn?: string;
   timeOut?: string;
   amount: number;
@@ -38,36 +40,57 @@ interface ApprovalItem {
 })
 export class ApprovalsComponent implements OnInit {
   private vehicleService = inject(VehicleService);
-  
+
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
   activeTab = signal<string>('Pending');
   searchText = signal<string>('');
-  
+
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
   modalActiveTab = signal<'Items' | 'Comments'>('Items');
 
   approvals = signal<ApprovalItem[]>([]);
 
+  // เก็บข้อมูลหน้ารายละเอียด (Async)
+  currentDetailItems = signal<UnifiedItem[]>([]);
+  currentDetailType = signal<'allowance' | 'taxi' | null>(null);
+
+  // ตัวช่วยสำหรับแสดงผลใน Template
+  selectedRequestDetails = computed(() => {
+    if (!this.selectedItem()) return null;
+    return {
+      type: this.currentDetailType(),
+      items: this.currentDetailItems()
+    };
+  });
+
   ngOnInit() {
     this.refresh();
   }
 
   refresh() {
-    const allowances = this.vehicleService.getAllowanceRequests()();
-    const taxis = this.vehicleService.getTaxiRequests()();
-    
-    const mockUser = {
-      name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)',
-      employeeId: 'OTD01054',
-      department: '10806-IT Department',
+    // ดึงข้อมูลทั้งหมดพร้อมกัน (ใช้ take(1) เพื่อให้ Observable จบการทำงาน)
+    forkJoin({
+      allowances: this.vehicleService.getAllowanceRequests().pipe(take(1)),
+      taxis: this.vehicleService.getTaxiRequests().pipe(take(1)),
+      vehicles: this.vehicleService.getRequests().pipe(take(1))
+    }).subscribe(({ allowances, taxis, vehicles }) => {
+      this.processData(allowances, taxis, vehicles);
+    });
+  }
+
+  private processData(allowances: AllowanceRequest[], taxis: TaxiRequest[], vehicles: VehicleRequest[]) {
+    const defaultUser = {
+      name: 'Unknown',
+      employeeId: 'N/A',
+      department: 'N/A',
       company: 'บริษัท OTD'
     };
 
     const mappedAllowances: ApprovalItem[] = allowances.map(a => ({
       requestNo: a.id,
       requestDate: a.createDate,
-      requestBy: mockUser,
+      requestBy: a.requester || defaultUser,
       requestType: 'ค่าเบี้ยเลี้ยง',
       requestDetail: a.items[0]?.description || 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน',
       amount: a.items.reduce((sum, i) => sum + i.amount, 0),
@@ -77,14 +100,24 @@ export class ApprovalsComponent implements OnInit {
     const mappedTaxis: ApprovalItem[] = taxis.map(t => ({
       requestNo: t.id,
       requestDate: t.createDate,
-      requestBy: { ...mockUser, name: 'แพรวนภา บุตรโคษา (แพรว)' },
-      requestType: t.items[0]?.desc?.includes('แท็กซี่') ? 'ค่าแท็กซี่' : 'ค่ารถ',
+      requestBy: t.requester || defaultUser,
+      requestType: 'ค่าแท็กซี่',
       requestDetail: t.items[0]?.desc || 'เบิกค่าเดินทางไปพบลูกค้า',
       amount: t.items.reduce((sum, i) => sum + i.amount, 0),
       status: this.mapStatus(t.status)
     }));
 
-    const combined = [...mappedAllowances, ...mappedTaxis].sort((a, b) => b.requestNo.localeCompare(a.requestNo));
+    const mappedVehicles: ApprovalItem[] = vehicles.map(v => ({
+      requestNo: v.id,
+      requestDate: v.createDate,
+      requestBy: v.requester || defaultUser,
+      requestType: 'ค่ารถ',
+      requestDetail: v.items[0]?.desc || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
+      amount: v.items.reduce((sum, i) => sum + i.amount, 0),
+      status: this.mapStatus(v.status)
+    }));
+
+    const combined = [...mappedAllowances, ...mappedTaxis, ...mappedVehicles].sort((a, b) => b.requestNo.localeCompare(a.requestNo));
     this.approvals.set(combined);
   }
 
@@ -106,20 +139,11 @@ export class ApprovalsComponent implements OnInit {
     );
   });
 
-  selectedRequestDetails = computed(() => {
-    const item = this.selectedItem();
-    if (!item) return null;
-    if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
-      const data = this.vehicleService.getAllowanceRequestById(item.requestNo);
-      return data ? { type: 'allowance', items: data.items as UnifiedItem[] } : null;
-    } 
-    const data = this.vehicleService.getTaxiRequestById(item.requestNo);
-    return data ? { type: 'taxi', items: data.items as UnifiedItem[] } : null;
-  });
+  // (Logic ย้ายไปที่ viewDetail) 
 
   modalItemsTotal = computed(() => {
-    const details = this.selectedRequestDetails();
-    return details?.items?.reduce((sum, item) => sum + item.amount, 0) || 0;
+    // คำนวณยอดรวม
+    return this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0);
   });
 
   setActiveTab(tab: string) { this.activeTab.set(tab); }
@@ -129,12 +153,34 @@ export class ApprovalsComponent implements OnInit {
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.modalActiveTab.set('Items');
+    this.currentDetailItems.set([]); // Reset while loading
+
+    // ดึงข้อมูลรายละเอียด
+    if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
+      this.currentDetailType.set('allowance');
+      this.vehicleService.getAllowanceRequestById(item.requestNo).subscribe(data => {
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+        }
+      });
+    } else {
+      // ค่ารถ / แท็กซี่
+      this.currentDetailType.set('taxi');
+      this.vehicleService.getTaxiRequestById(item.requestNo).subscribe(data => {
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+        }
+      });
+    }
+
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
+    this.currentDetailItems.set([]);
+    this.currentDetailType.set(null);
   }
 
   updateStatus(item: ApprovalItem, newStatus: any) {

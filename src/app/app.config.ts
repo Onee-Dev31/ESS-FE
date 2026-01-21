@@ -1,4 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 
@@ -12,29 +13,15 @@ import { matSelfImprovement } from '@ng-icons/material-icons/baseline';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),provideIcons({ 
-      heroCurrencyDollarSolid, 
-      tablerCar, 
-      bootstrapTaxiFrontFill, 
-      tablerFriends, 
-      matSelfImprovement, 
-      tablerGrave2, 
-      tablerFlower 
+    provideHttpClient(),
+    provideRouter(routes), provideIcons({
+      heroCurrencyDollarSolid,
+      tablerCar,
+      bootstrapTaxiFrontFill,
+      tablerFriends,
+      matSelfImprovement,
+      tablerGrave2,
+      tablerFlower
     })
   ]
 };
-
-
-// ค่าเบี้ยเลี้ยง heroCurrencyDollarSolid
-
-// ค่ารถ tablerCar
-
-// ค่าแท็กซี่ bootstrapTaxiFrontFill
-
-// ค่าสมรส tablerFriends
-
-// ค่าอุปสมบท matSelfImprovement
-
-// ค่าฌาปนกิจ tablerGrave2
-
-// ค่าพวงหรีด tablerFlower

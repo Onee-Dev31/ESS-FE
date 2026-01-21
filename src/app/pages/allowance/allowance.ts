@@ -33,8 +33,8 @@ export class AllowanceComponent implements OnInit {
   filterEndDate = '';
   filterStatus = '';
 
-  // Use signal from service
-  allRequests = this.vehicleService.getAllowanceRequests();
+  // เก็บข้อมูลดิบจาก API
+  allRequests = signal<AllowanceRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
@@ -120,18 +120,29 @@ export class AllowanceComponent implements OnInit {
     getCoreRowModel: getCoreRowModel(),
   }));
 
-  ngOnInit() { }
+  ngOnInit() {
+    // ดึงข้อมูลการเบิกจาก Service
+    this.vehicleService.getAllowanceRequests().subscribe(data => {
+      this.allRequests.set(data);
+    });
+  }
 
   openModal(id: string = '') {
     if (id === '') {
-      this.selectedRequestId = this.vehicleService.generateNextAllowanceId();
+      // สร้างเลขที่เอกสารใหม่
+      this.vehicleService.generateNextAllowanceId().subscribe(nid => {
+        this.selectedRequestId = nid;
+        this.isModalOpen = true;
+      });
     } else {
       this.selectedRequestId = id;
+      this.isModalOpen = true;
     }
-    this.isModalOpen = true;
   }
   closeModal() { this.isModalOpen = false; }
-  onSearch() { this.allRequests.set([...this.allRequests()]); }
+  onSearch() {
+    // ฟังก์ชันค้นหา (ข้อมูลจะถูก filter ผ่าน computed signal)
+  }
 
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);

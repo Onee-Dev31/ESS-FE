@@ -11,11 +11,7 @@
             <i class="fas fa-pen"></i>
           </button>
           <div class="avatar-frame">
-            <img
-              src="https://randomuser.me/api/portraits/women/44.jpg"
-              alt="Profile Avatar"
-              class="avatar-img"
-            />
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile Avatar" class="avatar-img" />
           </div>
         </div>
 
@@ -41,11 +37,7 @@
           </div>
 
           <div class="card-footer text-end">
-            <button
-              type="button"
-              class="action-btn"
-              style="min-width: 140px; justify-content: center"
-            >
+            <button type="button" class="action-btn" style="min-width: 140px; justify-content: center">
               <i class="fas fa-clock-rotate-left" style="margin-right: 8px"></i>
               ดูเวลาเข้า-ออก
             </button>
@@ -144,7 +136,7 @@
           </div>
 
           <div class="stat-items-grid">
-            <div class="stat-item" *ngFor="let stat of medicalStats">
+            <div class="stat-item" *ngFor="let stat of medicalStats$ | async">
               <div class="stat-header">
                 <div class="stat-title">{{ stat.label }}</div>
                 <div class="stat-limit">{{ stat.subLabel }}</div>
@@ -165,11 +157,7 @@
               </div>
 
               <div class="stat-progress">
-                <div
-                  class="progress-bar"
-                  [ngClass]="stat.progressColor"
-                  [style.width.%]="stat.percent"
-                ></div>
+                <div class="progress-bar" [ngClass]="stat.progressColor" [style.width.%]="stat.percent"></div>
               </div>
             </div>
           </div>
@@ -182,15 +170,21 @@
         </section>
 
         <div class="welfare-section">
-          <p class="section-title">สวัสดิการ</p>
+          <div class="section-header-flex">
+            <p class="section-title mb-0">สวัสดิการ</p>
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+              <div class="icon-shake">
+                <i class="fas fa-bell"></i>
+                <ng-container *ngIf="(pendingCount$ | async) as count">
+                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
+                </ng-container>
+              </div>
+              (10) รายการรออนุมัติ
+            </button>
+          </div>
           <div class="bottom-stats-grid">
-            <div
-              class="card mini-stat-card"
-              *ngFor="let item of welfareStats"
-              [ngClass]="item.cardClass || ''"
-              (click)="navigateTo(item.route)"
-              [style.cursor]="item.route ? 'pointer' : 'default'"
-            >
+            <div class="card mini-stat-card" *ngFor="let item of welfareStats$ | async" [ngClass]="item.cardClass || ''"
+              (click)="navigateTo(item.route)" [style.cursor]="item.route ? 'pointer' : 'default'">
               <div class="card-body">
                 <div class="mini-icon">
                   <i [class]="item.iconName"></i>
@@ -219,7 +213,7 @@
         <div class="leave-section">
           <p class="section-title">ลาหยุดงาน</p>
           <div class="leave-stats-grid">
-            <div class="card leave-card" *ngFor="let leave of leaveStats" [ngClass]="leave.theme">
+            <div class="card leave-card" *ngFor="let leave of leaveStats$ | async" [ngClass]="leave.theme">
               <div class="leave-body">
                 <div class="leave-header">
                   <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
@@ -243,7 +237,7 @@
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
                 <ul class="holiday-list" style="padding: 0; list-style: none">
-                  <li class="holiday-item" *ngFor="let h of holidays">
+                  <li class="holiday-item" *ngFor="let h of holidays$ | async">
                     <span class="status-dot dot-green"></span>
                     <div class="holiday-info">
                       <span class="h-date">{{ h.date }}</span>

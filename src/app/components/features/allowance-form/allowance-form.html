@@ -42,7 +42,6 @@
       <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
       <div class="info-badges">
         <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span>
-        <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
       </div>
     </div>
 
@@ -51,10 +50,10 @@
         <colgroup>
           <col style="width: 50px" />
           <col style="width: 110px" />
-          <col style="width: 85px" />
-          <col style="width: 80px" />
-          <col style="width: 80px" />
-          <col style="width: 80px" />
+          <col style="width: 90px" />
+          <col style="width: 110px" />
+          <col style="width: 60px" />
+          <col style="width: 60px" />
           <col style="width: 110px" />
           <col style="width: auto" />
         </colgroup>
@@ -62,7 +61,8 @@
           <tr>
             <th rowspan="2">เลือก</th>
             <th rowspan="2">วันที่</th>
-            <th rowspan="2">ประเภท</th>
+            <th rowspan="2">ประเภทวัน</th>
+            <th rowspan="2">รหัสกะ</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
             <th rowspan="2">ชม.</th>
             <th rowspan="2">จำนวนเงิน</th>
@@ -79,11 +79,11 @@
               <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
             </td>
             <td class="text-center bg-gray">{{ log.date }}</td>
-            <td
-              class="text-center bg-gray font-bold"
-              [style.color]="log.dayType === 'H' ? '#d93025' : '#3c4043'"
-            >
+            <td class="text-center bg-gray font-bold" [style.color]="log.dayType === 'H' ? '#d93025' : '#3c4043'">
               {{ log.dayType }}
+            </td>
+            <td class="text-center bg-gray" style="font-size: 12px; color: #555;">
+              {{ log.shiftCode }}
             </td>
             <td class="p-0">
               <input type="text" class="time-input" [ngModel]="log.timeIn" readonly />
@@ -95,14 +95,8 @@
             <td class="text-center font-bold">{{ log.amount | number }}</td>
             <td class="desc-cell">
               <div class="input-container">
-                <input
-                  type="text"
-                  class="table-input"
-                  [(ngModel)]="log.description"
-                  placeholder="ระบุรายละเอียด..."
-                  [class.is-invalid]="log.selected && !log.description"
-                  [disabled]="!log.selected"
-                />
+                <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+                  [class.is-invalid]="log.selected && !log.description" [disabled]="!log.selected" />
                 <small class="error-msg" *ngIf="log.selected && !log.description"></small>
               </div>
             </td>
@@ -111,10 +105,7 @@
         <tfoot>
           <tr class="footer-row">
             <td colspan="5" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
-            <td
-              class="total-val text-center"
-              style="background: #f8f9fa !important; color: #5f6368"
-            >
+            <td class="total-val text-center" style="background: #f8f9fa !important; color: #5f6368">
               {{ totalHoursStr }}
             </td>
             <td class="total-val text-center">{{ totalAmount | number }}</td>

@@ -1,4 +1,4 @@
-import { Component, computed, signal, inject } from '@angular/core';
+import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
@@ -17,7 +17,7 @@ import {
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })
-export class VehicleTaxiComponent {
+export class VehicleTaxiComponent implements OnInit {
   private vehicleService = inject(VehicleService);
 
   filterStartDate: string = '';
@@ -31,7 +31,8 @@ export class VehicleTaxiComponent {
   isPreviewModalOpen: boolean = false;
   previewFiles: FilePreviewItem[] = [];
 
-  allRequests = this.vehicleService.getTaxiRequests();
+  // [API-Refactor] Writable signal for taxi requests
+  allRequests = signal<TaxiRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
@@ -120,6 +121,13 @@ export class VehicleTaxiComponent {
     getCoreRowModel: getCoreRowModel(),
   }));
 
+  ngOnInit() {
+    // [API-Refactor] Subscribe to fetch info
+    this.vehicleService.getTaxiRequests().subscribe(data => {
+      this.allRequests.set(data);
+    });
+  }
+
   onSearch() {
   }
 
@@ -156,11 +164,15 @@ export class VehicleTaxiComponent {
 
   openModal(id: string = '') {
     if (id === '') {
-      this.selectedRequestId = this.vehicleService.generateNextTaxiId();
+      // [API-Refactor] Fetch ID Async
+      this.vehicleService.generateNextTaxiId().subscribe(nid => {
+        this.selectedRequestId = nid;
+        this.isModalOpen = true;
+      });
     } else {
       this.selectedRequestId = id;
+      this.isModalOpen = true;
     }
-    this.isModalOpen = true;
   }
 
   closeModal() {
@@ -170,7 +182,8 @@ export class VehicleTaxiComponent {
 
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการ ' + id)) {
-      this.vehicleService.deleteTaxiRequest(id);
+      // [API-Refactor] Delete Async
+      this.vehicleService.deleteTaxiRequest(id).subscribe();
     }
   }
 

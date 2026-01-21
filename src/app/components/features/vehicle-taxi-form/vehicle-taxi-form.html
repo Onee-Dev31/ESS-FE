@@ -10,11 +10,11 @@
       <div class="month-selector">
         <label>ประจำเดือน :</label>
 
-        <select class="form-control" style="width: 140px;" [(ngModel)]="selectedMonth">
+        <select class="form-control" style="width: 140px;" [(ngModel)]="selectedMonth" (change)="generateMockData()">
           <option *ngFor="let m of thaiMonths" [value]="m">{{ m }}</option>
         </select>
 
-        <select class="form-control" style="width: 100px;" [(ngModel)]="selectedYear">
+        <select class="form-control" style="width: 100px;" [(ngModel)]="selectedYear" (change)="generateMockData()">
           <option *ngFor="let y of years" [value]="y">{{ y }}</option>
         </select>
 
@@ -27,7 +27,6 @@
 
       <div class="info-badges">
         <span class="request-id-badge">เลขที่การเบิก : {{ requestId }}</span>
-        <span class="right-info">รหัสกะ : 001 | 09:00 - 18:00</span>
       </div>
     </div>
 
@@ -35,22 +34,24 @@
       <table class="excel-table">
         <colgroup>
           <col style="width: 50px" />
-          <col style="width: 100px" />
-          <col style="width: 70px" />
-          <col style="width: 70px" />
-          <col style="width: 70px" />
-          <col style="width: auto" />
-          <col style="width: auto" />
-          <col style="width: 80px" />
-          <col style="width: 80px" />
+          <col style="width: 95px" />
           <col style="width: 60px" />
+          <col style="width: 110px" />
+          <col style="width: 55px" />
+          <col style="width: 55px" />
+          <col style="width: auto" />
+          <col style="width: auto" />
+          <col style="width: 60px" />
+          <col style="width: 70px" />
+          <col style="width: 50px" />
         </colgroup>
 
         <thead>
           <tr>
             <th rowspan="2">เลือก</th>
             <th rowspan="2">วันที่</th>
-            <th rowspan="2">ประเภท</th>
+            <th rowspan="2">ประเภทวัน</th>
+            <th rowspan="2">รหัสกะ</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
 
             <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
@@ -74,6 +75,9 @@
             <td class="text-center bg-gray">{{ item.date }}</td>
             <td class="text-center bg-gray font-bold" [style.color]="item.type === 'H' ? '#d93025' : '#3c4043'">
               {{ item.type }}
+            </td>
+            <td class="text-center bg-gray" style="font-size: 12px; color: #555;">
+              {{ item.shiftCode }}
             </td>
             <td class="p-0"><input type="text" class="time-input" [ngModel]="item.checkIn || '-'" readonly /></td>
             <td class="p-0"><input type="text" class="time-input" [ngModel]="item.checkOut || '-'" readonly /></td>

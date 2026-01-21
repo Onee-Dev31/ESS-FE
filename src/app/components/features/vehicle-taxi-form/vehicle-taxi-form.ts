@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, Input, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
@@ -11,11 +11,15 @@ import { VehicleService, TaxiRequest, TaxiItem } from '../../../services/vehicle
   templateUrl: './vehicle-taxi-form.html',
   styleUrl: './vehicle-taxi-form.scss'
 })
-export class VehicleTaxiFormComponent implements OnInit {
+export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
 
   private vehicleService = inject(VehicleService);
+  private cdr = inject(ChangeDetectorRef);
+
+  // เก็บข้อมูลที่โหลดมาเพื่อใช้ตอนเปลี่ยนเดือน
+  loadedRequest?: TaxiRequest;
 
   items: any[] = [];
 
@@ -33,29 +37,41 @@ export class VehicleTaxiFormComponent implements OnInit {
   currentUploadItem: any = null;
 
   ngOnInit() {
-    const existingRequest = this.vehicleService.getTaxiRequestById(this.requestId);
-    this.generateMockData(existingRequest);
+    this.loadData();
   }
 
-  generateMockData(existingRequest?: TaxiRequest) {
-    // In real app, convert selectedMonth string to index if needed, or pass string
-    // Simplified mapping for mock
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['requestId'] && !changes['requestId'].firstChange) {
+      this.loadData();
+    }
+  }
 
-    // Get base calendar from service
-    const mockRows = this.vehicleService.getMockTaxiLogs(9, this.selectedYear); // 9 = October
+  loadData() {
+    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
+      this.loadedRequest = existingRequest;
+      this.generateMockData();
+      this.cdr.markForCheck(); // อัปเดตหน้าจอ
+    });
+  }
 
-    this.items = mockRows.map((row: any) => {
-      const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
+  generateMockData() {
+    const existingRequest = this.loadedRequest;
 
-      return {
-        ...row,
-        desc: matchingItem ? matchingItem.desc : row.desc,
-        dest: matchingItem ? matchingItem.destination : row.dest,
-        dist: matchingItem ? matchingItem.distance : row.dist,
-        amt: matchingItem ? matchingItem.amount : row.amt,
-        selected: !!matchingItem,
-        attachedFile: matchingItem?.attachedFile || null
-      };
+    this.vehicleService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockRows => {
+      this.items = mockRows.map((row: any) => {
+        const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
+
+        return {
+          ...row,
+          desc: matchingItem ? matchingItem.desc : row.desc,
+          dest: matchingItem ? matchingItem.destination : row.dest,
+          dist: matchingItem ? matchingItem.distance : row.dist,
+          amt: matchingItem ? matchingItem.amount : row.amt,
+          selected: !!matchingItem,
+          attachedFile: matchingItem?.attachedFile || null
+        };
+      });
+      this.cdr.markForCheck();
     });
   }
 
@@ -84,7 +100,6 @@ export class VehicleTaxiFormComponent implements OnInit {
       return;
     }
 
-    // Convert UI items back to TaxiItems
     const taxiItems: TaxiItem[] = selectedItems.map(i => ({
       date: i.date,
       desc: i.desc,
@@ -94,34 +109,34 @@ export class VehicleTaxiFormComponent implements OnInit {
       attachedFile: i.attachedFile
     }));
 
-    const existing = this.vehicleService.getTaxiRequestById(this.requestId);
-
-    if (existing) {
-      const updated: TaxiRequest = {
-        ...existing,
-        items: taxiItems
-      };
-      this.vehicleService.updateTaxiRequest(this.requestId, updated);
-      alert('บันทึกการแก้ไขข้อมูลเรียบร้อย');
-    } else {
-      const newReq: TaxiRequest = {
-        id: this.requestId,
-        createDate: new Date().toLocaleDateString('en-GB'), // dd/mm/yyyy
-        status: 'รอตรวจสอบ',
-        items: taxiItems
-      };
-      this.vehicleService.addTaxiRequest(newReq);
-      alert(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
-    }
-
-    this.onClose.emit();
+    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existing => {
+      if (existing) {
+        const updated: TaxiRequest = {
+          ...existing,
+          items: taxiItems
+        };
+        this.vehicleService.updateTaxiRequest(this.requestId, updated).subscribe(() => {
+          alert('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+          this.onClose.emit();
+        });
+      } else {
+        const newReq: TaxiRequest = {
+          id: this.requestId,
+          createDate: new Date().toLocaleDateString('en-GB'), // วันที่ dd/mm/yyyy
+          status: 'รอตรวจสอบ',
+          items: taxiItems
+        };
+        this.vehicleService.addTaxiRequest(newReq).subscribe(() => {
+          alert(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
+          this.onClose.emit();
+        });
+      }
+    });
   }
 
   cancel() {
     this.onClose.emit();
   }
-
-  // --- Modal Logic ใหม่ ---
 
   openUploadModal(item: any) {
     this.currentUploadItem = item;
@@ -133,12 +148,9 @@ export class VehicleTaxiFormComponent implements OnInit {
     this.currentUploadItem = null;
   }
 
-  // ฟังก์ชันรับค่าเมื่อ Modal กด Save ส่งกลับมา
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;
-
-      // Auto select ถ้ามีการแนบไฟล์
       if (fileName) {
         this.currentUploadItem.selected = true;
       }

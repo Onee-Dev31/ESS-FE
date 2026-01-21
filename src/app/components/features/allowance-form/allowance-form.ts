@@ -1,7 +1,8 @@
-import { Component, OnInit, EventEmitter, Output, Input, inject } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleService, AllowanceRequest, AllowanceItem } from '../../../services/vehicle.service';
+import { switchMap, of, forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-allowance-form',
@@ -10,11 +11,14 @@ import { VehicleService, AllowanceRequest, AllowanceItem } from '../../../servic
   templateUrl: './allowance-form.html',
   styleUrls: ['./allowance-form.scss']
 })
-export class AllowanceFormComponent implements OnInit {
+export class AllowanceFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
 
   private vehicleService = inject(VehicleService);
+  private cdr = inject(ChangeDetectorRef);
+
+  loadedRequest?: AllowanceRequest;
 
   thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2568, 2569, 2570];
@@ -25,52 +29,71 @@ export class AllowanceFormComponent implements OnInit {
   logs: any[] = [];
 
   ngOnInit(): void {
-    if (!this.requestId) {
-      this.requestId = this.vehicleService.generateNextAllowanceId();
-    }
-    const existing = this.vehicleService.getAllowanceRequestById(this.requestId);
-    this.generateCalendar(existing);
+    this.loadData();
   }
 
-  generateCalendar(existing?: AllowanceRequest) {
-    // In real app, pass month/year to service
-    const rawData = this.vehicleService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE);
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['requestId'] && !changes['requestId'].firstChange) {
+      this.loadData();
+    }
+  }
 
-    this.logs = rawData.map(item => {
-      // Find matching item in existing request
-      const match = existing?.items.find(i => i.date === item.d); // Mock logs use 'd', service items use 'date'
+  loadData() {
+    if (!this.requestId) {
+      this.vehicleService.generateNextAllowanceId().pipe(
+        switchMap(id => {
+          this.requestId = id;
+          return this.vehicleService.getAllowanceRequestById(id);
+        })
+      ).subscribe(existing => {
+        this.loadedRequest = existing;
+        this.generateCalendar();
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existing => {
+        this.loadedRequest = existing;
+        this.generateCalendar();
+        this.cdr.markForCheck();
+      });
+    }
+  }
 
-      // If match found, use its values. Else use defaults from rawData
-      // Note: rawData uses 'd', 't', 'in', 'out', 's', 'desc'
-      // AllowanceItem uses 'date', 'dayType', 'timeIn', 'timeOut', 'description'
+  generateCalendar() {
+    const existing = this.loadedRequest;
 
-      const log = {
-        date: item.d,
-        dayType: item.t,
-        timeIn: item.in,
-        timeOut: item.out,
-        displayHours: '0.00',
-        actualExtraHours: 0,
-        amount: 0,
-        selected: item.s,
-        description: item.desc
-      };
+    this.vehicleService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE)
+      .subscribe(rawData => {
+        this.logs = rawData.map(item => {
+          const match = existing?.items.find(i => i.date === item.d);
 
-      if (match) {
-        log.timeIn = match.timeIn;
-        log.timeOut = match.timeOut;
-        log.amount = match.amount;
-        log.selected = match.selected;
-        log.description = match.description;
-        // hours logic re-calc below
-      }
+          const log = {
+            date: item.d,
+            dayType: item.t,
+            timeIn: item.in,
+            timeOut: item.out,
+            displayHours: '0.00',
+            actualExtraHours: 0,
+            amount: 0,
+            selected: item.s,
+            description: item.desc,
+            shiftCode: item.shiftCode
+          };
 
-      this.autoCalculate(log);
-      // If match, ensure we use the saved amount/hours if possible, 
-      // but autoCalculate should yield same result if inputs are same.
+          if (match) {
+            log.timeIn = match.timeIn;
+            log.timeOut = match.timeOut;
+            log.amount = match.amount;
+            log.selected = match.selected;
+            log.description = match.description;
+          }
 
-      return log;
-    });
+          this.autoCalculate(log);
+
+          return log;
+        });
+        this.cdr.markForCheck();
+      });
   }
 
   autoCalculate(log: any) {
@@ -136,7 +159,6 @@ export class AllowanceFormComponent implements OnInit {
       return;
     }
 
-    // Convert to AllowanceItem[]
     const items: AllowanceItem[] = this.logs
       .filter(l => l.selected)
       .map(l => ({
@@ -145,7 +167,7 @@ export class AllowanceFormComponent implements OnInit {
         timeIn: l.timeIn,
         timeOut: l.timeOut,
         description: l.description,
-        hours: parseFloat(l.displayHours), // approx
+        hours: parseFloat(l.displayHours), // ประมาณค่า
         amount: l.amount,
         selected: true
       }));
@@ -155,25 +177,28 @@ export class AllowanceFormComponent implements OnInit {
       return;
     }
 
-    const existing = this.vehicleService.getAllowanceRequestById(this.requestId);
-    if (existing) {
-      this.vehicleService.updateAllowanceRequest(this.requestId, {
-        ...existing,
-        items: items
-      });
-      alert(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
-    } else {
-      const newReq: AllowanceRequest = {
-        id: this.requestId,
-        createDate: new Date().toISOString().split('T')[0], // yyyy-mm-dd
-        status: 'รอตรวจสอบ',
-        items: items
-      };
-      this.vehicleService.addAllowanceRequest(newReq);
-      alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
-    }
-
-    this.closeModal();
+    this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existing => {
+      if (existing) {
+        this.vehicleService.updateAllowanceRequest(this.requestId, {
+          ...existing,
+          items: items
+        }).subscribe(() => {
+          alert(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
+          this.closeModal();
+        });
+      } else {
+        const newReq: AllowanceRequest = {
+          id: this.requestId,
+          createDate: new Date().toISOString().split('T')[0], // วันที่ yyyy-mm-dd
+          status: 'รอตรวจสอบ',
+          items: items
+        };
+        this.vehicleService.addAllowanceRequest(newReq).subscribe(() => {
+          alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+          this.closeModal();
+        });
+      }
+    });
   }
 
   closeModal() {

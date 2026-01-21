@@ -26,8 +26,8 @@ export class VehicleComponent implements OnInit {
   filterEndDate: string = '';
   filterStatus: string = '';
 
-  // Use service signal directly or wrapping it if needed
-  allRequests = this.vehicleService.getRequests();
+  // [API-Refactor] Writable signal to hold data from Observable
+  allRequests = signal<VehicleRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
@@ -102,17 +102,21 @@ export class VehicleComponent implements OnInit {
     getCoreRowModel: getCoreRowModel(),
   }));
 
-  ngOnInit() { }
+  ngOnInit() {
+    // [API-Refactor] Subscribe to the observable to update the signal
+    this.vehicleService.getRequests().subscribe(data => {
+      this.allRequests.set(data);
+    });
+  }
 
   onSearch() {
-    // Current filtering is reactive via signals, so explicit set() might not be needed
-    // unless we want to trigger something else. 
-    // Data updates automatically because processedData depends on allRequests() and filter signals.
+    // Filter is reactive
   }
 
   deleteRequest(id: string) {
     if (confirm(`ยืนยันการลบรายการ ${id}?`)) {
-      this.vehicleService.deleteRequest(id);
+      // [API-Refactor] Subscribe to perform action
+      this.vehicleService.deleteRequest(id).subscribe();
     }
   }
 
@@ -144,11 +148,15 @@ export class VehicleComponent implements OnInit {
 
   openModal(id: string = '') {
     if (id === '') {
-      this.selectedRequestId = this.vehicleService.generateNextId();
+      // [API-Refactor] Fetch ID asynchronously
+      this.vehicleService.generateNextId().subscribe(nextId => {
+        this.selectedRequestId = nextId;
+        this.isModalOpen = true;
+      });
     } else {
       this.selectedRequestId = id;
+      this.isModalOpen = true;
     }
-    this.isModalOpen = true;
   }
 
   closeModal() {

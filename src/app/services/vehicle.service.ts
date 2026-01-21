@@ -1,4 +1,7 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { delay, tap } from 'rxjs/operators';
 
 export interface RequestItem {
     date: string; // dd/MM/yyyy
@@ -6,11 +9,19 @@ export interface RequestItem {
     amount: number;
 }
 
+export interface Requester {
+    name: string;
+    employeeId: string;
+    department: string;
+    company: string;
+}
+
 export interface VehicleRequest {
     id: string; // e.g. 2701#001
     createDate: string; // yyyy-MM-dd
     status: string;
     items: RequestItem[];
+    requester?: Requester;
 }
 
 export interface AttendanceLog {
@@ -21,315 +32,6 @@ export interface AttendanceLog {
     amount: number;
     selected: boolean;
     description: string;
-}
-
-@Injectable({
-    providedIn: 'root'
-})
-export class VehicleService {
-    // Centralized mock data
-    private requests = signal<VehicleRequest[]>([
-        {
-            id: '2701#001',
-            createDate: '2026-01-15',
-            status: 'รอตรวจสอบ',
-            items: [
-                { date: '27/10/2026', desc: 'ถ่ายงานหลังรายการแฉ', amount: 120 },
-                { date: '22/10/2026', desc: 'สแตนด์บายงาน', amount: 120 },
-                { date: '15/10/2026', desc: 'ทดสอบการเบิก', amount: 120 },
-                { date: '01/10/2026', desc: 'ทดสอบการเบิก', amount: 120 },
-            ],
-        },
-        {
-            id: '2701#002',
-            createDate: '2026-01-17',
-            status: 'ต้นสังกัดอนุมัติ',
-            items: [
-                { date: '27/10/2026', desc: 'ทดสอบ 1', amount: 120 },
-                { date: '28/10/2026', desc: 'ทดสอบ 2', amount: 120 },
-                { date: '29/10/2026', desc: 'ทดสอบ 3', amount: 120 },
-                { date: '30/10/2026', desc: 'ทดสอบ 4', amount: 120 },
-                { date: '31/10/2026', desc: 'ทดสอบ 5', amount: 120 },
-            ],
-        }
-    ]);
-
-    getRequests() {
-        return this.requests;
-    }
-
-    getRequestById(id: string): VehicleRequest | undefined {
-        return this.requests().find(r => r.id === id);
-    }
-
-    addRequest(request: VehicleRequest) {
-        this.requests.update(active => [request, ...active]);
-    }
-
-    updateRequest(id: string, updatedRequest: VehicleRequest) {
-        this.requests.update(active => active.map(r => r.id === id ? updatedRequest : r));
-    }
-
-    deleteRequest(id: string) {
-        this.requests.update(active => active.filter(r => r.id !== id));
-    }
-
-    // Generate mock running number
-    generateNextId(): string {
-        const lastIdNum = this.requests().reduce((max, item) => {
-            const num = parseInt(item.id.split('#')[1] || '0');
-            return num > max ? num : max;
-        }, 0);
-        const nextNum = (lastIdNum + 1).toString().padStart(3, '0');
-        return `2701#${nextNum}`;
-    }
-
-    // Mock Attendance Data (moved from vehicle-form)
-    // In a real app, this would fetch from an API based on employee ID and month/year
-    getMockAttendanceLogs(month: number, year: number): any[] {
-        // Return the same hardcoded data for now, but exposed via service
-        return [
-            { d: '01/10/2025', t: 'W', in: '09:14', out: '23:30', s: false, desc: 'แชร์ค่าแท็กซี่กลับบ้าน (เลิกงานดึก)' },
-            { d: '02/10/2025', t: 'W', in: '05:30', out: '18:00', s: false, desc: 'เรียก Grab มาทำงาน (เข้างานเช้า)' },
-            { d: '03/10/2025', t: 'W', in: '09:34', out: '18:15', s: false, desc: '' },
-            { d: '04/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '05/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '06/10/2025', t: 'W', in: '09:20', out: '18:10', s: false, desc: '' },
-            { d: '07/10/2025', t: 'W', in: '09:15', out: '18:22', s: false, desc: '' },
-            { d: '08/10/2025', t: 'W', in: '09:26', out: '18:22', s: false, desc: '' },
-            { d: '09/10/2025', t: 'W', in: '09:22', out: '18:13', s: false, desc: '' },
-            { d: '10/10/2025', t: 'W', in: '08:58', out: '18:14', s: false, desc: '' },
-            { d: '11/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '12/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '13/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-            { d: '14/10/2025', t: 'W', in: '09:24', out: '18:39', s: false, desc: '' },
-            { d: '15/10/2025', t: 'W', in: '09:12', out: '17:40', s: false, desc: '' },
-            { d: '16/10/2025', t: 'W', in: '09:17', out: '18:27', s: false, desc: '' },
-            { d: '17/10/2025', t: 'W', in: '11:19', out: '16:59', s: false, desc: '' },
-            { d: '18/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '19/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '20/10/2025', t: 'W', in: '09:19', out: '15:55', s: false, desc: '' },
-            { d: '21/10/2025', t: 'W', in: '09:17', out: '18:36', s: false, desc: '' },
-            { d: '22/10/2025', t: 'W', in: '09:46', out: '18:05', s: false, desc: '' },
-            { d: '23/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-            { d: '24/10/2025', t: 'L', in: '', out: '', s: false, desc: '' },
-            { d: '25/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '26/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '27/10/2025', t: 'W', in: '09:31', out: '22:15', s: false, desc: '' },
-            { d: '28/10/2025', t: 'W', in: '09:52', out: '18:39', s: false, desc: '' },
-            { d: '29/10/2025', t: 'W', in: '09:37', out: '18:13', s: false, desc: '' },
-            { d: '30/10/2025', t: 'W', in: '09:44', out: '18:51', s: false, desc: '' },
-            { d: '31/10/2025', t: 'W', in: '09:39', out: '18:09', s: false, desc: '' }
-        ];
-    }
-
-    // --- TAXI SECTION ---
-
-    private taxiRequests = signal<TaxiRequest[]>([
-        {
-            id: '2701#001',
-            createDate: '15/01/2026',
-            status: 'รอตรวจสอบ',
-            items: [
-                { date: '27/10/2026', desc: 'ถ่ายงานหลังรายการแฉ', destination: 'Bravo Studio', distance: 10.00, amount: 120 },
-                { date: '22/10/2026', desc: 'สแตนด์บายงาน', destination: 'GMM Studio', distance: 4.50, amount: 120 },
-                { date: '15/10/2026', desc: 'ทดสอบการเบิก', destination: 'สักที่', distance: 2.00, amount: 120 },
-                { date: '01/10/2026', desc: 'ทดสอบการเบิก', destination: 'สักแห่ง', distance: 5.00, amount: 120 }
-            ]
-        },
-        {
-            id: '2701#002',
-            createDate: '17/01/2026',
-            status: 'ต้นสังกัดอนุมัติ',
-            items: [
-                { date: '27/10/2026', desc: 'ทดสอบ1', destination: 'สักหน', distance: 6.25, amount: 120 },
-                { date: '28/10/2026', desc: 'ทดสอบ2', destination: 'Some where', distance: 7.75, amount: 120 },
-                { date: '29/10/2026', desc: 'ทดสอบ3', destination: 'ไปห้าง', distance: 100.00, amount: 120 },
-                { date: '30/10/2026', desc: 'ทดสอบ4', destination: 'ไปสวนสัตว์', distance: 1.00, amount: 120 }
-            ]
-        }
-    ]);
-
-    getTaxiRequests() {
-        return this.taxiRequests;
-    }
-
-    getTaxiRequestById(id: string): TaxiRequest | undefined {
-        return this.taxiRequests().find(r => r.id === id);
-    }
-
-    addTaxiRequest(request: TaxiRequest) {
-        this.taxiRequests.update(active => [request, ...active]);
-    }
-
-    updateTaxiRequest(id: string, updatedRequest: TaxiRequest) {
-        this.taxiRequests.update(active => active.map(r => r.id === id ? updatedRequest : r));
-    }
-
-    deleteTaxiRequest(id: string) {
-        this.taxiRequests.update(active => active.filter(r => r.id !== id));
-    }
-
-    generateNextTaxiId(): string {
-        const lastIdNum = this.taxiRequests().reduce((max, item) => {
-            const num = parseInt(item.id.split('#')[1] || '0');
-            return num > max ? num : max;
-        }, 0);
-        const nextNum = (lastIdNum + 1).toString().padStart(3, '0');
-        return `2701#${nextNum}`;
-    }
-
-    // Mock Taxi Logs (for form calendar/list)
-    // Reusing similar structure to attendance, but for Taxi Form usage
-    getMockTaxiLogs(month: number, year: number): any[] {
-        return [
-            { date: '01/10/2025', type: 'W', checkIn: '09:14', checkOut: '17:56', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '02/10/2025', type: 'W', checkIn: '09:16', checkOut: '18:16', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '03/10/2025', type: 'W', checkIn: '09:34', checkOut: '18:15', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '04/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '05/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '06/10/2025', type: 'W', checkIn: '09:20', checkOut: '18:10', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '07/10/2025', type: 'W', checkIn: '09:15', checkOut: '18:22', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '08/10/2025', type: 'W', checkIn: '09:26', checkOut: '18:22', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '09/10/2025', type: 'W', checkIn: '09:22', checkOut: '18:13', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '10/10/2025', type: 'W', checkIn: '08:58', checkOut: '18:14', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '11/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '12/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '13/10/2025', type: 'T', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '14/10/2025', type: 'W', checkIn: '09:24', checkOut: '18:39', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '15/10/2025', type: 'W', checkIn: '09:12', checkOut: '17:40', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '16/10/2025', type: 'W', checkIn: '09:17', checkOut: '18:27', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '17/10/2025', type: 'W', checkIn: '11:19', checkOut: '16:59', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '18/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '19/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '20/10/2025', type: 'W', checkIn: '09:19', checkOut: '15:55', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '21/10/2025', type: 'W', checkIn: '09:17', checkOut: '18:36', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '22/10/2025', type: 'W', checkIn: '09:46', checkOut: '18:05', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '23/10/2025', type: 'T', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '24/10/2025', type: 'L', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '25/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '26/10/2025', type: 'H', checkIn: '', checkOut: '', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '27/10/2025', type: 'W', checkIn: '09:31', checkOut: '18:15', desc: 'ทดสอบการเบิก', dest: 'ทดสอบการเบิก', dist: 0, amt: 0, selected: false },
-            { date: '28/10/2025', type: 'W', checkIn: '09:52', checkOut: '18:39', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '29/10/2025', type: 'W', checkIn: '09:37', checkOut: '18:13', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '30/10/2025', type: 'W', checkIn: '09:44', checkOut: '18:51', desc: '', dest: '', dist: 0, amt: 0, selected: false },
-            { date: '31/10/2025', type: 'W', checkIn: '09:39', checkOut: '18:09', desc: '', dest: '', dist: 0, amt: 0, selected: false }
-        ];
-    }
-
-    // --- ALLOWANCE SECTION ---
-
-    private allowanceRequests = signal<AllowanceRequest[]>([
-        {
-            id: '2701#001',
-            createDate: '2026-01-15',
-            status: 'รอตรวจสอบ',
-            items: [
-                { date: '27/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน A', hours: 2, amount: 150, selected: true },
-                { date: '28/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน B', hours: 2, amount: 150, selected: true },
-                { date: '29/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน C', hours: 2, amount: 150, selected: true },
-                { date: '30/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน D', hours: 2, amount: 150, selected: true },
-            ],
-        },
-        {
-            id: '2701#002',
-            createDate: '2026-01-16',
-            status: 'ต้นสังกัดอนุมัติ',
-            items: [
-                { date: '22/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '23:00', description: 'สแตนด์บายงาน', hours: 5, amount: 500, selected: true },
-                { date: '27/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน D', hours: 2, amount: 150, selected: true },
-                { date: '28/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน E', hours: 2, amount: 150, selected: true },
-                { date: '29/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'ถ่ายงาน F', hours: 2, amount: 150, selected: true },
-            ],
-        },
-        {
-            id: '2701#003',
-            createDate: '2026-01-17',
-            status: 'รอจ่าย',
-            items: [
-                { date: '15/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '19:00', description: 'ทดสอบการเบิก', hours: 1, amount: 100, selected: true },
-            ],
-        },
-        {
-            id: '2701#004',
-            createDate: '2026-01-16',
-            status: 'จ่ายแล้ว',
-            items: [
-                { date: '10/01/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'Test 1', hours: 2, amount: 150, selected: true },
-                { date: '27/10/2025', dayType: 'W', timeIn: '09:00', timeOut: '20:00', description: 'Test 2', hours: 2, amount: 150, selected: true },
-            ],
-        },
-    ]);
-
-    getAllowanceRequests() {
-        return this.allowanceRequests;
-    }
-
-    getAllowanceRequestById(id: string): AllowanceRequest | undefined {
-        return this.allowanceRequests().find(r => r.id === id);
-    }
-
-    addAllowanceRequest(request: AllowanceRequest) {
-        this.allowanceRequests.update(active => [request, ...active]);
-    }
-
-    updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest) {
-        this.allowanceRequests.update(active => active.map(r => r.id === id ? updatedRequest : r));
-    }
-
-    deleteAllowanceRequest(id: string) {
-        this.allowanceRequests.update(active => active.filter(r => r.id !== id));
-    }
-
-    generateNextAllowanceId(): string {
-        const prefix = '2701';
-        const lastIdNum = this.allowanceRequests().reduce((max, item) => {
-            if (item.id.startsWith(prefix)) {
-                const parts = item.id.split('#');
-                const num = parseInt(parts[1] || '0');
-                return num > max ? num : max;
-            }
-            return max;
-        }, 0);
-
-        return `${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`;
-    }
-
-    getMockAllowanceLogs(month: number, year: number): any[] {
-        return [
-            { d: '01/10/2025', t: 'W', in: '09:14', out: '20:00', s: false, desc: 'ถ่ายงานหลังรายการแฉ' },
-            { d: '02/10/2025', t: 'W', in: '09:16', out: '23:00', s: false, desc: 'สแตนด์บายงาน' },
-            { d: '03/10/2025', t: 'W', in: '09:34', out: '18:15', s: false, desc: '' },
-            { d: '04/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '05/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '06/10/2025', t: 'W', in: '09:20', out: '18:10', s: false, desc: '' },
-            { d: '07/10/2025', t: 'W', in: '09:15', out: '18:22', s: false, desc: '' },
-            { d: '08/10/2025', t: 'W', in: '09:26', out: '18:22', s: false, desc: '' },
-            { d: '09/10/2025', t: 'W', in: '09:22', out: '18:13', s: false, desc: '' },
-            { d: '10/10/2025', t: 'W', in: '08:58', out: '18:14', s: false, desc: '' },
-            { d: '11/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '12/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '13/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-            { d: '14/10/2025', t: 'W', in: '09:24', out: '18:39', s: false, desc: '' },
-            { d: '15/10/2025', t: 'W', in: '09:12', out: '17:40', s: false, desc: '' },
-            { d: '16/10/2025', t: 'W', in: '09:17', out: '18:27', s: false, desc: '' },
-            { d: '17/10/2025', t: 'W', in: '11:19', out: '16:59', s: false, desc: '' },
-            { d: '18/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '19/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '20/10/2025', t: 'W', in: '09:19', out: '15:55', s: false, desc: '' },
-            { d: '21/10/2025', t: 'W', in: '09:17', out: '18:36', s: false, desc: '' },
-            { d: '22/10/2025', t: 'W', in: '09:46', out: '18:05', s: false, desc: '' },
-            { d: '23/10/2025', t: 'T', in: '', out: '', s: false, desc: '' },
-            { d: '24/10/2025', t: 'L', in: '', out: '', s: false, desc: '' },
-            { d: '25/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '26/10/2025', t: 'H', in: '', out: '', s: false, desc: '' },
-            { d: '27/10/2025', t: 'W', in: '09:31', out: '18:15', s: false, desc: 'ทดสอบการเบิก' },
-            { d: '28/10/2025', t: 'W', in: '09:52', out: '18:39', s: false, desc: '' },
-            { d: '29/10/2025', t: 'W', in: '09:37', out: '18:13', s: false, desc: '' },
-            { d: '30/10/2025', t: 'W', in: '09:44', out: '18:51', s: false, desc: '' },
-            { d: '31/10/2025', t: 'W', in: '09:39', out: '18:09', s: false, desc: '' }
-        ];
-    }
 }
 
 export interface TaxiItem {
@@ -347,6 +49,7 @@ export interface TaxiRequest {
     createDate: string; // dd/MM/yyyy
     status: string;
     items: TaxiItem[];
+    requester?: Requester;
 }
 
 export interface AllowanceItem {
@@ -365,4 +68,404 @@ export interface AllowanceRequest {
     createDate: string;
     status: string;
     items: AllowanceItem[];
+    requester?: Requester;
+}
+
+
+@Injectable({
+    providedIn: 'root'
+})
+export class VehicleService {
+    private http = inject(HttpClient);
+
+    // จำลองฐานข้อมูล
+    private requestsMock: VehicleRequest[] = this.generateMockVehicleRequests(15);
+    private taxiRequestsMock: TaxiRequest[] = this.generateMockTaxiRequests(15);
+    private allowanceRequestsMock: AllowanceRequest[] = this.generateMockAllowanceRequests(15);
+
+    // ตัวแปรสำหรับกระจายข้อมูล (State)
+    private requestsSubject = new BehaviorSubject<VehicleRequest[]>(this.requestsMock);
+    private taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>(this.taxiRequestsMock);
+    private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>(this.allowanceRequestsMock);
+
+    // --- ส่วนสร้างข้อมูลจำลอง ---
+
+    private getRandomStatus(): string {
+        const statuses = ['รอตรวจสอบ', 'รอตรวจสอบ', 'อนุมัติ', 'อนุมัติ', 'ต้นสังกัดอนุมัติ', 'ไม่อนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
+        return statuses[Math.floor(Math.random() * statuses.length)];
+    }
+
+    private getRandomDateInPast3Months(): string {
+        const today = new Date();
+        const past = new Date();
+        past.setMonth(today.getMonth() - 3);
+        const randomTime = past.getTime() + Math.random() * (today.getTime() - past.getTime());
+        const d = new Date(randomTime);
+        // แปลงวันที่เป็น YYYY-MM-DD
+
+
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    private getRandomRequester(): Requester {
+        const users = [
+            { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', id: 'OTD01054', dept: '10806-IT Department' },
+            { name: 'แพรวนภา บุตรโคษา (แพรว)', id: 'OTD01055', dept: '10801-HR Department' },
+            { name: 'สมชาย รักดี', id: 'OTD01056', dept: '10802-Sales Department' },
+            { name: 'วิภาวี สวยงาม', id: 'OTD01057', dept: '10803-Marketing' },
+            { name: 'กิตติศักดิ์ มั่นคง', id: 'OTD01058', dept: '10804-Operations' }
+        ];
+        const user = users[Math.floor(Math.random() * users.length)];
+        return {
+            name: user.name,
+            employeeId: user.id,
+            department: user.dept,
+            company: 'บริษัท OTD'
+        };
+    }
+
+    private generateMockVehicleRequests(count: number): VehicleRequest[] {
+        const reqs: VehicleRequest[] = [];
+        for (let i = 1; i <= count; i++) {
+            const dateStr = this.getRandomDateInPast3Months();
+            reqs.push({
+                id: `2701#${String(i).padStart(3, '0')}`,
+                createDate: dateStr,
+                status: this.getRandomStatus(),
+                requester: this.getRandomRequester(),
+                items: [
+                    { date: '2026-01-01', desc: 'Mock Item 1', amount: 150 },
+                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150 }
+                ]
+            });
+        }
+        return reqs;
+    }
+
+    private generateMockTaxiRequests(count: number): TaxiRequest[] {
+        const reqs: TaxiRequest[] = [];
+        for (let i = 1; i <= count; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - Math.floor(Math.random() * 60));
+            const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+            reqs.push({
+                id: `2701#${String(i).padStart(3, '0')}`,
+                createDate: dateStr,
+                status: this.getRandomStatus(),
+                requester: this.getRandomRequester(),
+                items: [
+                    { date: dateStr, desc: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250 },
+                    { date: dateStr, desc: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230 }
+                ]
+            });
+        }
+        return reqs;
+    }
+
+    private generateMockAllowanceRequests(count: number): AllowanceRequest[] {
+        const reqs: AllowanceRequest[] = [];
+        for (let i = 1; i <= count; i++) {
+            const dateStr = this.getRandomDateInPast3Months();
+            reqs.push({
+                id: `2701#${String(i).padStart(3, '0')}`,
+                createDate: dateStr,
+                status: this.getRandomStatus(),
+                requester: this.getRandomRequester(),
+                items: [
+                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true }
+                ]
+            });
+        }
+        return reqs;
+    }
+
+    constructor() { }
+
+    /**
+     * ดึงข้อมูลทั้งหมด
+     */
+    getRequests(): Observable<VehicleRequest[]> {
+        return this.requestsSubject.asObservable().pipe(delay(200));
+    }
+
+    getRequestById(id: string): Observable<VehicleRequest | undefined> {
+        const item = this.requestsMock.find(r => r.id === id);
+        return of(item).pipe(delay(200));
+    }
+
+    addRequest(request: VehicleRequest): Observable<void> {
+        // (API) เพิ่มข้อมูลใหม่
+        this.requestsMock = [request, ...this.requestsMock];
+        this.requestsSubject.next(this.requestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    updateRequest(id: string, updatedRequest: VehicleRequest): Observable<void> {
+        // (API) อัปเดตข้อมูล
+        this.requestsMock = this.requestsMock.map(r => r.id === id ? updatedRequest : r);
+        this.requestsSubject.next(this.requestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    deleteRequest(id: string): Observable<void> {
+        // (API) ลบข้อมูล
+        this.requestsMock = this.requestsMock.filter(r => r.id !== id);
+        this.requestsSubject.next(this.requestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    generateNextId(): Observable<string> {
+        // สร้าง ID ใหม่ (จำลอง Server)
+        const lastIdNum = this.requestsMock.reduce((max, item) => {
+            const num = parseInt(item.id.split('#')[1] || '0');
+            return num > max ? num : max;
+        }, 0);
+        const nextNum = (lastIdNum + 1).toString().padStart(3, '0');
+        return of(`2701#${nextNum}`);
+    }
+
+    // --- ส่วนของ Taxi ---
+
+    getTaxiRequests(): Observable<TaxiRequest[]> {
+        return this.taxiRequestsSubject.asObservable().pipe(delay(200));
+    }
+
+    getTaxiRequestById(id: string): Observable<TaxiRequest | undefined> {
+        const item = this.taxiRequestsMock.find(r => r.id === id);
+        return of(item).pipe(delay(200));
+    }
+
+    addTaxiRequest(request: TaxiRequest): Observable<void> {
+        this.taxiRequestsMock = [request, ...this.taxiRequestsMock];
+        this.taxiRequestsSubject.next(this.taxiRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    updateTaxiRequest(id: string, updatedRequest: TaxiRequest): Observable<void> {
+        this.taxiRequestsMock = this.taxiRequestsMock.map(r => r.id === id ? updatedRequest : r);
+        this.taxiRequestsSubject.next(this.taxiRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    deleteTaxiRequest(id: string): Observable<void> {
+        this.taxiRequestsMock = this.taxiRequestsMock.filter(r => r.id !== id);
+        this.taxiRequestsSubject.next(this.taxiRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    generateNextTaxiId(): Observable<string> {
+        const lastIdNum = this.taxiRequestsMock.reduce((max, item) => {
+            const num = parseInt(item.id.split('#')[1] || '0');
+            return num > max ? num : max;
+        }, 0);
+        const nextNum = (lastIdNum + 1).toString().padStart(3, '0');
+        return of(`2701#${nextNum}`);
+    }
+
+    // --- ส่วนของเบี้ยเลี้ยง ---
+
+    getAllowanceRequests(): Observable<AllowanceRequest[]> {
+        return this.allowanceRequestsSubject.asObservable().pipe(delay(200));
+    }
+
+    getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
+        const item = this.allowanceRequestsMock.find(r => r.id === id);
+        return of(item).pipe(delay(200));
+    }
+
+    addAllowanceRequest(request: AllowanceRequest): Observable<void> {
+        this.allowanceRequestsMock = [request, ...this.allowanceRequestsMock];
+        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
+        this.allowanceRequestsMock = this.allowanceRequestsMock.map(r => r.id === id ? updatedRequest : r);
+        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    deleteAllowanceRequest(id: string): Observable<void> {
+        this.allowanceRequestsMock = this.allowanceRequestsMock.filter(r => r.id !== id);
+        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        return of(void 0).pipe(delay(300));
+    }
+
+    generateNextAllowanceId(): Observable<string> {
+        const prefix = '2701';
+        const lastIdNum = this.allowanceRequestsMock.reduce((max, item) => {
+            if (item.id.startsWith(prefix)) {
+                const parts = item.id.split('#');
+                const num = parseInt(parts[1] || '0');
+                return num > max ? num : max;
+            }
+            return max;
+        }, 0);
+
+        return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
+    }
+
+    // --- Dynamic Mock Generation Helper ---
+
+    // Helper สร้างวันที่ในเดือน
+    private generateDays(month: number, year: number): Date[] {
+        // แปลงปี พ.ศ. เป็น ค.ศ.
+
+
+        const adYear = year - 543;
+        const date = new Date(adYear, month, 1);
+        const days: Date[] = [];
+        while (date.getMonth() === month) {
+            days.push(new Date(date));
+            date.setDate(date.getDate() + 1);
+        }
+        return days;
+    }
+
+    private formatDate(d: Date): string {
+        // แปลง format วันที่ dd/MM/yyyy
+
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+
+        return `${dd}/${mm}/${yyyy}`;
+    }
+
+    private getRandomShiftCode(): string {
+        const shifts = [
+            'O01 09.00-18.00', 'O02 10.00-19.00', 'O03 10.00-22.00', 'O04 09.00-23.00', 'O19 19.00-07.00',
+            'O01 09.00-18.01', 'O02 10.00-19.01', 'O03 10.00-22.01', 'O04 09.00-23.01', 'O19 19.00-07.01',
+            'O01 09.00-18.02', 'O01 09.00-18.01', 'O02 10.00-19.01', 'O03 10.00-22.01', 'O04 09.00-23.01',
+            'O19 19.00-07.01', 'O01 09.00-18.02', 'O02 10.00-19.02', 'O03 10.00-22.02', 'O04 09.00-23.02',
+            'O19 19.00-07.02', 'O01 09.00-18.03', 'O01 09.00-18.02', 'O02 10.00-19.02', 'O03 10.00-22.02',
+            'O04 09.00-23.02', 'O01 09.00-18.01', 'O02 10.00-19.01', 'O03 10.00-22.01', 'O04 09.00-23.01',
+            'O19 19.00-07.01'
+        ];
+        return shifts[Math.floor(Math.random() * shifts.length)];
+    }
+
+    getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
+        const days = this.generateDays(month, year);
+        const results = days.map(d => {
+            const dayOfWeek = d.getDay(); // 0=Sun, 6=Sat
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+            // สุ่มค่า
+            const type = isWeekend ? 'H' : 'W';
+
+            let timeIn = '';
+            let timeOut = '';
+            let desc = '';
+
+            if (type === 'W') {
+                // สุ่มเวลาเข้า-ออกงาน
+
+                const inHour = 8 + Math.floor(Math.random() * 2); // 8 or 9
+                const inMin = Math.floor(Math.random() * 60);
+                const outHour = 17 + Math.floor(Math.random() * 4); // 17 - 20
+                const outMin = Math.floor(Math.random() * 60);
+
+                timeIn = `${String(inHour).padStart(2, '0')}:${String(inMin).padStart(2, '0')}`;
+                timeOut = `${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}`;
+
+                // สุ่มใส่รายละเอียด
+                if (Math.random() > 0.7) desc = 'ทดสอบการเบิก';
+            }
+
+            return {
+                d: this.formatDate(d),
+                t: type,
+                in: timeIn,
+                out: timeOut,
+                s: false,
+                desc: desc,
+                shiftCode: this.getRandomShiftCode()
+            };
+        });
+        return of(results).pipe(delay(200));
+    }
+
+    getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
+        const days = this.generateDays(month, year);
+        const results = days.map(d => {
+            const dayOfWeek = d.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const type = isWeekend ? 'H' : 'W';
+
+            let timeIn = '';
+            let timeOut = '';
+            let desc = '';
+
+            if (type === 'W') {
+                // สุ่มสถานะการเข้างาน (มาสาย/กลับดึก)
+                const scenario = Math.random();
+                if (scenario > 0.9) {
+                    // Late night
+                    timeIn = '09:00';
+                    timeOut = '23:30';
+                    desc = 'กลับดึก';
+                } else if (scenario > 0.8) {
+                    // Early bird
+                    timeIn = '05:30';
+                    timeOut = '18:00';
+                    desc = 'มาเช้า';
+                } else {
+                    // Normal
+                    const inHour = 8 + Math.floor(Math.random() * 2);
+                    const inMin = Math.floor(Math.random() * 60);
+                    const outHour = 17 + Math.floor(Math.random() * 2);
+                    const outMin = Math.floor(Math.random() * 60);
+                    timeIn = `${String(inHour).padStart(2, '0')}:${String(inMin).padStart(2, '0')}`;
+                    timeOut = `${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}`;
+                }
+            }
+
+            return {
+                d: this.formatDate(d),
+                t: type,
+                in: timeIn,
+                out: timeOut,
+                s: false,
+                desc: desc,
+                shiftCode: this.getRandomShiftCode()
+            };
+        });
+        return of(results).pipe(delay(200));
+    }
+
+    getMockTaxiLogs(month: number, year: number): Observable<any[]> {
+        const days = this.generateDays(month, year);
+        const results = days.map(d => {
+            const dayOfWeek = d.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const type = isWeekend ? 'H' : 'W';
+
+            let checkIn = '';
+            let checkOut = '';
+
+            if (type === 'W') {
+                checkIn = `09:${String(Math.floor(Math.random() * 59)).padStart(2, '0')}`;
+                checkOut = `18:${String(Math.floor(Math.random() * 59)).padStart(2, '0')}`;
+            }
+
+            return {
+                date: this.formatDate(d),
+                type: type,
+                checkIn: checkIn,
+                checkOut: checkOut,
+                desc: '',
+                dest: '',
+                dist: 0,
+                amt: 0,
+                selected: false,
+                shiftCode: this.getRandomShiftCode()
+            };
+        });
+        return of(results).pipe(delay(200));
+    }
 }
