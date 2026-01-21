@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
+import { delay, tap, map } from 'rxjs/operators';
 
 export interface RequestItem {
     date: string; // dd/MM/yyyy
@@ -307,6 +307,42 @@ export class VehicleService {
         }, 0);
 
         return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
+    }
+
+    // --- Global Helper for Real-time Updates ---
+
+    getGlobalPendingCount(): Observable<number> {
+        return combineLatest([
+            this.requestsSubject,
+            this.taxiRequestsSubject,
+            this.allowanceRequestsSubject
+        ]).pipe(
+            map(([reqs, taxis, allowances]) => {
+                const p1 = reqs.filter(r => r.status.includes('รอตรวจสอบ')).length;
+                const p2 = taxis.filter(t => t.status.includes('รอตรวจสอบ')).length;
+                const p3 = allowances.filter(a => a.status.includes('รอตรวจสอบ')).length;
+                return p1 + p2 + p3;
+            })
+        );
+    }
+
+    updateStatus(id: string, type: 'allowance' | 'taxi' | 'vehicle', status: string): void {
+        if (type === 'allowance') {
+            this.allowanceRequestsMock = this.allowanceRequestsMock.map(r =>
+                r.id === id ? { ...r, status: status } : r
+            );
+            this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        } else if (type === 'taxi') {
+            this.taxiRequestsMock = this.taxiRequestsMock.map(r =>
+                r.id === id ? { ...r, status: status } : r
+            );
+            this.taxiRequestsSubject.next(this.taxiRequestsMock);
+        } else {
+            this.requestsMock = this.requestsMock.map(r =>
+                r.id === id ? { ...r, status: status } : r
+            );
+            this.requestsSubject.next(this.requestsMock);
+        }
     }
 
     // --- Dynamic Mock Generation Helper ---

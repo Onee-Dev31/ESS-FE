@@ -184,7 +184,25 @@ export class ApprovalsComponent implements OnInit {
   }
 
   updateStatus(item: ApprovalItem, newStatus: any) {
-    this.approvals.update(items => items.map(i => i.requestNo === item.requestNo ? { ...i, status: newStatus } : i));
+    let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
+    let statusLabel = 'รอตรวจสอบ'; // Default
+
+    if (item.requestType === 'ค่าเบี้ยเลี้ยง') type = 'allowance';
+    else if (item.requestType === 'ค่าแท็กซี่') type = 'taxi';
+
+    if (newStatus === 'Approved') statusLabel = 'อนุมัติ';
+    else if (newStatus === 'Rejected') statusLabel = 'ไม่อนุมัติ';
+    else if (newStatus === 'Referred Back') statusLabel = 'รอแก้ไข';
+
+    // Call service to update state
+    this.vehicleService.updateStatus(item.requestNo, type, statusLabel);
+
+    // Refresh local list (since we are subscribed to BehaviorSubjects in refresh(), 
+    // simply calling refresh() again will get the latest state if we remove take(1) or if we just rely on the fact 
+    // that BehaviorSubjects emit new values to active subscribers.
+    // However, refresh() uses take(1). So let's re-run refresh().
+    this.refresh();
+
     this.closeModal();
   }
 }

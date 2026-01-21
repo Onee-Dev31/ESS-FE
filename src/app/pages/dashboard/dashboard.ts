@@ -149,18 +149,7 @@ export class DashboardComponent implements OnInit {
     this.holidays$ = this.dashboardService.getHolidays();
 
     // คำนวณยอดรออนุมัติทั้งหมด
-    this.pendingCount$ = forkJoin({
-      allowances: this.vehicleService.getAllowanceRequests(),
-      taxis: this.vehicleService.getTaxiRequests(),
-      vehicles: this.vehicleService.getRequests()
-    }).pipe(
-      map(({ allowances, taxis, vehicles }) => {
-        const p1 = allowances.filter(a => a.status.includes('รอตรวจสอบ')).length;
-        const p2 = taxis.filter(t => t.status.includes('รอตรวจสอบ')).length;
-        const p3 = vehicles.filter(v => v.status.includes('รอตรวจสอบ')).length;
-        return p1 + p2 + p3;
-      })
-    );
+    this.pendingCount$ = this.vehicleService.getGlobalPendingCount();
 
     // แปลงข้อมูล Profile ให้แสดงผลได้ง่ายขึ้น
     this.userProfile$.subscribe(profile => {
