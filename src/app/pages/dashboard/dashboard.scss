@@ -1810,97 +1810,110 @@ body {
     }
   }
 
+  /* --- แก้ไขเฉพาะส่วน Attendance Card (วางทับของเดิม) --- */
+  /* --- แก้ไขเฉพาะส่วน Attendance Card --- */
   .attendance-card {
-  border: none;
-  box-shadow: $shadow;
-  border-radius: $radius-lg !important;
-  overflow: hidden;
-
-  .card-header {
-    background: linear-gradient(to right, #ffffff, #f8fafc);
-    padding: 20px 24px;
-    border-bottom: 1px solid #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-left: 4px solid $primary;
-
-    .card-heading {
-      color: $primary;
-      font-size: 17px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0;
-
-      i {
-        font-size: 18px;
-        opacity: 0.9;
-      }
-    }
-  }
-
-  .card-body {
-    padding: 24px;
-  }
-
-  .date-range-section {
+    border: none;
+    box-shadow: $shadow; // ใช้ตัวแปร $shadow ที่มีอยู่แล้วในไฟล์
+    border-radius: $radius-lg !important; // ใช้ $radius-lg
+    overflow: hidden;
+    background: #fff;
     margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
 
-    .label-date {
-      font-size: 13px;
-      color: $muted;
-      font-weight: 500;
-    }
-
-    .value-date {
-      font-size: 16px;
-      color: $dark;
-      font-weight: 700;
-      font-family: 'Inter', sans-serif;
-    }
-  }
-
-  .attendance-list-clean {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    width: 100%;
-
-    .att-clean-item {
+    .card-header {
+      background: linear-gradient(to right, #ffffff, #f8fafc);
+      padding: 20px 24px;
+      border-bottom: 1px solid #f1f5f9;
       display: flex;
-      justify-content: space-between !important;
       align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px dashed #e2e8f0; 
-      width: 100%;
+      justify-content: space-between;
+      border-left: 4px solid $primary; // ใช้ $primary
 
-      &:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+      .card-heading {
+        color: $primary;
+        font-size: 17px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+
+        i {
+          font-size: 18px;
+          opacity: 0.9;
+        }
       }
+    }
 
-      .att-label {
+    .card-body {
+      padding: 24px;
+    }
+
+    .date-range-section {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #f8fafc;
+      padding: 10px 15px;
+      border-radius: 8px;
+
+      .label-date {
+        font-size: 13px;
         color: $muted;
         font-weight: 500;
-        font-size: 15px; // ปรับขนาดให้พอดี
       }
 
-      .att-value {
-        color: $dark;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
+      .value-date {
         font-size: 16px;
-        text-align: right;
-        flex-shrink: 0;
+        color: $dark;
+        font-weight: 700;
+        font-family: 'Inter', sans-serif;
       }
     }
+
+    /* --- จุดที่แก้ไข: บังคับชิดซ้าย-ขวา --- */
+    /* --- วางโค้ดนี้ไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
+
+    .attendance-list-clean {
+      display: flex !important;
+      flex-direction: column !important;
+      width: 100% !important;
+
+      .att-clean-item {
+        display: flex !important;
+        justify-content: space-between !important; /* คำสั่งสำคัญ: ดันซ้าย-ขวา */
+        align-items: center !important;
+        width: 100% !important;
+        padding: 12px 0 !important;
+        border-bottom: 1px dashed #e2e8f0 !important;
+
+        /* ป้องกันการติดค่า float หรือ width ผิดๆ จากจุดอื่น */
+        float: none !important;
+
+        .att-label {
+          text-align: left !important;
+          margin-right: auto !important; /* เทคนิคดันตัวอื่นไปขวาสุด */
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        .att-value {
+          text-align: right !important;
+          margin-left: auto !important; /* เทคนิคดันตัวเองไปขวาสุด */
+          color: #0f172a;
+          font-weight: 600;
+          flex-shrink: 0 !important;
+        }
+      }
+    }
+
+    .card-footer {
+      background: #fff;
+      border-top: 1px solid #f1f5f9;
+      padding: 16px 24px;
+    }
   }
-}
 
   .performance-card {
     border: none;
@@ -2164,6 +2177,198 @@ body {
 
       .leave-body {
         padding: 15px;
+      }
+    }
+  }
+}
+
+/* --- วางไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
+/* FIX: ตกแต่งส่วนวันที่ และแก้รายการให้ชิดซ้าย-ขวา */
+
+.dashboard-wrapper .attendance-card .card-body {
+  /* 1. แต่งส่วนแสดงวันที่ */
+  .date-range-section {
+    display: flex !important;
+    justify-content: space-between !important; /* ดันซ้าย-ขวา */
+    align-items: center !important;
+    background: #f8fafc !important; /* พื้นหลังสีเทาอ่อน */
+    padding: 10px 5px !important;
+    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #f1f5f9 !important;
+
+    .label-date {
+      float: left !important;
+      margin-right: auto !important; /* ดันตัวขวาออกไป */
+      color: #64748b !important;
+      font-weight: 500 !important;
+    }
+
+    .value-date {
+      float: right !important;
+      margin-left: auto !important; /* ดันตัวเองไปขวาสุด */
+      color: #4650dd !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  /* 2. แก้รายการ Attendance ให้ชิดซ้าย-ขวา */
+  .attendance-list-clean {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+
+    .att-clean-item {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+      padding: 12px 0 !important;
+      border-bottom: 1px dashed #e2e8f0 !important;
+      float: none !important;
+
+      .att-label {
+        text-align: left !important;
+        margin-right: auto !important;
+        color: #64748b !important;
+        font-size: 15px !important;
+      }
+
+      .att-value {
+        text-align: right !important;
+        margin-left: auto !important;
+        color: #0f172a !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+      }
+    }
+  }
+}
+/* --- วางไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
+
+/* FIX: ตกแต่ง Performance Card ให้สวยงาม */
+.dashboard-wrapper .performance-card {
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  margin-bottom: 24px !important;
+
+  .card-header {
+    background: linear-gradient(to right, #ffffff, #f8fafc) !important;
+    padding: 20px 24px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+
+    .card-heading {
+      color: #4650dd !important; /* สีส้ม */
+      font-size: 17px !important;
+      font-weight: 700 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      margin: 0 !important;
+
+      i {
+        font-size: 18px !important;
+        opacity: 0.9 !important;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 24px !important;
+
+    /* ส่วนข้อมูลอายุงาน */
+    .work-meta-group {
+      background:#f8fafc !important; /* พื้นหลังสีส้มอ่อนๆ */
+      border: 1px solid #f8fafc !important;
+      border-radius: 12px !important;
+      padding: 15px !important;
+      margin-bottom: 20px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+
+      .meta-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 1px dashed #4650dd !important;
+        padding-bottom: 8px !important;
+
+        &:last-child {
+          border-bottom: none !important;
+          padding-bottom: 0 !important;
+        }
+
+        .meta-label {
+          color: #4650dd !important; /* สีส้มเข้ม */
+          font-size: 14px !important;
+          font-weight: 500 !important;
+        }
+
+        .meta-value {
+          color: #4650dd !important; /* สีส้มสด */
+          font-weight: 700 !important;
+          font-size: 15px !important;
+        }
+      }
+    }
+
+    .perf-subtitle {
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      color: #334155 !important;
+      margin: 0 0 15px 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 4px;
+        height: 16px;
+        background: #4650dd;
+        border-radius: 2px;
+      }
+    }
+
+    /* รายการผลประเมิน */
+    .performance-list {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+
+      .perf-item {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 16px !important;
+        background: #f8fafc !important;
+        border-radius: 8px !important;
+        border: 1px solid #f1f5f9 !important;
+        transition: transform 0.2s !important;
+
+        &:hover {
+          transform: translateX(5px) !important;
+          border-color: #cbd5e1 !important;
+        }
+
+        .perf-year {
+          font-weight: 600 !important;
+          color: #64748b !important;
+        }
+
+        .perf-grade {
+          font-weight: 800 !important;
+          color: #0f172a !important;
+          background: #e2e8f0 !important;
+          padding: 4px 12px !important;
+          border-radius: 20px !important;
+          font-size: 14px !important;
+        }
       }
     }
   }
