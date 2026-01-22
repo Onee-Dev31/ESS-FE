@@ -330,10 +330,15 @@ body {
   padding: 20px;
 
   @media (min-width: 992px) {
-    padding: 30px 40px;
+    padding: 24px 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-height: auto;
+  }
+
+  @media (min-width: 1200px) {
+    padding: 30px 40px;
     min-height: 250px;
   }
 
@@ -396,17 +401,17 @@ body {
     position: relative;
     z-index: 5;
 
-    @media (min-width: 992px) {
+    @media (min-width: 1200px) {
       flex-direction: row;
       align-items: flex-start;
       gap: 40px;
     }
 
     .section-divider {
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      margin: 5px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      margin: 5px 0 15px 0;
 
-      @media (min-width: 992px) {
+      @media (min-width: 1200px) {
         display: none;
       }
     }
@@ -467,20 +472,29 @@ body {
       gap: 12px;
       width: 100%;
 
-      @media (min-width: 992px) {
+      @media (min-width: 1200px) {
         border-left: 1px solid rgba(255, 255, 255, 0.2);
-        padding-left: 60px;
+        padding-left: 40px;
         padding-top: 4px;
         margin-top: 0 !important;
       }
 
+      @media (min-width: 1400px) {
+        padding-left: 60px;
+      }
+
       .profile-display-group {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 4px;
         font-size: 14px !important;
         margin-top: 0 !important;
+
+        @media (min-width: 1200px) {
+          flex-direction: row;
+          gap: 15px;
+        }
 
         @media (max-width: 576px) {
           flex-wrap: wrap;
@@ -498,15 +512,21 @@ body {
           height: 100%;
           line-height: 1.4;
 
-          @media (min-width: 768px) {
-            flex: 0 0 140px;
-          }
+          flex: 0 0 auto;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 12px;
+          font-weight: 500;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          height: auto;
+          line-height: 1.4;
 
-          @media (max-width: 576px) {
-            flex: 0 0 100%;
-            width: 100%;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+          @media (min-width: 1200px) {
+            flex: 0 0 140px;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 14px;
           }
 
           i {
@@ -706,20 +726,24 @@ body {
     margin-bottom: 20px;
     display: grid;
     gap: 15px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     align-items: stretch;
 
-    @media (max-width: 1199px) {
+    @media (min-width: 1600px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 1599px) and (min-width: 1200px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
     @media (max-width: 480px) {
-      grid-template-columns: repeat(2, 1fr); // แสดง 2 คอลัมน์บนมือถือ
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
     @media (max-width: 350px) {
-      grid-template-columns: 1fr; // แสดง 1 คอลัมน์บนหน้าจอขนาดเล็กมาก
+      grid-template-columns: 1fr;
     }
   }
 
@@ -750,7 +774,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    flex-wrap: nowrap; // หัวข้อและวงเงินให้อยู่บรรทัดเดียวกัน
+    flex-wrap: nowrap;
 
     .stat-title {
       font-size: 14px;
@@ -787,11 +811,10 @@ body {
     align-items: flex-end;
     margin-bottom: 8px;
     gap: 10px;
-    flex-wrap: nowrap; // กลุ่มข้อมูลให้อยู่บรรทัดเดียวกัน
+    flex-wrap: nowrap;
 
     .stat-data-group {
       display: flex;
-      // แสดงผลในบรรทัดเดียวกัน
       flex-direction: row;
       align-items: baseline;
       gap: 4px;
@@ -1365,9 +1388,9 @@ body {
 
   .btn-pending-approvals {
     // --- สไตล์สถานะปกติ ---
-    background: #fbe1fb;      // พื้นม่วงอ่อน
+    background: #fbe1fb; // พื้นม่วงอ่อน
     border: 1.5px solid #800080; // ขอบม่วงเข้ม
-    color: #800080;           // ตัวอักษรมม่วงเข้ม
+    color: #800080; // ตัวอักษรมม่วงเข้ม
     padding: 5px 14px;
     border-radius: 20px;
     font-size: 13px;
@@ -1382,13 +1405,13 @@ body {
 
     // --- สไตล์เมื่อ Hover (เปลี่ยนสีทั้งหมด) ---
     &:hover {
-      background: #800080;    // พื้นหลังเปลี่ยนเป็นม่วงเข้ม
-      color: #ffffff;         // ตัวอักษรเปลี่ยนเป็นสีขาว
-      border-color: #800080;  // ขอบคงเดิม
-      animation: none;        // หยุด Glow เมื่อชี้
+      background: #800080; // พื้นหลังเปลี่ยนเป็นม่วงเข้ม
+      color: #ffffff; // ตัวอักษรเปลี่ยนเป็นสีขาว
+      border-color: #800080; // ขอบคงเดิม
+      animation: none; // หยุด Glow เมื่อชี้
 
       .icon-shake i {
-        color: #ffffff;       // ไอคอนระฆังเปลี่ยนเป็นสีขาว
+        color: #ffffff; // ไอคอนระฆังเปลี่ยนเป็นสีขาว
         filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
       }
 
@@ -1405,7 +1428,7 @@ body {
 
       i {
         font-size: 16px;
-        color: #800080;       // สีระฆังปกติเป็นม่วงเข้ม
+        color: #800080; // สีระฆังปกติเป็นม่วงเข้ม
         animation: bellShake 1.5s infinite;
         transform-origin: top center;
         transition: color 0.25s ease;
@@ -1417,7 +1440,7 @@ body {
         right: -7px;
         min-width: 15px;
         height: 15px;
-        background: #CC0000;  // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
+        background: #CC0000; // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
         color: white;
         border-radius: 50%;
         border: 2px solid white;
@@ -1430,7 +1453,7 @@ body {
         animation: pulseCriticalRed 1.5s infinite;
       }
     }
-}
+  }
 }
 
 @keyframes pulseCriticalRed {
