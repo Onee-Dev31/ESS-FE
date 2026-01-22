@@ -10,37 +10,13 @@ import {
   getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
+import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 
-interface UnifiedItem {
-  date: string;
-  description?: string;
-  timeIn?: string;
-  timeOut?: string;
-  amount: number;
-  destination?: string;
-  shiftCode?: string;
-}
-
-interface ApprovalItem {
-  requestNo: string;
-  requestDate: string;
-  requestBy: {
-    name: string;
-    employeeId: string;
-    department: string;
-    company: string;
-  };
-  requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่';
-  typeId: number;
-  requestDetail: string;
-  amount: number;
-  status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
-}
 
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
   encapsulation: ViewEncapsulation.None
@@ -55,35 +31,16 @@ export class ApprovalsComponent implements OnInit {
 
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
-  modalActiveTab = signal<'Items' | 'Comments'>('Items');
+  initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
-
-  // สถานะ Modal ยืนยันการกระทำ (Approve/Reject/Refer)
-  isActionConfirm = signal<boolean>(false);
-  actionType = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
-  reasonText = signal<string>('');
-
-  // เก็บข้อมูลหน้ารายละเอียด (Async)
-  currentDetailItems = signal<UnifiedItem[]>([]);
-  currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
-
-  // ตัวช่วยสำหรับแสดงผลใน Template
-  selectedRequestDetails = computed(() => {
-    if (!this.selectedItem()) return null;
-    return {
-      type: this.currentDetailType(),
-      items: this.currentDetailItems()
-    };
-  });
 
   ngOnInit() {
     this.refresh();
   }
 
   refresh() {
-    // ดึงข้อมูลทั้งหมดพร้อมกัน (ใช้ take(1) เพื่อให้ Observable จบการทำงาน)
     forkJoin({
       allowances: this.vehicleService.getAllowanceRequests().pipe(take(1)),
       taxis: this.vehicleService.getTaxiRequests().pipe(take(1)),
@@ -169,7 +126,6 @@ export class ApprovalsComponent implements OnInit {
           case 'requestNo':
             return a.requestNo.localeCompare(b.requestNo) * direction;
           case 'requestDate':
-            // รูปแบบ dd/mm/yyyy หรือ yyyy-mm-dd
             valA = a.requestDate.split('/').reverse().join('');
             valB = b.requestDate.split('/').reverse().join('');
             return valA.localeCompare(valB) * direction;
@@ -215,16 +171,9 @@ export class ApprovalsComponent implements OnInit {
     },
   }));
 
-  // (Logic ย้ายไปที่ viewDetail) 
-
-  modalItemsTotal = computed(() => {
-    // คำนวณยอดรวม
-    return this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0);
-  });
 
   setActiveTab(tab: string) {
     this.activeTab.set(tab);
-    // รีเซ็ตการเรียงลำดับเมื่อเปลี่ยนแท็บ (ถ้าจำเป็น)
   }
   getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
   onSearch(event: any) { this.searchText.set(event.target.value); }
@@ -256,92 +205,25 @@ export class ApprovalsComponent implements OnInit {
 
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
-    this.modalActiveTab.set('Items');
-    this.currentDetailItems.set([]); // รีเซ็ตข้อมูลระหว่างโหลด
-
-    // ดึงข้อมูลรายละเอียด
-    if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
-      this.currentDetailType.set('allowance');
-      this.vehicleService.getAllowanceRequestById(item.requestNo).subscribe(data => {
-        if (data) {
-          this.currentDetailItems.set(data.items as UnifiedItem[]);
-        }
-      });
-    } else if (item.requestType === 'ค่าแท็กซี่') {
-      this.currentDetailType.set('taxi');
-      this.vehicleService.getTaxiRequestById(item.requestNo).subscribe(data => {
-        if (data) {
-          this.currentDetailItems.set(data.items as UnifiedItem[]);
-        }
-      });
-    } else {
-      // ค่ารถ
-      this.currentDetailType.set('vehicle');
-      this.vehicleService.getRequestById(item.requestNo).subscribe(data => {
-        if (data) {
-          this.currentDetailItems.set(data.items as UnifiedItem[]);
-        }
-      });
-    }
-
+    this.initialAction.set(null);
     this.isModalOpen.set(true);
-    this.isActionConfirm.set(false);
-    this.actionType.set(null);
-    this.reasonText.set('');
   }
 
   openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
-    this.viewDetail(item);
-    this.isActionConfirm.set(true);
-    this.actionType.set(action);
-  }
-
-  confirmAction() {
-    const item = this.selectedItem();
-    const action = this.actionType();
-    const reason = this.reasonText();
-    if (!item || !action) return;
-
-    if ((action === 'Rejected' || action === 'Referred Back') && !reason.trim()) {
-      alert('กรุณาระบุเหตุผล (Please provide a reason)');
-      return;
-    }
-
-    this.updateStatus(item, action, reason);
+    this.selectedItem.set(item);
+    this.initialAction.set(action);
+    this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
-    this.currentDetailItems.set([]);
-    this.currentDetailType.set(null);
-    this.isActionConfirm.set(false);
-    this.actionType.set(null);
-    this.reasonText.set('');
+    this.initialAction.set(null);
   }
 
-  updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
-    let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
-    let statusLabel = 'รอตรวจสอบ'; // ค่าเริ่มต้น
-
-    if (item.requestType === 'ค่าเบี้ยเลี้ยง') type = 'allowance';
-    else if (item.requestType === 'ค่าแท็กซี่') type = 'taxi';
-
-    if (newStatus === 'Approved') statusLabel = 'อนุมัติ';
-    else if (newStatus === 'Rejected') statusLabel = 'ไม่อนุมัติ';
-    else if (newStatus === 'Referred Back') statusLabel = 'รอแก้ไข';
-
-    // เรียกใช้ Service เพื่ออัปเดตสถานะ
-    this.vehicleService.updateStatus(item.requestNo, type, statusLabel);
-
-    if (reason) {
-      console.log(`Action: ${newStatus}, Reason: ${reason}`);
-      // ในแอปจริง ข้อมูลนี้จะถูกส่งไปยัง Backend เพื่อเก็บประวัติหรือคอมเมนต์
-    }
-
-    // รีเฟรชรายการข้อมูลใหม่
+  onStatusUpdated() {
     this.refresh();
-
-    this.closeModal();
   }
+
+
 }
