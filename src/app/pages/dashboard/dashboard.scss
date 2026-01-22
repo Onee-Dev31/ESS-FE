@@ -1,5 +1,4 @@
 @use 'sass:color';
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 $primary: #4650dd;
 $dark: #0f172a;
@@ -132,15 +131,16 @@ body {
       display: contents;
     }
 
-    grid-template-areas: 'avatar'
-    'profile'
-    'attendance'
-    'performance'
-    'it-story'
-    'medical'
-    'welfare'
-    'leave'
-    'schedule';
+    grid-template-areas:
+      'avatar'
+      'profile'
+      'attendance'
+      'performance'
+      'it-story'
+      'medical'
+      'welfare'
+      'leave'
+      'schedule';
 
     .banner-avatar-section {
       grid-area: avatar;
@@ -219,11 +219,12 @@ body {
   min-width: 0;
 }
 
-
 .banner-avatar-section {
-  background: linear-gradient(135deg,
-      $primary,
-      color.adjust($primary, $lightness: -10%)) !important;
+  background: linear-gradient(
+    135deg,
+    $primary,
+    color.adjust($primary, $lightness: -10%)
+  ) !important;
   border-radius: $radius-lg;
   padding: 20px;
   display: flex;
@@ -316,9 +317,11 @@ body {
 }
 
 .profile-card {
-  background: linear-gradient(135deg,
-      $primary,
-      color.adjust($primary, $lightness: -10%)) !important;
+  background: linear-gradient(
+    135deg,
+    $primary,
+    color.adjust($primary, $lightness: -10%)
+  ) !important;
   color: white !important;
   border-radius: $radius-lg !important;
   box-shadow: $shadow;
@@ -729,11 +732,11 @@ body {
     grid-template-columns: repeat(2, 1fr);
     align-items: stretch;
 
-    @media (min-width: 1600px) {
+    @media (min-width: 1441px) {
       grid-template-columns: repeat(4, 1fr);
     }
 
-    @media (max-width: 1599px) and (min-width: 1200px) {
+    @media (max-width: 1440px) and (min-width: 1200px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
@@ -807,26 +810,30 @@ body {
 
   .stat-content-row {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 8px;
-    gap: 10px;
-    flex-wrap: nowrap;
+
+    @media (min-width: 1600px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 10px;
+    }
 
     .stat-data-group {
       display: flex;
-      flex-direction: row;
+      justify-content: space-between;
       align-items: baseline;
-      gap: 4px;
-      flex: 1;
+      width: 100%;
+
+      @media (min-width: 1600px) {
+        width: auto;
+        gap: 4px;
+      }
 
       .inline-label {
         font-size: 11px;
-
-        @media (min-width: 768px) {
-          font-size: 13px;
-        }
-
         color: $muted;
         font-weight: 500;
         white-space: nowrap;
@@ -834,23 +841,14 @@ body {
 
       .inline-value {
         font-size: 16px;
-
-        @media (min-width: 768px) {
-          font-size: 20px;
-        }
-
         font-weight: 700;
         line-height: 1;
-        font-family: 'Inter',
-        sans-serif;
-        color: $muted;
+        font-family: 'Inter', sans-serif;
+        color: #334155;
         white-space: nowrap;
-      }
 
-      &.text-end {
-        justify-content: flex-end;
-
-        .inline-value {
+        &.bold-value {
+          font-size: 18px;
           color: $balance;
         }
       }
@@ -980,7 +978,7 @@ body {
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
           &::after {
-            content: "";
+            content: '';
             position: absolute;
             top: 100%;
             left: 50%;
@@ -1119,7 +1117,7 @@ body {
       display: flex;
       flex-direction: column;
 
-      @media(min-width: 992px) {
+      @media (min-width: 992px) {
         flex-direction: row;
       }
     }
@@ -1129,7 +1127,7 @@ body {
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
 
-      @media(min-width: 992px) {
+      @media (min-width: 992px) {
         width: 300px;
         flex-shrink: 0;
         border-bottom: none;
@@ -1258,7 +1256,6 @@ body {
     }
   }
 }
-
 
 /* --- FullCalendar Overrides --- */
 ::ng-deep {
@@ -1440,7 +1437,7 @@ body {
         right: -7px;
         min-width: 15px;
         height: 15px;
-        background: #CC0000; // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
+        background: #cc0000; // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
         color: white;
         border-radius: 50%;
         border: 2px solid white;
@@ -1487,8 +1484,6 @@ body {
   }
 }
 
-
-
 @keyframes bellShake {
   0% {
     transform: rotate(0);
@@ -1526,11 +1521,6 @@ body {
     transform: rotate(0);
   }
 }
-
-
-
-
-
 
 .leave-card {
   border: none;
@@ -1601,239 +1591,253 @@ body {
     'pink': #ef4444,
   );
 
-@each $name, $color in $leave-themes {
-  &.theme-#{$name} {
-    .leave-count {
-      color: $color;
-    }
+  @each $name, $color in $leave-themes {
+    &.theme-#{$name} {
+      .leave-count {
+        color: $color;
+      }
 
-    .leave-icon {
-      color: $color;
-      background: rgba($color, 0.1);
-    }
+      .leave-icon {
+        color: $color;
+        background: rgba($color, 0.1);
+      }
 
-    .leave-footer {
-      background: rgba($color, 0.08);
-      color: $color;
+      .leave-footer {
+        background: rgba($color, 0.08);
+        color: $color;
+      }
     }
   }
-}
-}
 
-.schedule-card {
-  margin-top: 20px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  .schedule-body {
+  .schedule-card {
+    margin-top: 20px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     width: 100%;
 
-    @media (min-width: 1024px) {
-      flex-direction: row;
-      align-items: stretch;
+    .schedule-body {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      @media (min-width: 1024px) {
+        flex-direction: row;
+        align-items: stretch;
+      }
     }
   }
-}
 
-.holiday-list-panel {
-  background: #f8fafc;
-  padding: 20px;
-  width: 100%;
-  border-bottom: 1px solid #f1f5f9;
-
-  @media (min-width: 1024px) {
-    width: 300px;
-    flex-shrink: 0;
-    border-bottom: none;
-    border-right: 1px solid #f1f5f9;
-    padding: 25px;
-    overflow-y: auto;
-    max-height: 600px;
-  }
-
-  .panel-title {
-    margin: 0 0 20px;
-    font-size: 16px;
-    font-weight: 700;
-    color: $primary;
-  }
-
-  .holiday-item {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-    font-size: 13px;
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-top: 6px;
-      background: $success;
-      flex-shrink: 0;
-    }
-
-    .h-date {
-      font-weight: 700;
-      display: block;
-      color: $dark;
-    }
-
-    .h-name {
-      color: $muted;
-    }
-  }
-}
-
-.calendar-panel {
-  flex-grow: 1;
-  flex-basis: 0;
-  max-width: 100%;
-  width: 100%;
-  padding: 15px;
-  background: white;
-  min-height: 400px;
-  position: relative;
-  overflow-x: auto;
-
-  @media (min-width: 768px) {
-    padding: 25px;
-  }
-
-  full-calendar {
+  .holiday-list-panel {
+    background: #f8fafc;
+    padding: 20px;
     width: 100%;
-    height: 100%;
-    display: block;
-    min-width: 250px;
-  }
-}
-
-.schedule-footer {
-  padding: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
-  color: $muted;
-  background: #fff;
-  border-top: 1px solid #f1f5f9;
-
-  @media (min-width: 768px) {
-    padding: 15px 25px;
-    font-size: 13px;
-    gap: 20px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-  }
-
-  .legend-box {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    display: inline-block;
-    margin-right: 6px;
-  }
-
-  .box-gray {
-    background: #94a3b8;
-  }
-
-  .box-red {
-    background: $danger;
-  }
-
-  .box-green {
-    background: $success;
-  }
-
-  .box-orange {
-    background: $warning;
-  }
-
-  .box-blue {
-    background: #3b82f6;
-  }
-}
-
-.tooltip-container {
-  position: relative;
-  display: inline-block;
-  margin-left: 5px;
-  cursor: help;
-  z-index: 101;
-
-  &:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-  }
-}
-
-.tooltip-text {
-  visibility: hidden;
-  width: max-content;
-  max-width: 200px;
-
-  @media (min-width: 768px) {
-    max-width: 280px;
-  }
-
-  background: #333;
-  color: #fff;
-  border-radius: 6px;
-  padding: 10px;
-  position: absolute;
-  z-index: 9999;
-  bottom: 140%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: 0.2s;
-  font-size: 12px;
-  line-height: 1.4;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  white-space: normal;
-
-  @media (max-width: 480px) {
-    left: 0;
-    transform: translateX(-10px);
-
-    &::after {
-      left: 20px;
-    }
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border: 5px solid transparent;
-    border-top-color: #333;
-  }
-}
-
-.attendance-card {
-  .card-header {
-    background: #fafafa;
-    border-radius: 12px 12px 0 0;
-    padding: 16px 24px;
     border-bottom: 1px solid #f1f5f9;
-    justify-content: space-between;
-    width: 100%;
 
-    .card-heading {
-      color: #1e293b;
+    @media (min-width: 1024px) {
+      width: 300px;
+      flex-shrink: 0;
+      border-bottom: none;
+      border-right: 1px solid #f1f5f9;
+      padding: 25px;
+      overflow-y: auto;
+      max-height: 600px;
+    }
+
+    .panel-title {
+      margin: 0 0 20px;
       font-size: 16px;
       font-weight: 700;
+      color: $primary;
+    }
+
+    .holiday-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 6px;
+        background: $success;
+        flex-shrink: 0;
+      }
+
+      .h-date {
+        font-weight: 700;
+        display: block;
+        color: $dark;
+      }
+
+      .h-name {
+        color: $muted;
+      }
+    }
+  }
+
+  .calendar-panel {
+    flex-grow: 1;
+    flex-basis: 0;
+    max-width: 100%;
+    width: 100%;
+    padding: 15px;
+    background: white;
+    min-height: 400px;
+    position: relative;
+    overflow-x: auto;
+
+    @media (min-width: 768px) {
+      padding: 25px;
+    }
+
+    full-calendar {
+      width: 100%;
+      height: 100%;
+      display: block;
+      min-width: 250px;
+    }
+  }
+
+  .schedule-footer {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+    color: $muted;
+    background: #fff;
+    border-top: 1px solid #f1f5f9;
+
+    @media (min-width: 768px) {
+      padding: 15px 25px;
+      font-size: 13px;
+      gap: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+    }
+
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .box-gray {
+      background: #94a3b8;
+    }
+
+    .box-red {
+      background: $danger;
+    }
+
+    .box-green {
+      background: $success;
+    }
+
+    .box-orange {
+      background: $warning;
+    }
+
+    .box-blue {
+      background: #3b82f6;
+    }
+  }
+
+  .tooltip-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    cursor: help;
+    z-index: 101;
+
+    &:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    width: max-content;
+    max-width: 200px;
+
+    @media (min-width: 768px) {
+      max-width: 280px;
+    }
+
+    background: #333;
+    color: #fff;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 9999;
+    bottom: 140%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: 0.2s;
+    font-size: 12px;
+    line-height: 1.4;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: normal;
+
+    @media (max-width: 480px) {
+      left: 0;
+      transform: translateX(-10px);
+
+      &::after {
+        left: 20px;
+      }
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border: 5px solid transparent;
+      border-top-color: #333;
+    }
+  }
+
+  .attendance-card {
+  border: none;
+  box-shadow: $shadow;
+  border-radius: $radius-lg !important;
+  overflow: hidden;
+
+  .card-header {
+    background: linear-gradient(to right, #ffffff, #f8fafc);
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 4px solid $primary;
+
+    .card-heading {
+      color: $primary;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+
+      i {
+        font-size: 18px;
+        opacity: 0.9;
+      }
     }
   }
 
@@ -1864,14 +1868,16 @@ body {
   .attendance-list-clean {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
+    width: 100%;
 
     .att-clean-item {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-between !important;
       align-items: center;
-      font-size: 15px;
-      padding-bottom: 8px;
+      padding: 14px 0;
+      border-bottom: 1px dashed #e2e8f0; 
+      width: 100%;
 
       &:last-child {
         border-bottom: none;
@@ -1879,245 +1885,286 @@ body {
       }
 
       .att-label {
-        color: #334155;
+        color: $muted;
         font-weight: 500;
+        font-size: 15px; // ปรับขนาดให้พอดี
       }
 
       .att-value {
         color: $dark;
         font-weight: 600;
         font-family: 'Inter', sans-serif;
+        font-size: 16px;
+        text-align: right;
+        flex-shrink: 0;
       }
     }
   }
 }
 
-.performance-card {
-  .card-header {
-    background: #fafafa;
-    border-radius: 12px 12px 0 0;
-    padding: 16px 24px;
-    border-bottom: 1px solid #f1f5f9;
+  .performance-card {
+    border: none;
+    box-shadow: $shadow;
+    border-radius: $radius-lg !important;
+    overflow: hidden;
 
-    .card-heading {
-      color: $primary;
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-    }
-  }
-
-  .card-body {
-    padding: 24px;
-  }
-
-  .work-meta-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #f1f5f9;
-
-    .meta-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      width: 100%;
-
-      .meta-label {
-        min-width: 100px;
-        font-weight: 500;
-        color: #64748b;
-        font-size: 14px;
-      }
-
-      .meta-value {
-        font-size: 15px;
-        color: $dark;
-        font-weight: 600;
-      }
-    }
-  }
-
-  .perf-subtitle {
-    font-size: 15px;
-    font-weight: 700;
-    color: $dark;
-    margin-bottom: 16px;
-  }
-
-  .performance-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-
-    .perf-item {
+    .card-header {
+      background: linear-gradient(to right, #ffffff, #f8fafc);
+      padding: 20px 24px;
+      border-bottom: 1px solid #f1f5f9;
       display: flex;
       align-items: center;
-      font-size: 15px;
-      justify-content: space-between;
+      border-left: 4px solid #6366f1;
 
-      .perf-year {
-        min-width: 150px;
-        color: #64748b;
-        font-weight: 500;
-      }
-
-      .perf-grade {
+      .card-heading {
+        color: #6366f1;
+        font-size: 17px;
         font-weight: 700;
-        color: $dark;
-        background: #f1f5f9;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+
+        i {
+          font-size: 18px;
+        }
       }
     }
-  }
-}
 
-@media (max-width: 374px) {
-  .dashboard-wrapper {
-    padding: 10px;
-  }
-
-  .page-title {
-    font-size: 16px;
-    margin-bottom: 15px;
-  }
-
-  .banner-avatar-section {
-    min-height: 160px;
-    padding: 15px;
-
-    .avatar-frame {
-      width: 100px;
-      height: 100px;
-      border-width: 3px;
+    .card-body {
+      padding: 24px;
     }
 
-    .edit-icon-btn {
-      width: 28px;
-      height: 28px;
-      top: 10px;
-      right: 10px;
+    .work-meta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+
+      .meta-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        width: 100%;
+
+        .meta-label {
+          min-width: 100px;
+          font-weight: 500;
+          color: #64748b;
+          font-size: 14px;
+        }
+
+        .meta-value {
+          font-size: 15px;
+          color: $dark;
+          font-weight: 600;
+        }
+      }
     }
-  }
 
-  .profile-card {
-    padding: 15px;
+    .perf-subtitle {
+      font-size: 19px;
+      font-weight: 700;
+      color: $dark;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #6366f1;
+      display: inline-block;
+    }
 
-    .card-body.profile-layout {
-      gap: 15px;
+    .performance-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
 
-      .profile-info-list {
-        padding-left: 0;
+      .perf-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8fafc;
+        width: 100%;
 
-        .profile-display-group {
-          flex-direction: column;
-          gap: 2px;
-          margin-bottom: 8px;
+        &:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
 
-          .display-label {
-            flex: 0 0 auto;
-            width: 100%;
-            font-size: 11px;
+        .perf-year {
+          color: #64748b;
+          font-weight: 500;
+          font-size: 14px;
+          text-align: right;
+        }
 
-            i {
-              width: 16px;
-            }
-          }
-
-          .display-value {
-            font-size: 13px;
-            padding-left: 24px;
-          }
+        .perf-grade {
+          font-weight: 700;
+          color: #6366f1;
+          background: #f1f5f9;
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          border: 1px solid #e2e8f0;
+          min-width: 70px;
+          text-align: center;
         }
       }
     }
   }
 
-  .performance-card .card-body {
+  @media (max-width: 374px) {
+    .dashboard-wrapper {
+      padding: 10px;
+    }
 
-    .work-meta-group .meta-row,
-    .performance-list .perf-item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
+    .page-title {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
 
-      .meta-label,
-      .perf-year {
-        font-size: 12px;
+    .banner-avatar-section {
+      min-height: 160px;
+      padding: 15px;
+
+      .avatar-frame {
+        width: 100px;
+        height: 100px;
+        border-width: 3px;
       }
 
-      .meta-value,
-      .perf-grade {
-        font-size: 14px;
+      .edit-icon-btn {
+        width: 28px;
+        height: 28px;
+        top: 10px;
+        right: 10px;
+      }
+    }
+
+    .profile-card {
+      padding: 15px;
+
+      .card-body.profile-layout {
+        gap: 15px;
+
+        .profile-info-list {
+          padding-left: 0;
+
+          .profile-display-group {
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 8px;
+
+            .display-label {
+              flex: 0 0 auto;
+              width: 100%;
+              font-size: 11px;
+
+              i {
+                width: 16px;
+              }
+            }
+
+            .display-value {
+              font-size: 13px;
+              padding-left: 24px;
+            }
+          }
+        }
+      }
+    }
+
+    .performance-card .card-body {
+      .work-meta-group .meta-row,
+      .performance-list .perf-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+
+        .meta-label,
+        .perf-year {
+          font-size: 12px;
+        }
+
+        .meta-value,
+        .perf-grade {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .fc-toolbar {
+      flex-direction: column;
+      gap: 10px;
+
+      .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
       }
     }
   }
 
-  .fc-toolbar {
-    flex-direction: column;
-    gap: 10px;
+  @media (min-width: 375px) and (max-width: 424px) {
+    .banner-avatar-section {
+      min-height: 180px;
 
-    .fc-toolbar-chunk {
+      .avatar-frame {
+        width: 130px;
+        height: 130px;
+      }
+    }
+
+    .profile-card
+      .card-body.profile-layout
+      .profile-info-list
+      .profile-display-group
+      .display-label {
+      flex: 0 0 110px;
+    }
+  }
+
+  @media (min-width: 425px) and (max-width: 767px) {
+    .profile-card
+      .card-body.profile-layout
+      .profile-info-list
+      .profile-display-group
+      .display-label {
+      flex: 0 0 130px;
+    }
+
+    .stats-grid-card .stat-items-grid,
+    .bottom-stats-grid,
+    .leave-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .main-layout-grid {
+      gap: 16px;
+    }
+
+    .card-footer .action-btn {
+      width: 100%;
       display: flex;
       justify-content: center;
     }
-  }
-}
 
-@media (min-width: 375px) and (max-width: 424px) {
-  .banner-avatar-section {
-    min-height: 180px;
-
-    .avatar-frame {
-      width: 130px;
-      height: 130px;
+    .schedule-card .schedule-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      justify-content: start;
     }
-  }
 
-  .profile-card .card-body.profile-layout .profile-info-list .profile-display-group .display-label {
-    flex: 0 0 110px;
-  }
-}
+    .leave-card {
+      min-height: auto;
 
-@media (min-width: 425px) and (max-width: 767px) {
-  .profile-card .card-body.profile-layout .profile-info-list .profile-display-group .display-label {
-    flex: 0 0 130px;
-  }
-
-  .stats-grid-card .stat-items-grid,
-  .bottom-stats-grid,
-  .leave-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 767px) {
-  .main-layout-grid {
-    gap: 16px;
-  }
-
-  .card-footer .action-btn {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .schedule-card .schedule-footer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    justify-content: start;
-  }
-
-  .leave-card {
-    min-height: auto;
-
-    .leave-body {
-      padding: 15px;
+      .leave-body {
+        padding: 15px;
+      }
     }
   }
 }

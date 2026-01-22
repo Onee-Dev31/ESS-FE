@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit {
   welfareStats$!: Observable<WelfareItem[]>;
   leaveStats$!: Observable<LeaveItem[]>;
   holidays$!: Observable<HolidayItem[]>;
-  pendingCount$!: Observable<number>; // ตัวแปรแสดงจำนวนรายการรออนุมัติ
+  pendingCount$!: Observable<number>;   
 
   // ข้อมูลจำลอง (Static)
   profileList: ProfileItem[] = [];
