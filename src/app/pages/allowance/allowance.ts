@@ -30,7 +30,7 @@ export class AllowanceComponent implements OnInit {
   protected readonly Math = Math;
 
   isModalOpen = false;
-  selectedRequestId = ''; // For passing to modal
+  selectedRequestId = ''; // สำหรับส่งค่าไปยัง Modal
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
@@ -76,7 +76,7 @@ export class AllowanceComponent implements OnInit {
             const dateA = valA.split('/').reverse().join('');
             const dateB = valB.split('/').reverse().join('');
             return dateA.localeCompare(dateB) * direction;
-          case 'desc':
+          case 'description':
             valA = a.items[0]?.description || '';
             valB = b.items[0]?.description || '';
             return valA.localeCompare(valB) * direction;
@@ -109,7 +109,7 @@ export class AllowanceComponent implements OnInit {
       { accessorKey: 'requestId', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
       { accessorKey: 'date', header: 'วันที่ขอเบิก' },
-      { accessorKey: 'desc', header: 'รายละเอียด' },
+      { accessorKey: 'description', header: 'รายละเอียด' },
       { accessorKey: 'hours', header: 'จำนวนชั่วโมง' },
       { accessorKey: 'amount', header: 'จำนวนเงิน' },
       { accessorKey: 'status', header: 'สถานะ' },

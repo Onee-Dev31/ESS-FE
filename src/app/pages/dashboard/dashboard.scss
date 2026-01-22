@@ -194,7 +194,7 @@ body {
       grid-column: 2;
       display: flex;
       flex-direction: column;
-      padding-left: 10px; // Add slight gap
+      padding-left: 10px; // เพิ่มระยะห่างเล็กน้อย
     }
 
     .banner-avatar-section,
@@ -714,12 +714,12 @@ body {
     }
 
     @media (max-width: 480px) {
-      grid-template-columns: repeat(2, 1fr); // Keep 2 columns even on mobile
+      grid-template-columns: repeat(2, 1fr); // แสดง 2 คอลัมน์บนมือถือ
       gap: 10px;
     }
 
     @media (max-width: 350px) {
-      grid-template-columns: 1fr; // Only 1 column on very small screens
+      grid-template-columns: 1fr; // แสดง 1 คอลัมน์บนหน้าจอขนาดเล็กมาก
     }
   }
 
@@ -750,7 +750,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    flex-wrap: nowrap; // Ensure title and limit are on one line
+    flex-wrap: nowrap; // หัวข้อและวงเงินให้อยู่บรรทัดเดียวกัน
 
     .stat-title {
       font-size: 14px;
@@ -787,12 +787,11 @@ body {
     align-items: flex-end;
     margin-bottom: 8px;
     gap: 10px;
-    flex-wrap: nowrap; // Keep data groups on one line
+    flex-wrap: nowrap; // กลุ่มข้อมูลให้อยู่บรรทัดเดียวกัน
 
     .stat-data-group {
       display: flex;
-      flex-direction: column; // Stack label over value if needed, or keep baseline?
-      // User asked for "same row", let's keep row but ensure it fits
+      // แสดงผลในบรรทัดเดียวกัน
       flex-direction: row;
       align-items: baseline;
       gap: 4px;

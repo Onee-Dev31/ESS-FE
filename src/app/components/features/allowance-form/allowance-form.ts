@@ -60,32 +60,32 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   generateCalendar() {
-    const existing = this.loadedRequest;
+    const existingRequest = this.loadedRequest;
 
     this.vehicleService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE)
-      .subscribe(rawData => {
-        this.logs = rawData.map(item => {
-          const match = existing?.items.find(i => i.date === item.d);
+      .subscribe(rawLogs => {
+        this.logs = rawLogs.map(item => {
+          const matchingItem = existingRequest?.items.find(i => i.date === item.date);
 
           const log = {
-            date: item.d,
-            dayType: item.t,
-            timeIn: item.in,
-            timeOut: item.out,
+            date: item.date,
+            dayType: item.dayType,
+            timeIn: item.timeIn,
+            timeOut: item.timeOut,
             displayHours: '0.00',
             actualExtraHours: 0,
             amount: 0,
-            selected: item.s,
-            description: item.desc,
+            selected: item.selected,
+            description: item.description,
             shiftCode: item.shiftCode
           };
 
-          if (match) {
-            log.timeIn = match.timeIn;
-            log.timeOut = match.timeOut;
-            log.amount = match.amount;
-            log.selected = match.selected;
-            log.description = match.description;
+          if (matchingItem) {
+            log.timeIn = matchingItem.timeIn;
+            log.timeOut = matchingItem.timeOut;
+            log.amount = matchingItem.amount;
+            log.selected = matchingItem.selected;
+            log.description = matchingItem.description;
           }
 
           this.autoCalculate(log);
@@ -105,22 +105,22 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    const [sh, sm] = log.timeIn.split(':').map(Number);
-    const [eh, em] = log.timeOut.split(':').map(Number);
+    const [startHour, startMinute] = log.timeIn.split(':').map(Number);
+    const [endHour, endMinute] = log.timeOut.split(':').map(Number);
 
-    let totalMins = (eh * 60 + em) - (sh * 60 + sm);
-    if (totalMins < 0) totalMins += 1440;
+    let totalMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+    if (totalMinutes < 0) totalMinutes += 1440;
 
-    let extraMins = totalMins - 540;
-    if (extraMins < 0) extraMins = 0;
+    let extraMinutes = totalMinutes - 540;
+    if (extraMinutes < 0) extraMinutes = 0;
 
 
-    const extraHoursDecimal = extraMins / 60;
+    const extraHoursDecimal = extraMinutes / 60;
     log.actualExtraHours = extraHoursDecimal;
 
-    const h = Math.floor(extraMins / 60);
-    const m = extraMins % 60;
-    log.displayHours = `${h}.${m.toString().padStart(2, '0')}`;
+    const hours = Math.floor(extraMinutes / 60);
+    const minutes = extraMinutes % 60;
+    log.displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
 
     if (extraHoursDecimal >= 2) {
       if (extraHoursDecimal <= 4) log.amount = 150;
@@ -142,14 +142,14 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   updateTotal() {
-    const selected = this.logs.filter(l => l.selected);
+    const selectedLogs = this.logs.filter(log => log.selected);
 
-    this.totalAmount = selected.reduce((sum, c) => sum + (c.amount || 0), 0);
+    this.totalAmount = selectedLogs.reduce((sum, current) => sum + (current.amount || 0), 0);
 
-    let totalExtraMins = selected.reduce((sum, c) => sum + (c.actualExtraHours * 60), 0);
-    const h = Math.floor(totalExtraMins / 60);
-    const m = Math.round(totalExtraMins % 60);
-    this.totalHoursStr = `${h}.${m.toString().padStart(2, '0')}`;
+    let totalExtraMinutes = selectedLogs.reduce((sum, current) => sum + (current.actualExtraHours * 60), 0);
+    const hours = Math.floor(totalExtraMinutes / 60);
+    const minutes = Math.round(totalExtraMinutes % 60);
+    this.totalHoursStr = `${hours}.${minutes.toString().padStart(2, '0')}`;
   }
 
   onSubmit() {
@@ -160,15 +160,15 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
 
     const items: AllowanceItem[] = this.logs
-      .filter(l => l.selected)
-      .map(l => ({
-        date: l.date,
-        dayType: l.dayType,
-        timeIn: l.timeIn,
-        timeOut: l.timeOut,
-        description: l.description,
-        hours: parseFloat(l.displayHours), // ประมาณค่า
-        amount: l.amount,
+      .filter(log => log.selected)
+      .map(log => ({
+        date: log.date,
+        dayType: log.dayType,
+        timeIn: log.timeIn,
+        timeOut: log.timeOut,
+        description: log.description,
+        hours: parseFloat(log.displayHours), // ประมาณค่า
+        amount: log.amount,
         selected: true
       }));
 
@@ -177,24 +177,24 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existing => {
-      if (existing) {
+    this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existingRequest => {
+      if (existingRequest) {
         this.vehicleService.updateAllowanceRequest(this.requestId, {
-          ...existing,
+          ...existingRequest,
           items: items
         }).subscribe(() => {
           alert(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
           this.closeModal();
         });
       } else {
-        const newReq: AllowanceRequest = {
+        const newRequest: AllowanceRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.ALLOWANCE,
-          createDate: new Date().toISOString().split('T')[0], // วันที่ yyyy-mm-dd
+          createDate: new Date().toISOString().split('T')[0], // วันที่ปัจจุบัน (yyyy-mm-dd)
           status: 'รอตรวจสอบ',
           items: items
         };
-        this.vehicleService.addAllowanceRequest(newReq).subscribe(() => {
+        this.vehicleService.addAllowanceRequest(newRequest).subscribe(() => {
           alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
           this.closeModal();
         });

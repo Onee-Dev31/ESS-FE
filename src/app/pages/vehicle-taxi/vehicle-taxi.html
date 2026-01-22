@@ -79,7 +79,7 @@
               สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
 
-            <th style="width: 10%;" class="text-center">Action</th>
+            <th style="width: 10%;" class="text-center">การกระทำ</th>
           </tr>
         </thead>
         <tbody>
@@ -100,7 +100,7 @@
               <td>
                 <div class="desc-wrapper">
                   <i class="fas fa-taxi text-muted" style="margin-right: 8px;"></i>
-                  {{ item.desc }}
+                  {{ item.description }}
                 </div>
               </td>
 
@@ -142,14 +142,14 @@
       </table>
       <div class="pagination-container">
         <div class="pagination-info">
-          Showing {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-          to {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+          แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
+          ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
           processedData().length) }}
-          of {{ processedData().length }} entries
+          จาก {{ processedData().length }} รายการ
         </div>
         <div class="pagination-controls">
           <div class="page-size-selector">
-            <span>Rows per page:</span>
+            <span>จำนวนแถวต่อหน้า:</span>
             <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
               <option [value]="10">10</option>
               <option [value]="20">20</option>
@@ -164,7 +164,7 @@
               <i class="fas fa-angle-left"></i>
             </button>
             <span class="page-info">
-              <strong>Page {{ table.getState().pagination.pageIndex + 1 }} of {{ table.getPageCount() }}</strong>
+              <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
             </span>
             <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
               <i class="fas fa-angle-right"></i>

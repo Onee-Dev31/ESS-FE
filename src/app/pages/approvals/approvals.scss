@@ -1,3 +1,4 @@
+@use "sass:color";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 $primary-blue: #008ebc;
@@ -7,7 +8,7 @@ $primary-orange: #ff914d;
 $bg-slate: #f4f7f9;
 
 .approvals-wrapper {
-  padding: 1rem; // Reduced from 2.5rem for mobile
+  padding: 1rem; // ปรับระยะห่างสำหรับมือถือ
 
   @media (min-width: 768px) {
     padding: 2.5rem;
@@ -22,19 +23,19 @@ $bg-slate: #f4f7f9;
   .card {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem; // Reduced from 2rem
+    padding: 1.5rem; // ปรับระยะห่าง
 
     @media (min-width: 768px) {
       padding: 2rem;
     }
 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden; // Ensure table doesn't break card
+    overflow: hidden; // ป้องกันตารางล้นการ์ด
   }
 
   .page-header {
     display: flex;
-    flex-direction: column; // Stack on mobile
+    flex-direction: column; // แสดงผลแนวตั้งบนมือถือ
     gap: 1rem;
 
     @media (min-width: 768px) {
@@ -63,7 +64,7 @@ $bg-slate: #f4f7f9;
         cursor: pointer;
         font-family: inherit;
         font-weight: 500;
-        flex: 1; // Grow on mobile
+        flex: 1; // ขยายเต็มที่บนมือถือ
 
         @media (min-width: 768px) {
           flex: none;
@@ -77,7 +78,7 @@ $bg-slate: #f4f7f9;
 
     .search-box {
       position: relative;
-      width: 100%; // Full width on mobile
+      width: 100%; // เต็มความกว้างบนมือถือ
       max-width: 320px;
       margin-bottom: 1.5rem;
 
@@ -101,21 +102,21 @@ $bg-slate: #f4f7f9;
     .tab-navigation {
       display: flex;
       border-bottom: 1px solid #eee;
-      overflow-x: auto; // Horizontal scroll for tabs on mobile
+      overflow-x: auto; // เลื่อนแนวนอนบนมือถือ
       white-space: nowrap;
 
       &::-webkit-scrollbar {
         display: none;
       }
 
-      // Hide scrollbar for clean look
+      // ซ่อน Scrollbar
       -ms-overflow-style: none;
       scrollbar-width: none;
 
       .tab-item {
         background: none;
         border: none;
-        padding: 0.8rem 1rem; // Reduced padding
+        padding: 0.8rem 1rem; // ปรับระยะห่างคอลัมน์
 
         @media (min-width: 768px) {
           padding: 0.8rem 1.5rem;
@@ -159,9 +160,9 @@ $bg-slate: #f4f7f9;
 
   .data-grid-container {
     width: 100%;
-    overflow-x: auto; // Horizontal scroll for table
+    overflow-x: auto; // เลื่อนแนวนอนสำหรับตาราง
     -webkit-overflow-scrolling: touch;
-    margin: 0 -1.5rem; // Pull out to edges on mobile
+    margin: 0 -1.5rem; // ขยายชิดขอบมือถือ
     padding: 0 1.5rem;
 
     @media (min-width: 768px) {
@@ -173,7 +174,7 @@ $bg-slate: #f4f7f9;
   .data-grid {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px; // Maintain readable widths for columns
+    min-width: 800px; // กำหนดความกว้างตารางขั้นต่ำ
 
     th {
       padding: 1rem;
@@ -391,7 +392,7 @@ $bg-slate: #f4f7f9;
   }
 }
 
-/* MODAL & AVATAR STYLES */
+/* ส่วนของ Modal และ Avatar */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -457,7 +458,7 @@ $bg-slate: #f4f7f9;
 
     .modal-layout-body {
       display: flex;
-      flex-direction: column; // Stack on mobile
+      flex-direction: column; // แสดงผลแนวตั้งบนมือถือ
 
       @media (min-width: 992px) {
         flex-direction: row;
@@ -466,7 +467,7 @@ $bg-slate: #f4f7f9;
 
       .main-panel {
         flex: 1;
-        padding: 1.5rem; // Reduced padding
+        padding: 1.5rem; // ปรับระยะห่างคอลัมน์
 
         @media (min-width: 768px) {
           padding: 2rem;
@@ -732,7 +733,7 @@ $bg-slate: #f4f7f9;
               border: none;
 
               &:hover {
-                background: darken($primary-blue, 10%);
+                background: color.adjust($primary-blue, $lightness: -10%);
                 transform: translateY(-1px);
               }
             }
@@ -752,7 +753,7 @@ $bg-slate: #f4f7f9;
       }
 
       .side-panel {
-        width: 100%; // Full width on mobile
+        width: 100%; // เต็มความกว้างบนมือถือ
 
         @media (min-width: 992px) {
           width: 280px;

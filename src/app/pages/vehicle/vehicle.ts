@@ -28,7 +28,7 @@ export class VehicleComponent implements OnInit {
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
 
-  // [API-Refactor] Writable signal to hold data from Observable
+  // ตัวแปร Signal สำหรับเก็บข้อมูลจาก Observable
   allRequests = signal<VehicleRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
@@ -71,9 +71,9 @@ export class VehicleComponent implements OnInit {
             const dA = valA.split('/').reverse().join('');
             const dB = valB.split('/').reverse().join('');
             return dA.localeCompare(dB) * direction;
-          case 'desc':
-            valA = a.items[0]?.desc || '';
-            valB = b.items[0]?.desc || '';
+          case 'description':
+            valA = a.items[0]?.description || '';
+            valB = b.items[0]?.description || '';
             return valA.localeCompare(valB) * direction;
           default:
             return 0;
@@ -111,14 +111,14 @@ export class VehicleComponent implements OnInit {
   }));
 
   ngOnInit() {
-    // [API-Refactor] Subscribe to the observable to update the signal
+    // ดึงข้อมูลและอัปเดตตค่า Signal
     this.vehicleService.getRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
   onSearch() {
-    // Filter is reactive
+    // ตัวกรองเป็นแบบ Reactive (ทำงานอัตโนมัติ)
   }
 
   clearFilters() {
@@ -129,7 +129,7 @@ export class VehicleComponent implements OnInit {
 
   deleteRequest(id: string) {
     if (confirm(`ยืนยันการลบรายการ ${id}?`)) {
-      // [API-Refactor] Subscribe to perform action
+      // ดำเนินการลบข้อมูลแบบ Async
       this.vehicleService.deleteRequest(id).subscribe();
     }
   }
@@ -162,7 +162,7 @@ export class VehicleComponent implements OnInit {
 
   openModal(id: string = '') {
     if (id === '') {
-      // [API-Refactor] Fetch ID asynchronously
+      // ดึงเลขที่การเบิกถัดไปแบบ Async
       this.vehicleService.generateNextId().subscribe(nextId => {
         this.selectedRequestId = nextId;
         this.isModalOpen = true;

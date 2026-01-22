@@ -62,16 +62,16 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
     this.vehicleService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
       this.logs = rawLogs.map((item: any) => {
-        const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.d);
+        const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.date);
 
         return {
-          date: item.d,
-          dayType: item.t,
-          timeIn: matchTime(item.in),
-          timeOut: matchTime(item.out),
+          date: item.date,
+          dayType: item.dayType,
+          timeIn: matchTime(item.timeIn),
+          timeOut: matchTime(item.timeOut),
           amount: matchingItem ? matchingItem.amount : 0,
           selected: !!matchingItem,
-          description: matchingItem ? matchingItem.desc : item.desc,
+          description: matchingItem ? matchingItem.description : item.description,
           shiftCode: item.shiftCode
         };
       });
@@ -121,20 +121,20 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
   updateTotal() {
     this.totalAmount = this.logs
-      .filter(l => l.selected)
+      .filter(log => log.selected)
       .reduce((sum, current) => sum + current.amount, 0);
   }
 
   onSubmit() {
-    const selectedLogs = this.logs.filter(l => l.selected);
+    const selectedLogs = this.logs.filter(log => log.selected);
 
-    const invalidLogs = selectedLogs.filter(l => {
-      const desc = l.description ? String(l.description).trim() : '';
-      return desc === '';
+    const invalidLogs = selectedLogs.filter(log => {
+      const description = log.description ? String(log.description).trim() : '';
+      return description === '';
     });
 
     if (invalidLogs.length > 0) {
-      const invalidDates = invalidLogs.map(l => l.date).join(', ');
+      const invalidDates = invalidLogs.map(log => log.date).join(', ');
       alert(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
       return;
     }
@@ -144,31 +144,31 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    const requestItems: RequestItem[] = selectedLogs.map(l => ({
-      date: l.date,
-      desc: l.description,
-      amount: l.amount
+    const requestItems: RequestItem[] = selectedLogs.map(log => ({
+      date: log.date,
+      description: log.description,
+      amount: log.amount
     }));
 
-    this.vehicleService.getRequestById(this.requestId).subscribe(existing => {
-      if (existing) {
-        const updated: VehicleRequest = {
-          ...existing,
+    this.vehicleService.getRequestById(this.requestId).subscribe(existingRequest => {
+      if (existingRequest) {
+        const updatedRequest: VehicleRequest = {
+          ...existingRequest,
           items: requestItems
         };
-        this.vehicleService.updateRequest(this.requestId, updated).subscribe(() => {
+        this.vehicleService.updateRequest(this.requestId, updatedRequest).subscribe(() => {
           alert(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
           this.closeModal();
         });
       } else {
-        const newReq: VehicleRequest = {
+        const newRequest: VehicleRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TRANSPORT,
-          createDate: new Date().toISOString().split('T')[0], // วันที่วันนี้ (YYYY-MM-DD)
+          createDate: new Date().toISOString().split('T')[0], // วันที่ปัจจุบัน (YYYY-MM-DD)
           status: 'รอตรวจสอบ',
           items: requestItems
         };
-        this.vehicleService.addRequest(newReq).subscribe(() => {
+        this.vehicleService.addRequest(newRequest).subscribe(() => {
           alert(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
           this.closeModal();
         });

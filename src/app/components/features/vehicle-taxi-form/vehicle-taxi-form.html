@@ -73,8 +73,8 @@
               <input type="checkbox" [(ngModel)]="item.selected" />
             </td>
             <td class="text-center bg-gray">{{ item.date }}</td>
-            <td class="text-center bg-gray font-bold" [style.color]="item.type === 'H' ? '#d93025' : '#3c4043'">
-              {{ item.type }}
+            <td class="text-center bg-gray font-bold" [style.color]="item.dayType === 'H' ? '#d93025' : '#3c4043'">
+              {{ item.dayType }}
             </td>
             <td class="text-center bg-gray" style="font-size: 12px; color: #555;">
               {{ item.shiftCode }}
@@ -84,29 +84,31 @@
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.desc" [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && !item.desc" placeholder="รายละเอียด..." />
+                <input type="text" class="table-input" [(ngModel)]="item.description" [disabled]="!item.selected"
+                  [class.is-invalid]="item.selected && !item.description" placeholder="รายละเอียด..." />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.dest" [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && !item.dest" placeholder="ระบุจุดหมาย" />
+                <input type="text" class="table-input" [(ngModel)]="item.destination" [disabled]="!item.selected"
+                  [class.is-invalid]="item.selected && !item.destination" placeholder="ระบุจุดหมาย" />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="number" class="table-input text-center" [(ngModel)]="item.dist" [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && (!item.dist || item.dist <= 0)" />
+                <input type="number" class="table-input text-center" [(ngModel)]="item.distance"
+                  [disabled]="!item.selected"
+                  [class.is-invalid]="item.selected && (!item.distance || item.distance <= 0)" />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="number" class="table-input text-center font-bold" [(ngModel)]="item.amt"
-                  [disabled]="!item.selected" [class.is-invalid]="item.selected && (!item.amt || item.amt <= 0)" />
+                <input type="number" class="table-input text-center font-bold" [(ngModel)]="item.amount"
+                  [disabled]="!item.selected"
+                  [class.is-invalid]="item.selected && (!item.amount || item.amount <= 0)" />
               </div>
             </td>
 

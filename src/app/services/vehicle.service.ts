@@ -10,8 +10,8 @@ export const WELFARE_TYPES = {
 };
 
 export interface RequestItem {
-    date: string; // dd/MM/yyyy
-    desc: string;
+    date: string; // วันที่ dd/MM/yyyy
+    description: string;
     amount: number;
     shiftCode?: string;
 }
@@ -24,9 +24,9 @@ export interface Requester {
 }
 
 export interface VehicleRequest {
-    id: string; // e.g. 2701#001
+    id: string; // เช่น 2701#001
     typeId: number;
-    createDate: string; // yyyy-MM-dd
+    createDate: string; // วันที่ yyyy-MM-dd
     status: string;
     items: RequestItem[];
     requester?: Requester;
@@ -34,7 +34,7 @@ export interface VehicleRequest {
 
 export interface AttendanceLog {
     date: string;
-    dayType: string; // W, H, L, T
+    dayType: string; // ประเภทวัน (W, H, L, T)
     timeIn: string;
     timeOut: string;
     amount: number;
@@ -44,19 +44,19 @@ export interface AttendanceLog {
 
 export interface TaxiItem {
     date: string;
-    desc: string;
+    description: string;
     destination: string;
     distance: number;
     amount: number;
     shiftCode?: string;
-    // For UI convenience in mapping
+    // ใช้สำหรับจัดการข้อมูลไฟล์แนบใน UI
     attachedFile?: string | null;
 }
 
 export interface TaxiRequest {
-    id: string; // 2701#xxx
+    id: string; // เช่น 2701#xxx
     typeId: number;
-    createDate: string; // dd/MM/yyyy
+    createDate: string; // วันที่ dd/MM/yyyy
     status: string;
     items: TaxiItem[];
     requester?: Requester;
@@ -75,7 +75,7 @@ export interface AllowanceItem {
 }
 
 export interface AllowanceRequest {
-    id: string; // 2701#xxx
+    id: string; // เช่น 2701#xxx
     typeId: number;
     createDate: string;
     status: string;
@@ -107,7 +107,7 @@ export class VehicleService {
         if (type === 'allowance') {
             statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
         } else {
-            // vehicle and taxi
+            // ประเภทรถส่วนตัวและแท็กซี่
             statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'HR อนุมัติ', 'CEO อนุมัติ', 'ACC อนุมัติ'];
         }
         return statuses[Math.floor(Math.random() * statuses.length)];
@@ -115,17 +115,16 @@ export class VehicleService {
 
     private getRandomDateInPast3Months(): string {
         const today = new Date();
-        const past = new Date();
-        past.setMonth(today.getMonth() - 3);
-        const randomTime = past.getTime() + Math.random() * (today.getTime() - past.getTime());
-        const d = new Date(randomTime);
+        const pastDate = new Date();
+        pastDate.setMonth(today.getMonth() - 3);
+        const randomTime = pastDate.getTime() + Math.random() * (today.getTime() - pastDate.getTime());
+        const date = new Date(randomTime);
         // แปลงวันที่เป็น YYYY-MM-DD
 
-
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     private getRandomRequester(): Requester {
@@ -146,52 +145,52 @@ export class VehicleService {
     }
 
     private generateMockVehicleRequests(count: number): VehicleRequest[] {
-        const reqs: VehicleRequest[] = [];
+        const requests: VehicleRequest[] = [];
         for (let i = 1; i <= count; i++) {
             const dateStr = this.getRandomDateInPast3Months();
-            reqs.push({
+            requests.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TRANSPORT,
                 createDate: dateStr,
                 status: this.getRandomStatus('vehicle'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: '2026-01-01', desc: 'Mock Item 1', amount: 150, shiftCode: 'O01 09.00-18.00' },
-                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150, shiftCode: 'O01 09.00-18.00' },
-                    { date: '2026-01-03', desc: 'Mock Item 3', amount: 150, shiftCode: 'O01 09.00-18.00' }
+                    { date: '2026-01-01', description: 'Mock Item 1', amount: 150, shiftCode: 'O01 09.00-18.00' },
+                    { date: '2026-01-02', description: 'Mock Item 2', amount: 150, shiftCode: 'O01 09.00-18.00' },
+                    { date: '2026-01-03', description: 'Mock Item 3', amount: 150, shiftCode: 'O01 09.00-18.00' }
                 ]
             });
         }
-        return reqs;
+        return requests;
     }
 
     private generateMockTaxiRequests(count: number): TaxiRequest[] {
-        const reqs: TaxiRequest[] = [];
+        const requests: TaxiRequest[] = [];
         for (let i = 1; i <= count; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() - Math.floor(Math.random() * 60));
-            const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            const date = new Date();
+            date.setDate(date.getDate() - Math.floor(Math.random() * 60));
+            const dateStr = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 
-            reqs.push({
+            requests.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TAXI,
                 createDate: dateStr,
                 status: this.getRandomStatus('taxi'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: dateStr, desc: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00' },
-                    { date: dateStr, desc: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00' }
+                    { date: dateStr, description: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00' },
+                    { date: dateStr, description: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00' }
                 ]
             });
         }
-        return reqs;
+        return requests;
     }
 
     private generateMockAllowanceRequests(count: number): AllowanceRequest[] {
-        const reqs: AllowanceRequest[] = [];
+        const requests: AllowanceRequest[] = [];
         for (let i = 1; i <= count; i++) {
             const dateStr = this.getRandomDateInPast3Months();
-            reqs.push({
+            requests.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.ALLOWANCE,
                 createDate: dateStr,
@@ -202,7 +201,7 @@ export class VehicleService {
                 ]
             });
         }
-        return reqs;
+        return requests;
     }
 
     constructor() { }
@@ -409,39 +408,39 @@ export class VehicleService {
 
     getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
         const days = this.generateDays(month, year);
-        const results = days.map(d => {
-            const dayOfWeek = d.getDay(); // 0=Sun, 6=Sat
+        const results = days.map(date => {
+            const dayOfWeek = date.getDay(); // 0=Sun, 6=Sat
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
             // สุ่มค่า
-            const type = isWeekend ? 'H' : 'W';
+            const dayType = isWeekend ? 'H' : 'W';
 
             let timeIn = '';
             let timeOut = '';
-            let desc = '';
+            let description = '';
 
-            if (type === 'W') {
+            if (dayType === 'W') {
                 // สุ่มเวลาเข้า-ออกงาน
 
-                const inHour = 8 + Math.floor(Math.random() * 2); // 8 or 9
-                const inMin = Math.floor(Math.random() * 60);
-                const outHour = 17 + Math.floor(Math.random() * 4); // 17 - 20
-                const outMin = Math.floor(Math.random() * 60);
+                const startHour = 8 + Math.floor(Math.random() * 2); // 8 or 9
+                const startMinute = Math.floor(Math.random() * 60);
+                const endHour = 17 + Math.floor(Math.random() * 4); // 17 - 20
+                const endMinute = Math.floor(Math.random() * 60);
 
-                timeIn = `${String(inHour).padStart(2, '0')}:${String(inMin).padStart(2, '0')}`;
-                timeOut = `${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}`;
+                timeIn = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                timeOut = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
 
                 // สุ่มใส่รายละเอียด
-                if (Math.random() > 0.7) desc = 'ทดสอบการเบิก';
+                if (Math.random() > 0.7) description = 'ทดสอบการเบิก';
             }
 
             return {
-                d: this.formatDate(d),
-                t: type,
-                in: timeIn,
-                out: timeOut,
-                s: false,
-                desc: desc,
+                date: this.formatDate(date),
+                dayType: dayType,
+                timeIn: timeIn,
+                timeOut: timeOut,
+                selected: false,
+                description: description,
                 shiftCode: this.getRandomShiftCode()
             };
         });
@@ -450,28 +449,28 @@ export class VehicleService {
 
     getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
         const days = this.generateDays(month, year);
-        const results = days.map(d => {
-            const dayOfWeek = d.getDay();
+        const results = days.map(date => {
+            const dayOfWeek = date.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-            const type = isWeekend ? 'H' : 'W';
+            const dayType = isWeekend ? 'H' : 'W';
 
             let timeIn = '';
             let timeOut = '';
-            let desc = '';
+            let description = '';
 
-            if (type === 'W') {
+            if (dayType === 'W') {
                 // สุ่มสถานะการเข้างาน (มาสาย/กลับดึก)
                 const scenario = Math.random();
                 if (scenario > 0.9) {
                     // Late night
                     timeIn = '09:00';
                     timeOut = '23:30';
-                    desc = 'กลับดึก';
+                    description = 'กลับดึก';
                 } else if (scenario > 0.8) {
                     // Early bird
                     timeIn = '05:30';
                     timeOut = '18:00';
-                    desc = 'มาเช้า';
+                    description = 'มาเช้า';
                 } else {
                     // Normal
                     const inHour = 8 + Math.floor(Math.random() * 2);
@@ -484,12 +483,12 @@ export class VehicleService {
             }
 
             return {
-                d: this.formatDate(d),
-                t: type,
-                in: timeIn,
-                out: timeOut,
-                s: false,
-                desc: desc,
+                date: this.formatDate(date),
+                dayType: dayType,
+                timeIn: timeIn,
+                timeOut: timeOut,
+                selected: false,
+                description: description,
                 shiftCode: this.getRandomShiftCode()
             };
         });
@@ -498,28 +497,28 @@ export class VehicleService {
 
     getMockTaxiLogs(month: number, year: number): Observable<any[]> {
         const days = this.generateDays(month, year);
-        const results = days.map(d => {
-            const dayOfWeek = d.getDay();
+        const results = days.map(date => {
+            const dayOfWeek = date.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-            const type = isWeekend ? 'H' : 'W';
+            const dayType = isWeekend ? 'H' : 'W';
 
             let checkIn = '';
             let checkOut = '';
 
-            if (type === 'W') {
+            if (dayType === 'W') {
                 checkIn = `09:${String(Math.floor(Math.random() * 59)).padStart(2, '0')}`;
                 checkOut = `18:${String(Math.floor(Math.random() * 59)).padStart(2, '0')}`;
             }
 
             return {
-                date: this.formatDate(d),
-                type: type,
+                date: this.formatDate(date),
+                dayType: dayType,
                 checkIn: checkIn,
                 checkOut: checkOut,
-                desc: '',
-                dest: '',
-                dist: 0,
-                amt: 0,
+                description: '',
+                destination: '',
+                distance: 0,
+                amount: 0,
                 selected: false,
                 shiftCode: this.getRandomShiftCode()
             };

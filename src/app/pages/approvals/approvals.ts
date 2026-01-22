@@ -13,8 +13,7 @@ import {
 
 interface UnifiedItem {
   date: string;
-  description?: string; // Allowance description (optional in taxi)
-  desc?: string; // Taxi description (optional in allowance)
+  description?: string;
   timeIn?: string;
   timeOut?: string;
   amount: number;
@@ -61,7 +60,7 @@ export class ApprovalsComponent implements OnInit {
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
 
-  // Action Modal State
+  // สถานะ Modal ยืนยันการกระทำ (Approve/Reject/Refer)
   isActionConfirm = signal<boolean>(false);
   actionType = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
   reasonText = signal<string>('');
@@ -113,26 +112,26 @@ export class ApprovalsComponent implements OnInit {
       status: this.mapStatus(a.status)
     }));
 
-    const mappedTaxis: ApprovalItem[] = taxis.map(t => ({
-      requestNo: t.id,
-      requestDate: t.createDate,
-      requestBy: t.requester || defaultUser,
+    const mappedTaxis: ApprovalItem[] = taxis.map(taxi => ({
+      requestNo: taxi.id,
+      requestDate: taxi.createDate,
+      requestBy: taxi.requester || defaultUser,
       requestType: 'ค่าแท็กซี่',
-      typeId: t.typeId,
-      requestDetail: t.items[0]?.desc || 'เบิกค่าเดินทางไปพบลูกค้า',
-      amount: t.items.reduce((sum, i) => sum + i.amount, 0),
-      status: this.mapStatus(t.status)
+      typeId: taxi.typeId,
+      requestDetail: taxi.items[0]?.description || 'เบิกค่าเดินทางไปพบลูกค้า',
+      amount: taxi.items.reduce((sum, item) => sum + item.amount, 0),
+      status: this.mapStatus(taxi.status)
     }));
 
-    const mappedVehicles: ApprovalItem[] = vehicles.map(v => ({
-      requestNo: v.id,
-      requestDate: v.createDate,
-      requestBy: v.requester || defaultUser,
+    const mappedVehicles: ApprovalItem[] = vehicles.map(vehicle => ({
+      requestNo: vehicle.id,
+      requestDate: vehicle.createDate,
+      requestBy: vehicle.requester || defaultUser,
       requestType: 'ค่ารถ',
-      typeId: v.typeId,
-      requestDetail: v.items[0]?.desc || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
-      amount: v.items.reduce((sum, i) => sum + i.amount, 0),
-      status: this.mapStatus(v.status)
+      typeId: vehicle.typeId,
+      requestDetail: vehicle.items[0]?.description || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
+      amount: vehicle.items.reduce((sum, item) => sum + item.amount, 0),
+      status: this.mapStatus(vehicle.status)
     }));
 
     const combined = [...mappedAllowances, ...mappedTaxis, ...mappedVehicles].sort((a, b) => b.requestNo.localeCompare(a.requestNo));
@@ -170,7 +169,7 @@ export class ApprovalsComponent implements OnInit {
           case 'requestNo':
             return a.requestNo.localeCompare(b.requestNo) * direction;
           case 'requestDate':
-            // Format is dd/mm/yyyy or yyyy-mm-dd
+            // รูปแบบ dd/mm/yyyy หรือ yyyy-mm-dd
             valA = a.requestDate.split('/').reverse().join('');
             valB = b.requestDate.split('/').reverse().join('');
             return valA.localeCompare(valB) * direction;
@@ -225,7 +224,7 @@ export class ApprovalsComponent implements OnInit {
 
   setActiveTab(tab: string) {
     this.activeTab.set(tab);
-    // Reset sorting to default or keep it? User might expect default sorting per tab.
+    // รีเซ็ตการเรียงลำดับเมื่อเปลี่ยนแท็บ (ถ้าจำเป็น)
   }
   getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
   onSearch(event: any) { this.searchText.set(event.target.value); }
@@ -258,7 +257,7 @@ export class ApprovalsComponent implements OnInit {
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.modalActiveTab.set('Items');
-    this.currentDetailItems.set([]); // Reset while loading
+    this.currentDetailItems.set([]); // รีเซ็ตข้อมูลระหว่างโหลด
 
     // ดึงข้อมูลรายละเอียด
     if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
@@ -323,7 +322,7 @@ export class ApprovalsComponent implements OnInit {
 
   updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
     let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
-    let statusLabel = 'รอตรวจสอบ'; // Default
+    let statusLabel = 'รอตรวจสอบ'; // ค่าเริ่มต้น
 
     if (item.requestType === 'ค่าเบี้ยเลี้ยง') type = 'allowance';
     else if (item.requestType === 'ค่าแท็กซี่') type = 'taxi';
@@ -332,18 +331,15 @@ export class ApprovalsComponent implements OnInit {
     else if (newStatus === 'Rejected') statusLabel = 'ไม่อนุมัติ';
     else if (newStatus === 'Referred Back') statusLabel = 'รอแก้ไข';
 
-    // Call service to update state
+    // เรียกใช้ Service เพื่ออัปเดตสถานะ
     this.vehicleService.updateStatus(item.requestNo, type, statusLabel);
 
     if (reason) {
       console.log(`Action: ${newStatus}, Reason: ${reason}`);
-      // In a real app, you would send this to the backend as a comment or status history
+      // ในแอปจริง ข้อมูลนี้จะถูกส่งไปยัง Backend เพื่อเก็บประวัติหรือคอมเมนต์
     }
 
-    // Refresh local list (since we are subscribed to BehaviorSubjects in refresh(), 
-    // simply calling refresh() again will get the latest state if we remove take(1) or if we just rely on the fact 
-    // that BehaviorSubjects emit new values to active subscribers.
-    // However, refresh() uses take(1). So let's re-run refresh().
+    // รีเฟรชรายการข้อมูลใหม่
     this.refresh();
 
     this.closeModal();

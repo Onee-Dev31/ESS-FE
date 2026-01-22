@@ -33,7 +33,7 @@ export class VehicleTaxiComponent implements OnInit {
   isPreviewModalOpen: boolean = false;
   previewFiles: FilePreviewItem[] = [];
 
-  // [API-Refactor] Writable signal for taxi requests
+  // ตัวแปร Signal สำหรับเก็บข้อมูลการเบิก Taxi
   allRequests = signal<TaxiRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
@@ -76,13 +76,13 @@ export class VehicleTaxiComponent implements OnInit {
             return a.status.localeCompare(b.status) * direction;
 
           case 'amount':
-            valA = a.items.reduce((sum, i) => sum + i.amount, 0);
-            valB = b.items.reduce((sum, i) => sum + i.amount, 0);
+            valA = a.items.reduce((sum, item) => sum + item.amount, 0);
+            valB = b.items.reduce((sum, item) => sum + item.amount, 0);
             return (valA - valB) * direction;
 
           case 'distance':
-            valA = a.items.reduce((sum, i) => sum + i.distance, 0);
-            valB = b.items.reduce((sum, i) => sum + i.distance, 0);
+            valA = a.items.reduce((sum, item) => sum + item.distance, 0);
+            valB = b.items.reduce((sum, item) => sum + item.distance, 0);
             return (valA - valB) * direction;
 
           case 'date':
@@ -90,9 +90,9 @@ export class VehicleTaxiComponent implements OnInit {
             valB = b.items[0]?.date.split('/').reverse().join('') || '';
             return valA.localeCompare(valB) * direction;
 
-          case 'desc':
-            valA = a.items[0]?.desc || '';
-            valB = b.items[0]?.desc || '';
+          case 'description':
+            valA = a.items[0]?.description || '';
+            valB = b.items[0]?.description || '';
             return valA.localeCompare(valB) * direction;
 
           case 'destination':
@@ -130,7 +130,7 @@ export class VehicleTaxiComponent implements OnInit {
   }));
 
   ngOnInit() {
-    // [API-Refactor] Subscribe to fetch info
+    // ดึงข้อมูลการเบิก Taxi แบบ Async
     this.vehicleService.getTaxiRequests().subscribe(data => {
       this.allRequests.set(data);
     });
@@ -178,7 +178,7 @@ export class VehicleTaxiComponent implements OnInit {
 
   openModal(id: string = '') {
     if (id === '') {
-      // [API-Refactor] Fetch ID Async
+      // ดึงเลขที่การเบิกถัดไปแบบ Async
       this.vehicleService.generateNextTaxiId().subscribe(nid => {
         this.selectedRequestId = nid;
         this.isModalOpen = true;
@@ -196,7 +196,7 @@ export class VehicleTaxiComponent implements OnInit {
 
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการ ' + id)) {
-      // [API-Refactor] Delete Async
+      // ลบรายการแบบ Async
       this.vehicleService.deleteTaxiRequest(id).subscribe();
     }
   }
@@ -204,10 +204,10 @@ export class VehicleTaxiComponent implements OnInit {
   openPreviewModal(items: TaxiItem[]) {
     // Extract files
     const files = items
-      .filter(i => i.attachedFile)
-      .map(i => ({
-        fileName: i.attachedFile || '',
-        date: i.date
+      .filter(item => item.attachedFile)
+      .map(item => ({
+        fileName: item.attachedFile || '',
+        date: item.date
       }));
 
     if (files.length === 0) {

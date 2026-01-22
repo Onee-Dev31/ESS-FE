@@ -57,16 +57,16 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
-    this.vehicleService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockRows => {
-      this.items = mockRows.map((row: any) => {
+    this.vehicleService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockLogs => {
+      this.items = mockLogs.map((row: any) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
 
         return {
           ...row,
-          desc: matchingItem ? matchingItem.desc : row.desc,
-          dest: matchingItem ? matchingItem.destination : row.dest,
-          dist: matchingItem ? matchingItem.distance : row.dist,
-          amt: matchingItem ? matchingItem.amount : row.amt,
+          description: matchingItem ? matchingItem.description : row.description,
+          destination: matchingItem ? matchingItem.destination : row.destination,
+          distance: matchingItem ? matchingItem.distance : row.distance,
+          amount: matchingItem ? matchingItem.amount : row.amount,
           selected: !!matchingItem,
           attachedFile: matchingItem?.attachedFile || null
         };
@@ -77,22 +77,22 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
 
   getTotalAmount() {
     return this.items
-      .filter(i => i.selected)
-      .reduce((sum, i) => sum + (Number(i.amt) || 0), 0);
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
   save() {
-    const selectedItems = this.items.filter(i => i.selected);
+    const selectedItems = this.items.filter(item => item.selected);
 
     if (selectedItems.length === 0) {
       alert('กรุณาเลือกรายการที่ต้องการเบิก');
       return;
     }
 
-    const invalidItem = selectedItems.find(i =>
-      !i.desc || i.desc.trim() === '' ||
-      !i.dest || i.dest.trim() === '' ||
-      i.amt === null || i.amt === undefined || i.amt <= 0
+    const invalidItem = selectedItems.find(item =>
+      !item.description || item.description.trim() === '' ||
+      !item.destination || item.destination.trim() === '' ||
+      item.amount === null || item.amount === undefined || item.amount <= 0
     );
 
     if (invalidItem) {
@@ -100,34 +100,34 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    const taxiItems: TaxiItem[] = selectedItems.map(i => ({
-      date: i.date,
-      desc: i.desc,
-      destination: i.dest,
-      distance: Number(i.dist),
-      amount: Number(i.amt),
-      attachedFile: i.attachedFile
+    const taxiItems: TaxiItem[] = selectedItems.map(item => ({
+      date: item.date,
+      description: item.description,
+      destination: item.destination,
+      distance: Number(item.distance),
+      amount: Number(item.amount),
+      attachedFile: item.attachedFile
     }));
 
-    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existing => {
-      if (existing) {
-        const updated: TaxiRequest = {
-          ...existing,
+    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
+      if (existingRequest) {
+        const updatedRequest: TaxiRequest = {
+          ...existingRequest,
           items: taxiItems
         };
-        this.vehicleService.updateTaxiRequest(this.requestId, updated).subscribe(() => {
+        this.vehicleService.updateTaxiRequest(this.requestId, updatedRequest).subscribe(() => {
           alert('บันทึกการแก้ไขข้อมูลเรียบร้อย');
           this.onClose.emit();
         });
       } else {
-        const newReq: TaxiRequest = {
+        const newRequest: TaxiRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TAXI,
-          createDate: new Date().toLocaleDateString('en-GB'), // วันที่ dd/mm/yyyy
+          createDate: new Date().toLocaleDateString('en-GB'), // วันที่ปัจจุบัน (dd/mm/yyyy)
           status: 'รอตรวจสอบ',
           items: taxiItems
         };
-        this.vehicleService.addTaxiRequest(newReq).subscribe(() => {
+        this.vehicleService.addTaxiRequest(newRequest).subscribe(() => {
           alert(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
           this.onClose.emit();
         });
