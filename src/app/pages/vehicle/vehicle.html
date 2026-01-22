@@ -131,12 +131,47 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Showing {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
+          to {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+          processedData().length) }}
+          of {{ processedData().length }} entries
+        </div>
+        <div class="pagination-controls">
+          <div class="page-size-selector">
+            <span>Rows per page:</span>
+            <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
+              <option [value]="10">10</option>
+              <option [value]="20">20</option>
+              <option [value]="50">50</option>
+            </select>
+          </div>
+          <div class="page-buttons">
+            <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
+              <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
+              <i class="fas fa-angle-left"></i>
+            </button>
+            <span class="page-info">
+              <strong>Page {{ table.getState().pagination.pageIndex + 1 }} of {{ table.getPageCount() }}</strong>
+            </span>
+            <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
+              <i class="fas fa-angle-right"></i>
+            </button>
+            <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
+              [disabled]="!table.getCanNextPage()">
+              <i class="fas fa-angle-double-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="modal-overlay" *ngIf="isModalOpen">
-  <div class="modal-container">
-    <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-form>
+  <div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-container">
+      <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-form>
+    </div>
   </div>
-</div>

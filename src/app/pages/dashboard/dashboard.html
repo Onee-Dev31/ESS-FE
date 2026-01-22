@@ -131,8 +131,19 @@
         </div>
 
         <section class="stats-grid-card">
-          <div class="stats-group-header">
-            <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
+          <div class="section-header-flex">
+            <div class="stats-group-header">
+              <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
+            </div>
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+              <div class="icon-shake">
+                <i class="fas fa-bell"></i>
+                <ng-container *ngIf="(pendingCount$ | async) as count">
+                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
+                </ng-container>
+              </div>
+              รายการรออนุมัติ
+            </button>
           </div>
 
           <div class="stat-items-grid">
@@ -211,7 +222,18 @@
         </div>
 
         <div class="leave-section">
-          <p class="section-title">ลาหยุดงาน</p>
+          <div class="section-header-flex">
+            <p class="section-title">ลาหยุดงาน</p>
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+              <div class="icon-shake">
+                <i class="fas fa-bell"></i>
+                <ng-container *ngIf="(pendingCount$ | async) as count">
+                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
+                </ng-container>
+              </div>
+              รายการรออนุมัติ
+            </button>
+          </div>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats$ | async" [ngClass]="leave.theme">
               <div class="leave-body">

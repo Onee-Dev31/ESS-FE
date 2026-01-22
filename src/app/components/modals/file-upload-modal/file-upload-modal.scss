@@ -1,4 +1,6 @@
 @use 'sass:color';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 $primary: #1a73e8;
 $danger: #d93025;
 $border: #dee2e6;
@@ -33,20 +35,33 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      
-      h3 { margin: 0; font-size: 1.1rem; color: $text; }
-      .close-btn { 
-        background: none; border: none; font-size: 1.2rem; cursor: pointer; color: $text-sub; 
-        &:hover { color: $danger; }
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: $text;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: $text-sub;
+
+        &:hover {
+          color: $danger;
+        }
       }
     }
 
     .modal-body {
       padding: 20px;
+
       .date-label {
-         margin: 0 0 15px 0;
-         color: $text-sub;
-         font-size: 0.9rem;
+        margin: 0 0 15px 0;
+        color: $text-sub;
+        font-size: 0.9rem;
       }
 
       .upload-box {
@@ -73,8 +88,15 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           align-items: center;
           color: $primary;
           gap: 8px;
-          i { font-size: 1.5rem; }
-          span { font-size: 0.9rem; font-weight: 500; }
+
+          i {
+            font-size: 1.5rem;
+          }
+
+          span {
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
         }
 
         .file-preview {
@@ -88,18 +110,29 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           width: 100%;
           box-sizing: border-box;
 
-          .file-icon { color: $danger; font-size: 1.2rem; }
-          .filename { 
-              flex: 1; 
-              text-align: left; 
-              white-space: nowrap; 
-              overflow: hidden; 
-              text-overflow: ellipsis; 
-              font-size: 0.9rem;
+          .file-icon {
+            color: $danger;
+            font-size: 1.2rem;
           }
+
+          .filename {
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+          }
+
           .btn-remove-file {
-              background: none; border: none; color: $text-sub; cursor: pointer;
-              &:hover { color: $danger; }
+            background: none;
+            border: none;
+            color: $text-sub;
+            cursor: pointer;
+
+            &:hover {
+              color: $danger;
+            }
           }
         }
       }
@@ -124,20 +157,37 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       .btn-cancel {
         background: #f1f3f4;
         color: $text;
-        &:hover { background: #e8eaed; }
+
+        &:hover {
+          background: #e8eaed;
+        }
       }
 
       .btn-confirm {
         background: $primary;
         color: #fff;
-        &:hover { background: color.adjust($primary, $lightness: -5%); }
-        &:disabled { background: #bdc1c6; cursor: not-allowed; }
+
+        &:hover {
+          background: color.adjust($primary, $lightness: -5%);
+        }
+
+        &:disabled {
+          background: #bdc1c6;
+          cursor: not-allowed;
+        }
       }
     }
   }
 }
 
 @keyframes popUp {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

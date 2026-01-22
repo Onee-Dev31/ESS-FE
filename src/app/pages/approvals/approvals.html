@@ -80,18 +80,62 @@
             </td>
             <td>
               <div class="action-cell">
-                <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">👁</button>
-                <button class="act-btn a-btn" title="Approve"
-                  (click)="updateStatus(row.original, 'Approved')">✓</button>
-                <button class="act-btn r-btn" title="Reject" (click)="updateStatus(row.original, 'Rejected')">✕</button>
+                <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="act-btn a-btn" title="Approve" (click)="openActionModal(row.original, 'Approved')">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="act-btn r-btn" title="Reject" (click)="openActionModal(row.original, 'Rejected')">
+                  <i class="fas fa-times"></i>
+                </button>
                 <button class="act-btn b-btn" title="Refer Back"
-                  (click)="updateStatus(row.original, 'Referred Back')">↩</button>
+                  (click)="openActionModal(row.original, 'Referred Back')">
+                  <i class="fas fa-undo-alt"></i>
+                </button>
               </div>
             </td>
           </tr>
           }
         </tbody>
       </table>
+    </div>
+
+    <div class="pagination-container">
+      <div class="pagination-info">
+        Showing {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
+        to {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+        filteredData().length) }}
+        of {{ filteredData().length }} entries
+      </div>
+      <div class="pagination-controls">
+        <div class="page-size-selector">
+          <span>Rows per page:</span>
+          <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+        <div class="page-buttons">
+          <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <span class="page-info">
+            <strong>Page {{ table.getState().pagination.pageIndex + 1 }} of {{ table.getPageCount() }}</strong>
+          </span>
+          <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
+            [disabled]="!table.getCanNextPage()">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -105,9 +149,12 @@
         <div class="requester-line">Created on: <span class="highlight">{{ selectedItem()?.requestDate }}</span></div>
       </div>
       <div class="header-actions-group">
-        <button class="btn-action-green" (click)="updateStatus(selectedItem()!, 'Approved')">Approve</button>
-        <button class="btn-action-red" (click)="updateStatus(selectedItem()!, 'Rejected')">Reject</button>
-        <button class="btn-action-orange" (click)="updateStatus(selectedItem()!, 'Referred Back')">Refer Back</button>
+        @if (!isActionConfirm()) {
+        <button class="btn-action-green" (click)="openActionModal(selectedItem()!, 'Approved')">Approve</button>
+        <button class="btn-action-red" (click)="openActionModal(selectedItem()!, 'Rejected')">Reject</button>
+        <button class="btn-action-orange" (click)="openActionModal(selectedItem()!, 'Referred Back')">Refer
+          Back</button>
+        }
         <button class="btn-close-x" (click)="closeModal()">&times;</button>
       </div>
     </div>
@@ -115,7 +162,7 @@
     <div class="modal-layout-body">
       <div class="main-panel">
         <div class="summary-cards-grid">
-          <div class="summary-card">
+          <div class="summary-card status-card" [ngClass]="selectedItem()?.status?.toLowerCase()?.replace(' ', '-')">
             <div class="s-data"><label>Status</label>
               <div class="s-value">{{ selectedItem()?.status }}</div>
             </div>
@@ -126,6 +173,8 @@
             </div>
           </div>
         </div>
+
+
 
         <div class="content-tabs">
           <button class="tab-link" [class.active]="modalActiveTab() === 'Items'"
@@ -142,6 +191,7 @@
               <thead>
                 <tr>
                   <th>วันที่</th>
+                  <th>รหัสกะ</th>
                   <th>รายละเอียด</th>
                   @if (selectedRequestDetails()?.type === 'allowance') {
                   <th class="text-center">เวลา In-Out</th>
@@ -155,6 +205,7 @@
                 @for (item of selectedRequestDetails()?.items; track $index) {
                 <tr>
                   <td>{{ item.date }}</td>
+                  <td><span class="shift-badge">{{ item.shiftCode || '-' }}</span></td>
                   <td>{{ item.description || item.desc }}</td>
                   @if (selectedRequestDetails()?.type === 'allowance') {
                   <td class="text-center">{{ item.timeIn }} - {{ item.timeOut }}</td>
@@ -167,7 +218,9 @@
               </tbody>
               <tfoot>
                 <tr class="modal-total-row">
-                  <td colspan="3" class="text-right"><strong>Total : </strong></td>
+                  <td
+                    [attr.colspan]="(selectedRequestDetails()?.type === 'allowance' || selectedRequestDetails()?.type === 'taxi') ? 4 : 3"
+                    class="text-right"><strong>Total : </strong></td>
                   <td class="text-right total-val">{{ modalItemsTotal() | number }}</td>
                 </tr>
               </tfoot>
@@ -191,6 +244,27 @@
           </div>
           }
         </div>
+
+        @if (isActionConfirm()) {
+        <div class="action-confirm-box" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
+          <div class="action-title">
+            Confirm Action: <span class="action-name">{{ actionType() }}</span>
+          </div>
+
+          @if (actionType() === 'Rejected' || actionType() === 'Referred Back') {
+          <div class="reason-section">
+            <label for="reason">ระบุเหตุผล (Reason):</label>
+            <textarea id="reason" class="reason-input" [(ngModel)]="reasonText"
+              placeholder="ระบุเหตุผลที่นี่..."></textarea>
+          </div>
+          }
+
+          <div class="action-footer">
+            <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
+            <button class="btn-cancel" (click)="isActionConfirm.set(false)">ยกเลิก (Cancel)</button>
+          </div>
+        </div>
+        }
       </div>
 
       <div class="side-panel">

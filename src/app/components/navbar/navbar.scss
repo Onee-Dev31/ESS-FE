@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 $navbar-height: 70px;
 $primary: #4f46e5;
 $text-light: #94a3b8;
@@ -13,7 +15,7 @@ $warning: #f59e0b;
   background: white;
   padding: 0 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   position: relative;
   z-index: 1001;
 
@@ -46,6 +48,7 @@ $warning: #f59e0b;
 
   .nav-center {
     display: none;
+
     .nav-title {
       font-size: 16px;
       font-weight: 800;
@@ -85,6 +88,7 @@ $warning: #f59e0b;
           box-shadow: 0 0 0 2px rgba($primary, 0.1);
           width: 220px;
         }
+
         &::placeholder {
           color: #cbd5e1;
         }
@@ -202,6 +206,7 @@ $warning: #f59e0b;
                 font-weight: 600;
                 color: #334155;
               }
+
               .message {
                 margin: 2px 0 0;
                 font-size: 12px;
@@ -211,6 +216,7 @@ $warning: #f59e0b;
                 text-overflow: ellipsis;
                 max-width: 190px;
               }
+
               .time {
                 font-size: 10px;
                 color: #94a3b8;
@@ -233,12 +239,15 @@ $warning: #f59e0b;
             &.purple {
               background: #796aee;
             }
+
             &.green {
               background: $success;
             }
+
             &.orange {
               background: $warning;
             }
+
             &.red {
               background: $danger;
             }
@@ -248,6 +257,7 @@ $warning: #f59e0b;
             padding: 12px;
             text-align: center;
             background: #fff;
+
             a {
               font-size: 12px;
               font-weight: 700;
@@ -255,6 +265,7 @@ $warning: #f59e0b;
               text-transform: uppercase;
               text-decoration: none;
               letter-spacing: 0.5px;
+
               &:hover {
                 color: #000;
               }
@@ -275,6 +286,7 @@ $warning: #f59e0b;
           cursor: pointer;
           border: 2px solid #f1f5f9;
           transition: all 0.2s;
+
           &:hover {
             border-color: $primary;
           }
@@ -296,11 +308,13 @@ $warning: #f59e0b;
             padding: 12px 16px;
             border-bottom: 1px solid #f1f5f9;
             background: #f8fafc;
+
             .name {
               font-size: 14px;
               font-weight: 700;
               color: #334155;
             }
+
             .role {
               font-size: 12px;
               color: #64748b;
@@ -359,6 +373,7 @@ $warning: #f59e0b;
     .desktop-search {
       display: none;
     }
+
     .nav-actions .mobile-search-btn {
       display: flex;
     }

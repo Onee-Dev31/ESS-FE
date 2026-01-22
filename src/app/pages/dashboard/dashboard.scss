@@ -1351,121 +1351,113 @@ body {
 
 // ... existing code ...
 
-.welfare-section {
-  .section-header-flex {
+.section-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding-right: 10px;
+
+  .section-title,
+  .stats-group-header {
+    margin-bottom: 0 !important;
+  }
+
+  .btn-pending-approvals {
+    background: #fff5f5;
+    border: 1.5px solid #feb2b2;
+    color: #c53030;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: flex-start; // Changed from space-between to keep them close
-    gap: 12px;
-    margin-bottom: 15px;
-    padding-right: 10px;
+    gap: 8px;
+    position: relative;
+    transition: all 0.25s ease;
+    animation: redButtonGlow 2s infinite;
 
-    .section-title {
-      margin-bottom: 0;
+    &:hover {
+      background: #c53030;
+      color: #fff;
+      border-color: #9b2c2c;
+      animation: none;
+
+      .icon-shake i {
+        color: white;
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+      }
     }
 
-    .btn-pending-approvals {
-      // เปลี่ยนพื้นหลังเป็นสีแดงระเรื่อ (Soft Pinkish-White)
-      background: #fff5f5;
-      border: 1.5px solid #feb2b2; // เส้นขอบสีแดงอ่อน
-      color: #c53030; // ตัวอักษรสีแดงเข้ม (อ่านง่ายและดูเป็นทางการ)
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
+    .icon-shake {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      position: relative;
-      transition: all 0.25s ease;
 
-      // เพิ่ม Animation ให้ปุ่มเรืองแสงสีแดงเบาๆ
-      animation: redButtonGlow 2s infinite;
-
-      &:hover {
-        background: #c53030; // เมื่อ Hover จะกลายเป็นสีแดงเข้ม
-        color: #fff;
-        border-color: #9b2c2c;
-        animation: none;
-
-        .icon-shake i {
-          color: white;
-          filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
-        }
+      i {
+        font-size: 16px;
+        color: #e53e3e;
+        animation: bellShake 1.5s infinite;
+        transform-origin: top center;
       }
 
-      .icon-shake {
-        position: relative;
+      .notification-badge {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        min-width: 15px;
+        height: 15px;
+        background: #f56565;
+        color: white;
+        border-radius: 50%;
+        border: 2px solid white;
+        font-size: 8px;
         display: flex;
         align-items: center;
-
-        i {
-          font-size: 16px;
-          color: #e53e3e; // สีระฆังสีแดงสด
-          animation: bellShake 1.5s infinite;
-          transform-origin: top center;
-        }
-
-        .notification-badge {
-          position: absolute;
-          top: -7px;
-          right: -7px;
-          min-width: 15px;
-          height: 15px;
-          background: #f56565; // แดงสว่าง
-          color: white;
-          border-radius: 50%;
-          border: 2px solid white;
-          font-size: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 4px;
-          font-weight: 800;
-
-          // ไฟกระพริบสีแดง
-          animation: pulseCriticalRed 1.5s infinite;
-        }
+        justify-content: center;
+        padding: 0 4px;
+        font-weight: 800;
+        animation: pulseCriticalRed 1.5s infinite;
       }
     }
-
-    // --- Keyframes ใหม่สำหรับโทนสีแดง ---
-
-    @keyframes pulseCriticalRed {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
-      }
-
-      70% {
-        transform: scale(1.2);
-        box-shadow: 0 0 0 8px rgba(229, 62, 62, 0);
-      }
-
-      100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
-      }
-    }
-
-    @keyframes redButtonGlow {
-      0% {
-        box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
-      }
-
-      50% {
-        box-shadow: 0 0 16px rgba(254, 178, 178, 0.6);
-      }
-
-      100% {
-        box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
-      }
-    }
-
-
   }
 }
+
+@keyframes pulseCriticalRed {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+  }
+
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(229, 62, 62, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+  }
+}
+
+@keyframes redButtonGlow {
+  0% {
+    box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(254, 178, 178, 0.6);
+  }
+
+  100% {
+    box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
+  }
+}
+
+
 
 @keyframes bellShake {
   0% {

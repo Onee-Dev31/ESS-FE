@@ -6,6 +6,7 @@ import { VehicleService, AllowanceRequest, AllowanceItem } from '../../services/
 import {
   createAngularTable,
   getCoreRowModel,
+  getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 
@@ -26,6 +27,7 @@ interface FlatAllowanceRow extends AllowanceItem {
 })
 export class AllowanceComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  protected readonly Math = Math;
 
   isModalOpen = false;
   selectedRequestId = ''; // For passing to modal
@@ -118,6 +120,12 @@ export class AllowanceComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   }));
 
   ngOnInit() {

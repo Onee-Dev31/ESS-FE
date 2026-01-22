@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 $primary-color: #4650dd;
 $primary-hover: #3942b8;
@@ -6,7 +6,7 @@ $text-dark: #333;
 $text-muted: #666;
 $text-label: #555;
 $bg-light: #f1f5f9;
-$font-stack: 'Poppins', sans-serif;
+$font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 :host {
   display: flex;
@@ -278,9 +278,11 @@ $font-stack: 'Poppins', sans-serif;
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -327,6 +329,7 @@ $font-stack: 'Poppins', sans-serif;
       .logoEss-img {
         max-width: 90px;
       }
+
       h1 {
         font-size: 2rem;
       }
@@ -346,6 +349,7 @@ $font-stack: 'Poppins', sans-serif;
     .brand-header h1 {
       font-size: 1.6rem;
     }
+
     .login-button {
       padding: 14px;
       font-size: 0.95rem;

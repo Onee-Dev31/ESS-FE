@@ -13,6 +13,7 @@ export interface RequestItem {
     date: string; // dd/MM/yyyy
     desc: string;
     amount: number;
+    shiftCode?: string;
 }
 
 export interface Requester {
@@ -47,6 +48,7 @@ export interface TaxiItem {
     destination: string;
     distance: number;
     amount: number;
+    shiftCode?: string;
     // For UI convenience in mapping
     attachedFile?: string | null;
 }
@@ -69,6 +71,7 @@ export interface AllowanceItem {
     hours: number;
     amount: number;
     selected: boolean;
+    shiftCode?: string;
 }
 
 export interface AllowanceRequest {
@@ -153,9 +156,9 @@ export class VehicleService {
                 status: this.getRandomStatus('vehicle'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: '2026-01-01', desc: 'Mock Item 1', amount: 150 },
-                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150 },
-                    { date: '2026-01-03', desc: 'Mock Item 3', amount: 150 }
+                    { date: '2026-01-01', desc: 'Mock Item 1', amount: 150, shiftCode: 'O01 09.00-18.00' },
+                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150, shiftCode: 'O01 09.00-18.00' },
+                    { date: '2026-01-03', desc: 'Mock Item 3', amount: 150, shiftCode: 'O01 09.00-18.00' }
                 ]
             });
         }
@@ -176,8 +179,8 @@ export class VehicleService {
                 status: this.getRandomStatus('taxi'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: dateStr, desc: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250 },
-                    { date: dateStr, desc: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230 }
+                    { date: dateStr, desc: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00' },
+                    { date: dateStr, desc: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00' }
                 ]
             });
         }
@@ -195,7 +198,7 @@ export class VehicleService {
                 status: this.getRandomStatus('allowance'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true }
+                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' }
                 ]
             });
         }

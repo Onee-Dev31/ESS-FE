@@ -7,6 +7,7 @@ import { VehicleService, TaxiRequest, TaxiItem } from '../../services/vehicle.se
 import {
   createAngularTable,
   getCoreRowModel,
+  getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 
@@ -19,6 +20,7 @@ import {
 })
 export class VehicleTaxiComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  protected readonly Math = Math;
 
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
@@ -119,6 +121,12 @@ export class VehicleTaxiComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   }));
 
   ngOnInit() {

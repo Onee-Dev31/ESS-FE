@@ -7,6 +7,7 @@ import { take } from 'rxjs/operators';
 import {
   createAngularTable,
   getCoreRowModel,
+  getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 
@@ -18,6 +19,7 @@ interface UnifiedItem {
   timeOut?: string;
   amount: number;
   destination?: string;
+  shiftCode?: string;
 }
 
 interface ApprovalItem {
@@ -46,6 +48,7 @@ interface ApprovalItem {
 })
 export class ApprovalsComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  protected readonly Math = Math;
 
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
   activeTab = signal<string>('Pending');
@@ -57,6 +60,11 @@ export class ApprovalsComponent implements OnInit {
 
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
+
+  // Action Modal State
+  isActionConfirm = signal<boolean>(false);
+  actionType = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+  reasonText = signal<string>('');
 
   // เก็บข้อมูลหน้ารายละเอียด (Async)
   currentDetailItems = signal<UnifiedItem[]>([]);
@@ -200,6 +208,12 @@ export class ApprovalsComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   }));
 
   // (Logic ย้ายไปที่ viewDetail) 
@@ -272,6 +286,29 @@ export class ApprovalsComponent implements OnInit {
     }
 
     this.isModalOpen.set(true);
+    this.isActionConfirm.set(false);
+    this.actionType.set(null);
+    this.reasonText.set('');
+  }
+
+  openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
+    this.viewDetail(item);
+    this.isActionConfirm.set(true);
+    this.actionType.set(action);
+  }
+
+  confirmAction() {
+    const item = this.selectedItem();
+    const action = this.actionType();
+    const reason = this.reasonText();
+    if (!item || !action) return;
+
+    if ((action === 'Rejected' || action === 'Referred Back') && !reason.trim()) {
+      alert('กรุณาระบุเหตุผล (Please provide a reason)');
+      return;
+    }
+
+    this.updateStatus(item, action, reason);
   }
 
   closeModal() {
@@ -279,9 +316,12 @@ export class ApprovalsComponent implements OnInit {
     this.selectedItem.set(null);
     this.currentDetailItems.set([]);
     this.currentDetailType.set(null);
+    this.isActionConfirm.set(false);
+    this.actionType.set(null);
+    this.reasonText.set('');
   }
 
-  updateStatus(item: ApprovalItem, newStatus: any) {
+  updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
     let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
     let statusLabel = 'รอตรวจสอบ'; // Default
 
@@ -294,6 +334,11 @@ export class ApprovalsComponent implements OnInit {
 
     // Call service to update state
     this.vehicleService.updateStatus(item.requestNo, type, statusLabel);
+
+    if (reason) {
+      console.log(`Action: ${newStatus}, Reason: ${reason}`);
+      // In a real app, you would send this to the backend as a comment or status history
+    }
 
     // Refresh local list (since we are subscribed to BehaviorSubjects in refresh(), 
     // simply calling refresh() again will get the latest state if we remove take(1) or if we just rely on the fact 
