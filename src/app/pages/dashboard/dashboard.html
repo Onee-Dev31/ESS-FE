@@ -191,7 +191,7 @@
                 </div>
                 <div class="card-info">
                   <h6 [style.color]="item.titleColor">
-                    {{ item.title }}
+                    <span class="title-text">{{ item.title }}</span>
                     <div class="tooltip-container" tabindex="0" *ngIf="item.tooltip">
                       <i class="fas fa-info-circle" style="color: #888"></i>
                       <span class="tooltip-text" [innerHTML]="item.tooltip"></span>

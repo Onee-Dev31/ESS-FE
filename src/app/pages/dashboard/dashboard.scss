@@ -124,7 +124,7 @@ body {
   gap: 20px;
   width: 100%;
 
-  @media (max-width: 1199px) {
+  @media (max-width: 1023px) {
     grid-template-columns: 100%;
 
     .left-col-wrapper,
@@ -179,7 +179,7 @@ body {
     }
   }
 
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     grid-template-columns: 280px 1fr;
     grid-template-areas: none;
 
@@ -194,6 +194,7 @@ body {
       grid-column: 2;
       display: flex;
       flex-direction: column;
+      padding-left: 10px; // Add slight gap
     }
 
     .banner-avatar-section,
@@ -337,7 +338,7 @@ body {
   }
 
   @media (min-width: 1400px) {
-    padding: 0px 80px;
+    padding: 30px 60px; // Reduced from 80px to be safer
   }
 
   &::before {
@@ -708,12 +709,17 @@ body {
     grid-template-columns: repeat(4, 1fr);
     align-items: stretch;
 
-    @media (max-width: 991px) {
+    @media (max-width: 1199px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 576px) {
-      grid-template-columns: 1fr;
+    @media (max-width: 480px) {
+      grid-template-columns: repeat(2, 1fr); // Keep 2 columns even on mobile
+      gap: 10px;
+    }
+
+    @media (max-width: 350px) {
+      grid-template-columns: 1fr; // Only 1 column on very small screens
     }
   }
 
@@ -743,17 +749,35 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap; // Ensure title and limit are on one line
 
     .stat-title {
-      font-size: 15px;
+      font-size: 14px;
+
+      @media (min-width: 768px) {
+        font-size: 15px;
+      }
+
       font-weight: 600;
       color: $dark;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
 
     .stat-limit {
-      font-size: 13px;
+      font-size: 11px;
+
+      @media (min-width: 768px) {
+        font-size: 13px;
+      }
+
       color: $muted;
       font-weight: 400;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
   }
 
@@ -762,28 +786,51 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 8px;
+    gap: 10px;
+    flex-wrap: nowrap; // Keep data groups on one line
 
     .stat-data-group {
       display: flex;
+      flex-direction: column; // Stack label over value if needed, or keep baseline?
+      // User asked for "same row", let's keep row but ensure it fits
+      flex-direction: row;
       align-items: baseline;
-      gap: 6px;
+      gap: 4px;
+      flex: 1;
 
       .inline-label {
-        font-size: 13px;
+        font-size: 11px;
+
+        @media (min-width: 768px) {
+          font-size: 13px;
+        }
+
         color: $muted;
         font-weight: 500;
+        white-space: nowrap;
       }
 
       .inline-value {
-        font-size: 20px;
+        font-size: 16px;
+
+        @media (min-width: 768px) {
+          font-size: 20px;
+        }
+
         font-weight: 700;
         line-height: 1;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter',
+        sans-serif;
         color: $muted;
+        white-space: nowrap;
       }
 
-      &.text-end .inline-value {
-        color: $balance;
+      &.text-end {
+        justify-content: flex-end;
+
+        .inline-value {
+          color: $balance;
+        }
       }
     }
   }
@@ -828,7 +875,7 @@ body {
   background: white;
   border-radius: $radius;
   box-shadow: $shadow;
-  overflow: hidden !important;
+  overflow: visible !important;
   transform-style: preserve-3d;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -868,11 +915,18 @@ body {
       color: $muted;
       margin-bottom: 4px;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      overflow: visible; // Allow tooltip to show
+      text-overflow: clip; // Ellipsis moves to child span
       display: flex;
       align-items: center;
       gap: 5px;
+
+      .title-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 0 1 auto; // Stay close to tooltip
+      }
 
       .tooltip-container {
         position: relative;
@@ -893,7 +947,7 @@ body {
           border-radius: 6px;
           padding: 8px;
           position: absolute;
-          z-index: 1;
+          z-index: 999;
           bottom: 125%;
           left: 50%;
           transform: translateX(-50%);
@@ -936,7 +990,7 @@ body {
 // --- Leave Section Specifics ---
 .leave-section {
   .leave-stats-grid {
-    // defined above
+    margin-bottom: 20px;
   }
 
   .leave-card {
@@ -950,40 +1004,30 @@ body {
     }
 
     &.theme-blue {
-
-
       .leave-icon {
         background: #eff6ff;
       }
     }
 
     &.theme-green {
-
-
       .leave-icon {
         background: #f0fdf4;
       }
     }
 
     &.theme-orange {
-
-
       .leave-icon {
         background: #fff7ed;
       }
     }
 
     &.theme-purple {
-
-
       .leave-icon {
         background: #faf5ff;
       }
     }
 
     &.theme-red {
-
-
       .leave-icon {
         background: #fef2f2;
       }

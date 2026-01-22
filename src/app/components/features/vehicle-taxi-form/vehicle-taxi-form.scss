@@ -15,7 +15,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   height: 100%;
   background: #fff;
   font-family: $font-main;
-  overflow: hidden; 
+  overflow: hidden;
 
   input,
   button,
@@ -28,25 +28,43 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
+    padding: 10px 15px;
+
+    @media (min-width: 768px) {
+      padding: 12px 24px;
+    }
+
     border-bottom: 1px solid $border;
     flex-shrink: 0;
 
     h2 {
-      font-size: 1.15rem;
+      font-size: 1.0rem;
+
+      @media (min-width: 768px) {
+        font-size: 1.15rem;
+      }
+
       margin: 0;
       font-weight: 600;
       color: $primary;
     }
+
     .btn-close-modal {
       border: none;
       background: #f1f3f4;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
+
+      @media (min-width: 768px) {
+        width: 32px;
+        height: 32px;
+      }
+
       border-radius: 50%;
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: 1.0rem;
       line-height: 1;
+
       &:hover {
         background: #e8eaed;
         color: $danger;
@@ -56,40 +74,79 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .content-card {
     flex: 1;
-    padding: 20px 24px;
+    padding: 15px 15px;
+
+    @media (min-width: 768px) {
+      padding: 20px 24px;
+    }
+
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
   .filter-section {
-    margin-bottom: 16px;
-    padding: 16px 20px;
+    margin-bottom: 12px;
+    padding: 12px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 16px;
+      padding: 16px 20px;
+    }
+
     background: #f8f9fa;
     border-radius: 12px;
     border: 1px solid $border;
     flex-shrink: 0;
+
     .month-selector {
       display: flex;
-      align-items: center;
-      gap: 15px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+      }
+
       label {
         font-weight: 600;
         color: $text-sub;
-        font-size: 0.95rem;
+        font-size: 0.85rem;
+
+        @media (min-width: 768px) {
+          font-size: 0.95rem;
+        }
       }
+
       .form-control {
+        width: 100%;
+
+        @media (min-width: 768px) {
+          width: auto;
+        }
+
         padding: 8px 12px;
         border: 1px solid $border;
         border-radius: 6px;
       }
+
       .btn-search {
+        width: 100%;
+
+        @media (min-width: 768px) {
+          width: auto;
+        }
+
         background: #fff;
         color: $primary;
         border: 1.5px solid $primary;
         padding: 7px 20px;
         border-radius: 6px;
         cursor: pointer;
+
         &:hover {
           background: $primary;
           color: #fff;
@@ -100,13 +157,26 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .action-bar {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column-reverse;
+    gap: 12px;
     margin-bottom: 12px;
-    gap: 20px;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
     flex-shrink: 0;
 
     .btn-submit {
+      width: 100%;
+
+      @media (min-width: 768px) {
+        width: auto;
+      }
+
       background: $success;
       color: #fff;
       border: none;
@@ -116,22 +186,36 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       cursor: pointer;
       flex-shrink: 0;
     }
-    
+
     .info-badges {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       flex-shrink: 0;
+
       .right-info,
       .request-id-badge {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+
+        @media (min-width: 768px) {
+          font-size: 0.85rem;
+        }
+
         font-weight: 600;
-        padding: 6px 14px;
+        padding: 6px 12px;
+
+        @media (min-width: 768px) {
+          padding: 6px 14px;
+        }
+
         border-radius: 20px;
       }
+
       .right-info {
         background: #e8f0fe;
         color: $primary;
       }
+
       .request-id-badge {
         background: #eed686;
         color: #4e342e;
@@ -155,7 +239,12 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       td {
         border-bottom: 1px solid $border;
         border-right: 1px solid $border;
-        height: 44px;
+        height: 40px;
+
+        @media (min-width: 768px) {
+          height: 44px;
+        }
+
         vertical-align: middle;
         box-sizing: border-box;
       }
@@ -169,6 +258,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         color: $text-sub;
         border-top: 1px solid $border;
       }
+
       .sub-header th {
         top: 44px;
         font-size: 0.8rem;
@@ -177,32 +267,38 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
       .text-center {
         text-align: center;
+
         input[type='checkbox'] {
           cursor: pointer;
           margin: 0 auto;
           display: block;
         }
       }
+
       .text-right {
         text-align: right;
       }
+
       .bg-gray {
         background-color: #fcfcfc;
       }
+
       .font-bold {
         font-weight: 700;
       }
+
       .highlight-row td {
         background-color: #fffdef !important;
       }
 
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
+      input[type=number]::-webkit-inner-spin-button,
+      input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
       }
+
       input[type=number] {
-        -moz-appearance: textfield; 
+        -moz-appearance: textfield;
         appearance: textfield;
       }
 
@@ -213,14 +309,17 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         background: transparent;
         outline: none;
       }
+
       .desc-cell {
         padding: 0 8px;
         position: relative;
+
         .input-container {
           display: flex;
           align-items: center;
           height: 100%;
         }
+
         .table-input {
           width: 100%;
           height: 32px;
@@ -228,7 +327,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           border-radius: 4px;
           padding: 0 8px;
           background: transparent;
-          
+
           &.is-invalid {
             border: 1px solid $danger !important;
             background-color: rgba($danger, 0.05);
@@ -241,6 +340,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           }
         }
       }
+
       .btn-icon-folder {
         background: none;
         border: none;
@@ -248,13 +348,13 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 1.1rem;
         color: #9575cd;
         transition: transform 0.2s;
-        
+
         &:hover {
-            transform: scale(1.1);
+          transform: scale(1.1);
         }
 
         &.has-file {
-            color: $success;
+          color: $success;
         }
       }
 
@@ -264,17 +364,20 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           bottom: 0;
           z-index: 11;
           background: #fff;
-        } 
+        }
+
         .total-val {
           background: #e6f4ea !important;
           color: $success;
           font-weight: 700;
         }
+
         .total-label {
           text-align: right;
           padding-right: 20px;
           font-weight: 600;
         }
+
         .bg-white {
           background: #fff;
         }
@@ -297,32 +400,52 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .upload-modal-content {
       background: #fff;
-      width: 400px;
+      width: 90%; // Fluid on mobile
+      max-width: 400px;
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       animation: popUp 0.2s ease-out;
       font-family: $font-main;
 
       .modal-header {
-        padding: 15px 20px;
+        padding: 12px 15px; // Reduced padding
+
+        @media (min-width: 768px) {
+          padding: 15px 20px;
+        }
+
         border-bottom: 1px solid $border;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        
-        h3 { margin: 0; font-size: 1.1rem; color: $text; }
-        .close-btn { 
-          background: none; border: none; font-size: 1.2rem; cursor: pointer; color: $text-sub; 
-          &:hover { color: $danger; }
+
+        h3 {
+          margin: 0;
+          font-size: 1rem;
+          color: $text;
+        }
+
+        // Adjusted font
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: $text-sub;
+
+          &:hover {
+            color: $danger;
+          }
         }
       }
 
       .modal-body {
         padding: 20px;
+
         .date-label {
-           margin: 0 0 15px 0;
-           color: $text-sub;
-           font-size: 0.9rem;
+          margin: 0 0 15px 0;
+          color: $text-sub;
+          font-size: 0.9rem;
         }
 
         .upload-box {
@@ -349,8 +472,15 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             align-items: center;
             color: $primary;
             gap: 8px;
-            i { font-size: 1.5rem; }
-            span { font-size: 0.9rem; font-weight: 500; }
+
+            i {
+              font-size: 1.5rem;
+            }
+
+            span {
+              font-size: 0.9rem;
+              font-weight: 500;
+            }
           }
 
           .file-preview {
@@ -364,18 +494,29 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             width: 100%;
             box-sizing: border-box;
 
-            .file-icon { color: $danger; font-size: 1.2rem; }
-            .filename { 
-                flex: 1; 
-                text-align: left; 
-                white-space: nowrap; 
-                overflow: hidden; 
-                text-overflow: ellipsis; 
-                font-size: 0.9rem;
+            .file-icon {
+              color: $danger;
+              font-size: 1.2rem;
             }
+
+            .filename {
+              flex: 1;
+              text-align: left;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              font-size: 0.9rem;
+            }
+
             .btn-remove-file {
-                background: none; border: none; color: $text-sub; cursor: pointer;
-                &:hover { color: $danger; }
+              background: none;
+              border: none;
+              color: $text-sub;
+              cursor: pointer;
+
+              &:hover {
+                color: $danger;
+              }
             }
           }
         }
@@ -400,14 +541,24 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         .btn-cancel {
           background: #f1f3f4;
           color: $text;
-          &:hover { background: #e8eaed; }
+
+          &:hover {
+            background: #e8eaed;
+          }
         }
 
         .btn-confirm {
           background: $primary;
           color: #fff;
-          &:hover { background: color.adjust($primary, $lightness: -5%); }
-          &:disabled { background: #bdc1c6; cursor: not-allowed; }
+
+          &:hover {
+            background: color.adjust($primary, $lightness: -5%);
+          }
+
+          &:disabled {
+            background: #bdc1c6;
+            cursor: not-allowed;
+          }
         }
       }
     }
@@ -415,6 +566,13 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 }
 
 @keyframes popUp {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

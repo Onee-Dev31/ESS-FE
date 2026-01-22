@@ -20,9 +20,9 @@ import {
 export class VehicleTaxiComponent implements OnInit {
   private vehicleService = inject(VehicleService);
 
-  filterStartDate: string = '';
-  filterEndDate: string = '';
-  filterStatus: string = '';
+  filterStartDate = signal<string>('');
+  filterEndDate = signal<string>('');
+  filterStatus = signal<string>('');
 
   // Modal States
   isModalOpen: boolean = false;
@@ -38,17 +38,17 @@ export class VehicleTaxiComponent implements OnInit {
 
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
-    if (this.filterStatus) filtered = filtered.filter(r => r.status === this.filterStatus);
+    if (this.filterStatus()) filtered = filtered.filter(r => r.status === this.filterStatus());
 
-    if (this.filterStartDate || this.filterEndDate) {
+    if (this.filterStartDate() || this.filterEndDate()) {
       filtered = filtered.filter(r => {
         const [day, month, year] = r.createDate.split('/');
         const isoDate = `${year}-${month}-${day}`;
 
         let passStart = true;
         let passEnd = true;
-        if (this.filterStartDate) passStart = isoDate >= this.filterStartDate;
-        if (this.filterEndDate) passEnd = isoDate <= this.filterEndDate;
+        if (this.filterStartDate()) passStart = isoDate >= this.filterStartDate();
+        if (this.filterEndDate()) passEnd = isoDate <= this.filterEndDate();
         return passStart && passEnd;
       });
     }
@@ -129,6 +129,12 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   onSearch() {
+  }
+
+  clearFilters() {
+    this.filterStartDate.set('');
+    this.filterEndDate.set('');
+    this.filterStatus.set('');
   }
 
   toggleSort(columnId: string) {

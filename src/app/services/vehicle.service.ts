@@ -99,8 +99,14 @@ export class VehicleService {
 
     // --- ส่วนสร้างข้อมูลจำลอง ---
 
-    private getRandomStatus(): string {
-        const statuses = ['รอตรวจสอบ', 'รอตรวจสอบ', 'รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
+    private getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
+        let statuses: string[] = [];
+        if (type === 'allowance') {
+            statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
+        } else {
+            // vehicle and taxi
+            statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'HR อนุมัติ', 'CEO อนุมัติ', 'ACC อนุมัติ'];
+        }
         return statuses[Math.floor(Math.random() * statuses.length)];
     }
 
@@ -144,7 +150,7 @@ export class VehicleService {
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TRANSPORT,
                 createDate: dateStr,
-                status: this.getRandomStatus(),
+                status: this.getRandomStatus('vehicle'),
                 requester: this.getRandomRequester(),
                 items: [
                     { date: '2026-01-01', desc: 'Mock Item 1', amount: 150 },
@@ -167,7 +173,7 @@ export class VehicleService {
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TAXI,
                 createDate: dateStr,
-                status: this.getRandomStatus(),
+                status: this.getRandomStatus('taxi'),
                 requester: this.getRandomRequester(),
                 items: [
                     { date: dateStr, desc: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250 },
@@ -186,7 +192,7 @@ export class VehicleService {
                 id: `2701#${String(i).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.ALLOWANCE,
                 createDate: dateStr,
-                status: this.getRandomStatus(),
+                status: this.getRandomStatus('allowance'),
                 requester: this.getRandomRequester(),
                 items: [
                     { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true }

@@ -4,22 +4,23 @@
       <h3>แนบไฟล์เอกสาร</h3>
       <button class="close-btn" (click)="close()">✕</button>
     </div>
-    
+
     <div class="modal-body">
       <p class="date-label">สำหรับวันที่: <strong>{{ dateLabel }}</strong></p>
-      
+
       <div class="upload-box">
         <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
-        
+
         <label for="fileInput" class="upload-trigger" *ngIf="!tempFileName">
           <i class="fas fa-cloud-upload-alt"></i>
           <span>คลิกเพื่อเลือกไฟล์</span>
+          <small style="color: #999; margin-top: 4px;">(รองรับทุกประเภท, สูงสุด 4MB)</small>
         </label>
 
         <div class="file-preview" *ngIf="tempFileName">
-           <i class="fas fa-file-alt file-icon"></i>
-           <span class="filename">{{ tempFileName }}</span>
-           <button class="btn-remove-file" (click)="removeFile()">✕</button>
+          <i class="fas fa-file-alt file-icon"></i>
+          <span class="filename">{{ tempFileName }}</span>
+          <button class="btn-remove-file" (click)="removeFile()">✕</button>
         </div>
       </div>
     </div>

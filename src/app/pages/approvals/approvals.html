@@ -23,59 +23,76 @@
       </div>
     </div>
 
-    <table class="data-grid">
-      <thead>
-        <tr>
-          <th>Request No</th>
-          <th>Date Created</th>
-          <th>Requester Info</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of filteredData(); track row.requestNo + row.typeId) {
-        <tr>
-          <td class="text-center font-inter" (click)="viewDetail(row)"
-            style="cursor: pointer; color: #008ebc; font-weight: 600;">
-            {{ row.requestNo }}
-          </td>
-          <td class="text-center text-muted">{{ row.requestDate }}</td>
-          <td>
-            <div class="requester-info">
-              <div class="name">{{ row.requestBy.name }}</div>
-              <div class="details-box">
-                <span>{{ row.requestBy.employeeId }}</span>
-                <span class="divider">|</span>
-                <span>{{ row.requestBy.department }}</span>
-                <span class="divider">|</span>
-                <span>{{ row.requestBy.company }}</span>
+    <div class="data-grid-container">
+      <table class="data-grid">
+        <thead>
+          <tr>
+            <th (click)="toggleSort('requestNo')" style="cursor: pointer">
+              Request No <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
+            </th>
+            <th (click)="toggleSort('requestDate')" style="cursor: pointer">
+              Date Created <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+            </th>
+            <th (click)="toggleSort('requestBy')" style="cursor: pointer">
+              Requester Info <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+            </th>
+            <th (click)="toggleSort('requestType')" style="cursor: pointer">
+              Type <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+            </th>
+            <th>Description</th>
+            <th (click)="toggleSort('amount')" style="cursor: pointer" class="text-right">
+              Amount <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+            <th (click)="toggleSort('status')" style="cursor: pointer" class="text-center">
+              Status <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            </th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of table.getRowModel().rows; track row.original.requestNo + row.original.typeId) {
+          <tr>
+            <td class="text-center font-inter" (click)="viewDetail(row.original)"
+              style="cursor: pointer; color: #008ebc; font-weight: 600;">
+              {{ row.original.requestNo }}
+            </td>
+            <td class="text-center text-muted">{{ row.original.requestDate }}</td>
+            <td>
+              <div class="requester-info">
+                <div class="name">{{ row.original.requestBy.name }}</div>
+                <div class="details-box">
+                  <span>{{ row.original.requestBy.employeeId }}</span>
+                  <span class="divider">|</span>
+                  <span>{{ row.original.requestBy.department }}</span>
+                  <span class="divider">|</span>
+                  <span>{{ row.original.requestBy.company }}</span>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="text-center">{{ row.requestType }}</td>
-          <td class="text-left description-cell">
-            <div class="truncate-text">{{ row.requestDetail }}</div>
-          </td>
-          <td class="amount-cell">{{ row.amount | number }}</td>
-          <td class="text-center">
-            <span class="status-badge" [ngClass]="row.status.toLowerCase().replace(' ', '-')">{{ row.status }}</span>
-          </td>
-          <td>
-            <div class="action-cell">
-              <button class="act-btn v-btn" title="View" (click)="viewDetail(row)">👁</button>
-              <button class="act-btn a-btn" title="Approve" (click)="updateStatus(row, 'Approved')">✓</button>
-              <button class="act-btn r-btn" title="Reject" (click)="updateStatus(row, 'Rejected')">✕</button>
-              <button class="act-btn b-btn" title="Refer Back" (click)="updateStatus(row, 'Referred Back')">↩</button>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+            </td>
+            <td class="text-center">{{ row.original.requestType }}</td>
+            <td class="text-left description-cell">
+              <div class="truncate-text">{{ row.original.requestDetail }}</div>
+            </td>
+            <td class="amount-cell">{{ row.original.amount | number }}</td>
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">{{
+                row.original.status }}</span>
+            </td>
+            <td>
+              <div class="action-cell">
+                <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">👁</button>
+                <button class="act-btn a-btn" title="Approve"
+                  (click)="updateStatus(row.original, 'Approved')">✓</button>
+                <button class="act-btn r-btn" title="Reject" (click)="updateStatus(row.original, 'Rejected')">✕</button>
+                <button class="act-btn b-btn" title="Refer Back"
+                  (click)="updateStatus(row.original, 'Referred Back')">↩</button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

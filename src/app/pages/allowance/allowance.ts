@@ -29,9 +29,9 @@ export class AllowanceComponent implements OnInit {
 
   isModalOpen = false;
   selectedRequestId = ''; // For passing to modal
-  filterStartDate = '';
-  filterEndDate = '';
-  filterStatus = '';
+  filterStartDate = signal<string>('');
+  filterEndDate = signal<string>('');
+  filterStatus = signal<string>('');
 
   // เก็บข้อมูลดิบจาก API
   allRequests = signal<AllowanceRequest[]>([]);
@@ -41,9 +41,9 @@ export class AllowanceComponent implements OnInit {
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
-    if (this.filterStatus) filtered = filtered.filter((r) => r.status === this.filterStatus);
-    if (this.filterStartDate) filtered = filtered.filter((r) => r.createDate >= this.filterStartDate);
-    if (this.filterEndDate) filtered = filtered.filter((r) => r.createDate <= this.filterEndDate);
+    if (this.filterStatus()) filtered = filtered.filter((r) => r.status === this.filterStatus());
+    if (this.filterStartDate()) filtered = filtered.filter((r) => r.createDate >= this.filterStartDate());
+    if (this.filterEndDate()) filtered = filtered.filter((r) => r.createDate <= this.filterEndDate());
 
     const sortState = this.sorting()[0];
     if (sortState) {
@@ -142,6 +142,12 @@ export class AllowanceComponent implements OnInit {
   closeModal() { this.isModalOpen = false; }
   onSearch() {
     // ฟังก์ชันค้นหา (ข้อมูลจะถูก filter ผ่าน computed signal)
+  }
+
+  clearFilters() {
+    this.filterStartDate.set('');
+    this.filterEndDate.set('');
+    this.filterStatus.set('');
   }
 
   toggleSort(columnId: string) {

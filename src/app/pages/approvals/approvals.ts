@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { VehicleService, VehicleRequest, TaxiRequest, AllowanceRequest } from '../../services/vehicle.service';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
+import {
+  createAngularTable,
+  getCoreRowModel,
+  SortingState,
+} from '@tanstack/angular-table';
 
 interface UnifiedItem {
   date: string;
@@ -51,6 +56,7 @@ export class ApprovalsComponent implements OnInit {
   modalActiveTab = signal<'Items' | 'Comments'>('Items');
 
   approvals = signal<ApprovalItem[]>([]);
+  sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
 
   // เก็บข้อมูลหน้ารายละเอียด (Async)
   currentDetailItems = signal<UnifiedItem[]>([]);
@@ -126,22 +132,75 @@ export class ApprovalsComponent implements OnInit {
   }
 
   private mapStatus(status: string): any {
-    if (status.includes('รอตรวจสอบ')) return 'Pending';
-    if (status.includes('อนุมัติ')) return 'Approved';
     if (status.includes('ไม่อนุมัติ')) return 'Rejected';
+    if (status.includes('อนุมัติ') || status.includes('จ่าย')) return 'Approved';
+    if (status.includes('รอตรวจสอบ')) return 'Pending';
+    if (status.includes('รอแก้ไข')) return 'Referred Back';
     return 'Pending';
   }
 
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();
-    return this.approvals().filter(item =>
+
+    let filtered = this.approvals().filter(item =>
       item.status === statusFilter &&
       (item.requestNo.toLowerCase().includes(searchFilter) ||
         item.requestBy.name.toLowerCase().includes(searchFilter) ||
         item.requestDetail.toLowerCase().includes(searchFilter))
     );
+
+    const sortState = this.sorting()[0];
+    if (sortState) {
+      const { id, desc } = sortState;
+      const direction = desc ? -1 : 1;
+
+      filtered.sort((a, b) => {
+        let valA: any, valB: any;
+
+        switch (id) {
+          case 'requestNo':
+            return a.requestNo.localeCompare(b.requestNo) * direction;
+          case 'requestDate':
+            // Format is dd/mm/yyyy or yyyy-mm-dd
+            valA = a.requestDate.split('/').reverse().join('');
+            valB = b.requestDate.split('/').reverse().join('');
+            return valA.localeCompare(valB) * direction;
+          case 'requester':
+            return a.requestBy.name.localeCompare(b.requestBy.name) * direction;
+          case 'requestType':
+            return a.requestType.localeCompare(b.requestType) * direction;
+          case 'amount':
+            return (a.amount - b.amount) * direction;
+          case 'status':
+            return a.status.localeCompare(b.status) * direction;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filtered;
   });
+
+  table = createAngularTable(() => ({
+    data: this.filteredData(),
+    columns: [
+      { accessorKey: 'requestNo', header: 'Request No' },
+      { accessorKey: 'requestDate', header: 'Date Created' },
+      { accessorKey: 'requestBy', header: 'Requester Info' },
+      { accessorKey: 'requestType', header: 'Type' },
+      { accessorKey: 'requestDetail', header: 'Description' },
+      { accessorKey: 'amount', header: 'Amount' },
+      { accessorKey: 'status', header: 'Status' },
+    ],
+    state: { sorting: this.sorting() },
+    onSortingChange: (updaterOrValue) => {
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      this.sorting.set(next);
+    },
+    getCoreRowModel: getCoreRowModel(),
+  }));
 
   // (Logic ย้ายไปที่ viewDetail) 
 
@@ -150,9 +209,37 @@ export class ApprovalsComponent implements OnInit {
     return this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0);
   });
 
-  setActiveTab(tab: string) { this.activeTab.set(tab); }
+  setActiveTab(tab: string) {
+    this.activeTab.set(tab);
+    // Reset sorting to default or keep it? User might expect default sorting per tab.
+  }
   getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
   onSearch(event: any) { this.searchText.set(event.target.value); }
+
+  toggleSort(columnId: string) {
+    const column = this.table.getColumn(columnId);
+    if (column) {
+      column.toggleSorting(column.getIsSorted() === 'asc');
+    } else {
+      const currentSort = this.sorting()[0];
+      if (currentSort?.id === columnId) {
+        this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);
+      } else {
+        this.sorting.set([{ id: columnId, desc: false }]);
+      }
+    }
+  }
+
+  getSortIcon(columnId: string) {
+    const sortState = this.sorting()[0];
+    const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
+    return {
+      'fa-sort-amount-up': isSorted === 'asc',
+      'fa-sort-amount-down-alt': isSorted === 'desc',
+      'fa-sort': !isSorted,
+      'text-muted': !isSorted
+    };
+  }
 
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);

@@ -11,10 +11,15 @@ $bg-page: #f8f9fa;
 $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 @mixin mobile {
-  @media (max-width: 575.98px) { @content; }
+  @media (max-width: 575.98px) {
+    @content;
+  }
 }
+
 @mixin tablet {
-  @media (max-width: 991.98px) { @content; }
+  @media (max-width: 991.98px) {
+    @content;
+  }
 }
 
 .allowance-page {
@@ -138,13 +143,14 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 0.9rem;
         color: #333;
         font-family: $font-stack;
-        
+
         @include mobile {
-           display: none;
+          display: none;
         }
       }
 
-      .form-control, .select-status {
+      .form-control,
+      .select-status {
         padding: 6px 10px;
         border: 1px solid #ced4da;
         border-radius: 4px;
@@ -160,11 +166,11 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
         @include mobile {
           width: 100%;
-          padding: 10px; 
+          padding: 10px;
           height: 40px;
         }
       }
-      
+
       .btn-search {
         background-color: $btn-search-bg;
         color: white;
@@ -185,30 +191,52 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           margin-top: 5px;
         }
       }
+
+      .btn-clear {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #ced4da;
+        padding: 7px 20px;
+        border-radius: 4px;
+        font-weight: 500;
+        font-family: $font-stack;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #e2e6ea;
+          color: #212529;
+        }
+
+        @include mobile {
+          width: 100%;
+          padding: 10px;
+        }
+      }
     }
   }
 
   .table-responsive {
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; 
+    -webkit-overflow-scrolling: touch;
     border-top: 1px solid $border-color;
   }
 
   .modern-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 900px; 
+    min-width: 900px;
 
     thead {
       background-color: $header-bg;
+
       tr th {
         color: $text-header;
         font-weight: 600;
         font-size: 0.85rem;
         padding: 15px 12px;
         border: none;
-        text-align: center; 
+        text-align: center;
         white-space: nowrap;
         font-family: $font-stack;
 
@@ -235,10 +263,21 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             padding: 10px 8px;
           }
 
-          &.top-align { vertical-align: top; }
-          &.text-center { text-align: center; }
-          &.text-right { text-align: right; }
-          &.font-bold { font-weight: 600; }
+          &.top-align {
+            vertical-align: top;
+          }
+
+          &.text-center {
+            text-align: center;
+          }
+
+          &.text-right {
+            text-align: right;
+          }
+
+          &.font-bold {
+            font-weight: 600;
+          }
         }
 
         .id-text {
@@ -269,16 +308,19 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             background-color: rgba(40, 167, 69, 0.15);
             color: #28a745;
           }
+
           &.status-pending,
           &.status-รอตรวจสอบ {
             background-color: rgba(255, 193, 7, 0.15);
             color: #f1b44c;
           }
+
           &.status-approved,
           &.status-ต้นสังกัดอนุมัติ {
             background-color: rgba(23, 162, 184, 0.15);
             color: #17a2b8;
           }
+
           &.status-waiting,
           &.status-รอจ่าย {
             background-color: rgba(0, 123, 255, 0.15);
@@ -302,7 +344,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(4px);
-  
+
   @include mobile {
     padding: 0;
     align-items: flex-end;
@@ -320,7 +362,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     overflow: hidden;
     position: relative;
     font-family: $font-stack;
-    
+
     @include mobile {
       width: 100%;
       height: 100%;
@@ -331,17 +373,37 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     app-allowance-form {
       flex: 1;
       overflow-y: auto;
-       &::-webkit-scrollbar { width: 8px; }
-       &::-webkit-scrollbar-track { background: #f1f1f1; }
-       &::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-       &::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
     }
-    
+
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }
 
 @keyframes popIn {
-  from { transform: scale(0.9) translateY(20px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
