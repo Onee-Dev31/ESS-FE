@@ -468,6 +468,28 @@ $bg-slate: #f4f7f9;
     }
 }
 
+.file-icon-link {
+    cursor: pointer;
+    color: $primary-blue;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #ebf5fa;
+        color: color.adjust($primary-blue, $lightness: -10%);
+        transform: scale(1.1);
+    }
+
+    i {
+        pointer-events: none;
+    }
+}
+
 @keyframes slideDown {
     from {
         opacity: 0;

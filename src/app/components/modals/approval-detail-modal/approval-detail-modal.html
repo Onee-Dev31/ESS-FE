@@ -55,6 +55,7 @@
                                     <th class="text-center">เวลา In-Out</th>
                                     } @else if (selectedRequestDetails().type === 'taxi') {
                                     <th>ปลายทาง</th>
+                                    <th class="text-center">ไฟล์แนบ</th>
                                     }
                                     <th class="text-right">จำนวนเงิน</th>
                                 </tr>
@@ -69,6 +70,16 @@
                                     <td class="text-center">{{ item.timeIn }} - {{ item.timeOut }}</td>
                                     } @else if (selectedRequestDetails().type === 'taxi') {
                                     <td>{{ item.destination }}</td>
+                                    <td class="text-center">
+                                        @if (item.attachedFile) {
+                                        <a class="file-icon-link" (click)="openPreview(item.attachedFile)"
+                                            title="ดูไฟล์แนบ">
+                                            <i class="far fa-folder-open"></i>
+                                        </a>
+                                        } @else {
+                                        <span class="text-muted">-</span>
+                                        }
+                                    </td>
                                     }
                                     <td class="text-right font-bold">{{ item.amount | number }}</td>
                                 </tr>
@@ -76,7 +87,7 @@
                             </tbody>
                             <tfoot>
                                 <tr class="modal-total-row">
-                                    <td [attr.colspan]="(selectedRequestDetails().type === 'allowance' || selectedRequestDetails().type === 'taxi') ? 4 : 3"
+                                    <td [attr.colspan]="selectedRequestDetails().type === 'allowance' ? 4 : (selectedRequestDetails().type === 'taxi' ? 5 : 3)"
                                         class="text-right"><strong>Total : </strong></td>
                                     <td class="text-right total-val">{{ modalItemsTotal() | number }}</td>
                                 </tr>
@@ -143,3 +154,6 @@
         </div>
     </div>
 </div>
+
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>

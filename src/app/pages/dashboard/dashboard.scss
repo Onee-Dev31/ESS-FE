@@ -1364,9 +1364,10 @@ body {
   }
 
   .btn-pending-approvals {
-    background: #fbe1fb;
-    border: 1.5px solid #800080;
-    color: #800080;
+    // --- สไตล์สถานะปกติ ---
+    background: #fbe1fb;      // พื้นม่วงอ่อน
+    border: 1.5px solid #800080; // ขอบม่วงเข้ม
+    color: #800080;           // ตัวอักษรมม่วงเข้ม
     padding: 5px 14px;
     border-radius: 20px;
     font-size: 13px;
@@ -1377,20 +1378,26 @@ body {
     gap: 8px;
     position: relative;
     transition: all 0.25s ease;
-    animation: redButtonGlow 2s infinite;
+    animation: purpleGlow 2s infinite;
 
+    // --- สไตล์เมื่อ Hover (เปลี่ยนสีทั้งหมด) ---
     &:hover {
-      background: #c53030;
-      color: #fff;
-      border-color: #9b2c2c;
-      animation: none;
+      background: #800080;    // พื้นหลังเปลี่ยนเป็นม่วงเข้ม
+      color: #ffffff;         // ตัวอักษรเปลี่ยนเป็นสีขาว
+      border-color: #800080;  // ขอบคงเดิม
+      animation: none;        // หยุด Glow เมื่อชี้
 
       .icon-shake i {
-        color: white;
-        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+        color: #ffffff;       // ไอคอนระฆังเปลี่ยนเป็นสีขาว
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+      }
+
+      .notification-badge {
+        border-color: #800080; // ขอบตัวเลขกลืนไปกับพื้นหลังปุ่ม
       }
     }
 
+    // --- ส่วนประกอบภายใน ---
     .icon-shake {
       position: relative;
       display: flex;
@@ -1398,9 +1405,10 @@ body {
 
       i {
         font-size: 16px;
-        color: #e53e3e;
+        color: #800080;       // สีระฆังปกติเป็นม่วงเข้ม
         animation: bellShake 1.5s infinite;
         transform-origin: top center;
+        transition: color 0.25s ease;
       }
 
       .notification-badge {
@@ -1409,7 +1417,7 @@ body {
         right: -7px;
         min-width: 15px;
         height: 15px;
-        background: #f56565;
+        background: #CC0000;  // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
         color: white;
         border-radius: 50%;
         border: 2px solid white;
@@ -1422,7 +1430,7 @@ body {
         animation: pulseCriticalRed 1.5s infinite;
       }
     }
-  }
+}
 }
 
 @keyframes pulseCriticalRed {

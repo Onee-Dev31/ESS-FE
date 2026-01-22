@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface FilePreviewItem {
@@ -13,11 +13,17 @@ export interface FilePreviewItem {
     templateUrl: './file-preview-modal.html',
     styleUrls: ['./file-preview-modal.scss']
 })
-export class FilePreviewModalComponent {
+export class FilePreviewModalComponent implements OnInit {
     @Input() files: FilePreviewItem[] = [];
     @Output() onClose = new EventEmitter<void>();
 
     selectedFile: FilePreviewItem | null = null;
+
+    ngOnInit() {
+        if (this.files.length > 0) {
+            this.selectedFile = this.files[0];
+        }
+    }
 
     selectFile(file: FilePreviewItem) {
         this.selectedFile = file;

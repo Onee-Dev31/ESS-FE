@@ -178,8 +178,8 @@ export class VehicleService {
                 status: this.getRandomStatus('taxi'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: dateStr, description: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00' },
-                    { date: dateStr, description: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00' }
+                    { date: dateStr, description: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00', attachedFile: 'receipt_01.jpg' },
+                    { date: dateStr, description: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00', attachedFile: 'receipt_02.jpg' }
                 ]
             });
         }

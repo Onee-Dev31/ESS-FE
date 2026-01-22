@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, computed, inject, OnIni
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleService } from '../../../services/vehicle.service';
+import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 
 export interface UnifiedItem {
   date: string;
@@ -11,6 +12,7 @@ export interface UnifiedItem {
   amount: number;
   destination?: string;
   shiftCode?: string;
+  attachedFile?: string;
 }
 
 export interface ApprovalItem {
@@ -32,7 +34,7 @@ export interface ApprovalItem {
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
   templateUrl: './approval-detail-modal.html',
   styleUrl: './approval-detail-modal.scss'
 })
@@ -52,6 +54,9 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   currentDetailItems = signal<UnifiedItem[]>([]);
   currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
+
+  isPreviewModalOpen = signal(false);
+  previewFiles = signal<any[]>([]);
 
   selectedRequestDetails = computed(() => {
     return {
@@ -144,5 +149,15 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   close() {
     this.onClose.emit();
+  }
+
+  openPreview(fileName: string) {
+    if (!fileName) return;
+    this.previewFiles.set([{ fileName, date: '' }]); // basic mock
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 }
