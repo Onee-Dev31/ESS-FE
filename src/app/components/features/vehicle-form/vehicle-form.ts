@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService, RequestItem, VehicleRequest } from '../../../services/vehicle.service';
+import { VehicleService, RequestItem, VehicleRequest, WELFARE_TYPES } from '../../../services/vehicle.service';
 
 interface LogItem {
   date: string;
@@ -163,6 +163,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       } else {
         const newReq: VehicleRequest = {
           id: this.requestId,
+          typeId: WELFARE_TYPES.TRANSPORT,
           createDate: new Date().toISOString().split('T')[0], // วันที่วันนี้ (YYYY-MM-DD)
           status: 'รอตรวจสอบ',
           items: requestItems

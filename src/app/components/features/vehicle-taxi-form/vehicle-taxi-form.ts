@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
-import { VehicleService, TaxiRequest, TaxiItem } from '../../../services/vehicle.service';
+import { VehicleService, TaxiRequest, TaxiItem, WELFARE_TYPES } from '../../../services/vehicle.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -122,6 +122,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       } else {
         const newReq: TaxiRequest = {
           id: this.requestId,
+          typeId: WELFARE_TYPES.TAXI,
           createDate: new Date().toLocaleDateString('en-GB'), // วันที่ dd/mm/yyyy
           status: 'รอตรวจสอบ',
           items: taxiItems

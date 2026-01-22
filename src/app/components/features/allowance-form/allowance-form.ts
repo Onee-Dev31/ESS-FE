@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService, AllowanceRequest, AllowanceItem } from '../../../services/vehicle.service';
+import { VehicleService, AllowanceRequest, AllowanceItem, WELFARE_TYPES } from '../../../services/vehicle.service';
 import { switchMap, of, forkJoin } from 'rxjs';
 
 @Component({
@@ -189,6 +189,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       } else {
         const newReq: AllowanceRequest = {
           id: this.requestId,
+          typeId: WELFARE_TYPES.ALLOWANCE,
           createDate: new Date().toISOString().split('T')[0], // วันที่ yyyy-mm-dd
           status: 'รอตรวจสอบ',
           items: items

@@ -25,6 +25,7 @@ interface ApprovalItem {
     company: string;
   };
   requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่';
+  typeId: number;
   requestDetail: string;
   amount: number;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
@@ -53,7 +54,7 @@ export class ApprovalsComponent implements OnInit {
 
   // เก็บข้อมูลหน้ารายละเอียด (Async)
   currentDetailItems = signal<UnifiedItem[]>([]);
-  currentDetailType = signal<'allowance' | 'taxi' | null>(null);
+  currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
 
   // ตัวช่วยสำหรับแสดงผลใน Template
   selectedRequestDetails = computed(() => {
@@ -92,6 +93,7 @@ export class ApprovalsComponent implements OnInit {
       requestDate: a.createDate,
       requestBy: a.requester || defaultUser,
       requestType: 'ค่าเบี้ยเลี้ยง',
+      typeId: a.typeId,
       requestDetail: a.items[0]?.description || 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน',
       amount: a.items.reduce((sum, i) => sum + i.amount, 0),
       status: this.mapStatus(a.status)
@@ -102,6 +104,7 @@ export class ApprovalsComponent implements OnInit {
       requestDate: t.createDate,
       requestBy: t.requester || defaultUser,
       requestType: 'ค่าแท็กซี่',
+      typeId: t.typeId,
       requestDetail: t.items[0]?.desc || 'เบิกค่าเดินทางไปพบลูกค้า',
       amount: t.items.reduce((sum, i) => sum + i.amount, 0),
       status: this.mapStatus(t.status)
@@ -112,6 +115,7 @@ export class ApprovalsComponent implements OnInit {
       requestDate: v.createDate,
       requestBy: v.requester || defaultUser,
       requestType: 'ค่ารถ',
+      typeId: v.typeId,
       requestDetail: v.items[0]?.desc || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
       amount: v.items.reduce((sum, i) => sum + i.amount, 0),
       status: this.mapStatus(v.status)
@@ -163,10 +167,17 @@ export class ApprovalsComponent implements OnInit {
           this.currentDetailItems.set(data.items as UnifiedItem[]);
         }
       });
-    } else {
-      // ค่ารถ / แท็กซี่
+    } else if (item.requestType === 'ค่าแท็กซี่') {
       this.currentDetailType.set('taxi');
       this.vehicleService.getTaxiRequestById(item.requestNo).subscribe(data => {
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+        }
+      });
+    } else {
+      // ค่ารถ
+      this.currentDetailType.set('vehicle');
+      this.vehicleService.getRequestById(item.requestNo).subscribe(data => {
         if (data) {
           this.currentDetailItems.set(data.items as UnifiedItem[]);
         }

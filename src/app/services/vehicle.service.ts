@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, combineLatest } from 'rxjs';
 import { delay, tap, map } from 'rxjs/operators';
 
+export const WELFARE_TYPES = {
+    ALLOWANCE: 1,
+    TRANSPORT: 2,
+    TAXI: 3
+};
+
 export interface RequestItem {
     date: string; // dd/MM/yyyy
     desc: string;
@@ -18,6 +24,7 @@ export interface Requester {
 
 export interface VehicleRequest {
     id: string; // e.g. 2701#001
+    typeId: number;
     createDate: string; // yyyy-MM-dd
     status: string;
     items: RequestItem[];
@@ -46,6 +53,7 @@ export interface TaxiItem {
 
 export interface TaxiRequest {
     id: string; // 2701#xxx
+    typeId: number;
     createDate: string; // dd/MM/yyyy
     status: string;
     items: TaxiItem[];
@@ -65,6 +73,7 @@ export interface AllowanceItem {
 
 export interface AllowanceRequest {
     id: string; // 2701#xxx
+    typeId: number;
     createDate: string;
     status: string;
     items: AllowanceItem[];
@@ -91,7 +100,7 @@ export class VehicleService {
     // --- ส่วนสร้างข้อมูลจำลอง ---
 
     private getRandomStatus(): string {
-        const statuses = ['รอตรวจสอบ', 'รอตรวจสอบ', 'อนุมัติ', 'อนุมัติ', 'ต้นสังกัดอนุมัติ', 'ไม่อนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
+        const statuses = ['รอตรวจสอบ', 'รอตรวจสอบ', 'รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
         return statuses[Math.floor(Math.random() * statuses.length)];
     }
 
@@ -133,12 +142,14 @@ export class VehicleService {
             const dateStr = this.getRandomDateInPast3Months();
             reqs.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
+                typeId: WELFARE_TYPES.TRANSPORT,
                 createDate: dateStr,
                 status: this.getRandomStatus(),
                 requester: this.getRandomRequester(),
                 items: [
                     { date: '2026-01-01', desc: 'Mock Item 1', amount: 150 },
-                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150 }
+                    { date: '2026-01-02', desc: 'Mock Item 2', amount: 150 },
+                    { date: '2026-01-03', desc: 'Mock Item 3', amount: 150 }
                 ]
             });
         }
@@ -154,6 +165,7 @@ export class VehicleService {
 
             reqs.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
+                typeId: WELFARE_TYPES.TAXI,
                 createDate: dateStr,
                 status: this.getRandomStatus(),
                 requester: this.getRandomRequester(),
@@ -172,6 +184,7 @@ export class VehicleService {
             const dateStr = this.getRandomDateInPast3Months();
             reqs.push({
                 id: `2701#${String(i).padStart(3, '0')}`,
+                typeId: WELFARE_TYPES.ALLOWANCE,
                 createDate: dateStr,
                 status: this.getRandomStatus(),
                 requester: this.getRandomRequester(),
