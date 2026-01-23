@@ -16,6 +16,33 @@
             </div>
         </div>
 
+        <div class="approval-progress-bar">
+            <div class="progress-stepper">
+                <div class="stepper-points">
+                    <div class="progress-line-bg"></div>
+                    <div class="progress-line-fill" [style.width.%]="(currentStepIndex() / (steps.length - 1)) * 100">
+                    </div>
+
+                    @for (step of steps; track step.id) {
+                    <div class="progress-step" [class.completed]="currentStepIndex() >= step.id"
+                        [class.active]="currentStepIndex() === step.id - 1"
+                        [class.rejected]="currentStepIndex() === -1">
+
+                        <div class="step-icon-circle">
+                            @if (currentStepIndex() >= step.id) {
+                            <i class="fas fa-check"></i>
+                            } @else {
+                            <i [class]="step.icon"></i>
+                            }
+                        </div>
+
+                        <div class="step-label">{{ step.label }}</div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
         <div class="modal-layout-body">
             <div class="main-panel">
                 <div class="summary-cards-grid">

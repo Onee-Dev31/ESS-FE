@@ -1,4 +1,5 @@
 import { Component, computed, signal, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
@@ -20,6 +21,11 @@ import {
 })
 export class VehicleTaxiComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  private router = inject(Router);
+
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
   protected readonly Math = Math;
 
   filterStartDate = signal<string>('');

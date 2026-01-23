@@ -54,6 +54,28 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   currentDetailItems = signal<UnifiedItem[]>([]);
   currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
+  detailedStatus = signal<string>('');
+
+  steps = [
+    { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
+    { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
+    { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
+    { label: 'ผู้บริหารอนุมัติ', id: 4, icon: 'fas fa-user-tie' },
+    { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
+  ];
+
+  currentStepIndex = computed(() => {
+    const status = this.detailedStatus();
+    if (!status) return 0;
+
+    // Mapping logic for stepper
+    if (status === 'คำขอใหม่') return 1;
+    if (status === 'ตรวจสอบแล้ว') return 2;
+    if (status === 'อยู่ระหว่างการอนุมัติ') return 3;
+    if (status === 'อนุมัติแล้ว') return 5;
+    if (status === 'ไม่อนุมัติ') return -1;
+    return 1;
+  });
 
   isPreviewModalOpen = signal(false);
   previewFiles = signal<any[]>([]);
@@ -84,17 +106,26 @@ export class ApprovalDetailModalComponent implements OnInit {
     if (item.requestType === 'ค่าเบี้ยเลี้ยง') {
       this.currentDetailType.set('allowance');
       this.vehicleService.getAllowanceRequestById(item.requestNo).subscribe(data => {
-        if (data) this.currentDetailItems.set(data.items as UnifiedItem[]);
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+          this.detailedStatus.set(data.status);
+        }
       });
     } else if (item.requestType === 'ค่าแท็กซี่') {
       this.currentDetailType.set('taxi');
       this.vehicleService.getTaxiRequestById(item.requestNo).subscribe(data => {
-        if (data) this.currentDetailItems.set(data.items as UnifiedItem[]);
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+          this.detailedStatus.set(data.status);
+        }
       });
     } else {
       this.currentDetailType.set('vehicle');
       this.vehicleService.getRequestById(item.requestNo).subscribe(data => {
-        if (data) this.currentDetailItems.set(data.items as UnifiedItem[]);
+        if (data) {
+          this.currentDetailItems.set(data.items as UnifiedItem[]);
+          this.detailedStatus.set(data.status);
+        }
       });
     }
   }

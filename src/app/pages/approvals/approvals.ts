@@ -1,4 +1,5 @@
 import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleService, VehicleRequest, TaxiRequest, AllowanceRequest } from '../../services/vehicle.service';
@@ -23,6 +24,7 @@ import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/mod
 })
 export class ApprovalsComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  private router = inject(Router);
   protected readonly Math = Math;
 
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
@@ -225,5 +227,7 @@ export class ApprovalsComponent implements OnInit {
     this.refresh();
   }
 
-
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
@@ -19,6 +20,11 @@ import {
 })
 export class VehicleComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  private router = inject(Router);
+
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
   protected readonly Math = Math;
 
   isModalOpen: boolean = false;

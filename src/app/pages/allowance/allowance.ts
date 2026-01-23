@@ -1,4 +1,5 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
@@ -27,6 +28,11 @@ interface FlatAllowanceRow extends AllowanceItem {
 })
 export class AllowanceComponent implements OnInit {
   private vehicleService = inject(VehicleService);
+  private router = inject(Router);
+
+  goBack() {
+    this.router.navigate(['/dashboard']);
+  }
   protected readonly Math = Math;
 
   isModalOpen = false;

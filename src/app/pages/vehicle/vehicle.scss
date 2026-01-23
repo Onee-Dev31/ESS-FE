@@ -36,6 +36,31 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     padding: 15px 20px;
     border-radius: 4px;
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .btn-back {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #ced4da;
+      background: #fff;
+      color: #003e6d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+
+      &:hover {
+        background: #003e6d;
+        color: #fff;
+        border-color: #003e6d;
+        transform: translateX(-3px);
+      }
+    }
 
     h2 {
       margin: 0;

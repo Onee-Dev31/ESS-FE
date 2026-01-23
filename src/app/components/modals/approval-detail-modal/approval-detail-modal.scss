@@ -89,6 +89,159 @@ $bg-slate: #f4f7f9;
             }
         }
 
+        .approval-progress-bar {
+            padding: 3rem 2rem 2.5rem;
+            background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
+            border-bottom: 1px solid #e2e8f0;
+
+            .progress-stepper {
+                max-width: 800px;
+                margin: 0 auto;
+
+                .stepper-points {
+                    position: relative;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+
+                    // Background line - connects all circles
+                    .progress-line-bg {
+                        position: absolute;
+                        top: 24px; // Half of 48px circle
+                        left: 24px; // Half of 48px circle
+                        right: 24px; // Half of 48px circle
+                        height: 4px;
+                        background: #e2e8f0;
+                        border-radius: 2px;
+                        z-index: 0;
+                    }
+
+                    // Animated fill line
+                    .progress-line-fill {
+                        position: absolute;
+                        top: 24px;
+                        left: 24px;
+                        height: 4px;
+                        background: linear-gradient(90deg, #74c34d 0%, #5bb030 100%);
+                        border-radius: 2px;
+                        z-index: 1;
+                        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+                        box-shadow: 0 0 8px rgba(116, 195, 77, 0.3);
+                        max-width: calc(100% - 48px); // Prevent extending beyond last circle
+                    }
+
+                    .progress-step {
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        flex: 1;
+                        z-index: 2;
+
+                        .step-icon-circle {
+                            width: 48px;
+                            height: 48px;
+                            border-radius: 50%;
+                            background: white;
+                            border: 3px solid #cbd5e1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 18px;
+                            color: #94a3b8;
+                            margin-bottom: 12px;
+                            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                            position: relative;
+
+                            i {
+                                transition: all 0.3s ease;
+                            }
+                        }
+
+                        .step-label {
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #64748b;
+                            text-align: center;
+                            max-width: 110px;
+                            line-height: 1.4;
+                            transition: all 0.3s ease;
+                        }
+
+                        // Completed state
+                        &.completed {
+                            .step-icon-circle {
+                                background: linear-gradient(135deg, #74c34d 0%, #5bb030 100%);
+                                border-color: #5bb030;
+                                color: white;
+                                box-shadow: 0 6px 16px rgba(116, 195, 77, 0.35);
+                                transform: scale(1.05);
+                            }
+
+                            .step-label {
+                                color: #1e293b;
+                                font-weight: 700;
+                            }
+                        }
+
+                        // Active state
+                        &.active {
+                            .step-icon-circle {
+                                background: white;
+                                border-color: $primary-blue;
+                                border-width: 4px;
+                                color: $primary-blue;
+                                transform: scale(1.2);
+                                box-shadow: 0 8px 24px rgba(0, 142, 188, 0.25),
+                                    0 0 0 8px rgba(0, 142, 188, 0.1);
+                                animation: pulse-active 2s ease-in-out infinite;
+
+                                i {
+                                    transform: scale(1.1);
+                                }
+                            }
+
+                            .step-label {
+                                color: $primary-blue;
+                                font-weight: 800;
+                                transform: translateY(5px);
+                            }
+                        }
+
+                        // Rejected state
+                        &.rejected {
+                            .step-icon-circle {
+                                background: linear-gradient(135deg, $primary-red 0%, #dc2626 100%);
+                                border-color: #dc2626;
+                                color: white;
+                                box-shadow: 0 6px 16px rgba(244, 91, 91, 0.35);
+                            }
+
+                            .step-label {
+                                color: $primary-red;
+                                font-weight: 700;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @keyframes pulse-active {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 24px rgba(0, 142, 188, 0.25),
+                    0 0 0 8px rgba(0, 142, 188, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 8px 24px rgba(0, 142, 188, 0.35),
+                    0 0 0 12px rgba(0, 142, 188, 0.15);
+            }
+        }
+
         .modal-layout-body {
             display: flex;
             flex-direction: column;
@@ -487,6 +640,63 @@ $bg-slate: #f4f7f9;
 
     i {
         pointer-events: none;
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-border {
+    0% {
+        transform: scale(1);
+        opacity: 0.2;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.2;
+    }
+}
+
+@keyframes rotate-ring {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-4px);
+    }
+
+    40%,
+    80% {
+        transform: translateX(4px);
     }
 }
 
