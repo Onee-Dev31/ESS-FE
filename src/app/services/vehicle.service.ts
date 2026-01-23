@@ -100,7 +100,9 @@ export class VehicleService {
     private taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>(this.taxiRequestsMock);
     private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>(this.allowanceRequestsMock);
 
-    // --- ส่วนสร้างข้อมูลจำลอง ---
+    // ==========================================
+    // Mock Data Generation
+    // ==========================================
 
     private getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
         let statuses: string[] = [];

@@ -136,8 +136,6 @@ export class VehicleTaxiComponent implements OnInit {
     });
   }
 
-  onSearch() {
-  }
 
   clearFilters() {
     this.filterStartDate.set('');

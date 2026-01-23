@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { VehicleService, VehicleRequest } from '../../services/vehicle.service';
 import {
-  ColumnDef,
   getCoreRowModel,
   getPaginationRowModel,
   createAngularTable,
@@ -117,9 +116,6 @@ export class VehicleComponent implements OnInit {
     });
   }
 
-  onSearch() {
-    // ตัวกรองเป็นแบบ Reactive (ทำงานอัตโนมัติ)
-  }
 
   clearFilters() {
     this.filterStartDate.set('');

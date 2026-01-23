@@ -6,7 +6,6 @@ $btn-search-bg: #003e6d;
 $text-header: #ffffff;
 $border-color: #e9ecef;
 $bg-page: #f8f9fa;
-
 $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 @mixin mobile {
@@ -93,29 +92,31 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       gap: 12px;
     }
 
-    .btn-create {
-      background-color: $btn-create-bg;
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 4px;
-      font-weight: 600;
-      font-family: $font-stack;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      white-space: nowrap;
+    .left-action {
+      .btn-create {
+        background-color: $btn-create-bg;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-family: $font-stack;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
 
-      &:hover {
-        background-color: color.adjust($btn-create-bg, $lightness: -5%);
-      }
+        &:hover {
+          background-color: color.adjust($btn-create-bg, $lightness: -5%);
+        }
 
-      @include mobile {
-        width: 100%;
-        padding: 12px;
-        order: 2;
+        @include mobile {
+          width: 100%;
+          padding: 12px;
+          order: 2;
+        }
       }
     }
 
@@ -137,6 +138,33 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         order: 1;
       }
 
+      .select-input-group {
+        @include mobile {
+          width: 100%;
+        }
+
+        .select-status {
+          padding: 6px 10px;
+          border: 1px solid #ced4da;
+          border-radius: 6px;
+          background-color: white;
+          font-family: $font-stack;
+          cursor: pointer;
+          min-width: 150px;
+
+          &:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+          }
+
+          @include mobile {
+            width: 100%;
+            height: 40px;
+          }
+        }
+      }
+
       .filter-label {
         font-weight: 500;
         font-size: 0.9rem;
@@ -148,8 +176,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         }
       }
 
-      .form-control,
-      .select-status {
+      .form-control {
         padding: 6px 10px;
         border: 1px solid #ced4da;
         border-radius: 4px;
@@ -157,7 +184,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 0.9rem;
         outline: none;
         font-family: $font-stack;
-        background-color: white;
 
         &:focus {
           border-color: $btn-search-bg;
@@ -165,7 +191,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
         @include mobile {
           width: 100%;
-          padding: 10px;
           height: 40px;
         }
       }
@@ -219,6 +244,144 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-top: 1px solid $border-color;
+  }
+
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+
+    thead {
+      background-color: $header-bg;
+
+      tr th {
+        color: $text-header;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 15px 12px;
+        border: none;
+        text-align: left;
+        white-space: nowrap;
+        font-family: $font-stack;
+
+        &.text-center {
+          text-align: center !important;
+        }
+
+        &.text-right {
+          text-align: right !important;
+        }
+
+        @include mobile {
+          padding: 12px 8px;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-color;
+        background-color: #fff;
+
+        td {
+          padding: 12px 12px;
+          vertical-align: middle;
+          color: #495057;
+          font-size: 0.9rem;
+          font-family: $font-stack;
+
+          @include mobile {
+            padding: 10px 8px;
+            font-size: 0.85rem;
+          }
+
+          &.text-center {
+            text-align: center !important;
+          }
+
+          &.text-right {
+            text-align: right !important;
+          }
+        }
+
+        .id-text {
+          font-weight: 700;
+          color: #0056b3;
+          font-family: $font-stack;
+        }
+
+        .action-btns {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          margin: 0 auto;
+
+          .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+
+            &.edit {
+              color: #17a2b8;
+            }
+
+            &.delete {
+              color: #dc3545;
+            }
+
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+
+        .status-badge {
+          display: inline-block;
+          padding: 5px 10px;
+          border-radius: 50px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          white-space: nowrap;
+          min-width: 100px;
+          text-align: center;
+          font-family: $font-stack;
+
+          @include mobile {
+            min-width: auto;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+          }
+
+          &.status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #f1b44c;
+          }
+
+          &.status-dept {
+            background-color: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+          }
+
+          &.status-hr {
+            background-color: rgba(0, 123, 255, 0.15);
+            color: #007bff;
+          }
+
+          &.status-ceo {
+            background-color: rgba(111, 66, 193, 0.15);
+            color: #6f42c1;
+          }
+
+          &.status-success {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+          }
+        }
+      }
+    }
   }
 
   .pagination-container {
@@ -310,204 +473,68 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     }
   }
 
-  .modern-table {
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    border-collapse: collapse;
-    min-width: 900px;
-
-    thead {
-      background-color: $header-bg;
-
-      tr th {
-        color: $text-header;
-        font-weight: 600;
-        font-size: 0.85rem;
-        padding: 15px 12px;
-        border: none;
-        text-align: center;
-        white-space: nowrap;
-        font-family: $font-stack;
-
-        @include mobile {
-          padding: 12px 8px;
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        border-bottom: 1px solid $border-color;
-        background-color: #fff;
-
-        td {
-          padding: 12px 12px;
-          vertical-align: middle;
-          color: #495057;
-          font-size: 0.9rem;
-          font-family: $font-stack;
-          word-break: break-word;
-
-          @include mobile {
-            padding: 10px 8px;
-          }
-
-          &.top-align {
-            vertical-align: top;
-          }
-
-          &.text-center {
-            text-align: center;
-          }
-
-          &.text-right {
-            text-align: right;
-          }
-
-          &.font-bold {
-            font-weight: 600;
-          }
-        }
-
-        .id-text {
-          font-weight: 700;
-          color: #0056b3;
-          font-family: $font-stack;
-        }
-
-        .action-btns {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 8px;
-          margin: 0 auto;
-
-          .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-
-            &.edit {
-              color: #17a2b8;
-            }
-
-            &.delete {
-              color: #dc3545;
-            }
-
-            &:hover {
-              transform: scale(1.1);
-            }
-          }
-        }
-
-        .status-badge {
-          display: inline-block;
-          padding: 5px 10px;
-          border-radius: 50px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          white-space: nowrap;
-          min-width: 100px;
-          text-align: center;
-          font-family: $font-stack;
-
-          @include mobile {
-            min-width: auto;
-            padding: 4px 8px;
-            font-size: 0.7rem;
-          }
-
-          &.status-success,
-          &.status-จ่ายแล้ว {
-            background-color: rgba(40, 167, 69, 0.15);
-            color: #28a745;
-          }
-
-          &.status-pending,
-          &.status-รอตรวจสอบ {
-            background-color: rgba(255, 193, 7, 0.15);
-            color: #f1b44c;
-          }
-
-          &.status-approved,
-          &.status-ต้นสังกัดอนุมัติ {
-            background-color: rgba(23, 162, 184, 0.15);
-            color: #17a2b8;
-          }
-
-          &.status-waiting,
-          &.status-รอจ่าย {
-            background-color: rgba(0, 123, 255, 0.15);
-            color: #007bff;
-          }
-        }
-      }
-    }
-  }
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.65);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(4px);
-
-  @include mobile {
-    padding: 0;
-    align-items: flex-end;
-  }
-
-  .modal-container {
-    background: white;
-    width: 95%;
-    max-width: 1600px;
-    max-height: 90vh;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: 9999;
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-    font-family: $font-stack;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
 
     @include mobile {
-      width: 100%;
-      height: 100%;
-      max-height: 100vh;
-      border-radius: 0;
+      padding: 0;
+      align-items: flex-end;
     }
 
-    app-allowance-form {
-      flex: 1;
-      overflow-y: auto;
+    .modal-container {
+      background: white;
+      width: 95%;
+      max-width: 1600px;
+      max-height: 90vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      font-family: $font-stack;
 
-      &::-webkit-scrollbar {
-        width: 8px;
+      @include mobile {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
       }
 
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+      app-allowance-form {
+        flex: 1;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
       }
 
-      &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-      }
-
-      &::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-      }
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 }
 

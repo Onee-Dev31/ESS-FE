@@ -19,9 +19,7 @@ export const routes: Routes = [
                 path: 'dashboard',
                 children: [
                     { path: '', component: DashboardComponent },
-                    { path: 'default', component: DashboardComponent },
-                    { path: 'cms', component: DashboardComponent },
-                    { path: 'e-commerce', component: DashboardComponent },
+                    { path: 'default', component: DashboardComponent }
                 ]
             },
 

@@ -5,7 +5,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { UserService, UserProfile } from '../../services/user.service';
@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit {
   welfareStats$!: Observable<WelfareItem[]>;
   leaveStats$!: Observable<LeaveItem[]>;
   holidays$!: Observable<HolidayItem[]>;
-  pendingCount$!: Observable<number>;   
+  pendingCount$!: Observable<number>;
 
   // ข้อมูลจำลอง (Static)
   profileList: ProfileItem[] = [];
@@ -139,7 +139,6 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-  constructor() { }
 
   ngOnInit() {
     this.userProfile$ = this.userService.getUserProfile();
@@ -179,9 +178,5 @@ export class DashboardComponent implements OnInit {
     if (path) {
       this.router.navigate([path]);
     }
-  }
-
-  logout() {
-    this.router.navigate(['/login']);
   }
 }

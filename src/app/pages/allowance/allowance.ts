@@ -148,10 +148,6 @@ export class AllowanceComponent implements OnInit {
     }
   }
   closeModal() { this.isModalOpen = false; }
-  onSearch() {
-    // ฟังก์ชันค้นหา (ข้อมูลจะถูก filter ผ่าน computed signal)
-  }
-
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
@@ -173,7 +169,7 @@ export class AllowanceComponent implements OnInit {
     };
   }
 
-  getStatusClass(status: string): string {
+  public getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
       'รอตรวจสอบ': 'status-pending',
       'ต้นสังกัดอนุมัติ': 'status-approved',

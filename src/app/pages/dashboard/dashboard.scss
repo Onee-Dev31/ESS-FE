@@ -131,16 +131,15 @@ body {
       display: contents;
     }
 
-    grid-template-areas:
-      'avatar'
-      'profile'
-      'attendance'
-      'performance'
-      'it-story'
-      'medical'
-      'welfare'
-      'leave'
-      'schedule';
+    grid-template-areas: 'avatar'
+    'profile'
+    'attendance'
+    'performance'
+    'it-story'
+    'medical'
+    'welfare'
+    'leave'
+    'schedule';
 
     .banner-avatar-section {
       grid-area: avatar;
@@ -194,7 +193,7 @@ body {
       grid-column: 2;
       display: flex;
       flex-direction: column;
-      padding-left: 10px; // เพิ่มระยะห่างเล็กน้อย
+      padding-left: 10px;
     }
 
     .banner-avatar-section,
@@ -220,11 +219,7 @@ body {
 }
 
 .banner-avatar-section {
-  background: linear-gradient(
-    135deg,
-    $primary,
-    color.adjust($primary, $lightness: -10%)
-  ) !important;
+  background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%));
   border-radius: $radius-lg;
   padding: 20px;
   display: flex;
@@ -233,10 +228,8 @@ body {
   box-shadow: $shadow;
   position: relative;
   width: 100%;
-  height: auto;
   min-height: 200px;
   @include smooth-corners;
-  overflow: hidden;
 
   @media (min-width: 1200px) {
     min-height: 250px;
@@ -317,18 +310,13 @@ body {
 }
 
 .profile-card {
-  background: linear-gradient(
-    135deg,
-    $primary,
-    color.adjust($primary, $lightness: -10%)
-  ) !important;
-  color: white !important;
-  border-radius: $radius-lg !important;
+  background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%));
+  color: white;
+  border-radius: $radius-lg;
   box-shadow: $shadow;
   border: none;
   width: 100%;
   position: relative;
-  height: auto;
   overflow: hidden;
   padding: 20px;
 
@@ -337,7 +325,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: auto;
   }
 
   @media (min-width: 1200px) {
@@ -346,7 +333,7 @@ body {
   }
 
   @media (min-width: 1400px) {
-    padding: 30px 60px; // Reduced from 80px to be safer
+    padding: 30px 60px;
   }
 
   &::before {
@@ -397,7 +384,6 @@ body {
   }
 
   .card-body.profile-layout {
-    padding: 0 !important;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -440,7 +426,6 @@ body {
         line-height: 1.5;
         padding: 4px 12px;
         margin-bottom: 12px;
-        margin-top: 0 !important;
       }
 
       .user-name {
@@ -456,7 +441,7 @@ body {
 
       .user-role,
       .user-meta {
-        font-size: 13px !important;
+        font-size: 13px;
         color: rgba(255, 255, 255, 0.9);
         margin-bottom: 4px;
         font-weight: 500;
@@ -478,8 +463,6 @@ body {
       @media (min-width: 1200px) {
         border-left: 1px solid rgba(255, 255, 255, 0.2);
         padding-left: 40px;
-        padding-top: 4px;
-        margin-top: 0 !important;
       }
 
       @media (min-width: 1400px) {
@@ -491,39 +474,21 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
-        font-size: 14px !important;
-        margin-top: 0 !important;
+        font-size: 14px;
 
         @media (min-width: 1200px) {
           flex-direction: row;
           gap: 15px;
         }
 
-        @media (max-width: 576px) {
-          flex-wrap: wrap;
-          gap: 4px;
-        }
-
         .display-label {
-          flex: 0 0 120px;
-          color: rgba(255, 255, 255, 0.75);
-          font-weight: 500;
-          margin: 0;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          height: 100%;
-          line-height: 1.4;
-
           flex: 0 0 auto;
           color: rgba(255, 255, 255, 0.6);
           font-size: 12px;
           font-weight: 500;
-          margin: 0;
           display: flex;
           align-items: center;
           gap: 8px;
-          height: auto;
           line-height: 1.4;
 
           @media (min-width: 1200px) {
@@ -558,7 +523,7 @@ body {
   flex-direction: column;
   border: none;
   position: relative;
-  overflow: visible !important;
+  overflow: visible;
   width: 100%;
 
   .card-header {
@@ -597,10 +562,6 @@ body {
       padding: 12px 24px;
     }
   }
-
-  &:hover {
-    z-index: 5;
-  }
 }
 
 .it-story-card {
@@ -608,7 +569,6 @@ body {
     background: #fafafa;
     border-radius: 12px 12px 0 0;
     padding: 15px 20px;
-    margin-bottom: 0;
   }
 
   .card-body {
@@ -621,8 +581,6 @@ body {
     padding-bottom: 15px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-start;
     gap: 5px;
 
     &:last-child {
@@ -640,12 +598,8 @@ body {
       font-size: 13px;
       color: $dark;
       font-weight: 600;
-      text-align: left;
-      width: 100%;
-      white-space: normal;
-      word-break: break-word;
-      overflow-wrap: break-word;
       line-height: 1.5;
+      word-break: break-word;
     }
   }
 }
@@ -704,7 +658,6 @@ body {
   box-shadow: $shadow;
   margin-bottom: 25px;
   border: none;
-  overflow: visible !important;
   padding: 15px;
 
   @media (min-width: 768px) {
@@ -730,7 +683,6 @@ body {
     display: grid;
     gap: 15px;
     grid-template-columns: repeat(2, 1fr);
-    align-items: stretch;
 
     @media (min-width: 1441px) {
       grid-template-columns: repeat(4, 1fr);
@@ -741,7 +693,6 @@ body {
     }
 
     @media (max-width: 480px) {
-      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
 
@@ -754,11 +705,11 @@ body {
     background: #fafafa;
     border-radius: 0 0 $radius $radius;
     padding: 12px 15px;
-    margin: -15px -15px -15px -15px;
+    margin: 15px -15px -15px -15px;
 
     @media (min-width: 768px) {
       padding: 12px 24px;
-      margin: -24px -24px -24px -24px;
+      margin: 24px -24px -24px -24px;
     }
   }
 }
@@ -777,34 +728,28 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    flex-wrap: nowrap;
 
     .stat-title {
       font-size: 14px;
+      font-weight: 600;
+      color: $dark;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       @media (min-width: 768px) {
         font-size: 15px;
       }
-
-      font-weight: 600;
-      color: $dark;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
     }
 
     .stat-limit {
       font-size: 11px;
+      color: $muted;
+      white-space: nowrap;
 
       @media (min-width: 768px) {
         font-size: 13px;
       }
-
-      color: $muted;
-      font-weight: 400;
-      white-space: nowrap;
-      flex-shrink: 0;
     }
   }
 
@@ -818,7 +763,6 @@ body {
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-end;
-      gap: 10px;
     }
 
     .stat-data-group {
@@ -836,16 +780,13 @@ body {
         font-size: 11px;
         color: $muted;
         font-weight: 500;
-        white-space: nowrap;
       }
 
       .inline-value {
         font-size: 16px;
         font-weight: 700;
-        line-height: 1;
-        font-family: 'Inter', sans-serif;
         color: #334155;
-        white-space: nowrap;
+        font-family: 'Inter', sans-serif;
 
         &.bold-value {
           font-size: 18px;
@@ -888,15 +829,12 @@ body {
 }
 
 .mini-stat-card {
-  position: relative;
   min-height: 100px;
   cursor: pointer;
   border: none;
   background: white;
   border-radius: $radius;
   box-shadow: $shadow;
-  overflow: visible !important;
-  transform-style: preserve-3d;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover {
@@ -929,14 +867,10 @@ body {
     min-width: 0;
 
     h6 {
-      margin: 0;
+      margin: 0 0 4px;
       font-size: 13px;
       font-weight: 500;
       color: $muted;
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: visible; // Allow tooltip to show
-      text-overflow: clip; // Ellipsis moves to child span
       display: flex;
       align-items: center;
       gap: 5px;
@@ -945,49 +879,7 @@ body {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        flex: 0 1 auto; // Stay close to tooltip
-      }
-
-      .tooltip-container {
-        position: relative;
-        display: inline-block;
-
-        &:focus .tooltip-text,
-        &:hover .tooltip-text {
-          opacity: 1;
-          visibility: visible;
-        }
-
-        .tooltip-text {
-          visibility: hidden;
-          width: 200px;
-          background-color: #333;
-          color: #fff;
-          text-align: left;
-          border-radius: 6px;
-          padding: 8px;
-          position: absolute;
-          z-index: 999;
-          bottom: 125%;
-          left: 50%;
-          transform: translateX(-50%);
-          opacity: 0;
-          transition: opacity 0.3s;
-          font-size: 12px;
-          line-height: 1.4;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-          &::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-          }
-        }
+        flex: 0 1 auto;
       }
     }
 
@@ -1007,521 +899,6 @@ body {
   }
 }
 
-// --- Leave Section Specifics ---
-.leave-section {
-  .leave-stats-grid {
-    margin-bottom: 20px;
-  }
-
-  .leave-card {
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.2s;
-    cursor: default;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-
-    &.theme-blue {
-      .leave-icon {
-        background: #eff6ff;
-      }
-    }
-
-    &.theme-green {
-      .leave-icon {
-        background: #f0fdf4;
-      }
-    }
-
-    &.theme-orange {
-      .leave-icon {
-        background: #fff7ed;
-      }
-    }
-
-    &.theme-purple {
-      .leave-icon {
-        background: #faf5ff;
-      }
-    }
-
-    &.theme-red {
-      .leave-icon {
-        background: #fef2f2;
-      }
-    }
-
-    .leave-body {
-      padding: 15px;
-    }
-
-    .leave-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-
-      .leave-count {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1;
-      }
-
-      .leave-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-      }
-    }
-
-    .leave-label {
-      margin: 0;
-      font-size: 14px;
-      color: $muted;
-      font-weight: 500;
-    }
-
-    .leave-footer {
-      padding: 10px 15px;
-      background: #fafafa;
-      border-top: 1px solid #f1f5f9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: $muted;
-      font-weight: 500;
-
-      i {
-        font-size: 10px;
-      }
-    }
-  }
-}
-
-// --- Schedule Section ---
-.schedule-section {
-  .schedule-card {
-    padding: 0;
-    overflow: hidden;
-
-    .schedule-body {
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-
-      @media (min-width: 992px) {
-        flex-direction: row;
-      }
-    }
-
-    .holiday-list-panel {
-      padding: 20px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-
-      @media (min-width: 992px) {
-        width: 300px;
-        flex-shrink: 0;
-        border-bottom: none;
-        border-right: 1px solid #e2e8f0;
-      }
-
-      .panel-title {
-        margin: 0 0 15px;
-        font-size: 15px;
-        font-weight: 700;
-      }
-
-      .holiday-list {
-        max-height: 300px;
-        overflow-y: auto;
-        padding-right: 5px;
-
-        // Custom scrollbar
-        &::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 4px;
-        }
-
-        .holiday-item {
-          display: flex;
-          align-items: flex-start;
-          margin-bottom: 12px;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 6px;
-            margin-right: 10px;
-            flex-shrink: 0;
-
-            &.dot-green {
-              background: $success;
-            }
-          }
-
-          .holiday-info {
-            display: flex;
-            flex-direction: column;
-
-            .h-date {
-              font-size: 13px;
-              font-weight: 600;
-              color: $dark;
-            }
-
-            .h-name {
-              font-size: 12px;
-              color: $muted;
-            }
-          }
-        }
-      }
-    }
-
-    .calendar-panel {
-      flex: 1;
-      padding: 20px;
-      min-height: 400px;
-    }
-
-    .schedule-footer {
-      padding: 15px 20px;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      background: white;
-
-      .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: $muted;
-
-        .legend-box {
-          width: 12px;
-          height: 12px;
-          border-radius: 3px;
-
-          &.box-gray {
-            background: #e2e8f0;
-          }
-
-          // Normal
-          &.box-red {
-            background: #fee2e2;
-            border: 1px solid #ef4444;
-          }
-
-          // Weekend/Off
-          &.box-green {
-            background: #dcfce7;
-            border: 1px solid #22c55e;
-          }
-
-          // Holiday
-          &.box-orange {
-            background: #ffedd5;
-            border: 1px solid #f97316;
-          }
-
-          // Leave
-          &.box-blue {
-            background: #eff6ff;
-            border: 1px solid #3b82f6;
-          }
-
-          // Shutdown (custom)
-        }
-      }
-    }
-  }
-}
-
-/* --- FullCalendar Overrides --- */
-::ng-deep {
-  .fc {
-    font-family: inherit;
-    --fc-border-color: #e2e8f0;
-    --fc-today-bg-color: transparent;
-
-    .fc-toolbar-title {
-      font-size: 16px !important;
-      font-weight: 700;
-    }
-
-    .fc-button-primary {
-      background-color: white;
-      color: $dark;
-      border: 1px solid #ced4da;
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: capitalize;
-      box-shadow: none !important;
-
-      &:hover {
-        background-color: #f8fafc;
-        border-color: #cbd5e1;
-        color: $dark;
-      }
-
-      &:focus {
-        box-shadow: none !important;
-      }
-    }
-
-    .fc-col-header-cell-cushion {
-      font-size: 12px;
-      font-weight: 600;
-      color: $muted;
-      padding: 8px 0;
-    }
-
-    .fc-daygrid-day-frame {
-      min-height: 80px;
-    }
-
-    .fc-daygrid-day {
-      &.fc-day-today {
-        background-color: transparent !important;
-
-        .date-cell-custom .date-circle {
-          background-color: $primary;
-          color: white;
-          border-color: $primary;
-        }
-      }
-    }
-  }
-}
-
-.date-cell-custom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-
-  .date-circle {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 2px;
-    border: 1px solid transparent;
-
-    &.circle-green-outline {
-      border-color: $success;
-      color: $success;
-      background: #f0fdf4;
-    }
-
-    &.circle-red-outline {
-      color: $danger;
-    }
-
-    &.circle-orange-outline {
-      border-color: $warning;
-      color: $warning;
-      background: #fff7ed;
-    }
-  }
-
-  .date-code {
-    font-size: 10px;
-    font-weight: 600;
-    line-height: 1;
-  }
-
-  .date-note {
-    font-size: 9px;
-    margin-top: 1px;
-    text-align: center;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
-}
-
-// ... existing code ...
-
-.section-header-flex {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  margin-bottom: 15px;
-  padding-right: 10px;
-
-  .section-title,
-  .stats-group-header {
-    margin-bottom: 0 !important;
-  }
-
-  .btn-pending-approvals {
-    // --- สไตล์สถานะปกติ ---
-    background: #fbe1fb; // พื้นม่วงอ่อน
-    border: 1.5px solid #800080; // ขอบม่วงเข้ม
-    color: #800080; // ตัวอักษรมม่วงเข้ม
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-    transition: all 0.25s ease;
-    animation: purpleGlow 2s infinite;
-
-    // --- สไตล์เมื่อ Hover (เปลี่ยนสีทั้งหมด) ---
-    &:hover {
-      background: #800080; // พื้นหลังเปลี่ยนเป็นม่วงเข้ม
-      color: #ffffff; // ตัวอักษรเปลี่ยนเป็นสีขาว
-      border-color: #800080; // ขอบคงเดิม
-      animation: none; // หยุด Glow เมื่อชี้
-
-      .icon-shake i {
-        color: #ffffff; // ไอคอนระฆังเปลี่ยนเป็นสีขาว
-        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
-      }
-
-      .notification-badge {
-        border-color: #800080; // ขอบตัวเลขกลืนไปกับพื้นหลังปุ่ม
-      }
-    }
-
-    // --- ส่วนประกอบภายใน ---
-    .icon-shake {
-      position: relative;
-      display: flex;
-      align-items: center;
-
-      i {
-        font-size: 16px;
-        color: #800080; // สีระฆังปกติเป็นม่วงเข้ม
-        animation: bellShake 1.5s infinite;
-        transform-origin: top center;
-        transition: color 0.25s ease;
-      }
-
-      .notification-badge {
-        position: absolute;
-        top: -7px;
-        right: -7px;
-        min-width: 15px;
-        height: 15px;
-        background: #cc0000; // สี Badge แจ้งเตือน (แดงเพื่อให้เด่น)
-        color: white;
-        border-radius: 50%;
-        border: 2px solid white;
-        font-size: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 4px;
-        font-weight: 800;
-        animation: pulseCriticalRed 1.5s infinite;
-      }
-    }
-  }
-}
-
-@keyframes pulseCriticalRed {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
-  }
-
-  70% {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 8px rgba(229, 62, 62, 0);
-  }
-
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
-  }
-}
-
-@keyframes redButtonGlow {
-  0% {
-    box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 16px rgba(254, 178, 178, 0.6);
-  }
-
-  100% {
-    box-shadow: 0 0 8px rgba(254, 178, 178, 0.3);
-  }
-}
-
-@keyframes bellShake {
-  0% {
-    transform: rotate(0);
-  }
-
-  10% {
-    transform: rotate(15deg);
-  }
-
-  20% {
-    transform: rotate(-15deg);
-  }
-
-  30% {
-    transform: rotate(10deg);
-  }
-
-  40% {
-    transform: rotate(-10deg);
-  }
-
-  50% {
-    transform: rotate(5deg);
-  }
-
-  60% {
-    transform: rotate(-5deg);
-  }
-
-  70% {
-    transform: rotate(0);
-  }
-
-  100% {
-    transform: rotate(0);
-  }
-}
-
 .leave-card {
   border: none;
   display: flex;
@@ -1532,7 +909,6 @@ body {
   border-radius: $radius;
   box-shadow: $shadow;
   transition: transform 0.2s;
-  overflow: visible !important;
 
   &:hover {
     transform: translateY(-3px);
@@ -1588,38 +964,36 @@ body {
     'green': #22c55e,
     'purple': #4650dd,
     'blue': #3b82f6,
-    'pink': #ef4444,
+    'pink': #ef4444
   );
 
-  @each $name, $color in $leave-themes {
-    &.theme-#{$name} {
-      .leave-count {
-        color: $color;
-      }
+@each $name, $color in $leave-themes {
+  &.theme-#{$name} {
+    .leave-count {
+      color: $color;
+    }
 
-      .leave-icon {
-        color: $color;
-        background: rgba($color, 0.1);
-      }
+    .leave-icon {
+      color: $color;
+      background: rgba($color, 0.1);
+    }
 
-      .leave-footer {
-        background: rgba($color, 0.08);
-        color: $color;
-      }
+    .leave-footer {
+      background: rgba($color, 0.08);
+      color: $color;
     }
   }
+}
+}
 
+.schedule-section {
   .schedule-card {
     margin-top: 20px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
 
     .schedule-body {
       display: flex;
       flex-direction: column;
-      width: 100%;
 
       @media (min-width: 1024px) {
         flex-direction: row;
@@ -1679,15 +1053,10 @@ body {
   }
 
   .calendar-panel {
-    flex-grow: 1;
-    flex-basis: 0;
-    max-width: 100%;
-    width: 100%;
+    flex: 1;
     padding: 15px;
     background: white;
     min-height: 400px;
-    position: relative;
-    overflow-x: auto;
 
     @media (min-width: 768px) {
       padding: 25px;
@@ -1726,7 +1095,6 @@ body {
       width: 12px;
       height: 12px;
       border-radius: 3px;
-      display: inline-block;
       margin-right: 6px;
     }
 
@@ -1750,626 +1118,506 @@ body {
       background: #3b82f6;
     }
   }
+}
 
-  .tooltip-container {
-    position: relative;
-    display: inline-block;
-    margin-left: 5px;
-    cursor: help;
-    z-index: 101;
+::ng-deep {
+  .fc {
+    font-family: inherit;
+    --fc-border-color: #e2e8f0;
+    --fc-today-bg-color: transparent;
 
-    &:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-  }
-
-  .tooltip-text {
-    visibility: hidden;
-    width: max-content;
-    max-width: 200px;
-
-    @media (min-width: 768px) {
-      max-width: 280px;
-    }
-
-    background: #333;
-    color: #fff;
-    border-radius: 6px;
-    padding: 10px;
-    position: absolute;
-    z-index: 9999;
-    bottom: 140%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: 0.2s;
-    font-size: 12px;
-    line-height: 1.4;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-    white-space: normal;
-
-    @media (max-width: 480px) {
-      left: 0;
-      transform: translateX(-10px);
-
-      &::after {
-        left: 20px;
-      }
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border: 5px solid transparent;
-      border-top-color: #333;
-    }
-  }
-
-  /* --- แก้ไขเฉพาะส่วน Attendance Card (วางทับของเดิม) --- */
-  /* --- แก้ไขเฉพาะส่วน Attendance Card --- */
-  .attendance-card {
-    border: none;
-    box-shadow: $shadow; // ใช้ตัวแปร $shadow ที่มีอยู่แล้วในไฟล์
-    border-radius: $radius-lg !important; // ใช้ $radius-lg
-    overflow: hidden;
-    background: #fff;
-    margin-bottom: 24px;
-
-    .card-header {
-      background: linear-gradient(to right, #ffffff, #f8fafc);
-      padding: 20px 24px;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-left: 4px solid $primary; // ใช้ $primary
-
-      .card-heading {
-        color: $primary;
-        font-size: 17px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-
-        i {
-          font-size: 18px;
-          opacity: 0.9;
-        }
-      }
-    }
-
-    .card-body {
-      padding: 24px;
-    }
-
-    .date-range-section {
-      margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      background: #f8fafc;
-      padding: 10px 15px;
-      border-radius: 8px;
-
-      .label-date {
-        font-size: 13px;
-        color: $muted;
-        font-weight: 500;
-      }
-
-      .value-date {
-        font-size: 16px;
-        color: $dark;
-        font-weight: 700;
-        font-family: 'Inter', sans-serif;
-      }
-    }
-
-    /* --- จุดที่แก้ไข: บังคับชิดซ้าย-ขวา --- */
-    /* --- วางโค้ดนี้ไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
-
-    .attendance-list-clean {
-      display: flex !important;
-      flex-direction: column !important;
-      width: 100% !important;
-
-      .att-clean-item {
-        display: flex !important;
-        justify-content: space-between !important; /* คำสั่งสำคัญ: ดันซ้าย-ขวา */
-        align-items: center !important;
-        width: 100% !important;
-        padding: 12px 0 !important;
-        border-bottom: 1px dashed #e2e8f0 !important;
-
-        /* ป้องกันการติดค่า float หรือ width ผิดๆ จากจุดอื่น */
-        float: none !important;
-
-        .att-label {
-          text-align: left !important;
-          margin-right: auto !important; /* เทคนิคดันตัวอื่นไปขวาสุด */
-          color: #64748b;
-          font-weight: 500;
-        }
-
-        .att-value {
-          text-align: right !important;
-          margin-left: auto !important; /* เทคนิคดันตัวเองไปขวาสุด */
-          color: #0f172a;
-          font-weight: 600;
-          flex-shrink: 0 !important;
-        }
-      }
-    }
-
-    .card-footer {
-      background: #fff;
-      border-top: 1px solid #f1f5f9;
-      padding: 16px 24px;
-    }
-  }
-
-  .performance-card {
-    border: none;
-    box-shadow: $shadow;
-    border-radius: $radius-lg !important;
-    overflow: hidden;
-
-    .card-header {
-      background: linear-gradient(to right, #ffffff, #f8fafc);
-      padding: 20px 24px;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      align-items: center;
-      border-left: 4px solid #6366f1;
-
-      .card-heading {
-        color: #6366f1;
-        font-size: 17px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-
-        i {
-          font-size: 18px;
-        }
-      }
-    }
-
-    .card-body {
-      padding: 24px;
-    }
-
-    .work-meta-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #f1f5f9;
-
-      .meta-row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        width: 100%;
-
-        .meta-label {
-          min-width: 100px;
-          font-weight: 500;
-          color: #64748b;
-          font-size: 14px;
-        }
-
-        .meta-value {
-          font-size: 15px;
-          color: $dark;
-          font-weight: 600;
-        }
-      }
-    }
-
-    .perf-subtitle {
-      font-size: 19px;
+    .fc-toolbar-title {
+      font-size: 16px !important;
       font-weight: 700;
+    }
+
+    .fc-button-primary {
+      background-color: white;
       color: $dark;
-      margin-bottom: 18px;
-      padding-bottom: 10px;
-      border-bottom: 3px solid #6366f1;
-      display: inline-block;
-    }
+      border: 1px solid #ced4da;
+      font-size: 12px;
+      font-weight: 500;
 
-    .performance-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-
-      .perf-item {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 15px;
-        padding: 12px 0;
-        border-bottom: 1px solid #f8fafc;
-        width: 100%;
-
-        &:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-
-        .perf-year {
-          color: #64748b;
-          font-weight: 500;
-          font-size: 14px;
-          text-align: right;
-        }
-
-        .perf-grade {
-          font-weight: 700;
-          color: #6366f1;
-          background: #f1f5f9;
-          padding: 4px 12px;
-          border-radius: 6px;
-          font-size: 13px;
-          border: 1px solid #e2e8f0;
-          min-width: 70px;
-          text-align: center;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 374px) {
-    .dashboard-wrapper {
-      padding: 10px;
-    }
-
-    .page-title {
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-
-    .banner-avatar-section {
-      min-height: 160px;
-      padding: 15px;
-
-      .avatar-frame {
-        width: 100px;
-        height: 100px;
-        border-width: 3px;
-      }
-
-      .edit-icon-btn {
-        width: 28px;
-        height: 28px;
-        top: 10px;
-        right: 10px;
+      &:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
       }
     }
 
-    .profile-card {
-      padding: 15px;
-
-      .card-body.profile-layout {
-        gap: 15px;
-
-        .profile-info-list {
-          padding-left: 0;
-
-          .profile-display-group {
-            flex-direction: column;
-            gap: 2px;
-            margin-bottom: 8px;
-
-            .display-label {
-              flex: 0 0 auto;
-              width: 100%;
-              font-size: 11px;
-
-              i {
-                width: 16px;
-              }
-            }
-
-            .display-value {
-              font-size: 13px;
-              padding-left: 24px;
-            }
-          }
-        }
-      }
-    }
-
-    .performance-card .card-body {
-      .work-meta-group .meta-row,
-      .performance-list .perf-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-
-        .meta-label,
-        .perf-year {
-          font-size: 12px;
-        }
-
-        .meta-value,
-        .perf-grade {
-          font-size: 14px;
-        }
-      }
-    }
-
-    .fc-toolbar {
-      flex-direction: column;
-      gap: 10px;
-
-      .fc-toolbar-chunk {
-        display: flex;
-        justify-content: center;
-      }
-    }
-  }
-
-  @media (min-width: 375px) and (max-width: 424px) {
-    .banner-avatar-section {
-      min-height: 180px;
-
-      .avatar-frame {
-        width: 130px;
-        height: 130px;
-      }
-    }
-
-    .profile-card
-      .card-body.profile-layout
-      .profile-info-list
-      .profile-display-group
-      .display-label {
-      flex: 0 0 110px;
-    }
-  }
-
-  @media (min-width: 425px) and (max-width: 767px) {
-    .profile-card
-      .card-body.profile-layout
-      .profile-info-list
-      .profile-display-group
-      .display-label {
-      flex: 0 0 130px;
-    }
-
-    .stats-grid-card .stat-items-grid,
-    .bottom-stats-grid,
-    .leave-stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 767px) {
-    .main-layout-grid {
-      gap: 16px;
-    }
-
-    .card-footer .action-btn {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .schedule-card .schedule-footer {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      justify-content: start;
-    }
-
-    .leave-card {
-      min-height: auto;
-
-      .leave-body {
-        padding: 15px;
+    .fc-daygrid-day.fc-day-today {
+      .date-cell-custom .date-circle {
+        background-color: $primary;
+        color: white;
+        border-color: $primary;
       }
     }
   }
 }
 
-/* --- วางไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
-/* FIX: ตกแต่งส่วนวันที่ และแก้รายการให้ชิดซ้าย-ขวา */
+.date-cell-custom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4px;
 
-.dashboard-wrapper .attendance-card .card-body {
-  /* 1. แต่งส่วนแสดงวันที่ */
-  .date-range-section {
-    display: flex !important;
-    justify-content: space-between !important; /* ดันซ้าย-ขวา */
-    align-items: center !important;
-    background: #f8fafc !important; /* พื้นหลังสีเทาอ่อน */
-    padding: 10px 5px !important;
-    border-radius: 8px !important;
-    margin-bottom: 20px !important;
-    border: 1px solid #f1f5f9 !important;
+  .date-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    @include flex-center;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
 
-    .label-date {
-      float: left !important;
-      margin-right: auto !important; /* ดันตัวขวาออกไป */
-      color: #64748b !important;
-      font-weight: 500 !important;
+    &.circle-green-outline {
+      border-color: $success;
+      color: $success;
+      background: #f0fdf4;
     }
 
-    .value-date {
-      float: right !important;
-      margin-left: auto !important; /* ดันตัวเองไปขวาสุด */
-      color: #4650dd !important;
-      font-weight: 700 !important;
+    &.circle-red-outline {
+      color: $danger;
+    }
+
+    &.circle-orange-outline {
+      border-color: $warning;
+      color: $warning;
+      background: #fff7ed;
     }
   }
 
-  /* 2. แก้รายการ Attendance ให้ชิดซ้าย-ขวา */
-  .attendance-list-clean {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
+  .date-code {
+    font-size: 10px;
+    font-weight: 600;
+  }
 
-    .att-clean-item {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      width: 100% !important;
-      padding: 12px 0 !important;
-      border-bottom: 1px dashed #e2e8f0 !important;
-      float: none !important;
-
-      .att-label {
-        text-align: left !important;
-        margin-right: auto !important;
-        color: #64748b !important;
-        font-size: 15px !important;
-      }
-
-      .att-value {
-        text-align: right !important;
-        margin-left: auto !important;
-        color: #0f172a !important;
-        font-weight: 600 !important;
-        font-size: 16px !important;
-      }
-    }
+  .date-note {
+    font-size: 9px;
+    margin-top: 1px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
   }
 }
-/* --- วางไว้บรรทัดสุดท้ายของไฟล์ dashboard.scss --- */
 
-/* FIX: ตกแต่ง Performance Card ให้สวยงาม */
-.dashboard-wrapper .performance-card {
-  border: none !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-  border-radius: 20px !important;
-  overflow: hidden !important;
-  background: #fff !important;
-  margin-bottom: 24px !important;
+.section-header-flex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
 
-  .card-header {
-    background: linear-gradient(to right, #ffffff, #f8fafc) !important;
-    padding: 20px 24px !important;
-    border-bottom: 1px solid #f1f5f9 !important;
+  .btn-pending-approvals {
+    background: #fbe1fb;
+    border: 1.5px solid #800080;
+    color: #800080;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    animation: purpleGlow 2s infinite;
 
-    .card-heading {
-      color: #4650dd !important; /* สีส้ม */
-      font-size: 17px !important;
-      font-weight: 700 !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      margin: 0 !important;
+    &:hover {
+      background: #800080;
+      color: #ffffff;
+      animation: none;
+
+      .icon-shake i {
+        color: #ffffff;
+      }
+    }
+
+    .icon-shake {
+      position: relative;
 
       i {
-        font-size: 18px !important;
-        opacity: 0.9 !important;
+        font-size: 16px;
+        animation: bellShake 1.5s infinite;
+        transform-origin: top center;
       }
+
+      .notification-badge {
+        position: absolute;
+        top: -7px;
+        right: -7px;
+        min-width: 15px;
+        height: 15px;
+        background: #cc0000;
+        color: white;
+        border-radius: 50%;
+        border: 2px solid white;
+        font-size: 8px;
+        @include flex-center;
+        font-weight: 800;
+        animation: pulseCriticalRed 1.5s infinite;
+      }
+    }
+  }
+}
+
+@keyframes purpleGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(128, 0, 128, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(128, 0, 128, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(128, 0, 128, 0);
+  }
+}
+
+@keyframes pulseCriticalRed {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+  }
+
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(229, 62, 62, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+  }
+}
+
+@keyframes bellShake {
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  10%,
+  30% {
+    transform: rotate(15deg);
+  }
+
+  20%,
+  40% {
+    transform: rotate(-15deg);
+  }
+
+  50% {
+    transform: rotate(5deg);
+  }
+
+  60% {
+    transform: rotate(-5deg);
+  }
+}
+
+.attendance-card {
+  border: none;
+  box-shadow: $shadow;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 24px;
+
+  .card-header {
+    background: linear-gradient(to right, #ffffff, #f8fafc);
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 4px solid $primary;
+
+    .card-heading {
+      color: $primary;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
     }
   }
 
   .card-body {
-    padding: 24px !important;
+    padding: 24px;
+  }
 
-    /* ส่วนข้อมูลอายุงาน */
+  .date-range-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #f1f5f9;
+
+    .label-date {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .value-date {
+      color: $primary;
+      font-weight: 700;
+    }
+  }
+
+  .attendance-list-clean {
+    display: flex;
+    flex-direction: column;
+
+    .att-clean-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px dashed #e2e8f0;
+
+      .att-label {
+        color: #64748b;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .att-value {
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .card-footer {
+    background: #fff;
+    border-top: 1px solid #f1f5f9;
+    padding: 16px 24px;
+  }
+}
+
+.performance-card {
+  border: none;
+  box-shadow: $shadow;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 24px;
+
+  .card-header {
+    background: linear-gradient(to right, #ffffff, #f8fafc);
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: 4px solid $primary;
+
+    .card-heading {
+      color: $primary;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+  }
+
+  .card-body {
+    padding: 24px;
+
     .work-meta-group {
-      background:#f8fafc !important; /* พื้นหลังสีส้มอ่อนๆ */
-      border: 1px solid #f8fafc !important;
-      border-radius: 12px !important;
-      padding: 15px !important;
-      margin-bottom: 20px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 10px !important;
+      background: #f8fafc;
+      border: 1px solid #f8fafc;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
 
       .meta-row {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        border-bottom: 1px dashed #4650dd !important;
-        padding-bottom: 8px !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px dashed $primary;
+        padding-bottom: 8px;
 
         &:last-child {
-          border-bottom: none !important;
-          padding-bottom: 0 !important;
+          border-bottom: none;
         }
 
         .meta-label {
-          color: #4650dd !important; /* สีส้มเข้ม */
-          font-size: 14px !important;
-          font-weight: 500 !important;
+          color: $primary;
+          font-size: 14px;
+          font-weight: 500;
         }
 
         .meta-value {
-          color: #4650dd !important; /* สีส้มสด */
-          font-weight: 700 !important;
-          font-size: 15px !important;
+          color: $primary;
+          font-weight: 700;
+          font-size: 15px;
         }
       }
     }
 
     .perf-subtitle {
-      font-size: 15px !important;
-      font-weight: 600 !important;
-      color: #334155 !important;
-      margin: 0 0 15px 0 !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 8px !important;
+      font-size: 15px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
 
       &::before {
         content: '';
-        display: block;
         width: 4px;
         height: 16px;
-        background: #4650dd;
+        background: $primary;
         border-radius: 2px;
       }
     }
 
-    /* รายการผลประเมิน */
     .performance-list {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 10px !important;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
 
       .perf-item {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 12px 16px !important;
-        background: #f8fafc !important;
-        border-radius: 8px !important;
-        border: 1px solid #f1f5f9 !important;
-        transition: transform 0.2s !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #f1f5f9;
+        transition: transform 0.2s;
 
         &:hover {
-          transform: translateX(5px) !important;
-          border-color: #cbd5e1 !important;
+          transform: translateX(5px);
+          border-color: #cbd5e1;
         }
 
         .perf-year {
-          font-weight: 600 !important;
-          color: #64748b !important;
+          font-weight: 600;
+          color: #64748b;
         }
 
         .perf-grade {
-          font-weight: 800 !important;
-          color: #0f172a !important;
-          background: #e2e8f0 !important;
-          padding: 4px 12px !important;
-          border-radius: 20px !important;
-          font-size: 14px !important;
+          font-weight: 800;
+          color: #0f172a;
+          background: #e2e8f0;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 14px;
         }
       }
     }
+  }
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+  z-index: 101;
+
+  &:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  max-width: 200px;
+  background: #333;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 9999;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: 0.2s;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  white-space: normal;
+
+  @media (min-width: 768px) {
+    max-width: 280px;
+  }
+
+  @media (max-width: 480px) {
+    left: 0;
+    transform: translateX(-10px);
+
+    &::after {
+      left: 20px;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: #333;
+  }
+}
+
+@media (max-width: 767px) {
+  .dashboard-wrapper {
+    padding: 10px;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
+
+  .main-layout-grid {
+    gap: 16px;
+  }
+
+  .banner-avatar-section {
+    min-height: 160px;
+
+    .avatar-frame {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  .profile-card {
+    padding: 15px;
+
+    .user-id-badge {
+      font-size: 18px;
+    }
+  }
+
+  .card-footer .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .schedule-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 }
