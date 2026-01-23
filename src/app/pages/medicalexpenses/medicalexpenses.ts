@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService, MedicalRequest, MedicalItem } from '../../services/medicalexpenses.service';
+import { VehicleService } from '../../services/vehicle.service';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -27,6 +28,7 @@ interface FlatMedicalRow extends MedicalItem {
 })
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
+  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
   /**
@@ -42,6 +44,7 @@ export class MedicalexpensesComponent implements OnInit {
   fromYear = signal<string>((new Date().getFullYear() + 543).toString());
   toMonth = signal<number>(new Date().getMonth());
   toYear = signal<string>((new Date().getFullYear() + 543).toString());
+  filterStatus = signal<string>(''); // เพิ่ม filter สถานะ
 
   // รายชื่อเดือนสำหรับ Select
   months = [
@@ -64,7 +67,12 @@ export class MedicalexpensesComponent implements OnInit {
    */
   processedData = computed(() => {
     let data = [...this.allRequests()];
-    // (ตรรกะการกรองตามเดือน/ปี สามารถเพิ่มได้ที่นี่)
+
+    // กรองตามสถานะ
+    if (this.filterStatus()) {
+      data = data.filter(r => r.status === this.filterStatus());
+    }
+
     return data;
   });
 
@@ -95,9 +103,10 @@ export class MedicalexpensesComponent implements OnInit {
     if (sortState) {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
-      rows.sort((a: any, b: any) => {
-        const valA = a[id] || '';
-        const valB = b[id] || '';
+      rows.sort((a: FlatMedicalRow, b: FlatMedicalRow) => {
+        const valA = (a as any)[id] || '';
+        const valB = (b as any)[id] || '';
+        if (id === 'requestId') return valA.localeCompare(valB) * direction;
         if (typeof valA === 'string') return valA.localeCompare(valB) * direction;
         return (valA - valB) * direction;
       });
@@ -124,6 +133,7 @@ export class MedicalexpensesComponent implements OnInit {
   table = createAngularTable(() => ({
     data: this.paginatedRows(),
     columns: [
+      { accessorKey: 'requestId', header: 'เลขที่เอกสาร' },
       { accessorKey: 'requestDate', header: 'วันที่ขอเบิก' },
       { accessorKey: 'limitType', header: 'ประเภทวงเงิน' },
       { accessorKey: 'diseaseType', header: 'ประเภทโรค' },
@@ -132,6 +142,7 @@ export class MedicalexpensesComponent implements OnInit {
       { accessorKey: 'treatmentDateTo', header: 'ถึง' },
       { accessorKey: 'requestedAmount', header: 'จำนวนเงินที่ขอเบิก' },
       { accessorKey: 'approvedAmount', header: 'จำนวนเงินที่เบิกได้' },
+      { accessorKey: 'status', header: 'สถานะ' },
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
@@ -154,6 +165,7 @@ export class MedicalexpensesComponent implements OnInit {
   clearFilters() {
     this.fromMonth.set(new Date().getMonth());
     this.toMonth.set(new Date().getMonth());
+    this.filterStatus.set('');
   }
 
   /**
@@ -216,5 +228,12 @@ export class MedicalexpensesComponent implements OnInit {
   trackByRowId(index: number, row: any): string {
     const original = row.original || row;
     return `${original.requestId}-${index}`;
+  }
+
+  /**
+   * คืนค่า CSS Class สำหรับ Status Badge
+   */
+  getStatusClass(status: string): string {
+    return this.vehicleService.getStatusBadgeClass(status);
   }
 }

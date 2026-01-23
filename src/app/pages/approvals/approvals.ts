@@ -76,41 +76,24 @@ export class ApprovalsComponent implements OnInit {
       company: 'บริษัท OTD'
     };
 
-    const mappedAllowances: ApprovalItem[] = allowances.map(a => ({
-      requestNo: a.id,
-      requestDate: a.createDate,
-      requestBy: a.requester || defaultUser,
-      requestType: 'ค่าเบี้ยเลี้ยง',
-      typeId: a.typeId,
-      requestDetail: a.items[0]?.description || 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน',
-      amount: a.items.reduce((sum: number, i: any) => sum + i.amount, 0),
-      status: this.mapStatus(a.status)
-    }));
+    const mapToApproval = (req: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่', typeId: number, detailSub?: string): ApprovalItem => ({
+      requestNo: req.id,
+      requestDate: req.createDate,
+      requestBy: req.requester || defaultUser,
+      requestType: type,
+      typeId: typeId,
+      requestDetail: req.items[0]?.description || detailSub || '',
+      amount: req.items.reduce((sum: number, i: any) => sum + (i.amount || 0), 0),
+      status: this.mapStatus(req.status)
+    });
 
-    const mappedTaxis: ApprovalItem[] = taxis.map(taxi => ({
-      requestNo: taxi.id,
-      requestDate: taxi.createDate,
-      requestBy: taxi.requester || defaultUser,
-      requestType: 'ค่าแท็กซี่',
-      typeId: taxi.typeId,
-      requestDetail: taxi.items[0]?.description || 'เบิกค่าเดินทางไปพบลูกค้า',
-      amount: taxi.items.reduce((sum: number, item: any) => sum + item.amount, 0),
-      status: this.mapStatus(taxi.status)
-    }));
+    const combined = [
+      ...allowances.map(a => mapToApproval(a, 'ค่าเบี้ยเลี้ยง', a.typeId, 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน')),
+      ...taxis.map(t => mapToApproval(t, 'ค่าแท็กซี่', t.typeId, 'เบิกค่าเดินทางไปพบลูกค้า')),
+      ...vehicles.map(v => mapToApproval(v, 'ค่ารถ', v.typeId, 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)'))
+    ];
 
-    const mappedVehicles: ApprovalItem[] = vehicles.map(vehicle => ({
-      requestNo: vehicle.id,
-      requestDate: vehicle.createDate,
-      requestBy: vehicle.requester || defaultUser,
-      requestType: 'ค่ารถ',
-      typeId: vehicle.typeId,
-      requestDetail: vehicle.items[0]?.description || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
-      amount: vehicle.items.reduce((sum: number, item: any) => sum + item.amount, 0),
-      status: this.mapStatus(vehicle.status)
-    }));
-
-    const combined = [...mappedAllowances, ...mappedTaxis, ...mappedVehicles].sort((a, b) => b.requestNo.localeCompare(a.requestNo));
-    this.approvals.set(combined);
+    this.approvals.set(combined.sort((a, b) => b.requestNo.localeCompare(a.requestNo)));
   }
 
   /**
@@ -169,7 +152,7 @@ export class ApprovalsComponent implements OnInit {
             valA = a.requestDate.split('/').reverse().join('');
             valB = b.requestDate.split('/').reverse().join('');
             return valA.localeCompare(valB) * direction;
-          case 'requester':
+          case 'requestBy':
             return a.requestBy.name.localeCompare(b.requestBy.name) * direction;
           case 'requestType':
             return a.requestType.localeCompare(b.requestType) * direction;

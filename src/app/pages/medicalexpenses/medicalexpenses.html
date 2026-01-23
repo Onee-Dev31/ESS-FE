@@ -51,6 +51,20 @@
                     </div>
                 </div>
 
+                <div class="filter-group">
+                    <span class="filter-label" style="&::after { content: '' }">สถานะ</span>
+                    <div class="select-input-group">
+                        <select class="form-control" [ngModel]="filterStatus()"
+                            (ngModelChange)="filterStatus.set($event)">
+                            <option value="">ทั้งหมด</option>
+                            <option value="คำขอใหม่">คำขอใหม่</option>
+                            <option value="ตรวจสอบแล้ว">ตรวจสอบแล้ว</option>
+                            <option value="อยู่ระหว่างการอนุมัติ">อยู่ระหว่างการอนุมัติ</option>
+                            <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
+                        </select>
+                    </div>
+                </div>
+
                 <button class="btn-clear" (click)="clearFilters()">
                     <i class="fas fa-sync-alt"></i> คืนค่า
                 </button>
@@ -64,7 +78,10 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 40px; text-align: center;">#</th>
+                        <th rowspan="2" style="width: 110px; cursor: pointer; text-align: center;"
+                            (click)="toggleSort('requestId')">
+                            เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
+                        </th>
                         <th rowspan="2" style="width: 100px; cursor: pointer; text-align: center;"
                             (click)="toggleSort('requestDate')">
                             วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
@@ -91,6 +108,10 @@
                             (click)="toggleSort('approvedAmount')">
                             จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
+                        <th rowspan="2" style="width: 150px; cursor: pointer; text-align: center;"
+                            (click)="toggleSort('status')">
+                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                        </th>
                     </tr>
                     <tr>
                         <th style="width: 90px; text-align: center; cursor: pointer;"
@@ -105,7 +126,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of table.getRowModel().rows; let i = index; trackBy: trackByRowId">
-                        <td class="text-center">{{ i + 1 + (currentPage() * pageSize()) }}</td>
+                        <td class="text-center font-bold" style="color: #008ebc;">{{ row.original.requestId }}</td>
                         <td class="text-center">{{ row.original.requestDate }}</td>
                         <td class="text-left">{{ row.original.limitType }}</td>
                         <td class="text-left">{{ row.original.diseaseType }}</td>
@@ -114,9 +135,14 @@
                         <td class="text-center">{{ row.original.treatmentDateTo }}</td>
                         <td class="text-right font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
                         <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
+                        <td class="text-center">
+                            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                                {{ row.original.status }}
+                            </span>
+                        </td>
                     </tr>
                     <tr *ngIf="table.getRowModel().rows.length === 0">
-                        <td colspan="9" style="text-align: center; padding: 40px; color: #999">
+                        <td colspan="10" style="text-align: center; padding: 40px; color: #999">
                             ไม่พบรายการที่ตรงตามเงื่อนไข
                         </td>
                     </tr>

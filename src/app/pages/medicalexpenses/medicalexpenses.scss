@@ -347,4 +347,34 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             }
         }
     }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+        white-space: nowrap;
+
+        &.status-new {
+            background: #e7f5ff;
+            color: #1971c2;
+        }
+
+        &.status-verified {
+            background: #f3f0ff;
+            color: #6741d9;
+        }
+
+        &.status-pending {
+            background: #fff4e6;
+            color: #d9480f;
+        }
+
+        &.status-success {
+            background: #ebfbee;
+            color: #2b8a3e;
+        }
+    }
 }

@@ -119,4 +119,22 @@ export class VehicleService {
         ];
         return shifts[Math.floor(Math.random() * shifts.length)];
     }
+
+    /**
+     * คืนค่า CSS Class สำหรับ Status Badge (ใช้ร่วมกันทุกหน้า)
+     * @param status ชื่อสถานะภาษาไทย
+     */
+    public getStatusBadgeClass(status: string): string {
+        const s = status?.trim();
+        switch (s) {
+            case 'คำขอใหม่': return 'status-new';
+            case 'ตรวจสอบแล้ว':
+            case 'รอตรวจสอบ': return 'status-verified';
+            case 'อยู่ระหว่างการอนุมัติ': return 'status-pending';
+            case 'อนุมัติแล้ว': return 'status-success';
+            case 'ไม่อนุมัติ': return 'status-rejected';
+            case 'รอแก้ไข': return 'status-referred-back';
+            default: return '';
+        }
+    }
 }
