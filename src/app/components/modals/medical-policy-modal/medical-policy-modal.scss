@@ -1,0 +1,306 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.modal-container {
+    background: #ffffff;
+    width: 95%;
+    max-width: 900px;
+    height: 85vh;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: modalFadeIn 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .header-icon {
+            color: #3b82f6;
+            font-size: 1.5rem;
+        }
+
+        .header-text {
+            h3 {
+                margin: 0;
+                font-size: 1.25rem;
+                color: #0f172a;
+                font-weight: 700;
+            }
+
+            .header-subtitle {
+                font-size: 0.85rem;
+                color: #64748b;
+            }
+        }
+    }
+
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+            color: #1e293b;
+        }
+    }
+}
+
+.modal-body {
+    padding: 32px 48px;
+    overflow-y: auto;
+    flex: 1;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #334155;
+    font-family: 'Sarabun', sans-serif;
+
+    .policy-section {
+        margin-bottom: 2.5rem;
+
+        .main-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    .clause {
+        margin-bottom: 1rem;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .table-container {
+        margin: 24px 0;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .policy-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .jc-cell {
+            text-align: left;
+            padding-left: 20px;
+            background: #fcfcfc;
+            font-weight: 600;
+        }
+
+        .amount-cell {
+            font-weight: 700;
+            color: #2563eb;
+        }
+    }
+
+    .clause-with-notes {
+        background: #fff9db;
+        padding: 24px;
+        border-radius: 12px;
+        border-left: 5px solid #fab005;
+        margin: 24px 0;
+
+        .note-header {
+            margin-bottom: 8px;
+            color: #854d0e;
+        }
+    }
+
+    .sub-clause-list {
+        padding-left: 1rem;
+
+        .list-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+
+            .item-num {
+                font-weight: 700;
+                min-width: 20px;
+            }
+        }
+    }
+
+    .square-bullets-verbatim {
+        list-style: none;
+        padding-left: 2rem;
+        margin: 1rem 0;
+
+        li {
+            position: relative;
+            margin-bottom: 12px;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: -20px;
+                top: 10px;
+                width: 6px;
+                height: 6px;
+                background: #475569;
+            }
+        }
+    }
+
+    .verbatim-list {
+        .list-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+
+            .item-num {
+                min-width: 45px;
+                font-weight: 700;
+            }
+
+            .item-text {
+                flex: 1;
+            }
+        }
+    }
+
+    .important-warning {
+        background: #fff5f5;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #ffa8a8;
+        margin: 24px 0;
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e03131;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+    }
+
+    .sub-policy-v2 {
+        margin-bottom: 2rem;
+        padding-left: 1rem;
+
+        .sub-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0.5rem;
+
+            h5 {
+                margin: 0;
+                font-weight: 700;
+                font-size: 1.1rem;
+            }
+
+            .sub-num {
+                font-weight: 700;
+            }
+        }
+    }
+}
+
+.modal-footer {
+    padding: 20px 32px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-confirm {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 40px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #2563eb;
+        }
+    }
+}
+
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+
+        &:hover {
+            background: #94a3b8;
+        }
+    }
+}
+
+u {
+    text-underline-offset: 4px;
+}
+
+b,
+strong {
+    color: #0f172a;
+}

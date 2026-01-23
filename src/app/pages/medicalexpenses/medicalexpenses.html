@@ -3,7 +3,13 @@
         <button class="btn-back" (click)="goBack()">
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h2>ค่ารักษาพยาบาล</h2>
+        <div class="title-with-info">
+            <h2>ค่ารักษาพยาบาล</h2>
+            <button class="btn-info-policy" (click)="isPolicyModalOpen.set(true)"
+                title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
     </div>
 
     <div class="content-card">
@@ -185,3 +191,6 @@
         </div>
     </div>
 </div>
+
+<app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+</app-medical-policy-modal>

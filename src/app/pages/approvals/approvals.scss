@@ -368,23 +368,23 @@ $bg-slate: #f4f7f9;
   text-transform: uppercase;
 
   &.pending {
-    background: #fff4e6;
-    color: #d9480f;
+    background: #007bff26;
+    color: #007bff;
   }
 
   &.approved {
-    background: #ebfbee;
-    color: #2b8a3e;
+    background: #28a74526;
+    color: #28a745;
   }
 
   &.rejected {
-    background: #fff5f5;
-    color: #c92a2a;
+    background: #dc354526;
+    color: #dc3545;
   }
 
   &.referred-back {
-    background: #e7f5ff;
-    color: #1971c2;
+    background: #ffc10726;
+    color: #f1b44c;
   }
 }
 

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService, MedicalRequest, MedicalItem } from '../../services/medicalexpenses.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -22,7 +23,7 @@ interface FlatMedicalRow extends MedicalItem {
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
@@ -45,6 +46,7 @@ export class MedicalexpensesComponent implements OnInit {
   toMonth = signal<number>(new Date().getMonth());
   toYear = signal<string>((new Date().getFullYear() + 543).toString());
   filterStatus = signal<string>(''); // เพิ่ม filter สถานะ
+  isPolicyModalOpen = signal<boolean>(false);
 
   // รายชื่อเดือนสำหรับ Select
   months = [
