@@ -9,7 +9,6 @@ import { Observable, map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../services/dashboard.service';
-import { VehicleService } from '../../services/vehicle.service';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 
@@ -28,9 +27,8 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
-  private vehicleService = inject(VehicleService);
 
-  // Observables for Async Data
+  // ข้อมูลสำหรับหน้า Dashboard ที่ดึงจาก Service
   userProfile$!: Observable<UserProfile>;
   medicalStats$!: Observable<MedicalStat[]>;
   welfareStats$!: Observable<WelfareItem[]>;
@@ -38,11 +36,11 @@ export class DashboardComponent implements OnInit {
   holidays$!: Observable<HolidayItem[]>;
   pendingCount$!: Observable<number>;
 
-  // Derived Observables
+  // รายการโปรไฟล์พนักงานและทรัพย์สิน IT
   profileList$!: Observable<ProfileItem[]>;
   itList$!: Observable<ProfileItem[]>;
 
-  // ข้อมูลจำลอง (Static)
+  // ข้อมูลจำลองสถิติการมาทำงาน
   attendanceList = [
     { label: 'ลาป่วย', value: '10 วัน' },
     { label: 'ลาพักร้อน', value: '5 วัน' },
@@ -51,6 +49,7 @@ export class DashboardComponent implements OnInit {
     { label: 'ขาดงาน', value: '5 ครั้ง' }
   ];
 
+  // ข้อมูลจำลองผลการปฏิบัติงาน
   performanceList = [
     { year: 'ปี 2026', grade: 'เกรด A+' },
     { year: 'ปี 2025', grade: 'เกรด A' },
@@ -60,29 +59,18 @@ export class DashboardComponent implements OnInit {
     { year: 'ปี 2021', grade: 'เกรด C' }
   ];
 
+  // ข้อมูลวันสำคัญและรายการลาสำหรับแสดงในปฏิทิน
   specialDates: Record<string, any> = {
     '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
     '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' },
     '2026-04-06': { type: 'holiday', note: 'วันจักรี', code: 'HOL' },
     '2026-04-13': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
-    '2026-04-14': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
-    '2026-04-15': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
-    '2026-05-01': { type: 'holiday', note: 'วันแรงงาน', code: 'HOL' },
-    '2026-05-04': { type: 'holiday', note: 'วันฉัตรมงคล', code: 'HOL' },
-    '2026-05-31': { type: 'holiday', note: 'วันวิสาขบูชา', code: 'HOL' },
-    '2026-06-03': { type: 'holiday', note: 'วันเฉลิมฯ ราชินี', code: 'HOL' },
-    '2026-07-28': { type: 'holiday', note: 'วันเฉลิมฯ ร.10', code: 'HOL' },
-    '2026-07-29': { type: 'holiday', note: 'วันอาสาฬหบูชา', code: 'HOL' },
-    '2026-07-30': { type: 'holiday', note: 'วันเข้าพรรษา', code: 'HOL' },
-    '2026-08-12': { type: 'holiday', note: 'วันแม่แห่งชาติ', code: 'HOL' },
-    '2026-10-13': { type: 'holiday', note: 'วันนวมินทรมหาราช', code: 'HOL' },
-    '2026-10-23': { type: 'holiday', note: 'วันปิยมหาราช', code: 'HOL' },
-    '2026-12-05': { type: 'holiday', note: 'วันพ่อแห่งชาติ', code: 'HOL' },
-    '2026-12-10': { type: 'holiday', note: 'วันรัฐธรรมนูญ', code: 'HOL' },
-    '2026-12-31': { type: 'holiday', note: 'วันสิ้นปี', code: 'HOL' },
     '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
   };
 
+  /**
+   * ตั้งค่าการแสดงผล FullCalendar ปฏิทินบริษัท
+   */
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
@@ -95,6 +83,9 @@ export class DashboardComponent implements OnInit {
     firstDay: 0,
     contentHeight: 'auto',
     fixedWeekCount: false,
+    /**
+     * ปรับแต่งหน้าตาของแต่ละช่องวันที่ในปฏิทิน
+     */
     dayCellContent: (arg: DayCellContentArg) => {
       const offset = arg.date.getTimezoneOffset() * 60000;
       const localDate = new Date(arg.date.getTime() - offset);
@@ -141,14 +132,15 @@ export class DashboardComponent implements OnInit {
 
 
   ngOnInit() {
+    // ดึงข้อมูลพื้นฐานจาก Service เมื่อเริ่มใช้งาน
     this.userProfile$ = this.userService.getUserProfile();
     this.medicalStats$ = this.dashboardService.getMedicalStats();
     this.welfareStats$ = this.dashboardService.getWelfareStats();
     this.leaveStats$ = this.dashboardService.getLeaveStats();
     this.holidays$ = this.dashboardService.getHolidays();
-    this.pendingCount$ = this.vehicleService.getGlobalPendingCount();
+    this.pendingCount$ = this.dashboardService.getGlobalPendingCount();
 
-    // แปลงข้อมูล Profile เป็น List สำหรับแสดงผล
+    // แปลงข้อมูล Profile เป็นรายการ List เพื่อความสะดวกในการแสดงผล
     this.profileList$ = this.userProfile$.pipe(
       map(profile => [
         { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
@@ -159,6 +151,7 @@ export class DashboardComponent implements OnInit {
       ])
     );
 
+    // รายการทรัพย์สิน IT ของพนักงาน
     this.itList$ = this.userProfile$.pipe(
       map(profile => {
         if (!profile.itAssets) return [];
@@ -173,6 +166,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * ฟังก์ชันเปลี่ยนเส้นทาง (Routing) ไปยังหน้าที่ต้องการ
+   * @param path เส้นทาง URL
+   */
   navigateTo(path: string | undefined) {
     if (path) {
       this.router.navigate([path]);

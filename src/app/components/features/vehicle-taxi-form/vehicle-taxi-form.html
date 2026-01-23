@@ -84,31 +84,33 @@
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.description" [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && !item.description" placeholder="รายละเอียด..." />
+                <input type="text" class="table-input" [(ngModel)]="item.description"
+                  [class.is-invalid]="item.selected && !item.description" (ngModelChange)="onInputChange(item)"
+                  placeholder="รายละเอียด..." />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="item.destination" [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && !item.destination" placeholder="ระบุจุดหมาย" />
+                <input type="text" class="table-input" [(ngModel)]="item.destination"
+                  [class.is-invalid]="item.selected && !item.destination" (ngModelChange)="onInputChange(item)"
+                  placeholder="ระบุจุดหมาย" />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
                 <input type="number" class="table-input text-center" [(ngModel)]="item.distance"
-                  [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && (!item.distance || item.distance <= 0)" />
+                  [class.is-invalid]="item.selected && (!item.distance || item.distance <= 0)"
+                  (ngModelChange)="onInputChange(item)" />
               </div>
             </td>
 
             <td class="desc-cell">
               <div class="input-container">
                 <input type="number" class="table-input text-center font-bold" [(ngModel)]="item.amount"
-                  [disabled]="!item.selected"
-                  [class.is-invalid]="item.selected && (!item.amount || item.amount <= 0)" />
+                  [class.is-invalid]="item.selected && (!item.amount || item.amount <= 0)"
+                  (ngModelChange)="onInputChange(item)" />
               </div>
             </td>
 

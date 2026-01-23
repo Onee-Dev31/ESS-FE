@@ -1,7 +1,9 @@
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService, AllowanceRequest, AllowanceItem, WELFARE_TYPES } from '../../../services/vehicle.service';
+import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
+import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { WELFARE_TYPES } from '../../../services/vehicle.service';
 import { switchMap, of, forkJoin } from 'rxjs';
 
 @Component({
@@ -15,7 +17,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
 
-  private vehicleService = inject(VehicleService);
+  private allowanceService = inject(AllowanceService);
+  private alertService = inject(AlertService); // ฉีด AlertService
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: AllowanceRequest;
@@ -40,10 +43,10 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadData() {
     if (!this.requestId) {
-      this.vehicleService.generateNextAllowanceId().pipe(
+      this.allowanceService.generateNextAllowanceId().pipe(
         switchMap(id => {
           this.requestId = id;
-          return this.vehicleService.getAllowanceRequestById(id);
+          return this.allowanceService.getAllowanceRequestById(id);
         })
       ).subscribe(existing => {
         this.loadedRequest = existing;
@@ -51,7 +54,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         this.cdr.markForCheck();
       });
     } else {
-      this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existing => {
+      this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
         this.loadedRequest = existing;
         this.generateCalendar();
         this.cdr.markForCheck();
@@ -62,7 +65,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
-    this.vehicleService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE)
+    this.allowanceService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE)
       .subscribe(rawLogs => {
         this.logs = rawLogs.map(item => {
           const matchingItem = existingRequest?.items.find(i => i.date === item.date);
@@ -137,6 +140,13 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.updateTotal();
   }
 
+  onInputChange(log: any) {
+    if (log.description && log.description.trim() !== '') {
+      log.selected = true;
+      this.autoCalculate(log);
+    }
+  }
+
   onToggleCheck(log: any) {
     this.autoCalculate(log);
   }
@@ -155,7 +165,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {
-      alert('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
+      this.alertService.showWarning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน'); // ใช้ AlertService
       return;
     }
 
@@ -173,17 +183,17 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       }));
 
     if (items.length === 0) {
-      alert('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
+      this.alertService.showWarning('กรุณาเลือกรายการอย่างน้อย 1 รายการ'); // ใช้ AlertService
       return;
     }
 
-    this.vehicleService.getAllowanceRequestById(this.requestId).subscribe(existingRequest => {
+    this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existingRequest => {
       if (existingRequest) {
-        this.vehicleService.updateAllowanceRequest(this.requestId, {
+        this.allowanceService.updateAllowanceRequest(this.requestId, {
           ...existingRequest,
           items: items
         }).subscribe(() => {
-          alert(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
+          this.alertService.showSuccess(`อัปเดตรายการ ${this.requestId} เรียบร้อย`); // ใช้ AlertService
           this.closeModal();
         });
       } else {
@@ -194,8 +204,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
           status: 'รอตรวจสอบ',
           items: items
         };
-        this.vehicleService.addAllowanceRequest(newRequest).subscribe(() => {
-          alert(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+        this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
+          this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`); // ใช้ AlertService
           this.closeModal();
         });
       }

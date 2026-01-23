@@ -647,7 +647,13 @@ body {
 
 .action-btn-sm {
   @extend .action-btn;
-  padding: 10px 15px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   font-size: 15px;
   font-weight: 400;
 }

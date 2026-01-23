@@ -1,0 +1,18 @@
+<div class="alert-overlay" *ngIf="state$ | async as state" [class.show]="state.show" (click)="close()">
+    <div class="alert-container" [class.show]="state.show" (click)="$event.stopPropagation()">
+        <div class="alert-icon-wrapper">
+            <i [ngClass]="getIconClass(state.type)"></i>
+        </div>
+
+        <div class="alert-content">
+            <h3 class="alert-title">{{ state.title }}</h3>
+            <p class="alert-message">{{ state.message }}</p>
+        </div>
+
+        <div class="alert-footer">
+            <button [class]="getBtnClass(state.type)" (click)="close()">
+                ตกลง
+            </button>
+        </div>
+    </div>
+</div>

@@ -6,6 +6,7 @@ import { VehicleComponent } from './pages/vehicle/vehicle';
 import { AllowanceComponent } from './pages/allowance/allowance'
 import { VehicleTaxiComponent } from './pages/vehicle-taxi/vehicle-taxi'
 import { ApprovalsComponent } from './pages/approvals/approvals';
+import { MedicalexpensesComponent } from './pages/medicalexpenses/medicalexpenses';
 
 
 export const routes: Routes = [
@@ -28,6 +29,7 @@ export const routes: Routes = [
             { path: 'allowance', component: AllowanceComponent },
             { path: 'vehicle-taxi', component: VehicleTaxiComponent },
             { path: 'approvals', component: ApprovalsComponent },
+            { path: 'medicalexpenses', component: MedicalexpensesComponent },
 
             {
                 path: '',

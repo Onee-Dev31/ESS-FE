@@ -1,7 +1,9 @@
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService, RequestItem, VehicleRequest, WELFARE_TYPES } from '../../../services/vehicle.service';
+import { TransportService, RequestItem, VehicleRequest } from '../../../services/transport.service';
+import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { WELFARE_TYPES } from '../../../services/vehicle.service';
 
 interface LogItem {
   date: string;
@@ -26,7 +28,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
   @Output() onClose = new EventEmitter<void>();
 
-  private vehicleService = inject(VehicleService);
+  private transportService = inject(TransportService);
+  private alertService = inject(AlertService); // ฉีด AlertService
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: VehicleRequest;
@@ -50,7 +53,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 
   loadData() {
-    this.vehicleService.getRequestById(this.requestId).subscribe(existingRequest => {
+    this.transportService.getRequestById(this.requestId).subscribe(existingRequest => {
       this.loadedRequest = existingRequest;
       this.generateCalendar();
       this.cdr.markForCheck();
@@ -60,13 +63,14 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
-    this.vehicleService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
+    this.transportService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
       this.logs = rawLogs.map((item: any) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.date);
 
         return {
           date: item.date,
           dayType: item.dayType,
+          ThaiLooped: matchTime(item.timeIn),
           timeIn: matchTime(item.timeIn),
           timeOut: matchTime(item.timeOut),
           amount: matchingItem ? matchingItem.amount : 0,
@@ -110,6 +114,13 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     this.updateTotal();
   }
 
+  onInputChange(log: LogItem) {
+    if (log.description && log.description.trim() !== '') {
+      log.selected = true;
+      this.calculateVehicleAmount(log);
+    }
+  }
+
   onToggleCheck(log: LogItem) {
     if (log.selected) {
       this.calculateVehicleAmount(log);
@@ -135,12 +146,12 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
     if (invalidLogs.length > 0) {
       const invalidDates = invalidLogs.map(log => log.date).join(', ');
-      alert(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
+      this.alertService.showWarning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`); // ใช้ AlertService
       return;
     }
 
     if (selectedLogs.length === 0 || this.totalAmount === 0) {
-      alert('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
+      this.alertService.showWarning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)'); // ใช้ AlertService
       return;
     }
 
@@ -150,14 +161,14 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       amount: log.amount
     }));
 
-    this.vehicleService.getRequestById(this.requestId).subscribe(existingRequest => {
+    this.transportService.getRequestById(this.requestId).subscribe(existingRequest => {
       if (existingRequest) {
         const updatedRequest: VehicleRequest = {
           ...existingRequest,
           items: requestItems
         };
-        this.vehicleService.updateRequest(this.requestId, updatedRequest).subscribe(() => {
-          alert(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
+        this.transportService.updateRequest(this.requestId, updatedRequest).subscribe(() => {
+          this.alertService.showSuccess(`บันทึกการแก้ไขข้อมูลเรียบร้อย`); // ใช้ AlertService
           this.closeModal();
         });
       } else {
@@ -168,8 +179,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           status: 'รอตรวจสอบ',
           items: requestItems
         };
-        this.vehicleService.addRequest(newRequest).subscribe(() => {
-          alert(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
+        this.transportService.addRequest(newRequest).subscribe(() => {
+          this.alertService.showSuccess(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`); // ใช้ AlertService
           this.closeModal();
         });
       }

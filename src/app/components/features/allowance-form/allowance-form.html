@@ -96,7 +96,7 @@
             <td class="desc-cell">
               <div class="input-container">
                 <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-                  [class.is-invalid]="log.selected && !log.description" [disabled]="!log.selected" />
+                  [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
                 <small class="error-msg" *ngIf="log.selected && !log.description"></small>
               </div>
             </td>

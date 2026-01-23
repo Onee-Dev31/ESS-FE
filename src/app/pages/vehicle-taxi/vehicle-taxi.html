@@ -49,8 +49,8 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('id')">
-              เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('requestId')">
+              เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
             </th>
 
             <th style="width: 10%; cursor: pointer" (click)="toggleSort('createDate')">
@@ -61,8 +61,8 @@
               วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
 
-            <th style="cursor: pointer" (click)="toggleSort('desc')">
-              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
+            <th style="cursor: pointer" (click)="toggleSort('description')">
+              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
             </th>
 
             <th style="width: 12%; cursor: pointer" (click)="toggleSort('destination')">
@@ -85,56 +85,58 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
-            <tr *ngFor="let item of row.original.items; let i = index"
-              [class.group-end]="i === row.original.items.length - 1">
+          <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
-                <span class="id-text">{{ row.original.id }}</span>
-              </td>
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
+              class="merged-col top-align text-center">
+              <span class="id-text">{{ row.original.requestId }}</span>
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
-                {{ row.original.createDate }}
-              </td>
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
+              class="merged-col top-align">
+              {{ row.original.createDate }}
+            </td>
 
-              <td class="text-center">{{ item.date }}</td>
+            <td class="text-center">{{ row.original.date }}</td>
 
-              <td>
-                <div class="desc-wrapper">
-                  <i class="fas fa-taxi text-muted" style="margin-right: 8px;"></i>
-                  {{ item.description }}
-                </div>
-              </td>
+            <td>
+              <div class="desc-wrapper">
+                <i class="fas fa-taxi text-muted" style="margin-right: 8px;"></i>
+                {{ row.original.description }}
+              </div>
+            </td>
 
-              <td>{{ item.destination }}</td>
+            <td>{{ row.original.destination }}</td>
 
-              <td class="text-center">{{ item.distance | number:'1.2-2' }}</td>
+            <td class="text-center">{{ row.original.distance | number:'1.2-2' }}</td>
 
-              <td class="text-right" style="font-weight: 600;">
-                {{ item.amount | number:'1.2-2' }}
-              </td>
+            <td class="text-right" style="font-weight: 600;">
+              {{ row.original.amount | number:'1.2-2' }}
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
-                <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                  {{ row.original.status }}
-                </span>
-              </td>
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
+              class="merged-col text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                {{ row.original.status }}
+              </span>
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
-                <div class="action-btns">
-                  <button class="btn-icon edit" (click)="openModal(row.original.id)">
-                    <i class="far fa-edit"></i>
-                  </button>
-                  <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
-                    <i class="far fa-trash-alt"></i>
-                  </button>
-                  <button class="btn-icon folder" (click)="openPreviewModal(row.original.items)">
-                    <i class="far fa-folder-open"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </ng-container>
+            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
+              class="merged-col text-center">
+              <div class="action-btns">
+                <button class="btn-icon edit" (click)="openModal(row.original.requestId)">
+                  <i class="far fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="deleteRequest(row.original.requestId)">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+                <button class="btn-icon folder" (click)="openPreviewModalForRequest(row.original.requestId)">
+                  <i class="far fa-folder-open"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
           <tr *ngIf="table.getRowModel().rows.length === 0">
             <td colspan="9" style="text-align: center; padding: 40px; color: #999">
               ไม่พบรายการที่ตรงตามเงื่อนไข
@@ -146,8 +148,8 @@
         <div class="pagination-info">
           แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
           ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-          processedData().length) }}
-          จาก {{ processedData().length }} รายการ
+          totalRequests()) }}
+          จาก {{ totalRequests() }} รายการ
         </div>
         <div class="pagination-controls">
           <div class="page-size-selector">
@@ -189,3 +191,4 @@
 
   <app-file-preview-modal *ngIf="isPreviewModalOpen" [files]="previewFiles" (onClose)="closePreviewModal()">
   </app-file-preview-modal>
+</div>

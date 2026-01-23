@@ -1,25 +1,73 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, combineLatest, map } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { AllowanceService } from './allowance.service';
+import { TaxiService } from './taxi.service';
+import { TransportService } from './transport.service';
+import { MedicalexpensesService } from './medicalexpenses.service';
 
-// Interface สำหรับใช้งานร่วมกัน
+/**
+ * อินเตอร์เฟสสำหรับสถิติค่ารักษาพยาบาล
+ */
 export interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
+
+/**
+ * อินเตอร์เฟสสำหรับรายการสวัสดิการ
+ */
 export interface WelfareItem { title: string; amount: string; iconName: string; cardClass?: string; titleColor?: string; amountColor?: string; tooltip?: string; route?: string; }
+
+/**
+ * อินเตอร์เฟสสำหรับรายการแสดงการลา
+ */
 export interface LeaveItem { label: string; count: string; countColor: string; iconClass: string; iconColor?: string; theme: string; balance: number; }
+
+/**
+ * อินเตอร์เฟสสำหรับวันหยุด
+ */
 export interface HolidayItem { date: string; name: string; }
 
 @Injectable({
     providedIn: 'root'
 })
 export class DashboardService {
-    // สำหรับเชื่อมต่อ API
     private http = inject(HttpClient);
+    private allowanceService = inject(AllowanceService);
+    private taxiService = inject(TaxiService);
+    private transportService = inject(TransportService);
+    private medicalService = inject(MedicalexpensesService);
 
     constructor() { }
 
     /**
-     * ดึงข้อมูลสถิติการรักษาพยาบาล
+     * คำนวณจำนวนรายการที่รอการอนุมัติทั้งหมด (Global Pending Count)
+     * โดยรวมจากสวัสดิการทุกประเภท
+     */
+    getGlobalPendingCount(): Observable<number> {
+        return combineLatest([
+            this.allowanceService.getAllowanceRequests(),
+            this.taxiService.getTaxiRequests(),
+            this.transportService.getRequests(),
+            this.medicalService.getMedicalRequests()
+        ]).pipe(
+            map(([allowances, taxis, transports, medicals]) => {
+                const isPending = (s: string) =>
+                    s === 'คำขอใหม่' ||
+                    s === 'ตรวจสอบแล้ว' ||
+                    s === 'อยู่ระหว่างการอนุมัติ';
+
+                const p1 = allowances.filter(a => isPending(a.status)).length;
+                const p2 = taxis.filter(t => isPending(t.status)).length;
+                const p3 = transports.filter(v => isPending(v.status)).length;
+                const p4 = medicals.filter(m => isPending(m.status)).length;
+
+                return p1 + p2 + p3 + p4;
+            })
+        );
+    }
+
+    /**
+     * ดึงข้อมูลสรุปวงเงินค่ารักษาพยาบาล
      */
     getMedicalStats(): Observable<MedicalStat[]> {
         const stats: MedicalStat[] = [
@@ -32,7 +80,7 @@ export class DashboardService {
     }
 
     /**
-     * ดึงข้อมูลสวัสดิการ
+     * ดึงข้อมูลสรุปการเบิกสวัสดิการต่างๆ ของพนักงาน
      */
     getWelfareStats(): Observable<WelfareItem[]> {
         const stats: WelfareItem[] = [
@@ -42,45 +90,42 @@ export class DashboardService {
             },
             {
                 title: 'ค่ารถ', amount: '584', iconName: 'fas fa-car', cardClass: 'card-blue',
-                tooltip: `<strong>เงื่อนไข:</strong><br />- ค่ารถก่อน 06:00 น. ต้องเข้างานก่อน 06:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง<br />- ค่ารถหลัง 22:00 น. ต้องเข้างานเกิน 22:00 น. เบิกได้ไม่เกิน 120 บาท/ครั้ง`,
+                tooltip: `<strong>เงื่อนไข:</strong>ย้อนหลัง 22:00 หรือ ก่อน 06:00 น.`,
                 titleColor: '#1e40af', amountColor: '#1e40af', route: '/vehicle'
             },
             {
                 title: 'ค่าแท็กซี่', amount: '876', iconName: 'fas fa-taxi', cardClass: 'card-yellow',
-                tooltip: `<strong>เงื่อนไข:</strong><br />- 1,000 บาท/ปี<br />- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น`,
+                tooltip: `<strong>เงื่อนไข:</strong>เบิกได้ตามจริง ไม่เกินวงเงิน 1,000 บาท/ปี`,
                 titleColor: '#9a3412', amountColor: '#9a3412', route: '/vehicle-taxi'
             },
             {
                 title: 'ค่าสมรส', amount: '3,500', iconName: 'fas fa-heart',
-                tooltip: `<strong>เงื่อนไข:</strong><br />- อายุงานครบ 1 ปี<br />- เบิกได้ 5,000 บาท 1 ครั้งตลอดอายุงาน`
+                tooltip: `<strong>เงื่อนไข:</strong>ปฏิบัติงานครบ 1 ปีขึ้นไป`
             },
             {
                 title: 'ค่าอุปสมบท', amount: '10,500', iconName: 'fas fa-hands-praying',
-                tooltip: `<strong>เงื่อนไข:</strong><br />- อายุงาน 1 ปี เพศชาย<br />- เบิกได้ 5,000 บาท 1 ครั้งตลอดอายุงาน`
+                tooltip: `<strong>เงื่อนไข:</strong>ปฏิบัติงานครบ 1 ปีขึ้นไป`
             },
             {
                 title: 'ค่าฌาปนกิจ', amount: '584', iconName: 'fas fa-church',
-                tooltip: `<strong>เงื่อนไข :</strong><br />- เบิกได้ 80,000 บาท/ตลอดอายุงาน<br />- พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000 บาท/คน`
+                tooltip: `<strong>เงื่อนไข:</strong>กรณีพนักงานหรือครอบครัวเสียชีวิต`
             },
             {
                 title: 'ค่าพวงหรีด', amount: '876', iconName: 'fas fa-spa',
-                tooltip: `<strong>เงื่อนไข :</strong><br />- เบิกได้ 12,000 บาท/ตลอดอายุงาน<br />- พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน`
+                tooltip: `<strong>เงื่อนไข:</strong>ระเบียบบริษัทสวัสดิการช่วยเหลือ`
             }
         ];
         return of(stats).pipe(delay(300));
     }
 
     /**
-     * ดึงข้อมูลการลา
+     * ดึงข้อมูลสรุปสิทธิ์การลาประเภทต่างๆ
      */
     getLeaveStats(): Observable<LeaveItem[]> {
         const leaves: LeaveItem[] = [
             { label: 'ลาพักร้อน', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-plane-departure', iconColor: '#ef4444', theme: 'theme-pink', balance: 8 },
             { label: 'ลากิจ', count: '03/06', countColor: '#0d6efd', iconClass: 'fas fa-briefcase', iconColor: '#3b82f6', theme: 'theme-blue', balance: 3 },
             { label: 'ลาป่วย', count: '10/30', countColor: '#4650dd', iconClass: 'fas fa-stethoscope', iconColor: '#4049c7', theme: 'theme-purple', balance: 20 },
-            { label: 'ลาเพื่อประกอบพิธีสมรส', count: '0/5', countColor: '#35b653', iconClass: 'fas fa-ring', iconColor: '#35b653', theme: 'theme-green', balance: 5 },
-            { label: 'ลาคลอด', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-baby-carriage', iconColor: '#ef4444', theme: 'theme-pink', balance: 8 },
-            { label: 'ลาต่อเนื่องจากลาคลอด (บุตรเจ็บป่วย)', count: '03/06', countColor: '#0d6efd', iconClass: 'fas fa-hand-holding-heart', iconColor: '#3b82f6', theme: 'theme-blue', balance: 3 },
             { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', iconColor: '#4049c7', theme: 'theme-purple', balance: 3 },
             { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', iconColor: '#35b653', theme: 'theme-green', balance: 3 },
         ];
@@ -88,11 +133,11 @@ export class DashboardService {
     }
 
     /**
-     * ดึงข้อมูลวันหยุด
+     * ดึงประกาศวันหยุดบริษัท
      */
     getHolidays(): Observable<HolidayItem[]> {
         return of([
-            { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ...' },
+            { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },
             { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
             { date: '31/12/2569', name: 'วันสิ้นปี' }
         ]).pipe(delay(200));

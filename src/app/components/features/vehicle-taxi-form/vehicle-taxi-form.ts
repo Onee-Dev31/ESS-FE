@@ -2,7 +2,9 @@ import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
-import { VehicleService, TaxiRequest, TaxiItem, WELFARE_TYPES } from '../../../services/vehicle.service';
+import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
+import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { WELFARE_TYPES } from '../../../services/vehicle.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -15,7 +17,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
 
-  private vehicleService = inject(VehicleService);
+  private taxiService = inject(TaxiService);
+  private alertService = inject(AlertService); // ฉีด AlertService
   private cdr = inject(ChangeDetectorRef);
 
   // เก็บข้อมูลที่โหลดมาเพื่อใช้ตอนเปลี่ยนเดือน
@@ -47,7 +50,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   }
 
   loadData() {
-    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
+    this.taxiService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
       this.loadedRequest = existingRequest;
       this.generateMockData();
       this.cdr.markForCheck(); // อัปเดตหน้าจอ
@@ -57,7 +60,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
-    this.vehicleService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockLogs => {
+    this.taxiService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockLogs => {
       this.items = mockLogs.map((row: any) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
 
@@ -85,7 +88,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     const selectedItems = this.items.filter(item => item.selected);
 
     if (selectedItems.length === 0) {
-      alert('กรุณาเลือกรายการที่ต้องการเบิก');
+      this.alertService.showWarning('กรุณาเลือกรายการที่ต้องการเบิก'); // ใช้ AlertService
       return;
     }
 
@@ -96,7 +99,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     );
 
     if (invalidItem) {
-      alert(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`);
+      this.alertService.showWarning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`); // ใช้ AlertService
       return;
     }
 
@@ -109,14 +112,14 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       attachedFile: item.attachedFile
     }));
 
-    this.vehicleService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
+    this.taxiService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
       if (existingRequest) {
         const updatedRequest: TaxiRequest = {
           ...existingRequest,
           items: taxiItems
         };
-        this.vehicleService.updateTaxiRequest(this.requestId, updatedRequest).subscribe(() => {
-          alert('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+        this.taxiService.updateTaxiRequest(this.requestId, updatedRequest).subscribe(() => {
+          this.alertService.showSuccess('บันทึกการแก้ไขข้อมูลเรียบร้อย'); // ใช้ AlertService
           this.onClose.emit();
         });
       } else {
@@ -127,13 +130,24 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
           status: 'รอตรวจสอบ',
           items: taxiItems
         };
-        this.vehicleService.addTaxiRequest(newRequest).subscribe(() => {
-          alert(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
+        this.taxiService.addTaxiRequest(newRequest).subscribe(() => {
+          this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`); // ใช้ AlertService
           this.onClose.emit();
         });
       }
     });
   }
+
+  onInputChange(item: any) {
+    if ((item.description && item.description.trim() !== '') ||
+      (item.destination && item.destination.trim() !== '') ||
+      (item.distance && item.distance > 0) ||
+      (item.amount && item.amount > 0)) {
+      item.selected = true;
+    }
+  }
+
+  ThaiLooped = matchTime; // สำหรับการใช้งานใน template
 
   cancel() {
     this.onClose.emit();
@@ -158,4 +172,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     }
     this.closeUploadModal();
   }
+}
+
+function matchTime(t: any): string {
+  return t ? String(t) : '';
 }

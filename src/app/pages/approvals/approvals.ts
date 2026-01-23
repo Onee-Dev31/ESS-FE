@@ -2,7 +2,10 @@ import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService, VehicleRequest, TaxiRequest, AllowanceRequest } from '../../services/vehicle.service';
+import { VehicleService } from '../../services/vehicle.service';
+import { AllowanceService, AllowanceRequest } from '../../services/allowance.service';
+import { TaxiService, TaxiRequest } from '../../services/taxi.service';
+import { TransportService, VehicleRequest } from '../../services/transport.service';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
@@ -23,18 +26,25 @@ import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/mod
   encapsulation: ViewEncapsulation.None
 })
 export class ApprovalsComponent implements OnInit {
+  // ฉีด Service ต่างๆ ที่จำเป็น
   private vehicleService = inject(VehicleService);
+  private allowanceService = inject(AllowanceService);
+  private taxiService = inject(TaxiService);
+  private transportService = inject(TransportService);
   private router = inject(Router);
   protected readonly Math = Math;
 
+  // สถานะแท็บในหน้าอนุมัติ
   tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
   activeTab = signal<string>('Pending');
   searchText = signal<string>('');
 
+  // สถานะของ Modal รายละเอียดการอนุมัติ
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
+  // ข้อมูลรายการอนุมัติทั้งหมด
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
 
@@ -42,19 +52,25 @@ export class ApprovalsComponent implements OnInit {
     this.refresh();
   }
 
+  /**
+   * รีเฟรชข้อมูลโดยดึงข้อมูลจากทุก Service ของสวัสดิการ
+   */
   refresh() {
     forkJoin({
-      allowances: this.vehicleService.getAllowanceRequests().pipe(take(1)),
-      taxis: this.vehicleService.getTaxiRequests().pipe(take(1)),
-      vehicles: this.vehicleService.getRequests().pipe(take(1))
+      allowances: this.allowanceService.getAllowanceRequests().pipe(take(1)),
+      taxis: this.taxiService.getTaxiRequests().pipe(take(1)),
+      vehicles: this.transportService.getRequests().pipe(take(1))
     }).subscribe(({ allowances, taxis, vehicles }) => {
       this.processData(allowances, taxis, vehicles);
     });
   }
 
+  /**
+   * รวมข้อมูลจาก Service ต่างๆ เข้าด้วยกันและแปลงเป็นรูปแบบ ApprovalItem
+   */
   private processData(allowances: AllowanceRequest[], taxis: TaxiRequest[], vehicles: VehicleRequest[]) {
     const defaultUser = {
-      name: 'Unknown',
+      name: 'พนักงานทดสอบ',
       employeeId: 'N/A',
       department: 'N/A',
       company: 'บริษัท OTD'
@@ -67,7 +83,7 @@ export class ApprovalsComponent implements OnInit {
       requestType: 'ค่าเบี้ยเลี้ยง',
       typeId: a.typeId,
       requestDetail: a.items[0]?.description || 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน',
-      amount: a.items.reduce((sum, i) => sum + i.amount, 0),
+      amount: a.items.reduce((sum: number, i: any) => sum + i.amount, 0),
       status: this.mapStatus(a.status)
     }));
 
@@ -78,7 +94,7 @@ export class ApprovalsComponent implements OnInit {
       requestType: 'ค่าแท็กซี่',
       typeId: taxi.typeId,
       requestDetail: taxi.items[0]?.description || 'เบิกค่าเดินทางไปพบลูกค้า',
-      amount: taxi.items.reduce((sum, item) => sum + item.amount, 0),
+      amount: taxi.items.reduce((sum: number, item: any) => sum + item.amount, 0),
       status: this.mapStatus(taxi.status)
     }));
 
@@ -89,7 +105,7 @@ export class ApprovalsComponent implements OnInit {
       requestType: 'ค่ารถ',
       typeId: vehicle.typeId,
       requestDetail: vehicle.items[0]?.description || 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)',
-      amount: vehicle.items.reduce((sum, item) => sum + item.amount, 0),
+      amount: vehicle.items.reduce((sum: number, item: any) => sum + item.amount, 0),
       status: this.mapStatus(vehicle.status)
     }));
 
@@ -97,17 +113,17 @@ export class ApprovalsComponent implements OnInit {
     this.approvals.set(combined);
   }
 
-  private mapStatus(status: string): any {
+  /**
+   * แปลงสถานะจากระบบ (ภาษาไทย) เป็นสถานะหลักของการอนุมัติ (ภาษาอังกฤษ)
+   */
+  private mapStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
     const s = status?.trim();
 
-    // Check for rejected and referred back
     if (s === 'ไม่อนุมัติ') return 'Rejected';
     if (s === 'รอแก้ไข') return 'Referred Back';
 
-    // Approved status
     if (s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
 
-    // Pending statuses: 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ' -> Pending
     if (s === 'คำขอใหม่' ||
       s === 'ตรวจสอบแล้ว' ||
       s === 'อยู่ระหว่างการอนุมัติ' ||
@@ -120,10 +136,12 @@ export class ApprovalsComponent implements OnInit {
       return 'Pending';
     }
 
-    // Default
     return 'Pending';
   }
 
+  /**
+   * ข้อมูลที่ผ่านการกรองตามแท็บและคำค้นหา
+   */
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();
@@ -135,6 +153,7 @@ export class ApprovalsComponent implements OnInit {
         item.requestDetail.toLowerCase().includes(searchFilter))
     );
 
+    // การเรียงลำดับข้อมูล
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -167,6 +186,9 @@ export class ApprovalsComponent implements OnInit {
     return filtered;
   });
 
+  /**
+   * ตั้งค่า TanStack Table สำหรับจัดการข้อมูลตาราง
+   */
   table = createAngularTable(() => ({
     data: this.filteredData(),
     columns: [
@@ -193,12 +215,26 @@ export class ApprovalsComponent implements OnInit {
   }));
 
 
+  /**
+   * เปลี่ยนแท็บแสดงผลตามสถานะ
+   */
   setActiveTab(tab: string) {
     this.activeTab.set(tab);
   }
+
+  /**
+   * นับจำนวนรายการในแต่ละแท็บ
+   */
   getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
+
+  /**
+   * ฟังเหตุการณ์การเปลี่ยนค่าในช่องค้นหา
+   */
   onSearch(event: any) { this.searchText.set(event.target.value); }
 
+  /**
+   * สลับการเรียงลำดับในแต่ละคอลัมน์
+   */
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) {
@@ -213,6 +249,9 @@ export class ApprovalsComponent implements OnInit {
     }
   }
 
+  /**
+   * ดึง Class ไอคอนสำหรับการเรียงลำดับ
+   */
   getSortIcon(columnId: string) {
     const sortState = this.sorting()[0];
     const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
@@ -224,28 +263,43 @@ export class ApprovalsComponent implements OnInit {
     };
   }
 
+  /**
+   * เปิด Modal ดูรายละเอียดการขอเบิก
+   */
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }
 
+  /**
+   * เปิด Modal เพื่อทำการอนุมัติ/ไม่อนุมัติ โดยระบุการตัดสินใจเบื้องต้น
+   */
   openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
     this.selectedItem.set(item);
     this.initialAction.set(action);
     this.isModalOpen.set(true);
   }
 
+  /**
+   * ปิด Modal รายละเอียด
+   */
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
   }
 
+  /**
+   * เรียกรีเฟรชข้อมูลเมื่อมีการอัปเดตสถานะสำเร็จ
+   */
   onStatusUpdated() {
     this.refresh();
   }
 
+  /**
+   * กลับไปยังหน้า Dashboard
+   */
   goBack() {
     this.router.navigate(['/dashboard']);
   }

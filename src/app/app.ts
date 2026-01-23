@@ -1,9 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AlertModals } from './components/modals/alert-modals/alert-modals';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, AlertModals],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
