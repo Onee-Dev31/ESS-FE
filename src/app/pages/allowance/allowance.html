@@ -30,10 +30,10 @@
           <select class="form-control select-status" [ngModel]="filterStatus()"
             (ngModelChange)="filterStatus.set($event)">
             <option value="">ทั้งหมด</option>
-            <option value="รอตรวจสอบ">รอตรวจสอบ</option>
-            <option value="ต้นสังกัดอนุมัติ">ต้นสังกัดอนุมัติ</option>
-            <option value="รอจ่าย">รอจ่าย</option>
-            <option value="จ่ายแล้ว">จ่ายแล้ว</option>
+            <option value="คำขอใหม่">คำขอใหม่</option>
+            <option value="ตรวจสอบแล้ว">ตรวจสอบแล้ว</option>
+            <option value="อยู่ระหว่างการอนุมัติ">อยู่ระหว่างการอนุมัติ</option>
+            <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
           </select>
         </div>
         <button class="btn-search">ค้นหา</button>

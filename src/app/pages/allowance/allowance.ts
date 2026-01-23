@@ -171,10 +171,10 @@ export class AllowanceComponent implements OnInit {
 
   public getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
-      'รอตรวจสอบ': 'status-pending',
-      'ต้นสังกัดอนุมัติ': 'status-approved',
-      'รอจ่าย': 'status-waiting',
-      'จ่ายแล้ว': 'status-success',
+      'คำขอใหม่': 'status-new',
+      'ตรวจสอบแล้ว': 'status-verified',
+      'อยู่ระหว่างการอนุมัติ': 'status-pending',
+      'อนุมัติแล้ว': 'status-success',
     };
     return statusMap[status] || '';
   }

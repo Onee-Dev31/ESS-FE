@@ -355,24 +355,19 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             font-size: 0.7rem;
           }
 
-          &.status-pending {
+          &.status-new {
             background-color: rgba(255, 193, 7, 0.15);
             color: #f1b44c;
           }
 
-          &.status-dept {
+          &.status-verified {
             background-color: rgba(23, 162, 184, 0.15);
             color: #17a2b8;
           }
 
-          &.status-hr {
+          &.status-pending {
             background-color: rgba(0, 123, 255, 0.15);
             color: #007bff;
-          }
-
-          &.status-ceo {
-            background-color: rgba(111, 66, 193, 0.15);
-            color: #6f42c1;
           }
 
           &.status-success {

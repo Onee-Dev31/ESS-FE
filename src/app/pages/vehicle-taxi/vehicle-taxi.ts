@@ -165,11 +165,10 @@ export class VehicleTaxiComponent implements OnInit {
 
   getStatusClass(status: string) {
     switch (status) {
-      case 'รอตรวจสอบ': return 'status-pending';
-      case 'ต้นสังกัดอนุมัติ': return 'status-dept';
-      case 'HR อนุมัติ': return 'status-hr';
-      case 'CEO อนุมัติ': return 'status-ceo';
-      case 'ACC อนุมัติ': return 'status-success';
+      case 'คำขอใหม่': return 'status-new';
+      case 'ตรวจสอบแล้ว': return 'status-verified';
+      case 'อยู่ระหว่างการอนุมัติ': return 'status-pending';
+      case 'อนุมัติแล้ว': return 'status-success';
       default: return '';
     }
   }

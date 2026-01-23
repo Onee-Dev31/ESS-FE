@@ -105,13 +105,7 @@ export class VehicleService {
     // ==========================================
 
     private getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
-        let statuses: string[] = [];
-        if (type === 'allowance') {
-            statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'รอจ่าย', 'จ่ายแล้ว'];
-        } else {
-            // ประเภทรถส่วนตัวและแท็กซี่
-            statuses = ['รอตรวจสอบ', 'ต้นสังกัดอนุมัติ', 'HR อนุมัติ', 'CEO อนุมัติ', 'ACC อนุมัติ'];
-        }
+        const statuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ', 'อนุมัติแล้ว'];
         return statuses[Math.floor(Math.random() * statuses.length)];
     }
 
@@ -199,6 +193,8 @@ export class VehicleService {
                 status: this.getRandomStatus('allowance'),
                 requester: this.getRandomRequester(),
                 items: [
+                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' },
+                    { date: '2026-01-11', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค B', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' },
                     { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' }
                 ]
             });
@@ -341,9 +337,10 @@ export class VehicleService {
             this.allowanceRequestsSubject
         ]).pipe(
             map(([reqs, taxis, allowances]) => {
-                const p1 = reqs.filter(r => r.status.includes('รอตรวจสอบ')).length;
-                const p2 = taxis.filter(t => t.status.includes('รอตรวจสอบ')).length;
-                const p3 = allowances.filter(a => a.status.includes('รอตรวจสอบ')).length;
+                const isPending = (s: string) => s === 'คำขอใหม่' || s === 'ตรวจสอบแล้ว' || s === 'อยู่ระหว่างการอนุมัติ';
+                const p1 = reqs.filter(r => isPending(r.status)).length;
+                const p2 = taxis.filter(t => isPending(t.status)).length;
+                const p3 = allowances.filter(a => isPending(a.status)).length;
                 return p1 + p2 + p3;
             })
         );

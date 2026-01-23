@@ -176,11 +176,10 @@ export class VehicleComponent implements OnInit {
 
   getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
-      'รอตรวจสอบ': 'status-pending',
-      'ต้นสังกัดอนุมัติ': 'status-dept',
-      'HR อนุมัติ': 'status-hr',
-      'CEO อนุมัติ': 'status-ceo',
-      'ACC อนุมัติ': 'status-success',
+      'คำขอใหม่': 'status-new',
+      'ตรวจสอบแล้ว': 'status-verified',
+      'อยู่ระหว่างการอนุมัติ': 'status-pending',
+      'อนุมัติแล้ว': 'status-success',
     };
     return statusMap[status] || '';
   }
