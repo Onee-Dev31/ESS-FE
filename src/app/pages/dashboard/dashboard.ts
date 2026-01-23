@@ -5,8 +5,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../services/dashboard.service';
@@ -39,10 +38,11 @@ export class DashboardComponent implements OnInit {
   holidays$!: Observable<HolidayItem[]>;
   pendingCount$!: Observable<number>;
 
-  // ข้อมูลจำลอง (Static)
-  profileList: ProfileItem[] = [];
-  itList: ProfileItem[] = [];
+  // Derived Observables
+  profileList$!: Observable<ProfileItem[]>;
+  itList$!: Observable<ProfileItem[]>;
 
+  // ข้อมูลจำลอง (Static)
   attendanceList = [
     { label: 'ลาป่วย', value: '10 วัน' },
     { label: 'ลาพักร้อน', value: '5 วัน' },
@@ -146,32 +146,31 @@ export class DashboardComponent implements OnInit {
     this.welfareStats$ = this.dashboardService.getWelfareStats();
     this.leaveStats$ = this.dashboardService.getLeaveStats();
     this.holidays$ = this.dashboardService.getHolidays();
-
-    // คำนวณยอดรออนุมัติทั้งหมด
     this.pendingCount$ = this.vehicleService.getGlobalPendingCount();
 
-    // แปลงข้อมูล Profile ให้แสดงผลได้ง่ายขึ้น
-    this.userProfile$.subscribe(profile => {
-      this.profileList = [
+    // แปลงข้อมูล Profile เป็น List สำหรับแสดงผล
+    this.profileList$ = this.userProfile$.pipe(
+      map(profile => [
         { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
         { label: 'เบอร์โทรศัพท์', value: profile.phone, icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
         { label: 'ชั้น', value: profile.floor, icon: 'fas fa-layer-group', iconColor: '#ffffff' },
         { label: 'แผนก', value: profile.department, icon: 'fas fa-sitemap', iconColor: '#ffffff' },
         { label: 'บริษัท', value: profile.company, icon: 'fas fa-building', iconColor: '#ffffff' }
-      ];
+      ])
+    );
 
-      if (profile.itAssets) {
-        this.itList = [
+    this.itList$ = this.userProfile$.pipe(
+      map(profile => {
+        if (!profile.itAssets) return [];
+        return [
           { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
           { label: 'Account expire date', value: profile.itAssets.expireDate },
           { label: 'Laptop', value: profile.itAssets.laptop },
           { label: 'PC', value: profile.itAssets.pc },
           { label: 'Monitor', value: profile.itAssets.monitor }
         ];
-      }
-    });
-
-    // หมายเหตุ: ข้อมูลวันหยุดปัจจุบันยังเป็น Hardcoded
+      })
+    );
   }
 
   navigateTo(path: string | undefined) {

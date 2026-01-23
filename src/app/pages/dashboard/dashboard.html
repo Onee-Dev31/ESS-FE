@@ -4,6 +4,18 @@
   </header>
 
   <main class="content-body">
+    <ng-template #pendingBtn>
+      <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+        <div class="icon-shake">
+          <i class="fas fa-bell"></i>
+          <ng-container *ngIf="(pendingCount$ | async) as count">
+            <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
+          </ng-container>
+        </div>
+        รายการรออนุมัติ
+      </button>
+    </ng-template>
+
     <div class="main-layout-grid">
       <div class="left-col-wrapper">
         <div class="banner-avatar-section">
@@ -90,7 +102,7 @@
           </div>
           <div class="card-body">
             <div class="profile-info-list">
-              <div class="profile-display-group" *ngFor="let item of itList">
+              <div class="profile-display-group" *ngFor="let item of itList$ | async">
                 <label class="display-label">{{ item.label }}</label>
                 <div class="display-value">{{ item.value }}</div>
               </div>
@@ -121,7 +133,7 @@
             <hr class="section-divider" />
 
             <div class="profile-info-list">
-              <div class="profile-display-group" *ngFor="let item of profileList">
+              <div class="profile-display-group" *ngFor="let item of profileList$ | async">
                 <label class="display-label">
                   <i [class]="item.icon" [style.color]="item.iconColor"></i>
                   {{ item.label }}
@@ -137,15 +149,7 @@
             <div class="stats-group-header">
               <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
             </div>
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                <ng-container *ngIf="(pendingCount$ | async) as count">
-                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
-                </ng-container>
-              </div>
-              รายการรออนุมัติ
-            </button>
+            <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
 
           <div class="stat-items-grid">
@@ -185,15 +189,7 @@
         <div class="welfare-section">
           <div class="section-header-flex">
             <p class="section-title mb-0">สวัสดิการ</p>
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                <ng-container *ngIf="(pendingCount$ | async) as count">
-                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
-                </ng-container>
-              </div>
-              รายการรออนุมัติ
-            </button>
+            <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
           <div class="bottom-stats-grid">
             <div class="card mini-stat-card" *ngFor="let item of welfareStats$ | async" [ngClass]="item.cardClass || ''"
@@ -226,15 +222,7 @@
         <div class="leave-section">
           <div class="section-header-flex">
             <p class="section-title">ลาหยุดงาน</p>
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                <ng-container *ngIf="(pendingCount$ | async) as count">
-                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
-                </ng-container>
-              </div>
-              รายการรออนุมัติ
-            </button>
+            <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats$ | async" [ngClass]="leave.theme">

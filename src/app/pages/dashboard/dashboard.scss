@@ -1345,14 +1345,14 @@ body {
 
     &.vertical {
       flex-direction: column;
-      align-items: center; // Center for better "Box" feel if vertical
+      align-items: center;
       text-align: center;
       gap: 6px;
 
       .meta-label {
         font-size: 13px;
         margin-bottom: 0;
-        color: $primary; // Use muted for label in vertical box
+        color: $primary;
       }
 
       .meta-value {
