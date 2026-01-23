@@ -105,7 +105,12 @@ export class VehicleService {
     // ==========================================
 
     private getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
-        const statuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ', 'อนุมัติแล้ว'];
+        const statuses = [
+            'คำขอใหม่',
+            'ตรวจสอบแล้ว',
+            'อยู่ระหว่างการอนุมัติ',
+            'อนุมัติแล้ว'
+        ];
         return statuses[Math.floor(Math.random() * statuses.length)];
     }
 
@@ -174,7 +179,7 @@ export class VehicleService {
                 status: this.getRandomStatus('taxi'),
                 requester: this.getRandomRequester(),
                 items: [
-                    { date: dateStr, description: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 250, shiftCode: 'O01 09.00-18.00', attachedFile: 'receipt_01.jpg' },
+                    { date: dateStr, description: 'เดินทางไปหาลูกค้า A', destination: 'GMM Grammy', distance: 12.5, amount: 2500, shiftCode: 'O01 09.00-18.00', attachedFile: 'receipt_01.jpg' },
                     { date: dateStr, description: 'กลับจากหาลูกค้า A', destination: 'Office', distance: 12.5, amount: 230, shiftCode: 'O01 09.00-18.00', attachedFile: 'receipt_02.jpg' }
                 ]
             });
@@ -195,7 +200,7 @@ export class VehicleService {
                 items: [
                     { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' },
                     { date: '2026-01-11', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค B', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' },
-                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 225, selected: true, shiftCode: 'O01 09.00-21.00' }
+                    { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 2225, selected: true, shiftCode: 'O01 09.00-21.00' }
                 ]
             });
         }
@@ -337,7 +342,12 @@ export class VehicleService {
             this.allowanceRequestsSubject
         ]).pipe(
             map(([reqs, taxis, allowances]) => {
-                const isPending = (s: string) => s === 'คำขอใหม่' || s === 'ตรวจสอบแล้ว' || s === 'อยู่ระหว่างการอนุมัติ';
+                const isPending = (s: string) =>
+                    s === 'รอพนักงานยืนยัน' ||
+                    s === 'รอต้นสังกัดอนุมัติ' ||
+                    s === 'รอฝ่ายบุคคลอนุมัติ' ||
+                    s === 'รอผู้บริหารอนุมัติ' ||
+                    s === 'รอฝ่ายบัญชีอนุมัติ';
                 const p1 = reqs.filter(r => isPending(r.status)).length;
                 const p2 = taxis.filter(t => isPending(t.status)).length;
                 const p3 = allowances.filter(a => isPending(a.status)).length;

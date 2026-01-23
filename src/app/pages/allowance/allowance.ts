@@ -46,12 +46,19 @@ export class AllowanceComponent implements OnInit {
 
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
+  // Pagination state for request-based pagination
+  currentPage = signal<number>(0);
+  pageSize = signal<number>(10);
+
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
-    if (this.filterStatus()) filtered = filtered.filter((r) => r.status === this.filterStatus());
-    if (this.filterStartDate()) filtered = filtered.filter((r) => r.createDate >= this.filterStartDate());
-    if (this.filterEndDate()) filtered = filtered.filter((r) => r.createDate <= this.filterEndDate());
+    if (this.filterStatus()) {
+      filtered = filtered.filter((r) => {
+        const mapped = this.mapStatus(r.status);
+        return mapped === this.filterStatus();
+      });
+    }
 
     const sortState = this.sorting()[0];
     if (sortState) {
@@ -109,8 +116,81 @@ export class AllowanceComponent implements OnInit {
     return rows;
   });
 
+  // Get unique requests for pagination
+  paginatedRequests = computed(() => {
+    const allReqs = [...this.allRequests()];
+
+    // Apply filters
+    let filtered = allReqs;
+    if (this.filterStatus()) {
+      filtered = filtered.filter(r => r.status === this.filterStatus());
+    }
+    if (this.filterStartDate()) {
+      filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
+    }
+    if (this.filterEndDate()) {
+      filtered = filtered.filter(r => r.createDate <= this.filterEndDate());
+    }
+
+    // Apply sorting
+    const sortState = this.sorting()[0];
+    if (sortState) {
+      const { id, desc } = sortState;
+      const direction = desc ? -1 : 1;
+      filtered.sort((a, b) => {
+        switch (id) {
+          case 'requestId':
+            return a.id.localeCompare(b.id) * direction;
+          case 'createDate':
+            return a.createDate.localeCompare(b.createDate) * direction;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    // Paginate by unique requests
+    const start = this.currentPage() * this.pageSize();
+    const end = start + this.pageSize();
+    return filtered.slice(start, end);
+  });
+
+  // Flatten only the paginated requests
+  displayedRows = computed(() => {
+    const rows: FlatAllowanceRow[] = [];
+    this.paginatedRequests().forEach((req) => {
+      req.items.forEach((item, index) => {
+        rows.push({
+          ...item,
+          requestId: req.id,
+          createDate: req.createDate,
+          status: req.status,
+          isFirstInGroup: index === 0,
+          groupLength: req.items.length,
+        });
+      });
+    });
+    return rows;
+  });
+
+  totalRequests = computed(() => {
+    let filtered = [...this.allRequests()];
+    if (this.filterStatus()) {
+      filtered = filtered.filter(r => r.status === this.filterStatus());
+    }
+    if (this.filterStartDate()) {
+      filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
+    }
+    if (this.filterEndDate()) {
+      filtered = filtered.filter(r => r.createDate <= this.filterEndDate());
+    }
+    return filtered.length;
+  });
+
+  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
+
   table = createAngularTable(() => ({
-    data: this.processedData(),
+    data: this.displayedRows(),
     columns: [
       { accessorKey: 'requestId', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
@@ -126,13 +206,38 @@ export class AllowanceComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
+    manualPagination: true,
   }));
+
+  // Pagination methods
+  setPageSize(size: number) {
+    this.pageSize.set(size);
+    this.currentPage.set(0);
+  }
+
+  nextPage() {
+    if (this.canNextPage()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  previousPage() {
+    if (this.canPreviousPage()) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
+
+  goToPage(page: number) {
+    this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
+  }
+
+  canNextPage() {
+    return this.currentPage() < this.totalPages() - 1;
+  }
+
+  canPreviousPage() {
+    return this.currentPage() > 0;
+  }
 
   ngOnInit() {
     // ดึงข้อมูลการเบิกจาก Service
@@ -175,6 +280,12 @@ export class AllowanceComponent implements OnInit {
     };
   }
 
+  trackByRowId(index: number, row: any): string {
+    // Create a unique key from request ID, date, and index to ensure stability
+    const original = row.original || row;
+    return `${original.requestId}-${original.date}-${index}`;
+  }
+
   public getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
       'คำขอใหม่': 'status-new',
@@ -183,5 +294,10 @@ export class AllowanceComponent implements OnInit {
       'อนุมัติแล้ว': 'status-success',
     };
     return statusMap[status] || '';
+  }
+
+  private mapStatus(status: string): string {
+    const s = status?.trim();
+    return s; // Data is already clean from service
   }
 }

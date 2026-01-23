@@ -55,7 +55,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (row of table.getRowModel().rows; track row.original.requestNo + row.original.typeId) {
+          @for (row of table.getRowModel().rows; track $index) {
           <tr>
             <td class="text-center font-inter" (click)="viewDetail(row.original)"
               style="cursor: pointer; color: #008ebc; font-weight: 600;">

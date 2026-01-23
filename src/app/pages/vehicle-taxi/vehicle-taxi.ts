@@ -46,7 +46,7 @@ export class VehicleTaxiComponent implements OnInit {
 
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
-    if (this.filterStatus()) filtered = filtered.filter(r => r.status === this.filterStatus());
+    if (this.filterStatus()) filtered = filtered.filter(r => this.mapStatus(r.status) === this.filterStatus());
 
     if (this.filterStartDate() || this.filterEndDate()) {
       filtered = filtered.filter(r => {
@@ -169,6 +169,11 @@ export class VehicleTaxiComponent implements OnInit {
     };
   }
 
+  trackByRowId(index: number, row: any): string {
+    const original = row.original || row;
+    return `${original.id}-${index}`;
+  }
+
   getStatusClass(status: string) {
     switch (status) {
       case 'คำขอใหม่': return 'status-new';
@@ -177,6 +182,11 @@ export class VehicleTaxiComponent implements OnInit {
       case 'อนุมัติแล้ว': return 'status-success';
       default: return '';
     }
+  }
+
+  private mapStatus(status: string): string {
+    const s = status?.trim();
+    return s; // Data is already clean from service
   }
 
   openModal(id: string = '') {

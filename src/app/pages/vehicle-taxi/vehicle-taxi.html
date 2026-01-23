@@ -85,7 +85,7 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let row of table.getRowModel().rows">
+          <ng-container *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
             <tr *ngFor="let item of row.original.items; let i = index"
               [class.group-end]="i === row.original.items.length - 1">
 

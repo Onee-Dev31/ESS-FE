@@ -72,7 +72,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of table.getRowModel().rows">
+          <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
               class="text-center top-align merged-col">
@@ -107,35 +107,33 @@
       </table>
       <div class="pagination-container">
         <div class="pagination-info">
-          แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-          ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-          processedData().length) }}
-          จาก {{ processedData().length }} รายการ
+          แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
+          ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
+          จาก {{ totalRequests() }} รายการ
         </div>
         <div class="pagination-controls">
           <div class="page-size-selector">
-            <span>จำนวนแถวต่อหน้า:</span>
-            <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
-              <option [value]="10">10</option>
-              <option [value]="20">20</option>
-              <option [value]="50">50</option>
+            <span>เลขที่การเบิก:</span>
+            <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+              <option [value]="10">10 รายการ</option>
+              <option [value]="20">20 รายการ</option>
+              <option [value]="50">50 รายการ</option>
             </select>
           </div>
           <div class="page-buttons">
-            <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
+            <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
               <i class="fas fa-angle-double-left"></i>
             </button>
-            <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
+            <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
               <i class="fas fa-angle-left"></i>
             </button>
             <span class="page-info">
-              <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
+              <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
             </span>
-            <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
+            <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
               <i class="fas fa-angle-right"></i>
             </button>
-            <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
-              [disabled]="!table.getCanNextPage()">
+            <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
               <i class="fas fa-angle-double-right"></i>
             </button>
           </div>

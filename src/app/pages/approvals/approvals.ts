@@ -98,10 +98,29 @@ export class ApprovalsComponent implements OnInit {
   }
 
   private mapStatus(status: string): any {
-    if (status.includes('ไม่อนุมัติ')) return 'Rejected';
-    if (status.includes('อนุมัติ') || status.includes('จ่าย')) return 'Approved';
-    if (status.includes('รอตรวจสอบ')) return 'Pending';
-    if (status.includes('รอแก้ไข')) return 'Referred Back';
+    const s = status?.trim();
+
+    // Check for rejected and referred back
+    if (s === 'ไม่อนุมัติ') return 'Rejected';
+    if (s === 'รอแก้ไข') return 'Referred Back';
+
+    // Approved status
+    if (s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
+
+    // Pending statuses: 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ' -> Pending
+    if (s === 'คำขอใหม่' ||
+      s === 'ตรวจสอบแล้ว' ||
+      s === 'อยู่ระหว่างการอนุมัติ' ||
+      s === 'รอพนักงานยืนยัน' ||
+      s === 'รอต้นสังกัดอนุมัติ' ||
+      s === 'รอฝ่ายบุคคลอนุมัติ' ||
+      s === 'รอผู้บริหารอนุมัติ' ||
+      s === 'รอฝ่ายบัญชีอนุมัติ' ||
+      s.includes('รอตรวจสอบ')) {
+      return 'Pending';
+    }
+
+    // Default
     return 'Pending';
   }
 

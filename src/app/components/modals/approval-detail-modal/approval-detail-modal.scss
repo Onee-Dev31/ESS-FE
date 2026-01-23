@@ -90,7 +90,7 @@ $bg-slate: #f4f7f9;
         }
 
         .approval-progress-bar {
-            padding: 3rem 2rem 2.5rem;
+            padding: 1.5rem 1.5rem 1.5rem;
             background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
             border-bottom: 1px solid #e2e8f0;
 
@@ -108,8 +108,8 @@ $bg-slate: #f4f7f9;
                     .progress-line-bg {
                         position: absolute;
                         top: 24px; // Half of 48px circle
-                        left: 24px; // Half of 48px circle
-                        right: 24px; // Half of 48px circle
+                        left: 10%; // Center of first step (100% / 5 steps / 2)
+                        right: 10%; // Center of last step
                         height: 4px;
                         background: #e2e8f0;
                         border-radius: 2px;
@@ -120,14 +120,14 @@ $bg-slate: #f4f7f9;
                     .progress-line-fill {
                         position: absolute;
                         top: 24px;
-                        left: 24px;
+                        left: 10%; // Center of first step
                         height: 4px;
                         background: linear-gradient(90deg, #74c34d 0%, #5bb030 100%);
                         border-radius: 2px;
                         z-index: 1;
                         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
                         box-shadow: 0 0 8px rgba(116, 195, 77, 0.3);
-                        max-width: calc(100% - 48px); // Prevent extending beyond last circle
+                        max-width: 80%; // Total width between first and last centers
                     }
 
                     .progress-step {

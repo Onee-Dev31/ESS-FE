@@ -42,7 +42,7 @@ export class VehicleComponent implements OnInit {
     let filtered = [...this.allRequests()];
 
     if (this.filterStatus()) {
-      filtered = filtered.filter(r => r.status === this.filterStatus());
+      filtered = filtered.filter(r => this.mapStatus(r.status) === this.filterStatus());
     }
     if (this.filterStartDate()) {
       filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
@@ -180,6 +180,11 @@ export class VehicleComponent implements OnInit {
     this.selectedRequestId = '';
   }
 
+  trackByRowId(index: number, row: any): string {
+    const original = row.original || row;
+    return `${original.id}-${index}`;
+  }
+
   getStatusClass(status: string): string {
     const statusMap: Record<string, string> = {
       'คำขอใหม่': 'status-new',
@@ -188,5 +193,10 @@ export class VehicleComponent implements OnInit {
       'อนุมัติแล้ว': 'status-success',
     };
     return statusMap[status] || '';
+  }
+
+  private mapStatus(status: string): string {
+    const s = status?.trim();
+    return s; // Data is already clean from service
   }
 }
