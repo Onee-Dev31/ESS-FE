@@ -265,23 +265,12 @@
   }
 
   @media (max-width: 1100px) {
-    @include vertical-mode;
-
-    &.collapsed {
-      width: 0 !important;
-      min-width: 0 !important;
-      border: none;
-
-      * {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
+    // Rely on the collapsed class or defaults
   }
 
   @media (max-width: 768px) {
-    position: absolute;
-    height: 100vh;
+    // Removed absolute positioning to allow sidebar to push content
+    height: 100%;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
   }
 }
