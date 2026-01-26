@@ -131,8 +131,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId"
-                        (click)="openModal(row.original.requestId)" style="cursor: pointer;">
+                    <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
                         <!-- ID -->
                         <td class="text-center font-bold" style="color: #008ebc;">
