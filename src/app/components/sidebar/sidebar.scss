@@ -10,14 +10,26 @@
   background: #ffffff;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    padding 0.3s ease;
+    padding 0.7s ease,
+    border-right-color 0.7s ease; // Add border transition
+
   display: flex;
   flex-direction: column;
   border-right: 1px solid #f1f5f9;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
   position: relative;
   z-index: 10;
-  overflow-x: hidden;
+  overflow-x: hidden; // Ensure content is clipped during transition
+
+  // ... (existing code) ...
+
+  @mixin hidden-mode {
+    width: 0;
+    min-width: 0;
+    border-right-color: transparent; // Fade border instead of removing (prevents snap)
+    box-shadow: none;
+    // Removed * { opacity: 0 } to let overflow:hidden handle the hiding smoothly
+  }
 
   ul,
   li {
@@ -43,8 +55,8 @@
   }
 
   @mixin vertical-mode {
-    width: 80px !important;
-    min-width: 80px !important; // Force override the global 230px
+    width: 80px;
+    min-width: 80px;
 
     .section-title {
       display: block !important;
@@ -155,7 +167,7 @@
     padding: 10px 20px;
     color: #64748b;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.7s ease;
     position: relative;
     border-left: 3px solid transparent;
 
@@ -194,7 +206,7 @@
     margin-right: 12px;
     text-align: center;
     color: #94a3b8;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .link-text {
@@ -207,7 +219,7 @@
   .arrow-icon {
     font-size: 12px;
     color: #cbd5e1;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
   }
 
   .nav-item.open .arrow-icon {
@@ -219,7 +231,7 @@
     max-height: 0;
     opacity: 0;
     background: #f8fafc;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease;
 
     &.expanded {
       max-height: 500px;
@@ -264,15 +276,10 @@
   }
 
   @mixin hidden-mode {
-    width: 0 !important;
-    min-width: 0 !important;
-    border: none;
+    width: 0;
+    min-width: 0;
+    border-right-color: transparent;
     box-shadow: none;
-
-    * {
-      opacity: 0;
-      visibility: hidden;
-    }
   }
 
   &.collapsed {
