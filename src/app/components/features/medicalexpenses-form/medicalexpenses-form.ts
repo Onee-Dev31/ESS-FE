@@ -139,8 +139,8 @@ export class MedicalexpensesForm implements OnInit {
   }
 
   save() {
-    if (!this.hospital || !this.disease || this.amount <= 0) {
-      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน', 'ข้อมูลไม่ครบ');
+    if (!this.hospital || !this.disease || this.amount < 0) {
+      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วนและจำนวนเงินต้องไม่ติดลบ', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
 
