@@ -23,7 +23,7 @@ export class MedicalexpensesForm implements OnInit {
 
   claimTypes = [
     { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: '#ff6b6b' },
-    { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-book-medical', color: '#4d96ff' },
+    { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: '#4d96ff' },
     { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: '#6bc1ff' },
     { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: '#6bcb77' },
   ];
@@ -139,8 +139,13 @@ export class MedicalexpensesForm implements OnInit {
   }
 
   save() {
-    if (!this.hospital || !this.disease || this.amount < 0) {
-      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วนและจำนวนเงินต้องไม่ติดลบ', 'ข้อมูลไม่ถูกต้อง');
+    if (!this.selectedClaimType()) {
+      this.alertService.showWarning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
+      return;
+    }
+
+    if (!this.hospital || !this.disease || this.amount <= 0) {
+      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
 
@@ -155,7 +160,7 @@ export class MedicalexpensesForm implements OnInit {
     const request: MedicalRequest = {
       id: this.requestId,
       createDate: this.isEditMode() ? new Date().toISOString() : new Date().toISOString(), // In real app use existing createDate
-      status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'รออนุมัติ',
+      status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
       employeeId: 'EMP001',
       totalRequestedAmount: this.amount,
       totalApprovedAmount: 0,
@@ -172,9 +177,21 @@ export class MedicalexpensesForm implements OnInit {
     };
 
     if (this.isEditMode()) {
-      this.medicalService.updateRequest(request).subscribe(() => this.close());
+      this.medicalService.updateRequest(request).subscribe({
+        next: () => {
+          this.alertService.showSuccess('แก้ไขข้อมูลเรียบร้อยแล้ว');
+          this.close();
+        },
+        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
+      });
     } else {
-      this.medicalService.addRequest(request).subscribe(() => this.close());
+      this.medicalService.addRequest(request).subscribe({
+        next: () => {
+          this.alertService.showSuccess('บันทึกข้อมูลเรียบร้อยแล้ว');
+          this.close();
+        },
+        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+      });
     }
   }
 }

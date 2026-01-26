@@ -21,7 +21,7 @@
                     <div class="card-content">
                         <div class="type-info">
                             <span class="type-label">{{ type.label }}</span>
-                            <span class="balance-value" [style.color]="type.color">${{ type.amount }}</span>
+                            <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
                             <span class="balance-label">ยอดคงเหลือ</span>
                         </div>
                         <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
@@ -91,25 +91,23 @@
                     <thead>
                         <tr>
                             <th style="width: 50px;">#</th>
-                            <th style="width: 50px;"><i class="far fa-trash-alt"></i></th>
                             <th>Upload file</th>
+                            <th style="width: 50px;"><i class="far fa-trash-alt"></i></th>
                             <th>รายละเอียด</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let file of attachments(); let i = index">
                             <td class="text-center">{{ i + 1 }}</td>
+                            <td>
+                                <div class="file-name-container">
+                                    <span class="file-text">{{ file.name }}</span>
+                                </div>
+                            </td>
                             <td class="text-center">
                                 <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
-                            </td>
-                            <td>
-                                <div class="file-name-container">
-                                    <span class="file-text">{{ file.name }}</span>
-                                    <i class="far fa-trash-alt file-delete-icon"
-                                        (click)="deleteAttachment(file.id)"></i>
-                                </div>
                             </td>
                             <td>
                                 <div class="desc-input-wrapper">
@@ -123,7 +121,6 @@
             </div>
         </section>
 
-        <!-- Placeholder when no type selected -->
         <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedClaimType()">
             <div class="placeholder-content">
                 <i class="fas fa-mouse-pointer pulse-icon"></i>

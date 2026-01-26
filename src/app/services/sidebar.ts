@@ -2,14 +2,17 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class SidebarService {
   isCollapsed = signal(false);
+
   setCollapsed(value: boolean) {
     this.isCollapsed.set(value);
   }
 
   toggle() {
-    // If screen is 1024px or less, force it to stay collapsed
+    // Force folded state at 1024px - ignore manual toggle to expand
     if (window.innerWidth <= 1024) {
-      this.setCollapsed(true);
+      if (!this.isCollapsed()) {
+        this.setCollapsed(true);
+      }
       return;
     }
 
@@ -19,5 +22,4 @@ export class SidebarService {
       window.dispatchEvent(new Event('resize'));
     }, 300);
   }
-
 }

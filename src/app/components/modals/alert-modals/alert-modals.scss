@@ -6,7 +6,7 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 99999;
+    z-index: 2147483647; // Maximum possible z-index to ensure visibility over any other modal
     display: flex;
     align-items: center;
     justify-content: center;

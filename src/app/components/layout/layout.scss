@@ -19,8 +19,8 @@
       flex-shrink: 0;
       z-index: 1000;
 
-      @media (max-width: 1100px) {
-        // We'll let the collapsed class or sidebar component handle this mostly
+      @media (max-width: 1024px) {
+        // We'll let the collapsed class handle the width
       }
     }
 
@@ -43,6 +43,10 @@
   &.collapsed {
     .sidebar-container {
       width: 80px;
+
+      @media (max-width: 1024px) {
+        // Keep it 80px as requested "folded" mode
+      }
     }
   }
 }

@@ -34,16 +34,10 @@ export class LayoutComponent implements OnInit {
   private checkWindowSize(): void {
     const isSmallScreen = window.innerWidth <= 1024;
 
-    if (isSmallScreen) {
-      // Force collapsed state on screens <= 1024px (disables manual expansion)
-      if (!this.sidebarService.isCollapsed()) {
-        this.sidebarService.setCollapsed(true);
-      }
-    } else if (this.lastIsSmallScreen !== isSmallScreen) {
-      // Automatically expand ONLY when crossing from small to large screen
-      this.sidebarService.setCollapsed(false);
+    // Only auto-update the sidebar state when we CROSS the breakpoint
+    if (this.lastIsSmallScreen !== isSmallScreen) {
+      this.sidebarService.setCollapsed(isSmallScreen);
+      this.lastIsSmallScreen = isSmallScreen;
     }
-
-    this.lastIsSmallScreen = isSmallScreen;
   }
 }
