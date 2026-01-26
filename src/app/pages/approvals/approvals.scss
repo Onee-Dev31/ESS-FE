@@ -15,9 +15,7 @@ $bg-slate: #f4f7f9;
 
   background: $bg-slate;
   min-height: 100vh;
-  font-family: 'Inter',
-  'IBM Plex Sans Thai Looped',
-  sans-serif;
+  font-family: var(--font-main);
 
   .card {
     background: white;
@@ -206,7 +204,7 @@ $bg-slate: #f4f7f9;
   .data-grid {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    min-width: 950px;
 
     th {
       padding: 1rem;

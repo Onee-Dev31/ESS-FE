@@ -4,7 +4,7 @@ $text-dark: #333;
 $text-muted: #666;
 $text-label: #555;
 $bg-light: #f1f5f9;
-$font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+$bg-light: #f1f5f9;
 
 :host {
   display: flex;
@@ -14,7 +14,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
-  font-family: $font-stack;
   background: linear-gradient(-45deg, #7179e1, $primary-color, #1f277d, #1666a3);
   background-size: 400% 400%;
   animation: gradientBG 10s ease infinite;

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -90,7 +92,7 @@
     font-size: 1rem;
     line-height: 1.8;
     color: #334155;
-    font-family: 'Sarabun', sans-serif;
+    font-family: var(--font-main);
 
     .policy-section {
         margin-bottom: 2.5rem;
@@ -107,7 +109,7 @@
         margin-bottom: 1.2rem;
 
         p {
-            margin: 0;
+            margin: 0 0 1.2rem 0;
             font-weight: 700; // เด่นกว่าเดิมเพื่อให้เป็นหัวข้อหลัก 5.x
             color: #1e293b;
             font-size: 1.15rem; // ใหญ่ขึ้นนิดหน่อย
@@ -202,13 +204,15 @@
     }
 
     .verbatim-list {
+        padding-left: 1rem;
+
         .list-item {
             display: flex;
-            gap: 1.5rem;
+            gap: 12px;
             margin-bottom: 1.5rem;
 
             .item-num {
-                min-width: 45px;
+                min-width: 35px;
                 font-weight: 700;
             }
 

@@ -6,22 +6,14 @@ $danger: #d93025;
 $border: #dee2e6;
 $text: #202124;
 $text-sub: #5f6368;
-$font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+$text-sub: #5f6368;
 
 .medical-expenses-form-page {
     display: flex;
     flex-direction: column;
     height: 100%;
     background: #fff;
-    font-family: $font-main;
     overflow: hidden;
-
-    input,
-    button,
-    select,
-    textarea {
-        font-family: $font-main;
-    }
 
     .top-header-strip {
         display: flex;

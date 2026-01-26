@@ -6,7 +6,6 @@ $btn-search-bg: #003e6d;
 $text-header: #ffffff;
 $border-color: #e9ecef;
 $bg-page: #f8f9fa;
-$font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 @mixin mobile {
     @media (max-width: 575.98px) {
@@ -23,7 +22,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 .medical-page {
     padding: 20px;
     background-color: $bg-page;
-    font-family: $font-stack;
     min-height: 100vh;
     box-sizing: border-box;
 
@@ -95,7 +93,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             font-size: 1.2rem;
             font-weight: 700;
             color: #000;
-            font-family: $font-stack;
 
             @include mobile {
                 font-size: 1.1rem;
@@ -117,7 +114,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         font-size: 1.1rem;
         font-weight: 600;
         color: #333;
-        font-family: $font-stack;
     }
 
     .toolbar-container {
@@ -136,7 +132,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
                 padding: 8px 20px;
                 border-radius: 4px;
                 font-weight: 600;
-                font-family: $font-stack;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -153,6 +148,13 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             align-items: flex-end;
             gap: 12px;
             flex-wrap: wrap;
+
+            @media (max-width: 768px) {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
 
             .filter-group {
                 display: flex;
@@ -248,7 +250,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     .modern-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1200px;
+        min-width: 900px;
 
         thead {
             background-color: $header-bg;
@@ -435,7 +437,6 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            font-family: $font-stack;
 
             @include mobile {
                 width: 100%;

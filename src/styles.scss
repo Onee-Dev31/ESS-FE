@@ -12,12 +12,13 @@
   --bg-body: #f4f7f6;
   --text-muted: #adb5bd;
   --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+  --font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 }
 
 body {
   margin: 0;
   background-color: var(--bg-body);
-  font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -43,4 +44,49 @@ textarea {
 
 .bg-primary {
   background-color: var(--primary-color) !important;
+}
+
+// Responsive Utilities
+.mobile-only {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.w-100-mobile {
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+}
+
+.p-0-mobile {
+  @media (max-width: 768px) {
+    padding: 0 !important;
+  }
+}
+
+.m-0-mobile {
+  @media (max-width: 768px) {
+    margin: 0 !important;
+  }
+}
+
+.text-center-mobile {
+  @media (max-width: 768px) {
+    text-align: center !important;
+  }
+}
+
+// Global Card Adjustments for Small Screens
+@media (max-width: 768px) {
+  .card {
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+  }
 }

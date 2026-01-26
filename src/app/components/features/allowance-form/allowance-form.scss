@@ -284,6 +284,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
+      min-width: 800px;
       table-layout: fixed;
 
       th,
