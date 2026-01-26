@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
-import { AlertService } from '../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../services/alert.service';
+import { VehicleService } from '../../services/vehicle.service';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import {
   createAngularTable,
@@ -21,7 +22,8 @@ import {
 })
 export class VehicleComponent implements OnInit {
   private transportService = inject(TransportService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
+  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
   /**
@@ -218,12 +220,6 @@ export class VehicleComponent implements OnInit {
    * คืนค่า CSS Class ตามสถานะของรายการ
    */
   public getStatusClass(status: string): string {
-    const statusMap: Record<string, string> = {
-      'คำขอใหม่': 'status-new',
-      'ตรวจสอบแล้ว': 'status-verified',
-      'อยู่ระหว่างการอนุมัติ': 'status-pending',
-      'อนุมัติแล้ว': 'status-success',
-    };
-    return statusMap[status] || '';
+    return this.vehicleService.getStatusBadgeClass(status);
   }
 }

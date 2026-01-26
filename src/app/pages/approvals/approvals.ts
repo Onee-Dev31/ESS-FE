@@ -2,7 +2,6 @@ import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VehicleService } from '../../services/vehicle.service';
 import { AllowanceService, AllowanceRequest } from '../../services/allowance.service';
 import { TaxiService, TaxiRequest } from '../../services/taxi.service';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
@@ -27,7 +26,6 @@ import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/mod
 })
 export class ApprovalsComponent implements OnInit {
   // ฉีด Service ต่างๆ ที่จำเป็น
-  private vehicleService = inject(VehicleService);
   private allowanceService = inject(AllowanceService);
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);

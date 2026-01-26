@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../services/taxi.service';
-import { AlertService } from '../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../services/alert.service';
+import { VehicleService } from '../../services/vehicle.service';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import {
@@ -33,7 +34,8 @@ interface FlatTaxiRow extends TaxiItem {
 })
 export class VehicleTaxiComponent implements OnInit {
   private taxiService = inject(TaxiService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
+  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
   /**
@@ -276,12 +278,6 @@ export class VehicleTaxiComponent implements OnInit {
    * คืนค่าคลาส CSS สถานะเพื่อใช้แสดงสี Badge
    */
   public getStatusClass(status: string): string {
-    const statusMap: Record<string, string> = {
-      'คำขอใหม่': 'status-new',
-      'ตรวจสอบแล้ว': 'status-verified',
-      'อยู่ระหว่างการอนุมัติ': 'status-pending',
-      'อนุมัติแล้ว': 'status-success',
-    };
-    return statusMap[status] || '';
+    return this.vehicleService.getStatusBadgeClass(status);
   }
 }

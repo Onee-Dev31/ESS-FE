@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../services/allowance.service';
-import { AlertService } from '../../services/alert.service'; // เพิ่ม AlertService
+import { VehicleService } from '../../services/vehicle.service';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -32,7 +32,7 @@ interface FlatAllowanceRow extends AllowanceItem {
 })
 export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
   /**
@@ -296,12 +296,6 @@ export class AllowanceComponent implements OnInit {
    * ระบุ CSS Class ตามสถานะ (เพื่อใช้ในการแสดงสี Badge)
    */
   public getStatusClass(status: string): string {
-    const statusMap: Record<string, string> = {
-      'คำขอใหม่': 'status-new',
-      'ตรวจสอบแล้ว': 'status-verified',
-      'อยู่ระหว่างการอนุมัติ': 'status-pending',
-      'อนุมัติแล้ว': 'status-success',
-    };
-    return statusMap[status] || '';
+    return this.vehicleService.getStatusBadgeClass(status);
   }
 }

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, OnInit, inject } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService, MedicalRequest } from '../../../services/medicalexpenses.service';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -12,6 +13,7 @@ import { MedicalexpensesService, MedicalRequest } from '../../../services/medica
 })
 export class MedicalexpensesForm implements OnInit {
   private medicalService = inject(MedicalexpensesService);
+  private alertService = inject(AlertService);
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -138,7 +140,7 @@ export class MedicalexpensesForm implements OnInit {
 
   save() {
     if (!this.hospital || !this.disease || this.amount <= 0) {
-      alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน', 'ข้อมูลไม่ครบ');
       return;
     }
 

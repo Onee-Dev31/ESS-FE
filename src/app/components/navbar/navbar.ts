@@ -15,60 +15,32 @@ interface NotificationItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
 export class NavbarComponent {
   isProfileOpen = false;
   isNotificationOpen = false;
-  
+
   userName = 'MARK STEPHEN';
   userRole = 'Web Developer';
 
   notifications: NotificationItem[] = [
-    { 
-      id: 1, 
-      title: 'รายการรออนุมัติ', 
-      message: 'รายการ #REQ-2024-001 รอการอนุมัติ', 
-      status: 'pending', 
-      time: 'เมื่อสักครู่' 
-    },
-    // { 
-    //   id: 2, 
-    //   title: 'ใบลางานได้รับการอนุมัติ', 
-    //   message: 'หัวหน้าอนุมัติการลาพักร้อนของคุณแล้ว', 
-    //   status: 'approved', 
-    //   time: '2 ชม. ที่แล้ว' 
-    // },
-    // { 
-    //   id: 3, 
-    //   title: 'ขอเบิกอุปกรณ์', 
-    //   message: 'รายการ #REQ-2024-005 ถูกปฏิเสธ', 
-    //   status: 'rejected', 
-    //   time: 'เมื่อวานนี้' 
-    // },
-    // { 
-    //   id: 4, 
-    //   title: 'สมัครสมาชิกใหม่', 
-    //   message: 'นาย สมชาย ใจดี รอการตรวจสอบ', 
-    //   status: 'pending', 
-    //   time: '2 วันที่แล้ว' 
-    // },
-    // { 
-    //   id: 4, 
-    //   title: 'สมัครสมาชิกใหม่', 
-    //   message: 'นาย สมชาย ใจดี รอการตรวจสอบ', 
-    //   status: 'pending', 
-    //   time: '2 วันที่แล้ว' 
-    // }
+    {
+      id: 1,
+      title: 'รายการรออนุมัติ',
+      message: 'รายการ #REQ-2024-001 รอการอนุมัติ',
+      status: 'pending',
+      time: 'เมื่อสักครู่'
+    }
   ];
 
   constructor(
     private eRef: ElementRef,
     private router: Router,
     public sidebarService: SidebarService
-  ) {}
+  ) { }
 
   toggleSidebar() {
     this.sidebarService.toggle();

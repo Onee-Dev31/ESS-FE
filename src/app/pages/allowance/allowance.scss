@@ -102,116 +102,119 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     }
   }
 
-  .toolbar-container {
-    padding: 0 20px 20px 20px;
+  .allowance-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    padding: 20px 30px;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 20px;
     flex-wrap: wrap;
-    gap: 15px;
 
     @include mobile {
-      padding: 0 15px 15px 15px;
       flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
+      align-items: flex-start;
+      padding: 15px;
+      gap: 15px;
     }
 
-    .left-action {
-      .btn-create {
-        background-color: $btn-create-bg;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-family: $font-stack;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        white-space: nowrap;
-
-        &:hover {
-          background-color: color.adjust($btn-create-bg, $lightness: -5%);
-        }
-
-        @include mobile {
-          width: 100%;
-          padding: 12px;
-          order: 2;
-        }
-      }
-    }
-
-    .right-filters {
+    .hero-section {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-
-      @include tablet {
-        flex: 1;
-      }
+      gap: 40px;
 
       @include mobile {
-        width: 100%;
         flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        order: 1;
+        align-items: flex-start;
+        gap: 15px;
+        width: 100%;
       }
 
-      .select-input-group {
-        @include mobile {
-          width: 100%;
+      .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex: 0 0 auto;
+
+        .card-header-title {
+          padding: 0;
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #333;
         }
 
-        .select-status {
-          padding: 6px 10px;
-          border: 1px solid #ced4da;
+        .btn-create {
+          background-color: $btn-create-bg;
+          color: white;
+          border: none;
+          padding: 10px 24px;
           border-radius: 6px;
-          background-color: white;
+          font-weight: 600;
           font-family: $font-stack;
           cursor: pointer;
-          min-width: 150px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: fit-content;
+          box-shadow: 0 4px 6px rgba($btn-create-bg, 0.2);
+          transition: all 0.2s;
 
-          &:focus {
-            border-color: #1a73e8;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+          &:hover {
+            background-color: color.adjust($btn-create-bg, $lightness: -5%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba($btn-create-bg, 0.3);
           }
 
-          @include mobile {
-            width: 100%;
-            height: 40px;
+          i {
+            font-size: 0.9rem;
           }
         }
       }
 
-      .filter-label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: #333;
-        font-family: $font-stack;
+    }
+  }
 
-        @include mobile {
-          display: none;
-        }
+  .right-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 5px;
+
+    @include tablet {
+      justify-content: flex-end;
+
+      margin-left: auto;
+    }
+
+    @include mobile {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .select-input-group {
+      @include mobile {
+        width: 100%;
       }
 
-      .form-control {
+      .select-status {
         padding: 6px 10px;
         border: 1px solid #ced4da;
-        border-radius: 4px;
-        color: #495057;
-        font-size: 0.9rem;
-        outline: none;
+        border-radius: 6px;
+        background-color: white;
         font-family: $font-stack;
+        cursor: pointer;
+        min-width: 150px;
+        height: 38px;
 
         &:focus {
-          border-color: $btn-search-bg;
+          border-color: #1a73e8;
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
         }
 
         @include mobile {
@@ -219,47 +222,89 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           height: 40px;
         }
       }
+    }
 
-      .btn-search {
-        background-color: $btn-search-bg;
-        color: white;
-        border: none;
-        padding: 7px 20px;
-        border-radius: 4px;
-        font-weight: 500;
-        font-family: $font-stack;
-        cursor: pointer;
+    .filter-label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #333;
+      font-family: $font-stack;
+      margin-bottom: 5px;
+      display: block;
 
-        &:hover {
-          background-color: color.adjust($btn-search-bg, $lightness: 5%);
-        }
+      @include mobile {
+        display: none;
+      }
+    }
 
-        @include mobile {
-          width: 100%;
-          padding: 10px;
-          margin-top: 5px;
-        }
+    .form-control {
+      padding: 6px 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      color: #495057;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: $font-stack;
+      height: 38px;
+
+      &:focus {
+        border-color: $btn-search-bg;
       }
 
-      .btn-clear {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #ced4da;
-        padding: 7px 20px;
-        border-radius: 4px;
-        font-weight: 500;
-        font-family: $font-stack;
-        cursor: pointer;
+      @include mobile {
+        width: 100%;
+        height: 40px;
+      }
+    }
 
-        &:hover {
-          background-color: #e2e6ea;
-          color: #212529;
-        }
+    .btn-search {
+      background-color: $btn-search-bg;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      height: 38px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-family: $font-stack;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      justify-content: center;
 
-        @include mobile {
-          width: 100%;
-          padding: 10px;
-        }
+      &:hover {
+        background-color: color.adjust($btn-search-bg, $lightness: 5%);
+      }
+
+      @include mobile {
+        width: 100%;
+        margin-top: 5px;
+      }
+    }
+
+    .btn-clear {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      height: 38px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-family: $font-stack;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      justify-content: center;
+
+      &:hover {
+        background-color: #e2e6ea;
+        color: #212529;
+      }
+
+      @include mobile {
+        width: 100%;
+        padding: 10px;
       }
     }
   }

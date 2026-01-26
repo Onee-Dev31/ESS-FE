@@ -7,17 +7,19 @@
   </div>
 
   <div class="content-card">
-    <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
-
-    <div class="toolbar-container">
-      <div class="left-action">
-        <button class="btn-create" (click)="openModal()">
-          <i class="fas fa-plus"></i> สร้างรายการเบิก
-        </button>
+    <div class="allowance-header">
+      <div class="hero-section">
+        <div class="header-content">
+          <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+          <button class="btn-create" (click)="openModal()">
+            <i class="fas fa-plus"></i> สร้างรายการเบิก
+          </button>
+        </div>
       </div>
 
       <div class="right-filters">
-        <span class="filter-label">วันที่สร้างรายการ</span>
+
+        <span class="filter-label">ตั้งแต่เดือน</span>
         <div class="date-input-group">
           <input type="date" class="form-control" [ngModel]="filterStartDate()"
             (ngModelChange)="filterStartDate.set($event)" />
@@ -39,8 +41,12 @@
             <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
           </select>
         </div>
-        <button class="btn-search">ค้นหา</button>
-        <button class="btn-clear" (click)="clearFilters()">ล้างค่า</button>
+        <button class="btn-clear" (click)="clearFilters()">
+          <i class="fas fa-sync-alt"></i> คืนค่า
+        </button>
+        <button class="btn-search">
+          <i class="fas fa-search"></i> ค้นหา
+        </button>
       </div>
     </div>
 
