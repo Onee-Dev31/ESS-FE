@@ -43,8 +43,8 @@
   }
 
   @mixin vertical-mode {
-    width: 80px;
-    min-width: 80px;
+    width: 80px !important;
+    min-width: 80px !important; // Force override the global 230px
 
     .section-title {
       display: block !important;
@@ -92,6 +92,9 @@
     .nav-icon {
       margin: 0 0 4px 0;
       font-size: 1.3rem;
+      display: block;
+      width: 100%;
+      text-align: center;
     }
 
     .link-text {
@@ -273,7 +276,17 @@
   }
 
   &.collapsed {
-    @include vertical-mode; // Keeps 80px width
+    @include vertical-mode; // Keeps 80px width (Desktop)
+
+    @media (max-width: 1024px) {
+      @include hidden-mode; // Hides completely (Small screens)
+    }
+  }
+
+  @media (max-width: 1024px) {
+    &:not(.collapsed) {
+      @include vertical-mode; // Force 80px even when NOT collapsed at small screens
+    }
   }
 
   @media (max-width: 768px) {

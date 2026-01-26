@@ -18,9 +18,10 @@
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
       z-index: 1000;
+      
 
       @media (max-width: 1024px) {
-        // We'll let the collapsed class handle the width
+         // When NOT collapsed on small screens (toggled open), only show mini-bar
       }
     }
 
@@ -45,7 +46,7 @@
       width: 80px;
 
       @media (max-width: 1024px) {
-        // Keep it 80px as requested "folded" mode
+        width: 0; // Hide completely when collapsed on small screens
       }
     }
   }

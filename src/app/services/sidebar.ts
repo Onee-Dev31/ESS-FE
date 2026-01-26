@@ -8,13 +8,7 @@ export class SidebarService {
   }
 
   toggle() {
-    // Force folded state at 1024px - ignore manual toggle to expand
-    if (window.innerWidth <= 1024) {
-      if (!this.isCollapsed()) {
-        this.setCollapsed(true);
-      }
-      return;
-    }
+
 
     this.isCollapsed.update(val => !val);
 
