@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -9,6 +9,7 @@ import { Observable, map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../services/dashboard.service';
+import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 
@@ -18,6 +19,7 @@ interface ProfileItem { label: string; value: string; icon?: string; iconColor?:
   imports: [
     CommonModule,
     FullCalendarModule,
+    MedicalPolicyModalComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -27,6 +29,8 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
+
+  isPolicyModalOpen = signal<boolean>(false);
 
   // ข้อมูลสำหรับหน้า Dashboard ที่ดึงจาก Service
   userProfile$!: Observable<UserProfile>;

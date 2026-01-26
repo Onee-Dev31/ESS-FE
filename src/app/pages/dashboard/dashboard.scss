@@ -682,6 +682,29 @@ body {
     i {
       color: $primary;
     }
+
+    .btn-info-policy {
+      background: none;
+      border: none;
+      color: $muted;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 14px;
+
+      i {
+        color: inherit;
+      }
+
+      &:hover {
+        color: $primary;
+        background-color: rgba($primary, 0.1);
+      }
+    }
   }
 
   .stat-items-grid {

@@ -148,6 +148,10 @@
           <div class="section-header-flex">
             <div class="stats-group-header">
               <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
+              <button class="btn-info-policy" (click)="isPolicyModalOpen.set(true)"
+                title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
+                <i class="fas fa-info-circle"></i>
+              </button>
             </div>
             <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
@@ -294,4 +298,8 @@
       </div>
     </div>
   </main>
+
+  <!-- Medical Policy Modal -->
+  <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+  </app-medical-policy-modal>
 </div>
