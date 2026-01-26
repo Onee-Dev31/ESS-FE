@@ -260,7 +260,23 @@
               </div>
 
               <div class="calendar-panel">
+                @defer (on viewport) {
                 <full-calendar [options]="calendarOptions"></full-calendar>
+                } @placeholder {
+                <div class="calendar-placeholder">
+                  <div class="skeleton-calendar"></div>
+                  <p>กำลังโหลดปฏิทิน...</p>
+                </div>
+                } @loading (after 100ms; minimum 500ms) {
+                <div class="calendar-loading">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>กำลังเตรียมข้อมูลปฏิทิน...</p>
+                </div>
+                } @error {
+                <div class="calendar-error">
+                  <p>ไม่สามารถโหลดปฏิทินได้ กรุณาลองใหม่</p>
+                </div>
+                }
               </div>
             </div>
 

@@ -1,12 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
-import { DashboardComponent } from './pages/dashboard/dashboard';
 import { LayoutComponent } from './components/layout/layout';
-import { VehicleComponent } from './pages/vehicle/vehicle';
-import { AllowanceComponent } from './pages/allowance/allowance'
-import { VehicleTaxiComponent } from './pages/vehicle-taxi/vehicle-taxi'
-import { ApprovalsComponent } from './pages/approvals/approvals';
-import { MedicalexpensesComponent } from './pages/medicalexpenses/medicalexpenses';
 
 
 export const routes: Routes = [
@@ -19,17 +13,38 @@ export const routes: Routes = [
             {
                 path: 'dashboard',
                 children: [
-                    { path: '', component: DashboardComponent },
-                    { path: 'default', component: DashboardComponent }
+                    {
+                        path: '',
+                        loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent)
+                    },
+                    {
+                        path: 'default',
+                        loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent)
+                    }
                 ]
             },
 
 
-            { path: 'vehicle', component: VehicleComponent },
-            { path: 'allowance', component: AllowanceComponent },
-            { path: 'vehicle-taxi', component: VehicleTaxiComponent },
-            { path: 'approvals', component: ApprovalsComponent },
-            { path: 'medicalexpenses', component: MedicalexpensesComponent },
+            {
+                path: 'vehicle',
+                loadComponent: () => import('./pages/vehicle/vehicle').then(m => m.VehicleComponent)
+            },
+            {
+                path: 'allowance',
+                loadComponent: () => import('./pages/allowance/allowance').then(m => m.AllowanceComponent)
+            },
+            {
+                path: 'vehicle-taxi',
+                loadComponent: () => import('./pages/vehicle-taxi/vehicle-taxi').then(m => m.VehicleTaxiComponent)
+            },
+            {
+                path: 'approvals',
+                loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent)
+            },
+            {
+                path: 'medicalexpenses',
+                loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent)
+            },
 
             {
                 path: '',

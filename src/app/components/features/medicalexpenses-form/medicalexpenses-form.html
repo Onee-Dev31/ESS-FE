@@ -1,1 +1,137 @@
-<p>medicalexpenses-form works!</p>
+<div class="medical-expenses-form-page">
+    <!-- Header -->
+    <header class="top-header-strip">
+        <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
+        <div class="header-right-meta">
+            <div class="info-badges">
+                <span class="request-id-badge">เลขที่การเบิก : {{ requestId }}</span>
+                <span class="date-badge ml-2">วันที่ทำรายการ : {{ currentDate() }}</span>
+            </div>
+            <button class="btn-close-modal" (click)="close()">✕</button>
+        </div>
+    </header>
+
+    <main class="content-card">
+        <!-- Section 1: Claim Type Selection -->
+        <section class="form-section-wrapper">
+            <h4 class="section-heading">1.เลือกประเภทการเบิก</h4>
+            <div class="claim-type-grid">
+                <div class="claim-type-card" *ngFor="let type of claimTypes"
+                    [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
+                    <div class="card-content">
+                        <div class="type-info">
+                            <span class="type-label">{{ type.label }}</span>
+                            <span class="balance-value" [style.color]="type.color">${{ type.amount }}</span>
+                            <span class="balance-label">ยอดคงเหลือ</span>
+                        </div>
+                        <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
+                            <i [class]="type.icon" [style.color]="type.color"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: OPD Selection -->
+
+        <section class="form-section-wrapper mt-4">
+            <h4 class="section-heading">2.กรอกรายละเอียด</h4>
+            <div class="details-grid">
+                <div class="input-field-group">
+                    <label>สถานพยาบาล</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" class="custom-form-control" placeholder="ระบุชื่อโรงพยาบาล/คลินิก"
+                            [(ngModel)]="hospital">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>ประเภทโรค</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" class="custom-form-control" placeholder="ระบุประเภทโรค"
+                            [(ngModel)]="disease">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+
+                <div class="date-range-group">
+                    <label>วันที่รักษา จาก ถึง</label>
+                    <div class="range-inputs">
+                        <div class="date-input-box">
+                            <input type="date" class="custom-form-control" [(ngModel)]="startDate">
+                        </div>
+                        <div class="date-input-box">
+                            <input type="date" class="custom-form-control" [(ngModel)]="endDate">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>จำนวนเงินที่ขอเบิก</label>
+                    <div class="amount-input-wrapper">
+                        <input type="number" class="custom-form-control text-right" placeholder="0.00"
+                            [(ngModel)]="amount">
+                        <span class="currency-tag">บาท</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Attachments -->
+        <section class="form-section-wrapper mt-4">
+            <div class="section-header-row">
+                <h4 class="section-heading">3.แนบเอกสาร (ใบรับรองแพทย์, ใบเสร็จรับเงิน, เอกสารอื่นๆ)</h4>
+                <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
+                    <i class="fas fa-file-upload"></i> Upload file
+                </button>
+                <input #fileInput type="file" style="display: none;" (change)="onFileSelected($event)" multiple>
+            </div>
+            <div class="attachment-table-container">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 50px;"><i class="far fa-trash-alt"></i></th>
+                            <th>Upload file</th>
+                            <th>รายละเอียด</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let file of attachments(); let i = index">
+                            <td class="text-center">{{ i + 1 }}</td>
+                            <td class="text-center">
+                                <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div class="file-name-container">
+                                    <span class="file-text">{{ file.name }}</span>
+                                    <i class="far fa-trash-alt file-delete-icon"
+                                        (click)="deleteAttachment(file.id)"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="desc-input-wrapper">
+                                    <input type="text" class="desc-control" [(ngModel)]="file.description"
+                                        [class.is-invalid]="!file.description">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div class="form-actions-footer">
+        <button class="btn-save-custom" (click)="save()">
+            <i class="fas fa-check-circle"></i> บันทึก
+        </button>
+        <button class="btn-back-custom" (click)="close()">
+            <i class="fas fa-chevron-circle-left"></i> ย้อนกลับ
+        </button>
+    </div>
+</div>

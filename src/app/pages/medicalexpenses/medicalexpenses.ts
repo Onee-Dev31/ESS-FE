@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService, MedicalRequest, MedicalItem } from '../../services/medicalexpenses.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
+import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -23,7 +24,7 @@ interface FlatMedicalRow extends MedicalItem {
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent],
+  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
@@ -40,15 +41,17 @@ export class MedicalexpensesComponent implements OnInit {
   }
   protected readonly Math = Math;
 
-  // ตัวกรองตามช่วงเวลา (เดือน/ปี)
-  fromMonth = signal<number>(new Date().getMonth());
-  fromYear = signal<string>((new Date().getFullYear() + 543).toString());
-  toMonth = signal<number>(new Date().getMonth());
-  toYear = signal<string>((new Date().getFullYear() + 543).toString());
+  isModalOpen = signal<boolean>(false);
+  selectedRequestId = signal<string>('');
   filterStatus = signal<string>(''); // เพิ่ม filter สถานะ
   isPolicyModalOpen = signal<boolean>(false);
+  isFilterVisible = signal<boolean>(false); // เพิ่มตัวแปรสำหรับเปิด-ปิด Filter
 
-  // รายชื่อเดือนสำหรับ Select
+  fromMonth = signal<number>(0);
+  fromYear = signal<string>((new Date().getFullYear() - 1).toString()); // ปรับให้เริ่มตั้งแต่ปีที่แล้วเพื่อให้เห็นข้อมูล Mock ครบ
+  toMonth = signal<number>(11);
+  toYear = signal<string>((new Date().getFullYear()).toString());
+
   months = [
     { label: 'มกราคม', value: 0 }, { label: 'กุมภาพันธ์', value: 1 }, { label: 'มีนาคม', value: 2 },
     { label: 'เมษายน', value: 3 }, { label: 'พฤษภาคม', value: 4 }, { label: 'มิถุนายน', value: 5 },
@@ -58,7 +61,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   // ข้อมูลจาก Service
   allRequests = signal<MedicalRequest[]>([]);
-  sorting = signal<SortingState>([{ id: 'requestDate', desc: true }]);
+  sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
   // สถานะ Pagination
   currentPage = signal<number>(0);
@@ -73,6 +76,26 @@ export class MedicalexpensesComponent implements OnInit {
     // กรองตามสถานะ
     if (this.filterStatus()) {
       data = data.filter(r => r.status === this.filterStatus());
+    }
+
+    // กรองตามช่วงวันที่ (Month/Year)
+    const fromMonth = this.fromMonth();
+    const fromYear = parseInt(this.fromYear());
+    const toMonth = this.toMonth();
+    const toYear = parseInt(this.toYear());
+
+    if (!isNaN(fromYear) && !isNaN(toYear)) {
+      data = data.filter(r => {
+        const reqDate = new Date(r.createDate);
+        const reqMonth = reqDate.getMonth();
+        const reqYear = reqDate.getFullYear();
+
+        const startVal = fromYear * 100 + fromMonth;
+        const endVal = toYear * 100 + toMonth;
+        const currentVal = reqYear * 100 + reqMonth;
+
+        return currentVal >= startVal && currentVal <= endVal;
+      });
     }
 
     return data;
@@ -103,12 +126,13 @@ export class MedicalexpensesComponent implements OnInit {
     let rows = [...this.flattenedRows()];
     const sortState = this.sorting()[0];
     if (sortState) {
-      const { id, desc } = sortState;
+      const fieldId = sortState.id;
+      const desc = sortState.desc;
       const direction = desc ? -1 : 1;
       rows.sort((a: FlatMedicalRow, b: FlatMedicalRow) => {
-        const valA = (a as any)[id] || '';
-        const valB = (b as any)[id] || '';
-        if (id === 'requestId') return valA.localeCompare(valB) * direction;
+        const valA = (a as any)[fieldId] || '';
+        const valB = (b as any)[fieldId] || '';
+        if (fieldId === 'requestId') return valA.localeCompare(valB) * direction;
         if (typeof valA === 'string') return valA.localeCompare(valB) * direction;
         return (valA - valB) * direction;
       });
@@ -156,18 +180,45 @@ export class MedicalexpensesComponent implements OnInit {
   }));
 
   ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
     this.medicalService.getMedicalRequests().subscribe(data => {
       this.allRequests.set(data);
     });
+  }
+
+  openModal(targetId: string = '') {
+    if (targetId === '') {
+      this.medicalService.generateNextMedicalId().subscribe((nid: string) => {
+        this.selectedRequestId.set(nid);
+        this.isModalOpen.set(true);
+      });
+    } else {
+      this.selectedRequestId.set(targetId);
+      this.isModalOpen.set(true);
+    }
+  }
+
+  closeModal() {
+    this.isModalOpen.set(false);
+    this.loadData();
   }
 
   /**
    * ล้างตัวกรอง
    */
   clearFilters() {
-    this.fromMonth.set(new Date().getMonth());
-    this.toMonth.set(new Date().getMonth());
     this.filterStatus.set('');
+    this.fromMonth.set(0);
+    this.fromYear.set((new Date().getFullYear() - 1).toString());
+    this.toMonth.set(11);
+    this.toYear.set((new Date().getFullYear()).toString());
+  }
+
+  toggleFilter() {
+    this.isFilterVisible.update(v => !v);
   }
 
   /**
@@ -228,8 +279,8 @@ export class MedicalexpensesComponent implements OnInit {
    * trackBy สำหรับรายการ
    */
   trackByRowId(index: number, row: any): string {
-    const original = row.original || row;
-    return `${original.requestId}-${index}`;
+    const original = (row as any).original || row;
+    return `${original.requestId || 'new'}-${index}`;
   }
 
   /**

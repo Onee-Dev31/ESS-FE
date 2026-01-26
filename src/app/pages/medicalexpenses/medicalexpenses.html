@@ -17,7 +17,7 @@
 
         <div class="toolbar-container">
             <div class="left-action">
-                <button class="btn-create">
+                <button class="btn-create" (click)="openModal()">
                     <i class="fas fa-plus"></i> สร้างรายการเบิก
                 </button>
             </div>
@@ -131,9 +131,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let row of table.getRowModel().rows; let i = index; trackBy: trackByRowId">
-                        <td class="text-center font-bold" style="color: #008ebc;">{{ row.original.requestId }}</td>
-                        <td class="text-center">{{ row.original.requestDate }}</td>
+                    <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId"
+                        (click)="openModal(row.original.requestId)" style="cursor: pointer;">
+
+                        <!-- ID -->
+                        <td class="text-center font-bold" style="color: #008ebc;">
+                            {{ row.original.requestId }}
+                        </td>
+
+                        <!-- Date -->
+                        <td class="text-center">
+                            {{ row.original.requestDate }}
+                        </td>
+
                         <td class="text-left">{{ row.original.limitType }}</td>
                         <td class="text-left">{{ row.original.diseaseType }}</td>
                         <td class="text-left">{{ row.original.hospital }}</td>
@@ -141,6 +151,8 @@
                         <td class="text-center">{{ row.original.treatmentDateTo }}</td>
                         <td class="text-right font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
                         <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
+
+                        <!-- Status -->
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                                 {{ row.original.status }}
@@ -190,7 +202,14 @@
             </div>
         </div>
     </div>
-</div>
 
-<app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
-</app-medical-policy-modal>
+    <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+    </app-medical-policy-modal>
+
+    <div class="modal-overlay" *ngIf="isModalOpen()">
+        <div class="modal-container">
+            <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+            </app-medicalexpenses-form>
+        </div>
+    </div>
+</div>

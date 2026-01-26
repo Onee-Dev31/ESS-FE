@@ -219,7 +219,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             }
 
             .btn-clear {
-                background-color: #6c757d;
+                background-color: #666;
                 color: white;
                 border: none;
                 padding: 0 20px;
@@ -233,7 +233,7 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
                 gap: 8px;
 
                 &:hover {
-                    background-color: #5a6268;
+                    background-color: #444;
                 }
             }
         }
@@ -404,5 +404,81 @@ $font-stack: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
             background: #28a74526;
             color: #28a745;
         }
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.65);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+
+        @include mobile {
+            padding: 0;
+            align-items: flex-end;
+        }
+
+        .modal-container {
+            background: white;
+            width: 95%;
+            max-width: 1600px;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            font-family: $font-stack;
+
+            @include mobile {
+                width: 100%;
+                height: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            app-medicalexpenses-form {
+                flex: 1;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                    width: 8px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: #c1c1c1;
+                    border-radius: 4px;
+                }
+
+                &::-webkit-scrollbar-thumb:hover {
+                    background: #a8a8a8;
+                }
+            }
+
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
     }
 }

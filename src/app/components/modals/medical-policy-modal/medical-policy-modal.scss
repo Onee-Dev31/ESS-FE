@@ -104,10 +104,13 @@
     }
 
     .clause {
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
 
         p {
             margin: 0;
+            font-weight: 700; // เด่นกว่าเดิมเพื่อให้เป็นหัวข้อหลัก 5.x
+            color: #1e293b;
+            font-size: 1.15rem; // ใหญ่ขึ้นนิดหน่อย
         }
     }
 
