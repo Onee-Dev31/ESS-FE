@@ -28,7 +28,7 @@ export class MedicalexpensesForm implements OnInit {
     { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: '#6bcb77' },
   ];
 
-  selectedClaimType = signal<string>('opd');
+  selectedClaimType = signal<string>('');
 
   hospital: string = '';
   disease: string = '';

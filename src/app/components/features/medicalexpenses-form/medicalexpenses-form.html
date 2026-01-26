@@ -32,9 +32,8 @@
             </div>
         </section>
 
-        <!-- Section 1: OPD Selection -->
-
-        <section class="form-section-wrapper mt-4">
+        <!-- Section 2: Details - Only visible if claim type is selected -->
+        <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <h4 class="section-heading">2.กรอกรายละเอียด</h4>
             <div class="details-grid">
                 <div class="input-field-group">
@@ -78,8 +77,8 @@
             </div>
         </section>
 
-        <!-- Section 3: Attachments -->
-        <section class="form-section-wrapper mt-4">
+        <!-- Section 3: Attachments - Only visible if claim type is selected -->
+        <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <div class="section-header-row">
                 <h4 class="section-heading">3.แนบเอกสาร (ใบรับรองแพทย์, ใบเสร็จรับเงิน, เอกสารอื่นๆ)</h4>
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
@@ -123,6 +122,15 @@
                 </table>
             </div>
         </section>
+
+        <!-- Placeholder when no type selected -->
+        <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedClaimType()">
+            <div class="placeholder-content">
+                <i class="fas fa-mouse-pointer pulse-icon"></i>
+                <p>กรุณาเลือกประเภทการเบิกด้านบนเพื่อดำเนินการต่อ</p>
+                <span class="sub-text">Please select a claim type to view details and upload documents</span>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
