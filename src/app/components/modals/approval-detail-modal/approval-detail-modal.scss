@@ -26,8 +26,22 @@ $bg-slate: #f4f7f9;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        max-height: 90vh; // Constrain height
+        display: flex; // Use flexbox for internal layout
+        flex-direction: column; // Stack children vertically
 
         .modal-header-modern {
+            flex-shrink: 0; // Prevent header shrinking
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            // ... (content matches existing until end of header)
+            // Skipping deep nested content for brevity in replacement, focusing on structure.
+            // I will target the specific blocks to minimize context limit hit if possible, or just replace layout significant parts.
+            // Let's replace the container definition and the body definition separately or cover enough context.
+
             padding: 1.5rem 2rem;
             border-bottom: 1px solid #eee;
             display: flex;
@@ -245,6 +259,9 @@ $bg-slate: #f4f7f9;
         .modal-layout-body {
             display: flex;
             flex-direction: column;
+            overflow-y: auto; // Enable vertical scrolling for the body content
+            flex: 1; // Take remaining height
+
 
             @media (min-width: 992px) {
                 flex-direction: row;

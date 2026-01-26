@@ -151,9 +151,55 @@ $bg-page: #f8f9fa;
 
             @media (max-width: 768px) {
                 width: 100%;
-                flex-direction: column;
-                align-items: stretch;
+                display: grid;
+                grid-template-columns: 1fr 1fr; // Two columns for pairs
                 gap: 10px;
+                align-items: end; // Align to bottom to match labels
+
+                // Sequence fixes using order if HTML order is strict,
+                // but Grid flow works naturally if items are:
+                // Month, Year, Month, Year, Status, Search, Clear
+
+                // Month (Start)
+                .filter-group:nth-child(1) {
+                    grid-column: 1 / 2;
+                }
+
+                // Year (Start)
+                .filter-group:nth-child(2) {
+                    grid-column: 2 / 3;
+                }
+
+                // Month (End)
+                .filter-group:nth-child(3) {
+                    grid-column: 1 / 2;
+                }
+
+                // Year (End)
+                .filter-group:nth-child(4) {
+                    grid-column: 2 / 3;
+                }
+
+                // Status - Full width
+                .filter-group:nth-child(5) {
+                    grid-column: 1 / -1;
+                }
+
+                // Search Button
+                .btn-search {
+                    grid-column: 1 / 2; // Left side
+                    width: 100%;
+                    justify-content: center;
+                    margin-top: 5px;
+                }
+
+                // Clear Button
+                .btn-clear {
+                    grid-column: 2 / 3; // Right side
+                    width: 100%;
+                    justify-content: center;
+                    margin-top: 5px;
+                }
             }
 
             .filter-group {
@@ -447,24 +493,9 @@ $bg-page: #f8f9fa;
 
             app-medicalexpenses-form {
                 flex: 1;
-                overflow-y: auto;
-
-                &::-webkit-scrollbar {
-                    width: 8px;
-                }
-
-                &::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                }
-
-                &::-webkit-scrollbar-thumb {
-                    background: #c1c1c1;
-                    border-radius: 4px;
-                }
-
-                &::-webkit-scrollbar-thumb:hover {
-                    background: #a8a8a8;
-                }
+                width: 100%;
+                overflow: hidden; // Disable host scroll to allow inner sticky layout
+                display: block; // Ensure it behaves as a block container
             }
 
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
