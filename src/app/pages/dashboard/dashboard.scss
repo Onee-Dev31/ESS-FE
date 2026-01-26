@@ -646,15 +646,18 @@ body {
 
 .action-btn-sm {
   @extend .action-btn;
-  width: 40px;
-  height: 40px;
-  padding: 0;
+  width: 40px !important;
+  min-width: 40px !important; // Force min-width to prevent squashing
+  max-width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   font-size: 15px;
   font-weight: 400;
+  flex: none !important; // Prevent any flex interaction
 }
 
 .stats-grid-card {
