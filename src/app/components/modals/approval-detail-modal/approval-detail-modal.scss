@@ -118,30 +118,29 @@ $bg-slate: #f4f7f9;
                     justify-content: space-between;
                     align-items: flex-start;
 
-                    // Background line - connects all circles
+
                     .progress-line-bg {
                         position: absolute;
-                        top: 24px; // Half of 48px circle
-                        left: 10%; // Center of first step (100% / 5 steps / 2)
-                        right: 10%; // Center of last step
+                        top: 24px; 
+                        left: 10%; 
+                        right: 10%; 
                         height: 4px;
                         background: #e2e8f0;
                         border-radius: 2px;
                         z-index: 0;
                     }
 
-                    // Animated fill line
                     .progress-line-fill {
                         position: absolute;
                         top: 24px;
-                        left: 10%; // Center of first step
+                        left: 10%; 
                         height: 4px;
                         background: linear-gradient(90deg, #74c34d 0%, #5bb030 100%);
                         border-radius: 2px;
                         z-index: 1;
                         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
                         box-shadow: 0 0 8px rgba(116, 195, 77, 0.3);
-                        max-width: 80%; // Total width between first and last centers
+                        max-width: 80%; 
                     }
 
                     .progress-step {
@@ -183,7 +182,6 @@ $bg-slate: #f4f7f9;
                             transition: all 0.3s ease;
                         }
 
-                        // Completed state
                         &.completed {
                             .step-icon-circle {
                                 background: linear-gradient(135deg, #74c34d 0%, #5bb030 100%);
@@ -199,7 +197,6 @@ $bg-slate: #f4f7f9;
                             }
                         }
 
-                        // Active state
                         &.active {
                             .step-icon-circle {
                                 background: white;
@@ -223,7 +220,6 @@ $bg-slate: #f4f7f9;
                             }
                         }
 
-                        // Rejected state
                         &.rejected {
                             .step-icon-circle {
                                 background: linear-gradient(135deg, $primary-red 0%, #dc2626 100%);
@@ -259,8 +255,8 @@ $bg-slate: #f4f7f9;
         .modal-layout-body {
             display: flex;
             flex-direction: column;
-            overflow-y: auto; // Enable vertical scrolling for the body content
-            flex: 1; // Take remaining height
+            overflow-y: auto; 
+            flex: 1; 
 
 
             @media (min-width: 992px) {

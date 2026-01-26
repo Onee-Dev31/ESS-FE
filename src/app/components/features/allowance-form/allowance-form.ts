@@ -2,7 +2,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
-import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../services/vehicle.service';
 import { switchMap, of, forkJoin } from 'rxjs';
 
@@ -18,7 +18,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private allowanceService = inject(AllowanceService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: AllowanceRequest;
@@ -165,7 +165,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {
-      this.alertService.showWarning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน'); // ใช้ AlertService
+      this.alertService.showWarning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
       return;
     }
 
@@ -177,13 +177,13 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         timeIn: log.timeIn,
         timeOut: log.timeOut,
         description: log.description,
-        hours: parseFloat(log.displayHours), // ประมาณค่า
+        hours: parseFloat(log.displayHours),
         amount: log.amount,
         selected: true
       }));
 
     if (items.length === 0) {
-      this.alertService.showWarning('กรุณาเลือกรายการอย่างน้อย 1 รายการ'); // ใช้ AlertService
+      this.alertService.showWarning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
       return;
     }
 
@@ -193,19 +193,19 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
           ...existingRequest,
           items: items
         }).subscribe(() => {
-          this.alertService.showSuccess(`อัปเดตรายการ ${this.requestId} เรียบร้อย`); // ใช้ AlertService
+          this.alertService.showSuccess(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
           this.closeModal();
         });
       } else {
         const newRequest: AllowanceRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.ALLOWANCE,
-          createDate: new Date().toISOString().split('T')[0], // วันที่ปัจจุบัน (yyyy-mm-dd)
+          createDate: new Date().toISOString().split('T')[0],
           status: 'รอตรวจสอบ',
           items: items
         };
         this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`); // ใช้ AlertService
+          this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
           this.closeModal();
         });
       }

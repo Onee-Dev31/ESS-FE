@@ -400,7 +400,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .upload-modal-content {
       background: #fff;
-      width: 90%; // Fluid on mobile
+      width: 90%;
       max-width: 400px;
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -408,7 +408,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       font-family: $font-main;
 
       .modal-header {
-        padding: 12px 15px; // Reduced padding
+        padding: 12px 15px;
 
         @media (min-width: 768px) {
           padding: 15px 20px;
@@ -425,7 +425,6 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
           color: $text;
         }
 
-        // Adjusted font
         .close-btn {
           background: none;
           border: none;

@@ -2,7 +2,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, RequestItem, VehicleRequest } from '../../../services/transport.service';
-import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../services/vehicle.service';
 
 interface LogItem {
@@ -29,7 +29,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private transportService = inject(TransportService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: VehicleRequest;
@@ -107,7 +107,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     const [outH] = log.timeOut.split(':').map(Number);
 
     if (inH < 6 || outH >= 22) {
-      log.amount = 150; // เรทคงที่ 150 บาท
+      log.amount = 150;
     } else {
       log.amount = 0;
     }
@@ -146,12 +146,12 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
     if (invalidLogs.length > 0) {
       const invalidDates = invalidLogs.map(log => log.date).join(', ');
-      this.alertService.showWarning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`); // ใช้ AlertService
+      this.alertService.showWarning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
       return;
     }
 
     if (selectedLogs.length === 0 || this.totalAmount === 0) {
-      this.alertService.showWarning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)'); // ใช้ AlertService
+      this.alertService.showWarning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
       return;
     }
 
@@ -168,19 +168,19 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           items: requestItems
         };
         this.transportService.updateRequest(this.requestId, updatedRequest).subscribe(() => {
-          this.alertService.showSuccess(`บันทึกการแก้ไขข้อมูลเรียบร้อย`); // ใช้ AlertService
+          this.alertService.showSuccess(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
           this.closeModal();
         });
       } else {
         const newRequest: VehicleRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TRANSPORT,
-          createDate: new Date().toISOString().split('T')[0], // วันที่ปัจจุบัน (YYYY-MM-DD)
+          createDate: new Date().toISOString().split('T')[0],
           status: 'รอตรวจสอบ',
           items: requestItems
         };
         this.transportService.addRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`); // ใช้ AlertService
+          this.alertService.showSuccess(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
           this.closeModal();
         });
       }

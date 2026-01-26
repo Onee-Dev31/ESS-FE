@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
-import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../../services/alert.service'; 
 import { WELFARE_TYPES } from '../../../services/vehicle.service';
 
 @Component({
@@ -18,10 +18,9 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private taxiService = inject(TaxiService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
   private cdr = inject(ChangeDetectorRef);
 
-  // เก็บข้อมูลที่โหลดมาเพื่อใช้ตอนเปลี่ยนเดือน
   loadedRequest?: TaxiRequest;
 
   items: any[] = [];
@@ -35,7 +34,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   selectedMonth: string = 'ตุลาคม';
   selectedYear: number = 2568;
 
-  // Variables สำหรับ Modal
   isShowUploadModal: boolean = false;
   currentUploadItem: any = null;
 
@@ -53,7 +51,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.taxiService.getTaxiRequestById(this.requestId).subscribe(existingRequest => {
       this.loadedRequest = existingRequest;
       this.generateMockData();
-      this.cdr.markForCheck(); // อัปเดตหน้าจอ
+      this.cdr.markForCheck();
     });
   }
 
@@ -88,7 +86,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     const selectedItems = this.items.filter(item => item.selected);
 
     if (selectedItems.length === 0) {
-      this.alertService.showWarning('กรุณาเลือกรายการที่ต้องการเบิก'); // ใช้ AlertService
+      this.alertService.showWarning('กรุณาเลือกรายการที่ต้องการเบิก');
       return;
     }
 
@@ -99,7 +97,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     );
 
     if (invalidItem) {
-      this.alertService.showWarning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`); // ใช้ AlertService
+      this.alertService.showWarning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`);
       return;
     }
 
@@ -119,19 +117,19 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
           items: taxiItems
         };
         this.taxiService.updateTaxiRequest(this.requestId, updatedRequest).subscribe(() => {
-          this.alertService.showSuccess('บันทึกการแก้ไขข้อมูลเรียบร้อย'); // ใช้ AlertService
+          this.alertService.showSuccess('บันทึกการแก้ไขข้อมูลเรียบร้อย');
           this.onClose.emit();
         });
       } else {
         const newRequest: TaxiRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TAXI,
-          createDate: new Date().toLocaleDateString('en-GB'), // วันที่ปัจจุบัน (dd/mm/yyyy)
+          createDate: new Date().toLocaleDateString('en-GB'), 
           status: 'รอตรวจสอบ',
           items: taxiItems
         };
         this.taxiService.addTaxiRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`); // ใช้ AlertService
+          this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
           this.onClose.emit();
         });
       }
@@ -147,7 +145,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     }
   }
 
-  ThaiLooped = matchTime; // สำหรับการใช้งานใน template
+  ThaiLooped = matchTime; 
 
   cancel() {
     this.onClose.emit();

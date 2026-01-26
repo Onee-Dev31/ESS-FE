@@ -95,7 +95,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .month-selector {
       display: flex;
-      flex-direction: column; // Stack on mobile
+      flex-direction: column; 
       align-items: flex-start;
       gap: 8px;
 
@@ -116,7 +116,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
 
       .form-control {
-        width: 100%; // Full width on mobile
+        width: 100%; 
 
         @media (min-width: 768px) {
           width: auto;
@@ -128,7 +128,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
 
       .btn-search {
-        width: 100%; // Full width on mobile
+        width: 100%; 
 
         @media (min-width: 768px) {
           width: auto;
@@ -210,7 +210,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .action-bar {
     display: flex;
-    flex-direction: column-reverse; // Info on top for mobile
+    flex-direction: column-reverse; 
     gap: 12px;
     margin-bottom: 12px;
 
@@ -224,7 +224,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     flex-shrink: 0;
 
     .btn-submit {
-      width: 100%; // Full width on mobile
+      width: 100%; 
 
       @media (min-width: 768px) {
         width: auto;
@@ -241,7 +241,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .info-badges {
       display: flex;
-      flex-wrap: wrap; // Wrap badges on very small screens
+      flex-wrap: wrap; 
       gap: 8px;
 
       .right-info,
@@ -291,7 +291,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       td {
         border-bottom: 1px solid $border;
         border-right: 1px solid $border;
-        height: 40px; // Slightly smaller height for mobile
+        height: 40px; 
 
         @media (min-width: 768px) {
           height: 44px;
