@@ -7,6 +7,8 @@
                     <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
                     <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
                             }}</span></div>
+                    <div class="requester-line">Requester: <span class="highlight">{{ approvalItem.requestBy.name
+                            }}</span> ({{ approvalItem.requestBy.employeeId }})</div>
                 </div>
                 <div class="header-actions-group">
                     @if (!isActionConfirm()) {
@@ -125,6 +127,55 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+
+                    <!-- Card View for Modal (Mobile/Tablet) -->
+                    <div class="modal-card-list-view">
+                        @for (item of selectedRequestDetails().items; track $index) {
+                        <div class="item-card">
+                            <div class="card-row top">
+                                <div class="date-info">
+                                    <span class="date">{{ item.date }}</span>
+                                    @if (item.shiftCode) {
+                                    <span class="shift-badge micro">{{ item.shiftCode }}</span>
+                                    }
+                                </div>
+                                <div class="amount">{{ item.amount | number }}</div>
+                            </div>
+
+                            <div class="card-row desc">
+                                <div class="label">รายละเอียด:</div>
+                                <div class="value">{{ item.description }}</div>
+                            </div>
+
+                            @if (selectedRequestDetails().type === 'allowance') {
+                            <div class="card-row time">
+                                <div class="label">เวลา In-Out:</div>
+                                <div class="value highlight">{{ item.timeIn }} - {{ item.timeOut }}</div>
+                            </div>
+                            } @else if (selectedRequestDetails().type === 'taxi') {
+                            <div class="card-row dest">
+                                <div class="label">ปลายทาง:</div>
+                                <div class="value">{{ item.destination }}</div>
+                            </div>
+                            @if (item.attachedFile) {
+                            <div class="card-row file">
+                                <div class="label">ไฟล์แนบ:</div>
+                                <div class="value">
+                                    <a class="file-link-card" (click)="openPreview(item.attachedFile)">
+                                        <i class="far fa-folder-open"></i> ดูไฟล์
+                                    </a>
+                                </div>
+                            </div>
+                            }
+                            }
+                        </div>
+                        }
+
+                        <div class="item-card total-card">
+                            <div class="total-label">Total Amount</div>
+                            <div class="total-value">{{ modalItemsTotal() | number }} THB</div>
+                        </div>
                     </div>
 
                     @if (modalItemsTotal() !== approvalItem.amount) {

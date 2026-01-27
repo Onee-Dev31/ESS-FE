@@ -376,14 +376,21 @@ $navbar-height: 70px;
     }
 
     .nav-actions .mobile-search-btn {
-      display: flex;
+      display: none;
+    }
+
+    .nav-actions .chart-icon-btn {
+      display: none;
     }
   }
 
   .navbar .nav-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
+    left: auto;
+    transform: none;
+    flex: 1;
+    overflow: hidden;
+    padding: 0 8px;
   }
 }
 
