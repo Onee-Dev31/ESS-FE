@@ -8,7 +8,9 @@
                     <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
                             }}</span></div>
                     <div class="requester-line">Requester: <span class="highlight">{{ approvalItem.requestBy.name
-                            }}</span> ({{ approvalItem.requestBy.employeeId }})</div>
+                            }}</span> ({{ approvalItem.requestBy.employeeId }}) | Department: <span class="highlight">{{
+                            approvalItem.requestBy.department }}</span> | Company: <span class="highlight">{{
+                            approvalItem.requestBy.company }}</span></div>
                 </div>
                 <div class="header-actions-group">
                     @if (!isActionConfirm()) {
