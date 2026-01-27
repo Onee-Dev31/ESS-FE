@@ -1,9 +1,7 @@
 @use 'theme' as *;
 @use 'sass:color';
 
-// Shared styles for responsive filters and card views
-
-// Filter Styles
+// สไตล์สำหรับตัวกรองข้อมูลด้านขวา
 .right-filters {
     display: flex;
     align-items: flex-end;
@@ -42,7 +40,6 @@
         .select-status {
             cursor: pointer;
             min-width: 150px;
-            // height removed to allow global padding to dictate size
             width: 100%;
         }
     }
@@ -54,7 +51,7 @@
 
         @media (max-width: 991px) {
             width: 100%;
-            grid-column: 1 / -1; // Span full width on tablet
+            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: 1fr auto;
         }
@@ -108,7 +105,7 @@
     }
 }
 
-// Card View Styles
+// สไตล์สำหรับแสดงผลแบบการ์ด (บนมือถือ/แท็บเล็ต)
 .card-list-view {
     display: none;
     padding: 15px;
@@ -333,9 +330,7 @@
     }
 }
 
-// ----------------------------------------------------
-// Shared Modal Overlay Styles
-// ----------------------------------------------------
+// Animation สำหรับ Modal
 @keyframes popIn {
     from {
         transform: scale(0.9) translateY(20px);
@@ -348,6 +343,7 @@
     }
 }
 
+// Mixin สำหรับ Modal Overlay และการจัดกึ่งกลาง
 @mixin modal-overlay-styles {
     position: fixed;
     top: 0;
@@ -386,7 +382,6 @@
             border-radius: 0;
         }
 
-        // Generic rule for the content component (e.g. app-vehicle-form)
         >* {
             flex: 1;
             display: flex;
