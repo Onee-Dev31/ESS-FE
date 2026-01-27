@@ -38,9 +38,9 @@ textarea {
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid $border;
-  border-radius: 0.5rem; // 8px
+  border-radius: 0.5rem;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  appearance: none; // Remove default browser styles for selects
+  appearance: none; 
 
   &::placeholder {
     color: $text-muted;
@@ -52,7 +52,7 @@ textarea {
     background-color: #fff;
     border-color: $primary;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba($primary, 0.15); // Subtle focus ring
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.15);
   }
 
   &:disabled,
@@ -62,7 +62,6 @@ textarea {
     cursor: not-allowed;
   }
 
-  // Validation States (Optional)
   &.ng-invalid.ng-touched {
     border-color: $danger;
 

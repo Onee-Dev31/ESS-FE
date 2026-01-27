@@ -120,7 +120,7 @@ body {
   gap: 20px;
   width: 100%;
 
-  @media (max-width: 1023px) {
+  @include tablet {
     grid-template-columns: 100%;
 
     .left-col-wrapper,
@@ -129,13 +129,13 @@ body {
     }
 
     grid-template-areas: 'avatar'
+    'medical'
+    'welfare'
+    'leave'
     'profile'
     'attendance'
     'performance'
     'it-story'
-    'medical'
-    'welfare'
-    'leave'
     'schedule';
 
     .banner-avatar-section {
@@ -175,7 +175,7 @@ body {
     }
   }
 
-  @media (min-width: 1024px) {
+  @include desktop {
     grid-template-columns: 280px 1fr;
     grid-template-areas: none;
 
