@@ -1,3 +1,4 @@
+@use './styles/theme' as *;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 *,
@@ -6,44 +7,40 @@
   box-sizing: border-box;
 }
 
-
-:root {
-  --primary-color: #4650dd;
-  --bg-body: #f4f7f6;
-  --text-muted: #adb5bd;
-  --card-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-  --font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+html {
+  font-family: $font-main;
 }
 
 body {
   margin: 0;
-  background-color: var(--bg-body);
-  font-family: var(--font-main);
+  background-color: #f4f7f6;
+  font-family: $font-main;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: inherit;
+  font-family: $font-main;
 }
 
 .card {
   background: #fff;
   border-radius: 1rem;
   border: none;
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
 
 .text-primary {
-  color: var(--primary-color) !important;
+  color: $primary !important;
 }
 
 .bg-primary {
-  background-color: var(--primary-color) !important;
+  background-color: $primary !important;
 }
 
 // Responsive Utilities

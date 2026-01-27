@@ -1,23 +1,5 @@
 @use 'sass:color';
-
-$header-bg: #343a40;
-$btn-create-bg: #28a745;
-$btn-search-bg: #003e6d;
-$text-header: #ffffff;
-$border-color: #e9ecef;
-$bg-page: #f8f9fa;
-
-@mixin mobile {
-  @media (max-width: 575.98px) {
-    @content;
-  }
-}
-
-@mixin tablet {
-  @media (max-width: 991.98px) {
-    @content;
-  }
-}
+@use '../../../styles/theme' as *;
 
 .vehicle-page {
   padding: 20px;

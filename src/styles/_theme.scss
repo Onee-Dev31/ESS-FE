@@ -1,0 +1,70 @@
+// Primary Colors
+$primary: #1a73e8; // Main brand color (Blue)
+$primary-dark: #1557b0; // Darker shade for hover states
+$primary-light: #4285f4; // Lighter shade
+
+// Secondary Colors
+$success: #1e8e3e; // Green for success states
+$danger: #d93025; // Red for errors/warnings
+$warning: #f1b44c; // Yellow/Orange for warnings
+$info: #17a2b8; // Cyan for info
+$text-light: #94a3b8; // Light text for navbar
+
+// Button Colors
+$btn-create-bg: #28a745; // Create/Add button (Green)
+$btn-search-bg: #1a73e8; // Search button (Primary Blue)
+$btn-delete-bg: #dc3545; // Delete button (Red)
+
+// Background Colors
+$bg-page: #f8f9fa; // Page background
+$bg-card: #ffffff; // Card background
+$bg-gray: #fcfcfc; // Light gray background
+$bg-slate: #f4f7f9; // Slate background
+
+// Text Colors
+$text: #202124; // Primary text
+$text-sub: #5f6368; // Secondary text
+$text-muted: #888; // Muted text
+$text-header: #ffffff; // Header text (on dark backgrounds)
+
+// Border Colors
+$border: #dee2e6; // Standard border
+$border-color: #e9ecef; // Alternative border
+
+// Header/Table Colors
+$header-bg: #343a40; // Dark header background
+
+// Font
+$font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+
+// Status Badge Colors
+$status-new-bg: rgba(255, 193, 7, 0.15);
+$status-new-text: #f1b44c;
+
+$status-verified-bg: rgba(23, 162, 184, 0.15);
+$status-verified-text: #17a2b8;
+
+$status-pending-bg: rgba(0, 123, 255, 0.15);
+$status-pending-text: #007bff;
+
+$status-success-bg: rgba(40, 167, 69, 0.15);
+$status-success-text: #28a745;
+
+// Mixins for responsive design
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: 991.98px) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: 992px) {
+        @content;
+    }
+}

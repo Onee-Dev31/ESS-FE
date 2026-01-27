@@ -1,9 +1,6 @@
+@use '../../../styles/theme' as *;
+
 $navbar-height: 70px;
-$primary: #4f46e5;
-$text-light: #94a3b8;
-$danger: #dc3545;
-$success: #10b981;
-$warning: #f59e0b;
 
 .navbar {
   display: flex;

@@ -1,12 +1,5 @@
 @use 'sass:color';
-
-$primary: #1a73e8;
-$success: #1e8e3e;
-$danger: #d93025;
-$border: #dee2e6;
-$text: #202124;
-$text-sub: #5f6368;
-$font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+@use '../../../../styles/theme' as *;
 
 :host {
   display: flex;

@@ -1,6 +1,7 @@
 @use 'sass:color';
+@use '../../../styles/theme' as *;
 
-$primary: #4650dd;
+// Dashboard-specific variables
 $dark: #0f172a;
 $muted: #64748b;
 $border-color: transparent;
@@ -8,10 +9,7 @@ $radius: 12px;
 $radius-lg: 20px;
 $shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 $bg-light: #f8fafc;
-$success: #22c55e;
 $balance: #15803d;
-$warning: #f97316;
-$danger: #ef4444;
 
 @mixin flex-center {
   display: flex;
