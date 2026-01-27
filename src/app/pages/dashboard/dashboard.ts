@@ -41,30 +41,9 @@ export class DashboardComponent implements OnInit {
   profileList$!: Observable<ProfileItem[]>;
   itList$!: Observable<ProfileItem[]>;
 
-  attendanceList = [
-    { label: 'ลาป่วย', value: '10 วัน' },
-    { label: 'ลาพักร้อน', value: '5 วัน' },
-    { label: 'ลากิจ', value: '5 วัน' },
-    { label: 'มาสาย', value: '5 ครั้ง' },
-    { label: 'ขาดงาน', value: '5 ครั้ง' }
-  ];
-
-  performanceList = [
-    { year: 'ปี 2026', grade: 'เกรด A+' },
-    { year: 'ปี 2025', grade: 'เกรด A' },
-    { year: 'ปี 2024', grade: 'เกรด B+' },
-    { year: 'ปี 2023', grade: 'เกรด B' },
-    { year: 'ปี 2022', grade: 'เกรด C+' },
-    { year: 'ปี 2021', grade: 'เกรด C' }
-  ];
-
-  specialDates: Record<string, any> = {
-    '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
-    '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' },
-    '2026-04-06': { type: 'holiday', note: 'วันจักรี', code: 'HOL' },
-    '2026-04-13': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
-    '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
-  };
+  attendanceList: any[] = [];
+  performanceList: any[] = [];
+  specialDates: Record<string, any> = {};
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -131,6 +110,11 @@ export class DashboardComponent implements OnInit {
     this.leaveStats$ = this.dashboardService.getLeaveStats();
     this.holidays$ = this.dashboardService.getHolidays();
     this.pendingCount$ = this.dashboardService.getGlobalPendingCount();
+
+    // Fetch static data
+    this.attendanceList = this.dashboardService.getAttendanceList();
+    this.performanceList = this.dashboardService.getPerformanceList();
+    this.specialDates = this.dashboardService.getSpecialDates();
 
     // แปลงข้อมูลโปรไฟล์สำหรับการแสดงผลในรายการ
     this.profileList$ = this.userProfile$.pipe(

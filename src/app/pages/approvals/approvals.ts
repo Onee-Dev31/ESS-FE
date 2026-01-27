@@ -14,6 +14,7 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class ApprovalsComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);
+  private approvalsHelper = inject(ApprovalsHelperService);
   private router = inject(Router);
   protected readonly Math = Math;
 
@@ -53,61 +55,9 @@ export class ApprovalsComponent implements OnInit {
       taxis: this.taxiService.getTaxiRequests().pipe(take(1)),
       vehicles: this.transportService.getRequests().pipe(take(1))
     }).subscribe(({ allowances, taxis, vehicles }) => {
-      this.processData(allowances, taxis, vehicles);
+      const allData = this.approvalsHelper.processData(allowances, taxis, vehicles);
+      this.approvals.set(allData.sort((a, b) => b.requestNo.localeCompare(a.requestNo)));
     });
-  }
-
-  // รวมและแปลงข้อมูลจากหลาย Service เป็นรูปแบบรายการอนุมัติ
-  private processData(allowances: AllowanceRequest[], taxis: TaxiRequest[], vehicles: VehicleRequest[]) {
-    const defaultUser = {
-      name: 'พนักงานทดสอบ',
-      employeeId: 'N/A',
-      department: 'N/A',
-      company: 'บริษัท OTD'
-    };
-
-    const mapToApproval = (req: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่', typeId: number, detailSub?: string): ApprovalItem => ({
-      requestNo: req.id,
-      requestDate: req.createDate,
-      requestBy: req.requester || defaultUser,
-      requestType: type,
-      typeId: typeId,
-      requestDetail: req.items[0]?.description || detailSub || '',
-      amount: req.items.reduce((sum: number, i: any) => sum + (i.amount || 0), 0),
-      status: this.mapStatus(req.status)
-    });
-
-    const combined = [
-      ...allowances.map(a => mapToApproval(a, 'ค่าเบี้ยเลี้ยง', a.typeId, 'เบิกค่าเบี้ยเลี้ยงปฏิบัติงาน')),
-      ...taxis.map(t => mapToApproval(t, 'ค่าแท็กซี่', t.typeId, 'เบิกค่าเดินทางไปพบลูกค้า')),
-      ...vehicles.map(v => mapToApproval(v, 'ค่ารถ', v.typeId, 'ค่าเดินทาง (รถส่วนตัว/สาธารณะ)'))
-    ];
-
-    this.approvals.set(combined.sort((a, b) => b.requestNo.localeCompare(a.requestNo)));
-  }
-
-  // แปลงสถานะภาษาไทยเป็นภาษาอังกฤษประเภทต่างๆ
-  private mapStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-    const s = status?.trim();
-
-    if (s === 'ไม่อนุมัติ') return 'Rejected';
-    if (s === 'รอแก้ไข') return 'Referred Back';
-
-    if (s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
-
-    if (s === 'คำขอใหม่' ||
-      s === 'ตรวจสอบแล้ว' ||
-      s === 'อยู่ระหว่างการอนุมัติ' ||
-      s === 'รอพนักงานยืนยัน' ||
-      s === 'รอต้นสังกัดอนุมัติ' ||
-      s === 'รอฝ่ายบุคคลอนุมัติ' ||
-      s === 'รอผู้บริหารอนุมัติ' ||
-      s === 'รอฝ่ายบัญชีอนุมัติ' ||
-      s.includes('รอตรวจสอบ')) {
-      return 'Pending';
-    }
-
-    return 'Pending';
   }
 
   // กรองเมธอดตาม Tab และการค้นหา
