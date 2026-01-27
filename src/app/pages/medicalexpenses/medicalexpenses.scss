@@ -486,16 +486,18 @@ $bg-page: #f8f9fa;
 
             @include mobile {
                 width: 100%;
-                height: 100%;
-                max-height: 100vh;
+                height: 100dvh; // Use dynamic viewport height to account for mobile browser bars
+                max-height: 100dvh;
                 border-radius: 0;
             }
 
             app-medicalexpenses-form {
                 flex: 1;
                 width: 100%;
-                overflow: hidden; // Disable host scroll to allow inner sticky layout
-                display: block; // Ensure it behaves as a block container
+                overflow: hidden;
+                display: flex; // Change from block to flex
+                flex-direction: column;
+                min-height: 0; // Prevent flex item expansion
             }
 
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);

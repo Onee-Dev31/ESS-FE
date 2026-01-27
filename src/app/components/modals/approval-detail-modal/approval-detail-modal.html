@@ -1,18 +1,21 @@
 <div class="modal-overlay" (click)="close()">
     <div class="modal-container-large" (click)="$event.stopPropagation()">
         <div class="modal-header-modern">
-            <div class="header-info">
-                <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
-                <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate }}</span>
+            <div class="header-top-row">
+                <div class="header-info-inline">
+                    <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
+                    <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
+                            }}</span></div>
                 </div>
+                <button class="btn-close-x" (click)="close()">&times;</button>
             </div>
+
             <div class="header-actions-group">
                 @if (!isActionConfirm()) {
                 <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
                 <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
                 <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
                 }
-                <button class="btn-close-x" (click)="close()">&times;</button>
             </div>
         </div>
 

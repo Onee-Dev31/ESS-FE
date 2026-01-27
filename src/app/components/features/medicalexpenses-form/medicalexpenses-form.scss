@@ -9,16 +9,20 @@ $text-sub: #5f6368;
 $text-sub: #5f6368;
 
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    overflow: hidden;
 }
 
 .medical-expenses-form-page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%; // Ensure it fills the host
     background: #fff;
     overflow: hidden;
+    flex: 1; // Add flex: 1
+    min-height: 0; // Add min-height constraint
 
     .top-header-strip {
         display: flex;
@@ -104,6 +108,7 @@ $text-sub: #5f6368;
 
     .content-card {
         flex: 1;
+        min-height: 0; // Fix: Allow flex item to shrink below content height to enable scrolling
         padding: 15px 15px;
 
         @media (min-width: 768px) {
@@ -112,16 +117,30 @@ $text-sub: #5f6368;
 
         display: flex;
         flex-direction: column;
-        overflow-y: auto; // Allow content to scroll
+        overflow-y: auto;
         overflow-x: hidden;
     }
 
     .form-section-wrapper {
+        min-width: 0;
+        width: 100%;
+
         .section-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.25rem;
+
+            @media (max-width: 768px) {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+
+                .btn-upload-file {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
 
             .section-heading {
                 margin-bottom: 0;
@@ -302,7 +321,8 @@ $text-sub: #5f6368;
 
     .attachment-table-container {
         flex: 1;
-        overflow: auto;
+        overflow-x: auto;
+        max-width: 100%;
         border: 1px solid $border;
         border-radius: 8px;
 
@@ -318,6 +338,14 @@ $text-sub: #5f6368;
                 height: 40px;
                 vertical-align: middle;
                 box-sizing: border-box;
+
+                &:nth-child(2) {
+                    min-width: 180px;
+                }
+
+                &:nth-child(4) {
+                    min-width: 180px;
+                }
             }
 
             th {
@@ -353,6 +381,10 @@ $text-sub: #5f6368;
                 padding: 6px 12px;
                 border-radius: 4px;
                 max-width: 400px;
+
+                @media (max-width: 768px) {
+                    max-width: 150px;
+                }
 
                 .file-text {
                     flex: 1;
@@ -414,6 +446,7 @@ $text-sub: #5f6368;
 
     .form-actions-footer {
         padding: 1rem 2rem;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom)); // Ensure buttons clear home indicator
         border-top: 1px solid $border;
         display: flex;
         gap: 12px;
@@ -536,8 +569,21 @@ $text-sub: #5f6368;
 
 @media (max-width: 768px) {
     .medical-expenses-form-page {
+        .content-card {
+            padding: 15px 10px; // Reduce card padding on mobile
+        }
+
         .details-grid {
             grid-template-columns: 1fr;
+            padding: 1rem; // Reduce internal padding
+            gap: 1rem;
+        }
+
+        // Stack date inputs vertically on very narrow screens to prevent overflow
+        .range-inputs {
+            @media (max-width: 480px) {
+                grid-template-columns: 1fr;
+            }
         }
     }
 }

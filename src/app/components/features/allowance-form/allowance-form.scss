@@ -9,10 +9,19 @@ $text-sub: #5f6368;
 
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
 .allowance-form-page {
   display: flex;
   flex-direction: column;
   height: 100%;
+  flex: 1;
+  min-height: 0;
   background: #fff;
   font-family: $font-main;
   overflow: hidden;
@@ -73,10 +82,11 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .content-card {
     flex: 1;
+    min-height: 0; // Allow content to shrink and scroll
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden; // Parent for the table-container scroll
   }
 
   .filter-section {
@@ -95,7 +105,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .month-selector {
       display: flex;
-      flex-direction: column; 
+      flex-direction: column;
       align-items: flex-start;
       gap: 8px;
 
@@ -116,7 +126,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
 
       .form-control {
-        width: 100%; 
+        width: 100%;
 
         @media (min-width: 768px) {
           width: auto;
@@ -128,7 +138,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
 
       .btn-search {
-        width: 100%; 
+        width: 100%;
 
         @media (min-width: 768px) {
           width: auto;
@@ -210,7 +220,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .action-bar {
     display: flex;
-    flex-direction: column-reverse; 
+    flex-direction: column-reverse;
     gap: 12px;
     margin-bottom: 12px;
 
@@ -224,7 +234,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
     flex-shrink: 0;
 
     .btn-submit {
-      width: 100%; 
+      width: 100%;
 
       @media (min-width: 768px) {
         width: auto;
@@ -241,7 +251,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
     .info-badges {
       display: flex;
-      flex-wrap: wrap; 
+      flex-wrap: wrap;
       gap: 8px;
 
       .right-info,
@@ -276,6 +286,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
   .table-container {
     flex: 1;
+    min-height: 0;
     overflow: auto;
     border: 1px solid $border;
     border-radius: 8px;
@@ -291,7 +302,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       td {
         border-bottom: 1px solid $border;
         border-right: 1px solid $border;
-        height: 40px; 
+        height: 40px;
 
         @media (min-width: 768px) {
           height: 44px;
@@ -312,7 +323,12 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
       }
 
       .sub-header th {
-        top: 44px;
+        top: 40px; // Mobile height
+
+        @media (min-width: 768px) {
+          top: 44px; // Desktop height
+        }
+
         font-size: 0.8rem;
         z-index: 9;
       }
@@ -389,6 +405,7 @@ $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
         padding-right: 20px;
         font-weight: 600;
       }
+
     }
   }
 }

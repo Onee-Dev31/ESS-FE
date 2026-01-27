@@ -34,35 +34,58 @@ $bg-slate: #f4f7f9;
             flex-shrink: 0; // Prevent header shrinking
             padding: 1.5rem 2rem;
             border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            // ... (content matches existing until end of header)
-            // Skipping deep nested content for brevity in replacement, focusing on structure.
-            // I will target the specific blocks to minimize context limit hit if possible, or just replace layout significant parts.
-            // Let's replace the container definition and the body definition separately or cover enough context.
-
+            flex-shrink: 0;
             padding: 1.5rem 2rem;
             border-bottom: 1px solid #eee;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
 
-            .header-info {
-                .request-title {
-                    margin: 0;
-                    font-size: 1.25rem;
-                    color: #333;
+            .header-top-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                width: 100%;
+
+                .header-info-inline {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 12px;
+                    flex-wrap: wrap;
+
+                    .request-title {
+                        margin: 0;
+                        font-size: 1.25rem;
+                        color: #333;
+                    }
+
+                    .requester-line {
+                        font-size: 0.9rem;
+                        color: #666;
+
+                        .highlight {
+                            color: $primary-blue;
+                            font-weight: 600;
+                        }
+                    }
                 }
 
-                .requester-line {
-                    font-size: 0.85rem;
-                    color: #666;
-                    margin-top: 4px;
+                .btn-close-x {
+                    background: transparent;
+                    border: none;
+                    color: #ccc;
+                    font-size: 28px; // Slightly larger
+                    line-height: 1;
+                    padding: 0;
+                    cursor: pointer;
+                    margin-left: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: color 0.2s;
 
-                    .highlight {
-                        color: $primary-blue;
-                        font-weight: 600;
+                    &:hover {
+                        color: $primary-red;
                     }
                 }
             }
@@ -70,15 +93,21 @@ $bg-slate: #f4f7f9;
             .header-actions-group {
                 display: flex;
                 gap: 8px;
+                flex-wrap: wrap;
 
                 button {
-                    padding: 8px 18px;
+                    padding: 8px 20px;
                     border-radius: 20px;
                     border: none;
                     color: white;
                     font-weight: 600;
                     cursor: pointer;
                     font-size: 13px;
+                    transition: transform 0.1s;
+
+                    &:active {
+                        transform: translateY(1px);
+                    }
                 }
 
                 .btn-action-green {
@@ -91,14 +120,6 @@ $bg-slate: #f4f7f9;
 
                 .btn-action-orange {
                     background: $primary-orange;
-                }
-
-                .btn-close-x {
-                    background: transparent;
-                    color: #ccc;
-                    font-size: 24px;
-                    padding-left: 10px;
-                    line-height: 1;
                 }
             }
         }
@@ -121,9 +142,9 @@ $bg-slate: #f4f7f9;
 
                     .progress-line-bg {
                         position: absolute;
-                        top: 24px; 
-                        left: 10%; 
-                        right: 10%; 
+                        top: 24px;
+                        left: 10%;
+                        right: 10%;
                         height: 4px;
                         background: #e2e8f0;
                         border-radius: 2px;
@@ -133,14 +154,14 @@ $bg-slate: #f4f7f9;
                     .progress-line-fill {
                         position: absolute;
                         top: 24px;
-                        left: 10%; 
+                        left: 10%;
                         height: 4px;
                         background: linear-gradient(90deg, #74c34d 0%, #5bb030 100%);
                         border-radius: 2px;
                         z-index: 1;
                         transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
                         box-shadow: 0 0 8px rgba(116, 195, 77, 0.3);
-                        max-width: 80%; 
+                        max-width: 80%;
                     }
 
                     .progress-step {
@@ -255,8 +276,8 @@ $bg-slate: #f4f7f9;
         .modal-layout-body {
             display: flex;
             flex-direction: column;
-            overflow-y: auto; 
-            flex: 1; 
+            overflow-y: auto;
+            flex: 1;
 
 
             @media (min-width: 992px) {

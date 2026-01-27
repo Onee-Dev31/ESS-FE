@@ -13,8 +13,10 @@
 
     .preview-card {
         background: #fff;
-        width: 800px;
-        height: 500px;
+        width: 90%; // Changed from 800px to 90%
+        max-width: 1000px;
+        height: 80vh; // Changed from 500px to viewport height
+        max-height: 800px;
         border-radius: 8px;
         display: flex;
         flex-direction: column;
@@ -22,12 +24,14 @@
         overflow: hidden;
 
         .modal-header {
+            // ... existing header styles ...
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
             border-bottom: 1px solid #eee;
             background-color: #f9fafb;
+            flex-shrink: 0; // Prevent header from shrinking
 
             h3 {
                 margin: 0;
@@ -52,10 +56,26 @@
             flex: 1;
             display: flex;
             overflow: hidden;
+            flex-direction: column; // Default to column (mobile-first approach)
+
+            @media (min-width: 768px) {
+                flex-direction: row; // Row on desktop
+            }
 
             .file-list-panel {
-                width: 300px;
-                border-right: 1px solid #eee;
+                width: 100%; // Full width on mobile
+                height: 150px; // Fixed height on mobile
+                flex-shrink: 0;
+
+                @media (min-width: 768px) {
+                    width: 300px;
+                    height: auto; // Auto height on desktop
+                    flex-shrink: 0;
+                    border-right: 1px solid #eee;
+                    border-bottom: none;
+                }
+
+                border-bottom: 1px solid #eee;
                 background-color: #fcfcfc;
                 overflow-y: auto;
                 padding: 10px;
