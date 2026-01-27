@@ -29,7 +29,69 @@
       </div>
     </div>
 
-    <!-- ตารางรายการข้อมูลสำหรับการอนุมัติ -->
+    <!-- Card View for mobile/tablet (max-width: 1310px) -->
+    <div class="card-list-view">
+      @for (row of table.getRowModel().rows; track $index) {
+      <div class="mobile-card">
+        <div class="card-header">
+          <div class="request-id">
+            <span class="label">No.</span>
+            <span class="value">{{ row.original.requestNo }}</span>
+          </div>
+          <span class="status-badge" [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">
+            {{ row.original.status }}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Date Created:</span>
+            <span class="value">{{ row.original.requestDate }}</span>
+          </div>
+
+          <div class="requester-block">
+            <div class="req-name">{{ row.original.requestBy.name }}</div>
+            <div class="req-details">
+              <span>{{ row.original.requestBy.employeeId }}</span> &bull;
+              <span>{{ row.original.requestBy.department }}</span>
+            </div>
+            <div class="req-company">{{ row.original.requestBy.company }}</div>
+          </div>
+
+          <div class="info-row mt-2">
+            <span class="label">Type:</span>
+            <span class="value highlight">{{ row.original.requestType }}</span>
+          </div>
+
+          <div class="description-block">
+            <div class="desc-label">Description:</div>
+            <div class="desc-content">{{ row.original.requestDetail }}</div>
+          </div>
+
+          <div class="amount-row">
+            <span class="label">Amount</span>
+            <span class="value amount">{{ row.original.amount | number }}</span>
+          </div>
+
+          <div class="card-actions">
+            <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="act-btn a-btn" title="Approve" (click)="openActionModal(row.original, 'Approved')">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="act-btn r-btn" title="Reject" (click)="openActionModal(row.original, 'Rejected')">
+              <i class="fas fa-times"></i>
+            </button>
+            <button class="act-btn b-btn" title="Refer Back" (click)="openActionModal(row.original, 'Referred Back')">
+              <i class="fas fa-undo-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- ตารางรายการข้อมูลสำหรับการอนุมัติ (Old Table) -->
     <div class="data-grid-container">
       <table class="data-grid">
         <thead>
