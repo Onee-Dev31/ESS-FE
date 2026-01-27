@@ -41,11 +41,11 @@ export class MedicalexpensesForm implements OnInit {
     { id: 2, name: 'original-aa87c620661b3eb94e5d85441b761387.png', description: 'ใบรับรองแพทย์' }
   ]);
 
+  // เริ่มต้นคอมโพเนนต์: โหลดข้อมูลคำขอหากอยู่ในโหมดแก้ไข
   ngOnInit() {
     if (this.requestId) {
       this.medicalService.getRequestById(this.requestId).subscribe(req => {
         if (req) {
-          // Edit Mode: Populate existing data
           this.isEditMode.set(true);
           this.currentDate.set(this.formatDateToThaiMonth(req.createDate));
 
@@ -54,18 +54,13 @@ export class MedicalexpensesForm implements OnInit {
             this.hospital = item.hospital;
             this.disease = item.diseaseType;
 
-            // Map types from Service label back to UI id
             const typeMatch = this.claimTypes.find(t => t.label === item.limitType);
             if (typeMatch) {
               this.selectedClaimType.set(typeMatch.id);
             }
 
-            // Convert DD/MM/YYYY to YYYY-MM-DD for date inputs
             const fromParts = item.treatmentDateFrom.split('/');
             if (fromParts.length === 3) {
-              // assume BE year in data, convert to AD for input if necessary? 
-              // Actually the service uses formatted strings. Let's keep it simple.
-              // If it's 23/01/2568 -> we need 2025-01-23 for input type="date"
               const yearAD = parseInt(fromParts[2]) - 543;
               this.startDate = `${yearAD}-${fromParts[1]}-${fromParts[0]}`;
 
@@ -77,7 +72,6 @@ export class MedicalexpensesForm implements OnInit {
             this.amount = item.requestedAmount;
           }
         } else {
-          // Create Mode with generated ID
           this.isEditMode.set(false);
           this.currentDate.set(this.formatDateToThaiMonth(new Date().toISOString()));
           this.resetDates();
@@ -94,6 +88,7 @@ export class MedicalexpensesForm implements OnInit {
     this.endDate = new Date().toISOString().split('T')[0];
   }
 
+  // แปลงวันที่เป็นรูปแบบ dd-MonthName-yyyy
   private formatDateToThaiMonth(dateStr: string): string {
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',
@@ -118,6 +113,7 @@ export class MedicalexpensesForm implements OnInit {
     input.click();
   }
 
+  // จัดการเมื่อมีการเลือกไฟล์แนบ
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -138,6 +134,7 @@ export class MedicalexpensesForm implements OnInit {
     this.onClose.emit();
   }
 
+  // ตรวจสอบข้อมูลและบันทึกคำขอค่ารักษาพยาบาล
   save() {
     if (!this.selectedClaimType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
@@ -151,7 +148,6 @@ export class MedicalexpensesForm implements OnInit {
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
-    // Format dates back to DD/MM/YYYY (BE)
     const formatDateToBE = (iso: string) => {
       const parts = iso.split('-');
       return `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}`;
@@ -159,7 +155,7 @@ export class MedicalexpensesForm implements OnInit {
 
     const request: MedicalRequest = {
       id: this.requestId,
-      createDate: this.isEditMode() ? new Date().toISOString() : new Date().toISOString(), // In real app use existing createDate
+      createDate: this.isEditMode() ? new Date().toISOString() : new Date().toISOString(),
       status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
       employeeId: 'EMP001',
       totalRequestedAmount: this.amount,
@@ -195,3 +191,4 @@ export class MedicalexpensesForm implements OnInit {
     }
   }
 }
+

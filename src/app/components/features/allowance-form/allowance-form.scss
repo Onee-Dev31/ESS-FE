@@ -29,7 +29,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px; // Reduced padding
+    padding: 10px 15px;
 
     @media (min-width: 768px) {
       padding: 17px 24px;
@@ -38,7 +38,7 @@
     border-bottom: 1px solid $border;
 
     h2 {
-      font-size: 1rem; // Smaller font on mobile
+      font-size: 1rem;
 
       @media (min-width: 768px) {
         font-size: 1.15rem;
@@ -74,11 +74,11 @@
 
   .content-card {
     flex: 1;
-    min-height: 0; // Allow content to shrink and scroll
+    min-height: 0;
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    overflow: hidden; // Parent for the table-container scroll
+    overflow: hidden;
   }
 
   .filter-section {
@@ -315,10 +315,10 @@
       }
 
       .sub-header th {
-        top: 40px; // Mobile height
+        top: 40px;
 
         @media (min-width: 768px) {
-          top: 44px; // Desktop height
+          top: 44px;
         }
 
         font-size: 0.8rem;

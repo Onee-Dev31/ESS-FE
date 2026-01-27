@@ -1,6 +1,7 @@
 @use './styles/theme' as *;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
+// กำหนดค่าเริ่มต้นและฟอนต์หลักของระบบ
 *,
 *::before,
 *::after {
@@ -26,13 +27,19 @@ textarea {
   font-family: $font-main;
 }
 
+// เมนคาร์ดสไตล์ (Premium Card)
 .card {
   background: #fff;
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin-bottom: 1.5rem;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .text-primary {
@@ -43,7 +50,19 @@ textarea {
   background-color: $primary !important;
 }
 
-// Responsive Utilities
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 .mobile-only {
   @media (min-width: 769px) {
     display: none !important;
@@ -80,7 +99,7 @@ textarea {
   }
 }
 
-// Global Card Adjustments for Small Screens
+
 @media (max-width: 768px) {
   .card {
     border-radius: 0.75rem;

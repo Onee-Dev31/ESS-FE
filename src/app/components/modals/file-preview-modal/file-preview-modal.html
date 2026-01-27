@@ -6,7 +6,7 @@
         </header>
 
         <div class="modal-body">
-            <!-- Left: File List -->
+            <!-- ฝั่งซ้าย: รายการไฟล์ทั้งหมดในคำขอนี้ -->
             <div class="file-list-panel">
                 <div *ngIf="files.length === 0" class="no-files">
                     <i class="fas fa-file-excel text-muted"></i>
@@ -26,7 +26,7 @@
                 </ul>
             </div>
 
-            <!-- Right: Preview Area -->
+            <!-- ฝั่งขวา: แสดงตัวอย่างไฟล์ที่เลือก -->
             <div class="preview-panel">
                 <div *ngIf="!selectedFile" class="empty-state">
                     <p>เลือกไฟล์เพื่อดูตัวอย่าง</p>
@@ -37,7 +37,6 @@
                         <h4>{{ selectedFile.fileName }}</h4>
                     </div>
                     <div class="image-box">
-                        <!-- Placeholder for image since we don't have real backend storage -->
                         <div class="mock-image">
                             <i class="fas fa-image fa-3x"></i>
                             <span>Preview: {{ selectedFile.fileName }}</span>

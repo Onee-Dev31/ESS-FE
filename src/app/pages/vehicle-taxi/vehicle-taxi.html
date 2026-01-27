@@ -9,6 +9,7 @@
   <div class="content-card">
     <div class="card-header-title">รายการเบิกแท็กซี่ของฉัน</div>
 
+    <!-- แถบเครื่องมือและส่วนตัวกรองรายการเบิกแท็กซี่ -->
     <div class="toolbar-container">
       <div class="left-action">
         <button class="btn-create" (click)="openModal()">
@@ -45,6 +46,7 @@
       </div>
     </div>
 
+    <!-- ตารางรายการเบิกแท็กซี่ (แสดงรายละเอียดการเดินทางและค่าใช้จ่าย) -->
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -144,6 +146,7 @@
           </tr>
         </tbody>
       </table>
+      <!-- การแบ่งหน้า -->
       <div class="pagination-container">
         <div class="pagination-info">
           แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}

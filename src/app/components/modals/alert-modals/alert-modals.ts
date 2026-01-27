@@ -12,19 +12,16 @@ import { AlertService, AlertState } from '../../../services/alert.service';
 export class AlertModals {
   private alertService = inject(AlertService);
 
-  // เชื่อมต่อสถานะ Alert จาก Service
+
   state$ = this.alertService.alertState$;
 
-  /**
-   * ปิด Alert เมื่อกดยืนยันหรือพื้นหลัง
-   */
+
+  // ปิดหน้าต่างแจ้งเตือน
   close() {
     this.alertService.hide();
   }
 
-  /**
-   * คืนค่าคลาส CSS ตามประเภทของ Alert เพื่อแสดงสีและไอคอนที่ต่างกัน
-   */
+  // ดึงคลาสไอคอนตามประเภทการแจ้งเตือน
   getIconClass(type: string): string {
     switch (type) {
       case 'success': return 'fas fa-check-circle text-green';
@@ -35,9 +32,7 @@ export class AlertModals {
     }
   }
 
-  /**
-   * คืนค่าคลาส CSS สำหรับปุ่ม
-   */
+  // ดึงคลาสปุ่มตามประเภทการแจ้งเตือน
   getBtnClass(type: string): string {
     return `btn-confirm btn-${type}`;
   }

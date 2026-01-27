@@ -27,10 +27,12 @@ export class LoginComponent {
 
   constructor() { }
 
+  // สลับการซ่อน/แสดงรหัสผ่าน
   togglePasswordVisibility() {
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 
+  // จัดการการเข้าสู่ระบบ
   onLogin() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -41,7 +43,7 @@ export class LoginComponent {
     this.loginMessage = '';
     const { email, password } = this.loginForm.value;
 
-    // [API-Refactor] Use AuthService
+
     this.authService.login(email || '', password || '').subscribe({
       next: (success) => {
         if (success) {

@@ -19,10 +19,6 @@
       flex-shrink: 0;
       z-index: 1000;
       
-
-      @media (max-width: 1024px) {
-         // When NOT collapsed on small screens (toggled open), only show mini-bar
-      }
     }
 
     .content-container {
@@ -46,7 +42,7 @@
       width: 80px;
 
       @media (max-width: 1024px) {
-        width: 0; // Hide completely when collapsed on small screens
+        width: 0;
       }
     }
   }

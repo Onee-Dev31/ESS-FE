@@ -25,14 +25,14 @@ export class FileUploadModal implements OnChanges {
     }
   }
 
+  // จัดการเมื่อเลือกไฟล์ (จำกัดขนาดไม่เกิน 4MB)
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // ตรวจสอบขนาดไฟล์ (ไม่เกิน 4MB)
       const maxSizeInBytes = 4 * 1024 * 1024;
       if (file.size > maxSizeInBytes) {
         alert('ขนาดไฟล์ต้องไม่เกิน 4MB (ไฟล์ที่เลือกมีขนาด ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB)');
-        event.target.value = ''; // Reset input
+        event.target.value = '';
         return;
       }
 
@@ -41,15 +41,18 @@ export class FileUploadModal implements OnChanges {
     }
   }
 
+  // ลบไฟล์ที่เลือกไว้ออก
   removeFile() {
     this.tempFileName = null;
     this.isDeleted = true;
   }
 
+  // ยืนยันการอัปโหลดไฟล์
   confirm() {
     this.onSave.emit(this.tempFileName);
   }
 
+  // ปิดหน้าต่างอัปโหลด
   close() {
     this.onClose.emit();
   }

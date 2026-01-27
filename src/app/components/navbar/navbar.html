@@ -1,16 +1,19 @@
 <nav class="navbar">
+  <!-- ฝั่งซ้าย: ปุ่มเปิด/ปิด Sidebar -->
   <div class="nav-left">
     <button class="icon-btn menu-trigger" (click)="toggleSidebar()">
       <i class="fas fa-bars"></i>
     </button>
   </div>
 
+  <!-- ส่วนกลาง: ชื่อระบบและลิงก์หน้าหลัก -->
   <div class="nav-center">
-  <h1 class="nav-title" routerLink="/dashboard" style="cursor: pointer;">
-    ESS DASHBOARD
-  </h1>
-</div>
+    <h1 class="nav-title" routerLink="/dashboard" style="cursor: pointer;">
+      ESS DASHBOARD
+    </h1>
+  </div>
 
+  <!-- ฝั่งขวา: ช่องค้นหา, การแจ้งเตือน และโปรไฟล์ผู้ใช้งาน -->
   <div class="nav-right">
     <div class="search-box desktop-search">
       <input type="text" placeholder="Search..." />
@@ -37,22 +40,16 @@
           <div class="dropdown-header">การแจ้งเตือนล่าสุด</div>
 
           <a href="javascript:void(0)" class="dropdown-item" *ngFor="let item of notifications">
-            <div
-              class="icon-circle"
-              [ngClass]="{
+            <div class="icon-circle" [ngClass]="{
                 orange: item.status === 'pending',
                 green: item.status === 'approved',
                 red: item.status === 'rejected'
-              }"
-            >
-              <i
-                class="fas"
-                [ngClass]="{
+              }">
+              <i class="fas" [ngClass]="{
                   'fa-hourglass-half': item.status === 'pending',
                   'fa-check': item.status === 'approved',
                   'fa-times': item.status === 'rejected'
-                }"
-              ></i>
+                }"></i>
             </div>
 
             <div class="content">

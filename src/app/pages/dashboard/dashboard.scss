@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use '../../../styles/theme' as *;
 
-// Dashboard-specific variables
+
 $dark: #0f172a;
 $muted: #64748b;
 $border-color: transparent;
@@ -645,7 +645,7 @@ body {
 .action-btn-sm {
   @extend .action-btn;
   width: 40px !important;
-  min-width: 40px !important; // Force min-width to prevent squashing
+  min-width: 40px !important;
   max-width: 40px !important;
   height: 40px !important;
   padding: 0 !important;
@@ -655,7 +655,7 @@ body {
   border-radius: 50%;
   font-size: 15px;
   font-weight: 400;
-  flex: none !important; // Prevent any flex interaction
+  flex: none !important;
 }
 
 .stats-grid-card {
@@ -1677,7 +1677,7 @@ body {
     padding: 10px;
   }
 
-  // ... existing media query content ...
+
 
   .page-title {
     font-size: 16px;

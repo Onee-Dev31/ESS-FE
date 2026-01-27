@@ -3,9 +3,7 @@ import { Observable, of, BehaviorSubject } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Requester, VehicleService, WELFARE_TYPES } from './vehicle.service';
 
-/**
- * อินเตอร์เฟสสำหรับรายการค่าแท็กซี่
- */
+// รายการค่าแท็กซี่
 export interface TaxiItem {
     date: string;
     description: string;
@@ -16,9 +14,7 @@ export interface TaxiItem {
     attachedFile?: string | null;
 }
 
-/**
- * อินเตอร์เฟสสำหรับคำขอเบิกค่าแท็กซี่
- */
+// ข้อมูลคำขอค่าแท็กซี่
 export interface TaxiRequest {
     id: string;
     typeId: number;
@@ -34,16 +30,13 @@ export interface TaxiRequest {
 export class TaxiService {
     private vehicleService = inject(VehicleService);
 
-    // ข้อมูลจำลองสำหรับคำขอเบิกค่าแท็กซี่
+    // ข้อมูลจำลองคำขอค่าแท็กซี่
     private taxiRequestsMock: TaxiRequest[] = this.generateMockTaxiRequests(15);
     private taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>(this.taxiRequestsMock);
 
     constructor() { }
 
-    /**
-     * สร้างข้อมูลจำลองสำหรับคำขอเบิกค่าแท็กซี่
-     * @param count จำนวนรายการ
-     */
+    // สร้างข้อมูลจำลองคำขอค่าแท็กซี่
     private generateMockTaxiRequests(count: number): TaxiRequest[] {
         const requests: TaxiRequest[] = [];
         for (let i = 1; i <= count; i++) {
@@ -66,56 +59,39 @@ export class TaxiService {
         return requests;
     }
 
-    /**
-     * ดึงรายการคำขอเบิกค่าแท็กซี่ทั้งหมด
-     */
+    // ดึงข้อมูลคำขอค่าแท็กซี่ทั้งหมด
     getTaxiRequests(): Observable<TaxiRequest[]> {
         return this.taxiRequestsSubject.asObservable().pipe(delay(200));
     }
 
-    /**
-     * ดึงข้อมูลคำขอเบิกค่าแท็กซี่ตาม ID
-     * @param id รหัสคำขอ
-     */
+    // ดึงข้อมูลคำขอค่าแท็กซี่ตาม ID
     getTaxiRequestById(id: string): Observable<TaxiRequest | undefined> {
         const item = this.taxiRequestsMock.find(r => r.id === id);
         return of(item).pipe(delay(200));
     }
 
-    /**
-     * เพิ่มคำขอเบิกค่าแท็กซี่ใหม่
-     * @param request ข้อมูลคำขอ
-     */
+    // เพิ่มคำขอค่าแท็กซี่ใหม่
     addTaxiRequest(request: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = [request, ...this.taxiRequestsMock];
         this.taxiRequestsSubject.next(this.taxiRequestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * อัปเดตข้อมูลคำขอเบิกค่าแท็กซี่
-     * @param id รหัสคำขอ
-     * @param updatedRequest ข้อมูลที่อัปเดต
-     */
+    // อัปเดตข้อมูลคำขอค่าแท็กซี่
     updateTaxiRequest(id: string, updatedRequest: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.map(r => r.id === id ? updatedRequest : r);
         this.taxiRequestsSubject.next(this.taxiRequestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * ลบรายการคำขอเบิกค่าแท็กซี่
-     * @param id รหัสคำขอ
-     */
+    // ลบคำขอค่าแท็กซี่
     deleteTaxiRequest(id: string): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.filter(r => r.id !== id);
         this.taxiRequestsSubject.next(this.taxiRequestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * สร้างเลขที่เอกสารการเบิกค่าแท็กซี่ถัดไป
-     */
+    // สร้างรหัสคำขอแท็กซี่ถัดไป
     generateNextTaxiId(): Observable<string> {
         const lastIdNum = this.taxiRequestsMock.reduce((max, item) => {
             const num = parseInt(item.id.split('#')[1] || '0');
@@ -125,11 +101,7 @@ export class TaxiService {
         return of(`2701#${nextNum}`);
     }
 
-    /**
-     * ดึงข้อมูล Log การเดินทางจำลอง
-     * @param month เดือน
-     * @param year ปี
-     */
+    // ดึงข้อมูล log จำลองสำหรับค่าแท็กซี่
     getMockTaxiLogs(month: number, year: number): Observable<any[]> {
         const days = this.vehicleService.generateDays(month, year);
         const results = days.map((date: Date) => {
@@ -161,11 +133,7 @@ export class TaxiService {
         return of(results).pipe(delay(200));
     }
 
-    /**
-     * อัปเดตสถานะของคำขอเบิกค่าแท็กซี่
-     * @param id รหัสคำขอ
-     * @param status สถานะใหม่
-     */
+    // อัปเดตสถานะคำขอแท็กซี่
     updateTaxiStatus(id: string, status: string): void {
         this.taxiRequestsMock = this.taxiRequestsMock.map(r =>
             r.id === id ? { ...r, status: status } : r
@@ -173,3 +141,4 @@ export class TaxiService {
         this.taxiRequestsSubject.next(this.taxiRequestsMock);
     }
 }
+

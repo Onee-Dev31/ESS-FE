@@ -5,12 +5,9 @@ import { VehicleService } from '../../../services/vehicle.service';
 import { AllowanceService } from '../../../services/allowance.service';
 import { TaxiService } from '../../../services/taxi.service';
 import { TransportService } from '../../../services/transport.service';
-import { AlertService } from '../../../services/alert.service'; // เพิ่ม AlertService
+import { AlertService } from '../../../services/alert.service';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 
-/**
- * อินเตอร์เฟสสำหรับรายการสิ่งของ/ค่าใช้จ่ายที่รวมกัน (Unified) สำหรับแสดงใน Modal
- */
 export interface UnifiedItem {
   date: string;
   description?: string;
@@ -22,9 +19,6 @@ export interface UnifiedItem {
   attachedFile?: string;
 }
 
-/**
- * อินเตอร์เฟสสำหรับรายการที่รอการอนุมัติ
- */
 export interface ApprovalItem {
   requestNo: string;
   requestDate: string;
@@ -53,7 +47,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);
-  private alertService = inject(AlertService); // ฉีด AlertService
+  private alertService = inject(AlertService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -63,18 +57,14 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   protected readonly Math = Math;
 
-  // สถานะ UI ใน Modal
   modalActiveTab = signal<'Items' | 'Comments'>('Items');
   isActionConfirm = signal<boolean>(false);
   actionType = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
   reasonText = signal<string>('');
 
-  // ข้อมูลรายละเอียดที่ดึงมา
   currentDetailItems = signal<UnifiedItem[]>([]);
   currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
   detailedStatus = signal<string>('');
-
-  // ขั้นตอนการอนุมัติ (Stepper)
   steps = [
     { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
     { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
@@ -83,9 +73,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
   ];
 
-  /**
-   * คำนวณลำดับขั้นตอนปัจจุบันจากสถานะข้อความ
-   */
+  // คำนวณลำดับขั้นตอนการอนุมัติ (1-5) จากสถานะภาษาไทย
   currentStepIndex = computed(() => {
     const status = this.detailedStatus();
     if (!status) return 0;
@@ -101,9 +89,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     return 1;
   });
 
-  /**
-   * แปลงสถานะเพื่อใช้แสดงผลใน Badge ของ Modal
-   */
+  // แปลงสถานะรายละเอียดเป็นสถานะหลัก (Pending, Approved, Rejected, Referred Back)
   getDisplayStatus(): string {
     const status = this.detailedStatus() || this.approvalItem.status;
     const s = status?.trim();
@@ -127,9 +113,6 @@ export class ApprovalDetailModalComponent implements OnInit {
   isPreviewModalOpen = signal(false);
   previewFiles = signal<any[]>([]);
 
-  /**
-   * รวมประเภทและรายการเข้าด้วยกันเพื่อใช้งานใน Template
-   */
   selectedRequestDetails = computed(() => {
     return {
       type: this.currentDetailType(),
@@ -137,13 +120,11 @@ export class ApprovalDetailModalComponent implements OnInit {
     };
   });
 
-  /**
-   * คำนวณยอดรวมของรายการใน Modal
-   */
   modalItemsTotal = computed(() => {
     return this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0);
   });
 
+  // เริ่มต้น: โหลดรายละเอียดคำขอและตรวจสอบค่าเริ่มต้น
   ngOnInit() {
     this.loadDetails();
     if (this.initialAction) {
@@ -152,9 +133,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
-  /**
-   * โหลดข้อมูลรายละเอียดเชิงลึกตามประเภทของสวัสดิการ
-   */
+  // โหลดรายละเอียดรายการเบิกตามประเภท (เบี้ยเลี้ยง, แท็กซี่, หรือรถส่วนตัว)
   loadDetails() {
     const item = this.approvalItem;
     if (!item) return;
@@ -186,27 +165,22 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
-  /**
-   * เปิดหน้าต่างยืนยันการตัดสินใจ (Approve/Reject/Refer Back)
-   */
+  // เปิดส่วนยืนยันการดำเนินการ (อนุมัติ/ไม่อนุมัติ/ส่งคืน)
   openActionConfirm(action: 'Approved' | 'Rejected' | 'Referred Back') {
     this.isActionConfirm.set(true);
     this.actionType.set(action);
     this.reasonText.set('');
   }
 
-  /**
-   * ปิดหน้าต่างยืนยันการตัดสินใจ
-   */
+
   closeActionConfirm() {
     this.isActionConfirm.set(false);
     this.actionType.set(null);
     this.reasonText.set('');
   }
 
-  /**
-   * ยืนยันการดำเนินการ
-   */
+
+  // ยืนยันการดำเนินการและตรวจสอบความถูกต้องของข้อมูล
   confirmAction() {
     const item = this.approvalItem;
     const action = this.actionType();
@@ -214,7 +188,6 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     if (!item || !action) return;
 
-    // ตรวจสอบว่าต้องใส่เหตุผลหรือไม่
     if ((action === 'Rejected' || action === 'Referred Back') && !reason.trim()) {
       this.alertService.showWarning('กรุณาระบุเหตุผลการปฏิเสธหรือส่งแก้ไขเพื่อความชัดเจน', 'กรุณาระบุเหตุผล');
       return;
@@ -223,9 +196,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.updateStatus(item, action, reason);
   }
 
-  /**
-   * อัปเดตสถานะของคำขอใน Service ที่เกี่ยวข้อง
-   */
+  // อัปเดตสถานะคำขอตามขั้นตอนการอนุมัติและแจ้งเตือนผลลัพธ์
   private updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
     let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
     let statusLabel = 'รอพนักงานยืนยัน';
@@ -238,7 +209,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     } else if (newStatus === 'Referred Back') {
       statusLabel = 'รอแก้ไข';
     } else if (newStatus === 'Approved') {
-      // ตรรกะการเลื่อนลำดับการอนุมัติ (Multi-stage progression)
       const currentStatus = this.detailedStatus();
       const currentStep = this.currentStepIndex();
 
@@ -257,7 +227,6 @@ export class ApprovalDetailModalComponent implements OnInit {
       }
     }
 
-    // เรียกอัปเดตสถานะตามประเภทของสวัสดิการ
     if (type === 'allowance') {
       this.allowanceService.updateAllowanceStatus(item.requestNo, statusLabel);
     } else if (type === 'taxi') {
@@ -269,31 +238,23 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.onStatusUpdated.emit();
     this.onClose.emit();
 
-    // แสดง Alert แจ้งผลการดำเนินการสำเร็จ
     const successMsg = newStatus === 'Approved' ? 'ดำเนินการอนุมัติเรียบร้อยแล้ว' : 'ดำเนินการส่งคืน/ปฏิเสธเรียบร้อยแล้ว';
     this.alertService.showSuccess(successMsg, 'ดำเนินการสำเร็จ');
   }
 
-  /**
-   * ปิด Modal
-   */
   close() {
     this.onClose.emit();
   }
 
-  /**
-   * เปิดดูพรีวิวไฟล์แนบ
-   */
+  // เปิดดูไฟล์แนบ
   openPreview(fileName: string) {
     if (!fileName) return;
     this.previewFiles.set([{ fileName, date: '' }]);
     this.isPreviewModalOpen.set(true);
   }
 
-  /**
-   * ปิดหน้าต่างพรีวิวไฟล์
-   */
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
 }
+

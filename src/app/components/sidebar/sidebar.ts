@@ -84,6 +84,7 @@ export class Sidebar implements OnInit, OnDestroy {
     }
   }
 
+  // ตรวจสอบเมนูที่กำลังใช้งานอยู่ตาม URL เพื่อเปิดกลุ่มเมนูอัตโนมัติ
   checkActiveMenu(url: string) {
     if (url.startsWith('/dashboard')) {
       this.openMenu = 'Dashboards';
@@ -101,6 +102,7 @@ export class Sidebar implements OnInit, OnDestroy {
     }
   }
 
+  // ตรวจสอบว่าเมนูย่อยนั้นๆ กำลังถูกใช้งานอยู่หรือไม่
   isSubMenuActive(path: string): boolean {
     const currentUrl = this.router.url.split('?')[0];
     if ((currentUrl === '/dashboard' || currentUrl === '/dashboard/') && path === '/dashboard/default') {
@@ -115,6 +117,7 @@ export class Sidebar implements OnInit, OnDestroy {
     });
   }
 
+  // สลับการเปิด/ปิดกลุ่มเมนูหลัก
   toggleMenu(menuName: string) {
     this.openMenu = this.openMenu === menuName ? '' : menuName;
   }

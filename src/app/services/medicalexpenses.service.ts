@@ -2,9 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { Requester, VehicleService } from './vehicle.service';
 
-/**
- * อินเตอร์เฟสสำหรับรายการค่ารักษาพยาบาล
- */
+// รายการค่ารักษาพยาบาล
 export interface MedicalItem {
     id?: string;
     requestDate: string;
@@ -17,11 +15,9 @@ export interface MedicalItem {
     approvedAmount: number;
 }
 
-/**
- * อินเตอร์เฟสสำหรับคำขอเบิกค่ารักษาพยาบาล
- */
+// คำขอค่ารักษาพยาบาล
 export interface MedicalRequest {
-    id: string; // เช่น 2701#xxx
+    id: string;
     createDate: string;
     status: string;
     items: MedicalItem[];
@@ -37,94 +33,61 @@ export interface MedicalRequest {
 export class MedicalexpensesService {
     private vehicleService = inject(VehicleService);
 
-    // จำลองฐานข้อมูลสำหรับค่ารักษาพยาบาล
     private medicalRequestsMock: MedicalRequest[] = this.generateMockMedicalRequests(15);
 
-    // ตัวแปรสำหรับกระจายข้อมูล (State Management)
     private medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>(this.medicalRequestsMock);
 
     constructor() { }
 
+    // สร้างข้อมูลจำลองคำขอค่ารักษาพยาบาล
     private generateMockMedicalRequests(count: number): MedicalRequest[] {
-        const requests: MedicalRequest[] = [];
-        const diseaseTypes = [
-            'เอ็นอักเสบ', 'เนื้อเยื่อช้ำ', 'ไข้หวัดใหญ่', 'ปวดฟัน/อุดฟัน', 'ตรวจสุขภาพประจำปี',
-            'ปวดศีรษะ', 'ผื่นคัน', 'ตาอักเสบ', 'ท้องเสีย', 'ปวดหลัง', 'นิ้วล็อค'
-        ];
-        const hospitals = [
-            'สินแพทย์ รพ.', 'พญาไท รพ.', 'เปาโล รพ.', 'วิภาวดี รพ.', 'สมิติเวช รพ.',
-            'คลินิกทันตกรรมสไมล์', 'คลินิกเวชกรรมอินเตอร์', 'รพ.กรุงเทพ', 'รพ.รามาธิบดี'
-        ];
-        const limitTypes = [
-            'ผู้ป่วยนอก (OPD)',
-            'ทันตกรรม',
-            'สายตา',
-            'ผู้ป่วยใน'
-        ];
+        const diseaseTypes = ['เอ็นอักเสบ', 'ไข้หวัดใหญ่', 'ปวดฟัน/อุดฟัน', 'ปวดศีรษะ', 'ท้องเสีย'];
+        const hospitals = ['สินแพทย์ รพ.', 'พญาไท รพ.', 'เปาโล รพ.', 'รพ.กรุงเทพ'];
+        const limitTypes = ['ผู้ป่วยนอก (OPD)', 'ทันตกรรม', 'สายตา', 'ผู้ป่วยใน'];
 
-        for (let i = 1; i <= count; i++) {
+        return Array.from({ length: count }, (_, i) => {
             const dateStr = this.vehicleService.getRandomDateInPast3Months();
-            const createDateObj = new Date(dateStr);
             const status = this.vehicleService.getRandomStatus('vehicle');
-
-            const items: MedicalItem[] = [];
-            const requestId = `2701#${String(i).padStart(3, '0')}`;
-
-            const treatmentDate = new Date(createDateObj);
-            treatmentDate.setDate(treatmentDate.getDate() - Math.floor(Math.random() * 3));
-
-            const treatmentDateStr = treatmentDate.toISOString().split('T')[0];
-            const [y, m, d] = treatmentDateStr.split('-');
-            const formattedDate = `${d}/${m}/${y}`;
-
             const amount = Math.floor(Math.random() * 5000) + 300;
             const approvedAmount = status === 'อนุมัติแล้ว' ? amount : (status === 'รออนุมัติ' ? 0 : Math.floor(amount * 0.8));
 
-            items.push({
-                requestDate: formattedDate,
-                limitType: limitTypes[Math.floor(Math.random() * limitTypes.length)],
-                diseaseType: diseaseTypes[Math.floor(Math.random() * diseaseTypes.length)],
-                hospital: hospitals[Math.floor(Math.random() * hospitals.length)],
-                treatmentDateFrom: formattedDate,
-                treatmentDateTo: formattedDate,
-                requestedAmount: amount,
-                approvedAmount: approvedAmount
-            });
+            const [y, m, d] = dateStr.split('-');
+            const formattedDate = `${d}/${m}/${y}`;
 
-            requests.push({
-                id: requestId,
+            return {
+                id: `2701#${String(i + 1).padStart(3, '0')}`,
                 createDate: dateStr,
                 status: status,
                 requester: this.vehicleService.getRandomRequester(),
                 employeeId: 'EMP001',
-                items: items,
+                items: [{
+                    requestDate: formattedDate,
+                    limitType: limitTypes[Math.floor(Math.random() * limitTypes.length)],
+                    diseaseType: diseaseTypes[Math.floor(Math.random() * diseaseTypes.length)],
+                    hospital: hospitals[Math.floor(Math.random() * hospitals.length)],
+                    treatmentDateFrom: formattedDate,
+                    treatmentDateTo: formattedDate,
+                    requestedAmount: amount,
+                    approvedAmount: approvedAmount
+                }],
                 totalRequestedAmount: amount,
                 totalApprovedAmount: approvedAmount
-            });
-        }
-
-        // เรียงลำดับตามเลขที่เอกสารใหม่ล่าสุด (Descending)
-        return requests.sort((a, b) => b.id.localeCompare(a.id));
+            };
+        }).sort((a, b) => b.id.localeCompare(a.id));
     }
 
-    /**
-     * ดึงรายการคำขอเบิกค่ารักษาพยาบาลทั้งหมด
-     */
+    // ดึงข้อมูลคำขอค่ารักษาพยาบาลทั้งหมด
     getMedicalRequests(): Observable<MedicalRequest[]> {
         return this.medicalRequestsSubject.asObservable().pipe(delay(200));
     }
 
-    /**
-     * ดึงข้อมูลคำขอเบิกตาม ID
-     */
+    // ดึงข้อมูลตาม ID
     getRequestById(id: string): Observable<MedicalRequest | undefined> {
         const request = this.medicalRequestsMock.find(r => r.id === id);
         return of(request).pipe(delay(200));
     }
 
-    /**
-     * สร้างเลขที่เอกสารใหม่ (เช่น 2701#021)
-     */
+    // สร้างรหัสคำขอถัดไป
     generateNextMedicalId(): Observable<string> {
         const prefix = '2701';
 
@@ -141,20 +104,15 @@ export class MedicalexpensesService {
         return of(nextId).pipe(delay(200));
     }
 
-    /**
-     * เพิ่มรายการคำขอใหม่
-     */
+    // เพิ่มคำขอใหม่
     addRequest(request: MedicalRequest): Observable<void> {
         this.medicalRequestsMock.unshift(request);
-        // เรียงลำดับใหม่เสมอตาม ID
         this.medicalRequestsMock.sort((a, b) => b.id.localeCompare(a.id));
         this.medicalRequestsSubject.next([...this.medicalRequestsMock]);
         return of(undefined).pipe(delay(500));
     }
 
-    /**
-     * อัปเดตรายการคำขอเดิม
-     */
+    // อัปเดตข้อมูลคำขอ
     updateRequest(request: MedicalRequest): Observable<void> {
         const index = this.medicalRequestsMock.findIndex(r => r.id === request.id);
         if (index !== -1) {
@@ -164,3 +122,4 @@ export class MedicalexpensesService {
         return of(undefined).pipe(delay(500));
     }
 }
+

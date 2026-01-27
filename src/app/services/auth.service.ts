@@ -16,15 +16,12 @@ export class AuthService {
 
     constructor() { }
 
-    /**
-     * [API-Refactor] Login method returning Observable.
-     * Replace logic with: return this.http.post<{token: string}>('/api/login', { email, password }).pipe(...);
-     */
+    // ตรวจสอบการเข้าสู่ระบบ
     login(email: string, password: string): Observable<boolean> {
         const success = email === this.MOCK_USER.username && password === this.MOCK_USER.password;
 
         return of(success).pipe(
-            delay(1000), // Simulate network delay
+            delay(1000),
             tap(isValid => {
                 if (isValid) {
                     localStorage.setItem('isLoggedIn', 'true');
@@ -34,8 +31,10 @@ export class AuthService {
         );
     }
 
+    // ออกจากระบบ
     logout() {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('currentUser');
     }
 }
+

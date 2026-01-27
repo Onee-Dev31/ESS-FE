@@ -3,9 +3,7 @@ import { Observable, of, BehaviorSubject } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Requester, VehicleService, WELFARE_TYPES } from './vehicle.service';
 
-/**
- * อินเตอร์เฟสสำหรับรายการค่าพาหนะ
- */
+// รายการค่าเดินทาง (ยานพาหนะ)
 export interface RequestItem {
     date: string;
     description: string;
@@ -13,9 +11,7 @@ export interface RequestItem {
     shiftCode?: string;
 }
 
-/**
- * อินเตอร์เฟสสำหรับคำขอเบิกค่าพาหนะ
- */
+// ข้อมูลคำขอค่าเดินทาง (ยานพาหนะ)
 export interface VehicleRequest {
     id: string;
     typeId: number;
@@ -31,86 +27,63 @@ export interface VehicleRequest {
 export class TransportService {
     private vehicleService = inject(VehicleService);
 
-    // ข้อมูลจำลองสำหรับคำขอเบิกค่าพาหนะ
+    // ข้อมูลจำลองคำขอค่าเดินทาง
     private requestsMock: VehicleRequest[] = this.generateMockVehicleRequests(15);
     private requestsSubject = new BehaviorSubject<VehicleRequest[]>(this.requestsMock);
 
     constructor() { }
 
-    /**
-     * สร้างข้อมูลจำลองสำหรับคำขอเบิกค่าพาหนะ
-     * @param count จำนวนรายการ
-     */
+    // สร้างข้อมูลจำลองคำขอค่าเดินทาง
     private generateMockVehicleRequests(count: number): VehicleRequest[] {
-        const requests: VehicleRequest[] = [];
-        for (let i = 1; i <= count; i++) {
+        return Array.from({ length: count }, (_, i) => {
             const dateStr = this.vehicleService.getRandomDateInPast3Months();
-            requests.push({
-                id: `2701#${String(i).padStart(3, '0')}`,
+            return {
+                id: `2701#${String(i + 1).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TRANSPORT,
                 createDate: dateStr,
                 status: this.vehicleService.getRandomStatus('vehicle'),
                 requester: this.vehicleService.getRandomRequester(),
                 items: [
                     { date: '2026-01-01', description: 'เดินทางไปสำนักงานใหญ่', amount: 150, shiftCode: 'O01 09.00-18.00' },
-                    { date: '2026-01-02', description: 'เดินทางไปคลังสินค้าสำโรง', amount: 150, shiftCode: 'O01 09.00-18.00' },
-                    { date: '2026-01-03', description: 'เดินทางกลับจากคลังสินค้า', amount: 150, shiftCode: 'O01 09.00-18.00' }
+                    { date: '2026-01-02', description: 'เดินทางไปคลังสินค้าสำโรง', amount: 150, shiftCode: 'O01 09.00-18.00' }
                 ]
-            });
-        }
-        return requests;
+            };
+        });
     }
 
-    /**
-     * ดึงรายการคำขอเบิกค่าพาหนะทั้งหมด
-     */
+    // ดึงข้อมูลคำขอทั้งหมด
     getRequests(): Observable<VehicleRequest[]> {
         return this.requestsSubject.asObservable().pipe(delay(200));
     }
 
-    /**
-     * ดึงข้อมูลคำขอเบิกค่าพาหนะตาม ID
-     * @param id รหัสคำขอ
-     */
+    // ดึงข้อมูลคำขอตาม ID
     getRequestById(id: string): Observable<VehicleRequest | undefined> {
         const item = this.requestsMock.find(r => r.id === id);
         return of(item).pipe(delay(200));
     }
 
-    /**
-     * เพิ่มคำขอเบิกค่าพาหนะใหม่
-     * @param request ข้อมูลคำขอ
-     */
+    // เพิ่มคำขอใหม่
     addRequest(request: VehicleRequest): Observable<void> {
         this.requestsMock = [request, ...this.requestsMock];
         this.requestsSubject.next(this.requestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * อัปเดตข้อมูลคำขอเบิกค่าพาหนะ
-     * @param id รหัสคำขอ
-     * @param updatedRequest ข้อมูลที่อัปเดต
-     */
+    // อัปเดตข้อมูลคำขอ
     updateRequest(id: string, updatedRequest: VehicleRequest): Observable<void> {
         this.requestsMock = this.requestsMock.map(r => r.id === id ? updatedRequest : r);
         this.requestsSubject.next(this.requestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * ลบรายการคำขอเบิกค่าพาหนะ
-     * @param id รหัสคำขอ
-     */
+    // ลบคำขอ
     deleteRequest(id: string): Observable<void> {
         this.requestsMock = this.requestsMock.filter(r => r.id !== id);
         this.requestsSubject.next(this.requestsMock);
         return of(void 0).pipe(delay(300));
     }
 
-    /**
-     * สร้างเลขที่เอกสารการเบิกค่าพาหนะถัดไป
-     */
+    // สร้างรหัสคำขอถัดไป
     generateNextId(): Observable<string> {
         const lastIdNum = this.requestsMock.reduce((max, item) => {
             const num = parseInt(item.id.split('#')[1] || '0');
@@ -120,11 +93,7 @@ export class TransportService {
         return of(`2701#${nextNum}`);
     }
 
-    /**
-     * ดึงข้อมูล Log การลงเวลาจำลอง
-     * @param month เดือน
-     * @param year ปี
-     */
+    // ดึงข้อมูล log การมาทำงานจำลอง
     getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
         const days = this.vehicleService.generateDays(month, year);
         const results = days.map(date => {
@@ -169,11 +138,7 @@ export class TransportService {
         return of(results).pipe(delay(200));
     }
 
-    /**
-     * อัปเดตสถานะของคำขอเบิกค่าพาหนะ
-     * @param id รหัสคำขอ
-     * @param status สถานะใหม่
-     */
+    // อัปเดตสถานะคำขอ
     updateStatus(id: string, status: string): void {
         this.requestsMock = this.requestsMock.map(r =>
             r.id === id ? { ...r, status: status } : r
@@ -181,3 +146,4 @@ export class TransportService {
         this.requestsSubject.next(this.requestsMock);
     }
 }
+

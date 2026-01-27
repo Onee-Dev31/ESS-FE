@@ -26,9 +26,9 @@ $bg-slate: #f4f7f9;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        max-height: 90vh; // Constrain height
-        display: flex; // Use flexbox for internal layout
-        flex-direction: column; // Stack children vertically
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
 
         .modal-header-modern {
             flex-shrink: 0;
@@ -45,7 +45,7 @@ $bg-slate: #f4f7f9;
                 @media screen and (max-width: 600px) {
                     flex-wrap: wrap;
                     position: relative;
-                    padding-right: 30px; // Space for absolute close button
+                    padding-right: 30px;
                     gap: 12px;
                 }
 

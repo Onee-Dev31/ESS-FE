@@ -7,24 +7,12 @@ import { TaxiService } from './taxi.service';
 import { TransportService } from './transport.service';
 import { MedicalexpensesService } from './medicalexpenses.service';
 
-/**
- * อินเตอร์เฟสสำหรับสถิติค่ารักษาพยาบาล
- */
 export interface MedicalStat { label: string; subLabel: string; used: string; balance: string; balanceColor: string; progressColor: string; percent: number; }
 
-/**
- * อินเตอร์เฟสสำหรับรายการสวัสดิการ
- */
 export interface WelfareItem { title: string; amount: string; iconName: string; cardClass?: string; titleColor?: string; amountColor?: string; tooltip?: string; route?: string; }
 
-/**
- * อินเตอร์เฟสสำหรับรายการแสดงการลา
- */
 export interface LeaveItem { label: string; count: string; countColor: string; iconClass: string; iconColor?: string; theme: string; balance: number; }
 
-/**
- * อินเตอร์เฟสสำหรับวันหยุด
- */
 export interface HolidayItem { date: string; name: string; }
 
 @Injectable({
@@ -39,10 +27,7 @@ export class DashboardService {
 
     constructor() { }
 
-    /**
-     * คำนวณจำนวนรายการที่รอการอนุมัติทั้งหมด (Global Pending Count)
-     * โดยรวมจากสวัสดิการทุกประเภท
-     */
+    // ดึงจำนวนรายการที่รออนุมัติทั้งหมดจากทุก Service
     getGlobalPendingCount(): Observable<number> {
         return combineLatest([
             this.allowanceService.getAllowanceRequests(),
@@ -50,25 +35,14 @@ export class DashboardService {
             this.transportService.getRequests(),
             this.medicalService.getMedicalRequests()
         ]).pipe(
-            map(([allowances, taxis, transports, medicals]) => {
-                const isPending = (s: string) =>
-                    s === 'คำขอใหม่' ||
-                    s === 'ตรวจสอบแล้ว' ||
-                    s === 'อยู่ระหว่างการอนุมัติ';
-
-                const p1 = allowances.filter(a => isPending(a.status)).length;
-                const p2 = taxis.filter(t => isPending(t.status)).length;
-                const p3 = transports.filter(v => isPending(v.status)).length;
-                const p4 = medicals.filter(m => isPending(m.status)).length;
-
-                return p1 + p2 + p3 + p4;
+            map(results => {
+                const pendingStatuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
+                return results.reduce((sum, list) =>
+                    sum + list.filter(item => pendingStatuses.includes(item.status)).length, 0);
             })
         );
     }
 
-    /**
-     * ดึงข้อมูลสรุปวงเงินค่ารักษาพยาบาล
-     */
     getMedicalStats(): Observable<MedicalStat[]> {
         const stats: MedicalStat[] = [
             { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },
@@ -79,9 +53,6 @@ export class DashboardService {
         return of(stats).pipe(delay(300));
     }
 
-    /**
-     * ดึงข้อมูลสรุปการเบิกสวัสดิการต่างๆ ของพนักงาน
-     */
     getWelfareStats(): Observable<WelfareItem[]> {
         const stats: WelfareItem[] = [
             {
@@ -118,9 +89,6 @@ export class DashboardService {
         return of(stats).pipe(delay(300));
     }
 
-    /**
-     * ดึงข้อมูลสรุปสิทธิ์การลาประเภทต่างๆ
-     */
     getLeaveStats(): Observable<LeaveItem[]> {
         const leaves: LeaveItem[] = [
             { label: 'ลาพักร้อน', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-plane-departure', iconColor: '#ef4444', theme: 'theme-pink', balance: 8 },
@@ -132,9 +100,6 @@ export class DashboardService {
         return of(leaves).pipe(delay(300));
     }
 
-    /**
-     * ดึงประกาศวันหยุดบริษัท
-     */
     getHolidays(): Observable<HolidayItem[]> {
         return of([
             { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },

@@ -14,9 +14,6 @@ import {
   getPaginationRowModel,
 } from '@tanstack/angular-table';
 
-/**
- * โครงสร้างข้อมูลสำหรับแถวในตารางค่าแท็กซี่ (แบบเรียบ)
- */
 interface FlatTaxiRow extends TaxiItem {
   requestId: string;
   createDate: string;
@@ -38,9 +35,6 @@ export class VehicleTaxiComponent implements OnInit {
   private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
-  /**
-   * กลับหน้า Dashboard
-   */
   goBack() {
     this.router.navigate(['/dashboard']);
   }
@@ -52,21 +46,16 @@ export class VehicleTaxiComponent implements OnInit {
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
 
-  // สถานะสำหรับ Modal พรีวิวไฟล์
   isPreviewModalOpen = false;
   previewFiles: any[] = [];
 
-  // ข้อมูลคำขอเบิกค่าแท็กซี่ทั้งหมด
   allRequests = signal<TaxiRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  // การจัดการหน้า (Pagination)
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  /**
-   * ประมวลผลและกรองข้อมูลค่าแท็กซี่
-   */
+  // กรองและเรียงลำดับข้อมูลคำขอค่าแท็กซี่
   processedData = computed(() => {
     const allReqs = [...this.allRequests()];
     let filtered = allReqs;
@@ -100,9 +89,6 @@ export class VehicleTaxiComponent implements OnInit {
     return filtered;
   });
 
-  /**
-   * ข้อมูลคำขอที่ผ่านการกรองและแบ่งตามหน้า
-   */
   paginatedRequests = computed(() => {
     const filtered = this.processedData();
     const start = this.currentPage() * this.pageSize();
@@ -110,9 +96,6 @@ export class VehicleTaxiComponent implements OnInit {
     return filtered.slice(start, end);
   });
 
-  /**
-   * แปลงข้อมูลให้พร้อมสำหรับการรวบกลุ่ม (Grouping) ในตาราง
-   */
   displayedRows = computed(() => {
     const rows: FlatTaxiRow[] = [];
     this.paginatedRequests().forEach((req) => {
@@ -133,9 +116,6 @@ export class VehicleTaxiComponent implements OnInit {
   totalRequests = computed(() => this.processedData().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
-  /**
-   * ตั้งค่า TanStack Table สำหรับค่าแท็กซี่
-   */
   table = createAngularTable(() => ({
     data: this.displayedRows(),
     columns: [
@@ -160,31 +140,22 @@ export class VehicleTaxiComponent implements OnInit {
     this.loadData();
   }
 
-  /**
-   * โหลดข้อมูลคำขอเบิกค่าแท็กซี่
-   */
   loadData() {
     this.taxiService.getTaxiRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  /**
-   * ลบคำขอเบิกค่าแท็กซี่
-   * @param id รหัสคำขอ
-   */
+  // ลบรายการคำขอ
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
       this.taxiService.deleteTaxiRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว'); // ใช้ alertService
+        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
         this.loadData();
       });
     }
   }
 
-  /**
-   * เปิด Modal สำหรับจัดการข้อมูลแท็กซี่
-   */
   openModal(id: string = '') {
     if (id === '') {
       this.taxiService.generateNextTaxiId().subscribe(nid => {
@@ -197,22 +168,15 @@ export class VehicleTaxiComponent implements OnInit {
     }
   }
 
-  /**
-   * ปิด Modal รายละเอียด
-   */
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-  /**
-   * เปิด Modal พรีวิวไฟล์แนบสำหรับคำขอที่ระบุ
-   * @param requestId รหัสคำขอ
-   */
+  // เปิด Modal เพื่อดูไฟล์แนบของคำขอนั้นๆ
   openPreviewModalForRequest(requestId: string) {
     const request = this.allRequests().find(r => r.id === requestId);
     if (request && request.items) {
-      // ดึงรายการไฟล์แนบจากทุกไอเทมในคำขอ
       this.previewFiles = request.items
         .filter(item => item.attachedFile)
         .map(item => ({
@@ -223,39 +187,27 @@ export class VehicleTaxiComponent implements OnInit {
       if (this.previewFiles.length > 0) {
         this.isPreviewModalOpen = true;
       } else {
-        this.alertService.showWarning('ไม่พบไฟล์แนบสำหรับรายการนี้', 'ไม่พบไฟล์'); // ใช้ alertService
+        this.alertService.showWarning('ไม่พบไฟล์แนบสำหรับรายการนี้', 'ไม่พบไฟล์');
       }
     }
   }
 
-  /**
-   * ปิด Modal พรีวิวไฟล์
-   */
   closePreviewModal() {
     this.isPreviewModalOpen = false;
     this.previewFiles = [];
   }
 
-  /**
-   * ล้างตัวกรอง
-   */
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
     this.filterStatus.set('');
   }
 
-  /**
-   * สลับการเรียงลำดับคอลัมน์
-   */
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  /**
-   * คืนค่าคลาสไอคอนเรียงลำดับ
-   */
   getSortIcon(columnId: string) {
     const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
@@ -266,17 +218,11 @@ export class VehicleTaxiComponent implements OnInit {
     };
   }
 
-  /**
-   * trackBy สำหรับ TanStack Table
-   */
   trackByRowId(index: number, row: any): string {
     const original = row.original || row;
     return `${original.requestId}-${original.date}-${index}`;
   }
 
-  /**
-   * คืนค่าคลาส CSS สถานะเพื่อใช้แสดงสี Badge
-   */
   public getStatusClass(status: string): string {
     return this.vehicleService.getStatusBadgeClass(status);
   }

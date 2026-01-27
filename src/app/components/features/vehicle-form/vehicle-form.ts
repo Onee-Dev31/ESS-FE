@@ -60,6 +60,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     });
   }
 
+  // สร้างรายการปฏิทินและดึงข้อมูล Log การลงเวลางาน
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
@@ -90,6 +91,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     });
   }
 
+  // คำนวณเงินค่ารถ (150 บาท) หากเวลาเข้า-ออกอยู่นอกช่วงปกติ (ก่อน 06:00 หรือหลัง 22:00)
   calculateVehicleAmount(log: LogItem) {
     if (!log.selected) {
       log.amount = 0;
@@ -136,6 +138,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       .reduce((sum, current) => sum + current.amount, 0);
   }
 
+  // ตรวจสอบความถูกต้องและบันทึกรายการเบิกค่ารถ
   onSubmit() {
     const selectedLogs = this.logs.filter(log => log.selected);
 

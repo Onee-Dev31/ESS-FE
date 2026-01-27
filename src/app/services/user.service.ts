@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
+// ข้อมูลโปรไฟล์ผู้ใช้งาน
 export interface UserProfile {
     name: string;
     email: string;
@@ -12,7 +13,6 @@ export interface UserProfile {
     position: string;
     phone: string;
     floor: string;
-    // IT Assets
     itAssets?: {
         account: string;
         expireDate: string;
@@ -30,11 +30,7 @@ export class UserService {
 
     constructor() { }
 
-    /**
-     * ดึงข้อมูลโปรไฟล์ผู้ใช้งาน
-     * ปัจจุบันใช้ข้อมูลจำลอง (Mock Data) หากต้องการต่อ API จริง
-     * ให้เปลี่ยนไปใช้: return this.http.get<UserProfile>('/api/user/profile');
-     */
+    // ดึงข้อมูลโปรไฟล์ผู้ใช้งานจำลอง
     getUserProfile(): Observable<UserProfile> {
         const MOCK_PROFILE: UserProfile = {
             name: 'Rapeepan Pipatvejwong (Jola)',
@@ -57,3 +53,4 @@ export class UserService {
         return of(MOCK_PROFILE).pipe(delay(300));
     }
 }
+

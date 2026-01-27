@@ -12,9 +12,6 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 
-/**
- * โครงสร้างข้อมูลสำหรับแถวในตารางเบี้ยเลี้ยง (แบบเรียบ)
- */
 interface FlatAllowanceRow extends AllowanceItem {
   requestId: string;
   createDate: string;
@@ -35,43 +32,46 @@ export class AllowanceComponent implements OnInit {
   private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
-  /**
-   * กลับหน้า Dashboard
-   */
+  // กลับหน้า Dashboard
   goBack() {
     this.router.navigate(['/dashboard']);
   }
   protected readonly Math = Math;
 
   isModalOpen = false;
-  selectedRequestId = ''; // รหัสคำขอที่เลือกเพื่อส่งให้ Modal
+  selectedRequestId = '';
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
 
-  // ข้อมูลดิบจาก Service
+
   allRequests = signal<AllowanceRequest[]>([]);
 
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  // สถานะ Pagination
+
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  /**
-   * ประมวลผลและกรองข้อมูลเบี้ยเลี้ยงทั้งหมด
-   */
+
+  // ประมวลผลและกรองข้อมูลเบี้ยเลี้ยงทั้งหมด
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
-    // กรองตามสถานะ
+
     if (this.filterStatus()) {
-      filtered = filtered.filter((r) => {
-        return r.status === this.filterStatus();
-      });
+      filtered = filtered.filter((r) => r.status === this.filterStatus());
     }
 
-    // การเรียงลำดับข้อมูลเชิงลึก
+    if (this.filterStartDate()) {
+      filtered = filtered.filter((r) => r.createDate >= this.filterStartDate());
+    }
+
+    if (this.filterEndDate()) {
+      filtered = filtered.filter((r) => r.createDate <= this.filterEndDate());
+    }
+
+
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -114,9 +114,7 @@ export class AllowanceComponent implements OnInit {
     return filtered;
   });
 
-  /**
-   * ข้อมูลคำขอที่แบ่งตามหน้า
-   */
+  // ข้อมูลคำขอที่แบ่งตามหน้า
   paginatedRequests = computed(() => {
     const filtered = this.processedData();
     const start = this.currentPage() * this.pageSize();
@@ -124,9 +122,7 @@ export class AllowanceComponent implements OnInit {
     return filtered.slice(start, end);
   });
 
-  /**
-   * แปลงข้อมูลคำขอ (Request) เป็นรายการแถว (Row) เพื่อแสดงผลแบบ Grouping ในตาราง
-   */
+  // แปลงข้อมูลเป็นรายการแถวเพื่อแสดงในตาราง (รองรับ Grouping)
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
     this.paginatedRequests().forEach((req) => {
@@ -144,13 +140,11 @@ export class AllowanceComponent implements OnInit {
     return rows;
   });
 
+
   // คำนวณจำนวนรายการและหน้าทั้งหมด
   totalRequests = computed(() => this.processedData().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
-  /**
-   * ตั้งค่าตารางเบี้ยเลี้ยง
-   */
   table = createAngularTable(() => ({
     data: this.displayedRows(),
     columns: [
@@ -171,49 +165,35 @@ export class AllowanceComponent implements OnInit {
     manualPagination: true,
   }));
 
-  /**
-   * ตั้งค่าขนาดของหน้า (Page Size)
-   */
+  // ตั้งค่าขนาดหน้า
   setPageSize(size: number) {
     this.pageSize.set(size);
     this.currentPage.set(0);
   }
 
-  /**
-   * ไปยังหน้าถัดไป
-   */
+  // ไปหน้าถัดไป
   nextPage() {
     if (this.canNextPage()) {
       this.currentPage.update(p => p + 1);
     }
   }
 
-  /**
-   * ย้อนกลับหน้าก่อนหน้า
-   */
+  // ย้อนกลับหน้าก่อนหน้า
   previousPage() {
     if (this.canPreviousPage()) {
       this.currentPage.update(p => p - 1);
     }
   }
 
-  /**
-   * ไปยังหน้าที่ระบุ
-   */
+  // ไปยังหน้าที่ระบุ
   goToPage(page: number) {
     this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
   }
 
-  /**
-   * ตรวจสอบว่าสามารถไปหน้าถัดไปได้หรือไม่
-   */
   canNextPage() {
     return this.currentPage() < this.totalPages() - 1;
   }
 
-  /**
-   * ตรวจสอบว่าสามารถถอยหลังได้หรือไม่
-   */
   canPreviousPage() {
     return this.currentPage() > 0;
   }
@@ -222,18 +202,14 @@ export class AllowanceComponent implements OnInit {
     this.loadData();
   }
 
-  /**
-   * โหลดข้อมูลจาก Service
-   */
+  // โหลดข้อมูลจาก Service
   loadData() {
     this.allowanceService.getAllowanceRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  /**
-   * เปิด Modal สำหรับจัดการคำขอ
-   */
+  // เปิด Modal เพิ่ม/แก้ไขคำขอ
   openModal(id: string = '') {
     if (id === '') {
       this.allowanceService.generateNextAllowanceId().subscribe(nid => {
@@ -246,34 +222,26 @@ export class AllowanceComponent implements OnInit {
     }
   }
 
-  /**
-   * ปิด Modal และรีเฟรชข้อมูล
-   */
+  // ปิด Modal และรีเฟรชข้อมูล
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-  /**
-   * ล้างตัวกรอง
-   */
+  // ล้างตัวกรอง
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
     this.filterStatus.set('');
   }
 
-  /**
-   * จัดการการเรียงลำดับคอลัมน์
-   */
+  // สลับการเรียงลำดับคอลัมน์
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  /**
-   * คืนค่าคลาส CSS ของไอคอนเรียงลำดับ
-   */
+  // ดึงไอคอนแสดงการเรียงลำดับ
   getSortIcon(columnId: string) {
     const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
@@ -284,17 +252,11 @@ export class AllowanceComponent implements OnInit {
     };
   }
 
-  /**
-   * trackBy สำหรับรายการในตาราง
-   */
   trackByRowId(index: number, row: any): string {
     const original = row.original || row;
     return `${original.requestId}-${original.date}-${index}`;
   }
 
-  /**
-   * ระบุ CSS Class ตามสถานะ (เพื่อใช้ในการแสดงสี Badge)
-   */
   public getStatusClass(status: string): string {
     return this.vehicleService.getStatusBadgeClass(status);
   }

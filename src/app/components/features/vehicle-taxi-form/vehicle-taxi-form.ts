@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
-import { AlertService } from '../../../services/alert.service'; 
+import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../services/vehicle.service';
 
 @Component({
@@ -55,6 +55,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     });
   }
 
+  // สร้างข้อมูลจำลองรายการค่าแท็กซี่
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
@@ -82,6 +83,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
+  // ตรวจสอบความครบถ้วนและบันทึกคำขอค่าแท็กซี่
   save() {
     const selectedItems = this.items.filter(item => item.selected);
 
@@ -124,7 +126,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
         const newRequest: TaxiRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TAXI,
-          createDate: new Date().toLocaleDateString('en-GB'), 
+          createDate: new Date().toLocaleDateString('en-GB'),
           status: 'รอตรวจสอบ',
           items: taxiItems
         };
@@ -145,7 +147,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     }
   }
 
-  ThaiLooped = matchTime; 
+  ThaiLooped = matchTime;
 
   cancel() {
     this.onClose.emit();
@@ -161,6 +163,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.currentUploadItem = null;
   }
 
+  // จัดการอัปเดตชื่อไฟล์เมื่ออัปโหลดไฟล์แนบสำเร็จ
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;

@@ -5,6 +5,7 @@
   </header>
 
   <main class="content-card">
+    <!-- ส่วนเลือกเดือนและปีสำหรับการดึงข้อมูล Log -->
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
@@ -18,6 +19,7 @@
       </div>
     </section>
 
+    <!-- หมายเหตุเงื่อนไขการคำนวณเงินเบี้ยเลี้ยง -->
     <div class="allowance-policy-note">
       <span class="note-header">
         <i class="fas fa-info-circle"></i> <strong>เงื่อนไขการคำนวณเบี้ยเลี้ยง :</strong>
@@ -38,6 +40,7 @@
       </span>
     </div>
 
+    <!-- แถบปุ่มบันทึกและแสดงเลขที่การเบิก -->
     <div class="action-bar">
       <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
       <div class="info-badges">
@@ -45,6 +48,7 @@
       </div>
     </div>
 
+    <!-- ตารางบันทึกข้อมูลแบบ Excel-style -->
     <div class="table-container">
       <table class="excel-table">
         <colgroup>

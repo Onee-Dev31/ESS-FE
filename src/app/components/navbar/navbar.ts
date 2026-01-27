@@ -42,20 +42,24 @@ export class NavbarComponent {
     public sidebarService: SidebarService
   ) { }
 
+  // เปิด/ปิด แถบเมนูด้านข้าง
   toggleSidebar() {
     this.sidebarService.toggle();
   }
 
+  // เปิด/ปิด การแจ้งเตือน
   toggleNotification() {
     this.isNotificationOpen = !this.isNotificationOpen;
     if (this.isNotificationOpen) this.isProfileOpen = false;
   }
 
+  // เปิด/ปิด เมนูโปรไฟล์ผู้ใช้งาน
   toggleProfile() {
     this.isProfileOpen = !this.isProfileOpen;
     if (this.isProfileOpen) this.isNotificationOpen = false;
   }
 
+  // ปิดเมนูเมื่อคลิกนอกพื้นที่ Navbar
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
     if (!this.eRef.nativeElement.contains(event.target)) {
@@ -64,6 +68,7 @@ export class NavbarComponent {
     }
   }
 
+  // ออกจากระบบและกลับไปหน้า Login
   logout() {
     this.isProfileOpen = false;
     this.router.navigate(['/login']);

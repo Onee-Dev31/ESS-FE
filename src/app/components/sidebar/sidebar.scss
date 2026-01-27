@@ -11,7 +11,7 @@
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     padding 0.7s ease,
-    border-right-color 0.7s ease; // Add border transition
+    border-right-color 0.7s ease;
 
   display: flex;
   flex-direction: column;
@@ -19,16 +19,15 @@
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
   position: relative;
   z-index: 10;
-  overflow-x: hidden; // Ensure content is clipped during transition
+  overflow-x: hidden;
 
-  // ... (existing code) ...
+
 
   @mixin hidden-mode {
     width: 0;
     min-width: 0;
-    border-right-color: transparent; // Fade border instead of removing (prevents snap)
+    border-right-color: transparent;
     box-shadow: none;
-    // Removed * { opacity: 0 } to let overflow:hidden handle the hiding smoothly
   }
 
   ul,
@@ -283,16 +282,16 @@
   }
 
   &.collapsed {
-    @include vertical-mode; // Keeps 80px width (Desktop)
+    @include vertical-mode;
 
     @media (max-width: 1024px) {
-      @include hidden-mode; // Hides completely (Small screens)
+      @include hidden-mode;
     }
   }
 
   @media (max-width: 1024px) {
     &:not(.collapsed) {
-      @include vertical-mode; // Force 80px even when NOT collapsed at small screens
+      @include vertical-mode;
     }
   }
 

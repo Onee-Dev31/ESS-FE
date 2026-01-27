@@ -1,18 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-/**
- * รหัสประเภทสวัสดิการ
- */
+// ประเภทของสวัสดิการ
 export const WELFARE_TYPES = {
     ALLOWANCE: 1,
     TRANSPORT: 2,
     TAXI: 3
 };
 
-/**
- * อินเตอร์เฟสสำหรับข้อมูลผู้ขอเบิก
- */
+// ข้อมูลผู้ส่งคำขอ
 export interface Requester {
     name: string;
     employeeId: string;
@@ -28,14 +24,7 @@ export class VehicleService {
 
     constructor() { }
 
-    // ==========================================
-    // Shared Helper Methods (ฟังก์ชันช่วยเหลือส่วนกลาง)
-    // ==========================================
-
-    /**
-     * สุ่มสถานะสำหรับข้อมูลจำลอง
-     * @param type ประเภทของการเบิก
-     */
+    // สุ่มสถานะคำขอ
     public getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
         const statuses = [
             'คำขอใหม่',
@@ -46,9 +35,7 @@ export class VehicleService {
         return statuses[Math.floor(Math.random() * statuses.length)];
     }
 
-    /**
-     * สุ่มวันที่ย้อนหลังภายใน 3 เดือน
-     */
+    // สุ่มวันที่ย้อนหลัง 3 เดือน
     public getRandomDateInPast3Months(): string {
         const today = new Date();
         const pastDate = new Date();
@@ -62,9 +49,7 @@ export class VehicleService {
         return `${year}-${month}-${day}`;
     }
 
-    /**
-     * สุ่มข้อมูลพนักงานผู้ขอเบิก (จำลอง)
-     */
+    // สุ่มข้อมูลผู้ส่งคำขอ
     public getRandomRequester(): Requester {
         const users = [
             { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', id: 'OTD01054', dept: '10806-IT Department' },
@@ -82,13 +67,9 @@ export class VehicleService {
         };
     }
 
-    /**
-     * สร้างรายการวันที่ทั้งหมดในเดือนและปีที่ระบุ
-     * @param month เดือน (0-11)
-     * @param year ปี พ.ศ.
-     */
+    // สร้างรายการวันที่ในเดือนและปีที่ระบุ
     public generateDays(month: number, year: number): Date[] {
-        const adYear = year - 543; // แปลง พ.ศ. เป็น ค.ศ.
+        const adYear = year - 543;
         const date = new Date(adYear, month, 1);
         const days: Date[] = [];
         while (date.getMonth() === month) {
@@ -98,10 +79,7 @@ export class VehicleService {
         return days;
     }
 
-    /**
-     * ตรวจสอบและแปลงรูปแบบวันที่เป็น dd/mm/yyyy
-     * @param d วัตถุ Date
-     */
+    // จัดรูปแบบวันที่เป็น dd/mm/yyyy
     public formatDate(d: Date): string {
         const dd = String(d.getDate()).padStart(2, '0');
         const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -109,9 +87,7 @@ export class VehicleService {
         return `${dd}/${mm}/${yyyy}`;
     }
 
-    /**
-     * สุ่มรหัสกะการทำงาน (Shift Code) จำลอง
-     */
+    // สุ่มรหัสกะการทำงาน
     public getRandomShiftCode(): string {
         const shifts = [
             'O01 09.00-18.00', 'O02 10.00-19.00', 'O03 10.00-22.00', 'O04 09.00-23.00', 'O19 19.00-07.00',
@@ -120,10 +96,7 @@ export class VehicleService {
         return shifts[Math.floor(Math.random() * shifts.length)];
     }
 
-    /**
-     * คืนค่า CSS Class สำหรับ Status Badge (ใช้ร่วมกันทุกหน้า)
-     * @param status ชื่อสถานะภาษาไทย
-     */
+    // ดึงคลาส CSS สำหรับป้ายสถานะ (Badge)
     public getStatusBadgeClass(status: string): string {
         const s = status?.trim();
         switch (s) {
@@ -138,3 +111,4 @@ export class VehicleService {
         }
     }
 }
+

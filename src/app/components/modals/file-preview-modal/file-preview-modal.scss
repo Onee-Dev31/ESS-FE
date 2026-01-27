@@ -13,9 +13,9 @@
 
     .preview-card {
         background: #fff;
-        width: 90%; // Changed from 800px to 90%
+        width: 90%;
         max-width: 1000px;
-        height: 80vh; // Changed from 500px to viewport height
+        height: 80vh;
         max-height: 800px;
         border-radius: 8px;
         display: flex;
@@ -24,14 +24,13 @@
         overflow: hidden;
 
         .modal-header {
-            // ... existing header styles ...
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
             border-bottom: 1px solid #eee;
             background-color: #f9fafb;
-            flex-shrink: 0; // Prevent header from shrinking
+            flex-shrink: 0;
 
             h3 {
                 margin: 0;
@@ -56,20 +55,20 @@
             flex: 1;
             display: flex;
             overflow: hidden;
-            flex-direction: column; // Default to column (mobile-first approach)
+            flex-direction: column;
 
             @media (min-width: 768px) {
-                flex-direction: row; // Row on desktop
+                flex-direction: row;
             }
 
             .file-list-panel {
-                width: 100%; // Full width on mobile
-                height: 150px; // Fixed height on mobile
+                width: 100%;
+                height: 150px;
                 flex-shrink: 0;
 
                 @media (min-width: 768px) {
                     width: 300px;
-                    height: auto; // Auto height on desktop
+                    height: auto;
                     flex-shrink: 0;
                     border-right: 1px solid #eee;
                     border-bottom: none;

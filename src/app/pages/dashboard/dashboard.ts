@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -22,8 +22,7 @@ interface ProfileItem { label: string; value: string; icon?: string; iconColor?:
     MedicalPolicyModalComponent
   ],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit {
   private router = inject(Router);
@@ -32,7 +31,6 @@ export class DashboardComponent implements OnInit {
 
   isPolicyModalOpen = signal<boolean>(false);
 
-  // ข้อมูลสำหรับหน้า Dashboard ที่ดึงจาก Service
   userProfile$!: Observable<UserProfile>;
   medicalStats$!: Observable<MedicalStat[]>;
   welfareStats$!: Observable<WelfareItem[]>;
@@ -40,11 +38,9 @@ export class DashboardComponent implements OnInit {
   holidays$!: Observable<HolidayItem[]>;
   pendingCount$!: Observable<number>;
 
-  // รายการโปรไฟล์พนักงานและทรัพย์สิน IT
   profileList$!: Observable<ProfileItem[]>;
   itList$!: Observable<ProfileItem[]>;
 
-  // ข้อมูลจำลองสถิติการมาทำงาน
   attendanceList = [
     { label: 'ลาป่วย', value: '10 วัน' },
     { label: 'ลาพักร้อน', value: '5 วัน' },
@@ -53,7 +49,6 @@ export class DashboardComponent implements OnInit {
     { label: 'ขาดงาน', value: '5 ครั้ง' }
   ];
 
-  // ข้อมูลจำลองผลการปฏิบัติงาน
   performanceList = [
     { year: 'ปี 2026', grade: 'เกรด A+' },
     { year: 'ปี 2025', grade: 'เกรด A' },
@@ -63,7 +58,6 @@ export class DashboardComponent implements OnInit {
     { year: 'ปี 2021', grade: 'เกรด C' }
   ];
 
-  // ข้อมูลวันสำคัญและรายการลาสำหรับแสดงในปฏิทิน
   specialDates: Record<string, any> = {
     '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
     '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' },
@@ -72,9 +66,6 @@ export class DashboardComponent implements OnInit {
     '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
   };
 
-  /**
-   * ตั้งค่าการแสดงผล FullCalendar ปฏิทินบริษัท
-   */
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
@@ -87,9 +78,7 @@ export class DashboardComponent implements OnInit {
     firstDay: 0,
     contentHeight: 'auto',
     fixedWeekCount: false,
-    /**
-     * ปรับแต่งหน้าตาของแต่ละช่องวันที่ในปฏิทิน
-     */
+    // การตั้งค่าปฏิทิน (FullCalendar): ภาษาไทย, แสดงวันหยุด และวันลา
     dayCellContent: (arg: DayCellContentArg) => {
       const offset = arg.date.getTimezoneOffset() * 60000;
       const localDate = new Date(arg.date.getTime() - offset);
@@ -136,7 +125,6 @@ export class DashboardComponent implements OnInit {
 
 
   ngOnInit() {
-    // ดึงข้อมูลพื้นฐานจาก Service เมื่อเริ่มใช้งาน
     this.userProfile$ = this.userService.getUserProfile();
     this.medicalStats$ = this.dashboardService.getMedicalStats();
     this.welfareStats$ = this.dashboardService.getWelfareStats();
@@ -144,7 +132,7 @@ export class DashboardComponent implements OnInit {
     this.holidays$ = this.dashboardService.getHolidays();
     this.pendingCount$ = this.dashboardService.getGlobalPendingCount();
 
-    // แปลงข้อมูล Profile เป็นรายการ List เพื่อความสะดวกในการแสดงผล
+    // แปลงข้อมูลโปรไฟล์สำหรับการแสดงผลในรายการ
     this.profileList$ = this.userProfile$.pipe(
       map(profile => [
         { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
@@ -155,7 +143,7 @@ export class DashboardComponent implements OnInit {
       ])
     );
 
-    // รายการทรัพย์สิน IT ของพนักงาน
+    // แปลงข้อมูลทรัพย์สิน IT สำหรับการแสดงผลในรายการ
     this.itList$ = this.userProfile$.pipe(
       map(profile => {
         if (!profile.itAssets) return [];
@@ -170,10 +158,7 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  /**
-   * ฟังก์ชันเปลี่ยนเส้นทาง (Routing) ไปยังหน้าที่ต้องการ
-   * @param path เส้นทาง URL
-   */
+  // นำทางไปยังหน้าต่างๆ
   navigateTo(path: string | undefined) {
     if (path) {
       this.router.navigate([path]);

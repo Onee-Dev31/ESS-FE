@@ -15,6 +15,7 @@
     <div class="content-card">
         <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
 
+        <!-- แถบเครื่องมือ: ปุ่มสร้างคำขอเบิก และ ส่วนตัวกรองข้อมูล -->
         <div class="toolbar-container">
             <div class="left-action">
                 <button class="btn-create" (click)="openModal()">
@@ -81,6 +82,7 @@
             </div>
         </div>
 
+        <!-- ตารางแสดงรายการเบิกค่ารักษาพยาบาล -->
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
@@ -134,12 +136,10 @@
                 <tbody>
                     <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
-                        <!-- ID -->
                         <td class="text-center font-bold" style="color: #008ebc;">
                             {{ row.original.requestId }}
                         </td>
 
-                        <!-- Date -->
                         <td class="text-center">
                             {{ row.original.requestDate }}
                         </td>
@@ -152,7 +152,6 @@
                         <td class="text-right font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
                         <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
 
-                        <!-- Status -->
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                                 {{ row.original.status }}
@@ -166,6 +165,7 @@
                     </tr>
                 </tbody>
             </table>
+            <!-- ส่วนควบคุมการแบ่งหน้า -->
             <div class="pagination-container">
                 <div class="pagination-info">
                     แสดง {{ currentPage() * pageSize() + 1 }}
@@ -206,6 +206,7 @@
     <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
     </app-medical-policy-modal>
 
+    <!-- Modal ฟอร์มสร้าง/แก้ไขข้อมูล -->
     <div class="modal-overlay" *ngIf="isModalOpen()">
         <div class="modal-container">
             <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">

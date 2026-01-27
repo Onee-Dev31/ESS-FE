@@ -26,41 +26,30 @@ export class VehicleComponent implements OnInit {
   private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
-  /**
-   * กลับไปหน้า Dashboard
-   */
   goBack() {
     this.router.navigate(['/dashboard']);
   }
   protected readonly Math = Math;
 
-  // สถานะการเปิด/ปิด Modal และข้อมูลที่เลือก
   isModalOpen = false;
   selectedRequestId = '';
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
 
-  // ข้อมูลคำขอเบิกค่าพาหนะทั้งหมด
   allRequests = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  // การจัดการหน้า (Pagination)
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  /**
-   * ข้อมูลที่ผ่านการกรองและเรียงลำดับแล้ว
-   */
   processedData = computed(() => {
     const allReqs = [...this.allRequests()];
     let filtered = allReqs;
 
-    // กรองตามสถานะ
     if (this.filterStatus()) {
       filtered = filtered.filter(r => r.status === this.filterStatus());
     }
-    // กรองตามวันที่สร้าง
     if (this.filterStartDate()) {
       filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
     }
@@ -68,7 +57,6 @@ export class VehicleComponent implements OnInit {
       filtered = filtered.filter(r => r.createDate <= this.filterEndDate());
     }
 
-    // จัดการการเรียงลำดับ
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -88,9 +76,6 @@ export class VehicleComponent implements OnInit {
     return filtered;
   });
 
-  /**
-   * ข้อมูลในหน้าปัจจุบัน (สำหรับการแสดงผลแบบแบ่งหน้า)
-   */
   paginatedRequests = computed(() => {
     const filtered = this.processedData();
     const start = this.currentPage() * this.pageSize();
@@ -98,13 +83,9 @@ export class VehicleComponent implements OnInit {
     return filtered.slice(start, end);
   });
 
-  // คำนวณจำนวนรายการและจำนวนหน้าทั้งหมด
   totalRequests = computed(() => this.processedData().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
-  /**
-   * ตั้งค่า TanStack Table สำหรับจัดการข้อมูลตารางค่าพาหนะ
-   */
   table = createAngularTable(() => ({
     data: this.paginatedRequests(),
     columns: [
@@ -126,35 +107,25 @@ export class VehicleComponent implements OnInit {
     this.loadData();
   }
 
-  /**
-   * โหลดข้อมูลคำขอเบิกค่าพาหนะจาก Service
-   */
+  // โหลดข้อมูลคำขอค่าเดินทางทั้งหมด
   loadData() {
     this.transportService.getRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  /**
-   * ลบรายการคำขอเบิก
-   * @param id รหัสคำขอ
-   */
+  // ลบรายการคำขอ
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
       this.transportService.deleteRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว'); // ใช้ alertService
+        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
         this.loadData();
       });
     }
   }
 
-  /**
-   * เปิด Modal สำหรับสร้างหรือแก้ไขคำขอเบิก
-   * @param id รหัสคำขอ (ถ้าไม่มีจะเป็นการสร้างใหม่)
-   */
   openModal(id: string = '') {
     if (id === '') {
-      // สร้างเลขที่เอกสารใหม่
       this.transportService.generateNextId().subscribe(nid => {
         this.selectedRequestId = nid;
         this.isModalOpen = true;
@@ -165,26 +136,18 @@ export class VehicleComponent implements OnInit {
     }
   }
 
-  /**
-   * ปิด Modal และรีเฟรชข้อมูล
-   */
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-  /**
-   * ล้างค่าตัวกรองทั้งหมด
-   */
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
     this.filterStatus.set('');
   }
 
-  /**
-   * สลับการเรียงลำดับคอลัมน์
-   */
+  // สลับการเรียงลำดับข้อมูลในตาราง
   toggleSort(columnId: string) {
     const currentSort = this.sorting()[0];
     if (currentSort?.id === columnId) {
@@ -194,9 +157,6 @@ export class VehicleComponent implements OnInit {
     }
   }
 
-  /**
-   * ดึง Class ไอคอนสำหรับการเรียงลำดับ
-   */
   getSortIcon(columnId: string) {
     const sortState = this.sorting()[0];
     const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
@@ -208,17 +168,11 @@ export class VehicleComponent implements OnInit {
     };
   }
 
-  /**
-   * trackBy สำหรับ ngFor เพื่อเพิ่มประสิทธิภาพการเรนเดอร์
-   */
   trackByRowId(index: number, row: any): string {
     const original = row.original || row;
     return `${original.id}-${index}`;
   }
 
-  /**
-   * คืนค่า CSS Class ตามสถานะของรายการ
-   */
   public getStatusClass(status: string): string {
     return this.vehicleService.getStatusBadgeClass(status);
   }

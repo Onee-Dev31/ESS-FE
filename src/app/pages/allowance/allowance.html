@@ -17,6 +17,7 @@
         </div>
       </div>
 
+      <!-- ส่วนตัวกรองข้อมูล (วันที่ และ สถานะ) -->
       <div class="right-filters">
 
         <span class="filter-label">ตั้งแต่เดือน</span>
@@ -50,6 +51,7 @@
       </div>
     </div>
 
+    <!-- ตารางแสดงรายการเบิกเบี้ยเลี้ยง -->
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -111,6 +113,7 @@
           </tr>
         </tbody>
       </table>
+      <!-- ส่วนควบคุมการแบ่งหน้า -->
       <div class="pagination-container">
         <div class="pagination-info">
           แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
@@ -148,6 +151,7 @@
     </div>
   </div>
 
+  <!-- Modal สำหรับฟอร์มเพิ่ม/แก้ไขข้อมูล -->
   <div class="modal-overlay" *ngIf="isModalOpen">
     <div class="modal-container">
       <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>

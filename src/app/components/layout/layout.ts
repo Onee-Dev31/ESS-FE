@@ -31,10 +31,10 @@ export class LayoutComponent implements OnInit {
     this.checkWindowSize();
   }
 
+  // ตรวจสอบขนาดหน้าจอเพื่อปรับสถานะ Sidebar อัตโนมัติ (ยุบเมื่อจอเล็กกว่า 1024px)
   private checkWindowSize(): void {
     const isSmallScreen = window.innerWidth <= 1024;
 
-    // Only auto-update the sidebar state when we CROSS the breakpoint
     if (this.lastIsSmallScreen !== isSmallScreen) {
       this.sidebarService.setCollapsed(isSmallScreen);
       this.lastIsSmallScreen = isSmallScreen;

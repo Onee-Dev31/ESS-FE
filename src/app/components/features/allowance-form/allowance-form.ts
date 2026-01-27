@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../services/vehicle.service';
-import { switchMap, of, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-allowance-form',
@@ -23,7 +23,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadedRequest?: AllowanceRequest;
 
-  thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+  thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษาพยน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
   years = [2568, 2569, 2570];
   selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
@@ -41,6 +41,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // โหลดข้อมูลคำขอเบี้ยเลี้ยงหรือสร้างใหม่
   loadData() {
     if (!this.requestId) {
       this.allowanceService.generateNextAllowanceId().pipe(
@@ -62,6 +63,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // สร้างรายการปฏิทินและดึงข้อมูล Log การทำงานจาก Service
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
@@ -99,6 +101,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       });
   }
 
+  // คำนวณชั่วโมงและจำนวนเงินเบี้ยเลี้ยงอัตโนมัติตามเวลาเข้า-ออก
   autoCalculate(log: any) {
     if (!log.selected || !log.timeIn || !log.timeOut) {
       log.displayHours = '0.00';
@@ -126,12 +129,12 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     log.displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
 
     if (extraHoursDecimal >= 2) {
+      // ขั้นบันไดการเบิก: 2-4 ชม. = 150, 4-8 ชม. = 225, 8-12 ชม. = 300, ...
       if (extraHoursDecimal <= 4) log.amount = 150;
       else if (extraHoursDecimal <= 8) log.amount = 225;
       else if (extraHoursDecimal <= 12) log.amount = 300;
       else if (extraHoursDecimal <= 16) log.amount = 375;
       else if (extraHoursDecimal <= 20) log.amount = 450;
-      else if (extraHoursDecimal <= 24) log.amount = 525;
       else log.amount = 525;
     } else {
       log.amount = 0;
@@ -151,6 +154,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.autoCalculate(log);
   }
 
+  // คำนวณยอดรวมจำนวนเงินและชั่วโมงทั้งหมดที่เลือก
   updateTotal() {
     const selectedLogs = this.logs.filter(log => log.selected);
 
@@ -162,6 +166,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.totalHoursStr = `${hours}.${minutes.toString().padStart(2, '0')}`;
   }
 
+  // ตรวจสอบความถูกต้องและบันทึกรายการเบิก
   onSubmit() {
     const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {

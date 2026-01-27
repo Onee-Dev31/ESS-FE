@@ -75,7 +75,7 @@
 
   .content-card {
     flex: 1;
-    min-height: 0; // Allow content to shrink and scroll
+    min-height: 0;
     padding: 15px 15px;
 
     @media (min-width: 768px) {
@@ -84,7 +84,7 @@
 
     display: flex;
     flex-direction: column;
-    overflow: hidden; // Parent for the table-container scroll
+    overflow: hidden;
   }
 
   .filter-section {
@@ -264,10 +264,10 @@
       }
 
       .sub-header th {
-        top: 40px; // Mobile height
+        top: 40px;
 
         @media (min-width: 768px) {
-          top: 44px; // Desktop height
+          top: 44px;
         }
 
         font-size: 0.8rem;
