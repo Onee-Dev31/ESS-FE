@@ -27,6 +27,51 @@ textarea {
   font-family: $font-main;
 }
 
+// --- Global Form Controls (Premium Style) ---
+.form-control {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: $text;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid $border;
+  border-radius: 0.5rem; // 8px
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  appearance: none; // Remove default browser styles for selects
+
+  &::placeholder {
+    color: $text-muted;
+    opacity: 0.8;
+  }
+
+  &:focus {
+    color: $text;
+    background-color: #fff;
+    border-color: $primary;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.15); // Subtle focus ring
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: $bg-gray;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  // Validation States (Optional)
+  &.ng-invalid.ng-touched {
+    border-color: $danger;
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba($danger, 0.15);
+    }
+  }
+}
+
 // เมนคาร์ดสไตล์ (Premium Card)
 .card {
   background: #fff;

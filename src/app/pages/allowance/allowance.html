@@ -20,19 +20,19 @@
       <!-- ส่วนตัวกรองข้อมูล (วันที่ และ สถานะ) -->
       <div class="right-filters">
 
-        <span class="filter-label">ตั้งแต่เดือน</span>
         <div class="date-input-group">
+          <span class="filter-label">ตั้งแต่เดือน</span>
           <input type="date" class="form-control" [ngModel]="filterStartDate()"
             (ngModelChange)="filterStartDate.set($event)" />
         </div>
-        <span class="filter-label ml-2">ถึง</span>
         <div class="date-input-group">
+          <span class="filter-label">ถึง</span>
           <input type="date" class="form-control" [ngModel]="filterEndDate()"
             (ngModelChange)="filterEndDate.set($event)" />
         </div>
 
-        <span class="filter-label ml-2">สถานะ</span>
         <div class="select-input-group">
+          <span class="filter-label">สถานะ</span>
           <select class="form-control select-status" [ngModel]="filterStatus()"
             (ngModelChange)="filterStatus.set($event)">
             <option value="">ทั้งหมด</option>
@@ -45,9 +45,12 @@
         <button class="btn-clear" (click)="clearFilters()">
           <i class="fas fa-sync-alt"></i> คืนค่า
         </button>
-        <button class="btn-search">
-          <i class="fas fa-search"></i> ค้นหา
-        </button>
+        <div class="search-input-group">
+          <input type="text" class="form-control" placeholder="ค้นหา...">
+          <button class="btn-search">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -86,7 +89,7 @@
             </div>
           </div>
 
-          
+
         </div>
       </div>
 
