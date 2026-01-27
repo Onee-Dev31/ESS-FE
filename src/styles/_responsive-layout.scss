@@ -17,8 +17,10 @@
         margin-left: 0;
     }
 
+    // Mobile keeps 2 columns for date filters and status/clear button
     @include mobile {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px; // Reduce gap to prevent overflow
     }
 
     .select-input-group,
@@ -26,6 +28,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
+        min-width: 0; // Allow flex items to shrink below content size
 
         @media (max-width: 991px) {
             width: 100%;
@@ -37,10 +40,22 @@
             color: #333;
         }
 
+        .form-control,
+        .select-status {
+            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
+            overflow: hidden;
+        }
+
         .select-status {
             cursor: pointer;
             min-width: 150px;
             width: 100%;
+
+            @include mobile {
+                min-width: 0; // Override min-width on mobile
+            }
         }
     }
 

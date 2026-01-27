@@ -10,16 +10,17 @@
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
+        <div class="inputs-row">
+          <select class="form-control" [(ngModel)]="selectedMonth" (change)="generateMockData()">
+            <option *ngFor="let m of thaiMonths" [value]="m">{{ m }}</option>
+          </select>
 
-        <select class="form-control" style="width: 140px;" [(ngModel)]="selectedMonth" (change)="generateMockData()">
-          <option *ngFor="let m of thaiMonths" [value]="m">{{ m }}</option>
-        </select>
+          <select class="form-control" [(ngModel)]="selectedYear" (change)="generateMockData()">
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
 
-        <select class="form-control" style="width: 100px;" [(ngModel)]="selectedYear" (change)="generateMockData()">
-          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-        </select>
-
-        <button class="btn-search" (click)="generateMockData()">ค้นหาข้อมูล</button>
+          <button class="btn-search" (click)="generateMockData()">ค้นหาข้อมูล</button>
+        </div>
       </div>
     </section>
 

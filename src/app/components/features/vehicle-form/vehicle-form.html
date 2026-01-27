@@ -9,13 +9,15 @@
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
-        <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
-          <option *ngFor="let m of thaiMonths; let i = index" [value]="i">{{ m }}</option>
-        </select>
-        <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
-          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
-        </select>
-        <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+        <div class="inputs-row">
+          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
+            <option *ngFor="let m of thaiMonths; let i = index" [value]="i">{{ m }}</option>
+          </select>
+          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+          <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+        </div>
       </div>
     </section>
 

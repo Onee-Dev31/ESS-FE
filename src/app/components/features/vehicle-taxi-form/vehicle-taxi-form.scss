@@ -105,7 +105,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 8px;
 
       @media (min-width: 768px) {
         flex-direction: row;
@@ -117,17 +117,33 @@
         font-weight: 600;
         color: $text-sub;
         font-size: 0.85rem;
+        white-space: nowrap;
 
         @media (min-width: 768px) {
           font-size: 0.95rem;
         }
       }
 
-      .form-control {
+      .inputs-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
         width: 100%;
 
         @media (min-width: 768px) {
           width: auto;
+          gap: 15px;
+        }
+      }
+
+      .form-control {
+        flex: 1;
+        min-width: 0;
+
+        @media (min-width: 768px) {
+          width: auto;
+          flex: initial;
         }
 
         padding: 8px 12px;
@@ -136,7 +152,12 @@
       }
 
       .btn-search {
-        width: 100%;
+        flex-shrink: 0;
+
+        @media (max-width: 767px) {
+          padding: 8px 16px;
+          font-size: 0.85rem;
+        }
 
         @media (min-width: 768px) {
           width: auto;
@@ -159,21 +180,25 @@
 
   .action-bar {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
     margin-bottom: 12px;
 
     @media (min-width: 768px) {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
       gap: 20px;
     }
 
     flex-shrink: 0;
 
     .btn-submit {
-      width: 100%;
+      flex-shrink: 0;
+
+      @media (max-width: 767px) {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
 
       @media (min-width: 768px) {
         width: auto;
@@ -186,14 +211,13 @@
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
-      flex-shrink: 0;
     }
 
     .info-badges {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      flex-shrink: 0;
+      justify-content: flex-end;
 
       .right-info,
       .request-id-badge {

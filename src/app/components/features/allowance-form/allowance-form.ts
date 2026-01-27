@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
@@ -30,6 +30,9 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   totalAmount: number = 0;
   totalHoursStr: string = '0.00';
   logs: any[] = [];
+
+  // Signal for policy popup
+  isPolicyPopupOpen = signal(false);
 
   ngOnInit(): void {
     this.loadData();
