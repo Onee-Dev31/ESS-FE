@@ -487,3 +487,213 @@
         opacity: 1;
     }
 }
+
+// ----------------------------------------------------
+// Responsive Card View (Tablet & Mobile)
+// ----------------------------------------------------
+.card-list-view {
+    display: none; // Hidden on Desktop
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 20px;
+
+    @include tablet {
+        display: flex; // Show on Tablet/Mobile
+    }
+
+    // Mobile Card Styling
+    .mobile-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+        transition: transform 0.2s, box-shadow 0.2s;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .header-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                .ticket-no {
+                    font-weight: 700;
+                    color: #008ebc;
+                    font-size: 1rem;
+                }
+            }
+
+            .card-actions-top {
+                display: flex;
+                gap: 8px;
+
+                .btn-icon {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 6px;
+                    border: 1px solid #dee2e6;
+                    background: #fff;
+                    color: #495057;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.2s;
+
+                    &:hover {
+                        background: #e9ecef;
+                        color: #212529;
+                    }
+
+                    &.edit {
+                        color: #ffc107;
+                        border-color: #ffc107;
+
+                        &:hover {
+                            background: #fff3cd;
+                        }
+                    }
+                }
+            }
+        }
+
+        .card-body {
+            padding: 15px;
+
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                font-size: 0.9rem;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #f5f5f5;
+
+                .label {
+                    color: #666;
+                }
+
+                .value {
+                    font-weight: 600;
+                    color: #333;
+                }
+            }
+
+            // Nested List Styles
+            .nested-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nested-item {
+                background: #fcfcfc;
+                border: 1px solid #f0f0f0;
+                border-radius: 8px;
+                padding: 12px;
+
+                .item-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    margin-bottom: 8px;
+
+                    .item-title {
+                        font-weight: 600;
+                        color: #333;
+                        font-size: 0.95rem;
+                    }
+
+                    .item-amount {
+                        font-weight: 700;
+                        color: #28a745;
+                        font-size: 1rem;
+                    }
+                }
+
+                .item-detail {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    .detail-row {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 0.85rem;
+                        color: #666;
+
+                        i {
+                            width: 16px;
+                            text-align: center;
+                            color: #adb5bd;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Hide Table on Tablet
+@include tablet {
+    .table-responsive {
+        display: none;
+    }
+}
+
+// ----------------------------------------------------
+// Status Badge Colors (Hardcoded to Title)
+// ----------------------------------------------------
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+    white-space: nowrap;
+
+    // Hardcoded status colors
+    &[class*="status-new"],
+    &[class*="คำขอใหม่"] {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+        color: #f1b44c !important;
+    }
+
+    &[class*="status-verified"],
+    &[class*="ตรวจสอบแล้ว"] {
+        background-color: rgba(23, 162, 184, 0.15) !important;
+        color: #17a2b8 !important;
+    }
+
+    &[class*="status-pending"],
+    &[class*="อยู่ระหว่างการอนุมัติ"],
+    &[class*="รออนุมัติ"] {
+        background-color: rgba(0, 123, 255, 0.15) !important;
+        color: #007bff !important;
+    }
+
+    &[class*="status-success"],
+    &[class*="อนุมัติแล้ว"] {
+        background-color: rgba(40, 167, 69, 0.15) !important;
+        color: #28a745 !important;
+    }
+
+    &[class*="status-rejected"],
+    &[class*="ไม่อนุมัติ"] {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        color: #dc3545 !important;
+    }
+}

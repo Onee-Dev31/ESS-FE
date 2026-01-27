@@ -124,6 +124,19 @@ export class MedicalexpensesComponent implements OnInit {
     return rows;
   });
 
+  // สำหรับ Card View: แบ่งหน้าข้อมูลแบบ Group (Request)
+  paginatedGroupedRequests = computed(() => {
+    const start = this.currentPage() * this.pageSize();
+    const end = start + this.pageSize();
+    return this.processedData().slice(start, end);
+  });
+
+  // สำหรับ Table View: จำนวนรายการทั้งหมดนับตามแถวที่แตกออกมาแล้ว
+  // * หมายเหตุ: ถ้าต้องการให้ Pagination ของ Table และ Card สอดคล้องกันเป๊ะๆ
+  // อาจต้องปรับ Logic ให้ Table โชว์ตาม Request หรือ Card โชว์ตาม Item
+  // ณ ที่นี้ขอคง Logic เดิมของ Table ไว้ (User อาจจะงงได้ถ้าเลขหน้าไม่ตรงกันระหว่าง 2 วิว)
+  // แต่เพื่อให้ Card View ใช้งานได้ดี เราจะใช้ Pagination ของ Table เป็นหลักในการ Control
+
   paginatedRows = computed(() => {
     const start = this.currentPage() * this.pageSize();
     const end = start + this.pageSize();
@@ -147,7 +160,23 @@ export class MedicalexpensesComponent implements OnInit {
       { accessorKey: 'approvedAmount', header: 'จำนวนเงินที่เบิกได้' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
-    state: { sorting: this.sorting() },
+    state: {
+      sorting: this.sorting(),
+      pagination: {
+        pageIndex: this.currentPage(),
+        pageSize: this.pageSize(),
+      },
+    },
+    pageCount: this.totalPages(),
+    onPaginationChange: (updaterOrValue) => {
+      const prev = {
+        pageIndex: this.currentPage(),
+        pageSize: this.pageSize(),
+      };
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
+      this.currentPage.set(next.pageIndex);
+      this.pageSize.set(next.pageSize);
+    },
     onSortingChange: (updaterOrValue) => {
       const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);

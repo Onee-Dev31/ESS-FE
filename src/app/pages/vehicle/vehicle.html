@@ -46,6 +46,56 @@
       </div>
     </div>
 
+    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
+    <div class="card-list-view">
+      <div class="mobile-card" *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
+
+        <div class="card-header">
+          <div class="request-id">
+            <span class="label">เลขที่การเบิก:</span>
+            <span class="value">{{ row.original.id }}</span>
+          </div>
+          <div class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+            {{ row.original.status }}
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="info-item date-created">
+            <span class="label">วันที่สร้างรายการ:</span>
+            <span class="value">{{ row.original.createDate | date : 'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="items-list">
+            <div class="trip-item" *ngFor="let item of row.original.items; let i = index">
+              <div class="trip-header">
+                <span class="trip-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                <span class="trip-icon"><i class="fas fa-car-side"></i></span>
+              </div>
+              <div class="trip-desc">{{ item.description }}</div>
+              <div class="trip-amount">
+                <span class="label">จำนวนเงิน:</span>
+                <span class="value">{{ item.amount | number : '1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="action-btn edit" (click)="openModal(row.original.id)">
+              <i class="far fa-edit"></i>
+            </button>
+            <button class="action-btn delete" (click)="deleteRequest(row.original.id)">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-data" *ngIf="table.getRowModel().rows.length === 0">
+        ไม่พบรายการที่ตรงตามเงื่อนไข
+      </div>
+    </div>
+
     <!-- ตารางรายการเบิกค่าพาหนะ (มีการรวมแถวตามเลขที่การเบิก) -->
     <div class="table-responsive">
       <table class="modern-table">
@@ -135,41 +185,42 @@
           </tr>
         </tbody>
       </table>
-      <!-- การแบ่งหน้า -->
-      <div class="pagination-container">
-        <div class="pagination-info">
-          แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-          ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-          processedData().length) }}
-          จาก {{ processedData().length }} รายการ
+    </div>
+    <!-- การแบ่งหน้า -->
+    <div class="pagination-container">
+      <div class="pagination-info">
+        แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
+        ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+        processedData().length) }}
+        จาก {{ processedData().length }} รายการ
+      </div>
+      <div class="pagination-controls">
+        <div class="page-size-selector">
+          <span>จำนวนแถวต่อหน้า:</span>
+          <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="30">30</option>
+            <option [value]="50">50</option>
+          </select>
         </div>
-        <div class="pagination-controls">
-          <div class="page-size-selector">
-            <span>จำนวนแถวต่อหน้า:</span>
-            <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
-              <option [value]="10">10</option>
-              <option [value]="20">20</option>
-              <option [value]="50">50</option>
-            </select>
-          </div>
-          <div class="page-buttons">
-            <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
-              <i class="fas fa-angle-double-left"></i>
-            </button>
-            <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
-              <i class="fas fa-angle-left"></i>
-            </button>
-            <span class="page-info">
-              <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
-            </span>
-            <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
-              <i class="fas fa-angle-right"></i>
-            </button>
-            <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
-              [disabled]="!table.getCanNextPage()">
-              <i class="fas fa-angle-double-right"></i>
-            </button>
-          </div>
+        <div class="page-buttons">
+          <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <span class="page-info">
+            <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
+          </span>
+          <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
+            [disabled]="!table.getCanNextPage()">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
         </div>
       </div>
     </div>

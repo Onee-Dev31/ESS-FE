@@ -127,7 +127,23 @@ export class VehicleTaxiComponent implements OnInit {
       { accessorKey: 'amount', header: 'จำนวนเงิน' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
-    state: { sorting: this.sorting() },
+    state: {
+      sorting: this.sorting(),
+      pagination: {
+        pageIndex: this.currentPage(),
+        pageSize: this.pageSize(),
+      },
+    },
+    pageCount: this.totalPages(),
+    onPaginationChange: (updaterOrValue) => {
+      const prev = {
+        pageIndex: this.currentPage(),
+        pageSize: this.pageSize(),
+      };
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
+      this.currentPage.set(next.pageIndex);
+      this.pageSize.set(next.pageSize);
+    },
     onSortingChange: (updaterOrValue) => {
       const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
@@ -216,6 +232,10 @@ export class VehicleTaxiComponent implements OnInit {
       'fa-sort': !isSorted,
       'text-muted': !isSorted,
     };
+  }
+
+  trackByReqId(index: number, req: TaxiRequest): string {
+    return req.id;
   }
 
   trackByRowId(index: number, row: any): string {

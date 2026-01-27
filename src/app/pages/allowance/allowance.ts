@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../services/allowance.service';
+import { AlertService } from '../../services/alert.service';
 import { VehicleService } from '../../services/vehicle.service';
 import {
   createAngularTable,
@@ -29,6 +30,7 @@ interface FlatAllowanceRow extends AllowanceItem {
 })
 export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
+  private alertService = inject(AlertService);
   private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
@@ -250,6 +252,20 @@ export class AllowanceComponent implements OnInit {
       'fa-sort': !isSorted,
       'text-muted': !isSorted,
     };
+  }
+
+  // ลบรายการคำขอ
+  deleteRequest(id: string) {
+    if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
+      this.allowanceService.deleteAllowanceRequest(id).subscribe(() => {
+        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
+        this.loadData();
+      });
+    }
+  }
+
+  trackByReqId(index: number, req: AllowanceRequest): string {
+    return req.id;
   }
 
   trackByRowId(index: number, row: any): string {

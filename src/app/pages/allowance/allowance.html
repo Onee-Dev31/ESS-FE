@@ -51,6 +51,50 @@
       </div>
     </div>
 
+    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
+    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
+    <div class="card-list-view">
+      <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
+
+        <div class="card-header">
+          <div class="request-id">
+            <span class="label">เลขที่การเบิก:</span>
+            <span class="value">{{ req.id }}</span>
+          </div>
+          <div class="status-badge" [ngClass]="getStatusClass(req.status)">
+            {{ req.status }}
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="info-item date-created">
+            <span class="label">วันที่สร้างรายการ:</span>
+            <span class="value">{{ req.createDate | date: 'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="items-list">
+            <div class="trip-item" *ngFor="let item of req.items">
+              <div class="trip-header">
+                <span class="trip-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                <span class="hours"><i class="far fa-clock"></i> {{ item.hours }} ชม.</span>
+              </div>
+              <div class="trip-desc">{{ item.description }}</div>
+              <div class="trip-amount">
+                <span class="label">จำนวนเงิน:</span>
+                <span class="value">{{ item.amount | number: '1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          
+        </div>
+      </div>
+
+      <div class="no-data" *ngIf="paginatedRequests().length === 0">
+        ไม่พบรายการที่ตรงตามเงื่อนไข
+      </div>
+    </div>
+
     <!-- ตารางแสดงรายการเบิกเบี้ยเลี้ยง -->
     <div class="table-responsive">
       <table class="modern-table">
@@ -113,39 +157,40 @@
           </tr>
         </tbody>
       </table>
-      <!-- ส่วนควบคุมการแบ่งหน้า -->
-      <div class="pagination-container">
-        <div class="pagination-info">
-          แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
-          ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
-          จาก {{ totalRequests() }} รายการ
+    </div>
+
+    <!-- ส่วนควบคุมการแบ่งหน้า -->
+    <div class="pagination-container">
+      <div class="pagination-info">
+        แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
+        ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
+        จาก {{ totalRequests() }} รายการ
+      </div>
+      <div class="pagination-controls">
+        <div class="page-size-selector">
+          <span>เลขที่การเบิก:</span>
+          <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+            <option [value]="10">10 รายการ</option>
+            <option [value]="20">20 รายการ</option>
+            <option [value]="50">50 รายการ</option>
+          </select>
         </div>
-        <div class="pagination-controls">
-          <div class="page-size-selector">
-            <span>เลขที่การเบิก:</span>
-            <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-              <option [value]="10">10 รายการ</option>
-              <option [value]="20">20 รายการ</option>
-              <option [value]="50">50 รายการ</option>
-            </select>
-          </div>
-          <div class="page-buttons">
-            <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
-              <i class="fas fa-angle-double-left"></i>
-            </button>
-            <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
-              <i class="fas fa-angle-left"></i>
-            </button>
-            <span class="page-info">
-              <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
-            </span>
-            <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
-              <i class="fas fa-angle-right"></i>
-            </button>
-            <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
-              <i class="fas fa-angle-double-right"></i>
-            </button>
-          </div>
+        <div class="page-buttons">
+          <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <span class="page-info">
+            <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
+          </span>
+          <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
         </div>
       </div>
     </div>

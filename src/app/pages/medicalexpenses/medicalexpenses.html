@@ -83,6 +83,7 @@
         </div>
 
         <!-- ตารางแสดงรายการเบิกค่ารักษาพยาบาล -->
+        <!-- ตารางแสดงรายการเบิกค่ารักษาพยาบาล (Desktop) -->
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
@@ -165,39 +166,87 @@
                     </tr>
                 </tbody>
             </table>
-            <!-- ส่วนควบคุมการแบ่งหน้า -->
-            <div class="pagination-container">
-                <div class="pagination-info">
-                    แสดง {{ currentPage() * pageSize() + 1 }}
-                    ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
-                    จาก {{ totalRequests() }} รายการ
-                </div>
-                <div class="pagination-controls">
-                    <div class="page-size-selector">
-                        <span>จำนวนแถว:</span>
-                        <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-                            <option [value]="10">10</option>
-                            <option [value]="20">20</option>
-                            <option [value]="50">50</option>
-                        </select>
+        </div>
+
+        <!-- Card View (Mobile/Tablet) -->
+        <div class="card-list-view">
+            <div class="mobile-card" *ngFor="let req of paginatedGroupedRequests(); trackBy: trackByRowId">
+                <div class="card-header">
+                    <div class="header-content">
+                        <span class="ticket-no">{{ req.id }}</span>
                     </div>
-                    <div class="page-buttons">
-                        <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
-                            <i class="fas fa-angle-double-left"></i>
-                        </button>
-                        <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
-                            <i class="fas fa-angle-left"></i>
-                        </button>
-                        <span class="page-info">
-                            <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
+                    <div class="card-actions-top">
+                        <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+                            {{ req.status }}
                         </span>
-                        <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
-                            <i class="fas fa-angle-right"></i>
-                        </button>
-                        <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
-                            <i class="fas fa-angle-double-right"></i>
-                        </button>
                     </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label">วันที่สร้างรายการ:</span>
+                        <span class="value">{{ req.createDate }}</span>
+                    </div>
+
+                    <div class="nested-list">
+                        <div class="nested-item" *ngFor="let item of req.items">
+                            <div class="item-header">
+                                <span class="item-title">{{ item.diseaseType }}</span>
+                                <span class="item-amount">฿{{ item.requestedAmount | number:'1.2-2' }}</span>
+                            </div>
+                            <div class="item-detail">
+                                <div class="detail-row">
+                                    <i class="fas fa-hospital"></i> {{ item.hospital }}
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-notes-medical"></i> {{ item.limitType }}
+                                </div>
+                                <div class="detail-row">
+                                    <i class="far fa-calendar-alt"></i> {{ item.treatmentDateFrom }} - {{
+                                    item.treatmentDateTo }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-data" *ngIf="paginatedGroupedRequests().length === 0">
+                ไม่พบรายการที่ตรงตามเงื่อนไข
+            </div>
+        </div>
+
+        <!-- ส่วนควบคุมการแบ่งหน้า -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                แสดง {{ currentPage() * pageSize() + 1 }}
+                ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
+                จาก {{ totalRequests() }} รายการ
+            </div>
+            <div class="pagination-controls">
+                <div class="page-size-selector">
+                    <span>จำนวนแถว:</span>
+                    <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+                        <option [value]="10">10</option>
+                        <option [value]="20">20</option>
+                        <option [value]="50">50</option>
+                    </select>
+                </div>
+                <div class="page-buttons">
+                    <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <span class="page-info">
+                        <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
+                    </span>
+                    <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
