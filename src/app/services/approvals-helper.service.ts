@@ -13,14 +13,14 @@ export class ApprovalsHelperService {
 
     // รวมและแปลงข้อมูลจากหลาย Service เป็นรูปแบบรายการอนุมัติ
     processData(allowances: AllowanceRequest[], taxis: TaxiRequest[], vehicles: VehicleRequest[]): ApprovalItem[] {
-        const list1: ApprovalItem[] = allowances.map(req => this.mapToApproval(req, 'ค่าเบี้ยเลี้ยง', req.typeId, 'Allowance'));
-        const list2: ApprovalItem[] = taxis.map(req => this.mapToApproval(req, 'ค่าแท็กซี่', req.typeId, 'Taxi'));
-        const list3: ApprovalItem[] = vehicles.map(req => this.mapToApproval(req, 'ค่ารถ', req.typeId, 'Vehicle'));
+        const list1: ApprovalItem[] = allowances.map(request => this.mapToApproval(request, 'ค่าเบี้ยเลี้ยง', request.typeId, 'Allowance'));
+        const list2: ApprovalItem[] = taxis.map(request => this.mapToApproval(request, 'ค่าแท็กซี่', request.typeId, 'Taxi'));
+        const list3: ApprovalItem[] = vehicles.map(request => this.mapToApproval(request, 'ค่ารถ', request.typeId, 'Vehicle'));
 
         return [...list1, ...list2, ...list3];
     }
 
-    private mapToApproval(req: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่าแท็กซี่' | 'ค่ารถ', typeId: number, detailSub?: string): ApprovalItem {
+    private mapToApproval(request: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่าแท็กซี่' | 'ค่ารถ', typeId: number, detailSub?: string): ApprovalItem {
         const defaultUser = {
             name: 'พนักงานทดสอบ',
             employeeId: 'N/A',
@@ -29,35 +29,35 @@ export class ApprovalsHelperService {
         };
 
         return {
-            requestNo: req.id,
-            requestDate: req.createDate,
-            requestBy: req.requester || defaultUser,
+            requestNo: request.id,
+            requestDate: request.createDate,
+            requestBy: request.requester || defaultUser,
             requestType: type,
             typeId: typeId,
-            requestDetail: req.items[0]?.description || detailSub || '',
-            amount: req.items.reduce((sum: number, i: any) => sum + (i.amount || 0), 0),
-            status: this.mapStatus(req.status)
+            requestDetail: request.items[0]?.description || detailSub || '',
+            amount: request.items.reduce((sum: number, item: any) => sum + (item.amount || 0), 0),
+            status: this.mapStatus(request.status)
         };
     }
 
     // แปลงสถานะภาษาไทยเป็นภาษาอังกฤษประเภทต่างๆ
     mapStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-        const s = status?.trim();
+        const statusValue = status?.trim();
 
-        if (s === 'ไม่อนุมัติ') return 'Rejected';
-        if (s === 'รอแก้ไข') return 'Referred Back';
+        if (statusValue === 'ไม่อนุมัติ') return 'Rejected';
+        if (statusValue === 'รอแก้ไข') return 'Referred Back';
 
-        if (s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
+        if (statusValue === 'อนุมัติแล้ว' || statusValue.includes('จ่าย')) return 'Approved';
 
-        if (s === 'คำขอใหม่' ||
-            s === 'ตรวจสอบแล้ว' ||
-            s === 'อยู่ระหว่างการอนุมัติ' ||
-            s === 'รอพนักงานยืนยัน' ||
-            s === 'รอต้นสังกัดอนุมัติ' ||
-            s === 'รอฝ่ายบุคคลอนุมัติ' ||
-            s === 'รอผู้บริหารอนุมัติ' ||
-            s === 'รอฝ่ายบัญชีอนุมัติ' ||
-            s.includes('รอตรวจสอบ')) {
+        if (statusValue === 'คำขอใหม่' ||
+            statusValue === 'ตรวจสอบแล้ว' ||
+            statusValue === 'อยู่ระหว่างการอนุมัติ' ||
+            statusValue === 'รอพนักงานยืนยัน' ||
+            statusValue === 'รอต้นสังกัดอนุมัติ' ||
+            statusValue === 'รอฝ่ายบุคคลอนุมัติ' ||
+            statusValue === 'รอผู้บริหารอนุมัติ' ||
+            statusValue === 'รอฝ่ายบัญชีอนุมัติ' ||
+            statusValue.includes('รอตรวจสอบ')) {
             return 'Pending';
         }
 

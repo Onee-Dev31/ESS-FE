@@ -56,7 +56,7 @@ export class ApprovalsComponent implements OnInit {
       vehicles: this.transportService.getRequests().pipe(take(1))
     }).subscribe(({ allowances, taxis, vehicles }) => {
       const allData = this.approvalsHelper.processData(allowances, taxis, vehicles);
-      this.approvals.set(allData.sort((a, b) => b.requestNo.localeCompare(a.requestNo)));
+      this.approvals.set(allData.sort((itemA, itemB) => itemB.requestNo.localeCompare(itemA.requestNo)));
     });
   }
 
@@ -77,24 +77,24 @@ export class ApprovalsComponent implements OnInit {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
 
-      filtered.sort((a, b) => {
-        let valA: any, valB: any;
+      filtered.sort((itemA, itemB) => {
+        let valueA: any, valueB: any;
 
         switch (id) {
           case 'requestNo':
-            return a.requestNo.localeCompare(b.requestNo) * direction;
+            return itemA.requestNo.localeCompare(itemB.requestNo) * direction;
           case 'requestDate':
-            valA = a.requestDate.split('/').reverse().join('');
-            valB = b.requestDate.split('/').reverse().join('');
-            return valA.localeCompare(valB) * direction;
+            valueA = itemA.requestDate.split('/').reverse().join('');
+            valueB = itemB.requestDate.split('/').reverse().join('');
+            return valueA.localeCompare(valueB) * direction;
           case 'requestBy':
-            return a.requestBy.name.localeCompare(b.requestBy.name) * direction;
+            return itemA.requestBy.name.localeCompare(itemB.requestBy.name) * direction;
           case 'requestType':
-            return a.requestType.localeCompare(b.requestType) * direction;
+            return itemA.requestType.localeCompare(itemB.requestType) * direction;
           case 'amount':
-            return (a.amount - b.amount) * direction;
+            return (itemA.amount - itemB.amount) * direction;
           case 'status':
-            return a.status.localeCompare(b.status) * direction;
+            return itemA.status.localeCompare(itemB.status) * direction;
           default:
             return 0;
         }
@@ -136,7 +136,7 @@ export class ApprovalsComponent implements OnInit {
   }
 
   // นับจำนวนรายการในแต่ละ Tab
-  getTabCount(tab: string) { return this.approvals().filter(i => i.status === tab).length; }
+  getTabCount(tab: string) { return this.approvals().filter(item => item.status === tab).length; }
 
   onSearch(event: any) { this.searchText.set(event.target.value); }
 

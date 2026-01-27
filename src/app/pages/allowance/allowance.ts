@@ -79,34 +79,34 @@ export class AllowanceComponent implements OnInit {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
 
-      filtered.sort((a, b) => {
-        let valA: any, valB: any;
+      filtered.sort((requestA, requestB) => {
+        let valueA: any, valueB: any;
 
         switch (id) {
           case 'requestId':
-            return a.id.localeCompare(b.id) * direction;
+            return requestA.id.localeCompare(requestB.id) * direction;
           case 'createDate':
-            return a.createDate.localeCompare(b.createDate) * direction;
+            return requestA.createDate.localeCompare(requestB.createDate) * direction;
           case 'status':
-            return a.status.localeCompare(b.status) * direction;
+            return requestA.status.localeCompare(requestB.status) * direction;
           case 'amount':
-            valA = a.items.reduce((sum, item) => sum + item.amount, 0);
-            valB = b.items.reduce((sum, item) => sum + item.amount, 0);
-            return (valA - valB) * direction;
+            valueA = requestA.items.reduce((sum, item) => sum + item.amount, 0);
+            valueB = requestB.items.reduce((sum, item) => sum + item.amount, 0);
+            return (valueA - valueB) * direction;
           case 'hours':
-            valA = a.items.reduce((sum, item) => sum + item.hours, 0);
-            valB = b.items.reduce((sum, item) => sum + item.hours, 0);
-            return (valA - valB) * direction;
+            valueA = requestA.items.reduce((sum, item) => sum + item.hours, 0);
+            valueB = requestB.items.reduce((sum, item) => sum + item.hours, 0);
+            return (valueA - valueB) * direction;
           case 'date':
-            valA = a.items[0]?.date || '';
-            valB = b.items[0]?.date || '';
-            const dateA = valA.split('/').reverse().join('');
-            const dateB = valB.split('/').reverse().join('');
+            valueA = requestA.items[0]?.date || '';
+            valueB = requestB.items[0]?.date || '';
+            const dateA = valueA.split('/').reverse().join('');
+            const dateB = valueB.split('/').reverse().join('');
             return dateA.localeCompare(dateB) * direction;
           case 'description':
-            valA = a.items[0]?.description || '';
-            valB = b.items[0]?.description || '';
-            return valA.localeCompare(valB) * direction;
+            valueA = requestA.items[0]?.description || '';
+            valueB = requestB.items[0]?.description || '';
+            return valueA.localeCompare(valueB) * direction;
           default:
             return 0;
         }
@@ -127,15 +127,15 @@ export class AllowanceComponent implements OnInit {
   // แปลงข้อมูลเป็นรายการแถวเพื่อแสดงในตาราง (รองรับ Grouping)
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
-    this.paginatedRequests().forEach((req) => {
-      req.items.forEach((item, index) => {
+    this.paginatedRequests().forEach((request) => {
+      request.items.forEach((item, index) => {
         rows.push({
           ...item,
-          requestId: req.id,
-          createDate: req.createDate,
-          status: req.status,
+          requestId: request.id,
+          createDate: request.createDate,
+          status: request.status,
           isFirstInGroup: index === 0,
-          groupLength: req.items.length,
+          groupLength: request.items.length,
         });
       });
     });

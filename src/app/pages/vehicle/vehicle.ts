@@ -54,19 +54,19 @@ export class VehicleComponent implements OnInit {
       filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
     }
     if (this.filterEndDate()) {
-      filtered = filtered.filter(r => r.createDate <= this.filterEndDate());
+      filtered = filtered.filter(request => request.createDate <= this.filterEndDate());
     }
 
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
-      filtered.sort((a, b) => {
+      filtered.sort((requestA, requestB) => {
         switch (id) {
           case 'id':
-            return a.id.localeCompare(b.id) * direction;
+            return requestA.id.localeCompare(requestB.id) * direction;
           case 'createDate':
-            return a.createDate.localeCompare(b.createDate) * direction;
+            return requestA.createDate.localeCompare(requestB.createDate) * direction;
           default:
             return 0;
         }
