@@ -7,15 +7,14 @@
                     <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
                             }}</span></div>
                 </div>
+                <div class="header-actions-group">
+                    @if (!isActionConfirm()) {
+                    <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
+                    <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
+                    <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
+                    }
+                </div>
                 <button class="btn-close-x" (click)="close()">&times;</button>
-            </div>
-
-            <div class="header-actions-group">
-                @if (!isActionConfirm()) {
-                <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
-                <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
-                <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
-                }
             </div>
         </div>
 

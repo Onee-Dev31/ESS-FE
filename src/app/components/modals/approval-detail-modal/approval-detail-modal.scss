@@ -31,27 +31,36 @@ $bg-slate: #f4f7f9;
         flex-direction: column; // Stack children vertically
 
         .modal-header-modern {
-            flex-shrink: 0; // Prevent header shrinking
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid #eee;
             flex-shrink: 0;
             padding: 1.5rem 2rem;
             border-bottom: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
 
             .header-top-row {
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
+                align-items: center;
                 width: 100%;
+                gap: 16px;
+
+                @media screen and (max-width: 600px) {
+                    flex-wrap: wrap;
+                    position: relative;
+                    padding-right: 30px; // Space for absolute close button
+                    gap: 12px;
+                }
 
                 .header-info-inline {
                     display: flex;
                     align-items: baseline;
                     gap: 12px;
                     flex-wrap: wrap;
+                    flex: 1;
+                    min-width: 0;
+
+                    @media screen and (max-width: 600px) {
+                        flex: 0 0 100%;
+                        order: 1;
+                    }
 
                     .request-title {
                         margin: 0;
@@ -70,11 +79,59 @@ $bg-slate: #f4f7f9;
                     }
                 }
 
+                .header-actions-group {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: nowrap;
+                    flex-shrink: 0;
+
+                    @media screen and (max-width: 600px) {
+                        order: 2;
+                        width: 100%;
+                        justify-content: flex-start;
+                        margin-top: 4px;
+                    }
+
+                    button {
+                        padding: 8px 20px;
+                        border-radius: 20px;
+                        border: none;
+                        color: white;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 13px;
+                        transition: transform 0.1s;
+                        white-space: nowrap;
+
+                        @media screen and (max-width: 425px) {
+                            flex: 1;
+                            padding: 8px 10px;
+                            text-align: center;
+                        }
+
+                        &:active {
+                            transform: translateY(1px);
+                        }
+                    }
+
+                    .btn-action-green {
+                        background: $primary-green;
+                    }
+
+                    .btn-action-red {
+                        background: $primary-red;
+                    }
+
+                    .btn-action-orange {
+                        background: $primary-orange;
+                    }
+                }
+
                 .btn-close-x {
                     background: transparent;
                     border: none;
                     color: #ccc;
-                    font-size: 28px; // Slightly larger
+                    font-size: 28px;
                     line-height: 1;
                     padding: 0;
                     cursor: pointer;
@@ -83,43 +140,18 @@ $bg-slate: #f4f7f9;
                     align-items: center;
                     justify-content: center;
                     transition: color 0.2s;
+                    flex-shrink: 0;
+
+                    @media screen and (max-width: 600px) {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        margin: 0;
+                    }
 
                     &:hover {
                         color: $primary-red;
                     }
-                }
-            }
-
-            .header-actions-group {
-                display: flex;
-                gap: 8px;
-                flex-wrap: wrap;
-
-                button {
-                    padding: 8px 20px;
-                    border-radius: 20px;
-                    border: none;
-                    color: white;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 13px;
-                    transition: transform 0.1s;
-
-                    &:active {
-                        transform: translateY(1px);
-                    }
-                }
-
-                .btn-action-green {
-                    background: $primary-green;
-                }
-
-                .btn-action-red {
-                    background: $primary-red;
-                }
-
-                .btn-action-orange {
-                    background: $primary-orange;
                 }
             }
         }
