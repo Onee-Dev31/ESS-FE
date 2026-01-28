@@ -239,7 +239,8 @@
             <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
           <div class="leave-stats-grid">
-            <div class="card leave-card" *ngFor="let leave of leaveStats$ | async" [ngClass]="leave.theme">
+            <div class="card leave-card" *ngFor="let leave of leaveStats$ | async" [ngClass]="leave.theme"
+              (click)="openTimeOffForm(leave.label)" style="cursor: pointer;">
               <div class="leave-body">
                 <div class="leave-header">
                   <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
@@ -312,6 +313,10 @@
 
   <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
   </app-medical-policy-modal>
+
+  <app-time-off-form *ngIf="isTimeOffModalOpen()" [initialLeaveTypeId]="selectedLeaveTypeId()"
+    (onClose)="closeTimeOffForm()">
+  </app-time-off-form>
 
   <!-- Modal แสดง Tooltip Info -->
   <div class="modal-overlay" *ngIf="isTooltipModalOpen()" (click)="closeTooltip()">

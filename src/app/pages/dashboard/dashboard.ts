@@ -11,6 +11,7 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
+import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
@@ -22,7 +23,8 @@ interface PerformanceItem { year: string; grade: string; }
   imports: [
     CommonModule,
     FullCalendarModule,
-    MedicalPolicyModalComponent
+    MedicalPolicyModalComponent,
+    TimeOffForm
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -33,8 +35,10 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
 
   isPolicyModalOpen = signal<boolean>(false);
+  isTimeOffModalOpen = signal<boolean>(false);
   isTooltipModalOpen = signal<boolean>(false);
   tooltipModalContent = signal<string>('');
+  selectedLeaveTypeId = signal<string>('');
 
   userProfile$!: Observable<UserProfile>;
   medicalStats$!: Observable<MedicalStat[]>;
@@ -62,7 +66,6 @@ export class DashboardComponent implements OnInit {
     firstDay: 0,
     contentHeight: 'auto',
     fixedWeekCount: false,
-    // การตั้งค่าปฏิทิน (FullCalendar): ภาษาไทย, แสดงวันหยุด และวันลา
     dayCellContent: (arg: DayCellContentArg) => {
       const offset = arg.date.getTimezoneOffset() * 60000;
       const localDate = new Date(arg.date.getTime() - offset);
@@ -107,7 +110,6 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-
   ngOnInit() {
     this.userProfile$ = this.userService.getUserProfile();
     this.medicalStats$ = this.dashboardService.getMedicalStats();
@@ -116,12 +118,10 @@ export class DashboardComponent implements OnInit {
     this.holidays$ = this.dashboardService.getHolidays();
     this.pendingCount$ = this.dashboardService.getGlobalPendingCount();
 
-    // Fetch static data
     this.attendanceList = this.dashboardService.getAttendanceList();
     this.performanceList = this.dashboardService.getPerformanceList();
     this.specialDates = this.dashboardService.getSpecialDates();
 
-    // แปลงข้อมูลโปรไฟล์สำหรับการแสดงผลในรายการ
     this.profileList$ = this.userProfile$.pipe(
       map(profile => [
         { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
@@ -132,7 +132,6 @@ export class DashboardComponent implements OnInit {
       ])
     );
 
-    // แปลงข้อมูลทรัพย์สิน IT สำหรับการแสดงผลในรายการ
     this.itList$ = this.userProfile$.pipe(
       map(profile => {
         if (!profile.itAssets) return [];
@@ -147,7 +146,25 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  // เปิด Tooltip เป็น Modal
+  openTimeOffForm(leaveLabel: string) {
+    const mapping: Record<string, string> = {
+      'ลาพักร้อน': 'vacation',
+      'ลากิจ': 'personal',
+      'ลาป่วย': 'sick',
+      'ลาทำหมัน': 'sterilization',
+      'ลาเพื่อจัดการงานศพ': 'funeral'
+    };
+
+    const typeId = mapping[leaveLabel] || '';
+    this.selectedLeaveTypeId.set(typeId);
+    this.isTimeOffModalOpen.set(true);
+  }
+
+  closeTimeOffForm() {
+    this.isTimeOffModalOpen.set(false);
+    this.selectedLeaveTypeId.set('');
+  }
+
   openTooltip(content: string) {
     this.tooltipModalContent.set(content);
     this.isTooltipModalOpen.set(true);
@@ -158,7 +175,6 @@ export class DashboardComponent implements OnInit {
     this.tooltipModalContent.set('');
   }
 
-  // นำทางไปยังหน้าต่างๆ
   navigateTo(path: string | undefined) {
     if (path) {
       this.router.navigate([path]);
