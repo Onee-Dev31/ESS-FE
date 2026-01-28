@@ -3,12 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { SidebarService } from '../../services/sidebar';
 import { filter, Subscription } from 'rxjs';
+import { SIDEBAR_MENU_ITEMS, MenuItem } from '../../config/constants';
 
-interface MenuItem {
-  name: string;
-  icon: string;
-  subItems?: { label: string; path: string }[];
-}
+
 
 @Component({
   selector: 'app-sidebar',
@@ -21,47 +18,7 @@ export class Sidebar implements OnInit, OnDestroy {
   openMenu: string = '';
   private routerSubscription: Subscription | undefined;
 
-  menuItems: MenuItem[] = [
-    {
-      name: 'Dashboards',
-      icon: 'fa-home',
-      subItems: [
-        { label: 'Default', path: '/dashboard' },
-        { label: 'CMS', path: '/dashboard/cms' },
-      ]
-    },
-    {
-      name: 'CMS',
-      icon: 'fa-book',
-      subItems: [
-        { label: 'โพสต์ทั้งหมด', path: '/cms/posts' },
-        { label: 'เพิ่มเนื้อหาใหม่', path: '/cms/new' }
-      ]
-    },
-    {
-      name: 'Widgets',
-      icon: 'fa-chart-line',
-      subItems: [
-        { label: 'สถิติการใช้งาน', path: '/widgets/stats' },
-        { label: 'กราฟภาพรวม', path: '/widgets/charts' }
-      ]
-    },
-    {
-      name: 'User',
-      icon: 'fa-user',
-      subItems: [
-        { label: 'จัดการผู้ใช้งาน', path: '/users/list' },
-        { label: 'บทบาทและสิทธิ์', path: '/users/roles' }
-      ]
-    },
-    {
-      name: 'Tables',
-      icon: 'fa-table',
-      subItems: [
-        { label: 'ตารางข้อมูล', path: '/tables/data' }
-      ]
-    }
-  ];
+  menuItems: MenuItem[] = SIDEBAR_MENU_ITEMS;
 
   constructor(
     public sidebarService: SidebarService,

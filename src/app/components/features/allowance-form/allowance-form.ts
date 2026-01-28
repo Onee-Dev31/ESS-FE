@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
 import { AlertService } from '../../../services/alert.service';
-import { WELFARE_TYPES } from '../../../services/vehicle.service';
+import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { switchMap } from 'rxjs';
 
 @Component({

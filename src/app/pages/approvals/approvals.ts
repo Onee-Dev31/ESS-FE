@@ -2,7 +2,8 @@ import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AllowanceService, AllowanceRequest } from '../../services/allowance.service';
+import { AllowanceService } from '../../services/allowance.service';
+import { AllowanceRequest } from '../../interfaces/allowance.interface';
 import { TaxiService, TaxiRequest } from '../../services/taxi.service';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
 import { forkJoin } from 'rxjs';
@@ -15,6 +16,7 @@ import {
 } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
+import { APPROVAL_STATUS_TABS } from '../../config/constants';
 
 
 @Component({
@@ -33,7 +35,7 @@ export class ApprovalsComponent implements OnInit {
   private router = inject(Router);
   protected readonly Math = Math;
 
-  tabs = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
+  tabs = APPROVAL_STATUS_TABS;
   activeTab = signal<string>('Pending');
   searchText = signal<string>('');
 

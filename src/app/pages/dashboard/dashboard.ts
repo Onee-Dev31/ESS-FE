@@ -8,7 +8,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Observable, map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
-import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../services/dashboard.service';
+import { DashboardService } from '../../services/dashboard.service';
+import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }

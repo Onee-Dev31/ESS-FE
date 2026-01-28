@@ -2,7 +2,8 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MedicalexpensesService, MedicalRequest, MedicalItem } from '../../services/medicalexpenses.service';
+import { MedicalexpensesService } from '../../services/medicalexpenses.service';
+import { MedicalRequest, MedicalItem } from '../../interfaces/medical.interface';
 import { VehicleService } from '../../services/vehicle.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
@@ -92,8 +93,8 @@ export class MedicalexpensesComponent implements OnInit {
   // แปลงข้อมูลเป็นรูปแบบแถวเดี่ยวเพื่อแสดงในตาราง
   flattenedRows = computed(() => {
     const rows: FlatMedicalRow[] = [];
-    this.processedData().forEach(req => {
-      req.items.forEach(item => {
+    this.processedData().forEach((req: MedicalRequest) => {
+      req.items.forEach((item: MedicalItem) => {
         rows.push({
           ...item,
           requestId: req.id,
@@ -191,7 +192,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   // โหลดข้อมูลจาก Service
   loadData() {
-    this.medicalService.getMedicalRequests().subscribe(data => {
+    this.medicalService.getMedicalRequests().subscribe((data: MedicalRequest[]) => {
       this.allRequests.set(data);
     });
   }
@@ -258,7 +259,7 @@ export class MedicalexpensesComponent implements OnInit {
   canPreviousPage() { return this.currentPage() > 0; }
 
   trackByRowId(index: number, row: any): string {
-    const original = (row as any).original || row;
+    const original = (row as { original: any }).original || row;
     return `${original.requestId || 'new'}-${index}`;
   }
 

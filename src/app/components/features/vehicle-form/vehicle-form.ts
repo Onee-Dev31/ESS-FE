@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, RequestItem, VehicleRequest } from '../../../services/transport.service';
 import { AlertService } from '../../../services/alert.service';
-import { WELFARE_TYPES } from '../../../services/vehicle.service';
+import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
+import { THAI_MONTHS, YEARS_CONFIG } from '../../../config/constants';
 
 interface LogItem {
   date: string;
@@ -34,8 +35,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
   loadedRequest?: VehicleRequest;
 
-  thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-  years = [2568, 2569, 2570];
+  thaiMonths = THAI_MONTHS;
+  years = YEARS_CONFIG;
 
   selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;

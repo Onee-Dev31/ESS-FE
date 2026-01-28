@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AllowanceRequest } from './allowance.service';
+import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { TaxiRequest } from './taxi.service';
 import { VehicleRequest } from './transport.service';
 import { ApprovalItem } from '../components/modals/approval-detail-modal/approval-detail-modal';

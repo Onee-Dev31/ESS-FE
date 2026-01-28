@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
 import { AlertService } from '../../../services/alert.service';
-import { WELFARE_TYPES } from '../../../services/vehicle.service';
+import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 
 @Component({
   selector: 'app-vehicle-taxi-form',

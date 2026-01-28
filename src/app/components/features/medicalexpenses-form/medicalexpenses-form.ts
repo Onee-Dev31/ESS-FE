@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MedicalexpensesService, MedicalRequest } from '../../../services/medicalexpenses.service';
+import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
+import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
 import { AlertService } from '../../../services/alert.service';
 
 @Component({

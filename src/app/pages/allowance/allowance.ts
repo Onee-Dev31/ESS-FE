@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
-import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../services/allowance.service';
+import { AllowanceService } from '../../services/allowance.service';
+import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
 import { AlertService } from '../../services/alert.service';
 import { VehicleService } from '../../services/vehicle.service';
 import {
@@ -90,12 +91,12 @@ export class AllowanceComponent implements OnInit {
           case 'status':
             return requestA.status.localeCompare(requestB.status) * direction;
           case 'amount':
-            valueA = requestA.items.reduce((sum, item) => sum + item.amount, 0);
-            valueB = requestB.items.reduce((sum, item) => sum + item.amount, 0);
+            valueA = requestA.items.reduce((sum: number, item: AllowanceItem) => sum + item.amount, 0);
+            valueB = requestB.items.reduce((sum: number, item: AllowanceItem) => sum + item.amount, 0);
             return (valueA - valueB) * direction;
           case 'hours':
-            valueA = requestA.items.reduce((sum, item) => sum + item.hours, 0);
-            valueB = requestB.items.reduce((sum, item) => sum + item.hours, 0);
+            valueA = requestA.items.reduce((sum: number, item: AllowanceItem) => sum + item.hours, 0);
+            valueB = requestB.items.reduce((sum: number, item: AllowanceItem) => sum + item.hours, 0);
             return (valueA - valueB) * direction;
           case 'date':
             valueA = requestA.items[0]?.date || '';
@@ -127,8 +128,8 @@ export class AllowanceComponent implements OnInit {
   // แปลงข้อมูลเป็นรายการแถวเพื่อแสดงในตาราง (รองรับ Grouping)
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
-    this.paginatedRequests().forEach((request) => {
-      request.items.forEach((item, index) => {
+    this.paginatedRequests().forEach((request: AllowanceRequest) => {
+      request.items.forEach((item: AllowanceItem, index: number) => {
         rows.push({
           ...item,
           requestId: request.id,
