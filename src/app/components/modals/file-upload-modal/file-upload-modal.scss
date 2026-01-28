@@ -36,15 +36,7 @@
       }
 
       .close-btn {
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-        color: $text-sub;
-
-        &:hover {
-          color: $danger;
-        }
+        @include close-btn-style;
       }
     }
 

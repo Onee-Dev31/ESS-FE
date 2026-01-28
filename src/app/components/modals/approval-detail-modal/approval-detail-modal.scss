@@ -1,4 +1,5 @@
 @use "sass:color";
+@use '../../../../styles/theme' as *;
 
 $primary-blue: #008ebc;
 $primary-green: #74c34d;
@@ -128,29 +129,16 @@ $bg-slate: #f4f7f9;
                 }
 
                 .btn-close-x {
-                    background: transparent;
-                    border: none;
-                    color: #ccc;
-                    font-size: 28px;
-                    line-height: 1;
-                    padding: 0;
-                    cursor: pointer;
+                    @include close-btn-style;
+                    font-size: 14px; // Override mixin default if needed, but mixin has 14px.
+                    // The mixin handles everything including hover rotation.
                     margin-left: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: color 0.2s;
-                    flex-shrink: 0;
 
                     @media screen and (max-width: 600px) {
                         position: absolute;
-                        top: 0;
-                        right: 0;
+                        top: 15px; // Adjusted for better mobile positioning
+                        right: 15px; // Adjusted for better mobile positioning
                         margin: 0;
-                    }
-
-                    &:hover {
-                        color: $primary-red;
                     }
                 }
             }

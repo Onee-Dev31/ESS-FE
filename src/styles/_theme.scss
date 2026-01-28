@@ -30,6 +30,9 @@ $text-header: #ffffff;
 $border: #dee2e6;
 $border-color: #e9ecef;
 
+$radius: 12px;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
 
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
@@ -62,5 +65,31 @@ $status-success-text: #28a745;
 @mixin desktop {
     @media (min-width: 1025px) {
         @content;
+    }
+}
+
+// --- Standardized UI Elements ---
+@mixin close-btn-style {
+    border: none;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+
+    // Ensure icon centering if it's an <i> tag or similar
+    display: inline-flex;
+
+    &:hover {
+        color: #ef4444; // $danger or specific red
+        background: #fee2e2; // Light red bg
+        transform: rotate(90deg);
     }
 }

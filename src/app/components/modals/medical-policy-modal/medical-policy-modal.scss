@@ -1,3 +1,4 @@
+@use '../../../../styles/theme' as *;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 .modal-backdrop {
@@ -72,16 +73,7 @@
     }
 
     .btn-close {
-        background: none;
-        border: none;
-        font-size: 1.25rem;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: color 0.2s;
-
-        &:hover {
-            color: #1e293b;
-        }
+        @include close-btn-style;
     }
 }
 

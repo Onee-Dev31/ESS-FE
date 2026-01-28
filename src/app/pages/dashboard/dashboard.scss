@@ -1,13 +1,13 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 @use '../../../styles/theme' as *;
+@use '../../../styles/responsive-layout' as responsive;
+@use 'tooltip-modal';
 
 
 $dark: #0f172a;
 $muted: #64748b;
 $border-color: transparent;
-$radius: 12px;
 $radius-lg: 20px;
-$shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 $bg-light: #f8fafc;
 $balance: #15803d;
 
@@ -1513,62 +1513,29 @@ $balance: #15803d;
   }
 }
 
-.tooltip-container {
-  position: relative;
-  display: inline-block;
+.btn-info-circle {
+  border: none;
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-left: 5px;
-  cursor: help;
-  z-index: 101;
 
-  &:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+  &:hover {
+    color: $primary;
+    background: #eff6ff;
+  }
+
+  i {
+    font-size: 14px;
   }
 }
 
-.tooltip-text {
-  visibility: hidden;
-  width: max-content;
-  max-width: 200px;
-  background: #333;
-  color: #fff;
-  border-radius: 6px;
-  padding: 10px;
-  position: absolute;
-  z-index: 9999;
-  bottom: 140%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: 0.2s;
-  font-size: 12px;
-  line-height: 1.4;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  white-space: normal;
-
-  @media (min-width: 768px) {
-    max-width: 280px;
-  }
-
-  @media (max-width: 480px) {
-    left: 0;
-    transform: translateX(-10px);
-
-    &::after {
-      left: 20px;
-    }
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border: 5px solid transparent;
-    border-top-color: #333;
-  }
-}
 
 
 .calendar-panel {

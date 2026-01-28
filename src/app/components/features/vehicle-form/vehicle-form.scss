@@ -49,25 +49,7 @@
     }
 
     .btn-close-modal {
-      border: none;
-      background: #f1f3f4;
-      width: 28px;
-      height: 28px;
-
-      @include desktop {
-        width: 32px;
-        height: 32px;
-      }
-
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.0rem;
-      line-height: 1;
-
-      &:hover {
-        background: #e8eaed;
-        color: $danger;
-      }
+      @include close-btn-style;
     }
   }
 

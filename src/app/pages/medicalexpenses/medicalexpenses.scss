@@ -2,6 +2,8 @@
 @use '../../../styles/theme' as *;
 @use '../../../styles/responsive-layout' as responsive;
 
+$primary-blue: #008ebc;
+
 .medical-page {
     padding: 20px;
     background-color: $bg-page;
@@ -327,11 +329,20 @@
     }
 
     .pagination-container {
-        padding: 1.5rem 20px;
+        padding: 1rem 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-top: 1px solid #f0f0f0;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        @media (max-width: 767px) {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
         .pagination-info {
             font-size: 13px;
@@ -342,6 +353,8 @@
             display: flex;
             align-items: center;
             gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
 
             .page-size-selector {
                 display: flex;
@@ -355,6 +368,8 @@
                     border: 1px solid #ddd;
                     border-radius: 4px;
                     outline: none;
+                    background: white;
+                    cursor: pointer;
                 }
             }
 
@@ -374,16 +389,18 @@
                     border-radius: 4px;
                     cursor: pointer;
                     color: #666;
+                    transition: all 0.2s;
 
                     &:hover:not(:disabled) {
-                        border-color: $btn-search-bg;
-                        color: $btn-search-bg;
+                        border-color: $primary-blue;
+                        color: $primary-blue;
                         background: #f0f7ff;
                     }
 
                     &:disabled {
                         opacity: 0.5;
                         cursor: not-allowed;
+                        background: #f5f5f5;
                     }
                 }
 
@@ -391,6 +408,7 @@
                     font-size: 13px;
                     color: #333;
                     margin: 0 0.5rem;
+                    white-space: nowrap;
                 }
             }
         }

@@ -32,6 +32,8 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
 
   isPolicyModalOpen = signal<boolean>(false);
+  isTooltipModalOpen = signal<boolean>(false);
+  tooltipModalContent = signal<string>('');
 
   userProfile$!: Observable<UserProfile>;
   medicalStats$!: Observable<MedicalStat[]>;
@@ -142,6 +144,17 @@ export class DashboardComponent implements OnInit {
         ];
       })
     );
+  }
+
+  // เปิด Tooltip เป็น Modal
+  openTooltip(content: string) {
+    this.tooltipModalContent.set(content);
+    this.isTooltipModalOpen.set(true);
+  }
+
+  closeTooltip() {
+    this.isTooltipModalOpen.set(false);
+    this.tooltipModalContent.set('');
   }
 
   // นำทางไปยังหน้าต่างๆ

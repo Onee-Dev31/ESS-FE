@@ -213,9 +213,10 @@
                 <div class="card-info">
                   <h6 [style.color]="item.titleColor">
                     <span class="title-text">{{ item.title }}</span>
-                    <div class="tooltip-container" tabindex="0" *ngIf="item.tooltip">
-                      <i class="fas fa-info-circle" style="color: #888"></i>
-                      <span class="tooltip-text" [innerHTML]="item.tooltip"></span>
+                    <div class="tooltip-container" *ngIf="item.tooltip">
+                      <button class="btn-info-circle" (click)="openTooltip(item.tooltip); $event.stopPropagation()">
+                        <i class="fas fa-info-circle"></i>
+                      </button>
                     </div>
                   </h6>
                   <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
@@ -311,4 +312,17 @@
 
   <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
   </app-medical-policy-modal>
+
+  <!-- Modal แสดง Tooltip Info -->
+  <div class="modal-overlay" *ngIf="isTooltipModalOpen()" (click)="closeTooltip()">
+    <div class="modal-container info-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>รายละเอียด</h3>
+        <button class="close-btn" (click)="closeTooltip()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" [innerHTML]="tooltipModalContent()"></div>
+    </div>
+  </div>
 </div>
