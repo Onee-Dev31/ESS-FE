@@ -71,9 +71,8 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         return {
           date: item.date,
           dayType: item.dayType,
-          ThaiLooped: matchTime(item.timeIn),
-          timeIn: matchTime(item.timeIn),
-          timeOut: matchTime(item.timeOut),
+          timeIn: item.timeIn ? String(item.timeIn) : '',
+          timeOut: item.timeOut ? String(item.timeOut) : '',
           amount: matchingItem ? matchingItem.amount : 0,
           selected: !!matchingItem,
           description: matchingItem ? matchingItem.description : item.description,
@@ -195,6 +194,3 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 }
 
-function matchTime(t: any): string {
-  return t ? String(t) : '';
-}

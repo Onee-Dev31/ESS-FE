@@ -1,6 +1,14 @@
 @use 'sass:color';
 @use '../../../../styles/theme' as *;
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
 .vehicle-form-page {
   display: flex;
   flex-direction: column;
@@ -22,7 +30,7 @@
     align-items: center;
     padding: 10px 15px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       padding: 17px 24px;
     }
 
@@ -31,7 +39,7 @@
     h2 {
       font-size: 1.0rem;
 
-      @media (min-width: 768px) {
+      @include desktop {
         font-size: 1.15rem;
       }
 
@@ -46,7 +54,7 @@
       width: 28px;
       height: 28px;
 
-      @media (min-width: 768px) {
+      @include desktop {
         width: 32px;
         height: 32px;
       }
@@ -67,12 +75,13 @@
     flex: 1;
     padding: 15px 15px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       padding: 20px 24px;
     }
 
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     overflow: hidden;
   }
 
@@ -80,7 +89,7 @@
     margin-bottom: 12px;
     padding: 12px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       margin-bottom: 16px;
       padding: 16px 20px;
     }
@@ -130,7 +139,11 @@
         flex: 1;
         min-width: 0;
 
-        @media (min-width: 768px) {
+        @media (max-width: 1024px) {
+          width: auto;
+        }
+
+        @media (min-width: 1025px) {
           width: auto;
           flex: initial;
         }
@@ -143,12 +156,12 @@
       .btn-search {
         flex-shrink: 0;
 
-        @media (max-width: 767px) {
+        @media (max-width: 1024px) {
           padding: 8px 16px;
           font-size: 0.85rem;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1025px) {
           width: auto;
         }
 
@@ -161,6 +174,8 @@
       }
     }
   }
+
+  // Desktop/Mobile/Tablet visibility helpers
 
   .action-bar {
     display: flex;
@@ -179,12 +194,11 @@
     .btn-submit {
       flex-shrink: 0;
 
-      @media (max-width: 767px) {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+      @include tablet {
+        display: none;
       }
 
-      @media (min-width: 768px) {
+      @include desktop {
         width: auto;
       }
 
@@ -234,17 +248,29 @@
   }
 
   .table-container {
-    flex: 1;
+    width: 100% !important;
+    display: block !important;
+    flex: 1 1 100%;
+    align-self: stretch;
     overflow: auto;
     border: 1px solid $border;
     border-radius: 8px;
 
+    @include tablet {
+      border: none;
+      background: transparent;
+      overflow-y: auto;
+      padding-bottom: 80px;
+    }
+
     .excel-table {
-      width: 100%;
+      width: 100% !important;
+      min-width: 100% !important;
+      display: table;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 800px;
-      table-layout: fixed;
+      table-layout: fixed !important;
+      margin: 0 !important;
 
       th,
       td {
@@ -347,6 +373,194 @@
         text-align: right;
         padding-right: 20px;
         font-weight: 600;
+      }
+    }
+  }
+
+  // Mobile Card Styles
+  .mobile-cards-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px;
+
+    .log-card {
+      background: #fff;
+      border: 1px solid $border;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s;
+
+      &.highlight-card {
+        border-color: #eed686;
+        background: #fffdef;
+        box-shadow: 0 4px 15px rgba(238, 214, 134, 0.2);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba($border, 0.5);
+
+        .date-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .day-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+          }
+
+          .date {
+            font-weight: 700;
+            color: $text;
+            font-size: 0.95rem;
+          }
+
+          .day-type {
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+        }
+
+        .card-checkbox {
+          width: 20px;
+          height: 20px;
+          accent-color: $primary;
+          cursor: pointer;
+        }
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        .grid-item {
+          label {
+            display: block;
+            font-size: 0.75rem;
+            color: $text-sub;
+            margin-bottom: 4px;
+          }
+
+          .val {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text;
+
+            &.highlight-blue {
+              color: $primary;
+            }
+
+            &.highlight-green {
+              color: $success;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+
+      .card-input-section {
+        label {
+          display: block;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: $text-sub;
+          margin-bottom: 6px;
+
+          .required {
+            color: $danger;
+          }
+        }
+
+        .card-input {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1.5px solid $border;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          background: #fdfdfd;
+          transition: all 0.2s;
+
+          &:focus {
+            outline: none;
+            border-color: $primary;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+          }
+
+          &.is-invalid {
+            border-color: $danger;
+            background: rgba($danger, 0.02);
+          }
+        }
+      }
+    }
+  }
+
+  // Mobile Sticky Footer Summary
+  .mobile-sticky-footer {
+    position: sticky;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    margin: 10px -24px -20px -24px;
+    background: #fff;
+    border-top: 1px solid $border;
+    padding: 16px 20px;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 100;
+
+    .summary-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+
+      .sum-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        span {
+          font-size: 0.75rem;
+          color: $text-sub;
+        }
+
+        strong {
+          font-size: 1.05rem;
+          color: $text;
+        }
+      }
+    }
+
+    .btn-submit-mobile {
+      width: 100%;
+      background: $success;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba($success, 0.2);
+
+      &:active {
+        transform: scale(0.98);
       }
     }
   }

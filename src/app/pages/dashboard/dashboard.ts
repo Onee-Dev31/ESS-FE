@@ -12,6 +12,8 @@ import { DashboardService, MedicalStat, WelfareItem, LeaveItem, HolidayItem } fr
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
+interface AttendanceItem { label: string; value: string; }
+interface PerformanceItem { year: string; grade: string; }
 
 @Component({
   selector: 'app-dashboard',
@@ -41,8 +43,8 @@ export class DashboardComponent implements OnInit {
   profileList$!: Observable<ProfileItem[]>;
   itList$!: Observable<ProfileItem[]>;
 
-  attendanceList: any[] = [];
-  performanceList: any[] = [];
+  attendanceList: AttendanceItem[] = [];
+  performanceList: PerformanceItem[] = [];
   specialDates: Record<string, any> = {};
 
   calendarOptions: CalendarOptions = {

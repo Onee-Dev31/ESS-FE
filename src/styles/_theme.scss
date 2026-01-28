@@ -54,13 +54,13 @@ $status-success-text: #28a745;
 }
 
 @mixin tablet {
-    @media (max-width: 1300px) {
+    @media (max-width: 1024px) {
         @content;
     }
 }
 
 @mixin desktop {
-    @media (min-width: 1301px) {
+    @media (min-width: 1025px) {
         @content;
     }
 }

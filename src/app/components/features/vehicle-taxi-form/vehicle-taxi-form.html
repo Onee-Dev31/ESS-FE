@@ -11,12 +11,11 @@
       <div class="month-selector">
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
-          <select class="form-control" [(ngModel)]="selectedMonth" (change)="generateMockData()">
-            <option *ngFor="let m of thaiMonths" [value]="m">{{ m }}</option>
+          <select class="form-control" [(ngModel)]="selectedMonthIndex" (change)="generateMockData()">
+            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i">{{ m }}</option>
           </select>
-
           <select class="form-control" [(ngModel)]="selectedYear" (change)="generateMockData()">
-            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
           </select>
 
           <button class="btn-search" (click)="generateMockData()">ค้นหาข้อมูล</button>
@@ -33,20 +32,21 @@
       </div>
     </div>
 
-    <!-- รายละเอียดการเดินทาง (Excel Table) -->
+    <!-- ส่วนตาราง/การ์ดบันทึกข้อมูล (Dual View) -->
     <div class="table-container">
-      <table class="excel-table">
+      <!-- Desktop Table (Hidden on Mobile/Tablet) -->
+      <table class="excel-table desktop-only" style="width: 100%">
         <colgroup>
           <col style="width: 50px" />
-          <col style="width: 95px" />
-          <col style="width: 60px" />
+          <col style="width: 100px" />
+          <col style="width: 65px" />
           <col style="width: 110px" />
-          <col style="width: 55px" />
-          <col style="width: 55px" />
-          <col style="width: auto" />
-          <col style="width: auto" />
           <col style="width: 60px" />
-          <col style="width: 70px" />
+          <col style="width: 60px" />
+          <col />
+          <col style="width: 220px" />
+          <col style="width: 75px" />
+          <col style="width: 100px" />
           <col style="width: 50px" />
         </colgroup>
 
@@ -57,10 +57,8 @@
             <th rowspan="2">ประเภทวัน</th>
             <th rowspan="2">รหัสกะ</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
-
             <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
             <th rowspan="2">จุดหมาย <span style="color:red">*</span></th>
-
             <th rowspan="2">ระยะทาง <span style="color:red">*</span><br>(Km.)</th>
             <th rowspan="2">จำนวนเงิน <span style="color:red">*</span></th>
             <th rowspan="2">ไฟล์</th>
@@ -134,6 +132,64 @@
           </tr>
         </tfoot>
       </table>
+
+      <!-- Mobile Card View (Hidden on Desktop) -->
+      <div class="mobile-cards-view mobile-only">
+        <div *ngFor="let item of items" class="log-card" [class.highlight-card]="item.selected">
+          <div class="card-header">
+            <div class="date-info">
+              <span class="day-dot" [style.background]="item.dayType === 'H' ? '#d93025' : '#1a73e8'"></span>
+              <span class="date">{{ item.date }}</span>
+              <span class="day-type" [style.color]="item.dayType === 'H' ? '#d93025' : '#5f6368'">({{ item.dayType
+                }})</span>
+            </div>
+            <div class="header-right">
+              <button class="btn-card-upload" (click)="openUploadModal(item)" [class.has-file]="item.attachedFile">
+                <i class="fas fa-file-arrow-up"></i> {{ item.attachedFile ? 'แก้ไขไฟล์' : 'แนบไฟล์' }}
+              </button>
+              <input type="checkbox" [(ngModel)]="item.selected" class="card-checkbox" />
+            </div>
+          </div>
+
+          <div class="card-grid">
+            <div class="grid-item">
+              <label>รหัสกะ / เวลา</label>
+              <div class="val">{{ item.shiftCode }} ({{ item.checkIn || '-' }} - {{ item.checkOut || '-' }})</div>
+            </div>
+            <div class="grid-item">
+              <label>ระยะทาง (Km.)</label>
+              <div class="val">{{ item.distance || 0 }} กม.</div>
+            </div>
+            <div class="grid-item full-width">
+              <label>จุดหมาย <span *ngIf="item.selected" class="required">*</span></label>
+              <input type="text" class="card-input" [(ngModel)]="item.destination" placeholder="ระบุจุดหมาย..."
+                [class.is-invalid]="item.selected && !item.destination" />
+            </div>
+            <div class="grid-item full-width">
+              <label>รายละเอียดการเบิก <span *ngIf="item.selected" class="required">*</span></label>
+              <input type="text" class="card-input" [(ngModel)]="item.description" placeholder="ระบุรายละเอียด..."
+                [class.is-invalid]="item.selected && !item.description" />
+            </div>
+            <div class="grid-item">
+              <label>ยอดรวม (บาท)</label>
+              <div class="val highlight-green">{{ (item.amount || 0) | number }}.-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sticky Footer Summary -->
+    <div class="mobile-sticky-footer mobile-only">
+      <div class="summary-details">
+        <div class="sum-item">
+          <span>รวมยอดเบิกทั้งสิ้น :</span>
+          <strong>{{ getTotalAmount() | number }} บาท</strong>
+        </div>
+      </div>
+      <button class="btn-submit-mobile" (click)="save()">
+        <i class="fas fa-check-circle"></i> ยืนยันการเบิก
+      </button>
     </div>
   </main>
 

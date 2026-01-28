@@ -10,6 +10,7 @@
 
 html {
   font-family: $font-main;
+  background: #f1f5f9;
 }
 
 body {
@@ -40,7 +41,7 @@ textarea {
   border: 1px solid $border;
   border-radius: 0.5rem;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  appearance: none; 
+  appearance: none;
 
   &::placeholder {
     color: $text-muted;
@@ -106,42 +107,48 @@ textarea {
   align-items: center;
 }
 
+// Common Utilities
+.mt-4 {
+  margin-top: 24px !important;
+}
+
+.text-end {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-red {
+  color: $danger !important;
+}
+
+.text-green {
+  color: $success !important;
+}
+
+.bg-red {
+  background-color: $danger !important;
+}
+
+.bg-green {
+  background-color: $success !important;
+}
+
 
 .mobile-only {
-  @media (min-width: 769px) {
+  @include desktop {
     display: none !important;
   }
 }
 
 .desktop-only {
-  @media (max-width: 768px) {
+  @include tablet {
     display: none !important;
   }
 }
 
-.w-100-mobile {
-  @media (max-width: 768px) {
-    width: 100% !important;
-  }
-}
-
-.p-0-mobile {
-  @media (max-width: 768px) {
-    padding: 0 !important;
-  }
-}
-
-.m-0-mobile {
-  @media (max-width: 768px) {
-    margin: 0 !important;
-  }
-}
-
-.text-center-mobile {
-  @media (max-width: 768px) {
-    text-align: center !important;
-  }
-}
 
 
 @media (max-width: 768px) {

@@ -36,5 +36,10 @@ export class AuthService {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('currentUser');
     }
+
+    // ดึง Token จาก LocalStorage (สำหรับ Interceptor)
+    getToken(): string | null {
+        return localStorage.getItem('authToken'); // ปรับตามระบบจริงเมื่อต่อ API
+    }
 }
 

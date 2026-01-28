@@ -23,22 +23,7 @@ $balance: #15803d;
   background-clip: padding-box;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  background: #f1f5f9;
-  margin: 0;
-  padding: 0;
-  color: $dark;
-  font-size: 14px;
-  line-height: 1.6;
-  width: 100%;
-  overflow-x: hidden;
-  position: relative;
-}
+// Global styles moved to styles.scss
 
 .dashboard-wrapper {
   padding: 15px;
@@ -46,7 +31,7 @@ body {
   min-width: 0;
   box-sizing: border-box;
 
-  @media (min-width: 768px) {
+  @include desktop {
     padding: 25px;
   }
 }
@@ -57,54 +42,12 @@ body {
   font-weight: 700;
   color: $dark;
 
-  @media (min-width: 768px) {
+  @include desktop {
     font-size: 20px;
   }
 }
 
-.mt-4 {
-  margin-top: 24px;
-}
-
-.text-end {
-  text-align: right;
-}
-
-.text-red {
-  color: $danger;
-}
-
-.text-green {
-  color: $success;
-}
-
-.text-balance {
-  color: $balance;
-}
-
-.text-blue {
-  color: #3b82f6;
-}
-
-.text-indigo {
-  color: #6366f1;
-}
-
-.bg-red {
-  background: $danger;
-}
-
-.bg-green {
-  background: $success;
-}
-
-.bg-blue {
-  background: #3b82f6;
-}
-
-.bg-indigo {
-  background: #6366f1;
-}
+// Utility classes moved to styles.scss
 
 .section-title {
   font-size: 16px;
@@ -228,7 +171,7 @@ body {
   min-height: 200px;
   @include smooth-corners;
 
-  @media (min-width: 1200px) {
+  @include desktop {
     min-height: 250px;
   }
 
@@ -291,7 +234,7 @@ body {
     position: relative;
     z-index: 5;
 
-    @media (min-width: 768px) {
+    @include desktop {
       width: 180px;
       height: 180px;
     }
@@ -317,19 +260,19 @@ body {
   overflow: hidden;
   padding: 20px;
 
-  @media (min-width: 992px) {
+  @include desktop {
     padding: 24px 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
-  @media (min-width: 1200px) {
+  @include desktop {
     padding: 30px 40px;
     min-height: 250px;
   }
 
-  @media (min-width: 1400px) {
+  @include desktop {
     padding: 30px 60px;
   }
 
@@ -397,7 +340,7 @@ body {
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       margin: 5px 0 15px 0;
 
-      @media (min-width: 1200px) {
+      @include desktop {
         display: none;
       }
     }

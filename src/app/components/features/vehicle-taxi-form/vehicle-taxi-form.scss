@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -12,6 +13,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   flex: 1;
   min-height: 0;
   background: #fff;
@@ -31,7 +33,7 @@
     align-items: center;
     padding: 10px 15px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       padding: 17px 24px;
     }
 
@@ -41,7 +43,7 @@
     h2 {
       font-size: 1.0rem;
 
-      @media (min-width: 768px) {
+      @include desktop {
         font-size: 1.15rem;
       }
 
@@ -56,7 +58,7 @@
       width: 28px;
       height: 28px;
 
-      @media (min-width: 768px) {
+      @include desktop {
         width: 32px;
         height: 32px;
       }
@@ -78,12 +80,13 @@
     min-height: 0;
     padding: 15px 15px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       padding: 20px 24px;
     }
 
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     overflow: hidden;
   }
 
@@ -91,7 +94,7 @@
     margin-bottom: 12px;
     padding: 12px;
 
-    @media (min-width: 768px) {
+    @include desktop {
       margin-bottom: 16px;
       padding: 16px 20px;
     }
@@ -141,7 +144,11 @@
         flex: 1;
         min-width: 0;
 
-        @media (min-width: 768px) {
+        @media (max-width: 1024px) {
+          width: auto;
+        }
+
+        @media (min-width: 1025px) {
           width: auto;
           flex: initial;
         }
@@ -154,12 +161,12 @@
       .btn-search {
         flex-shrink: 0;
 
-        @media (max-width: 767px) {
+        @media (max-width: 1024px) {
           padding: 8px 16px;
           font-size: 0.85rem;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1025px) {
           width: auto;
         }
 
@@ -178,6 +185,8 @@
     }
   }
 
+  // Desktop/Mobile/Tablet visibility helpers
+
   .action-bar {
     display: flex;
     flex-direction: row;
@@ -195,12 +204,11 @@
     .btn-submit {
       flex-shrink: 0;
 
-      @media (max-width: 767px) {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+      @include tablet {
+        display: none;
       }
 
-      @media (min-width: 768px) {
+      @include desktop {
         width: auto;
       }
 
@@ -250,18 +258,30 @@
   }
 
   .table-container {
-    flex: 1;
+    width: 100% !important;
+    display: block !important;
+    flex: 1 1 100%;
+    align-self: stretch;
     min-height: 0;
     overflow: auto;
     border: 1px solid $border;
     border-radius: 8px;
 
+    @include tablet {
+      border: none;
+      background: transparent;
+      overflow-y: auto;
+      padding-bottom: 80px;
+    }
+
     .excel-table {
-      width: 100%;
+      width: 100% !important;
+      min-width: 100% !important;
+      display: table;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 900px;
-      table-layout: fixed;
+      table-layout: fixed !important;
+      margin: 0 !important;
 
       th,
       td {
@@ -308,10 +328,6 @@
         }
       }
 
-      .text-right {
-        text-align: right;
-      }
-
       .bg-gray {
         background-color: #fcfcfc;
       }
@@ -322,17 +338,6 @@
 
       .highlight-row td {
         background-color: #fffdef !important;
-      }
-
-      input[type=number]::-webkit-inner-spin-button,
-      input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-
-      input[type=number] {
-        -moz-appearance: textfield;
-        appearance: textfield;
       }
 
       .time-input {
@@ -403,187 +408,375 @@
           padding-right: 20px;
           font-weight: 600;
         }
+      }
+    }
+  }
 
-        .bg-white {
-          background: #fff;
+  // Mobile Card Styles
+  .mobile-cards-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px;
+
+    .log-card {
+      background: #fff;
+      border: 1px solid $border;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s;
+
+      &.highlight-card {
+        border-color: #eed686;
+        background: #fffdef;
+        box-shadow: 0 4px 15px rgba(238, 214, 134, 0.2);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba($border, 0.5);
+
+        .date-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .day-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+          }
+
+          .date {
+            font-weight: 700;
+            color: $text;
+            font-size: 0.95rem;
+          }
+
+          .day-type {
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .btn-card-upload {
+            background: #f0ebf8;
+            color: #673ab7;
+            border: 1px solid #d1c4e9;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            &.has-file {
+              background: #e6f4ea;
+              color: $success;
+              border-color: #c4ebd0;
+            }
+          }
+
+          .card-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: $primary;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+
+        .grid-item {
+          &.full-width {
+            grid-column: span 2;
+          }
+
+          label {
+            display: block;
+            font-size: 0.75rem;
+            color: $text-sub;
+            margin-bottom: 4px;
+          }
+
+          .val {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text;
+
+            &.highlight-green {
+              color: $success;
+              font-weight: 700;
+            }
+          }
+
+          .card-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid $border;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #fdfdfd;
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 3px rgba($primary, 0.1);
+            }
+
+            &.is-invalid {
+              border-color: $danger;
+            }
+          }
         }
       }
     }
   }
 
-  .upload-modal-overlay {
-    position: absolute;
-    top: 0;
+  // Mobile Sticky Footer Summary
+  .mobile-sticky-footer {
+    position: sticky;
+    bottom: -20px;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 100;
+    right: 0;
+    margin: 10px -24px -20px -24px;
+    background: #fff;
+    border-top: 1px solid $border;
+    padding: 16px 20px;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
     display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(2px);
+    flex-direction: column;
+    gap: 12px;
+    z-index: 100;
 
-    .upload-modal-content {
-      background: #fff;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      animation: popUp 0.2s ease-out;
-      font-family: $font-main;
+    .summary-details {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
 
-      .modal-header {
-        padding: 12px 15px;
+      .sum-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
 
-        @media (min-width: 768px) {
-          padding: 15px 20px;
+        span {
+          font-size: 0.75rem;
+          color: $text-sub;
         }
 
-        border-bottom: 1px solid $border;
+        strong {
+          font-size: 1.05rem;
+          color: $text;
+        }
+      }
+    }
+
+    .btn-submit-mobile {
+      width: 100%;
+      background: $success;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba($success, 0.2);
+    }
+  }
+}
+
+.upload-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+
+  .upload-modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    animation: popUp 0.2s ease-out;
+    font-family: $font-main;
+
+    .modal-header {
+      padding: 12px 15px;
+
+      @media (min-width: 768px) {
+        padding: 15px 20px;
+      }
+
+      border-bottom: 1px solid $border;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: $text;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: $text-sub;
+
+        &:hover {
+          color: $danger;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 20px;
+
+      .date-label {
+        margin: 0 0 15px 0;
+        color: $text-sub;
+        font-size: 0.9rem;
+      }
+
+      .upload-box {
+        border: 2px dashed #bdc1c6;
+        border-radius: 6px;
+        padding: 20px;
+        text-align: center;
+        background: #f8f9fa;
+        min-height: 100px;
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
 
-        h3 {
-          margin: 0;
-          font-size: 1rem;
-          color: $text;
+        &:hover {
+          border-color: $primary;
+          background: #e8f0fe;
         }
 
-        .close-btn {
-          background: none;
-          border: none;
-          font-size: 1.2rem;
+        .upload-trigger {
           cursor: pointer;
-          color: $text-sub;
-
-          &:hover {
-            color: $danger;
-          }
-        }
-      }
-
-      .modal-body {
-        padding: 20px;
-
-        .date-label {
-          margin: 0 0 15px 0;
-          color: $text-sub;
-          font-size: 0.9rem;
-        }
-
-        .upload-box {
-          border: 2px dashed #bdc1c6;
-          border-radius: 6px;
-          padding: 20px;
-          text-align: center;
-          background: #f8f9fa;
-          min-height: 100px;
           display: flex;
           flex-direction: column;
-          justify-content: center;
           align-items: center;
+          color: $primary;
+          gap: 8px;
 
-          &:hover {
-            border-color: $primary;
-            background: #e8f0fe;
+          i {
+            font-size: 1.5rem;
           }
 
-          .upload-trigger {
+          span {
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
+        }
+
+        .file-preview {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: #fff;
+          padding: 8px 12px;
+          border-radius: 4px;
+          border: 1px solid $border;
+          width: 100%;
+          box-sizing: border-box;
+
+          .file-icon {
+            color: $danger;
+            font-size: 1.2rem;
+          }
+
+          .filename {
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+          }
+
+          .btn-remove-file {
+            background: none;
+            border: none;
+            color: $text-sub;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: $primary;
-            gap: 8px;
 
-            i {
-              font-size: 1.5rem;
-            }
-
-            span {
-              font-size: 0.9rem;
-              font-weight: 500;
-            }
-          }
-
-          .file-preview {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid $border;
-            width: 100%;
-            box-sizing: border-box;
-
-            .file-icon {
+            &:hover {
               color: $danger;
-              font-size: 1.2rem;
-            }
-
-            .filename {
-              flex: 1;
-              text-align: left;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              font-size: 0.9rem;
-            }
-
-            .btn-remove-file {
-              background: none;
-              border: none;
-              color: $text-sub;
-              cursor: pointer;
-
-              &:hover {
-                color: $danger;
-              }
             }
           }
         }
       }
+    }
 
-      .modal-footer {
-        padding: 15px 20px;
-        border-top: 1px solid $border;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid $border;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
 
-        button {
-          padding: 8px 16px;
-          border-radius: 4px;
-          font-weight: 500;
-          cursor: pointer;
-          border: none;
-          font-family: $font-main;
+      button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        font-family: $font-main;
+      }
+
+      .btn-cancel {
+        background: #f1f3f4;
+        color: $text;
+
+        &:hover {
+          background: #e8eaed;
+        }
+      }
+
+      .btn-confirm {
+        background: $primary;
+        color: #fff;
+
+        &:hover {
+          background: color.adjust($primary, $lightness: -5%);
         }
 
-        .btn-cancel {
-          background: #f1f3f4;
-          color: $text;
-
-          &:hover {
-            background: #e8eaed;
-          }
-        }
-
-        .btn-confirm {
-          background: $primary;
-          color: #fff;
-
-          &:hover {
-            background: color.adjust($primary, $lightness: -5%);
-          }
-
-          &:disabled {
-            background: #bdc1c6;
-            cursor: not-allowed;
-          }
+        &:disabled {
+          background: #bdc1c6;
+          cursor: not-allowed;
         }
       }
     }

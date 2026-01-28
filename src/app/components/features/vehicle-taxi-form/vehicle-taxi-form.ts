@@ -31,7 +31,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   ];
   years = [2568, 2569, 2570];
 
-  selectedMonth: string = 'ตุลาคม';
+  selectedMonthIndex: number = 9;
   selectedYear: number = 2568;
 
   isShowUploadModal: boolean = false;
@@ -59,7 +59,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
-    this.taxiService.getMockTaxiLogs(9, this.selectedYear).subscribe(mockLogs => {
+    this.taxiService.getMockTaxiLogs(this.selectedMonthIndex, this.selectedYear).subscribe(mockLogs => {
       this.items = mockLogs.map((row: any) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
 
@@ -147,7 +147,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     }
   }
 
-  ThaiLooped = matchTime;
 
   cancel() {
     this.onClose.emit();
@@ -175,6 +174,3 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   }
 }
 
-function matchTime(t: any): string {
-  return t ? String(t) : '';
-}

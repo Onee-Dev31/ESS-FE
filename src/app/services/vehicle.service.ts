@@ -68,7 +68,9 @@ export class VehicleService {
     }
 
     // สร้างรายการวันที่ในเดือนและปีที่ระบุ
-    public generateDays(month: number, year: number): Date[] {
+    public generateDays(monthInput: number | string, yearInput: number | string): Date[] {
+        const month = Number(monthInput);
+        const year = Number(yearInput);
         const adYear = year - 543;
         const date = new Date(adYear, month, 1);
         const days: Date[] = [];

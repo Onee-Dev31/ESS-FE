@@ -39,7 +39,7 @@
                     <label>สถานพยาบาล</label>
                     <div class="search-input-wrapper">
                         <input type="text" class="custom-form-control" placeholder="ระบุชื่อโรงพยาบาล/คลินิก"
-                            [(ngModel)]="hospital">
+                            [ngModel]="hospital()" (ngModelChange)="hospital.set($event)">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                 </div>
@@ -47,8 +47,8 @@
                 <div class="input-field-group">
                     <label>ประเภทโรค</label>
                     <div class="search-input-wrapper">
-                        <input type="text" class="custom-form-control" placeholder="ระบุประเภทโรค"
-                            [(ngModel)]="disease">
+                        <input type="text" class="custom-form-control" placeholder="ระบุประเภทโรค" [ngModel]="disease()"
+                            (ngModelChange)="disease.set($event)">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                 </div>
@@ -57,10 +57,12 @@
                     <label>วันที่รักษา จาก ถึง</label>
                     <div class="range-inputs">
                         <div class="date-input-box">
-                            <input type="date" class="custom-form-control" [(ngModel)]="startDate">
+                            <input type="date" class="custom-form-control" [ngModel]="startDate()"
+                                (ngModelChange)="startDate.set($event)">
                         </div>
                         <div class="date-input-box">
-                            <input type="date" class="custom-form-control" [(ngModel)]="endDate">
+                            <input type="date" class="custom-form-control" [ngModel]="endDate()"
+                                (ngModelChange)="endDate.set($event)">
                         </div>
                     </div>
                 </div>
@@ -69,7 +71,7 @@
                     <label>จำนวนเงินที่ขอเบิก</label>
                     <div class="amount-input-wrapper">
                         <input type="number" class="custom-form-control text-right" placeholder="0.00"
-                            [(ngModel)]="amount" min="0">
+                            [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0">
                         <span class="currency-tag">บาท</span>
                     </div>
                 </div>

@@ -30,13 +30,13 @@ export class MedicalexpensesForm implements OnInit {
 
   selectedClaimType = signal<string>('');
 
-  hospital: string = '';
-  disease: string = '';
-  startDate: string = '';
-  endDate: string = '';
-  amount: number = 0;
+  hospital = signal<string>('');
+  disease = signal<string>('');
+  startDate = signal<string>('');
+  endDate = signal<string>('');
+  amount = signal<number>(0);
 
-  attachments = signal<any[]>([
+  attachments = signal<{ id: number; name: string; description: string }[]>([
     { id: 1, name: 'approval-list-page.005-87d92c90a8cb2e588a7032052d9d94ac.png', description: 'ใบเสร็จยา' },
     { id: 2, name: 'original-aa87c620661b3eb94e5d85441b761387.png', description: 'ใบรับรองแพทย์' }
   ]);
@@ -51,8 +51,8 @@ export class MedicalexpensesForm implements OnInit {
 
           if (req.items && req.items.length > 0) {
             const item = req.items[0];
-            this.hospital = item.hospital;
-            this.disease = item.diseaseType;
+            this.hospital.set(item.hospital);
+            this.disease.set(item.diseaseType);
 
             const typeMatch = this.claimTypes.find(t => t.label === item.limitType);
             if (typeMatch) {
@@ -62,14 +62,14 @@ export class MedicalexpensesForm implements OnInit {
             const fromParts = item.treatmentDateFrom.split('/');
             if (fromParts.length === 3) {
               const yearAD = parseInt(fromParts[2]) - 543;
-              this.startDate = `${yearAD}-${fromParts[1]}-${fromParts[0]}`;
+              this.startDate.set(`${yearAD}-${fromParts[1]}-${fromParts[0]}`);
 
               const toParts = item.treatmentDateTo.split('/');
               const toYearAD = parseInt(toParts[2]) - 543;
-              this.endDate = `${toYearAD}-${toParts[1]}-${toParts[0]}`;
+              this.endDate.set(`${toYearAD}-${toParts[1]}-${toParts[0]}`);
             }
 
-            this.amount = item.requestedAmount;
+            this.amount.set(item.requestedAmount);
           }
         } else {
           this.isEditMode.set(false);
@@ -84,8 +84,8 @@ export class MedicalexpensesForm implements OnInit {
   }
 
   private resetDates() {
-    this.startDate = new Date().toISOString().split('T')[0];
-    this.endDate = new Date().toISOString().split('T')[0];
+    this.startDate.set(new Date().toISOString().split('T')[0]);
+    this.endDate.set(new Date().toISOString().split('T')[0]);
   }
 
   // แปลงวันที่เป็นรูปแบบ dd-MonthName-yyyy
@@ -141,7 +141,7 @@ export class MedicalexpensesForm implements OnInit {
       return;
     }
 
-    if (!this.hospital || !this.disease || this.amount <= 0) {
+    if (!this.hospital() || !this.disease() || this.amount() <= 0) {
       this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
@@ -158,16 +158,16 @@ export class MedicalexpensesForm implements OnInit {
       createDate: this.isEditMode() ? new Date().toISOString() : new Date().toISOString(),
       status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
       employeeId: 'EMP001',
-      totalRequestedAmount: this.amount,
+      totalRequestedAmount: this.amount(),
       totalApprovedAmount: 0,
       items: [{
         requestDate: formatDateToBE(new Date().toISOString().split('T')[0]),
         limitType: typeLabel,
-        diseaseType: this.disease,
-        hospital: this.hospital,
-        treatmentDateFrom: formatDateToBE(this.startDate),
-        treatmentDateTo: formatDateToBE(this.endDate),
-        requestedAmount: this.amount,
+        diseaseType: this.disease(),
+        hospital: this.hospital(),
+        treatmentDateFrom: formatDateToBE(this.startDate()),
+        treatmentDateTo: formatDateToBE(this.endDate()),
+        requestedAmount: this.amount(),
         approvedAmount: 0
       }]
     };

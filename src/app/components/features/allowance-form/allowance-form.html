@@ -11,10 +11,10 @@
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
           <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
-            <option *ngFor="let m of thaiMonths; let i = index" [value]="i">{{ m }}</option>
+            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i">{{ m }}</option>
           </select>
           <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
-            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
           </select>
           <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
         </div>
@@ -96,18 +96,20 @@
       </div>
     </div>
 
-    <!-- ตารางบันทึกข้อมูลแบบ Excel-style -->
+    <!-- ส่วนตาราง/การ์ดบันทึกข้อมูล -->
     <div class="table-container">
-      <table class="excel-table">
+      <!-- Desktop Table (Hidden on Mobile) -->
+      <table class="excel-table desktop-only" style="width: 100%">
         <colgroup>
           <col style="width: 50px" />
-          <col style="width: 110px" />
-          <col style="width: 90px" />
-          <col style="width: 110px" />
+          <col style="width: 100px" />
+          <col style="width: 80px" />
+          <col style="width: 100px" />
           <col style="width: 60px" />
           <col style="width: 60px" />
-          <col style="width: 110px" />
-          <col style="width: auto" />
+          <col style="width: 60px" />
+          <col style="width: 100px" />
+          <col />
         </colgroup>
         <thead>
           <tr>
@@ -156,7 +158,7 @@
         </tbody>
         <tfoot>
           <tr class="footer-row">
-            <td colspan="5" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
+            <td colspan="6" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
             <td class="total-val text-center" style="background: #f8f9fa !important; color: #5f6368">
               {{ totalHoursStr }}
             </td>
@@ -165,6 +167,63 @@
           </tr>
         </tfoot>
       </table>
+
+      <!-- Mobile Card View (Hidden on Desktop) -->
+      <div class="mobile-cards-view mobile-only">
+        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
+          <div class="card-header">
+            <div class="date-info">
+              <span class="day-dot" [style.background]="log.dayType === 'H' ? '#d93025' : '#1a73e8'"></span>
+              <span class="date">{{ log.date }}</span>
+              <span class="day-type" [style.color]="log.dayType === 'H' ? '#d93025' : '#5f6368'">({{ log.dayType
+                }})</span>
+            </div>
+            <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox" />
+          </div>
+
+          <div class="card-grid">
+            <div class="grid-item">
+              <label>รหัสกะ</label>
+              <div class="val">{{ log.shiftCode || '-' }}</div>
+            </div>
+            <div class="grid-item">
+              <label>เวลา เข้า - ออก</label>
+              <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
+            </div>
+            <div class="grid-item">
+              <label>จำนวนชั่วโมง</label>
+              <div class="val highlight-blue">{{ log.displayHours }} ชม.</div>
+            </div>
+            <div class="grid-item">
+              <label>ยอดรวม (บาท)</label>
+              <div class="val highlight-green">{{ log.amount | number }}.-</div>
+            </div>
+          </div>
+
+          <div class="card-input-section">
+            <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
+            <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+              [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sticky Footer Summary -->
+    <div class="mobile-sticky-footer mobile-only">
+      <div class="summary-details">
+        <div class="sum-item">
+          <span>รวมยอดเบิก :</span>
+          <strong>{{ totalAmount | number }} บาท</strong>
+        </div>
+        <div class="sum-item">
+          <span>รวมเวลา :</span>
+          <strong>{{ totalHoursStr }} ชม.</strong>
+        </div>
+      </div>
+      <button class="btn-submit-mobile" (click)="onSubmit()">
+        <i class="fas fa-check-circle"></i> ยืนยันการเบิก
+      </button>
     </div>
   </main>
 </div>

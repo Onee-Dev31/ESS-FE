@@ -9,7 +9,7 @@ $bg-slate: #f4f7f9;
 .approvals-wrapper {
   padding: 1rem;
 
-  @media (min-width: 768px) {
+  @include desktop {
     padding: 2.5rem;
   }
 
@@ -22,7 +22,7 @@ $bg-slate: #f4f7f9;
     border-radius: 12px;
     padding: 1.5rem;
 
-    @media (min-width: 768px) {
+    @include desktop {
       padding: 2rem;
     }
 
@@ -38,7 +38,7 @@ $bg-slate: #f4f7f9;
     padding-bottom: 1rem;
     border-bottom: 1px solid #f1f5f9;
 
-    @media (min-width: 992px) {
+    @include desktop {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
@@ -97,7 +97,7 @@ $bg-slate: #f4f7f9;
         font-weight: 500;
         flex: 1;
 
-        @media (min-width: 768px) {
+        @include desktop {
           flex: none;
         }
       }
@@ -148,7 +148,7 @@ $bg-slate: #f4f7f9;
         border: none;
         padding: 0.8rem 1rem;
 
-        @media (min-width: 768px) {
+        @include desktop {
           padding: 0.8rem 1.5rem;
         }
 
