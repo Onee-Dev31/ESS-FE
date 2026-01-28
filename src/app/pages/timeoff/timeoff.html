@@ -1,0 +1,249 @@
+<div class="timeoff-page">
+    <!-- Top Header -->
+    <div class="top-header-strip">
+        <button class="btn-back" (click)="goBack()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <h2>บันทึกการลา (Time Off)</h2>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+        <div class="card-header-title">รายการลา</div>
+
+        <!-- Toolbar -->
+        <div class="toolbar-container">
+            <div class="left-action">
+                <button class="btn-create" (click)="openForm()">
+                    <i class="fas fa-plus"></i> สร้างรายการลา
+                </button>
+            </div>
+
+            <div class="right-filters">
+                <div class="date-input-group">
+                    <span class="filter-label">วันที่สร้างรายการ</span>
+                    <input type="date" class="form-control" [ngModel]="filterStartDate()"
+                        (ngModelChange)="filterStartDate.set($event); applyFilters()" />
+                </div>
+                <div class="date-input-group">
+                    <span class="filter-label">ถึง</span>
+                    <input type="date" class="form-control" [ngModel]="filterEndDate()"
+                        (ngModelChange)="filterEndDate.set($event); applyFilters()" />
+                </div>
+
+                <div class="select-input-group">
+                    <span class="filter-label">สถานะ</span>
+                    <select class="form-control select-status" [ngModel]="filterStatus()"
+                        (ngModelChange)="filterStatus.set($event); applyFilters()">
+                        <option value="">ทั้งหมด</option>
+                        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                    </select>
+                </div>
+
+                <button class="btn-clear" (click)="clearFilters()">ล้างค่า</button>
+                <div class="search-input-group">
+                    <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
+                        (ngModelChange)="searchText.set($event); applyFilters()">
+                    <button class="btn-search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card View for Tablet/Mobile -->
+        <div class="card-list-view">
+            <div class="mobile-card" *ngFor="let request of paginatedRequests()">
+                <div class="card-header">
+                    <div class="request-id">
+                        <span class="label">ประเภทการลา:</span>
+                        <span class="value">{{ request.leaveType }}</span>
+                    </div>
+                    <div class="status-badge" [ngClass]="getStatusClass(request.status)">
+                        {{ request.status }}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="label">ระยะเวลา:</span>
+                        <span class="value">{{ request.startDate }} - {{ request.endDate }}</span>
+                    </div>
+                    <div class="info-item" *ngIf="request.days">
+                        <span class="label">จำนวนวัน:</span>
+                        <span class="value">{{ request.days }} วัน</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">ประเภทวันลา:</span>
+                        <span class="value">{{ getPeriodLabel(request.leavePeriod) }}</span>
+                    </div>
+                    <div class="info-item reason-item">
+                        <span class="label">เหตุผล:</span>
+                        <span class="value">{{ request.reason }}</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="action-btn folder" *ngIf="request.attachments.length > 0"
+                            (click)="openPreview(request.attachments)" title="ดูเอกสาร">
+                            <i class="far fa-folder-open"></i>
+                        </button>
+
+                        <ng-container *ngIf="request.status === 'คำขอใหม่'">
+                            <button class="action-btn edit" title="แก้ไข" (click)="openForm(request.status)">
+                                <i class="far fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete" title="ลบ">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </ng-container>
+
+                        <button class="action-btn view" title="ดูรายละเอียด" *ngIf="request.status !== 'คำขอใหม่'"
+                            (click)="openForm(request.status)">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-data" *ngIf="paginatedRequests().length === 0">
+                <i class="fas fa-inbox"></i>
+                <p>ไม่พบข้อมูลรายการลา</p>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="text-center">วัน-เวลา ที่ขอลา</th>
+                        <th rowspan="2" class="text-center" style="width: 80px;">จำนวนวัน</th>
+                        <th rowspan="2" style="width: 15%">ประเภทการลา</th>
+                        <th rowspan="2" style="width: 15%">ประเภทวันลา</th>
+                        <th rowspan="2" style="width: auto;">เหตุผล</th>
+                        <th rowspan="2" class="text-center" style="width: 150px;">สถานะ</th>
+                        <th rowspan="2" class="text-center" style="width: 100px;">เอกสารแนบ</th>
+                        <th rowspan="2" class="text-center" style="width: 100px;">Action</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center" style="width: 150px; border-top: 1px solid rgba(255,255,255,0.2)">จาก
+                        </th>
+                        <th class="text-center" style="width: 150px; border-top: 1px solid rgba(255,255,255,0.2)">ถึง
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let request of paginatedRequests()">
+                        <td class="text-center">
+                            <div class="font-bold">{{ request.startDate }}</div>
+                            <div class="small text-muted" *ngIf="request.shiftStartTime">{{ request.shiftStartTime }}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div class="font-bold">{{ request.endDate }}</div>
+                            <div class="small text-muted" *ngIf="request.shiftEndTime">{{ request.shiftEndTime }}</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="days-badge">{{ request.days }}</span>
+                        </td>
+                        <td>
+                            <div class="leave-type-cell">
+                                <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
+                                {{ request.leaveType }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
+                        </td>
+                        <td class="reason-cell">{{ request.reason }}</td>
+                        <td class="text-center">
+                            <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a class="file-icon-link" *ngIf="request.attachments.length > 0"
+                                (click)="openPreview(request.attachments)" title="ดูเอกสาร">
+                                <i class="far fa-folder-open"></i>
+                                <span class="attach-count" *ngIf="request.attachments.length > 1">{{
+                                    request.attachments.length }}</span>
+                            </a>
+                            <span class="text-muted" *ngIf="request.attachments.length === 0">-</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="action-btns">
+                                <!-- Show Edit/Delete only for "คำขอใหม่" -->
+                                <ng-container *ngIf="request.status === 'คำขอใหม่'">
+                                    <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
+                                        <i class="far fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon delete" title="ลบ">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                </ng-container>
+
+                                <!-- Show View details for other statuses -->
+                                <button class="btn-icon view" title="ดูรายละเอียด" *ngIf="request.status !== 'คำขอใหม่'"
+                                    (click)="openForm(request.status)">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="paginatedRequests().length === 0">
+                        <td colspan="9" class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            <p>ไม่พบข้อมูลรายการลา</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                แสดงรายการ {{ currentPage() * pageSize() + 1 }}
+                ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
+                จาก {{ totalRequests() }} รายการ
+            </div>
+            <div class="pagination-controls">
+                <div class="page-size-selector">
+                    <span>จำนวนคงเหลือต่อหน้า:</span>
+                    <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+                        <option [value]="10">10 รายการ</option>
+                        <option [value]="20">20 รายการ</option>
+                        <option [value]="50">50 รายการ</option>
+                    </select>
+                </div>
+                <div class="page-buttons">
+                    <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <span class="page-info">
+                        <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
+                    </span>
+                    <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
+
+<!-- Time Off Form Modal Overlay -->
+<div class="modal-overlay" *ngIf="isFormOpen()">
+    <div class="modal-container">
+        <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>
+    </div>
+</div>

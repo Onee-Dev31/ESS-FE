@@ -45,6 +45,10 @@ export const routes: Routes = [
                 path: 'medicalexpenses',
                 loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent)
             },
+            {
+                path: 'timeoff',
+                loadComponent: () => import('./pages/timeoff/timeoff').then(m => m.TimeoffComponent)
+            },
 
             {
                 path: '',

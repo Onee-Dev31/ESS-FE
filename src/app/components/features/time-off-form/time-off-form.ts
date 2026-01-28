@@ -17,6 +17,7 @@ export class TimeOffForm implements OnInit {
   private alertService = inject(AlertService);
 
   @Input() initialLeaveTypeId: string = '';
+  @Input() requestStatus: string = 'คำขอใหม่';
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');

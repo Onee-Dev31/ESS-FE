@@ -5,7 +5,7 @@
             <div class="info-badges">
                 <span class="date-badge ml-2">วันที่ทำรายการ : {{ currentDate() }}</span>
             </div>
-            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+            <button class="btn-close-x" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
     </header>
 
@@ -78,21 +78,21 @@
                         </div>
                     </div>
                     <div class="input-field-group">
-                    <label>เวลากะ</label>
-                    <div class="time-range-inputs">
-                        <div class="time-input-box">
-                            <label class="time-label">เริ่ม</label>
-                            <input type="time" class="custom-form-control" [ngModel]="shiftStartTime()"
-                                (ngModelChange)="shiftStartTime.set($event)">
-                        </div>
-                        <div class="time-separator">-</div>
-                        <div class="time-input-box">
-                            <label class="time-label">สิ้นสุด</label>
-                            <input type="time" class="custom-form-control" [ngModel]="shiftEndTime()"
-                                (ngModelChange)="shiftEndTime.set($event)">
+                        <label>เวลากะ</label>
+                        <div class="time-range-inputs">
+                            <div class="time-input-box">
+                                <label class="time-label">เริ่ม</label>
+                                <input type="time" class="custom-form-control" [ngModel]="shiftStartTime()"
+                                    (ngModelChange)="shiftStartTime.set($event)">
+                            </div>
+                            <div class="time-separator">-</div>
+                            <div class="time-input-box">
+                                <label class="time-label">สิ้นสุด</label>
+                                <input type="time" class="custom-form-control" [ngModel]="shiftEndTime()"
+                                    (ngModelChange)="shiftEndTime.set($event)">
+                            </div>
                         </div>
                     </div>
-                </div>
                     <div class="calculated-days-display">
                         <label>จำนวนวันลา</label>
                         <div class="days-value">
@@ -151,7 +151,7 @@
         </div>
     </main>
 
-    <div class="form-actions-footer">
+    <div class="form-actions-footer" *ngIf="requestStatus === 'คำขอใหม่'">
         <button class="btn-save-custom" (click)="save()">
             <i class="fas fa-check-circle"></i> ส่งใบลา
         </button>
