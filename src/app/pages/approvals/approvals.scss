@@ -144,6 +144,18 @@ $bg-slate: #f4f7f9;
       -ms-overflow-style: none;
       scrollbar-width: none;
 
+      @media (max-width: 768px) {
+        border-bottom: none;
+        gap: 10px;
+        padding: 5px;
+        flex-wrap: wrap;
+        /* Wrap items on mobile */
+        overflow-x: visible;
+        /* Disable horizontal scroll */
+        white-space: normal;
+        /* Allow text wrapping if needed */
+      }
+
       .tab-item {
         background: none;
         border: none;
@@ -184,6 +196,40 @@ $bg-slate: #f4f7f9;
         &.active .badge {
           background: $primary-blue;
           color: white;
+        }
+
+        /* Mobile Pill Style */
+        @media (max-width: 768px) {
+          background-color: #f1f5f9;
+          color: #64748b;
+          border-radius: 30px;
+          padding: 8px 16px;
+          font-weight: 500;
+          font-size: 14px;
+          border: 1px solid transparent;
+
+          &.active {
+            background-color: $primary-blue;
+            color: white;
+            box-shadow: 0 4px 10px rgba($primary-blue, 0.25);
+            font-weight: 600;
+
+            &::after {
+              display: none;
+              /* Hide desktop underline */
+            }
+
+            .badge {
+              background: rgba(255, 255, 255, 0.25);
+              color: white;
+            }
+          }
+
+          .badge {
+            background: #e2e8f0;
+            color: #64748b;
+            margin-left: 6px;
+          }
         }
       }
     }
