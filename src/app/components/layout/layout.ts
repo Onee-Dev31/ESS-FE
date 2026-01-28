@@ -35,6 +35,17 @@ export class LayoutComponent implements OnInit {
   private checkWindowSize(): void {
     const isSmallScreen = window.innerWidth <= 1024;
 
+    // หากเป็นครั้งแรกที่รัน (lastIsSmallScreen === null) 
+    // และไม่ใช่จอมือถือ (isSmallScreen === false)
+    // เราจะไม่สั่งขยาย (setCollapsed(false)) เพื่อให้คงสถานะยุบ (Default Collapsed) ตาม Service
+    if (this.lastIsSmallScreen === null) {
+      if (isSmallScreen) {
+        this.sidebarService.setCollapsed(true);
+      }
+      this.lastIsSmallScreen = isSmallScreen;
+      return;
+    }
+
     if (this.lastIsSmallScreen !== isSmallScreen) {
       this.sidebarService.setCollapsed(isSmallScreen);
       this.lastIsSmallScreen = isSmallScreen;
