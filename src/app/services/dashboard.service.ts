@@ -60,30 +60,30 @@ export class DashboardService {
                 titleColor: '#15803d', amountColor: '#15803d', route: '/allowance'
             },
             {
-                title: 'ค่ารถ', amount: '584', iconName: 'fas fa-car', cardClass: 'card-blue',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-car fa-2x text-blue-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>ค่ารถหลัง 22.00 น ต้องทำงานเกิน 22:00 เบิกได้ได้ไม่เกิน 120 บาท/ครั้ง</li></ul>`,
+                title: 'ค่ารถ', amount: '584', iconName: 'fas fa-car ', cardClass: 'card-blue',
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-car fa-2x text-blue-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>ค่ารถหลัง 22.00 น ต้องทำงานเกิน 22:00 เบิกได้ได้ไม่เกิน 120 บาท/ครั้ง</span></li></ul>`,
                 titleColor: '#1e40af', amountColor: '#1e40af', route: '/vehicle'
             },
             {
                 title: 'ค่าแท็กซี่', amount: '876', iconName: 'fas fa-taxi', cardClass: 'card-yellow',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-taxi fa-2x text-yellow-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>1,000 บาท/ปี</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</li></ul>`,
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-taxi fa-2x text-yellow-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>1,000 บาท/ปี</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></li></ul>`,
                 titleColor: '#9a3412', amountColor: '#9a3412', route: '/vehicle-taxi'
             },
             {
                 title: 'ค่าสมรส', amount: '3,500', iconName: 'fas fa-heart',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-heart fa-2x text-pink-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>อายุงาน 1 ปี</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</li></ul>`
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-heart fa-2x text-pink-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>อายุงาน 1 ปี</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</span></li></ul>`
             },
             {
                 title: 'ค่าอุปสมบท', amount: '10,500', iconName: 'fas fa-hands-praying',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-hands-praying fa-2x text-orange-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>อายุงาน 1 ปี</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</li></ul>`
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-hands-praying fa-2x text-orange-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>อายุงาน 1 ปี</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</span></li></ul>`
             },
             {
                 title: 'ค่าฌาปนกิจ', amount: '584', iconName: 'fas fa-church',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-church fa-2x text-gray-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>เบิกได้ 80,000 บาท/ตลอดอายุการทำงาน</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000 บาท/คน</li></ul>`
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-church fa-2x text-gray-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 80,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000 บาท/คน</span></li></ul>`
             },
             {
                 title: 'ค่าพวงหรีด', amount: '876', iconName: 'fas fa-spa',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-spa fa-2x text-purple-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li><i class="fas fa-check-circle text-green-500 me-2"></i>เบิกได้ 12,000 บาท/ตลอดอายุการทำงาน</li><li><i class="fas fa-check-circle text-green-500 me-2"></i>พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน</li></ul>`
+                tooltip: `<div class="text-center mb-3"><i class="fas fa-spa fa-2x text-purple-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 12,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน</span></li></ul>`
             }
         ];
         return of(stats).pipe(delay(300));

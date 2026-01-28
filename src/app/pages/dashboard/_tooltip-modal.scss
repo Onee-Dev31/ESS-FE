@@ -156,6 +156,24 @@
                 .text-green-500 {
                     color: #22c55e;
                 }
+
+                // New class for hanging indent layout
+                .tooltip-condition-item {
+                    display: flex;
+                    align-items: flex-start;
+                    margin-bottom: 6px;
+                    text-align: left;
+
+                    i {
+                        flex-shrink: 0;
+                        margin-top: 4px; // Align icon with the first line of text
+                        margin-right: 8px;
+                    }
+
+                    span {
+                        flex: 1;
+                    }
+                }
             }
         }
     }
