@@ -44,6 +44,16 @@ export class DashboardService {
         );
     }
 
+    getMedicalPendingCount(): Observable<number> {
+        return this.medicalService.getMedicalRequests().pipe(
+            catchError(() => of([])),
+            map((requests: any[]) => {
+                const pendingStatuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
+                return requests.filter(item => pendingStatuses.includes(item.status)).length;
+            })
+        );
+    }
+
     getMedicalStats(): Observable<MedicalStat[]> {
         const stats: MedicalStat[] = [
             { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },

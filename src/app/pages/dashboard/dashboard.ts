@@ -59,6 +59,7 @@ export class DashboardComponent implements OnInit {
   leaveStats = toSignal(this.dashboardService.getLeaveStats(), { initialValue: [] });
   holidays = toSignal(this.dashboardService.getHolidays(), { initialValue: [] });
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
+  medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
   // Computed lists derived from userProfile signal
   profileList = computed<ProfileItem[]>(() => {

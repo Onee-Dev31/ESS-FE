@@ -164,7 +164,7 @@
               (click)="navigateTo('/approvals-medicalexpenses')">
               <div class="icon-shake">
                 <i class="fas fa-bell"></i>
-                <ng-container *ngIf="pendingCount() as count">
+                <ng-container *ngIf="medicalPendingCount() as count">
                   <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
                 </ng-container>
               </div>
