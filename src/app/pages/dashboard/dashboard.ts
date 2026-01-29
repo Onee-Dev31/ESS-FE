@@ -6,7 +6,6 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
@@ -88,7 +87,7 @@ export class DashboardComponent implements OnInit {
 
   attendanceList: AttendanceItem[] = [];
   performanceList: PerformanceItem[] = [];
-  specialDates: Record<string, any> = {};
+  specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
 
   // --- Day.js Dynamic Props ---
   workStartDate = '2021-07-10';
@@ -133,13 +132,13 @@ export class DashboardComponent implements OnInit {
       if (data?.type === 'holiday') {
         circleClass = 'circle-green-outline';
         textClass = 'text-green';
-        noteText = data.note;
-        codeText = data.code;
+        noteText = data.note || '';
+        codeText = data.code || '001';
       } else if (data?.type === 'leave') {
         circleClass = 'circle-orange-outline';
         textClass = 'text-orange';
-        noteText = data.note;
-        codeText = data.code;
+        noteText = data.note || '';
+        codeText = data.code || '001';
       } else if (isWeekend) {
         circleClass = 'circle-red-outline';
         textClass = 'text-red';
