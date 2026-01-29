@@ -1,59 +1,94 @@
-# MyAngularApp
+# ESS-FE (Employee Self Service - Front End)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+ระบบบริการตนเองสำหรับพนักงาน (Employee Self Service) พัฒนาด้วย **Angular 21**
 
-## Development server
+## 🚀 Tech Stack
 
-To start a local development server, run:
+- **Framework:** [Angular v21](https://angular.dev/)
+- **Styling:** SCSS (Sass)
+- **Calendar:** [FullCalendar](https://fullcalendar.io/)
+- **Date Handling:** [Day.js](https://day.js.org/) (พร้อม Thai Locale)
+- **Icons:** [FontAwesome 6](https://fontawesome.com/)
+- **State Management:** Angular Signals
+
+## 🛠️ Getting Started
+
+### Prerequisites
+- Node.js (Latest LTS recommended)
+- npm
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+
+# Navigate to project directory
+cd ESS-FE
+
+# Install dependencies
+npm install
+```
+
+### Development Server
+
+```bash
+npm start
+# หรือ
 ng serve
 ```
+Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 📂 Project Structure
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+src/app/
+├── components/          # Reusable UI components
+│   ├── features/       # Feature-specific components (e.g., forms)
+│   ├── modals/         # Modal dialogs
+│   └── navbar/         # Navigation components
+├── pages/              # Main route pages (Dashboard, Approvals, etc.)
+├── services/           # Business logic and API communication
+├── guards/             # Route guards (Auth, Role)
+├── interfaces/         # TypeScript interfaces and types
+├── constants/          # Static data and configuration
+└── styles/             # Global styles
+    ├── _responsive-layout.scss  # Responsive mixins
+    └── _theme.scss              # Global variables
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 💡 Key Architectural Patterns
 
-```bash
-ng generate --help
-```
+### 1. Styling Strategy
+โปรเจคนี้ใช้ **SCSS** ในการจัดการ Style ทั้งหมด
+- **Global Styles**: ไฟล์ `_theme.scss` เก็บตัวแปรสีและค่าคงที่ต่างๆ, `_responsive-layout.scss` เก็บ Mixins สำหรับ Responsive Design
+- **Component Styles**: ใช้ SCSS แยกตาม Component (Encapsulated)
+- **Grid Layout**: ใช้ CSS Grid และ Flexbox เป็นหลักใน `dashboard.scss` และ layout อื่นๆ
 
-## Building
+### 2. Date & Time Handling
+เราใช้ **Day.js** แทน Moment.js หรือ Date Object ปกติเพื่อความเบาและง่ายต่อการจัดการ
+- Locale: ตั้งค่าเป็น `th` (ไทย) เป็น global default
+- Holidays: ใช้ library `date-holidays` ในการดึงวันหยุดไทยอัตโนมัติ (ดูตัวอย่างใน `DashboardService`)
 
-To build the project run:
+### 3. Service Layer
+แยก Business Logic ออกจาก Component ให้ชัดเจน
+- **DashboardService**: จัดการข้อมูลหน้ารวม และ Logic การนับจำนวน Pending ต่างๆ
+- **ApprovalsHelperService**: ช่วยจัดการ Logic ที่ซับซ้อนในหน้าอนุมัติ
+- **AuthService**: จัดการ User Role และ State การ Login (Mock data)
 
-```bash
-ng build
-```
+## 📝 CLI Commands
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+| Command | Description |
+|---------|-------------|
+| `ng generate component <name>` | สร้าง Component ใหม่ |
+| `ng generate service <name>` | สร้าง Service ใหม่ |
+| `ng build` | Build โปรเจคสำหรับ Production (output ที่ `dist/`) |
+| `ng test` | รัน Unit Tests |
 
-## Running unit tests
+## 🤝 Contribution Guidelines
+1. เช็ค Code ล่าสุดก่อนแก้เสมอ (`git pull`)
+2. พยายามรักษา Clean Code และลบ unused imports
+3. หากมีการแก้ไข Logic วันหยุด หรือการคำนวณวันลา ให้ตรวจสอบไฟล์ `DashboardService` และ `TimeOffForm`
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+**Maintained by Onee-Dev Team**
