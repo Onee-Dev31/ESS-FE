@@ -2,9 +2,17 @@
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
         <div class="header-right-meta">
-            <div class="info-badges">
-                <span class="request-id-badge">เลขที่การเบิก : {{ requestId }}</span>
-                <span class="date-badge ml-2">วันที่ทำรายการ : {{ currentDate() }}</span>
+            <div class="header-meta-list">
+                <div class="meta-item">
+                    <i class="far fa-calendar-alt"></i>
+                    <span class="meta-label">วันที่ขอ :</span>
+                    <span class="meta-value">{{ currentDate() }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-hashtag"></i>
+                    <span class="meta-label">เลขที่การเบิก :</span>
+                    <span class="meta-value">{{ requestId }}</span>
+                </div>
             </div>
             <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
@@ -53,16 +61,24 @@
                     </div>
                 </div>
 
-                <div class="date-range-group">
-                    <label>วันที่รักษา จาก ถึง</label>
-                    <div class="range-inputs">
-                        <div class="date-input-box">
-                            <input type="date" class="custom-form-control" [ngModel]="startDate()"
-                                (ngModelChange)="startDate.set($event)">
+                <div class="input-field-group">
+                    <label>วันที่รักษา ตั้งแต่ <span class="required">*</span></label>
+                    <div class="custom-input-wrapper">
+                        <input type="date" class="input-field" [ngModel]="startDate()"
+                            (ngModelChange)="startDate.set($event)">
+                        <div class="icon-box">
+                            <i class="far fa-calendar-alt"></i>
                         </div>
-                        <div class="date-input-box">
-                            <input type="date" class="custom-form-control" [ngModel]="endDate()"
-                                (ngModelChange)="endDate.set($event)">
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>ถึงวันที่ <span class="required">*</span></label>
+                    <div class="custom-input-wrapper">
+                        <input type="date" class="input-field" [ngModel]="endDate()"
+                            (ngModelChange)="endDate.set($event)">
+                        <div class="icon-box">
+                            <i class="far fa-calendar-alt"></i>
                         </div>
                     </div>
                 </div>

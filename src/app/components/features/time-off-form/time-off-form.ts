@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AlertService } from '../../../services/alert.service';
 import { TimeOffService, TimeOffRequest } from '../../../services/time-off.service';
 import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 @Component({
   selector: 'app-time-off-form',
@@ -15,34 +16,52 @@ import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private alertService = inject(AlertService);
+  private dateUtil = inject(DateUtilityService);
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'คำขอใหม่';
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');
+  employeeId = signal<string>('OTD01050');
+  requestId = signal<string>('1');
   leaveTypes = LEAVE_TYPES;
   selectedLeaveType = signal<string>('');
   reason = signal<string>('');
   startDate = signal<string>('');
   endDate = signal<string>('');
-  leavePeriod = signal<string>('full-day'); // ลาเช้า, ลาบ่าย, ลาเต็มวัน
+  leavePeriod = signal<string>('full-day'); // ลาเช้า, ลาบ่าย, ลาเต็มวัน, กำหนดเอง
   shiftStartTime = signal<string>(''); // เวลาเริ่มกะ
   shiftEndTime = signal<string>(''); // เวลาสิ้นสุดกะ
 
-  // คำนวณจำนวนวันลาตามประเภทการลา
   calculatedDays = computed(() => {
     const period = this.leavePeriod();
     if (period === 'morning' || period === 'afternoon') {
       return 0.5;
     }
+    if (period === 'custom') {
+      return 0; // Or implement hourly calculation
+    }
+    // For full-day, calculate from date range
+    const start = new Date(this.startDate());
+    const end = new Date(this.endDate());
+    if (this.startDate() && this.endDate() && start <= end) {
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      return diffDays;
+    }
     return 1;
+  });
+
+  isHalfDayDisabled = computed(() => {
+    const selectedType = this.leaveTypes.find(t => t.id === this.selectedLeaveType());
+    return selectedType?.label === 'ลาพักร้อน' || selectedType?.label === 'ลาเพื่อจัดการงานศพ';
   });
 
   attachments = signal<{ id: number; name: string; description: string }[]>([]);
 
   ngOnInit() {
-    this.currentDate.set(this.formatDateToThaiMonth(new Date().toISOString()));
+    this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
     this.resetDates();
 
     if (this.initialLeaveTypeId) {
@@ -51,24 +70,46 @@ export class TimeOffForm implements OnInit {
   }
 
   private resetDates() {
-    this.startDate.set(new Date().toISOString().split('T')[0]);
-    this.endDate.set(new Date().toISOString().split('T')[0]);
+    const today = this.dateUtil.getCurrentDateISO();
+    this.startDate.set(today);
+    this.endDate.set(today);
   }
 
-  private formatDateToThaiMonth(dateStr: string): string {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+  private updateEndDate() {
+    const start = this.startDate();
+    if (!start) return;
+
+    const period = this.leavePeriod();
+    const startDate = new Date(start);
+
+    // For half-day, end date = start date
+    if (period === 'morning' || period === 'afternoon') {
+      this.endDate.set(start);
+    }
+    // For full-day, keep current end date or set to start date if invalid
+    else if (period === 'full-day') {
+      const end = this.endDate();
+      if (!end || new Date(end) < startDate) {
+        this.endDate.set(start);
+      }
+    }
   }
 
   selectLeaveType(id: string) {
     this.selectedLeaveType.set(id);
+    // If vacation or funeral leave, force full-day
+    if (this.isHalfDayDisabled()) {
+      this.leavePeriod.set('full-day');
+    }
+  }
+
+  onStartDateChange() {
+    this.updateEndDate();
+  }
+
+  onLeavePeriodChange(period: string) {
+    this.leavePeriod.set(period);
+    this.updateEndDate();
   }
 
   deleteAttachment(id: number) {
@@ -82,15 +123,13 @@ export class TimeOffForm implements OnInit {
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const newId = this.attachments().length > 0 ? Math.max(...this.attachments().map(a => (a as any).id)) + 1 : 1;
-        this.attachments.update(current => [...current, {
-          id: newId,
-          name: file.name,
-          description: ''
-        }]);
-      }
+      const currentAttachments = this.attachments();
+      const newAttachments = Array.from(files).map((file: any, index) => ({
+        id: currentAttachments.length + index + 1,
+        name: file.name,
+        description: ''
+      }));
+      this.attachments.update(current => [...current, ...newAttachments]);
     }
     event.target.value = '';
   }
@@ -102,6 +141,16 @@ export class TimeOffForm implements OnInit {
   save() {
     if (!this.selectedLeaveType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
+      return;
+    }
+
+    if (!this.startDate() || !this.endDate()) {
+      this.alertService.showWarning('กรุณาระบุวันที่ลา', 'ข้อมูลไม่ครบถ้วน');
+      return;
+    }
+
+    if (new Date(this.startDate()) > new Date(this.endDate())) {
+      this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
 
@@ -122,7 +171,11 @@ export class TimeOffForm implements OnInit {
       startDate: this.startDate(),
       endDate: this.endDate(),
       reason: this.reason(),
-      attachments: this.attachments().map(a => ({ name: a.name }))
+      attachments: this.attachments().map(a => ({ name: a.name })),
+      days: this.calculatedDays(),
+      leavePeriod: this.leavePeriod(),
+      shiftStartTime: this.shiftStartTime() || '08:00',
+      shiftEndTime: this.shiftEndTime() || '17:00'
     };
 
     this.timeOffService.addRequest(request).subscribe({

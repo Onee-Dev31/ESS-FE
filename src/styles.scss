@@ -158,6 +158,40 @@ textarea {
   }
 }
 
+// Circular Back Button
+.btn-back {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white !important;
+  color: #64748b !important;
+  border: 1px solid #e2e8f0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+
+  i {
+    font-size: 0.9rem;
+    color: inherit;
+  }
+
+  &:hover {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateX(0) scale(0.95);
+  }
+}
+
 // ===== Global Premium Button Styles =====
 // Base button styling
 button {
@@ -171,21 +205,9 @@ button {
 }
 
 // Premium button base with ripple effect
-.btn-save-custom,
-.btn-back-custom,
-.btn-create,
-.btn-confirm,
-.btn-cancel,
-.btn-submit,
-.btn-close,
-.btn-search,
-.btn-clear,
-.btn-action-green,
-.btn-action-red,
-.btn-action-orange,
-.btn-back {
+.btn-action-orange {
   padding: 0.875rem 1.75rem;
-  border-radius: 10px;
+  border-radius: 50px;
   font-size: 0.95rem;
   font-weight: 600;
   display: inline-flex;
@@ -224,6 +246,7 @@ button {
   }
 }
 
+
 // Green buttons (Save, Submit, Confirm, Approve)
 .btn-save-custom,
 .btn-submit,
@@ -241,11 +264,10 @@ button {
 
 // Gray buttons (Back, Cancel)
 .btn-back-custom,
-.btn-cancel,
-.btn-back {
+.btn-cancel {
   background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
   color: white !important;
-  border: none !important;
+  border-radius: 50px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -259,7 +281,7 @@ button {
 .btn-info-policy {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
   color: white !important;
-  border: none !important;
+  border-radius: 50px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -291,7 +313,7 @@ button {
 .btn-close {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
   color: white !important;
-  border: none !important;
+  border-radius: 50px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -304,7 +326,7 @@ button {
 .btn-clear {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
   color: white !important;
-  border: none !important;
+  border-radius: 50px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -318,7 +340,7 @@ button {
   border: 2px solid #3b82f6 !important;
   color: #3b82f6 !important;
   padding: 0.875rem 1.75rem;
-  border-radius: 10px;
+  border-radius: 50px;
   font-weight: 600;
 
   &:hover {
@@ -336,8 +358,12 @@ button {
 .btn-close-x,
 .btn-info-circle,
 .btn-delete-row {
-  padding: 0.5rem;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: #f1f5f9;
   color: #64748b;
   border: none;
@@ -356,7 +382,7 @@ button {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
   color: white !important;
   padding: 0.75rem 1.5rem;
-  border-radius: 10px;
+  border-radius: 50px;
   border: none;
   font-weight: 600;
 

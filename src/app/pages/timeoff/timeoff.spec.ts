@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Timeoff } from './timeoff';
+import { TimeoffComponent } from './timeoff';
 
-describe('Timeoff', () => {
-  let component: Timeoff;
-  let fixture: ComponentFixture<Timeoff>;
+describe('TimeoffComponent', () => {
+  let component: TimeoffComponent;
+  let fixture: ComponentFixture<TimeoffComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Timeoff]
+      imports: [TimeoffComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(Timeoff);
+    fixture = TestBed.createComponent(TimeoffComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

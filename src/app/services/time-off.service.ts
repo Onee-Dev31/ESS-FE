@@ -12,7 +12,7 @@ export type { TimeOffRequest };
 export class TimeOffService {
     private http = inject(HttpClient);
 
-    private requestsMock: TimeOffRequest[] = TimeOffMock.generateRequests(5);
+    private requestsMock: TimeOffRequest[] = TimeOffMock.generateRequests(15);
     private requestsSubject = new BehaviorSubject<TimeOffRequest[]>(this.requestsMock);
 
     constructor() { }

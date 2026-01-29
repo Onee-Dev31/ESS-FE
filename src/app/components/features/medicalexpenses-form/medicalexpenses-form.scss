@@ -11,32 +11,26 @@
 .medical-expenses-form-page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    width: 100%;
+    max-width: 1300px;
+    height: 95vh;
+    max-height: 920px;
     background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-    flex: 1;
-    min-height: 0;
+    margin: auto;
 
     .top-header-strip {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 15px;
-
-        @include desktop {
-            padding: 17px 24px;
-        }
-
+        padding: 15px 20px;
         border-bottom: 1px solid $border;
         flex-shrink: 0;
 
         h2 {
-            font-size: 1rem;
-
-            @include desktop {
-                font-size: 1.15rem;
-            }
-
+            font-size: 1.15rem;
             margin: 0;
             font-weight: 600;
             color: $primary;
@@ -47,31 +41,35 @@
             align-items: center;
             gap: 1.5rem;
 
-            .info-badges {
+            .header-meta-list {
                 display: flex;
-                gap: 8px;
+                flex-direction: column;
+                gap: 4px;
 
-                .date-badge,
-                .request-id-badge {
-                    font-size: 0.75rem;
+                .meta-item {
+                    display: flex;
+                    align-items: center;
+                    font-size: 0.85rem;
+                    color: #4b5563;
+                    gap: 8px;
 
-                    @include desktop {
-                        font-size: 0.85rem;
+                    i {
+                        width: 16px;
+                        color: $primary;
+                        text-align: center;
+                        font-size: 0.9rem;
                     }
 
-                    font-weight: 600;
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                }
+                    .meta-label {
+                        font-weight: 500;
+                        color: #6b7280;
+                        min-width: 90px;
+                    }
 
-                .date-badge {
-                    background: #e1f5fe;
-                    color: #0277bd;
-                }
-
-                .request-id-badge {
-                    background: #fff9c4;
-                    color: #f57f17;
+                    .meta-value {
+                        font-weight: 600;
+                        color: #1f2937;
+                    }
                 }
             }
         }
@@ -84,12 +82,7 @@
     .content-card {
         flex: 1;
         min-height: 0;
-        padding: 15px 15px;
-
-        @include desktop {
-            padding: 20px 24px;
-        }
-
+        padding: 20px 24px;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
@@ -110,15 +103,6 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
-
-                .btn-upload-file {
-                    width: 100%;
-                    justify-content: center;
-                }
-            }
-
-            .section-heading {
-                margin-bottom: 0;
             }
 
             .btn-upload-file {
@@ -228,8 +212,7 @@
         border: 1px solid $border;
     }
 
-    .input-field-group,
-    .date-range-group {
+    .input-field-group {
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -237,7 +220,12 @@
         label {
             font-weight: 600;
             font-size: 0.9rem;
-            color: $text-sub;
+            color: #7f8c8d;
+
+            .required {
+                color: #e74c3c;
+                margin-left: 2px;
+            }
         }
     }
 
@@ -254,11 +242,57 @@
         }
     }
 
-    .range-inputs {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        align-items: center;
+    .custom-input-wrapper {
+        display: flex;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        overflow: hidden;
+        height: 42px;
+        background: #f8f8f5; // Light beige
+        position: relative;
+
+        .input-field {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0 10px;
+            font-size: 0.95rem;
+            text-align: center;
+            color: #2c3e50;
+            width: 100%;
+
+            &::-webkit-calendar-picker-indicator {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .icon-box {
+            width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            border-left: 1px solid #d1d5db;
+            color: #9ca3af;
+            cursor: pointer;
+
+            i {
+                font-size: 1.1rem;
+            }
+        }
+
+        &:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
     }
 
     .amount-input-wrapper {
@@ -544,6 +578,10 @@
 
 @media (max-width: 768px) {
     .medical-expenses-form-page {
+        height: auto;
+        min-height: 100vh;
+        border-radius: 0;
+
         .content-card {
             padding: 15px 10px;
         }
@@ -552,12 +590,6 @@
             grid-template-columns: 1fr;
             padding: 1rem;
             gap: 1rem;
-        }
-
-        .range-inputs {
-            @media (max-width: 480px) {
-                grid-template-columns: 1fr;
-            }
         }
     }
 }

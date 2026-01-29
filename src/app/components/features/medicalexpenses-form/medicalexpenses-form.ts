@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
 import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
 import { AlertService } from '../../../services/alert.service';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -15,6 +16,7 @@ import { AlertService } from '../../../services/alert.service';
 export class MedicalexpensesForm implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private alertService = inject(AlertService);
+  private dateUtil = inject(DateUtilityService);
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -48,7 +50,7 @@ export class MedicalexpensesForm implements OnInit {
       this.medicalService.getRequestById(this.requestId).subscribe(req => {
         if (req) {
           this.isEditMode.set(true);
-          this.currentDate.set(this.formatDateToThaiMonth(req.createDate));
+          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(req.createDate));
 
           if (req.items && req.items.length > 0) {
             const item = req.items[0];
@@ -60,46 +62,26 @@ export class MedicalexpensesForm implements OnInit {
               this.selectedClaimType.set(typeMatch.id);
             }
 
-            const fromParts = item.treatmentDateFrom.split('/');
-            if (fromParts.length === 3) {
-              const yearAD = parseInt(fromParts[2]) - 543;
-              this.startDate.set(`${yearAD}-${fromParts[1]}-${fromParts[0]}`);
-
-              const toParts = item.treatmentDateTo.split('/');
-              const toYearAD = parseInt(toParts[2]) - 543;
-              this.endDate.set(`${toYearAD}-${toParts[1]}-${toParts[0]}`);
-            }
-
+            this.startDate.set(this.dateUtil.formatBEToISO(item.treatmentDateFrom));
+            this.endDate.set(this.dateUtil.formatBEToISO(item.treatmentDateTo));
             this.amount.set(item.requestedAmount);
           }
         } else {
           this.isEditMode.set(false);
-          this.currentDate.set(this.formatDateToThaiMonth(new Date().toISOString()));
+          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
           this.resetDates();
         }
       });
     } else {
-      this.currentDate.set(this.formatDateToThaiMonth(new Date().toISOString()));
+      this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
       this.resetDates();
     }
   }
 
   private resetDates() {
-    this.startDate.set(new Date().toISOString().split('T')[0]);
-    this.endDate.set(new Date().toISOString().split('T')[0]);
-  }
-
-  // แปลงวันที่เป็นรูปแบบ dd-MonthName-yyyy
-  private formatDateToThaiMonth(dateStr: string): string {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    const today = this.dateUtil.getCurrentDateISO();
+    this.startDate.set(today);
+    this.endDate.set(today);
   }
 
   selectClaimType(id: string) {
@@ -118,15 +100,13 @@ export class MedicalexpensesForm implements OnInit {
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const newId = this.attachments().length > 0 ? Math.max(...this.attachments().map(a => (a as any).id)) + 1 : 1;
-        this.attachments.update(current => [...current, {
-          id: newId,
-          name: file.name,
-          description: ''
-        }]);
-      }
+      const currentAttachments = this.attachments();
+      const newAttachments = Array.from(files).map((file: any, index) => ({
+        id: currentAttachments.length + index + 1,
+        name: file.name,
+        description: ''
+      }));
+      this.attachments.update(current => [...current, ...newAttachments]);
     }
     event.target.value = '';
   }
@@ -142,6 +122,16 @@ export class MedicalexpensesForm implements OnInit {
       return;
     }
 
+    if (!this.startDate() || !this.endDate()) {
+      this.alertService.showWarning('กรุณาระบุวันที่รักษา', 'ข้อมูลไม่ครบถ้วน');
+      return;
+    }
+
+    if (new Date(this.startDate()) > new Date(this.endDate())) {
+      this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
+      return;
+    }
+
     if (!this.hospital() || !this.disease() || this.amount() <= 0) {
       this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0', 'ข้อมูลไม่ถูกต้อง');
       return;
@@ -149,25 +139,20 @@ export class MedicalexpensesForm implements OnInit {
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
-    const formatDateToBE = (iso: string) => {
-      const parts = iso.split('-');
-      return `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}`;
-    };
-
     const request: MedicalRequest = {
       id: this.requestId,
-      createDate: this.isEditMode() ? new Date().toISOString() : new Date().toISOString(),
+      createDate: new Date().toISOString(),
       status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
       employeeId: 'EMP001',
       totalRequestedAmount: this.amount(),
       totalApprovedAmount: 0,
       items: [{
-        requestDate: formatDateToBE(new Date().toISOString().split('T')[0]),
+        requestDate: this.dateUtil.formatDateToBE(this.dateUtil.getCurrentDateISO()),
         limitType: typeLabel,
         diseaseType: this.disease(),
         hospital: this.hospital(),
-        treatmentDateFrom: formatDateToBE(this.startDate()),
-        treatmentDateTo: formatDateToBE(this.endDate()),
+        treatmentDateFrom: this.dateUtil.formatDateToBE(this.startDate()),
+        treatmentDateTo: this.dateUtil.formatDateToBE(this.endDate()),
         requestedAmount: this.amount(),
         approvedAmount: 0
       }]

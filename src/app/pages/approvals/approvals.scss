@@ -50,32 +50,7 @@ $bg-slate: #f4f7f9;
       align-items: center;
       gap: 1rem;
 
-      .btn-back {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1px solid #dee2e6;
-        background: #fff;
-        color: #4650dd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
-        &:hover {
-          background: #4650dd;
-          color: #fff;
-          border-color: #4650dd;
-          transform: translateX(-3px);
-          box-shadow: 0 4px 12px rgba(70, 80, 221, 0.2);
-        }
-
-        i {
-          font-size: 1rem;
-        }
-      }
     }
 
     .main-title {
@@ -237,7 +212,7 @@ $bg-slate: #f4f7f9;
 
   // --- Styles for Card View (Visible ONLY at max-width: 1310px) ---
   .card-list-view {
-    display: none; // Hidden by default (desktop)
+    display: none;
 
     @media (max-width: 1310px) {
       display: flex;

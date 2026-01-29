@@ -2,8 +2,8 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar';
-import { Sidebar } from '../sidebar/sidebar';
-import { SidebarService } from '../../services/sidebar';
+import { Sidebar } from '../sidebar/sidebar.component';
+import { SidebarService } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-layout',

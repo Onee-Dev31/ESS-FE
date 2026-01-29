@@ -2,9 +2,10 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TimeoffService, TimeOffRequest } from '../../services/timeoff.service';
+import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { DateUtilityService } from '../../services/date-utility.service';
 
 @Component({
   selector: 'app-timeoff',
@@ -14,8 +15,9 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
   styleUrl: './timeoff.scss',
 })
 export class TimeoffComponent implements OnInit {
-  private timeoffService = inject(TimeoffService);
+  private timeoffService = inject(TimeOffService);
   private router = inject(Router);
+  private dateUtil = inject(DateUtilityService);
 
   requests = signal<TimeOffRequest[]>([]);
   filteredRequests = signal<TimeOffRequest[]>([]);
@@ -56,7 +58,7 @@ export class TimeoffComponent implements OnInit {
   }
 
   loadRequests() {
-    this.timeoffService.getTimeOffRequests().subscribe(data => {
+    this.timeoffService.getRequests().subscribe((data: TimeOffRequest[]) => {
       this.requests.set(data);
       this.applyFilters();
     });
@@ -173,12 +175,17 @@ export class TimeoffComponent implements OnInit {
     return iconMap[leaveType] || 'fas fa-calendar';
   }
 
-  getPeriodLabel(period: string): string {
+  getPeriodLabel(period: string | undefined): string {
+    if (!period) return '';
     const periodMap: { [key: string]: string } = {
       'full-day': 'เต็มวัน',
       'morning': 'ครึ่งวันเช้า',
       'afternoon': 'ครึ่งวันบ่าย'
     };
     return periodMap[period] || period;
+  }
+
+  formatDate(dateStr: string): string {
+    return this.dateUtil.formatDateToThaiMonth(dateStr);
   }
 }

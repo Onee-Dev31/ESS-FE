@@ -1,23 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
-import { Sidebar } from './sidebar';
+import { SidebarService } from './sidebar';
 
 describe('Sidebar', () => {
-  let component: Sidebar;
-  let fixture: ComponentFixture<Sidebar>;
+  let service: SidebarService;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Sidebar]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(Sidebar);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(SidebarService);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 });

@@ -40,12 +40,14 @@
                     </select>
                 </div>
 
-                <button class="btn-clear" (click)="clearFilters()">ล้างค่า</button>
+                <button class="btn-clear" (click)="clearFilters()">
+                    <i class="fas fa-sync-alt"></i> คืนค่า
+                </button>
                 <div class="search-input-group">
                     <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
                         (ngModelChange)="searchText.set($event); applyFilters()">
                     <button class="btn-search">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-search"></i> ค้นหา
                     </button>
                 </div>
             </div>
@@ -66,8 +68,22 @@
 
                 <div class="card-body">
                     <div class="info-item">
-                        <span class="label">ระยะเวลา:</span>
-                        <span class="value">{{ request.startDate }} - {{ request.endDate }}</span>
+                        <span class="label">รหัสคำขอ:</span>
+                        <span class="value">{{ request.id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">จาก:</span>
+                        <span class="value">
+                            {{ formatDate(request.startDate) }}
+                            <span class="text-muted" *ngIf="request.shiftStartTime"> {{ request.shiftStartTime }}</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">ถึง:</span>
+                        <span class="value">
+                            {{ formatDate(request.endDate) }}
+                            <span class="text-muted" *ngIf="request.shiftEndTime"> {{ request.shiftEndTime }}</span>
+                        </span>
                     </div>
                     <div class="info-item" *ngIf="request.days">
                         <span class="label">จำนวนวัน:</span>
@@ -116,43 +132,45 @@
             <table class="modern-table">
                 <thead>
                     <tr>
+                        <th rowspan="2" style="width: 110px;">รหัสคำขอ</th>
                         <th colspan="2" class="text-center">วัน-เวลา ที่ขอลา</th>
                         <th rowspan="2" class="text-center" style="width: 80px;">จำนวนวัน</th>
-                        <th rowspan="2" style="width: 15%">ประเภทการลา</th>
-                        <th rowspan="2" style="width: 15%">ประเภทวันลา</th>
-                        <th rowspan="2" style="width: auto;">เหตุผล</th>
-                        <th rowspan="2" class="text-center" style="width: 150px;">สถานะ</th>
-                        <th rowspan="2" class="text-center" style="width: 100px;">เอกสารแนบ</th>
-                        <th rowspan="2" class="text-center" style="width: 100px;">Action</th>
+                        <th rowspan="2" class="text-center" style="width: 13%">ประเภทการลา</th>
+                        <th rowspan="2" class="text-center" style="width: 15%">ประเภทวันลา</th>
+                        <th rowspan="2" style="width: 20%">เหตุผล</th>
+                        <th rowspan="2" class="text-center" style="width: 10%">สถานะ</th>
+                        <th rowspan="2" class="text-center" style="width: 80px;">เอกสารแนบ</th>
+                        <th rowspan="2" class="text-center" style="width: 120px;">จัดการ</th>
                     </tr>
                     <tr>
-                        <th class="text-center" style="width: 150px; border-top: 1px solid rgba(255,255,255,0.2)">จาก
+                        <th class="text-center" style="width: 150px;">จาก
                         </th>
-                        <th class="text-center" style="width: 150px; border-top: 1px solid rgba(255,255,255,0.2)">ถึง
+                        <th class="text-center" style="width: 150px;">ถึง
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let request of paginatedRequests()">
+                        <td class="text-center font-bold text-primary">{{ request.id }}</td>
                         <td class="text-center">
-                            <div class="font-bold">{{ request.startDate }}</div>
+                            <div class="font-bold">{{ formatDate(request.startDate) }}</div>
                             <div class="small text-muted" *ngIf="request.shiftStartTime">{{ request.shiftStartTime }}
                             </div>
                         </td>
                         <td class="text-center">
-                            <div class="font-bold">{{ request.endDate }}</div>
+                            <div class="font-bold">{{ formatDate(request.endDate) }}</div>
                             <div class="small text-muted" *ngIf="request.shiftEndTime">{{ request.shiftEndTime }}</div>
                         </td>
                         <td class="text-center">
                             <span class="days-badge">{{ request.days }}</span>
                         </td>
-                        <td>
-                            <div class="leave-type-cell">
+                        <td class="text-center">
+                            <div class="leave-type-cell" style="justify-content: center;">
                                 <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
                                 {{ request.leaveType }}
                             </div>
                         </td>
-                        <td>
+                        <td class="text-center">
                             <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
                         </td>
                         <td class="reason-cell">{{ request.reason }}</td>
