@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay } from 'rxjs';
+import { Observable, of, BehaviorSubject, delay, tap, finalize } from 'rxjs';
 import { MedicalItem, MedicalRequest } from '../interfaces';
 import { MedicalMock } from '../mocks';
+import { LoadingService } from './loading.service';
 
 export type { MedicalItem, MedicalRequest };
 
@@ -9,7 +10,7 @@ export type { MedicalItem, MedicalRequest };
     providedIn: 'root'
 })
 export class MedicalexpensesService {
-
+    private loadingService = inject(LoadingService);
     private medicalRequestsMock: MedicalRequest[] = MedicalMock.generateRequests(15);
     private medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>(this.medicalRequestsMock);
 
@@ -17,13 +18,13 @@ export class MedicalexpensesService {
 
     // ดึงข้อมูลคำขอค่ารักษาพยาบาลทั้งหมด
     getMedicalRequests(): Observable<MedicalRequest[]> {
-        return this.medicalRequestsSubject.asObservable().pipe(delay(200));
+        return this.loadingService.wrap(this.medicalRequestsSubject.asObservable().pipe(delay(200)));
     }
 
     // ดึงข้อมูลตาม ID
     getRequestById(id: string): Observable<MedicalRequest | undefined> {
-        const request = this.medicalRequestsMock.find(r => r.id === id);
-        return of(request).pipe(delay(200));
+        const item = this.medicalRequestsMock.find(r => r.id === id);
+        return this.loadingService.wrap(of(item).pipe(delay(200)));
     }
 
     // สร้างรหัสคำขอถัดไป
@@ -45,10 +46,9 @@ export class MedicalexpensesService {
 
     // เพิ่มคำขอใหม่
     addRequest(request: MedicalRequest): Observable<void> {
-        this.medicalRequestsMock.unshift(request);
-        this.medicalRequestsMock.sort((a, b) => b.id.localeCompare(a.id));
+        this.medicalRequestsMock = [request, ...this.medicalRequestsMock];
         this.medicalRequestsSubject.next([...this.medicalRequestsMock]);
-        return of(undefined).pipe(delay(500));
+        return this.loadingService.wrap(of(void 0).pipe(delay(500)));
     }
 
     // อัปเดตข้อมูลคำขอ
@@ -58,6 +58,6 @@ export class MedicalexpensesService {
             this.medicalRequestsMock[index] = request;
             this.medicalRequestsSubject.next([...this.medicalRequestsMock]);
         }
-        return of(undefined).pipe(delay(500));
+        return this.loadingService.wrap(of(void 0).pipe(delay(500)));
     }
 }

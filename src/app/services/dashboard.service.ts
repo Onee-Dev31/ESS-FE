@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, combineLatest, map } from 'rxjs';
+import { Observable, of, combineLatest, map, finalize } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { LoadingService } from './loading.service';
 import { AllowanceService } from './allowance.service';
 import { TaxiService } from './taxi.service';
 import { TransportService } from './transport.service';
@@ -13,6 +14,7 @@ import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/
     providedIn: 'root'
 })
 export class DashboardService {
+    private loadingService = inject(LoadingService);
     private http = inject(HttpClient);
     private allowanceService = inject(AllowanceService);
     private taxiService = inject(TaxiService);
@@ -44,7 +46,7 @@ export class DashboardService {
             { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-indigo', percent: 100 },
             { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
         ];
-        return of(stats).pipe(delay(300));
+        return this.loadingService.wrap(of(stats).pipe(delay(300)));
     }
 
     getWelfareStats(): Observable<WelfareItem[]> {
@@ -80,7 +82,7 @@ export class DashboardService {
                 tooltip: `<div class="text-center mb-3"><i class="fas fa-spa fa-2x text-purple-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 12,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน</span></li></ul>`
             }
         ];
-        return of(stats).pipe(delay(300));
+        return this.loadingService.wrap(of(stats).pipe(delay(300)));
     }
 
     getLeaveStats(): Observable<LeaveItem[]> {
@@ -91,15 +93,15 @@ export class DashboardService {
             { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', iconColor: '#9333ea', theme: 'theme-purple', balance: 3 },
             { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', iconColor: '#35b653', theme: 'theme-green', balance: 3 },
         ];
-        return of(leaves).pipe(delay(300));
+        return this.loadingService.wrap(of(leaves).pipe(delay(300)));
     }
 
     getHolidays(): Observable<HolidayItem[]> {
-        return of([
+        return this.loadingService.wrap(of([
             { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },
             { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
             { date: '31/12/2569', name: 'วันสิ้นปี' }
-        ]).pipe(delay(200));
+        ]).pipe(delay(200)));
     }
 
     getAttendanceList(): any[] {

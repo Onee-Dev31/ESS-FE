@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, delay, finalize } from 'rxjs';
+import { LoadingService } from './loading.service';
 import { TaxiItem, TaxiRequest } from '../interfaces';
 import { Requester } from '../interfaces';
 import { TaxiMock } from '../mocks';
@@ -11,6 +11,7 @@ export type { TaxiItem, TaxiRequest };
     providedIn: 'root'
 })
 export class TaxiService {
+    private loadingService = inject(LoadingService);
 
     // ข้อมูลจำลองคำขอค่าแท็กซี่
     private taxiRequestsMock: TaxiRequest[] = TaxiMock.generateRequests(15);
@@ -20,34 +21,34 @@ export class TaxiService {
 
     // ดึงข้อมูลคำขอค่าแท็กซี่ทั้งหมด
     getTaxiRequests(): Observable<TaxiRequest[]> {
-        return this.taxiRequestsSubject.asObservable().pipe(delay(200));
+        return this.loadingService.wrap(this.taxiRequestsSubject.asObservable().pipe(delay(200)));
     }
 
     // ดึงข้อมูลคำขอค่าแท็กซี่ตาม ID
     getTaxiRequestById(id: string): Observable<TaxiRequest | undefined> {
         const item = this.taxiRequestsMock.find(r => r.id === id);
-        return of(item).pipe(delay(200));
+        return this.loadingService.wrap(of(item).pipe(delay(200)));
     }
 
     // เพิ่มคำขอค่าแท็กซี่ใหม่
     addTaxiRequest(request: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = [request, ...this.taxiRequestsMock];
-        this.taxiRequestsSubject.next(this.taxiRequestsMock);
-        return of(void 0).pipe(delay(300));
+        this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // อัปเดตข้อมูลคำขอค่าแท็กซี่
     updateTaxiRequest(id: string, updatedRequest: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.map(r => r.id === id ? updatedRequest : r);
-        this.taxiRequestsSubject.next(this.taxiRequestsMock);
-        return of(void 0).pipe(delay(300));
+        this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // ลบคำขอค่าแท็กซี่
     deleteTaxiRequest(id: string): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.filter(r => r.id !== id);
-        this.taxiRequestsSubject.next(this.taxiRequestsMock);
-        return of(void 0).pipe(delay(300));
+        this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // สร้างรหัสคำขอแท็กซี่ถัดไป

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject, delay, finalize } from 'rxjs';
+import { LoadingService } from './loading.service';
 import { AllowanceItem, AllowanceRequest } from '../interfaces';
 import { Requester } from '../interfaces';
 import { AllowanceMock } from '../mocks';
@@ -11,6 +11,7 @@ export type { AllowanceItem, AllowanceRequest };
     providedIn: 'root'
 })
 export class AllowanceService {
+    private loadingService = inject(LoadingService);
 
     // ข้อมูลจำลองคำขอเบี้ยเลี้ยง
     private allowanceRequestsMock: AllowanceRequest[] = AllowanceMock.generateRequests(15);
@@ -20,34 +21,34 @@ export class AllowanceService {
 
     // ดึงข้อมูลคำขอเบี้ยเลี้ยงทั้งหมด
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
-        return this.allowanceRequestsSubject.asObservable().pipe(delay(200));
+        return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(200)));
     }
 
     // ดึงข้อมูลคำขอเบี้ยเลี้ยงตาม ID
     getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
         const item = this.allowanceRequestsMock.find(r => r.id === id);
-        return of(item).pipe(delay(200));
+        return this.loadingService.wrap(of(item).pipe(delay(200)));
     }
 
     // เพิ่มคำขอเบี้ยเลี้ยงใหม่
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
         this.allowanceRequestsMock = [request, ...this.allowanceRequestsMock];
         this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
-        return of(void 0).pipe(delay(300));
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // อัปเดตข้อมูลคำขอเบี้ยเลี้ยง
     updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
         this.allowanceRequestsMock = this.allowanceRequestsMock.map(r => r.id === id ? updatedRequest : r);
-        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
-        return of(void 0).pipe(delay(300));
+        this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // ลบคำขอเบี้ยเลี้ยง
     deleteAllowanceRequest(id: string): Observable<void> {
         this.allowanceRequestsMock = this.allowanceRequestsMock.filter(r => r.id !== id);
-        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
-        return of(void 0).pipe(delay(300));
+        this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
+        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
     }
 
     // สร้างรหัสคำขอถัดไป

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { TaxiRequest } from './taxi.service';
 import { VehicleRequest } from './transport.service';
+import { MedicalRequest } from './medicalexpenses.service';
 import { ApprovalItem } from '../components/modals/approval-detail-modal/approval-detail-modal';
 
 @Injectable({
@@ -18,6 +19,10 @@ export class ApprovalsHelperService {
         const list3: ApprovalItem[] = vehicles.map(request => this.mapToApproval(request, 'ค่ารถ', request.typeId, 'Vehicle'));
 
         return [...list1, ...list2, ...list3];
+    }
+
+    processMedicalData(medicals: MedicalRequest[]): ApprovalItem[] {
+        return medicals.map(req => this.mapMedicalToApproval(req));
     }
 
     private mapToApproval(request: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่าแท็กซี่' | 'ค่ารถ', typeId: number, detailSub?: string): ApprovalItem {
@@ -37,6 +42,26 @@ export class ApprovalsHelperService {
             requestDetail: request.items[0]?.description || detailSub || '',
             amount: request.items.reduce((sum: number, item: any) => sum + (item.amount || 0), 0),
             status: this.mapStatus(request.status)
+        };
+    }
+
+    public mapMedicalToApproval(req: MedicalRequest): ApprovalItem {
+        const defaultUser = {
+            name: 'พนักงานทดสอบ',
+            employeeId: 'N/A',
+            department: 'N/A',
+            company: 'บริษัท OTD'
+        };
+
+        return {
+            requestNo: req.id,
+            requestDate: req.createDate,
+            requestBy: req.requester || defaultUser,
+            requestType: 'ค่ารักษาพยาบาล',
+            typeId: 99,
+            requestDetail: req.items.map((i: any) => i.diseaseType).join(', '),
+            amount: req.totalRequestedAmount || 0,
+            status: this.mapStatus(req.status)
         };
     }
 
