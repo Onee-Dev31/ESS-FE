@@ -1,7 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from './sidebar';
+import { AuthService } from '../../services/auth.service';
+import { USER_ROLES } from '../../constants/user-roles.constant';
 
 interface SubMenuItem {
     label: string;
@@ -12,6 +14,7 @@ interface MenuItem {
     name: string;
     icon: string;
     subItems: SubMenuItem[];
+    role?: string;
 }
 
 @Component({
@@ -23,11 +26,12 @@ interface MenuItem {
 })
 export class Sidebar {
     sidebarService = inject(SidebarService);
+    private authService = inject(AuthService);
     private router = inject(Router);
 
     openMenu: string | null = null;
 
-    menuItems: MenuItem[] = [
+    private allMenuItems: MenuItem[] = [
         {
             name: 'Dashboard',
             icon: 'fa-home',
@@ -55,12 +59,19 @@ export class Sidebar {
         {
             name: 'อนุมัติ',
             icon: 'fa-check-circle',
+            role: USER_ROLES.ADMIN,
             subItems: [
                 { label: 'สวัสดิการ', path: '/approvals' },
                 { label: 'ค่ารักษาพยาบาล', path: '/approvals-medicalexpenses' }
             ]
         }
     ];
+
+    // Reactive menu filtering using computed signal
+    menuItems = computed(() => {
+        const userRole = this.authService.userRole();
+        return this.allMenuItems.filter(item => !item.role || item.role === userRole);
+    });
 
     toggleMenu(menuName: string) {
         this.openMenu = this.openMenu === menuName ? null : menuName;

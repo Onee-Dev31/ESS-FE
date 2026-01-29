@@ -1,5 +1,6 @@
 import { Requester } from '../interfaces/vehicle.interface';
 import { REQUEST_STATUS_LIST } from '../constants/request-status.constant';
+import dayjs from 'dayjs';
 
 export class MockHelper {
     static getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
@@ -7,16 +8,7 @@ export class MockHelper {
     }
 
     static getRandomDateInPast3Months(): string {
-        const today = new Date();
-        const pastDate = new Date();
-        pastDate.setMonth(today.getMonth() - 3);
-        const randomTime = pastDate.getTime() + Math.random() * (today.getTime() - pastDate.getTime());
-        const date = new Date(randomTime);
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        return dayjs().subtract(Math.floor(Math.random() * 90), 'day').format('YYYY-MM-DD');
     }
 
     static getRandomRequester(): Requester {
@@ -39,21 +31,20 @@ export class MockHelper {
     static generateDays(monthInput: number | string, yearInput: number | string): Date[] {
         const month = Number(monthInput);
         const year = Number(yearInput);
-        const adYear = year - 543;
-        const date = new Date(adYear, month, 1);
+        // year input is in BE, so convert to CE
+        const yearCE = year - 543;
+        const startDate = dayjs().year(yearCE).month(month).date(1);
         const days: Date[] = [];
-        while (date.getMonth() === month) {
-            days.push(new Date(date));
-            date.setDate(date.getDate() + 1);
+        let curr = startDate;
+        while (curr.month() === month) {
+            days.push(curr.toDate());
+            curr = curr.add(1, 'day');
         }
         return days;
     }
 
     static formatDate(d: Date): string {
-        const dd = String(d.getDate()).padStart(2, '0');
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
+        return dayjs(d).format('DD/MM/YYYY');
     }
 
     static getRandomShiftCode(): string {

@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { LayoutComponent } from './components/layout/layout';
-
+import { authGuard } from './guards/auth-guard';
+import { roleGuard } from './guards/role-guard';
+import { USER_ROLES } from './constants/user-roles.constant';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -9,6 +11,7 @@ export const routes: Routes = [
     {
         path: '',
         component: LayoutComponent,
+        canActivate: [authGuard],
         children: [
             {
                 path: 'dashboard',
@@ -24,7 +27,6 @@ export const routes: Routes = [
                 ]
             },
 
-
             {
                 path: 'vehicle',
                 loadComponent: () => import('./pages/vehicle/vehicle').then(m => m.VehicleComponent)
@@ -39,11 +41,15 @@ export const routes: Routes = [
             },
             {
                 path: 'approvals',
-                loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent)
+                loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
+                canActivate: [roleGuard],
+                data: { role: USER_ROLES.ADMIN }
             },
             {
                 path: 'approvals-medicalexpenses',
-                loadComponent: () => import('./pages/approvals-medicalexpenses/approvals-medicalexpenses').then(m => m.ApprovalsMedicalexpensesComponent)
+                loadComponent: () => import('./pages/approvals-medicalexpenses/approvals-medicalexpenses').then(m => m.ApprovalsMedicalexpensesComponent),
+                canActivate: [roleGuard],
+                data: { role: USER_ROLES.ADMIN }
             },
             {
                 path: 'medicalexpenses',

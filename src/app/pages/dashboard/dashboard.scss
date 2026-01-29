@@ -1098,84 +1098,157 @@ $balance: #15803d;
 
 ::ng-deep {
   .fc {
-    font-family: inherit;
-    --fc-border-color: #e2e8f0;
+    font-family: 'Inter', sans-serif; // Ensure premium font
+    --fc-border-color: #f1f5f9;
     --fc-today-bg-color: transparent;
+    --fc-neutral-bg-color: #f8fafc;
+    --fc-page-bg-color: #ffffff;
 
-    .fc-toolbar-title {
-      font-size: 16px !important;
-      font-weight: 700;
+    .fc-toolbar {
+      margin-bottom: 24px !important;
+
+      .fc-toolbar-title {
+        font-size: 20px !important;
+        font-weight: 700;
+        color: $dark;
+        letter-spacing: -0.5px;
+      }
+
+      .fc-button-group {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+        .fc-button {
+          background: white;
+          border: 1px solid #e2e8f0;
+          color: #64748b;
+          font-weight: 600;
+          padding: 8px 16px;
+          text-transform: capitalize;
+
+          &:focus {
+            box-shadow: none !important;
+          }
+
+          &:hover {
+            background: #f8fafc;
+            color: $dark;
+            z-index: 1;
+          }
+
+          &.fc-button-active {
+            background: $primary;
+            color: white;
+            border-color: $primary;
+          }
+        }
+      }
     }
 
-    .fc-button-primary {
-      background-color: white;
-      color: $dark;
-      border: 1px solid #ced4da;
+    .fc-col-header-cell-cushion {
+      padding: 12px 0;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+    }
+
+    .fc-daygrid-day {
+      transition: background-color 0.2s;
 
       &:hover {
-        background-color: #f8fafc;
-        border-color: #cbd5e1;
+        background-color: #fcfcfc;
       }
-    }
 
-    .fc-daygrid-day.fc-day-today {
-      .date-cell-custom .date-circle {
-        background-color: $primary;
-        color: white;
-        border-color: $primary;
+      &.fc-day-today {
+        background-color: transparent !important; // Handle today highlight in content
       }
     }
   }
-}
 
-.date-cell-custom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 4px;
+  // Moved inside ::ng-deep to ensure styles apply to dynamically generated content
+  .date-cell-custom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 4px;
+    height: 100%;
+    min-height: 50px; // Ensure enough height
 
-  .date-circle {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    @include flex-center;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 2px;
-    border: 1px solid transparent;
+    .date-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%; // or 8px for soft square
+      @include flex-center;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: $dark;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
 
-    &.circle-green-outline {
-      border-color: $success;
-      color: $success;
-      background: #f0fdf4;
+      // Today Style
+
+      &.circle-green-outline {
+        background: #ecfdf5; // Emerald 50
+        color: #059669; // Emerald 600
+        border-color: transparent;
+      }
+
+      &.circle-orange-outline {
+        background: #fff7ed; // Orange 50
+        color: #ea580c; // Orange 600
+        border-color: transparent;
+      }
+
+      // Weekend
+      &.circle-red-outline {
+        color: #ef4444; // Red 500
+        background: #fef2f2; // Red 50
+      }
     }
 
-    &.circle-red-outline {
-      color: $danger;
+    // Today Highlight specifically
+    :host ::ng-deep .fc-day-today & .date-circle {
+      background: $primary !important;
+      color: white !important;
+      box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
+      border: none;
     }
 
-    &.circle-orange-outline {
-      border-color: $warning;
-      color: $warning;
-      background: #fff7ed;
+    .date-code {
+      display: none; // Hide code, too messy for premium look
     }
-  }
 
-  .date-code {
-    font-size: 10px;
-    font-weight: 600;
-  }
+    .date-note {
+      font-size: 10px;
+      line-height: 1.2;
+      text-align: center;
+      width: 100%; // Expanded to use full width
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-top: 2px;
+      white-space: normal;
+      word-break: break-word;
 
-  .date-note {
-    font-size: 9px;
-    margin-top: 1px;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
+      &.text-green {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &.text-orange {
+        background: #ffedd5;
+        color: #9a3412;
+      }
+
+      &.text-red {
+        color: #ef4444;
+        font-weight: 500;
+      }
+    }
   }
 }
 

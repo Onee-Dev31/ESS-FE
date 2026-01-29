@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LoadingService } from '../../services/loading.service';
+import { take, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +15,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  private loadingService = inject(LoadingService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required]),
@@ -40,11 +44,20 @@ export class LoginComponent {
     }
 
     this.isLoading = true;
+    this.loadingService.show();
     this.loginMessage = '';
+    this.cdr.detectChanges();
+
     const { email, password } = this.loginForm.value;
 
-
-    this.authService.login(email || '', password || '').subscribe({
+    this.authService.login(email || '', password || '').pipe(
+      take(1),
+      finalize(() => {
+        this.isLoading = false;
+        this.loadingService.hide();
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
       next: (success) => {
         if (success) {
           this.loginMessage = 'Login successful!';
@@ -55,13 +68,11 @@ export class LoginComponent {
         } else {
           this.loginMessage = 'Incorrect username or password.';
           this.isError = true;
-          this.isLoading = false;
         }
       },
       error: () => {
-        this.loginMessage = 'An error occurred.';
+        this.loginMessage = 'An error occurred during login.';
         this.isError = true;
-        this.isLoading = false;
       }
     });
   }

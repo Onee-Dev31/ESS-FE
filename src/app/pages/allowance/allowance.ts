@@ -7,6 +7,7 @@ import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
 import { AlertService } from '../../services/alert.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { DateUtilityService } from '../../services/date-utility.service';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -33,6 +34,7 @@ export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private alertService = inject(AlertService);
   private vehicleService = inject(VehicleService);
+  private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
   // กลับหน้า Dashboard
@@ -101,9 +103,10 @@ export class AllowanceComponent implements OnInit {
           case 'date':
             valueA = requestA.items[0]?.date || '';
             valueB = requestB.items[0]?.date || '';
-            const dateA = valueA.split('/').reverse().join('');
-            const dateB = valueB.split('/').reverse().join('');
-            return dateA.localeCompare(dateB) * direction;
+            // Convert BE to ISO for proper comparison
+            const isoA = this.dateUtil.formatBEToISO(valueA);
+            const isoB = this.dateUtil.formatBEToISO(valueB);
+            return isoA.localeCompare(isoB) * direction;
           case 'description':
             valueA = requestA.items[0]?.description || '';
             valueB = requestB.items[0]?.description || '';

@@ -45,7 +45,10 @@
         <div class="card-body">
           <div class="info-row">
             <span class="label">Date Created:</span>
-            <span class="value">{{ row.original.requestDate }}</span>
+            <span class="value">
+              {{ row.original.requestDate }}
+              <small class="text-muted ml-1">({{ getTimeAgo(row.original.requestDate) }})</small>
+            </span>
           </div>
 
           <div class="requester-block">

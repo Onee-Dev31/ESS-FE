@@ -5,6 +5,7 @@ import { AlertService } from '../../../services/alert.service';
 import { TimeOffService, TimeOffRequest } from '../../../services/time-off.service';
 import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-time-off-form',
@@ -43,12 +44,8 @@ export class TimeOffForm implements OnInit {
       return 0; // Or implement hourly calculation
     }
     // For full-day, calculate from date range
-    const start = new Date(this.startDate());
-    const end = new Date(this.endDate());
-    if (this.startDate() && this.endDate() && start <= end) {
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      return diffDays;
+    if (this.startDate() && this.endDate()) {
+      return this.dateUtil.diffInDays(this.startDate(), this.endDate());
     }
     return 1;
   });
@@ -61,7 +58,7 @@ export class TimeOffForm implements OnInit {
   attachments = signal<{ id: number; name: string; description: string }[]>([]);
 
   ngOnInit() {
-    this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
+    this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
     this.resetDates();
 
     if (this.initialLeaveTypeId) {
@@ -80,7 +77,6 @@ export class TimeOffForm implements OnInit {
     if (!start) return;
 
     const period = this.leavePeriod();
-    const startDate = new Date(start);
 
     // For half-day, end date = start date
     if (period === 'morning' || period === 'afternoon') {
@@ -89,7 +85,7 @@ export class TimeOffForm implements OnInit {
     // For full-day, keep current end date or set to start date if invalid
     else if (period === 'full-day') {
       const end = this.endDate();
-      if (!end || new Date(end) < startDate) {
+      if (!end || dayjs(end).isBefore(dayjs(start))) {
         this.endDate.set(start);
       }
     }
@@ -149,7 +145,7 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
-    if (new Date(this.startDate()) > new Date(this.endDate())) {
+    if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
       this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
@@ -164,7 +160,7 @@ export class TimeOffForm implements OnInit {
     // Create Mock Request
     const request: TimeOffRequest = {
       id: 'NEW',
-      createDate: new Date().toISOString(),
+      createDate: dayjs().toISOString(),
       status: 'คำขอใหม่',
       employeeId: 'EMP001',
       leaveType: typeLabel,

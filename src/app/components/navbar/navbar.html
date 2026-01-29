@@ -70,8 +70,8 @@
 
         <div class="profile-dropdown" *ngIf="isProfileOpen">
           <div class="dropdown-user-info">
-            <div class="name">{{ userName }}</div>
-            <div class="role">{{ userRole }}</div>
+            <div class="name">{{ userName() }}</div>
+            <div class="role">{{ userRole() }}</div>
           </div>
           <ul class="dropdown-menu-list">
             <li (click)="isProfileOpen = false">Settings</li>

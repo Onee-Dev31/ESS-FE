@@ -41,6 +41,8 @@
     "@ng-icons/material-icons": "^33.0.0",
     "@ng-icons/tabler-icons": "^33.0.0",
     "@tanstack/angular-table": "^8.21.3",
+    "date-holidays": "^3.26.7",
+    "dayjs": "^1.11.19",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

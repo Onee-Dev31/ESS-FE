@@ -1,67 +1,76 @@
 import { Injectable } from '@angular/core';
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
+
+// Extend dayjs with plugins
+dayjs.extend(relativeTime);
+dayjs.extend(buddhistEra);
+dayjs.locale('th');
 
 @Injectable({
     providedIn: 'root'
 })
 export class DateUtilityService {
-    private readonly MONTHS = [
-        'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.',
-        'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.',
-        'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-    ];
 
     /**
-     * Format date to Thai month format (dd-MonthName-yyyy)
-     * @param dateStr ISO date string or Date object
-     * @returns Formatted date string
+     * Format date to Thai month format (dd-MMM-yyyy)
      */
     formatDateToThaiMonth(dateStr: string | Date): string {
-        const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = this.MONTHS[date.getMonth()];
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
+        return dayjs(dateStr).format('DD-MMM-YYYY');
     }
 
     /**
      * Convert ISO date to Buddhist Era format (dd/mm/yyyy+543)
-     * @param isoDate ISO date string (yyyy-mm-dd)
-     * @returns Date in BE format (dd/mm/yyyy)
      */
     formatDateToBE(isoDate: string): string {
-        const parts = isoDate.split('-');
-        if (parts.length !== 3) return isoDate;
-        const year = parseInt(parts[0]) + 543;
-        return `${parts[2]}/${parts[1]}/${year}`;
+        if (!isoDate) return '';
+        return dayjs(isoDate).format('DD/MM/BBBB'); // BBBB is Day.js Buddhist Era year
     }
 
     /**
      * Convert Buddhist Era date to ISO format (yyyy-mm-dd)
-     * @param beDate Date in BE format (dd/mm/yyyy)
-     * @returns ISO date string
      */
     formatBEToISO(beDate: string): string {
+        if (!beDate) return '';
         const parts = beDate.split('/');
         if (parts.length !== 3) return beDate;
-        const year = parseInt(parts[2]) - 543;
-        return `${year}-${parts[1]}-${parts[0]}`;
+
+        // Buddhist Era to Gregorian (CE)
+        const yearCE = parseInt(parts[2]) - 543;
+        return `${yearCE}-${parts[1]}-${parts[0]}`;
     }
 
     /**
      * Get current date in ISO format
-     * @returns Current date (yyyy-mm-dd)
      */
     getCurrentDateISO(): string {
-        return new Date().toISOString().split('T')[0];
+        return dayjs().format('YYYY-MM-DD');
     }
 
     /**
-     * Validate date range (start date must be before or equal to end date)
-     * @param startDate Start date
-     * @param endDate End date
-     * @returns true if valid, false otherwise
+     * Validate date range
      */
     isValidDateRange(startDate: string, endDate: string): boolean {
-        return new Date(startDate) <= new Date(endDate);
+        const start = dayjs(startDate);
+        const end = dayjs(endDate);
+        return start.isBefore(end) || start.isSame(end);
+    }
+
+    /**
+     * Get human-readable time difference (e.g., "2 วันที่แล้ว")
+     */
+    getTimeAgo(date: string | Date): string {
+        return dayjs(date).fromNow();
+    }
+
+    /**
+     * Calculate difference in days
+     */
+    diffInDays(startDate: string | Date, endDate: string | Date): number {
+        const start = dayjs(startDate).startOf('day');
+        const end = dayjs(endDate).startOf('day');
+        return end.diff(start, 'day') + 1;
     }
 }

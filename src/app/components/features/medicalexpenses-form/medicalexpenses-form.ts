@@ -5,6 +5,7 @@ import { MedicalexpensesService } from '../../../services/medicalexpenses.servic
 import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
 import { AlertService } from '../../../services/alert.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -68,12 +69,12 @@ export class MedicalexpensesForm implements OnInit {
           }
         } else {
           this.isEditMode.set(false);
-          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
+          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
           this.resetDates();
         }
       });
     } else {
-      this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date()));
+      this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
       this.resetDates();
     }
   }
@@ -127,7 +128,7 @@ export class MedicalexpensesForm implements OnInit {
       return;
     }
 
-    if (new Date(this.startDate()) > new Date(this.endDate())) {
+    if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
       this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
       return;
     }
@@ -141,7 +142,7 @@ export class MedicalexpensesForm implements OnInit {
 
     const request: MedicalRequest = {
       id: this.requestId,
-      createDate: new Date().toISOString(),
+      createDate: dayjs().toISOString(),
       status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
       employeeId: 'EMP001',
       totalRequestedAmount: this.amount(),

@@ -5,6 +5,7 @@ import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-moda
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -19,6 +20,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
 
   private taxiService = inject(TaxiService);
   private alertService = inject(AlertService);
+  private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: TaxiRequest;
@@ -126,7 +128,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
         const newRequest: TaxiRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TAXI,
-          createDate: new Date().toLocaleDateString('en-GB'),
+          createDate: this.dateUtil.getCurrentDateISO(),
           status: 'รอตรวจสอบ',
           items: taxiItems
         };

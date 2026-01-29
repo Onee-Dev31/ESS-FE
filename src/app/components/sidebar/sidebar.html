@@ -6,7 +6,7 @@
       <h3 class="section-title">Main</h3>
 
       <ul class="nav-list">
-        <li class="nav-item" *ngFor="let item of menuItems" [class.open]="openMenu === item.name">
+        <li class="nav-item" *ngFor="let item of menuItems()" [class.open]="openMenu === item.name">
 
           <div class="nav-link" (click)="toggleMenu(item.name)" [class.active]="openMenu === item.name">
             <div class="link-content">

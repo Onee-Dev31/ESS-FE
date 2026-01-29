@@ -21,34 +21,34 @@ export class AllowanceService {
 
     // ดึงข้อมูลคำขอเบี้ยเลี้ยงทั้งหมด
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
-        return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(200)));
+        return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(100)));
     }
 
     // ดึงข้อมูลคำขอเบี้ยเลี้ยงตาม ID
     getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
         const item = this.allowanceRequestsMock.find(r => r.id === id);
-        return this.loadingService.wrap(of(item).pipe(delay(200)));
+        return this.loadingService.wrap(of(item).pipe(delay(100)));
     }
 
     // เพิ่มคำขอเบี้ยเลี้ยงใหม่
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
         this.allowanceRequestsMock = [request, ...this.allowanceRequestsMock];
         this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // อัปเดตข้อมูลคำขอเบี้ยเลี้ยง
     updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
         this.allowanceRequestsMock = this.allowanceRequestsMock.map(r => r.id === id ? updatedRequest : r);
         this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // ลบคำขอเบี้ยเลี้ยง
     deleteAllowanceRequest(id: string): Observable<void> {
         this.allowanceRequestsMock = this.allowanceRequestsMock.filter(r => r.id !== id);
         this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // สร้างรหัสคำขอถัดไป
@@ -69,7 +69,7 @@ export class AllowanceService {
     // ดึงข้อมูล log จำลองสำหรับเบี้ยเลี้ยง
     getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
         const results = AllowanceMock.getMockAllowanceLogs(month, year);
-        return of(results).pipe(delay(200));
+        return of(results).pipe(delay(100));
     }
 
     // อัปเดตสถานะคำขอเบี้ยเลี้ยง

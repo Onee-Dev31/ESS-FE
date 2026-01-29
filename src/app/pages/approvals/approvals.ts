@@ -16,6 +16,7 @@ import {
 } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
+import { DateUtilityService } from '../../services/date-utility.service';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 
 
@@ -32,6 +33,7 @@ export class ApprovalsComponent implements OnInit {
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);
   private approvalsHelper = inject(ApprovalsHelperService);
+  private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
   protected readonly Math = Math;
 
@@ -86,9 +88,7 @@ export class ApprovalsComponent implements OnInit {
           case 'requestNo':
             return itemA.requestNo.localeCompare(itemB.requestNo) * direction;
           case 'requestDate':
-            valueA = itemA.requestDate.split('/').reverse().join('');
-            valueB = itemB.requestDate.split('/').reverse().join('');
-            return valueA.localeCompare(valueB) * direction;
+            return itemA.requestDate.localeCompare(itemB.requestDate) * direction;
           case 'requestBy':
             return itemA.requestBy.name.localeCompare(itemB.requestBy.name) * direction;
           case 'requestType':
@@ -195,5 +195,9 @@ export class ApprovalsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/dashboard']);
+  }
+
+  getTimeAgo(date: string): string {
+    return this.dateUtil.getTimeAgo(date);
   }
 }

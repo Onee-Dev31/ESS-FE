@@ -21,34 +21,34 @@ export class TaxiService {
 
     // ดึงข้อมูลคำขอค่าแท็กซี่ทั้งหมด
     getTaxiRequests(): Observable<TaxiRequest[]> {
-        return this.loadingService.wrap(this.taxiRequestsSubject.asObservable().pipe(delay(200)));
+        return this.loadingService.wrap(this.taxiRequestsSubject.asObservable().pipe(delay(100)));
     }
 
     // ดึงข้อมูลคำขอค่าแท็กซี่ตาม ID
     getTaxiRequestById(id: string): Observable<TaxiRequest | undefined> {
         const item = this.taxiRequestsMock.find(r => r.id === id);
-        return this.loadingService.wrap(of(item).pipe(delay(200)));
+        return this.loadingService.wrap(of(item).pipe(delay(100)));
     }
 
     // เพิ่มคำขอค่าแท็กซี่ใหม่
     addTaxiRequest(request: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = [request, ...this.taxiRequestsMock];
         this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // อัปเดตข้อมูลคำขอค่าแท็กซี่
     updateTaxiRequest(id: string, updatedRequest: TaxiRequest): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.map(r => r.id === id ? updatedRequest : r);
         this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // ลบคำขอค่าแท็กซี่
     deleteTaxiRequest(id: string): Observable<void> {
         this.taxiRequestsMock = this.taxiRequestsMock.filter(r => r.id !== id);
         this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
-        return this.loadingService.wrap(of(void 0).pipe(delay(300)));
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // สร้างรหัสคำขอแท็กซี่ถัดไป
@@ -64,7 +64,7 @@ export class TaxiService {
     // ดึงข้อมูล log จำลองสำหรับค่าแท็กซี่
     getMockTaxiLogs(month: number, year: number): Observable<any[]> {
         const results = TaxiMock.getMockTaxiLogs(month, year);
-        return of(results).pipe(delay(200));
+        return of(results).pipe(delay(100));
     }
 
     // อัปเดตสถานะคำขอแท็กซี่

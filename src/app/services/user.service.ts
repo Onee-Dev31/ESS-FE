@@ -33,6 +33,6 @@ export class UserService {
 
     // ดึงข้อมูลโปรไฟล์ผู้ใช้งานจำลอง
     getUserProfile(): Observable<UserProfile> {
-        return of(UserMock.PROFILE).pipe(delay(300));
+        return of(UserMock.PROFILE).pipe(delay(100));
     }
 }

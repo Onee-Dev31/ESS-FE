@@ -1,8 +1,8 @@
-import { Component, HostListener, ElementRef } from '@angular/core';
+import { Component, HostListener, ElementRef, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface NotificationItem {
   id: number;
@@ -23,8 +23,8 @@ export class NavbarComponent {
   isProfileOpen = false;
   isNotificationOpen = false;
 
-  userName = 'MARK STEPHEN';
-  userRole = 'Web Developer';
+  userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
+  userRole = computed(() => this.authService.userRole() || 'Web Developer');
 
   notifications: NotificationItem[] = [
     {
@@ -39,7 +39,8 @@ export class NavbarComponent {
   constructor(
     private eRef: ElementRef,
     private router: Router,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    private authService: AuthService
   ) { }
 
   // เปิด/ปิด แถบเมนูด้านข้าง
@@ -71,6 +72,7 @@ export class NavbarComponent {
   // ออกจากระบบและกลับไปหน้า Login
   logout() {
     this.isProfileOpen = false;
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 }

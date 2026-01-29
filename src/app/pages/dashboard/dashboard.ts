@@ -1,21 +1,29 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Observable, map } from 'rxjs';
+import { map } from 'rxjs';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
+import { AuthService } from '../../services/auth.service';
+
+import dayjs from 'dayjs';
+import 'dayjs/locale/th';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
 interface PerformanceItem { year: string; grade: string; }
+
+// ตั้งค่า Locale เป็นไทยทั่วทั้ง Component
+dayjs.locale('th');
 
 @Component({
   selector: 'app-dashboard',
@@ -33,6 +41,10 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
+  private authService = inject(AuthService);
+
+  // Reactive role from signal
+  userRole = this.authService.userRole;
 
   isPolicyModalOpen = signal<boolean>(false);
   isTimeOffModalOpen = signal<boolean>(false);
@@ -40,19 +52,59 @@ export class DashboardComponent implements OnInit {
   tooltipModalContent = signal<string>('');
   selectedLeaveTypeId = signal<string>('');
 
-  userProfile$!: Observable<UserProfile>;
-  medicalStats$!: Observable<MedicalStat[]>;
-  welfareStats$!: Observable<WelfareItem[]>;
-  leaveStats$!: Observable<LeaveItem[]>;
-  holidays$!: Observable<HolidayItem[]>;
-  pendingCount$!: Observable<number>;
+  // Data Signals using toSignal
+  userProfile = toSignal(this.userService.getUserProfile());
+  medicalStats = toSignal(this.dashboardService.getMedicalStats(), { initialValue: [] });
+  welfareStats = toSignal(this.dashboardService.getWelfareStats(), { initialValue: [] });
+  leaveStats = toSignal(this.dashboardService.getLeaveStats(), { initialValue: [] });
+  holidays = toSignal(this.dashboardService.getHolidays(), { initialValue: [] });
+  pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
 
-  profileList$!: Observable<ProfileItem[]>;
-  itList$!: Observable<ProfileItem[]>;
+  // Computed lists derived from userProfile signal
+  profileList = computed<ProfileItem[]>(() => {
+    const profile = this.userProfile();
+    if (!profile) return [];
+    return [
+      { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
+      { label: 'เบอร์โทรศัพท์', value: profile.phone, icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
+      { label: 'ชั้น', value: profile.floor, icon: 'fas fa-layer-group', iconColor: '#ffffff' },
+      { label: 'แผนก', value: profile.department, icon: 'fas fa-sitemap', iconColor: '#ffffff' },
+      { label: 'บริษัท', value: profile.company, icon: 'fas fa-building', iconColor: '#ffffff' }
+    ];
+  });
+
+  itList = computed<ProfileItem[]>(() => {
+    const profile = this.userProfile();
+    if (!profile?.itAssets) return [];
+    return [
+      { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
+      { label: 'Account expire date', value: profile.itAssets.expireDate },
+      { label: 'Laptop', value: profile.itAssets.laptop },
+      { label: 'PC', value: profile.itAssets.pc },
+      { label: 'Monitor', value: profile.itAssets.monitor }
+    ];
+  });
 
   attendanceList: AttendanceItem[] = [];
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, any> = {};
+
+  // --- Day.js Dynamic Props ---
+  workStartDate = '2021-07-10';
+
+  // ช่วงวันที่ของเดือนปัจจุบันแบบอัตโนมัติ
+  attendancePeriod = computed(() => {
+    const start = dayjs().startOf('month').format('DD/MM/YYYY');
+    const end = dayjs().endOf('month').format('DD/MM/YYYY');
+    return `${start} - ${end}`;
+  });
+
+  // อายุงานคำนวณอัตโนมัติ
+  workDuration = computed(() => {
+    const years = dayjs().diff(dayjs(this.workStartDate), 'year');
+    return `${years} ปี`;
+  });
+  // ---------------------------
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -67,9 +119,7 @@ export class DashboardComponent implements OnInit {
     contentHeight: 'auto',
     fixedWeekCount: false,
     dayCellContent: (arg: DayCellContentArg) => {
-      const offset = arg.date.getTimezoneOffset() * 60000;
-      const localDate = new Date(arg.date.getTime() - offset);
-      const dateStr = localDate.toISOString().split('T')[0];
+      const dateStr = dayjs(arg.date).format('YYYY-MM-DD');
       const dayNumber = arg.dayNumberText;
       const data = this.specialDates[dateStr];
       const isWeekend = arg.date.getDay() === 0 || arg.date.getDay() === 6;
@@ -111,39 +161,9 @@ export class DashboardComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.userProfile$ = this.userService.getUserProfile();
-    this.medicalStats$ = this.dashboardService.getMedicalStats();
-    this.welfareStats$ = this.dashboardService.getWelfareStats();
-    this.leaveStats$ = this.dashboardService.getLeaveStats();
-    this.holidays$ = this.dashboardService.getHolidays();
-    this.pendingCount$ = this.dashboardService.getGlobalPendingCount();
-
     this.attendanceList = this.dashboardService.getAttendanceList();
     this.performanceList = this.dashboardService.getPerformanceList();
     this.specialDates = this.dashboardService.getSpecialDates();
-
-    this.profileList$ = this.userProfile$.pipe(
-      map(profile => [
-        { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
-        { label: 'เบอร์โทรศัพท์', value: profile.phone, icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
-        { label: 'ชั้น', value: profile.floor, icon: 'fas fa-layer-group', iconColor: '#ffffff' },
-        { label: 'แผนก', value: profile.department, icon: 'fas fa-sitemap', iconColor: '#ffffff' },
-        { label: 'บริษัท', value: profile.company, icon: 'fas fa-building', iconColor: '#ffffff' }
-      ])
-    );
-
-    this.itList$ = this.userProfile$.pipe(
-      map(profile => {
-        if (!profile.itAssets) return [];
-        return [
-          { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
-          { label: 'Account expire date', value: profile.itAssets.expireDate },
-          { label: 'Laptop', value: profile.itAssets.laptop },
-          { label: 'PC', value: profile.itAssets.pc },
-          { label: 'Monitor', value: profile.itAssets.monitor }
-        ];
-      })
-    );
   }
 
   openTimeOffForm(leaveLabel: string) {

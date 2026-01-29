@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, combineLatest, map, finalize } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { catchError, delay } from 'rxjs/operators';
 import { LoadingService } from './loading.service';
 import { AllowanceService } from './allowance.service';
 import { TaxiService } from './taxi.service';
@@ -9,6 +9,8 @@ import { TransportService } from './transport.service';
 import { MedicalexpensesService } from './medicalexpenses.service';
 
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/dashboard.interface';
+import DateHolidays from 'date-holidays';
+import dayjs from 'dayjs';
 
 @Injectable({
     providedIn: 'root'
@@ -24,14 +26,17 @@ export class DashboardService {
     constructor() { }
 
     // ดึงจำนวนรายการที่รออนุมัติทั้งหมดจากทุก Service
+    // ปรับปรุงให้ทนทานต่อ Error (Resiliency) - ถ้า Service ไหนพัง ข้อมูลที่เหลือยังโหลดได้
     getGlobalPendingCount(): Observable<number> {
-        return combineLatest([
-            this.allowanceService.getAllowanceRequests(),
-            this.taxiService.getTaxiRequests(),
-            this.transportService.getRequests(),
-            this.medicalService.getMedicalRequests()
-        ]).pipe(
-            map(results => {
+        const streams: Observable<any[]>[] = [
+            this.allowanceService.getAllowanceRequests().pipe(catchError(() => of([]))),
+            this.taxiService.getTaxiRequests().pipe(catchError(() => of([]))),
+            this.transportService.getRequests().pipe(catchError(() => of([]))),
+            this.medicalService.getMedicalRequests().pipe(catchError(() => of([])))
+        ];
+
+        return combineLatest(streams).pipe(
+            map((results: any[][]) => {
                 const pendingStatuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
                 return results.reduce((sum, list) =>
                     sum + list.filter(item => pendingStatuses.includes(item.status)).length, 0);
@@ -46,7 +51,7 @@ export class DashboardService {
             { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-indigo', percent: 100 },
             { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
         ];
-        return this.loadingService.wrap(of(stats).pipe(delay(300)));
+        return this.loadingService.wrap(of(stats).pipe(delay(100)));
     }
 
     getWelfareStats(): Observable<WelfareItem[]> {
@@ -82,7 +87,7 @@ export class DashboardService {
                 tooltip: `<div class="text-center mb-3"><i class="fas fa-spa fa-2x text-purple-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>เบิกได้ 12,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><i class="fas fa-check-circle text-green-500"></i><span>พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน</span></li></ul>`
             }
         ];
-        return this.loadingService.wrap(of(stats).pipe(delay(300)));
+        return this.loadingService.wrap(of(stats).pipe(delay(100)));
     }
 
     getLeaveStats(): Observable<LeaveItem[]> {
@@ -93,7 +98,7 @@ export class DashboardService {
             { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', iconColor: '#9333ea', theme: 'theme-purple', balance: 3 },
             { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', iconColor: '#35b653', theme: 'theme-green', balance: 3 },
         ];
-        return this.loadingService.wrap(of(leaves).pipe(delay(300)));
+        return this.loadingService.wrap(of(leaves).pipe(delay(100)));
     }
 
     getHolidays(): Observable<HolidayItem[]> {
@@ -101,7 +106,7 @@ export class DashboardService {
             { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },
             { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
             { date: '31/12/2569', name: 'วันสิ้นปี' }
-        ]).pipe(delay(200)));
+        ]).pipe(delay(100)));
     }
 
     getAttendanceList(): any[] {
@@ -126,13 +131,31 @@ export class DashboardService {
     }
 
     getSpecialDates(): Record<string, any> {
-        return {
-            '2026-01-01': { type: 'holiday', note: 'วันขึ้นปีใหม่', code: 'HOL' },
-            '2026-03-03': { type: 'holiday', note: 'วันมาฆบูชา', code: 'HOL' },
-            '2026-04-06': { type: 'holiday', note: 'วันจักรี', code: 'HOL' },
-            '2026-04-13': { type: 'holiday', note: 'วันสงกรานต์', code: 'HOL' },
-            '2026-01-20': { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' },
-        };
+        const hd = new DateHolidays('TH');
+        hd.setLanguages('th'); // Set language to Thai
+        const currentYear = dayjs().year();
+        const nextYear = currentYear + 1;
+
+        // Get holidays for current and next year
+        const holidays = [
+            ...hd.getHolidays(currentYear),
+            ...hd.getHolidays(nextYear)
+        ];
+
+        const result: Record<string, any> = {};
+
+        holidays.forEach(h => {
+            const dateStr = h.date.split(' ')[0]; // Format: YYYY-MM-DD HH:mm:ss
+            // Check if it's a public holiday (type 'public')
+            if (h.type === 'public') {
+                result[dateStr] = { type: 'holiday', note: h.name, code: 'HOL' };
+            }
+        });
+
+        // Add specific leave mock data
+        result['2026-01-20'] = { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' };
+
+        return result;
     }
 }
 

@@ -1,11 +1,11 @@
 import { TimeOffRequest, LEAVE_TYPES } from '../interfaces/time-off.interface';
+import dayjs from 'dayjs';
 
 export class TimeOffMock {
     static generateRequests(count: number): TimeOffRequest[] {
         return Array.from({ length: count }, (_, i) => {
-            const today = new Date();
-            const startDate = new Date(today);
-            startDate.setDate(today.getDate() + i);
+            const today = dayjs();
+            const startDate = today.add(i, 'day');
 
             const leaveType = LEAVE_TYPES[i % LEAVE_TYPES.length];
 
@@ -33,11 +33,9 @@ export class TimeOffMock {
             }
 
             // Calculate end date based on number of days
-            const endDate = new Date(startDate);
-            // For half day (0.5), end date is same as start date
-            // For full days, add (days - 1) to start date
+            let endDate = startDate;
             if (daysCount > 0.5) {
-                endDate.setDate(startDate.getDate() + Math.floor(daysCount) - 1);
+                endDate = startDate.add(Math.floor(daysCount) - 1, 'day');
             }
 
             // Rotate through all 4 statuses
@@ -49,8 +47,8 @@ export class TimeOffMock {
                 status: statuses[i % statuses.length],
                 employeeId: 'EMP001',
                 leaveType: leaveType.label,
-                startDate: startDate.toISOString().split('T')[0],
-                endDate: endDate.toISOString().split('T')[0],
+                startDate: startDate.format('YYYY-MM-DD'),
+                endDate: endDate.format('YYYY-MM-DD'),
                 reason: 'ไปทำธุระส่วนตัว',
                 attachments: this.generateAttachments(i),
                 days: daysCount,

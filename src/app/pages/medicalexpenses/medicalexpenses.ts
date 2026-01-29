@@ -12,6 +12,8 @@ import {
   getCoreRowModel,
   SortingState,
 } from '@tanstack/angular-table';
+import { DateUtilityService } from '../../services/date-utility.service';
+import dayjs from 'dayjs';
 
 interface FlatMedicalRow extends MedicalItem {
   requestId: string;
@@ -29,6 +31,7 @@ interface FlatMedicalRow extends MedicalItem {
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private vehicleService = inject(VehicleService);
+  private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
   goBack() {
@@ -43,9 +46,9 @@ export class MedicalexpensesComponent implements OnInit {
   isFilterVisible = signal<boolean>(false);
 
   fromMonth = signal<number>(0);
-  fromYear = signal<string>((new Date().getFullYear() - 1).toString());
+  fromYear = signal<string>((dayjs().year() - 1).toString());
   toMonth = signal<number>(11);
-  toYear = signal<string>((new Date().getFullYear()).toString());
+  toYear = signal<string>(dayjs().year().toString());
 
   months = [
     { label: 'มกราคม', value: 0 }, { label: 'กุมภาพันธ์', value: 1 }, { label: 'มีนาคม', value: 2 },
@@ -75,9 +78,9 @@ export class MedicalexpensesComponent implements OnInit {
 
     if (!isNaN(fromYear) && !isNaN(toYear)) {
       data = data.filter(r => {
-        const reqDate = new Date(r.createDate);
-        const reqMonth = reqDate.getMonth();
-        const reqYear = reqDate.getFullYear();
+        const reqDate = dayjs(r.createDate);
+        const reqMonth = reqDate.month();
+        const reqYear = reqDate.year();
 
         const startVal = fromYear * 100 + fromMonth;
         const endVal = toYear * 100 + toMonth;
@@ -218,9 +221,9 @@ export class MedicalexpensesComponent implements OnInit {
   clearFilters() {
     this.filterStatus.set('');
     this.fromMonth.set(0);
-    this.fromYear.set((new Date().getFullYear() - 1).toString());
+    this.fromYear.set((dayjs().year() - 1).toString());
     this.toMonth.set(11);
-    this.toYear.set((new Date().getFullYear()).toString());
+    this.toYear.set(dayjs().year().toString());
   }
 
   // แสดง/ซ่อน ส่วนตัวกรองข้อมูล

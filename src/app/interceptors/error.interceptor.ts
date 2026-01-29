@@ -1,13 +1,17 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AlertService } from '../services/alert.service';
+import { AuthService } from '../services/auth.service';
 
 /**
  * Interceptor สำหรับจัดการข้อผิดพลาดในการเรียก API ทั่วทั้งระบบ
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const alertService = inject(AlertService);
+    const authService = inject(AuthService);
+    const router = inject(Router);
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
@@ -15,7 +19,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
             if (error.status === 401) {
                 errorMessage = 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่';
-                // สามารถเพิ่ม logic สำหรับ redirect ไปหน้า login ได้ที่นี่
+                authService.logout();
+                router.navigate(['/login']);
             } else if (error.status === 403) {
                 errorMessage = 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้';
             } else if (error.status === 404) {

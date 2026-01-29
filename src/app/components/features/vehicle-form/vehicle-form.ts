@@ -5,6 +5,7 @@ import { TransportService, RequestItem, VehicleRequest } from '../../../services
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { THAI_MONTHS, YEARS_CONFIG } from '../../../config/constants';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 interface LogItem {
   date: string;
@@ -31,6 +32,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
   private transportService = inject(TransportService);
   private alertService = inject(AlertService);
+  private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: VehicleRequest;
@@ -178,7 +180,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         const newRequest: VehicleRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.TRANSPORT,
-          createDate: new Date().toISOString().split('T')[0],
+          createDate: this.dateUtil.getCurrentDateISO(),
           status: 'รอตรวจสอบ',
           items: requestItems
         };

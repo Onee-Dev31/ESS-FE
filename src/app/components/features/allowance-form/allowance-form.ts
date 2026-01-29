@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
+import { DateUtilityService } from '../../../services/date-utility.service';
 import { switchMap } from 'rxjs';
 
 @Component({
@@ -19,6 +20,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   private allowanceService = inject(AllowanceService);
   private alertService = inject(AlertService);
+  private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: AllowanceRequest;
@@ -208,7 +210,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         const newRequest: AllowanceRequest = {
           id: this.requestId,
           typeId: WELFARE_TYPES.ALLOWANCE,
-          createDate: new Date().toISOString().split('T')[0],
+          createDate: this.dateUtil.getCurrentDateISO(),
           status: 'รอตรวจสอบ',
           items: items
         };
