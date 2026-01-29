@@ -1,0 +1,224 @@
+<div class="approvals-wrapper">
+    <div class="card">
+        <div class="page-header">
+            <div class="title-with-back">
+                <button class="btn-back" (click)="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="main-title">Medical Expenses Approvals</h1>
+            </div>
+            <div class="utility-btns">
+                <button class="btn-outline">📥 Export</button>
+                <button class="btn-outline" (click)="refresh()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="table-controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="searchText()"
+                    (input)="onSearch($event)" />
+            </div>
+
+            <div class="tab-navigation">
+                @for (tab of tabs; track tab) {
+                <button class="tab-item" [class.active]="activeTab() === tab" (click)="setActiveTab(tab)">
+                    {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
+                </button>
+                }
+            </div>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="card-list-view">
+            @for (row of table.getRowModel().rows; track $index) {
+            <div class="mobile-card">
+                <div class="card-header">
+                    <div class="request-id">
+                        <span class="label">No.</span>
+                        <span class="value">{{ row.original.requestNo }}</span>
+                    </div>
+                    <span class="status-badge" [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">
+                        {{ row.original.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label">Date Created:</span>
+                        <span class="value">{{ row.original.requestDate }}</span>
+                    </div>
+
+                    <div class="requester-block">
+                        <div class="req-name">{{ row.original.requestBy.name }}</div>
+                        <div class="req-details">
+                            <span>{{ row.original.requestBy.employeeId }}</span> &bull;
+                            <span>{{ row.original.requestBy.department }}</span>
+                        </div>
+                        <div class="req-company">{{ row.original.requestBy.company }}</div>
+                    </div>
+
+                    <div class="info-row mt-2">
+                        <span class="label">Type:</span>
+                        <span class="value highlight">{{ row.original.requestType }}</span>
+                    </div>
+
+                    <div class="description-block">
+                        <div class="desc-label">Description:</div>
+                        <div class="desc-content">{{ row.original.requestDetail }}</div>
+                    </div>
+
+                    <div class="amount-row">
+                        <span class="label">Amount</span>
+                        <span class="value amount">{{ row.original.amount | number }}</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="act-btn a-btn" title="Approve"
+                            (click)="openActionModal(row.original, 'Approved')">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="act-btn r-btn" title="Reject"
+                            (click)="openActionModal(row.original, 'Rejected')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="act-btn b-btn" title="Refer Back"
+                            (click)="openActionModal(row.original, 'Referred Back')">
+                            <i class="fas fa-undo-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="data-grid-container">
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th (click)="toggleSort('requestNo')" style="cursor: pointer">
+                            Request No <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
+                        </th>
+                        <th (click)="toggleSort('requestDate')" style="cursor: pointer">
+                            Date Created <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+                        </th>
+                        <th (click)="toggleSort('requestBy')" style="cursor: pointer">
+                            Requester Info <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+                        </th>
+                        <th (click)="toggleSort('requestType')" style="cursor: pointer">
+                            Type <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+                        </th>
+                        <th>Description</th>
+                        <th (click)="toggleSort('amount')" style="cursor: pointer" class="text-right">
+                            Amount <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+                        </th>
+                        <th (click)="toggleSort('status')" style="cursor: pointer" class="text-center">
+                            Status <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                        </th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of table.getRowModel().rows; track $index) {
+                    <tr>
+                        <td class="text-center font-inter" (click)="viewDetail(row.original)"
+                            style="cursor: pointer; color: #008ebc; font-weight: 600;">
+                            {{ row.original.requestNo }}
+                        </td>
+                        <td class="text-center text-muted">{{ row.original.requestDate }}</td>
+                        <td>
+                            <div class="requester-info">
+                                <div class="name">{{ row.original.requestBy.name }}</div>
+                                <div class="details-box">
+                                    <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
+                                    <div class="detail-item">{{ row.original.requestBy.department }}</div>
+                                    <div class="detail-item">{{ row.original.requestBy.company }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">{{ row.original.requestType }}</td>
+                        <td class="text-left description-cell">
+                            <div class="truncate-text">{{ row.original.requestDetail }}</div>
+                        </td>
+                        <td class="amount-cell">{{ row.original.amount | number }}</td>
+                        <td class="text-center">
+                            <span class="status-badge"
+                                [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">{{
+                                row.original.status }}</span>
+                        </td>
+                        <td>
+                            <div class="action-cell">
+                                <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="act-btn a-btn" title="Approve"
+                                    (click)="openActionModal(row.original, 'Approved')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="act-btn r-btn" title="Reject"
+                                    (click)="openActionModal(row.original, 'Rejected')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <button class="act-btn b-btn" title="Refer Back"
+                                    (click)="openActionModal(row.original, 'Referred Back')">
+                                    <i class="fas fa-undo-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
+                ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                filteredData().length) }}
+                จาก {{ filteredData().length }} รายการ
+            </div>
+            <div class="pagination-controls">
+                <div class="page-size-selector">
+                    <span>จำนวนแถวต่อหน้า:</span>
+                    <select [ngModel]="table.getState().pagination.pageSize"
+                        (ngModelChange)="table.setPageSize($event)">
+                        <option [value]="10">10</option>
+                        <option [value]="20">20</option>
+                        <option [value]="50">50</option>
+                    </select>
+                </div>
+                <div class="page-buttons">
+                    <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <span class="page-info">
+                        <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount()
+                            }}</strong>
+                    </span>
+                    <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
+                        [disabled]="!table.getCanNextPage()">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (isModalOpen() && selectedItem()) {
+<app-approval-detail-modal [approvalItem]="selectedItem()!" [initialAction]="initialAction()" (onClose)="closeModal()"
+    (onStatusUpdated)="onStatusUpdated()">
+</app-approval-detail-modal>
+}

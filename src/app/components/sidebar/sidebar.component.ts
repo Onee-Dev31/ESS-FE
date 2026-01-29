@@ -56,7 +56,8 @@ export class Sidebar {
             name: 'อนุมัติ',
             icon: 'fa-check-circle',
             subItems: [
-                { label: 'รายการรออนุมัติ', path: '/approvals' }
+                { label: 'สวัสดิการ', path: '/approvals' },
+                { label: 'ค่ารักษาพยาบาล', path: '/approvals-medicalexpenses' }
             ]
         }
     ];

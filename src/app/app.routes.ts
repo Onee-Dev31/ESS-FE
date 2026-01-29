@@ -42,6 +42,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent)
             },
             {
+                path: 'approvals-medicalexpenses',
+                loadComponent: () => import('./pages/approvals-medicalexpenses/approvals-medicalexpenses').then(m => m.ApprovalsMedicalexpensesComponent)
+            },
+            {
                 path: 'medicalexpenses',
                 loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent)
             },

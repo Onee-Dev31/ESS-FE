@@ -5,6 +5,7 @@ import { VehicleService } from '../../../services/vehicle.service';
 import { AllowanceService } from '../../../services/allowance.service';
 import { TaxiService } from '../../../services/taxi.service';
 import { TransportService } from '../../../services/transport.service';
+import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
 import { AlertService } from '../../../services/alert.service';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 
@@ -28,7 +29,7 @@ export interface ApprovalItem {
     department: string;
     company: string;
   };
-  requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่';
+  requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล';
   typeId: number;
   requestDetail: string;
   amount: number;
@@ -47,6 +48,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);
+  private medicalService = inject(MedicalexpensesService);
   private alertService = inject(AlertService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
@@ -63,7 +65,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   reasonText = signal<string>('');
 
   currentDetailItems = signal<UnifiedItem[]>([]);
-  currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | null>(null);
+  currentDetailType = signal<'allowance' | 'taxi' | 'vehicle' | 'medical' | null>(null);
   detailedStatus = signal<string>('');
   steps = [
     { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
@@ -154,6 +156,21 @@ export class ApprovalDetailModalComponent implements OnInit {
           this.detailedStatus.set(data.status);
         }
       });
+    } else if (item.requestType === 'ค่ารักษาพยาบาล') {
+      this.currentDetailType.set('medical');
+      this.medicalService.getRequestById(item.requestNo).subscribe(data => {
+        if (data) {
+          // Map medical items to UnifiedItem
+          const unifiedItems: UnifiedItem[] = (data.items || []).map(m => ({
+            date: m.treatmentDateFrom || data.createDate,
+            description: `${m.diseaseType} (${m.hospital})` || '',
+            amount: m.requestedAmount || 0,
+            attachedFile: '' // If there are files, map them here
+          }));
+          this.currentDetailItems.set(unifiedItems);
+          this.detailedStatus.set(data.status);
+        }
+      });
     } else {
       this.currentDetailType.set('vehicle');
       this.transportService.getRequestById(item.requestNo).subscribe(data => {
@@ -198,11 +215,12 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   // อัปเดตสถานะคำขอตามขั้นตอนการอนุมัติและแจ้งเตือนผลลัพธ์
   private updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
-    let type: 'allowance' | 'taxi' | 'vehicle' = 'vehicle';
+    let type: 'allowance' | 'taxi' | 'vehicle' | 'medical' = 'vehicle';
     let statusLabel = 'รอพนักงานยืนยัน';
 
     if (item.requestType === 'ค่าเบี้ยเลี้ยง') type = 'allowance';
     else if (item.requestType === 'ค่าแท็กซี่') type = 'taxi';
+    else if (item.requestType === 'ค่ารักษาพยาบาล') type = 'medical';
 
     if (newStatus === 'Rejected') {
       statusLabel = 'ไม่อนุมัติ';
@@ -231,6 +249,20 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.allowanceService.updateAllowanceStatus(item.requestNo, statusLabel);
     } else if (type === 'taxi') {
       this.taxiService.updateTaxiStatus(item.requestNo, statusLabel);
+    } else if (type === 'medical') {
+      // Assuming updateRequest takes the whole object, but here we only have status. 
+      // We might need to fetch, update, then save, or if service supports updateStatus.
+      // Looking at service, it has updateRequest(MedicalRequest). 
+      // So I should fetch first or create a partial update. 
+      // For now, I'll fetch briefly or assume I have it. 
+      // Actually I have loaded it in loadDetails but I didn't store the full object.
+      // Let's just call a new method if it exists, or update via getRequestById -> update.
+      this.medicalService.getRequestById(item.requestNo).subscribe(req => {
+        if (req) {
+          req.status = statusLabel;
+          this.medicalService.updateRequest(req).subscribe();
+        }
+      });
     } else {
       this.transportService.updateStatus(item.requestNo, statusLabel);
     }
