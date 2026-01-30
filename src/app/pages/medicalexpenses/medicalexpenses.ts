@@ -205,7 +205,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   // โหลดข้อมูลจาก Service
   loadData() {
-    this.medicalService.getMedicalRequests().subscribe((data: MedicalRequest[]) => {
+    this.medicalService.getRequests().subscribe((data: MedicalRequest[]) => {
       this.allRequests.set(data);
     });
   }

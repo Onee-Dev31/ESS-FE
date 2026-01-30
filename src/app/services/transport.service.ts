@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay, finalize } from 'rxjs';
+import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
-import { RequestItem, VehicleRequest } from '../interfaces';
-import { TransportMock } from '../mocks';
+import { RequestItem, VehicleRequest } from '../interfaces/transport.interface';
+import { TransportMock } from '../mocks/transport.mock';
 
 export type { RequestItem, VehicleRequest };
 
@@ -11,81 +11,89 @@ export type { RequestItem, VehicleRequest };
 })
 export class TransportService {
     private loadingService = inject(LoadingService);
-
-    private readonly STORAGE_KEY = 'MOCK_ADDED_TRANSPORT';
-
-    private requestsMock!: VehicleRequest[];
-    private requestsSubject!: BehaviorSubject<VehicleRequest[]>;
+    private readonly STORAGE_KEY = 'MOCK_TRANSPORT_DATA';
+    private requestsSubject = new BehaviorSubject<VehicleRequest[]>([]);
 
     constructor() {
-        this.refreshMockData();
+        this.initializeData();
     }
 
-    refreshMockData() {
-        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
-        const generatedMocks = TransportMock.generateRequestsByRole(15, role);
-        const addedRequests = this.getAddedRequestsFromStorage();
-
-        this.requestsMock = [...addedRequests, ...generatedMocks];
-
-        if (this.requestsSubject) {
-            this.requestsSubject.next(this.requestsMock);
+    private initializeData() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+            const data = JSON.parse(stored);
+            this.updateSubject(data);
         } else {
-            this.requestsSubject = new BehaviorSubject<VehicleRequest[]>(this.requestsMock);
+            const masterData = TransportMock.generateRequestsByRole(20, 'Admin');
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
     }
 
-    private getAddedRequestsFromStorage(): VehicleRequest[] {
+    private saveToStorage(data: VehicleRequest[]) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    }
+
+    private updateSubject(masterData: VehicleRequest[]) {
+        const role = localStorage.getItem('userRole') || 'Member';
+        const employeeId = localStorage.getItem('employeeId');
+
+        let viewData = masterData;
+        if (role !== 'Admin' && employeeId) {
+            viewData = masterData.filter(req => req.requester?.employeeId === employeeId);
+        }
+
+        viewData.sort((a, b) => b.id.localeCompare(a.id));
+        this.requestsSubject.next(viewData);
+    }
+
+    private getMasterData(): VehicleRequest[] {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         return stored ? JSON.parse(stored) : [];
     }
 
-    // ดึงข้อมูลคำขอทั้งหมด
     getRequests(): Observable<VehicleRequest[]> {
+        const masterData = this.getMasterData();
+        this.updateSubject(masterData);
         return this.loadingService.wrap(this.requestsSubject.asObservable().pipe(delay(100)));
     }
 
-    // ดึงข้อมูลคำขอตาม ID
     getRequestById(id: string): Observable<VehicleRequest | undefined> {
-        const item = this.requestsMock.find(r => r.id === id);
+        const masterData = this.getMasterData();
+        const item = masterData.find(r => r.id === id);
         return this.loadingService.wrap(of(item).pipe(delay(100)));
     }
 
-    // เพิ่มคำขอใหม่
     addRequest(request: VehicleRequest): Observable<void> {
-        const addedRequests = this.getAddedRequestsFromStorage();
-        addedRequests.unshift(request);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
-
-        this.requestsMock = [request, ...this.requestsMock];
-        this.requestsSubject.next([...this.requestsMock]);
+        const masterData = this.getMasterData();
+        masterData.unshift(request);
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // อัปเดตข้อมูลคำขอ
     updateRequest(id: string, updatedRequest: VehicleRequest): Observable<void> {
-        const addedRequests = this.getAddedRequestsFromStorage();
-        const index = addedRequests.findIndex(r => r.id === id);
+        const masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
         if (index !== -1) {
-            addedRequests[index] = updatedRequest;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+            masterData[index] = updatedRequest;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
-
-        this.requestsMock = this.requestsMock.map(r => r.id === id ? updatedRequest : r);
-        this.requestsSubject.next([...this.requestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // ลบคำขอ
     deleteRequest(id: string): Observable<void> {
-        this.requestsMock = this.requestsMock.filter(r => r.id !== id);
-        this.requestsSubject.next([...this.requestsMock]);
+        let masterData = this.getMasterData();
+        masterData = masterData.filter(r => r.id !== id);
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // สร้างรหัสคำขอถัดไป
     generateNextId(): Observable<string> {
-        const lastIdNum = this.requestsMock.reduce((max, item) => {
+        const masterData = this.getMasterData();
+        const lastIdNum = masterData.reduce((max, item) => {
             const num = parseInt(item.id.split('#')[1] || '0');
             return num > max ? num : max;
         }, 0);
@@ -93,17 +101,27 @@ export class TransportService {
         return of(`2701#${nextNum}`);
     }
 
-    // ดึงข้อมูล log การมาทำงานจำลอง
+    updateStatus(id: string, status: string): void {
+        const masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
+        if (index !== -1) {
+            masterData[index].status = status;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
+        }
+    }
+
+    refreshMockData() {
+        const masterData = this.getMasterData();
+        if (masterData.length === 0) {
+            this.initializeData();
+        } else {
+            this.updateSubject(masterData);
+        }
+    }
+
     getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
         const results = TransportMock.getMockAttendanceLogs(month, year);
         return of(results).pipe(delay(100));
-    }
-
-    // อัปเดตสถานะคำขอ
-    updateStatus(id: string, status: string): void {
-        this.requestsMock = this.requestsMock.map(r =>
-            r.id === id ? { ...r, status: status } : r
-        );
-        this.requestsSubject.next(this.requestsMock);
     }
 }

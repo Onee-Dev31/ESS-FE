@@ -1,6 +1,10 @@
 <div class="dashboard-wrapper">
-  <header class="dashboard-header">
+  <header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
     <h1 class="page-title">Dashboards</h1>
+    <button (click)="clearStorage()"
+      style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+      <i class="fas fa-trash-alt"></i> Reset Data
+    </button>
   </header>
 
   <main class="content-body">

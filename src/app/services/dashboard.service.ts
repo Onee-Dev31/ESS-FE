@@ -32,7 +32,7 @@ export class DashboardService {
             this.allowanceService.getAllowanceRequests().pipe(catchError(() => of([]))),
             this.taxiService.getTaxiRequests().pipe(catchError(() => of([]))),
             this.transportService.getRequests().pipe(catchError(() => of([]))),
-            this.medicalService.getMedicalRequests().pipe(catchError(() => of([])))
+            this.medicalService.getRequests().pipe(catchError(() => of([])))
         ];
 
         return combineLatest(streams).pipe(
@@ -45,7 +45,7 @@ export class DashboardService {
     }
 
     getMedicalPendingCount(): Observable<number> {
-        return this.medicalService.getMedicalRequests().pipe(
+        return this.medicalService.getRequests().pipe(
             catchError(() => of([])),
             map((requests: any[]) => {
                 const pendingStatuses = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];

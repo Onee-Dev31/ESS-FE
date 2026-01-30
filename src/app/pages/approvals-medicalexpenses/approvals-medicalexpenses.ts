@@ -47,7 +47,7 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   }
 
   refresh() {
-    this.medicalService.getMedicalRequests().pipe(take(1)).subscribe((requests) => {
+    this.medicalService.getRequests().pipe(take(1)).subscribe((requests) => {
       // Use helper service to process data
       const mappedData = this.approvalsHelper.processMedicalData(requests);
       this.approvals.set(mappedData.sort((a: ApprovalItem, b: ApprovalItem) => b.requestNo.localeCompare(a.requestNo)));

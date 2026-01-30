@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay, finalize } from 'rxjs';
+import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
-import { AllowanceItem, AllowanceRequest } from '../interfaces';
-import { Requester } from '../interfaces';
-import { AllowanceMock } from '../mocks';
+import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
+import { AllowanceMock } from '../mocks/allowance.mock';
 
 export type { AllowanceItem, AllowanceRequest };
 
@@ -12,94 +11,100 @@ export type { AllowanceItem, AllowanceRequest };
 })
 export class AllowanceService {
     private loadingService = inject(LoadingService);
-
-    private readonly STORAGE_KEY = 'MOCK_ADDED_ALLOWANCE';
-
-    // ข้อมูลจำลองคำขอเบี้ยเลี้ยง
-    private allowanceRequestsMock!: AllowanceRequest[];
-    private allowanceRequestsSubject!: BehaviorSubject<AllowanceRequest[]>;
+    private readonly STORAGE_KEY = 'MOCK_ALLOWANCE_DATA';
+    private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>([]);
 
     constructor() {
-        this.refreshMockData();
+        this.initializeData();
     }
 
-    private generateMockData(count: number): AllowanceRequest[] {
-        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
-        return AllowanceMock.generateRequestsByRole(count, role);
-    }
-
-    refreshMockData() {
-        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
-        const generatedMocks = AllowanceMock.generateRequestsByRole(15, role);
-        const addedRequests = this.getAddedRequestsFromStorage();
-
-        // Merge generated mocks with user-added requests
-        // Added requests go first to appear at the top
-        this.allowanceRequestsMock = [...addedRequests, ...generatedMocks];
-
-        // If subject exists, update it. If not (constructor), create it.
-        if (this.allowanceRequestsSubject) {
-            this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+    // Initialize data from LocalStorage or generate defaults
+    private initializeData() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+            // Load existing data
+            const data = JSON.parse(stored);
+            this.updateSubject(data);
         } else {
-            this.allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>(this.allowanceRequestsMock);
+            // Generate master dataset (Admin view = mixed users)
+            const masterData = AllowanceMock.generateRequestsByRole(20, 'Admin');
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
     }
 
-    private getAddedRequestsFromStorage(): AllowanceRequest[] {
+    // Save master dataset to storage
+    private saveToStorage(data: AllowanceRequest[]) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // Update the BehaviorSubject based on User Role
+    // Admin sees ALL, Member sees OWN
+    private updateSubject(masterData: AllowanceRequest[]) {
+        const role = localStorage.getItem('userRole') || 'Member';
+        const employeeId = localStorage.getItem('employeeId');
+
+        let viewData = masterData;
+        if (role !== 'Admin' && employeeId) {
+            viewData = masterData.filter(req => req.requester?.employeeId === employeeId);
+        }
+
+        // Sort by ID desc
+        viewData.sort((a, b) => b.id.localeCompare(a.id));
+        this.allowanceRequestsSubject.next(viewData);
+    }
+
+    private getMasterData(): AllowanceRequest[] {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         return stored ? JSON.parse(stored) : [];
     }
 
-    // ดึงข้อมูลคำขอเบี้ยเลี้ยงทั้งหมด
+    // --- Public API ---
+
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
+        // Trigger a refresh of the subject based on current role/storage before returning
+        const masterData = this.getMasterData();
+        this.updateSubject(masterData);
         return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(100)));
     }
 
-    // ดึงข้อมูลคำขอเบี้ยเลี้ยงตาม ID
     getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
-        const item = this.allowanceRequestsMock.find(r => r.id === id);
+        const masterData = this.getMasterData();
+        const item = masterData.find(r => r.id === id);
         return this.loadingService.wrap(of(item).pipe(delay(100)));
     }
 
-    // เพิ่มคำขอเบี้ยเลี้ยงใหม่
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
-        // Save to LocalStorage
-        const addedRequests = this.getAddedRequestsFromStorage();
-        addedRequests.unshift(request);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
-
-        // Update In-Memory State
-        this.allowanceRequestsMock = [request, ...this.allowanceRequestsMock];
-        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        const masterData = this.getMasterData();
+        masterData.unshift(request); // Add to top
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // อัปเดตข้อมูลคำขอเบี้ยเลี้ยง
     updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
-        // Update in storage if it exists there
-        const addedRequests = this.getAddedRequestsFromStorage();
-        const index = addedRequests.findIndex(r => r.id === id);
+        let masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
         if (index !== -1) {
-            addedRequests[index] = updatedRequest;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+            masterData[index] = updatedRequest;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
-
-        this.allowanceRequestsMock = this.allowanceRequestsMock.map(r => r.id === id ? updatedRequest : r);
-        this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // ลบคำขอเบี้ยเลี้ยง
     deleteAllowanceRequest(id: string): Observable<void> {
-        this.allowanceRequestsMock = this.allowanceRequestsMock.filter(r => r.id !== id);
-        this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
+        let masterData = this.getMasterData();
+        masterData = masterData.filter(r => r.id !== id);
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // สร้างรหัสคำขอถัดไป
     generateNextAllowanceId(): Observable<string> {
+        const masterData = this.getMasterData();
         const prefix = '2701';
-        const lastIdNum = this.allowanceRequestsMock.reduce((max, item) => {
+        const lastIdNum = masterData.reduce((max, item) => {
             if (item.id.startsWith(prefix)) {
                 const parts = item.id.split('#');
                 const num = parseInt(parts[1] || '0');
@@ -107,21 +112,36 @@ export class AllowanceService {
             }
             return max;
         }, 0);
-
         return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
     }
 
-    // ดึงข้อมูล log จำลองสำหรับเบี้ยเลี้ยง
+    // Called by AuthService on Login/Logout
+    refreshMockData() {
+        // Re-read storage and re-filter based on new role
+        const masterData = this.getMasterData();
+
+        // If storage is empty (edge case), re-init
+        if (masterData.length === 0) {
+            this.initializeData();
+        } else {
+            this.updateSubject(masterData);
+        }
+    }
+
+    // Mock logs
     getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
         const results = AllowanceMock.getMockAllowanceLogs(month, year);
         return of(results).pipe(delay(100));
     }
 
-    // อัปเดตสถานะคำขอเบี้ยเลี้ยง
+    // Update status (Admin approval)
     updateAllowanceStatus(id: string, status: string): void {
-        this.allowanceRequestsMock = this.allowanceRequestsMock.map(r =>
-            r.id === id ? { ...r, status: status } : r
-        );
-        this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        const masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
+        if (index !== -1) {
+            masterData[index].status = status;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
+        }
     }
 }

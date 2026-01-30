@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay, tap, finalize } from 'rxjs';
-import { MedicalItem, MedicalRequest } from '../interfaces';
-import { MedicalMock } from '../mocks';
+import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
+import { MedicalItem, MedicalRequest } from '../interfaces/medical.interface';
+import { MedicalMock } from '../mocks/medical.mock';
 
 export type { MedicalItem, MedicalRequest };
 
@@ -11,90 +11,119 @@ export type { MedicalItem, MedicalRequest };
 })
 export class MedicalexpensesService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_ADDED_MEDICAL';
-
-    private medicalRequestsMock!: MedicalRequest[];
-    private medicalRequestsSubject!: BehaviorSubject<MedicalRequest[]>;
+    private readonly STORAGE_KEY = 'MOCK_MEDICAL_DATA';
+    private medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>([]);
 
     constructor() {
-        this.refreshMockData();
+        this.initializeData();
     }
 
-    private generateMockData(count: number): MedicalRequest[] {
-        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
-        return MedicalMock.generateRequestsByRole(count, role);
-    }
-
-    refreshMockData() {
-        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
-        const generatedMocks = MedicalMock.generateRequestsByRole(15, role);
-        const addedRequests = this.getAddedRequestsFromStorage();
-
-        this.medicalRequestsMock = [...addedRequests, ...generatedMocks];
-
-        if (this.medicalRequestsSubject) {
-            this.medicalRequestsSubject.next(this.medicalRequestsMock);
+    private initializeData() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+            const data = JSON.parse(stored);
+            this.updateSubject(data);
         } else {
-            this.medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>(this.medicalRequestsMock);
+            const masterData = MedicalMock.generateRequestsByRole(20, 'Admin');
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
     }
 
-    private getAddedRequestsFromStorage(): MedicalRequest[] {
+    private saveToStorage(data: MedicalRequest[]) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    }
+
+    private updateSubject(masterData: MedicalRequest[]) {
+        const role = localStorage.getItem('userRole') || 'Member';
+        const employeeId = localStorage.getItem('employeeId');
+
+        let viewData = masterData;
+        if (role !== 'Admin' && employeeId) {
+            viewData = masterData.filter(req => req.requester?.employeeId === employeeId);
+        }
+
+        viewData.sort((a, b) => b.id.localeCompare(a.id));
+        this.medicalRequestsSubject.next(viewData);
+    }
+
+    private getMasterData(): MedicalRequest[] {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         return stored ? JSON.parse(stored) : [];
     }
 
-    // ดึงข้อมูลคำขอค่ารักษาพยาบาลทั้งหมด
-    getMedicalRequests(): Observable<MedicalRequest[]> {
+    // --- Public API ---
+
+    getRequests(): Observable<MedicalRequest[]> {
+        const masterData = this.getMasterData();
+        this.updateSubject(masterData);
         return this.loadingService.wrap(this.medicalRequestsSubject.asObservable().pipe(delay(100)));
     }
 
-    // ดึงข้อมูลคำขอค่ารักษาพยาบาลตาม ID
     getRequestById(id: string): Observable<MedicalRequest | undefined> {
-        const item = this.medicalRequestsMock.find(r => r.id === id);
+        const masterData = this.getMasterData();
+        const item = masterData.find(r => r.id === id);
         return this.loadingService.wrap(of(item).pipe(delay(100)));
     }
 
-    // สร้างรหัสคำขอถัดไป
-    generateNextMedicalId(): Observable<string> {
-        const prefix = '2701';
-
-        const ids = this.medicalRequestsMock
-            .filter(r => r.id.startsWith(prefix))
-            .map(r => {
-                const parts = r.id.split('#');
-                return parts.length > 1 ? parseInt(parts[1]) : 0;
-            })
-            .sort((a, b) => b - a);
-
-        const nextNum = ids.length > 0 ? ids[0] + 1 : 1;
-        const nextId = `${prefix}#${String(nextNum).padStart(3, '0')}`;
-        return of(nextId).pipe(delay(100));
-    }
-
-    // เพิ่มคำขอค่ารักษาพยาบาลใหม่
     addRequest(request: MedicalRequest): Observable<void> {
-        const addedRequests = this.getAddedRequestsFromStorage();
-        addedRequests.unshift(request);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
-
-        this.medicalRequestsMock = [request, ...this.medicalRequestsMock];
-        this.medicalRequestsSubject.next(this.medicalRequestsMock);
+        const masterData = this.getMasterData();
+        masterData.unshift(request);
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    // อัปเดตข้อมูลคำขอค่ารักษาพยาบาล
     updateRequest(updatedRequest: MedicalRequest): Observable<void> {
         const id = updatedRequest.id;
-        const addedRequests = this.getAddedRequestsFromStorage();
-        const index = addedRequests.findIndex(r => r.id === id);
+        const masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
         if (index !== -1) {
-            addedRequests[index] = updatedRequest;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+            masterData[index] = updatedRequest;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
         }
-
-        this.medicalRequestsMock = this.medicalRequestsMock.map(r => r.id === id ? updatedRequest : r);
-        this.medicalRequestsSubject.next([...this.medicalRequestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
+    }
+
+    deleteMedicalRequest(id: string): Observable<void> {
+        let masterData = this.getMasterData();
+        masterData = masterData.filter(r => r.id !== id);
+        this.saveToStorage(masterData);
+        this.updateSubject(masterData);
+        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
+    }
+
+    generateNextMedicalId(): Observable<string> {
+        const masterData = this.getMasterData();
+        const prefix = '2701';
+        const lastIdNum = masterData.reduce((max, item) => {
+            if (item.id.startsWith(prefix)) {
+                const parts = item.id.split('#');
+                const num = parseInt(parts[1] || '0');
+                return num > max ? num : max;
+            }
+            return max;
+        }, 0);
+        return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
+    }
+
+    updateMedicalStatus(id: string, status: string): void {
+        const masterData = this.getMasterData();
+        const index = masterData.findIndex(r => r.id === id);
+        if (index !== -1) {
+            masterData[index].status = status;
+            this.saveToStorage(masterData);
+            this.updateSubject(masterData);
+        }
+    }
+
+    refreshMockData() {
+        const masterData = this.getMasterData();
+        if (masterData.length === 0) {
+            this.initializeData();
+        } else {
+            this.updateSubject(masterData);
+        }
     }
 }

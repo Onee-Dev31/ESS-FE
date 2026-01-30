@@ -200,4 +200,11 @@ export class DashboardComponent implements OnInit {
       this.router.navigate([path]);
     }
   }
+
+  clearStorage() {
+    if (confirm('คุณต้องการล้างข้อมูลทั้งหมดเพื่อให้ระบบเริ่มใหม่หรือไม่?')) {
+      localStorage.clear();
+      window.location.reload();
+    }
+  }
 }
