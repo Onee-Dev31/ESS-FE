@@ -3,20 +3,33 @@ import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
 export class TransportMock {
-    static generateRequests(count: number): VehicleRequest[] {
+    static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): VehicleRequest[] {
         return Array.from({ length: count }, (_, i) => {
             const dateStr = MockHelper.getRandomDateInPast3Months();
+            let requester = MockHelper.getRequesterByRole(role);
+            let status = MockHelper.getRandomStatus('vehicle');
+
+            if (role === 'Admin') {
+                requester = MockHelper.getRandomRequester();
+                const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+                status = conditions[Math.floor(Math.random() * conditions.length)];
+            }
+
             return {
                 id: `2701#${String(i + 1).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.TRANSPORT,
                 createDate: dateStr,
-                status: MockHelper.getRandomStatus('vehicle'),
-                requester: MockHelper.getRandomRequester(),
+                status: status,
+                requester: requester,
                 items: [
                     { date: '2026-01-15', description: 'เดินทางไปพบลูกค้า', amount: 500, shiftCode: 'O01 09.00-18.00' }
                 ]
             };
         });
+    }
+
+    static generateRequests(count: number): VehicleRequest[] {
+        return this.generateRequestsByRole(count, 'Member');
     }
 
     static getMockAttendanceLogs(month: number, year: number): any[] {

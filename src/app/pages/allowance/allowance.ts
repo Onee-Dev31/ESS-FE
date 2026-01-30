@@ -23,10 +23,12 @@ interface FlatAllowanceRow extends AllowanceItem {
   groupLength: number;
 }
 
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 @Component({
   selector: 'app-allowance',
   standalone: true,
-  imports: [CommonModule, FormsModule, AllowanceFormComponent],
+  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
 })

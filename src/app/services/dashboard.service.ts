@@ -37,7 +37,7 @@ export class DashboardService {
 
         return combineLatest(streams).pipe(
             map((results: any[][]) => {
-                const pendingStatuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
+                const pendingStatuses = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
                 return results.reduce((sum, list) =>
                     sum + list.filter(item => pendingStatuses.includes(item.status)).length, 0);
             })
@@ -48,7 +48,7 @@ export class DashboardService {
         return this.medicalService.getMedicalRequests().pipe(
             catchError(() => of([])),
             map((requests: any[]) => {
-                const pendingStatuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
+                const pendingStatuses = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
                 return requests.filter(item => pendingStatuses.includes(item.status)).length;
             })
         );

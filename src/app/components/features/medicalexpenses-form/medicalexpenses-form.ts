@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, OnInit, inject } from '
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
+import { UserService } from '../../../services/user.service';
 import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
 import { AlertService } from '../../../services/alert.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -16,6 +17,7 @@ import dayjs from 'dayjs';
 })
 export class MedicalexpensesForm implements OnInit {
   private medicalService = inject(MedicalexpensesService);
+  private userService = inject(UserService);
   private alertService = inject(AlertService);
   private dateUtil = inject(DateUtilityService);
 
@@ -140,42 +142,51 @@ export class MedicalexpensesForm implements OnInit {
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
-    const request: MedicalRequest = {
-      id: this.requestId,
-      createDate: dayjs().toISOString(),
-      status: this.isEditMode() ? 'ตรวจสอบแล้ว' : 'คำขอใหม่',
-      employeeId: 'EMP001',
-      totalRequestedAmount: this.amount(),
-      totalApprovedAmount: 0,
-      items: [{
-        requestDate: this.dateUtil.formatDateToBE(this.dateUtil.getCurrentDateISO()),
-        limitType: typeLabel,
-        diseaseType: this.disease(),
-        hospital: this.hospital(),
-        treatmentDateFrom: this.dateUtil.formatDateToBE(this.startDate()),
-        treatmentDateTo: this.dateUtil.formatDateToBE(this.endDate()),
-        requestedAmount: this.amount(),
-        approvedAmount: 0
-      }]
-    };
+    // Fetch profile and save
+    this.userService.getUserProfile().subscribe(profile => {
+      const titleName = profile.name.split(' ')[0]; // Simple logic, adjust if needed
+      const request: MedicalRequest = {
+        id: this.requestId,
+        createDate: dayjs().toISOString(),
+        status: this.isEditMode() ? 'VERIFIED' : 'NEW',
+        employeeId: profile.employeeId,
+        requester: {
+          employeeId: profile.employeeId,
+          name: profile.name,
+          department: profile.department,
+          company: profile.company
+        },
+        totalRequestedAmount: this.amount(),
+        totalApprovedAmount: 0,
+        items: [{
+          requestDate: this.dateUtil.formatDateToBE(this.dateUtil.getCurrentDateISO()),
+          limitType: typeLabel,
+          diseaseType: this.disease(),
+          hospital: this.hospital(),
+          treatmentDateFrom: this.dateUtil.formatDateToBE(this.startDate()),
+          treatmentDateTo: this.dateUtil.formatDateToBE(this.endDate()),
+          requestedAmount: this.amount(),
+          approvedAmount: 0
+        }]
+      };
 
-    if (this.isEditMode()) {
-      this.medicalService.updateRequest(request).subscribe({
-        next: () => {
-          this.alertService.showSuccess('แก้ไขข้อมูลเรียบร้อยแล้ว');
-          this.close();
-        },
-        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
-      });
-    } else {
-      this.medicalService.addRequest(request).subscribe({
-        next: () => {
-          this.alertService.showSuccess('บันทึกข้อมูลเรียบร้อยแล้ว');
-          this.close();
-        },
-        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
-      });
-    }
+      if (this.isEditMode()) {
+        this.medicalService.updateRequest(request).subscribe({
+          next: () => {
+            this.alertService.showSuccess('แก้ไขข้อมูลเรียบร้อยแล้ว');
+            this.close();
+          },
+          error: () => this.alertService.showError('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
+        });
+      } else {
+        this.medicalService.addRequest(request).subscribe({
+          next: () => {
+            this.alertService.showSuccess('บันทึกข้อมูลเรียบร้อยแล้ว');
+            this.close();
+          },
+          error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+        });
+      }
+    });
   }
 }
-

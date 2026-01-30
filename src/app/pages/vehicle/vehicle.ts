@@ -13,10 +13,12 @@ import {
   getPaginationRowModel,
 } from '@tanstack/angular-table';
 
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleFormComponent],
+  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
 })

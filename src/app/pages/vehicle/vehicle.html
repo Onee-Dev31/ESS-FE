@@ -34,10 +34,10 @@
           <select class="form-control select-status" [ngModel]="filterStatus()"
             (ngModelChange)="filterStatus.set($event)">
             <option value="">ทั้งหมด</option>
-            <option value="คำขอใหม่">คำขอใหม่</option>
-            <option value="ตรวจสอบแล้ว">ตรวจสอบแล้ว</option>
-            <option value="อยู่ระหว่างการอนุมัติ">อยู่ระหว่างการอนุมัติ</option>
-            <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
+            <option value="NEW">คำขอใหม่</option>
+            <option value="VERIFIED">ตรวจสอบแล้ว</option>
+            <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
+            <option value="APPROVED">อนุมัติแล้ว</option>
           </select>
         </div>
 
@@ -63,7 +63,7 @@
             <span class="value">{{ row.original.id }}</span>
           </div>
           <div class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-            {{ row.original.status }}
+            {{ row.original.status | statusLabel }}
           </div>
         </div>
 
@@ -169,7 +169,7 @@
 
               <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
                 <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                  {{ row.original.status }}
+                  {{ row.original.status | statusLabel }}
                 </span>
               </td>
 

@@ -13,11 +13,34 @@ export type { TaxiItem, TaxiRequest };
 export class TaxiService {
     private loadingService = inject(LoadingService);
 
-    // ข้อมูลจำลองคำขอค่าแท็กซี่
-    private taxiRequestsMock: TaxiRequest[] = TaxiMock.generateRequests(15);
-    private taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>(this.taxiRequestsMock);
+    private readonly STORAGE_KEY = 'MOCK_ADDED_TAXI';
 
-    constructor() { }
+    // ข้อมูลจำลองคำขอค่าแท็กซี่
+    private taxiRequestsMock!: TaxiRequest[];
+    private taxiRequestsSubject!: BehaviorSubject<TaxiRequest[]>;
+
+    constructor() {
+        this.refreshMockData();
+    }
+
+    refreshMockData() {
+        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
+        const generatedMocks = TaxiMock.generateRequestsByRole(15, role);
+        const addedRequests = this.getAddedRequestsFromStorage();
+
+        this.taxiRequestsMock = [...addedRequests, ...generatedMocks];
+
+        if (this.taxiRequestsSubject) {
+            this.taxiRequestsSubject.next(this.taxiRequestsMock);
+        } else {
+            this.taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>(this.taxiRequestsMock);
+        }
+    }
+
+    private getAddedRequestsFromStorage(): TaxiRequest[] {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
 
     // ดึงข้อมูลคำขอค่าแท็กซี่ทั้งหมด
     getTaxiRequests(): Observable<TaxiRequest[]> {
@@ -32,13 +55,24 @@ export class TaxiService {
 
     // เพิ่มคำขอค่าแท็กซี่ใหม่
     addTaxiRequest(request: TaxiRequest): Observable<void> {
+        const addedRequests = this.getAddedRequestsFromStorage();
+        addedRequests.unshift(request);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+
         this.taxiRequestsMock = [request, ...this.taxiRequestsMock];
-        this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
+        this.taxiRequestsSubject.next(this.taxiRequestsMock);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
     // อัปเดตข้อมูลคำขอค่าแท็กซี่
     updateTaxiRequest(id: string, updatedRequest: TaxiRequest): Observable<void> {
+        const addedRequests = this.getAddedRequestsFromStorage();
+        const index = addedRequests.findIndex(r => r.id === id);
+        if (index !== -1) {
+            addedRequests[index] = updatedRequest;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+        }
+
         this.taxiRequestsMock = this.taxiRequestsMock.map(r => r.id === id ? updatedRequest : r);
         this.taxiRequestsSubject.next([...this.taxiRequestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));

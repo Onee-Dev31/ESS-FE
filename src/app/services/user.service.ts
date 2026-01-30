@@ -33,6 +33,8 @@ export class UserService {
 
     // ดึงข้อมูลโปรไฟล์ผู้ใช้งานจำลอง
     getUserProfile(): Observable<UserProfile> {
-        return of(UserMock.PROFILE).pipe(delay(100));
+        const role = localStorage.getItem('userRole');
+        const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;
+        return of(profile).pipe(delay(100));
     }
 }

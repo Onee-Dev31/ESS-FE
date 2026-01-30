@@ -1,12 +1,23 @@
 export const REQUEST_STATUS = {
-    NEW: 'คำขอใหม่',
-    VERIFIED: 'ตรวจสอบแล้ว',
-    WAITING_CHECK: 'รอตรวจสอบ',
-    PENDING_ACTION: 'รอดำเนินการ',
-    PENDING_APPROVAL: 'อยู่ระหว่างการอนุมัติ',
-    APPROVED: 'อนุมัติแล้ว',
-    REJECTED: 'ไม่อนุมัติ',
-    REFERRED_BACK: 'รอแก้ไข'
+    NEW: 'NEW',
+    VERIFIED: 'VERIFIED',
+    WAITING_CHECK: 'WAITING_CHECK',
+    PENDING_ACTION: 'PENDING_ACTION',
+    PENDING_APPROVAL: 'PENDING_APPROVAL',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED',
+    REFERRED_BACK: 'REFERRED_BACK'
+};
+
+export const REQUEST_STATUS_LABEL: Record<string, string> = {
+    [REQUEST_STATUS.NEW]: 'คำขอใหม่',
+    [REQUEST_STATUS.VERIFIED]: 'ตรวจสอบแล้ว',
+    [REQUEST_STATUS.WAITING_CHECK]: 'รอตรวจสอบ',
+    [REQUEST_STATUS.PENDING_ACTION]: 'รอดำเนินการ',
+    [REQUEST_STATUS.PENDING_APPROVAL]: 'อยู่ระหว่างการอนุมัติ',
+    [REQUEST_STATUS.APPROVED]: 'อนุมัติแล้ว',
+    [REQUEST_STATUS.REJECTED]: 'ไม่อนุมัติ',
+    [REQUEST_STATUS.REFERRED_BACK]: 'รอแก้ไข'
 };
 
 export const REQUEST_STATUS_LIST = [

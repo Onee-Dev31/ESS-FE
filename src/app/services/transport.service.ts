@@ -12,11 +12,33 @@ export type { RequestItem, VehicleRequest };
 export class TransportService {
     private loadingService = inject(LoadingService);
 
-    // ข้อมูลจำลองคำขอค่าเดินทาง
-    private requestsMock: VehicleRequest[] = TransportMock.generateRequests(15);
-    private requestsSubject = new BehaviorSubject<VehicleRequest[]>(this.requestsMock);
+    private readonly STORAGE_KEY = 'MOCK_ADDED_TRANSPORT';
 
-    constructor() { }
+    private requestsMock!: VehicleRequest[];
+    private requestsSubject!: BehaviorSubject<VehicleRequest[]>;
+
+    constructor() {
+        this.refreshMockData();
+    }
+
+    refreshMockData() {
+        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
+        const generatedMocks = TransportMock.generateRequestsByRole(15, role);
+        const addedRequests = this.getAddedRequestsFromStorage();
+
+        this.requestsMock = [...addedRequests, ...generatedMocks];
+
+        if (this.requestsSubject) {
+            this.requestsSubject.next(this.requestsMock);
+        } else {
+            this.requestsSubject = new BehaviorSubject<VehicleRequest[]>(this.requestsMock);
+        }
+    }
+
+    private getAddedRequestsFromStorage(): VehicleRequest[] {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
 
     // ดึงข้อมูลคำขอทั้งหมด
     getRequests(): Observable<VehicleRequest[]> {
@@ -31,6 +53,10 @@ export class TransportService {
 
     // เพิ่มคำขอใหม่
     addRequest(request: VehicleRequest): Observable<void> {
+        const addedRequests = this.getAddedRequestsFromStorage();
+        addedRequests.unshift(request);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+
         this.requestsMock = [request, ...this.requestsMock];
         this.requestsSubject.next([...this.requestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
@@ -38,6 +64,13 @@ export class TransportService {
 
     // อัปเดตข้อมูลคำขอ
     updateRequest(id: string, updatedRequest: VehicleRequest): Observable<void> {
+        const addedRequests = this.getAddedRequestsFromStorage();
+        const index = addedRequests.findIndex(r => r.id === id);
+        if (index !== -1) {
+            addedRequests[index] = updatedRequest;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+        }
+
         this.requestsMock = this.requestsMock.map(r => r.id === id ? updatedRequest : r);
         this.requestsSubject.next([...this.requestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));

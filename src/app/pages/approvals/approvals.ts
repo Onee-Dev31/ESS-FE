@@ -18,12 +18,13 @@ import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/mod
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
 
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, StatusLabelPipe],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
   encapsulation: ViewEncapsulation.None
@@ -38,7 +39,7 @@ export class ApprovalsComponent implements OnInit {
   protected readonly Math = Math;
 
   tabs = APPROVAL_STATUS_TABS;
-  activeTab = signal<string>('Pending');
+  activeTab = signal<string>('รออนุมัติ');
   searchText = signal<string>('');
 
   isModalOpen = signal<boolean>(false);
@@ -199,5 +200,15 @@ export class ApprovalsComponent implements OnInit {
 
   getTimeAgo(date: string): string {
     return this.dateUtil.getTimeAgo(date);
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'อนุมัติแล้ว': return 'approved';
+      case 'ไม่อนุมัติ': return 'rejected';
+      case 'รอแก้ไข': return 'referred-back';
+      case 'รออนุมัติ': return 'pending';
+      default: return 'pending';
+    }
   }
 }

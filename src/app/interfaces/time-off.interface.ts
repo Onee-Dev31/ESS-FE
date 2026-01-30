@@ -12,6 +12,12 @@ export interface TimeOffRequest {
     leavePeriod?: string;
     shiftStartTime?: string;
     shiftEndTime?: string;
+    requester?: {
+        employeeId: string;
+        name: string;
+        department: string;
+        company: string;
+    };
 }
 
 export const LEAVE_TYPES = [

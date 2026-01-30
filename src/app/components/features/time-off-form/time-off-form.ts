@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, computed, OnInit, injec
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlertService } from '../../../services/alert.service';
+import { UserService } from '../../../services/user.service';
 import { TimeOffService, TimeOffRequest } from '../../../services/time-off.service';
 import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -16,11 +17,12 @@ import dayjs from 'dayjs';
 })
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
+  private userService = inject(UserService);
   private alertService = inject(AlertService);
   private dateUtil = inject(DateUtilityService);
 
   @Input() initialLeaveTypeId: string = '';
-  @Input() requestStatus: string = 'คำขอใหม่';
+  @Input() requestStatus: string = 'NEW';
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');
@@ -157,29 +159,38 @@ export class TimeOffForm implements OnInit {
 
     const typeLabel = this.leaveTypes.find(t => t.id === this.selectedLeaveType())?.label || '';
 
-    // Create Mock Request
-    const request: TimeOffRequest = {
-      id: 'NEW',
-      createDate: dayjs().toISOString(),
-      status: 'คำขอใหม่',
-      employeeId: 'EMP001',
-      leaveType: typeLabel,
-      startDate: this.startDate(),
-      endDate: this.endDate(),
-      reason: this.reason(),
-      attachments: this.attachments().map(a => ({ name: a.name })),
-      days: this.calculatedDays(),
-      leavePeriod: this.leavePeriod(),
-      shiftStartTime: this.shiftStartTime() || '08:00',
-      shiftEndTime: this.shiftEndTime() || '17:00'
-    };
+    // Fetch profile and save
+    this.userService.getUserProfile().subscribe(profile => {
+      // Create Mock Request
+      const request: TimeOffRequest = {
+        id: 'NEW',
+        createDate: dayjs().toISOString(),
+        status: 'NEW',
+        employeeId: profile.employeeId,
+        requester: {
+          employeeId: profile.employeeId,
+          name: profile.name,
+          department: profile.department,
+          company: profile.company
+        },
+        leaveType: typeLabel,
+        startDate: this.startDate(),
+        endDate: this.endDate(),
+        reason: this.reason(),
+        attachments: this.attachments().map(a => ({ name: a.name })),
+        days: this.calculatedDays(),
+        leavePeriod: this.leavePeriod(),
+        shiftStartTime: this.shiftStartTime() || '08:00',
+        shiftEndTime: this.shiftEndTime() || '17:00'
+      };
 
-    this.timeOffService.addRequest(request).subscribe({
-      next: () => {
-        this.alertService.showSuccess('บันทึกคำขอลาเรียบร้อยแล้ว');
-        this.close();
-      },
-      error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+      this.timeOffService.addRequest(request).subscribe({
+        next: () => {
+          this.alertService.showSuccess('บันทึกคำขอลาเรียบร้อยแล้ว');
+          this.close();
+        },
+        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+      });
     });
   }
 }

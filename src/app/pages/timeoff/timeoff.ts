@@ -7,10 +7,12 @@ import { TimeOffForm } from '../../components/features/time-off-form/time-off-fo
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 @Component({
   selector: 'app-timeoff',
   standalone: true,
-  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
 })
@@ -39,7 +41,12 @@ export class TimeoffComponent implements OnInit {
 
   protected readonly Math = Math;
 
-  statuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ', 'อนุมัติแล้ว'];
+  statuses = [
+    { value: 'NEW', label: 'คำขอใหม่' },
+    { value: 'VERIFIED', label: 'ตรวจสอบแล้ว' },
+    { value: 'PENDING_APPROVAL', label: 'อยู่ระหว่างการอนุมัติ' },
+    { value: 'APPROVED', label: 'อนุมัติแล้ว' }
+  ];
 
   totalRequests = computed(() => this.filteredRequests().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
@@ -116,7 +123,7 @@ export class TimeoffComponent implements OnInit {
     }
   }
 
-  openForm(status: string = 'คำขอใหม่') {
+  openForm(status: string = 'NEW') {
     this.selectedRequestStatus.set(status);
     this.isFormOpen.set(true);
   }
@@ -155,6 +162,14 @@ export class TimeoffComponent implements OnInit {
 
   getStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
+      'NEW': 'status-new',
+      'WAITING_CHECK': 'status-new',
+      'VERIFIED': 'status-reviewed',
+      'PENDING_APPROVAL': 'status-pending',
+      'APPROVED': 'status-approved',
+      'REJECTED': 'status-rejected',
+      'REFERRED_BACK': 'status-rejected',
+      // Legacy support just in case
       'คำขอใหม่': 'status-new',
       'ตรวจสอบแล้ว': 'status-reviewed',
       'อยู่ระหว่างการอนุมัติ': 'status-pending',

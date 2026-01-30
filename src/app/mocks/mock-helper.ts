@@ -54,4 +54,22 @@ export class MockHelper {
         ];
         return shifts[Math.floor(Math.random() * shifts.length)];
     }
+
+    static getRequesterByRole(role: 'Admin' | 'Member'): Requester {
+        if (role === 'Admin') {
+            return {
+                name: 'Admin User (Admin)',
+                employeeId: 'OTD00001',
+                department: '10801-Management',
+                company: 'บริษัท OTD'
+            };
+        } else {
+            return {
+                name: 'Rapeepan Pipatvejwong (Jola)',
+                employeeId: 'OTD01054',
+                department: '11206-Program Development',
+                company: 'บริษัท OTD'
+            };
+        }
+    }
 }

@@ -1,48 +1,90 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { TaxiRequest } from './taxi.service';
 import { VehicleRequest } from './transport.service';
 import { MedicalRequest } from './medicalexpenses.service';
 import { ApprovalItem } from '../components/modals/approval-detail-modal/approval-detail-modal';
+import { DateUtilityService } from './date-utility.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ApprovalsHelperService {
 
+    private dateUtil = inject(DateUtilityService); // Inject here
+
     constructor() { }
 
     // รวมและแปลงข้อมูลจากหลาย Service เป็นรูปแบบรายการอนุมัติ
-    processData(allowances: AllowanceRequest[], taxis: TaxiRequest[], vehicles: VehicleRequest[]): ApprovalItem[] {
-        const list1: ApprovalItem[] = allowances.map(request => this.mapToApproval(request, 'ค่าเบี้ยเลี้ยง', request.typeId, 'Allowance'));
-        const list2: ApprovalItem[] = taxis.map(request => this.mapToApproval(request, 'ค่าแท็กซี่', request.typeId, 'Taxi'));
-        const list3: ApprovalItem[] = vehicles.map(request => this.mapToApproval(request, 'ค่ารถ', request.typeId, 'Vehicle'));
+    processData(allowance: AllowanceRequest[], taxi: TaxiRequest[], vehicle: VehicleRequest[]): ApprovalItem[] {
+        const allowanceItems = allowance.map(item => ({
+            requestNo: item.id,
+            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
+            requestBy: {
+                name: item.requester?.name || 'Unknown',
+                employeeId: item.requester?.employeeId || 'EM-001',
+                department: item.requester?.department || '-',
+                company: 'Onee',
+                position: 'Software Engineer', // Mock position
+                profileImage: 'assets/images/user-placeholder.png'
+            },
+            requestType: 'ค่าเบี้ยเลี้ยง' as const,
+            typeId: 99, // Added typeId
+            requestDetail: item.items.map(i => i.description).join(', ') || 'ค่าเบี้ยเลี้ยงและที่พัก',
+            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
+            status: this.mapStatus(item.status),
+            rawStatus: this.normalizeStatus(item.status),
+            type: 'allowance',
+            originalData: item
+        }));
 
-        return [...list1, ...list2, ...list3];
+        const taxiItems = taxi.map(item => ({
+            requestNo: item.id,
+            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
+            requestBy: {
+                name: item.requester?.name || 'Unknown',
+                employeeId: item.requester?.employeeId || 'EM-002',
+                department: item.requester?.department || '-',
+                company: 'Onee',
+                position: 'Sales Representative',
+                profileImage: 'assets/images/user-placeholder.png'
+            },
+            requestType: 'ค่าแท็กซี่' as const,
+            typeId: 99,
+            requestDetail: item.items.map(i => i.description).join(', ') || 'เดินทางไปหาลูกค้า',
+            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
+            status: this.mapStatus(item.status),
+            rawStatus: this.normalizeStatus(item.status),
+            type: 'taxi',
+            originalData: item
+        }));
+
+        const vehicleItems = vehicle.map(item => ({
+            requestNo: item.id,
+            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
+            requestBy: {
+                name: item.requester?.name || 'Unknown',
+                employeeId: item.requester?.employeeId || 'EM-003',
+                department: item.requester?.department || '-',
+                company: 'Onee',
+                position: 'Driver',
+                profileImage: 'assets/images/user-placeholder.png'
+            },
+            requestType: 'ค่ารถ' as const,
+            typeId: 99,
+            requestDetail: item.items.map(i => i.description).join(', ') || 'ค่าน้ำมันรถ',
+            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
+            status: this.mapStatus(item.status),
+            rawStatus: this.normalizeStatus(item.status),
+            type: 'transport',
+            originalData: item
+        }));
+
+        return [...allowanceItems, ...taxiItems, ...vehicleItems];
     }
 
     processMedicalData(medicals: MedicalRequest[]): ApprovalItem[] {
         return medicals.map(req => this.mapMedicalToApproval(req));
-    }
-
-    private mapToApproval(request: any, type: 'ค่าเบี้ยเลี้ยง' | 'ค่าแท็กซี่' | 'ค่ารถ', typeId: number, detailSub?: string): ApprovalItem {
-        const defaultUser = {
-            name: 'พนักงานทดสอบ',
-            employeeId: 'N/A',
-            department: 'N/A',
-            company: 'บริษัท OTD'
-        };
-
-        return {
-            requestNo: request.id,
-            requestDate: request.createDate,
-            requestBy: request.requester || defaultUser,
-            requestType: type,
-            typeId: typeId,
-            requestDetail: request.items[0]?.description || detailSub || '',
-            amount: request.items.reduce((sum: number, item: any) => sum + (item.amount || 0), 0),
-            status: this.mapStatus(request.status)
-        };
     }
 
     public mapMedicalToApproval(req: MedicalRequest): ApprovalItem {
@@ -61,31 +103,35 @@ export class ApprovalsHelperService {
             typeId: 99,
             requestDetail: req.items.map((i: any) => i.diseaseType).join(', '),
             amount: req.totalRequestedAmount || 0,
-            status: this.mapStatus(req.status)
+            status: this.mapStatus(req.status),
+            rawStatus: this.normalizeStatus(req.status)
         };
     }
 
-    // แปลงสถานะภาษาไทยเป็นภาษาอังกฤษประเภทต่างๆ
-    mapStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-        const statusValue = status?.trim();
+    // แปลงสถานะ Code เป็นสถานะหลัก (รออนุมัติ, อนุมัติแล้ว, ไม่อนุมัติ, รอแก้ไข)
+    // แปลงสถานะ Code เป็นสถานะหลัก (รออนุมัติ, อนุมัติแล้ว, ไม่อนุมัติ, รอแก้ไข)
+    mapStatus(status: string): 'รออนุมัติ' | 'อนุมัติแล้ว' | 'ไม่อนุมัติ' | 'รอแก้ไข' {
+        const s = this.normalizeStatus(status);
 
-        if (statusValue === 'ไม่อนุมัติ') return 'Rejected';
-        if (statusValue === 'รอแก้ไข') return 'Referred Back';
+        if (s === 'REJECTED' || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
+        if (s === 'REFERRED_BACK' || s === 'รอแก้ไข') return 'รอแก้ไข';
+        if (s === 'APPROVED' || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'อนุมัติแล้ว';
 
-        if (statusValue === 'อนุมัติแล้ว' || statusValue.includes('จ่าย')) return 'Approved';
+        // All pending states
+        return 'รออนุมัติ';
+    }
 
-        if (statusValue === 'คำขอใหม่' ||
-            statusValue === 'ตรวจสอบแล้ว' ||
-            statusValue === 'อยู่ระหว่างการอนุมัติ' ||
-            statusValue === 'รอพนักงานยืนยัน' ||
-            statusValue === 'รอต้นสังกัดอนุมัติ' ||
-            statusValue === 'รอฝ่ายบุคคลอนุมัติ' ||
-            statusValue === 'รอผู้บริหารอนุมัติ' ||
-            statusValue === 'รอฝ่ายบัญชีอนุมัติ' ||
-            statusValue.includes('รอตรวจสอบ')) {
-            return 'Pending';
-        }
+    // Sanitize status from mock data to ensure valid codes
+    private normalizeStatus(status: string): string {
+        if (!status) return 'WAITING_CHECK';
+        const s = status.trim();
 
-        return 'Pending';
+        // Handle potential legacy values
+        if (s === 'Pending' || s === 'Waiting Check' || s === 'New') return 'WAITING_CHECK';
+        if (s === 'Approved' || s === 'Approve') return 'APPROVED';
+        if (s === 'Rejected' || s === 'Reject') return 'REJECTED';
+        if (s === 'Referred Back' || s === 'Refer Back') return 'REFERRED_BACK';
+
+        return s;
     }
 }

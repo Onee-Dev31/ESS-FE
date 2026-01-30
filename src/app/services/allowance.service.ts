@@ -13,11 +13,42 @@ export type { AllowanceItem, AllowanceRequest };
 export class AllowanceService {
     private loadingService = inject(LoadingService);
 
-    // ข้อมูลจำลองคำขอเบี้ยเลี้ยง
-    private allowanceRequestsMock: AllowanceRequest[] = AllowanceMock.generateRequests(15);
-    private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>(this.allowanceRequestsMock);
+    private readonly STORAGE_KEY = 'MOCK_ADDED_ALLOWANCE';
 
-    constructor() { }
+    // ข้อมูลจำลองคำขอเบี้ยเลี้ยง
+    private allowanceRequestsMock!: AllowanceRequest[];
+    private allowanceRequestsSubject!: BehaviorSubject<AllowanceRequest[]>;
+
+    constructor() {
+        this.refreshMockData();
+    }
+
+    private generateMockData(count: number): AllowanceRequest[] {
+        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
+        return AllowanceMock.generateRequestsByRole(count, role);
+    }
+
+    refreshMockData() {
+        const role = localStorage.getItem('userRole') as 'Admin' | 'Member' || 'Member';
+        const generatedMocks = AllowanceMock.generateRequestsByRole(15, role);
+        const addedRequests = this.getAddedRequestsFromStorage();
+
+        // Merge generated mocks with user-added requests
+        // Added requests go first to appear at the top
+        this.allowanceRequestsMock = [...addedRequests, ...generatedMocks];
+
+        // If subject exists, update it. If not (constructor), create it.
+        if (this.allowanceRequestsSubject) {
+            this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
+        } else {
+            this.allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>(this.allowanceRequestsMock);
+        }
+    }
+
+    private getAddedRequestsFromStorage(): AllowanceRequest[] {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
 
     // ดึงข้อมูลคำขอเบี้ยเลี้ยงทั้งหมด
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
@@ -32,6 +63,12 @@ export class AllowanceService {
 
     // เพิ่มคำขอเบี้ยเลี้ยงใหม่
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
+        // Save to LocalStorage
+        const addedRequests = this.getAddedRequestsFromStorage();
+        addedRequests.unshift(request);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+
+        // Update In-Memory State
         this.allowanceRequestsMock = [request, ...this.allowanceRequestsMock];
         this.allowanceRequestsSubject.next(this.allowanceRequestsMock);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
@@ -39,6 +76,14 @@ export class AllowanceService {
 
     // อัปเดตข้อมูลคำขอเบี้ยเลี้ยง
     updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
+        // Update in storage if it exists there
+        const addedRequests = this.getAddedRequestsFromStorage();
+        const index = addedRequests.findIndex(r => r.id === id);
+        if (index !== -1) {
+            addedRequests[index] = updatedRequest;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(addedRequests));
+        }
+
         this.allowanceRequestsMock = this.allowanceRequestsMock.map(r => r.id === id ? updatedRequest : r);
         this.allowanceRequestsSubject.next([...this.allowanceRequestsMock]);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));

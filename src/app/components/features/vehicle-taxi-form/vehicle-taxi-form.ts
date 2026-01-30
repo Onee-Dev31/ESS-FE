@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
+import { UserService } from '../../../services/user.service';
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -19,6 +20,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private taxiService = inject(TaxiService);
+  private userService = inject(UserService);
   private alertService = inject(AlertService);
   private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
@@ -125,16 +127,25 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
           this.onClose.emit();
         });
       } else {
-        const newRequest: TaxiRequest = {
-          id: this.requestId,
-          typeId: WELFARE_TYPES.TAXI,
-          createDate: this.dateUtil.getCurrentDateISO(),
-          status: 'รอตรวจสอบ',
-          items: taxiItems
-        };
-        this.taxiService.addTaxiRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
-          this.onClose.emit();
+        // Fetch current user profile to populate requester info
+        this.userService.getUserProfile().subscribe(profile => {
+          const newRequest: TaxiRequest = {
+            id: this.requestId,
+            typeId: WELFARE_TYPES.TAXI,
+            createDate: this.dateUtil.getCurrentDateISO(),
+            status: 'WAITING_CHECK',
+            requester: {
+              employeeId: profile.employeeId,
+              name: profile.name,
+              department: profile.department,
+              company: profile.company
+            },
+            items: taxiItems
+          };
+          this.taxiService.addTaxiRequest(newRequest).subscribe(() => {
+            this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
+            this.onClose.emit();
+          });
         });
       }
     });

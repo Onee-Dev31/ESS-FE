@@ -1,9 +1,27 @@
 import { UserProfile } from '../services/user.service';
 
 export class UserMock {
-    static readonly PROFILE: UserProfile = {
+    static readonly ADMIN_PROFILE: UserProfile = {
+        name: 'Admin User (Admin)',
+        email: 'admin@onee.one',
+        employeeId: 'OTD00001',
+        department: '10801 - Management',
+        company: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด',
+        position: 'System Administrator',
+        phone: '9001',
+        floor: '15',
+        itAssets: {
+            account: 'admin',
+            expireDate: '31-Dec-2026',
+            laptop: 'MacBook Pro M3 Asset No. ADMIN001',
+            pc: 'Dell Workstation Asset No. ADMIN002',
+            monitor: 'Dell UltraSharp 32" Asset No. ADMIN003'
+        }
+    };
+
+    static readonly MEMBER_PROFILE: UserProfile = {
         name: 'Rapeepan Pipatvejwong (Jola)',
-        email: 'praewnapa.boo@onee.one',
+        email: 'member@onee.one',
         employeeId: 'OTD01054',
         department: '11206 - Program Development',
         company: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด',
@@ -18,4 +36,7 @@ export class UserMock {
             monitor: 'Dell 999 Asset No. 415v489dfg7df/9'
         }
     };
+
+    // Backward compatibility
+    static readonly PROFILE = UserMock.MEMBER_PROFILE;
 }

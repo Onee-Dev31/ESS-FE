@@ -22,10 +22,12 @@ interface FlatTaxiRow extends TaxiItem {
   groupLength: number;
 }
 
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })

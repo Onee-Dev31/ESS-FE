@@ -2,6 +2,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
+import { UserService } from '../../../services/user.service';
 import { AlertService } from '../../../services/alert.service';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
@@ -19,6 +20,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private allowanceService = inject(AllowanceService);
+  private userService = inject(UserService);
   private alertService = inject(AlertService);
   private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
@@ -207,16 +209,25 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
           this.closeModal();
         });
       } else {
-        const newRequest: AllowanceRequest = {
-          id: this.requestId,
-          typeId: WELFARE_TYPES.ALLOWANCE,
-          createDate: this.dateUtil.getCurrentDateISO(),
-          status: 'รอตรวจสอบ',
-          items: items
-        };
-        this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
-          this.closeModal();
+        // Fetch current user profile to populate requester info
+        this.userService.getUserProfile().subscribe(profile => {
+          const newRequest: AllowanceRequest = {
+            id: this.requestId,
+            typeId: WELFARE_TYPES.ALLOWANCE,
+            createDate: this.dateUtil.getCurrentDateISO(),
+            status: 'WAITING_CHECK',
+            requester: {
+              employeeId: profile.employeeId,
+              name: profile.name,
+              department: profile.department,
+              company: profile.company
+            },
+            items: items
+          };
+          this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
+            this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+            this.closeModal();
+          });
         });
       }
     });

@@ -64,10 +64,10 @@
                         <select class="form-control" [ngModel]="filterStatus()"
                             (ngModelChange)="filterStatus.set($event)">
                             <option value="">ทั้งหมด</option>
-                            <option value="คำขอใหม่">คำขอใหม่</option>
-                            <option value="ตรวจสอบแล้ว">ตรวจสอบแล้ว</option>
-                            <option value="อยู่ระหว่างการอนุมัติ">อยู่ระหว่างการอนุมัติ</option>
-                            <option value="อนุมัติแล้ว">อนุมัติแล้ว</option>
+                            <option value="NEW">คำขอใหม่</option>
+                            <option value="VERIFIED">ตรวจสอบแล้ว</option>
+                            <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
+                            <option value="APPROVED">อนุมัติแล้ว</option>
                         </select>
                     </div>
                 </div>
@@ -155,7 +155,7 @@
 
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                                {{ row.original.status }}
+                                {{ row.original.status | statusLabel }}
                             </span>
                         </td>
                     </tr>
@@ -177,7 +177,7 @@
                     </div>
                     <div class="card-actions-top">
                         <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                            {{ req.status }}
+                            {{ req.status | statusLabel }}
                         </span>
                     </div>
                 </div>

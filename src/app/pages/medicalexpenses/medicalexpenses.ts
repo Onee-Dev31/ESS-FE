@@ -21,10 +21,12 @@ interface FlatMedicalRow extends MedicalItem {
   status: string;
 }
 
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm],
+  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })

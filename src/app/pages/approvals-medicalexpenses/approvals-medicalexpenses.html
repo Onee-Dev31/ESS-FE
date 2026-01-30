@@ -101,25 +101,25 @@
                 <thead>
                     <tr>
                         <th (click)="toggleSort('requestNo')" style="cursor: pointer">
-                            Request No <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
+                            เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
                         </th>
                         <th (click)="toggleSort('requestDate')" style="cursor: pointer">
-                            Date Created <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+                            วันที่สร้าง <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
                         </th>
                         <th (click)="toggleSort('requestBy')" style="cursor: pointer">
-                            Requester Info <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+                            ผู้ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
                         </th>
                         <th (click)="toggleSort('requestType')" style="cursor: pointer">
-                            Type <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+                            ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
                         </th>
-                        <th>Description</th>
+                        <th>รายละเอียด</th>
                         <th (click)="toggleSort('amount')" style="cursor: pointer" class="text-right">
-                            Amount <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+                            จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
                         </th>
                         <th (click)="toggleSort('status')" style="cursor: pointer" class="text-center">
-                            Status <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
                         </th>
-                        <th class="text-center">Actions</th>
+                        <th class="text-center">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,7 +148,7 @@
                         <td class="text-center">
                             <span class="status-badge"
                                 [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">{{
-                                row.original.status }}</span>
+                                (row.original.rawStatus || row.original.status) | statusLabel }}</span>
                         </td>
                         <td>
                             <div class="action-cell">

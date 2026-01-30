@@ -1,8 +1,9 @@
 import { TimeOffRequest, LEAVE_TYPES } from '../interfaces/time-off.interface';
+import { MockHelper } from './mock-helper';
 import dayjs from 'dayjs';
 
 export class TimeOffMock {
-    static generateRequests(count: number): TimeOffRequest[] {
+    static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): TimeOffRequest[] {
         return Array.from({ length: count }, (_, i) => {
             const today = dayjs();
             const startDate = today.add(i, 'day');
@@ -39,13 +40,23 @@ export class TimeOffMock {
             }
 
             // Rotate through all 4 statuses
-            const statuses = ['คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ', 'อนุมัติแล้ว'];
+            // Rotate through all 4 statuses
+            let statuses = ['NEW', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+            let requester = MockHelper.getRequesterByRole(role);
+            let status = statuses[i % statuses.length];
+
+            if (role === 'Admin') {
+                requester = MockHelper.getRandomRequester();
+                const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+                status = conditions[Math.floor(Math.random() * conditions.length)];
+            }
 
             return {
                 id: `L2701#${String(i + 1).padStart(3, '0')}`,
                 createDate: today.toISOString(),
-                status: statuses[i % statuses.length],
-                employeeId: 'EMP001',
+                status: status,
+                employeeId: role === 'Admin' ? 'OTD00001' : 'OTD01054',
+                requester: requester,
                 leaveType: leaveType.label,
                 startDate: startDate.format('YYYY-MM-DD'),
                 endDate: endDate.format('YYYY-MM-DD'),
@@ -57,6 +68,10 @@ export class TimeOffMock {
                 shiftEndTime: '17:00'
             };
         });
+    }
+
+    static generateRequests(count: number): TimeOffRequest[] {
+        return this.generateRequestsByRole(count, 'Member');
     }
 
     private static generateAttachments(index: number): { name: string; url?: string }[] {

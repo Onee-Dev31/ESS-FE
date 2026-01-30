@@ -3,21 +3,37 @@ import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
 export class AllowanceMock {
-    static generateRequests(count: number): AllowanceRequest[] {
+    static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): AllowanceRequest[] {
         return Array.from({ length: count }, (_, i) => {
             const dateStr = MockHelper.getRandomDateInPast3Months();
+            let requester = MockHelper.getRequesterByRole(role);
+            let status = MockHelper.getRandomStatus('allowance');
+
+            // Logic for Admin: See others' requests that need approval
+            if (role === 'Admin') {
+                requester = MockHelper.getRandomRequester(); // Random employees
+                // Bias towards actionable statuses for Admin
+                const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+                status = 'WAITING_CHECK'; // Default for memberandom() * conditions.length)];
+            }
+            // Logic for Member: See own requests (already set by getRequesterByRole)
+
             return {
                 id: `2701#${String(i + 1).padStart(3, '0')}`,
                 typeId: WELFARE_TYPES.ALLOWANCE,
                 createDate: dateStr,
-                status: MockHelper.getRandomStatus('allowance'),
-                requester: MockHelper.getRandomRequester(),
+                status: status,
+                requester: requester,
                 items: [
                     { date: '2026-01-10', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค A', hours: 3, amount: 150, selected: true, shiftCode: 'O01 09.00-21.00' },
                     { date: '2026-01-11', dayType: 'W', timeIn: '09:00', timeOut: '21:00', description: 'ทำงานล่วงเวลาโปรเจค B', hours: 3, amount: 150, selected: true, shiftCode: 'O01 09.00-21.00' }
                 ]
             };
         });
+    }
+
+    static generateRequests(count: number): AllowanceRequest[] {
+        return this.generateRequestsByRole(count, 'Member');
     }
 
     static getMockAllowanceLogs(month: number, year: number): any[] {

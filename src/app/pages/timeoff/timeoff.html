@@ -36,7 +36,7 @@
                     <select class="form-control select-status" [ngModel]="filterStatus()"
                         (ngModelChange)="filterStatus.set($event); applyFilters()">
                         <option value="">ทั้งหมด</option>
-                        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                        <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
                     </select>
                 </div>
 
@@ -62,7 +62,7 @@
                         <span class="value">{{ request.leaveType }}</span>
                     </div>
                     <div class="status-badge" [ngClass]="getStatusClass(request.status)">
-                        {{ request.status }}
+                        {{ request.status | statusLabel }}
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@
                             <i class="far fa-folder-open"></i>
                         </button>
 
-                        <ng-container *ngIf="request.status === 'คำขอใหม่'">
+                        <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
                             <button class="action-btn edit" title="แก้ไข" (click)="openForm(request.status)">
                                 <i class="far fa-edit"></i>
                             </button>
@@ -113,7 +113,8 @@
                             </button>
                         </ng-container>
 
-                        <button class="action-btn view" title="ดูรายละเอียด" *ngIf="request.status !== 'คำขอใหม่'"
+                        <button class="action-btn view" title="ดูรายละเอียด"
+                            *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
                             (click)="openForm(request.status)">
                             <i class="far fa-eye"></i>
                         </button>
@@ -176,7 +177,7 @@
                         <td class="reason-cell">{{ request.reason }}</td>
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(request.status)">
-                                {{ request.status }}
+                                {{ request.status | statusLabel }}
                             </span>
                         </td>
                         <td class="text-center">
@@ -191,7 +192,7 @@
                         <td class="text-center">
                             <div class="action-btns">
                                 <!-- Show Edit/Delete only for "คำขอใหม่" -->
-                                <ng-container *ngIf="request.status === 'คำขอใหม่'">
+                                <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
                                     <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
                                         <i class="far fa-edit"></i>
                                     </button>
@@ -201,7 +202,8 @@
                                 </ng-container>
 
                                 <!-- Show View details for other statuses -->
-                                <button class="btn-icon view" title="ดูรายละเอียด" *ngIf="request.status !== 'คำขอใหม่'"
+                                <button class="btn-icon view" title="ดูรายละเอียด"
+                                    *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
                                     (click)="openForm(request.status)">
                                     <i class="far fa-eye"></i>
                                 </button>

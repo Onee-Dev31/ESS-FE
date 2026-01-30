@@ -128,12 +128,12 @@
           </button>
 
           <div class="card-body profile-layout">
-            <div class="profile-left-section">
-              <div class="user-id-badge">OTD01030</div>
-              <div class="user-name">แพรวนภา บุตรโคษา</div>
-              <div class="user-role">JC01-เจ้าหน้าที่ตรวจสอบคำบรรยายแทนเสียง</div>
-              <div class="user-meta"><span>รหัสกะ : O01 - 09.00-18.00</span></div>
-              <div class="user-meta"><span>เวลาตั้งแต่ : 09:00 - 18:00</span></div>
+            <div class="profile-left-section" *ngIf="userProfile() as profile">
+              <div class="user-id-badge">{{ profile.employeeId }}</div>
+              <div class="user-name">{{ profile.name }}</div>
+              <div class="user-role">{{ profile.position }}</div>
+              <div class="user-meta"><span>แผนก : {{ profile.department }}</span></div>
+              <div class="user-meta"><span>บริษัท : {{ profile.company }}</span></div>
             </div>
 
             <hr class="section-divider" />
