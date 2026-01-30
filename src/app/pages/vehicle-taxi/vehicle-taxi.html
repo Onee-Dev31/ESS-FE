@@ -45,7 +45,8 @@
           <i class="fas fa-sync-alt"></i> คืนค่า
         </button>
         <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา...">
+          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)">
           <button class="btn-search">
             <i class="fas fa-search"></i> ค้นหา
           </button>

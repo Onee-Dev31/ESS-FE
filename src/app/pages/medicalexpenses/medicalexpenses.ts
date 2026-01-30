@@ -46,6 +46,7 @@ export class MedicalexpensesComponent implements OnInit {
   filterStatus = signal<string>('');
   isPolicyModalOpen = signal<boolean>(false);
   isFilterVisible = signal<boolean>(false);
+  searchText = signal<string>('');
 
   fromMonth = signal<number>(0);
   fromYear = signal<string>((dayjs().year() - 1).toString());
@@ -90,6 +91,13 @@ export class MedicalexpensesComponent implements OnInit {
 
         return currentVal >= startVal && currentVal <= endVal;
       });
+    }
+
+    if (this.searchText()) {
+      const search = this.searchText().toLowerCase();
+      data = data.filter(r =>
+        r.id.toLowerCase().includes(search)
+      );
     }
 
     return data;
@@ -226,6 +234,7 @@ export class MedicalexpensesComponent implements OnInit {
     this.fromYear.set((dayjs().year() - 1).toString());
     this.toMonth.set(11);
     this.toYear.set(dayjs().year().toString());
+    this.searchText.set('');
   }
 
   // แสดง/ซ่อน ส่วนตัวกรองข้อมูล

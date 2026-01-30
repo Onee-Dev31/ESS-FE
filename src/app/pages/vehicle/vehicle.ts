@@ -38,6 +38,7 @@ export class VehicleComponent implements OnInit {
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
+  searchText = signal<string>('');
 
   allRequests = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
@@ -57,6 +58,13 @@ export class VehicleComponent implements OnInit {
     }
     if (this.filterEndDate()) {
       filtered = filtered.filter(request => request.createDate <= this.filterEndDate());
+    }
+
+    if (this.searchText()) {
+      const search = this.searchText().toLowerCase();
+      filtered = filtered.filter(r =>
+        r.id.toLowerCase().includes(search)
+      );
     }
 
     const sortState = this.sorting()[0];
@@ -163,6 +171,7 @@ export class VehicleComponent implements OnInit {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
     this.filterStatus.set('');
+    this.searchText.set('');
   }
 
   // สลับการเรียงลำดับข้อมูลในตาราง

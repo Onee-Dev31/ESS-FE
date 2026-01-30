@@ -76,6 +76,11 @@ src/app/
 - **ApprovalsHelperService**: ช่วยจัดการ Logic ที่ซับซ้อนในหน้าอนุมัติ
 - **AuthService**: จัดการ User Role และ State การ Login (Mock data)
 
+### 4. Status Management
+ระบบจัดการสถานะแบ่งเป็น 2 ส่วน:
+- **Backend/Logic**: ใช้ภาษาอังกฤษเป็นหลัก (e.g., `NEW`, `APPROVED`, `WAITING_CHECK`) เพื่อความเสถียรในการเขียนโค้ด
+- **UI Display**: ใช้ **Thai Labels** ในการแสดงผลให้ user เห็น โดยผ่าน `StatusLabelPipe` หรือการ map ค่าคงที่จาก `REQUEST_STATUS_LABEL`
+
 ## 📝 CLI Commands
 
 | Command | Description |

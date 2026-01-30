@@ -14,7 +14,7 @@ export class AllowanceMock {
                 requester = MockHelper.getRandomRequester(); // Random employees
                 // Bias towards actionable statuses for Admin
                 const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
-                status = 'WAITING_CHECK'; // Default for memberandom() * conditions.length)];
+                status = conditions[Math.floor(Math.random() * conditions.length)];
             }
             // Logic for Member: See own requests (already set by getRequesterByRole)
 

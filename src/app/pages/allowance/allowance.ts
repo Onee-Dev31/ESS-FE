@@ -50,6 +50,7 @@ export class AllowanceComponent implements OnInit {
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   filterStatus = signal<string>('');
+  searchText = signal<string>('');
 
 
   allRequests = signal<AllowanceRequest[]>([]);
@@ -76,6 +77,14 @@ export class AllowanceComponent implements OnInit {
 
     if (this.filterEndDate()) {
       filtered = filtered.filter((r) => r.createDate <= this.filterEndDate());
+    }
+
+    if (this.searchText()) {
+      const search = this.searchText().toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.id.toLowerCase().includes(search) || // Filter by ID
+        r.items.some(item => item.description.toLowerCase().includes(search)) // Filter by Item Description
+      );
     }
 
 
@@ -241,6 +250,7 @@ export class AllowanceComponent implements OnInit {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
     this.filterStatus.set('');
+    this.searchText.set('');
   }
 
   // สลับการเรียงลำดับคอลัมน์
