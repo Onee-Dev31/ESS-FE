@@ -153,4 +153,13 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
 
   onStatusUpdated() { this.refresh(); }
   goBack() { this.router.navigate(['/dashboard']); }
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'อนุมัติแล้ว': return 'approved';
+      case 'ไม่อนุมัติ': return 'rejected';
+      case 'รอแก้ไข': return 'referred-back';
+      case 'รออนุมัติ': return 'pending';
+      default: return 'pending';
+    }
+  }
 }

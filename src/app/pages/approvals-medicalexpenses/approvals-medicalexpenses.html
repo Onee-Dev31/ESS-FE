@@ -37,7 +37,7 @@
                         <span class="label">No.</span>
                         <span class="value">{{ row.original.requestNo }}</span>
                     </div>
-                    <span class="status-badge" [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">
+                    <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                         {{ row.original.status }}
                     </span>
                 </div>
@@ -142,8 +142,7 @@
                         </td>
                         <td class="amount-cell">{{ row.original.amount | number }}</td>
                         <td class="text-center">
-                            <span class="status-badge"
-                                [ngClass]="row.original.status.toLowerCase().replace(' ', '-')">{{
+                            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">{{
                                 (row.original.rawStatus || row.original.status) | statusLabel }}</span>
                         </td>
                         <td>

@@ -414,6 +414,7 @@ $bg-slate: #f4f7f9;
                 border-bottom: 1px solid #f9f9f9;
                 text-align: center;
                 font-size: 13px;
+                white-space: nowrap;
 
                 &.request-no-link {
                     cursor: pointer;
@@ -427,8 +428,9 @@ $bg-slate: #f4f7f9;
             }
 
             .description-cell {
-                max-width: 280px;
+                max-width: 200px;
                 text-align: left;
+                white-space: normal; 
 
                 .truncate-text {
                     white-space: nowrap;
@@ -445,6 +447,7 @@ $bg-slate: #f4f7f9;
 
         .requester-info {
             text-align: left;
+            white-space: normal;
 
             .name {
                 font-weight: 700;
