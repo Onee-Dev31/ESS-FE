@@ -15,21 +15,59 @@ $bg-slate: #f4f7f9;
     height: 100vh;
     background: rgba(0, 0, 0, 0.4);
     display: flex;
-    align-items: center;
     justify-content: center;
     z-index: 10000;
     backdrop-filter: blur(4px);
+
+    /* Mobile: Scrollable Overlay Strategy */
+    /* This allows the modal to grow fully and uses native scrolling */
+    @media (max-width: 991px) {
+        align-items: flex-start;
+        overflow-y: scroll;
+        /* Force scrollbar to always show scroll capability */
+        overflow-x: hidden;
+        padding: 20px 0 120px;
+        /* Extra bottom padding for safe scrolling */
+        -webkit-overflow-scrolling: touch;
+        /* Ensure body doesn't scroll behind */
+        position: fixed;
+        height: 100dvh;
+        /* Use dynamic viewport height for mobile */
+    }
+
+    /* Desktop: Centered Fixed Modal */
+    @media (min-width: 992px) {
+        align-items: center;
+        overflow: hidden;
+    }
 
     .modal-container-large {
         background: white;
         width: 90%;
         max-width: 1100px;
         border-radius: 12px;
-        overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
+
+        /* Mobile: Auto height, let content dictate size */
+        @media (max-width: 991px) {
+            max-height: none;
+            height: auto;
+            min-height: auto;
+            position: relative;
+            margin: 20px auto 120px;
+            /* Significant bottom margin */
+            display: block;
+            overflow: visible;
+        }
+
+        /* Desktop: Fixed height with internal scroll */
+        @media (min-width: 992px) {
+            max-height: 80vh;
+            /* Reduced to ensure bottom is visible */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
         .modal-header-modern {
             flex-shrink: 0;
@@ -60,7 +98,8 @@ $bg-slate: #f4f7f9;
 
                     @media screen and (max-width: 600px) {
                         flex: 0 0 100%;
-                        order: 1;
+                        order: 2;
+                        /* Move below actions on mobile if actions wrap */
                     }
 
                     .request-title {
@@ -144,6 +183,8 @@ $bg-slate: #f4f7f9;
         }
 
         .approval-progress-bar {
+            flex-shrink: 0;
+            /* Prevent shrinking */
             padding: 1.5rem 1.5rem 1.5rem;
             background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
             border-bottom: 1px solid #e2e8f0;
@@ -293,45 +334,71 @@ $bg-slate: #f4f7f9;
         }
 
         .modal-layout-body {
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            flex: 1;
+            /* Mobile: Natural height, no internal scroll */
+            display: block;
+            height: auto;
+            overflow: visible;
+            min-height: 0;
 
-
+            /* Desktop: Flex scrollable area */
             @media (min-width: 992px) {
-                display: grid;
-                grid-template-columns: 1fr 280px;
-                min-height: 500px;
-                // align-items: stretch; // Grid does this by default
+                display: flex;
+                flex-direction: row;
+                align-items: stretch;
+                /* Ensure both panels stretch to full height */
+                overflow-y: auto;
+                flex: 1;
+                min-height: 0;
+                padding-bottom: 0;
+                /* Fix: Allow panels to reach the bottom edge */
+                background: linear-gradient(to left, #f4f7f9 280px, #e2e8f0 280px, #e2e8f0 281px, #ffffff 281px);
+                /* Faux Column & Border */
             }
 
-            @media (min-width: 992px) and (max-width: 1200px) {
-                grid-template-columns: 1fr 240px;
+            /* Mobile: Natural flow */
+            @media (max-width: 991px) {
+                padding-bottom: 20px;
+            }
+
+            /* Spacer for mobile bottom clearance removed */
+            &::after {
+                display: none;
+            }
+
+            .mobile-safe-spacer {
+                display: none;
+                /* Ensure hidden if HTML still has it */
             }
 
             .main-panel {
-                flex: 1;
+                /* Mobile defaults */
                 padding: 1.5rem;
-                padding-bottom: 1rem;
+                padding-bottom: 0px;
 
                 @media (min-width: 768px) {
                     padding: 2rem;
                 }
 
-                @media (min-width: 992px) and (max-width: 1200px) {
-                    padding: 1.5rem;
-                    padding-bottom: 3rem;
+                @media (min-width: 992px) {
+                    flex: 1;
+                    padding-bottom: 40px;
+                    border-right: 1px solid #eee;
+                    position: relative;
                 }
 
-                border-right: none;
-
-                @media (min-width: 992px) {
-                    border-right: 1px solid #eee;
+                /* Force scroll capability using pseudo-element */
+                &::after {
+                    content: '';
+                    display: block;
+                    height: 30px;
+                    /* Force scrollable area */
+                    width: 100%;
+                    flex-shrink: 0;
                 }
 
                 .summary-cards-grid {
                     display: grid;
+                    /* Enable Grid Grid */
                     grid-template-columns: repeat(2, 1fr);
                     gap: 15px;
                     margin-bottom: 1rem;
@@ -406,40 +473,15 @@ $bg-slate: #f4f7f9;
                     }
                 }
 
-                .content-tabs {
+                .content-header {
                     border-bottom: 1px solid #eee;
                     margin-bottom: 1.5rem;
-                    display: flex;
-                    overflow-x: auto;
-                    gap: 5px;
+                    padding-bottom: 10px;
 
-                    &::-webkit-scrollbar {
-                        display: none;
-                    }
-
-                    .tab-link {
-                        background: none;
-                        border: none;
-                        padding: 10px 15px;
-                        color: #888;
-                        font-weight: 600;
-                        cursor: pointer;
-                        position: relative;
-                        white-space: nowrap;
-
-                        &.active {
-                            color: $primary-blue;
-
-                            &::after {
-                                content: '';
-                                position: absolute;
-                                bottom: -1px;
-                                left: 0;
-                                width: 100%;
-                                height: 2px;
-                                background: $primary-blue;
-                            }
-                        }
+                    h3 {
+                        margin: 0;
+                        font-size: 1.1rem;
+                        color: #333;
                     }
                 }
 
@@ -604,14 +646,39 @@ $bg-slate: #f4f7f9;
                 .action-confirm-box {
                     background: #f8fafc;
                     border: 1px solid #e2e8f0;
-                    border-radius: 8px;
-                    padding: 1rem;
-                    margin-top: 2rem;
-                    margin-bottom: 2rem; // Ensure space at the bottom
+                    border-radius: 12px;
+                    /* Slightly more rounded */
+                    padding: 1.5rem;
+                    /* Increased padding from 1rem */
+                    margin-top: 1.5rem;
+                    margin-bottom: 0;
+                    /* Handled by spacer div */
                     animation: slideDown 0.3s ease-out;
 
+                    /* Make Approved state more compact since it has no input */
                     &.approved {
                         border-left: 4px solid $primary-green;
+                        padding: 1rem 1.5rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        gap: 1rem;
+
+                        .action-footer {
+                            margin-top: 0;
+                            width: auto;
+                        }
+
+                        .reason-section {
+                            display: none;
+                        }
+
+                        /* Hide title in approved state to save space */
+                        .action-title {
+                            margin-bottom: 0;
+                            margin-right: auto;
+                        }
                     }
 
                     &.rejected {
@@ -641,6 +708,13 @@ $bg-slate: #f4f7f9;
                             text-decoration: underline;
                             font-weight: 800;
                         }
+                    }
+
+                    /* Remove bottom margin for title in Approved state to save space */
+                    &.approved .action-title {
+                        margin-bottom: 0;
+                        margin-right: auto;
+                        /* Push buttons to right if flex row */
                     }
 
                     .reason-section {
@@ -675,6 +749,8 @@ $bg-slate: #f4f7f9;
                     }
 
                     .action-footer {
+                        margin-top: 1rem;
+                        /* Ensure buttons have space from content above */
                         display: flex;
                         gap: 8px;
                         justify-content: flex-end;
@@ -720,7 +796,15 @@ $bg-slate: #f4f7f9;
                 flex-direction: column;
 
                 @media (min-width: 992px) {
-                    width: 100%;
+                    width: 280px;
+                    padding-bottom: 40px;
+                    /* border-left removed: handled by container gradient */
+                    position: relative;
+                    /* Ensure it takes full height */
+                    display: flex;
+                    flex-direction: column;
+                    align-self: stretch;
+                    /* Critical: force it to stretch in flex container */
                 }
 
                 padding: 1.5rem;
@@ -730,13 +814,9 @@ $bg-slate: #f4f7f9;
                     padding: 2rem;
                 }
 
-
-                @media (min-width: 992px) and (max-width: 1200px) {
-                    padding: 1.5rem;
-                    padding-bottom: 3rem;
-                }
-
-                background: #fafbfc;
+                background: transparent;
+                /* Transparent on desktop to show container gradient */
+                /* Faux Column: Transparent to show container bg */
 
                 .side-title {
                     color: $primary-blue;
@@ -761,6 +841,13 @@ $bg-slate: #f4f7f9;
                         font-weight: 500;
                     }
                 }
+
+                .side-divider {
+                    height: 1px;
+                    background: #e2e8f0;
+                    margin: 1.5rem 0;
+                    width: 100%;
+                }
             }
         }
     }
@@ -770,6 +857,29 @@ $bg-slate: #f4f7f9;
     display: flex;
     gap: 15px;
     margin-top: 1rem;
+
+    &.side-mode {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 0.5rem;
+        flex: 1;
+        /* Grow to fill side panel */
+        display: flex;
+
+        .avatar-circle {
+            display: none;
+        }
+
+        .comment-bubble {
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #eef2f6;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            /* Grow to fill thread container */
+        }
+    }
 
     .avatar-circle {
         width: 40px;
@@ -791,15 +901,18 @@ $bg-slate: #f4f7f9;
         flex: 1;
 
         .comment-top {
-            font-size: 12px;
+            font-size: 11px;
             color: #888;
             margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         p {
             margin: 0;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.5;
+            color: #333;
         }
     }
 }

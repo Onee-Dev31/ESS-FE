@@ -33,7 +33,7 @@ export class MedicalMock {
                     treatmentDateTo: formattedDate,
                     requestedAmount: amount,
                     approvedAmount: approvedAmount,
-                    attachedFile: 'mock_medical_receipt.jpg'
+                    attachedFile: Math.random() > 0.3 ? `medical_receipt_${i + 1}.pdf` : '' // 70% have files
                 }],
                 totalRequestedAmount: amount,
                 totalApprovedAmount: approvedAmount

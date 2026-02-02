@@ -18,7 +18,6 @@ export class AllowanceService {
         this.initializeData();
     }
 
-    // Initialize data from LocalStorage or generate defaults
     private initializeData() {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         if (stored) {
@@ -33,13 +32,10 @@ export class AllowanceService {
         }
     }
 
-    // Save master dataset to storage
     private saveToStorage(data: AllowanceRequest[]) {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     }
 
-    // Update the BehaviorSubject based on User Role
-    // Admin sees ALL, Member sees OWN
     private updateSubject(masterData: AllowanceRequest[]) {
         const role = localStorage.getItem('userRole') || 'Member';
         const employeeId = localStorage.getItem('employeeId');
@@ -49,7 +45,6 @@ export class AllowanceService {
             viewData = masterData.filter(req => req.requester?.employeeId === employeeId);
         }
 
-        // Sort by ID desc
         viewData.sort((a, b) => b.id.localeCompare(a.id));
         this.allowanceRequestsSubject.next(viewData);
     }
@@ -62,7 +57,6 @@ export class AllowanceService {
     // --- Public API ---
 
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
-        // Trigger a refresh of the subject based on current role/storage before returning
         const masterData = this.getMasterData();
         this.updateSubject(masterData);
         return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(100)));
@@ -76,7 +70,7 @@ export class AllowanceService {
 
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
         const masterData = this.getMasterData();
-        masterData.unshift(request); // Add to top
+        masterData.unshift(request);
         this.saveToStorage(masterData);
         this.updateSubject(masterData);
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
@@ -115,12 +109,9 @@ export class AllowanceService {
         return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
     }
 
-    // Called by AuthService on Login/Logout
     refreshMockData() {
-        // Re-read storage and re-filter based on new role
         const masterData = this.getMasterData();
 
-        // If storage is empty (edge case), re-init
         if (masterData.length === 0) {
             this.initializeData();
         } else {
@@ -128,13 +119,11 @@ export class AllowanceService {
         }
     }
 
-    // Mock logs
     getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
         const results = AllowanceMock.getMockAllowanceLogs(month, year);
         return of(results).pipe(delay(100));
     }
 
-    // Update status (Admin approval)
     updateAllowanceStatus(id: string, status: string): void {
         const masterData = this.getMasterData();
         const index = masterData.findIndex(r => r.id === id);

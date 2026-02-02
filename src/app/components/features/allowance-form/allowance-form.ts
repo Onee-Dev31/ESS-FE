@@ -35,7 +35,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   totalHoursStr: string = '0.00';
   logs: any[] = [];
 
-  // Signal for policy popup
   isPolicyPopupOpen = signal(false);
 
   ngOnInit(): void {
@@ -48,7 +47,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
   }
 
-  // โหลดข้อมูลคำขอเบี้ยเลี้ยงหรือสร้างใหม่
   loadData() {
     if (!this.requestId) {
       this.allowanceService.generateNextAllowanceId().pipe(
@@ -70,7 +68,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
   }
 
-  // สร้างรายการปฏิทินและดึงข้อมูล Log การทำงานจาก Service
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
@@ -108,7 +105,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       });
   }
 
-  // คำนวณชั่วโมงและจำนวนเงินเบี้ยเลี้ยงอัตโนมัติตามเวลาเข้า-ออก
   autoCalculate(log: any) {
     if (!log.selected || !log.timeIn || !log.timeOut) {
       log.displayHours = '0.00';
@@ -161,7 +157,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.autoCalculate(log);
   }
 
-  // คำนวณยอดรวมจำนวนเงินและชั่วโมงทั้งหมดที่เลือก
   updateTotal() {
     const selectedLogs = this.logs.filter(log => log.selected);
 
@@ -173,7 +168,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.totalHoursStr = `${hours}.${minutes.toString().padStart(2, '0')}`;
   }
 
-  // ตรวจสอบความถูกต้องและบันทึกรายการเบิก
   onSubmit() {
     const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {

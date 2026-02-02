@@ -33,9 +33,9 @@ export class TimeOffForm implements OnInit {
   reason = signal<string>('');
   startDate = signal<string>('');
   endDate = signal<string>('');
-  leavePeriod = signal<string>('full-day'); // ลาเช้า, ลาบ่าย, ลาเต็มวัน, กำหนดเอง
-  shiftStartTime = signal<string>(''); // เวลาเริ่มกะ
-  shiftEndTime = signal<string>(''); // เวลาสิ้นสุดกะ
+  leavePeriod = signal<string>('full-day');
+  shiftStartTime = signal<string>('');
+  shiftEndTime = signal<string>('');
 
   calculatedDays = computed(() => {
     const period = this.leavePeriod();
@@ -43,9 +43,8 @@ export class TimeOffForm implements OnInit {
       return 0.5;
     }
     if (period === 'custom') {
-      return 0; // Or implement hourly calculation
+      return 0;
     }
-    // For full-day, calculate from date range
     if (this.startDate() && this.endDate()) {
       return this.dateUtil.diffInDays(this.startDate(), this.endDate());
     }
@@ -80,11 +79,9 @@ export class TimeOffForm implements OnInit {
 
     const period = this.leavePeriod();
 
-    // For half-day, end date = start date
     if (period === 'morning' || period === 'afternoon') {
       this.endDate.set(start);
     }
-    // For full-day, keep current end date or set to start date if invalid
     else if (period === 'full-day') {
       const end = this.endDate();
       if (!end || dayjs(end).isBefore(dayjs(start))) {
@@ -95,7 +92,6 @@ export class TimeOffForm implements OnInit {
 
   selectLeaveType(id: string) {
     this.selectedLeaveType.set(id);
-    // If vacation or funeral leave, force full-day
     if (this.isHalfDayDisabled()) {
       this.leavePeriod.set('full-day');
     }

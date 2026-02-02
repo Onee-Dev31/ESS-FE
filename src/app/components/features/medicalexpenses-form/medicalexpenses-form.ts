@@ -41,6 +41,13 @@ export class MedicalexpensesForm implements OnInit {
   startDate = signal<string>('');
   endDate = signal<string>('');
   amount = signal<number>(0);
+  totalDays = computed(() => {
+    if (!this.startDate() || !this.endDate()) return 0;
+    const start = dayjs(this.startDate());
+    const end = dayjs(this.endDate());
+    const diff = end.diff(start, 'day') + 1;
+    return diff > 0 ? diff : 0;
+  });
 
   attachments = signal<{ id: number; name: string; description: string }[]>([
     { id: 1, name: 'approval-list-page.005-87d92c90a8cb2e588a7032052d9d94ac.png', description: 'ใบเสร็จยา' },
@@ -55,7 +62,7 @@ export class MedicalexpensesForm implements OnInit {
     return end.diff(start, 'day') + 1;
   });
 
-  // เริ่มต้นคอมโพเนนต์: โหลดข้อมูลคำขอหากอยู่ในโหมดแก้ไข
+  
   ngOnInit() {
     if (this.requestId) {
       this.medicalService.getRequestById(this.requestId).subscribe(req => {
@@ -107,7 +114,7 @@ export class MedicalexpensesForm implements OnInit {
     input.click();
   }
 
-  // จัดการเมื่อมีการเลือกไฟล์แนบ
+  
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -126,7 +133,7 @@ export class MedicalexpensesForm implements OnInit {
     this.onClose.emit();
   }
 
-  // ตรวจสอบข้อมูลและบันทึกคำขอค่ารักษาพยาบาล
+  
   save() {
     if (!this.selectedClaimType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
@@ -150,9 +157,9 @@ export class MedicalexpensesForm implements OnInit {
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
-    // Fetch profile and save
+    
     this.userService.getUserProfile().subscribe(profile => {
-      const titleName = profile.name.split(' ')[0]; // Simple logic, adjust if needed
+      const titleName = profile.name.split(' ')[0]; 
       const request: MedicalRequest = {
         id: this.requestId,
         createDate: dayjs().toISOString(),

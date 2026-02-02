@@ -99,17 +99,17 @@
     <!-- ส่วนตาราง/การ์ดบันทึกข้อมูล -->
     <div class="table-container">
       <!-- Desktop Table (Hidden on Mobile) -->
-      <table class="excel-table desktop-only" style="width: 100%">
+      <table class="excel-table desktop-only">
         <colgroup>
-          <col style="width: 50px" />
-          <col style="width: 100px" />
-          <col style="width: 80px" />
-          <col style="width: 100px" />
-          <col style="width: 60px" />
-          <col style="width: 60px" />
-          <col style="width: 60px" />
-          <col style="width: 100px" />
-          <col />
+          <col class="col-50" />
+          <col class="col-100" />
+          <col class="col-80" />
+          <col class="col-100" />
+          <col class="col-60" />
+          <col class="col-60" />
+          <col class="col-60" />
+          <col class="col-100" />
+          <col class="col-auto" />
         </colgroup>
         <thead>
           <tr>
@@ -133,10 +133,11 @@
               <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
             </td>
             <td class="text-center bg-gray">{{ log.date }}</td>
-            <td class="text-center bg-gray font-bold" [style.color]="log.dayType === 'H' ? '#d93025' : '#3c4043'">
+            <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
+              [class.regular-label]="log.dayType === 'W'">
               {{ log.dayType }}
             </td>
-            <td class="text-center bg-gray" style="font-size: 12px; color: #555;">
+            <td class="text-center bg-gray shift-code">
               {{ log.shiftCode }}
             </td>
             <td class="p-0">
@@ -159,7 +160,7 @@
         <tfoot>
           <tr class="footer-row">
             <td colspan="6" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
-            <td class="total-val text-center" style="background: #f8f9fa !important; color: #5f6368">
+            <td class="total-val text-center total-hours">
               {{ totalHoursStr }}
             </td>
             <td class="total-val text-center">{{ totalAmount | number }}</td>

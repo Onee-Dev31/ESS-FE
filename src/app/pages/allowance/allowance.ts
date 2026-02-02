@@ -39,7 +39,7 @@ export class AllowanceComponent implements OnInit {
   private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
-  // กลับหน้า Dashboard
+  
   goBack() {
     this.router.navigate(['/dashboard']);
   }
@@ -62,7 +62,7 @@ export class AllowanceComponent implements OnInit {
   pageSize = signal<number>(10);
 
 
-  // ประมวลผลและกรองข้อมูลเบี้ยเลี้ยงทั้งหมด
+  
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
@@ -82,8 +82,8 @@ export class AllowanceComponent implements OnInit {
     if (this.searchText()) {
       const search = this.searchText().toLowerCase();
       filtered = filtered.filter((r) =>
-        r.id.toLowerCase().includes(search) || // Filter by ID
-        r.items.some(item => item.description.toLowerCase().includes(search)) // Filter by Item Description
+        r.id.toLowerCase().includes(search) || 
+        r.items.some(item => item.description.toLowerCase().includes(search)) 
       );
     }
 
@@ -114,7 +114,7 @@ export class AllowanceComponent implements OnInit {
           case 'date':
             valueA = requestA.items[0]?.date || '';
             valueB = requestB.items[0]?.date || '';
-            // Convert BE to ISO for proper comparison
+            
             const isoA = this.dateUtil.formatBEToISO(valueA);
             const isoB = this.dateUtil.formatBEToISO(valueB);
             return isoA.localeCompare(isoB) * direction;
@@ -131,7 +131,7 @@ export class AllowanceComponent implements OnInit {
     return filtered;
   });
 
-  // ข้อมูลคำขอที่แบ่งตามหน้า
+  
   paginatedRequests = computed(() => {
     const filtered = this.processedData();
     const start = this.currentPage() * this.pageSize();
@@ -139,7 +139,7 @@ export class AllowanceComponent implements OnInit {
     return filtered.slice(start, end);
   });
 
-  // แปลงข้อมูลเป็นรายการแถวเพื่อแสดงในตาราง (รองรับ Grouping)
+  
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
     this.paginatedRequests().forEach((request: AllowanceRequest) => {
@@ -158,7 +158,7 @@ export class AllowanceComponent implements OnInit {
   });
 
 
-  // คำนวณจำนวนรายการและหน้าทั้งหมด
+  
   totalRequests = computed(() => this.processedData().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
@@ -182,27 +182,27 @@ export class AllowanceComponent implements OnInit {
     manualPagination: true,
   }));
 
-  // ตั้งค่าขนาดหน้า
+  
   setPageSize(size: number) {
     this.pageSize.set(size);
     this.currentPage.set(0);
   }
 
-  // ไปหน้าถัดไป
+  
   nextPage() {
     if (this.canNextPage()) {
       this.currentPage.update(p => p + 1);
     }
   }
 
-  // ย้อนกลับหน้าก่อนหน้า
+  
   previousPage() {
     if (this.canPreviousPage()) {
       this.currentPage.update(p => p - 1);
     }
   }
 
-  // ไปยังหน้าที่ระบุ
+  
   goToPage(page: number) {
     this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
   }
@@ -219,14 +219,14 @@ export class AllowanceComponent implements OnInit {
     this.loadData();
   }
 
-  // โหลดข้อมูลจาก Service
+  
   loadData() {
     this.allowanceService.getAllowanceRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  // เปิด Modal เพิ่ม/แก้ไขคำขอ
+  
   openModal(id: string = '') {
     if (id === '') {
       this.allowanceService.generateNextAllowanceId().subscribe(nid => {
@@ -239,13 +239,13 @@ export class AllowanceComponent implements OnInit {
     }
   }
 
-  // ปิด Modal และรีเฟรชข้อมูล
+  
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-  // ล้างตัวกรอง
+  
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
@@ -253,13 +253,13 @@ export class AllowanceComponent implements OnInit {
     this.searchText.set('');
   }
 
-  // สลับการเรียงลำดับคอลัมน์
+  
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  // ดึงไอคอนแสดงการเรียงลำดับ
+  
   getSortIcon(columnId: string) {
     const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
@@ -268,16 +268,6 @@ export class AllowanceComponent implements OnInit {
       'fa-sort': !isSorted,
       'text-muted': !isSorted,
     };
-  }
-
-  // ลบรายการคำขอ
-  deleteRequest(id: string) {
-    if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
-      this.allowanceService.deleteAllowanceRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
-        this.loadData();
-      });
-    }
   }
 
   trackByReqId(index: number, req: AllowanceRequest): string {

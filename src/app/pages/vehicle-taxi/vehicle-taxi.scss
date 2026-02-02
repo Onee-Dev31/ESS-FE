@@ -21,8 +21,6 @@
     align-items: center;
     gap: 12px;
 
-
-
     h2 {
       margin: 0;
       font-size: 1.2rem;
@@ -61,114 +59,74 @@
     }
   }
 
-  .toolbar-container {
-    padding: 0 20px 20px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-
-    @include mobile {
-      padding: 0 15px 15px 15px;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    .left-action {
-      .btn-create {
-        background-color: $btn-create-bg;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 4px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        white-space: nowrap;
-
-        &:hover {
-          background-color: color.adjust($btn-create-bg, $lightness: -5%);
-        }
-
-        @include mobile {
-          width: 100%;
-          padding: 12px;
-          order: 2;
-        }
-      }
-    }
-
-  }
-
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-
-    @include tablet {
-      display: none;
-    }
-  }
-
   .modern-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 900px;
 
     thead {
       background-color: $header-bg;
 
-      tr th {
-        color: $text-header;
-        font-weight: 600;
-        font-size: 0.85rem;
-        padding: 15px 12px;
-        border: none;
-        text-align: left;
-        white-space: nowrap;
-
-        &.text-center {
-          text-align: center !important;
-        }
-
-        &.text-right {
-          text-align: right !important;
-        }
-
-        @include mobile {
-          padding: 12px 8px;
-        }
-      }
-    }
-
-    tbody {
       tr {
-        border-bottom: 1px solid $border-color;
-        background-color: #fff;
-
-        td {
-          padding: 12px 12px;
-          vertical-align: middle;
-          color: #495057;
-          font-size: 0.9rem;
+        th {
+          color: $text-header;
+          padding: 15px 12px;
+          font-weight: 600;
+          font-size: 0.85rem;
+          text-align: left;
+          white-space: nowrap;
 
           @include mobile {
-            padding: 10px 8px;
-            font-size: 0.85rem;
+            padding: 12px 8px;
           }
 
-          &.text-center {
-            text-align: center !important;
+          &.col-id {
+            width: 12%;
+          }
+
+          &.col-date-create {
+            width: 10%;
+          }
+
+          &.col-date-req {
+            width: 10%;
+          }
+
+          &.col-dest {
+            width: 12%;
+          }
+
+          &.col-dist {
+            width: 8%;
+          }
+
+          &.col-amount {
+            width: 10%;
+          }
+
+          &.col-status {
+            width: 12%;
+          }
+
+          &.col-actions {
+            width: 10%;
           }
 
           &.text-right {
             text-align: right !important;
           }
+        }
+      }
+    }
+
+    tbody {
+      tr td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+        vertical-align: middle;
+
+        &.text-right {
+          text-align: right !important;
         }
 
         .id-text {
@@ -210,39 +168,44 @@
 
         .status-badge {
           display: inline-block;
-          padding: 5px 10px;
+          padding: 5px 12px;
           border-radius: 8px;
           font-size: 0.75rem;
           font-weight: 700;
           white-space: nowrap;
           min-width: 100px;
           text-align: center;
+          transition: all 0.2s ease;
 
           @include mobile {
             min-width: auto;
-            padding: 4px 8px;
+            padding: 4px 10px;
             font-size: 0.7rem;
           }
 
           &.status-new {
-            background-color: rgba(255, 193, 7, 0.15);
-            color: #f1b44c;
+            background-color: $status-new-bg;
+            color: $status-new-text;
           }
 
           &.status-verified {
-            background-color: rgba(23, 162, 184, 0.15);
-            color: #17a2b8;
+            background-color: $status-verified-bg;
+            color: $status-verified-text;
           }
 
           &.status-pending {
-            background-color: rgba(0, 123, 255, 0.15);
-            color: #007bff;
+            background-color: $status-pending-bg;
+            color: $status-pending-text;
           }
 
           &.status-success {
-            background-color: rgba(40, 167, 69, 0.15);
-            color: #28a745;
+            background-color: $status-success-bg;
+            color: $status-success-text;
           }
+        }
+
+        &.font-semibold {
+          font-weight: 600;
         }
       }
     }

@@ -1,25 +1,137 @@
 @use 'theme' as *;
 @use 'sass:color';
 
-// สไตล์สำหรับตัวกรองข้อมูลด้านขวา
+// แถบเครื่องมือ (Search bar, Filter bar)
+.toolbar-container {
+    padding: 0 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .toolbar-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 15px;
+
+        .left-action {
+            .btn-create {
+                background-color: $btn-create-bg;
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 4px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                white-space: nowrap;
+                height: 38px; // Match search group height
+
+                &:hover {
+                    background-color: color.adjust($btn-create-bg, $lightness: -5%);
+                }
+
+                @include mobile {
+                    width: 100%;
+                    padding: 12px;
+                    order: 2;
+                }
+            }
+        }
+    }
+
+
+    .toolbar-bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        width: 100%;
+        gap: 15px;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .right-filters {
+            margin-left: 0 !important;
+            justify-content: flex-start !important;
+            gap: 12px;
+            flex-wrap: wrap;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .search-input-group {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+
+            @include mobile {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .form-control {
+                width: 200px;
+                border-radius: 4px;
+                height: 38px;
+
+                @include mobile {
+                    width: 100%;
+                }
+            }
+
+            .btn-search {
+                background-color: $btn-search-bg;
+                color: white;
+                border: none;
+                padding: 0 15px;
+                border-radius: 4px;
+                cursor: pointer;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.2s;
+                min-width: 40px;
+                white-space: nowrap;
+
+                &:hover {
+                    background-color: color.adjust($btn-search-bg, $lightness: -5%);
+                }
+            }
+        }
+    }
+
+    @media (max-width: 991px) {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-left: 0;
+    }
+}
+
 .right-filters {
     display: flex;
     align-items: flex-end;
     gap: 10px;
     flex-wrap: wrap;
     margin-left: auto;
-
-    @media (max-width: 991px) {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-left: 0;
-    }
+    padding-bottom: 0px;
 
     @include mobile {
+        display: grid !important; // Force grid for consistent 2-column layout
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 12px 8px; // Vertical gap 12px, Horizontal gap 8px
+        width: 100%;
     }
 
     .select-input-group,
@@ -56,51 +168,12 @@
             width: 100%;
 
             @include mobile {
-                min-width: 0; 
+                min-width: 0;
             }
         }
     }
 
-    .search-input-group {
-        display: flex;
-        gap: 10px;
-        align-items: flex-end;
 
-        @media (max-width: 991px) {
-            width: 100%;
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: 1fr auto;
-        }
-
-        .form-control {
-            width: 200px;
-            border-radius: 4px; // Ensure explicit radius
-
-            @media (max-width: 991px) {
-                width: 100%;
-            }
-        }
-
-        .btn-search {
-            background-color: $btn-search-bg;
-            color: white;
-            border: none;
-            padding: 0 15px;
-            border-radius: 4px; // Consistent border radius
-            cursor: pointer;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-            min-width: 40px;
-
-            &:hover {
-                background-color: #1557b0;
-            }
-        }
-    }
 
     .btn-clear {
         background-color: #f8f9fa;
@@ -118,7 +191,12 @@
 
         @include mobile {
             width: 100%;
-            padding: 10px;
+            padding: 0 10px;
+            height: 38px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 }
@@ -345,6 +423,31 @@
                 }
             }
         }
+    }
+}
+
+// Common Table Styles
+.modern-table {
+    .sortable-header {
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px !important;
+        color: #999;
+        font-style: italic;
     }
 }
 

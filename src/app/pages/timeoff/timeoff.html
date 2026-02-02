@@ -13,36 +13,40 @@
 
         <!-- Toolbar -->
         <div class="toolbar-container">
-            <div class="left-action">
-                <button class="btn-create" (click)="openForm()">
-                    <i class="fas fa-plus"></i> สร้างรายการลา
-                </button>
+            <div class="toolbar-top-row">
+                <div class="left-action">
+                    <button class="btn-create" (click)="openForm()">
+                        <i class="fas fa-plus"></i> สร้างรายการลา
+                    </button>
+                </div>
             </div>
 
-            <div class="right-filters">
-                <div class="date-input-group">
-                    <span class="filter-label">วันที่สร้างรายการ</span>
-                    <input type="date" class="form-control" [ngModel]="filterStartDate()"
-                        (ngModelChange)="filterStartDate.set($event); applyFilters()" />
-                </div>
-                <div class="date-input-group">
-                    <span class="filter-label">ถึง</span>
-                    <input type="date" class="form-control" [ngModel]="filterEndDate()"
-                        (ngModelChange)="filterEndDate.set($event); applyFilters()" />
+            <div class="toolbar-bottom-row">
+                <div class="right-filters">
+                    <div class="date-input-group">
+                        <span class="filter-label">วันที่สร้างรายการ</span>
+                        <input type="date" class="form-control" [ngModel]="filterStartDate()"
+                            (ngModelChange)="filterStartDate.set($event); applyFilters()" />
+                    </div>
+                    <div class="date-input-group">
+                        <span class="filter-label">ถึง</span>
+                        <input type="date" class="form-control" [ngModel]="filterEndDate()"
+                            (ngModelChange)="filterEndDate.set($event); applyFilters()" />
+                    </div>
+
+                    <div class="select-input-group">
+                        <span class="filter-label">สถานะ</span>
+                        <select class="form-control select-status" [ngModel]="filterStatus()"
+                            (ngModelChange)="filterStatus.set($event); applyFilters()">
+                            <option value="">ทั้งหมด</option>
+                            <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+                        </select>
+                    </div>
+                    <button class="btn-clear" (click)="clearFilters()">
+                        <i class="fas fa-sync-alt"></i> คืนค่า
+                    </button>
                 </div>
 
-                <div class="select-input-group">
-                    <span class="filter-label">สถานะ</span>
-                    <select class="form-control select-status" [ngModel]="filterStatus()"
-                        (ngModelChange)="filterStatus.set($event); applyFilters()">
-                        <option value="">ทั้งหมด</option>
-                        <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
-                    </select>
-                </div>
-
-                <button class="btn-clear" (click)="clearFilters()">
-                    <i class="fas fa-sync-alt"></i> คืนค่า
-                </button>
                 <div class="search-input-group">
                     <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
                         (ngModelChange)="searchText.set($event); applyFilters()">
@@ -133,21 +137,19 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 110px;">รหัสคำขอ</th>
+                        <th rowspan="2" class="col-id">รหัสคำขอ</th>
                         <th colspan="2" class="text-center">วัน-เวลา ที่ขอลา</th>
-                        <th rowspan="2" class="text-center" style="width: 80px;">จำนวนวัน</th>
-                        <th rowspan="2" class="text-center" style="width: 13%">ประเภทการลา</th>
-                        <th rowspan="2" class="text-center" style="width: 15%">ประเภทวันลา</th>
-                        <th rowspan="2" style="width: 20%">เหตุผล</th>
-                        <th rowspan="2" class="text-center" style="width: 10%">สถานะ</th>
-                        <th rowspan="2" class="text-center" style="width: 80px;">เอกสารแนบ</th>
-                        <th rowspan="2" class="text-center" style="width: 120px;">จัดการ</th>
+                        <th rowspan="2" class="text-center col-days">จำนวนวัน</th>
+                        <th rowspan="2" class="text-center col-type">ประเภทการลา</th>
+                        <th rowspan="2" class="text-center col-period">ประเภทวันลา</th>
+                        <th rowspan="2" class="col-reason">เหตุผล</th>
+                        <th rowspan="2" class="text-center col-status">สถานะ</th>
+                        <th rowspan="2" class="text-center col-attach">เอกสารแนบ</th>
+                        <th rowspan="2" class="text-center col-actions">จัดการ</th>
                     </tr>
                     <tr>
-                        <th class="text-center" style="width: 150px;">จาก
-                        </th>
-                        <th class="text-center" style="width: 150px;">ถึง
-                        </th>
+                        <th class="text-center col-date">จาก</th>
+                        <th class="text-center col-date">ถึง</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -166,7 +168,7 @@
                             <span class="days-badge">{{ request.days }}</span>
                         </td>
                         <td class="text-center">
-                            <div class="leave-type-cell" style="justify-content: center;">
+                            <div class="leave-type-cell centered">
                                 <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
                                 {{ request.leaveType }}
                             </div>

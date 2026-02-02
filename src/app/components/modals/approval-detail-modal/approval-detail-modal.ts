@@ -195,7 +195,7 @@ export class ApprovalDetailModalComponent implements OnInit {
             date: m.treatmentDateFrom || data.createDate,
             description: `${m.diseaseType} (${m.hospital})` || '',
             amount: m.requestedAmount || 0,
-            attachedFile: m.attachedFile || ''
+            attachedFile: m.attachedFile || '' // Map file attachment from medical data
           }));
           this.currentDetailItems.set(unifiedItems);
           this.detailedStatus.set(data.status);

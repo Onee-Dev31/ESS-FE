@@ -1,6 +1,17 @@
 @use 'sass:color';
 @use '../../../../styles/theme' as *;
 
+$col-select: 50px;
+$col-date: 120px;
+$col-day-type: 80px;
+$col-shift: 120px;
+$col-time: 60px;
+$col-desc: auto;
+$col-dest: 200px;
+$col-dist: 75px;
+$col-amount: 100px;
+$col-file: 50px;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -167,7 +178,7 @@
     }
   }
 
-  // Desktop/Mobile/Tablet visibility helpers
+  
 
   .action-bar {
     display: flex;
@@ -279,6 +290,46 @@
         box-sizing: border-box;
       }
 
+      .col-select {
+        width: $col-select;
+      }
+
+      .col-date {
+        width: $col-date;
+      }
+
+      .col-day-type {
+        width: $col-day-type;
+      }
+
+      .col-shift {
+        width: $col-shift;
+      }
+
+      .col-time {
+        width: $col-time;
+      }
+
+      .col-desc {
+        width: $col-desc;
+      }
+
+      .col-dest {
+        width: $col-dest;
+      }
+
+      .col-dist {
+        width: $col-dist;
+      }
+
+      .col-amount {
+        width: $col-amount;
+      }
+
+      .col-file {
+        width: $col-file;
+      }
+
       th {
         background: #f8f9fa;
         position: sticky;
@@ -287,6 +338,11 @@
         text-align: center;
         color: $text-sub;
         border-top: 1px solid $border;
+
+        .required {
+          color: #d93025;
+          margin-left: 2px;
+        }
       }
 
       .sub-header th {
@@ -316,6 +372,21 @@
 
       .font-bold {
         font-weight: 700;
+      }
+
+      .holiday-label {
+        color: #d93025;
+        font-weight: 700;
+      }
+
+      .regular-label {
+        color: #3c4043;
+        font-weight: 700;
+      }
+
+      .shift-code {
+        font-size: 12px;
+        color: #555;
       }
 
       .highlight-row td {
@@ -394,7 +465,7 @@
     }
   }
 
-  // Mobile Card Styles
+  
   .mobile-cards-view {
     display: flex;
     flex-direction: column;
@@ -531,7 +602,7 @@
     }
   }
 
-  // Mobile Sticky Footer Summary
+  
   .mobile-sticky-footer {
     position: sticky;
     bottom: -20px;

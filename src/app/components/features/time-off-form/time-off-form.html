@@ -168,15 +168,15 @@
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
                     <i class="fas fa-file-upload"></i> Upload file
                 </button>
-                <input #fileInput type="file" style="display: none;" (change)="onFileSelected($event)" multiple>
+                <input #fileInput type="file" class="hidden-input" (change)="onFileSelected($event)" multiple>
             </div>
             <div class="attachment-table-container" *ngIf="attachments().length > 0">
                 <table class="excel-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">#</th>
+                            <th class="col-xs">#</th>
                             <th>ชื่อไฟล์</th>
-                            <th style="width: 50px;">ลบ</th>
+                            <th class="col-xs">ลบ</th>
                         </tr>
                     </thead>
                     <tbody>

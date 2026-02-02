@@ -15,62 +15,70 @@
     <div class="content-card">
         <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
 
-        <!-- แถบเครื่องมือ: ปุ่มสร้างคำขอเบิก และ ส่วนตัวกรองข้อมูล -->
         <div class="toolbar-container">
-            <div class="left-action">
-                <button class="btn-create" (click)="openModal()">
-                    <i class="fas fa-plus"></i> สร้างรายการเบิก
-                </button>
+            <div class="toolbar-top-row">
+                <div class="left-action">
+                    <button class="btn-create" (click)="openModal()">
+                        <i class="fas fa-plus"></i> สร้างรายการเบิก
+                    </button>
+                </div>
             </div>
 
-            <div class="right-filters">
-                <div class="filter-group">
-                    <span class="filter-label">ตั้งแต่เดือน *</span>
-                    <div class="select-input-group">
-                        <select class="form-control" [ngModel]="fromMonth()" (ngModelChange)="fromMonth.set($event)">
-                            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
-                        </select>
+            <div class="toolbar-bottom-row">
+                <div class="right-filters">
+                    <div class="filter-group">
+                        <span class="filter-label">ตั้งแต่เดือน *</span>
+                        <div class="select-input-group">
+                            <select class="form-control" [ngModel]="fromMonth()"
+                                (ngModelChange)="fromMonth.set($event)">
+                                <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <div class="filter-group">
+                        <span class="filter-label">ปี *</span>
+                        <div class="date-input-group">
+                            <input type="text" class="form-control" [ngModel]="fromYear()"
+                                (ngModelChange)="fromYear.set($event)" />
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <span class="filter-label">ถึงเดือน *</span>
+                        <div class="select-input-group">
+                            <select class="form-control" [ngModel]="toMonth()" (ngModelChange)="toMonth.set($event)">
+                                <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <span class="filter-label">ปี *</span>
+                        <div class="date-input-group">
+                            <input type="text" class="form-control" [ngModel]="toYear()"
+                                (ngModelChange)="toYear.set($event)" />
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <span class="filter-label">สถานะ</span>
+                        <div class="select-input-group">
+                            <select class="form-control" [ngModel]="filterStatus()"
+                                (ngModelChange)="filterStatus.set($event)">
+                                <option value="">ทั้งหมด</option>
+                                <option value="NEW">คำขอใหม่</option>
+                                <option value="VERIFIED">ตรวจสอบแล้ว</option>
+                                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
+                                <option value="APPROVED">อนุมัติแล้ว</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-clear" (click)="clearFilters()">
+                        <i class="fas fa-sync-alt"></i> คืนค่า
+                    </button>
                 </div>
 
-                <div class="filter-group">
-                    <span class="filter-label">ปี *</span>
-                    <div class="date-input-group">
-                        <input type="text" class="form-control" [ngModel]="fromYear()"
-                            (ngModelChange)="fromYear.set($event)" />
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <span class="filter-label">ถึงเดือน *</span>
-                    <div class="select-input-group">
-                        <select class="form-control" [ngModel]="toMonth()" (ngModelChange)="toMonth.set($event)">
-                            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <span class="filter-label">ปี *</span>
-                    <div class="date-input-group">
-                        <input type="text" class="form-control" [ngModel]="toYear()"
-                            (ngModelChange)="toYear.set($event)" />
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <span class="filter-label" style="&::after { content: '' }">สถานะ</span>
-                    <div class="select-input-group">
-                        <select class="form-control" [ngModel]="filterStatus()"
-                            (ngModelChange)="filterStatus.set($event)">
-                            <option value="">ทั้งหมด</option>
-                            <option value="NEW">คำขอใหม่</option>
-                            <option value="VERIFIED">ตรวจสอบแล้ว</option>
-                            <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-                            <option value="APPROVED">อนุมัติแล้ว</option>
-                        </select>
-                    </div>
-                </div>
                 <div class="search-input-group">
                     <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
                         (ngModelChange)="searchText.set($event)">
@@ -78,64 +86,55 @@
                         <i class="fas fa-search"></i> ค้นหา
                     </button>
                 </div>
-                <button class="btn-clear" (click)="clearFilters()">
-                    <i class="fas fa-sync-alt"></i> คืนค่า
-                </button>
-
             </div>
         </div>
 
-        <!-- ตารางแสดงรายการเบิกค่ารักษาพยาบาล -->
-        <!-- ตารางแสดงรายการเบิกค่ารักษาพยาบาล (Desktop) -->
+
+
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 110px; cursor: pointer; text-align: center;"
-                            (click)="toggleSort('requestId')">
+                        <th rowspan="2" class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
                             เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
                         </th>
-                        <th rowspan="2" style="width: 100px; cursor: pointer; text-align: center;"
+                        <th rowspan="2" class="col-date sortable-header text-center"
                             (click)="toggleSort('requestDate')">
                             วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
                         </th>
-                        <th rowspan="2" style="width: 180px; cursor: pointer; text-align: center;"
-                            (click)="toggleSort('limitType')">
+                        <th rowspan="2" class="col-limit sortable-header text-center" (click)="toggleSort('limitType')">
                             ประเภทวงเงิน <i class="fas ml-1" [ngClass]="getSortIcon('limitType')"></i>
                         </th>
-                        <th rowspan="2" style="width: 150px; cursor: pointer; text-align: center;"
+                        <th rowspan="2" class="col-disease sortable-header text-center"
                             (click)="toggleSort('diseaseType')">
                             ประเภทโรค <i class="fas ml-1" [ngClass]="getSortIcon('diseaseType')"></i>
                         </th>
-                        <th rowspan="2" style="width: 180px; cursor: pointer; text-align: center;"
+                        <th rowspan="2" class="col-hospital sortable-header text-center"
                             (click)="toggleSort('hospital')">
                             สถานพยาบาล <i class="fas ml-1" [ngClass]="getSortIcon('hospital')"></i>
                         </th>
-                        <th colspan="2" style="text-align: center;">
+                        <th colspan="2" class="text-center">
                             วันที่เข้ารับการรักษา</th>
-                        <th rowspan="2" style="width: 130px; cursor: pointer; text-align: center;"
+                        <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('requestedAmount')">
                             จำนวนเงินที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestedAmount')"></i>
                         </th>
-                        <th rowspan="2" style="width: 130px; cursor: pointer; text-align: center;"
+                        <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('approvedAmount')">
                             จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
-                        <th rowspan="2" style="width: 80px; text-align: center;">
-                            ไฟล์แนบ
-                        </th>
-                        <th rowspan="2" style="width: 150px; cursor: pointer; text-align: center;"
-                            (click)="toggleSort('status')">
+                        <th rowspan="2" class="col-status sortable-header text-center" (click)="toggleSort('status')">
                             สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                        </th>
+                        <th rowspan="2" class="col-attach text-center">
+                            เอกสารแนบ
                         </th>
                     </tr>
                     <tr>
-                        <th style="width: 90px; text-align: center; cursor: pointer;"
-                            (click)="toggleSort('treatmentDateFrom')">
+                        <th class="col-date-sm text-center sortable-header" (click)="toggleSort('treatmentDateFrom')">
                             ตั้งแต่ <i class="fas ml-1" [ngClass]="getSortIcon('treatmentDateFrom')"></i>
                         </th>
-                        <th style="width: 90px; text-align: center; cursor: pointer;"
-                            (click)="toggleSort('treatmentDateTo')">
+                        <th class="col-date-sm text-center sortable-header" (click)="toggleSort('treatmentDateTo')">
                             ถึง <i class="fas ml-1" [ngClass]="getSortIcon('treatmentDateTo')"></i>
                         </th>
                     </tr>
@@ -143,7 +142,7 @@
                 <tbody>
                     <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
-                        <td class="text-center font-bold" style="color: #008ebc;">
+                        <td class="text-center font-bold text-primary-link">
                             {{ row.original.requestId }}
                         </td>
 
@@ -160,22 +159,21 @@
                         <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
 
                         <td class="text-center">
-                            <a *ngIf="row.original.attachedFile" class="file-icon-link"
-                                (click)="openPreview(row.original.attachedFile)" title="ดูไฟล์แนบ"
-                                style="cursor: pointer; color: #008ebc; font-size: 1.2rem;">
-                                <i class="far fa-folder-open"></i>
-                            </a>
-                            <span *ngIf="!row.original.attachedFile" class="text-muted">-</span>
-                        </td>
-
-                        <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                                 {{ row.original.status | statusLabel }}
                             </span>
                         </td>
+
+                        <td class="text-center">
+                            <a class="file-icon-link" *ngIf="row.original.attachedFile"
+                                (click)="openPreview(row.original.attachedFile || undefined)" title="ดูเอกสาร">
+                                <i class="far fa-folder-open"></i>
+                            </a>
+                            <span class="text-muted" *ngIf="!row.original.attachedFile">-</span>
+                        </td>
                     </tr>
                     <tr *ngIf="table.getRowModel().rows.length === 0">
-                        <td colspan="10" style="text-align: center; padding: 40px; color: #999">
+                        <td colspan="11" class="empty-state">
                             ไม่พบรายการที่ตรงตามเงื่อนไข
                         </td>
                     </tr>
@@ -183,7 +181,7 @@
             </table>
         </div>
 
-        <!-- Card View (Mobile/Tablet) -->
+
         <div class="card-list-view">
             <div class="mobile-card" *ngFor="let req of paginatedGroupedRequests(); trackBy: trackByRowId">
                 <div class="card-header">
@@ -191,6 +189,10 @@
                         <span class="ticket-no">{{ req.id }}</span>
                     </div>
                     <div class="card-actions-top">
+                        <button class="action-btn folder" *ngIf="req.items[0]?.attachedFile"
+                            (click)="openPreview(req.items[0].attachedFile || undefined)" title="ดูเอกสาร">
+                            <i class="far fa-folder-open"></i>
+                        </button>
                         <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                             {{ req.status | statusLabel }}
                         </span>
@@ -221,7 +223,7 @@
                                 </div>
                                 <div class="detail-row" *ngIf="item.attachedFile">
                                     <i class="fas fa-paperclip"></i>
-                                    <a (click)="openPreview(item.attachedFile)"
+                                    <a (click)="openPreview(item.attachedFile || undefined)"
                                         style="cursor: pointer; color: #008ebc;">
                                         ดูไฟล์แนบ
                                     </a>
@@ -238,7 +240,7 @@
         </div>
     </div>
 
-    <!-- ส่วนควบคุมการแบ่งหน้า -->
+
     <div class="pagination-container">
         <div class="pagination-info">
             แสดง {{ currentPage() * pageSize() + 1 }}
@@ -276,7 +278,7 @@
     <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
     </app-medical-policy-modal>
 
-    <!-- Modal ฟอร์มสร้าง/แก้ไขข้อมูล -->
+
     <div class="modal-overlay" *ngIf="isModalOpen()">
         <div class="modal-container">
             <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">

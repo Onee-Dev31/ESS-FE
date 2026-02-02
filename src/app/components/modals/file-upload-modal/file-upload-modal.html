@@ -15,7 +15,7 @@
         <label for="fileInput" class="upload-trigger" *ngIf="!tempFileName">
           <i class="fas fa-cloud-upload-alt"></i>
           <span>คลิกเพื่อเลือกไฟล์</span>
-          <small style="color: #999; margin-top: 4px;">(รองรับทุกประเภท, สูงสุด 4MB)</small>
+          <small class="file-hint">(รองรับทุกประเภท, สูงสุด 4MB)</small>
         </label>
 
         <div class="file-preview" *ngIf="tempFileName">

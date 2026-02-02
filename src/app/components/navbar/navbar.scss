@@ -54,6 +54,7 @@ $navbar-height: 70px;
       margin: 0;
       white-space: nowrap;
       text-transform: uppercase;
+      cursor: pointer;
 
       @media (max-width: 480px) {
         font-size: 14px;

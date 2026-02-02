@@ -1,10 +1,6 @@
 <div class="dashboard-wrapper">
-  <header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+  <header class="dashboard-header">
     <h1 class="page-title">Dashboards</h1>
-    <button (click)="clearStorage()"
-      style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-      <i class="fas fa-trash-alt"></i> Reset Data
-    </button>
   </header>
 
   <main class="content-body">
@@ -37,7 +33,7 @@
         <div class="card attendance-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
-              <i class="fas fa-calendar-check" style="padding-right: 5px"></i>My Time Attendance
+              <i class="fas fa-calendar-check"></i>My Time Attendance
             </h4>
           </div>
 
@@ -58,8 +54,8 @@
           </div>
 
           <div class="card-footer text-end">
-            <button type="button" class="action-btn" style="min-width: 140px; justify-content: center">
-              <i class="fas fa-clock-rotate-left" style="margin-right: 8px"></i>
+            <button type="button" class="action-btn">
+              <i class="fas fa-clock-rotate-left"></i>
               ดูเวลาเข้า-ออก
             </button>
           </div>
@@ -69,7 +65,7 @@
         <div class="card performance-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
-              <i class="fas fa-tachometer-alt" style="padding-right: 5px"></i>My Performance
+              <i class="fas fa-tachometer-alt"></i>My Performance
             </h4>
           </div>
 
@@ -106,7 +102,7 @@
         <div class="card it-story-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
-              <i class="fas fa-laptop-code" style="padding-right: 25px"></i>My IT Story
+              <i class="fas fa-laptop-code"></i>My IT Story
             </h4>
           </div>
           <div class="card-body">
@@ -119,7 +115,7 @@
           </div>
           <div class="card-footer text-end">
             <button type="button" class="action-btn">
-              <i class="fas fa-tools" style="margin-right: 6px"></i>ขอใช้บริการ
+              <i class="fas fa-tools"></i>ขอใช้บริการ
             </button>
           </div>
         </div>
@@ -237,7 +233,7 @@
                 <div class="card-arrow" *ngIf="item.route">
                   <i class="fas fa-chevron-right"></i>
                 </div>
-                <div class="card-arrow" *ngIf="!item.route" style="opacity: 0.3">
+                <div class="card-arrow disabled-arrow" *ngIf="!item.route">
                   <i class="fas fa-chevron-right"></i>
                 </div>
               </div>
@@ -253,7 +249,7 @@
           </div>
           <div class="leave-stats-grid">
             <div class="card leave-card" *ngFor="let leave of leaveStats()" [ngClass]="leave.theme"
-              (click)="navigateTo('/timeoff')" style="cursor: pointer;">
+              (click)="navigateTo('/timeoff')">
               <div class="leave-body">
                 <div class="leave-header">
                   <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
@@ -277,7 +273,7 @@
             <div class="schedule-body">
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-                <ul class="holiday-list" style="padding: 0; list-style: none">
+                <ul class="holiday-list">
                   <li class="holiday-item" *ngFor="let h of holidays()">
                     <span class="status-dot dot-green"></span>
                     <div class="holiday-info">
@@ -322,6 +318,9 @@
         </div>
       </div>
     </div>
+    <button (click)="clearStorage()" class="btn-danger">
+      <i class="fas fa-trash-alt"></i> Reset Data
+    </button>
   </main>
 
   <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">

@@ -53,7 +53,6 @@ export class ApprovalsComponent implements OnInit {
     this.refresh();
   }
 
-  // โหลดข้อมูลคำขอใหม่ทั้งหมด
   refresh() {
     forkJoin({
       allowances: this.allowanceService.getAllowanceRequests().pipe(take(1)),
@@ -65,7 +64,6 @@ export class ApprovalsComponent implements OnInit {
     });
   }
 
-  // กรองเมธอดตาม Tab และการค้นหา
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();
@@ -133,12 +131,10 @@ export class ApprovalsComponent implements OnInit {
   }));
 
 
-  // เปลี่ยน Tab การแสดงผล
   setActiveTab(tab: string) {
     this.activeTab.set(tab);
   }
 
-  // นับจำนวนรายการในแต่ละ Tab
   getTabCount(tab: string) { return this.approvals().filter(item => item.status === tab).length; }
 
   onSearch(event: any) { this.searchText.set(event.target.value); }
@@ -168,28 +164,24 @@ export class ApprovalsComponent implements OnInit {
     };
   }
 
-  // ดูรายละเอียดและจัดการคำขอ
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }
 
-  // เปิด Modal เพื่อดำเนินการจัดการ (อนุมัติ/ไม่อนุมัติ/ส่งคืน)
   openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
     this.selectedItem.set(item);
     this.initialAction.set(action);
     this.isModalOpen.set(true);
   }
 
-  // ปิด Modal
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
   }
 
-  // อัปเดตข้อมูลเมื่อมีการเปลี่ยนแปลงสถานะ
   onStatusUpdated() {
     this.refresh();
   }

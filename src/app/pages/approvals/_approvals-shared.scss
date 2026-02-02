@@ -400,6 +400,15 @@ $bg-slate: #f4f7f9;
                 text-transform: uppercase;
                 border-bottom: 2px solid #f5f5f5;
                 text-align: center;
+
+                &.sortable-header {
+                    cursor: pointer;
+                    transition: background 0.2s;
+
+                    &:hover {
+                        background: #f1f5f9;
+                    }
+                }
             }
 
             td {
@@ -407,6 +416,16 @@ $bg-slate: #f4f7f9;
                 border-bottom: 1px solid #f9f9f9;
                 text-align: center;
                 font-size: 13px;
+
+                &.request-no-link {
+                    cursor: pointer;
+                    color: $primary-blue;
+                    font-weight: 600;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
             }
 
             .description-cell {

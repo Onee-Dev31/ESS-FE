@@ -68,23 +68,21 @@
                     </div>
                 </div>
 
-                <div class="content-tabs">
-                    <button class="tab-link" [class.active]="modalActiveTab() === 'Items'"
-                        (click)="modalActiveTab.set('Items')">รายการเบิก</button>
-                    <button class="tab-link" [class.active]="modalActiveTab() === 'Comments'"
-                        (click)="modalActiveTab.set('Comments')">Comments</button>
+                <div class="content-header">
+                    <h3>รายการเบิก (Items)</h3>
                 </div>
 
                 <!-- ส่วนรายละเอียดรายการเบิก และความคิดเห็น -->
                 <div class="tab-view">
-                    @if (modalActiveTab() === 'Items') {
                     @if (selectedRequestDetails()) {
                     <div class="detail-table-wrapper">
                         <table class="detail-table">
                             <thead>
                                 <tr>
                                     <th>วันที่</th>
+                                    @if (selectedRequestDetails().type !== 'medical') {
                                     <th>รหัสกะ</th>
+                                    }
                                     <th>รายละเอียด</th>
                                     @if (selectedRequestDetails().type === 'allowance') {
                                     <th class="text-center">เวลา In-Out</th>
@@ -101,7 +99,9 @@
                                 @for (item of selectedRequestDetails().items; track $index) {
                                 <tr>
                                     <td>{{ item.date }}</td>
+                                    @if (selectedRequestDetails().type !== 'medical') {
                                     <td><span class="shift-badge">{{ item.shiftCode || '-' }}</span></td>
+                                    }
                                     <td>{{ item.description }}</td>
                                     @if (selectedRequestDetails().type === 'allowance') {
                                     <td class="text-center">{{ item.timeIn }} - {{ item.timeOut }}</td>
@@ -135,7 +135,7 @@
                             </tbody>
                             <tfoot>
                                 <tr class="modal-total-row">
-                                    <td [attr.colspan]="selectedRequestDetails().type === 'allowance' ? 4 : (selectedRequestDetails().type === 'taxi' ? 5 : 3)"
+                                    <td [attr.colspan]="selectedRequestDetails().type === 'allowance' ? 4 : (selectedRequestDetails().type === 'taxi' ? 5 : (selectedRequestDetails().type === 'medical' ? 3 : 3))"
                                         class="text-right"><strong>Total : </strong></td>
                                     <td class="text-right total-val">{{ modalItemsTotal() | number }}</td>
                                 </tr>
@@ -172,17 +172,10 @@
                                 <div class="label">ปลายทาง:</div>
                                 <div class="value">{{ item.destination }}</div>
                             </div>
-                            @if (item.attachedFile) {
-                            <div class="card-row file">
-                                <div class="label">ไฟล์แนบ:</div>
-                                <div class="value">
-                                    <a class="file-link-card" (click)="openPreview(item.attachedFile)">
-                                        <i class="far fa-folder-open"></i> ดูไฟล์
-                                    </a>
-                                </div>
-                            </div>
-                            }
                             } @else if (selectedRequestDetails().type === 'medical') {
+                            <!-- Medical fields if any in the future -->
+                            }
+
                             @if (item.attachedFile) {
                             <div class="card-row file">
                                 <div class="label">ไฟล์แนบ:</div>
@@ -192,7 +185,6 @@
                                     </a>
                                 </div>
                             </div>
-                            }
                             }
                         </div>
                         }
@@ -208,17 +200,6 @@
                         }})
                     </div>
                     }
-                    }
-                    }
-
-                    @if (modalActiveTab() === 'Comments') {
-                    <div class="comment-thread">
-                        <div class="avatar-circle">{{ approvalItem.requestBy.name.charAt(0) }}</div>
-                        <div class="comment-bubble">
-                            <div class="comment-top"><strong>Request Detail :</strong></div>
-                            <p>{{ approvalItem.requestDetail }}</p>
-                        </div>
-                    </div>
                     }
                 </div>
 
@@ -262,7 +243,19 @@
                 <div class="side-group"><label>Company</label>
                     <div class="side-val">{{ approvalItem.requestBy.company }}</div>
                 </div>
+
+                <div class="side-divider"></div>
+
+                <h3 class="side-title">Comments</h3>
+                <div class="comment-thread side-mode">
+                    <div class="comment-bubble">
+                        <div class="comment-top"><strong>Request Detail :</strong></div>
+                        <p>{{ approvalItem.requestDetail }}</p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Mobile Safe Spacer - Removed in favor of Scrollable Overlay strategy -->
         </div>
     </div>
 </div>

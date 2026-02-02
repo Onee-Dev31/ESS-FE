@@ -7,44 +7,53 @@
   </div>
 
   <div class="content-card">
-    <div class="allowance-header">
-      <div class="hero-section">
-        <div class="header-content">
-          <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+    <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+
+    <div class="toolbar-container">
+      <div class="toolbar-top-row">
+        <div class="left-action">
           <button class="btn-create" (click)="openModal()">
             <i class="fas fa-plus"></i> สร้างรายการเบิก
           </button>
         </div>
       </div>
 
-      <!-- ส่วนตัวกรองข้อมูล (วันที่ และ สถานะ) -->
-      <div class="right-filters">
+      <div class="toolbar-bottom-row">
+        <div class="right-filters">
+          <div class="filter-group">
+            <span class="filter-label">ตั้งแต่เดือน</span>
+            <div class="date-input-group">
+              <input type="date" class="form-control" [ngModel]="filterStartDate()"
+                (ngModelChange)="filterStartDate.set($event)" />
+            </div>
+          </div>
 
-        <div class="date-input-group">
-          <span class="filter-label">ตั้งแต่เดือน</span>
-          <input type="date" class="form-control" [ngModel]="filterStartDate()"
-            (ngModelChange)="filterStartDate.set($event)" />
-        </div>
-        <div class="date-input-group">
-          <span class="filter-label">ถึง</span>
-          <input type="date" class="form-control" [ngModel]="filterEndDate()"
-            (ngModelChange)="filterEndDate.set($event)" />
+          <div class="filter-group">
+            <span class="filter-label">ถึง</span>
+            <div class="date-input-group">
+              <input type="date" class="form-control" [ngModel]="filterEndDate()"
+                (ngModelChange)="filterEndDate.set($event)" />
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">สถานะ</span>
+            <div class="select-input-group">
+              <select class="form-control select-status" [ngModel]="filterStatus()"
+                (ngModelChange)="filterStatus.set($event)">
+                <option value="">ทั้งหมด</option>
+                <option value="NEW">คำขอใหม่</option>
+                <option value="VERIFIED">ตรวจสอบแล้ว</option>
+                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
+                <option value="APPROVED">อนุมัติแล้ว</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-clear" (click)="clearFilters()">
+            <i class="fas fa-sync-alt"></i> คืนค่า
+          </button>
         </div>
 
-        <div class="select-input-group">
-          <span class="filter-label">สถานะ</span>
-          <select class="form-control select-status" [ngModel]="filterStatus()"
-            (ngModelChange)="filterStatus.set($event)">
-            <option value="">ทั้งหมด</option>
-            <option value="NEW">คำขอใหม่</option>
-            <option value="VERIFIED">ตรวจสอบแล้ว</option>
-            <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-            <option value="APPROVED">อนุมัติแล้ว</option>
-          </select>
-        </div>
-        <button class="btn-clear" (click)="clearFilters()">
-          <i class="fas fa-sync-alt"></i> คืนค่า
-        </button>
         <div class="search-input-group">
           <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
             (ngModelChange)="searchText.set($event)">
@@ -55,8 +64,7 @@
       </div>
     </div>
 
-    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
-    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
+    
     <div class="card-list-view">
       <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
 
@@ -99,30 +107,30 @@
       </div>
     </div>
 
-    <!-- ตารางแสดงรายการเบิกเบี้ยเลี้ยง -->
+    
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 12%; cursor: pointer; text-align: center;" (click)="toggleSort('requestId')">
+            <th class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
               เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
             </th>
-            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('createDate')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
               วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
-            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('date')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
               วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
-            <th style="width: 20%; cursor: pointer; text-align: center;" (click)="toggleSort('description')">
+            <th class="col-desc sortable-header text-center" (click)="toggleSort('description')">
               รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
             </th>
-            <th style="width: 14%; cursor: pointer; text-align: center;" (click)="toggleSort('hours')">
+            <th class="col-hours sortable-header text-center" (click)="toggleSort('hours')">
               จำนวนชั่วโมง <i class="fas ml-1" [ngClass]="getSortIcon('hours')"></i>
             </th>
-            <th style="width: 10%; cursor: pointer; text-align: center;" (click)="toggleSort('amount')">
+            <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
               จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
-            <th style="width: 15%; cursor: pointer; text-align: center;" (click)="toggleSort('status')">
+            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
               สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
           </tr>
@@ -155,15 +163,16 @@
             </td>
           </tr>
           <tr *ngIf="table.getRowModel().rows.length === 0">
-            <td colspan="7" style="text-align: center; padding: 40px; color: #999">
-              ไม่พบรายการที่ตรงตามเงื่อนไข
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-folder-open empty-state-icon"></i>
+              ไม่พบข้อมูลรายการเบิก
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- ส่วนควบคุมการแบ่งหน้า -->
+    
     <div class="pagination-container">
       <div class="pagination-info">
         แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
@@ -200,7 +209,7 @@
     </div>
   </div>
 
-  <!-- Modal สำหรับฟอร์มเพิ่ม/แก้ไขข้อมูล -->
+  
   <div class="modal-overlay" *ngIf="isModalOpen">
     <div class="modal-container">
       <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>

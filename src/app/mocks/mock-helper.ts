@@ -11,26 +11,31 @@ export class MockHelper {
         return dayjs().subtract(Math.floor(Math.random() * 90), 'day').format('YYYY-MM-DD');
     }
 
+    private static readonly USERS: Requester[] = [
+        { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', employeeId: 'OTD01054', department: '10806-IT Department', company: 'บริษัท OTD' },
+        { name: 'แพรวนภา บุตรโคษา (แพรว)', employeeId: 'OTD01055', department: '10801-HR Department', company: 'บริษัท OTD' },
+        { name: 'สมชาย รักดี', employeeId: 'OTD01056', department: '10802-Sales Department', company: 'บริษัท OTD' },
+        { name: 'วิภาวี สวยงาม', employeeId: 'OTD01057', department: '10803-Marketing', company: 'บริษัท OTD' },
+        { name: 'กิตติศักดิ์ มั่นคง', employeeId: 'OTD01058', department: '10804-Operations', company: 'บริษัท OTD' }
+    ];
+
+    private static readonly ADMIN_USER: Requester = {
+        name: 'Admin User (Admin)',
+        employeeId: 'OTD00001',
+        department: '10801-Management',
+        company: 'บริษัท OTD'
+    };
+
     static getRandomRequester(): Requester {
-        const users = [
-            { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', id: 'OTD01054', dept: '10806-IT Department' },
-            { name: 'แพรวนภา บุตรโคษา (แพรว)', id: 'OTD01055', dept: '10801-HR Department' },
-            { name: 'สมชาย รักดี', id: 'OTD01056', dept: '10802-Sales Department' },
-            { name: 'วิภาวี สวยงาม', id: 'OTD01057', dept: '10803-Marketing' },
-            { name: 'กิตติศักดิ์ มั่นคง', id: 'OTD01058', dept: '10804-Operations' }
-        ];
-
         // 60% chance to be the default Member (Jola), 40% chance for others
-        // This ensures the member sees plenty of their own data in the demo
         const isDefaultMember = Math.random() < 0.6;
-        const user = isDefaultMember ? users[0] : users[Math.floor(Math.random() * users.length)];
+        return isDefaultMember
+            ? this.USERS[0]
+            : this.USERS[Math.floor(Math.random() * this.USERS.length)];
+    }
 
-        return {
-            name: user.name,
-            employeeId: user.id,
-            department: user.dept,
-            company: 'บริษัท OTD'
-        };
+    static getRequesterByRole(role: 'Admin' | 'Member'): Requester {
+        return role === 'Admin' ? this.ADMIN_USER : this.USERS[0];
     }
 
     static generateDays(monthInput: number | string, yearInput: number | string): Date[] {
@@ -58,23 +63,5 @@ export class MockHelper {
             'O01 09.00-18.01', 'O02 10.00-19.01', 'O03 10.00-22.01', 'O04 09.00-23.01', 'O19 19.00-07.02'
         ];
         return shifts[Math.floor(Math.random() * shifts.length)];
-    }
-
-    static getRequesterByRole(role: 'Admin' | 'Member'): Requester {
-        if (role === 'Admin') {
-            return {
-                name: 'Admin User (Admin)',
-                employeeId: 'OTD00001',
-                department: '10801-Management',
-                company: 'บริษัท OTD'
-            };
-        } else {
-            return {
-                name: 'Rapeepan Pipatvejwong (Jola)',
-                employeeId: 'OTD01054',
-                department: '11206-Program Development',
-                company: 'บริษัท OTD'
-            };
-        }
     }
 }

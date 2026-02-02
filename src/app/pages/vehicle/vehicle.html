@@ -11,39 +11,50 @@
 
     <!-- แถบเครื่องมือและตัวกรองข้อมูลค่าพาหนะ -->
     <div class="toolbar-container">
-      <div class="left-action">
-        <button class="btn-create" (click)="openModal('')">
-          <i class="fas fa-plus"></i> สร้างรายการเบิก
-        </button>
+      <div class="toolbar-top-row">
+        <div class="left-action">
+          <button class="btn-create" (click)="openModal()">
+            <i class="fas fa-plus"></i> สร้างรายการเบิก
+          </button>
+        </div>
       </div>
 
-      <div class="right-filters">
-        <div class="date-input-group">
-          <span class="filter-label">วันที่สร้างรายการ</span>
-          <input type="date" class="form-control" [ngModel]="filterStartDate()"
-            (ngModelChange)="filterStartDate.set($event)" />
-        </div>
-        <div class="date-input-group">
-          <span class="filter-label">ถึง</span>
-          <input type="date" class="form-control" [ngModel]="filterEndDate()"
-            (ngModelChange)="filterEndDate.set($event)" />
+      <div class="toolbar-bottom-row">
+        <div class="right-filters">
+          <div class="filter-group">
+            <span class="filter-label">ตั้งแต่เดือน</span>
+            <div class="date-input-group">
+              <input type="date" class="form-control" [ngModel]="filterStartDate()"
+                (ngModelChange)="filterStartDate.set($event)" />
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">ถึง</span>
+            <div class="date-input-group">
+              <input type="date" class="form-control" [ngModel]="filterEndDate()"
+                (ngModelChange)="filterEndDate.set($event)" />
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">สถานะ</span>
+            <div class="select-input-group">
+              <select class="form-control select-status" [ngModel]="filterStatus()"
+                (ngModelChange)="filterStatus.set($event)">
+                <option value="">ทั้งหมด</option>
+                <option value="NEW">คำขอใหม่</option>
+                <option value="VERIFIED">ตรวจสอบแล้ว</option>
+                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
+                <option value="APPROVED">อนุมัติแล้ว</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-clear" (click)="clearFilters()">
+            <i class="fas fa-sync-alt"></i> คืนค่า
+          </button>
         </div>
 
-        <div class="select-input-group">
-          <span class="filter-label">สถานะ</span>
-          <select class="form-control select-status" [ngModel]="filterStatus()"
-            (ngModelChange)="filterStatus.set($event)">
-            <option value="">ทั้งหมด</option>
-            <option value="NEW">คำขอใหม่</option>
-            <option value="VERIFIED">ตรวจสอบแล้ว</option>
-            <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-            <option value="APPROVED">อนุมัติแล้ว</option>
-          </select>
-        </div>
-
-        <button class="btn-clear" (click)="clearFilters()">
-          <i class="fas fa-sync-alt"></i> คืนค่า
-        </button>
         <div class="search-input-group">
           <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
             (ngModelChange)="searchText.set($event)">
@@ -109,37 +120,37 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th style="width: 12%; cursor: pointer" class="text-center" (click)="toggleSort('id')">
+            <th class="col-id sortable-header text-center" (click)="toggleSort('id')">
               เลขที่การเบิก
               <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
             </th>
 
-            <th style="width: 12%; cursor: pointer" (click)="toggleSort('createDate')">
+            <th class="col-date sortable-header" (click)="toggleSort('createDate')">
               วันที่สร้างรายการ
               <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
 
-            <th style="width: 12%; cursor: pointer" (click)="toggleSort('date')">
+            <th class="col-date sortable-header" (click)="toggleSort('date')">
               วันที่ขอเบิก
               <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
 
-            <th style="cursor: pointer" (click)="toggleSort('desc')">
+            <th class="sortable-header" (click)="toggleSort('desc')">
               รายละเอียด
               <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
             </th>
 
-            <th style="width: 10%; cursor: pointer" class="text-right" (click)="toggleSort('amount')">
+            <th class="col-amount sortable-header text-right" (click)="toggleSort('amount')">
               จำนวนเงิน
               <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
 
-            <th style="width: 15%; cursor: pointer" class="text-center" (click)="toggleSort('status')">
+            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
               สถานะ
               <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
 
-            <th style="width: 10%" class="text-center">Actions</th>
+            <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -159,12 +170,12 @@
 
               <td>
                 <div class="desc-wrapper">
-                  <i class="fas fa-car-side text-muted" style="margin-right: 8px"></i>
+                  <i class="fas fa-car-side text-muted"></i>
                   {{ item.description }}
                 </div>
               </td>
 
-              <td class="text-right" style="font-weight: 600">
+              <td class="text-right font-semibold">
                 {{ item.amount | number : '1.2-2' }}
               </td>
 
@@ -187,7 +198,7 @@
             </tr>
           </ng-container>
           <tr *ngIf="table.getRowModel().rows.length === 0">
-            <td colspan="7" style="text-align: center; padding: 40px; color: #999">
+            <td colspan="7" class="empty-state">
               ไม่พบรายการที่ตรงตามเงื่อนไข
             </td>
           </tr>

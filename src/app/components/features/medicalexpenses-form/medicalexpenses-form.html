@@ -1,4 +1,4 @@
-<div class="medical-expenses-form-page">
+<div class="form-root">
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
         <div class="header-right-meta">
@@ -19,7 +19,7 @@
     </header>
 
     <main class="content-card">
-        <!-- ขั้นตอนที่ 1: การเลือกประเภทสวัสดิการค่ารักษาพยาบาล -->
+        
         <section class="form-section-wrapper">
             <h4 class="section-heading">1.เลือกประเภทการเบิก</h4>
             <div class="claim-type-grid">
@@ -39,7 +39,7 @@
             </div>
         </section>
 
-        <!-- ขั้นตอนที่ 2: กรอกรายละเอียดสถานพยาบาลและวันที่รักษา -->
+        
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <h4 class="section-heading">2.กรอกรายละเอียด</h4>
             <div class="details-grid">
@@ -105,22 +105,22 @@
             </div>
         </section>
 
-        <!-- ขั้นตอนที่ 3: การจัดการไฟล์แนบ (ใบรับรองแพทย์/ใบเสร็จ) -->
+        
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <div class="section-header-row">
                 <h4 class="section-heading">3.แนบเอกสาร (ใบรับรองแพทย์, ใบเสร็จรับเงิน, เอกสารอื่นๆ)</h4>
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
                     <i class="fas fa-file-upload"></i> Upload file
                 </button>
-                <input #fileInput type="file" style="display: none;" (change)="onFileSelected($event)" multiple>
+                <input #fileInput type="file" class="hidden-input" (change)="onFileSelected($event)" multiple>
             </div>
             <div class="attachment-table-container">
                 <table class="excel-table">
                     <thead>
                         <tr>
-                            <th style="width: 20px;">#</th>
+                            <th class="col-xs">#</th>
                             <th>Upload file</th>
-                            <th style="width: 20px;"><i class="far fa-trash-alt"></i></th>
+                            <th class="col-xs"><i class="far fa-trash-alt"></i></th>
                             <th>รายละเอียด</th>
                         </tr>
                     </thead>
@@ -158,13 +158,13 @@
         </div>
     </main>
 
-    <!-- ปุ่มยืนยันการบันทึกข้อมูล -->
+    
     <div class="form-actions-footer">
         <button class="btn-save-custom" (click)="save()">
-            <i class="fas fa-check-circle"></i> บันทึก
+            บันทึก
         </button>
         <button class="btn-back-custom" (click)="close()">
-            <i class="fas fa-chevron-circle-left"></i> ย้อนกลับ
+            ย้อนกลับ
         </button>
     </div>
 </div>

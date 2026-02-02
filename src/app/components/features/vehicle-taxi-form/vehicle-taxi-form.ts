@@ -59,7 +59,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     });
   }
 
-  // สร้างข้อมูลจำลองรายการค่าแท็กซี่
+  
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
@@ -87,7 +87,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
-  // ตรวจสอบความครบถ้วนและบันทึกคำขอค่าแท็กซี่
+  
   save() {
     const selectedItems = this.items.filter(item => item.selected);
 
@@ -127,7 +127,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
           this.onClose.emit();
         });
       } else {
-        // Fetch current user profile to populate requester info
+        
         this.userService.getUserProfile().subscribe(profile => {
           const newRequest: TaxiRequest = {
             id: this.requestId,
@@ -175,7 +175,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.currentUploadItem = null;
   }
 
-  // จัดการอัปเดตชื่อไฟล์เมื่ออัปโหลดไฟล์แนบสำเร็จ
+  
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;

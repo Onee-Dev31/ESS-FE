@@ -49,6 +49,8 @@ export class MedicalexpensesComponent implements OnInit {
   isPolicyModalOpen = signal<boolean>(false);
   isFilterVisible = signal<boolean>(false);
   searchText = signal<string>('');
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<any[]>([]);
 
   fromMonth = signal<number>(0);
   fromYear = signal<string>((dayjs().year() - 1).toString());
@@ -68,7 +70,7 @@ export class MedicalexpensesComponent implements OnInit {
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  // กรองข้อมูลตามสถานะและช่วงโครงการที่เลือก
+  
   processedData = computed(() => {
     let data = [...this.allRequests()];
 
@@ -167,8 +169,8 @@ export class MedicalexpensesComponent implements OnInit {
       { accessorKey: 'treatmentDateTo', header: 'ถึง' },
       { accessorKey: 'requestedAmount', header: 'จำนวนเงินที่ขอเบิก' },
       { accessorKey: 'approvedAmount', header: 'จำนวนเงินที่เบิกได้' },
-      { accessorKey: 'attachedFile', header: 'ไฟล์แนบ' },
       { accessorKey: 'status', header: 'สถานะ' },
+      { accessorKey: 'attachedFile', header: 'ไฟล์แนบ' },
     ],
     state: {
       sorting: this.sorting(),
@@ -207,7 +209,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   openModal(targetId: string = '') {
     if (targetId === '') {
-      this.medicalService.generateNextMedicalId().subscribe((nid: string) => {
+      this.medicalService.generateNextId().subscribe((nid: string) => {
         this.selectedRequestId.set(nid);
         this.isModalOpen.set(true);
       });
@@ -238,6 +240,19 @@ export class MedicalexpensesComponent implements OnInit {
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+  }
+
+  openPreview(attachment: string | undefined) {
+    if (!attachment) return;
+    this.previewFiles.set([{
+      fileName: attachment,
+      date: ''
+    }]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 
   getSortIcon(columnId: string) {
@@ -272,19 +287,6 @@ export class MedicalexpensesComponent implements OnInit {
 
   getStatusClass(status: string): string {
     return this.vehicleService.getStatusBadgeClass(status);
-  }
-
-  isPreviewModalOpen = signal(false);
-  previewFiles = signal<any[]>([]);
-
-  openPreview(fileName: string) {
-    if (!fileName) return;
-    this.previewFiles.set([{ fileName, date: '' }]);
-    this.isPreviewModalOpen.set(true);
-  }
-
-  closePreview() {
-    this.isPreviewModalOpen.set(false);
   }
 }
 

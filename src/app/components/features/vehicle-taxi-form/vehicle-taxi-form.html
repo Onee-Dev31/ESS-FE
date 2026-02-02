@@ -6,7 +6,7 @@
 
   <main class="content-card">
 
-    <!-- ตัวเลือกเดือนที่ต้องการเบิกค่าแท็กซี่ -->
+    
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
@@ -23,7 +23,7 @@
       </div>
     </section>
 
-    <!-- แถบปุ่มดำเนินการหลัก -->
+    
     <div class="action-bar">
       <button class="btn-submit" (click)="save()">ยืนยันการเบิก</button>
 
@@ -32,22 +32,22 @@
       </div>
     </div>
 
-    <!-- ส่วนตาราง/การ์ดบันทึกข้อมูล (Dual View) -->
+    
     <div class="table-container">
-      <!-- Desktop Table (Hidden on Mobile/Tablet) -->
-      <table class="excel-table desktop-only" style="width: 100%">
+      
+      <table class="excel-table desktop-only">
         <colgroup>
-          <col style="width: 50px" />
-          <col style="width: 100px" />
-          <col style="width: 65px" />
-          <col style="width: 110px" />
-          <col style="width: 60px" />
-          <col style="width: 60px" />
-          <col />
-          <col style="width: 220px" />
-          <col style="width: 75px" />
-          <col style="width: 100px" />
-          <col style="width: 50px" />
+          <col class="col-select" />
+          <col class="col-date" />
+          <col class="col-day-type" />
+          <col class="col-shift" />
+          <col class="col-time" />
+          <col class="col-time" />
+          <col class="col-desc" />
+          <col class="col-dest" />
+          <col class="col-dist" />
+          <col class="col-amount" />
+          <col class="col-file" />
         </colgroup>
 
         <thead>
@@ -57,10 +57,10 @@
             <th rowspan="2">ประเภทวัน</th>
             <th rowspan="2">รหัสกะ</th>
             <th colspan="2" class="col-time-header">เวลาทำงาน</th>
-            <th rowspan="2">รายละเอียดการเบิก <span style="color:red">*</span></th>
-            <th rowspan="2">จุดหมาย <span style="color:red">*</span></th>
-            <th rowspan="2">ระยะทาง <span style="color:red">*</span><br>(Km.)</th>
-            <th rowspan="2">จำนวนเงิน <span style="color:red">*</span></th>
+            <th rowspan="2">รายละเอียดการเบิก <span class="required">*</span></th>
+            <th rowspan="2">จุดหมาย <span class="required">*</span></th>
+            <th rowspan="2">ระยะทาง <span class="required">*</span><br>(Km.)</th>
+            <th rowspan="2">จำนวนเงิน <span class="required">*</span></th>
             <th rowspan="2">ไฟล์</th>
           </tr>
           <tr class="sub-header">
@@ -75,10 +75,11 @@
               <input type="checkbox" [(ngModel)]="item.selected" />
             </td>
             <td class="text-center bg-gray">{{ item.date }}</td>
-            <td class="text-center bg-gray font-bold" [style.color]="item.dayType === 'H' ? '#d93025' : '#3c4043'">
+            <td class="text-center bg-gray" [class.holiday-label]="item.dayType === 'H'"
+              [class.regular-label]="item.dayType === 'W'">
               {{ item.dayType }}
             </td>
-            <td class="text-center bg-gray" style="font-size: 12px; color: #555;">
+            <td class="text-center bg-gray shift-code">
               {{ item.shiftCode }}
             </td>
             <td class="p-0"><input type="text" class="time-input" [ngModel]="item.checkIn || '-'" readonly /></td>
@@ -133,7 +134,7 @@
         </tfoot>
       </table>
 
-      <!-- Mobile Card View (Hidden on Desktop) -->
+      
       <div class="mobile-cards-view mobile-only">
         <div *ngFor="let item of items" class="log-card" [class.highlight-card]="item.selected">
           <div class="card-header">
@@ -179,7 +180,7 @@
       </div>
     </div>
 
-    <!-- Mobile Sticky Footer Summary -->
+    
     <div class="mobile-sticky-footer mobile-only">
       <div class="summary-details">
         <div class="sum-item">

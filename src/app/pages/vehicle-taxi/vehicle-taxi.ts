@@ -58,7 +58,7 @@ export class VehicleTaxiComponent implements OnInit {
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  // กรองและเรียงลำดับข้อมูลคำขอค่าแท็กซี่
+  
   processedData = computed(() => {
     const allReqs = [...this.allRequests()];
     let filtered = allReqs;
@@ -173,7 +173,7 @@ export class VehicleTaxiComponent implements OnInit {
     });
   }
 
-  // ลบรายการคำขอ
+  
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
       this.taxiService.deleteTaxiRequest(id).subscribe(() => {
@@ -200,7 +200,7 @@ export class VehicleTaxiComponent implements OnInit {
     this.loadData();
   }
 
-  // เปิด Modal เพื่อดูไฟล์แนบของคำขอนั้นๆ
+  
   openPreviewModalForRequest(requestId: string) {
     const request = this.allRequests().find(r => r.id === requestId);
     if (request && request.items) {

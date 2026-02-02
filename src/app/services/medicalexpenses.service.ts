@@ -86,7 +86,7 @@ export class MedicalexpensesService {
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    deleteMedicalRequest(id: string): Observable<void> {
+    deleteRequest(id: string): Observable<void> {
         let masterData = this.getMasterData();
         masterData = masterData.filter(r => r.id !== id);
         this.saveToStorage(masterData);
@@ -94,7 +94,7 @@ export class MedicalexpensesService {
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
-    generateNextMedicalId(): Observable<string> {
+    generateNextId(): Observable<string> {
         const masterData = this.getMasterData();
         const prefix = '2701';
         const lastIdNum = masterData.reduce((max, item) => {
@@ -108,7 +108,7 @@ export class MedicalexpensesService {
         return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
     }
 
-    updateMedicalStatus(id: string, status: string): void {
+    updateStatus(id: string, status: string): void {
         const masterData = this.getMasterData();
         const index = masterData.findIndex(r => r.id === id);
         if (index !== -1) {
