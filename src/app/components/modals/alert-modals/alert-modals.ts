@@ -16,12 +16,10 @@ export class AlertModals {
   state$ = this.alertService.alertState$;
 
 
-  // ปิดหน้าต่างแจ้งเตือน
   close() {
     this.alertService.hide();
   }
 
-  // ดึงคลาสไอคอนตามประเภทการแจ้งเตือน
   getIconClass(type: string): string {
     switch (type) {
       case 'success': return 'fas fa-check-circle text-green';
@@ -32,7 +30,6 @@ export class AlertModals {
     }
   }
 
-  // ดึงคลาสปุ่มตามประเภทการแจ้งเตือน
   getBtnClass(type: string): string {
     return `btn-confirm btn-${type}`;
   }

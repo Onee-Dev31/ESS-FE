@@ -118,7 +118,6 @@
         }
       }
 
-      // Container for inputs on mobile
       @media (max-width: 1024px) {
 
         >select,
@@ -233,7 +232,6 @@
 }
 
 
-// Mobile icon button
 .policy-icon-btn {
   width: 24px;
   height: 24px;
@@ -260,7 +258,6 @@
   }
 }
 
-// Policy popup modal
 .policy-popup-overlay {
   position: fixed;
   top: 0;
@@ -410,7 +407,7 @@
     flex-shrink: 0;
 
     @media (max-width: 1024px) {
-      display: none; // Hidden on mobile/tablet, use sticky footer instead
+      display: none;
     }
 
     @media (min-width: 768px) {
@@ -476,11 +473,10 @@
     border: none;
     background: transparent;
     overflow-y: auto;
-    padding-bottom: 80px; // Space for sticky footer
+    padding-bottom: 80px;
   }
 
   .excel-table {
-    // Column Width Variables
     $col-select-width: 50px;
     $col-date-width: 120px;
     $col-daytype-width: 80px;
@@ -489,7 +485,7 @@
 
     width: 100% !important;
     min-width: 100% !important;
-    display: table; // Removed !important to allow desktop-only to hide it
+    display: table;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed !important;
@@ -652,7 +648,6 @@
   }
 }
 
-// Mobile Card Styles
 .mobile-cards-view {
   display: flex;
   flex-direction: column;
@@ -781,13 +776,12 @@
   }
 }
 
-// Mobile Sticky Footer Summary
 .mobile-sticky-footer {
   position: sticky;
-  bottom: -20px; // Adjust based on parent padding
+  bottom: -20px;
   left: 0;
   right: 0;
-  margin: 10px -24px -20px -24px; // Break out of content card padding
+  margin: 10px -24px -20px -24px;
   background: #fff;
   border-top: 1px solid $border;
   padding: 16px 20px;

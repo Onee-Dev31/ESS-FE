@@ -132,7 +132,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     log.displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
 
     if (extraHoursDecimal >= 2) {
-      // ขั้นบันไดการเบิก: 2-4 ชม. = 150, 4-8 ชม. = 225, 8-12 ชม. = 300, ...
       if (extraHoursDecimal <= 4) log.amount = 150;
       else if (extraHoursDecimal <= 8) log.amount = 225;
       else if (extraHoursDecimal <= 12) log.amount = 300;
@@ -203,7 +202,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
           this.closeModal();
         });
       } else {
-        // Fetch current user profile to populate requester info
         this.userService.getUserProfile().subscribe(profile => {
           const newRequest: AllowanceRequest = {
             id: this.requestId,

@@ -27,7 +27,6 @@ export class MockHelper {
     };
 
     static getRandomRequester(): Requester {
-        // 60% chance to be the default Member (Jola), 40% chance for others
         const isDefaultMember = Math.random() < 0.6;
         return isDefaultMember
             ? this.USERS[0]
@@ -41,7 +40,6 @@ export class MockHelper {
     static generateDays(monthInput: number | string, yearInput: number | string): Date[] {
         const month = Number(monthInput);
         const year = Number(yearInput);
-        // year input is in BE, so convert to CE
         const yearCE = year - 543;
         const startDate = dayjs().year(yearCE).month(month).date(1);
         const days: Date[] = [];

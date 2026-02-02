@@ -5,9 +5,6 @@ import { catchError, throwError } from 'rxjs';
 import { AlertService } from '../services/alert.service';
 import { AuthService } from '../services/auth.service';
 
-/**
- * Interceptor สำหรับจัดการข้อผิดพลาดในการเรียก API ทั่วทั้งระบบ
- */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const alertService = inject(AlertService);
     const authService = inject(AuthService);
@@ -29,7 +26,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 errorMessage = 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ (Internal Server Error)';
             }
 
-            // แสดง Alert แจ้งเตือนผู้ใช้
             alertService.showError(errorMessage);
 
             return throwError(() => error);

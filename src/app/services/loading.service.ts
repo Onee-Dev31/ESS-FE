@@ -23,11 +23,6 @@ export class LoadingService {
         }
     }
 
-    /**
-     * Wraps an observable with loading show/hide logic.
-     * Ensures hide is called exactly once per show, either on first release or error/unsub.
-     * Uses defer to ensure show() only happens when the observable is subscribed to.
-     */
     wrap<T>(obs: Observable<T>): Observable<T> {
         return defer(() => {
             this.show();

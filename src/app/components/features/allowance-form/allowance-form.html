@@ -5,7 +5,6 @@
   </header>
 
   <main class="content-card">
-    <!-- ส่วนเลือกเดือนและปีสำหรับการดึงข้อมูล Log -->
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
@@ -21,8 +20,6 @@
       </div>
     </section>
 
-    <!-- หมายเหตุเงื่อนไขการคำนวณเงินเบี้ยเลี้ยง -->
-    <!-- Desktop: แสดงเต็ม, Mobile: แสดงเป็น icon -->
     <div class="allowance-policy-note desktop-only">
       <span class="note-header">
         <i class="fas fa-info-circle"></i> <strong>เงื่อนไขการคำนวณเบี้ยเลี้ยง :</strong>
@@ -43,7 +40,6 @@
       </span>
     </div>
 
-    <!-- Policy Popup Modal -->
     <div class="policy-popup-overlay" *ngIf="isPolicyPopupOpen()" (click)="isPolicyPopupOpen.set(false)">
       <div class="policy-popup-content" (click)="$event.stopPropagation()">
         <div class="policy-popup-header">
@@ -82,11 +78,9 @@
       </div>
     </div>
 
-    <!-- แถบปุ่มบันทึกและแสดงเลขที่การเบิก -->
     <div class="action-bar">
       <div class="left-actions">
         <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
-        <!-- Mobile: Icon button -->
         <button class="policy-icon-btn mobile-only" (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ">
           <i class="fas fa-info-circle"></i>
         </button>
@@ -96,9 +90,7 @@
       </div>
     </div>
 
-    <!-- ส่วนตาราง/การ์ดบันทึกข้อมูล -->
     <div class="table-container">
-      <!-- Desktop Table (Hidden on Mobile) -->
       <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-50" />
@@ -169,7 +161,6 @@
         </tfoot>
       </table>
 
-      <!-- Mobile Card View (Hidden on Desktop) -->
       <div class="mobile-cards-view mobile-only">
         <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
           <div class="card-header">
@@ -210,7 +201,6 @@
       </div>
     </div>
 
-    <!-- Mobile Sticky Footer Summary -->
     <div class="mobile-sticky-footer mobile-only">
       <div class="summary-details">
         <div class="sum-item">

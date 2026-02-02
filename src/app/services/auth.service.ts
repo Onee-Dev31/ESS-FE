@@ -10,10 +10,15 @@ import { MedicalexpensesService } from './medicalexpenses.service';
 import { TaxiService } from './taxi.service';
 import { TransportService } from './transport.service';
 import { TimeOffService } from './time-off.service';
+import { UserMock } from '../mocks/user.mock';
 
 @Injectable({
     providedIn: 'root'
 })
+/**
+ * Service สำหรับจัดการการเข้าสู่ระบบ, การยืนยันตัวตน (Authentication), และการจัดการ Token
+ * รวมไปถึงการจำลองข้อมูล User (Mock Data)
+ */
 export class AuthService {
     private http = inject(HttpClient);
     private allowanceService = inject(AllowanceService);
@@ -22,12 +27,8 @@ export class AuthService {
     private transportService = inject(TransportService);
     private timeOffService = inject(TimeOffService);
 
-    private readonly MOCK_USERS = [
-        { username: 'admin', password: '123', name: 'Admin User', role: USER_ROLES.ADMIN, employeeId: 'OTD00001' },
-        { username: 'member', password: '123', name: 'Member User', role: USER_ROLES.MEMBER, employeeId: 'OTD01054' }
-    ];
+    private readonly MOCK_USERS = UserMock.MOCK_USERS;
 
-    // Reactive State using Signals
     private _currentUser = signal<string | null>(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
     private _userRole = signal<string | null>(localStorage.getItem(STORAGE_KEYS.USER_ROLE));
     private _isLoggedIn = signal<boolean>(localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true');
@@ -40,7 +41,10 @@ export class AuthService {
 
     constructor() { }
 
-    // ตรวจสอบการเข้าสู่ระบบ
+    /**
+     * เข้าสู่ระบบด้วย Email และ Password
+     * (จำลองการตรวจสอบและเก็บ session ลง LocalStorage)
+     */
     login(email: string, password: string): Observable<boolean> {
         const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
 
@@ -57,14 +61,17 @@ export class AuthService {
                     this._currentUser.set(user.name);
                     this._userRole.set(user.role);
 
-                    // Refresh Mock Data
                     this.refreshAllMockData();
                 }
             })
         );
     }
 
-    // ออกจากระบบ
+    /**
+     * ออกจากระบบ (Logout)
+     * - ล้างค่า Token และข้อมูลผู้ใช้ใน LocalStorage
+     * - รีเซ็ตข้อมูล Mock ทั้งหมด
+     */
     logout() {
         localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN);
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
@@ -75,10 +82,10 @@ export class AuthService {
         this._currentUser.set(null);
         this._userRole.set(null);
 
-        // Refresh Mock Data (will default to Member/Empty)
         this.refreshAllMockData();
     }
 
+    // รีเฟรชข้อมูล Mock ทั้งหมดเมื่อมีการ Login/Logout เพื่อให้เหมือนเริ่มต้นใหม่
     private refreshAllMockData() {
         this.allowanceService.refreshMockData();
         this.medicalService.refreshMockData();
@@ -87,17 +94,14 @@ export class AuthService {
         this.timeOffService.refreshMockData();
     }
 
-    // ดึง Role ของผู้ใช้ปัจจุบัน
     getUserRole(): string | null {
         return this._userRole();
     }
 
-    // ดึง Token จาก LocalStorage (สำหรับ Interceptor)
     getToken(): string | null {
         return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     }
 
-    // ดึง Employee ID ของผู้ใช้ปัจจุบัน
     getEmployeeId(): string | null {
         return localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
     }

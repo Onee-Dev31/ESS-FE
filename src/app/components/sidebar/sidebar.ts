@@ -1,5 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
+/**
+ * Service สำหรับจัดการสถานะการเปิด/ปิด Sidebar
+ */
 export class SidebarService {
   isCollapsed = signal(true);
 

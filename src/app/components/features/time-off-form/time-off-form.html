@@ -24,7 +24,6 @@
     </header>
 
     <main class="content-card">
-        <!-- ขั้นตอนที่ 1: เลือกประเภทการลา -->
         <section class="form-section-wrapper">
             <h4 class="section-heading">1. เลือกประเภทการลา</h4>
             <div class="leave-type-grid">
@@ -49,7 +48,6 @@
             </div>
         </section>
 
-        <!-- ขั้นตอนที่ 2: รายละเอียดการลา -->
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedLeaveType()">
             <h4 class="section-heading">2. รายละเอียดการลา</h4>
 
@@ -97,7 +95,6 @@
             </div>
 
             <div class="details-grid-custom">
-                <!-- Row 1: Start Date & Start Time -->
                 <div class="input-field-group">
                     <label>ตั้งแต่วันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
@@ -120,7 +117,6 @@
                     </div>
                 </div>
 
-                <!-- Row 2: End Date & End Time -->
                 <div class="input-field-group">
                     <label>ถึงวันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
@@ -161,7 +157,6 @@
             </div>
         </section>
 
-        <!-- ขั้นตอนที่ 3: แนบเอกสาร -->
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedLeaveType()">
             <div class="section-header-row">
                 <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>

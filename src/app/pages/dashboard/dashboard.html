@@ -4,7 +4,6 @@
   </header>
 
   <main class="content-body">
-    <!-- ปุ่มนำทางไปยังรายการรออนุมัติ -->
     <ng-template #pendingBtn>
       <button *ngIf="userRole() === 'Admin'" class="btn-pending-approvals" (click)="navigateTo('/approvals')">
         <div class="icon-shake">
@@ -19,7 +18,6 @@
 
     <div class="main-layout-grid">
       <div class="left-col-wrapper">
-        <!-- ส่วนแสดงรูปโปรไฟล์และแบนเนอร์ -->
         <div class="banner-avatar-section">
           <button class="edit-icon-btn" title="แก้ไขรูปโปรไฟล์">
             <i class="fas fa-pen"></i>
@@ -29,7 +27,6 @@
           </div>
         </div>
 
-        <!-- ข้อมูลการลงเวลางาน -->
         <div class="card attendance-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
@@ -61,7 +58,6 @@
           </div>
         </div>
 
-        <!-- ผลการปฏิบัติงานและอายุงาน -->
         <div class="card performance-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
@@ -98,7 +94,6 @@
           </div>
         </div>
 
-        <!-- ข้อมูลทรัพย์สินไอทีของผู้ใช้งาน -->
         <div class="card it-story-card">
           <div class="card-header border-0">
             <h4 class="card-heading">
@@ -121,7 +116,6 @@
         </div>
       </div>
       <div class="right-col-wrapper">
-        <!-- ข้อมูลโปรไฟล์ผู้ใช้งานหลัก -->
         <div class="card profile-card">
           <button type="button" class="action-btn-outline top-right-pos">
             <i class="fas fa-pen"></i>
@@ -150,7 +144,6 @@
           </div>
         </div>
 
-        <!-- สถิติการเบิกค่ารักษาพยาบาล -->
         <section class="stats-grid-card">
           <div class="section-header-flex">
             <div class="stats-group-header">
@@ -206,7 +199,6 @@
           </div>
         </section>
 
-        <!-- บริการสวัสดิการอื่นๆ (เบี้ยเลี้ยง, ค่ารถ, แท็กซี่) -->
         <div class="welfare-section">
           <div class="section-header-flex">
             <p class="section-title mb-0">สวัสดิการ</p>
@@ -241,7 +233,6 @@
           </div>
         </div>
 
-        <!-- สถิติการลาหยุดงาน -->
         <div class="leave-section">
           <div class="section-header-flex">
             <p class="section-title">ลาหยุดงาน</p>
@@ -266,7 +257,6 @@
             </div>
           </div>
         </div>
-        <!-- ตารางการปฏิบัติงานและปฏิทินวันหยุด -->
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>
           <div class="card schedule-card">
@@ -330,7 +320,6 @@
     (onClose)="closeTimeOffForm()">
   </app-time-off-form>
 
-  <!-- Modal แสดง Tooltip Info -->
   <div class="modal-overlay" *ngIf="isTooltipModalOpen()" (click)="closeTooltip()">
     <div class="modal-container info-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">

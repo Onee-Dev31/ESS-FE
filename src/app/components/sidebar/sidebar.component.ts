@@ -67,7 +67,6 @@ export class Sidebar {
         }
     ];
 
-    // Reactive menu filtering using computed signal
     menuItems = computed(() => {
         const userRole = this.authService.userRole();
         return this.allMenuItems.filter(item => !item.role || item.role === userRole);

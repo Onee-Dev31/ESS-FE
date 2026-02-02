@@ -26,13 +26,11 @@ export class TimeoffComponent implements OnInit {
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
 
-  // New Standardized Filters
   filterStatus = signal<string>('');
   filterStartDate = signal<string>('');
   filterEndDate = signal<string>('');
   searchText = signal<string>('');
 
-  // Pagination
   pageSize = signal<number>(10);
   currentPage = signal<number>(0);
 
@@ -74,7 +72,6 @@ export class TimeoffComponent implements OnInit {
   applyFilters() {
     let filtered = [...this.requests()];
 
-    // Filter by search text
     if (this.searchText()) {
       const search = this.searchText().toLowerCase();
       filtered = filtered.filter(req =>
@@ -84,12 +81,10 @@ export class TimeoffComponent implements OnInit {
       );
     }
 
-    // Filter by status
     if (this.filterStatus()) {
       filtered = filtered.filter(req => req.status === this.filterStatus());
     }
 
-    // Filter by date range
     if (this.filterStartDate()) {
       filtered = filtered.filter(req => req.createDate >= this.filterStartDate());
     }
@@ -98,10 +93,9 @@ export class TimeoffComponent implements OnInit {
     }
 
     this.filteredRequests.set(filtered);
-    this.currentPage.set(0); // Reset to first page on filter change
+    this.currentPage.set(0);
   }
 
-  // Pagination Methods
   setPageSize(size: number) {
     this.pageSize.set(size);
     this.currentPage.set(0);
@@ -169,7 +163,6 @@ export class TimeoffComponent implements OnInit {
       'APPROVED': 'status-approved',
       'REJECTED': 'status-rejected',
       'REFERRED_BACK': 'status-rejected',
-      // Legacy support just in case
       'คำขอใหม่': 'status-new',
       'ตรวจสอบแล้ว': 'status-reviewed',
       'อยู่ระหว่างการอนุมัติ': 'status-pending',

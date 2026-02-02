@@ -25,12 +25,10 @@ export class FilePreviewModalComponent implements OnInit {
         }
     }
 
-    // เลือกไฟล์สำหรับแสดงตัวอย่าง
     selectFile(file: FilePreviewItem) {
         this.selectedFile = file;
     }
 
-    // ปิดการแสดงตัวอย่าง
     close() {
         this.onClose.emit();
     }

@@ -6,7 +6,6 @@
         </header>
 
         <div class="modal-body">
-            <!-- ฝั่งซ้าย: รายการไฟล์ทั้งหมดในคำขอนี้ -->
             <div class="file-list-panel">
                 <div *ngIf="files.length === 0" class="no-files">
                     <i class="fas fa-file-excel text-muted"></i>
@@ -26,7 +25,6 @@
                 </ul>
             </div>
 
-            <!-- ฝั่งขวา: แสดงตัวอย่างไฟล์ที่เลือก -->
             <div class="preview-panel">
                 <div *ngIf="!selectedFile" class="empty-state">
                     <p>เลือกไฟล์เพื่อดูตัวอย่าง</p>

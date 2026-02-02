@@ -10,6 +10,7 @@
 
   @include mobile {
     padding: 10px;
+    padding-bottom: 80px;
   }
 
   .top-header-strip {
@@ -46,7 +47,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding-bottom: 20px;
     width: 100%;
-    overflow: hidden;
+    // overflow: hidden; // Removed to fix mobile scrolling
   }
 
   .modern-table {
@@ -239,108 +240,6 @@
     }
   }
 
-  .pagination-container {
-    padding: 1.5rem 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #f0f0f0;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    @include mobile {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 1.5rem 15px;
-    }
-
-    .pagination-info {
-      font-size: 13px;
-      color: #666;
-    }
-
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
-
-      .page-size-selector {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 13px;
-        color: #666;
-
-        select {
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          outline: none;
-          background: white;
-          cursor: pointer;
-        }
-      }
-
-      .page-buttons {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        .page-btn {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid #ddd;
-          background: white;
-          border-radius: 4px;
-          cursor: pointer;
-          color: #666;
-          transition: all 0.2s;
-
-          &:hover:not(:disabled) {
-            border-color: $btn-search-bg;
-            color: $btn-search-bg;
-            background: #f0f7ff;
-          }
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #f5f5f5;
-          }
-        }
-
-        &.text-right {
-          text-align: right !important;
-        }
-
-        &.font-semibold {
-          font-weight: 600;
-        }
-
-        .desc-wrapper {
-          display: flex;
-          align-items: center;
-
-          i {
-            margin-right: 0; // Removed margin-right
-          }
-        }
-
-        .page-info {
-          font-size: 13px;
-          color: #333;
-          margin: 0 0.5rem;
-          white-space: nowrap;
-        }
-      }
-    }
-  }
 
   .modal-overlay {
     @include responsive.modal-overlay-styles;

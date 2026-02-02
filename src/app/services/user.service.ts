@@ -4,7 +4,6 @@ import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { UserMock } from '../mocks/user.mock';
 
-// ข้อมูลโปรไฟล์ผู้ใช้งาน
 export interface UserProfile {
     name: string;
     email: string;
@@ -31,7 +30,6 @@ export class UserService {
 
     constructor() { }
 
-    // ดึงข้อมูลโปรไฟล์ผู้ใช้งานจำลอง
     getUserProfile(): Observable<UserProfile> {
         const role = localStorage.getItem('userRole');
         const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;

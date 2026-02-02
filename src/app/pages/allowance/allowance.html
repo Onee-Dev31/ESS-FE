@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    
+
     <div class="card-list-view">
       <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
 
@@ -107,7 +107,7 @@
       </div>
     </div>
 
-    
+
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -172,20 +172,20 @@
       </table>
     </div>
 
-    
+
     <div class="pagination-container">
       <div class="pagination-info">
-        แสดงเลขที่การเบิก {{ currentPage() * pageSize() + 1 }}
+        แสดง {{ currentPage() * pageSize() + 1 }}
         ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
         จาก {{ totalRequests() }} รายการ
       </div>
       <div class="pagination-controls">
         <div class="page-size-selector">
-          <span>เลขที่การเบิก:</span>
+          <span>จำนวนแถวต่อหน้า:</span>
           <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-            <option [value]="10">10 รายการ</option>
-            <option [value]="20">20 รายการ</option>
-            <option [value]="50">50 รายการ</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
           </select>
         </div>
         <div class="page-buttons">
@@ -209,7 +209,7 @@
     </div>
   </div>
 
-  
+
   <div class="modal-overlay" *ngIf="isModalOpen">
     <div class="modal-container">
       <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>

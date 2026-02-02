@@ -13,7 +13,6 @@
             </div>
         </div>
 
-        <!-- Controls -->
         <div class="table-controls">
             <div class="search-box">
                 <span class="search-icon">🔍</span>
@@ -30,7 +29,6 @@
             </div>
         </div>
 
-        <!-- Mobile Card View -->
         <div class="card-list-view">
             @for (row of table.getRowModel().rows; track $index) {
             <div class="mobile-card">
@@ -95,7 +93,6 @@
             }
         </div>
 
-        <!-- Desktop Table View -->
         <div class="data-grid-container">
             <table class="data-grid">
                 <thead>
@@ -174,7 +171,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination-container">
             <div class="pagination-info">
                 แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}

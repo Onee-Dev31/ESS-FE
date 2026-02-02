@@ -1,4 +1,5 @@
 import { UserProfile } from '../services/user.service';
+import { USER_ROLES } from '../constants/user-roles.constant';
 
 export class UserMock {
     static readonly ADMIN_PROFILE: UserProfile = {
@@ -37,6 +38,10 @@ export class UserMock {
         }
     };
 
-    // Backward compatibility
     static readonly PROFILE = UserMock.MEMBER_PROFILE;
+
+    static readonly MOCK_USERS = [
+        { username: 'admin', password: '123', name: 'Admin User', role: USER_ROLES.ADMIN, employeeId: 'OTD00001' },
+        { username: 'member', password: '123', name: 'Member User', role: USER_ROLES.MEMBER, employeeId: 'OTD01054' }
+    ];
 }

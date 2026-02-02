@@ -1,6 +1,5 @@
 <div class="modal-overlay" (click)="close()">
     <div class="modal-container-large" (click)="$event.stopPropagation()">
-        <!-- ส่วนหัวของหน้าต่าง: แสดงเลขที่เอกสารและปุ่มดำเนินการหลัก -->
         <div class="modal-header-modern">
             <div class="header-top-row">
                 <div class="header-info-inline">
@@ -23,7 +22,6 @@
             </div>
         </div>
 
-        <!-- แถบแสดงขั้นตอนการอนุมัติ (Stepper) -->
         <div class="approval-progress-bar">
             <div class="progress-stepper">
                 <div class="stepper-points">
@@ -72,7 +70,6 @@
                     <h3>รายการเบิก (Items)</h3>
                 </div>
 
-                <!-- ส่วนรายละเอียดรายการเบิก และความคิดเห็น -->
                 <div class="tab-view">
                     @if (selectedRequestDetails()) {
                     <div class="detail-table-wrapper">
@@ -143,7 +140,6 @@
                         </table>
                     </div>
 
-                    <!-- Card View for Modal (Mobile/Tablet) -->
                     <div class="modal-card-list-view">
                         @for (item of selectedRequestDetails().items; track $index) {
                         <div class="item-card">
@@ -173,7 +169,6 @@
                                 <div class="value">{{ item.destination }}</div>
                             </div>
                             } @else if (selectedRequestDetails().type === 'medical') {
-                            <!-- Medical fields if any in the future -->
                             }
 
                             @if (item.attachedFile) {
@@ -203,7 +198,6 @@
                     }
                 </div>
 
-                <!-- กล่องยืนยันการดำเนินการ (Approve/Reject/Refer Back) พร้อมระบุเหตุผล -->
                 @if (isActionConfirm()) {
                 <div class="action-confirm-box" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
                     <div class="action-title">
@@ -224,11 +218,9 @@
                     </div>
                 </div>
                 }
-                <!-- Spacer to force scroll -->
                 <div style="min-height: 10px; width: 100%;"></div>
             </div>
 
-            <!-- แถบข้อมูลผู้ขอเบิกสวัสดิการ -->
             <div class="side-panel">
                 <h3 class="side-title">Requester Info</h3>
                 <div class="side-group"><label>Name</label>
@@ -255,7 +247,6 @@
                 </div>
             </div>
 
-            <!-- Mobile Safe Spacer - Removed in favor of Scrollable Overlay strategy -->
         </div>
     </div>
 </div>

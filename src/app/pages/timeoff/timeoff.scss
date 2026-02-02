@@ -12,6 +12,7 @@
 
     @include mobile {
         padding: 10px;
+        padding-bottom: 80px;
     }
 
     .top-header-strip {
@@ -48,6 +49,7 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         padding-bottom: 20px;
         width: 100%;
+        // overflow: hidden; // Removed to fix mobile scrolling
     }
 
     .card-header-title {
@@ -65,88 +67,6 @@
 
 
 
-    .pagination-container {
-        padding: 1.5rem 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid #f1f5f9;
-        flex-wrap: wrap;
-        gap: 1rem;
-
-        @include mobile {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .pagination-info {
-            font-size: 0.85rem;
-            color: #64748b;
-        }
-
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-
-            .page-size-selector {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 0.85rem;
-                color: #64748b;
-
-                select {
-                    padding: 4px 8px;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 4px;
-                    outline: none;
-                    background: white;
-                    cursor: pointer;
-                }
-            }
-
-            .page-buttons {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-
-                .page-btn {
-                    width: 34px;
-                    height: 34px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border: 1px solid #e2e8f0;
-                    background: white;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    color: #64748b;
-                    transition: all 0.2s;
-
-                    &:hover:not(:disabled) {
-                        border-color: #3b82f6;
-                        color: #3b82f6;
-                        background: #f0f9ff;
-                    }
-
-                    &:disabled {
-                        opacity: 0.4;
-                        cursor: not-allowed;
-                        background: #f8fafc;
-                    }
-                }
-
-                .page-info {
-                    font-size: 0.85rem;
-                    color: #1e293b;
-                    margin: 0 10px;
-                }
-            }
-        }
-    }
 
     .modal-overlay {
         @include responsive.modal-overlay-styles;
@@ -333,7 +253,7 @@
     .modern-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1200px; // Ensure table doesn't cramp up
+        min-width: 1200px;
 
         thead {
             background-color: $header-bg;
@@ -494,7 +414,7 @@
                     vertical-align: middle;
                     color: #1e293b;
                     font-size: 0.92rem;
-                    height: auto; // Reset any potential height
+                    height: auto;
 
                     @include mobile {
                         padding: 12px 8px;
@@ -526,7 +446,7 @@
                     }
 
                     &.reason-cell {
-                        white-space: normal; // Allow reason to wrap
+                        white-space: normal;
                         word-break: break-word;
                         text-overflow: clip;
                         max-width: none;

@@ -19,23 +19,16 @@ $bg-slate: #f4f7f9;
     z-index: 10000;
     backdrop-filter: blur(4px);
 
-    /* Mobile: Scrollable Overlay Strategy */
-    /* This allows the modal to grow fully and uses native scrolling */
     @media (max-width: 991px) {
         align-items: flex-start;
         overflow-y: scroll;
-        /* Force scrollbar to always show scroll capability */
         overflow-x: hidden;
         padding: 20px 0 120px;
-        /* Extra bottom padding for safe scrolling */
         -webkit-overflow-scrolling: touch;
-        /* Ensure body doesn't scroll behind */
         position: fixed;
         height: 100dvh;
-        /* Use dynamic viewport height for mobile */
     }
 
-    /* Desktop: Centered Fixed Modal */
     @media (min-width: 992px) {
         align-items: center;
         overflow: hidden;
@@ -48,22 +41,18 @@ $bg-slate: #f4f7f9;
         border-radius: 12px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 
-        /* Mobile: Auto height, let content dictate size */
         @media (max-width: 991px) {
             max-height: none;
             height: auto;
             min-height: auto;
             position: relative;
             margin: 20px auto 120px;
-            /* Significant bottom margin */
             display: block;
             overflow: visible;
         }
 
-        /* Desktop: Fixed height with internal scroll */
         @media (min-width: 992px) {
             max-height: 80vh;
-            /* Reduced to ensure bottom is visible */
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -99,7 +88,6 @@ $bg-slate: #f4f7f9;
                     @media screen and (max-width: 600px) {
                         flex: 0 0 100%;
                         order: 2;
-                        /* Move below actions on mobile if actions wrap */
                     }
 
                     .request-title {
@@ -184,7 +172,6 @@ $bg-slate: #f4f7f9;
 
         .approval-progress-bar {
             flex-shrink: 0;
-            /* Prevent shrinking */
             padding: 1.5rem 1.5rem 1.5rem;
             background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
             border-bottom: 1px solid #e2e8f0;
@@ -334,44 +321,30 @@ $bg-slate: #f4f7f9;
         }
 
         .modal-layout-body {
-            /* Mobile: Natural height, no internal scroll */
-            display: block;
-            height: auto;
-            overflow: visible;
-            min-height: 0;
-
-            /* Desktop: Flex scrollable area */
             @media (min-width: 992px) {
                 display: flex;
                 flex-direction: row;
                 align-items: stretch;
-                /* Ensure both panels stretch to full height */
                 overflow-y: auto;
                 flex: 1;
                 min-height: 0;
                 padding-bottom: 0;
-                /* Fix: Allow panels to reach the bottom edge */
                 background: linear-gradient(to left, #f4f7f9 280px, #e2e8f0 280px, #e2e8f0 281px, #ffffff 281px);
-                /* Faux Column & Border */
             }
 
-            /* Mobile: Natural flow */
             @media (max-width: 991px) {
                 padding-bottom: 20px;
             }
 
-            /* Spacer for mobile bottom clearance removed */
             &::after {
                 display: none;
             }
 
             .mobile-safe-spacer {
                 display: none;
-                /* Ensure hidden if HTML still has it */
             }
 
             .main-panel {
-                /* Mobile defaults */
                 padding: 1.5rem;
                 padding-bottom: 0px;
 
@@ -386,19 +359,16 @@ $bg-slate: #f4f7f9;
                     position: relative;
                 }
 
-                /* Force scroll capability using pseudo-element */
                 &::after {
                     content: '';
                     display: block;
                     height: 30px;
-                    /* Force scrollable area */
                     width: 100%;
                     flex-shrink: 0;
                 }
 
                 .summary-cards-grid {
                     display: grid;
-                    /* Enable Grid Grid */
                     grid-template-columns: repeat(2, 1fr);
                     gap: 15px;
                     margin-bottom: 1rem;
@@ -647,15 +617,11 @@ $bg-slate: #f4f7f9;
                     background: #f8fafc;
                     border: 1px solid #e2e8f0;
                     border-radius: 12px;
-                    /* Slightly more rounded */
                     padding: 1.5rem;
-                    /* Increased padding from 1rem */
                     margin-top: 1.5rem;
                     margin-bottom: 0;
-                    /* Handled by spacer div */
                     animation: slideDown 0.3s ease-out;
 
-                    /* Make Approved state more compact since it has no input */
                     &.approved {
                         border-left: 4px solid $primary-green;
                         padding: 1rem 1.5rem;
@@ -674,7 +640,6 @@ $bg-slate: #f4f7f9;
                             display: none;
                         }
 
-                        /* Hide title in approved state to save space */
                         .action-title {
                             margin-bottom: 0;
                             margin-right: auto;
@@ -710,11 +675,9 @@ $bg-slate: #f4f7f9;
                         }
                     }
 
-                    /* Remove bottom margin for title in Approved state to save space */
                     &.approved .action-title {
                         margin-bottom: 0;
                         margin-right: auto;
-                        /* Push buttons to right if flex row */
                     }
 
                     .reason-section {
@@ -750,7 +713,6 @@ $bg-slate: #f4f7f9;
 
                     .action-footer {
                         margin-top: 1rem;
-                        /* Ensure buttons have space from content above */
                         display: flex;
                         gap: 8px;
                         justify-content: flex-end;
@@ -798,13 +760,10 @@ $bg-slate: #f4f7f9;
                 @media (min-width: 992px) {
                     width: 280px;
                     padding-bottom: 40px;
-                    /* border-left removed: handled by container gradient */
                     position: relative;
-                    /* Ensure it takes full height */
                     display: flex;
                     flex-direction: column;
                     align-self: stretch;
-                    /* Critical: force it to stretch in flex container */
                 }
 
                 padding: 1.5rem;
@@ -815,8 +774,6 @@ $bg-slate: #f4f7f9;
                 }
 
                 background: transparent;
-                /* Transparent on desktop to show container gradient */
-                /* Faux Column: Transparent to show container bg */
 
                 .side-title {
                     color: $primary-blue;
@@ -863,7 +820,6 @@ $bg-slate: #f4f7f9;
         gap: 8px;
         margin-top: 0.5rem;
         flex: 1;
-        /* Grow to fill side panel */
         display: flex;
 
         .avatar-circle {
@@ -877,7 +833,6 @@ $bg-slate: #f4f7f9;
             padding: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             flex: 1;
-            /* Grow to fill thread container */
         }
     }
 

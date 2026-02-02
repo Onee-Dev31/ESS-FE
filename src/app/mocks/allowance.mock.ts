@@ -9,14 +9,11 @@ export class AllowanceMock {
             let requester = MockHelper.getRequesterByRole(role);
             let status = MockHelper.getRandomStatus('allowance');
 
-            // Logic for Admin: See others' requests that need approval
             if (role === 'Admin') {
-                requester = MockHelper.getRandomRequester(); // Random employees
-                // Bias towards actionable statuses for Admin
+                requester = MockHelper.getRandomRequester();
                 const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
                 status = conditions[Math.floor(Math.random() * conditions.length)];
             }
-            // Logic for Member: See own requests (already set by getRequesterByRole)
 
             return {
                 id: `2701#${String(i + 1).padStart(3, '0')}`,

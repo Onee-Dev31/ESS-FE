@@ -1,6 +1,5 @@
 import { Requester } from './vehicle.interface';
 
-// รายการค่ารักษาพยาบาล
 export interface MedicalItem {
     id?: string;
     requestDate: string;
@@ -14,7 +13,6 @@ export interface MedicalItem {
     attachedFile?: string | null;
 }
 
-// คำขอค่ารักษาพยาบาล
 export interface MedicalRequest {
     id: string;
     createDate: string;

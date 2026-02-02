@@ -1,6 +1,5 @@
 import { Requester } from './vehicle.interface';
 
-// รายการค่าแท็กซี่
 export interface TaxiItem {
     date: string;
     description: string;
@@ -11,7 +10,6 @@ export interface TaxiItem {
     attachedFile?: string | null;
 }
 
-// ข้อมูลคำขอค่าแท็กซี่
 export interface TaxiRequest {
     id: string;
     typeId: number;

@@ -489,7 +489,6 @@
         background: #fff;
         flex-shrink: 0;
         justify-content: flex-end;
-        /* Align buttons to the right */
 
         button {
             display: flex;
@@ -504,7 +503,6 @@
             transition: all 0.2s;
             border: none;
             max-width: 80px;
-            /* Force narrow width */
             white-space: nowrap;
         }
 

@@ -15,6 +15,12 @@ import dayjs from 'dayjs';
 @Injectable({
     providedIn: 'root'
 })
+/**
+ * Service สำหรับจัดการข้อมูลที่จะแสดงในหน้า Dashboard
+ * - จำนวนรายการรออนุมัติ
+ * - สถิติการเบิกสวัสดิการ
+ * - วันหยุดและปฏิทิน
+ */
 export class DashboardService {
     private loadingService = inject(LoadingService);
     private http = inject(HttpClient);
@@ -25,8 +31,10 @@ export class DashboardService {
 
     constructor() { }
 
-    // ดึงจำนวนรายการที่รออนุมัติทั้งหมดจากทุก Service
-    // ปรับปรุงให้ทนทานต่อ Error (Resiliency) - ถ้า Service ไหนพัง ข้อมูลที่เหลือยังโหลดได้
+    /**
+     * ดึงจำนวนรายการที่รออนุมัติทั้งหมด (รวมทุก Module: เบี้ยเลี้ยง, แท็กซี่, ค่ารถ, ค่ารักษา)
+     * ใช้สำหรับแสดง Badge แจ้งเตือน
+     */
     getGlobalPendingCount(): Observable<number> {
         const streams: Observable<any[]>[] = [
             this.allowanceService.getAllowanceRequests().pipe(catchError(() => of([]))),
@@ -44,6 +52,7 @@ export class DashboardService {
         );
     }
 
+    // ดึงจำนวนรายการรออนุมัติ เฉพาะส่วนค่ารักษาพยาบาล
     getMedicalPendingCount(): Observable<number> {
         return this.medicalService.getRequests().pipe(
             catchError(() => of([])),
@@ -54,6 +63,7 @@ export class DashboardService {
         );
     }
 
+    // ดึงข้อมูลสถิติวงเงินคงเหลือของค่ารักษาพยาบาล (Mock Data)
     getMedicalStats(): Observable<MedicalStat[]> {
         const stats: MedicalStat[] = [
             { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },
@@ -64,6 +74,7 @@ export class DashboardService {
         return this.loadingService.wrap(of(stats).pipe(delay(100)));
     }
 
+    // ดึงรายการสวัสดิการต่างๆ เพื่อแสดงเป็น Card (พร้อม Tooltip เงื่อนไข)
     getWelfareStats(): Observable<WelfareItem[]> {
         const stats: WelfareItem[] = [
             {
@@ -111,6 +122,7 @@ export class DashboardService {
         return this.loadingService.wrap(of(leaves).pipe(delay(100)));
     }
 
+    // ดึงวันหยุดราชการ
     getHolidays(): Observable<HolidayItem[]> {
         return this.loadingService.wrap(of([
             { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },
@@ -140,13 +152,17 @@ export class DashboardService {
         ];
     }
 
+    /**
+     * ดึงข้อมูลวันพิเศษ/วันหยุดสำหรับแสดงในปฏิทิน
+     * - ใช้ library date-holidays สำหรับวันหยุดไทย
+     * - เพิ่มวันลาจำลอง (Hardcoded)
+     */
     getSpecialDates(): Record<string, any> {
         const hd = new DateHolidays('TH');
-        hd.setLanguages('th'); // Set language to Thai
+        hd.setLanguages('th');
         const currentYear = dayjs().year();
         const nextYear = currentYear + 1;
 
-        // Get holidays for current and next year
         const holidays = [
             ...hd.getHolidays(currentYear),
             ...hd.getHolidays(nextYear)
@@ -155,14 +171,12 @@ export class DashboardService {
         const result: Record<string, any> = {};
 
         holidays.forEach(h => {
-            const dateStr = h.date.split(' ')[0]; // Format: YYYY-MM-DD HH:mm:ss
-            // Check if it's a public holiday (type 'public')
+            const dateStr = h.date.split(' ')[0];
             if (h.type === 'public') {
                 result[dateStr] = { type: 'holiday', note: h.name, code: 'HOL' };
             }
         });
 
-        // Add specific leave mock data
         result['2026-01-20'] = { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' };
 
         return result;

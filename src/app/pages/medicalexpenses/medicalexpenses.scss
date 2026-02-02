@@ -15,13 +15,11 @@ $col-date-sm: 85px;
 $col-attach: 60px;
 
 .medical-page {
-    padding: 20px;
-    background-color: $bg-page;
-    min-height: 100vh;
-    box-sizing: border-box;
+    padding-bottom: 80px;
 
     @include mobile {
         padding: 10px;
+        padding-bottom: 60px;
     }
 
     .top-header-strip {
@@ -79,7 +77,7 @@ $col-attach: 60px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         padding-bottom: 20px;
         width: 100%;
-        overflow: hidden;
+        // overflow: hidden; // Removed to prevent clipping of bottom content/shadows
     }
 
     .card-header-title {
@@ -383,50 +381,6 @@ $col-attach: 60px;
     }
 }
 
-.pagination-container {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #eee;
-    flex-wrap: wrap;
-    gap: 15px;
-
-    .pagination-info {
-        font-size: 0.85rem;
-        color: #666;
-    }
-
-    .pagination-controls {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-
-        .page-buttons {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-
-            .page-btn {
-                border: 1px solid #dee2e6;
-                background: #fff;
-                padding: 5px 10px;
-                border-radius: 4px;
-                cursor: pointer;
-                color: #495057;
-
-                &:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-
-                &:hover:not(:disabled) {
-                    background: #e9ecef;
-                }
-            }
-        }
-    }
-}
 
 .modal-overlay {
     @include responsive.modal-overlay-styles;

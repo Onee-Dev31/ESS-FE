@@ -10,21 +10,17 @@ export class TimeOffMock {
 
             const leaveType = LEAVE_TYPES[i % LEAVE_TYPES.length];
 
-            // Determine days and period based on leave type
             let daysCount: number;
             let leavePeriod: string;
 
-            // Vacation and funeral leave = full days only (1, 2, 3)
             if (leaveType.label === 'ลาพักร้อน' || leaveType.label === 'ลาเพื่อจัดการงานศพ') {
                 const fullDays = [1, 2, 3];
                 daysCount = fullDays[i % fullDays.length];
                 leavePeriod = 'full-day';
             } else {
-                // Sick, Personal, Sterilization can have half days
                 const periods = ['full-day', 'morning', 'full-day', 'afternoon'];
                 leavePeriod = periods[i % periods.length];
 
-                // Set days based on period
                 if (leavePeriod === 'morning' || leavePeriod === 'afternoon') {
                     daysCount = 0.5;
                 } else {
@@ -33,7 +29,6 @@ export class TimeOffMock {
                 }
             }
 
-            // Calculate end date based on number of days
             let endDate = startDate;
             if (daysCount > 0.5) {
                 endDate = startDate.add(Math.floor(daysCount) - 1, 'day');
@@ -75,8 +70,7 @@ export class TimeOffMock {
     }
 
     private static generateAttachments(index: number): { name: string; url?: string }[] {
-        // All requests have 1-3 attachments
-        const attachmentCount = (index % 3) + 1; // 1, 2, or 3 files
+        const attachmentCount = (index % 3) + 1;
 
         const fileNames = [
             'ใบรับรองแพทย์.pdf',

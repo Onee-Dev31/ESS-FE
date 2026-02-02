@@ -9,7 +9,6 @@
   <div class="content-card">
     <div class="card-header-title">รายการเบิกของฉัน</div>
 
-    <!-- แถบเครื่องมือและตัวกรองข้อมูลค่าพาหนะ -->
     <div class="toolbar-container">
       <div class="toolbar-top-row">
         <div class="left-action">
@@ -65,7 +64,6 @@
       </div>
     </div>
 
-    <!-- ส่วนแสดงผลแบบ Card สำหรับ Tablet/Mobile -->
     <div class="card-list-view">
       <div class="mobile-card" *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
 
@@ -115,7 +113,6 @@
       </div>
     </div>
 
-    <!-- ตารางรายการเบิกค่าพาหนะ (มีการรวมแถวตามเลขที่การเบิก) -->
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -205,7 +202,6 @@
         </tbody>
       </table>
     </div>
-    <!-- การแบ่งหน้า -->
     <div class="pagination-container">
       <div class="pagination-info">
         แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}

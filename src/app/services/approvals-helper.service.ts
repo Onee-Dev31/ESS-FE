@@ -3,7 +3,8 @@ import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { TaxiRequest } from './taxi.service';
 import { VehicleRequest } from './transport.service';
 import { MedicalRequest } from './medicalexpenses.service';
-import { ApprovalItem } from '../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalItem } from '../interfaces/approval.interface';
+import { REQUEST_STATUS } from '../constants/request-status.constant';
 import { DateUtilityService } from './date-utility.service';
 
 @Injectable({
@@ -11,11 +12,10 @@ import { DateUtilityService } from './date-utility.service';
 })
 export class ApprovalsHelperService {
 
-    private dateUtil = inject(DateUtilityService); // Inject here
+    private dateUtil = inject(DateUtilityService);
 
     constructor() { }
 
-    // รวมและแปลงข้อมูลจากหลาย Service เป็นรูปแบบรายการอนุมัติ
     processData(allowance: AllowanceRequest[], taxi: TaxiRequest[], vehicle: VehicleRequest[]): ApprovalItem[] {
         const allowanceItems = allowance.map(item => ({
             requestNo: item.id,
@@ -25,11 +25,11 @@ export class ApprovalsHelperService {
                 employeeId: item.requester?.employeeId || 'EM-001',
                 department: item.requester?.department || '-',
                 company: 'Onee',
-                position: 'Software Engineer', // Mock position
+                position: 'Software Engineer',
                 profileImage: 'assets/images/user-placeholder.png'
             },
             requestType: 'ค่าเบี้ยเลี้ยง' as const,
-            typeId: 99, // Added typeId
+            typeId: 99,
             requestDetail: item.items.map(i => i.description).join(', ') || 'ค่าเบี้ยเลี้ยงและที่พัก',
             amount: item.items.reduce((sum, i) => sum + i.amount, 0),
             status: this.mapStatus(item.status),
@@ -108,29 +108,24 @@ export class ApprovalsHelperService {
         };
     }
 
-    // แปลงสถานะ Code เป็นสถานะหลัก (รออนุมัติ, อนุมัติแล้ว, ไม่อนุมัติ, รอแก้ไข)
-    // แปลงสถานะ Code เป็นสถานะหลัก (รออนุมัติ, อนุมัติแล้ว, ไม่อนุมัติ, รอแก้ไข)
     mapStatus(status: string): 'รออนุมัติ' | 'อนุมัติแล้ว' | 'ไม่อนุมัติ' | 'รอแก้ไข' {
         const s = this.normalizeStatus(status);
 
-        if (s === 'REJECTED' || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
-        if (s === 'REFERRED_BACK' || s === 'รอแก้ไข') return 'รอแก้ไข';
-        if (s === 'APPROVED' || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'อนุมัติแล้ว';
+        if (s === REQUEST_STATUS.REJECTED || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
+        if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'รอแก้ไข';
+        if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'อนุมัติแล้ว';
 
-        // All pending states
         return 'รออนุมัติ';
     }
 
-    // Sanitize status from mock data to ensure valid codes
     private normalizeStatus(status: string): string {
-        if (!status) return 'WAITING_CHECK';
+        if (!status) return REQUEST_STATUS.WAITING_CHECK;
         const s = status.trim();
 
-        // Handle potential legacy values
-        if (s === 'Pending' || s === 'Waiting Check' || s === 'New') return 'WAITING_CHECK';
-        if (s === 'Approved' || s === 'Approve') return 'APPROVED';
-        if (s === 'Rejected' || s === 'Reject') return 'REJECTED';
-        if (s === 'Referred Back' || s === 'Refer Back') return 'REFERRED_BACK';
+        if (s === 'Pending' || s === 'Waiting Check' || s === 'New') return REQUEST_STATUS.WAITING_CHECK;
+        if (s === 'Approved' || s === 'Approve') return REQUEST_STATUS.APPROVED;
+        if (s === 'Rejected' || s === 'Reject') return REQUEST_STATUS.REJECTED;
+        if (s === 'Referred Back' || s === 'Refer Back') return REQUEST_STATUS.REFERRED_BACK;
 
         return s;
     }

@@ -25,7 +25,6 @@ export class FileUploadModal implements OnChanges {
     }
   }
 
-  // จัดการเมื่อเลือกไฟล์ (จำกัดขนาดไม่เกิน 4MB)
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -41,18 +40,15 @@ export class FileUploadModal implements OnChanges {
     }
   }
 
-  // ลบไฟล์ที่เลือกไว้ออก
   removeFile() {
     this.tempFileName = null;
     this.isDeleted = true;
   }
 
-  // ยืนยันการอัปโหลดไฟล์
   confirm() {
     this.onSave.emit(this.tempFileName);
   }
 
-  // ปิดหน้าต่างอัปโหลด
   close() {
     this.onClose.emit();
   }

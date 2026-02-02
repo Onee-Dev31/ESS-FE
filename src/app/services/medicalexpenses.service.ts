@@ -52,7 +52,6 @@ export class MedicalexpensesService {
         return stored ? JSON.parse(stored) : [];
     }
 
-    // --- Public API ---
 
     getRequests(): Observable<MedicalRequest[]> {
         const masterData = this.getMasterData();

@@ -133,14 +133,12 @@ export class VehicleComponent implements OnInit {
     this.loadData();
   }
 
-  // โหลดข้อมูลคำขอค่าเดินทางทั้งหมด
   loadData() {
     this.transportService.getRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  // ลบรายการคำขอ
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
       this.transportService.deleteRequest(id).subscribe(() => {
@@ -174,7 +172,6 @@ export class VehicleComponent implements OnInit {
     this.searchText.set('');
   }
 
-  // สลับการเรียงลำดับข้อมูลในตาราง
   toggleSort(columnId: string) {
     const currentSort = this.sorting()[0];
     if (currentSort?.id === columnId) {

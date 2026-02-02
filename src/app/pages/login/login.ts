@@ -31,12 +31,10 @@ export class LoginComponent {
 
   constructor() { }
 
-  // สลับการซ่อน/แสดงรหัสผ่าน
   togglePasswordVisibility() {
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }
 
-  // จัดการการเข้าสู่ระบบ
   onLogin() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();

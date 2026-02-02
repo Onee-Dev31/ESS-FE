@@ -15,6 +15,12 @@ import dayjs from 'dayjs';
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss'
 })
+/**
+ * ฟอร์มสำหรับสร้างคำขอลาหยุด (Time Off Request)
+ * - เลือกประเภทการลา
+ * - ระบุวัน/เวลา
+ * - แนบเอกสาร
+ */
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private userService = inject(UserService);
@@ -37,6 +43,7 @@ export class TimeOffForm implements OnInit {
   shiftStartTime = signal<string>('');
   shiftEndTime = signal<string>('');
 
+  // คำนวณจำนวนวันลาอัตโนมัติจากวันที่เริ่มต้นและสิ้นสุด
   calculatedDays = computed(() => {
     const period = this.leavePeriod();
     if (period === 'morning' || period === 'afternoon') {
@@ -73,6 +80,7 @@ export class TimeOffForm implements OnInit {
     this.endDate.set(today);
   }
 
+  // ปรับวันที่สิ้นสุดให้สอดคล้องกับวันที่เริ่มต้นและช่วงเวลาที่เลือก
   private updateEndDate() {
     const start = this.startDate();
     if (!start) return;
@@ -132,6 +140,7 @@ export class TimeOffForm implements OnInit {
     this.onClose.emit();
   }
 
+  // บันทึกคำขอลาหยุด
   save() {
     if (!this.selectedLeaveType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
@@ -143,6 +152,7 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
+    // ตรวจสอบความถูกต้องของช่วงเวลา
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
       this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
       return;
@@ -155,9 +165,7 @@ export class TimeOffForm implements OnInit {
 
     const typeLabel = this.leaveTypes.find(t => t.id === this.selectedLeaveType())?.label || '';
 
-    // Fetch profile and save
     this.userService.getUserProfile().subscribe(profile => {
-      // Create Mock Request
       const request: TimeOffRequest = {
         id: 'NEW',
         createDate: dayjs().toISOString(),

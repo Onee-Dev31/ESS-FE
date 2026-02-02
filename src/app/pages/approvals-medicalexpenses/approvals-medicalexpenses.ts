@@ -1,5 +1,4 @@
 import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
-// Rebuild trigger
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +11,8 @@ import {
   getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
-import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalItem } from '../../interfaces/approval.interface';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
@@ -48,13 +48,11 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
 
   refresh() {
     this.medicalService.getRequests().pipe(take(1)).subscribe((requests) => {
-      // Use helper service to process data
       const mappedData = this.approvalsHelper.processMedicalData(requests);
       this.approvals.set(mappedData.sort((a: ApprovalItem, b: ApprovalItem) => b.requestNo.localeCompare(a.requestNo)));
     });
   }
 
-  // Filter Logic
   filteredData = computed(() => {
     const statusFilter = this.activeTab();
     const searchFilter = this.searchText().toLowerCase();

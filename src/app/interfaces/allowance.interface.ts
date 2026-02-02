@@ -1,6 +1,5 @@
 import { Requester } from './vehicle.interface';
 
-// รายการเบี้ยเลี้ยง
 export interface AllowanceItem {
     date: string;
     dayType?: string;
@@ -13,7 +12,6 @@ export interface AllowanceItem {
     shiftCode?: string;
 }
 
-// ข้อมูลคำขอเบี้ยเลี้ยง
 export interface AllowanceRequest {
     id: string;
     typeId: number;

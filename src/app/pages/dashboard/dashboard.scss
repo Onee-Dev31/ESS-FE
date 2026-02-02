@@ -23,7 +23,6 @@ $balance: #15803d;
   background-clip: padding-box;
 }
 
-// Global styles moved to styles.scss
 
 .dashboard-wrapper {
   padding: 15px;
@@ -55,7 +54,6 @@ $balance: #15803d;
   }
 }
 
-// Utility classes moved to styles.scss
 
 .section-title {
   font-size: 16px;
@@ -1183,7 +1181,7 @@ $balance: #15803d;
 
 ::ng-deep {
   .fc {
-    font-family: 'Inter', sans-serif; // Ensure premium font
+    font-family: 'Inter', sans-serif;
     --fc-border-color: #f1f5f9;
     --fc-today-bg-color: transparent;
     --fc-neutral-bg-color: #f8fafc;
@@ -1248,12 +1246,11 @@ $balance: #15803d;
       }
 
       &.fc-day-today {
-        background-color: transparent !important; // Handle today highlight in content
+        background-color: transparent !important;
       }
     }
   }
 
-  // Moved inside ::ng-deep to ensure styles apply to dynamically generated content
   .date-cell-custom {
     display: flex;
     flex-direction: column;
@@ -1261,12 +1258,12 @@ $balance: #15803d;
     justify-content: flex-start;
     padding-top: 4px;
     height: 100%;
-    min-height: 50px; // Ensure enough height
+    min-height: 50px;
 
     .date-circle {
       width: 28px;
       height: 28px;
-      border-radius: 50%; // or 8px for soft square
+      border-radius: 50%;
       @include flex-center;
       font-size: 14px;
       font-weight: 600;
@@ -1275,28 +1272,25 @@ $balance: #15803d;
       transition: all 0.2s ease;
       border: 1px solid transparent;
 
-      // Today Style
 
       &.circle-green-outline {
-        background: #ecfdf5; // Emerald 50
-        color: #059669; // Emerald 600
+        background: #ecfdf5;
+        color: #059669;
         border-color: transparent;
       }
 
       &.circle-orange-outline {
-        background: #fff7ed; // Orange 50
-        color: #ea580c; // Orange 600
+        background: #fff7ed;
+        color: #ea580c;
         border-color: transparent;
       }
 
-      // Weekend
       &.circle-red-outline {
-        color: #ef4444; // Red 500
-        background: #fef2f2; // Red 50
+        color: #ef4444;
+        background: #fef2f2;
       }
     }
 
-    // Today Highlight specifically
     :host ::ng-deep .fc-day-today & .date-circle {
       background: $primary !important;
       color: white !important;
@@ -1305,14 +1299,14 @@ $balance: #15803d;
     }
 
     .date-code {
-      display: none; // Hide code, too messy for premium look
+      display: none;
     }
 
     .date-note {
       font-size: 10px;
       line-height: 1.2;
       text-align: center;
-      width: 100%; // Expanded to use full width
+      width: 100%;
       padding: 2px 4px;
       border-radius: 4px;
       margin-top: 2px;

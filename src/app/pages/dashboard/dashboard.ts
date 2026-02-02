@@ -21,7 +21,6 @@ interface ProfileItem { label: string; value: string; icon?: string; iconColor?:
 interface AttendanceItem { label: string; value: string; }
 interface PerformanceItem { year: string; grade: string; }
 
-// ตั้งค่า Locale เป็นไทยทั่วทั้ง Component
 dayjs.locale('th');
 
 @Component({
@@ -42,7 +41,6 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private authService = inject(AuthService);
 
-  // Reactive role from signal
   userRole = this.authService.userRole;
 
   isPolicyModalOpen = signal<boolean>(false);
@@ -51,7 +49,6 @@ export class DashboardComponent implements OnInit {
   tooltipModalContent = signal<string>('');
   selectedLeaveTypeId = signal<string>('');
 
-  // Data Signals using toSignal
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats(), { initialValue: [] });
   welfareStats = toSignal(this.dashboardService.getWelfareStats(), { initialValue: [] });
@@ -60,7 +57,6 @@ export class DashboardComponent implements OnInit {
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
-  // Computed lists derived from userProfile signal
   profileList = computed<ProfileItem[]>(() => {
     const profile = this.userProfile();
     if (!profile) return [];
@@ -89,22 +85,18 @@ export class DashboardComponent implements OnInit {
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
 
-  // --- Day.js Dynamic Props ---
   workStartDate = '2021-07-10';
 
-  // ช่วงวันที่ของเดือนปัจจุบันแบบอัตโนมัติ
   attendancePeriod = computed(() => {
     const start = dayjs().startOf('month').format('DD/MM/YYYY');
     const end = dayjs().endOf('month').format('DD/MM/YYYY');
     return `${start} - ${end}`;
   });
 
-  // อายุงานคำนวณอัตโนมัติ
   workDuration = computed(() => {
     const years = dayjs().diff(dayjs(this.workStartDate), 'year');
     return `${years} ปี`;
   });
-  // ---------------------------
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',

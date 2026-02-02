@@ -23,7 +23,7 @@ export class MedicalMock {
                     ? ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'][Math.floor(Math.random() * 4)]
                     : status,
                 requester: role === 'Admin' ? MockHelper.getRandomRequester() : MockHelper.getRequesterByRole(role),
-                employeeId: role === 'Admin' ? 'OTD00001' : 'OTD01054', // Keep for backward compatibility if needed, or remove if unused
+                employeeId: role === 'Admin' ? 'OTD00001' : 'OTD01054',
                 items: [{
                     requestDate: formattedDate,
                     limitType: limitTypes[Math.floor(Math.random() * limitTypes.length)],
@@ -33,7 +33,7 @@ export class MedicalMock {
                     treatmentDateTo: formattedDate,
                     requestedAmount: amount,
                     approvedAmount: approvedAmount,
-                    attachedFile: Math.random() > 0.3 ? `medical_receipt_${i + 1}.pdf` : '' // 70% have files
+                    attachedFile: Math.random() > 0.3 ? `medical_receipt_${i + 1}.pdf` : ''
                 }],
                 totalRequestedAmount: amount,
                 totalApprovedAmount: approvedAmount

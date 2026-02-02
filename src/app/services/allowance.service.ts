@@ -21,11 +21,9 @@ export class AllowanceService {
     private initializeData() {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         if (stored) {
-            // Load existing data
             const data = JSON.parse(stored);
             this.updateSubject(data);
         } else {
-            // Generate master dataset (Admin view = mixed users)
             const masterData = AllowanceMock.generateRequestsByRole(20, 'Admin');
             this.saveToStorage(masterData);
             this.updateSubject(masterData);
@@ -54,7 +52,6 @@ export class AllowanceService {
         return stored ? JSON.parse(stored) : [];
     }
 
-    // --- Public API ---
 
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
         const masterData = this.getMasterData();

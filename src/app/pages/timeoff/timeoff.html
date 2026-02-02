@@ -1,5 +1,4 @@
 <div class="timeoff-page">
-    <!-- Top Header -->
     <div class="top-header-strip">
         <button class="btn-back" (click)="goBack()">
             <i class="fas fa-chevron-left"></i>
@@ -7,11 +6,9 @@
         <h2>บันทึกการลา (Time Off)</h2>
     </div>
 
-    <!-- Content Card -->
     <div class="content-card">
         <div class="card-header-title">รายการลา</div>
 
-        <!-- Toolbar -->
         <div class="toolbar-container">
             <div class="toolbar-top-row">
                 <div class="left-action">
@@ -57,7 +54,6 @@
             </div>
         </div>
 
-        <!-- Card View for Tablet/Mobile -->
         <div class="card-list-view">
             <div class="mobile-card" *ngFor="let request of paginatedRequests()">
                 <div class="card-header">
@@ -132,7 +128,6 @@
             </div>
         </div>
 
-        <!-- Table -->
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
@@ -193,7 +188,6 @@
                         </td>
                         <td class="text-center">
                             <div class="action-btns">
-                                <!-- Show Edit/Delete only for "คำขอใหม่" -->
                                 <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
                                     <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
                                         <i class="far fa-edit"></i>
@@ -203,7 +197,6 @@
                                     </button>
                                 </ng-container>
 
-                                <!-- Show View details for other statuses -->
                                 <button class="btn-icon view" title="ดูรายละเอียด"
                                     *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
                                     (click)="openForm(request.status)">
@@ -222,20 +215,19 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination-container">
             <div class="pagination-info">
-                แสดงรายการ {{ currentPage() * pageSize() + 1 }}
+                แสดง {{ currentPage() * pageSize() + 1 }}
                 ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
                 จาก {{ totalRequests() }} รายการ
             </div>
             <div class="pagination-controls">
                 <div class="page-size-selector">
-                    <span>จำนวนคงเหลือต่อหน้า:</span>
+                    <span>จำนวนแถวต่อหน้า:</span>
                     <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-                        <option [value]="10">10 รายการ</option>
-                        <option [value]="20">20 รายการ</option>
-                        <option [value]="50">50 รายการ</option>
+                        <option [value]="10">10</option>
+                        <option [value]="20">20</option>
+                        <option [value]="50">50</option>
                     </select>
                 </div>
                 <div class="page-buttons">
@@ -263,7 +255,6 @@
 <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>
 
-<!-- Time Off Form Modal Overlay -->
 <div class="modal-overlay" *ngIf="isFormOpen()">
     <div class="modal-container">
         <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>

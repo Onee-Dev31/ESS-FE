@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 export class MedicalPolicyModalComponent {
     @Output() onClose = new EventEmitter<void>();
 
-    // ปิดป๊อปอัปสวัสดิการ
     close() {
         this.onClose.emit();
     }

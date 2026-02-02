@@ -1,19 +1,16 @@
 <nav class="navbar">
-  <!-- ฝั่งซ้าย: ปุ่มเปิด/ปิด Sidebar -->
   <div class="nav-left">
     <button class="icon-btn menu-trigger" (click)="toggleSidebar()">
       <i class="fas fa-bars"></i>
     </button>
   </div>
 
-  <!-- ส่วนกลาง: ชื่อระบบและลิงก์หน้าหลัก -->
   <div class="nav-center">
     <h1 class="nav-title" routerLink="/dashboard">
       ESS DASHBOARD
     </h1>
   </div>
 
-  <!-- ฝั่งขวา: ช่องค้นหา, การแจ้งเตือน และโปรไฟล์ผู้ใช้งาน -->
   <div class="nav-right">
     <div class="search-box desktop-search">
       <input type="text" placeholder="Search..." />

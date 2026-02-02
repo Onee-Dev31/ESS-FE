@@ -14,7 +14,8 @@ import {
   getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
-import { ApprovalDetailModalComponent, ApprovalItem } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
