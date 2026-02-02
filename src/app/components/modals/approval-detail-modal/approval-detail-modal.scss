@@ -95,7 +95,7 @@ $bg-slate: #f4f7f9;
 
                     button {
                         padding: 8px 20px;
-                        border-radius: 20px;
+                        border-radius: 8px;
                         border: none;
                         color: white;
                         font-weight: 600;
@@ -130,14 +130,13 @@ $bg-slate: #f4f7f9;
 
                 .btn-close-x {
                     @include close-btn-style;
-                    font-size: 14px; // Override mixin default if needed, but mixin has 14px.
-                    // The mixin handles everything including hover rotation.
+                    font-size: 14px;
                     margin-left: 10px;
 
                     @media screen and (max-width: 600px) {
                         position: absolute;
-                        top: 15px; // Adjusted for better mobile positioning
-                        right: 15px; // Adjusted for better mobile positioning
+                        top: 15px;
+                        right: 15px;
                         margin: 0;
                     }
                 }
@@ -301,16 +300,28 @@ $bg-slate: #f4f7f9;
 
 
             @media (min-width: 992px) {
-                flex-direction: row;
+                display: grid;
+                grid-template-columns: 1fr 280px;
                 min-height: 500px;
+                // align-items: stretch; // Grid does this by default
+            }
+
+            @media (min-width: 992px) and (max-width: 1200px) {
+                grid-template-columns: 1fr 240px;
             }
 
             .main-panel {
                 flex: 1;
                 padding: 1.5rem;
+                padding-bottom: 1rem;
 
                 @media (min-width: 768px) {
                     padding: 2rem;
+                }
+
+                @media (min-width: 992px) and (max-width: 1200px) {
+                    padding: 1.5rem;
+                    padding-bottom: 3rem;
                 }
 
                 border-right: none;
@@ -441,9 +452,8 @@ $bg-slate: #f4f7f9;
                     }
                 }
 
-                // Card View for Modal (Visible only on Mobile/Tablet)
                 .modal-card-list-view {
-                    display: none; // Hidden by default
+                    display: none;
 
                     @media (max-width: 991px) {
                         display: flex;
@@ -596,7 +606,8 @@ $bg-slate: #f4f7f9;
                     border: 1px solid #e2e8f0;
                     border-radius: 8px;
                     padding: 1rem;
-                    margin-top: 1rem;
+                    margin-top: 2rem;
+                    margin-bottom: 2rem; // Ensure space at the bottom
                     animation: slideDown 0.3s ease-out;
 
                     &.approved {
@@ -670,7 +681,7 @@ $bg-slate: #f4f7f9;
 
                         button {
                             padding: 0.5rem 1.2rem;
-                            border-radius: 6px;
+                            border-radius: 8px;
                             font-weight: 600;
                             cursor: pointer;
                             transition: all 0.2s;
@@ -705,15 +716,24 @@ $bg-slate: #f4f7f9;
 
             .side-panel {
                 width: 100%;
+                display: flex;
+                flex-direction: column;
 
                 @media (min-width: 992px) {
-                    width: 280px;
+                    width: 100%;
                 }
 
                 padding: 1.5rem;
+                padding-bottom: 2rem;
 
                 @media (min-width: 768px) {
                     padding: 2rem;
+                }
+
+
+                @media (min-width: 992px) and (max-width: 1200px) {
+                    padding: 1.5rem;
+                    padding-bottom: 3rem;
                 }
 
                 background: #fafbfc;

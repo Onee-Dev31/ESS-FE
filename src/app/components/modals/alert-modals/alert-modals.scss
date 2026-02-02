@@ -6,7 +6,7 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 2147483647; 
+    z-index: 2147483647;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +81,7 @@
 
 .btn-confirm {
     padding: 0.75rem 2.5rem;
-    border-radius: 12px;
+    border-radius: 8px;
     font-weight: 600;
     font-size: 1rem;
     border: none;

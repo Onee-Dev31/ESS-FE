@@ -159,9 +159,9 @@
           <div class="section-header-flex">
             <div class="stats-group-header">
               <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
-              <button class="btn-info-policy" (click)="isPolicyModalOpen.set(true)"
+              <button class="btn-info-circle" (click)="isPolicyModalOpen.set(true)"
                 title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
-                <i class="fas fa-info-circle"></i>
+                <i class="fa-solid fa-circle-info"></i>
               </button>
             </div>
             <button *ngIf="userRole() === 'Admin'" class="btn-pending-approvals"
@@ -228,7 +228,7 @@
                     <span class="title-text">{{ item.title }}</span>
                     <div class="tooltip-container" *ngIf="item.tooltip">
                       <button class="btn-info-circle" (click)="openTooltip(item.tooltip); $event.stopPropagation()">
-                        <i class="fas fa-info-circle"></i>
+                        <i class="fa-solid fa-circle-info"></i>
                       </button>
                     </div>
                   </h6>

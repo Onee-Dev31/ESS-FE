@@ -11,6 +11,7 @@ export interface MedicalItem {
     treatmentDateTo: string;
     requestedAmount: number;
     approvedAmount: number;
+    attachedFile?: string | null;
 }
 
 // คำขอค่ารักษาพยาบาล

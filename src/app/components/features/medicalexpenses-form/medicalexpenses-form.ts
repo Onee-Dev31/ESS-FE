@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
@@ -46,6 +46,14 @@ export class MedicalexpensesForm implements OnInit {
     { id: 1, name: 'approval-list-page.005-87d92c90a8cb2e588a7032052d9d94ac.png', description: 'ใบเสร็จยา' },
     { id: 2, name: 'original-aa87c620661b3eb94e5d85441b761387.png', description: 'ใบรับรองแพทย์' }
   ]);
+
+  calculatedDays = computed(() => {
+    if (!this.startDate() || !this.endDate()) return 0;
+    const start = dayjs(this.startDate());
+    const end = dayjs(this.endDate());
+    if (end.isBefore(start)) return 0;
+    return end.diff(start, 'day') + 1;
+  });
 
   // เริ่มต้นคอมโพเนนต์: โหลดข้อมูลคำขอหากอยู่ในโหมดแก้ไข
   ngOnInit() {

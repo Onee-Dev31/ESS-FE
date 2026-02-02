@@ -32,7 +32,8 @@ export class MedicalMock {
                     treatmentDateFrom: formattedDate,
                     treatmentDateTo: formattedDate,
                     requestedAmount: amount,
-                    approvedAmount: approvedAmount
+                    approvedAmount: approvedAmount,
+                    attachedFile: 'mock_medical_receipt.jpg'
                 }],
                 totalRequestedAmount: amount,
                 totalApprovedAmount: approvedAmount

@@ -12,14 +12,8 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1300px;
-    height: 95vh;
-    max-height: 920px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    height: 100%;
     overflow: hidden;
-    margin: auto;
 
     .top-header-strip {
         display: flex;
@@ -110,7 +104,7 @@
                 color: $primary;
                 border: 1.5px solid $primary;
                 padding: 6px 16px;
-                border-radius: 6px;
+                border-radius: 8px;
                 font-weight: 600;
                 font-size: 0.85rem;
                 cursor: pointer;
@@ -467,7 +461,7 @@
             align-items: center;
             gap: 8px;
             padding: 8px 24px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;

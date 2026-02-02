@@ -84,6 +84,17 @@
                 </div>
 
                 <div class="input-field-group">
+                    <label>จำนวนวัน</label>
+                    <div class="custom-input-wrapper">
+                        <input type="text" class="input-field text-center" [value]="calculatedDays()" readonly
+                            style="background-color: #f1f5f9; font-weight: 700;">
+                        <div class="icon-box">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
                     <label>จำนวนเงินที่ขอเบิก</label>
                     <div class="amount-input-wrapper">
                         <input type="number" class="custom-form-control text-right" placeholder="0.00"

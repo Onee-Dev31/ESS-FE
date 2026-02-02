@@ -7,6 +7,7 @@ import { MedicalRequest, MedicalItem } from '../../interfaces/medical.interface'
 import { VehicleService } from '../../services/vehicle.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
+import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -19,6 +20,7 @@ interface FlatMedicalRow extends MedicalItem {
   requestId: string;
   createDate: string;
   status: string;
+  attachedFile?: string | null;
 }
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
@@ -26,7 +28,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe, FilePreviewModalComponent],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
@@ -103,7 +105,6 @@ export class MedicalexpensesComponent implements OnInit {
     return data;
   });
 
-  // แปลงข้อมูลเป็นรูปแบบแถวเดี่ยวเพื่อแสดงในตาราง
   flattenedRows = computed(() => {
     const rows: FlatMedicalRow[] = [];
     this.processedData().forEach((req: MedicalRequest) => {
@@ -112,14 +113,14 @@ export class MedicalexpensesComponent implements OnInit {
           ...item,
           requestId: req.id,
           createDate: req.createDate,
-          status: req.status
+          status: req.status,
+          attachedFile: item.attachedFile
         });
       });
     });
     return rows;
   });
 
-  // เรียงลำดับข้อมูลตามคอลัมน์ที่เลือก
   sortedRows = computed(() => {
     let rows = [...this.flattenedRows()];
     const sortState = this.sorting()[0];
@@ -138,18 +139,12 @@ export class MedicalexpensesComponent implements OnInit {
     return rows;
   });
 
-  // สำหรับ Card View: แบ่งหน้าข้อมูลแบบ Group (Request)
   paginatedGroupedRequests = computed(() => {
     const start = this.currentPage() * this.pageSize();
     const end = start + this.pageSize();
     return this.processedData().slice(start, end);
   });
 
-  // สำหรับ Table View: จำนวนรายการทั้งหมดนับตามแถวที่แตกออกมาแล้ว
-  // * หมายเหตุ: ถ้าต้องการให้ Pagination ของ Table และ Card สอดคล้องกันเป๊ะๆ
-  // อาจต้องปรับ Logic ให้ Table โชว์ตาม Request หรือ Card โชว์ตาม Item
-  // ณ ที่นี้ขอคง Logic เดิมของ Table ไว้ (User อาจจะงงได้ถ้าเลขหน้าไม่ตรงกันระหว่าง 2 วิว)
-  // แต่เพื่อให้ Card View ใช้งานได้ดี เราจะใช้ Pagination ของ Table เป็นหลักในการ Control
 
   paginatedRows = computed(() => {
     const start = this.currentPage() * this.pageSize();
@@ -172,6 +167,7 @@ export class MedicalexpensesComponent implements OnInit {
       { accessorKey: 'treatmentDateTo', header: 'ถึง' },
       { accessorKey: 'requestedAmount', header: 'จำนวนเงินที่ขอเบิก' },
       { accessorKey: 'approvedAmount', header: 'จำนวนเงินที่เบิกได้' },
+      { accessorKey: 'attachedFile', header: 'ไฟล์แนบ' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
     state: {
@@ -203,14 +199,12 @@ export class MedicalexpensesComponent implements OnInit {
     this.loadData();
   }
 
-  // โหลดข้อมูลจาก Service
   loadData() {
     this.medicalService.getRequests().subscribe((data: MedicalRequest[]) => {
       this.allRequests.set(data);
     });
   }
 
-  // เปิด Modal เพื่อเพิ่มหรือแก้ไขคำขอ
   openModal(targetId: string = '') {
     if (targetId === '') {
       this.medicalService.generateNextMedicalId().subscribe((nid: string) => {
@@ -237,7 +231,6 @@ export class MedicalexpensesComponent implements OnInit {
     this.searchText.set('');
   }
 
-  // แสดง/ซ่อน ส่วนตัวกรองข้อมูล
   toggleFilter() {
     this.isFilterVisible.update(v => !v);
   }
@@ -279,6 +272,19 @@ export class MedicalexpensesComponent implements OnInit {
 
   getStatusClass(status: string): string {
     return this.vehicleService.getStatusBadgeClass(status);
+  }
+
+  isPreviewModalOpen = signal(false);
+  previewFiles = signal<any[]>([]);
+
+  openPreview(fileName: string) {
+    if (!fileName) return;
+    this.previewFiles.set([{ fileName, date: '' }]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 }
 

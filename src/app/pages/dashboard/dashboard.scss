@@ -550,7 +550,7 @@ $balance: #15803d;
   color: white;
   border: none;
   padding: 8px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -570,7 +570,7 @@ $balance: #15803d;
   border: 1px solid $primary;
   color: $primary;
   padding: 6px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -623,32 +623,10 @@ $balance: #15803d;
     gap: 10px;
     color: $dark;
 
-    i {
+    >i {
       color: $primary;
     }
 
-    .btn-info-policy {
-      background: none;
-      border: none;
-      color: $muted;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-size: 14px;
-
-      i {
-        color: inherit;
-      }
-
-      &:hover {
-        color: $primary;
-        background-color: rgba($primary, 0.1);
-      }
-    }
   }
 
   .stat-items-grid {
@@ -1578,7 +1556,7 @@ $balance: #15803d;
           color: #0f172a;
           background: #e2e8f0;
           padding: 4px 12px;
-          border-radius: 20px;
+          border-radius: 8px;
           font-size: 14px;
         }
       }

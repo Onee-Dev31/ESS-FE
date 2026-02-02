@@ -207,7 +207,7 @@ button {
 // Premium button base with ripple effect
 .btn-action-orange {
   padding: 0.875rem 1.75rem;
-  border-radius: 50px;
+  border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
   display: inline-flex;
@@ -267,7 +267,7 @@ button {
 .btn-cancel {
   background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
   color: white !important;
-  border-radius: 50px !important;
+  border-radius: 8px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -281,7 +281,7 @@ button {
 .btn-info-policy {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
   color: white !important;
-  border-radius: 50px !important;
+  border-radius: 8px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -313,7 +313,7 @@ button {
 .btn-close {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
   color: white !important;
-  border-radius: 50px !important;
+  border-radius: 8px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -326,7 +326,7 @@ button {
 .btn-clear {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
   color: white !important;
-  border-radius: 50px !important;
+  border-radius: 8px !important;
 
   &:hover {
     transform: translateY(-2px);
@@ -340,7 +340,7 @@ button {
   border: 2px solid #3b82f6 !important;
   color: #3b82f6 !important;
   padding: 0.875rem 1.75rem;
-  border-radius: 50px;
+  border-radius: 8px;
   font-weight: 600;
 
   &:hover {
@@ -382,7 +382,7 @@ button {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
   color: white !important;
   padding: 0.75rem 1.5rem;
-  border-radius: 50px;
+  border-radius: 8px;
   border: none;
   font-weight: 600;
 

@@ -121,6 +121,9 @@
                             (click)="toggleSort('approvedAmount')">
                             จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
+                        <th rowspan="2" style="width: 80px; text-align: center;">
+                            ไฟล์แนบ
+                        </th>
                         <th rowspan="2" style="width: 150px; cursor: pointer; text-align: center;"
                             (click)="toggleSort('status')">
                             สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
@@ -155,6 +158,15 @@
                         <td class="text-center">{{ row.original.treatmentDateTo }}</td>
                         <td class="text-right font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
                         <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
+
+                        <td class="text-center">
+                            <a *ngIf="row.original.attachedFile" class="file-icon-link"
+                                (click)="openPreview(row.original.attachedFile)" title="ดูไฟล์แนบ"
+                                style="cursor: pointer; color: #008ebc; font-size: 1.2rem;">
+                                <i class="far fa-folder-open"></i>
+                            </a>
+                            <span *ngIf="!row.original.attachedFile" class="text-muted">-</span>
+                        </td>
 
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
@@ -207,54 +219,60 @@
                                     <i class="far fa-calendar-alt"></i> {{ item.treatmentDateFrom }} - {{
                                     item.treatmentDateTo }}
                                 </div>
+                                <div class="detail-row" *ngIf="item.attachedFile">
+                                    <i class="fas fa-paperclip"></i>
+                                    <a (click)="openPreview(item.attachedFile)"
+                                        style="cursor: pointer; color: #008ebc;">
+                                        ดูไฟล์แนบ
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="no-data" *ngIf="paginatedGroupedRequests().length === 0">
-                ไม่พบรายการที่ตรงตามเงื่อนไข
-            </div>
         </div>
 
-        <!-- ส่วนควบคุมการแบ่งหน้า -->
-        <div class="pagination-container">
-            <div class="pagination-info">
-                แสดง {{ currentPage() * pageSize() + 1 }}
-                ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
-                จาก {{ totalRequests() }} รายการ
-            </div>
-            <div class="pagination-controls">
-                <div class="page-size-selector">
-                    <span>จำนวนแถวต่อหน้า:</span>
-                    <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-                        <option [value]="10">10</option>
-                        <option [value]="20">20</option>
-                        <option [value]="50">50</option>
-                    </select>
-                </div>
-                <div class="page-buttons">
-                    <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
-                        <i class="fas fa-angle-double-left"></i>
-                    </button>
-                    <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
-                        <i class="fas fa-angle-left"></i>
-                    </button>
-                    <span class="page-info">
-                        <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
-                    </span>
-                    <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
-                        <i class="fas fa-angle-right"></i>
-                    </button>
-                    <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
-                        <i class="fas fa-angle-double-right"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="no-data" *ngIf="paginatedGroupedRequests().length === 0">
+            ไม่พบรายการที่ตรงตามเงื่อนไข
         </div>
     </div>
 
+    <!-- ส่วนควบคุมการแบ่งหน้า -->
+    <div class="pagination-container">
+        <div class="pagination-info">
+            แสดง {{ currentPage() * pageSize() + 1 }}
+            ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
+            จาก {{ totalRequests() }} รายการ
+        </div>
+        <div class="pagination-controls">
+            <div class="page-size-selector">
+                <span>จำนวนแถวต่อหน้า:</span>
+                <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                </select>
+            </div>
+            <div class="page-buttons">
+                <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
+                    <i class="fas fa-angle-left"></i>
+                </button>
+                <span class="page-info">
+                    <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
+                </span>
+                <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
+                    <i class="fas fa-angle-right"></i>
+                </button>
+                <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
     <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
     </app-medical-policy-modal>
 
@@ -265,4 +283,7 @@
             </app-medicalexpenses-form>
         </div>
     </div>
+
+    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
 </div>

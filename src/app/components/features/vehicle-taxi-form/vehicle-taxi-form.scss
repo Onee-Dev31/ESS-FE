@@ -156,7 +156,7 @@
         color: $primary;
         border: 1.5px solid $primary;
         padding: 7px 20px;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
 
         &:hover {
@@ -198,7 +198,7 @@
       color: #fff;
       border: none;
       padding: 10px 30px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
     }
@@ -456,7 +456,7 @@
             color: #673ab7;
             border: 1px solid #d1c4e9;
             padding: 4px 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.75rem;
             font-weight: 600;
             display: flex;
@@ -575,7 +575,7 @@
       color: #fff;
       border: none;
       padding: 12px;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 1rem;
       font-weight: 700;
       display: flex;
