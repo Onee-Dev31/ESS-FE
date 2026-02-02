@@ -143,7 +143,7 @@
                         <td class="amount-cell">{{ row.original.amount | number }}</td>
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">{{
-                                (row.original.rawStatus || row.original.status) | statusLabel }}</span>
+                                row.original.status }}</span>
                         </td>
                         <td>
                             <div class="action-cell">

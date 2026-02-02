@@ -430,7 +430,7 @@ $bg-slate: #f4f7f9;
             .description-cell {
                 max-width: 200px;
                 text-align: left;
-                white-space: normal; 
+                white-space: normal;
 
                 .truncate-text {
                     white-space: nowrap;
@@ -488,8 +488,8 @@ $bg-slate: #f4f7f9;
         text-transform: uppercase;
 
         &.pending {
-            background: #007bff26;
-            color: #007bff;
+            background: rgba($primary-orange, 0.15);
+            color: $primary-orange;
         }
 
         &.approved {
@@ -503,8 +503,23 @@ $bg-slate: #f4f7f9;
         }
 
         &.referred-back {
-            background: #ffc10726;
+            background: #ffc10726; // Amber/Yellow
             color: #f1b44c;
+        }
+
+        &.verified {
+            background: #17a2b826;
+            color: #17a2b8;
+        }
+
+        &.waiting-check {
+            background: #6f42c126; // Purple
+            color: #6f42c1;
+        }
+
+        &.pending-approval {
+            background: rgba($primary-orange, 0.15); // Orange (synced with pending)
+            color: $primary-orange;
         }
     }
 

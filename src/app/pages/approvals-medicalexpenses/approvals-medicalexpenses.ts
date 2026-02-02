@@ -15,12 +15,12 @@ import { ApprovalDetailModalComponent } from '../../components/modals/approval-d
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 
-import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+
 
 @Component({
   selector: 'app-approvals-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent],
   templateUrl: './approvals-medicalexpenses.html',
   styleUrl: './approvals-medicalexpenses.scss',
   encapsulation: ViewEncapsulation.None
@@ -32,7 +32,7 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   protected readonly Math = Math;
 
   tabs = APPROVAL_STATUS_TABS;
-  activeTab = signal<string>('รออนุมัติ');
+  activeTab = signal<string>('Pending');
   searchText = signal<string>('');
 
   isModalOpen = signal<boolean>(false);
@@ -66,24 +66,7 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
 
     const sortState = this.sorting()[0];
     if (sortState) {
-      const { id, desc } = sortState;
-      const direction = desc ? -1 : 1;
-
-      filtered.sort((itemA, itemB) => {
-        let valueA: any, valueB: any;
-        switch (id) {
-          case 'requestNo': return itemA.requestNo.localeCompare(itemB.requestNo) * direction;
-          case 'requestDate':
-            valueA = itemA.requestDate.split('/').reverse().join('');
-            valueB = itemB.requestDate.split('/').reverse().join('');
-            return valueA.localeCompare(valueB) * direction;
-          case 'requestBy': return itemA.requestBy.name.localeCompare(itemB.requestBy.name) * direction;
-          case 'requestType': return itemA.requestType.localeCompare(itemB.requestType) * direction;
-          case 'amount': return (itemA.amount - itemB.amount) * direction;
-          case 'status': return itemA.status.localeCompare(itemB.status) * direction;
-          default: return 0;
-        }
-      });
+      return this.approvalsHelper.sortData(filtered, sortState.id, sortState.desc);
     }
     return filtered;
   });
@@ -154,12 +137,6 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   onStatusUpdated() { this.refresh(); }
   goBack() { this.router.navigate(['/dashboard']); }
   getStatusClass(status: string): string {
-    switch (status) {
-      case 'อนุมัติแล้ว': return 'approved';
-      case 'ไม่อนุมัติ': return 'rejected';
-      case 'รอแก้ไข': return 'referred-back';
-      case 'รออนุมัติ': return 'pending';
-      default: return 'pending';
-    }
+    return this.approvalsHelper.getStatusClass(status);
   }
 }

@@ -22,6 +22,6 @@ export interface ApprovalItem {
     typeId: number;
     requestDetail: string;
     amount: number;
-    status: 'รออนุมัติ' | 'อนุมัติแล้ว' | 'ไม่อนุมัติ' | 'รอแก้ไข';
+    status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
     rawStatus: string;
 }

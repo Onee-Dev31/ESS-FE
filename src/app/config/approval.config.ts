@@ -1,1 +1,1 @@
-export const APPROVAL_STATUS_TABS = ['รออนุมัติ', 'อนุมัติแล้ว', 'ไม่อนุมัติ', 'รอแก้ไข'];
+export const APPROVAL_STATUS_TABS = ['Pending', 'Approved', 'Rejected', 'Referred Back'];
