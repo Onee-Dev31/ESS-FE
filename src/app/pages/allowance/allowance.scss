@@ -61,23 +61,7 @@
       }
     }
 
-    tbody {
-      tr {
 
-        .status-badge {
-
-          &.status-verified {
-            background-color: $status-verified-bg;
-            color: $status-verified-text;
-          }
-
-          &.status-success {
-            background-color: $status-success-bg;
-            color: $status-success-text;
-          }
-        }
-      }
-    }
   }
 
   .card-list-view {
@@ -208,11 +192,5 @@
     }
   }
 
-  .modal-overlay {
-    @include responsive.modal-overlay-styles;
-  }
 
-  .modal-overlay {
-    @include responsive.modal-overlay-styles;
-  }
 }

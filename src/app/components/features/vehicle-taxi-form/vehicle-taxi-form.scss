@@ -657,7 +657,7 @@ $col-file: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(8px);
 
   .upload-modal-content {
     background: #fff;

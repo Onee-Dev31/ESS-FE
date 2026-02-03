@@ -456,55 +456,7 @@ $primary-orange: #ff914d;
 
 
 
-    .status-badge {
-        padding: 5px 12px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        display: inline-block;
-        min-width: 100px;
-        text-align: center;
 
-        &.pending,
-        &.pending-approval {
-            background: $status-pending-bg;
-            color: $status-pending-text;
-            border: 1px solid rgba($status-pending-text, 0.2);
-        }
-
-        &.approved,
-        &.success {
-            background: $status-success-bg;
-            color: $status-success-text;
-            border: 1px solid rgba($status-success-text, 0.2);
-        }
-
-        &.rejected {
-            background: $status-danger-bg;
-            color: $status-danger-text;
-            border: 1px solid rgba($status-danger-text, 0.2);
-        }
-
-        &.referred-back {
-            background: $status-new-bg;
-            color: $status-new-text;
-            border: 1px solid rgba($status-new-text, 0.2);
-        }
-
-        &.verified,
-        &.reviewed {
-            background: $status-verified-bg;
-            color: $status-verified-text;
-            border: 1px solid rgba($status-verified-text, 0.2);
-        }
-
-        &.waiting-check {
-            background: rgba($color-purple, 0.1);
-            color: $color-purple;
-            border: 1px solid rgba($color-purple, 0.2);
-        }
-    }
 
     .act-btn {
         width: 32px;

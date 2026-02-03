@@ -1,6 +1,12 @@
 @use "sass:color";
 @use './styles/theme' as *;
+@use './styles/responsive-layout' as responsive;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
+// --- Global Overlay Styles ---
+.modal-overlay {
+  @include responsive.modal-overlay-styles;
+}
 
 // กำหนดค่าเริ่มต้นและฟอนต์หลักของระบบ
 *,
@@ -307,6 +313,59 @@ button {
   }
 }
 
+// --- Global Status Badge ---
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+  min-width: 100px;
+  text-align: center;
+
+  &.pending,
+  &.pending-approval {
+    background: $status-pending-bg;
+    color: $status-pending-text;
+    border: 1px solid rgba($status-pending-text, 0.2);
+  }
+
+  &.approved,
+  &.success,
+  &.status-success {
+    background: $status-success-bg;
+    color: $status-success-text;
+    border: 1px solid rgba($status-success-text, 0.2);
+  }
+
+  &.rejected {
+    background: $status-danger-bg;
+    color: $status-danger-text;
+    border: 1px solid rgba($status-danger-text, 0.2);
+  }
+
+  &.referred-back {
+    background: $status-new-bg;
+    color: $status-new-text;
+    border: 1px solid rgba($status-new-text, 0.2);
+  }
+
+  &.verified,
+  &.reviewed,
+  &.status-verified {
+    background: $status-verified-bg;
+    color: $status-verified-text;
+    border: 1px solid rgba($status-verified-text, 0.2);
+  }
+
+  &.waiting-check {
+    background: rgba($color-purple, 0.1);
+    color: $color-purple;
+    border: 1px solid rgba($color-purple, 0.2);
+  }
+}
+
 .btn-action-red,
 .btn-close {
   background: $color-delete !important;
@@ -426,7 +485,7 @@ button {
   border-radius: 50%;
   border: 1px solid #fef3c7;
   background: #fffbeb;
-  color: #d97706; 
+  color: #d97706;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -489,7 +548,7 @@ button {
     select {
       padding: 0.5rem 0.5rem;
       border: 1px solid #e2e8f0;
-      border-radius: 8px; 
+      border-radius: 8px;
       outline: none;
       background-color: white;
       color: #475569;
@@ -518,7 +577,7 @@ button {
         justify-content: center;
         border: 1px solid #e2e8f0;
         background: white;
-        border-radius: 8px; 
+        border-radius: 8px;
         cursor: pointer;
         color: #64748b;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1017,6 +1076,7 @@ button {
     color: $text-muted;
   }
 }
+
 // Styled Folder Icon Link
 .file-icon-link {
   display: inline-flex;
@@ -1041,20 +1101,20 @@ button {
   }
 
   .attach-count {
-      position: absolute;
-      top: -4px;
-      right: -6px;
-      background: #ef4444;
-      color: white;
-      font-size: 0.65rem;
-      font-weight: 700;
-      min-width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }

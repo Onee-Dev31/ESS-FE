@@ -7,32 +7,11 @@ $primary-red: #f45b5b;
 $primary-orange: #ff914d;
 $bg-slate: #f4f7f9;
 
+@use '../../../../styles/responsive-layout' as responsive;
+
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    z-index: 10000;
-    backdrop-filter: blur(4px);
+    @include responsive.modal-overlay-styles;
 
-    @media (max-width: 991px) {
-        align-items: flex-start;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        padding: 20px 0 120px;
-        -webkit-overflow-scrolling: touch;
-        position: fixed;
-        height: 100dvh;
-    }
-
-    @media (min-width: 992px) {
-        align-items: center;
-        overflow: hidden;
-    }
 
     .modal-container-large {
         background: white;
