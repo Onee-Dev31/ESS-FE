@@ -61,7 +61,11 @@ $primary-orange: #ff914d;
 
         .utility-btns {
             display: flex;
-            gap: 20px;
+            gap: 0.5rem;
+
+            @include desktop {
+                gap: 20px;
+            }
 
             .btn-outline {
                 background: white;
@@ -75,6 +79,15 @@ $primary-orange: #ff914d;
 
                 @include desktop {
                     flex: none;
+                }
+
+                .btn-text {
+                    display: none;
+
+                    @include desktop {
+                        display: inline;
+                        margin-left: 4px;
+                    }
                 }
             }
         }
