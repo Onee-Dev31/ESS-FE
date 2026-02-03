@@ -41,7 +41,7 @@ export class UserMock {
     static readonly PROFILE = UserMock.MEMBER_PROFILE;
 
     static readonly MOCK_USERS = [
-        { username: 'admin', password: '123', name: 'Admin User', role: USER_ROLES.ADMIN, employeeId: 'OTD00001' },
-        { username: 'member', password: '123', name: 'Member User', role: USER_ROLES.MEMBER, employeeId: 'OTD01054' }
+        { username: 'admin', password: '123', name: UserMock.ADMIN_PROFILE.name, role: USER_ROLES.ADMIN, employeeId: UserMock.ADMIN_PROFILE.employeeId },
+        { username: 'member', password: '123', name: UserMock.MEMBER_PROFILE.name, role: USER_ROLES.MEMBER, employeeId: UserMock.MEMBER_PROFILE.employeeId }
     ];
 }
