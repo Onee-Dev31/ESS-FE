@@ -18,7 +18,6 @@
 
     thead tr th {
 
-      // Specific overrides
       &.col-id {
         width: 12%;
       }
@@ -41,12 +40,11 @@
     }
 
     tbody tr td {
-      // Specific overrides if any
+
 
       .action-btns {
 
-        // Standardize to global flex layout.
-        // If we want to keep specific colors for vehicle icons:
+
         .btn-icon {
           &.edit {
             color: #17a2b8;

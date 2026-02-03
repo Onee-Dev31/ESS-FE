@@ -157,7 +157,7 @@
 
                         <td class="text-center">
                             <a class="file-icon-link" *ngIf="row.original.attachedFile"
-                                (click)="openPreview(row.original.attachedFile || undefined)" title="ดูเอกสาร">
+                                (click)="openPreview(row.original.attachedFile)" title="ดูเอกสาร">
                                 <i class="far fa-folder-open"></i>
                             </a>
                             <span class="text-muted" *ngIf="!row.original.attachedFile">-</span>
@@ -182,7 +182,7 @@
                     </div>
                     <div class="card-actions-top">
                         <button class="action-btn folder" *ngIf="req.items[0]?.attachedFile"
-                            (click)="openPreview(req.items[0].attachedFile || undefined)" title="ดูเอกสาร">
+                            (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
                             <i class="far fa-folder-open"></i>
                         </button>
                         <span class="status-badge" [ngClass]="getStatusClass(req.status)">
@@ -215,7 +215,7 @@
                                 </div>
                                 <div class="detail-row" *ngIf="item.attachedFile">
                                     <i class="fas fa-paperclip"></i>
-                                    <a (click)="openPreview(item.attachedFile || undefined)"
+                                    <a (click)="openPreview(item.attachedFile)"
                                         style="cursor: pointer; color: #008ebc;">
                                         ดูไฟล์แนบ
                                     </a>
@@ -227,7 +227,7 @@
             </div>
         </div>
 
-        <div class="no-data" *ngIf="comps.paginatedData().length === 0">
+        <div class="no-data" *ngIf="comps.totalItems() === 0">
             <i class="fas fa-inbox"></i>
             <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
         </div>
@@ -235,8 +235,7 @@
 
 
     <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
-        (onPageSizeChange)="listing.pageSize.set($event)">
+        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
     </app-pagination>
 
     <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">

@@ -108,7 +108,6 @@ export class VehicleTaxiComponent implements OnInit {
     return filtered;
   });
 
-  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
   comps = createListingComputeds(this.processedData, this.listing);
 
   displayedRows = computed(() => {

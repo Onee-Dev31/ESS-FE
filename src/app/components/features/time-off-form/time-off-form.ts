@@ -17,12 +17,7 @@ import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-pr
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss'
 })
-/**
- * ฟอร์มสำหรับสร้างคำขอลาหยุด (Time Off Request)
- * - เลือกประเภทการลา
- * - ระบุวัน/เวลา
- * - แนบเอกสาร
- */
+
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private userService = inject(UserService);
@@ -82,7 +77,6 @@ export class TimeOffForm implements OnInit {
     this.endDate.set(today);
   }
 
-  // ปรับวันที่สิ้นสุดให้สอดคล้องกับวันที่เริ่มต้นและช่วงเวลาที่เลือก
   private updateEndDate() {
     const start = this.startDate();
     if (!start) return;
@@ -148,7 +142,7 @@ export class TimeOffForm implements OnInit {
   openPreview(file: { name: string }) {
     this.previewFiles.set([{
       fileName: file.name,
-      date: this.currentDate() // Using current date or file upload date if available
+      date: this.currentDate()
     }]);
     this.isPreviewModalOpen.set(true);
   }
@@ -157,7 +151,7 @@ export class TimeOffForm implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
-  // บันทึกคำขอลาหยุด
+
   save() {
     if (!this.selectedLeaveType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
@@ -169,7 +163,6 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
-    // ตรวจสอบความถูกต้องของช่วงเวลา
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
       this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
       return;

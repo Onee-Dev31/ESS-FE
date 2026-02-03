@@ -34,7 +34,6 @@ export class TimeOffMock {
                 endDate = startDate.add(Math.floor(daysCount) - 1, 'day');
             }
 
-            // Rotate through all 4 statuses
             let statuses = ['NEW', 'WAITING_CHECK', 'PENDING_APPROVAL', 'APPROVED'];
             let requester = MockHelper.getRequesterByRole(role);
             let status = statuses[i % statuses.length];

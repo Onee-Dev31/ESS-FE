@@ -100,25 +100,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    // ใช้ StatusUtil แทน logic เดิมที่ hardcode
     const cssClass = StatusUtil.getStatusBadgeClass(status);
-
-    // Map class name from StatusUtil to local expected class names if they differ, 
-    // OR just use the StatusUtil class if the SCSS supports it.
-    // The original code returned: 'approved', 'rejected', 'referred-back', 'pending'.
-    // StatusUtil returns: 'status-approved', 'status-rejected', 'status-pending', 'status-verified', 'status-new'.
-    // I should probably simplify and just return what StatusUtil returns, BUT the SCSS might depend on the specific names.
-    // Let's check if I can just use StatusUtil directly. 
-    // Wait, the original switched 'อนุมัติแล้ว' -> 'approved'. StatusUtil maps 'APPROVED' -> 'status-approved'.
-    // If I change the return value, I might break the template if .approved style is defined locally and differs from global .status-approved.
-    // However, the goal is Standardization. 
-    // Let's assume for now I should return the simpler strings OR update the SCSS.
-    // Given "Clean Code" request, I should probably standardize to StatusUtil classes globally.
-    // But to be safe without seeing SCSS, I'll map them.
-
-    // Actually, looking at previous refactors, I used StatusUtil.getStatusBadgeClass directly.
-    // This implies global styles are set up for .status-approved etc.
-    // Let's try using StatusUtil directly.
     return StatusUtil.getStatusBadgeClass(status);
   }
 
@@ -144,7 +126,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
-  // โหลดรายละเอียดของรายการตามประเภท (Request Type)
   loadDetails() {
     const item = this.approvalItem;
     if (!item) return;
@@ -203,8 +184,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.reasonText.set('');
   }
 
-
-  // ยืนยันการทำรายการ (อนุมัติ/ปฏิเสธ/ส่งแก้ไข)
   confirmAction() {
     const item = this.approvalItem;
     const action = this.actionType();
@@ -234,7 +213,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     } else if (newStatus === 'Referred Back') {
       statusCode = REQUEST_STATUS.REFERRED_BACK;
     } else if (newStatus === 'Approved') {
-      // Logic for approved status
     }
 
     if (type === 'allowance') {

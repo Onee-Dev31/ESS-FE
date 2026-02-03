@@ -3,7 +3,7 @@
 @use '../../../styles/responsive-layout' as responsive;
 
 .timeoff-page {
-    position: relative; // Ensure overlay is positioned relative to the page
+    position: relative; 
 
     .loading-overlay {
         position: absolute;

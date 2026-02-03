@@ -9,7 +9,7 @@
     gap: 15px;
 
     @include mobile {
-        padding: 0 10px 20px 10px; // Reduced padding
+        padding: 0 10px 20px 10px; 
     }
 
     .toolbar-top-row {
@@ -34,7 +34,7 @@
                 justify-content: center;
                 gap: 8px;
                 white-space: nowrap;
-                height: 38px; // Match search group height
+                height: 38px; 
 
                 &:hover {
                     background-color: color.adjust($btn-create-bg, $lightness: -5%);
@@ -215,7 +215,7 @@
 // สไตล์สำหรับแสดงผลแบบการ์ด (บนมือถือ/แท็บเล็ต) - Premium Standardized
 .card-list-view {
     display: none;
-    padding: 0; // Removed padding to fit edge-to-edge better or controlled by container
+    padding: 0;
 
     @include tablet {
         display: flex;
@@ -225,14 +225,14 @@
 
     .mobile-card {
         background: #fff;
-        border-radius: 16px; // Premium radius
-        box-shadow: $shadow; // Global premium shadow
+        border-radius: 16px; 
+        box-shadow: $shadow; 
         overflow: hidden;
-        border: none; // Cleaner look
+        border: none; 
         margin-bottom: 5px;
 
         .card-header {
-            background: rgba($bg-slate, 0.5); // Subtle background
+            background: rgba($bg-slate, 0.5); 
             padding: 16px;
             border-bottom: 1px solid $border-color;
             display: flex;
@@ -261,7 +261,6 @@
                 align-items: center;
                 gap: 8px;
 
-                // Folder button in header
                 .action-btn.folder {
                     width: 32px;
                     height: 32px;
@@ -270,8 +269,8 @@
                     align-items: center;
                     justify-content: center;
                     border: 1px solid transparent;
-                    background: rgba(234, 179, 8, 0.1); // Amber bg
-                    color: #d97706; // Amber 600
+                    background: rgba(234, 179, 8, 0.1); 
+                    color: #d97706; 
                     font-size: 0.9rem;
                     cursor: pointer;
 
@@ -281,7 +280,6 @@
                 }
             }
 
-            // Support old structure if needed
             .request-id {
                 display: flex;
                 align-items: center;
@@ -304,7 +302,6 @@
         .card-body {
             padding: 16px;
 
-            // Standard Info Row
             .info-row,
             .info-item {
                 display: flex;
@@ -342,7 +339,6 @@
                 }
             }
 
-            // Nested List (for Medical/Vehicle items)
             .nested-list,
             .items-list {
                 display: flex;
@@ -411,7 +407,6 @@
                 }
             }
 
-            // Card Footer Actions (Text Buttons)
             .card-footer-actions,
             .card-actions {
                 margin-top: 16px;
@@ -468,9 +463,6 @@
                         }
                     }
                 }
-
-                // Keep round icon buttons support for older code if needed (optional, or just migrate)
-                // But generally favoring the text buttons now.
             }
         }
     }

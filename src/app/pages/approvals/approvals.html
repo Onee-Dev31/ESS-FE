@@ -1,5 +1,5 @@
 <div class="approvals-wrapper">
-  <app-page-header title="My Approvals">
+  <app-page-header title="Pending Approvals">
     <div class="utility-btns">
       <button class="btn-outline">📥 Export</button>
       <button class="btn-outline" (click)="refresh()">🔄 Refresh</button>
@@ -10,109 +10,116 @@
     <div class="table-controls">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="searchText()" (input)="onSearch($event)" />
+        <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="listing.searchText()"
+          (input)="onSearch($event)" />
       </div>
 
       <div class="tab-navigation">
         @for (tab of tabs; track tab) {
-        <button class="tab-item" [class.active]="activeTab() === tab" (click)="setActiveTab(tab)">
+        <button class="tab-item" [class.active]="listing.filterStatus() === tab" (click)="setActiveTab(tab)">
           {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
         </button>
         }
       </div>
     </div>
 
+    <!-- Mobile Card View -->
     <div class="card-list-view">
-      @for (row of table.getRowModel().rows; track $index) {
+      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
       <div class="mobile-card">
         <div class="card-header">
           <div class="request-id">
             <span class="label">No.</span>
-            <span class="value">{{ row.original.requestNo }}</span>
+            <span class="value">{{ req.requestNo }}</span>
           </div>
-          <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-            {{ row.original.status }}
+          <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+            {{ req.status }}
           </span>
         </div>
         <div class="card-body">
           <div class="info-row">
             <span class="label">Date Created:</span>
-            <span class="value">{{ row.original.requestDate }}</span>
+            <span class="value">{{ req.requestDate }}</span>
           </div>
 
           <div class="requester-block">
-            <div class="req-name">{{ row.original.requestBy.name }}</div>
+            <div class="req-name">{{ req.requestBy.name }}</div>
             <div class="req-details">
-              <span>{{ row.original.requestBy.employeeId }}</span> &bull;
-              <span>{{ row.original.requestBy.department }}</span>
+              <span>{{ req.requestBy.employeeId }}</span> &bull;
+              <span>{{ req.requestBy.department }}</span>
             </div>
-            <div class="req-company">{{ row.original.requestBy.company }}</div>
+            <div class="req-company">{{ req.requestBy.company }}</div>
           </div>
 
           <div class="info-row mt-2">
             <span class="label">Type:</span>
-            <span class="value highlight">{{ row.original.requestType }}</span>
+            <span class="value highlight">{{ req.requestType }}</span>
           </div>
 
           <div class="description-block">
             <div class="desc-label">Description:</div>
-            <div class="desc-content">{{ row.original.requestDetail }}</div>
+            <div class="desc-content">{{ req.requestDetail }}</div>
           </div>
 
           <div class="amount-row">
             <span class="label">Amount</span>
-            <span class="value amount">{{ row.original.amount | number }}</span>
+            <span class="value amount">{{ req.amount | number }}</span>
           </div>
 
           <div class="card-actions">
-            <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+            <button class="act-btn v-btn" title="View" (click)="viewDetail(req)">
               <i class="fas fa-eye"></i>
             </button>
-            <button class="act-btn a-btn" title="Approve" (click)="openActionModal(row.original, 'Approved')">
+            <button class="act-btn a-btn" title="Approve" (click)="openActionModal(req, 'Approved')">
               <i class="fas fa-check"></i>
             </button>
-            <button class="act-btn r-btn" title="Reject" (click)="openActionModal(row.original, 'Rejected')">
+            <button class="act-btn r-btn" title="Reject" (click)="openActionModal(req, 'Rejected')">
               <i class="fas fa-times"></i>
             </button>
-            <button class="act-btn b-btn" title="Refer Back" (click)="openActionModal(row.original, 'Referred Back')">
+            <button class="act-btn b-btn" title="Refer Back" (click)="openActionModal(req, 'Referred Back')">
               <i class="fas fa-undo-alt"></i>
             </button>
           </div>
         </div>
       </div>
       }
+      <div class="no-data" *ngIf="comps.totalItems() === 0">
+        <i class="fas fa-inbox"></i>
+        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+      </div>
     </div>
 
+    <!-- Desktop Grid View -->
     <div class="data-grid-container">
       <table class="data-grid">
         <thead>
           <tr>
             <th class="sortable-header" (click)="toggleSort('requestNo')">
-              เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
+              Request No <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDate')">
-              วันที่สร้าง <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+              Date Created <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestBy')">
-              ผู้ขออนุมัติ <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+              Requester <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestType')">
-              ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+              Type <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDetail')">
-              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('requestDetail')"></i>
+              Description <i class="fas ml-1" [ngClass]="getSortIcon('requestDetail')"></i>
             </th>
             <th class="sortable-header text-right" (click)="toggleSort('amount')">
-              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+              Amount <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
             <th class="sortable-header text-center" (click)="toggleSort('status')">
-              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+              Status <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
-            <th class="text-center">จัดการ</th>
+            <th class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (row of table.getRowModel().rows; track $index) {
+          @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
           <tr>
             <td class="text-center font-inter request-no-link" (click)="viewDetail(row.original)">
               {{ row.original.requestNo }}
@@ -158,11 +165,14 @@
           }
         </tbody>
       </table>
+      <div class="no-data" *ngIf="comps.totalItems() === 0">
+        <i class="fas fa-inbox"></i>
+        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+      </div>
     </div>
 
-    <app-pagination [currentPage]="table.getState().pagination.pageIndex"
-      [pageSize]="table.getState().pagination.pageSize" [totalItems]="filteredData().length"
-      (onPageChange)="table.setPageIndex($event)" (onPageSizeChange)="table.setPageSize($event)">
+    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+      [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
     </app-pagination>
   </div>
 </div>

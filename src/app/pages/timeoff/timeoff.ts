@@ -37,12 +37,10 @@ export class TimeoffComponent implements OnInit {
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
 
-  // ใช้ Utility จัดการ State (DRY Pagination & Filters)
   listing = createListingState();
 
   sorting = signal<SortingState>([{ id: 'createDate', desc: true }]);
 
-  // Processed Data with Sorting & Filtering
   processedData = computed(() => {
     let filtered = [...this.requests()];
 
@@ -51,7 +49,6 @@ export class TimeoffComponent implements OnInit {
     const start = this.listing.filterStartDate();
     const end = this.listing.filterEndDate();
 
-    // Filter
     if (search || status || start || end) {
       filtered = filtered.filter(req => {
         const matchSearch = !search ||
@@ -67,7 +64,6 @@ export class TimeoffComponent implements OnInit {
       });
     }
 
-    // Sort
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
@@ -78,7 +74,6 @@ export class TimeoffComponent implements OnInit {
         let valA: any = a[key];
         let valB: any = b[key];
 
-        // Custom Sort Mappings
         if (id === 'days') {
           valA = Number(a.days || 0);
           valB = Number(b.days || 0);
@@ -99,10 +94,8 @@ export class TimeoffComponent implements OnInit {
     return filtered;
   });
 
-  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
   comps = createListingComputeds(this.processedData, this.listing);
 
-  // TanStack Table Definition
   table = createAngularTable(() => ({
     data: this.comps.paginatedData(),
     columns: [

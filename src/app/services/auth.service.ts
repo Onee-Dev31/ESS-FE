@@ -15,10 +15,6 @@ import { UserMock } from '../mocks/auth-user.mock';
 @Injectable({
     providedIn: 'root'
 })
-/**
- * Service สำหรับจัดการการเข้าสู่ระบบ, การยืนยันตัวตน (Authentication), และการจัดการ Token
- * รวมไปถึงการจำลองข้อมูล User (Mock Data)
- */
 export class AuthService {
     private http = inject(HttpClient);
     private allowanceService = inject(AllowanceService);
@@ -41,10 +37,6 @@ export class AuthService {
 
     constructor() { }
 
-    /**
-     * เข้าสู่ระบบด้วย Email และ Password
-     * (จำลองการตรวจสอบและเก็บ session ลง LocalStorage)
-     */
     login(email: string, password: string): Observable<boolean> {
         const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
 
@@ -67,11 +59,6 @@ export class AuthService {
         );
     }
 
-    /**
-     * ออกจากระบบ (Logout)
-     * - ล้างค่า Token และข้อมูลผู้ใช้ใน LocalStorage
-     * - รีเซ็ตข้อมูล Mock ทั้งหมด
-     */
     logout() {
         localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN);
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
@@ -85,7 +72,6 @@ export class AuthService {
         this.refreshAllMockData();
     }
 
-    // รีเฟรชข้อมูล Mock ทั้งหมดเมื่อมีการ Login/Logout เพื่อให้เหมือนเริ่มต้นใหม่
     private refreshAllMockData() {
         this.allowanceService.refreshMockData();
         this.medicalService.refreshMockData();

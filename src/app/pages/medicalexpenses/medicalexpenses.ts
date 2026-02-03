@@ -17,9 +17,9 @@ import {
   getCoreRowModel,
   SortingState,
 } from '@tanstack/angular-table';
-import { DateUtilityService } from '../../services/date-utility.service';
 import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
 interface FlatMedicalRow extends MedicalItem {
   requestId: string;
@@ -27,8 +27,6 @@ interface FlatMedicalRow extends MedicalItem {
   status: string;
   attachedFile?: string | null;
 }
-
-import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
 @Component({
   selector: 'app-medicalexpenses',
@@ -41,10 +39,8 @@ export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private router = inject(Router);
 
-  // Common listing state
   listing = createListingState();
 
-  // Additional medical-specific filters
   fromMonth = signal<number>(0);
   fromYear = signal<string>((dayjs().year() - 1).toString());
   toMonth = signal<number>(11);
@@ -124,7 +120,7 @@ export class MedicalexpensesComponent implements OnInit {
         if (typeof valA === 'string' && typeof valB === 'string') {
           return valA.localeCompare(valB) * direction;
         }
-        return ((valA as any) - (valB as any)) * direction;
+        return (((valA as any) || 0) - ((valB as any) || 0)) * direction;
       });
     }
     return rows;
@@ -207,7 +203,7 @@ export class MedicalexpensesComponent implements OnInit {
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  openPreview(attachment?: string) {
+  openPreview(attachment?: string | null) {
     if (!attachment) return;
     this.previewFiles.set([{ fileName: attachment, date: '' }]);
     this.isPreviewModalOpen.set(true);
@@ -227,9 +223,9 @@ export class MedicalexpensesComponent implements OnInit {
     };
   }
 
-  trackByRowId(index: number, row: any): string {
-    const original = (row as { original: any }).original || row;
-    return `${original.requestId || 'new'}-${index}`;
+  trackByRowId(index: number, item: any): string {
+    const core = item?.original || item;
+    return `${core.id || core.requestId || 'row'}-${index}`;
   }
 
   getStatusClass(status: string): string {

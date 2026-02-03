@@ -136,7 +136,6 @@ export class ApprovalsHelperService {
                 case 'requestNo':
                     return itemA.requestNo.localeCompare(itemB.requestNo) * direction;
                 case 'requestDate':
-                    // Robust date sorting (Assume DD/MM/YYYY format)
                     const dateA = itemA.requestDate.split(' ')[0].split('/').reverse().join('') || itemA.requestDate;
                     const dateB = itemB.requestDate.split(' ')[0].split('/').reverse().join('') || itemB.requestDate;
                     return dateA.localeCompare(dateB) * direction;
@@ -160,14 +159,12 @@ export class ApprovalsHelperService {
         if (!status) return REQUEST_STATUS.WAITING_CHECK;
         const s = status.trim();
 
-        // English Mapping
         if (['Pending', 'Waiting Check', 'New'].includes(s)) return REQUEST_STATUS.WAITING_CHECK;
         if (['Approved', 'Approve'].includes(s)) return REQUEST_STATUS.APPROVED;
         if (['Rejected', 'Reject'].includes(s)) return REQUEST_STATUS.REJECTED;
         if (['Referred Back', 'Refer Back'].includes(s)) return REQUEST_STATUS.REFERRED_BACK;
         if (['Verified', 'Verify', 'Checked'].includes(s)) return REQUEST_STATUS.VERIFIED;
 
-        // Thai Mapping (Internal/Legacy)
         if (s === 'รออนุมัติ') return REQUEST_STATUS.WAITING_CHECK;
         if (s === 'อนุมัติแล้ว') return REQUEST_STATUS.APPROVED;
         if (s === 'ไม่อนุมัติ') return REQUEST_STATUS.REJECTED;

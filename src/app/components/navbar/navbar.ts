@@ -19,12 +19,7 @@ interface NotificationItem {
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
-/**
- * Component สำหรับแสดงแถบเมนูด้านบน (Header)
- * - แสดงข้อมูลผู้ใช้
- * - แจ้งเตือน (Notifications)
- * - ปุ่ม Logout
- */
+
 export class NavbarComponent {
   isProfileOpen = false;
   isNotificationOpen = false;
@@ -49,7 +44,6 @@ export class NavbarComponent {
     private authService: AuthService
   ) { }
 
-  // เปิด/ปิด Sidebar เมนูด้านข้าง
   toggleSidebar() {
     this.sidebarService.toggle();
   }
@@ -71,8 +65,7 @@ export class NavbarComponent {
       this.isNotificationOpen = false;
     }
   }
-
-  // ออกจากระบบและกลับไปหน้า Login
+  
   logout() {
     this.isProfileOpen = false;
     this.authService.logout();

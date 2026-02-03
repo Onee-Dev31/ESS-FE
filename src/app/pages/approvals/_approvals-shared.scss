@@ -203,7 +203,7 @@ $primary-orange: #ff914d;
             }
         }
 
-        // Standardized Mobile View
+        // Standardized Mobile View (Starts early due to wide table)
         .card-list-view {
             display: none;
 
@@ -214,28 +214,18 @@ $primary-orange: #ff914d;
             }
 
             .mobile-card {
-                background: #fff;
-                border: none;
-                border-radius: 16px;
-                box-shadow: $shadow; 
-                overflow: hidden;
-                transition: all 0.2s ease;
+                // Inherits background, radius, shadow from global .card-list-view .mobile-card
 
                 .card-header {
-                    background: rgba($bg-slate, 0.5);
-                    padding: 16px;
-                    border-bottom: 1px solid $border-color;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
 
+                    // Inherits background, padding from global
                     .request-id {
                         display: flex;
                         flex-direction: column;
                         gap: 2px;
 
                         .label {
-                            display: none; 
+                            display: none;
                         }
 
                         .value {
@@ -247,8 +237,8 @@ $primary-orange: #ff914d;
                 }
 
                 .card-body {
-                    padding: 16px;
 
+                    // Inherits padding from global
                     .info-row {
                         display: flex;
                         justify-content: space-between;

@@ -8,7 +8,6 @@ import { take } from 'rxjs/operators';
 import {
   createAngularTable,
   getCoreRowModel,
-  getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
@@ -16,6 +15,7 @@ import { ApprovalItem } from '../../interfaces/approval.interface';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { createListingState, createListingComputeds } from '../../utils/listing.util';
 
 @Component({
   selector: 'app-approvals-medicalexpenses',
@@ -28,11 +28,9 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private approvalsHelper = inject(ApprovalsHelperService);
   private router = inject(Router);
-  protected readonly Math = Math;
 
+  listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
-  activeTab = signal<string>('Pending');
-  searchText = signal<string>('');
 
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
@@ -41,6 +39,10 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
 
+  constructor() {
+    this.listing.filterStatus.set('Pending');
+  }
+
   ngOnInit() {
     this.refresh();
   }
@@ -48,30 +50,39 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   refresh() {
     this.medicalService.getRequests().pipe(take(1)).subscribe((requests) => {
       const mappedData = this.approvalsHelper.processMedicalData(requests);
-      this.approvals.set(mappedData.sort((a: ApprovalItem, b: ApprovalItem) => b.requestNo.localeCompare(a.requestNo)));
+      this.approvals.set(mappedData);
     });
   }
 
-  filteredData = computed(() => {
-    const statusFilter = this.activeTab();
-    const searchFilter = this.searchText().toLowerCase();
+  comps = createListingComputeds(
+    this.approvals,
+    this.listing,
+    (item, search, status) => {
+      const matchStatus = !status || item.status === status;
+      const matchSearch = !search ||
+        item.requestNo.toLowerCase().includes(search) ||
+        item.requestBy.name.toLowerCase().includes(search) ||
+        item.requestDetail.toLowerCase().includes(search);
+      return matchStatus && matchSearch;
+    }
+  );
 
-    let filtered = this.approvals().filter(item =>
-      item.status === statusFilter &&
-      (item.requestNo.toLowerCase().includes(searchFilter) ||
-        item.requestBy.name.toLowerCase().includes(searchFilter) ||
-        item.requestDetail.toLowerCase().includes(searchFilter))
-    );
-
+  sortedData = computed(() => {
+    let list = [...this.comps.filteredData()];
     const sortState = this.sorting()[0];
     if (sortState) {
-      return this.approvalsHelper.sortData(filtered, sortState.id, sortState.desc);
+      return this.approvalsHelper.sortData(list, sortState.id, sortState.desc);
     }
-    return filtered;
+    return list;
+  });
+
+  paginatedRows = computed(() => {
+    const start = this.listing.currentPage() * this.listing.pageSize();
+    return this.sortedData().slice(start, start + this.listing.pageSize());
   });
 
   table = createAngularTable(() => ({
-    data: this.filteredData(),
+    data: this.paginatedRows(),
     columns: [
       { accessorKey: 'requestNo', header: 'Request No' },
       { accessorKey: 'requestDate', header: 'Date Created' },
@@ -87,26 +98,44 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    manualPagination: true,
   }));
 
-  setActiveTab(tab: string) { this.activeTab.set(tab); }
-  getTabCount(tab: string) { return this.approvals().filter(item => item.status === tab).length; }
-  onSearch(event: any) { this.searchText.set(event.target.value); }
+  setActiveTab(tab: string) {
+    this.listing.filterStatus.set(tab);
+    this.listing.currentPage.set(0);
+  }
+
+  getTabCount(tab: string) {
+    return this.approvals().filter(item => item.status === tab).length;
+  }
+
+  onSearch(event: any) {
+    this.listing.searchText.set(event.target.value);
+    this.listing.currentPage.set(0);
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+  }
 
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
-    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
-    else {
+    if (column) {
+      column.toggleSorting(column.getIsSorted() === 'asc');
+    } else {
       const currentSort = this.sorting()[0];
       this.sorting.set([{ id: columnId, desc: currentSort?.id === columnId ? !currentSort.desc : false }]);
     }
   }
 
   getSortIcon(columnId: string) {
-    const sortState = this.sorting()[0];
-    const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
+    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
       'fa-sort-amount-up': isSorted === 'asc',
       'fa-sort-amount-down-alt': isSorted === 'desc',
@@ -134,7 +163,13 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   }
 
   onStatusUpdated() { this.refresh(); }
+
   getStatusClass(status: string): string {
     return this.approvalsHelper.getStatusClass(status);
+  }
+
+  trackByRowId(index: number, item: any): string {
+    const core = item?.original || item;
+    return `${core.requestNo || 'row'}-${index}`;
   }
 }

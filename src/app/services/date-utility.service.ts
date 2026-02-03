@@ -11,27 +11,18 @@ dayjs.locale('th');
 @Injectable({
     providedIn: 'root'
 })
-/**
- * Service สำหรับจัดการเกี่ยวกับวันที่และเวลา
- * - แปลงวันที่เป็นรูปแบบภาษาไทย
- * - คำนวณระยะเวลา
- * - ตรวจสอบความถูกต้องของช่วงเวลา
- */
+
 export class DateUtilityService {
 
-    // แปลงวันที่เป็นรูปแบบเดือนไทยย่อ (วว-ดดด-ปปปป) เช่น 12-ม.ค.-2026
     formatDateToThaiMonth(dateStr: string | Date): string {
         return dayjs(dateStr).format('DD-MMM-YYYY');
     }
 
-
-    // แปลงวันที่จาก ISO เป็นพุทธศักราช (DD/MM/YYYY+543)
     formatDateToBE(isoDate: string): string {
         if (!isoDate) return '';
         return dayjs(isoDate).format('DD/MM/BBBB');
     }
 
-    // แปลงวันที่จากพุทธศักราช (DD/MM/BBBB) กลับเป็น ISO (YYYY-MM-DD)
     formatBEToISO(beDate: string): string {
         if (!beDate) return '';
         const parts = beDate.split('/');
@@ -55,7 +46,6 @@ export class DateUtilityService {
         return dayjs(date).fromNow();
     }
 
-    // คำนวณจำนวนวันระหว่างวันที่ 2 วัน (นับรวมวันเริ่มต้น)
     diffInDays(startDate: string | Date, endDate: string | Date): number {
         const start = dayjs(startDate).startOf('day');
         const end = dayjs(endDate).startOf('day');

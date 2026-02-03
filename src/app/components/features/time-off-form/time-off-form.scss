@@ -12,12 +12,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0; // Removed default padding to match medicalexpenses
+    padding: 0; 
     box-sizing: border-box;
     animation: fadeInOverlay 0.2s ease-out;
 
     @include mobile {
-        align-items: flex-end; // Match medicalexpenses mobile
+        align-items: flex-end; 
     }
 }
 
@@ -34,10 +34,10 @@
 .time-off-form-page {
     display: flex;
     flex-direction: column;
-    width: 95%; // Match medicalexpenses
-    max-width: 1600px; // Match medicalexpenses
+    width: 95%; 
+    max-width: 1600px; 
     height: auto;
-    max-height: 90vh; // Match medicalexpenses
+    max-height: 90vh; 
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -52,14 +52,14 @@
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
-        border-bottom: 1px solid $border; // Use $border
+        border-bottom: 1px solid $border; 
         flex-shrink: 0;
 
         h2 {
             font-size: 1.15rem;
             margin: 0;
             font-weight: 600;
-            color: $primary; // Use $primary
+            color: $primary;    
             line-height: 1.3;
         }
 
@@ -82,7 +82,7 @@
 
                     i {
                         width: 16px;
-                        color: $primary; // Use $primary
+                        color: $primary;
                         text-align: center;
                         font-size: 0.9rem;
                     }
@@ -370,7 +370,7 @@
         }
 
         .leave-body {
-            padding: 0; // Reset padding as parent has padding
+            padding: 0; 
             flex-grow: 1;
             display: flex;
             align-items: center;
@@ -399,8 +399,8 @@
 
             .leave-label {
                 margin: 0;
-                font-size: 0.95rem; // Adjusted size
-                color: #333; // Darker text
+                font-size: 0.95rem; 
+                color: #333; 
                 font-weight: 700;
                 text-align: left;
             }
@@ -421,9 +421,9 @@
         }
 
         .leave-footer {
-            margin: 12px -1.25rem -1.25rem -1.25rem; // Negative margin to fill width
-            padding: 0.75rem 1.25rem; // Add padding back
-            background-color: #f8faff; // Default background
+            margin: 12px -1.25rem -1.25rem -1.25rem; 
+            padding: 0.75rem 1.25rem; 
+            background-color: #f8faff; 
             font-size: 0.75rem;
             font-weight: 600;
             display: flex;
@@ -545,8 +545,8 @@
 .custom-form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid $border; // Match theme border
-    border-radius: 6px; // Match theme radius
+    border: 1px solid $border;
+    border-radius: 6px;
     font-size: 0.95rem;
     transition: border-color 0.2s;
     background: #fff;
@@ -630,7 +630,7 @@ textarea.custom-form-control {
 
 
 .calculated-days-display {
-    margin-top: 0; // Removed margin to fit in grid usually
+    margin-top: 0;
 
     label {
         display: block;
@@ -669,14 +669,14 @@ textarea.custom-form-control {
 .form-actions-footer {
     display: flex;
     gap: 12px;
-    padding: 12px 24px; // Refined padding
+    padding: 12px 24px; 
     border-top: 1px solid #e2e8f0;
-    background: #fff; // Changed to white to match medical form
+    background: #fff; 
     flex-shrink: 0;
-    justify-content: flex-end; // Aligned to right
+    justify-content: flex-end; 
 
     button {
-        flex: 0 0 auto; // Don't flex grow 
+        flex: 0 0 auto; 
     }
 }
 
@@ -708,9 +708,9 @@ textarea.custom-form-control {
 
     .time-off-form-page {
         max-width: 100%;
-        height: 100dvh; // Match medicalexpenses
-        max-height: 100dvh; // Match medicalexpenses
-        border-radius: 0; // Match medicalexpenses
+        height: 100dvh; 
+        max-height: 100dvh; 
+        border-radius: 0; 
 
         .top-header-strip {
             padding: 12px 15px;
