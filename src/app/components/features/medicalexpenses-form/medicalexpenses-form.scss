@@ -278,6 +278,11 @@
             &:focus {
                 outline: none;
             }
+
+            &.readonly-highlight {
+                background-color: #f1f5f9;
+                font-weight: 700;
+            }
         }
 
         .icon-box {

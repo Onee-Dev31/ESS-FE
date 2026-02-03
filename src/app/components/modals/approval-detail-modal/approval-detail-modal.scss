@@ -750,6 +750,11 @@ $bg-slate: #f4f7f9;
                         }
                     }
                 }
+
+                .panel-spacer {
+                    min-height: 10px;
+                    width: 100%;
+                }
             }
 
             .side-panel {
