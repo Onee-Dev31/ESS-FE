@@ -3,77 +3,493 @@
 @use '../../../styles/responsive-layout' as responsive;
 
 .vehicle-taxi-page {
-  padding: 20px;
+  padding: 24px;
   background-color: $bg-page;
   min-height: 100vh;
   box-sizing: border-box;
 
-  @include mobile {
-    padding: 10px;
-    padding-bottom: 80px;
+  @include tablet {
+    padding: 12px;
+    padding-bottom: 90px;
   }
 
-  .modern-table {
-    width: 100%;
+  .content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-top: 16px;
 
-    thead tr th {
+    @include tablet {
+      padding: 16px;
+      border-radius: 12px;
+    }
+  }
 
-      &.col-id {
-        width: 12%;
-      }
+  .card-header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 16px;
 
-      &.col-date-create {
-        width: 10%;
-      }
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 20px;
+      background: $primary;
+      border-radius: 2px;
+    }
+  }
 
-      &.col-date-req {
-        width: 10%;
-      }
+  .toolbar-container {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-      &.col-dest {
-        width: 12%;
-      }
+    .toolbar-top-row {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 4px;
 
-      &.col-dist {
-        width: 8%;
-      }
-
-      &.col-amount {
-        width: 10%;
-      }
-
-      &.col-status {
-        width: 12%;
-      }
-
-      &.col-actions {
-        width: 10%;
+      @include tablet {
+        width: 100%;
       }
     }
 
-    tbody tr td {
+    .toolbar-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
 
-      .action-btns {
+      @include tablet {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
 
-        .btn-icon {
-          &.edit {
-            color: #17a2b8;
+    .right-filters {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .filter-label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #64748b;
+        }
+
+        .form-control {
+          height: 38px;
+          border-radius: 10px;
+          border: 1px solid #e2e8f0;
+          padding: 0 12px;
+          font-size: 0.9rem;
+          background-color: #f8fafc;
+          transition: all 0.2s;
+
+          &:focus {
+            border-color: $primary;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+          }
+        }
+
+        .date-input-group,
+        .select-input-group {
+          width: 150px;
+
+          @include tablet {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      max-width: 400px;
+
+      @include tablet {
+        max-width: none;
+        width: 100%;
+      }
+
+      .form-control {
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0 14px;
+        flex: 1;
+      }
+    }
+  }
+
+  .btn-create {
+    background-color: $primary;
+    color: white;
+    border: none;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: color.adjust($primary, $lightness: -5%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($primary, 0.2);
+    }
+
+    @include tablet {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .btn-clear {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    background: #f1f5f9;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+      background: #e2e8f0;
+    }
+  }
+
+  .btn-search {
+    background-color: $primary;
+    color: white;
+    border: none;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  // View Switching Logic
+  .table-responsive {
+    display: block;
+    overflow-x: auto;
+
+    @include tablet {
+      display: none !important;
+    }
+  }
+
+  .card-list-view {
+    display: none;
+
+    @include tablet {
+      display: flex !important;
+      flex-direction: column;
+      gap: 16px;
+      padding: 10px 0;
+    }
+
+    .mobile-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+
+      .card-header {
+        background: #f8fafc;
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .header-content {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
+          .ticket-no {
+            font-weight: 700;
+            color: $primary;
+            font-size: 1.05rem;
+            letter-spacing: -0.01em;
           }
 
-          &.delete {
-            color: #dc3545;
+          .create-date {
+            font-size: 0.75rem;
+            color: #94a3b8;
+          }
+        }
+
+        .card-actions-top {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          .action-btn.folder {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+              background: #e2e8f0;
+            }
+          }
+        }
+      }
+
+      .card-body {
+        padding: 16px;
+
+        .nested-list {
+          background: #f8fafc;
+          border-radius: 12px;
+          padding: 4px;
+          border: 1px solid #f1f5f9;
+          margin-bottom: 16px;
+
+          .nested-item {
+            padding: 12px;
+
+            &:not(:last-child) {
+              border-bottom: 1px solid #f1f5f9;
+            }
+
+            .item-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 10px;
+
+              .item-title {
+                font-weight: 600;
+                color: #334155;
+                font-size: 0.95rem;
+              }
+
+              .item-amount {
+                color: #059669;
+                font-weight: 700;
+                font-size: 1rem;
+              }
+            }
+
+            .item-detail {
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+
+              .detail-row {
+                font-size: 0.85rem;
+                color: #64748b;
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                line-height: 1.4;
+
+                i {
+                  width: 14px;
+                  margin-top: 3px;
+                  text-align: center;
+                  font-size: 0.85rem;
+                  color: #94a3b8;
+                }
+              }
+            }
+          }
+        }
+
+        .card-footer-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-top: 4px;
+
+          button {
+            height: 40px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+
+            i {
+              font-size: 0.9rem;
+            }
           }
 
-          &.folder {
-            color: #6f42c1;
+          .btn-edit-sm {
+            background: #eff6ff;
+            color: #2563eb;
+
+            &:active {
+              background: #dbeafe;
+              transform: scale(0.98);
+            }
+          }
+
+          .btn-delete-sm {
+            background: #fef2f2;
+            color: #dc2626;
+
+            &:active {
+              background: #fee2e2;
+              transform: scale(0.98);
+            }
           }
         }
       }
     }
   }
 
-  .modal-overlay {
-    @include responsive.modal-overlay-styles;
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #f8fafc;
+
+      tr th {
+        padding: 16px 12px;
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid #e2e8f0;
+      }
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+
+      &:hover {
+        background: #f8fafc;
+      }
+
+      td {
+        padding: 16px 12px;
+        font-size: 0.95rem;
+        color: #1e293b;
+      }
+    }
+
+    &.taxi-table {
+      .col-id {
+        width: 120px;
+      }
+
+      .col-date {
+        width: 120px;
+      }
+
+      .col-desc {
+        width: auto;
+      }
+
+      .col-dest {
+        width: 200px;
+      }
+
+      .col-amount {
+        width: 120px;
+      }
+
+      .col-status {
+        width: 150px;
+      }
+
+      .col-actions {
+        width: 120px;
+      }
+    }
+
+    .action-btns {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+
+      .btn-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+
+        &.view {
+          color: #6366f1;
+          background: #eef2ff;
+
+          &:hover {
+            background: #e0e7ff;
+          }
+        }
+
+        &.edit {
+          color: #2563eb;
+          background: #eff6ff;
+
+          &:hover {
+            background: #dbeafe;
+          }
+        }
+
+        &.delete {
+          color: #dc2626;
+          background: #fef2f2;
+
+          &:hover {
+            background: #fee2e2;
+          }
+        }
+      }
+    }
   }
 
   .modal-overlay {

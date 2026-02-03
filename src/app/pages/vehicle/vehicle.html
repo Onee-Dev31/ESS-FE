@@ -61,33 +61,33 @@
 
     <div class="card-list-view">
       <div class="mobile-card" *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
-
         <div class="card-header">
-          <div class="request-id">
-            <span class="label">เลขที่การเบิก:</span>
-            <span class="value">{{ row.original.id }}</span>
+          <div class="header-content">
+            <span class="ticket-no">{{ row.original.id }}</span>
           </div>
-          <div class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-            {{ row.original.status | statusLabel }}
+          <div class="card-actions-top">
+            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+              {{ row.original.status | statusLabel }}
+            </span>
           </div>
         </div>
 
         <div class="card-body">
-          <div class="info-item date-created">
+          <div class="info-row">
             <span class="label">วันที่สร้างรายการ:</span>
             <span class="value">{{ row.original.createDate | date : 'dd/MM/yyyy' }}</span>
           </div>
 
-          <div class="items-list">
-            <div class="trip-item" *ngFor="let item of row.original.items; let i = index">
-              <div class="trip-header">
-                <span class="trip-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="trip-icon"><i class="fas fa-car-side"></i></span>
+          <div class="nested-list">
+            <div class="nested-item" *ngFor="let item of row.original.items; let i = index">
+              <div class="item-header">
+                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                <span class="item-amount">฿{{ item.amount | number : '1.2-2' }}</span>
               </div>
-              <div class="trip-desc">{{ item.description }}</div>
-              <div class="trip-amount">
-                <span class="label">จำนวนเงิน:</span>
-                <span class="value">{{ item.amount | number : '1.2-2' }}</span>
+              <div class="item-detail">
+                <div class="detail-row">
+                  <i class="fas fa-car-side"></i> {{ item.description }}
+                </div>
               </div>
             </div>
           </div>
