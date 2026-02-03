@@ -57,23 +57,24 @@ $primary-orange: #ff914d;
                 color: #2c3e50;
             }
 
-            .utility-btns {
-                display: flex;
-                gap: 0.5rem;
+        }
 
-                .btn-outline {
-                    background: white;
-                    border: 1px solid #ddd;
-                    padding: 0.6rem 1rem;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-family: inherit;
-                    font-weight: 500;
-                    flex: 1;
+        .utility-btns {
+            display: flex;
+            gap: 20px;
 
-                    @include desktop {
-                        flex: none;
-                    }
+            .btn-outline {
+                background: white;
+                border: 1px solid #ddd;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-family: inherit;
+                font-weight: 500;
+                flex: 1;
+
+                @include desktop {
+                    flex: none;
                 }
             }
         }
