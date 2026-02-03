@@ -8,6 +8,10 @@
     flex-direction: column;
     gap: 15px;
 
+    @include mobile {
+        padding: 0 10px 20px 10px; // Reduced padding
+    }
+
     .toolbar-top-row {
         display: flex;
         justify-content: space-between;
@@ -45,7 +49,6 @@
         }
     }
 
-
     .toolbar-bottom-row {
         display: flex;
         justify-content: space-between;
@@ -56,6 +59,7 @@
         @include mobile {
             flex-direction: column;
             align-items: stretch;
+            gap: 10px;
         }
 
         .right-filters {
@@ -65,6 +69,10 @@
             flex-wrap: wrap;
             display: flex;
             align-items: flex-end;
+
+            @include mobile {
+                width: 100%;
+            }
         }
 
         .search-input-group {
@@ -128,10 +136,11 @@
     padding-bottom: 0px;
 
     @include mobile {
-        display: grid !important; // Force grid for consistent 2-column layout
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px 8px; // Vertical gap 12px, Horizontal gap 8px
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)); // Use minmax(0, 1fr) to prevent overflow
+        gap: 10px; // Slightly increase gap for touch targets
         width: 100%;
+        box-sizing: border-box;
     }
 
     .select-input-group,
@@ -140,6 +149,7 @@
         flex-direction: column;
         gap: 5px;
         min-width: 0;
+        width: 100%; // Ensure container takes full grid cell width
 
         @media (max-width: 991px) {
             width: 100%;
@@ -155,7 +165,8 @@
         .select-status {
             box-sizing: border-box;
             max-width: 100%;
-            min-width: 0;
+            width: 100%; // Force full width
+            min-width: 0; // Allow shrinking
             overflow: hidden;
             height: 38px;
             padding: 6px 12px;
@@ -165,10 +176,10 @@
         .select-status {
             cursor: pointer;
             min-width: 150px;
-            width: 100%;
 
             @include mobile {
                 min-width: 0;
+                width: 100%;
             }
         }
     }
