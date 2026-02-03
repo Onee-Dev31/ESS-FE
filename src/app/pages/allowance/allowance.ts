@@ -6,12 +6,11 @@ import { AllowanceFormComponent } from '../../components/features/allowance-form
 import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
 import { AlertService } from '../../services/alert.service';
-import { VehicleService } from '../../services/vehicle.service';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { StatusUtil } from '../../utils/status.util';
 import {
   createAngularTable,
   getCoreRowModel,
-  getPaginationRowModel,
   SortingState,
 } from '@tanstack/angular-table';
 
@@ -35,11 +34,9 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private alertService = inject(AlertService);
-  private vehicleService = inject(VehicleService);
   private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
-  
   goBack() {
     this.router.navigate(['/dashboard']);
   }
@@ -62,7 +59,7 @@ export class AllowanceComponent implements OnInit {
   pageSize = signal<number>(10);
 
 
-  
+
   processedData = computed(() => {
     let filtered = [...this.allRequests()];
 
@@ -82,8 +79,8 @@ export class AllowanceComponent implements OnInit {
     if (this.searchText()) {
       const search = this.searchText().toLowerCase();
       filtered = filtered.filter((r) =>
-        r.id.toLowerCase().includes(search) || 
-        r.items.some(item => item.description.toLowerCase().includes(search)) 
+        r.id.toLowerCase().includes(search) ||
+        r.items.some(item => item.description.toLowerCase().includes(search))
       );
     }
 
@@ -114,7 +111,7 @@ export class AllowanceComponent implements OnInit {
           case 'date':
             valueA = requestA.items[0]?.date || '';
             valueB = requestB.items[0]?.date || '';
-            
+
             const isoA = this.dateUtil.formatBEToISO(valueA);
             const isoB = this.dateUtil.formatBEToISO(valueB);
             return isoA.localeCompare(isoB) * direction;
@@ -131,7 +128,7 @@ export class AllowanceComponent implements OnInit {
     return filtered;
   });
 
-  
+
   paginatedRequests = computed(() => {
     const filtered = this.processedData();
     const start = this.currentPage() * this.pageSize();
@@ -139,7 +136,7 @@ export class AllowanceComponent implements OnInit {
     return filtered.slice(start, end);
   });
 
-  
+
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
     this.paginatedRequests().forEach((request: AllowanceRequest) => {
@@ -158,7 +155,7 @@ export class AllowanceComponent implements OnInit {
   });
 
 
-  
+
   totalRequests = computed(() => this.processedData().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
@@ -182,27 +179,27 @@ export class AllowanceComponent implements OnInit {
     manualPagination: true,
   }));
 
-  
+
   setPageSize(size: number) {
     this.pageSize.set(size);
     this.currentPage.set(0);
   }
 
-  
+
   nextPage() {
     if (this.canNextPage()) {
       this.currentPage.update(p => p + 1);
     }
   }
 
-  
+
   previousPage() {
     if (this.canPreviousPage()) {
       this.currentPage.update(p => p - 1);
     }
   }
 
-  
+
   goToPage(page: number) {
     this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
   }
@@ -219,14 +216,14 @@ export class AllowanceComponent implements OnInit {
     this.loadData();
   }
 
-  
+
   loadData() {
     this.allowanceService.getAllowanceRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
 
-  
+
   openModal(id: string = '') {
     if (id === '') {
       this.allowanceService.generateNextAllowanceId().subscribe(nid => {
@@ -239,13 +236,13 @@ export class AllowanceComponent implements OnInit {
     }
   }
 
-  
+
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-  
+
   clearFilters() {
     this.filterStartDate.set('');
     this.filterEndDate.set('');
@@ -253,13 +250,13 @@ export class AllowanceComponent implements OnInit {
     this.searchText.set('');
   }
 
-  
+
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  
+
   getSortIcon(columnId: string) {
     const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
@@ -280,6 +277,6 @@ export class AllowanceComponent implements OnInit {
   }
 
   public getStatusClass(status: string): string {
-    return this.vehicleService.getStatusBadgeClass(status);
+    return StatusUtil.getStatusBadgeClass(status);
   }
 }

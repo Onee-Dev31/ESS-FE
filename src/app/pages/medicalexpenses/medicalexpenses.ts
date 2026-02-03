@@ -4,10 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../services/medicalexpenses.service';
 import { MedicalRequest, MedicalItem } from '../../interfaces/medical.interface';
-import { VehicleService } from '../../services/vehicle.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { StatusUtil } from '../../utils/status.util';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -34,7 +34,6 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 })
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
-  private vehicleService = inject(VehicleService);
   private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
@@ -70,7 +69,7 @@ export class MedicalexpensesComponent implements OnInit {
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  
+
   processedData = computed(() => {
     let data = [...this.allRequests()];
 
@@ -286,7 +285,7 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    return this.vehicleService.getStatusBadgeClass(status);
+    return StatusUtil.getStatusBadgeClass(status);
   }
 }
 

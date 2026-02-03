@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
 import { AlertService } from '../../services/alert.service';
-import { VehicleService } from '../../services/vehicle.service';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
+import { StatusUtil } from '../../utils/status.util';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -25,7 +25,6 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 export class VehicleComponent implements OnInit {
   private transportService = inject(TransportService);
   private alertService = inject(AlertService);
-  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
   goBack() {
@@ -198,6 +197,6 @@ export class VehicleComponent implements OnInit {
   }
 
   public getStatusClass(status: string): string {
-    return this.vehicleService.getStatusBadgeClass(status);
+    return StatusUtil.getStatusBadgeClass(status);
   }
 }
