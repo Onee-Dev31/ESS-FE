@@ -11,6 +11,7 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
+import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
 
@@ -30,6 +31,7 @@ dayjs.locale('th');
     CommonModule,
     FullCalendarModule,
     MedicalPolicyModalComponent,
+    TooltipModalComponent,
     TimeOffForm
   ],
   templateUrl: './dashboard.html',

@@ -1,5 +1,5 @@
-@use '../../../styles/_theme.scss' as *;
-@use '../../../styles/_responsive-layout.scss' as responsive;
+@use '../../../../styles/_theme.scss' as *;
+@use '../../../../styles/_responsive-layout.scss' as responsive;
 
 .modal-overlay {
     @include responsive.modal-overlay-styles;

@@ -320,15 +320,6 @@
     (onClose)="closeTimeOffForm()">
   </app-time-off-form>
 
-  <div class="modal-overlay" *ngIf="isTooltipModalOpen()" (click)="closeTooltip()">
-    <div class="modal-container info-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>รายละเอียด</h3>
-        <button class="close-btn" (click)="closeTooltip()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body" [innerHTML]="tooltipModalContent()"></div>
-    </div>
-  </div>
+  <app-tooltip-modal *ngIf="isTooltipModalOpen()" [content]="tooltipModalContent()" (onClose)="closeTooltip()">
+  </app-tooltip-modal>
 </div>
