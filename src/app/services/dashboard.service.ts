@@ -1,13 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, combineLatest, map, finalize } from 'rxjs';
-import { catchError, delay } from 'rxjs/operators';
+import { Observable, of, map, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
-import { AllowanceService } from './allowance.service';
-import { TaxiService } from './taxi.service';
-import { TransportService } from './transport.service';
-import { MedicalexpensesService } from './medicalexpenses.service';
-
+import { ApprovalsHelperService } from './approvals-helper.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
@@ -17,38 +12,21 @@ import dayjs from 'dayjs';
 })
 export class DashboardService {
     private loadingService = inject(LoadingService);
-    private http = inject(HttpClient);
-    private allowanceService = inject(AllowanceService);
-    private taxiService = inject(TaxiService);
-    private transportService = inject(TransportService);
-    private medicalService = inject(MedicalexpensesService);
+    private approvalsHelper = inject(ApprovalsHelperService);
+
+    private readonly PENDING_STATUSES = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
 
     constructor() { }
 
     getGlobalPendingCount(): Observable<number> {
-        const streams: Observable<any[]>[] = [
-            this.allowanceService.getAllowanceRequests().pipe(catchError(() => of([]))),
-            this.taxiService.getTaxiRequests().pipe(catchError(() => of([]))),
-            this.transportService.getRequests().pipe(catchError(() => of([]))),
-            this.medicalService.getRequests().pipe(catchError(() => of([])))
-        ];
-
-        return combineLatest(streams).pipe(
-            map((results: any[][]) => {
-                const pendingStatuses = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
-                return results.reduce((sum, list) =>
-                    sum + list.filter(item => pendingStatuses.includes(item.status)).length, 0);
-            })
+        return this.approvalsHelper.getAllCategoriesApprovals().pipe(
+            map(items => items.filter(item => this.PENDING_STATUSES.includes(item.rawStatus)).length)
         );
     }
 
     getMedicalPendingCount(): Observable<number> {
-        return this.medicalService.getRequests().pipe(
-            catchError(() => of([])),
-            map((requests: any[]) => {
-                const pendingStatuses = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
-                return requests.filter(item => pendingStatuses.includes(item.status)).length;
-            })
+        return this.approvalsHelper.getApprovals('medical').pipe(
+            map(items => items.filter(item => this.PENDING_STATUSES.includes(item.rawStatus)).length)
         );
     }
 
@@ -64,41 +42,32 @@ export class DashboardService {
 
     getWelfareStats(): Observable<WelfareItem[]> {
         const stats: WelfareItem[] = [
-            {
-                title: 'ค่าเบี้ยเลี้ยง', amount: '10,500', iconName: 'fas fa-dollar-sign', cardClass: 'card-green',
-                titleColor: '#15803d', amountColor: '#15803d', route: '/allowance'
-            },
+            { title: 'ค่าเบี้ยเลี้ยง', amount: '10,500', iconName: 'fas fa-dollar-sign', cardClass: 'card-green', titleColor: '#15803d', amountColor: '#15803d', route: '/allowance' },
             {
                 title: 'ค่ารถ', amount: '584', iconName: 'fas fa-car ', cardClass: 'card-blue',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-car fa-2x text-blue-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></li><li class="tooltip-condition-item"><span>ค่ารถหลัง 22.00 น ต้องทำงานเกิน 22:00 เบิกได้ได้ไม่เกิน 120 บาท/ครั้ง</span></li></ul>`,
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div><div class="tooltip-condition-item"><span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div>',
                 titleColor: '#1e40af', amountColor: '#1e40af', route: '/vehicle'
             },
             {
                 title: 'ค่าแท็กซี่', amount: '876', iconName: 'fas fa-taxi', cardClass: 'card-yellow',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-taxi fa-2x text-yellow-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>1,000 บาท/ปี</span></li><li class="tooltip-condition-item"><span>ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></li></ul>`,
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div><div class="tooltip-condition-item"><span>- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></div>',
                 titleColor: '#9a3412', amountColor: '#9a3412', route: '/vehicle-taxi'
             },
             {
                 title: 'ค่าสมรส', amount: '3,500', iconName: 'fas fa-heart',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-heart fa-2x text-pink-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>อายุงาน 1 ปี</span></li><li class="tooltip-condition-item"><span>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</span></li></ul>`
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
             },
             {
                 title: 'ค่าอุปสมบท', amount: '10,500', iconName: 'fas fa-hands-praying',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-hands-praying fa-2x text-orange-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>อายุงาน 1 ปี</span></li><li class="tooltip-condition-item"><span>เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุการทำงาน</span></li></ul>`
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
             },
             {
                 title: 'ค่าฌาปนกิจ', amount: '584', iconName: 'fas fa-church',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-church fa-2x text-gray-600"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>เบิกได้ 80,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><span>พนักงาน 20,000 บาท ครอบครัว(คู่สมรส,บุตร) 10,000 บาท/คน บิดามารดา 10,000 บาท/คน</span></li></ul>`
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา 10,000 บาท/คน</span></div>'
             },
             {
                 title: 'ค่าพวงหรีด', amount: '876', iconName: 'fas fa-spa',
-                tooltip: `<div class="text-center mb-3"><i class="fas fa-spa fa-2x text-purple-500"></i></div><strong>เงื่อนไข:</strong><ul class="list-unstyled text-left mt-2"><li class="tooltip-condition-item"><span>เบิกได้ 12,000 บาท/ตลอดอายุการทำงาน</span></li><li class="tooltip-condition-item"><span>พนักงาน 1,500 บาท ครอบครัว(คู่สมรส,บุตร) 1,500 บาท/คน บิดามารดา 1,500 บาท/คน</span></li></ul>`
-
+                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา 1,500 บาท/คน</span></div>'
             }
         ];
         return this.loadingService.wrap(of(stats).pipe(delay(100)));
@@ -149,24 +118,13 @@ export class DashboardService {
         hd.setLanguages('th');
         const currentYear = dayjs().year();
         const nextYear = currentYear + 1;
-
-        const holidays = [
-            ...hd.getHolidays(currentYear),
-            ...hd.getHolidays(nextYear)
-        ];
-
+        const holidays = [...hd.getHolidays(currentYear), ...hd.getHolidays(nextYear)];
         const result: Record<string, any> = {};
-
         holidays.forEach(h => {
             const dateStr = h.date.split(' ')[0];
-            if (h.type === 'public') {
-                result[dateStr] = { type: 'holiday', note: h.name, code: 'HOL' };
-            }
+            if (h.type === 'public') result[dateStr] = { type: 'holiday', note: h.name, code: 'HOL' };
         });
-
         result['2026-01-20'] = { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' };
-
         return result;
     }
 }
-

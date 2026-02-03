@@ -11,6 +11,7 @@ import { StatusUtil } from '../../utils/status.util';
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -30,7 +31,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-allowance',
   standalone: true,
-  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, MedicalPolicyModalComponent],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
 })
@@ -43,6 +44,7 @@ export class AllowanceComponent implements OnInit {
   protected readonly Math = Math;
 
   isModalOpen = false;
+  isPolicyModalOpen = signal<boolean>(false);
   selectedRequestId = '';
 
   allRequests = signal<AllowanceRequest[]>([]);
@@ -206,5 +208,14 @@ export class AllowanceComponent implements OnInit {
 
   goToPage(page: number) {
     this.listing.currentPage.set(page);
+  }
+
+  deleteRequest(id: string) {
+    if (confirm(`คุณต้องการลบรายการ ${id} ใช่หรือไม่?`)) {
+      this.allowanceService.deleteAllowanceRequest(id).subscribe(() => {
+        this.alertService.showSuccess('ลบรายการเรียบร้อยแล้ว');
+        this.loadData();
+      });
+    }
   }
 }

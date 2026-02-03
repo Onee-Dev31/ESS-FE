@@ -1,12 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AllowanceService } from '../../services/allowance.service';
-import { TaxiService } from '../../services/taxi.service';
-import { TransportService } from '../../services/transport.service';
-import { forkJoin } from 'rxjs';
-import { take } from 'rxjs/operators';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -29,12 +24,9 @@ import { createListingState, createListingComputeds } from '../../utils/listing.
   styleUrl: './approvals.scss',
 })
 export class ApprovalsComponent implements OnInit {
-  private allowanceService = inject(AllowanceService);
-  private taxiService = inject(TaxiService);
-  private transportService = inject(TransportService);
   private approvalsHelper = inject(ApprovalsHelperService);
   private dateUtil = inject(DateUtilityService);
-  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
@@ -46,27 +38,28 @@ export class ApprovalsComponent implements OnInit {
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
 
+  pageTitle = signal<string>('Pending Approvals');
+  category: 'all' | 'medical' = 'all';
+
   constructor() {
-    // Set initial tab
     this.listing.filterStatus.set('Pending');
   }
 
   ngOnInit() {
-    this.refresh();
+    // Detect mode from route
+    this.route.data.subscribe(data => {
+      this.category = data['category'] || 'all';
+      this.pageTitle.set(this.category === 'medical' ? 'Medical Expenses Approvals' : 'Pending Approvals');
+      this.refresh();
+    });
   }
 
   refresh() {
-    forkJoin({
-      allowances: this.allowanceService.getAllowanceRequests().pipe(take(1)),
-      taxis: this.taxiService.getTaxiRequests().pipe(take(1)),
-      vehicles: this.transportService.getRequests().pipe(take(1))
-    }).subscribe(({ allowances, taxis, vehicles }) => {
-      const allData = this.approvalsHelper.processData(allowances, taxis, vehicles);
+    this.approvalsHelper.getApprovals(this.category).subscribe(allData => {
       this.approvals.set(allData);
     });
   }
 
-  // Use shared utility for filtering and pagination
   comps = createListingComputeds(
     this.approvals,
     this.listing,
@@ -80,7 +73,6 @@ export class ApprovalsComponent implements OnInit {
     }
   );
 
-  // Sorting logic (desktop table)
   sortedData = computed(() => {
     let list = [...this.comps.filteredData()];
     const sortState = this.sorting()[0];

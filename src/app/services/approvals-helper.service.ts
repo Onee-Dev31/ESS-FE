@@ -6,6 +6,12 @@ import { MedicalRequest } from './medicalexpenses.service';
 import { ApprovalItem } from '../interfaces/approval.interface';
 import { REQUEST_STATUS } from '../constants/request-status.constant';
 import { DateUtilityService } from './date-utility.service';
+import { AllowanceService } from './allowance.service';
+import { TaxiService } from './taxi.service';
+import { TransportService } from './transport.service';
+import { MedicalexpensesService } from './medicalexpenses.service';
+import { BaseRequestService } from './base-request.service';
+import { Observable, forkJoin, map, take } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -13,74 +19,80 @@ import { DateUtilityService } from './date-utility.service';
 export class ApprovalsHelperService {
 
     private dateUtil = inject(DateUtilityService);
+    private allowanceService = inject(AllowanceService);
+    private taxiService = inject(TaxiService);
+    private transportService = inject(TransportService);
+    private medicalService = inject(MedicalexpensesService);
 
     constructor() { }
 
+    getApprovals(category: 'all' | 'medical'): Observable<ApprovalItem[]> {
+        if (category === 'medical') {
+            return this.medicalService.getRequests().pipe(
+                take(1),
+                map(requests => this.processMedicalData(requests))
+            );
+        }
+
+        return forkJoin({
+            allowances: this.allowanceService.getAllowanceRequests().pipe(take(1)),
+            taxis: this.taxiService.getTaxiRequests().pipe(take(1)),
+            vehicles: this.transportService.getRequests().pipe(take(1))
+        }).pipe(
+            map(({ allowances, taxis, vehicles }) => this.processData(allowances, taxis, vehicles))
+        );
+    }
+
+    getAllCategoriesApprovals(): Observable<ApprovalItem[]> {
+        return forkJoin({
+            general: this.getApprovals('all'),
+            medical: this.getApprovals('medical')
+        }).pipe(
+            map(({ general, medical }) => [...general, ...medical])
+        );
+    }
+
     processData(allowance: AllowanceRequest[], taxi: TaxiRequest[], vehicle: VehicleRequest[]): ApprovalItem[] {
-        const allowanceItems = allowance.map(item => ({
-            requestNo: item.id,
-            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
-            requestBy: {
-                name: item.requester?.name || 'Unknown',
-                employeeId: item.requester?.employeeId || 'EM-001',
-                department: item.requester?.department || '-',
-                company: 'Onee',
-                position: 'Software Engineer',
-                profileImage: 'assets/images/user-placeholder.png'
-            },
-            requestType: 'ค่าเบี้ยเลี้ยง' as const,
-            typeId: 99,
-            requestDetail: item.items.map(i => i.description).join(', ') || 'ค่าเบี้ยเลี้ยงและที่พัก',
-            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
-            status: this.mapStatus(item.status),
-            rawStatus: this.normalizeStatus(item.status),
-            type: 'allowance',
-            originalData: item
-        }));
-
-        const taxiItems = taxi.map(item => ({
-            requestNo: item.id,
-            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
-            requestBy: {
-                name: item.requester?.name || 'Unknown',
-                employeeId: item.requester?.employeeId || 'EM-002',
-                department: item.requester?.department || '-',
-                company: 'Onee',
-                position: 'Sales Representative',
-                profileImage: 'assets/images/user-placeholder.png'
-            },
-            requestType: 'ค่าแท็กซี่' as const,
-            typeId: 99,
-            requestDetail: item.items.map(i => i.description).join(', ') || 'เดินทางไปหาลูกค้า',
-            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
-            status: this.mapStatus(item.status),
-            rawStatus: this.normalizeStatus(item.status),
-            type: 'taxi',
-            originalData: item
-        }));
-
-        const vehicleItems = vehicle.map(item => ({
-            requestNo: item.id,
-            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
-            requestBy: {
-                name: item.requester?.name || 'Unknown',
-                employeeId: item.requester?.employeeId || 'EM-003',
-                department: item.requester?.department || '-',
-                company: 'Onee',
-                position: 'Driver',
-                profileImage: 'assets/images/user-placeholder.png'
-            },
-            requestType: 'ค่ารถ' as const,
-            typeId: 99,
-            requestDetail: item.items.map(i => i.description).join(', ') || 'ค่าน้ำมันรถ',
-            amount: item.items.reduce((sum, i) => sum + i.amount, 0),
-            status: this.mapStatus(item.status),
-            rawStatus: this.normalizeStatus(item.status),
-            type: 'transport',
-            originalData: item
-        }));
+        const allowanceItems = allowance.map(item => this.mapToApproval(item, 'allowance'));
+        const taxiItems = taxi.map(item => this.mapToApproval(item, 'taxi'));
+        const vehicleItems = vehicle.map(item => this.mapToApproval(item, 'transport'));
 
         return [...allowanceItems, ...taxiItems, ...vehicleItems];
+    }
+
+    private mapToApproval(item: any, type: 'allowance' | 'taxi' | 'transport'): ApprovalItem {
+        const typeLabels = {
+            allowance: 'ค่าเบี้ยเลี้ยง',
+            taxi: 'ค่าแท็กซี่',
+            transport: 'ค่ารถ'
+        };
+
+        const defaultDetails = {
+            allowance: 'ค่าเบี้ยเลี้ยงและที่พัก',
+            taxi: 'เดินทางไปหาลูกค้า',
+            transport: 'ค่าน้ำมันรถ'
+        };
+
+        return {
+            requestNo: item.id,
+            requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
+            requestBy: {
+                name: item.requester?.name || 'Unknown',
+                employeeId: item.requester?.employeeId || 'EM-XXX',
+                department: item.requester?.department || '-',
+                company: 'Onee',
+                position: '-',
+                profileImage: 'assets/images/user-placeholder.png'
+            },
+            requestType: typeLabels[type] as any,
+            typeId: 99,
+            requestDetail: item.items?.map((i: any) => i.description).join(', ') || defaultDetails[type],
+            amount: item.items?.reduce((sum: number, i: any) => sum + (i.amount || 0), 0) || 0,
+            status: this.mapStatus(item.status),
+            rawStatus: this.normalizeStatus(item.status),
+            type: type,
+            originalData: item
+        };
     }
 
     processMedicalData(medicals: MedicalRequest[]): ApprovalItem[] {
@@ -104,7 +116,9 @@ export class ApprovalsHelperService {
             requestDetail: req.items.map((i: any) => i.diseaseType).join(', '),
             amount: req.totalRequestedAmount || 0,
             status: this.mapStatus(req.status),
-            rawStatus: this.normalizeStatus(req.status)
+            rawStatus: this.normalizeStatus(req.status),
+            type: 'medical',
+            originalData: req
         };
     }
 
@@ -126,6 +140,17 @@ export class ApprovalsHelperService {
             case 'Rejected': return 'rejected';
             case 'Referred Back': return 'referred-back';
             default: return 'pending';
+        }
+    }
+
+    getServiceByType(type: string): BaseRequestService<any> {
+        switch (type) {
+            case 'allowance': return this.allowanceService;
+            case 'taxi': return this.taxiService;
+            case 'transport':
+            case 'vehicle': return this.transportService;
+            case 'medical': return this.medicalService;
+            default: throw new Error(`Unknown service type: ${type}`);
         }
     }
 

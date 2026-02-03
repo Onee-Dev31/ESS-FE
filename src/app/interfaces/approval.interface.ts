@@ -17,6 +17,8 @@ export interface ApprovalItem {
         employeeId: string;
         department: string;
         company: string;
+        position?: string;
+        profileImage?: string;
     };
     requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล';
     typeId: number;
@@ -24,4 +26,6 @@ export interface ApprovalItem {
     amount: number;
     status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
     rawStatus: string;
+    type?: 'allowance' | 'taxi' | 'transport' | 'medical';
+    originalData?: any;
 }

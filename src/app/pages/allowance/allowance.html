@@ -1,5 +1,9 @@
 <div class="allowance-page">
-  <app-page-header title="ค่าเบี้ยเลี้ยง"></app-page-header>
+  <app-page-header title="ค่าเบี้ยเลี้ยง">
+    <button class="btn-info-policy" (click)="isPolicyModalOpen.set(true)" title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
+      <i class="fas fa-info-circle"></i>
+    </button>
+  </app-page-header>
 
   <div class="content-card">
     <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
@@ -7,7 +11,7 @@
     <div class="toolbar-container">
       <div class="toolbar-top-row">
         <div class="left-action">
-          <button class="btn-create" (click)="openModal()">
+          <button class="btn-create" (click)="openModal()" title="สร้างรายการเบิก">
             <i class="fas fa-plus"></i> สร้างรายการเบิก
           </button>
         </div>
@@ -64,36 +68,47 @@
       <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
 
         <div class="card-header">
-          <div class="request-id">
-            <span class="label">เลขที่การเบิก:</span>
-            <span class="value">{{ req.id }}</span>
+          <div class="header-content">
+            <span class="ticket-no">{{ req.id }}</span>
           </div>
-          <div class="status-badge" [ngClass]="getStatusClass(req.status)">
-            {{ req.status | statusLabel }}
+          <div class="card-actions-top">
+            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+              {{ req.status | statusLabel }}
+            </span>
           </div>
         </div>
 
         <div class="card-body">
-          <div class="info-item date-created">
+          <div class="info-row">
             <span class="label">วันที่สร้างรายการ:</span>
             <span class="value">{{ req.createDate | date: 'dd/MM/yyyy' }}</span>
           </div>
 
-          <div class="items-list">
-            <div class="trip-item" *ngFor="let item of req.items">
-              <div class="trip-header">
-                <span class="trip-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="hours"><i class="far fa-clock"></i> {{ item.hours }} ชม.</span>
+          <div class="nested-list">
+            <div class="nested-item" *ngFor="let item of req.items">
+              <div class="item-header">
+                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                <span class="item-amount">฿{{ item.amount | number: '1.2-2' }}</span>
               </div>
-              <div class="trip-desc">{{ item.description }}</div>
-              <div class="trip-amount">
-                <span class="label">จำนวนเงิน:</span>
-                <span class="value">{{ item.amount | number: '1.2-2' }}</span>
+              <div class="item-detail">
+                <div class="detail-row">
+                  <i class="far fa-clock"></i> {{ item.hours }} ชม.
+                </div>
+                <div class="detail-row">
+                  <i class="fas fa-info-circle"></i> {{ item.description }}
+                </div>
               </div>
             </div>
           </div>
 
-
+          <div class="card-footer-actions">
+            <button class="btn-edit-sm" (click)="openModal(req.id)">
+              <i class="fas fa-edit"></i> แก้ไข
+            </button>
+            <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
+              <i class="fas fa-trash"></i> ลบ
+            </button>
+          </div>
         </div>
       </div>
 
@@ -180,3 +195,7 @@
       <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>
     </div>
   </div>
+
+  <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+  </app-medical-policy-modal>
+</div>

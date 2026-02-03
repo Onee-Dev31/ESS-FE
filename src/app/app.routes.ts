@@ -43,13 +43,13 @@ export const routes: Routes = [
                 path: 'approvals',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN }
+                data: { role: USER_ROLES.ADMIN, category: 'all' }
             },
             {
                 path: 'approvals-medicalexpenses',
-                loadComponent: () => import('./pages/approvals-medicalexpenses/approvals-medicalexpenses').then(m => m.ApprovalsMedicalexpensesComponent),
+                loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN }
+                data: { role: USER_ROLES.ADMIN, category: 'medical' }
             },
             {
                 path: 'medicalexpenses',

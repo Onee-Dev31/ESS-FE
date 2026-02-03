@@ -16,7 +16,7 @@
 
 
   .modern-table {
-    min-width: 1000px;
+    min-width: 1200px;
 
     thead {
       tr th {
@@ -74,6 +74,133 @@
           &.status-success {
             background-color: $status-success-bg;
             color: $status-success-text;
+          }
+        }
+      }
+    }
+  }
+
+  .card-list-view {
+    @include mobile {
+      padding: 5px;
+    }
+
+    .mobile-card {
+      margin-bottom: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+      .card-header {
+        padding: 16px 20px;
+
+        .ticket-no {
+          font-weight: 800;
+          font-size: 1.1rem;
+          color: $primary;
+        }
+      }
+
+      .card-body {
+        padding: 0 20px 20px 20px;
+
+        .info-row {
+          padding: 12px 0;
+          border-bottom: 1px solid #f1f5f9;
+          margin-bottom: 8px;
+
+          .label {
+            font-size: 0.85rem;
+            font-weight: 500;
+          }
+
+          .value {
+            font-weight: 700;
+          }
+        }
+      }
+
+      .nested-item {
+        padding: 15px 0;
+
+        .item-header {
+          margin-bottom: 10px;
+
+          .item-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: $text;
+
+            i {
+              color: $primary;
+              margin-right: 8px;
+              opacity: 0.8;
+            }
+          }
+
+          .item-amount {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: $primary;
+          }
+        }
+
+        .item-detail {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          .detail-row {
+            font-size: 0.9rem;
+            color: $text-sub;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            i {
+              width: 16px;
+              text-align: center;
+              color: $text-muted;
+            }
+          }
+        }
+      }
+
+      .card-footer-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
+
+        button {
+          flex: 1;
+          padding: 10px;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          border: none;
+          transition: all 0.2s;
+
+          &.btn-edit-sm {
+            background: #eff6ff;
+            color: #2563eb;
+
+            &:hover {
+              background: #dbeafe;
+            }
+          }
+
+          &.btn-delete-sm {
+            background: #fef2f2;
+            color: #dc2626;
+
+            &:hover {
+              background: #fee2e2;
+            }
           }
         }
       }

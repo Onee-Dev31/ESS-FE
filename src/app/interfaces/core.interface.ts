@@ -4,3 +4,10 @@ export interface Requester {
     department: string;
     company: string;
 }
+
+export interface RequestBase {
+    id: string;
+    createDate: string;
+    status: string;
+    requester?: Requester;
+}

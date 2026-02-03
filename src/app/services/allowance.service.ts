@@ -1,135 +1,53 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay } from 'rxjs';
-import { LoadingService } from './loading.service';
+import { Injectable } from '@angular/core';
+import { Observable, of, delay } from 'rxjs';
 import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
 import { AllowanceMock } from '../mocks/allowance.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
-import { BUSINESS_CONFIG } from '../constants/business.constant';
+import { BaseRequestService } from './base-request.service';
 
 export type { AllowanceItem, AllowanceRequest };
 
 @Injectable({
     providedIn: 'root'
 })
-export class AllowanceService {
-    private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = STORAGE_KEYS.MOCK_ALLOWANCE_DATA;
-    private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>([]);
+export class AllowanceService extends BaseRequestService<AllowanceRequest> {
+    protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_ALLOWANCE_DATA;
 
     constructor() {
-        this.initializeData();
+        super();
+        this.initializeData(() => AllowanceMock.generateRequestsByRole(20, 'Admin'));
     }
-
-    private initializeData() {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (stored) {
-            const data = JSON.parse(stored);
-            this.updateSubject(data);
-        } else {
-            const masterData = AllowanceMock.generateRequestsByRole(20, 'Admin');
-            this.saveToStorage(masterData);
-            this.updateSubject(masterData);
-        }
-    }
-
-    private saveToStorage(data: AllowanceRequest[]) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-    }
-
-    private updateSubject(masterData: AllowanceRequest[]) {
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
-        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
-
-        let viewData = masterData;
-        if (role !== 'Admin' && employeeId) {
-            viewData = masterData.filter(req => req.requester?.employeeId === employeeId);
-        }
-
-        viewData.sort((a, b) => b.id.localeCompare(a.id));
-        this.allowanceRequestsSubject.next(viewData);
-    }
-
-    private getMasterData(): AllowanceRequest[] {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-    }
-
 
     getAllowanceRequests(): Observable<AllowanceRequest[]> {
-        const masterData = this.getMasterData();
-        this.updateSubject(masterData);
-        return this.loadingService.wrap(this.allowanceRequestsSubject.asObservable().pipe(delay(100)));
+        return this.getRequests();
     }
 
     getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
-        const masterData = this.getMasterData();
-        const item = masterData.find(r => r.id === id);
-        return this.loadingService.wrap(of(item).pipe(delay(100)));
+        return this.getRequestById(id);
     }
 
     addAllowanceRequest(request: AllowanceRequest): Observable<void> {
-        const masterData = this.getMasterData();
-        masterData.unshift(request);
-        this.saveToStorage(masterData);
-        this.updateSubject(masterData);
-        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
+        return this.addRequest(request);
     }
 
     updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
-        let masterData = this.getMasterData();
-        const index = masterData.findIndex(r => r.id === id);
-        if (index !== -1) {
-            masterData[index] = updatedRequest;
-            this.saveToStorage(masterData);
-            this.updateSubject(masterData);
-        }
-        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
+        return this.updateRequest(updatedRequest);
     }
 
     deleteAllowanceRequest(id: string): Observable<void> {
-        let masterData = this.getMasterData();
-        masterData = masterData.filter(r => r.id !== id);
-        this.saveToStorage(masterData);
-        this.updateSubject(masterData);
-        return this.loadingService.wrap(of(void 0).pipe(delay(200)));
+        return this.deleteRequest(id);
     }
 
     generateNextAllowanceId(): Observable<string> {
-        const masterData = this.getMasterData();
-        const prefix = BUSINESS_CONFIG.DEFAULT_PREFIX;
-        const lastIdNum = masterData.reduce((max, item) => {
-            if (item.id.startsWith(prefix)) {
-                const parts = item.id.split('#');
-                const num = parseInt(parts[1] || '0');
-                return num > max ? num : max;
-            }
-            return max;
-        }, 0);
-        return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
+        return this.generateNextId();
     }
 
-    refreshMockData() {
-        const masterData = this.getMasterData();
-
-        if (masterData.length === 0) {
-            this.initializeData();
-        } else {
-            this.updateSubject(masterData);
-        }
+    updateAllowanceStatus(id: string, status: string): void {
+        this.updateStatus(id, status);
     }
 
     getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
         const results = AllowanceMock.getMockAllowanceLogs(month, year);
         return of(results).pipe(delay(100));
-    }
-
-    updateAllowanceStatus(id: string, status: string): void {
-        const masterData = this.getMasterData();
-        const index = masterData.findIndex(r => r.id === id);
-        if (index !== -1) {
-            masterData[index].status = status;
-            this.saveToStorage(masterData);
-            this.updateSubject(masterData);
-        }
     }
 }

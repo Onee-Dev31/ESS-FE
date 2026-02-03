@@ -63,7 +63,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     });
   }
 
-  
+
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
@@ -93,7 +93,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     });
   }
 
-  
+
   calculateVehicleAmount(log: LogItem) {
     if (!log.selected) {
       log.amount = 0;
@@ -140,7 +140,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       .reduce((sum, current) => sum + current.amount, 0);
   }
 
-  
+
   onSubmit() {
     const selectedLogs = this.logs.filter(log => log.selected);
 
@@ -172,7 +172,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           ...existingRequest,
           items: requestItems
         };
-        this.transportService.updateRequest(this.requestId, updatedRequest).subscribe(() => {
+        this.transportService.updateVehicleRequest(this.requestId, updatedRequest).subscribe(() => {
           this.alertService.showSuccess(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
           this.closeModal();
         });
