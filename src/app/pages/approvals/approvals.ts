@@ -1,11 +1,10 @@
-import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService } from '../../services/allowance.service';
-import { AllowanceRequest } from '../../interfaces/allowance.interface';
-import { TaxiService, TaxiRequest } from '../../services/taxi.service';
-import { TransportService, VehicleRequest } from '../../services/transport.service';
+import { TaxiService } from '../../services/taxi.service';
+import { TransportService } from '../../services/transport.service';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
@@ -19,15 +18,16 @@ import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
 
 
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
-  encapsulation: ViewEncapsulation.None
 })
 export class ApprovalsComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
@@ -161,10 +161,6 @@ export class ApprovalsComponent implements OnInit {
 
   onStatusUpdated() {
     this.refresh();
-  }
-
-  goBack() {
-    this.router.navigate(['/dashboard']);
   }
 
   getTimeAgo(date: string): string {

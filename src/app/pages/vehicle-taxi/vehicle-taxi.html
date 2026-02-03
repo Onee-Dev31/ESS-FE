@@ -1,20 +1,14 @@
 <div class="vehicle-taxi-page">
-  <div class="top-header-strip">
-    <button class="btn-back" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <h2>เบิกค่ารถแท็กซี่</h2>
-  </div>
+  <app-page-header title="เบิกค่าพาหนะ (Taxi)"></app-page-header>
 
   <div class="content-card">
-    <div class="card-header-title">รายการเบิกแท็กซี่ของฉัน</div>
-
+    <div class="card-header-title">รายการเบิกของฉัน</div>
 
     <div class="toolbar-container">
       <div class="toolbar-top-row">
         <div class="left-action">
           <button class="btn-create" (click)="openModal()">
-            <i class="fas fa-plus"></i> สร้างรายการเบิก
+            <i class="fas fa-plus"></i>สร้างรายการเบิก
           </button>
         </div>
       </div>
@@ -22,209 +16,101 @@
       <div class="toolbar-bottom-row">
         <div class="right-filters">
           <div class="filter-group">
-            <span class="filter-label">ตั้งแต่เดือน</span>
+            <span class="filter-label">ตั้งแต่วันที่</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterStartDate()"
-                (ngModelChange)="filterStartDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
+                (ngModelChange)="listing.filterStartDate.set($event)" />
             </div>
           </div>
-
           <div class="filter-group">
-            <span class="filter-label">ถึง</span>
+            <span class="filter-label">ถึงวันที่</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterEndDate()"
-                (ngModelChange)="filterEndDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
+                (ngModelChange)="listing.filterEndDate.set($event)" />
             </div>
           </div>
-
           <div class="filter-group">
             <span class="filter-label">สถานะ</span>
             <div class="select-input-group">
-              <select class="form-control select-status" [ngModel]="filterStatus()"
-                (ngModelChange)="filterStatus.set($event)">
+              <select class="form-control" [ngModel]="listing.filterStatus()"
+                (ngModelChange)="listing.filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
-                <option value="NEW">คำขอใหม่</option>
-                <option value="WAITING_CHECK">รอตรวจสอบ</option>
-                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-                <option value="APPROVED">อนุมัติแล้ว</option>
+                <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
               </select>
             </div>
           </div>
           <button class="btn-clear" (click)="clearFilters()">
-            <i class="fas fa-sync-alt"></i> คืนค่า
+            <i class="fas fa-sync-alt"></i>คืนค่า
           </button>
         </div>
 
         <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
-            (ngModelChange)="searchText.set($event)">
+          <input type="text" class="form-control" placeholder="ค้นหาเบิก/เลขที่..." [ngModel]="listing.searchText()"
+            (ngModelChange)="listing.searchText.set($event)">
           <button class="btn-search">
-            <i class="fas fa-search"></i> ค้นหา
+            <i class="fas fa-search"></i>ค้นหา
           </button>
         </div>
       </div>
     </div>
 
-
-    <div class="card-list-view">
-      <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
-
-        <div class="card-header">
-          <div class="request-id">
-            <span class="label">เลขที่การเบิก:</span>
-            <span class="value">{{ req.id }}</span>
-          </div>
-          <div class="status-badge" [ngClass]="getStatusClass(req.status)">
-            {{ req.status | statusLabel }}
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="info-item date-created">
-            <span class="label">วันที่สร้างรายการ:</span>
-            <span class="value">{{ req.createDate }}</span>
-          </div>
-
-          <div class="items-list">
-            <div class="trip-item" *ngFor="let item of req.items">
-              <div class="trip-header">
-                <span class="trip-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="taxi-icon"><i class="fas fa-taxi"></i></span>
-              </div>
-
-              <div class="trip-info-block">
-                <div class="trip-dest"><span class="label">ไป:</span> <span class="val">{{ item.destination }}</span>
-                </div>
-                <div class="trip-desc">{{ item.description }}</div>
-              </div>
-
-              <div class="trip-stats">
-                <div class="stat">
-                  <span class="label">ระยะทาง:</span>
-                  <span class="val">{{ item.distance | number:'1.2-2' }} Km.</span>
-                </div>
-                <div class="stat amount">
-                  <span class="label">จำนวนเงิน:</span>
-                  <span class="val">{{ item.amount | number: '1.2-2' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-actions">
-            <button class="action-btn edit" (click)="openModal(req.id)">
-              <i class="far fa-edit"></i>
-            </button>
-            <button class="action-btn delete" (click)="deleteRequest(req.id)">
-              <i class="far fa-trash-alt"></i>
-            </button>
-            <button class="action-btn folder" (click)="openPreviewModalForRequest(req.id)">
-              <i class="far fa-folder-open"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="no-data" *ngIf="paginatedRequests().length === 0">
-        ไม่พบรายการที่ตรงตามเงื่อนไข
-      </div>
-    </div>
-
-
+    <!-- Table View -->
     <div class="table-responsive">
-      <table class="modern-table">
+      <table class="modern-table taxi-table">
         <thead>
           <tr>
-            <th class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
+            <th class="col-id sortable-header" (click)="toggleSort('requestId')">
               เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
             </th>
-
-            <th class="col-date-create sortable-header" (click)="toggleSort('createDate')">
-              วันที่สร้าง <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
+            <th class="col-date sortable-header" (click)="toggleSort('createDate')">
+              วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
-
-            <th class="col-date-req sortable-header" (click)="toggleSort('date')">
-              วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
-            </th>
-
-            <th class="sortable-header" (click)="toggleSort('description')">
-              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
-            </th>
-
-            <th class="col-dest sortable-header" (click)="toggleSort('destination')">
-              จุดหมาย <i class="fas ml-1" [ngClass]="getSortIcon('destination')"></i>
-            </th>
-
-            <th class="col-dist sortable-header text-center" (click)="toggleSort('distance')">
-              ระยะทาง(Km.) <i class="fas ml-1" [ngClass]="getSortIcon('distance')"></i>
-            </th>
-
-            <th class="col-amount sortable-header text-right" (click)="toggleSort('amount')">
-              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
-            </th>
-
-            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
-              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
-            </th>
-
-            <th class="col-actions text-center">Actions</th>
+            <th class="col-date">วันที่ขอเบิก</th>
+            <th class="col-desc">รายละเอียด</th>
+            <th class="col-dest">สถานที่รับ-ส่ง</th>
+            <th class="col-amount text-right">จำนวนเงิน</th>
+            <th class="col-status text-center">สถานะ</th>
+            <th class="col-actions text-center">จัดการ</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
-
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="merged-col top-align text-center">
-              <span class="id-text">{{ row.original.requestId }}</span>
+              class="font-bold text-primary-link text-center vertical-top">
+              {{ row.original.requestId }}
             </td>
-
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="merged-col top-align">
+              class="text-center vertical-top">
               {{ row.original.createDate }}
             </td>
-
             <td class="text-center">{{ row.original.date }}</td>
-
-            <td>
-              <div class="desc-wrapper">
-                <i class="fas fa-taxi text-muted"></i>
-                {{ row.original.description }}
-              </div>
-            </td>
-
+            <td>{{ row.original.description }}</td>
             <td>{{ row.original.destination }}</td>
-
-            <td class="text-center">{{ row.original.distance | number:'1.2-2' }}</td>
-
-            <td class="text-right font-semibold">
-              {{ row.original.amount | number:'1.2-2' }}
-            </td>
-
+            <td class="text-right font-bold">{{ row.original.amount | number: '1.2-2' }}</td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="merged-col text-center">
+              class="text-center vertical-top">
               <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                 {{ row.original.status | statusLabel }}
               </span>
             </td>
-
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="merged-col text-center">
+              class="text-center vertical-top">
               <div class="action-btns">
-                <button class="btn-icon edit" (click)="openModal(row.original.requestId)">
-                  <i class="far fa-edit"></i>
-                </button>
-                <button class="btn-icon delete" (click)="deleteRequest(row.original.requestId)">
-                  <i class="far fa-trash-alt"></i>
-                </button>
-                <button class="btn-icon folder" (click)="openPreviewModalForRequest(row.original.requestId)">
+                <button class="btn-icon view" (click)="openPreviewModalForRequest(row.original.requestId)"
+                  title="ดูไฟล์แนบ">
                   <i class="far fa-folder-open"></i>
+                </button>
+                <button class="btn-icon edit" (click)="openModal(row.original.requestId)" title="แก้ไข">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="deleteRequest(row.original.requestId)" title="ลบ">
+                  <i class="fas fa-trash"></i>
                 </button>
               </div>
             </td>
           </tr>
-
-          <tr *ngIf="table.getRowModel().rows.length === 0">
-            <td colspan="9" class="empty-state">
+          <tr *ngIf="processedData().length === 0">
+            <td colspan="8" class="empty-state">
               ไม่พบรายการที่ตรงตามเงื่อนไข
             </td>
           </tr>
@@ -232,52 +118,65 @@
       </table>
     </div>
 
-
-    <div class="pagination-container">
-      <div class="pagination-info">
-        แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-        ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-        totalRequests()) }}
-        จาก {{ totalRequests() }} รายการ
+    <!-- Mobile Card View -->
+    <div class="card-list-view">
+      <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByRowId">
+        <div class="card-header">
+          <div class="header-content">
+            <span class="ticket-no">{{ req.id }}</span>
+            <span class="create-date">{{ req.createDate }}</span>
+          </div>
+          <div class="card-actions-top">
+            <button class="action-btn folder" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
+              <i class="far fa-folder-open"></i>
+            </button>
+            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+              {{ req.status | statusLabel }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="nested-list">
+            <div class="nested-item" *ngFor="let item of req.items">
+              <div class="item-header">
+                <span class="item-title">{{ item.date }}</span>
+                <span class="item-amount">฿{{ item.amount | number:'1.2-2' }}</span>
+              </div>
+              <div class="item-detail">
+                <div class="detail-row"><i class="fas fa-info-circle"></i> {{ item.description }}</div>
+                <div class="detail-row"><i class="fas fa-map-marker-alt"></i> {{ item.destination }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer-actions">
+            <button class="btn-edit-sm" (click)="openModal(req.id)">
+              <i class="fas fa-edit"></i>แก้ไข
+            </button>
+            <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
+              <i class="fas fa-trash"></i>ลบ
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="pagination-controls">
-        <div class="page-size-selector">
-          <span>จำนวนแถวต่อหน้า:</span>
-          <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-            <option [value]="30">30</option>
-            <option [value]="50">50</option>
-          </select>
-        </div>
-        <div class="page-buttons">
-          <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
-            <i class="fas fa-angle-double-left"></i>
-          </button>
-          <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
-            <i class="fas fa-angle-left"></i>
-          </button>
-          <span class="page-info">
-            <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
-          </span>
-          <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
-            <i class="fas fa-angle-right"></i>
-          </button>
-          <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
-            [disabled]="!table.getCanNextPage()">
-            <i class="fas fa-angle-double-right"></i>
-          </button>
-        </div>
+      <div class="no-data" *ngIf="processedData().length === 0">
+        ไม่พบรายการที่ตรงตามเงื่อนไข
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" *ngIf="isModalOpen">
+  <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+    [totalItems]="processedData().length" (onPageChange)="listing.currentPage.set($event)"
+    (onPageSizeChange)="listing.pageSize.set($event)">
+  </app-pagination>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" *ngIf="isModalOpen()">
     <div class="modal-container">
-      <app-vehicle-taxi-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-taxi-form>
+      <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+      </app-vehicle-taxi-form>
     </div>
   </div>
 
-  <app-file-preview-modal *ngIf="isPreviewModalOpen" [files]="previewFiles" (onClose)="closePreviewModal()">
+  <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
   </app-file-preview-modal>
 </div>

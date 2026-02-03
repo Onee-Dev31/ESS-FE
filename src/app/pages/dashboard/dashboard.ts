@@ -17,6 +17,7 @@ import { AuthService } from '../../services/auth.service';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
+import { BUSINESS_CONFIG } from '../../constants/business.constant';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
@@ -87,7 +88,7 @@ export class DashboardComponent implements OnInit {
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
 
-  workStartDate = '2021-07-10';
+  workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
 
   attendancePeriod = computed(() => {
     const start = dayjs().startOf('month').format('DD/MM/YYYY');
@@ -138,7 +139,7 @@ export class DashboardComponent implements OnInit {
         textClass = 'text-red';
         codeText = 'OFF';
       } else {
-        codeText = '001';
+        codeText = BUSINESS_CONFIG.DEFAULT_WORK_CODE;
         textClass = 'text-muted';
       }
 
@@ -161,13 +162,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openTimeOffForm(leaveLabel: string) {
-    const mapping: Record<string, string> = {
-      'ลาพักร้อน': 'vacation',
-      'ลากิจ': 'personal',
-      'ลาป่วย': 'sick',
-      'ลาทำหมัน': 'sterilization',
-      'ลาเพื่อจัดการงานศพ': 'funeral'
-    };
+    const mapping = BUSINESS_CONFIG.LEAVE_TYPE_MAP;
 
     const typeId = mapping[leaveLabel] || '';
     this.selectedLeaveTypeId.set(typeId);

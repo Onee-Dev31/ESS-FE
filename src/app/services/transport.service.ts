@@ -3,6 +3,8 @@ import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
 import { RequestItem, VehicleRequest } from '../interfaces/transport.interface';
 import { TransportMock } from '../mocks/transport.mock';
+import { STORAGE_KEYS } from '../constants/storage.constants';
+import { BUSINESS_CONFIG } from '../constants/business.constant';
 
 export type { RequestItem, VehicleRequest };
 
@@ -11,7 +13,7 @@ export type { RequestItem, VehicleRequest };
 })
 export class TransportService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_TRANSPORT_DATA_V3';
+    private readonly STORAGE_KEY = STORAGE_KEYS.MOCK_TRANSPORT_DATA;
     private requestsSubject = new BehaviorSubject<VehicleRequest[]>([]);
 
     constructor() {
@@ -35,8 +37,8 @@ export class TransportService {
     }
 
     private updateSubject(masterData: VehicleRequest[]) {
-        const role = localStorage.getItem('userRole') || 'Member';
-        const employeeId = localStorage.getItem('employeeId');
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
+        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
 
         let viewData = masterData;
         if (role !== 'Admin' && employeeId) {
@@ -98,7 +100,8 @@ export class TransportService {
             return num > max ? num : max;
         }, 0);
         const nextNum = (lastIdNum + 1).toString().padStart(3, '0');
-        return of(`2701#${nextNum}`);
+        const prefix = BUSINESS_CONFIG.DEFAULT_PREFIX;
+        return of(`${prefix}#${nextNum}`);
     }
 
     updateStatus(id: string, status: string): void {

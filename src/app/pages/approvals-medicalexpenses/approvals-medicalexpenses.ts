@@ -1,8 +1,8 @@
-import { Component, signal, computed, ViewEncapsulation, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MedicalexpensesService, MedicalRequest } from '../../services/medicalexpenses.service';
+import { MedicalexpensesService } from '../../services/medicalexpenses.service';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { take } from 'rxjs/operators';
 import {
@@ -14,16 +14,15 @@ import {
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
-
-
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
 
 @Component({
   selector: 'app-approvals-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent],
   templateUrl: './approvals-medicalexpenses.html',
   styleUrl: './approvals-medicalexpenses.scss',
-  encapsulation: ViewEncapsulation.None
 })
 export class ApprovalsMedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
@@ -135,7 +134,6 @@ export class ApprovalsMedicalexpensesComponent implements OnInit {
   }
 
   onStatusUpdated() { this.refresh(); }
-  goBack() { this.router.navigate(['/dashboard']); }
   getStatusClass(status: string): string {
     return this.approvalsHelper.getStatusClass(status);
   }

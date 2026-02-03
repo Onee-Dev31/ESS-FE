@@ -5,6 +5,8 @@ import { LoadingService } from './loading.service';
 import { TimeOffRequest } from '../interfaces/time-off.interface';
 import { TimeOffMock } from '../mocks/time-off.mock';
 
+import { STORAGE_KEYS } from '../constants/storage.constants';
+
 export type { TimeOffRequest };
 
 @Injectable({
@@ -13,7 +15,7 @@ export type { TimeOffRequest };
 export class TimeOffService {
     private http = inject(HttpClient);
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_TIMEOFF_DEBUG_V1';
+    private readonly STORAGE_KEY = STORAGE_KEYS.MOCK_TIMEOFF_DATA;
     private requestsSubject = new BehaviorSubject<TimeOffRequest[]>([]);
 
     constructor() {
@@ -37,8 +39,8 @@ export class TimeOffService {
     }
 
     private updateSubject(masterData: TimeOffRequest[]) {
-        const role = localStorage.getItem('userRole') || 'Member';
-        const employeeId = localStorage.getItem('employeeId');
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
+        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
 
         let viewData = masterData;
         if (role !== 'Admin' && employeeId) {

@@ -10,7 +10,7 @@ import { MedicalexpensesService } from './medicalexpenses.service';
 import { TaxiService } from './taxi.service';
 import { TransportService } from './transport.service';
 import { TimeOffService } from './time-off.service';
-import { UserMock } from '../mocks/user.mock';
+import { UserMock } from '../mocks/auth-user.mock';
 
 @Injectable({
     providedIn: 'root'

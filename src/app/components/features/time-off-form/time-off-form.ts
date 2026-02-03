@@ -62,7 +62,7 @@ export class TimeOffForm implements OnInit {
 
   isHalfDayDisabled = computed(() => {
     const selectedType = this.leaveTypes.find(t => t.id === this.selectedLeaveType());
-    return selectedType?.label === 'ลาพักร้อน' || selectedType?.label === 'ลาเพื่อจัดการงานศพ';
+    return selectedType?.id === 'vacation' || selectedType?.id === 'funeral';
   });
 
   attachments = signal<{ id: number; name: string; description: string }[]>([]);

@@ -1,18 +1,12 @@
 <div class="approvals-wrapper">
-    <div class="card">
-        <div class="page-header">
-            <div class="title-with-back">
-                <button class="btn-back" (click)="goBack()">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="main-title">Medical Expenses Approvals</h1>
-            </div>
-            <div class="utility-btns">
-                <button class="btn-outline">📥 Export</button>
-                <button class="btn-outline" (click)="refresh()">🔄 Refresh</button>
-            </div>
+    <app-page-header title="Medical Expenses Approvals">
+        <div class="utility-btns">
+            <button class="btn-outline">📥 Export</button>
+            <button class="btn-outline" (click)="refresh()">🔄 Refresh</button>
         </div>
+    </app-page-header>
 
+    <div class="card">
         <div class="table-controls">
             <div class="search-box">
                 <span class="search-icon">🔍</span>
@@ -170,44 +164,10 @@
             </table>
         </div>
 
-        <div class="pagination-container">
-            <div class="pagination-info">
-                แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-                ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                filteredData().length) }}
-                จาก {{ filteredData().length }} รายการ
-            </div>
-            <div class="pagination-controls">
-                <div class="page-size-selector">
-                    <span>จำนวนแถวต่อหน้า:</span>
-                    <select [ngModel]="table.getState().pagination.pageSize"
-                        (ngModelChange)="table.setPageSize($event)">
-                        <option [value]="10">10</option>
-                        <option [value]="20">20</option>
-                        <option [value]="50">50</option>
-                    </select>
-                </div>
-                <div class="page-buttons">
-                    <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
-                        <i class="fas fa-angle-double-left"></i>
-                    </button>
-                    <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
-                        <i class="fas fa-angle-left"></i>
-                    </button>
-                    <span class="page-info">
-                        <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount()
-                            }}</strong>
-                    </span>
-                    <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
-                        <i class="fas fa-angle-right"></i>
-                    </button>
-                    <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
-                        [disabled]="!table.getCanNextPage()">
-                        <i class="fas fa-angle-double-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+        <app-pagination [currentPage]="table.getState().pagination.pageIndex"
+            [pageSize]="table.getState().pagination.pageSize" [totalItems]="filteredData().length"
+            (onPageChange)="table.setPageIndex($event)" (onPageSizeChange)="table.setPageSize($event)">
+        </app-pagination>
     </div>
 </div>
 

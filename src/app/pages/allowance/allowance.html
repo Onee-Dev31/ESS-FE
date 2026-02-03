@@ -1,10 +1,5 @@
 <div class="allowance-page">
-  <div class="top-header-strip">
-    <button class="btn-back" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <h2>ค่าเบี้ยเลี้ยง</h2>
-  </div>
+  <app-page-header title="ค่าเบี้ยเลี้ยง"></app-page-header>
 
   <div class="content-card">
     <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
@@ -23,24 +18,24 @@
           <div class="filter-group">
             <span class="filter-label">ตั้งแต่เดือน</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterStartDate()"
-                (ngModelChange)="filterStartDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
+                (ngModelChange)="listing.filterStartDate.set($event)" />
             </div>
           </div>
 
           <div class="filter-group">
             <span class="filter-label">ถึง</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterEndDate()"
-                (ngModelChange)="filterEndDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
+                (ngModelChange)="listing.filterEndDate.set($event)" />
             </div>
           </div>
 
           <div class="filter-group">
             <span class="filter-label">สถานะ</span>
             <div class="select-input-group">
-              <select class="form-control select-status" [ngModel]="filterStatus()"
-                (ngModelChange)="filterStatus.set($event)">
+              <select class="form-control select-status" [ngModel]="listing.filterStatus()"
+                (ngModelChange)="listing.filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
                 <option value="NEW">คำขอใหม่</option>
                 <option value="WAITING_CHECK">รอตรวจสอบ</option>
@@ -55,8 +50,8 @@
         </div>
 
         <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
-            (ngModelChange)="searchText.set($event)">
+          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+            (ngModelChange)="listing.searchText.set($event)">
           <button class="btn-search">
             <i class="fas fa-search"></i> ค้นหา
           </button>
@@ -66,7 +61,7 @@
 
 
     <div class="card-list-view">
-      <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
+      <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
 
         <div class="card-header">
           <div class="request-id">
@@ -102,7 +97,7 @@
         </div>
       </div>
 
-      <div class="no-data" *ngIf="paginatedRequests().length === 0">
+      <div class="no-data" *ngIf="comps.paginatedData().length === 0">
         ไม่พบรายการที่ตรงตามเงื่อนไข
       </div>
     </div>
@@ -173,40 +168,9 @@
     </div>
 
 
-    <div class="pagination-container">
-      <div class="pagination-info">
-        แสดง {{ currentPage() * pageSize() + 1 }}
-        ถึง {{ Math.min((currentPage() + 1) * pageSize(), totalRequests()) }}
-        จาก {{ totalRequests() }} รายการ
-      </div>
-      <div class="pagination-controls">
-        <div class="page-size-selector">
-          <span>จำนวนแถวต่อหน้า:</span>
-          <select [ngModel]="pageSize()" (ngModelChange)="setPageSize($event)">
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-            <option [value]="50">50</option>
-          </select>
-        </div>
-        <div class="page-buttons">
-          <button class="page-btn" (click)="goToPage(0)" [disabled]="!canPreviousPage()">
-            <i class="fas fa-angle-double-left"></i>
-          </button>
-          <button class="page-btn" (click)="previousPage()" [disabled]="!canPreviousPage()">
-            <i class="fas fa-angle-left"></i>
-          </button>
-          <span class="page-info">
-            <strong>หน้า {{ currentPage() + 1 }} จาก {{ totalPages() }}</strong>
-          </span>
-          <button class="page-btn" (click)="nextPage()" [disabled]="!canNextPage()">
-            <i class="fas fa-angle-right"></i>
-          </button>
-          <button class="page-btn" (click)="goToPage(totalPages() - 1)" [disabled]="!canNextPage()">
-            <i class="fas fa-angle-double-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+      [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+    </app-pagination>
   </div>
 
 

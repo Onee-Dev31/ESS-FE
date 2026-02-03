@@ -3,6 +3,8 @@ import { Observable, of, BehaviorSubject, delay } from 'rxjs';
 import { LoadingService } from './loading.service';
 import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
 import { AllowanceMock } from '../mocks/allowance.mock';
+import { STORAGE_KEYS } from '../constants/storage.constants';
+import { BUSINESS_CONFIG } from '../constants/business.constant';
 
 export type { AllowanceItem, AllowanceRequest };
 
@@ -11,7 +13,7 @@ export type { AllowanceItem, AllowanceRequest };
 })
 export class AllowanceService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_ALLOWANCE_DATA_V3';
+    private readonly STORAGE_KEY = STORAGE_KEYS.MOCK_ALLOWANCE_DATA;
     private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>([]);
 
     constructor() {
@@ -35,8 +37,8 @@ export class AllowanceService {
     }
 
     private updateSubject(masterData: AllowanceRequest[]) {
-        const role = localStorage.getItem('userRole') || 'Member';
-        const employeeId = localStorage.getItem('employeeId');
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
+        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
 
         let viewData = masterData;
         if (role !== 'Admin' && employeeId) {
@@ -94,7 +96,7 @@ export class AllowanceService {
 
     generateNextAllowanceId(): Observable<string> {
         const masterData = this.getMasterData();
-        const prefix = '2701';
+        const prefix = BUSINESS_CONFIG.DEFAULT_PREFIX;
         const lastIdNum = masterData.reduce((max, item) => {
             if (item.id.startsWith(prefix)) {
                 const parts = item.id.split('#');

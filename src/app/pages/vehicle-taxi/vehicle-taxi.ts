@@ -4,14 +4,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../services/taxi.service';
 import { AlertService } from '../../services/alert.service';
-import { VehicleService } from '../../services/vehicle.service';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { StatusUtil } from '../../utils/status.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { createListingState, clearListingFilters } from '../../utils/listing.util';
+import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
   getCoreRowModel,
   SortingState,
-  getPaginationRowModel,
 } from '@tanstack/angular-table';
 
 interface FlatTaxiRow extends TaxiItem {
@@ -27,57 +30,43 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })
 export class VehicleTaxiComponent implements OnInit {
   private taxiService = inject(TaxiService);
   private alertService = inject(AlertService);
-  private vehicleService = inject(VehicleService);
   private router = inject(Router);
 
-  goBack() {
-    this.router.navigate(['/dashboard']);
-  }
-  protected readonly Math = Math;
+  listing = createListingState();
+  statusOptions = COMMON_STATUS_OPTIONS;
 
-  isModalOpen = false;
-  selectedRequestId = '';
-  filterStartDate = signal<string>('');
-  filterEndDate = signal<string>('');
-  filterStatus = signal<string>('');
-  searchText = signal<string>('');
-
-  isPreviewModalOpen = false;
-  previewFiles: any[] = [];
+  isModalOpen = signal<boolean>(false);
+  selectedRequestId = signal<string>('');
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<any[]>([]);
 
   allRequests = signal<TaxiRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  currentPage = signal<number>(0);
-  pageSize = signal<number>(10);
-
-  
   processedData = computed(() => {
-    const allReqs = [...this.allRequests()];
-    let filtered = allReqs;
+    let filtered = [...this.allRequests()];
+    const status = this.listing.filterStatus();
+    const start = this.listing.filterStartDate();
+    const end = this.listing.filterEndDate();
+    const search = this.listing.searchText().toLowerCase();
 
-    if (this.filterStatus()) {
-      filtered = filtered.filter(r => r.status === this.filterStatus());
-    }
-    if (this.filterStartDate()) {
-      filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
-    }
-    if (this.filterEndDate()) {
-      filtered = filtered.filter(request => request.createDate <= this.filterEndDate());
-    }
-
-    if (this.searchText()) {
-      const search = this.searchText().toLowerCase();
+    if (status) filtered = filtered.filter(r => r.status === status);
+    if (start) filtered = filtered.filter(r => r.createDate >= start);
+    if (end) filtered = filtered.filter(r => r.createDate <= end);
+    if (search) {
       filtered = filtered.filter(r =>
         r.id.toLowerCase().includes(search) ||
-        r.items.some(item => item.description.toLowerCase().includes(search) || item.destination.toLowerCase().includes(search))
+        r.items.some(item =>
+          item.description.toLowerCase().includes(search) ||
+          item.destination.toLowerCase().includes(search)
+        )
       );
     }
 
@@ -85,15 +74,10 @@ export class VehicleTaxiComponent implements OnInit {
     if (sortState) {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
-      filtered.sort((requestA, requestB) => {
-        switch (id) {
-          case 'requestId':
-            return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate':
-            return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          default:
-            return 0;
-        }
+      filtered.sort((a, b) => {
+        if (id === 'requestId') return a.id.localeCompare(b.id) * direction;
+        if (id === 'createDate') return a.createDate.localeCompare(b.createDate) * direction;
+        return 0;
       });
     }
 
@@ -101,31 +85,22 @@ export class VehicleTaxiComponent implements OnInit {
   });
 
   paginatedRequests = computed(() => {
-    const filtered = this.processedData();
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return filtered.slice(start, end);
+    const start = this.listing.currentPage() * this.listing.pageSize();
+    return this.processedData().slice(start, start + this.listing.pageSize());
   });
 
   displayedRows = computed(() => {
-    const rows: FlatTaxiRow[] = [];
-    this.paginatedRequests().forEach((request) => {
-      request.items.forEach((item, index) => {
-        rows.push({
-          ...item,
-          requestId: request.id,
-          createDate: request.createDate,
-          status: request.status,
-          isFirstInGroup: index === 0,
-          groupLength: request.items.length,
-        });
-      });
-    });
-    return rows;
+    return this.paginatedRequests().flatMap(request =>
+      request.items.map((item, index) => ({
+        ...item,
+        requestId: request.id,
+        createDate: request.createDate,
+        status: request.status,
+        isFirstInGroup: index === 0,
+        groupLength: request.items.length,
+      } as FlatTaxiRow))
+    );
   });
-
-  totalRequests = computed(() => this.processedData().length);
-  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
   table = createAngularTable(() => ({
     data: this.displayedRows(),
@@ -138,29 +113,12 @@ export class VehicleTaxiComponent implements OnInit {
       { accessorKey: 'amount', header: 'จำนวนเงิน' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
-    state: {
-      sorting: this.sorting(),
-      pagination: {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      },
-    },
-    pageCount: this.totalPages(),
-    onPaginationChange: (updaterOrValue) => {
-      const prev = {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      };
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
-      this.currentPage.set(next.pageIndex);
-      this.pageSize.set(next.pageSize);
-    },
+    state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
       const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
   }));
 
   ngOnInit() {
@@ -168,12 +126,9 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   loadData() {
-    this.taxiService.getTaxiRequests().subscribe(data => {
-      this.allRequests.set(data);
-    });
+    this.taxiService.getTaxiRequests().subscribe(data => this.allRequests.set(data));
   }
 
-  
   deleteRequest(id: string) {
     if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
       this.taxiService.deleteTaxiRequest(id).subscribe(() => {
@@ -184,35 +139,32 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   openModal(id: string = '') {
-    if (id === '') {
+    if (!id) {
       this.taxiService.generateNextTaxiId().subscribe(nid => {
-        this.selectedRequestId = nid;
-        this.isModalOpen = true;
+        this.selectedRequestId.set(nid);
+        this.isModalOpen.set(true);
       });
     } else {
-      this.selectedRequestId = id;
-      this.isModalOpen = true;
+      this.selectedRequestId.set(id);
+      this.isModalOpen.set(true);
     }
   }
 
   closeModal() {
-    this.isModalOpen = false;
+    this.isModalOpen.set(false);
     this.loadData();
   }
 
-  
   openPreviewModalForRequest(requestId: string) {
     const request = this.allRequests().find(r => r.id === requestId);
-    if (request && request.items) {
-      this.previewFiles = request.items
+    if (request?.items) {
+      const files = request.items
         .filter(item => item.attachedFile)
-        .map(item => ({
-          fileName: item.attachedFile,
-          date: item.date
-        }));
+        .map(item => ({ fileName: item.attachedFile, date: item.date }));
 
-      if (this.previewFiles.length > 0) {
-        this.isPreviewModalOpen = true;
+      if (files.length > 0) {
+        this.previewFiles.set(files);
+        this.isPreviewModalOpen.set(true);
       } else {
         this.alertService.showWarning('ไม่พบไฟล์แนบสำหรับรายการนี้', 'ไม่พบไฟล์');
       }
@@ -220,15 +172,12 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   closePreviewModal() {
-    this.isPreviewModalOpen = false;
-    this.previewFiles = [];
+    this.isPreviewModalOpen.set(false);
+    this.previewFiles.set([]);
   }
 
   clearFilters() {
-    this.filterStartDate.set('');
-    this.filterEndDate.set('');
-    this.filterStatus.set('');
-    this.searchText.set('');
+    clearListingFilters(this.listing);
   }
 
   toggleSort(columnId: string) {
@@ -246,16 +195,12 @@ export class VehicleTaxiComponent implements OnInit {
     };
   }
 
-  trackByReqId(index: number, req: TaxiRequest): string {
-    return req.id;
-  }
-
   trackByRowId(index: number, row: any): string {
     const original = row.original || row;
     return `${original.requestId}-${original.date}-${index}`;
   }
 
-  public getStatusClass(status: string): string {
-    return this.vehicleService.getStatusBadgeClass(status);
+  getStatusClass(status: string): string {
+    return StatusUtil.getStatusBadgeClass(status);
   }
 }

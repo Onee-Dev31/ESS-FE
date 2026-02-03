@@ -1,10 +1,5 @@
 <div class="vehicle-page">
-  <div class="top-header-strip">
-    <button class="btn-back" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <h2>เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)</h2>
-  </div>
+  <app-page-header title="เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)"></app-page-header>
 
   <div class="content-card">
     <div class="card-header-title">รายการเบิกของฉัน</div>
@@ -23,24 +18,24 @@
           <div class="filter-group">
             <span class="filter-label">ตั้งแต่เดือน</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterStartDate()"
-                (ngModelChange)="filterStartDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
+                (ngModelChange)="listing.filterStartDate.set($event)" />
             </div>
           </div>
 
           <div class="filter-group">
             <span class="filter-label">ถึง</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="filterEndDate()"
-                (ngModelChange)="filterEndDate.set($event)" />
+              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
+                (ngModelChange)="listing.filterEndDate.set($event)" />
             </div>
           </div>
 
           <div class="filter-group">
             <span class="filter-label">สถานะ</span>
             <div class="select-input-group">
-              <select class="form-control select-status" [ngModel]="filterStatus()"
-                (ngModelChange)="filterStatus.set($event)">
+              <select class="form-control select-status" [ngModel]="listing.filterStatus()"
+                (ngModelChange)="listing.filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
                 <option value="NEW">คำขอใหม่</option>
                 <option value="WAITING_CHECK">รอตรวจสอบ</option>
@@ -55,8 +50,8 @@
         </div>
 
         <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="searchText()"
-            (ngModelChange)="searchText.set($event)">
+          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+            (ngModelChange)="listing.searchText.set($event)">
           <button class="btn-search">
             <i class="fas fa-search"></i> ค้นหา
           </button>
@@ -202,43 +197,10 @@
         </tbody>
       </table>
     </div>
-    <div class="pagination-container">
-      <div class="pagination-info">
-        แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}
-        ถึง {{ Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-        processedData().length) }}
-        จาก {{ processedData().length }} รายการ
-      </div>
-      <div class="pagination-controls">
-        <div class="page-size-selector">
-          <span>จำนวนแถวต่อหน้า:</span>
-          <select [ngModel]="table.getState().pagination.pageSize" (ngModelChange)="table.setPageSize($event)">
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-            <option [value]="30">30</option>
-            <option [value]="50">50</option>
-          </select>
-        </div>
-        <div class="page-buttons">
-          <button class="page-btn" (click)="table.setPageIndex(0)" [disabled]="!table.getCanPreviousPage()">
-            <i class="fas fa-angle-double-left"></i>
-          </button>
-          <button class="page-btn" (click)="table.previousPage()" [disabled]="!table.getCanPreviousPage()">
-            <i class="fas fa-angle-left"></i>
-          </button>
-          <span class="page-info">
-            <strong>หน้า {{ table.getState().pagination.pageIndex + 1 }} จาก {{ table.getPageCount() }}</strong>
-          </span>
-          <button class="page-btn" (click)="table.nextPage()" [disabled]="!table.getCanNextPage()">
-            <i class="fas fa-angle-right"></i>
-          </button>
-          <button class="page-btn" (click)="table.setPageIndex(table.getPageCount() - 1)"
-            [disabled]="!table.getCanNextPage()">
-            <i class="fas fa-angle-double-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+
+    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+      [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+    </app-pagination>
   </div>
 
   <div class="modal-overlay" *ngIf="isModalOpen">

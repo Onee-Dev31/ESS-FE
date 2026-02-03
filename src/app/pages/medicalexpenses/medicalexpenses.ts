@@ -8,6 +8,10 @@ import { MedicalPolicyModalComponent } from '../../components/modals/medical-pol
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { StatusUtil } from '../../utils/status.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { createListingState, clearListingFilters } from '../../utils/listing.util';
+import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -15,6 +19,7 @@ import {
 } from '@tanstack/angular-table';
 import { DateUtilityService } from '../../services/date-utility.service';
 import dayjs from 'dayjs';
+import { MONTHS_TH } from '../../constants/date.constant';
 
 interface FlatMedicalRow extends MedicalItem {
   requestId: string;
@@ -28,133 +33,113 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe, FilePreviewModalComponent, PaginationComponent, PageHeaderComponent],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
-  private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
-  goBack() {
-    this.router.navigate(['/dashboard']);
-  }
-  protected readonly Math = Math;
+  // Common listing state
+  listing = createListingState();
 
-  isModalOpen = signal<boolean>(false);
-  selectedRequestId = signal<string>('');
-  filterStatus = signal<string>('');
-  isPolicyModalOpen = signal<boolean>(false);
-  isFilterVisible = signal<boolean>(false);
-  searchText = signal<string>('');
-  isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<any[]>([]);
-
+  // Additional medical-specific filters
   fromMonth = signal<number>(0);
   fromYear = signal<string>((dayjs().year() - 1).toString());
   toMonth = signal<number>(11);
   toYear = signal<string>(dayjs().year().toString());
 
-  months = [
-    { label: 'มกราคม', value: 0 }, { label: 'กุมภาพันธ์', value: 1 }, { label: 'มีนาคม', value: 2 },
-    { label: 'เมษายน', value: 3 }, { label: 'พฤษภาคม', value: 4 }, { label: 'มิถุนายน', value: 5 },
-    { label: 'กรกฎาคม', value: 6 }, { label: 'สิงหาคม', value: 7 }, { label: 'กันยายน', value: 8 },
-    { label: 'ตุลาคม', value: 9 }, { label: 'พฤศจิกายน', value: 10 }, { label: 'ธันวาคม', value: 11 }
-  ];
+  statusOptions = COMMON_STATUS_OPTIONS;
+  months = MONTHS_TH;
 
   allRequests = signal<MedicalRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  currentPage = signal<number>(0);
-  pageSize = signal<number>(10);
+  isModalOpen = signal<boolean>(false);
+  selectedRequestId = signal<string>('');
+  isPolicyModalOpen = signal<boolean>(false);
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<any[]>([]);
 
-
+  // 1. Filtered Data (Requests)
   processedData = computed(() => {
     let data = [...this.allRequests()];
+    const status = this.listing.filterStatus();
+    const search = this.listing.searchText().toLowerCase();
 
-    if (this.filterStatus()) {
-      data = data.filter(r => r.status === this.filterStatus());
+    if (status) {
+      data = data.filter(r => r.status === status);
     }
 
-    const fromMonth = this.fromMonth();
-    const fromYear = parseInt(this.fromYear());
-    const toMonth = this.toMonth();
-    const toYear = parseInt(this.toYear());
+    const fMonth = this.fromMonth();
+    const fYear = parseInt(this.fromYear());
+    const tMonth = this.toMonth();
+    const tYear = parseInt(this.toYear());
 
-    if (!isNaN(fromYear) && !isNaN(toYear)) {
+    if (!isNaN(fYear) && !isNaN(tYear)) {
+      const startVal = fYear * 100 + fMonth;
+      const endVal = tYear * 100 + tMonth;
+
       data = data.filter(r => {
         const reqDate = dayjs(r.createDate);
-        const reqMonth = reqDate.month();
-        const reqYear = reqDate.year();
-
-        const startVal = fromYear * 100 + fromMonth;
-        const endVal = toYear * 100 + toMonth;
-        const currentVal = reqYear * 100 + reqMonth;
-
+        const currentVal = reqDate.year() * 100 + reqDate.month();
         return currentVal >= startVal && currentVal <= endVal;
       });
     }
 
-    if (this.searchText()) {
-      const search = this.searchText().toLowerCase();
-      data = data.filter(r =>
-        r.id.toLowerCase().includes(search)
-      );
+    if (search) {
+      data = data.filter(r => r.id.toLowerCase().includes(search));
     }
 
     return data;
   });
 
+  // 2. Flattened Data for Table
   flattenedRows = computed(() => {
-    const rows: FlatMedicalRow[] = [];
-    this.processedData().forEach((req: MedicalRequest) => {
-      req.items.forEach((item: MedicalItem) => {
-        rows.push({
-          ...item,
-          requestId: req.id,
-          createDate: req.createDate,
-          status: req.status,
-          attachedFile: item.attachedFile
-        });
-      });
-    });
-    return rows;
+    return this.processedData().flatMap(req =>
+      req.items.map(item => ({
+        ...item,
+        requestId: req.id,
+        createDate: req.createDate,
+        status: req.status,
+        attachedFile: item.attachedFile
+      } as FlatMedicalRow))
+    );
   });
 
+  // 3. Sorted Data
   sortedRows = computed(() => {
     let rows = [...this.flattenedRows()];
     const sortState = this.sorting()[0];
     if (sortState) {
-      const fieldId = sortState.id;
-      const desc = sortState.desc;
+      const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
-      rows.sort((a: FlatMedicalRow, b: FlatMedicalRow) => {
-        const valA = (a as any)[fieldId] || '';
-        const valB = (b as any)[fieldId] || '';
-        if (fieldId === 'requestId') return valA.localeCompare(valB) * direction;
-        if (typeof valA === 'string') return valA.localeCompare(valB) * direction;
-        return (valA - valB) * direction;
+      rows.sort((a, b) => {
+        const valA = (a as any)[id] ?? '';
+        const valB = (b as any)[id] ?? '';
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          return valA.localeCompare(valB) * direction;
+        }
+        return ((valA as any) - (valB as any)) * direction;
       });
     }
     return rows;
   });
 
-  paginatedGroupedRequests = computed(() => {
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return this.processedData().slice(start, end);
-  });
-
-
+  // 4. Paginated Data for Table
   paginatedRows = computed(() => {
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return this.sortedRows().slice(start, end);
+    const start = this.listing.currentPage() * this.listing.pageSize();
+    return this.sortedRows().slice(start, start + this.listing.pageSize());
   });
 
-  totalRequests = computed(() => this.sortedRows().length);
-  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
+  // 5. Paginated Data for Mobile List (Grouped)
+  paginatedRequests = computed(() => {
+    const start = this.listing.currentPage() * this.listing.pageSize();
+    return this.processedData().slice(start, start + this.listing.pageSize());
+  });
+
+  totalItems = computed(() => this.sortedRows().length);
 
   table = createAngularTable(() => ({
     data: this.paginatedRows(),
@@ -171,29 +156,12 @@ export class MedicalexpensesComponent implements OnInit {
       { accessorKey: 'status', header: 'สถานะ' },
       { accessorKey: 'attachedFile', header: 'ไฟล์แนบ' },
     ],
-    state: {
-      sorting: this.sorting(),
-      pagination: {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      },
-    },
-    pageCount: this.totalPages(),
-    onPaginationChange: (updaterOrValue) => {
-      const prev = {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      };
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
-      this.currentPage.set(next.pageIndex);
-      this.pageSize.set(next.pageSize);
-    },
+    state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
       const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
   }));
 
   ngOnInit() {
@@ -201,14 +169,12 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   loadData() {
-    this.medicalService.getRequests().subscribe((data: MedicalRequest[]) => {
-      this.allRequests.set(data);
-    });
+    this.medicalService.getRequests().subscribe(data => this.allRequests.set(data));
   }
 
   openModal(targetId: string = '') {
-    if (targetId === '') {
-      this.medicalService.generateNextId().subscribe((nid: string) => {
+    if (!targetId) {
+      this.medicalService.generateNextId().subscribe(nid => {
         this.selectedRequestId.set(nid);
         this.isModalOpen.set(true);
       });
@@ -224,16 +190,11 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   clearFilters() {
-    this.filterStatus.set('');
+    clearListingFilters(this.listing);
     this.fromMonth.set(0);
     this.fromYear.set((dayjs().year() - 1).toString());
     this.toMonth.set(11);
     this.toYear.set(dayjs().year().toString());
-    this.searchText.set('');
-  }
-
-  toggleFilter() {
-    this.isFilterVisible.update(v => !v);
   }
 
   toggleSort(columnId: string) {
@@ -241,12 +202,9 @@ export class MedicalexpensesComponent implements OnInit {
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
-  openPreview(attachment: string | undefined) {
+  openPreview(attachment?: string) {
     if (!attachment) return;
-    this.previewFiles.set([{
-      fileName: attachment,
-      date: ''
-    }]);
+    this.previewFiles.set([{ fileName: attachment, date: '' }]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -264,21 +222,6 @@ export class MedicalexpensesComponent implements OnInit {
     };
   }
 
-  setPageSize(size: number) {
-    this.pageSize.set(size);
-    this.currentPage.set(0);
-  }
-
-  nextPage() { if (this.canNextPage()) this.currentPage.update(p => p + 1); }
-
-  previousPage() { if (this.canPreviousPage()) this.currentPage.update(p => p - 1); }
-
-  goToPage(page: number) { this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1))); }
-
-  canNextPage() { return this.currentPage() < this.totalPages() - 1; }
-
-  canPreviousPage() { return this.currentPage() > 0; }
-
   trackByRowId(index: number, row: any): string {
     const original = (row as { original: any }).original || row;
     return `${original.requestId || 'new'}-${index}`;
@@ -288,4 +231,3 @@ export class MedicalexpensesComponent implements OnInit {
     return StatusUtil.getStatusBadgeClass(status);
   }
 }
-

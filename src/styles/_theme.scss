@@ -93,3 +93,16 @@ $status-success-text: #28a745;
         transform: rotate(90deg);
     }
 }
+
+// --- Glassmorphism ---
+@mixin glass-blur($amount: 4px, $bg: rgba(0, 0, 0, 0.65)) {
+    background-color: $bg;
+    backdrop-filter: blur($amount);
+    -webkit-backdrop-filter: blur($amount);
+}
+
+@mixin glass-card($blur: 10px, $bg: rgba(255, 255, 255, 0.95)) {
+    background: $bg;
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+}

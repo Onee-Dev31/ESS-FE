@@ -10,12 +10,15 @@ import { DateUtilityService } from '../../services/date-utility.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { StatusUtil } from '../../utils/status.util';
-import { REQUEST_STATUS, REQUEST_STATUS_LABEL } from '../../constants/request-status.constant';
+import { REQUEST_STATUS, COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
+import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
 @Component({
   selector: 'app-timeoff',
   standalone: true,
-  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
 })
@@ -26,46 +29,31 @@ export class TimeoffComponent implements OnInit {
   private dateUtil = inject(DateUtilityService);
 
   requests = signal<TimeOffRequest[]>([]);
-  filteredRequests = signal<TimeOffRequest[]>([]);
   isFormOpen = signal<boolean>(false);
   selectedRequestStatus = signal<string>('คำขอใหม่');
 
-  filterStatus = signal<string>('');
-  filterStartDate = signal<string>('');
-  filterEndDate = signal<string>('');
-  searchText = signal<string>('');
+  // ใช้ Utility จัดการ State (DRY Pagination & Filters)
+  listing = createListingState();
 
-  pageSize = signal<number>(10);
-  currentPage = signal<number>(0);
+  // ใช้ Utility จัดการ Computed values (DRY filtering & pagination logic)
+  comps = createListingComputeds(this.requests, this.listing, (req, search, status, start, end) => {
+    const matchSearch = !search ||
+      req.id.toLowerCase().includes(search) ||
+      req.reason.toLowerCase().includes(search) ||
+      req.leaveType.toLowerCase().includes(search);
+
+    const matchStatus = !status || req.status === status;
+    const matchStart = !start || req.createDate >= start;
+    const matchEnd = !end || req.createDate <= end;
+
+    return matchSearch && matchStatus && matchStart && matchEnd;
+  });
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
   protected readonly Math = Math;
-
-  statuses = [
-    { value: REQUEST_STATUS.NEW, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.NEW] },
-    { value: REQUEST_STATUS.WAITING_CHECK, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.WAITING_CHECK] },
-    { value: REQUEST_STATUS.PENDING_APPROVAL, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.PENDING_APPROVAL] },
-    { value: REQUEST_STATUS.APPROVED, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.APPROVED] }
-  ];
-
-  // ... (keeping existing code in between if any, but replace is simpler if I target blocks)
-
-  // Let's target specific blocks. statuses first.
-
-
-  totalRequests = computed(() => this.filteredRequests().length);
-  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
-
-  paginatedRequests = computed(() => {
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return this.filteredRequests().slice(start, end);
-  });
-
-  canPreviousPage = computed(() => this.currentPage() > 0);
-  canNextPage = computed(() => this.currentPage() < this.totalPages() - 1);
+  statuses = COMMON_STATUS_OPTIONS;
 
   ngOnInit() {
     this.loadRequests();
@@ -74,56 +62,16 @@ export class TimeoffComponent implements OnInit {
   loadRequests() {
     this.timeoffService.getRequests().subscribe((data: TimeOffRequest[]) => {
       this.requests.set(data);
-      this.applyFilters();
     });
   }
 
-  applyFilters() {
-    let filtered = [...this.requests()];
-
-    if (this.searchText()) {
-      const search = this.searchText().toLowerCase();
-      filtered = filtered.filter(req =>
-        req.id.toLowerCase().includes(search) ||
-        req.reason.toLowerCase().includes(search) ||
-        req.leaveType.toLowerCase().includes(search)
-      );
-    }
-
-    if (this.filterStatus()) {
-      filtered = filtered.filter(req => req.status === this.filterStatus());
-    }
-
-    if (this.filterStartDate()) {
-      filtered = filtered.filter(req => req.createDate >= this.filterStartDate());
-    }
-    if (this.filterEndDate()) {
-      filtered = filtered.filter(req => req.createDate <= this.filterEndDate());
-    }
-
-    this.filteredRequests.set(filtered);
-    this.currentPage.set(0);
-  }
-
   setPageSize(size: number) {
-    this.pageSize.set(size);
-    this.currentPage.set(0);
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
   }
 
   goToPage(page: number) {
-    this.currentPage.set(page);
-  }
-
-  previousPage() {
-    if (this.canPreviousPage()) {
-      this.currentPage.update(p => p - 1);
-    }
-  }
-
-  nextPage() {
-    if (this.canNextPage()) {
-      this.currentPage.update(p => p + 1);
-    }
+    this.listing.currentPage.set(page);
   }
 
   openForm(status: string = 'NEW') {
@@ -151,12 +99,7 @@ export class TimeoffComponent implements OnInit {
   }
 
   clearFilters() {
-    this.filterStatus.set('');
-    this.filterStartDate.set('');
-    this.filterEndDate.set('');
-    this.searchText.set('');
-    this.currentPage.set(0);
-    this.applyFilters();
+    clearListingFilters(this.listing);
   }
 
   goBack() {

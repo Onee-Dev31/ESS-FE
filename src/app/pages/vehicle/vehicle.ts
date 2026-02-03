@@ -6,11 +6,13 @@ import { TransportService, VehicleRequest } from '../../services/transport.servi
 import { AlertService } from '../../services/alert.service';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { StatusUtil } from '../../utils/status.util';
+import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import {
   createAngularTable,
   getCoreRowModel,
   SortingState,
-  getPaginationRowModel,
 } from '@tanstack/angular-table';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
@@ -18,7 +20,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
 })
@@ -27,44 +29,33 @@ export class VehicleComponent implements OnInit {
   private alertService = inject(AlertService);
   private router = inject(Router);
 
-  goBack() {
-    this.router.navigate(['/dashboard']);
-  }
   protected readonly Math = Math;
 
   isModalOpen = false;
   selectedRequestId = '';
-  filterStartDate = signal<string>('');
-  filterEndDate = signal<string>('');
-  filterStatus = signal<string>('');
-  searchText = signal<string>('');
 
   allRequests = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  currentPage = signal<number>(0);
-  pageSize = signal<number>(10);
+  // ใช้ Utility จัดการ State
+  listing = createListingState();
 
+  // Custom sorting logic for processedData
   processedData = computed(() => {
-    const allReqs = [...this.allRequests()];
-    let filtered = allReqs;
+    const list = [...this.allRequests()];
 
-    if (this.filterStatus()) {
-      filtered = filtered.filter(r => r.status === this.filterStatus());
-    }
-    if (this.filterStartDate()) {
-      filtered = filtered.filter(r => r.createDate >= this.filterStartDate());
-    }
-    if (this.filterEndDate()) {
-      filtered = filtered.filter(request => request.createDate <= this.filterEndDate());
-    }
+    const search = this.listing.searchText().toLowerCase();
+    const status = this.listing.filterStatus();
+    const start = this.listing.filterStartDate();
+    const end = this.listing.filterEndDate();
 
-    if (this.searchText()) {
-      const search = this.searchText().toLowerCase();
-      filtered = filtered.filter(r =>
-        r.id.toLowerCase().includes(search)
-      );
-    }
+    let filtered = list.filter(r => {
+      const matchSearch = !search || r.id.toLowerCase().includes(search);
+      const matchStatus = !status || r.status === status;
+      const matchStart = !start || r.createDate >= start;
+      const matchEnd = !end || r.createDate <= end;
+      return matchSearch && matchStatus && matchStart && matchEnd;
+    });
 
     const sortState = this.sorting()[0];
     if (sortState) {
@@ -72,59 +63,31 @@ export class VehicleComponent implements OnInit {
       const direction = desc ? -1 : 1;
       filtered.sort((requestA, requestB) => {
         switch (id) {
-          case 'id':
-            return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate':
-            return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          default:
-            return 0;
+          case 'id': return requestA.id.localeCompare(requestB.id) * direction;
+          case 'createDate': return requestA.createDate.localeCompare(requestB.createDate) * direction;
+          default: return 0;
         }
       });
     }
-
     return filtered;
   });
 
-  paginatedRequests = computed(() => {
-    const filtered = this.processedData();
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return filtered.slice(start, end);
-  });
-
-  totalRequests = computed(() => this.processedData().length);
-  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
+  // ใช้ Utility สำหรับ Pagination logic
+  comps = createListingComputeds(this.processedData, this.listing);
 
   table = createAngularTable(() => ({
-    data: this.paginatedRequests(),
+    data: this.comps.paginatedData(),
     columns: [
       { accessorKey: 'id', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
-    state: {
-      sorting: this.sorting(),
-      pagination: {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      },
-    },
-    pageCount: this.totalPages(),
-    onPaginationChange: (updaterOrValue) => {
-      const prev = {
-        pageIndex: this.currentPage(),
-        pageSize: this.pageSize(),
-      };
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(prev) : updaterOrValue;
-      this.currentPage.set(next.pageIndex);
-      this.pageSize.set(next.pageSize);
-    },
+    state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
       const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
   }));
 
@@ -165,24 +128,16 @@ export class VehicleComponent implements OnInit {
   }
 
   clearFilters() {
-    this.filterStartDate.set('');
-    this.filterEndDate.set('');
-    this.filterStatus.set('');
-    this.searchText.set('');
+    clearListingFilters(this.listing);
   }
 
   toggleSort(columnId: string) {
-    const currentSort = this.sorting()[0];
-    if (currentSort?.id === columnId) {
-      this.sorting.set([{ id: columnId, desc: !currentSort.desc }]);
-    } else {
-      this.sorting.set([{ id: columnId, desc: false }]);
-    }
+    const column = this.table.getColumn(columnId);
+    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
 
   getSortIcon(columnId: string) {
-    const sortState = this.sorting()[0];
-    const isSorted = sortState?.id === columnId ? (sortState.desc ? 'desc' : 'asc') : false;
+    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
     return {
       'fa-sort-amount-up': isSorted === 'asc',
       'fa-sort-amount-down-alt': isSorted === 'desc',
@@ -196,7 +151,16 @@ export class VehicleComponent implements OnInit {
     return `${original.id}-${index}`;
   }
 
-  public getStatusClass(status: string): string {
+  getStatusClass(status: string): string {
     return StatusUtil.getStatusBadgeClass(status);
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { UserMock } from '../mocks/user.mock';
+import { UserMock } from '../mocks/auth-user.mock';
 
 export interface UserProfile {
     name: string;
@@ -22,6 +22,8 @@ export interface UserProfile {
     };
 }
 
+import { STORAGE_KEYS } from '../constants/storage.constants';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -31,7 +33,7 @@ export class UserService {
     constructor() { }
 
     getUserProfile(): Observable<UserProfile> {
-        const role = localStorage.getItem('userRole');
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
         const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;
         return of(profile).pipe(delay(100));
     }

@@ -4,6 +4,9 @@ import { LoadingService } from './loading.service';
 import { MedicalItem, MedicalRequest } from '../interfaces/medical.interface';
 import { MedicalMock } from '../mocks/medical.mock';
 
+import { STORAGE_KEYS } from '../constants/storage.constants';
+import { BUSINESS_CONFIG } from '../constants/business.constant';
+
 export type { MedicalItem, MedicalRequest };
 
 @Injectable({
@@ -11,7 +14,7 @@ export type { MedicalItem, MedicalRequest };
 })
 export class MedicalexpensesService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_MEDICAL_DATA_V3';
+    private readonly STORAGE_KEY = STORAGE_KEYS.MOCK_MEDICAL_DATA;
     private medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>([]);
 
     constructor() {
@@ -35,8 +38,8 @@ export class MedicalexpensesService {
     }
 
     private updateSubject(masterData: MedicalRequest[]) {
-        const role = localStorage.getItem('userRole') || 'Member';
-        const employeeId = localStorage.getItem('employeeId');
+        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
+        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
 
         let viewData = masterData;
         if (role !== 'Admin' && employeeId) {
@@ -95,7 +98,7 @@ export class MedicalexpensesService {
 
     generateNextId(): Observable<string> {
         const masterData = this.getMasterData();
-        const prefix = '2701';
+        const prefix = BUSINESS_CONFIG.DEFAULT_PREFIX;
         const lastIdNum = masterData.reduce((max, item) => {
             if (item.id.startsWith(prefix)) {
                 const parts = item.id.split('#');

@@ -8,6 +8,9 @@ import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.inte
 import { AlertService } from '../../services/alert.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusUtil } from '../../utils/status.util';
+import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -27,7 +30,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-allowance',
   standalone: true,
-  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
 })
@@ -37,53 +40,36 @@ export class AllowanceComponent implements OnInit {
   private dateUtil = inject(DateUtilityService);
   private router = inject(Router);
 
-  goBack() {
-    this.router.navigate(['/dashboard']);
-  }
   protected readonly Math = Math;
 
   isModalOpen = false;
   selectedRequestId = '';
-  filterStartDate = signal<string>('');
-  filterEndDate = signal<string>('');
-  filterStatus = signal<string>('');
-  searchText = signal<string>('');
-
 
   allRequests = signal<AllowanceRequest[]>([]);
-
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
+  // ใช้ Utility จัดการ State
+  listing = createListingState();
 
-  currentPage = signal<number>(0);
-  pageSize = signal<number>(10);
-
-
-
+  // Custom sorting logic for processedData (used as source for listing utility)
   processedData = computed(() => {
-    let filtered = [...this.allRequests()];
+    const list = [...this.allRequests()];
 
+    // Filtering logic matches the utility's filterFn requirement
+    // But processedData here also handles SORTING
+    const search = this.listing.searchText().toLowerCase();
+    const status = this.listing.filterStatus();
+    const start = this.listing.filterStartDate();
+    const end = this.listing.filterEndDate();
 
-    if (this.filterStatus()) {
-      filtered = filtered.filter((r) => r.status === this.filterStatus());
-    }
-
-    if (this.filterStartDate()) {
-      filtered = filtered.filter((r) => r.createDate >= this.filterStartDate());
-    }
-
-    if (this.filterEndDate()) {
-      filtered = filtered.filter((r) => r.createDate <= this.filterEndDate());
-    }
-
-    if (this.searchText()) {
-      const search = this.searchText().toLowerCase();
-      filtered = filtered.filter((r) =>
-        r.id.toLowerCase().includes(search) ||
-        r.items.some(item => item.description.toLowerCase().includes(search))
-      );
-    }
-
+    let filtered = list.filter(r => {
+      const matchSearch = !search || r.id.toLowerCase().includes(search) ||
+        r.items.some(item => item.description.toLowerCase().includes(search));
+      const matchStatus = !status || r.status === status;
+      const matchStart = !start || r.createDate >= start;
+      const matchEnd = !end || r.createDate <= end;
+      return matchSearch && matchStatus && matchStart && matchEnd;
+    });
 
     const sortState = this.sorting()[0];
     if (sortState) {
@@ -92,54 +78,39 @@ export class AllowanceComponent implements OnInit {
 
       filtered.sort((requestA, requestB) => {
         let valueA: any, valueB: any;
-
         switch (id) {
-          case 'requestId':
-            return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate':
-            return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          case 'status':
-            return requestA.status.localeCompare(requestB.status) * direction;
+          case 'requestId': return requestA.id.localeCompare(requestB.id) * direction;
+          case 'createDate': return requestA.createDate.localeCompare(requestB.createDate) * direction;
+          case 'status': return requestA.status.localeCompare(requestB.status) * direction;
           case 'amount':
-            valueA = requestA.items.reduce((sum: number, item: AllowanceItem) => sum + item.amount, 0);
-            valueB = requestB.items.reduce((sum: number, item: AllowanceItem) => sum + item.amount, 0);
+            valueA = requestA.items.reduce((sum, i) => sum + i.amount, 0);
+            valueB = requestB.items.reduce((sum, i) => sum + i.amount, 0);
             return (valueA - valueB) * direction;
           case 'hours':
-            valueA = requestA.items.reduce((sum: number, item: AllowanceItem) => sum + item.hours, 0);
-            valueB = requestB.items.reduce((sum: number, item: AllowanceItem) => sum + item.hours, 0);
+            valueA = requestA.items.reduce((sum, i) => sum + i.hours, 0);
+            valueB = requestB.items.reduce((sum, i) => sum + i.hours, 0);
             return (valueA - valueB) * direction;
           case 'date':
             valueA = requestA.items[0]?.date || '';
             valueB = requestB.items[0]?.date || '';
-
-            const isoA = this.dateUtil.formatBEToISO(valueA);
-            const isoB = this.dateUtil.formatBEToISO(valueB);
-            return isoA.localeCompare(isoB) * direction;
+            return this.dateUtil.formatBEToISO(valueA).localeCompare(this.dateUtil.formatBEToISO(valueB)) * direction;
           case 'description':
             valueA = requestA.items[0]?.description || '';
             valueB = requestB.items[0]?.description || '';
             return valueA.localeCompare(valueB) * direction;
-          default:
-            return 0;
+          default: return 0;
         }
       });
     }
-
     return filtered;
   });
 
-
-  paginatedRequests = computed(() => {
-    const filtered = this.processedData();
-    const start = this.currentPage() * this.pageSize();
-    const end = start + this.pageSize();
-    return filtered.slice(start, end);
-  });
-
+  // ใช้ Utility สำหรับ Pagination logic ต่อจาก processedData
+  comps = createListingComputeds(this.processedData, this.listing);
 
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
-    this.paginatedRequests().forEach((request: AllowanceRequest) => {
+    this.comps.paginatedData().forEach((request: AllowanceRequest) => {
       request.items.forEach((item: AllowanceItem, index: number) => {
         rows.push({
           ...item,
@@ -153,11 +124,6 @@ export class AllowanceComponent implements OnInit {
     });
     return rows;
   });
-
-
-
-  totalRequests = computed(() => this.processedData().length);
-  totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
 
   table = createAngularTable(() => ({
     data: this.displayedRows(),
@@ -179,50 +145,15 @@ export class AllowanceComponent implements OnInit {
     manualPagination: true,
   }));
 
-
-  setPageSize(size: number) {
-    this.pageSize.set(size);
-    this.currentPage.set(0);
-  }
-
-
-  nextPage() {
-    if (this.canNextPage()) {
-      this.currentPage.update(p => p + 1);
-    }
-  }
-
-
-  previousPage() {
-    if (this.canPreviousPage()) {
-      this.currentPage.update(p => p - 1);
-    }
-  }
-
-
-  goToPage(page: number) {
-    this.currentPage.set(Math.max(0, Math.min(page, this.totalPages() - 1)));
-  }
-
-  canNextPage() {
-    return this.currentPage() < this.totalPages() - 1;
-  }
-
-  canPreviousPage() {
-    return this.currentPage() > 0;
-  }
-
   ngOnInit() {
     this.loadData();
   }
-
 
   loadData() {
     this.allowanceService.getAllowanceRequests().subscribe(data => {
       this.allRequests.set(data);
     });
   }
-
 
   openModal(id: string = '') {
     if (id === '') {
@@ -236,26 +167,19 @@ export class AllowanceComponent implements OnInit {
     }
   }
 
-
   closeModal() {
     this.isModalOpen = false;
     this.loadData();
   }
 
-
   clearFilters() {
-    this.filterStartDate.set('');
-    this.filterEndDate.set('');
-    this.filterStatus.set('');
-    this.searchText.set('');
+    clearListingFilters(this.listing);
   }
-
 
   toggleSort(columnId: string) {
     const column = this.table.getColumn(columnId);
     if (column) column.toggleSorting(column.getIsSorted() === 'asc');
   }
-
 
   getSortIcon(columnId: string) {
     const isSorted = this.table.getColumn(columnId)?.getIsSorted();
@@ -276,7 +200,16 @@ export class AllowanceComponent implements OnInit {
     return `${original.requestId}-${original.date}-${index}`;
   }
 
-  public getStatusClass(status: string): string {
+  getStatusClass(status: string): string {
     return StatusUtil.getStatusBadgeClass(status);
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
   }
 }
