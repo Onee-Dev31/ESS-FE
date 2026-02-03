@@ -48,15 +48,10 @@ export class AllowanceComponent implements OnInit {
   allRequests = signal<AllowanceRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
-  // ใช้ Utility จัดการ State
   listing = createListingState();
 
-  // Custom sorting logic for processedData (used as source for listing utility)
   processedData = computed(() => {
     const list = [...this.allRequests()];
-
-    // Filtering logic matches the utility's filterFn requirement
-    // But processedData here also handles SORTING
     const search = this.listing.searchText().toLowerCase();
     const status = this.listing.filterStatus();
     const start = this.listing.filterStartDate();

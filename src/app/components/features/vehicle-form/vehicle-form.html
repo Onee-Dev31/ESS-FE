@@ -5,7 +5,7 @@
   </header>
 
   <main class="content-card">
-    
+
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
@@ -21,18 +21,20 @@
       </div>
     </section>
 
-    
+
     <div class="action-bar">
-      <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
+      <button class="btn-submit" (click)="onSubmit()">
+        <i class="fas fa-check"></i> ยืนยันการเบิก
+      </button>
 
       <div class="info-badges">
         <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span>
       </div>
     </div>
 
-    
+
     <div class="table-container">
-      
+
       <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-select" />
@@ -96,7 +98,7 @@
         </tfoot>
       </table>
 
-      
+
       <div class="mobile-cards-view mobile-only">
         <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
           <div class="card-header">
@@ -133,7 +135,7 @@
       </div>
     </div>
 
-    
+
     <div class="mobile-sticky-footer mobile-only">
       <div class="summary-details">
         <div class="sum-item">
@@ -142,7 +144,7 @@
         </div>
       </div>
       <button class="btn-submit-mobile" (click)="onSubmit()">
-        <i class="fas fa-check-circle"></i> ยืนยันการเบิก
+        <i class="fas fa-check"></i> ยืนยันการเบิก
       </button>
     </div>
   </main>

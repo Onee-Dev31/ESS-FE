@@ -6,12 +6,13 @@ import { UserService } from '../../../services/user.service';
 import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
 import { AlertService } from '../../../services/alert.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { FilePreviewModalComponent } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',
 })
@@ -25,7 +26,10 @@ export class MedicalexpensesForm implements OnInit {
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');
+  employeeId = signal<string>('');
   isEditMode = signal<boolean>(false);
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<any[]>([]);
 
   claimTypes = [
     { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: '#ff6b6b' },
@@ -62,8 +66,12 @@ export class MedicalexpensesForm implements OnInit {
     return end.diff(start, 'day') + 1;
   });
 
-  
+
   ngOnInit() {
+    this.userService.getUserProfile().subscribe(profile => {
+      this.employeeId.set(profile.employeeId);
+    });
+
     if (this.requestId) {
       this.medicalService.getRequestById(this.requestId).subscribe(req => {
         if (req) {
@@ -114,7 +122,7 @@ export class MedicalexpensesForm implements OnInit {
     input.click();
   }
 
-  
+
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -133,7 +141,16 @@ export class MedicalexpensesForm implements OnInit {
     this.onClose.emit();
   }
 
-  
+  openPreview(file: any) {
+    this.previewFiles.set([file]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
+
+
   save() {
     if (!this.selectedClaimType()) {
       this.alertService.showWarning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
@@ -157,9 +174,9 @@ export class MedicalexpensesForm implements OnInit {
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
-    
+
     this.userService.getUserProfile().subscribe(profile => {
-      const titleName = profile.name.split(' ')[0]; 
+      const titleName = profile.name.split(' ')[0];
       const request: MedicalRequest = {
         id: this.requestId,
         createDate: dayjs().toISOString(),

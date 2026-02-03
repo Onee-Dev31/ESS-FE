@@ -10,7 +10,7 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { createListingState, clearListingFilters } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
@@ -95,6 +95,9 @@ export class MedicalexpensesComponent implements OnInit {
     return data;
   });
 
+  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
+  comps = createListingComputeds(this.processedData, this.listing);
+
   // 2. Flattened Data for Table
   flattenedRows = computed(() => {
     return this.processedData().flatMap(req =>
@@ -127,19 +130,11 @@ export class MedicalexpensesComponent implements OnInit {
     return rows;
   });
 
-  // 4. Paginated Data for Table
+  // 4. Paginated Data for Table (Desktop)
   paginatedRows = computed(() => {
     const start = this.listing.currentPage() * this.listing.pageSize();
     return this.sortedRows().slice(start, start + this.listing.pageSize());
   });
-
-  // 5. Paginated Data for Mobile List (Grouped)
-  paginatedRequests = computed(() => {
-    const start = this.listing.currentPage() * this.listing.pageSize();
-    return this.processedData().slice(start, start + this.listing.pageSize());
-  });
-
-  totalItems = computed(() => this.sortedRows().length);
 
   table = createAngularTable(() => ({
     data: this.paginatedRows(),
@@ -162,7 +157,17 @@ export class MedicalexpensesComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   }));
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+  }
 
   ngOnInit() {
     this.loadData();

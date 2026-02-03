@@ -66,66 +66,59 @@
         <div class="card-list-view">
             <div class="mobile-card" *ngFor="let request of comps.paginatedData()">
                 <div class="card-header">
-                    <div class="request-id">
-                        <span class="label">ประเภทการลา:</span>
-                        <span class="value">{{ request.leaveType }}</span>
-                    </div>
-                    <div class="status-badge" [ngClass]="getStatusClass(request.status)">
-                        {{ request.status | statusLabel }}
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="info-item">
-                        <span class="label">รหัสคำขอ:</span>
-                        <span class="value">{{ request.id }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">จาก:</span>
-                        <span class="value">
-                            {{ formatDate(request.startDate) }}
-                            <span class="text-muted" *ngIf="request.shiftStartTime"> {{ request.shiftStartTime }}</span>
-                        </span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">ถึง:</span>
-                        <span class="value">
-                            {{ formatDate(request.endDate) }}
-                            <span class="text-muted" *ngIf="request.shiftEndTime"> {{ request.shiftEndTime }}</span>
-                        </span>
-                    </div>
-                    <div class="info-item" *ngIf="request.days">
-                        <span class="label">จำนวนวัน:</span>
-                        <span class="value">{{ request.days }} วัน</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">ประเภทวันลา:</span>
-                        <span class="value">{{ getPeriodLabel(request.leavePeriod) }}</span>
-                    </div>
-                    <div class="info-item reason-item">
-                        <span class="label">เหตุผล:</span>
-                        <span class="value">{{ request.reason }}</span>
+                    <div class="header-content">
+                        <span class="ticket-no">{{ request.leaveType }}</span>
                     </div>
 
-                    <div class="card-actions">
+                    <div class="card-actions-top">
                         <button class="action-btn folder" *ngIf="request.attachments && request.attachments.length > 0"
                             (click)="openPreview(request.attachments)" title="ดูเอกสาร">
                             <i class="far fa-folder-open"></i>
                         </button>
+                        <div class="status-badge" [ngClass]="getStatusClass(request.status)">
+                            {{ request.status | statusLabel }}
+                        </div>
+                    </div>
+                </div>
 
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label">รหัสคำขอ:</span>
+                        <span class="value">{{ request.id }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">วันที่ลา:</span>
+                        <span class="value" style="text-align: right;">
+                            {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
+                            <div class="text-muted small" *ngIf="request.shiftStartTime">
+                                ({{ request.shiftStartTime }} - {{ request.shiftEndTime }})
+                            </div>
+                        </span>
+                    </div>
+                    <div class="info-row" *ngIf="request.days">
+                        <span class="label">จำนวนวัน:</span>
+                        <span class="value">{{ request.days }} วัน <span class="text-muted">({{
+                                getPeriodLabel(request.leavePeriod) }})</span></span>
+                    </div>
+
+                    <div class="reason-box">
+                        <strong>เหตุผล:</strong>
+                        {{ request.reason }}
+                    </div>
+
+                    <div class="card-footer-actions">
                         <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
-                            <button class="action-btn edit" title="แก้ไข" (click)="openForm(request.status)">
-                                <i class="far fa-edit"></i>
+                            <button class="btn-edit-sm" (click)="openForm(request.status)">
+                                <i class="far fa-edit"></i> แก้ไข
                             </button>
-                            <button class="action-btn delete" title="ลบ">
-                                <i class="far fa-trash-alt"></i>
+                            <button class="btn-delete-sm">
+                                <i class="far fa-trash-alt"></i> ลบ
                             </button>
                         </ng-container>
 
-                        <button class="action-btn view" title="ดูรายละเอียด"
-                            *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
+                        <button class="btn-view-sm" *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
                             (click)="openForm(request.status)">
-                            <i class="far fa-eye"></i>
+                            <i class="far fa-eye"></i> ดูรายละเอียด
                         </button>
                     </div>
                 </div>
@@ -133,7 +126,7 @@
 
             <div class="no-data" *ngIf="comps.paginatedData().length === 0">
                 <i class="fas fa-inbox"></i>
-                <p>ไม่พบข้อมูลรายการลา</p>
+                <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
             </div>
         </div>
 
@@ -141,19 +134,36 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" class="col-id">รหัสคำขอ</th>
+                        <th rowspan="2" class="col-id sortable-header" (click)="toggleSort('id')">
+                            รหัสคำขอ <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+                        </th>
                         <th colspan="2" class="text-center">วัน-เวลา ที่ขอลา</th>
-                        <th rowspan="2" class="text-center col-days">จำนวนวัน</th>
-                        <th rowspan="2" class="text-center col-type">ประเภทการลา</th>
-                        <th rowspan="2" class="text-center col-period">ประเภทวันลา</th>
-                        <th rowspan="2" class="col-reason">เหตุผล</th>
-                        <th rowspan="2" class="text-center col-status">สถานะ</th>
+                        <th rowspan="2" class="text-center col-days sortable-header" (click)="toggleSort('days')">
+                            จำนวนวัน <i class="fas ml-1" [ngClass]="getSortIcon('days')"></i>
+                        </th>
+                        <th rowspan="2" class="text-center col-type sortable-header" (click)="toggleSort('leaveType')">
+                            ประเภทการลา <i class="fas ml-1" [ngClass]="getSortIcon('leaveType')"></i>
+                        </th>
+                        <th rowspan="2" class="text-center col-period sortable-header"
+                            (click)="toggleSort('leavePeriod')">
+                            ประเภทวันลา <i class="fas ml-1" [ngClass]="getSortIcon('leavePeriod')"></i>
+                        </th>
+                        <th rowspan="2" class="col-reason sortable-header" (click)="toggleSort('reason')">
+                            เหตุผล <i class="fas ml-1" [ngClass]="getSortIcon('reason')"></i>
+                        </th>
+                        <th rowspan="2" class="text-center col-status sortable-header" (click)="toggleSort('status')">
+                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                        </th>
                         <th rowspan="2" class="text-center col-attach">เอกสารแนบ</th>
                         <th rowspan="2" class="text-center col-actions">จัดการ</th>
                     </tr>
                     <tr>
-                        <th class="text-center col-date">จาก</th>
-                        <th class="text-center col-date">ถึง</th>
+                        <th class="text-center col-date sortable-header" (click)="toggleSort('startDate')">
+                            จาก <i class="fas ml-1" [ngClass]="getSortIcon('startDate')"></i>
+                        </th>
+                        <th class="text-center col-date sortable-header" (click)="toggleSort('endDate')">
+                            ถึง <i class="fas ml-1" [ngClass]="getSortIcon('endDate')"></i>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,9 +227,9 @@
                         </td>
                     </tr>
                     <tr *ngIf="comps.paginatedData().length === 0">
-                        <td colspan="9" class="no-data">
+                        <td colspan="10" class="no-data">
                             <i class="fas fa-inbox"></i>
-                            <p>ไม่พบข้อมูลรายการลา</p>
+                            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
                         </td>
                     </tr>
                 </tbody>

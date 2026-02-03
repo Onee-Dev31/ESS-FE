@@ -212,11 +212,11 @@
     </main>
 
     <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
-        <button class="btn-save-custom" (click)="save()">
-            <i class="fas fa-check-circle"></i> ส่งใบลา
-        </button>
         <button class="btn-back-custom" (click)="close()">
-            <i class="fas fa-chevron-circle-left"></i> ยกเลิก
+            <i class="fas fa-times"></i> ยกเลิก
+        </button>
+        <button class="btn-save-custom" (click)="save()">
+            <i class="fas fa-paper-plane"></i> ส่งใบลา
         </button>
     </div>
 

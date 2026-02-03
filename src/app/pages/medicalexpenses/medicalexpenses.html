@@ -164,8 +164,9 @@
                         </td>
                     </tr>
                     <tr *ngIf="table.getRowModel().rows.length === 0">
-                        <td colspan="11" class="empty-state">
-                            ไม่พบรายการที่ตรงตามเงื่อนไข
+                        <td colspan="11" class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
                         </td>
                     </tr>
                 </tbody>
@@ -174,7 +175,7 @@
 
 
         <div class="card-list-view">
-            <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByRowId">
+            <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
                 <div class="card-header">
                     <div class="header-content">
                         <span class="ticket-no">{{ req.id }}</span>
@@ -226,14 +227,16 @@
             </div>
         </div>
 
-        <div class="no-data" *ngIf="paginatedRequests().length === 0">
-            ไม่พบรายการที่ตรงตามเงื่อนไข
+        <div class="no-data" *ngIf="comps.paginatedData().length === 0">
+            <i class="fas fa-inbox"></i>
+            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
         </div>
     </div>
 
 
-    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()" [totalItems]="totalItems()"
-        (onPageChange)="listing.currentPage.set($event)" (onPageSizeChange)="listing.pageSize.set($event)">
+    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+        [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
+        (onPageSizeChange)="listing.pageSize.set($event)">
     </app-pagination>
 
     <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">

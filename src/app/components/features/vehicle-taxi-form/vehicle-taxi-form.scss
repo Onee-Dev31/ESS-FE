@@ -178,7 +178,7 @@ $col-file: 50px;
     }
   }
 
-  
+
 
   .action-bar {
     display: flex;
@@ -200,18 +200,6 @@ $col-file: 50px;
       @include tablet {
         display: none;
       }
-
-      @include desktop {
-        width: auto;
-      }
-
-      background: $success;
-      color: #fff;
-      border: none;
-      padding: 10px 30px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
     }
 
     .info-badges {
@@ -465,7 +453,7 @@ $col-file: 50px;
     }
   }
 
-  
+
   .mobile-cards-view {
     display: flex;
     flex-direction: column;
@@ -602,7 +590,7 @@ $col-file: 50px;
     }
   }
 
-  
+
   .mobile-sticky-footer {
     position: sticky;
     bottom: -20px;

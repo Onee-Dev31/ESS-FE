@@ -1,3 +1,4 @@
+@use "sass:color";
 @use './styles/theme' as *;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
@@ -193,7 +194,6 @@ textarea {
 }
 
 // ===== Global Premium Button Styles =====
-// Base button styling
 button {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -204,154 +204,148 @@ button {
   }
 }
 
-// Premium button base with ripple effect
-.btn-action-orange {
-  padding: 0.875rem 1.75rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.btn-save-custom,
+.btn-submit,
+.btn-confirm,
+.btn-action-green,
+.btn-back-custom,
+.btn-cancel,
+.btn-action-orange,
+.btn-create,
+.btn-search,
+.btn-info-policy {
+  padding: 8px 18px !important;
+  min-width: unset !important;
+  border-radius: 10px !important;
+  font-size: 0.925rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
-  &:hover::before {
-    width: 300px;
-    height: 300px;
-  }
 
   i {
-    font-size: 1.05rem;
+    font-size: 1rem;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    filter: brightness(1.05);
   }
 
   &:active {
-    transform: translateY(0) !important;
+    transform: scale(0.97) !important;
   }
 }
 
 
-// Green buttons (Save, Submit, Confirm, Approve)
 .btn-save-custom,
 .btn-submit,
 .btn-confirm,
 .btn-action-green {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  background: $color-save !important;
   color: white !important;
-  border: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4) !important;
+    background: color.adjust($color-save, $lightness: -5%) !important;
+    box-shadow: 0 4px 12px rgba($color-save, 0.25) !important;
   }
 }
 
-// Gray buttons (Back, Cancel)
 .btn-back-custom,
 .btn-cancel {
-  background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+  background: $color-cancel !important;
   color: white !important;
-  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4) !important;
+    background: color.adjust($color-cancel, $lightness: -5%) !important;
+    box-shadow: 0 4px 12px rgba($color-cancel, 0.25) !important;
   }
 }
 
-// Blue buttons (Create, Search, Info)
 .btn-create,
 .btn-search,
 .btn-info-policy {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  background: $primary !important;
   color: white !important;
-  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
+    background: color.adjust($primary, $lightness: -5%) !important;
+    box-shadow: 0 4px 12px rgba($primary, 0.25) !important;
   }
 }
 
-// Purple buttons (Pending Approvals)
+
 .btn-pending-approvals {
-  background: #fbe1fb !important;
-  border: 1.5px solid #800080 !important;
-  color: #800080 !important;
-  box-shadow: 0 2px 8px rgba(128, 0, 128, 0.1) !important;
+  background: #800080 !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(128, 0, 128, 0.4) !important;
 
   &:hover {
-    background: #f3c9f3 !important;
+    background: color.adjust(#800080, $lightness: 5%) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(128, 0, 128, 0.2) !important;
+    box-shadow: 0 8px 25px rgba(128, 0, 128, 0.5) !important;
   }
 
   .notification-badge {
-    background: #800080 !important;
-    color: white !important;
+    background: white !important;
+    color: #800080 !important;
+    font-weight: 800;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 }
 
-// Red buttons (Delete, Reject, Close)
 .btn-action-red,
 .btn-close {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  background: $color-delete !important;
   color: white !important;
-  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+    background: color.adjust($color-delete, $lightness: -5%) !important;
+    box-shadow: 0 4px 12px rgba($color-delete, 0.25) !important;
   }
 }
 
-// Orange buttons (Warning, Refer Back)
 .btn-action-orange,
 .btn-clear {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  background: $color-warning !important;
   color: white !important;
-  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+    background: color.adjust($color-warning, $lightness: -5%) !important;
+    box-shadow: 0 4px 12px rgba($color-warning, 0.25) !important;
   }
 }
 
-// Outline buttons
 .btn-outline {
   background: transparent !important;
-  border: 2px solid #3b82f6 !important;
-  color: #3b82f6 !important;
-  padding: 0.875rem 1.75rem;
-  border-radius: 8px;
+  border: 1.5px solid $color-create !important;
+  color: $color-create !important;
+  padding: 8px 18px !important;
+  border-radius: 10px !important;
   font-weight: 600;
 
   &:hover {
-    background: #3b82f6 !important;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3) !important;
+    background: rgba($color-create, 0.05) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($color-create, 0.08) !important;
   }
 }
 
-// Icon-only buttons
 .btn-icon,
 .btn-icon-folder,
 .btn-remove-file,
@@ -376,7 +370,6 @@ button {
   }
 }
 
-// Upload button
 .btn-upload-file,
 .btn-card-upload {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
@@ -392,20 +385,19 @@ button {
   }
 }
 
-// Form actions footer
 .form-actions-footer {
   display: flex;
-  gap: 1rem;
-  padding: 1.5rem 1.25rem;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
+  justify-content: flex-end;
 
   button {
-    flex: 1;
+    flex: 0 0 auto;
   }
 }
 
-// Mobile responsive
 @media (max-width: 768px) {
   .form-actions-footer {
     flex-direction: column;
@@ -428,14 +420,13 @@ button {
   }
 }
 
-// Folder Icon Button Style
 .action-btn.folder {
   width: 36px;
   height: 36px;
   border-radius: 50%;
   border: 1px solid #fef3c7;
-  background: #fffbeb; // Light amber
-  color: #d97706; // Amber 600
+  background: #fffbeb;
+  color: #d97706; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -498,7 +489,7 @@ button {
     select {
       padding: 0.5rem 0.5rem;
       border: 1px solid #e2e8f0;
-      border-radius: 8px; // Rounded
+      border-radius: 8px; 
       outline: none;
       background-color: white;
       color: #475569;
@@ -509,8 +500,8 @@ button {
 
       &:hover,
       &:focus {
-        border-color: #3b82f6; // Brand blue
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
       }
     }
 
@@ -527,18 +518,18 @@ button {
         justify-content: center;
         border: 1px solid #e2e8f0;
         background: white;
-        border-radius: 8px; // Uniform border-radius
+        border-radius: 8px; 
         cursor: pointer;
         color: #64748b;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 500;
 
         &:hover:not(:disabled) {
-          border-color: #3b82f6;
-          color: #3b82f6;
+          border-color: $primary;
+          color: $primary;
           background: #eff6ff;
           transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+          box-shadow: 0 2px 4px rgba($primary, 0.1);
         }
 
         &:disabled {
@@ -620,7 +611,7 @@ button {
   padding: 0 24px 20px 24px;
 
   @include mobile {
-    padding: 0 10px 15px 10px; // Reduced padding
+    padding: 0 10px 15px 10px;
     gap: 12px;
   }
 
@@ -655,12 +646,10 @@ button {
         gap: 8px;
         width: 100%;
 
-        // Allow grid items to shrink below content size to prevent overflow
         >* {
           min-width: 0;
         }
 
-        // Stack only on extremely small screens if absolutely necessary
         @media (max-width: 340px) {
           grid-template-columns: 1fr;
         }
@@ -686,14 +675,14 @@ button {
           @include mobile {
             min-width: auto;
             width: 100%;
-            padding: 0.6rem 0.25rem; // Very tight padding
-            font-size: 0.8rem; // Smaller font for mobile
+            padding: 0.6rem 0.25rem;
+            font-size: 0.8rem;
           }
         }
       }
 
       .btn-clear {
-        height: 42px; // Match input height roughly
+        height: 42px;
         margin-left: 4px;
 
         @include mobile {
@@ -711,7 +700,7 @@ button {
       gap: 8px;
       flex: 1;
       max-width: 350px;
-      margin-left: auto; // Push to right if space permits
+      margin-left: auto;
 
       @include mobile {
         max-width: none;
@@ -744,11 +733,14 @@ button {
 
   thead {
     background-color: $header-bg;
+    border-bottom: 1px solid #cbd5e1;
 
     tr th {
       color: $text-header;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       padding: 16px 12px;
 
       text-align: left;
@@ -831,40 +823,35 @@ button {
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
           &.status-new {
-            background-color: #fffbeb;
-            color: #d97706;
-            border: 1px solid #fde68a;
+            background-color: $status-new-bg;
+            color: $status-new-text;
+            border: 1px solid rgba($status-new-text, 0.2);
           }
 
-          &.status-reviewed {
-            background-color: #f0fdfa;
-            color: #0d9488;
-            border: 1px solid #99f6e4;
+          &.status-reviewed,
+          &.status-verified {
+            background-color: $status-verified-bg;
+            color: $status-verified-text;
+            border: 1px solid rgba($status-verified-text, 0.2);
           }
 
           &.status-pending {
-            background-color: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
+            background-color: $status-pending-bg;
+            color: $status-pending-text;
+            border: 1px solid rgba($status-pending-text, 0.2);
           }
 
           &.status-approved,
           &.status-success {
-            background-color: #f0fdf4;
-            color: #16a34a;
-            border: 1px solid #bbf7d0;
-          }
-
-          &.status-verified {
-            background-color: #f0fdfa; // Cyan-50
-            color: #0d9488; // Teal-600
-            border: 1px solid #99f6e4; // Teal-200
+            background-color: $status-success-bg;
+            color: $status-success-text;
+            border: 1px solid rgba($status-success-text, 0.2);
           }
 
           &.status-rejected {
-            background-color: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
+            background-color: $status-danger-bg;
+            color: $status-danger-text;
+            border: 1px solid rgba($status-danger-text, 0.2);
           }
         }
 
@@ -876,7 +863,6 @@ button {
       }
     }
 
-    // No Data state
     .no-data {
       text-align: center;
       padding: 50px 20px;
@@ -960,42 +946,36 @@ button {
         font-weight: 700;
         white-space: nowrap;
 
-        // Reuse status colors
         &.status-new {
-          background-color: #fffbeb;
-          color: #d97706;
-          border: 1px solid #fde68a;
+          background-color: $status-new-bg;
+          color: $status-new-text;
+          border: 1px solid rgba($status-new-text, 0.2);
         }
 
-        &.status-reviewed {
-          background-color: #f0fdfa;
-          color: #0d9488;
-          border: 1px solid #99f6e4;
+        &.status-reviewed,
+        &.status-verified {
+          background-color: $status-verified-bg;
+          color: $status-verified-text;
+          border: 1px solid rgba($status-verified-text, 0.2);
         }
 
         &.status-pending {
-          background-color: #eff6ff;
-          color: #2563eb;
-          border: 1px solid #bfdbfe;
+          background-color: $status-pending-bg;
+          color: $status-pending-text;
+          border: 1px solid rgba($status-pending-text, 0.2);
         }
 
         &.status-approved,
         &.status-success {
-          background-color: #f0fdf4;
-          color: #16a34a;
-          border: 1px solid #bbf7d0;
-        }
-
-        &.status-verified {
-          background-color: #f0fdfa; // Cyan-50
-          color: #0d9488; // Teal-600
-          border: 1px solid #99f6e4; // Teal-200
+          background-color: $status-success-bg;
+          color: $status-success-text;
+          border: 1px solid rgba($status-success-text, 0.2);
         }
 
         &.status-rejected {
-          background-color: #fef2f2;
-          color: #dc2626;
-          border: 1px solid #fecaca;
+          background-color: $status-danger-bg;
+          color: $status-danger-text;
+          border: 1px solid rgba($status-danger-text, 0.2);
         }
       }
     }
@@ -1035,5 +1015,46 @@ button {
     text-align: center;
     padding: 40px;
     color: $text-muted;
+  }
+}
+// Styled Folder Icon Link
+.file-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  padding: 4px;
+
+  i.fa-folder-open {
+    font-size: 1.2rem;
+    color: #f59e0b; // Amber 500
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 3px rgba(245, 158, 11, 0.15));
+  }
+
+  &:hover i.fa-folder-open {
+    color: #d97706; // Amber 600
+    transform: scale(1.15) rotate(-3deg);
+    filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.25));
+  }
+
+  .attach-count {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 }

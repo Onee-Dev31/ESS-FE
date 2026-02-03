@@ -29,7 +29,7 @@
 
       <div class="notification-dropdown" (click)="$event.stopPropagation()">
         <button class="icon-btn" (click)="toggleNotification()">
-          <i class="fas fa-paper-plane"></i>
+          <i class="fas fa-bell"></i>
           <span class="badge">{{ notifications.length }}</span>
         </button>
 
@@ -38,7 +38,7 @@
 
           <a href="javascript:void(0)" class="dropdown-item" *ngFor="let item of notifications">
             <div class="icon-circle" [ngClass]="{
-                orange: item.status === 'pending',
+                blue: item.status === 'pending',
                 green: item.status === 'approved',
                 red: item.status === 'rejected'
               }">

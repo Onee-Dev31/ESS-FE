@@ -8,46 +8,59 @@ $danger: #d93025;
 $warning: #f1b44c;
 $info: #17a2b8;
 
-$btn-create-bg: #28a745;
+$btn-create-bg: #1a73e8;
 $btn-search-bg: #1a73e8;
-$btn-delete-bg: #dc3545;
+$btn-delete-bg: #d93025;
+
+// --- Action Colors (Semantic) ---
+$color-save: #22c55e;
+$color-cancel: #64748b;
+$color-create: #1a73e8;
+$color-delete: #ef4444;
+$color-warning: #f59e0b;
+$color-info: #1a73e8;
+$color-purple: #800080;
+$color-amber: #d97706;
 
 // --- Background & Surface ---
 $bg-page: #f8f9fa;
 $bg-card: #ffffff;
 $bg-gray: #fcfcfc;
 $bg-slate: #f4f7f9;
-$header-bg: #343a40;
+$header-bg: #f8fafc; 
 
 // --- Text Colors ---
 $text: #202124;
 $text-sub: #5f6368;
 $text-muted: #94a3b8;
 $text-light: $text-muted;
-$text-header: #ffffff;
+$text-header: #475569; // Dark text for light header
 
 // --- Borders ---
 $border: #dee2e6;
 $border-color: #e9ecef;
 
 $radius: 12px;
-$shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08); // Diffused shadow
 
 
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
 
-$status-new-bg: rgba(255, 193, 7, 0.15);
-$status-new-text: #f1b44c;
+$status-new-bg: rgba(217, 119, 6, 0.1); // Amber
+$status-new-text: #d97706;
 
-$status-verified-bg: rgba(23, 162, 184, 0.15);
-$status-verified-text: #17a2b8;
+$status-verified-bg: rgba(13, 148, 136, 0.1); // Teal
+$status-verified-text: #0d9488;
 
-$status-pending-bg: rgba(0, 123, 255, 0.15);
-$status-pending-text: #007bff;
+$status-pending-bg: rgba(26, 115, 232, 0.1); // Blue
+$status-pending-text: #1a73e8;
 
-$status-success-bg: rgba(40, 167, 69, 0.15);
-$status-success-text: #28a745;
+$status-success-bg: rgba(22, 163, 74, 0.1); // Green
+$status-success-text: #16a34a;
+
+$status-danger-bg: rgba(220, 38, 38, 0.1); // Red
+$status-danger-text: #dc2626;
 
 
 @mixin mobile {

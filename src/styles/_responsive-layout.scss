@@ -137,8 +137,8 @@
 
     @include mobile {
         display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)); // Use minmax(0, 1fr) to prevent overflow
-        gap: 10px; // Slightly increase gap for touch targets
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
         width: 100%;
         box-sizing: border-box;
     }
@@ -149,7 +149,7 @@
         flex-direction: column;
         gap: 5px;
         min-width: 0;
-        width: 100%; // Ensure container takes full grid cell width
+        width: 100%;
 
         @media (max-width: 991px) {
             width: 100%;
@@ -165,8 +165,8 @@
         .select-status {
             box-sizing: border-box;
             max-width: 100%;
-            width: 100%; // Force full width
-            min-width: 0; // Allow shrinking
+            width: 100%;
+            min-width: 0;
             overflow: hidden;
             height: 38px;
             padding: 6px 12px;
@@ -191,7 +191,7 @@
         color: #6c757d;
         border: 1px solid #ced4da;
         padding: 7px 20px;
-        border-radius: 4px; // Consistent border radius
+        border-radius: 4px;
         font-weight: 500;
         cursor: pointer;
 
@@ -212,10 +212,10 @@
     }
 }
 
-// สไตล์สำหรับแสดงผลแบบการ์ด (บนมือถือ/แท็บเล็ต)
+// สไตล์สำหรับแสดงผลแบบการ์ด (บนมือถือ/แท็บเล็ต) - Premium Standardized
 .card-list-view {
     display: none;
-    padding: 15px;
+    padding: 0; // Removed padding to fit edge-to-edge better or controlled by container
 
     @include tablet {
         display: flex;
@@ -225,20 +225,63 @@
 
     .mobile-card {
         background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-radius: 16px; // Premium radius
+        box-shadow: $shadow; // Global premium shadow
         overflow: hidden;
-        border: 1px solid #edf2f7;
+        border: none; // Cleaner look
         margin-bottom: 5px;
 
         .card-header {
-            background: #fcfcfc;
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f0f0;
+            background: rgba($bg-slate, 0.5); // Subtle background
+            padding: 16px;
+            border-bottom: 1px solid $border-color;
             display: flex;
             justify-content: space-between;
             align-items: center;
 
+            .header-content {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+
+                .ticket-no {
+                    font-weight: 700;
+                    font-size: 1rem;
+                    color: $text;
+                }
+
+                .create-date {
+                    font-size: 0.75rem;
+                    color: $text-muted;
+                }
+            }
+
+            .card-actions-top {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                // Folder button in header
+                .action-btn.folder {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 1px solid transparent;
+                    background: rgba(234, 179, 8, 0.1); // Amber bg
+                    color: #d97706; // Amber 600
+                    font-size: 0.9rem;
+                    cursor: pointer;
+
+                    &:hover {
+                        background: rgba(234, 179, 8, 0.2);
+                    }
+                }
+            }
+
+            // Support old structure if needed
             .request-id {
                 display: flex;
                 align-items: center;
@@ -246,58 +289,14 @@
 
                 .label {
                     font-size: 0.75rem;
-                    color: #718096;
+                    color: $text-sub;
                     font-weight: 500;
                 }
 
                 .value {
                     font-weight: 700;
-                    color: #2d3748;
+                    color: $text;
                     font-size: 0.95rem;
-                }
-            }
-
-            .status-badge {
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 600;
-                border: 1px solid transparent;
-
-                &.status-new {
-                    background-color: rgba(255, 193, 7, 0.15);
-                    color: #f1b44c;
-                    border-color: rgba(241, 180, 76, 0.2);
-                }
-
-                &.status-verified {
-                    background-color: rgba(23, 162, 184, 0.15);
-                    color: #17a2b8;
-                    border-color: rgba(23, 162, 184, 0.2);
-                }
-
-                &.status-pending {
-                    background-color: rgba(0, 123, 255, 0.15);
-                    color: #007bff;
-                    border-color: rgba(0, 123, 255, 0.2);
-                }
-
-                &.status-success {
-                    background-color: rgba(40, 167, 69, 0.15);
-                    color: #28a745;
-                    border-color: rgba(40, 167, 69, 0.2);
-                }
-
-                &.status-rejected {
-                    background-color: rgba(217, 48, 37, 0.1);
-                    color: #d93025;
-                    border-color: rgba(217, 48, 37, 0.2);
-                }
-
-                &.status-referred-back {
-                    background-color: rgba(241, 180, 76, 0.1);
-                    color: #f1b44c;
-                    border-color: rgba(241, 180, 76, 0.2);
                 }
             }
         }
@@ -305,133 +304,173 @@
         .card-body {
             padding: 16px;
 
+            // Standard Info Row
+            .info-row,
             .info-item {
-                margin-bottom: 12px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                margin-bottom: 12px;
+                font-size: 0.9rem;
 
                 .label {
-                    font-size: 0.8rem;
-                    color: #718096;
+                    color: $text-sub;
                 }
 
                 .value {
-                    font-size: 0.9rem;
                     font-weight: 600;
-                    color: #2d3748;
+                    color: $text;
+                    text-align: right;
                 }
             }
 
+            // Reason Box
+            .reason-box {
+                background: $bg-slate;
+                padding: 12px;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                color: $text-sub;
+                line-height: 1.5;
+                margin-bottom: 12px;
+
+                strong {
+                    display: block;
+                    color: $text;
+                    font-size: 0.8rem;
+                    margin-bottom: 4px;
+                }
+            }
+
+            // Nested List (for Medical/Vehicle items)
+            .nested-list,
             .items-list {
                 display: flex;
                 flex-direction: column;
-                gap: 12px;
-                margin-top: 10px;
+                gap: 0;
 
+                .nested-item,
                 .trip-item {
-                    padding: 12px;
-                    background: #f7fafc;
-                    border-radius: 8px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 6px;
+                    padding: 12px 0;
+                    border-bottom: 1px dashed $border-color;
 
+                    &:first-child {
+                        padding-top: 0;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    .item-header,
                     .trip-header {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        font-size: 0.85rem;
-                        font-weight: 600;
-                        color: #4a5568;
+                        margin-bottom: 8px;
 
-                        .trip-date,
-                        .hours {
+                        .item-title,
+                        .trip-date {
+                            font-weight: 600;
+                            color: $text;
+                            font-size: 0.95rem;
+                        }
+
+                        .item-amount,
+                        .trip-amount .value {
+                            font-weight: 800;
+                            color: $primary;
+                            font-size: 1.1rem;
+                        }
+                    }
+
+                    .item-detail,
+                    .trip-detail {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 6px;
+
+                        .detail-row,
+                        .trip-desc {
+                            font-size: 0.9rem;
+                            color: $text-sub;
                             display: flex;
-                            align-items: center;
-                            gap: 6px;
+                            align-items: flex-start;
+                            gap: 10px;
+                            line-height: 1.5;
 
                             i {
-                                color: #a0aec0;
+                                margin-top: 3px;
+                                width: 16px;
+                                text-align: center;
+                                color: $primary;
+                                opacity: 0.7;
                             }
-                        }
-                    }
-
-                    .trip-desc {
-                        font-size: 0.9rem;
-                        color: #2d3748;
-                        line-height: 1.4;
-                    }
-
-                    .trip-amount {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-top: 4px;
-                        padding-top: 6px;
-                        border-top: 1px dashed #e2e8f0;
-
-                        .label {
-                            font-size: 0.75rem;
-                            color: #718096;
-                        }
-
-                        .value {
-                            font-weight: 700;
-                            color: $primary;
                         }
                     }
                 }
             }
 
+            // Card Footer Actions (Text Buttons)
+            .card-footer-actions,
             .card-actions {
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid $border-color;
                 display: flex;
                 justify-content: flex-end;
                 gap: 12px;
-                padding-top: 16px;
-                margin-top: 12px;
-                border-top: 1px solid #f0f0f0;
 
-                .action-btn {
-                    width: 38px;
-                    height: 38px;
-                    border-radius: 50%;
-                    display: flex;
+                button {
+                    display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    border: 1px solid #edf2f7;
-                    background: #fff;
-                    font-size: 1rem;
-                    color: #718096;
+                    gap: 8px;
+                    padding: 10px 20px;
+                    border-radius: 10px;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    cursor: pointer;
                     transition: all 0.2s;
+                    border: none;
 
+                    i {
+                        font-size: 1rem;
+                    }
+
+                    &.btn-edit-sm,
                     &.edit {
-                        color: #3182ce;
+                        background-color: $bg-slate;
+                        color: $primary;
 
                         &:hover {
-                            background: #ebf8ff;
-                            border-color: #3182ce;
+                            background-color: color.adjust($bg-slate, $lightness: -5%);
                         }
                     }
 
+                    &.btn-delete-sm,
                     &.delete {
-                        color: #e53e3e;
+                        background-color: rgba($color-delete, 0.1);
+                        color: $color-delete;
 
                         &:hover {
-                            background: #fff5f5;
-                            border-color: #e53e3e;
+                            background-color: rgba($color-delete, 0.2);
                         }
                     }
 
-                    &.folder {
-                        color: #eab308;
+                    &.btn-view-sm,
+                    &.view {
+                        background-color: rgba($color-info, 0.1);
+                        color: $color-info;
 
                         &:hover {
-                            background: #fefce8;
-                            border-color: #eab308;
+                            background-color: rgba($color-info, 0.2);
                         }
                     }
                 }
+
+                // Keep round icon buttons support for older code if needed (optional, or just migrate)
+                // But generally favoring the text buttons now.
             }
         }
     }

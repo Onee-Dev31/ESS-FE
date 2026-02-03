@@ -20,9 +20,7 @@
 
     thead {
       tr th {
-        // Shared styles inherited from global
 
-        // Specific Column Widths
         &.col-id {
           width: 12%;
         }
@@ -65,20 +63,8 @@
 
     tbody {
       tr {
-        // Shared styles inherited from global
-
-        // Keep status-badge for now if we want to preserve exact variables colors, 
-        // OR rely on global if standardization is desired.
-        // User asked "CSS must stay the same". 
-        // Global uses HEX, this uses $variables. 
-        // If I comment this out, it uses global Premium colors.
-        // I will keep specific specific overrides if they don't match global classes.
 
         .status-badge {
-          // Intentionally overriding global to keep legacy logic if needed, 
-          // but 'status-new' class names match. 
-          // If I remove this block, it uses the promoted styles from timeoff.
-          // Given 'clean up', I will defer to global.
 
           &.status-verified {
             background-color: $status-verified-bg;
@@ -92,6 +78,10 @@
         }
       }
     }
+  }
+
+  .modal-overlay {
+    @include responsive.modal-overlay-styles;
   }
 
   .modal-overlay {

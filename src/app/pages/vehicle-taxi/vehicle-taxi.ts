@@ -9,7 +9,7 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { createListingState, clearListingFilters } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
@@ -75,23 +75,45 @@ export class VehicleTaxiComponent implements OnInit {
       const { id, desc } = sortState;
       const direction = desc ? -1 : 1;
       filtered.sort((a, b) => {
-        if (id === 'requestId') return a.id.localeCompare(b.id) * direction;
-        if (id === 'createDate') return a.createDate.localeCompare(b.createDate) * direction;
-        return 0;
+        const valA_id = a.id;
+        const valB_id = b.id;
+        const valA_createDate = a.createDate;
+        const valB_createDate = b.createDate;
+
+        switch (id) {
+          case 'requestId': return valA_id.localeCompare(valB_id) * direction;
+          case 'createDate': return valA_createDate.localeCompare(valB_createDate) * direction;
+          case 'status': return a.status.localeCompare(b.status) * direction;
+          case 'amount':
+            const sumA = a.items.reduce((s, i) => s + i.amount, 0);
+            const sumB = b.items.reduce((s, i) => s + i.amount, 0);
+            return (sumA - sumB) * direction;
+          case 'description':
+            const descA = a.items[0]?.description || '';
+            const descB = b.items[0]?.description || '';
+            return descA.localeCompare(descB) * direction;
+          case 'destination':
+            const destA = a.items[0]?.destination || '';
+            const destB = b.items[0]?.destination || '';
+            return destA.localeCompare(destB) * direction;
+          case 'date':
+            const dateA = a.items[0]?.date || '';
+            const dateB = b.items[0]?.date || '';
+            return dateA.localeCompare(dateB) * direction;
+          default: return 0;
+        }
       });
     }
 
     return filtered;
   });
 
-  paginatedRequests = computed(() => {
-    const start = this.listing.currentPage() * this.listing.pageSize();
-    return this.processedData().slice(start, start + this.listing.pageSize());
-  });
+  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
+  comps = createListingComputeds(this.processedData, this.listing);
 
   displayedRows = computed(() => {
-    return this.paginatedRequests().flatMap(request =>
-      request.items.map((item, index) => ({
+    return this.comps.paginatedData().flatMap((request: TaxiRequest) =>
+      request.items.map((item: TaxiItem, index: number) => ({
         ...item,
         requestId: request.id,
         createDate: request.createDate,
@@ -119,7 +141,17 @@ export class VehicleTaxiComponent implements OnInit {
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   }));
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+  }
 
   ngOnInit() {
     this.loadData();

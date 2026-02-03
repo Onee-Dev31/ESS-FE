@@ -54,6 +54,7 @@
         @include responsive.modal-overlay-styles;
     }
 
-    // .table-responsive, .modern-table, .card-list-view, .toolbar-container 
-    // are now in global styles.scss
+    .modal-overlay {
+        @include responsive.modal-overlay-styles;
+    }
 }

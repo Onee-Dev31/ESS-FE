@@ -668,73 +668,15 @@ textarea.custom-form-control {
 
 .form-actions-footer {
     display: flex;
-    gap: 1rem;
-    padding: 1rem 2rem; // Adjusted padding
+    gap: 12px;
+    padding: 12px 24px; // Refined padding
     border-top: 1px solid #e2e8f0;
     background: #fff; // Changed to white to match medical form
     flex-shrink: 0;
     justify-content: flex-end; // Aligned to right
 
     button {
-        padding: 8px 24px;
-        max-width: 80px; // Match medicalexpenses
-        border: none;
-        white-space: nowrap;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-        max-width: none; // Reset max-width if inherited
         flex: 0 0 auto; // Don't flex grow 
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        &:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        i {
-            font-size: 1.1rem;
-        }
-
-        &.btn-save-custom {
-            background-color: $success;
-            color: #fff;
-
-            &:hover {
-                background-color: color.adjust($success, $lightness: -5%);
-                box-shadow: 0 4px 10px rgba($success, 0.3);
-            }
-        }
-
-        &.btn-back-custom {
-            background-color: #f1f3f4;
-            color: $text; // Use $text variable
-
-            &:hover {
-                background-color: #e8eaed;
-            }
-        }
     }
 }
 

@@ -144,6 +144,8 @@ export class ApprovalsHelperService {
                     return itemA.requestBy.name.localeCompare(itemB.requestBy.name) * direction;
                 case 'requestType':
                     return itemA.requestType.localeCompare(itemB.requestType) * direction;
+                case 'requestDetail':
+                    return itemA.requestDetail.localeCompare(itemB.requestDetail) * direction;
                 case 'amount':
                     return (itemA.amount - itemB.amount) * direction;
                 case 'status':

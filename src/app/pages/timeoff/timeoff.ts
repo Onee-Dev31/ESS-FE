@@ -14,6 +14,11 @@ import { REQUEST_STATUS, COMMON_STATUS_OPTIONS } from '../../constants/request-s
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import {
+  createAngularTable,
+  getCoreRowModel,
+  SortingState,
+} from '@tanstack/angular-table';
 
 @Component({
   selector: 'app-timeoff',
@@ -35,19 +40,89 @@ export class TimeoffComponent implements OnInit {
   // ใช้ Utility จัดการ State (DRY Pagination & Filters)
   listing = createListingState();
 
-  // ใช้ Utility จัดการ Computed values (DRY filtering & pagination logic)
-  comps = createListingComputeds(this.requests, this.listing, (req, search, status, start, end) => {
-    const matchSearch = !search ||
-      req.id.toLowerCase().includes(search) ||
-      req.reason.toLowerCase().includes(search) ||
-      req.leaveType.toLowerCase().includes(search);
+  sorting = signal<SortingState>([{ id: 'createDate', desc: true }]);
 
-    const matchStatus = !status || req.status === status;
-    const matchStart = !start || req.createDate >= start;
-    const matchEnd = !end || req.createDate <= end;
+  // Processed Data with Sorting & Filtering
+  processedData = computed(() => {
+    let filtered = [...this.requests()];
 
-    return matchSearch && matchStatus && matchStart && matchEnd;
+    const search = this.listing.searchText().toLowerCase();
+    const status = this.listing.filterStatus();
+    const start = this.listing.filterStartDate();
+    const end = this.listing.filterEndDate();
+
+    // Filter
+    if (search || status || start || end) {
+      filtered = filtered.filter(req => {
+        const matchSearch = !search ||
+          req.id.toLowerCase().includes(search) ||
+          req.reason.toLowerCase().includes(search) ||
+          req.leaveType.toLowerCase().includes(search);
+
+        const matchStatus = !status || req.status === status;
+        const matchStart = !start || req.createDate >= start;
+        const matchEnd = !end || req.createDate <= end;
+
+        return matchSearch && matchStatus && matchStart && matchEnd;
+      });
+    }
+
+    // Sort
+    const sortState = this.sorting()[0];
+    if (sortState) {
+      const { id, desc } = sortState;
+      const direction = desc ? -1 : 1;
+
+      filtered.sort((a, b) => {
+        const key = id as keyof TimeOffRequest;
+        let valA: any = a[key];
+        let valB: any = b[key];
+
+        // Custom Sort Mappings
+        if (id === 'days') {
+          valA = Number(a.days || 0);
+          valB = Number(b.days || 0);
+        } else if (id === 'startDate' || id === 'endDate' || id === 'createDate') {
+          const sA = (valA as string) || '';
+          const sB = (valB as string) || '';
+          return sA.localeCompare(sB) * direction;
+        } else if (typeof valA === 'string' && typeof valB === 'string') {
+          return valA.localeCompare(valB) * direction;
+        }
+
+        if (valA < valB) return -1 * direction;
+        if (valA > valB) return 1 * direction;
+        return 0;
+      });
+    }
+
+    return filtered;
   });
+
+  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
+  comps = createListingComputeds(this.processedData, this.listing);
+
+  // TanStack Table Definition
+  table = createAngularTable(() => ({
+    data: this.comps.paginatedData(),
+    columns: [
+      { accessorKey: 'id', header: 'รหัสคำขอ' },
+      { accessorKey: 'startDate', header: 'วันที่เริ่มลา' },
+      { accessorKey: 'endDate', header: 'วันที่สิ้นสุดลา' },
+      { accessorKey: 'days', header: 'จำนวนวัน' },
+      { accessorKey: 'leaveType', header: 'ประเภทการลา' },
+      { accessorKey: 'leavePeriod', header: 'ประเภทวันลา' },
+      { accessorKey: 'reason', header: 'เหตุผล' },
+      { accessorKey: 'status', header: 'สถานะ' },
+    ],
+    state: { sorting: this.sorting() },
+    onSortingChange: (updaterOrValue) => {
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      this.sorting.set(next);
+    },
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+  }));
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
@@ -104,6 +179,21 @@ export class TimeoffComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/dashboard']);
+  }
+
+  toggleSort(columnId: string) {
+    const column = this.table.getColumn(columnId);
+    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+  }
+
+  getSortIcon(columnId: string) {
+    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
+    return {
+      'fa-sort-amount-up': isSorted === 'asc',
+      'fa-sort-amount-down-alt': isSorted === 'desc',
+      'fa-sort': !isSorted,
+      'text-muted': !isSorted,
+    };
   }
 
   getStatusClass(status: string): string {

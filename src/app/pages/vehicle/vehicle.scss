@@ -75,4 +75,8 @@
   .modal-overlay {
     @include responsive.modal-overlay-styles;
   }
+
+  .modal-overlay {
+    @include responsive.modal-overlay-styles;
+  }
 }

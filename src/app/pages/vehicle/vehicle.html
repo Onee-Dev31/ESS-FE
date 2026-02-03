@@ -92,19 +92,20 @@
             </div>
           </div>
 
-          <div class="card-actions">
-            <button class="action-btn edit" (click)="openModal(row.original.id)">
-              <i class="far fa-edit"></i>
+          <div class="card-footer-actions">
+            <button class="btn-edit-sm" (click)="openModal(row.original.id)">
+              <i class="far fa-edit"></i> แก้ไข
             </button>
-            <button class="action-btn delete" (click)="deleteRequest(row.original.id)">
-              <i class="far fa-trash-alt"></i>
+            <button class="btn-delete-sm" (click)="deleteRequest(row.original.id)">
+              <i class="far fa-trash-alt"></i> ลบ
             </button>
           </div>
         </div>
       </div>
 
       <div class="no-data" *ngIf="table.getRowModel().rows.length === 0">
-        ไม่พบรายการที่ตรงตามเงื่อนไข
+        <i class="fas fa-inbox"></i>
+        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
       </div>
     </div>
 
@@ -190,8 +191,9 @@
             </tr>
           </ng-container>
           <tr *ngIf="table.getRowModel().rows.length === 0">
-            <td colspan="7" class="empty-state">
-              ไม่พบรายการที่ตรงตามเงื่อนไข
+            <td colspan="7" class="no-data">
+              <i class="fas fa-inbox"></i>
+              <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
             </td>
           </tr>
         </tbody>

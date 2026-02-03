@@ -65,11 +65,21 @@
             <th class="col-date sortable-header" (click)="toggleSort('createDate')">
               วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
-            <th class="col-date">วันที่ขอเบิก</th>
-            <th class="col-desc">รายละเอียด</th>
-            <th class="col-dest">สถานที่รับ-ส่ง</th>
-            <th class="col-amount text-right">จำนวนเงิน</th>
-            <th class="col-status text-center">สถานะ</th>
+            <th class="col-date sortable-header" (click)="toggleSort('date')">
+              วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
+            </th>
+            <th class="col-desc sortable-header" (click)="toggleSort('description')">
+              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
+            </th>
+            <th class="col-dest sortable-header" (click)="toggleSort('destination')">
+              สถานที่รับ-ส่ง <i class="fas ml-1" [ngClass]="getSortIcon('destination')"></i>
+            </th>
+            <th class="col-amount sortable-header text-right" (click)="toggleSort('amount')">
+              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
+              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            </th>
             <th class="col-actions text-center">จัดการ</th>
           </tr>
         </thead>
@@ -101,17 +111,18 @@
                   <i class="far fa-folder-open"></i>
                 </button>
                 <button class="btn-icon edit" (click)="openModal(row.original.requestId)" title="แก้ไข">
-                  <i class="fas fa-edit"></i>
+                  <i class="far fa-edit"></i>
                 </button>
                 <button class="btn-icon delete" (click)="deleteRequest(row.original.requestId)" title="ลบ">
-                  <i class="fas fa-trash"></i>
+                  <i class="far fa-trash-alt"></i>
                 </button>
               </div>
             </td>
           </tr>
-          <tr *ngIf="processedData().length === 0">
-            <td colspan="8" class="empty-state">
-              ไม่พบรายการที่ตรงตามเงื่อนไข
+          <tr *ngIf="comps.totalItems() === 0">
+            <td colspan="8" class="no-data">
+              <i class="fas fa-inbox"></i>
+              <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
             </td>
           </tr>
         </tbody>
@@ -120,7 +131,7 @@
 
     <!-- Mobile Card View -->
     <div class="card-list-view">
-      <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByRowId">
+      <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
         <div class="card-header">
           <div class="header-content">
             <span class="ticket-no">{{ req.id }}</span>
@@ -150,22 +161,23 @@
           </div>
           <div class="card-footer-actions">
             <button class="btn-edit-sm" (click)="openModal(req.id)">
-              <i class="fas fa-edit"></i>แก้ไข
+              <i class="far fa-edit"></i>แก้ไข
             </button>
             <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
-              <i class="fas fa-trash"></i>ลบ
+              <i class="far fa-trash-alt"></i>ลบ
             </button>
           </div>
         </div>
       </div>
-      <div class="no-data" *ngIf="processedData().length === 0">
-        ไม่พบรายการที่ตรงตามเงื่อนไข
+      <div class="no-data" *ngIf="comps.totalItems() === 0">
+        <i class="fas fa-inbox"></i>
+        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
       </div>
     </div>
   </div>
 
   <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-    [totalItems]="processedData().length" (onPageChange)="listing.currentPage.set($event)"
+    [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
     (onPageSizeChange)="listing.pageSize.set($event)">
   </app-pagination>
 

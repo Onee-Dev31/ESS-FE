@@ -6,7 +6,7 @@
 
   <main class="content-card">
 
-    
+
     <section class="filter-section">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
@@ -23,18 +23,20 @@
       </div>
     </section>
 
-    
+
     <div class="action-bar">
-      <button class="btn-submit" (click)="save()">ยืนยันการเบิก</button>
+      <button class="btn-submit" (click)="save()">
+        <i class="fas fa-check"></i> ยืนยันการเบิก
+      </button>
 
       <div class="info-badges">
         <span class="request-id-badge">เลขที่การเบิก : {{ requestId }}</span>
       </div>
     </div>
 
-    
+
     <div class="table-container">
-      
+
       <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-select" />
@@ -119,7 +121,7 @@
 
             <td class="text-center">
               <button class="btn-icon-folder" (click)="openUploadModal(item)" [class.has-file]="item.attachedFile">
-                <i class="fas fa-solid fa-file-arrow-up"></i>
+                <i class="fas fa-file-upload"></i>
               </button>
             </td>
           </tr>
@@ -134,7 +136,7 @@
         </tfoot>
       </table>
 
-      
+
       <div class="mobile-cards-view mobile-only">
         <div *ngFor="let item of items" class="log-card" [class.highlight-card]="item.selected">
           <div class="card-header">
@@ -146,7 +148,7 @@
             </div>
             <div class="header-right">
               <button class="btn-card-upload" (click)="openUploadModal(item)" [class.has-file]="item.attachedFile">
-                <i class="fas fa-file-arrow-up"></i> {{ item.attachedFile ? 'แก้ไขไฟล์' : 'แนบไฟล์' }}
+                <i class="fas fa-file-upload"></i> {{ item.attachedFile ? 'แก้ไขไฟล์' : 'แนบไฟล์' }}
               </button>
               <input type="checkbox" [(ngModel)]="item.selected" class="card-checkbox" />
             </div>
@@ -180,7 +182,7 @@
       </div>
     </div>
 
-    
+
     <div class="mobile-sticky-footer mobile-only">
       <div class="summary-details">
         <div class="sum-item">
@@ -189,7 +191,7 @@
         </div>
       </div>
       <button class="btn-submit-mobile" (click)="save()">
-        <i class="fas fa-check-circle"></i> ยืนยันการเบิก
+        <i class="fas fa-check"></i> ยืนยันการเบิก
       </button>
     </div>
   </main>

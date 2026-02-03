@@ -10,8 +10,13 @@
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-hashtag"></i>
-                    <span class="meta-label">เลขที่การเบิก :</span>
+                    <span class="meta-label">ลำดับที่ :</span>
                     <span class="meta-value">{{ requestId }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="far fa-user"></i>
+                    <span class="meta-label">รหัสพนักงาน :</span>
+                    <span class="meta-value">{{ employeeId() }}</span>
                 </div>
             </div>
             <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
@@ -19,9 +24,9 @@
     </header>
 
     <main class="content-card">
-        
+
         <section class="form-section-wrapper">
-            <h4 class="section-heading">1.เลือกประเภทการเบิก</h4>
+            <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
             <div class="claim-type-grid">
                 <div class="claim-type-card" *ngFor="let type of claimTypes"
                     [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
@@ -39,9 +44,9 @@
             </div>
         </section>
 
-        
+
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
-            <h4 class="section-heading">2.กรอกรายละเอียด</h4>
+            <h4 class="section-heading">2. กรอกรายละเอียด</h4>
             <div class="details-grid">
                 <div class="input-field-group">
                     <label>สถานพยาบาล</label>
@@ -105,10 +110,10 @@
             </div>
         </section>
 
-        
+
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <div class="section-header-row">
-                <h4 class="section-heading">3.แนบเอกสาร (ใบรับรองแพทย์, ใบเสร็จรับเงิน, เอกสารอื่นๆ)</h4>
+                <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
                     <i class="fas fa-file-upload"></i> Upload file
                 </button>
@@ -127,8 +132,9 @@
                     <tbody>
                         <tr *ngFor="let file of attachments(); let i = index">
                             <td class="text-center">{{ i + 1 }}</td>
-                            <td>
+                            <td class="clickable-file" (click)="openPreview(file)">
                                 <div class="file-name-container">
+                                    <i class="far fa-file-alt mr-2 text-primary"></i>
                                     <span class="file-text">{{ file.name }}</span>
                                 </div>
                             </td>
@@ -140,7 +146,7 @@
                             <td>
                                 <div class="desc-input-wrapper">
                                     <input type="text" class="desc-control" [(ngModel)]="file.description"
-                                        [class.is-invalid]="!file.description">
+                                        [class.is-invalid]="!file.description" placeholder="ระบุรายละเอียด (ถ้ามี)">
                                 </div>
                             </td>
                         </tr>
@@ -153,18 +159,22 @@
             <div class="placeholder-content">
                 <i class="fas fa-mouse-pointer pulse-icon"></i>
                 <p>กรุณาเลือกประเภทการเบิกด้านบนเพื่อดำเนินการต่อ</p>
-                <span class="sub-text">Please select a claim type to view details and upload documents</span>
+                <span class="sub-text">Please select a claim type to view details and proceed with your request</span>
             </div>
         </div>
     </main>
 
-    
+
     <div class="form-actions-footer">
-        <button class="btn-save-custom" (click)="save()">
-            บันทึก
-        </button>
         <button class="btn-back-custom" (click)="close()">
-            ย้อนกลับ
+            <i class="fas fa-times"></i> ยกเลิก
+        </button>
+        <button class="btn-save-custom" (click)="save()">
+            <i [class]="isEditMode() ? 'fas fa-check' : 'fas fa-paper-plane'"></i>
+            {{ isEditMode() ? 'บันทึกการแก้ไข' : 'ส่งเรื่องเบิก' }}
         </button>
     </div>
+
+    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
 </div>

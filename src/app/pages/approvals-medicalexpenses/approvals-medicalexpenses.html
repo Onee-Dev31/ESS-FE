@@ -103,7 +103,9 @@
                         <th class="sortable-header" (click)="toggleSort('requestType')">
                             ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
                         </th>
-                        <th>รายละเอียด</th>
+                        <th class="sortable-header" (click)="toggleSort('requestDetail')">
+                            รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('requestDetail')"></i>
+                        </th>
                         <th class="sortable-header text-right" (click)="toggleSort('amount')">
                             จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
                         </th>

@@ -80,7 +80,9 @@
 
     <div class="action-bar">
       <div class="left-actions">
-        <button class="btn-submit" (click)="onSubmit()">ยืนยันการเบิก</button>
+        <button class="btn-submit" (click)="onSubmit()">
+          <i class="fas fa-check"></i> ยืนยันการเบิก
+        </button>
         <button class="policy-icon-btn mobile-only" (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ">
           <i class="fas fa-info-circle"></i>
         </button>
@@ -213,7 +215,7 @@
         </div>
       </div>
       <button class="btn-submit-mobile" (click)="onSubmit()">
-        <i class="fas fa-check-circle"></i> ยืนยันการเบิก
+        <i class="fas fa-check"></i> ยืนยันการเบิก
       </button>
     </div>
   </main>
