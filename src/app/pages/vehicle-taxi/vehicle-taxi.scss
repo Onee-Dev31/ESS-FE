@@ -389,15 +389,16 @@
     border-collapse: collapse;
 
     thead {
-      background: #f8fafc;
+      background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+      box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
 
       tr th {
         padding: 16px 12px;
         font-weight: 600;
-        color: #64748b;
+        color: #ffffff;
         font-size: 0.85rem;
         text-transform: uppercase;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid #1557b0;
       }
     }
 

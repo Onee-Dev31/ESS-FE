@@ -791,11 +791,12 @@ button {
   min-width: 1200px;
 
   thead {
-    background-color: $header-bg;
-    border-bottom: 1px solid #cbd5e1;
+    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+    border-bottom: 1px solid #1557b0;
+    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
 
     tr th {
-      color: $text-header;
+      color: #ffffff;
       font-weight: 600;
       font-size: 0.85rem;
       text-transform: uppercase;

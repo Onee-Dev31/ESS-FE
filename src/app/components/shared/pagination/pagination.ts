@@ -48,7 +48,6 @@ import { FormsModule } from '@angular/forms';
       justify-content: space-between;
       align-items: center;
       padding: 1rem 0;
-      border-top: 1px solid #edf2f7;
       margin-top: 1rem;
       flex-wrap: wrap;
       gap: 1rem;

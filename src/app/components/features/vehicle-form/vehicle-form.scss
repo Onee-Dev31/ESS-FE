@@ -293,13 +293,13 @@ $col-desc: auto;
       }
 
       th {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
         position: sticky;
         top: 0;
         z-index: 10;
         text-align: center;
-        color: $text-sub;
-        border-top: 1px solid $border;
+        color: #ffffff;
+        border-top: 1px solid #1557b0;
       }
 
       .sub-header th {
