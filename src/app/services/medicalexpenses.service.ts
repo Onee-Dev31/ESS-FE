@@ -11,7 +11,7 @@ export type { MedicalItem, MedicalRequest };
 })
 export class MedicalexpensesService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_MEDICAL_DATA';
+    private readonly STORAGE_KEY = 'MOCK_MEDICAL_DATA_V3';
     private medicalRequestsSubject = new BehaviorSubject<MedicalRequest[]>([]);
 
     constructor() {

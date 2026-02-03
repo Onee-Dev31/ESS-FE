@@ -13,7 +13,7 @@ export type { TimeOffRequest };
 export class TimeOffService {
     private http = inject(HttpClient);
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_TIMEOFF_DATA';
+    private readonly STORAGE_KEY = 'MOCK_TIMEOFF_DEBUG_V1';
     private requestsSubject = new BehaviorSubject<TimeOffRequest[]>([]);
 
     constructor() {

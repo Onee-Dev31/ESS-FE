@@ -1,4 +1,4 @@
-import { Requester } from './vehicle.interface';
+import { Requester } from './core.interface';
 
 export interface AllowanceItem {
     date: string;

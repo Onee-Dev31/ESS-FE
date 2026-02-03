@@ -35,19 +35,18 @@ export class TimeOffMock {
             }
 
             // Rotate through all 4 statuses
-            // Rotate through all 4 statuses
-            let statuses = ['NEW', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+            let statuses = ['NEW', 'WAITING_CHECK', 'PENDING_APPROVAL', 'APPROVED'];
             let requester = MockHelper.getRequesterByRole(role);
             let status = statuses[i % statuses.length];
 
             if (role === 'Admin') {
                 requester = MockHelper.getRandomRequester();
-                const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+                const conditions = ['NEW', 'WAITING_CHECK', 'PENDING_APPROVAL', 'APPROVED'];
                 status = conditions[Math.floor(Math.random() * conditions.length)];
             }
 
             return {
-                id: `L2701#${String(i + 1).padStart(3, '0')}`,
+                id: `TO-${String(i + 1).padStart(3, '0')}`,
                 createDate: today.toISOString(),
                 status: status,
                 employeeId: role === 'Admin' ? 'OTD00001' : 'OTD01054',

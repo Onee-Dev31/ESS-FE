@@ -11,7 +11,7 @@ export type { RequestItem, VehicleRequest };
 })
 export class TransportService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_TRANSPORT_DATA';
+    private readonly STORAGE_KEY = 'MOCK_TRANSPORT_DATA_V3';
     private requestsSubject = new BehaviorSubject<VehicleRequest[]>([]);
 
     constructor() {

@@ -11,7 +11,7 @@ export type { TaxiItem, TaxiRequest };
 })
 export class TaxiService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_TAXI_DATA';
+    private readonly STORAGE_KEY = 'MOCK_TAXI_DATA_V3';
     private taxiRequestsSubject = new BehaviorSubject<TaxiRequest[]>([]);
 
     constructor() {

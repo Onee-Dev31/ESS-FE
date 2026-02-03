@@ -8,9 +8,9 @@ export class StatusUtil {
             case REQUEST_STATUS.VERIFIED:
             case REQUEST_STATUS.WAITING_CHECK: return 'status-verified';
             case REQUEST_STATUS.PENDING_APPROVAL: return 'status-pending';
-            case REQUEST_STATUS.APPROVED: return 'status-success';
+            case REQUEST_STATUS.APPROVED: return 'status-approved';
             case REQUEST_STATUS.REJECTED: return 'status-rejected';
-            case REQUEST_STATUS.REFERRED_BACK: return 'status-referred-back';
+            case REQUEST_STATUS.REFERRED_BACK: return 'status-rejected'; // Using rejected style for referred back as per timeoff.ts
             default: return '';
         }
     }

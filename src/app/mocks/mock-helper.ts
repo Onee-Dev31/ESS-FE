@@ -1,5 +1,6 @@
-import { Requester } from '../interfaces/vehicle.interface';
+import { Requester } from '../interfaces/core.interface';
 import { REQUEST_STATUS_LIST } from '../constants/request-status.constant';
+import { USERS_MOCK, ADMIN_USER_MOCK } from './users.mock';
 import dayjs from 'dayjs';
 
 export class MockHelper {
@@ -11,20 +12,8 @@ export class MockHelper {
         return dayjs().subtract(Math.floor(Math.random() * 90), 'day').format('YYYY-MM-DD');
     }
 
-    private static readonly USERS: Requester[] = [
-        { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', employeeId: 'OTD01054', department: '10806-IT Department', company: 'บริษัท OTD' },
-        { name: 'แพรวนภา บุตรโคษา (แพรว)', employeeId: 'OTD01055', department: '10801-HR Department', company: 'บริษัท OTD' },
-        { name: 'สมชาย รักดี', employeeId: 'OTD01056', department: '10802-Sales Department', company: 'บริษัท OTD' },
-        { name: 'วิภาวี สวยงาม', employeeId: 'OTD01057', department: '10803-Marketing', company: 'บริษัท OTD' },
-        { name: 'กิตติศักดิ์ มั่นคง', employeeId: 'OTD01058', department: '10804-Operations', company: 'บริษัท OTD' }
-    ];
-
-    private static readonly ADMIN_USER: Requester = {
-        name: 'Admin User (Admin)',
-        employeeId: 'OTD00001',
-        department: '10801-Management',
-        company: 'บริษัท OTD'
-    };
+    private static readonly USERS: Requester[] = USERS_MOCK;
+    private static readonly ADMIN_USER: Requester = ADMIN_USER_MOCK;
 
     static getRandomRequester(): Requester {
         const isDefaultMember = Math.random() < 0.6;

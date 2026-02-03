@@ -3,11 +3,14 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
+import { LoadingService } from '../../services/loading.service';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+import { StatusUtil } from '../../utils/status.util';
+import { REQUEST_STATUS, REQUEST_STATUS_LABEL } from '../../constants/request-status.constant';
 
 @Component({
   selector: 'app-timeoff',
@@ -17,6 +20,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
   styleUrl: './timeoff.scss',
 })
 export class TimeoffComponent implements OnInit {
+  protected loadingService = inject(LoadingService);
   private timeoffService = inject(TimeOffService);
   private router = inject(Router);
   private dateUtil = inject(DateUtilityService);
@@ -40,11 +44,16 @@ export class TimeoffComponent implements OnInit {
   protected readonly Math = Math;
 
   statuses = [
-    { value: 'NEW', label: 'คำขอใหม่' },
-    { value: 'VERIFIED', label: 'ตรวจสอบแล้ว' },
-    { value: 'PENDING_APPROVAL', label: 'อยู่ระหว่างการอนุมัติ' },
-    { value: 'APPROVED', label: 'อนุมัติแล้ว' }
+    { value: REQUEST_STATUS.NEW, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.NEW] },
+    { value: REQUEST_STATUS.WAITING_CHECK, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.WAITING_CHECK] },
+    { value: REQUEST_STATUS.PENDING_APPROVAL, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.PENDING_APPROVAL] },
+    { value: REQUEST_STATUS.APPROVED, label: REQUEST_STATUS_LABEL[REQUEST_STATUS.APPROVED] }
   ];
+
+  // ... (keeping existing code in between if any, but replace is simpler if I target blocks)
+
+  // Let's target specific blocks. statuses first.
+
 
   totalRequests = computed(() => this.filteredRequests().length);
   totalPages = computed(() => Math.ceil(this.totalRequests() / this.pageSize()));
@@ -155,21 +164,7 @@ export class TimeoffComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'NEW': 'status-new',
-      'WAITING_CHECK': 'status-new',
-      'VERIFIED': 'status-reviewed',
-      'PENDING_APPROVAL': 'status-pending',
-      'APPROVED': 'status-approved',
-      'REJECTED': 'status-rejected',
-      'REFERRED_BACK': 'status-rejected',
-      'คำขอใหม่': 'status-new',
-      'ตรวจสอบแล้ว': 'status-reviewed',
-      'อยู่ระหว่างการอนุมัติ': 'status-pending',
-      'อนุมัติแล้ว': 'status-approved',
-      'ไม่อนุมัติ': 'status-rejected'
-    };
-    return statusMap[status] || '';
+    return StatusUtil.getStatusBadgeClass(status);
   }
 
   getLeaveTypeIcon(leaveType: string): string {

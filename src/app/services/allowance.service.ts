@@ -11,7 +11,7 @@ export type { AllowanceItem, AllowanceRequest };
 })
 export class AllowanceService {
     private loadingService = inject(LoadingService);
-    private readonly STORAGE_KEY = 'MOCK_ALLOWANCE_DATA';
+    private readonly STORAGE_KEY = 'MOCK_ALLOWANCE_DATA_V3';
     private allowanceRequestsSubject = new BehaviorSubject<AllowanceRequest[]>([]);
 
     constructor() {

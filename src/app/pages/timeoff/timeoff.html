@@ -1,4 +1,10 @@
 <div class="timeoff-page">
+    <div class="loading-overlay" *ngIf="loadingService.isLoading()">
+        <div class="spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>กำลังโหลดข้อมูล...</p>
+    </div>
     <div class="top-header-strip">
         <button class="btn-back" (click)="goBack()">
             <i class="fas fa-chevron-left"></i>
@@ -107,7 +113,7 @@
                     </div>
 
                     <div class="card-actions">
-                        <button class="action-btn folder" *ngIf="request.attachments.length > 0"
+                        <button class="action-btn folder" *ngIf="request.attachments && request.attachments.length > 0"
                             (click)="openPreview(request.attachments)" title="ดูเอกสาร">
                             <i class="far fa-folder-open"></i>
                         </button>
@@ -186,13 +192,15 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <a class="file-icon-link" *ngIf="request.attachments.length > 0"
+                            <a class="file-icon-link" *ngIf="request.attachments && request.attachments.length > 0"
                                 (click)="openPreview(request.attachments)" title="ดูเอกสาร">
                                 <i class="far fa-folder-open"></i>
-                                <span class="attach-count" *ngIf="request.attachments.length > 1">{{
+                                <span class="attach-count"
+                                    *ngIf="request.attachments && request.attachments.length > 1">{{
                                     request.attachments.length }}</span>
                             </a>
-                            <span class="text-muted" *ngIf="request.attachments.length === 0">-</span>
+                            <span class="text-muted"
+                                *ngIf="!request.attachments || request.attachments.length === 0">-</span>
                         </td>
                         <td class="text-center">
                             <div class="action-btns">

@@ -11,7 +11,7 @@ export class TransportMock {
 
             if (role === 'Admin') {
                 requester = MockHelper.getRandomRequester();
-                const conditions = ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'];
+                const conditions = ['NEW', 'WAITING_CHECK', 'PENDING_APPROVAL', 'APPROVED'];
                 status = conditions[Math.floor(Math.random() * conditions.length)];
             }
 

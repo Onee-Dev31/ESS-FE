@@ -9,7 +9,7 @@
   <div class="content-card">
     <div class="card-header-title">รายการเบิกแท็กซี่ของฉัน</div>
 
-    
+
     <div class="toolbar-container">
       <div class="toolbar-top-row">
         <div class="left-action">
@@ -44,7 +44,7 @@
                 (ngModelChange)="filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
                 <option value="NEW">คำขอใหม่</option>
-                <option value="VERIFIED">ตรวจสอบแล้ว</option>
+                <option value="WAITING_CHECK">รอตรวจสอบ</option>
                 <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
                 <option value="APPROVED">อนุมัติแล้ว</option>
               </select>
@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    
+
     <div class="card-list-view">
       <div class="mobile-card" *ngFor="let req of paginatedRequests(); trackBy: trackByReqId">
 
@@ -130,7 +130,7 @@
       </div>
     </div>
 
-    
+
     <div class="table-responsive">
       <table class="modern-table">
         <thead>
@@ -232,7 +232,7 @@
       </table>
     </div>
 
-    
+
     <div class="pagination-container">
       <div class="pagination-info">
         แสดง {{ table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1 }}

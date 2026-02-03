@@ -20,7 +20,7 @@ export class MedicalMock {
                 id: `2701#${String(i + 1).padStart(3, '0')}`,
                 createDate: dateStr,
                 status: role === 'Admin'
-                    ? ['WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'APPROVED'][Math.floor(Math.random() * 4)]
+                    ? ['NEW', 'WAITING_CHECK', 'PENDING_APPROVAL', 'APPROVED'][Math.floor(Math.random() * 4)]
                     : status,
                 requester: role === 'Admin' ? MockHelper.getRandomRequester() : MockHelper.getRequesterByRole(role),
                 employeeId: role === 'Admin' ? 'OTD00001' : 'OTD01054',

@@ -1,3 +1,5 @@
+import { Requester } from './core.interface';
+
 export interface TimeOffRequest {
     id: string;
     createDate: string;
@@ -12,12 +14,7 @@ export interface TimeOffRequest {
     leavePeriod?: string;
     shiftStartTime?: string;
     shiftEndTime?: string;
-    requester?: {
-        employeeId: string;
-        name: string;
-        department: string;
-        company: string;
-    };
+    requester?: Requester;
 }
 
 export const LEAVE_TYPES = [
