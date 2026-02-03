@@ -20,24 +20,32 @@
 
             <div class="toolbar-bottom-row">
                 <div class="right-filters">
-                    <div class="date-input-group">
+                    <div class="filter-group">
                         <span class="filter-label">วันที่สร้างรายการ</span>
-                        <input type="date" class="form-control" [ngModel]="filterStartDate()"
-                            (ngModelChange)="filterStartDate.set($event); applyFilters()" />
-                    </div>
-                    <div class="date-input-group">
-                        <span class="filter-label">ถึง</span>
-                        <input type="date" class="form-control" [ngModel]="filterEndDate()"
-                            (ngModelChange)="filterEndDate.set($event); applyFilters()" />
+                        <div class="date-input-group">
+                            <input type="date" class="form-control" [ngModel]="filterStartDate()"
+                                (ngModelChange)="filterStartDate.set($event); applyFilters()" />
+                        </div>
                     </div>
 
-                    <div class="select-input-group">
+                    <div class="filter-group">
+                        <span class="filter-label">ถึง</span>
+                        <div class="date-input-group">
+                            <input type="date" class="form-control" [ngModel]="filterEndDate()"
+                                (ngModelChange)="filterEndDate.set($event); applyFilters()" />
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
                         <span class="filter-label">สถานะ</span>
-                        <select class="form-control select-status" [ngModel]="filterStatus()"
-                            (ngModelChange)="filterStatus.set($event); applyFilters()">
-                            <option value="">ทั้งหมด</option>
-                            <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
-                        </select>
+                        <div class="select-input-group">
+                            <select class="form-control select-status" [ngModel]="filterStatus()"
+                                (ngModelChange)="filterStatus.set($event); applyFilters()">
+                                <option value="">ทั้งหมด</option>
+                                <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
                     <button class="btn-clear" (click)="clearFilters()">
                         <i class="fas fa-sync-alt"></i> คืนค่า

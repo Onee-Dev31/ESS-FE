@@ -8,10 +8,12 @@ import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs from 'dayjs';
 
+import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
+
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss'
 })
@@ -136,8 +138,23 @@ export class TimeOffForm implements OnInit {
     event.target.value = '';
   }
 
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
+
   close() {
     this.onClose.emit();
+  }
+
+  openPreview(file: { name: string }) {
+    this.previewFiles.set([{
+      fileName: file.name,
+      date: this.currentDate() // Using current date or file upload date if available
+    }]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 
   // บันทึกคำขอลาหยุด

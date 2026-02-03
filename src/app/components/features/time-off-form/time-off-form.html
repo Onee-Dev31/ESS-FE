@@ -19,7 +19,7 @@
                     <span class="meta-value">{{ employeeId() }}</span>
                 </div>
             </div>
-            <button class="btn-close-x" (click)="close()"><i class="fas fa-times"></i></button>
+            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
     </header>
 
@@ -94,8 +94,8 @@
                 </div>
             </div>
 
-            <div class="details-grid-custom">
-                <div class="input-field-group">
+            <div class="details-grid">
+                <div class="input-field-group left-half">
                     <label>ตั้งแต่วันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
                         <input type="date" class="input-field" [ngModel]="startDate()"
@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                <div class="input-field-group">
+                <div class="input-field-group left-half">
                     <label>ตั้งแต่เวลา</label>
                     <div class="custom-input-wrapper">
                         <input type="time" class="input-field" [ngModel]="shiftStartTime()"
@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <div class="input-field-group">
+                <div class="input-field-group left-half">
                     <label>ถึงวันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
                         <input type="date" class="input-field" [ngModel]="endDate()"
@@ -128,7 +128,7 @@
                     </div>
                 </div>
 
-                <div class="input-field-group">
+                <div class="input-field-group left-half">
                     <label>ถึงเวลา</label>
                     <div class="custom-input-wrapper">
                         <input type="time" class="input-field" [ngModel]="shiftEndTime()"
@@ -138,14 +138,15 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="calculated-row mt-3">
-                <div class="calculated-days-display">
+                <div class="input-field-group left-half">
                     <label>จำนวนวันลา</label>
-                    <div class="days-value">
-                        <span class="days-number">{{ calculatedDays() }}</span>
-                        <span class="days-text">วัน</span>
+                    <div class="custom-input-wrapper">
+                        <input type="text" class="input-field text-center" [value]="calculatedDays()" readonly
+                            style="background-color: #f1f5f9; font-weight: 700;">
+                        <div class="icon-box">
+                            <i class="fas fa-calculator"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,18 +171,30 @@
                     <thead>
                         <tr>
                             <th class="col-xs">#</th>
-                            <th>ชื่อไฟล์</th>
-                            <th class="col-xs">ลบ</th>
+                            <th>Upload file</th>
+                            <th class="col-xs"><i class="far fa-trash-alt"></i></th>
+                            <th>รายละเอียด</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let file of attachments(); let i = index">
                             <td class="text-center">{{ i + 1 }}</td>
-                            <td>{{ file.name }}</td>
+                            <td class="clickable-file" (click)="openPreview(file)">
+                                <div class="file-name-container">
+                                    <i class="far fa-file-alt mr-2 text-primary"></i>
+                                    <span class="file-text">{{ file.name }}</span>
+                                </div>
+                            </td>
                             <td class="text-center">
                                 <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
+                            </td>
+                            <td>
+                                <div class="desc-input-wrapper">
+                                    <input type="text" class="desc-control" [(ngModel)]="file.description"
+                                        placeholder="ระบุรายละเอียด (ถ้ามี)">
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -198,7 +211,7 @@
         </div>
     </main>
 
-    <div class="form-actions-footer" *ngIf="requestStatus === 'คำขอใหม่'">
+    <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
         <button class="btn-save-custom" (click)="save()">
             <i class="fas fa-check-circle"></i> ส่งใบลา
         </button>
@@ -206,4 +219,7 @@
             <i class="fas fa-chevron-circle-left"></i> ยกเลิก
         </button>
     </div>
+
+    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
 </div>

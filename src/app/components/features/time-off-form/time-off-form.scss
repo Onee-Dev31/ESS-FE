@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use '../../../../styles/theme' as *;
+
 :host {
     position: fixed;
     top: 0;
@@ -5,13 +8,18 @@
     width: 100%;
     height: 100%;
     z-index: 1050;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.65); // Match opacity
+    backdrop-filter: blur(4px); // Add blur
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 0; // Removed default padding to match medicalexpenses
     box-sizing: border-box;
     animation: fadeInOverlay 0.2s ease-out;
+
+    @include mobile {
+        align-items: flex-end; // Match medicalexpenses mobile
+    }
 }
 
 @keyframes fadeInOverlay {
@@ -27,10 +35,10 @@
 .time-off-form-page {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 1300px;
-    height: 95vh;
-    max-height: 920px;
+    width: 95%; // Match medicalexpenses
+    max-width: 1600px; // Match medicalexpenses
+    height: auto;
+    max-height: 90vh; // Match medicalexpenses
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -45,14 +53,15 @@
         justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid $border; // Use $border
         flex-shrink: 0;
 
         h2 {
             font-size: 1.15rem;
             margin: 0;
             font-weight: 600;
-            color: #1e40af;
+            color: $primary; // Use $primary
+            line-height: 1.3;
         }
 
         .header-right-meta {
@@ -74,7 +83,7 @@
 
                     i {
                         width: 16px;
-                        color: #1e40af;
+                        color: $primary; // Use $primary
                         text-align: center;
                         font-size: 0.9rem;
                     }
@@ -93,26 +102,8 @@
             }
         }
 
-        .btn-close-x {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            font-size: 1.1rem;
-            cursor: pointer;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-
-            &:hover {
-                color: #ef4444;
-                background: #fef2f2;
-                border-color: #fecaca;
-                transform: rotate(90deg);
-            }
+        .btn-close-modal {
+            @include close-btn-style;
         }
     }
 
@@ -171,11 +162,177 @@
     }
 }
 
-.section-heading {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1e40af;
-    margin: 0 0 1rem 0;
+.form-section-wrapper {
+    min-width: 0;
+    width: 100%;
+
+    .section-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+
+        @include tablet {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .btn-upload-file {
+            background: #fff;
+            color: $primary;
+            border: 1.5px solid $primary;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+
+            &:hover {
+                background: $primary;
+                color: #fff;
+            }
+        }
+    }
+
+    .section-heading {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #3c4043;
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.01em;
+    }
+
+    .hidden-input {
+        display: none !important;
+    }
+}
+
+.attachment-table-container {
+    flex: 1;
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid $border;
+    border-radius: 8px;
+    margin-top: 1rem;
+
+    .excel-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+
+        th,
+        td {
+            border-bottom: 1px solid $border;
+            border-right: 1px solid $border;
+            height: 40px;
+            vertical-align: middle;
+            box-sizing: border-box;
+            padding: 8px;
+            font-size: 0.9rem;
+
+            &:last-child {
+                border-right: none;
+            }
+        }
+
+        th {
+            background: #f8f9fa;
+            text-align: center;
+            color: $text-sub;
+            font-weight: 600;
+            font-size: 0.85rem;
+
+            &.col-xs {
+                width: 50px;
+            }
+        }
+
+        .clickable-file {
+            cursor: pointer;
+
+            .file-name-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: #f1f3f4;
+                padding: 6px 12px;
+                border-radius: 4px;
+                max-width: 400px;
+                transition: all 0.2s;
+
+                @include tablet {
+                    max-width: 150px;
+                }
+
+                .file-text {
+                    flex: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-size: 0.85rem;
+                    color: $text;
+                }
+
+                &:hover {
+                    background: #e2e8f0;
+
+                    .file-text {
+                        color: $primary;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+
+        .btn-delete-row {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            border-radius: 4px;
+
+            &:hover {
+                background: #fef2f2;
+            }
+        }
+
+        .desc-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .desc-control {
+                width: 100%;
+                padding: 6px 10px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                background: transparent;
+
+                &.is-invalid {
+                    border: 1px solid $danger;
+                    background-color: rgba($danger, 0.05);
+
+                    &:focus {
+                        box-shadow: 0 0 0 2px rgba($danger, 0.1);
+                    }
+                }
+
+                &:focus {
+                    background: #fff;
+                    border-color: $primary;
+                    outline: none;
+                }
+            }
+        }
+    }
 }
 
 .leave-type-grid {
@@ -185,27 +342,28 @@
     margin-top: 1rem;
 
     .leave-type-card {
-        border: none;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         min-height: 150px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        cursor: pointer;
-        transition: all 0.2s ease;
         overflow: hidden;
 
         &:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            z-index: 10;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ddd;
         }
 
         &.active {
-            border: 2px solid;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid $primary;
+            background-color: #f8faff;
 
             .leave-footer {
                 font-weight: 700;
@@ -213,7 +371,7 @@
         }
 
         .leave-body {
-            padding: 15px;
+            padding: 0; // Reset padding as parent has padding
             flex-grow: 1;
             display: flex;
             align-items: center;
@@ -242,8 +400,8 @@
 
             .leave-label {
                 margin: 0;
-                font-size: 0.9rem;
-                color: #475569;
+                font-size: 0.95rem; // Adjusted size
+                color: #333; // Darker text
                 font-weight: 700;
                 text-align: left;
             }
@@ -256,21 +414,23 @@
 
             .leave-remaining {
                 font-size: 0.75rem;
-                color: #64748b;
+                color: #888;
                 text-align: left;
-                margin-top: 2px;
-                font-weight: 500;
+                margin-top: 4px;
+                font-weight: 600;
             }
         }
 
         .leave-footer {
-            padding: 8px 15px;
+            margin: 12px -1.25rem -1.25rem -1.25rem; // Negative margin to fill width
+            padding: 0.75rem 1.25rem; // Add padding back
+            background-color: #f8faff; // Default background
             font-size: 0.75rem;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 0 0 12px 12px;
+            border-top: 1px solid #eee;
 
             i {
                 font-size: 1.1rem;
@@ -305,11 +465,23 @@
     }
 }
 
-.details-grid-custom {
+.details-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem 1.25rem;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid $border;
+    box-sizing: border-box;
+    width: 100%;
     margin-top: 1rem;
+
+    @include tablet {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1rem;
+    }
 }
 
 .custom-input-wrapper {
@@ -374,10 +546,11 @@
 .custom-form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid $border; // Match theme border
+    border-radius: 6px; // Match theme radius
     font-size: 0.95rem;
     transition: border-color 0.2s;
+    background: #fff;
 
     &:focus {
         outline: none;
@@ -392,6 +565,10 @@ textarea.custom-form-control {
 
 .full-width {
     grid-column: 1 / -1;
+}
+
+.left-half {
+    grid-column: span 2;
 }
 
 .leave-period-options {
@@ -454,7 +631,7 @@ textarea.custom-form-control {
 
 
 .calculated-days-display {
-    margin-top: 1rem;
+    margin-top: 0; // Removed margin to fit in grid usually
 
     label {
         display: block;
@@ -493,15 +670,17 @@ textarea.custom-form-control {
 .form-actions-footer {
     display: flex;
     gap: 1rem;
-    padding: 1.5rem 1.25rem;
+    padding: 1rem 2rem; // Adjusted padding
     border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
+    background: #fff; // Changed to white to match medical form
     flex-shrink: 0;
+    justify-content: flex-end; // Aligned to right
 
     button {
-        flex: 1;
-        padding: 0.875rem 2.5rem;
+        padding: 8px 24px;
+        max-width: 80px; // Match medicalexpenses
         border: none;
+        white-space: nowrap;
         border-radius: 8px;
         font-size: 0.95rem;
         font-weight: 700;
@@ -514,6 +693,8 @@ textarea.custom-form-control {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
+        max-width: none; // Reset max-width if inherited
+        flex: 0 0 auto; // Don't flex grow 
 
         &::before {
             content: '';
@@ -538,30 +719,21 @@ textarea.custom-form-control {
         }
 
         &.btn-save-custom {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
+            background-color: $success;
+            color: #fff;
 
             &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
-            }
-
-            &:active {
-                transform: translateY(0);
+                background-color: color.adjust($success, $lightness: -5%);
+                box-shadow: 0 4px 10px rgba($success, 0.3);
             }
         }
 
         &.btn-back-custom {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
+            background-color: #f1f3f4;
+            color: $text; // Use $text variable
 
             &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
-            }
-
-            &:active {
-                transform: translateY(0);
+                background-color: #e8eaed;
             }
         }
     }
@@ -595,7 +767,9 @@ textarea.custom-form-control {
 
     .time-off-form-page {
         max-width: 100%;
-        height: 95vh;
+        height: 100dvh; // Match medicalexpenses
+        max-height: 100dvh; // Match medicalexpenses
+        border-radius: 0; // Match medicalexpenses
 
         .top-header-strip {
             padding: 12px 15px;
