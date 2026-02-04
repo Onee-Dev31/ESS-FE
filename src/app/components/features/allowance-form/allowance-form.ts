@@ -113,42 +113,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   autoCalculate(log: any) {
-    if (!log.selected || !log.timeIn || !log.timeOut) {
-      log.displayHours = '0.00';
-      log.actualExtraHours = 0;
-      log.amount = 0;
-      this.updateTotal();
-      return;
-    }
-
-    const [startHour, startMinute] = log.timeIn.split(':').map(Number);
-    const [endHour, endMinute] = log.timeOut.split(':').map(Number);
-
-    let totalMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
-    if (totalMinutes < 0) totalMinutes += 1440;
-
-    let extraMinutes = totalMinutes - 540;
-    if (extraMinutes < 0) extraMinutes = 0;
-
-
-    const extraHoursDecimal = extraMinutes / 60;
-    log.actualExtraHours = extraHoursDecimal;
-
-    const hours = Math.floor(extraMinutes / 60);
-    const minutes = extraMinutes % 60;
-    log.displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
-
-    if (extraHoursDecimal >= 2) {
-      if (extraHoursDecimal <= 4) log.amount = 150;
-      else if (extraHoursDecimal <= 8) log.amount = 225;
-      else if (extraHoursDecimal <= 12) log.amount = 300;
-      else if (extraHoursDecimal <= 16) log.amount = 375;
-      else if (extraHoursDecimal <= 20) log.amount = 450;
-      else log.amount = 525;
-    } else {
-      log.amount = 0;
-    }
-
+    const calculated = this.allowanceService.calculateAllowance(log);
+    Object.assign(log, calculated);
     this.updateTotal();
   }
 

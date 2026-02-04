@@ -70,33 +70,9 @@ export class VehicleComponent implements OnInit {
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
-      const direction = desc ? -1 : 1;
-      filtered.sort((requestA, requestB) => {
-        switch (id) {
-          case 'id':
-            return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate':
-            return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          case 'date': {
-            const dateA = requestA.items[0]?.date || '';
-            const dateB = requestB.items[0]?.date || '';
-            return dateA.localeCompare(dateB) * direction;
-          }
-          case 'desc': {
-            const descA = requestA.items[0]?.description || '';
-            const descB = requestB.items[0]?.description || '';
-            return descA.localeCompare(descB) * direction;
-          }
-          case 'amount': {
-            const amountA = requestA.items.reduce((sum, item) => sum + item.amount, 0);
-            const amountB = requestB.items.reduce((sum, item) => sum + item.amount, 0);
-            return (amountA - amountB) * direction;
-          }
-          case 'status':
-            return requestA.status.localeCompare(requestB.status) * direction;
-          default:
-            return 0;
-        }
+      filtered = TableSortHelper.sortVehicleLikeData(filtered, id, desc, {
+        desc: 'desc',
+        date: 'date'
       });
     }
     return filtered;

@@ -91,35 +91,11 @@ export class VehicleTaxiComponent implements OnInit {
     const sortState = this.sorting()[0];
     if (sortState) {
       const { id, desc } = sortState;
-      const direction = desc ? -1 : 1;
-      filtered.sort((a, b) => {
-        const valA_id = a.id;
-        const valB_id = b.id;
-        const valA_createDate = a.createDate;
-        const valB_createDate = b.createDate;
-
-        switch (id) {
-          case 'requestId': return valA_id.localeCompare(valB_id) * direction;
-          case 'createDate': return valA_createDate.localeCompare(valB_createDate) * direction;
-          case 'status': return a.status.localeCompare(b.status) * direction;
-          case 'amount':
-            const sumA = a.items.reduce((s, i) => s + i.amount, 0);
-            const sumB = b.items.reduce((s, i) => s + i.amount, 0);
-            return (sumA - sumB) * direction;
-          case 'description':
-            const descA = a.items[0]?.description || '';
-            const descB = b.items[0]?.description || '';
-            return descA.localeCompare(descB) * direction;
-          case 'destination':
-            const destA = a.items[0]?.destination || '';
-            const destB = b.items[0]?.destination || '';
-            return destA.localeCompare(destB) * direction;
-          case 'date':
-            const dateA = a.items[0]?.date || '';
-            const dateB = b.items[0]?.date || '';
-            return dateA.localeCompare(dateB) * direction;
-          default: return 0;
-        }
+      filtered = TableSortHelper.sortVehicleLikeData(filtered, id, desc, {
+        id: 'requestId',
+        desc: 'description',
+        date: 'date',
+        destination: 'destination'
       });
     }
 
