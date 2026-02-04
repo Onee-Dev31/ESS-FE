@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { routes } from './app.routes';
@@ -9,10 +9,12 @@ import { matSelfImprovement } from '@ng-icons/material-icons/baseline';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { GlobalErrorHandler } from './core/global-error-handler';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideHttpClient(
       withInterceptors([authInterceptor, errorInterceptor])
     ),

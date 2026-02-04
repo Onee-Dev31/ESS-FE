@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AlertModals } from './alert-modals';
+import { EmptyState } from './empty-state';
 
-describe('AlertModals', () => {
-  let component: AlertModals;
-  let fixture: ComponentFixture<AlertModals>;
+describe('EmptyState', () => {
+  let component: EmptyState;
+  let fixture: ComponentFixture<EmptyState>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AlertModals]
+      imports: [EmptyState]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AlertModals);
+    fixture = TestBed.createComponent(EmptyState);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

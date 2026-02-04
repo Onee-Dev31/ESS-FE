@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
 import { UserService } from '../../../services/user.service';
 import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { FilePreviewModalComponent } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+
+import { MasterDataService, ClaimType } from '../../../services/master-data.service';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -19,8 +21,9 @@ import dayjs from 'dayjs';
 export class MedicalexpensesForm implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private userService = inject(UserService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
+  private masterDataService = inject(MasterDataService);
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -31,12 +34,7 @@ export class MedicalexpensesForm implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
-  claimTypes = [
-    { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: '#ff6b6b' },
-    { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: '#4d96ff' },
-    { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: '#6bc1ff' },
-    { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: '#6bcb77' },
-  ];
+  claimTypes: ClaimType[] = [];
 
   selectedClaimType = signal<string>('');
 
@@ -72,6 +70,13 @@ export class MedicalexpensesForm implements OnInit {
       this.employeeId.set(profile.employeeId);
     });
 
+    this.masterDataService.getMedicalClaimTypes().subscribe(types => {
+      this.claimTypes = types;
+      this.loadRequestData();
+    });
+  }
+
+  loadRequestData() {
     if (this.requestId) {
       this.medicalService.getRequestById(this.requestId).subscribe(req => {
         if (req) {
@@ -153,22 +158,22 @@ export class MedicalexpensesForm implements OnInit {
 
   save() {
     if (!this.selectedClaimType()) {
-      this.alertService.showWarning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
+      this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
       return;
     }
 
     if (!this.startDate() || !this.endDate()) {
-      this.alertService.showWarning('กรุณาระบุวันที่รักษา', 'ข้อมูลไม่ครบถ้วน');
+      this.toastService.warning('กรุณาระบุวันที่รักษา');
       return;
     }
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
-      this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
+      this.toastService.warning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
       return;
     }
 
     if (!this.hospital() || !this.disease() || this.amount() <= 0) {
-      this.alertService.showWarning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0', 'ข้อมูลไม่ถูกต้อง');
+      this.toastService.warning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0');
       return;
     }
 
@@ -205,18 +210,18 @@ export class MedicalexpensesForm implements OnInit {
       if (this.isEditMode()) {
         this.medicalService.updateRequest(request).subscribe({
           next: () => {
-            this.alertService.showSuccess('แก้ไขข้อมูลเรียบร้อยแล้ว');
+            this.toastService.success('แก้ไขข้อมูลเรียบร้อยแล้ว');
             this.close();
           },
-          error: () => this.alertService.showError('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
+          error: () => this.toastService.error('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
         });
       } else {
         this.medicalService.addRequest(request).subscribe({
           next: () => {
-            this.alertService.showSuccess('บันทึกข้อมูลเรียบร้อยแล้ว');
+            this.toastService.success('บันทึกข้อมูลเรียบร้อยแล้ว');
             this.close();
           },
-          error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+          error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
         });
       }
     });

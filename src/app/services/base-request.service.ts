@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
-import { Observable, of, BehaviorSubject, delay } from 'rxjs';
-import { LoadingService } from './loading.service';
+import { Observable, of, BehaviorSubject, delay, take } from 'rxjs';
+import { LoadingService } from './loading';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BUSINESS_CONFIG } from '../constants/business.constant';
 import { RequestBase } from '../interfaces/core.interface';
@@ -49,13 +49,13 @@ export abstract class BaseRequestService<T extends RequestBase> {
     getRequests(): Observable<T[]> {
         const masterData = this.getMasterData();
         this.updateSubject(masterData);
-        return this.loadingService.wrap(this.requestsSubject.asObservable().pipe(delay(100)));
+        return this.requestsSubject.asObservable().pipe(delay(100), take(1));
     }
 
     getRequestById(id: string): Observable<T | undefined> {
         const masterData = this.getMasterData();
         const item = masterData.find(r => r.id === id);
-        return this.loadingService.wrap(of(item).pipe(delay(100)));
+        return of(item).pipe(delay(100));
     }
 
     addRequest(request: T): Observable<void> {

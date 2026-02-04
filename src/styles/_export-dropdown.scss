@@ -1,0 +1,95 @@
+// Export dropdown styles
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease;
+        z-index: 1000;
+
+        &.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: white;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: background 0.15s ease;
+
+            &:first-child {
+                border-radius: 8px 8px 0 0;
+            }
+
+            &:last-child {
+                border-radius: 0 0 8px 8px;
+            }
+
+            i {
+                font-size: 1rem;
+                width: 20px;
+                text-align: center;
+            }
+
+            &:hover {
+                background: #f5f5f7;
+            }
+
+            &:active {
+                background: #e8e8ed;
+            }
+        }
+    }
+
+    .btn-outline {
+        .fa-chevron-down {
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+    }
+
+    &:has(.dropdown-menu.show) {
+        .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+// Text color utilities
+.text-danger {
+    color: #dc2626 !important;
+}
+
+.text-success {
+    color: #16a34a !important;
+}
+
+.text-secondary {
+    color: #64748b !important;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}

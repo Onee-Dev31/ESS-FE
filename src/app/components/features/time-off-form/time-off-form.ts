@@ -1,14 +1,15 @@
 import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { UserService } from '../../../services/user.service';
 import { TimeOffService, TimeOffRequest } from '../../../services/time-off.service';
-import { LEAVE_TYPES } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs from 'dayjs';
 
 import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
+
+import { MasterDataService } from '../../../services/master-data.service';
 
 @Component({
   selector: 'app-time-off-form',
@@ -21,8 +22,9 @@ import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-pr
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private userService = inject(UserService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
+  private masterDataService = inject(MasterDataService);
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
@@ -31,7 +33,7 @@ export class TimeOffForm implements OnInit {
   currentDate = signal<string>('');
   employeeId = signal<string>('OTD01050');
   requestId = signal<string>('1');
-  leaveTypes = LEAVE_TYPES;
+  leaveTypes: any[] = [];
   selectedLeaveType = signal<string>('');
   reason = signal<string>('');
   startDate = signal<string>('');
@@ -66,9 +68,12 @@ export class TimeOffForm implements OnInit {
     this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
     this.resetDates();
 
-    if (this.initialLeaveTypeId) {
-      this.selectLeaveType(this.initialLeaveTypeId);
-    }
+    this.masterDataService.getLeaveTypes().subscribe(types => {
+      this.leaveTypes = types;
+      if (this.initialLeaveTypeId) {
+        this.selectLeaveType(this.initialLeaveTypeId);
+      }
+    });
   }
 
   private resetDates() {
@@ -154,22 +159,22 @@ export class TimeOffForm implements OnInit {
 
   save() {
     if (!this.selectedLeaveType()) {
-      this.alertService.showWarning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ', 'ข้อมูลไม่ครบถ้วน');
+      this.toastService.warning('กรุณาเลือกประเภทการลาก่อนดำเนินการต่อ');
       return;
     }
 
     if (!this.startDate() || !this.endDate()) {
-      this.alertService.showWarning('กรุณาระบุวันที่ลา', 'ข้อมูลไม่ครบถ้วน');
+      this.toastService.warning('กรุณาระบุวันที่ลา');
       return;
     }
 
     if (!this.dateUtil.isValidDateRange(this.startDate(), this.endDate())) {
-      this.alertService.showWarning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด', 'ข้อมูลไม่ถูกต้อง');
+      this.toastService.warning('วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด');
       return;
     }
 
     if (!this.reason()) {
-      this.alertService.showWarning('กรุณาระบุเหตุผลการลา', 'ข้อมูลไม่ครบถ้วน');
+      this.toastService.warning('กรุณาระบุเหตุผลการลา');
       return;
     }
 
@@ -200,10 +205,10 @@ export class TimeOffForm implements OnInit {
 
       this.timeOffService.addRequest(request).subscribe({
         next: () => {
-          this.alertService.showSuccess('บันทึกคำขอลาเรียบร้อยแล้ว');
+          this.toastService.success('บันทึกคำขอลาเรียบร้อยแล้ว');
           this.close();
         },
-        error: () => this.alertService.showError('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+        error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
       });
     });
   }

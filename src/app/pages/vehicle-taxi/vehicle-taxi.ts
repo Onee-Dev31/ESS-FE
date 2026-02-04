@@ -3,12 +3,18 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../services/taxi.service';
-import { AlertService } from '../../services/alert.service';
+import { LoadingService } from '../../services/loading';
+import { ToastService } from '../../services/toast';
+import { DialogService } from '../../services/dialog';
+import { ErrorService } from '../../services/error';
 import { VehicleTaxiFormComponent } from '../../components/features/vehicle-taxi-form/vehicle-taxi-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { SpinnerComponent } from '../../components/shared/spinner/spinner';
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
@@ -30,14 +36,19 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })
 export class VehicleTaxiComponent implements OnInit {
   private taxiService = inject(TaxiService);
-  private alertService = inject(AlertService);
+  private loadingService = inject(LoadingService);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
+  private errorService = inject(ErrorService);
   private router = inject(Router);
+
+  isLoading = this.loadingService.loading('taxi-list');
 
   listing = createListingState();
   statusOptions = COMMON_STATUS_OPTIONS;
@@ -157,14 +168,36 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   loadData() {
-    this.taxiService.getTaxiRequests().subscribe(data => this.allRequests.set(data));
+    this.loadingService.start('taxi-list');
+    this.taxiService.getTaxiRequests().subscribe({
+      next: (data) => {
+        this.allRequests.set(data);
+        this.loadingService.stop('taxi-list');
+      },
+      error: (error) => {
+        this.loadingService.stop('taxi-list');
+        this.errorService.handle(error, { component: 'VehicleTaxi', action: 'load-data' });
+      }
+    });
   }
 
-  deleteRequest(id: string) {
-    if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
-      this.taxiService.deleteTaxiRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
-        this.loadData();
+  async deleteRequest(id: string) {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการลบ',
+      message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
+      type: 'danger',
+      confirmText: 'ลบรายการ'
+    });
+
+    if (confirmed) {
+      this.taxiService.deleteTaxiRequest(id).subscribe({
+        next: () => {
+          this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
+          this.loadData();
+        },
+        error: (error) => {
+          this.errorService.handle(error, { component: 'VehicleTaxi', action: 'delete-request' });
+        }
       });
     }
   }
@@ -197,7 +230,7 @@ export class VehicleTaxiComponent implements OnInit {
         this.previewFiles.set(files);
         this.isPreviewModalOpen.set(true);
       } else {
-        this.alertService.showWarning('ไม่พบไฟล์แนบสำหรับรายการนี้', 'ไม่พบไฟล์');
+        this.toastService.warning('ไม่พบไฟล์แนบสำหรับรายการนี้');
       }
     }
   }

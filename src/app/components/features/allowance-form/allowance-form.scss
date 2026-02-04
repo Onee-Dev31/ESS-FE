@@ -405,10 +405,6 @@
 
   .btn-submit {
     flex-shrink: 0;
-
-    @media (max-width: 1024px) {
-      display: none;
-    }
   }
 
   .info-badges {
@@ -760,68 +756,6 @@
           background: rgba($danger, 0.02);
         }
       }
-    }
-  }
-}
-
-.mobile-sticky-footer {
-  position: sticky;
-  bottom: -20px;
-  left: 0;
-  right: 0;
-  margin: 10px -24px -20px -24px;
-  background: #fff;
-  border-top: 1px solid $border;
-  padding: 16px 20px;
-  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 100;
-
-  .summary-details {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-
-    .sum-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      span {
-        font-size: 0.75rem;
-        color: $text-sub;
-      }
-
-      strong {
-        font-size: 1.05rem;
-        color: $text;
-      }
-
-      &:last-child strong {
-        color: $primary;
-      }
-    }
-  }
-
-  .btn-submit-mobile {
-    width: 100%;
-    background: $success;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba($success, 0.2);
-
-    &:active {
-      transform: scale(0.98);
     }
   }
 }

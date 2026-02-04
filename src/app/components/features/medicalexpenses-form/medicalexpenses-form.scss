@@ -2,7 +2,11 @@
 @use '../../../../styles/theme' as *;
 
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .form-root {
@@ -76,11 +80,17 @@
     .content-card {
         flex: 1;
         min-height: 0;
+        max-height: calc(100vh - 200px); // Ensure content doesn't exceed viewport
         padding: 20px 24px;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
         overflow-x: hidden;
+
+        @include mobile {
+            max-height: calc(100vh - 180px); // Adjust for mobile
+            padding: 15px;
+        }
     }
 
     .form-section-wrapper {
@@ -266,9 +276,12 @@
             text-align: center;
             color: #2c3e50;
             width: 100%;
+            position: relative; // Ensure relative positioning for absolute child
 
             &::-webkit-calendar-picker-indicator {
                 position: absolute;
+                top: 0;
+                left: 0;
                 width: 100%;
                 height: 100%;
                 opacity: 0;
@@ -506,9 +519,27 @@
         background: #fff;
         flex-shrink: 0;
         justify-content: flex-end;
+        z-index: 100; // Increased z-index
+        position: relative; // Default position
+
+        // Failsafe: If the container scrolls instead of the content-card, make this sticky
+        position: sticky;
+        bottom: 0;
 
         button {
             flex: 0 0 auto;
+        }
+
+        @include tablet {
+            flex-direction: column;
+            padding: 1rem;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            gap: 12px;
+
+            button {
+                width: 100%;
+                margin: 0;
+            }
         }
     }
 
@@ -594,10 +625,10 @@
 }
 
 @include tablet {
-    .form-root {
-        height: 100%;
-        border-radius: 0;
 
+    // Remove redundant .form-root block that might override properties
+    // Instead, modify specific children if needed
+    .form-root {
         .top-header-strip {
             h2 {
                 font-size: 1rem;
@@ -622,12 +653,6 @@
 
         .amount-input-wrapper {
             gap: 6px;
-        }
-
-        .form-actions-footer {
-            flex-direction: row !important;
-            justify-content: flex-end !important;
-            padding: 0.75rem 1rem !important;
         }
     }
 }

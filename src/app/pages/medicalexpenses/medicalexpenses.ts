@@ -1,5 +1,4 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../services/medicalexpenses.service';
@@ -7,9 +6,15 @@ import { MedicalRequest, MedicalItem } from '../../interfaces/medical.interface'
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { LoadingService } from '../../services/loading';
+import { ToastService } from '../../services/toast';
+import { DialogService } from '../../services/dialog';
+import { ErrorService } from '../../services/error';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
@@ -31,13 +36,18 @@ interface FlatMedicalRow extends MedicalItem {
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalPolicyModalComponent, MedicalexpensesForm, StatusLabelPipe, FilePreviewModalComponent, PaginationComponent, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, MedicalexpensesForm, MedicalPolicyModalComponent, StatusLabelPipe, FilePreviewModalComponent, PaginationComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
-  private router = inject(Router);
+  private loadingService = inject(LoadingService);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
+  private errorService = inject(ErrorService);
+
+  isLoading = this.loadingService.loading('medical-list');
 
   listing = createListingState();
 
@@ -170,7 +180,17 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   loadData() {
-    this.medicalService.getRequests().subscribe(data => this.allRequests.set(data));
+    this.loadingService.start('medical-list');
+    this.medicalService.getRequests().subscribe({
+      next: (data) => {
+        this.allRequests.set(data);
+        this.loadingService.stop('medical-list');
+      },
+      error: (error) => {
+        this.loadingService.stop('medical-list');
+        this.errorService.handle(error, { component: 'MedicalExpenses', action: 'load-data' });
+      }
+    });
   }
 
   openModal(targetId: string = '') {

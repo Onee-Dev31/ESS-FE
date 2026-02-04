@@ -1,12 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AlertModals } from './components/modals/alert-modals/alert-modals';
 import { LoaderComponent } from './components/layout/loader/loader';
+import { ToastComponent } from './components/shared/toast/toast';
+import { ConfirmationDialogComponent } from './components/shared/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AlertModals, LoaderComponent],
+  imports: [RouterOutlet, LoaderComponent, ToastComponent, ConfirmationDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

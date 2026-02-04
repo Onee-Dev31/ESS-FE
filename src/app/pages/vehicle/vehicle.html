@@ -60,6 +60,9 @@
     </div>
 
     <div class="card-list-view">
+      @if (isLoading()) {
+      <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
       <div class="mobile-card" *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
         <div class="card-header">
           <div class="header-content">
@@ -103,13 +106,17 @@
         </div>
       </div>
 
-      <div class="no-data" *ngIf="table.getRowModel().rows.length === 0">
-        <i class="fas fa-inbox"></i>
-        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+      <div *ngIf="table.getRowModel().rows.length === 0">
+        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+        </app-empty-state>
       </div>
+      }
     </div>
 
     <div class="table-responsive">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
       <table class="modern-table">
         <thead>
           <tr>
@@ -191,13 +198,15 @@
             </tr>
           </ng-container>
           <tr *ngIf="table.getRowModel().rows.length === 0">
-            <td colspan="7" class="no-data">
-              <i class="fas fa-inbox"></i>
-              <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+            <td colspan="7" class="no-data-cell">
+              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                icon="fas fa-inbox">
+              </app-empty-state>
             </td>
           </tr>
         </tbody>
       </table>
+      }
     </div>
 
     <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"

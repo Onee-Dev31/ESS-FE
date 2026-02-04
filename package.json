@@ -45,6 +45,10 @@
     "@tanstack/angular-table": "^8.21.3",
     "date-holidays": "^3.26.7",
     "dayjs": "^1.11.19",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

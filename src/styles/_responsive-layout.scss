@@ -528,7 +528,7 @@
         background: white;
         width: 95%;
         max-width: 1600px;
-        max-height: 90vh;
+        max-height: 85vh; // Reduced from 90vh to ensure buttons visible at 100% zoom
         border-radius: 12px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         display: flex;
@@ -552,5 +552,18 @@
             width: 100%;
             min-height: 0;
         }
+    }
+}
+
+// --- Visibility Utilities ---
+.mobile-only {
+    @include desktop {
+        display: none !important;
+    }
+}
+
+.desktop-only {
+    @include mobile {
+        display: none !important;
     }
 }

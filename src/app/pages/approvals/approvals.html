@@ -1,7 +1,23 @@
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
-      <button class="btn-outline">📥 <span class="btn-text">Export</span></button>
+      <div class="export-dropdown">
+        <button class="btn-outline" (click)="toggleExportMenu()">
+          📥 <span class="btn-text">Export</span>
+          <i class="fas fa-chevron-down ml-1"></i>
+        </button>
+        <div class="dropdown-menu" [class.show]="showExportMenu()">
+          <button class="dropdown-item" (click)="exportPDF()">
+            <i class="fas fa-file-pdf text-danger"></i> Export PDF
+          </button>
+          <button class="dropdown-item" (click)="exportExcel()">
+            <i class="fas fa-file-excel text-success"></i> Export Excel
+          </button>
+          <button class="dropdown-item" (click)="print()">
+            <i class="fas fa-print text-secondary"></i> Print
+          </button>
+        </div>
+      </div>
       <button class="btn-outline" (click)="refresh()">🔄 <span class="btn-text">Refresh</span></button>
     </div>
   </app-page-header>
@@ -83,15 +99,18 @@
         </div>
       </div>
       }
-      <div class="no-data" *ngIf="comps.totalItems() === 0">
-        <i class="fas fa-inbox"></i>
-        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+      <div *ngIf="comps.totalItems() === 0">
+        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+        </app-empty-state>
       </div>
     </div>
 
     <!-- Desktop Grid View -->
     <div class="data-grid-container">
-      <table class="data-grid">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+      <table id="approvals-table" class="data-grid">
         <thead>
           <tr>
             <th class="sortable-header" (click)="toggleSort('requestNo')">
@@ -165,9 +184,10 @@
           }
         </tbody>
       </table>
-      <div class="no-data" *ngIf="comps.totalItems() === 0">
-        <i class="fas fa-inbox"></i>
-        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+      }
+      <div *ngIf="comps.totalItems() === 0 && !isLoading()">
+        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+        </app-empty-state>
       </div>
     </div>
 

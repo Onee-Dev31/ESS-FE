@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
 import { UserService } from '../../../services/user.service';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { switchMap } from 'rxjs';
@@ -21,7 +21,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   private allowanceService = inject(AllowanceService);
   private userService = inject(UserService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -170,7 +170,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
     if (invalid.length > 0) {
-      this.alertService.showWarning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
+      this.toastService.warning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
+      return;
+    }
+    if (!this.totalAmount || this.totalAmount <= 0) {
+      this.toastService.warning('กรุณากรอกจำนวนเงินให้ถูกต้อง');
       return;
     }
 
@@ -188,7 +192,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       }));
 
     if (items.length === 0) {
-      this.alertService.showWarning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
+      this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
       return;
     }
 
@@ -197,9 +201,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         this.allowanceService.updateAllowanceRequest(this.requestId, {
           ...existingRequest,
           items: items
-        }).subscribe(() => {
-          this.alertService.showSuccess(`อัปเดตรายการ ${this.requestId} เรียบร้อย`);
-          this.closeModal();
+        }).subscribe({
+          next: () => {
+            this.toastService.success('อัปเดตรายการเบิกเรียบร้อยแล้ว');
+            this.closeModal();
+          },
         });
       } else {
         this.userService.getUserProfile().subscribe(profile => {
@@ -217,7 +223,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             items: items
           };
           this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
-            this.alertService.showSuccess(`บันทึกสำเร็จ ยอดรวม ${this.totalAmount} บาท (รวม ${this.totalHoursStr} ชม.)`);
+            this.toastService.success('บันทึกสร้างรายการเบิกเรียบร้อยแล้ว');
             this.closeModal();
           });
         });

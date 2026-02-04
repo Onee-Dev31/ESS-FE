@@ -1,9 +1,11 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
-import { LoadingService } from '../../services/loading.service';
+import { LoadingService } from '../../services/loading';
+import { ToastService } from '../../services/toast';
+import { DialogService } from '../../services/dialog';
+import { ErrorService } from '../../services/error';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
@@ -14,6 +16,8 @@ import { REQUEST_STATUS, COMMON_STATUS_OPTIONS } from '../../constants/request-s
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -23,15 +27,19 @@ import {
 @Component({
   selector: 'app-timeoff',
   standalone: true,
-  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, SkeletonComponent, EmptyStateComponent, PageHeaderComponent],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
 })
 export class TimeoffComponent implements OnInit {
   protected loadingService = inject(LoadingService);
   private timeoffService = inject(TimeOffService);
-  private router = inject(Router);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
+  private errorService = inject(ErrorService);
   private dateUtil = inject(DateUtilityService);
+
+  isLoading = this.loadingService.loading('timeoff-list');
 
   requests = signal<TimeOffRequest[]>([]);
   isFormOpen = signal<boolean>(false);
@@ -128,9 +136,37 @@ export class TimeoffComponent implements OnInit {
   }
 
   loadRequests() {
-    this.timeoffService.getRequests().subscribe((data: TimeOffRequest[]) => {
-      this.requests.set(data);
+    this.loadingService.start('timeoff-list');
+    this.timeoffService.getRequests().subscribe({
+      next: (data: TimeOffRequest[]) => {
+        this.requests.set(data);
+        this.loadingService.stop('timeoff-list');
+      },
+      error: (error) => {
+        this.loadingService.stop('timeoff-list');
+        this.errorService.handle(error, { component: 'TimeOff', action: 'load-requests' });
+      }
     });
+  }
+
+  async deleteRequest(request: TimeOffRequest) {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการลบ',
+      message: `คุณต้องการลบรายการลา "${request.leaveType}" รหัส ${request.id} หรอไม่?`,
+      type: 'danger',
+      confirmText: 'ลบรายการ'
+    });
+
+    if (confirmed) {
+      // Since we don't have a specific delete API in the mock service yet, 
+      // we'll just simulate it or user Filter to remove it if this was real
+      // For now, let's assume we call a service method
+      // this.timeoffService.deleteRequest(request.id)...
+
+      // Simulating success
+      this.requests.set(this.requests().filter(r => r.id !== request.id));
+      this.toastService.success('ลบรายการสำเร็จ');
+    }
   }
 
   setPageSize(size: number) {
@@ -168,10 +204,6 @@ export class TimeoffComponent implements OnInit {
 
   clearFilters() {
     clearListingFilters(this.listing);
-  }
-
-  goBack() {
-    this.router.navigate(['/dashboard']);
   }
 
   toggleSort(columnId: string) {

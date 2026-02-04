@@ -55,6 +55,9 @@
     </div>
 
     <!-- Table View -->
+    @if (isLoading()) {
+    <app-skeleton type="table" [rows]="5"></app-skeleton>
+    } @else {
     <div class="table-responsive">
       <table class="modern-table taxi-table">
         <thead>
@@ -120,17 +123,22 @@
             </td>
           </tr>
           <tr *ngIf="comps.totalItems() === 0">
-            <td colspan="8" class="no-data">
-              <i class="fas fa-inbox"></i>
-              <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+            <td colspan="8" class="no-data-cell">
+              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                icon="fas fa-inbox">
+              </app-empty-state>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    }
 
     <!-- Mobile Card View -->
     <div class="card-list-view">
+      @if (isLoading()) {
+      <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
       <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
         <div class="card-header">
           <div class="header-content">
@@ -169,26 +177,26 @@
           </div>
         </div>
       </div>
-      <div class="no-data" *ngIf="comps.totalItems() === 0">
-        <i class="fas fa-inbox"></i>
-        <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
-      </div>
+      }
+    </div>
+
+    <div *ngIf="comps.totalItems() === 0">
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      </app-empty-state>
     </div>
   </div>
-
-  <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-    [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
-    (onPageSizeChange)="listing.pageSize.set($event)">
-  </app-pagination>
-
-  <!-- Modal Overlay -->
-  <div class="modal-overlay" *ngIf="isModalOpen()">
-    <div class="modal-container">
-      <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
-      </app-vehicle-taxi-form>
-    </div>
-  </div>
-
-  <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
-  </app-file-preview-modal>
 </div>
+
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
+</app-file-preview-modal>
+
+
+<app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()" [totalItems]="comps.totalItems()"
+  (onPageChange)="listing.currentPage.set($event)" (onPageSizeChange)="listing.pageSize.set($event)">
+</app-pagination>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" *ngIf="isModalOpen()">
+  <div class="modal-container">
+    <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+    </app-vehicle-taxi-form>

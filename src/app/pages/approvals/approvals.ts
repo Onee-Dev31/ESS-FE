@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -11,22 +11,37 @@ import { ApprovalDetailModalComponent } from '../../components/modals/approval-d
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { ExportService } from '../../services/export';
+import { ToastService } from '../../services/toast';
+import { DialogService } from '../../services/dialog';
+import { LoadingService } from '../../services/loading';
+import { ErrorService } from '../../services/error';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds } from '../../utils/listing.util';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
 })
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private dateUtil = inject(DateUtilityService);
+  private exportService = inject(ExportService);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
+  private loadingService = inject(LoadingService);
+  private errorService = inject(ErrorService);
   private route = inject(ActivatedRoute);
+
+  isLoading = this.loadingService.loading('approvals-list');
+  isExporting = this.loadingService.loading('export');
 
   listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
@@ -40,15 +55,22 @@ export class ApprovalsComponent implements OnInit {
 
   pageTitle = signal<string>('Pending Approvals');
   category: 'all' | 'medical' = 'all';
+  showExportMenu = signal<boolean>(false);
 
   constructor() {
     this.listing.filterStatus.set('Pending');
   }
 
   ngOnInit() {
+    // Simulate loading for testing skeleton
+    this.loadingService.start('approvals-list');
+    setTimeout(() => {
+      this.loadingService.stop('approvals-list');
+    }, 1500);
+
     // Detect mode from route
-    this.route.data.subscribe(data => {
-      this.category = data['category'] || 'all';
+    this.route.queryParams.subscribe(params => {
+      this.category = params['category'] || 'all';
       this.pageTitle.set(this.category === 'medical' ? 'Medical Expenses Approvals' : 'Pending Approvals');
       this.refresh();
     });
@@ -184,4 +206,73 @@ export class ApprovalsComponent implements OnInit {
     const core = item?.original || item;
     return `${core.requestNo || 'row'}-${index}`;
   }
+
+  // Export methods
+  toggleExportMenu() {
+    this.showExportMenu.set(!this.showExportMenu());
+  }
+
+  async exportPDF() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      await this.exportService.exportToPDF('approvals-table', 'approvals');
+      this.toastService.success('Export PDF สำเร็จ');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'Approvals', action: 'export-pdf' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
+
+  async exportExcel() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      const data = this.table.getRowModel().rows.map(row => ({
+        requestNo: row.original.requestNo,
+        requestDate: row.original.requestDate,
+        requestBy: row.original.requestBy.name,
+        employeeId: row.original.requestBy.employeeId,
+        department: row.original.requestBy.department,
+        requestType: row.original.requestType,
+        requestDetail: row.original.requestDetail,
+        amount: row.original.amount,
+        status: row.original.status
+      }));
+
+      const columns = [
+        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
+        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
+        { header: 'ผู้ขอเบิก', key: 'requestBy', width: 20 },
+        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
+        { header: 'แผนก', key: 'department', width: 20 },
+        { header: 'ประเภท', key: 'requestType', width: 15 },
+        { header: 'รายละเอียด', key: 'requestDetail', width: 30 },
+        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
+        { header: 'สถานะ', key: 'status', width: 15 }
+      ];
+
+      await this.exportService.exportToExcel(data, columns, 'approvals');
+      this.toastService.success('Export Excel สำเร็จ');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
+
+  print() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      this.exportService.printElement('approvals-table');
+      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'Approvals', action: 'print' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
 }
+

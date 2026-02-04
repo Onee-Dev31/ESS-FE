@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { LoadingService } from '../../services/loading.service';
+import { LoadingService } from '../../services/loading';
 import { take, finalize } from 'rxjs/operators';
 
 @Component({

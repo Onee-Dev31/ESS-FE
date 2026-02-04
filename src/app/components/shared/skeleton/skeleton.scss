@@ -1,0 +1,82 @@
+// Skeleton Loading Styles
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton-table {
+    width: 100%;
+    padding: 20px;
+}
+
+.skeleton-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+.skeleton-cell {
+    flex: 1;
+    height: 20px;
+    background: linear-gradient(90deg,
+            #f0f0f0 0%,
+            #f8f8f8 50%,
+            #f0f0f0 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-card-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(90deg,
+            #f0f0f0 0%,
+            #f8f8f8 50%,
+            #f0f0f0 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    flex-shrink: 0;
+}
+
+.skeleton-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-line {
+    width: 100%;
+    background: linear-gradient(90deg,
+            #f0f0f0 0%,
+            #f8f8f8 50%,
+            #f0f0f0 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}

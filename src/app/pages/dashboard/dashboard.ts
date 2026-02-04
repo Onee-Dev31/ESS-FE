@@ -9,6 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
+import { DialogService } from '../../services/dialog';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
@@ -42,6 +43,7 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
+  private dialogService = inject(DialogService);
   private authService = inject(AuthService);
 
   userRole = this.authService.userRole;
@@ -190,8 +192,15 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  clearStorage() {
-    if (confirm('คุณต้องการล้างข้อมูลทั้งหมดเพื่อให้ระบบเริ่มใหม่หรือไม่?')) {
+  async clearStorage() {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการล้างข้อมูล',
+      message: 'คุณต้องการล้างข้อมูลทั้งหมดเพื่อให้ระบบเริ่มใหม่หรือไม่?',
+      type: 'danger',
+      confirmText: 'ล้างข้อมูล'
+    });
+
+    if (confirmed) {
       localStorage.clear();
       window.location.reload();
     }

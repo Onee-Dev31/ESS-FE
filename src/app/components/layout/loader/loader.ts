@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoadingService } from '../../../services/loading.service';
+import { LoadingService } from '../../../services/loading';
 
 @Component({
-    selector: 'app-loader',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-loader',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     @if (loadingService.isLoading()) {
       <div class="loader-overlay">
         <div class="loader-content">
@@ -19,7 +19,7 @@ import { LoadingService } from '../../../services/loading.service';
       </div>
     }
   `,
-    styles: [`
+  styles: [`
     .loader-overlay {
       position: fixed;
       top: 0;
@@ -78,5 +78,5 @@ import { LoadingService } from '../../../services/loading.service';
   `]
 })
 export class LoaderComponent {
-    public loadingService = inject(LoadingService);
+  public loadingService = inject(LoadingService);
 }

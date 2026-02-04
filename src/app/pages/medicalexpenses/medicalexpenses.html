@@ -83,6 +83,9 @@
 
 
         <div class="table-responsive">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -164,17 +167,23 @@
                         </td>
                     </tr>
                     <tr *ngIf="table.getRowModel().rows.length === 0">
-                        <td colspan="11" class="no-data">
-                            <i class="fas fa-inbox"></i>
-                            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+                        <td colspan="11" class="no-data-cell">
+                            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                                icon="fas fa-inbox">
+                            </app-empty-state>
                         </td>
                     </tr>
                 </tbody>
             </table>
+
+            }
         </div>
 
 
         <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
             <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
                 <div class="card-header">
                     <div class="header-content">
@@ -225,30 +234,31 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="no-data" *ngIf="comps.totalItems() === 0">
-            <i class="fas fa-inbox"></i>
-            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+            }
         </div>
     </div>
 
-
-    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
-    </app-pagination>
-
-    <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
-    </app-medical-policy-modal>
-
-
-    <div class="modal-overlay" *ngIf="isModalOpen()">
-        <div class="modal-container">
-            <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
-            </app-medicalexpenses-form>
-        </div>
+    <div *ngIf="comps.totalItems() === 0">
+        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+        </app-empty-state>
     </div>
-
-    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
-    </app-file-preview-modal>
 </div>
+
+
+<app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()" [totalItems]="comps.totalItems()"
+    (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+</app-pagination>
+
+<app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+</app-medical-policy-modal>
+
+
+<div class="modal-overlay" *ngIf="isModalOpen()">
+    <div class="modal-container">
+        <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+        </app-medicalexpenses-form>
+    </div>
+</div>
+
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>

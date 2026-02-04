@@ -2,11 +2,11 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
-import { AlertService } from '../services/alert.service';
+import { ToastService } from '../services/toast';
 import { AuthService } from '../services/auth.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-    const alertService = inject(AlertService);
+    const toastService = inject(ToastService);
     const authService = inject(AuthService);
     const router = inject(Router);
 
@@ -26,7 +26,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 errorMessage = 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ (Internal Server Error)';
             }
 
-            alertService.showError(errorMessage);
+            toastService.error(errorMessage);
 
             return throwError(() => error);
         })

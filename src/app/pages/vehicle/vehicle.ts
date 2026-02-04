@@ -1,14 +1,17 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, VehicleRequest } from '../../services/transport.service';
-import { AlertService } from '../../services/alert.service';
+import { LoadingService } from '../../services/loading';
+import { ToastService } from '../../services/toast';
+import { DialogService } from '../../services/dialog';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { StatusUtil } from '../../utils/status.util';
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -20,14 +23,14 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, EmptyStateComponent, SkeletonComponent],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
 })
 export class VehicleComponent implements OnInit {
   private transportService = inject(TransportService);
-  private alertService = inject(AlertService);
-  private router = inject(Router);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
 
   protected readonly Math = Math;
 
@@ -118,16 +121,34 @@ export class VehicleComponent implements OnInit {
     this.loadData();
   }
 
+  private loadingService = inject(LoadingService);
+  isLoading = this.loadingService.loading('vehicle-list');
+
   loadData() {
-    this.transportService.getRequests().subscribe(data => {
-      this.allRequests.set(data);
+    this.loadingService.start('vehicle-list');
+    this.transportService.getRequests().subscribe({
+      next: (data) => {
+        this.allRequests.set(data);
+        this.loadingService.stop('vehicle-list');
+      },
+      error: (error) => {
+        this.loadingService.stop('vehicle-list');
+        // Handle error if needed
+      }
     });
   }
 
-  deleteRequest(id: string) {
-    if (confirm('ยืนยันการลบรายการเบิกเลขที่ ' + id)) {
+  async deleteRequest(id: string) {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการลบ',
+      message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
+      type: 'danger',
+      confirmText: 'ลบรายการ'
+    });
+
+    if (confirmed) {
       this.transportService.deleteRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเบิกเรียบร้อยแล้ว');
+        this.toastService.success('ลบรายการเรียบร้อยแล้ว');
         this.loadData();
       });
     }

@@ -1,17 +1,20 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
 import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
-import { AlertService } from '../../services/alert.service';
+import { ToastService } from '../../services/toast';
+import { LoadingService } from '../../services/loading';
+import { DialogService } from '../../services/dialog';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusUtil } from '../../utils/status.util';
 import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
+import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import {
   createAngularTable,
   getCoreRowModel,
@@ -31,15 +34,15 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 @Component({
   selector: 'app-allowance',
   standalone: true,
-  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, MedicalPolicyModalComponent],
+  imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, MedicalPolicyModalComponent, EmptyStateComponent, SkeletonComponent],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
 })
 export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
   private dateUtil = inject(DateUtilityService);
-  private router = inject(Router);
 
   protected readonly Math = Math;
 
@@ -146,9 +149,14 @@ export class AllowanceComponent implements OnInit {
     this.loadData();
   }
 
+  private loadingService = inject(LoadingService);
+  isLoading = this.loadingService.loading('allowance-list');
+
   loadData() {
+    this.loadingService.start('allowance-list');
     this.allowanceService.getAllowanceRequests().subscribe(data => {
       this.allRequests.set(data);
+      this.loadingService.stop('allowance-list');
     });
   }
 
@@ -210,10 +218,17 @@ export class AllowanceComponent implements OnInit {
     this.listing.currentPage.set(page);
   }
 
-  deleteRequest(id: string) {
-    if (confirm(`คุณต้องการลบรายการ ${id} ใช่หรือไม่?`)) {
+  async deleteRequest(id: string) {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการลบ',
+      message: `คุณต้องการลบรายการ ${id} ใช่หรือไม่?`,
+      type: 'danger',
+      confirmText: 'ลบรายการ'
+    });
+
+    if (confirmed) {
       this.allowanceService.deleteAllowanceRequest(id).subscribe(() => {
-        this.alertService.showSuccess('ลบรายการเรียบร้อยแล้ว');
+        this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
         this.loadData();
       });
     }

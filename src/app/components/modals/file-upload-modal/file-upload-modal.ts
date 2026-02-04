@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastService } from '../../../services/toast';
 
 @Component({
   selector: 'app-file-upload-modal',
@@ -9,6 +10,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './file-upload-modal.scss',
 })
 export class FileUploadModal implements OnChanges {
+  private toastService = inject(ToastService);
+
   @Input() currentFileName: string | null = null;
   @Input() dateLabel: string = '';
 
@@ -30,7 +33,7 @@ export class FileUploadModal implements OnChanges {
     if (file) {
       const maxSizeInBytes = 4 * 1024 * 1024;
       if (file.size > maxSizeInBytes) {
-        alert('ขนาดไฟล์ต้องไม่เกิน 4MB (ไฟล์ที่เลือกมีขนาด ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB)');
+        this.toastService.warning('ขนาดไฟล์ต้องไม่เกิน 4MB (ไฟล์ที่เลือกมีขนาด ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB)');
         event.target.value = '';
         return;
       }

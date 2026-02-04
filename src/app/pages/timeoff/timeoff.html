@@ -1,14 +1,6 @@
 <div class="timeoff-page">
-    <div class="loading-overlay" *ngIf="loadingService.isLoading()">
-        <div class="spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-        <p>กำลังโหลดข้อมูล...</p>
-    </div>
-    <app-page-header title="บันทึกการลา (Time Off)"></app-page-header>
-
+    <app-page-header title="รายการลา"></app-page-header>
     <div class="content-card">
-        <div class="card-header-title">รายการลา</div>
 
         <div class="toolbar-container">
             <div class="toolbar-top-row">
@@ -64,6 +56,9 @@
         </div>
 
         <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
             <div class="mobile-card" *ngFor="let request of comps.paginatedData()">
                 <div class="card-header">
                     <div class="header-content">
@@ -111,7 +106,7 @@
                             <button class="btn-edit-sm" (click)="openForm(request.status)">
                                 <i class="far fa-edit"></i> แก้ไข
                             </button>
-                            <button class="btn-delete-sm">
+                            <button class="btn-delete-sm" (click)="deleteRequest(request)">
                                 <i class="far fa-trash-alt"></i> ลบ
                             </button>
                         </ng-container>
@@ -124,13 +119,18 @@
                 </div>
             </div>
 
-            <div class="no-data" *ngIf="comps.paginatedData().length === 0">
-                <i class="fas fa-inbox"></i>
-                <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+            <div *ngIf="comps.paginatedData().length === 0">
+                <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                    icon="fas fa-inbox">
+                </app-empty-state>
             </div>
+            }
         </div>
 
         <div class="table-responsive">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -213,7 +213,7 @@
                                     <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
                                         <i class="far fa-edit"></i>
                                     </button>
-                                    <button class="btn-icon delete" title="ลบ">
+                                    <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
                                         <i class="far fa-trash-alt"></i>
                                     </button>
                                 </ng-container>
@@ -227,13 +227,15 @@
                         </td>
                     </tr>
                     <tr *ngIf="comps.paginatedData().length === 0">
-                        <td colspan="10" class="no-data">
-                            <i class="fas fa-inbox"></i>
-                            <p>ไม่พบรายการที่ตรงตามเงื่อนไข</p>
+                        <td colspan="10" class="no-data-cell">
+                            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                                icon="fas fa-inbox"></app-empty-state>
                         </td>
                     </tr>
                 </tbody>
             </table>
+
+            }
         </div>
 
         <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
@@ -242,6 +244,7 @@
         </app-pagination>
     </div>
 </div>
+
 
 <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>

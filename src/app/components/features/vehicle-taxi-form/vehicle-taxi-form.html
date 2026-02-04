@@ -183,17 +183,7 @@
     </div>
 
 
-    <div class="mobile-sticky-footer mobile-only">
-      <div class="summary-details">
-        <div class="sum-item">
-          <span>รวมยอดเบิกทั้งสิ้น :</span>
-          <strong>{{ getTotalAmount() | number }} บาท</strong>
-        </div>
-      </div>
-      <button class="btn-submit-mobile" (click)="save()">
-        <i class="fas fa-check"></i> ยืนยันการเบิก
-      </button>
-    </div>
+
   </main>
 
   <app-file-upload-modal *ngIf="isShowUploadModal" [currentFileName]="currentUploadItem?.attachedFile"

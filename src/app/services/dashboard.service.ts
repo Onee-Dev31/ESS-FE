@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
-import { LoadingService } from './loading.service';
+import { LoadingService } from './loading';
 import { ApprovalsHelperService } from './approvals-helper.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';

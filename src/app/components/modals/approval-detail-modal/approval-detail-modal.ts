@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
@@ -18,7 +18,7 @@ import { ApprovalsHelperService } from '../../../services/approvals-helper.servi
 })
 export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -133,7 +133,7 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     if (!item || !action) return;
     if ((action === 'Rejected' || action === 'Referred Back') && !reason.trim()) {
-      this.alertService.showWarning('กรุณาระบุเหตุผลการปฏิเสธหรือส่งแก้ไขเพื่อความชัดเจน', 'กรุณาระบุเหตุผล');
+      this.toastService.warning('กรุณาระบุเหตุผลการไม่อนุมัติ/ยกเลิกเพื่อความชัดเจน');
       return;
     }
 
@@ -154,7 +154,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.onStatusUpdated.emit();
     this.onClose.emit();
     const successMsg = newStatus === 'Approved' ? 'ดำเนินการอนุมัติเรียบร้อยแล้ว' : 'ดำเนินการส่งคืน/ปฏิเสธเรียบร้อยแล้ว';
-    this.alertService.showSuccess(successMsg, 'ดำเนินการสำเร็จ');
+    this.toastService.success(successMsg);
   }
 
   close() { this.onClose.emit(); }

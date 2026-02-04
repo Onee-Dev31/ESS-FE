@@ -2,9 +2,8 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, RequestItem, VehicleRequest } from '../../../services/transport.service';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
-import { THAI_MONTHS, YEARS_CONFIG } from '../../../config/constants';
 import { DateUtilityService } from '../../../services/date-utility.service';
 
 interface LogItem {
@@ -17,6 +16,8 @@ interface LogItem {
   description: string;
   shiftCode?: string;
 }
+
+import { MasterDataService } from '../../../services/master-data.service';
 
 @Component({
   selector: 'app-vehicle-form',
@@ -31,14 +32,15 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private transportService = inject(TransportService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
+  private masterDataService = inject(MasterDataService);
 
   loadedRequest?: VehicleRequest;
 
-  thaiMonths = THAI_MONTHS;
-  years = YEARS_CONFIG;
+  thaiMonths: string[] = [];
+  years: number[] = [];
 
   selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
@@ -46,7 +48,11 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   logs: LogItem[] = [];
 
   ngOnInit(): void {
-    this.loadData();
+    this.masterDataService.getDateConfig().subscribe(config => {
+      this.thaiMonths = config.months;
+      this.years = config.years;
+      this.loadData();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -151,12 +157,12 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
     if (invalidLogs.length > 0) {
       const invalidDates = invalidLogs.map(log => log.date).join(', ');
-      this.alertService.showWarning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
+      this.toastService.warning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
       return;
     }
 
     if (selectedLogs.length === 0 || this.totalAmount === 0) {
-      this.alertService.showWarning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
+      this.toastService.warning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
       return;
     }
 
@@ -173,7 +179,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           items: requestItems
         };
         this.transportService.updateVehicleRequest(this.requestId, updatedRequest).subscribe(() => {
-          this.alertService.showSuccess(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
+          this.toastService.success(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
           this.closeModal();
         });
       } else {
@@ -185,7 +191,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           items: requestItems
         };
         this.transportService.addRequest(newRequest).subscribe(() => {
-          this.alertService.showSuccess(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
+          this.toastService.success(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
           this.closeModal();
         });
       }

@@ -4,9 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
 import { UserService } from '../../../services/user.service';
-import { AlertService } from '../../../services/alert.service';
+import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
+
+import { MasterDataService } from '../../../services/master-data.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -21,19 +23,17 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
 
   private taxiService = inject(TaxiService);
   private userService = inject(UserService);
-  private alertService = inject(AlertService);
+  private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
+  private masterDataService = inject(MasterDataService);
 
   loadedRequest?: TaxiRequest;
 
   items: any[] = [];
 
-  thaiMonths = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-  ];
-  years = [2568, 2569, 2570];
+  thaiMonths: string[] = [];
+  years: number[] = [];
 
   selectedMonthIndex: number = 9;
   selectedYear: number = 2568;
@@ -42,7 +42,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   currentUploadItem: any = null;
 
   ngOnInit() {
-    this.loadData();
+    this.masterDataService.getDateConfig().subscribe(config => {
+      this.thaiMonths = config.months;
+      this.years = config.years;
+      this.loadData();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -59,7 +63,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     });
   }
 
-  
+
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
@@ -87,12 +91,12 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
-  
+
   save() {
     const selectedItems = this.items.filter(item => item.selected);
 
     if (selectedItems.length === 0) {
-      this.alertService.showWarning('กรุณาเลือกรายการที่ต้องการเบิก');
+      this.toastService.warning('กรุณาเลือกรายการที่ต้องการเบิก');
       return;
     }
 
@@ -103,7 +107,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     );
 
     if (invalidItem) {
-      this.alertService.showWarning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`);
+      this.toastService.warning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${invalidItem.date} (ขอบแดง)`);
       return;
     }
 
@@ -123,11 +127,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
           items: taxiItems
         };
         this.taxiService.updateTaxiRequest(this.requestId, updatedRequest).subscribe(() => {
-          this.alertService.showSuccess('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+          this.toastService.success('บันทึกการแก้ไขเรียบร้อยแล้ว');
           this.onClose.emit();
         });
       } else {
-        
+
         this.userService.getUserProfile().subscribe(profile => {
           const newRequest: TaxiRequest = {
             id: this.requestId,
@@ -143,7 +147,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
             items: taxiItems
           };
           this.taxiService.addTaxiRequest(newRequest).subscribe(() => {
-            this.alertService.showSuccess(`สร้างรายการเบิก Taxi เลขที่ ${this.requestId} สำเร็จ`);
+            this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
             this.onClose.emit();
           });
         });
@@ -175,7 +179,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.currentUploadItem = null;
   }
 
-  
+
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;
