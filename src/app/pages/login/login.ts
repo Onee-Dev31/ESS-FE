@@ -1,3 +1,9 @@
+/**
+ * @file Login
+ * @description Logic for Login
+ */
+
+// Section: Imports
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -6,6 +12,7 @@ import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../services/loading';
 import { take, finalize } from 'rxjs/operators';
 
+// Section: Logic
 @Component({
   selector: 'app-login',
   standalone: true,

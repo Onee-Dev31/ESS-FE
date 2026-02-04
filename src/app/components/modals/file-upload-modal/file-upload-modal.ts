@@ -1,7 +1,14 @@
+/**
+ * @file File Upload Modal
+ * @description Logic for File Upload Modal
+ */
+
+// Section: Imports
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
 
+// Section: Logic
 @Component({
   selector: 'app-file-upload-modal',
   standalone: true,

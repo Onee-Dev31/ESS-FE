@@ -1,18 +1,24 @@
+/**
+ * @file Medicalexpenses Spec
+ * @description Logic for Medicalexpenses Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Medicalexpenses } from './medicalexpenses';
+import { MedicalexpensesComponent } from './medicalexpenses';
 
 describe('Medicalexpenses', () => {
-  let component: Medicalexpenses;
-  let fixture: ComponentFixture<Medicalexpenses>;
+  let component: MedicalexpensesComponent;
+  let fixture: ComponentFixture<MedicalexpensesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Medicalexpenses]
+      imports: [MedicalexpensesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Medicalexpenses);
+    fixture = TestBed.createComponent(MedicalexpensesComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

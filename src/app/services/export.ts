@@ -1,9 +1,16 @@
+/**
+ * @file Export
+ * @description Logic for Export
+ */
+
+// Section: Imports
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
+// Section: Logic
 @Injectable({
   providedIn: 'root'
 })
@@ -11,11 +18,7 @@ export class ExportService {
 
   constructor() { }
 
-  /**
-   * Export table to PDF
-   * @param elementId - ID of the HTML element to export
-   * @param filename - Name of the PDF file (without extension)
-   */
+
   async exportToPDF(elementId: string, filename: string = 'export'): Promise<void> {
     try {
       const element = document.getElementById(elementId);
@@ -24,9 +27,9 @@ export class ExportService {
         return;
       }
 
-      // Convert HTML to canvas
+
       const canvas = await html2canvas(element, {
-        scale: 2, // Higher quality
+        scale: 2,
         useCORS: true,
         logging: false
       });
@@ -38,7 +41,7 @@ export class ExportService {
         format: 'a4'
       });
 
-      const imgWidth = 297; // A4 landscape width in mm
+      const imgWidth = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
@@ -49,12 +52,7 @@ export class ExportService {
     }
   }
 
-  /**
-   * Export data to Excel
-   * @param data - Array of data objects
-   * @param columns - Column definitions
-   * @param filename - Name of the Excel file (without extension)
-   */
+
   async exportToExcel(
     data: any[],
     columns: { header: string; key: string; width?: number }[],
@@ -64,30 +62,30 @@ export class ExportService {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-      // Define columns
+
       worksheet.columns = columns.map(col => ({
         header: col.header,
         key: col.key,
         width: col.width || 15
       }));
 
-      // Style header row
+
       worksheet.getRow(1).font = { bold: true, size: 12 };
       worksheet.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF0071E3' } // Primary blue
+        fgColor: { argb: 'FF0071E3' }
       };
       worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
       worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
       worksheet.getRow(1).height = 25;
 
-      // Add data rows
+
       data.forEach(item => {
         worksheet.addRow(item);
       });
 
-      // Add borders to all cells
+
       worksheet.eachRow((row, rowNumber) => {
         row.eachCell((cell) => {
           cell.border = {
@@ -99,7 +97,7 @@ export class ExportService {
         });
       });
 
-      // Generate Excel file
+
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -111,10 +109,7 @@ export class ExportService {
     }
   }
 
-  /**
-   * Print specific element
-   * @param elementId - ID of the HTML element to print
-   */
+
   printElement(elementId: string): void {
     try {
       const element = document.getElementById(elementId);
@@ -129,7 +124,7 @@ export class ExportService {
         return;
       }
 
-      // Get styles from current document
+
       const styles = Array.from(document.styleSheets)
         .map(styleSheet => {
           try {
@@ -164,7 +159,7 @@ export class ExportService {
       printWindow.document.close();
       printWindow.focus();
 
-      // Wait for content to load then print
+
       setTimeout(() => {
         printWindow.print();
         printWindow.close();
@@ -175,11 +170,7 @@ export class ExportService {
     }
   }
 
-  /**
-   * Export table data to Excel with auto-detected columns
-   * @param tableId - ID of the table element
-   * @param filename - Name of the Excel file
-   */
+
   async exportTableToExcel(tableId: string, filename: string = 'export'): Promise<void> {
     try {
       const table = document.getElementById(tableId) as HTMLTableElement;
@@ -191,13 +182,13 @@ export class ExportService {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-      // Get headers
+
       const headerRow = table.querySelector('thead tr');
       if (headerRow) {
         const headers = Array.from(headerRow.querySelectorAll('th')).map(th => th.textContent?.trim() || '');
         worksheet.addRow(headers);
 
-        // Style header
+
         worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
         worksheet.getRow(1).fill = {
           type: 'pattern',
@@ -208,19 +199,19 @@ export class ExportService {
         worksheet.getRow(1).height = 25;
       }
 
-      // Get data rows
+
       const dataRows = table.querySelectorAll('tbody tr');
       dataRows.forEach(tr => {
         const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent?.trim() || '');
         worksheet.addRow(cells);
       });
 
-      // Auto-fit columns
+
       worksheet.columns.forEach(column => {
         column.width = 15;
       });
 
-      // Add borders
+
       worksheet.eachRow((row) => {
         row.eachCell((cell) => {
           cell.border = {

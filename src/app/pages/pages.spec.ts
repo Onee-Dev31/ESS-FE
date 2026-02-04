@@ -1,3 +1,9 @@
+/**
+ * @file Pages Spec
+ * @description Logic for Pages Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Pages } from './pages';

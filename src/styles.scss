@@ -1,10 +1,15 @@
+// File: Styles
+// Description: Styles for Styles
+
+// Section: Dependencies
 @use "sass:color";
 @use './styles/theme' as *;
 @use './styles/responsive-layout' as responsive;
 @use './styles/export-dropdown';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-// ===== Toast Notification Styles =====
+// Toast Notifications
+
 .toast-container {
   position: fixed !important;
   top: 20px !important;
@@ -130,11 +135,8 @@
   }
 }
 
+// Global Base Styles
 
-// --- Global Overlay Styles ---
-// Modal overlay now comes from modal-components via theme
-
-// กำหนดค่าเริ่มต้นและฟอนต์หลักของระบบ
 *,
 *::before,
 *::after {
@@ -161,7 +163,8 @@ textarea {
   font-family: $font-main;
 }
 
-// --- Global Form Controls (Premium Style) ---
+// Form Controls
+
 .form-control {
   width: 100%;
   padding: 0.6rem 1rem;
@@ -205,7 +208,8 @@ textarea {
   }
 }
 
-// เมนคาร์ดสไตล์ (Premium Card)
+// UI Cards
+
 .card {
   background: #fff;
   border-radius: 1rem;
@@ -220,9 +224,8 @@ textarea {
   }
 }
 
-// Global Date Input Fix
 .custom-input-wrapper {
-  position: relative; // Ensure relative positioning context
+  position: relative;
 
   input[type="date"] {
     position: relative;
@@ -238,6 +241,8 @@ textarea {
     }
   }
 }
+
+// Utilities
 
 .text-primary {
   color: $primary !important;
@@ -259,7 +264,6 @@ textarea {
   align-items: center;
 }
 
-// Common Utilities
 .mt-4 {
   margin-top: 24px !important;
 }
@@ -288,7 +292,6 @@ textarea {
   background-color: $success !important;
 }
 
-
 .mobile-only {
   @include desktop {
     display: none !important;
@@ -301,8 +304,6 @@ textarea {
   }
 }
 
-
-
 @media (max-width: 768px) {
   .card {
     border-radius: 0.75rem;
@@ -310,7 +311,6 @@ textarea {
   }
 }
 
-// Circular Back Button
 .btn-back {
   width: 36px;
   height: 36px;
@@ -344,7 +344,8 @@ textarea {
   }
 }
 
-// ===== Global Premium Button Styles =====
+// Premium Buttons
+
 button {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -397,7 +398,6 @@ button {
   }
 }
 
-
 .btn-save-custom,
 .btn-submit,
 .btn-confirm,
@@ -437,7 +437,6 @@ button {
   }
 }
 
-
 .btn-pending-approvals {
   background: #800080 !important;
   color: white !important;
@@ -458,7 +457,8 @@ button {
   }
 }
 
-// --- Global Status Badge ---
+// Status Badges
+
 .status-badge {
   padding: 5px 12px;
   border-radius: 50px;
@@ -655,7 +655,8 @@ button {
   }
 }
 
-// ===== Global Pagination Style =====
+// Pagination Component
+
 .pagination-container {
   padding: 0.5rem 2rem;
   display: flex;
@@ -754,459 +755,10 @@ button {
       }
     }
   }
-
 }
 
-// ===== Global Layout Components (Promoted from Page Styles) =====
+// Attachment Links
 
-// 0. Content Card
-.content-card {
-  background: #f8f9fa;
-  border-radius: 8px;
-  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  padding-bottom: 20px;
-  width: 100%;
-}
-
-.card-header-title {
-  padding: 24px 24px 10px 24px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-
-  @include mobile {
-    padding: 15px;
-    font-size: 1.1rem;
-  }
-}
-
-// 1. Top Header Strip
-.top-header-strip {
-  background-color: #e2e6ea;
-  padding: 15px 20px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #000;
-
-    @include mobile {
-      font-size: 1.1rem;
-    }
-  }
-
-  @include mobile {
-    padding: 12px 15px;
-    margin-bottom: 15px;
-  }
-}
-
-// 2. Toolbar & Filters
-.toolbar-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 0 24px 20px 24px;
-
-  @include mobile {
-    padding: 0 10px 15px 10px;
-    gap: 12px;
-  }
-
-  .toolbar-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .toolbar-bottom-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
-    flex-wrap: wrap;
-
-    @include mobile {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    .right-filters {
-      display: flex;
-      align-items: flex-end;
-      gap: 12px;
-      flex-wrap: wrap;
-
-      @include mobile {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        width: 100%;
-
-        >* {
-          min-width: 0;
-        }
-
-        @media (max-width: 340px) {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        .filter-label {
-          font-size: 0.85rem;
-          color: $text-sub;
-          font-weight: 500;
-        }
-      }
-
-      .date-input-group,
-      .select-input-group {
-        .form-control {
-          min-width: 160px;
-
-          @include mobile {
-            min-width: auto;
-            width: 100%;
-            padding: 0.6rem 0.25rem;
-            font-size: 0.8rem;
-          }
-        }
-      }
-
-      .btn-clear {
-        height: 42px;
-        margin-left: 4px;
-
-        @include mobile {
-          margin-left: 0;
-          width: 100%;
-          padding-left: 0.25rem;
-          padding-right: 0.25rem;
-          font-size: 0.8rem;
-        }
-      }
-    }
-
-    .search-input-group {
-      display: flex;
-      gap: 8px;
-      flex: 1;
-      max-width: 350px;
-      margin-left: auto;
-
-      @include mobile {
-        max-width: none;
-        width: 100%;
-        margin-left: 0;
-      }
-
-      .form-control {
-        flex: 1;
-      }
-    }
-  }
-}
-
-// 3. Modern Table
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-
-  @include tablet {
-    display: none;
-  }
-}
-
-.modern-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 1200px;
-
-  thead {
-    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-    border-bottom: 1px solid #1557b0;
-    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
-
-    tr th {
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 16px 12px;
-
-      text-align: left;
-      white-space: nowrap;
-
-      &.text-center {
-        text-align: center !important;
-      }
-
-      &.text-right {
-        text-align: right !important;
-      }
-
-      &.col-id {
-        width: 100px;
-      }
-
-      &.col-date {
-        width: 140px;
-      }
-
-      &.col-status {
-        width: 120px;
-      }
-
-      &.col-actions {
-        width: 140px;
-      }
-    }
-  }
-
-  tbody {
-    tr {
-      border-bottom: 1px solid $border-color;
-      background-color: #fff;
-
-      &:hover {
-        background-color: #f8f9fa;
-      }
-
-      td {
-        padding: 16px 12px;
-        vertical-align: middle;
-        color: #1e293b;
-        font-size: 0.92rem;
-        height: auto;
-
-        @include mobile {
-          padding: 12px 8px;
-          font-size: 0.85rem;
-        }
-
-        &.text-center {
-          text-align: center !important;
-        }
-
-        &.text-right {
-          text-align: right !important;
-        }
-
-        .days-badge {
-          background: #f1f5f9;
-          color: #475569;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-weight: 700;
-          font-size: 0.95rem;
-          border: 1px solid #e2e8f0;
-        }
-
-        .status-badge {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 50px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          white-space: nowrap;
-          min-width: 110px;
-          text-align: center;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-          &.status-new {
-            background-color: $status-new-bg;
-            color: $status-new-text;
-            border: 1px solid rgba($status-new-text, 0.2);
-          }
-
-          &.status-reviewed,
-          &.status-verified {
-            background-color: $status-verified-bg;
-            color: $status-verified-text;
-            border: 1px solid rgba($status-verified-text, 0.2);
-          }
-
-          &.status-pending {
-            background-color: $status-pending-bg;
-            color: $status-pending-text;
-            border: 1px solid rgba($status-pending-text, 0.2);
-          }
-
-          &.status-approved,
-          &.status-success {
-            background-color: $status-success-bg;
-            color: $status-success-text;
-            border: 1px solid rgba($status-success-text, 0.2);
-          }
-
-          &.status-rejected {
-            background-color: $status-danger-bg;
-            color: $status-danger-text;
-            border: 1px solid rgba($status-danger-text, 0.2);
-          }
-        }
-
-        .action-btns {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-        }
-      }
-    }
-
-    .no-data-cell {
-      padding: 0 !important;
-      text-align: center;
-    }
-  }
-}
-
-// 4. Card List View (Mobile)
-.card-list-view {
-  display: none;
-  padding: 20px;
-
-  @include tablet {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  @include mobile {
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .mobile-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid #edf2f7;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-    }
-
-    .card-header {
-      padding: 14px 18px;
-      background: #f8fafc;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .request-id {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        .label {
-          font-size: 0.75rem;
-          color: #64748b;
-          font-weight: 500;
-        }
-
-        .value {
-          font-weight: 700;
-          color: #1e293b;
-          font-size: 1rem;
-        }
-      }
-
-      .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        white-space: nowrap;
-
-        &.status-new {
-          background-color: $status-new-bg;
-          color: $status-new-text;
-          border: 1px solid rgba($status-new-text, 0.2);
-        }
-
-        &.status-reviewed,
-        &.status-verified {
-          background-color: $status-verified-bg;
-          color: $status-verified-text;
-          border: 1px solid rgba($status-verified-text, 0.2);
-        }
-
-        &.status-pending {
-          background-color: $status-pending-bg;
-          color: $status-pending-text;
-          border: 1px solid rgba($status-pending-text, 0.2);
-        }
-
-        &.status-approved,
-        &.status-success {
-          background-color: $status-success-bg;
-          color: $status-success-text;
-          border: 1px solid rgba($status-success-text, 0.2);
-        }
-
-        &.status-rejected {
-          background-color: $status-danger-bg;
-          color: $status-danger-text;
-          border: 1px solid rgba($status-danger-text, 0.2);
-        }
-      }
-    }
-
-    .card-body {
-      padding: 18px;
-
-      .info-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        font-size: 0.92rem;
-
-        .label {
-          color: #64748b;
-        }
-
-        .value {
-          font-weight: 600;
-          color: #1e293b;
-        }
-      }
-
-      .card-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 18px;
-        padding-top: 14px;
-        border-top: 1px solid #f1f5f9;
-      }
-    }
-  }
-
-
-}
-
-// Styled Folder Icon Link
 .file-icon-link {
   display: inline-flex;
   align-items: center;
@@ -1218,13 +770,13 @@ button {
 
   i.fa-folder-open {
     font-size: 1.2rem;
-    color: #f59e0b; // Amber 500
+    color: #f59e0b;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     filter: drop-shadow(0 2px 3px rgba(245, 158, 11, 0.15));
   }
 
   &:hover i.fa-folder-open {
-    color: #d97706; // Amber 600
+    color: #d97706;
     transform: scale(1.15) rotate(-3deg);
     filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.25));
   }

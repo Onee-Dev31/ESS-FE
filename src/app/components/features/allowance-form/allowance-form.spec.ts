@@ -1,3 +1,9 @@
+/**
+ * @file Allowance Form Spec
+ * @description Logic for Allowance Form Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AllowanceFormComponent } from './allowance-form';

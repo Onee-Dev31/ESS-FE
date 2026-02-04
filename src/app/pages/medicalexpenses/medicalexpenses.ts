@@ -1,3 +1,9 @@
+/**
+ * @file Medicalexpenses
+ * @description Logic for Medicalexpenses
+ */
+
+// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +39,7 @@ interface FlatMedicalRow extends MedicalItem {
   attachedFile?: string | null;
 }
 
+// Section: Logic
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
@@ -68,7 +75,7 @@ export class MedicalexpensesComponent implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
-  // 1. Filtered Data (Requests)
+
   processedData = computed(() => {
     let data = [...this.allRequests()];
     const status = this.listing.filterStatus();
@@ -101,10 +108,10 @@ export class MedicalexpensesComponent implements OnInit {
     return data;
   });
 
-  // ใช้ Utility จัดการ Computed values (DRY pagination logic)
+
   comps = createListingComputeds(this.processedData, this.listing);
 
-  // 2. Flattened Data for Table
+
   flattenedRows = computed(() => {
     return this.processedData().flatMap(req =>
       req.items.map(item => ({
@@ -117,7 +124,7 @@ export class MedicalexpensesComponent implements OnInit {
     );
   });
 
-  // 3. Sorted Data
+
   sortedRows = computed(() => {
     let rows = [...this.flattenedRows()];
     const sortState = this.sorting()[0];
@@ -136,7 +143,7 @@ export class MedicalexpensesComponent implements OnInit {
     return rows;
   });
 
-  // 4. Paginated Data for Table (Desktop)
+
   paginatedRows = computed(() => {
     const start = this.listing.currentPage() * this.listing.pageSize();
     return this.sortedRows().slice(start, start + this.listing.pageSize());

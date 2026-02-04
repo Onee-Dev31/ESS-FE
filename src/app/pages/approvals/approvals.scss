@@ -1,3 +1,7 @@
+// File: Approvals
+// Description: Styles for Approvals
+
+// Section: Dependencies
 @use './approvals-shared' as *;
 
 @include approvals-layout;

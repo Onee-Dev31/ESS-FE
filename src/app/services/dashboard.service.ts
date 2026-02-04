@@ -1,3 +1,9 @@
+/**
+ * @file Dashboard Service
+ * @description Logic for Dashboard Service
+ */
+
+// Section: Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
@@ -7,6 +13,7 @@ import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 
+// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

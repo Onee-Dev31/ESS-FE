@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle Spec
+ * @description Logic for Vehicle Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VehicleComponent } from './vehicle';

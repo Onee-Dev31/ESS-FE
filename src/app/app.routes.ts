@@ -1,3 +1,9 @@
+/**
+ * @file App Routes
+ * @description Logic for App Routes
+ */
+
+// Section: Imports
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { LayoutComponent } from './components/layout/layout';
@@ -5,6 +11,7 @@ import { authGuard } from './guards/auth-guard';
 import { roleGuard } from './guards/role-guard';
 import { USER_ROLES } from './constants/user-roles.constant';
 
+// Section: Logic
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
 

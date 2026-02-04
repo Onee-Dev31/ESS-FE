@@ -1,8 +1,15 @@
+/**
+ * @file Master Data Service
+ * @description Logic for Master Data Service
+ */
+
+// Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
 import { LEAVE_TYPES } from '../interfaces/time-off.interface';
 
+// Section: Logic
 export interface ClaimType {
     id: string;
     label: string;
@@ -25,7 +32,7 @@ export class MasterDataService {
     getLeaveTypes(): Observable<any[]> {
         if (!this.leaveTypesCache$) {
             this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(
-                delay(500), // Simulate API latency
+                delay(500),
                 shareReplay(1)
             );
         }

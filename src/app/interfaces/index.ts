@@ -1,3 +1,8 @@
+/**
+ * @file Index
+ * @description Logic for Index
+ */
+
 export * from './allowance.interface';
 export * from './medical.interface';
 export * from './taxi.interface';

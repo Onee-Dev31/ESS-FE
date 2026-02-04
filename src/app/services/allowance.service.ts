@@ -1,3 +1,9 @@
+/**
+ * @file Allowance Service
+ * @description Logic for Allowance Service
+ */
+
+// Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
@@ -7,6 +13,7 @@ import { BaseRequestService } from './base-request.service';
 
 export type { AllowanceItem, AllowanceRequest };
 
+// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

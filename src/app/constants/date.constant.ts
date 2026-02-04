@@ -1,3 +1,9 @@
+/**
+ * @file Date Constant
+ * @description Logic for Date Constant
+ */
+
+// Section: Logic
 export const MONTHS_TH = [
     { label: 'มกราคม', value: 0 },
     { label: 'กุมภาพันธ์', value: 1 },

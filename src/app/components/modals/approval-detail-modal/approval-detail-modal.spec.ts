@@ -1,3 +1,9 @@
+/**
+ * @file Approval Detail Modal Spec
+ * @description Logic for Approval Detail Modal Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ApprovalDetailModalComponent } from './approval-detail-modal';

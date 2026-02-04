@@ -1,3 +1,9 @@
+/**
+ * @file Dashboard Interface
+ * @description Logic for Dashboard Interface
+ */
+
+// Section: Logic
 export interface MedicalStat {
     label: string;
     subLabel: string;

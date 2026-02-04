@@ -1,5 +1,12 @@
+/**
+ * @file Taxi Interface
+ * @description Logic for Taxi Interface
+ */
+
+// Section: Imports
 import { Requester } from './core.interface';
 
+// Section: Logic
 export interface TaxiItem {
     date: string;
     description: string;

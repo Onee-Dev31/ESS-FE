@@ -1,14 +1,13 @@
+// File: Table Components
+// Description: Styles for Table Components
+
+// Section: Dependencies
 @use 'sass:color';
 @use 'variables' as *;
 
-// Shared Table Component Styles
-// Note: Variables and mixins from theme are available through @forward
+// Table Structure Mixins
 
-// ========================================
-// TABLE COMPONENTS - Shared Table Styles
-// ========================================
 
-// --- Excel Table Base Structure ---
 @mixin excel-table-base {
     width: 100%;
     border-collapse: separate;
@@ -39,7 +38,7 @@
     }
 }
 
-// --- Excel Table Header (Blue gradient) ---
+
 @mixin excel-table-header {
     th {
         background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
@@ -56,7 +55,9 @@
     }
 }
 
-// --- Attachment Table Container ---
+
+
+// Ready-to-use Table Components
 .attachment-table-container {
     flex: 1;
     overflow-x: auto;
@@ -199,12 +200,12 @@
     }
 }
 
-// --- Modern Table Styles ---
+
 .modern-table {
     @include modern-table;
 }
 
-// --- Column Width Utilities ---
+
 .col-xs {
     width: 50px;
 }

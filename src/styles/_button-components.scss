@@ -1,14 +1,12 @@
+// File: Button Components
+// Description: Styles for Button Components
+
+// Section: Dependencies
 @use 'sass:color';
 @use 'variables' as *;
 
-// Shared Button Component Styles
-// Note: Variables and mixins from theme are available through @forward
+// Button Base Mixins
 
-// ========================================
-// BUTTON COMPONENTS - Shared Button Styles
-// ========================================
-
-// --- Action Button Base ---
 @mixin action-button-base {
     display: inline-flex;
     align-items: center;
@@ -27,7 +25,7 @@
     }
 }
 
-// --- Icon Button Mixin ---
+
 @mixin btn-icon($type: 'edit') {
     width: 32px;
     height: 32px;
@@ -68,9 +66,7 @@
     }
 }
 
-// --- Button Classes ---
-
-// Edit Button (Small)
+// Standard Button Classes
 .btn-edit-sm {
     @include action-button-base;
     background-color: $bg-slate;
@@ -91,7 +87,6 @@
     }
 }
 
-// Delete Button (Small)
 .btn-delete-sm {
     @include action-button-base;
     background-color: rgba($color-delete, 0.1);
@@ -112,7 +107,6 @@
     }
 }
 
-// View Button (Small)
 .btn-view-sm {
     @include action-button-base;
     background-color: rgba($color-info, 0.1);
@@ -123,22 +117,18 @@
     }
 }
 
-// Icon Button (Edit)
 .btn-icon.edit {
     @include btn-icon('edit');
 }
 
-// Icon Button (Delete)
 .btn-icon.delete {
     @include btn-icon('delete');
 }
 
-// Icon Button (View)
 .btn-icon.view {
     @include btn-icon('view');
 }
 
-// Upload File Button
 .btn-upload-file {
     background: #fff;
     color: $primary;
@@ -159,7 +149,6 @@
     }
 }
 
-// Submit Button
 .btn-submit {
     background-color: $color-save;
     color: white;
@@ -185,7 +174,6 @@
     }
 }
 
-// Cancel Button
 .btn-cancel {
     background-color: #fff;
     color: $color-cancel;

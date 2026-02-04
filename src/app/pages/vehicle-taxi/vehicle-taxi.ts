@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle Taxi
+ * @description Logic for Vehicle Taxi
+ */
+
+// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -33,6 +39,7 @@ interface FlatTaxiRow extends TaxiItem {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
+// Section: Logic
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,

@@ -1,7 +1,14 @@
+/**
+ * @file Toast
+ * @description Logic for Toast
+ */
+
+// Section: Imports
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
 
+// Section: Logic
 @Component({
   selector: 'app-toast',
   standalone: true,

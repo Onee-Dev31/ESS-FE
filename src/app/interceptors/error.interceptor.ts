@@ -1,3 +1,9 @@
+/**
+ * @file Error Interceptor
+ * @description Logic for Error Interceptor
+ */
+
+// Section: Imports
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
@@ -5,6 +11,7 @@ import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../services/toast';
 import { AuthService } from '../services/auth.service';
 
+// Section: Logic
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const toastService = inject(ToastService);
     const authService = inject(AuthService);

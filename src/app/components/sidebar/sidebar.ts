@@ -1,4 +1,11 @@
+/**
+ * @file Sidebar
+ * @description Logic for Sidebar
+ */
+
+// Section: Imports
 import { Injectable, signal } from '@angular/core';
+// Section: Logic
 @Injectable({ providedIn: 'root' })
 
 export class SidebarService {

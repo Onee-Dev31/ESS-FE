@@ -1,3 +1,9 @@
+/**
+ * @file Layout
+ * @description Logic for Layout
+ */
+
+// Section: Imports
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -5,6 +11,7 @@ import { NavbarComponent } from '../navbar/navbar';
 import { Sidebar } from '../sidebar/sidebar.component';
 import { SidebarService } from '../sidebar/sidebar';
 
+// Section: Logic
 @Component({
   selector: 'app-layout',
   standalone: true,

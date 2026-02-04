@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle Form
+ * @description Logic for Vehicle Form
+ */
+
+// Section: Imports
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +25,7 @@ interface LogItem {
 
 import { MasterDataService } from '../../../services/master-data.service';
 
+// Section: Logic
 @Component({
   selector: 'app-vehicle-form',
   standalone: true,

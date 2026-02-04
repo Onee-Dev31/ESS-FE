@@ -1,3 +1,9 @@
+/**
+ * @file Transport Service
+ * @description Logic for Transport Service
+ */
+
+// Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { RequestItem, VehicleRequest } from '../interfaces/transport.interface';
@@ -7,6 +13,7 @@ import { BaseRequestService } from './base-request.service';
 
 export type { RequestItem, VehicleRequest };
 
+// Section: Logic
 @Injectable({
     providedIn: 'root'
 })
@@ -18,7 +25,7 @@ export class TransportService extends BaseRequestService<VehicleRequest> {
         this.initializeData(() => TransportMock.generateRequestsByRole(20, 'Admin'));
     }
 
-    // Aliases to maintain compatibility with existing components
+
     getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
         const results = TransportMock.getMockAttendanceLogs(month, year);
         return of(results).pipe(delay(100));

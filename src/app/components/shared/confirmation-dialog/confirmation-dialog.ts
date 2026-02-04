@@ -1,7 +1,14 @@
+/**
+ * @file Confirmation Dialog
+ * @description Logic for Confirmation Dialog
+ */
+
+// Section: Imports
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../../services/dialog';
 
+// Section: Logic
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,

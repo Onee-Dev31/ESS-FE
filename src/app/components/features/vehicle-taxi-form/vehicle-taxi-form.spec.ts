@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle Taxi Form Spec
+ * @description Logic for Vehicle Taxi Form Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VehicleTaxiFormComponent } from './vehicle-taxi-form';

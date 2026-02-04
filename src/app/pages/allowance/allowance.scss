@@ -1,7 +1,10 @@
-@use 'sass:color';
-@use '../../../styles/theme' as *;
-@use '../../../styles/responsive-layout' as responsive;
+// File: Allowance
+// Description: Styles for Allowance
 
+// Section: Dependencies
+@use '../../../styles/theme' as *;
+
+// Allowance Page Layout
 .allowance-page {
   padding: 24px;
   background-color: $bg-page;

@@ -1,3 +1,9 @@
+/**
+ * @file Date Utility Service
+ * @description Logic for Date Utility Service
+ */
+
+// Section: Imports
 import { Injectable } from '@angular/core';
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
@@ -8,6 +14,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(buddhistEra);
 dayjs.locale('th');
 
+// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

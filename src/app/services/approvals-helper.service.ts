@@ -1,3 +1,9 @@
+/**
+ * @file Approvals Helper Service
+ * @description Logic for Approvals Helper Service
+ */
+
+// Section: Imports
 import { Injectable, inject } from '@angular/core';
 import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { TaxiRequest } from './taxi.service';
@@ -13,6 +19,7 @@ import { MedicalexpensesService } from './medicalexpenses.service';
 import { BaseRequestService } from './base-request.service';
 import { Observable, forkJoin, map, take } from 'rxjs';
 
+// Section: Logic
 @Injectable({
     providedIn: 'root'
 })
@@ -129,7 +136,7 @@ export class ApprovalsHelperService {
         if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'Referred Back';
         if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
 
-        // Everything else maps to 'Pending'
+
         return 'Pending';
     }
 

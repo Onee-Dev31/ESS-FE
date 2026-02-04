@@ -1,3 +1,9 @@
+/**
+ * @file Timeoff
+ * @description Logic for Timeoff
+ */
+
+// Section: Imports
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +30,7 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 
+// Section: Logic
 @Component({
   selector: 'app-timeoff',
   standalone: true,
@@ -158,12 +165,12 @@ export class TimeoffComponent implements OnInit {
     });
 
     if (confirmed) {
-      // Since we don't have a specific delete API in the mock service yet, 
-      // we'll just simulate it or user Filter to remove it if this was real
-      // For now, let's assume we call a service method
-      // this.timeoffService.deleteRequest(request.id)...
 
-      // Simulating success
+
+
+
+
+
       this.requests.set(this.requests().filter(r => r.id !== request.id));
       this.toastService.success('ลบรายการสำเร็จ');
     }

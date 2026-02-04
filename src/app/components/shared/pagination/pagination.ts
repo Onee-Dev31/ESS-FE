@@ -1,7 +1,14 @@
+/**
+ * @file Pagination
+ * @description Logic for Pagination
+ */
+
+// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+// Section: Logic
 @Component({
     selector: 'app-pagination',
     standalone: true,

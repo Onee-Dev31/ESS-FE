@@ -1,12 +1,11 @@
+// File: Variables
+// Description: Styles for Variables
+
+// Section: Dependencies
 @use 'sass:color';
 
-// ========================================
-// SCSS VARIABLES - Brand, Colors, Spacing
-// ========================================
-// This file contains all variables used throughout the application
-// Import this file in any SCSS file that needs access to these variables
+// Brand & Theme Colors
 
-// --- Brand & Status Colors ---
 $primary: #1a73e8;
 $primary-dark: #1557b0;
 $primary-light: #4285f4;
@@ -20,7 +19,6 @@ $btn-create-bg: #1a73e8;
 $btn-search-bg: #1a73e8;
 $btn-delete-bg: #d93025;
 
-// --- Action Colors (Semantic) ---
 $color-save: #22c55e;
 $color-cancel: #64748b;
 $color-create: #1a73e8;
@@ -30,21 +28,24 @@ $color-info: #1a73e8;
 $color-purple: #800080;
 $color-amber: #d97706;
 
-// --- Background & Surface ---
+// Page Backgrounds
+
 $bg-page: #f8f9fa;
 $bg-card: #ffffff;
 $bg-gray: #fcfcfc;
 $bg-slate: #f4f7f9;
 $header-bg: #f8fafc;
 
-// --- Text Colors ---
+// Typography & Text
+
 $text: #202124;
 $text-sub: #5f6368;
 $text-muted: #94a3b8;
 $text-light: $text-muted;
 $text-header: #475569;
 
-// --- Borders ---
+// Borders & Elevation
+
 $border: #dee2e6;
 $border-color: #e9ecef;
 
@@ -53,7 +54,8 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
 
-// --- Status Badge Colors ---
+// Status Badges
+
 $status-new-bg: rgba(217, 119, 6, 0.1);
 $status-new-text: #d97706;
 
@@ -69,8 +71,8 @@ $status-success-text: #16a34a;
 $status-danger-bg: rgba(220, 38, 38, 0.1);
 $status-danger-text: #dc2626;
 
-// --- Responsive Breakpoints ---
-// Usage: @include mobile { ... }
+// Responsive Breakpoints
+
 @mixin mobile {
     @media (max-width: 575.98px) {
         @content;
@@ -89,7 +91,8 @@ $status-danger-text: #dc2626;
     }
 }
 
-// --- Glassmorphism Mixins ---
+// Visual Effects (Glassmorphism)
+
 @mixin glass-blur($amount: 4px, $bg: rgba(0, 0, 0, 0.65)) {
     background-color: $bg;
     backdrop-filter: blur($amount);
@@ -102,7 +105,7 @@ $status-danger-text: #dc2626;
     -webkit-backdrop-filter: blur($blur);
 }
 
-// --- Global Layout Mixins ---
+// Core Layout Mixins
 
 @mixin content-card {
     background: white;
@@ -455,6 +458,8 @@ $status-danger-text: #dc2626;
         }
     }
 }
+
+// Component Mixins (Tables)
 
 @mixin modern-table {
     width: 100%;

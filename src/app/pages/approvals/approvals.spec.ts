@@ -1,3 +1,9 @@
+/**
+ * @file Approvals Spec
+ * @description Logic for Approvals Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ApprovalsComponent } from './approvals';

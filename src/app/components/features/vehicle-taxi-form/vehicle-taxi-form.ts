@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle Taxi Form
+ * @description Logic for Vehicle Taxi Form
+ */
+
+// Section: Imports
 import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +16,7 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 
 import { MasterDataService } from '../../../services/master-data.service';
 
+// Section: Logic
 @Component({
   selector: 'app-vehicle-taxi-form',
   standalone: true,

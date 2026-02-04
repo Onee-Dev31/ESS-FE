@@ -1,7 +1,10 @@
-@use 'sass:color';
-@use '../../../styles/theme' as *;
-@use '../../../styles/responsive-layout' as responsive;
+// File: Vehicle Taxi
+// Description: Styles for Vehicle Taxi
 
+// Section: Dependencies
+@use '../../../styles/theme' as *;
+
+// Vehicle Taxi Page Layout
 .vehicle-taxi-page {
   padding: 24px;
   background-color: $bg-page;

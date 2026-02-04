@@ -1,3 +1,9 @@
+/**
+ * @file Time Off Form Spec
+ * @description Logic for Time Off Form Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TimeOffForm } from './time-off-form';

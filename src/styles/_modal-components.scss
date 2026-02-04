@@ -1,14 +1,20 @@
+// File: Modal Components
+// Description: Styles for Modal Components
+
+// Section: Dependencies
 @use 'sass:color';
 @use 'variables' as *;
 
-// Shared Modal Component Styles
-// Note: Variables and mixins from theme are available through @forward
+// Modal Layout Mixins
 
-// ========================================
-// MODAL COMPONENTS - Modal Overlay & Container Styles
-// ========================================
 
-// --- Modal Overlay Mixin ---
+
+
+
+
+
+
+
 @mixin modal-overlay-styles {
     position: fixed;
     top: 0;
@@ -57,12 +63,14 @@
     }
 }
 
-// --- Modal Overlay Base Class ---
+
+
+// Modal Components
 .modal-overlay {
     @include modal-overlay-styles;
 }
 
-// --- Modal Header Mixin ---
+
 @mixin modal-header {
     display: flex;
     justify-content: space-between;
@@ -92,7 +100,9 @@
     }
 }
 
-// --- Pop-in Animation ---
+
+
+// Modal Animations
 @keyframes popIn {
     from {
         transform: scale(0.9) translateY(20px);
@@ -105,7 +115,7 @@
     }
 }
 
-// --- Fade In Overlay Animation ---
+
 @keyframes fadeInOverlay {
     from {
         opacity: 0;
@@ -116,7 +126,7 @@
     }
 }
 
-// --- Modal Content Card ---
+
 .modal-content-card {
     flex: 1;
     min-height: 0;

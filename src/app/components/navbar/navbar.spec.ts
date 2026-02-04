@@ -1,3 +1,9 @@
+/**
+ * @file Navbar Spec
+ * @description Logic for Navbar Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavbarComponent } from './navbar';

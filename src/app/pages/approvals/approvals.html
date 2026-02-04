@@ -1,3 +1,4 @@
+<!-- Approvals Template -->
 <div class="approvals-wrapper">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
@@ -39,7 +40,7 @@
       </div>
     </div>
 
-    <!-- Mobile Card View -->
+
     <div class="card-list-view">
       @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
       <div class="mobile-card">
@@ -105,7 +106,7 @@
       </div>
     </div>
 
-    <!-- Desktop Grid View -->
+
     <div class="data-grid-container">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>

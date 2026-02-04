@@ -1,5 +1,12 @@
+/**
+ * @file Listing Util
+ * @description Logic for Listing Util
+ */
+
+// Section: Imports
 import { signal, computed, WritableSignal, isSignal, Signal } from '@angular/core';
 
+// Section: Logic
 export interface ListingState {
     currentPage: WritableSignal<number>;
     pageSize: WritableSignal<number>;

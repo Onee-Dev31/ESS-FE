@@ -1,9 +1,13 @@
+// File: Responsive Layout
+// Description: Styles for Responsive Layout
+
+// Section: Dependencies
 @forward 'variables';
 
 @use 'variables' as *;
 @use 'sass:color';
 
-// แถบเครื่องมือ (Search bar, Filter bar)
+
 .toolbar-container {
     padding: 0 20px 20px 20px;
     display: flex;
@@ -214,7 +218,7 @@
     }
 }
 
-// สไตล์สำหรับแสดงผลแบบการ์ด (บนมือถือ/แท็บเล็ต) - Premium Standardized
+
 .card-list-view {
     display: none;
     padding: 0;
@@ -323,7 +327,7 @@
                 }
             }
 
-            // Reason Box
+
             .reason-box {
                 background: $bg-slate;
                 padding: 12px;
@@ -470,7 +474,7 @@
     }
 }
 
-// Common Table Styles
+
 .modern-table {
     .sortable-header {
         cursor: pointer;
@@ -495,7 +499,7 @@
     }
 }
 
-// --- Visibility Utilities ---
+
 
 .mobile-only {
     @include desktop {

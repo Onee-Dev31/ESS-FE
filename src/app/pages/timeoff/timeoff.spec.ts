@@ -1,3 +1,9 @@
+/**
+ * @file Timeoff Spec
+ * @description Logic for Timeoff Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TimeoffComponent } from './timeoff';

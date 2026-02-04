@@ -1,5 +1,12 @@
+/**
+ * @file Medical Interface
+ * @description Logic for Medical Interface
+ */
+
+// Section: Imports
 import { Requester } from './core.interface';
 
+// Section: Logic
 export interface MedicalItem {
     id?: string;
     requestDate: string;

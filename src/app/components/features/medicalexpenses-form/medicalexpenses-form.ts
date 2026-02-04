@@ -1,3 +1,9 @@
+/**
+ * @file Medicalexpenses Form
+ * @description Logic for Medicalexpenses Form
+ */
+
+// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +17,7 @@ import dayjs from 'dayjs';
 
 import { MasterDataService, ClaimType } from '../../../services/master-data.service';
 
+// Section: Logic
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,

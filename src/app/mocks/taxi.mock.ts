@@ -1,7 +1,14 @@
+/**
+ * @file Taxi Mock
+ * @description Logic for Taxi Mock
+ */
+
+// Section: Imports
 import { TaxiRequest } from '../interfaces/taxi.interface';
 import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
+// Section: Logic
 export class TaxiMock {
     static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): TaxiRequest[] {
         return Array.from({ length: count }, (_, i) => {

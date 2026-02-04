@@ -1,6 +1,13 @@
+/**
+ * @file Auth User Mock
+ * @description Logic for Auth User Mock
+ */
+
+// Section: Imports
 import { UserProfile } from '../services/user.service';
 import { USER_ROLES } from '../constants/user-roles.constant';
 
+// Section: Logic
 export class UserMock {
     static readonly ADMIN_PROFILE: UserProfile = {
         name: 'Admin User (Admin)',

@@ -1,3 +1,7 @@
+// File: Medicalexpenses Form
+// Description: Styles for Medicalexpenses Form
+
+// Section: Dependencies
 @use 'sass:color';
 @use '../../../../styles/theme' as *;
 
@@ -80,7 +84,7 @@
     .content-card {
         flex: 1;
         min-height: 0;
-        max-height: calc(100vh - 200px); // Ensure content doesn't exceed viewport
+        max-height: calc(100vh - 200px);
         padding: 20px 24px;
         display: flex;
         flex-direction: column;
@@ -88,7 +92,7 @@
         overflow-x: hidden;
 
         @include mobile {
-            max-height: calc(100vh - 180px); // Adjust for mobile
+            max-height: calc(100vh - 180px);
             padding: 15px;
         }
     }
@@ -214,7 +218,7 @@
         @extend .custom-form-control;
     }
 
-    // Use shared attachment table component
+
     .attachment-table-container {
         @extend .attachment-table-container;
     }
@@ -306,8 +310,8 @@
 
 @include tablet {
 
-    // Remove redundant .form-root block that might override properties
-    // Instead, modify specific children if needed
+
+
     .form-root {
         .top-header-strip {
             h2 {

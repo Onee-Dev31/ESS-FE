@@ -1,5 +1,12 @@
+/**
+ * @file Requesters Mock
+ * @description Logic for Requesters Mock
+ */
+
+// Section: Imports
 import { Requester } from '../interfaces/core.interface';
 
+// Section: Logic
 export const USERS_MOCK: Requester[] = [
     { name: 'รภีพาญจณ์ พิภัฌรเวชกุล(โจรา)', employeeId: 'OTD01054', department: '10806-IT Department', company: 'บริษัท OTD' },
     { name: 'แพรวนภา บุตรโคษา (แพรว)', employeeId: 'OTD01055', department: '10801-HR Department', company: 'บริษัท OTD' },

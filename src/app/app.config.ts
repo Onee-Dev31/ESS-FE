@@ -1,3 +1,9 @@
+/**
+ * @file App Config
+ * @description Logic for App Config
+ */
+
+// Section: Imports
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
@@ -11,6 +17,7 @@ import { errorInterceptor } from './interceptors/error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { GlobalErrorHandler } from './core/global-error-handler';
 
+// Section: Logic
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

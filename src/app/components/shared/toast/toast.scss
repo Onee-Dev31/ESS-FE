@@ -1,3 +1,7 @@
+// File: Toast
+// Description: Styles for Toast
+
+// Section: Dependencies
 @use '../../../../styles/_theme' as *;
 
 .toast-container {
@@ -32,7 +36,7 @@
     pointer-events: auto;
     min-width: 300px;
 
-    // CSS Animation
+
     animation: slideIn 0.3s ease-out;
 
     @keyframes slideIn {

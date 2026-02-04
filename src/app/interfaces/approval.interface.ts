@@ -1,3 +1,9 @@
+/**
+ * @file Approval Interface
+ * @description Logic for Approval Interface
+ */
+
+// Section: Logic
 export interface UnifiedItem {
     date: string;
     description?: string;

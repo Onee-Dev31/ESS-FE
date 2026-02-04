@@ -1,3 +1,9 @@
+/**
+ * @file Sidebar Spec
+ * @description Logic for Sidebar Spec
+ */
+
+// Section: Imports
 import { TestBed } from '@angular/core/testing';
 
 import { SidebarService } from './sidebar';

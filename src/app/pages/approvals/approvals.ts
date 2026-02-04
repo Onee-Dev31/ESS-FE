@@ -1,3 +1,9 @@
+/**
+ * @file Approvals
+ * @description Logic for Approvals
+ */
+
+// Section: Imports
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -23,6 +29,7 @@ import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 
+// Section: Logic
 @Component({
   selector: 'app-approvals',
   standalone: true,
@@ -62,13 +69,13 @@ export class ApprovalsComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Simulate loading for testing skeleton
+
     this.loadingService.start('approvals-list');
     setTimeout(() => {
       this.loadingService.stop('approvals-list');
     }, 1500);
 
-    // Detect mode from route
+
     this.route.queryParams.subscribe(params => {
       this.category = params['category'] || 'all';
       this.pageTitle.set(this.category === 'medical' ? 'Medical Expenses Approvals' : 'Pending Approvals');
@@ -207,7 +214,7 @@ export class ApprovalsComponent implements OnInit {
     return `${core.requestNo || 'row'}-${index}`;
   }
 
-  // Export methods
+
   toggleExportMenu() {
     this.showExportMenu.set(!this.showExportMenu());
   }

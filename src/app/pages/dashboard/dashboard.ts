@@ -1,3 +1,9 @@
+/**
+ * @file Dashboard
+ * @description Logic for Dashboard
+ */
+
+// Section: Imports
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -26,6 +32,7 @@ interface PerformanceItem { year: string; grade: string; }
 
 dayjs.locale('th');
 
+// Section: Logic
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -149,7 +156,7 @@ export class DashboardComponent implements OnInit {
         html: `
           <div class="date-cell-custom">
             <div class="date-circle ${circleClass}">${dayNumber}</div>
-            <div class="date-code ${textClass}">${codeText}</div> 
+            <div class="date-code ${textClass}">${codeText}</div>
             ${noteText ? `<div class="date-note ${textClass}">${noteText}</div>` : ''}
           </div>
         `

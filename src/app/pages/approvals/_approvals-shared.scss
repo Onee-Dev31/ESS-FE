@@ -1,3 +1,7 @@
+// File: Approvals Shared
+// Description: Styles for Approvals Shared
+
+// Section: Dependencies
 @use "sass:color";
 @use '../../../styles/theme' as *;
 
@@ -217,7 +221,7 @@ $primary-orange: #ff914d;
             }
         }
 
-        // Standardized Mobile View (Starts early due to wide table)
+
         .card-list-view {
             display: none;
 
@@ -228,11 +232,11 @@ $primary-orange: #ff914d;
             }
 
             .mobile-card {
-                // Inherits background, radius, shadow from global .card-list-view .mobile-card
+
 
                 .card-header {
 
-                    // Inherits background, padding from global
+
                     .request-id {
                         display: flex;
                         flex-direction: column;
@@ -252,7 +256,7 @@ $primary-orange: #ff914d;
 
                 .card-body {
 
-                    // Inherits padding from global
+
                     .info-row {
                         display: flex;
                         justify-content: space-between;

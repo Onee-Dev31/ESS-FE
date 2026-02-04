@@ -1,3 +1,9 @@
+/**
+ * @file Date Time Config
+ * @description Logic for Date Time Config
+ */
+
+// Section: Logic
 export const THAI_MONTHS = [
     'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'

@@ -1,3 +1,7 @@
+// File: Empty State
+// Description: Styles for Empty State
+
+// Section: Dependencies
 @use '../../../../styles/theme' as *;
 
 .empty-state-container {
@@ -7,9 +11,9 @@
     justify-content: center;
     padding: 3rem 1.5rem;
     text-align: center;
-    background-color: transparent; // Ensure it blends with card or table bg
+    background-color: transparent;
 
-    // Animation for smooth entry
+
     animation: fadeIn 0.4s ease-out;
 
     .empty-icon-wrapper {
@@ -20,7 +24,7 @@
         justify-content: center;
         margin-bottom: 1.25rem;
 
-        // Circle background style
+
         background: rgba($primary, 0.05);
         border-radius: 50%;
 
@@ -89,7 +93,7 @@
     }
 }
 
-// Responsive adjustments
+
 @media (max-width: 768px) {
     .empty-state-container {
         padding: 2.5rem 1rem;

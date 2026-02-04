@@ -1,6 +1,13 @@
+/**
+ * @file Spinner
+ * @description Logic for Spinner
+ */
+
+// Section: Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// Section: Logic
 @Component({
   selector: 'app-spinner',
   standalone: true,

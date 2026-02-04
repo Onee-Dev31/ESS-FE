@@ -1,7 +1,11 @@
+// File: Export Buttons
+// Description: Styles for Export Buttons
+
+// Section: Dependencies
 @use 'sass:color';
 @use 'theme' as *;
 
-// Export button styles
+
 .export-actions {
     display: flex;
     gap: 8px;
@@ -74,7 +78,6 @@
     }
 }
 
-// Toolbar layout
 .toolbar-top-row {
     display: flex;
     justify-content: space-between;

@@ -1,3 +1,9 @@
+/**
+ * @file Empty State Spec
+ * @description Logic for Empty State Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EmptyState } from './empty-state';

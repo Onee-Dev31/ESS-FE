@@ -1,3 +1,9 @@
+/**
+ * @file Core Interface
+ * @description Logic for Core Interface
+ */
+
+// Section: Logic
 export interface Requester {
     name: string;
     employeeId: string;

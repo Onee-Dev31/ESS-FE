@@ -1,7 +1,10 @@
-@use 'sass:color';
-@use '../../../styles/theme' as *;
-@use '../../../styles/responsive-layout' as responsive;
+// File: Vehicle
+// Description: Styles for Vehicle
 
+// Section: Dependencies
+@use '../../../styles/theme' as *;
+
+// Vehicle Page Layout
 .vehicle-page {
   padding: 24px;
   background-color: $bg-page;
@@ -14,20 +17,20 @@
   }
 
   .content-card {
-    @include content-card; // Shared mixin
+    @include content-card;
     margin-top: 16px;
   }
 
   .card-header-title {
-    @include card-header-title; // Shared mixin
+    @include card-header-title;
   }
 
   .toolbar-container {
-    @include toolbar-container; // Shared mixin
+    @include toolbar-container;
   }
 
   .card-list-view {
-    @include mobile-cards-view; // Shared mixin
+    @include mobile-cards-view;
   }
 
   .table-responsive {
@@ -39,8 +42,10 @@
     }
   }
 
+
+  // Table Styling
   .modern-table {
-    @include modern-table; // Shared mixin
+    @include modern-table;
 
     .col-id {
       width: 150px;

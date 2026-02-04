@@ -1,14 +1,18 @@
-// --- Forward Everything (Must be first) ---
+// File: Theme
+// Description: Styles for Theme
+
+// Section: Dependencies
+
 @forward 'variables';
 @forward 'form-components';
 @forward 'table-components';
 @forward 'modal-components';
 @forward 'button-components';
 
-// --- Import Variables & Mixins ---
+
 @use 'variables' as *;
 
-// --- Standardized UI Elements ---
+
 @mixin close-btn-style {
     border: none;
     background: white;

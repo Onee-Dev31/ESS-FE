@@ -1,3 +1,9 @@
+/**
+ * @file File Upload Modal Spec
+ * @description Logic for File Upload Modal Spec
+ */
+
+// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FileUploadModal } from './file-upload-modal';

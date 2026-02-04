@@ -1,3 +1,9 @@
+/**
+ * @file Request Status Constant
+ * @description Logic for Request Status Constant
+ */
+
+// Section: Logic
 export const REQUEST_STATUS = {
     NEW: 'NEW',
     VERIFIED: 'VERIFIED',

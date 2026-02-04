@@ -1,3 +1,9 @@
+/**
+ * @file Time Off Form
+ * @description Logic for Time Off Form
+ */
+
+// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +17,7 @@ import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-pr
 
 import { MasterDataService } from '../../../services/master-data.service';
 
+// Section: Logic
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
@@ -42,7 +49,7 @@ export class TimeOffForm implements OnInit {
   shiftStartTime = signal<string>('');
   shiftEndTime = signal<string>('');
 
-  // คำนวณจำนวนวันลาอัตโนมัติจากวันที่เริ่มต้นและสิ้นสุด
+
   calculatedDays = computed(() => {
     const period = this.leavePeriod();
     if (period === 'morning' || period === 'afternoon') {

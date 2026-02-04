@@ -1,3 +1,9 @@
+/**
+ * @file Allowance Form
+ * @description Logic for Allowance Form
+ */
+
+// Section: Imports
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +14,7 @@ import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { switchMap } from 'rxjs';
 
+// Section: Logic
 @Component({
   selector: 'app-allowance-form',
   standalone: true,

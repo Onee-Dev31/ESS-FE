@@ -1,3 +1,9 @@
+/**
+ * @file Vehicle
+ * @description Logic for Vehicle
+ */
+
+// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +26,7 @@ import {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
+// Section: Logic
 @Component({
   selector: 'app-vehicle',
   standalone: true,
@@ -40,10 +47,10 @@ export class VehicleComponent implements OnInit {
   allRequests = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-  // ใช้ Utility จัดการ State
+
   listing = createListingState();
 
-  // Custom sorting logic for processedData
+
   processedData = computed(() => {
     const list = [...this.allRequests()];
 
@@ -95,7 +102,7 @@ export class VehicleComponent implements OnInit {
     return filtered;
   });
 
-  // ใช้ Utility สำหรับ Pagination logic
+
   comps = createListingComputeds(this.processedData, this.listing);
 
   table = createAngularTable(() => ({
@@ -133,7 +140,7 @@ export class VehicleComponent implements OnInit {
       },
       error: (error) => {
         this.loadingService.stop('vehicle-list');
-        // Handle error if needed
+
       }
     });
   }

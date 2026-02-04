@@ -1,7 +1,14 @@
+/**
+ * @file Transport Mock
+ * @description Logic for Transport Mock
+ */
+
+// Section: Imports
 import { VehicleRequest } from '../interfaces/transport.interface';
 import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
+// Section: Logic
 export class TransportMock {
     static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): VehicleRequest[] {
         return Array.from({ length: count }, (_, i) => {
