@@ -1,5 +1,6 @@
 // File: File Preview Modal
 // Description: Styles for File Preview Modal
+@use '../../../../styles/theme' as *;
 
 .file-preview-modal-overlay {
     position: fixed;
