@@ -1,0 +1,206 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+// Shared Button Component Styles
+// Note: Variables and mixins from theme are available through @forward
+
+// ========================================
+// BUTTON COMPONENTS - Shared Button Styles
+// ========================================
+
+// --- Action Button Base ---
+@mixin action-button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+
+    i {
+        font-size: 1rem;
+    }
+}
+
+// --- Icon Button Mixin ---
+@mixin btn-icon($type: 'edit') {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    @if $type =='edit' {
+        color: #2563eb;
+        background: #eff6ff;
+
+        &:hover {
+            background: #dbeafe;
+        }
+    }
+
+    @else if $type =='delete' {
+        color: #dc2626;
+        background: #fef2f2;
+
+        &:hover {
+            background: #fee2e2;
+        }
+    }
+
+    @else if $type =='view' {
+        color: $primary;
+        background: rgba($primary, 0.1);
+
+        &:hover {
+            background: rgba($primary, 0.2);
+        }
+    }
+}
+
+// --- Button Classes ---
+
+// Edit Button (Small)
+.btn-edit-sm {
+    @include action-button-base;
+    background-color: $bg-slate;
+    color: $primary;
+
+    &:hover {
+        background-color: color.adjust($bg-slate, $lightness: -5%);
+    }
+
+    @include mobile {
+        background: #eff6ff;
+        color: #2563eb;
+
+        &:active {
+            background: #dbeafe;
+            transform: scale(0.98);
+        }
+    }
+}
+
+// Delete Button (Small)
+.btn-delete-sm {
+    @include action-button-base;
+    background-color: rgba($color-delete, 0.1);
+    color: $color-delete;
+
+    &:hover {
+        background-color: rgba($color-delete, 0.2);
+    }
+
+    @include mobile {
+        background: #fef2f2;
+        color: #dc2626;
+
+        &:active {
+            background: #fee2e2;
+            transform: scale(0.98);
+        }
+    }
+}
+
+// View Button (Small)
+.btn-view-sm {
+    @include action-button-base;
+    background-color: rgba($color-info, 0.1);
+    color: $color-info;
+
+    &:hover {
+        background-color: rgba($color-info, 0.2);
+    }
+}
+
+// Icon Button (Edit)
+.btn-icon.edit {
+    @include btn-icon('edit');
+}
+
+// Icon Button (Delete)
+.btn-icon.delete {
+    @include btn-icon('delete');
+}
+
+// Icon Button (View)
+.btn-icon.view {
+    @include btn-icon('view');
+}
+
+// Upload File Button
+.btn-upload-file {
+    background: #fff;
+    color: $primary;
+    border: 1.5px solid $primary;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+        background: $primary;
+        color: #fff;
+    }
+}
+
+// Submit Button
+.btn-submit {
+    background-color: $color-save;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: color.adjust($color-save, $lightness: -5%);
+    }
+
+    &:disabled {
+        background-color: #94a3b8;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+// Cancel Button
+.btn-cancel {
+    background-color: #fff;
+    color: $color-cancel;
+    border: 1px solid $color-cancel;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #f1f5f9;
+    }
+}

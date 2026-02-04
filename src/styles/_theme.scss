@@ -1,85 +1,12 @@
-// --- Brand & Status Colors ---
-$primary: #1a73e8;
-$primary-dark: #1557b0;
-$primary-light: #4285f4;
+// --- Forward Everything (Must be first) ---
+@forward 'variables';
+@forward 'form-components';
+@forward 'table-components';
+@forward 'modal-components';
+@forward 'button-components';
 
-$success: #1e8e3e;
-$danger: #d93025;
-$warning: #f1b44c;
-$info: #17a2b8;
-
-$btn-create-bg: #1a73e8;
-$btn-search-bg: #1a73e8;
-$btn-delete-bg: #d93025;
-
-// --- Action Colors (Semantic) ---
-$color-save: #22c55e;
-$color-cancel: #64748b;
-$color-create: #1a73e8;
-$color-delete: #ef4444;
-$color-warning: #f59e0b;
-$color-info: #1a73e8;
-$color-purple: #800080;
-$color-amber: #d97706;
-
-// --- Background & Surface ---
-$bg-page: #f8f9fa;
-$bg-card: #ffffff;
-$bg-gray: #fcfcfc;
-$bg-slate: #f4f7f9;
-$header-bg: #f8fafc; 
-
-// --- Text Colors ---
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-light: $text-muted;
-$text-header: #475569; 
-
-// --- Borders ---
-$border: #dee2e6;
-$border-color: #e9ecef;
-
-$radius: 12px;
-$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08); 
-
-
-$font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
-
-
-$status-new-bg: rgba(217, 119, 6, 0.1); 
-$status-new-text: #d97706;
-
-$status-verified-bg: rgba(13, 148, 136, 0.1); 
-$status-verified-text: #0d9488;
-
-$status-pending-bg: rgba(26, 115, 232, 0.1); 
-$status-pending-text: #1a73e8;
-
-$status-success-bg: rgba(22, 163, 74, 0.1); 
-$status-success-text: #16a34a;
-
-$status-danger-bg: rgba(220, 38, 38, 0.1); 
-$status-danger-text: #dc2626;
-
-
-@mixin mobile {
-    @media (max-width: 575.98px) {
-        @content;
-    }
-}
-
-@mixin tablet {
-    @media (max-width: 1024px) {
-        @content;
-    }
-}
-
-@mixin desktop {
-    @media (min-width: 1025px) {
-        @content;
-    }
-}
+// --- Import Variables & Mixins ---
+@use 'variables' as *;
 
 // --- Standardized UI Elements ---
 @mixin close-btn-style {
@@ -99,21 +26,8 @@ $status-danger-text: #dc2626;
     display: inline-flex;
 
     &:hover {
-        color: #ef4444; 
-        background: #fee2e2; 
+        color: #ef4444;
+        background: #fee2e2;
         transform: rotate(90deg);
     }
-}
-
-// --- Glassmorphism ---
-@mixin glass-blur($amount: 4px, $bg: rgba(0, 0, 0, 0.65)) {
-    background-color: $bg;
-    backdrop-filter: blur($amount);
-    -webkit-backdrop-filter: blur($amount);
-}
-
-@mixin glass-card($blur: 10px, $bg: rgba(255, 255, 255, 0.95)) {
-    background: $bg;
-    backdrop-filter: blur($blur);
-    -webkit-backdrop-filter: blur($blur);
 }

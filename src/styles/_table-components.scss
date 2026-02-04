@@ -1,0 +1,255 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+// Shared Table Component Styles
+// Note: Variables and mixins from theme are available through @forward
+
+// ========================================
+// TABLE COMPONENTS - Shared Table Styles
+// ========================================
+
+// --- Excel Table Base Structure ---
+@mixin excel-table-base {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    th,
+    td {
+        border-bottom: 1px solid $border;
+        border-right: 1px solid $border;
+        height: 40px;
+        vertical-align: middle;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 0.9rem;
+
+        &:last-child {
+            border-right: none;
+        }
+    }
+
+    @include tablet {
+
+        th,
+        td {
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+    }
+}
+
+// --- Excel Table Header (Blue gradient) ---
+@mixin excel-table-header {
+    th {
+        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+        text-align: center;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+
+        &.col-xs {
+            width: 50px;
+        }
+    }
+}
+
+// --- Attachment Table Container ---
+.attachment-table-container {
+    flex: 1;
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid $border;
+    border-radius: 8px;
+    margin-top: 1rem;
+
+    .excel-table {
+        @include excel-table-base;
+        @include excel-table-header;
+
+        .clickable-file {
+            cursor: pointer;
+
+            .file-name-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: #f1f3f4;
+                padding: 6px 12px;
+                border-radius: 4px;
+                max-width: 400px;
+                transition: all 0.2s;
+
+                @include tablet {
+                    max-width: 150px;
+                }
+
+                .file-text {
+                    flex: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    font-size: 0.85rem;
+                    color: $text;
+                }
+
+                &:hover {
+                    background: #e2e8f0;
+
+                    .file-text {
+                        color: $primary;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+
+        .btn-delete-row {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            border-radius: 4px;
+
+            &:hover {
+                background: #fef2f2;
+            }
+
+            @include tablet {
+                color: #888;
+
+                &:hover {
+                    color: $danger;
+                }
+            }
+        }
+
+        .desc-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .desc-control {
+                width: 100%;
+                padding: 6px 10px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                background: transparent;
+
+                &.is-invalid {
+                    border: 1px solid $danger;
+                    background-color: rgba($danger, 0.05);
+
+                    &:focus {
+                        box-shadow: 0 0 0 2px rgba($danger, 0.1);
+                    }
+                }
+
+                &:focus {
+                    background: #fff;
+                    border-color: $primary;
+                    outline: none;
+                }
+            }
+
+            .error-msg {
+                color: $danger;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+        }
+
+        .file-delete-icon {
+            color: $text-sub;
+            cursor: pointer;
+            font-size: 0.9rem;
+
+            &:hover {
+                color: $danger;
+            }
+        }
+
+        td {
+            &.clickable-file {
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background: rgba($primary, 0.02);
+
+                    .file-text {
+                        color: $primary;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+
+    @include tablet {
+        margin-top: 1rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow-x: auto;
+    }
+}
+
+// --- Modern Table Styles ---
+.modern-table {
+    .sortable-header {
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px !important;
+        color: #999;
+        font-style: italic;
+    }
+}
+
+// --- Column Width Utilities ---
+.col-xs {
+    width: 50px;
+}
+
+.col-sm {
+    width: 80px;
+}
+
+.col-md {
+    width: 120px;
+}
+
+.col-lg {
+    width: 150px;
+}
+
+.col-date {
+    width: 120px;
+}
+
+.col-amount {
+    width: 90px;
+}
+
+.col-actions {
+    width: 100px;
+    text-align: center;
+}

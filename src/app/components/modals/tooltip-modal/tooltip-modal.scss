@@ -1,8 +1,11 @@
 @use '../../../../styles/_theme.scss' as *;
 @use '../../../../styles/_responsive-layout.scss' as responsive;
 
+.tooltip-overlay {
+    @extend .modal-overlay;
+}
+
 .modal-overlay {
-    @include responsive.modal-overlay-styles;
     z-index: 1000;
 
     @media (max-width: 767px) {

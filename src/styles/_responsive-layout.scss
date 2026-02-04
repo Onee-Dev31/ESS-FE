@@ -1,4 +1,6 @@
-@use 'theme' as *;
+@forward 'variables';
+
+@use 'variables' as *;
 @use 'sass:color';
 
 // แถบเครื่องมือ (Search bar, Filter bar)
@@ -493,69 +495,8 @@
     }
 }
 
-// Animation สำหรับ Modal
-@keyframes popIn {
-    from {
-        transform: scale(0.9) translateY(20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-    }
-}
-
-// Mixin สำหรับ Modal Overlay และการจัดกึ่งกลาง
-@mixin modal-overlay-styles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    @include glass-blur(8px, rgba(0, 0, 0, 0.4));
-
-    @include mobile {
-        padding: 0;
-        align-items: flex-end;
-    }
-
-    .modal-container {
-        background: white;
-        width: 95%;
-        max-width: 1600px;
-        max-height: 85vh; // Reduced from 90vh to ensure buttons visible at 100% zoom
-        border-radius: 12px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-        @include mobile {
-            width: 100%;
-            height: 100dvh;
-            max-height: 100dvh;
-            border-radius: 0;
-        }
-
-        >* {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            width: 100%;
-            min-height: 0;
-        }
-    }
-}
-
 // --- Visibility Utilities ---
+
 .mobile-only {
     @include desktop {
         display: none !important;

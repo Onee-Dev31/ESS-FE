@@ -98,49 +98,15 @@
         width: 100%;
 
         .section-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-
-            @include tablet {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .btn-upload-file {
-                background: #fff;
-                color: $primary;
-                border: 1.5px solid $primary;
-                padding: 6px 16px;
-                border-radius: 8px;
-                font-weight: 600;
-                font-size: 0.85rem;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.2s;
-
-                &:hover {
-                    background: $primary;
-                    color: #fff;
-                }
-            }
+            @extend .section-header-row;
         }
 
         .section-heading {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
+            @include section-heading;
         }
 
         .hidden-input {
-            display: none !important;
+            @extend .hidden-input;
         }
     }
 
@@ -229,318 +195,32 @@
     }
 
     .input-field-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-
-            .required {
-                color: #e74c3c;
-                margin-left: 2px;
-            }
-        }
+        @include input-field-group;
     }
 
     .search-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-
-        .search-icon {
-            position: absolute;
-            right: 12px;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
+        @extend .search-input-wrapper;
     }
 
     .custom-input-wrapper {
-        display: flex;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        overflow: hidden;
-        height: 42px;
-        background: #f8f8f5;
-        position: relative;
-
-        .input-field {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 0 10px;
-            font-size: 0.95rem;
-            text-align: center;
-            color: #2c3e50;
-            width: 100%;
-            position: relative; // Ensure relative positioning for absolute child
-
-            &::-webkit-calendar-picker-indicator {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0;
-                cursor: pointer;
-            }
-
-            &:focus {
-                outline: none;
-            }
-
-            &.readonly-highlight {
-                background-color: #f1f5f9;
-                font-weight: 700;
-            }
-        }
-
-        .icon-box {
-            width: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f9fafb;
-            border-left: 1px solid #d1d5db;
-            color: #9ca3af;
-            cursor: pointer;
-
-            i {
-                font-size: 1.1rem;
-            }
-        }
-
-        &:focus-within {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-        }
+        @include custom-input-wrapper;
     }
 
     .amount-input-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-
-        .custom-form-control {
-            flex: 1;
-            width: auto;
-            min-width: 0;
-        }
-
-        .currency-tag {
-            font-weight: 600;
-            color: #666;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+        @extend .amount-input-wrapper;
     }
 
     .custom-form-control {
-        width: 100%;
-        height: 40px;
-        padding: 8px 12px;
-        border: 1px solid $border;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        background: #fff;
-        box-sizing: border-box;
-
-        &:focus {
-            border-color: $primary;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba($primary, 0.1);
-        }
-
-        &.text-right {
-            text-align: right;
-        }
-
-        &.read-only-input {
-            background-color: #f1f3f4;
-            color: #5f6368;
-            cursor: not-allowed;
-        }
+        @extend .custom-form-control;
     }
 
+    // Use shared attachment table component
     .attachment-table-container {
-        flex: 1;
-        overflow-x: auto;
-        max-width: 100%;
-        border: 1px solid $border;
-        border-radius: 8px;
-
-        .excel-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-
-            th,
-            td {
-                border-bottom: 1px solid $border;
-                border-right: 1px solid $border;
-                height: 40px;
-                vertical-align: middle;
-                box-sizing: border-box;
-
-                &:nth-child(2) {
-                    min-width: 180px;
-                }
-
-                &:nth-child(4) {
-                    min-width: 180px;
-                }
-            }
-
-            th {
-                background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-                text-align: center;
-                color: #ffffff;
-                font-weight: 600;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.025em;
-
-                &.col-xs {
-                    width: 50px;
-                }
-            }
-
-            td {
-                padding: 10px;
-                font-size: 0.925rem;
-                color: #334155;
-
-                &.clickable-file {
-                    cursor: pointer;
-                    transition: all 0.2s;
-
-                    &:hover {
-                        background: rgba($primary, 0.02);
-
-                        .file-text {
-                            color: $primary;
-                            text-decoration: underline;
-                        }
-                    }
-                }
-
-                .mr-2 {
-                    margin-right: 0.5rem;
-                }
-            }
-
-            .btn-delete-row {
-                background: none;
-                border: none;
-                color: #888;
-                cursor: pointer;
-                font-size: 1.1rem;
-
-                &:hover {
-                    color: $danger;
-                }
-            }
-
-            .file-name-container {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 4px 8px;
-                border-radius: 6px;
-
-                .file-text {
-                    flex: 1;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                }
-
-                .file-delete-icon {
-                    color: $text-sub;
-                    cursor: pointer;
-                    font-size: 0.9rem;
-
-                    &:hover {
-                        color: $danger;
-                    }
-                }
-            }
-
-            .desc-input-wrapper {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-
-                .desc-control {
-                    width: 100%;
-                    padding: 6px 10px;
-                    border: 1px solid transparent;
-                    border-radius: 4px;
-                    font-size: 0.9rem;
-                    background: transparent;
-
-                    &.is-invalid {
-                        border: 1px solid $danger;
-                        background-color: rgba($danger, 0.05);
-
-                        &:focus {
-                            box-shadow: 0 0 0 2px rgba($danger, 0.1);
-                        }
-                    }
-
-                    &:focus {
-                        background: #fff;
-                        border-color: $primary;
-                        outline: none;
-                    }
-                }
-
-                .error-msg {
-                    color: $danger;
-                    font-size: 0.75rem;
-                    font-weight: 500;
-                }
-            }
-        }
+        @extend .attachment-table-container;
     }
 
     .form-actions-footer {
-        padding: 12px 24px;
-        padding-bottom: calc(12px + env(safe-area-inset-bottom));
-        border-top: 1px solid $border;
-        display: flex;
-        gap: 12px;
-        background: #fff;
-        flex-shrink: 0;
-        justify-content: flex-end;
-        z-index: 100; // Increased z-index
-        position: relative; // Default position
-
-        // Failsafe: If the container scrolls instead of the content-card, make this sticky
-        position: sticky;
-        bottom: 0;
-
-        button {
-            flex: 0 0 auto;
-        }
-
-        @include tablet {
-            flex-direction: column;
-            padding: 1rem;
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-            gap: 12px;
-
-            button {
-                width: 100%;
-                margin: 0;
-            }
-        }
+        @extend .form-actions-footer;
     }
 
     .mt-4 {
@@ -649,10 +329,6 @@
                 grid-column: span 1 !important;
                 min-width: 0;
             }
-        }
-
-        .amount-input-wrapper {
-            gap: 6px;
         }
     }
 }
