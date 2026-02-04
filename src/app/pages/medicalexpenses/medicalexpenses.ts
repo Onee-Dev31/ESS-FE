@@ -108,9 +108,7 @@ export class MedicalexpensesComponent implements OnInit {
     return data;
   });
 
-
   comps = createListingComputeds(this.processedData, this.listing);
-
 
   flattenedRows = computed(() => {
     return this.processedData().flatMap(req =>
@@ -123,8 +121,6 @@ export class MedicalexpensesComponent implements OnInit {
       } as FlatMedicalRow))
     );
   });
-
-
   sortedRows = computed(() => {
     let rows = [...this.flattenedRows()];
     const sortState = this.sorting()[0];

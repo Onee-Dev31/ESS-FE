@@ -1,20 +1,56 @@
 // File: Utilities
 // Description: Global utility classes
 
+@use 'variables' as *;
+
 // Text Colors
 .text-danger {
-    color: #dc2626 !important;
+    color: $danger !important;
 }
 
 .text-success {
-    color: #16a34a !important;
+    color: $success !important;
 }
 
 .text-secondary {
-    color: #64748b !important;
+    color: $text-sub !important;
 }
 
 // Margins
 .ml-1 {
     margin-left: 0.25rem;
+}
+
+// Status Badges
+@mixin status-badge($bg, $color) {
+    background-color: $bg;
+    color: $color;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.status-new {
+    @include status-badge($status-new-bg, $status-new-text);
+}
+
+.status-verified {
+    @include status-badge($status-verified-bg, $status-verified-text);
+}
+
+.status-pending {
+    @include status-badge($status-pending-bg, $status-pending-text);
+}
+
+.status-approved {
+    @include status-badge($status-success-bg, $status-success-text);
+}
+
+.status-rejected {
+    @include status-badge($status-danger-bg, $status-danger-text);
 }

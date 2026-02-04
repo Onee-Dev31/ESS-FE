@@ -26,7 +26,7 @@ import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { createListingState, createListingComputeds } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 
 // Section: Logic
@@ -160,23 +160,11 @@ export class ApprovalsComponent implements OnInit {
   }
 
   toggleSort(columnId: string) {
-    const column = this.table.getColumn(columnId);
-    if (column) {
-      column.toggleSorting(column.getIsSorted() === 'asc');
-    } else {
-      const currentSort = this.sorting()[0];
-      this.sorting.set([{ id: columnId, desc: currentSort?.id === columnId ? !currentSort.desc : false }]);
-    }
+    TableSortHelper.toggleSort(this.table, columnId);
   }
 
   getSortIcon(columnId: string) {
-    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
-    return {
-      'fa-sort-amount-up': isSorted === 'asc',
-      'fa-sort-amount-down-alt': isSorted === 'desc',
-      'fa-sort': !isSorted,
-      'text-muted': !isSorted
-    };
+    return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
   viewDetail(item: ApprovalItem) {

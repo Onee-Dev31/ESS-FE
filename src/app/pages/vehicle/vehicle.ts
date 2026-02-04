@@ -13,7 +13,7 @@ import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { StatusUtil } from '../../utils/status.util';
-import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -183,18 +183,11 @@ export class VehicleComponent implements OnInit {
   }
 
   toggleSort(columnId: string) {
-    const column = this.table.getColumn(columnId);
-    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+    TableSortHelper.toggleSort(this.table, columnId);
   }
 
   getSortIcon(columnId: string) {
-    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
-    return {
-      'fa-sort-amount-up': isSorted === 'asc',
-      'fa-sort-amount-down-alt': isSorted === 'desc',
-      'fa-sort': !isSorted,
-      'text-muted': !isSorted,
-    };
+    return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
   trackByRowId(index: number, row: any): string {

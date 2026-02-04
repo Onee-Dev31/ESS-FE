@@ -18,7 +18,7 @@ import { DateUtilityService } from '../../services/date-utility.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { StatusUtil } from '../../utils/status.util';
-import { REQUEST_STATUS, COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
+import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
@@ -165,12 +165,6 @@ export class TimeoffComponent implements OnInit {
     });
 
     if (confirmed) {
-
-
-
-
-
-
       this.requests.set(this.requests().filter(r => r.id !== request.id));
       this.toastService.success('ลบรายการสำเร็จ');
     }

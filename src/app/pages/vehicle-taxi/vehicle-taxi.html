@@ -90,25 +90,25 @@
         <tbody>
           <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="font-bold text-primary-link text-center vertical-top">
-              {{ row.original.requestId }}
+              class="font-bold text-center top-align">
+              <span class="id-text">{{ row.original.requestId }}</span>
             </td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="text-center vertical-top">
+              class="text-center top-align">
               {{ row.original.createDate }}
             </td>
-            <td class="text-center">{{ row.original.date }}</td>
-            <td class="text-center">{{ row.original.description }}</td>
-            <td class="text-center">{{ row.original.destination }}</td>
-            <td class="text-center font-bold">{{ row.original.amount | number: '1.2-2' }}</td>
+            <td class="text-center top-align">{{ row.original.date }}</td>
+            <td class="text-center top-align">{{ row.original.description }}</td>
+            <td class="text-center top-align">{{ row.original.destination }}</td>
+            <td class="text-center font-bold top-align">{{ row.original.amount | number: '1.2-2' }}</td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="text-center vertical-top">
+              class="text-center top-align">
               <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                 {{ row.original.status | statusLabel }}
               </span>
             </td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="text-center vertical-top">
+              class="text-center top-align">
               <div class="action-btns">
                 <button class="btn-icon view" (click)="openPreviewModalForRequest(row.original.requestId)"
                   title="ดูไฟล์แนบ">

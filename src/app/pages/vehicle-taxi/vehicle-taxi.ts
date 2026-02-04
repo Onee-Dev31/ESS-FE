@@ -21,7 +21,7 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SpinnerComponent } from '../../components/shared/spinner/spinner';
-import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
@@ -252,18 +252,11 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   toggleSort(columnId: string) {
-    const column = this.table.getColumn(columnId);
-    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+    TableSortHelper.toggleSort(this.table, columnId);
   }
 
   getSortIcon(columnId: string) {
-    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
-    return {
-      'fa-sort-amount-up': isSorted === 'asc',
-      'fa-sort-amount-down-alt': isSorted === 'desc',
-      'fa-sort': !isSorted,
-      'text-muted': !isSorted,
-    };
+    return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
   trackByRowId(index: number, row: any): string {
