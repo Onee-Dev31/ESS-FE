@@ -30,25 +30,142 @@
         }
     }
 
-    padding: 20px;
+    padding: 24px;
+    padding-bottom: 30px;
     background-color: $bg-page;
-    box-sizing: border-box;
     min-height: 100vh;
 
+    @include tablet {
+        padding: 12px;
+        padding-bottom: 5px;
+    }
+
     .content-card {
-        margin-top: 20px;
+        @include content-card;
+        margin-top: 0; // Reset margin since content-card mixin handles padding/spacing
     }
 
-    @include mobile {
-        padding: 10px;
-        padding-bottom: 80px;
+    .card-header-title {
+        @include card-header-title;
     }
 
+    .toolbar-container {
+        @include toolbar-container;
+    }
 
+    .table-responsive {
+        margin-top: 24px;
 
+        @include tablet {
+            display: none;
+        }
+    }
 
+    .modern-table {
+        @include modern-table;
 
+        .col-id {
+            width: 100px;
+        }
 
+        .col-days {
+            width: 100px;
+        }
 
+        .col-type {
+            width: 150px;
+        }
 
+        .col-period {
+            width: 120px;
+        }
+
+        .col-status {
+            width: 130px;
+        }
+
+        .col-attach {
+            width: 100px;
+        }
+
+        .col-actions {
+            width: 100px;
+        }
+
+        .leave-type-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            i {
+                color: $primary;
+                font-size: 1rem;
+            }
+
+            &.centered {
+                justify-content: center;
+            }
+        }
+
+        .days-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .period-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .reason-cell {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .card-list-view {
+        @include mobile-cards-view;
+
+        .reason-box {
+            margin-top: 12px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #475569;
+            border: 1px solid #f1f5f9;
+
+            strong {
+                color: #1e293b;
+                display: block;
+                margin-bottom: 4px;
+            }
+        }
+
+        .action-btn.folder {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            color: #0ea5e9;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #e0f2fe;
+                transform: scale(1.05);
+            }
+        }
+    }
 }

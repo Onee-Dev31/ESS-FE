@@ -201,27 +201,7 @@
 
 // --- Modern Table Styles ---
 .modern-table {
-    .sortable-header {
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-        }
-
-        i {
-            margin-left: 5px;
-            font-size: 0.8rem;
-            opacity: 0.5;
-        }
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 40px !important;
-        color: #999;
-        font-style: italic;
-    }
+    @include modern-table;
 }
 
 // --- Column Width Utilities ---

@@ -103,6 +103,15 @@
               </div>
             </div>
           </div>
+
+          <div class="card-footer-actions">
+            <button class="btn-edit-sm" (click)="openModal(req.id)">
+              <i class="far fa-edit"></i> แก้ไข
+            </button>
+            <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
+              <i class="far fa-trash-alt"></i> ลบ
+            </button>
+          </div>
         </div>
       </div>
 
@@ -142,37 +151,46 @@
             <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
               สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
+            <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
+          <tr *ngFor="let row of displayedRows(); trackBy: trackByRowId">
 
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="text-center top-align merged-col">
-              <span class="id-text">{{ row.original.requestId }}</span>
+            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="text-center top-align merged-col">
+              <span class="id-text">{{ row.requestId }}</span>
             </td>
 
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="text-center top-align merged-col">
-              {{ row.original.createDate | date: 'dd/MM/yyyy' }}
+            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="text-center top-align merged-col">
+              {{ row.createDate | date: 'dd/MM/yyyy' }}
             </td>
 
-            <td class="text-center top-align">{{ row.original.date }}</td>
-            <td class="desc-cell top-align text-left">{{ row.original.description }}</td>
-            <td class="text-center top-align">{{ row.original.hours }}</td>
+            <td class="text-center top-align">{{ row.date }}</td>
+            <td class="desc-cell top-align text-left">{{ row.description }}</td>
+            <td class="text-center top-align">{{ row.hours }}</td>
             <td class="text-center font-bold">
-              {{ row.original.amount | number: '1.2-2' }}
+              {{ row.amount | number: '1.2-2' }}
             </td>
 
-            <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
-              class="v-middle text-center merged-col">
-              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                {{ row.original.status | statusLabel }}
+            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="v-middle text-center merged-col">
+              <span class="status-badge" [ngClass]="getStatusClass(row.status)">
+                {{ row.status | statusLabel }}
               </span>
+            </td>
+
+            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="text-center merged-col">
+              <div class="action-btns">
+                <button class="btn-icon edit" (click)="openModal(row.requestId)">
+                  <i class="far fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="deleteRequest(row.requestId)">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </div>
             </td>
           </tr>
           <tr *ngIf="displayedRows().length === 0">
-            <td colspan="7" class="no-data-cell">
+            <td colspan="8" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
                 icon="fas fa-inbox">
               </app-empty-state>

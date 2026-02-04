@@ -134,7 +134,6 @@
     </div>
     }
 
-    <!-- Mobile Card View -->
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -143,7 +142,6 @@
         <div class="card-header">
           <div class="header-content">
             <span class="ticket-no">{{ req.id }}</span>
-            <span class="create-date">วันที่สร้าง: {{ req.createDate }}</span>
           </div>
           <div class="card-actions-top">
             <button class="action-btn folder" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
@@ -155,10 +153,15 @@
           </div>
         </div>
         <div class="card-body">
+          <div class="info-row">
+            <span class="label">วันที่สร้างรายการ:</span>
+            <span class="value">{{ req.createDate }}</span>
+          </div>
+
           <div class="nested-list">
             <div class="nested-item" *ngFor="let item of req.items">
               <div class="item-header">
-                <span class="item-title">{{ item.date }}</span>
+                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
                 <span class="item-amount">฿{{ item.amount | number:'1.2-2' }}</span>
               </div>
               <div class="item-detail">
@@ -169,31 +172,31 @@
           </div>
           <div class="card-footer-actions">
             <button class="btn-edit-sm" (click)="openModal(req.id)">
-              <i class="far fa-edit"></i>แก้ไข
+              <i class="far fa-edit"></i> แก้ไข
             </button>
             <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
-              <i class="far fa-trash-alt"></i>ลบ
+              <i class="far fa-trash-alt"></i> ลบ
             </button>
           </div>
         </div>
       </div>
+
+      <div *ngIf="comps.paginatedData().length === 0">
+        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+        </app-empty-state>
+      </div>
       }
     </div>
 
-    <div *ngIf="comps.totalItems() === 0">
-      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-      </app-empty-state>
-    </div>
+    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+      [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
+      (onPageSizeChange)="listing.pageSize.set($event)">
+    </app-pagination>
   </div>
+
+  <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
+  </app-file-preview-modal>
 </div>
-
-<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
-</app-file-preview-modal>
-
-
-<app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()" [totalItems]="comps.totalItems()"
-  (onPageChange)="listing.currentPage.set($event)" (onPageSizeChange)="listing.pageSize.set($event)">
-</app-pagination>
 
 <!-- Modal Overlay -->
 <div class="modal-overlay" *ngIf="isModalOpen()">

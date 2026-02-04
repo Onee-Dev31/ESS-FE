@@ -236,18 +236,18 @@
             </div>
             }
         </div>
-    </div>
 
-    <div *ngIf="comps.totalItems() === 0">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
+        <div *ngIf="comps.totalItems() === 0">
+            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+            </app-empty-state>
+        </div>
+
+        <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+            [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
+            (onPageSizeChange)="setPageSize($event)">
+        </app-pagination>
     </div>
 </div>
-
-
-<app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()" [totalItems]="comps.totalItems()"
-    (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
-</app-pagination>
 
 <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
 </app-medical-policy-modal>
