@@ -271,19 +271,11 @@ $balance: #15803d;
   padding: 20px;
 
   @include desktop {
-    padding: 24px 30px;
+    padding: 30px 60px;
+    min-height: 250px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-
-  @include desktop {
-    padding: 30px 40px;
-    min-height: 250px;
-  }
-
-  @include desktop {
-    padding: 30px 60px;
   }
 
   &::before {
