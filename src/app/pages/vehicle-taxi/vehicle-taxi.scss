@@ -412,7 +412,6 @@
       td {
         padding: 16px 12px;
         font-size: 0.95rem;
-        color: #1e293b;
       }
     }
 
@@ -491,6 +490,11 @@
         }
       }
     }
+  }
+
+  .text-primary-link {
+    color: $primary;
+    font-weight: 700;
   }
 
 

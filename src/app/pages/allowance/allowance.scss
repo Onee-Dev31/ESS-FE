@@ -64,6 +64,11 @@
 
   }
 
+  .id-text {
+    font-weight: 700;
+    color: $primary;
+  }
+
   .card-list-view {
     @include mobile {
       padding: 5px;

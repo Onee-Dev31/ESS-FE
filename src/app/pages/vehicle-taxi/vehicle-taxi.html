@@ -59,22 +59,22 @@
       <table class="modern-table taxi-table">
         <thead>
           <tr>
-            <th class="col-id sortable-header" (click)="toggleSort('requestId')">
+            <th class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
               เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
             </th>
-            <th class="col-date sortable-header" (click)="toggleSort('createDate')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
               วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
-            <th class="col-date sortable-header" (click)="toggleSort('date')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
               วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
-            <th class="col-desc sortable-header" (click)="toggleSort('description')">
+            <th class="col-desc sortable-header text-center" (click)="toggleSort('description')">
               รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
             </th>
-            <th class="col-dest sortable-header" (click)="toggleSort('destination')">
+            <th class="col-dest sortable-header text-center" (click)="toggleSort('destination')">
               สถานที่รับ-ส่ง <i class="fas ml-1" [ngClass]="getSortIcon('destination')"></i>
             </th>
-            <th class="col-amount sortable-header text-right" (click)="toggleSort('amount')">
+            <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
               จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
             <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
@@ -94,9 +94,9 @@
               {{ row.original.createDate }}
             </td>
             <td class="text-center">{{ row.original.date }}</td>
-            <td>{{ row.original.description }}</td>
-            <td>{{ row.original.destination }}</td>
-            <td class="text-right font-bold">{{ row.original.amount | number: '1.2-2' }}</td>
+            <td class="text-center">{{ row.original.description }}</td>
+            <td class="text-center">{{ row.original.destination }}</td>
+            <td class="text-center font-bold">{{ row.original.amount | number: '1.2-2' }}</td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
               class="text-center vertical-top">
               <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">

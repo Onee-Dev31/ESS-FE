@@ -118,22 +118,22 @@
               <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
             </th>
 
-            <th class="col-date sortable-header" (click)="toggleSort('createDate')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
               วันที่สร้างรายการ
               <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
 
-            <th class="col-date sortable-header" (click)="toggleSort('date')">
+            <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
               วันที่ขอเบิก
               <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
 
-            <th class="sortable-header" (click)="toggleSort('desc')">
+            <th class="sortable-header text-center" (click)="toggleSort('desc')">
               รายละเอียด
               <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
             </th>
 
-            <th class="col-amount sortable-header text-right" (click)="toggleSort('amount')">
+            <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
               จำนวนเงิน
               <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
@@ -155,20 +155,20 @@
                 <span class="id-text">{{ row.original.id }}</span>
               </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align">
+              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
                 {{ row.original.createDate | date : 'dd/MM/yyyy' }}
               </td>
 
-              <td>{{ item.date }}</td>
+              <td class="text-center">{{ item.date }}</td>
 
-              <td>
+              <td class="text-center">
                 <div class="desc-wrapper">
                   <i class="fas fa-car-side text-muted"></i>
                   {{ item.description }}
                 </div>
               </td>
 
-              <td class="text-right font-semibold">
+              <td class="text-center font-semibold">
                 {{ item.amount | number : '1.2-2' }}
               </td>
 

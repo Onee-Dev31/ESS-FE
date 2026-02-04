@@ -379,6 +379,37 @@
   .modern-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: auto;
+
+    .col-id {
+      width: 150px;
+    }
+
+    .col-date {
+      width: 150px;
+    }
+
+    .col-amount {
+      width: 150px;
+    }
+
+    .col-status {
+      width: 200px;
+    }
+
+    .col-actions {
+      width: 150px;
+    }
+
+    td,
+    th {
+      &:nth-child(4) {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
 
     thead {
       background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
@@ -421,6 +452,7 @@
     .desc-wrapper {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       color: #334155;
 

@@ -63,9 +63,29 @@ export class VehicleComponent implements OnInit {
       const direction = desc ? -1 : 1;
       filtered.sort((requestA, requestB) => {
         switch (id) {
-          case 'id': return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate': return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          default: return 0;
+          case 'id':
+            return requestA.id.localeCompare(requestB.id) * direction;
+          case 'createDate':
+            return requestA.createDate.localeCompare(requestB.createDate) * direction;
+          case 'date': {
+            const dateA = requestA.items[0]?.date || '';
+            const dateB = requestB.items[0]?.date || '';
+            return dateA.localeCompare(dateB) * direction;
+          }
+          case 'desc': {
+            const descA = requestA.items[0]?.description || '';
+            const descB = requestB.items[0]?.description || '';
+            return descA.localeCompare(descB) * direction;
+          }
+          case 'amount': {
+            const amountA = requestA.items.reduce((sum, item) => sum + item.amount, 0);
+            const amountB = requestB.items.reduce((sum, item) => sum + item.amount, 0);
+            return (amountA - amountB) * direction;
+          }
+          case 'status':
+            return requestA.status.localeCompare(requestB.status) * direction;
+          default:
+            return 0;
         }
       });
     }
@@ -80,6 +100,9 @@ export class VehicleComponent implements OnInit {
     columns: [
       { accessorKey: 'id', header: 'เลขที่การเบิก' },
       { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
+      { accessorKey: 'date', header: 'วันที่ขอเบิก' },
+      { accessorKey: 'desc', header: 'รายละเอียด' },
+      { accessorKey: 'amount', header: 'จำนวนเงิน' },
       { accessorKey: 'status', header: 'สถานะ' },
     ],
     state: { sorting: this.sorting() },
