@@ -77,3 +77,20 @@ export function clearListingFilters(state: ListingState) {
     state.searchText.set('');
     state.currentPage.set(0);
 }
+
+export class TableSortHelper {
+    static toggleSort(table: any, columnId: string) {
+        const column = table.getColumn(columnId);
+        if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+    }
+
+    static getSortIcon(table: any, columnId: string) {
+        const isSorted = table.getColumn(columnId)?.getIsSorted();
+        return {
+            'fa-sort-amount-up': isSorted === 'asc',
+            'fa-sort-amount-down-alt': isSorted === 'desc',
+            'fa-sort': !isSorted,
+            'text-muted': !isSorted,
+        };
+    }
+}

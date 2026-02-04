@@ -281,7 +281,7 @@
 }
 
 .details-grid {
-    display: grid;
+    @extend .details-grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-top: 1rem;
@@ -298,9 +298,7 @@
     }
 }
 
-.details-grid {
-    @extend .details-grid;
-}
+
 
 .custom-input-wrapper {
     @include custom-input-wrapper;

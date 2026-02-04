@@ -21,7 +21,7 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { createListingState, createListingComputeds, clearListingFilters } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
   createAngularTable,
@@ -226,10 +226,17 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   toggleSort(columnId: string) {
-    const column = this.table.getColumn(columnId);
-    if (column) column.toggleSorting(column.getIsSorted() === 'asc');
+    TableSortHelper.toggleSort(this.table, columnId);
   }
 
+  getSortIcon(columnId: string) {
+    return TableSortHelper.getSortIcon(this.table, columnId);
+  }
+
+  trackByRowId(index: number, item: any): string {
+    const core = item?.original || item;
+    return `${core.id || core.requestId || 'row'}-${index}`;
+  }
   openPreview(attachment?: string | null) {
     if (!attachment) return;
     this.previewFiles.set([{ fileName: attachment, date: '' }]);
@@ -239,22 +246,6 @@ export class MedicalexpensesComponent implements OnInit {
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
-
-  getSortIcon(columnId: string) {
-    const isSorted = this.table.getColumn(columnId)?.getIsSorted();
-    return {
-      'fa-sort-amount-up': isSorted === 'asc',
-      'fa-sort-amount-down-alt': isSorted === 'desc',
-      'fa-sort': !isSorted,
-      'text-muted': !isSorted,
-    };
-  }
-
-  trackByRowId(index: number, item: any): string {
-    const core = item?.original || item;
-    return `${core.id || core.requestId || 'row'}-${index}`;
-  }
-
   getStatusClass(status: string): string {
     return StatusUtil.getStatusBadgeClass(status);
   }
