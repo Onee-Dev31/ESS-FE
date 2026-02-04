@@ -20,7 +20,7 @@ $primary-orange: #ff914d;
 
         background: $bg-slate;
         min-height: 100vh;
-        font-family: var(--font-main);
+        font-family: $font-main;
 
         .card {
             background: white;

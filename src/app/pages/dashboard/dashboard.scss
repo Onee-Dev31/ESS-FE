@@ -1,4 +1,4 @@
-// File: Dashboard
+﻿// File: Dashboard
 // Description: Styles for Dashboard
 
 // Section: Dependencies
@@ -831,7 +831,7 @@ $balance: #15803d;
         font-size: 16px;
         font-weight: 700;
         color: #334155;
-        font-family: 'Inter', sans-serif;
+        font-family: $font-main;
 
         &.bold-value {
           font-size: 18px;
@@ -934,7 +934,7 @@ $balance: #15803d;
       font-size: 20px;
       font-weight: 700;
       color: $dark;
-      font-family: 'Inter', sans-serif;
+      font-family: $font-main;
     }
   }
 
@@ -1177,7 +1177,7 @@ $balance: #15803d;
 
 ::ng-deep {
   .fc {
-    font-family: 'Inter', sans-serif;
+    font-family: $font-main;
     --fc-border-color: #f1f5f9;
     --fc-today-bg-color: transparent;
     --fc-neutral-bg-color: #f8fafc;

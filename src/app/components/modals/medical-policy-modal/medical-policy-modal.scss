@@ -3,7 +3,7 @@
 
 // Section: Dependencies
 @use '../../../../styles/theme' as *;
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 
 .modal-backdrop {
     position: fixed;
@@ -88,7 +88,7 @@
     font-size: 1rem;
     line-height: 1.8;
     color: #334155;
-    font-family: var(--font-main);
+    font-family: $font-main;
 
     .policy-section {
         margin-bottom: 2.5rem;

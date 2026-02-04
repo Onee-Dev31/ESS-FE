@@ -143,6 +143,10 @@
   box-sizing: border-box;
 }
 
+:root {
+  --font-main: #{$font-main};
+}
+
 html {
   font-family: $font-main;
   background: #f1f5f9;

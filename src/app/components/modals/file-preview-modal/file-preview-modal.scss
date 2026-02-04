@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     z-index: 20000;
-    font-family: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
+    font-family: $font-main;
 
     .preview-card {
         background: #fff;
