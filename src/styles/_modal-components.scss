@@ -25,11 +25,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     @include glass-blur(8px, rgba(0, 0, 0, 0.4));
 
     @include mobile {
         padding: 0;
-        align-items: flex-end;
+        align-items: flex-start; // Changed from flex-end to start for better scrolling experience
     }
 
     .modal-container {
