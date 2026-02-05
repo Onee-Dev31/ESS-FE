@@ -78,8 +78,8 @@ export class ApprovalsComponent implements OnInit {
     }, 1500);
 
 
-    this.route.queryParams.subscribe(params => {
-      this.category = params['category'] || 'all';
+    this.route.data.subscribe(data => {
+      this.category = data['category'] || 'all';
       this.pageTitle.set(this.category === 'medical' ? 'Medical Expenses Approvals' : 'Pending Approvals');
       this.refresh();
     });
