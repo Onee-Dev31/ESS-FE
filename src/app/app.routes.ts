@@ -25,7 +25,8 @@ export const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent)
+                        loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent),
+                        data: { animation: 'Dashboard' }
                     },
                     {
                         path: 'default',
@@ -36,35 +37,40 @@ export const routes: Routes = [
 
             {
                 path: 'vehicle',
-                loadComponent: () => import('./pages/vehicle/vehicle').then(m => m.VehicleComponent)
+                loadComponent: () => import('./pages/vehicle/vehicle').then(m => m.VehicleComponent),
+                data: { animation: 'Vehicle' }
             },
             {
                 path: 'allowance',
-                loadComponent: () => import('./pages/allowance/allowance').then(m => m.AllowanceComponent)
+                loadComponent: () => import('./pages/allowance/allowance').then(m => m.AllowanceComponent),
+                data: { animation: 'Allowance' }
             },
             {
                 path: 'vehicle-taxi',
-                loadComponent: () => import('./pages/vehicle-taxi/vehicle-taxi').then(m => m.VehicleTaxiComponent)
+                loadComponent: () => import('./pages/vehicle-taxi/vehicle-taxi').then(m => m.VehicleTaxiComponent),
+                data: { animation: 'VehicleTaxi' }
             },
             {
                 path: 'approvals',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN, category: 'all' }
+                data: { role: USER_ROLES.ADMIN, category: 'all', animation: 'Approvals' }
             },
             {
                 path: 'approvals-medicalexpenses',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN, category: 'medical' }
+                data: { role: USER_ROLES.ADMIN, category: 'medical', animation: 'ApprovalsMedical' }
             },
             {
                 path: 'medicalexpenses',
-                loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent)
+                loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent),
+                data: { animation: 'MedicalExpenses' }
             },
             {
                 path: 'timeoff',
-                loadComponent: () => import('./pages/timeoff/timeoff').then(m => m.TimeoffComponent)
+                loadComponent: () => import('./pages/timeoff/timeoff').then(m => m.TimeoffComponent),
+                data: { animation: 'TimeOff' }
             },
 
             {

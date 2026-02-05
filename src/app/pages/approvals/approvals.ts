@@ -28,12 +28,14 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { listAnimation } from '../../animations/animations';
 
 // Section: Logic
 @Component({
   selector: 'app-approvals',
   standalone: true,
   imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
+  animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
 })

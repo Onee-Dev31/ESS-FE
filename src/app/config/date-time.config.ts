@@ -7,6 +7,6 @@
 export const THAI_MONTHS = [
     'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
-];
+] as const;
 
-export const YEARS_CONFIG = [2568, 2569, 2570];
+export const YEARS_CONFIG = [2568, 2569, 2570] as const;

@@ -10,6 +10,8 @@ import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar';
 import { Sidebar } from '../sidebar/sidebar.component';
 import { SidebarService } from '../sidebar/sidebar';
+import { ChildrenOutletContexts } from '@angular/router';
+import { fadeSlideAnimation } from '../../animations/animations';
 
 // Section: Logic
 @Component({
@@ -21,13 +23,21 @@ import { SidebarService } from '../sidebar/sidebar';
     NavbarComponent,
     Sidebar
   ],
+  animations: [fadeSlideAnimation],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss']
 })
 export class LayoutComponent implements OnInit {
   private lastIsSmallScreen: boolean | null = null;
 
-  constructor(public sidebarService: SidebarService) { }
+  constructor(
+    public sidebarService: SidebarService,
+    private contexts: ChildrenOutletContexts
+  ) { }
+
+  getRouteAnimationData() {
+    return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
+  }
 
   ngOnInit(): void {
     this.checkWindowSize();

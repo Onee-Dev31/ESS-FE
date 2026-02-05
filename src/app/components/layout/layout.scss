@@ -43,9 +43,7 @@
   &.collapsed {
     .sidebar-container {
 
-      @media (max-width: 1280px) {
-        
-      }
+      @media (max-width: 1280px) {}
 
       @media (max-width: 600px) {
         width: 0; // Fully hidden on mobile phones

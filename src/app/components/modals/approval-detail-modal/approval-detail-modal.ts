@@ -14,12 +14,14 @@ import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interfac
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
+import { modalAnimation, fadeIn } from '../../../animations/animations';
 
 // Section: Logic
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,
   imports: [CommonModule, FormsModule, FilePreviewModalComponent, StatusLabelPipe],
+  animations: [modalAnimation, fadeIn],
   templateUrl: './approval-detail-modal.html',
   styleUrl: './approval-detail-modal.scss'
 })

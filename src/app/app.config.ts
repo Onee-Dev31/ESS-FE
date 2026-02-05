@@ -5,6 +5,7 @@
 
 // Section: Imports
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import { routes } from './app.routes';
@@ -20,6 +21,7 @@ import { GlobalErrorHandler } from './core/global-error-handler';
 // Section: Logic
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimations(),
     provideBrowserGlobalErrorListeners(),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideHttpClient(
