@@ -42,10 +42,13 @@
 
   &.collapsed {
     .sidebar-container {
-      width: 80px;
 
-      @media (max-width: 1024px) {
-        width: 0;
+      @media (max-width: 1280px) {
+        
+      }
+
+      @media (max-width: 600px) {
+        width: 0; // Fully hidden on mobile phones
       }
     }
   }
