@@ -8,7 +8,7 @@ import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileUploadModal } from '../../modals/file-upload-modal/file-upload-modal';
-import { TaxiService, TaxiRequest, TaxiItem } from '../../../services/taxi.service';
+import { TaxiService, TaxiRequest, TaxiItem, TaxiLogItem } from '../../../services/taxi.service';
 import { UserService } from '../../../services/user.service';
 import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
@@ -37,7 +37,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
 
   loadedRequest?: TaxiRequest;
 
-  items: any[] = [];
+  items: TaxiLogItem[] = [];
 
   thaiMonths: string[] = [];
   years: number[] = [];
@@ -46,7 +46,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
   selectedYear: number = 2568;
 
   isShowUploadModal: boolean = false;
-  currentUploadItem: any = null;
+  currentUploadItem: TaxiLogItem | null = null;
 
   ngOnInit() {
     this.masterDataService.getDateConfig().subscribe(config => {
@@ -75,18 +75,23 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     const existingRequest = this.loadedRequest;
 
     this.taxiService.getMockTaxiLogs(this.selectedMonthIndex, this.selectedYear).subscribe(mockLogs => {
-      this.items = mockLogs.map((row: any) => {
+      this.items = mockLogs.map((row: TaxiLogItem) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === row.date);
 
-        return {
-          ...row,
+        const item: TaxiLogItem = {
+          date: row.date,
           description: matchingItem ? matchingItem.description : row.description,
           destination: matchingItem ? matchingItem.destination : row.destination,
           distance: matchingItem ? matchingItem.distance : row.distance,
           amount: matchingItem ? matchingItem.amount : row.amount,
+          shiftCode: row.shiftCode,
           selected: !!matchingItem,
-          attachedFile: matchingItem?.attachedFile || null
+          attachedFile: matchingItem?.attachedFile || null,
+          checkIn: row.checkIn,
+          checkOut: row.checkOut,
+          dayType: row.dayType
         };
+        return item;
       });
       this.cdr.markForCheck();
     });
@@ -162,7 +167,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     });
   }
 
-  onInputChange(item: any) {
+  onInputChange(item: TaxiLogItem) {
     if ((item.description && item.description.trim() !== '') ||
       (item.destination && item.destination.trim() !== '') ||
       (item.distance && item.distance > 0) ||
@@ -176,7 +181,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.onClose.emit();
   }
 
-  openUploadModal(item: any) {
+  openUploadModal(item: TaxiLogItem) {
     this.currentUploadItem = item;
     this.isShowUploadModal = true;
   }

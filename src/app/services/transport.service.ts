@@ -6,12 +6,12 @@
 // Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { RequestItem, VehicleRequest } from '../interfaces/transport.interface';
+import { RequestItem, VehicleRequest, AttendanceLog } from '../interfaces/transport.interface';
 import { TransportMock } from '../mocks/transport.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 
-export type { RequestItem, VehicleRequest };
+export type { RequestItem, VehicleRequest, AttendanceLog };
 
 // Section: Logic
 @Injectable({
@@ -26,7 +26,7 @@ export class TransportService extends BaseRequestService<VehicleRequest> {
     }
 
 
-    getMockAttendanceLogs(month: number, year: number): Observable<any[]> {
+    getMockAttendanceLogs(month: number, year: number): Observable<AttendanceLog[]> {
         const results = TransportMock.getMockAttendanceLogs(month, year);
         return of(results).pipe(delay(100));
     }

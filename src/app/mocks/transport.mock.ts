@@ -4,7 +4,7 @@
  */
 
 // Section: Imports
-import { VehicleRequest } from '../interfaces/transport.interface';
+import { VehicleRequest, AttendanceLog } from '../interfaces/transport.interface';
 import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
@@ -39,7 +39,7 @@ export class TransportMock {
         return this.generateRequestsByRole(count, 'Member');
     }
 
-    static getMockAttendanceLogs(month: number, year: number): any[] {
+    static getMockAttendanceLogs(month: number, year: number): AttendanceLog[] {
         const days = MockHelper.generateDays(month, year);
         return days.map(date => {
             const dayOfWeek = date.getDay();

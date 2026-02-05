@@ -4,7 +4,7 @@
  */
 
 // Section: Imports
-import { TaxiRequest } from '../interfaces/taxi.interface';
+import { TaxiRequest, TaxiLogItem } from '../interfaces/taxi.interface';
 import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
@@ -42,7 +42,7 @@ export class TaxiMock {
         return this.generateRequestsByRole(count, 'Member');
     }
 
-    static getMockTaxiLogs(month: number, year: number): any[] {
+    static getMockTaxiLogs(month: number, year: number): TaxiLogItem[] {
         const days = MockHelper.generateDays(month, year);
         return days.map((date: Date) => {
             const dayOfWeek = date.getDay();

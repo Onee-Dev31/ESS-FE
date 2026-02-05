@@ -53,12 +53,12 @@ export class AllowanceService extends BaseRequestService<AllowanceRequest> {
         this.updateStatus(id, status);
     }
 
-    getMockAllowanceLogs(month: number, year: number): Observable<any[]> {
+    getMockAllowanceLogs(month: number, year: number): Observable<AllowanceItem[]> {
         const results = AllowanceMock.getMockAllowanceLogs(month, year);
-        return of(results).pipe(delay(100));
+        return of(results as unknown as AllowanceItem[]).pipe(delay(100));
     }
 
-    calculateAllowance(log: any): any {
+    calculateAllowance(log: Partial<AllowanceItem>): Partial<AllowanceItem> {
         if (!log.selected || !log.timeIn || !log.timeOut) {
             return {
                 ...log,

@@ -4,6 +4,11 @@
  */
 
 // Section: Logic
+export interface DateConfig {
+    months: string[];
+    years: number[];
+}
+
 export interface Requester {
     name: string;
     employeeId: string;

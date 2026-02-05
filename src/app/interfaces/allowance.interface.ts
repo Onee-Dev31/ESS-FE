@@ -17,6 +17,8 @@ export interface AllowanceItem {
     amount: number;
     selected: boolean;
     shiftCode?: string;
+    displayHours?: string;
+    actualExtraHours?: number;
 }
 
 export interface AllowanceRequest {

@@ -187,8 +187,8 @@
 
   </main>
 
-  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFileName]="currentUploadItem?.attachedFile"
-    [dateLabel]="currentUploadItem?.date" (onSave)="handleFileSave($event)" (onClose)="closeUploadModal()">
+  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFileName]="currentUploadItem?.attachedFile || ''"
+    [dateLabel]="currentUploadItem?.date || ''" (onSave)="handleFileSave($event)" (onClose)="closeUploadModal()">
   </app-file-upload-modal>
 
 </div>

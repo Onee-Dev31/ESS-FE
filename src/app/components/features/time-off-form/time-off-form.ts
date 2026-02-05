@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
 import { UserService } from '../../../services/user.service';
 import { TimeOffService, TimeOffRequest } from '../../../services/time-off.service';
+import { LeaveType } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs from 'dayjs';
 
@@ -40,7 +41,7 @@ export class TimeOffForm implements OnInit {
   currentDate = signal<string>('');
   employeeId = signal<string>('OTD01050');
   requestId = signal<string>('1');
-  leaveTypes: any[] = [];
+  leaveTypes: LeaveType[] = [];
   selectedLeaveType = signal<string>('');
   reason = signal<string>('');
   startDate = signal<string>('');
@@ -130,18 +131,18 @@ export class TimeOffForm implements OnInit {
     input.click();
   }
 
-  onFileSelected(event: any) {
-    const files = event.target.files;
-    if (files && files.length > 0) {
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
       const currentAttachments = this.attachments();
-      const newAttachments = Array.from(files).map((file: any, index) => ({
+      const newAttachments = Array.from(input.files).map((file: File, index) => ({
         id: currentAttachments.length + index + 1,
         name: file.name,
         description: ''
       }));
       this.attachments.update(current => [...current, ...newAttachments]);
     }
-    event.target.value = '';
+    input.value = '';
   }
 
   isPreviewModalOpen = signal<boolean>(false);

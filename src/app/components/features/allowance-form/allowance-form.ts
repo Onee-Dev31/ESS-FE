@@ -40,7 +40,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   selectedYearBE: number = 2568;
   totalAmount: number = 0;
   totalHoursStr: string = '0.00';
-  logs: any[] = [];
+  logs: AllowanceItem[] = [];
 
   isPolicyPopupOpen = signal(false);
 
@@ -83,7 +83,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         this.logs = rawLogs.map(item => {
           const matchingItem = existingRequest?.items.find(i => i.date === item.date);
 
-          const log = {
+          const log: AllowanceItem = {
             date: item.date,
             dayType: item.dayType,
             timeIn: item.timeIn,
@@ -93,7 +93,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             amount: 0,
             selected: item.selected,
             description: item.description,
-            shiftCode: item.shiftCode
+            shiftCode: item.shiftCode,
+            hours: 0
           };
 
           if (matchingItem) {
@@ -102,6 +103,9 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             log.amount = matchingItem.amount;
             log.selected = matchingItem.selected;
             log.description = matchingItem.description;
+            log.hours = matchingItem.hours;
+            log.displayHours = matchingItem.displayHours;
+            log.actualExtraHours = matchingItem.actualExtraHours;
           }
 
           this.autoCalculate(log);
@@ -112,20 +116,20 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       });
   }
 
-  autoCalculate(log: any) {
+  autoCalculate(log: AllowanceItem) {
     const calculated = this.allowanceService.calculateAllowance(log);
     Object.assign(log, calculated);
     this.updateTotal();
   }
 
-  onInputChange(log: any) {
+  onInputChange(log: AllowanceItem) {
     if (log.description && log.description.trim() !== '') {
       log.selected = true;
       this.autoCalculate(log);
     }
   }
 
-  onToggleCheck(log: any) {
+  onToggleCheck(log: AllowanceItem) {
     this.autoCalculate(log);
   }
 
@@ -134,7 +138,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
     this.totalAmount = selectedLogs.reduce((sum, current) => sum + (current.amount || 0), 0);
 
-    let totalExtraMinutes = selectedLogs.reduce((sum, current) => sum + (current.actualExtraHours * 60), 0);
+    let totalExtraMinutes = selectedLogs.reduce((sum, current) => sum + ((current.actualExtraHours || 0) * 60), 0);
     const hours = Math.floor(totalExtraMinutes / 60);
     const minutes = Math.round(totalExtraMinutes % 60);
     this.totalHoursStr = `${hours}.${minutes.toString().padStart(2, '0')}`;
@@ -159,7 +163,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         timeIn: log.timeIn,
         timeOut: log.timeOut,
         description: log.description,
-        hours: parseFloat(log.displayHours),
+        hours: parseFloat(log.displayHours || '0'),
         amount: log.amount,
         selected: true
       }));

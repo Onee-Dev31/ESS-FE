@@ -17,6 +17,13 @@ export interface TaxiItem {
     attachedFile?: string | null;
 }
 
+export interface TaxiLogItem extends TaxiItem {
+    selected: boolean;
+    checkIn?: string;
+    checkOut?: string;
+    dayType?: string;
+}
+
 export interface TaxiRequest {
     id: string;
     typeId: number;

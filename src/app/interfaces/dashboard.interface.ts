@@ -39,3 +39,19 @@ export interface HolidayItem {
     date: string;
     name: string;
 }
+
+export interface AttendanceStat {
+    label: string;
+    value: string;
+}
+
+export interface PerformanceItem {
+    year: string;
+    grade: string;
+}
+
+export interface SpecialDate {
+    type: string;
+    note: string;
+    code: string;
+}

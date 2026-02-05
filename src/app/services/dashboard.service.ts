@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
 import { LoadingService } from './loading';
 import { ApprovalsHelperService } from './approvals-helper.service';
-import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../interfaces/dashboard.interface';
+import { MedicalStat, WelfareItem, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 
@@ -99,7 +99,7 @@ export class DashboardService {
         ]).pipe(delay(100)));
     }
 
-    getAttendanceList(): any[] {
+    getAttendanceList(): AttendanceStat[] {
         return [
             { label: 'ลาป่วย', value: '10 วัน' },
             { label: 'ลาพักร้อน', value: '5 วัน' },
@@ -109,7 +109,7 @@ export class DashboardService {
         ];
     }
 
-    getPerformanceList(): any[] {
+    getPerformanceList(): PerformanceItem[] {
         return [
             { year: 'ปี 2026', grade: 'เกรด A+' },
             { year: 'ปี 2025', grade: 'เกรด A' },
@@ -120,13 +120,13 @@ export class DashboardService {
         ];
     }
 
-    getSpecialDates(): Record<string, any> {
+    getSpecialDates(): Record<string, SpecialDate> {
         const hd = new DateHolidays('TH');
         hd.setLanguages('th');
         const currentYear = dayjs().year();
         const nextYear = currentYear + 1;
         const holidays = [...hd.getHolidays(currentYear), ...hd.getHolidays(nextYear)];
-        const result: Record<string, any> = {};
+        const result: Record<string, SpecialDate> = {};
         holidays.forEach(h => {
             const dateStr = h.date.split(' ')[0];
             if (h.type === 'public') result[dateStr] = { type: 'holiday', note: h.name, code: 'HOL' };

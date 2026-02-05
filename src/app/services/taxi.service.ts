@@ -6,12 +6,12 @@
 // Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { TaxiItem, TaxiRequest } from '../interfaces/taxi.interface';
+import { TaxiItem, TaxiRequest, TaxiLogItem } from '../interfaces/taxi.interface';
 import { TaxiMock } from '../mocks/taxi.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 
-export type { TaxiItem, TaxiRequest };
+export type { TaxiItem, TaxiRequest, TaxiLogItem };
 
 // Section: Logic
 @Injectable({
@@ -53,7 +53,7 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
         this.updateStatus(id, status);
     }
 
-    getMockTaxiLogs(month: number, year: number): Observable<any[]> {
+    getMockTaxiLogs(month: number, year: number): Observable<TaxiLogItem[]> {
         const results = TaxiMock.getMockTaxiLogs(month, year);
         return of(results).pipe(delay(100));
     }

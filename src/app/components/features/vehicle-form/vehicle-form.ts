@@ -8,20 +8,15 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TransportService, RequestItem, VehicleRequest } from '../../../services/transport.service';
+import { AttendanceLog } from '../../../interfaces/transport.interface';
 import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
 import { DateUtilityService } from '../../../services/date-utility.service';
 
-interface LogItem {
-  date: string;
-  dayType: string;
-  timeIn: string;
-  timeOut: string;
+interface VehicleLogItem extends AttendanceLog {
   amount: number;
-  selected: boolean;
-  description: string;
-  shiftCode?: string;
 }
+
 
 import { MasterDataService } from '../../../services/master-data.service';
 
@@ -52,7 +47,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   selectedMonthIndex: number = 9;
   selectedYearBE: number = 2568;
   totalAmount: number = 0;
-  logs: LogItem[] = [];
+  logs: VehicleLogItem[] = [];
 
   ngOnInit(): void {
     this.masterDataService.getDateConfig().subscribe(config => {
@@ -81,19 +76,17 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     const existingRequest = this.loadedRequest;
 
     this.transportService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
-      this.logs = rawLogs.map((item: any) => {
+      this.logs = rawLogs.map((item: AttendanceLog) => {
         const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.date);
 
         return {
-          date: item.date,
-          dayType: item.dayType,
+          ...item,
           timeIn: item.timeIn ? String(item.timeIn) : '',
           timeOut: item.timeOut ? String(item.timeOut) : '',
           amount: matchingItem ? matchingItem.amount : 0,
           selected: !!matchingItem,
           description: matchingItem ? matchingItem.description : item.description,
-          shiftCode: item.shiftCode
-        };
+        } as VehicleLogItem;
       });
 
       this.logs.forEach(log => {
@@ -107,7 +100,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 
 
-  calculateVehicleAmount(log: LogItem) {
+  calculateVehicleAmount(log: VehicleLogItem) {
     if (!log.selected) {
       log.amount = 0;
       this.updateTotal();
@@ -131,14 +124,14 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     this.updateTotal();
   }
 
-  onInputChange(log: LogItem) {
+  onInputChange(log: VehicleLogItem) {
     if (log.description && log.description.trim() !== '') {
       log.selected = true;
       this.calculateVehicleAmount(log);
     }
   }
 
-  onToggleCheck(log: LogItem) {
+  onToggleCheck(log: VehicleLogItem) {
     if (log.selected) {
       this.calculateVehicleAmount(log);
     } else {

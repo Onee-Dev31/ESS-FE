@@ -24,7 +24,15 @@ export interface TimeOffRequest {
     requester?: Requester;
 }
 
-export const LEAVE_TYPES = [
+export interface LeaveType {
+    id: string;
+    label: string;
+    icon: string;
+    color: string;
+    remaining: number;
+}
+
+export const LEAVE_TYPES: LeaveType[] = [
     { id: 'vacation', label: 'ลาพักร้อน', icon: 'fas fa-plane-departure', color: '#ef4444', remaining: 10 },
     { id: 'personal', label: 'ลากิจ', icon: 'fas fa-briefcase', color: '#3b82f6', remaining: 6 },
     { id: 'sick', label: 'ลาป่วย', icon: 'fas fa-stethoscope', color: '#4049c7', remaining: 30 },

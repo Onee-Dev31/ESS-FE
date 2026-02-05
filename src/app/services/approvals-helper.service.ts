@@ -67,7 +67,7 @@ export class ApprovalsHelperService {
         return [...allowanceItems, ...taxiItems, ...vehicleItems];
     }
 
-    private mapToApproval(item: any, type: 'allowance' | 'taxi' | 'transport'): ApprovalItem {
+    private mapToApproval(item: AllowanceRequest | TaxiRequest | VehicleRequest, type: 'allowance' | 'taxi' | 'transport'): ApprovalItem {
         const typeLabels = {
             allowance: 'ค่าเบี้ยเลี้ยง',
             taxi: 'ค่าแท็กซี่',
@@ -79,6 +79,9 @@ export class ApprovalsHelperService {
             taxi: 'เดินทางไปหาลูกค้า',
             transport: 'ค่าน้ำมันรถ'
         };
+
+        const details = item.items.map((i) => i.description).join(', ') || defaultDetails[type];
+        const totalAmount = item.items.reduce((sum, i) => sum + (i.amount || 0), 0) || 0;
 
         return {
             requestNo: item.id,
@@ -93,8 +96,8 @@ export class ApprovalsHelperService {
             },
             requestType: typeLabels[type] as any,
             typeId: 99,
-            requestDetail: item.items?.map((i: any) => i.description).join(', ') || defaultDetails[type],
-            amount: item.items?.reduce((sum: number, i: any) => sum + (i.amount || 0), 0) || 0,
+            requestDetail: details,
+            amount: totalAmount,
             status: this.mapStatus(item.status),
             rawStatus: this.normalizeStatus(item.status),
             type: type,

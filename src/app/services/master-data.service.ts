@@ -7,7 +7,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
-import { LEAVE_TYPES } from '../interfaces/time-off.interface';
+import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
+
+import { DateConfig } from '../interfaces/core.interface';
 
 // Section: Logic
 export interface ClaimType {
@@ -23,13 +25,13 @@ export interface ClaimType {
 })
 export class MasterDataService {
 
-    private leaveTypesCache$: Observable<any[]> | null = null;
+    private leaveTypesCache$: Observable<LeaveType[]> | null = null;
     private claimTypesCache$: Observable<ClaimType[]> | null = null;
-    private dateConfigCache$: Observable<any> | null = null;
+    private dateConfigCache$: Observable<DateConfig> | null = null;
 
     constructor() { }
 
-    getLeaveTypes(): Observable<any[]> {
+    getLeaveTypes(): Observable<LeaveType[]> {
         if (!this.leaveTypesCache$) {
             this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(
                 delay(500),
@@ -55,7 +57,7 @@ export class MasterDataService {
         return this.claimTypesCache$;
     }
 
-    getDateConfig(): Observable<any> {
+    getDateConfig(): Observable<DateConfig> {
         if (!this.dateConfigCache$) {
             const config = {
                 months: [
