@@ -21,6 +21,7 @@ import { MedicalPolicyModalComponent } from '../../components/modals/medical-pol
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
 import { AuthService } from '../../services/auth.service';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
@@ -41,7 +42,8 @@ dayjs.locale('th');
     FullCalendarModule,
     MedicalPolicyModalComponent,
     TooltipModalComponent,
-    TimeOffForm
+    TimeOffForm,
+    SkeletonComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -62,10 +64,10 @@ export class DashboardComponent implements OnInit {
   selectedLeaveTypeId = signal<string>('');
 
   userProfile = toSignal(this.userService.getUserProfile());
-  medicalStats = toSignal(this.dashboardService.getMedicalStats(), { initialValue: [] });
-  welfareStats = toSignal(this.dashboardService.getWelfareStats(), { initialValue: [] });
-  leaveStats = toSignal(this.dashboardService.getLeaveStats(), { initialValue: [] });
-  holidays = toSignal(this.dashboardService.getHolidays(), { initialValue: [] });
+  medicalStats = toSignal(this.dashboardService.getMedicalStats());
+  welfareStats = toSignal(this.dashboardService.getWelfareStats());
+  leaveStats = toSignal(this.dashboardService.getLeaveStats());
+  holidays = toSignal(this.dashboardService.getHolidays());
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 

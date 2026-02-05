@@ -166,8 +166,8 @@
             </button>
           </div>
 
-          <div class="stat-items-grid">
-            <div class="stat-item" *ngFor="let stat of medicalStats()">
+          <div class="stat-items-grid" *ngIf="medicalStats() as stats; else medicalSkeleton">
+            <div class="stat-item" *ngFor="let stat of stats">
               <div class="stat-header">
                 <div class="stat-title">{{ stat.label }}</div>
                 <div class="stat-limit">{{ stat.subLabel }}</div>
@@ -192,6 +192,11 @@
               </div>
             </div>
           </div>
+          <ng-template #medicalSkeleton>
+            <div class="stat-items-grid">
+              <app-skeleton type="card" [rows]="4"></app-skeleton>
+            </div>
+          </ng-template>
 
           <div class="stats-action-area text-end card-footer">
             <button type="button" class="action-btn-sm" (click)="navigateTo('/medicalexpenses')">
@@ -205,8 +210,8 @@
             <p class="section-title mb-0">สวัสดิการ</p>
             <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
-          <div class="bottom-stats-grid">
-            <div class="card mini-stat-card" *ngFor="let item of welfareStats()" [ngClass]="item.cardClass || ''"
+          <div class="bottom-stats-grid" *ngIf="welfareStats() as wstats; else welfareSkeleton">
+            <div class="card mini-stat-card" *ngFor="let item of wstats" [ngClass]="item.cardClass || ''"
               (click)="navigateTo(item.route)" [style.cursor]="item.route ? 'pointer' : 'default'">
               <div class="card-body">
                 <div class="mini-icon">
@@ -232,6 +237,11 @@
               </div>
             </div>
           </div>
+          <ng-template #welfareSkeleton>
+            <div class="bottom-stats-grid">
+              <app-skeleton type="card" [rows]="3"></app-skeleton>
+            </div>
+          </ng-template>
         </div>
 
         <div class="leave-section">
@@ -239,8 +249,8 @@
             <p class="section-title">ลาหยุดงาน</p>
             <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
           </div>
-          <div class="leave-stats-grid">
-            <div class="card leave-card" *ngFor="let leave of leaveStats()" [ngClass]="leave.theme"
+          <div class="leave-stats-grid" *ngIf="leaveStats() as lstats; else leaveSkeleton">
+            <div class="card leave-card" *ngFor="let leave of lstats" [ngClass]="leave.theme"
               (click)="navigateTo('/timeoff')">
               <div class="leave-body">
                 <div class="leave-header">
@@ -257,6 +267,11 @@
               </div>
             </div>
           </div>
+          <ng-template #leaveSkeleton>
+            <div class="leave-stats-grid">
+              <app-skeleton type="card" [rows]="3"></app-skeleton>
+            </div>
+          </ng-template>
         </div>
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>

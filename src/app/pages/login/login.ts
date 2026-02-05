@@ -27,8 +27,9 @@ export class LoginComponent {
   private cdr = inject(ChangeDetectorRef);
 
   loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required])
+    email: new FormControl(localStorage.getItem('rememberedEmail') || '', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
+    rememberMe: new FormControl(localStorage.getItem('rememberMe') === 'true')
   });
 
   passwordFieldType: string = 'password';
@@ -48,36 +49,17 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true;
-    this.loadingService.show();
-    this.loginMessage = '';
-    this.cdr.detectChanges();
+    const { email, password, rememberMe } = this.loginForm.value;
 
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email || '', password || '').pipe(
-      take(1),
-      finalize(() => {
-        this.isLoading = false;
-        this.loadingService.hide();
-        this.cdr.detectChanges();
-      })
+    this.authService.login(email || '', password || '', !!rememberMe).pipe(
+      take(1)
     ).subscribe({
       next: (success) => {
         if (success) {
-          this.loginMessage = 'Login successful!';
-          this.isError = false;
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 500);
-        } else {
-          this.loginMessage = 'Incorrect username or password.';
-          this.isError = true;
         }
-      },
-      error: () => {
-        this.loginMessage = 'An error occurred during login.';
-        this.isError = true;
       }
     });
   }

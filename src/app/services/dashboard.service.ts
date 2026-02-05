@@ -44,7 +44,7 @@ export class DashboardService {
             { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-indigo', percent: 100 },
             { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
         ];
-        return this.loadingService.wrap(of(stats).pipe(delay(100)));
+        return this.loadingService.wrap(of(stats).pipe(delay(1000)));
     }
 
     getWelfareStats(): Observable<WelfareItem[]> {
@@ -77,7 +77,7 @@ export class DashboardService {
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา 1,500 บาท/คน</span></div>'
             }
         ];
-        return this.loadingService.wrap(of(stats).pipe(delay(100)));
+        return this.loadingService.wrap(of(stats).pipe(delay(1000)));
     }
 
     getLeaveStats(): Observable<LeaveItem[]> {
@@ -88,7 +88,7 @@ export class DashboardService {
             { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', iconColor: '#9333ea', theme: 'theme-purple', balance: 3 },
             { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', iconColor: '#35b653', theme: 'theme-green', balance: 3 },
         ];
-        return this.loadingService.wrap(of(leaves).pipe(delay(100)));
+        return this.loadingService.wrap(of(leaves).pipe(delay(1000)));
     }
 
     getHolidays(): Observable<HolidayItem[]> {
@@ -96,7 +96,7 @@ export class DashboardService {
             { date: '05/12/2569', name: 'วันคล้ายวันพระบรมราชสมภพ ร.9' },
             { date: '10/12/2569', name: 'วันรัฐธรรมนูญ' },
             { date: '31/12/2569', name: 'วันสิ้นปี' }
-        ]).pipe(delay(100)));
+        ]).pipe(delay(1000)));
     }
 
     getAttendanceList(): AttendanceStat[] {

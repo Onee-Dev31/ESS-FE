@@ -139,6 +139,44 @@ $bg-light: #f1f5f9;
     }
   }
 
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: $text-muted;
+      user-select: none;
+
+      input {
+        cursor: pointer;
+        width: 14px;
+        height: 14px;
+      }
+
+      span {
+        font-weight: 400;
+      }
+    }
+
+    .forgot-password {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+
+      &:hover {
+        color: $primary-hover;
+      }
+    }
+  }
+
   .login-button {
     width: 100%;
     padding: 16px;
