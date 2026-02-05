@@ -5,17 +5,6 @@
   </header>
 
   <main class="content-body">
-    <ng-template #pendingBtn>
-      <button *ngIf="userRole() === 'Admin'" class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-        <div class="icon-shake">
-          <i class="fas fa-bell"></i>
-          <ng-container *ngIf="pendingCount() as count">
-            <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
-          </ng-container>
-        </div>
-        รายการรออนุมัติ
-      </button>
-    </ng-template>
 
     <div class="main-layout-grid">
       <div class="left-col-wrapper">
@@ -44,10 +33,12 @@
             </div>
 
             <div class="attendance-list-clean">
-              <div class="att-clean-item" *ngFor="let item of attendanceList">
+              @for (item of attendanceList; track item.label) {
+              <div class="att-clean-item">
                 <div class="att-label">{{ item.label }}</div>
                 <div class="att-value">{{ item.value }}</div>
               </div>
+              }
             </div>
           </div>
 
@@ -81,10 +72,12 @@
             <h6 class="perf-subtitle">ประวัติผลการประเมินการทำงาน</h6>
 
             <div class="performance-list">
-              <div class="perf-item" *ngFor="let p of performanceList">
+              @for (p of performanceList; track p.year) {
+              <div class="perf-item">
                 <span class="perf-year">{{ p.year }}</span>
                 <span class="perf-grade">{{ p.grade }}</span>
               </div>
+              }
             </div>
           </div>
 
@@ -103,10 +96,12 @@
           </div>
           <div class="card-body">
             <div class="profile-info-list">
-              <div class="profile-display-group" *ngFor="let item of itList()">
+              @for (item of itList(); track item.label) {
+              <div class="profile-display-group">
                 <label class="display-label">{{ item.label }}</label>
                 <div class="display-value">{{ item.value }}</div>
               </div>
+              }
             </div>
           </div>
           <div class="card-footer text-end">
@@ -123,24 +118,32 @@
           </button>
 
           <div class="card-body profile-layout">
-            <div class="profile-left-section" *ngIf="userProfile() as profile">
+            @if (userProfile(); as profile) {
+            <div class="profile-left-section">
               <div class="user-id-badge">{{ profile.employeeId }}</div>
               <div class="user-name">{{ profile.name }}</div>
               <div class="user-role">{{ profile.position }}</div>
               <div class="user-meta"><span>แผนก : {{ profile.department }}</span></div>
               <div class="user-meta"><span>บริษัท : {{ profile.company }}</span></div>
             </div>
+            } @else {
+            <div class="profile-left-section">
+              <app-skeleton type="text" [rows]="5"></app-skeleton>
+            </div>
+            }
 
             <hr class="section-divider" />
 
             <div class="profile-info-list">
-              <div class="profile-display-group" *ngFor="let item of profileList()">
+              @for (item of profileList(); track item.label) {
+              <div class="profile-display-group">
                 <label class="display-label">
                   <i [class]="item.icon" [style.color]="item.iconColor"></i>
                   {{ item.label }}
                 </label>
                 <div class="display-value">{{ item.value }}</div>
               </div>
+              }
             </div>
           </div>
         </div>
@@ -154,20 +157,25 @@
                 <i class="fa-solid fa-circle-info"></i>
               </button>
             </div>
-            <button *ngIf="userRole() === 'Admin'" class="btn-pending-approvals"
-              (click)="navigateTo('/approvals-medicalexpenses')">
+            @if (userRole() === 'Admin') {
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals-medicalexpenses')">
               <div class="icon-shake">
                 <i class="fas fa-bell"></i>
-                <ng-container *ngIf="medicalPendingCount() as count">
-                  <span class="notification-badge" *ngIf="count > 0">{{ count }}</span>
-                </ng-container>
+                @if (medicalPendingCount(); as count) {
+                @if (count > 0) {
+                <span class="notification-badge">{{ count }}</span>
+                }
+                }
               </div>
               รายการรออนุมัติ
             </button>
+            }
           </div>
 
-          <div class="stat-items-grid" *ngIf="medicalStats() as stats; else medicalSkeleton">
-            <div class="stat-item" *ngFor="let stat of stats">
+          @if (medicalStats(); as stats) {
+          <div class="stat-items-grid">
+            @for (stat of stats; track stat.label) {
+            <div class="stat-item">
               <div class="stat-header">
                 <div class="stat-title">{{ stat.label }}</div>
                 <div class="stat-limit">{{ stat.subLabel }}</div>
@@ -191,12 +199,13 @@
                 <div class="progress-bar" [ngClass]="stat.progressColor" [style.width.%]="stat.percent"></div>
               </div>
             </div>
+            }
           </div>
-          <ng-template #medicalSkeleton>
-            <div class="stat-items-grid">
-              <app-skeleton type="card" [rows]="4"></app-skeleton>
-            </div>
-          </ng-template>
+          } @else {
+          <div class="stat-items-grid">
+            <app-skeleton type="card" [rows]="4"></app-skeleton>
+          </div>
+          }
 
           <div class="stats-action-area text-end card-footer">
             <button type="button" class="action-btn-sm" (click)="navigateTo('/medicalexpenses')">
@@ -208,11 +217,25 @@
         <div class="welfare-section">
           <div class="section-header-flex">
             <p class="section-title mb-0">สวัสดิการ</p>
-            <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
+            @if (userRole() === 'Admin') {
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+              <div class="icon-shake">
+                <i class="fas fa-bell"></i>
+                @if (pendingCount(); as count) {
+                @if (count > 0) {
+                <span class="notification-badge">{{ count }}</span>
+                }
+                }
+              </div>
+              รายการรออนุมัติ
+            </button>
+            }
           </div>
-          <div class="bottom-stats-grid" *ngIf="welfareStats() as wstats; else welfareSkeleton">
-            <div class="card mini-stat-card" *ngFor="let item of wstats" [ngClass]="item.cardClass || ''"
-              (click)="navigateTo(item.route)" [style.cursor]="item.route ? 'pointer' : 'default'">
+          @if (welfareStats(); as wstats) {
+          <div class="bottom-stats-grid">
+            @for (item of wstats; track item.title) {
+            <div class="card mini-stat-card" [ngClass]="item.cardClass || ''" (click)="navigateTo(item.route)"
+              [style.cursor]="item.route ? 'pointer' : 'default'">
               <div class="card-body">
                 <div class="mini-icon">
                   <i [class]="item.iconName"></i>
@@ -220,38 +243,51 @@
                 <div class="card-info">
                   <h6 [style.color]="item.titleColor">
                     <span class="title-text">{{ item.title }}</span>
-                    <div class="tooltip-container" *ngIf="item.tooltip">
+                    @if (item.tooltip) {
+                    <div class="tooltip-container">
                       <button class="btn-info-circle" (click)="openTooltip(item.tooltip); $event.stopPropagation()">
                         <i class="fa-solid fa-circle-info"></i>
                       </button>
                     </div>
+                    }
                   </h6>
                   <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
                 </div>
-                <div class="card-arrow" *ngIf="item.route">
-                  <i class="fas fa-chevron-right"></i>
-                </div>
-                <div class="card-arrow disabled-arrow" *ngIf="!item.route">
+                <div class="card-arrow" [class.disabled-arrow]="!item.route">
                   <i class="fas fa-chevron-right"></i>
                 </div>
               </div>
             </div>
+            }
           </div>
-          <ng-template #welfareSkeleton>
-            <div class="bottom-stats-grid">
-              <app-skeleton type="card" [rows]="3"></app-skeleton>
-            </div>
-          </ng-template>
+          } @else {
+          <div class="bottom-stats-grid">
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+          </div>
+          }
         </div>
 
         <div class="leave-section">
           <div class="section-header-flex">
             <p class="section-title">ลาหยุดงาน</p>
-            <ng-container *ngTemplateOutlet="pendingBtn"></ng-container>
+            @if (userRole() === 'Admin') {
+            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+              <div class="icon-shake">
+                <i class="fas fa-bell"></i>
+                @if (pendingCount(); as count) {
+                @if (count > 0) {
+                <span class="notification-badge">{{ count }}</span>
+                }
+                }
+              </div>
+              รายการรออนุมัติ
+            </button>
+            }
           </div>
-          <div class="leave-stats-grid" *ngIf="leaveStats() as lstats; else leaveSkeleton">
-            <div class="card leave-card" *ngFor="let leave of lstats" [ngClass]="leave.theme"
-              (click)="navigateTo('/timeoff')">
+          @if (leaveStats(); as lstats) {
+          <div class="leave-stats-grid">
+            @for (leave of lstats; track leave.label) {
+            <div class="card leave-card" [ngClass]="leave.theme" (click)="navigateTo('/timeoff')">
               <div class="leave-body">
                 <div class="leave-header">
                   <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
@@ -266,12 +302,13 @@
                 <i class="fas fa-chevron-right"></i>
               </div>
             </div>
+            }
           </div>
-          <ng-template #leaveSkeleton>
-            <div class="leave-stats-grid">
-              <app-skeleton type="card" [rows]="3"></app-skeleton>
-            </div>
-          </ng-template>
+          } @else {
+          <div class="leave-stats-grid">
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+          </div>
+          }
         </div>
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>
@@ -280,13 +317,15 @@
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
                 <ul class="holiday-list">
-                  <li class="holiday-item" *ngFor="let h of holidays()">
+                  @for (h of holidays(); track h.date) {
+                  <li class="holiday-item">
                     <span class="status-dot dot-green"></span>
                     <div class="holiday-info">
                       <span class="h-date">{{ h.date }}</span>
                       <span class="h-name">{{ h.name }}</span>
                     </div>
                   </li>
+                  }
                 </ul>
               </div>
 
@@ -295,7 +334,7 @@
                 <full-calendar [options]="calendarOptions"></full-calendar>
                 } @placeholder {
                 <div class="calendar-placeholder">
-                  <div class="skeleton-calendar"></div>
+                  <app-skeleton type="card" height="300px"></app-skeleton>
                   <p>กำลังโหลดปฏิทิน...</p>
                 </div>
                 } @loading (after 100ms; minimum 500ms) {
@@ -329,13 +368,18 @@
     </button>
   </main>
 
-  <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+  @if (isPolicyModalOpen()) {
+  <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)">
   </app-medical-policy-modal>
+  }
 
-  <app-time-off-form *ngIf="isTimeOffModalOpen()" [initialLeaveTypeId]="selectedLeaveTypeId()"
-    (onClose)="closeTimeOffForm()">
+  @if (isTimeOffModalOpen()) {
+  <app-time-off-form [initialLeaveTypeId]="selectedLeaveTypeId()" (onClose)="closeTimeOffForm()">
   </app-time-off-form>
+  }
 
-  <app-tooltip-modal *ngIf="isTooltipModalOpen()" [content]="tooltipModalContent()" (onClose)="closeTooltip()">
+  @if (isTooltipModalOpen()) {
+  <app-tooltip-modal [content]="tooltipModalContent()" (onClose)="closeTooltip()">
   </app-tooltip-modal>
+  }
 </div>

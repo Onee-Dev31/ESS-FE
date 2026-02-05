@@ -38,12 +38,12 @@ dayjs.locale('th');
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    SkeletonComponent,
     CommonModule,
     FullCalendarModule,
     MedicalPolicyModalComponent,
     TooltipModalComponent,
-    TimeOffForm,
-    SkeletonComponent
+    TimeOffForm
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
