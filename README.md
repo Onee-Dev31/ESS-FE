@@ -1,171 +1,148 @@
-# ESS-FE (Employee Self Service) 🏢✨
+# ESS-FE (Employee Self Service Frontend)
 
-> **The Next-Gen Employee Self Service Portal** built with **Angular 21** and **Extreme Clean Code** principles.
-
-![Angular](https://img.shields.io/badge/Angular-v21-dd0031.svg?style=flat-square&logo=angular)
-![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178c6.svg?style=flat-square&logo=typescript)
-![SCSS](https://img.shields.io/badge/Style-SCSS-cc6699.svg?style=flat-square&logo=sass)
-![Code Quality](https://img.shields.io/badge/Code%20Quality-A++-success.svg?style=flat-square)
+Welcome to the **ESS-FE** project! This is the frontend application for the Employee Self Service system, built with **Angular (v21+)**, modern architectural patterns, and a focus on performance and maintainability.
 
 ---
 
-## 🌟 Introduction
+## 🚀 Tech Stack & Key Libraries
 
-**ESS-FE** is the frontend application for the Employee Self Service system of Onee. It allows employees to manage their work-life needs, including:
-- 📅 **Time Off**: Request leave and view holidays.
-- � **Transport**: Vehicle and Taxi reimbursement requests.
-- 💊 **Medical**: Medical expense claims.
-- 💰 **Allowance**: Per diem and accommodation requests.
-- 📊 **Dashboard**: Real-time overview of quotas and status.
+This project utilizes a cutting-edge stack to ensure a premium user experience and developer productivity.
 
----
-
-## ✨ Extreme Clean Code Standards
-
-We adhere to a **Structure & Discipline First** philosophy. All contributors must follow these strict rules:
-
-### 1. 🚫 NO `any` Policy
-We have eliminated `any` usage in core modules. **Strict Typing** is mandatory.
-- **Bad:** `logs: any[] = []`
-- **Good:** `logs: VehicleLogItem[] = []`
-
-### 2. 🛡️ Strict Interface Inheritance
-We use TypeScript's power to ensure data consistency across Services, Mocks, and Components.
-
-```typescript
-// Core Interface (Single Source of Truth)
-export interface AttendanceLog {
-  date: string;
-  timeIn: string;
-  timeOut: string;
-}
-
-// Component View Model (Extends Core)
-interface VehicleLogItem extends AttendanceLog {
-  amount: number; // Extended property specific to this view
-  selected: boolean;
-}
-```
-
-### 3. 🎨 Modular SCSS Architecture
-We don't do "global soup". Styles are highly modular and component-scoped, but use shared mixins for consistency.
-
-- `src/styles/_theme.scss`: Global variables (Colors, Fonts).
-- `src/styles/_mixins.scss`: Reusable mixins (e.g., `flex-center`, `card-shadow`).
-- `src/styles/_layout-structure.scss`: Standard structural classes (`.content-card`, `.top-header-strip`).
-- `src/styles/_form-elements.scss`: Standardized form inputs and buttons (Legacy styles refactored).
-
----
-
-## 🏗️ Architecture
-
-### 📂 Folder Structure
-
-```text
-src/app/
-├── components/
-│   ├── features/       # Feature-rich Smart Components (Forms)
-│   ├── modals/         # Reusable Dialogs
-│   └── shared/         # Dumb Components (Pagination, Cards)
-├── interfaces/         # 🧠 The Brain: All Type Definitions
-├── services/           # ⚙️ The Engine: Business Logic & API
-├── mocks/              # 🧪 The Data: Strong-typed Mock Generators
-└── styles/             # 🎨 The Skin: Global SCSS & Mixins
-```
-
-### 🧠 Service Layer Pattern
-Services are responsible for **Data Transformation** and **Type Safety**. Components should receive *ready-to-use* data.
-
-- **BaseRequestService<T>**: Generic Abstract Class handling CRUD operations (Get, GetById, Add, Update).
-- **Mock Integration**: Services simulate network latency (`delay(100)`) and return `Observable<T>`, ensuring the UI is async-ready.
-
-## 🔄 Application Flow
-
-### 1. 🔑 Login & Authentication
-- User logs in via `LoginComponent`.
-- Token is verified. Roles (`Admin` vs `User`) are assigned.
-- **Guard Protection**: `AuthGuard` protects all internal routes.
-
-### 2. 📊 Dashboard (Landing)
-- Central hub showing:
-  - **Attendance Stats**: Leave balance, Late count.
-  - **Performance**: Yearly grading.
-  - **Pending Actions**: Admin sees a "Bell" icon if there are requests to approve.
-
-### 3. 📝 Request Submission (Employee)
-- User selects a module (e.g., `Vehicle`, `Medical`, `Time Off`).
-- **Smart Forms**:
-  - Forms auto-calculate totals (e.g., specific shifts trigger OT).
-  - Validations run in real-time.
-- **Submission**: Data is sent to Service -> Mapped to Interface -> Stored in LocalStorage (Mock DB).
-
-### 4. ✅ Approval Process (Manager/Admin)
-- Admin navigates to **Approvals Page**.
-- **Unified View**: Can see *all* request types in one table (Polymorphic UI).
-- Actions: `Approve`, `Reject`, or `Send Back`.
-- Status updates immediately reflect on the Employee's dashboard.
-
----
-
-
-
-## 🚀 Features & Logic
-
-### 1. 🚗 Vehicle & Transport
-- **Automatic Calculation**: Logic calculates reimbursement based on `timeIn`/`timeOut` (Before 06:00 or After 22:00).
-- **Linked Data**: `VehicleLogItem` is strictly mapped to `AttendanceLog`.
-
-### 2. 🚕 Taxi
-- **Strict Evidence**: Requires explicit checking of `attachedFile`, `distance`, and `amount`.
-- **Validation**: Strict validation rules in `TaxiService` before submission.
-
-### 3. 🛡️ Approvals
-- **Union Types**: The `ApprovalsHelperService` handles multiple request types using Union Types:
-  ```typescript
-  type RequestType = AllowanceRequest | TaxiRequest | VehicleRequest;
-  ```
-  This ensures the Approval Dashboard can display any request type without losing type safety.
+- **Framework**: [Angular v21](https://angular.dev/) (Standalone Components, Signals, Control Flow)
+- **State Management**: Angular Signals (`signal`, `computed`, `effect`)
+- **UI Components**:
+  - **Icons**: `@ng-icons` (Heroicons, Bootstrap Icons, etc.)
+  - **Calendar**: `@fullcalendar/angular`
+  - **Data Tables**: `@tanstack/angular-table` (Headless UI logic)
+  - **Charts/Export**: `jspdf`, `exceljs`, `html2canvas`
+- **Utilities**: `dayjs` (Date manipulation), `date-holidays`
+- **Testing**: `vitest` (Unit Testing), `cypress` (E2E Testing)
 
 ---
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js (Latest LTS)
-- npm
+- Node.js (v18+ recommended)
+- npm (v10+, project uses `npm@11.7.0`)
 
 ### Installation
-
 ```bash
+# Clone the repository
 git clone <repository-url>
-cd ESS-FE
+
+# Install dependencies
 npm install
 ```
 
-### Development
-
+### Development Server
+Run the app in development mode with HMR (Hot Module Replacement) enabled.
 ```bash
-# Start Dev Server
+npm start
+# OR
 ng serve
-
-# Build for Production
-ng build --watch=false
 ```
+Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-### 🧪 Verification
-Before pushing, run the build to ensure strict mode compliance:
+### 🏗️ Build
+Build the project for production. The build artifacts will be stored in the `dist/` directory.
 ```bash
-ng build
+npm run build
+```
+
+### ✅ Testing
+Run the unit test suite to verify system integrity.
+```bash
+npm test
 ```
 
 ---
 
-## 🤝 Contribution Guide
+## 📂 Project Architecture
 
-1.  **Strict Types Only**: Do not use `any`. Define an Interface in `src/app/interfaces/`.
-2.  **SCSS Modules**: If adding a new feature, use a dedicated `.scss` file and imports standard mixins.
-3.  **Mock First**: Update `src/app/mocks/` with typed mock data before implementing logic.
+The project follows a **Fractal / Domain-Driven Design (DDD)** inspired structure, emphasizing Separation of Concerns (SoC).
+
+```text
+src/app/
+├── components/          # Reusable UI components
+│   ├── features/        # Business-logic heavy components (Forms, Complex Widgets)
+│   ├── layout/          # Main Layout, Loader, Wrappers
+│   ├── modals/          # All modal dialogs (Approval Details, File Preview)
+│   ├── navbar/          # Navigation Bar
+│   ├── shared/          # Generic dumb components (Buttons, Skeleton, Inputs)
+│   └── sidebar/         # Sidebar Navigation
+├── config/              # Global configuration files (Menu, Constants)
+├── constants/           # Static constant values (Storage Keys, API Endpoints)
+├── guards/              # Route Guards (AuthGuard, RoleGuard)
+├── interfaces/          # TypeScript Interfaces & Types
+├── pages/               # Route Components (The "Screens" of the app)
+│   ├── dashboard/       # Dashboard with Charts & Widgets
+│   ├── approvals/       # Universal Approvals Page (Handles generic & medical)
+│   └── ...
+├── pipes/               # Data transformation pipes
+├── services/            # Business Logic & API Communication
+└── utils/               # Pure utility functions (Helpers)
+```
+
+### Key Architectural Decisions
+
+#### 1. Standalone Components
+Almost entire codebase uses **Standalone Components**. We do not use `NgModule`. This simplifies dependency injection and lazy loading.
+
+#### 2. Signal-Based Reactivity
+We prioritize **Signals** over `BehaviorSubject` for local state management.
+- **Example**: `isLoading = signal(false)`, `total = computed(() => ...)`
+- **Why?**: Signals provide finer-grained reactivity and better performance by reducing unnecessary change detection cycles.
+
+#### 3. Listing Utilities (`listing.util.ts`)
+To avoid repetitive boilerplate code for tables (Pagination, Search, Filtering), we use a shared utility `createListingState()` and `createListingComputeds()`.
+- **Usage**: See `ApprovalsComponent` or `VehicleComponent`.
+
+#### 4. Robust Loading States (`SkeletonComponent`)
+We use a shared `<app-skeleton>` component to improve Perceived Performance.
+- **Important**: In complex layouts like `DashboardComponent`, ensure `SkeletonComponent` is used within explicitly recognized control flow blocks (`@if`, `@else`) or is otherwise "visible" to compilation tools to avoid compilation warnings.
 
 ---
 
-**Maintained by Onee-Dev Team** ❤️ Code Quality
+## 🧩 Key Feature Implementation Details
+
+### Approvals Module (`/pages/approvals`)
+The Approvals page is designed to be **Universal**. It handles both generic approvals (Leave, Taxi, Allowance) and specific ones (Medical Expenses) using the same component.
+- **Routing**: The distinction is made via Route Data.
+  - `path: 'approvals'` -> `{ category: 'all' }`
+  - `path: 'approvals-medicalexpenses'` -> `{ category: 'medical' }`
+- **Logic**: `ApprovalsComponent` reads this `category` from `ActivatedRoute.data` to filter data correctly via `ApprovalsHelperService`.
+
+### Dashboard (`/pages/dashboard`)
+The dashboard aggregates data from multiple services. It uses `@defer` and `@placeholder` blocks to load heavy widgets (like the Calendar) lazily, enhancing initial load speed.
+
+---
+
+## 📏 Coding Standards & Best Practices
+
+1. **Naming Convention**:
+   - Files: `kebab-case.ts` (e.g., `approval-detail-modal.ts`)
+   - Classes: `PascalCase` (e.g., `ApprovalDetailModalComponent`)
+   - Variables/Methods: `camelCase` (e.g., `getApprovalDetails()`)
+
+2. **Control Flow**:
+   - Always use the new Angular Control Flow syntax (`@if`, `@for`, `@switch`) instead of structural directives (`*ngIf`, `*ngFor`).
+
+3. **CSS/SCSS**:
+   - Use SCSS modules or component-scoped styles.
+   - Avoid global style pollution unless adding utility classes to `styles.scss`.
+
+4. **Git Workflow**:
+   - Commit messages should be descriptive.
+   - Run `npm test` before pushing to ensure no regressions.
+
+---
+
+## 🤝 Contribution
+
+If you are the next developer picking up this project:
+1. **Check `task.md` (if available)**: It often contains the checklist of recent work.
+2. **Review `walkthrough.md`**: For a quick catch-up on the latest implemented features.
+3. **Run Tests**: Ensure the baseline is green before starting your work.
+
+**Happy Coding! 🚀**
