@@ -68,6 +68,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   getDisplayStatus(): string {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
     const s = status?.trim();
+    if (!s) return 'รออนุมัติ';
     if (s === REQUEST_STATUS.REJECTED || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
     if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'รอแก้ไข';
     if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'อนุมัติแล้ว';
