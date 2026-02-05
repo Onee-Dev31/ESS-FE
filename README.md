@@ -1,110 +1,171 @@
-# ESS-FE (Employee Self Service - Front End)
+# ESS-FE (Employee Self Service) 🏢✨
 
-ระบบบริการตนเองสำหรับพนักงาน (Employee Self Service) พัฒนาด้วย **Angular 21**
+> **The Next-Gen Employee Self Service Portal** built with **Angular 21** and **Extreme Clean Code** principles.
 
-## 🚀 Tech Stack
+![Angular](https://img.shields.io/badge/Angular-v21-dd0031.svg?style=flat-square&logo=angular)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178c6.svg?style=flat-square&logo=typescript)
+![SCSS](https://img.shields.io/badge/Style-SCSS-cc6699.svg?style=flat-square&logo=sass)
+![Code Quality](https://img.shields.io/badge/Code%20Quality-A++-success.svg?style=flat-square)
 
-- **Framework:** [Angular v21](https://angular.dev/)
-- **Styling:** SCSS (Sass)
-- **Calendar:** [FullCalendar](https://fullcalendar.io/)
-- **Date Handling:** [Day.js](https://day.js.org/) (พร้อม Thai Locale)
-- **Icons:** [FontAwesome 6](https://fontawesome.com/)
-- **State Management:** Angular Signals
+---
+
+## 🌟 Introduction
+
+**ESS-FE** is the frontend application for the Employee Self Service system of Onee. It allows employees to manage their work-life needs, including:
+- 📅 **Time Off**: Request leave and view holidays.
+- � **Transport**: Vehicle and Taxi reimbursement requests.
+- 💊 **Medical**: Medical expense claims.
+- 💰 **Allowance**: Per diem and accommodation requests.
+- 📊 **Dashboard**: Real-time overview of quotas and status.
+
+---
+
+## ✨ Extreme Clean Code Standards
+
+We adhere to a **Structure & Discipline First** philosophy. All contributors must follow these strict rules:
+
+### 1. 🚫 NO `any` Policy
+We have eliminated `any` usage in core modules. **Strict Typing** is mandatory.
+- **Bad:** `logs: any[] = []`
+- **Good:** `logs: VehicleLogItem[] = []`
+
+### 2. 🛡️ Strict Interface Inheritance
+We use TypeScript's power to ensure data consistency across Services, Mocks, and Components.
+
+```typescript
+// Core Interface (Single Source of Truth)
+export interface AttendanceLog {
+  date: string;
+  timeIn: string;
+  timeOut: string;
+}
+
+// Component View Model (Extends Core)
+interface VehicleLogItem extends AttendanceLog {
+  amount: number; // Extended property specific to this view
+  selected: boolean;
+}
+```
+
+### 3. 🎨 Modular SCSS Architecture
+We don't do "global soup". Styles are highly modular and component-scoped, but use shared mixins for consistency.
+
+- `src/styles/_theme.scss`: Global variables (Colors, Fonts).
+- `src/styles/_mixins.scss`: Reusable mixins (e.g., `flex-center`, `card-shadow`).
+- `src/styles/_layout-structure.scss`: Standard structural classes (`.content-card`, `.top-header-strip`).
+- `src/styles/_form-elements.scss`: Standardized form inputs and buttons (Legacy styles refactored).
+
+---
+
+## 🏗️ Architecture
+
+### 📂 Folder Structure
+
+```text
+src/app/
+├── components/
+│   ├── features/       # Feature-rich Smart Components (Forms)
+│   ├── modals/         # Reusable Dialogs
+│   └── shared/         # Dumb Components (Pagination, Cards)
+├── interfaces/         # 🧠 The Brain: All Type Definitions
+├── services/           # ⚙️ The Engine: Business Logic & API
+├── mocks/              # 🧪 The Data: Strong-typed Mock Generators
+└── styles/             # 🎨 The Skin: Global SCSS & Mixins
+```
+
+### 🧠 Service Layer Pattern
+Services are responsible for **Data Transformation** and **Type Safety**. Components should receive *ready-to-use* data.
+
+- **BaseRequestService<T>**: Generic Abstract Class handling CRUD operations (Get, GetById, Add, Update).
+- **Mock Integration**: Services simulate network latency (`delay(100)`) and return `Observable<T>`, ensuring the UI is async-ready.
+
+## 🔄 Application Flow
+
+### 1. 🔑 Login & Authentication
+- User logs in via `LoginComponent`.
+- Token is verified. Roles (`Admin` vs `User`) are assigned.
+- **Guard Protection**: `AuthGuard` protects all internal routes.
+
+### 2. 📊 Dashboard (Landing)
+- Central hub showing:
+  - **Attendance Stats**: Leave balance, Late count.
+  - **Performance**: Yearly grading.
+  - **Pending Actions**: Admin sees a "Bell" icon if there are requests to approve.
+
+### 3. 📝 Request Submission (Employee)
+- User selects a module (e.g., `Vehicle`, `Medical`, `Time Off`).
+- **Smart Forms**:
+  - Forms auto-calculate totals (e.g., specific shifts trigger OT).
+  - Validations run in real-time.
+- **Submission**: Data is sent to Service -> Mapped to Interface -> Stored in LocalStorage (Mock DB).
+
+### 4. ✅ Approval Process (Manager/Admin)
+- Admin navigates to **Approvals Page**.
+- **Unified View**: Can see *all* request types in one table (Polymorphic UI).
+- Actions: `Approve`, `Reject`, or `Send Back`.
+- Status updates immediately reflect on the Employee's dashboard.
+
+---
+
+
+
+## 🚀 Features & Logic
+
+### 1. 🚗 Vehicle & Transport
+- **Automatic Calculation**: Logic calculates reimbursement based on `timeIn`/`timeOut` (Before 06:00 or After 22:00).
+- **Linked Data**: `VehicleLogItem` is strictly mapped to `AttendanceLog`.
+
+### 2. 🚕 Taxi
+- **Strict Evidence**: Requires explicit checking of `attachedFile`, `distance`, and `amount`.
+- **Validation**: Strict validation rules in `TaxiService` before submission.
+
+### 3. 🛡️ Approvals
+- **Union Types**: The `ApprovalsHelperService` handles multiple request types using Union Types:
+  ```typescript
+  type RequestType = AllowanceRequest | TaxiRequest | VehicleRequest;
+  ```
+  This ensures the Approval Dashboard can display any request type without losing type safety.
+
+---
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js (Latest LTS recommended)
+- Node.js (Latest LTS)
 - npm
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone <repository-url>
-
-# Navigate to project directory
 cd ESS-FE
-
-# Install dependencies
 npm install
 ```
 
-### Development Server
+### Development
 
 ```bash
-npm start
-# หรือ
+# Start Dev Server
 ng serve
-```
-Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## 📂 Project Structure
-
-```text
-src/app/
-├── components/          # Reusable UI components
-│   ├── features/       # Feature-specific components (e.g., forms)
-│   ├── modals/         # Modal dialogs
-│   └── shared/         # Shared UI components (Pagination, etc.)
-├── pages/              # Main route pages (Dashboard, Approvals, etc.)
-├── services/           # Business logic and API communication
-├── guards/             # Route guards (Auth, Role)
-├── interfaces/         # TypeScript interfaces and types
-├── constants/          # Static data and configuration
-├── utils/              # Shared utility functions
-└── styles/             # Global styles
-    ├── _responsive-layout.scss  # Responsive mixins
-    ├── _theme.scss              # Global variables
-    ├── _utilities.scss          # Common utility classes
-    └── _table-components.scss   # Standard table styles
+# Build for Production
+ng build --watch=false
 ```
 
-## 💡 Key Architectural Patterns
-
-### 1. Styling Strategy
-โปรเจคนี้ใช้ **SCSS** ในการจัดการ Style ทั้งหมด
-- **Global Styles**: ไฟล์ `_theme.scss` เก็บตัวแปรสีและค่าคงที่ต่างๆ, `_utilities.scss` สำหรับ utility classes (e.g. status badges), `_table-components.scss` สำหรับตารางมาตรฐาน
-- **Component Styles**: ใช้ SCSS แยกตาม Component (Encapsulated)
-- **Shared Components**: เช่น `PaginationComponent` จะมีไฟล์ SCSS ของตัวเอง (`pagination.scss`) เพื่อความเป็นระเบียบและลด global styles
-
-### 2. Shared Utilities
-เรามี Helper Classes เพื่อลดโค้ดที่ซ้ำซ้อนใน `src/app/utils/`:
-- **TableSortHelper**: จัดการ Logic การ Sort ตารางทั้งหมด
-    - `toggleSort(table, colId)`: สลับการจัดเรียง
-    - `getSortIcon(table, colId)`: แสดงไอคอน Sort
-    - `sortVehicleLikeData(...)`: ฟังก์ชัน Sort มาตรฐานสำหรับข้อมูลกลุ่ม Vehicle/Taxi
-
-### 3. Service Layer
-แยก Business Logic ออกจาก Component ให้ชัดเจน
-- **AllowanceService**: คำนวณยอดเงินและชั่วโมง OT (ย้ายจาก Component มาลง Service)
-- **DashboardService**: จัดการข้อมูลหน้ารวม และ Logic การนับจำนวน Pending ต่างๆ
-- **BaseRequestService**: Abstract class หลักสำหรับ Request Service ทั่วไป
-
-### 4. Mock Data System
-ระบบใช้ Mock Data 100% ผ่าน Service และ `localStorage`
-- **Mock Files**: อยู่ใน `src/app/mocks/` แยกตาม module
-- **Data Persistence**: ข้อมูลจะถูกเก็บใน LocalStorage เพื่อจำลอง Database (กด Refresh ข้อมูลยังอยู่)
-- **Hard Reset**: สามารถกดปุ่ม "Reset Data" ในหน้า Dashboard เพื่อล้างข้อมูลทั้งหมดได้
-
-### 5. Status Management
-ระบบจัดการสถานะแบ่งเป็น 2 ส่วน:
-- **Backend/Logic**: ใช้ภาษาอังกฤษเป็นหลัก (e.g., `NEW`, `APPROVED`, `WAITING_CHECK`) เพื่อความเสถียรในการเขียนโค้ด
-- **UI Display**: ใช้ **Thai Labels** ในการแสดงผลให้ user เห็น โดยผ่าน `StatusLabelPipe` หรือการ map ค่าคงที่จาก `REQUEST_STATUS_LABEL`
-
-## 📝 CLI Commands
-
-| Command | Description |
-|---------|-------------|
-| `ng generate component <name>` | สร้าง Component ใหม่ |
-| `ng generate service <name>` | สร้าง Service ใหม่ |
-| `ng build` | Build โปรเจคสำหรับ Production (output ที่ `dist/`) |
-| `ng test` | รัน Unit Tests |
-
-## 🤝 Contribution Guidelines
-1. เช็ค Code ล่าสุดก่อนแก้เสมอ (`git pull`)
-2. พยายามรักษา Clean Code และลบ unused imports
-3. หากมีการแก้ไข Logic วันหยุด หรือการคำนวณวันลา ให้ตรวจสอบไฟล์ `DashboardService` และ `TimeOffForm`
+### 🧪 Verification
+Before pushing, run the build to ensure strict mode compliance:
+```bash
+ng build
+```
 
 ---
-**Maintained by Onee-Dev Team**
+
+## 🤝 Contribution Guide
+
+1.  **Strict Types Only**: Do not use `any`. Define an Interface in `src/app/interfaces/`.
+2.  **SCSS Modules**: If adding a new feature, use a dedicated `.scss` file and imports standard mixins.
+3.  **Mock First**: Update `src/app/mocks/` with typed mock data before implementing logic.
+
+---
+
+**Maintained by Onee-Dev Team** ❤️ Code Quality
