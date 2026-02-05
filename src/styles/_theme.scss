@@ -4,7 +4,10 @@
 // Section: Dependencies
 
 @forward 'variables';
-@forward 'form-components';
+@forward 'mixins';
+@forward 'layout-structure';
+@forward 'form-elements';
+@forward 'filters';
 @forward 'table-components';
 @forward 'modal-components';
 @forward 'button-components';
@@ -12,27 +15,3 @@
 
 
 @use 'variables' as *;
-
-
-@mixin close-btn-style {
-    border: none;
-    background: white;
-    color: #64748b;
-    cursor: pointer;
-    font-size: 14px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s;
-    display: inline-flex;
-
-    &:hover {
-        color: #ef4444;
-        background: #fee2e2;
-        transform: rotate(90deg);
-    }
-}

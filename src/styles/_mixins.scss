@@ -1,0 +1,36 @@
+// File: Mixins
+// Description: Shared Mixins
+
+// Close Button Style
+@mixin close-btn-style {
+    border: none;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    display: inline-flex;
+
+    &:hover {
+        color: #ef4444;
+        background: #fee2e2;
+        transform: rotate(90deg);
+    }
+}
+
+// Section Heading
+@mixin section-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+}

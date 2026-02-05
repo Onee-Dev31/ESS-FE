@@ -38,70 +38,12 @@
     }
 
     .top-header-strip {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 20px;
-        border-bottom: 1px solid $border;
-        flex-shrink: 0;
-
-        h2 {
-            font-size: 1.15rem;
-            margin: 0;
-            font-weight: 600;
-            color: $primary;
-            line-height: 1.3;
-        }
-
-        .header-right-meta {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-
-            .header-meta-list {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-
-                .meta-item {
-                    display: flex;
-                    align-items: center;
-                    font-size: 0.85rem;
-                    color: #4b5563;
-                    gap: 8px;
-
-                    i {
-                        width: 16px;
-                        color: $primary;
-                        text-align: center;
-                        font-size: 0.9rem;
-                    }
-
-                    .meta-label {
-                        font-weight: 500;
-                        color: #6b7280;
-                        min-width: 80px;
-                    }
-
-                    .meta-value {
-                        font-weight: 600;
-                        color: #1f2937;
-                    }
-                }
-            }
-        }
-
-        .btn-close-modal {
-            @include close-btn-style;
-        }
+        @extend .top-header-strip;
     }
 
     .content-card {
-        flex: 1;
-        min-height: 0;
+        @extend .content-card;
         padding: 20px;
-        overflow-y: auto;
-        overflow-x: hidden;
 
         .selection-placeholder {
             margin: 2.5rem 0;
@@ -473,18 +415,7 @@ textarea.custom-form-control {
             padding-bottom: 80px !important; // Add space for footer
         }
 
-        .top-header-strip {
-            padding: 12px 15px;
 
-            h2 {
-                font-size: 1rem;
-            }
-
-            .header-right-meta .date-badge {
-                font-size: 0.75rem;
-                padding: 4px 10px;
-            }
-        }
 
         .content-card {
             padding: 15px;
