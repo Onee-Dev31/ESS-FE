@@ -86,8 +86,8 @@ export class ExportService {
       });
 
 
-      worksheet.eachRow((row, rowNumber) => {
-        row.eachCell((cell) => {
+      worksheet.eachRow((row: ExcelJS.Row, rowNumber: number) => {
+        row.eachCell((cell: ExcelJS.Cell) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -207,13 +207,13 @@ export class ExportService {
       });
 
 
-      worksheet.columns.forEach(column => {
+      worksheet.columns.forEach((column: Partial<ExcelJS.Column>) => {
         column.width = 15;
       });
 
 
-      worksheet.eachRow((row) => {
-        row.eachCell((cell) => {
+      worksheet.eachRow((row: ExcelJS.Row) => {
+        row.eachCell((cell: ExcelJS.Cell) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
