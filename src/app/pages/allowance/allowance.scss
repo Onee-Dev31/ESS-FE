@@ -11,7 +11,7 @@
   min-height: 100vh;
   box-sizing: border-box;
 
-  @include tablet {
+  @include large-tablet {
     padding: 12px;
     padding-bottom: 5px;
   }
@@ -39,7 +39,7 @@
     display: block;
     overflow-x: auto;
 
-    @include tablet {
+    @include large-tablet {
       display: none !important;
     }
   }

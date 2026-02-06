@@ -65,15 +65,18 @@
     .sortable-header {
         cursor: pointer;
         transition: background-color 0.2s;
+        user-select: none;
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.05) !important;
         }
 
         i {
-            margin-left: 5px;
-            font-size: 0.8rem;
-            opacity: 0.5;
+            margin-left: 6px;
+            font-size: 0.75rem;
+            opacity: 0.6;
+            vertical-align: middle;
+            display: inline-block;
         }
     }
 
@@ -102,6 +105,18 @@
             padding: 16px 12px;
             font-size: 0.95rem;
             color: #1e293b;
+
+            &.text-right {
+                text-align: right !important;
+            }
+
+            &.text-center {
+                text-align: center !important;
+            }
+
+            &.text-left {
+                text-align: left !important;
+            }
         }
     }
 

@@ -110,11 +110,11 @@
                         </th>
                         <th colspan="2" class="text-center">
                             วันที่เข้ารับการรักษา</th>
-                        <th rowspan="2" class="col-amount sortable-header text-center"
+                        <th rowspan="2" class="col-amount sortable-header text-right"
                             (click)="toggleSort('requestedAmount')">
                             จำนวนเงินที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestedAmount')"></i>
                         </th>
-                        <th rowspan="2" class="col-amount sortable-header text-center"
+                        <th rowspan="2" class="col-amount sortable-header text-right"
                             (click)="toggleSort('approvedAmount')">
                             จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
@@ -162,7 +162,7 @@
                         <td class="text-center">
                             <a class="file-icon-link" *ngIf="row.original.attachedFile"
                                 (click)="openPreview(row.original.attachedFile)" title="ดูเอกสาร">
-                                <i class="far fa-folder-open"></i>
+                                <i class="far fa-folder-open "></i>
                             </a>
                             <span class="text-muted" *ngIf="!row.original.attachedFile">-</span>
                         </td>
@@ -224,10 +224,9 @@
                                     item.treatmentDateTo }}
                                 </div>
                                 <div class="detail-row" *ngIf="item.attachedFile">
-                                    <i class="fas fa-paperclip"></i>
                                     <a (click)="openPreview(item.attachedFile)"
                                         style="cursor: pointer; color: #008ebc;">
-                                        ดูไฟล์แนบ
+                                        <i class="fas fa-paperclip"></i>
                                     </a>
                                 </div>
                             </div>

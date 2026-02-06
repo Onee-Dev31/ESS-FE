@@ -4,34 +4,13 @@
 // Section: Dependencies
 @use '../../../styles/theme' as *;
 
-@mixin icon-btn-sky {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: #f0f9ff;
-    color: #0ea5e9;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: all 0.2s;
-
-    &:hover {
-        background: #e0f2fe;
-        transform: scale(1.1);
-    }
-}
-
 // Medical Expenses Page Layout
 .medical-page {
     padding: 24px;
-    padding-bottom: 24px;
     background-color: $bg-page;
     min-height: 100vh;
 
-    @include tablet {
+    @include large-tablet {
         padding: 12px;
         padding-bottom: 5px;
     }
@@ -45,8 +24,6 @@
         @include card-header-title;
     }
 
-
-
     .toolbar-container {
         @include toolbar-container;
     }
@@ -54,16 +31,26 @@
     .table-responsive {
         margin-top: 24px;
 
-        @include tablet {
+        @include large-tablet {
             display: none;
         }
     }
-
 
     // Table Styling
     .modern-table {
         @include modern-table;
         min-width: 1200px;
+
+        thead {
+            th {
+                white-space: nowrap;
+
+                // Numeric columns should be right-aligned
+                &.col-amount {
+                    text-align: right;
+                }
+            }
+        }
 
         .col-id {
             width: 110px;
@@ -86,11 +73,11 @@
         }
 
         .col-date-sm {
-            width: 95px;
+            width: 100px;
         }
 
         .col-amount {
-            width: 120px;
+            width: 130px;
         }
 
         .col-status {
@@ -117,6 +104,4 @@
             }
         }
     }
-
-
 }

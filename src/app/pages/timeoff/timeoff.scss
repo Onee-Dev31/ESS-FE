@@ -38,7 +38,7 @@
     background-color: $bg-page;
     min-height: 100vh;
 
-    @include tablet {
+    @include large-tablet {
         padding: 12px;
         padding-bottom: 5px;
     }
@@ -59,7 +59,7 @@
     .table-responsive {
         margin-top: 24px;
 
-        @include tablet {
+        @include large-tablet {
             display: none;
         }
     }
@@ -159,20 +159,9 @@
         }
 
         .action-btn.folder {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: #f0f9ff;
-            color: #0ea5e9;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            @include icon-btn-sky;
 
             &:hover {
-                background: #e0f2fe;
                 transform: scale(1.05);
             }
         }

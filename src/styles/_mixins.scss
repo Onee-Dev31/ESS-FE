@@ -34,3 +34,25 @@
     display: flex;
     align-items: center;
 }
+
+// Icon Button Sky Style
+@mixin icon-btn-sky {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+    border-radius: 8px;
+    background: #f0f9ff;
+    color: #0ea5e9;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #e0f2fe;
+        transform: scale(1.1);
+    }
+}

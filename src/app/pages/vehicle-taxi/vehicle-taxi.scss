@@ -11,7 +11,7 @@
   min-height: 100vh;
   box-sizing: border-box;
 
-  @include tablet {
+  @include large-tablet {
     padding: 12px;
     padding-bottom: 5px;
   }
@@ -42,13 +42,21 @@
         color: #94a3b8;
       }
     }
+
+    .action-btn.folder {
+      @include icon-btn-sky;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
   }
 
   .table-responsive {
     display: block;
     overflow-x: auto;
 
-    @include tablet {
+    @include large-tablet {
       display: none !important;
     }
   }

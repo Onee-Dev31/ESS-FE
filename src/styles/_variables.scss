@@ -85,6 +85,12 @@ $status-danger-text: #dc2626;
     }
 }
 
+@mixin large-tablet {
+    @media (max-width: 1728px) {
+        @content;
+    }
+}
+
 @mixin desktop {
     @media (min-width: 1025px) {
         @content;
@@ -293,7 +299,7 @@ $status-danger-text: #dc2626;
 @mixin mobile-cards-view {
     display: none;
 
-    @include tablet {
+    @include large-tablet {
         display: flex !important;
         flex-direction: column;
         gap: 16px;
