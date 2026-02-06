@@ -1,62 +1,149 @@
-// File: Utilities
-// Description: Global utility classes
+@use './variables' as *;
+@use './responsive-layout' as responsive;
 
-@use 'variables' as *;
+// Utility Styles - Moved from styles.scss
 
-// Text Colors
-.text-danger {
+.text-primary {
+    color: $primary !important;
+}
+
+.bg-primary {
+    background-color: $primary !important;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mt-4 {
+    margin-top: 24px !important;
+}
+
+.text-end {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-red {
     color: $danger !important;
 }
 
-.text-success {
+.text-green {
     color: $success !important;
 }
 
-.text-secondary {
-    color: $text-sub !important;
+.bg-red {
+    background-color: $danger !important;
 }
 
-.text-primary-link {
-    color: $primary !important;
-    font-weight: 700;
-    cursor: pointer;
+.bg-green {
+    background-color: $success !important;
 }
 
-// Margins
-.ml-1 {
-    margin-left: 0.25rem;
+.mobile-only {
+    @include responsive.desktop {
+        display: none !important;
+    }
 }
 
-// Status Badges
-@mixin status-badge($bg, $color) {
-    background-color: $bg;
-    color: $color;
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+.desktop-only {
+    @include responsive.tablet {
+        display: none !important;
+    }
 }
 
-.status-new {
-    @include status-badge($status-new-bg, $status-new-text);
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-.status-verified {
-    @include status-badge($status-verified-bg, $status-verified-text);
+:root {
+    --font-main: #{$font-main};
+    --primary: #{$primary};
+    --success: #{$success};
+    --danger: #{$danger};
+    --warning: #{$warning};
+    --bg-slate: #{$bg-slate};
+    --bg-card: #{$bg-card};
+    --text: #{$text};
+    --text-sub: #{$text-sub};
+    --text-muted: #{$text-muted};
+    --border: #{$border};
 }
 
-.status-pending {
-    @include status-badge($status-pending-bg, $status-pending-text);
+html {
+    font-family: $font-main;
+    background: #f1f5f9;
 }
 
-.status-approved {
-    @include status-badge($status-success-bg, $status-success-text);
+body {
+    margin: 0;
+    background-color: #f4f7f6;
+    font-family: $font-main;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.status-rejected {
-    @include status-badge($status-danger-bg, $status-danger-text);
+button,
+input,
+select,
+textarea {
+    font-family: $font-main;
+}
+
+// Form Controls
+
+.form-control {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: $text;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid $border;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    appearance: none;
+
+    &::placeholder {
+        color: $text-muted;
+        opacity: 0.8;
+    }
+
+    &:focus {
+        color: $text;
+        background-color: #fff;
+        border-color: $primary;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba($primary, 0.15);
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: $bg-gray;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+
+    &.ng-invalid.ng-touched {
+        border-color: $danger;
+
+        &:focus {
+            box-shadow: 0 0 0 0.2rem rgba($danger, 0.15);
+        }
+    }
 }

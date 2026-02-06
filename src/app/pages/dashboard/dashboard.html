@@ -172,7 +172,7 @@
             }
           </div>
 
-          @if (medicalStats(); as stats) {
+          @if (medicalStatsDisplay(); as stats) {
           <div class="stat-items-grid">
             @for (stat of stats; track stat.label) {
             <div class="stat-item">
@@ -231,7 +231,7 @@
             </button>
             }
           </div>
-          @if (welfareStats(); as wstats) {
+          @if (welfareStatsDisplay(); as wstats) {
           <div class="bottom-stats-grid">
             @for (item of wstats; track item.title) {
             <div class="card mini-stat-card" [ngClass]="item.cardClass || ''" (click)="navigateTo(item.route)"
@@ -284,7 +284,7 @@
             </button>
             }
           </div>
-          @if (leaveStats(); as lstats) {
+          @if (leaveStatsDisplay(); as lstats) {
           <div class="leave-stats-grid">
             @for (leave of lstats; track leave.label) {
             <div class="card leave-card" [ngClass]="leave.theme" (click)="navigateTo('/timeoff')">

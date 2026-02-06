@@ -71,6 +71,108 @@ export class DashboardComponent implements OnInit {
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
+  // UI Mappers
+  medicalStatsDisplay = computed(() => {
+    const stats = this.medicalStats();
+    if (!stats) return null;
+    return stats.map(stat => {
+      let balanceColor = 'text-balance';
+      let progressColor = 'bg-primary';
+
+      switch (stat.type) {
+        case 'outpatient': progressColor = 'bg-red'; break;
+        case 'dental': progressColor = 'bg-blue'; break;
+        case 'optical': progressColor = 'bg-indigo'; break;
+        case 'inpatient': progressColor = 'bg-green'; break;
+      }
+
+      return { ...stat, balanceColor, progressColor };
+    });
+  });
+
+  welfareStatsDisplay = computed(() => {
+    const stats = this.welfareStats();
+    if (!stats) return null;
+    return stats.map(item => {
+      let iconName = 'fas fa-star';
+      let cardClass = '';
+      let titleColor = '';
+      let amountColor = '';
+
+      switch (item.id) {
+        case 'allowance':
+          iconName = 'fas fa-dollar-sign';
+          cardClass = 'card-green';
+          titleColor = '#15803d';
+          amountColor = '#15803d';
+          break;
+        case 'transport':
+          iconName = 'fas fa-car';
+          cardClass = 'card-blue';
+          titleColor = '#1e40af';
+          amountColor = '#1e40af';
+          break;
+        case 'taxi':
+          iconName = 'fas fa-taxi';
+          cardClass = 'card-yellow';
+          titleColor = '#9a3412';
+          amountColor = '#9a3412';
+          break;
+        case 'wedding': iconName = 'fas fa-heart'; break;
+        case 'ordination': iconName = 'fas fa-hands-praying'; break;
+        case 'funeral': iconName = 'fas fa-church'; break;
+        case 'wreath': iconName = 'fas fa-spa'; break;
+      }
+      return { ...item, iconName, cardClass, titleColor, amountColor };
+    });
+  });
+
+  leaveStatsDisplay = computed(() => {
+    const stats = this.leaveStats();
+    if (!stats) return null;
+    return stats.map(leave => {
+      let countColor = '#4650dd';
+      let iconClass = 'fas fa-file';
+      let iconColor = '#888';
+      let theme = 'theme-purple';
+
+      switch (leave.type) {
+        case 'vacation':
+          countColor = '#dc3545';
+          iconClass = 'fas fa-plane-departure';
+          iconColor = '#ef4444';
+          theme = 'theme-pink';
+          break;
+        case 'business':
+          countColor = '#0d6efd';
+          iconClass = 'fas fa-briefcase';
+          iconColor = '#3b82f6';
+          theme = 'theme-blue';
+          break;
+        case 'sick':
+          countColor = '#4650dd';
+          iconClass = 'fas fa-stethoscope';
+          iconColor = '#4049c7';
+          theme = 'theme-purple';
+          break;
+        case 'sterilization':
+          countColor = '#4650dd';
+          iconClass = 'fas fa-user-md';
+          iconColor = '#9333ea';
+          theme = 'theme-purple';
+          break;
+        case 'funeral':
+          countColor = '#35b653';
+          iconClass = 'fas fa-ribbon';
+          iconColor = '#35b653';
+          theme = 'theme-green';
+          break;
+      }
+
+      return { ...leave, countColor, iconClass, iconColor, theme };
+    });
+  });
+
   profileList = computed<ProfileItem[]>(() => {
     const profile = this.userProfile();
     if (!profile) return [];

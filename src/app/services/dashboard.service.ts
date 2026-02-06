@@ -12,6 +12,7 @@ import { ApprovalsHelperService } from './approvals-helper.service';
 import { MedicalStat, WelfareItem, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
+import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
 
 // Section: Logic
 @Injectable({
@@ -21,7 +22,15 @@ export class DashboardService {
     private loadingService = inject(LoadingService);
     private approvalsHelper = inject(ApprovalsHelperService);
 
-    private readonly PENDING_STATUSES = ['NEW', 'WAITING_CHECK', 'VERIFIED', 'PENDING_APPROVAL', 'คำขอใหม่', 'ตรวจสอบแล้ว', 'อยู่ระหว่างการอนุมัติ'];
+    private readonly PENDING_STATUSES = [
+        APPROVAL_STATUS.NEW,
+        APPROVAL_STATUS.WAITING_CHECK,
+        APPROVAL_STATUS.VERIFIED,
+        APPROVAL_STATUS.PENDING_APPROVAL,
+        APPROVAL_LABELS.TH.NEW,
+        APPROVAL_LABELS.TH.VERIFIED,
+        APPROVAL_LABELS.TH.PENDING
+    ];
 
     constructor() { }
 
@@ -39,41 +48,41 @@ export class DashboardService {
 
     getMedicalStats(): Observable<MedicalStat[]> {
         const stats: MedicalStat[] = [
-            { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', balanceColor: 'text-balance', progressColor: 'bg-red', percent: 20 },
-            { label: 'ทันตกรรม', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-blue', percent: 100 },
-            { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', balanceColor: 'text-balance', progressColor: 'bg-indigo', percent: 100 },
-            { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', balanceColor: 'text-balance', progressColor: 'bg-green', percent: 7.5 },
+            { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', percent: 20, type: 'outpatient' },
+            { label: 'ทันตกรรม', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', percent: 100, type: 'dental' },
+            { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', percent: 100, type: 'optical' },
+            { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', percent: 7.5, type: 'inpatient' },
         ];
         return this.loadingService.wrap(of(stats).pipe(delay(1000)));
     }
 
     getWelfareStats(): Observable<WelfareItem[]> {
         const stats: WelfareItem[] = [
-            { title: 'ค่าเบี้ยเลี้ยง', amount: '10,500', iconName: 'fas fa-dollar-sign', cardClass: 'card-green', titleColor: '#15803d', amountColor: '#15803d', route: '/allowance' },
+            { id: 'allowance', title: 'ค่าเบี้ยเลี้ยง', amount: '10,500', route: '/allowance' },
             {
-                title: 'ค่ารถ', amount: '584', iconName: 'fas fa-car ', cardClass: 'card-blue',
+                id: 'transport', title: 'ค่ารถ', amount: '584',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div><div class="tooltip-condition-item"><span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div>',
-                titleColor: '#1e40af', amountColor: '#1e40af', route: '/vehicle'
+                route: '/vehicle'
             },
             {
-                title: 'ค่าแท็กซี่', amount: '876', iconName: 'fas fa-taxi', cardClass: 'card-yellow',
+                id: 'taxi', title: 'ค่าแท็กซี่', amount: '876',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div><div class="tooltip-condition-item"><span>- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></div>',
-                titleColor: '#9a3412', amountColor: '#9a3412', route: '/vehicle-taxi'
+                route: '/vehicle-taxi'
             },
             {
-                title: 'ค่าสมรส', amount: '3,500', iconName: 'fas fa-heart',
+                id: 'wedding', title: 'ค่าสมรส', amount: '3,500',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
             },
             {
-                title: 'ค่าอุปสมบท', amount: '10,500', iconName: 'fas fa-hands-praying',
+                id: 'ordination', title: 'ค่าอุปสมบท', amount: '10,500',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
             },
             {
-                title: 'ค่าฌาปนกิจ', amount: '584', iconName: 'fas fa-church',
+                id: 'funeral', title: 'ค่าฌาปนกิจ', amount: '584',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา 10,000 บาท/คน</span></div>'
             },
             {
-                title: 'ค่าพวงหรีด', amount: '876', iconName: 'fas fa-spa',
+                id: 'wreath', title: 'ค่าพวงหรีด', amount: '876',
                 tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา 1,500 บาท/คน</span></div>'
             }
         ];
@@ -82,11 +91,11 @@ export class DashboardService {
 
     getLeaveStats(): Observable<LeaveItem[]> {
         const leaves: LeaveItem[] = [
-            { label: 'ลาพักร้อน', count: '01/09', countColor: '#dc3545', iconClass: 'fas fa-plane-departure', iconColor: '#ef4444', theme: 'theme-pink', balance: 8 },
-            { label: 'ลากิจ', count: '03/06', countColor: '#0d6efd', iconClass: 'fas fa-briefcase', iconColor: '#3b82f6', theme: 'theme-blue', balance: 3 },
-            { label: 'ลาป่วย', count: '10/30', countColor: '#4650dd', iconClass: 'fas fa-stethoscope', iconColor: '#4049c7', theme: 'theme-purple', balance: 20 },
-            { label: 'ลาทำหมัน', count: '03/06', countColor: '#4650dd', iconClass: 'fas fa-user-md', iconColor: '#9333ea', theme: 'theme-purple', balance: 3 },
-            { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', countColor: '#35b653', iconClass: 'fas fa-ribbon', iconColor: '#35b653', theme: 'theme-green', balance: 3 },
+            { label: 'ลาพักร้อน', count: '01/09', type: 'vacation', balance: 8 },
+            { label: 'ลากิจ', count: '03/06', type: 'business', balance: 3 },
+            { label: 'ลาป่วย', count: '10/30', type: 'sick', balance: 20 },
+            { label: 'ลาทำหมัน', count: '03/06', type: 'sterilization', balance: 3 },
+            { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', type: 'funeral', balance: 3 },
         ];
         return this.loadingService.wrap(of(leaves).pipe(delay(1000)));
     }

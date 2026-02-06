@@ -18,6 +18,7 @@ import { TransportService } from './transport.service';
 import { MedicalexpensesService } from './medicalexpenses.service';
 import { BaseRequestService } from './base-request.service';
 import { Observable, forkJoin, map, take } from 'rxjs';
+import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
 
 // Section: Logic
 @Injectable({
@@ -135,9 +136,9 @@ export class ApprovalsHelperService {
     mapStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
         const s = this.normalizeStatus(status);
 
-        if (s === REQUEST_STATUS.REJECTED || s === 'ไม่อนุมัติ') return 'Rejected';
-        if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'Referred Back';
-        if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'Approved';
+        if (s === APPROVAL_STATUS.REJECTED || s === APPROVAL_LABELS.TH.REJECTED) return 'Rejected';
+        if (s === APPROVAL_STATUS.REFERRED_BACK || s === APPROVAL_LABELS.TH.REFERRED_BACK) return 'Referred Back';
+        if (s === APPROVAL_STATUS.APPROVED || s === APPROVAL_LABELS.TH.APPROVED || s.includes('จ่าย')) return 'Approved';
 
 
         return 'Pending';
@@ -191,19 +192,19 @@ export class ApprovalsHelperService {
     }
 
     private normalizeStatus(status: string): string {
-        if (!status) return REQUEST_STATUS.WAITING_CHECK;
+        if (!status) return APPROVAL_STATUS.WAITING_CHECK;
         const s = status.trim();
 
-        if (['Pending', 'Waiting Check', 'New'].includes(s)) return REQUEST_STATUS.WAITING_CHECK;
-        if (['Approved', 'Approve'].includes(s)) return REQUEST_STATUS.APPROVED;
-        if (['Rejected', 'Reject'].includes(s)) return REQUEST_STATUS.REJECTED;
-        if (['Referred Back', 'Refer Back'].includes(s)) return REQUEST_STATUS.REFERRED_BACK;
-        if (['Verified', 'Verify', 'Checked'].includes(s)) return REQUEST_STATUS.VERIFIED;
+        if (['Pending', 'Waiting Check', 'New'].includes(s)) return APPROVAL_STATUS.WAITING_CHECK;
+        if (['Approved', 'Approve'].includes(s)) return APPROVAL_STATUS.APPROVED;
+        if (['Rejected', 'Reject'].includes(s)) return APPROVAL_STATUS.REJECTED;
+        if (['Referred Back', 'Refer Back'].includes(s)) return APPROVAL_STATUS.REFERRED_BACK;
+        if (['Verified', 'Verify', 'Checked'].includes(s)) return APPROVAL_STATUS.VERIFIED;
 
-        if (s === 'รออนุมัติ') return REQUEST_STATUS.WAITING_CHECK;
-        if (s === 'อนุมัติแล้ว') return REQUEST_STATUS.APPROVED;
-        if (s === 'ไม่อนุมัติ') return REQUEST_STATUS.REJECTED;
-        if (s === 'รอแก้ไข') return REQUEST_STATUS.REFERRED_BACK;
+        if (s === APPROVAL_LABELS.TH.WAITING_CHECK) return APPROVAL_STATUS.WAITING_CHECK;
+        if (s === APPROVAL_LABELS.TH.APPROVED) return APPROVAL_STATUS.APPROVED;
+        if (s === APPROVAL_LABELS.TH.REJECTED) return APPROVAL_STATUS.REJECTED;
+        if (s === APPROVAL_LABELS.TH.REFERRED_BACK) return APPROVAL_STATUS.REFERRED_BACK;
 
         return s;
     }
