@@ -13,8 +13,6 @@ import { MedicalPolicyModalComponent } from '../../components/modals/medical-pol
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { LoadingService } from '../../services/loading';
-import { ToastService } from '../../services/toast';
-import { DialogService } from '../../services/dialog';
 import { ErrorService } from '../../services/error';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
@@ -50,8 +48,6 @@ interface FlatMedicalRow extends MedicalItem {
 export class MedicalexpensesComponent implements OnInit {
   private medicalService = inject(MedicalexpensesService);
   private loadingService = inject(LoadingService);
-  private toastService = inject(ToastService);
-  private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
 
   isLoading = this.loadingService.loading('medical-list');

@@ -16,6 +16,12 @@
     color: $text-sub !important;
 }
 
+.text-primary-link {
+    color: $primary !important;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 // Margins
 .ml-1 {
     margin-left: 0.25rem;

@@ -84,14 +84,14 @@
             <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
               สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
-            <th class="col-actions text-center">จัดการ</th>
+            <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
               class="font-bold text-center top-align">
-              <span class="id-text">{{ row.original.requestId }}</span>
+              <span class="text-primary-link">{{ row.original.requestId }}</span>
             </td>
             <td *ngIf="row.original.isFirstInGroup" [attr.rowspan]="row.original.groupLength"
               class="text-center top-align">

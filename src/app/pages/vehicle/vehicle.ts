@@ -39,7 +39,7 @@ export class VehicleComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
 
-  protected readonly Math = Math;
+
 
   isModalOpen = false;
   selectedRequestId = '';

@@ -5,7 +5,7 @@
 
 // Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaxiService, TaxiRequest, TaxiItem } from '../../services/taxi.service';
@@ -20,7 +20,6 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { SpinnerComponent } from '../../components/shared/spinner/spinner';
 import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import {
@@ -53,7 +52,7 @@ export class VehicleTaxiComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-  private router = inject(Router);
+
 
   isLoading = this.loadingService.loading('taxi-list');
 

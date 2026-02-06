@@ -505,7 +505,6 @@ button {
   &.status-verified {
     background: $status-verified-bg;
     color: $status-verified-text;
-    border: 1px solid rgba($status-verified-text, 0.2);
   }
 
   &.waiting-check {

@@ -45,27 +45,7 @@
         @include card-header-title;
     }
 
-    .btn-info-policy {
-        background: #f0f9ff;
-        border: 1px solid #7dd3fc;
-        color: #0369a1;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: all 0.2s;
-        padding: 0;
 
-        &:hover {
-            background: #0369a1;
-            color: white;
-            transform: scale(1.1);
-        }
-    }
 
     .toolbar-container {
         @include toolbar-container;
@@ -137,4 +117,6 @@
             }
         }
     }
+
+
 }

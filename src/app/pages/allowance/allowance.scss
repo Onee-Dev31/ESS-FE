@@ -29,26 +29,7 @@
     @include toolbar-container;
   }
 
-  .btn-info-policy {
-    margin-left: 12px;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    background: white;
-    color: $primary;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
 
-    &:hover {
-      background: #f8fafc;
-      border-color: $primary;
-      box-shadow: 0 2px 8px rgba($primary, 0.1);
-    }
-  }
 
   .card-list-view {
     @include mobile-cards-view;
@@ -71,19 +52,19 @@
     }
 
     .col-date {
-      width: 120px;
+      width: 200px;
     }
 
     .col-hours {
-      width: 100px;
+      width: 200px;
     }
 
     .col-amount {
-      width: 120px;
+      width: 200px;
     }
 
     .col-status {
-      width: 180px;
+      width: 200px;
     }
 
     .desc-cell {

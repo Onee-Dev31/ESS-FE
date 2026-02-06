@@ -135,7 +135,7 @@ export class TimeoffComponent implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
-  protected readonly Math = Math;
+
   statuses = COMMON_STATUS_OPTIONS;
 
   ngOnInit() {

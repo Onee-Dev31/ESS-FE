@@ -10,9 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
 import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
-import { ToastService } from '../../services/toast';
 import { LoadingService } from '../../services/loading';
-import { DialogService } from '../../services/dialog';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusUtil } from '../../utils/status.util';
 import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
@@ -47,8 +45,6 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 })
 export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
-  private toastService = inject(ToastService);
-  private dialogService = inject(DialogService);
   private dateUtil = inject(DateUtilityService);
 
   protected readonly Math = Math;
@@ -167,16 +163,11 @@ export class AllowanceComponent implements OnInit {
     });
   }
 
-  openModal(id: string = '') {
-    if (id === '') {
-      this.allowanceService.generateNextAllowanceId().subscribe(nid => {
-        this.selectedRequestId = nid;
-        this.isModalOpen = true;
-      });
-    } else {
-      this.selectedRequestId = id;
+  openModal() {
+    this.allowanceService.generateNextAllowanceId().subscribe(nid => {
+      this.selectedRequestId = nid;
       this.isModalOpen = true;
-    }
+    });
   }
 
   closeModal() {
@@ -218,19 +209,5 @@ export class AllowanceComponent implements OnInit {
     this.listing.currentPage.set(page);
   }
 
-  async deleteRequest(id: string) {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการลบ',
-      message: `คุณต้องการลบรายการ ${id} ใช่หรือไม่?`,
-      type: 'danger',
-      confirmText: 'ลบรายการ'
-    });
 
-    if (confirmed) {
-      this.allowanceService.deleteAllowanceRequest(id).subscribe(() => {
-        this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
-        this.loadData();
-      });
-    }
-  }
 }

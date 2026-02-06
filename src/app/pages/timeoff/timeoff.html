@@ -170,7 +170,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let request of comps.paginatedData()">
-                        <td class="text-center font-bold text-primary">{{ request.id }}</td>
+                        <td class="text-center text-primary-link">{{ request.id }}</td>
                         <td class="text-center">
                             <div class="font-bold">{{ formatDate(request.startDate) }}</div>
                             <div class="small text-muted" *ngIf="request.shiftStartTime">{{ request.shiftStartTime }}
@@ -192,7 +192,7 @@
                         <td class="text-center">
                             <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
                         </td>
-                        <td class="reason-cell">{{ request.reason }}</td>
+                        <td class="reason-cell text-center">{{ request.reason }}</td>
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(request.status)">
                                 {{ request.status | statusLabel }}

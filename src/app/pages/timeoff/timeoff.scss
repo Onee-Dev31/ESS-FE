@@ -70,15 +70,19 @@
         @include modern-table;
 
         .col-id {
-            width: 100px;
+            width: 120px;
+        }
+
+        .col-date {
+            width: 150px;
         }
 
         .col-days {
-            width: 100px;
+            width: 150px;
         }
 
         .col-type {
-            width: 150px;
+            width: 200px;
         }
 
         .col-period {
@@ -173,4 +177,6 @@
             }
         }
     }
+
+
 }
