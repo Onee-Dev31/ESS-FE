@@ -5,11 +5,11 @@
 @use "sass:color";
 @use '../../../../styles/theme' as *;
 
-$primary-blue: #008ebc;
-$primary-green: #74c34d;
-$primary-red: #f45b5b;
-$primary-orange: #ff914d;
-$bg-slate: #f4f7f9;
+$primary-blue: $primary;
+$primary-green: $success;
+$primary-red: $danger;
+$primary-orange: $warning;
+$bg-slate: $bg-slate;
 
 @use '../../../../styles/responsive-layout' as responsive;
 
@@ -18,11 +18,11 @@ $bg-slate: #f4f7f9;
 }
 
 .modal-container-large {
-    background: white;
+    background: $bg-card;
     width: 90%;
     max-width: 1100px;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-radius: $radius;
+    box-shadow: $shadow;
 
     @media (max-width: 991px) {
         max-height: none;
@@ -44,7 +44,7 @@ $bg-slate: #f4f7f9;
     .modal-header-modern {
         flex-shrink: 0;
         padding: 1.5rem 2rem;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid $border-color;
 
         .header-top-row {
             display: flex;
@@ -76,12 +76,12 @@ $bg-slate: #f4f7f9;
                 .request-title {
                     margin: 0;
                     font-size: 1.25rem;
-                    color: #333;
+                    color: $text;
                 }
 
                 .requester-line {
                     font-size: 0.9rem;
-                    color: #666;
+                    color: $text-sub;
 
                     .highlight {
                         color: $primary-blue;
@@ -156,8 +156,8 @@ $bg-slate: #f4f7f9;
     .approval-progress-bar {
         flex-shrink: 0;
         padding: 1.5rem 1.5rem 1.5rem;
-        background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
-        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, $header-bg 0%, rgba($header-bg, 0.5) 100%);
+        border-bottom: 1px solid $border-color;
 
         .progress-stepper {
             max-width: 800px;
@@ -176,7 +176,7 @@ $bg-slate: #f4f7f9;
                     left: 10%;
                     right: 10%;
                     height: 4px;
-                    background: #e2e8f0;
+                    background: $border-color;
                     border-radius: 2px;
                     z-index: 0;
                 }
@@ -186,11 +186,11 @@ $bg-slate: #f4f7f9;
                     top: 24px;
                     left: 10%;
                     height: 4px;
-                    background: linear-gradient(90deg, #74c34d 0%, #5bb030 100%);
+                    background: linear-gradient(90deg, $primary-green 0%, color.adjust($primary-green, $lightness: -10%) 100%);
                     border-radius: 2px;
                     z-index: 1;
                     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-                    box-shadow: 0 0 8px rgba(116, 195, 77, 0.3);
+                    box-shadow: 0 0 8px rgba($primary-green, 0.3);
                     max-width: 80%;
                 }
 
@@ -206,13 +206,13 @@ $bg-slate: #f4f7f9;
                         width: 48px;
                         height: 48px;
                         border-radius: 50%;
-                        background: white;
-                        border: 3px solid #cbd5e1;
+                        background: $bg-card;
+                        border: 3px solid $border;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         font-size: 18px;
-                        color: #94a3b8;
+                        color: $text-muted;
                         margin-bottom: 12px;
                         transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -226,7 +226,7 @@ $bg-slate: #f4f7f9;
                     .step-label {
                         font-size: 12px;
                         font-weight: 600;
-                        color: #64748b;
+                        color: $text-sub;
                         text-align: center;
                         max-width: 110px;
                         line-height: 1.4;
@@ -235,28 +235,28 @@ $bg-slate: #f4f7f9;
 
                     &.completed {
                         .step-icon-circle {
-                            background: linear-gradient(135deg, #74c34d 0%, #5bb030 100%);
-                            border-color: #5bb030;
+                            background: linear-gradient(135deg, $primary-green 0%, color.adjust($primary-green, $lightness: -10%) 100%);
+                            border-color: color.adjust($primary-green, $lightness: -10%);
                             color: white;
-                            box-shadow: 0 6px 16px rgba(116, 195, 77, 0.35);
+                            box-shadow: 0 6px 16px rgba($primary-green, 0.35);
                             transform: scale(1.05);
                         }
 
                         .step-label {
-                            color: #1e293b;
+                            color: $text;
                             font-weight: 700;
                         }
                     }
 
                     &.active {
                         .step-icon-circle {
-                            background: white;
+                            background: $bg-card;
                             border-color: $primary-blue;
                             border-width: 4px;
                             color: $primary-blue;
                             transform: scale(1.2);
-                            box-shadow: 0 8px 24px rgba(0, 142, 188, 0.25),
-                                0 0 0 8px rgba(0, 142, 188, 0.1);
+                            box-shadow: 0 8px 24px rgba($primary-blue, 0.25),
+                                0 0 0 8px rgba($primary-blue, 0.1);
                             animation: pulse-active 2s ease-in-out infinite;
 
                             i {
@@ -273,10 +273,10 @@ $bg-slate: #f4f7f9;
 
                     &.rejected {
                         .step-icon-circle {
-                            background: linear-gradient(135deg, $primary-red 0%, #dc2626 100%);
-                            border-color: #dc2626;
+                            background: linear-gradient(135deg, $primary-red 0%, color.adjust($primary-red, $lightness: -10%) 100%);
+                            border-color: color.adjust($primary-red, $lightness: -10%);
                             color: white;
-                            box-shadow: 0 6px 16px rgba(244, 91, 91, 0.35);
+                            box-shadow: 0 6px 16px rgba($primary-red, 0.35);
                         }
 
                         .step-label {
@@ -293,13 +293,13 @@ $bg-slate: #f4f7f9;
 
         0%,
         100% {
-            box-shadow: 0 8px 24px rgba(0, 142, 188, 0.25),
-                0 0 0 8px rgba(0, 142, 188, 0.1);
+            box-shadow: 0 8px 24px rgba($primary-blue, 0.25),
+                0 0 0 8px rgba($primary-blue, 0.1);
         }
 
         50% {
-            box-shadow: 0 8px 24px rgba(0, 142, 188, 0.35),
-                0 0 0 12px rgba(0, 142, 188, 0.15);
+            box-shadow: 0 8px 24px rgba($primary-blue, 0.35),
+                0 0 0 12px rgba($primary-blue, 0.15);
         }
     }
 
@@ -312,7 +312,7 @@ $bg-slate: #f4f7f9;
             flex: 1;
             min-height: 0;
             padding-bottom: 0;
-            background: linear-gradient(to left, #f4f7f9 280px, #e2e8f0 280px, #e2e8f0 281px, #ffffff 281px);
+            background: linear-gradient(to left, $bg-slate 280px, $border-color 280px, $border-color 281px, $bg-card 281px);
         }
 
         @media (max-width: 991px) {
@@ -338,7 +338,7 @@ $bg-slate: #f4f7f9;
             @media (min-width: 992px) {
                 flex: 1;
                 padding-bottom: 40px;
-                border-right: 1px solid #eee;
+                border-right: 1px solid $border-color;
                 position: relative;
             }
 
@@ -357,57 +357,57 @@ $bg-slate: #f4f7f9;
                 margin-bottom: 1rem;
 
                 .summary-card {
-                    background: #f8fafc;
+                    background: $header-bg;
                     padding: 12px;
                     border-radius: 8px;
                     transition: all 0.3s ease;
 
                     &.status-card {
                         &.pending {
-                            background: #fff4e6;
+                            background: rgba($warning, 0.1);
 
                             .s-value {
-                                color: #d9480f;
+                                color: color.adjust($warning, $lightness: -10%);
                             }
 
                             label {
-                                color: rgba(217, 72, 15, 0.6);
+                                color: rgba($warning, 0.6);
                             }
                         }
 
                         &.approved {
-                            background: #ebfbee;
+                            background: rgba($success, 0.1);
 
                             .s-value {
-                                color: #2b8a3e;
+                                color: $success;
                             }
 
                             label {
-                                color: rgba(43, 138, 62, 0.6);
+                                color: rgba($success, 0.6);
                             }
                         }
 
                         &.rejected {
-                            background: #fee2e2;
+                            background: rgba($danger, 0.1);
 
                             .s-value {
-                                color: #f45b5b;
+                                color: $danger;
                             }
 
                             label {
-                                color: rgba(244, 91, 91, 0.6);
+                                color: rgba($danger, 0.6);
                             }
                         }
 
                         &.referred-back {
-                            background: #fff7ed;
+                            background: rgba($primary-orange, 0.1);
 
                             .s-value {
-                                color: #ff914d;
+                                color: $primary-orange;
                             }
 
                             label {
-                                color: rgba(255, 145, 77, 0.6);
+                                color: rgba($primary-orange, 0.6);
                             }
                         }
                     }
@@ -415,7 +415,7 @@ $bg-slate: #f4f7f9;
                     label {
                         display: block;
                         font-size: 10px;
-                        color: #999;
+                        color: $text-muted;
                         margin-bottom: 2px;
                     }
 
@@ -427,14 +427,14 @@ $bg-slate: #f4f7f9;
             }
 
             .content-header {
-                border-bottom: 1px solid #eee;
+                border-bottom: 1px solid $border-color;
                 margin-bottom: 1.5rem;
                 padding-bottom: 10px;
 
                 h3 {
                     margin: 0;
                     font-size: 1.1rem;
-                    color: #333;
+                    color: $text;
                 }
             }
 
@@ -457,14 +457,14 @@ $bg-slate: #f4f7f9;
                 }
 
                 .item-card {
-                    background: #fff;
-                    border: 1px solid #eef2f6;
+                    background: $bg-card;
+                    border: 1px solid $border-color;
                     border-radius: 8px;
                     padding: 12px;
                     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 
                     &.total-card {
-                        background: #f8fafc;
+                        background: $header-bg;
                         border: 1px dashed $primary-blue;
                         display: flex;
                         justify-content: space-between;
@@ -472,7 +472,7 @@ $bg-slate: #f4f7f9;
 
                         .total-label {
                             font-weight: 700;
-                            color: #64748b;
+                            color: $text-sub;
                         }
 
                         .total-value {
@@ -490,7 +490,7 @@ $bg-slate: #f4f7f9;
                         &.top {
                             justify-content: space-between;
                             align-items: center;
-                            border-bottom: 1px solid #f1f5f9;
+                            border-bottom: 1px solid $border-color;
                             padding-bottom: 8px;
                             margin-bottom: 8px;
 
@@ -501,14 +501,14 @@ $bg-slate: #f4f7f9;
 
                                 .date {
                                     font-weight: 600;
-                                    color: #1e293b;
+                                    color: $text;
                                 }
 
                                 .shift-badge.micro {
                                     padding: 1px 5px;
                                     font-size: 10px;
-                                    background: #f1f5f9;
-                                    color: #64748b;
+                                    background: $bg-slate;
+                                    color: $text-sub;
                                     border-radius: 4px;
                                 }
                             }
@@ -521,12 +521,12 @@ $bg-slate: #f4f7f9;
 
                         .label {
                             min-width: 80px;
-                            color: #94a3b8;
+                            color: $text-muted;
                             font-size: 0.85rem;
                         }
 
                         .value {
-                            color: #475569;
+                            color: $text-header;
                             flex: 1;
 
                             &.highlight {
@@ -558,20 +558,20 @@ $bg-slate: #f4f7f9;
                 min-width: 500px;
 
                 th {
-                    background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+                    background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 20%) 100%);
                     padding: 12px;
                     text-align: left;
-                    color: #ffffff;
+                    color: white;
                     font-weight: 600;
                 }
 
                 td {
                     padding: 12px;
-                    border-bottom: 1px solid #f1f5f9;
+                    border-bottom: 1px solid $border-color;
                 }
 
                 .modal-total-row {
-                    background: #fdfdfd;
+                    background: $bg-gray;
                     font-size: 16px;
                     font-weight: 800;
                     color: $primary-blue;
@@ -580,8 +580,8 @@ $bg-slate: #f4f7f9;
                 .shift-badge {
                     display: inline-block;
                     padding: 2px 6px;
-                    background: #f1f5f9;
-                    color: #475569;
+                    background: $bg-slate;
+                    color: $text-header;
                     border-radius: 4px;
                     font-size: 11px;
                     font-weight: 600;
@@ -591,16 +591,16 @@ $bg-slate: #f4f7f9;
             .alert-warning {
                 margin-top: 10px;
                 padding: 10px;
-                background: #fff9db;
-                color: #f08c00;
+                background: rgba($warning, 0.1);
+                color: color.adjust($warning, $lightness: -20%);
                 border-radius: 6px;
                 font-size: 12px;
                 text-align: right;
             }
 
             .action-confirm-box {
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
+                background: $bg-slate;
+                border: 1px solid $border-color;
                 border-radius: 12px;
                 padding: 1.5rem;
                 margin-top: 1.5rem;
@@ -642,7 +642,7 @@ $bg-slate: #f4f7f9;
                 .action-title {
                     font-size: 1rem;
                     font-weight: 700;
-                    color: #1e293b;
+                    color: $text;
                     margin-bottom: 0.8rem;
                     display: flex;
                     align-items: center;
@@ -672,7 +672,7 @@ $bg-slate: #f4f7f9;
                         display: block;
                         font-weight: 600;
                         margin-bottom: 0.4rem;
-                        color: #64748b;
+                        color: $text-sub;
                         font-size: 0.85rem;
                     }
 
@@ -681,7 +681,7 @@ $bg-slate: #f4f7f9;
                         box-sizing: border-box;
                         min-height: 60px;
                         padding: 0.6rem;
-                        border: 1px solid #cbd5e1;
+                        border: 1px solid $border;
                         border-radius: 6px;
                         font-family: inherit;
                         font-size: 0.9rem;
@@ -690,8 +690,8 @@ $bg-slate: #f4f7f9;
                         transition: border-color 0.2s;
 
                         &:focus {
-                            border-color: #4650dd;
-                            box-shadow: 0 0 0 3px rgba(70, 80, 221, 0.1);
+                            border-color: $primary;
+                            box-shadow: 0 0 0 3px rgba($primary, 0.1);
                         }
                     }
                 }
@@ -724,13 +724,13 @@ $bg-slate: #f4f7f9;
                     }
 
                     .btn-cancel {
-                        background: #f1f5f9;
-                        color: #64748b;
-                        border: 1px solid #e2e8f0;
+                        background: $bg-slate;
+                        color: $text-sub;
+                        border: 1px solid $border-color;
 
                         &:hover {
-                            background: #e2e8f0;
-                            color: #1e293b;
+                            background: $border-color;
+                            color: $text;
                         }
                     }
                 }
@@ -778,26 +778,28 @@ $bg-slate: #f4f7f9;
                 label {
                     display: block;
                     font-size: 11px;
-                    color: #aaa;
+                    color: $text-muted;
                     margin-bottom: 2px;
                 }
 
                 .side-val {
                     font-size: 13px;
-                    color: #555;
+                    color: $text-header;
                     font-weight: 500;
                 }
             }
 
             .side-divider {
                 height: 1px;
-                background: #e2e8f0;
+                background: $border-color;
                 margin: 1.5rem 0;
                 width: 100%;
             }
         }
     }
 }
+
+// ... remaining lines truncated for summary ...
 
 .comment-thread {
     display: flex;

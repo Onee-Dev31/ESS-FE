@@ -1,41 +1,53 @@
 // File: Spinner
 // Description: Styles for Spinner
 
-
 .spinner-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9998;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .spinner {
-    border: 3px solid #f3f3f3;
+    border: 3px solid rgba(0, 113, 227, 0.1);
     border-radius: 50%;
     border-top: 3px solid #0071e3;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
 
     &-small {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
         border-width: 2px;
     }
 
     &-medium {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         border-width: 3px;
     }
 
     &-large {
-        width: 48px;
-        height: 48px;
+        width: 64px;
+        height: 64px;
         border-width: 4px;
     }
 }

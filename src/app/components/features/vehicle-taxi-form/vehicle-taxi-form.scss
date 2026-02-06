@@ -21,6 +21,7 @@ $col-file: 50px;
   flex-direction: column;
   height: 100%;
   width: 100%;
+  background: $bg-card;
   overflow: hidden;
 }
 
@@ -31,7 +32,7 @@ $col-file: 50px;
   width: 100%;
   flex: 1;
   min-height: 0;
-  background: #fff;
+  background: $bg-card;
   font-family: $font-main;
   overflow: hidden;
 
@@ -202,16 +203,16 @@ $col-file: 50px;
       }
 
       th {
-        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
         position: sticky;
         top: 0;
         z-index: 10;
         text-align: center;
-        color: #ffffff;
-        border-top: 1px solid #1557b0;
+        color: white;
+        border-top: 1px solid color.adjust($primary, $lightness: -10%);
 
         .required {
-          color: #fecaca;
+          color: rgba(white, 0.8);
           margin-left: 2px;
         }
       }
@@ -238,7 +239,7 @@ $col-file: 50px;
       }
 
       .bg-gray {
-        background-color: #fcfcfc;
+        background-color: $bg-slate;
       }
 
       .font-bold {
@@ -246,22 +247,22 @@ $col-file: 50px;
       }
 
       .holiday-label {
-        color: #d93025;
+        color: $danger;
         font-weight: 700;
       }
 
       .regular-label {
-        color: #3c4043;
+        color: $text;
         font-weight: 700;
       }
 
       .shift-code {
         font-size: 12px;
-        color: #555;
+        color: $text-sub;
       }
 
       .highlight-row td {
-        background-color: #fffdef !important;
+        background-color: rgba($warning, 0.05) !important;
       }
 
       .time-input {
@@ -296,7 +297,7 @@ $col-file: 50px;
           }
 
           &:focus:not(:disabled) {
-            background: #fff;
+            background: $bg-card;
             border: 1px solid $primary;
             outline: none;
           }
@@ -322,8 +323,8 @@ $col-file: 50px;
 
       tfoot {
         .total-val {
-          background: #e6f4ea !important;
-          color: $success;
+          background: $status-success-bg !important;
+          color: $status-success-text;
           font-weight: 700;
         }
 
@@ -344,17 +345,17 @@ $col-file: 50px;
     padding: 4px;
 
     .log-card {
-      background: #fff;
+      background: $bg-card;
       border: 1px solid $border;
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: $shadow;
       transition: all 0.2s;
 
       &.highlight-card {
-        border-color: #eed686;
-        background: #fffdef;
-        box-shadow: 0 4px 15px rgba(238, 214, 134, 0.2);
+        border-color: $warning;
+        background: rgba($warning, 0.05);
+        box-shadow: 0 4px 15px rgba($warning, 0.1);
       }
 
       .card-header {
@@ -456,11 +457,12 @@ $col-file: 50px;
             border: 1.5px solid $border;
             border-radius: 8px;
             font-size: 0.9rem;
-            background: #fdfdfd;
+            background: $bg-slate;
 
             &:focus {
               outline: none;
               border-color: $primary;
+              background: $bg-card;
               box-shadow: 0 0 0 3px rgba($primary, 0.1);
             }
 
@@ -491,11 +493,11 @@ $col-file: 50px;
   backdrop-filter: blur(8px);
 
   .upload-modal-content {
-    background: #fff;
+    background: $bg-card;
     width: 90%;
     max-width: 400px;
     border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: $shadow;
     animation: popUp 0.2s ease-out;
     font-family: $font-main;
 
@@ -630,11 +632,11 @@ $col-file: 50px;
       }
 
       .btn-cancel {
-        background: #f1f3f4;
+        background: $bg-slate;
         color: $text;
 
         &:hover {
-          background: #e8eaed;
+          background: $border-color;
         }
       }
 

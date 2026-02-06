@@ -60,34 +60,34 @@
   }
 
   &-success {
-    border-left-color: #30d158 !important;
+    border-left-color: $success !important;
 
     .toast-icon {
-      color: #30d158 !important;
+      color: $success !important;
     }
   }
 
   &-error {
-    border-left-color: #ff3b30 !important;
+    border-left-color: $danger !important;
 
     .toast-icon {
-      color: #ff3b30 !important;
+      color: $danger !important;
     }
   }
 
   &-warning {
-    border-left-color: #ff9500 !important;
+    border-left-color: $warning !important;
 
     .toast-icon {
-      color: #ff9500 !important;
+      color: $warning !important;
     }
   }
 
   &-info {
-    border-left-color: #0071e3 !important;
+    border-left-color: $primary !important;
 
     .toast-icon {
-      color: #0071e3 !important;
+      color: $primary !important;
     }
   }
 }
@@ -145,6 +145,16 @@
 
 :root {
   --font-main: #{$font-main};
+  --primary: #{$primary};
+  --success: #{$success};
+  --danger: #{$danger};
+  --warning: #{$warning};
+  --bg-slate: #{$bg-slate};
+  --bg-card: #{$bg-card};
+  --text: #{$text};
+  --text-sub: #{$text-sub};
+  --text-muted: #{$text-muted};
+  --border: #{$border};
 }
 
 html {

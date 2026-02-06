@@ -21,7 +21,6 @@ import { LoadingService } from '../../../services/loading';
             <div class="double-bounce1"></div>
             <div class="double-bounce2"></div>
           </div>
-          <p class="loading-text">กำลังโหลดข้อมูล...</p>
         </div>
       </div>
     }
@@ -33,13 +32,20 @@ import { LoadingService } from '../../../services/loading';
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 99999;
       transition: all 0.3s ease;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .loader-content {
@@ -50,14 +56,14 @@ import { LoadingService } from '../../../services/loading';
       width: 60px;
       height: 60px;
       position: relative;
-      margin: 0 auto 1.5rem;
+      margin: 0 auto;
     }
 
     .double-bounce1, .double-bounce2 {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background-color: #008ebc;
+      background-color: var(--primary);
       opacity: 0.6;
       position: absolute;
       top: 0;
@@ -67,15 +73,7 @@ import { LoadingService } from '../../../services/loading';
 
     .double-bounce2 {
       animation-delay: -1.0s;
-      background-color: #74c34d;
-    }
-
-    .loading-text {
-      font-family: var(--font-main);
-      color: #2c3e50;
-      font-weight: 600;
-      font-size: 1.1rem;
-      letter-spacing: 0.5px;
+      background-color: var(--success);
     }
 
     @keyframes sk-bounce {

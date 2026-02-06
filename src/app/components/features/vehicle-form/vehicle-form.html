@@ -104,9 +104,11 @@
         <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
           <div class="card-header">
             <div class="date-info">
-              <span class="day-dot" [style.background]="log.dayType === 'H' ? '#d93025' : '#1a73e8'"></span>
+              <span class="day-dot"
+                [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
               <span class="date">{{ log.date }}</span>
-              <span class="day-type" [style.color]="log.dayType === 'H' ? '#d93025' : '#5f6368'">({{ log.dayType
+              <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
+                log.dayType
                 }})</span>
             </div>
             <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox" />

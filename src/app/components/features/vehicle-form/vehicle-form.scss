@@ -25,7 +25,7 @@ $col-desc: auto;
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: $bg-card;
   font-family: $font-main;
   overflow: hidden;
 
@@ -103,13 +103,13 @@ $col-desc: auto;
       }
 
       .right-info {
-        background: #e8f0fe;
+        background: rgba($primary, 0.1);
         color: $primary;
       }
 
       .request-id-badge {
-        background: #eed686;
-        color: #4e342e;
+        background: $status-pending-bg;
+        color: $status-pending-text;
       }
     }
   }
@@ -182,13 +182,13 @@ $col-desc: auto;
       }
 
       th {
-        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
         position: sticky;
         top: 0;
         z-index: 10;
         text-align: center;
-        color: #ffffff;
-        border-top: 1px solid #1557b0;
+        color: white;
+        border-top: 1px solid color.adjust($primary, $lightness: -10%);
       }
 
       .sub-header th {
@@ -208,7 +208,7 @@ $col-desc: auto;
       }
 
       .bg-gray {
-        background-color: #fcfcfc;
+        background-color: $bg-slate;
       }
 
       .font-bold {
@@ -216,22 +216,22 @@ $col-desc: auto;
       }
 
       .holiday-label {
-        color: #d93025;
+        color: $danger;
         font-weight: 700;
       }
 
       .regular-label {
-        color: #3c4043;
+        color: $text;
         font-weight: 700;
       }
 
       .shift-code {
         font-size: 12px;
-        color: #555;
+        color: $text-sub;
       }
 
       .highlight-row td {
-        background-color: #fffdef !important;
+        background-color: rgba($warning, 0.05) !important;
       }
 
       .time-input {
@@ -267,15 +267,15 @@ $col-desc: auto;
           }
 
           &:focus:not(:disabled) {
-            background: #fff;
+            background: $bg-card;
             border: 1px solid $primary;
           }
         }
       }
 
       .total-val {
-        background: #e6f4ea !important;
-        color: $success;
+        background: $status-success-bg !important;
+        color: $status-success-text;
         font-weight: 700;
       }
 
@@ -295,17 +295,17 @@ $col-desc: auto;
     padding: 4px;
 
     .log-card {
-      background: #fff;
+      background: $bg-card;
       border: 1px solid $border;
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: $shadow;
       transition: all 0.2s;
 
       &.highlight-card {
-        border-color: #eed686;
-        background: #fffdef;
-        box-shadow: 0 4px 15px rgba(238, 214, 134, 0.2);
+        border-color: $warning;
+        background: rgba($warning, 0.05);
+        box-shadow: 0 4px 15px rgba($warning, 0.1);
       }
 
       .card-header {
@@ -397,13 +397,13 @@ $col-desc: auto;
           border: 1.5px solid $border;
           border-radius: 8px;
           font-size: 0.9rem;
-          background: #fdfdfd;
+          background: $bg-slate;
           transition: all 0.2s;
 
           &:focus {
             outline: none;
             border-color: $primary;
-            background: #fff;
+            background: $bg-card;
             box-shadow: 0 0 0 3px rgba($primary, 0.1);
           }
 

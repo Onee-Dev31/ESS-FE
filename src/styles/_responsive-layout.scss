@@ -164,7 +164,7 @@
         .filter-label {
             font-weight: 500;
             font-size: 0.9rem;
-            color: #333;
+            color: $text;
         }
 
         .form-control,
@@ -193,17 +193,17 @@
 
 
     .btn-clear {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #ced4da;
+        background-color: $bg-page;
+        color: $text-muted;
+        border: 1px solid $border;
         padding: 7px 20px;
         border-radius: 4px;
         font-weight: 500;
         cursor: pointer;
 
         &:hover {
-            background-color: #e2e6ea;
-            color: #212529;
+            background-color: $bg-slate;
+            color: $text;
         }
 
         @include mobile {
@@ -230,7 +230,7 @@
     }
 
     .mobile-card {
-        background: #fff;
+        background: $bg-card;
         border-radius: 16px;
         box-shadow: $shadow;
         overflow: hidden;
@@ -494,7 +494,7 @@
     .empty-state {
         text-align: center;
         padding: 40px !important;
-        color: #999;
+        color: $text-muted;
         font-style: italic;
     }
 }

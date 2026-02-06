@@ -1,6 +1,4 @@
-// File: Skeleton
-// Description: Styles for Skeleton
-
+@use '../../../../styles/_theme' as *;
 
 @keyframes shimmer {
     0% {
@@ -12,30 +10,35 @@
     }
 }
 
+.skeleton-base {
+    background: linear-gradient(90deg,
+            #f0f2f5 0%,
+            #f8f9fa 50%,
+            #f0f2f5 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 4px;
+}
+
 .skeleton-table {
     width: 100%;
-    padding: 20px;
+    padding: 0;
 }
 
 .skeleton-row {
     display: flex;
     gap: 16px;
-    margin-bottom: 16px;
-    padding: 16px;
+    margin-bottom: 24px;
+    padding: 16px 24px;
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .skeleton-cell {
+    @extend .skeleton-base;
     flex: 1;
     height: 20px;
-    background: linear-gradient(90deg,
-            #f0f0f0 0%,
-            #f8f8f8 50%,
-            #f0f0f0 100%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
-    border-radius: 4px;
 }
 
 .skeleton-card {
@@ -47,21 +50,18 @@
 .skeleton-card-item {
     display: flex;
     gap: 16px;
-    padding: 16px;
+    padding: 24px;
     background: white;
-    border-radius: 8px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .skeleton-avatar {
+    @extend .skeleton-base;
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(90deg,
-            #f0f0f0 0%,
-            #f8f8f8 50%,
-            #f0f0f0 100%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
     flex-shrink: 0;
 }
 
@@ -69,17 +69,23 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .skeleton-line {
+    @extend .skeleton-base;
     width: 100%;
-    background: linear-gradient(90deg,
-            #f0f0f0 0%,
-            #f8f8f8 50%,
-            #f0f0f0 100%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
-    border-radius: 4px;
-    margin-bottom: 8px;
+}
+
+@mixin large-tablet {
+    @media (max-width: 1728px) {
+        @content;
+    }
+}
+
+.skeleton-card-item {
+    @media (max-width: 768px) {
+        padding: 16px;
+        border-radius: 16px;
+    }
 }
