@@ -10,8 +10,6 @@ export abstract class BaseRequestService<T extends RequestBase> {
     protected abstract readonly STORAGE_KEY: string;
     protected requestsSubject = new BehaviorSubject<T[]>([]);
 
-    constructor() { }
-
     protected initializeData(mockGenerator: () => T[]) {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         if (stored) {

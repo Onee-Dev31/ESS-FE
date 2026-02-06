@@ -3,10 +3,10 @@
 @use './responsive-layout' as responsive;
 
 .card {
-    background: #fff;
+    background: $bg-card;
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: $shadow;
     margin-bottom: 1.5rem;
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -49,9 +49,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: white !important;
-    color: #64748b !important;
-    border: 1px solid #e2e8f0 !important;
+    background: $bg-card !important;
+    color: $text-muted !important;
+    border: 1px solid $border !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: pointer;
@@ -166,10 +166,10 @@ button {
 }
 
 .btn-pending-approvals {
-    background: #800080 !important;
+    background: $color-purple !important;
     color: white !important;
     border: none !important;
-    box-shadow: 0 4px 15px rgba(128, 0, 128, 0.4) !important;
+    box-shadow: 0 4px 15px rgba($color-purple, 0.4) !important;
 
     &:hover {
         background: color.adjust(#800080, $lightness: 5%) !important;
@@ -178,8 +178,8 @@ button {
     }
 
     .notification-badge {
-        background: white !important;
-        color: #800080 !important;
+        background: $bg-card !important;
+        color: $color-purple !important;
         font-weight: 800;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }

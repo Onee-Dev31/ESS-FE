@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { DialogService } from './dialog';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExportService {
-
-  constructor() { }
+  private dialog = inject(DialogService);
 
   async exportToPDF(elementId: string, filename: string = 'export'): Promise<void> {
     try {

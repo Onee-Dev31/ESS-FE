@@ -30,8 +30,6 @@ import { STORAGE_KEYS } from '../constants/storage.constants';
 export class UserService {
     private http = inject(HttpClient);
 
-    constructor() { }
-
     getUserProfile(): Observable<UserProfile> {
         const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
         const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;

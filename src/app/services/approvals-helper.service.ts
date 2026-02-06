@@ -25,7 +25,6 @@ export class ApprovalsHelperService {
     private transportService = inject(TransportService);
     private medicalService = inject(MedicalexpensesService);
 
-    constructor() { }
 
     getApprovals(category: 'all' | 'medical'): Observable<ApprovalItem[]> {
         if (category === 'medical') {

@@ -39,8 +39,6 @@ export class AuthService {
 
     isAdmin = computed(() => this._userRole() === USER_ROLES.ADMIN);
 
-    constructor() { }
-
     login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
         this.loadingService.show();
         const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);

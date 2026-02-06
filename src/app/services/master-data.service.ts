@@ -22,8 +22,6 @@ export class MasterDataService {
     private claimTypesCache$: Observable<ClaimType[]> | null = null;
     private dateConfigCache$: Observable<DateConfig> | null = null;
 
-    constructor() { }
-
     getLeaveTypes(): Observable<LeaveType[]> {
         if (!this.leaveTypesCache$) {
             this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(

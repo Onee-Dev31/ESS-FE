@@ -1,15 +1,13 @@
-﻿
-
-@use 'sass:color';
+﻿@use 'sass:color';
 @use '../../../styles/theme' as *;
 @use '../../../styles/responsive-layout' as responsive;
 
-$dark: #0f172a;
-$muted: #64748b;
+$dark: $text;
+$muted: $text-muted;
 $border-color: transparent;
 $radius-lg: 20px;
-$bg-light: #f8fafc;
-$balance: #15803d;
+$bg-light: $bg-slate;
+$balance: $status-success-text;
 
 @mixin flex-center {
   display: flex;
@@ -633,7 +631,7 @@ $balance: #15803d;
 }
 
 .btn-danger {
-  background-color: #dc3545;
+  background-color: $danger;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -929,6 +927,30 @@ $balance: #15803d;
       font-weight: 700;
       color: $dark;
       font-family: $font-main;
+    }
+  }
+
+  &.card-green {
+
+    h6,
+    h3 {
+      color: #15803d !important;
+    }
+  }
+
+  &.card-blue {
+
+    h6,
+    h3 {
+      color: #1e40af !important;
+    }
+  }
+
+  &.card-yellow {
+
+    h6,
+    h3 {
+      color: #9a3412 !important;
     }
   }
 

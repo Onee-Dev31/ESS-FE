@@ -30,8 +30,6 @@ export class LoginComponent {
   isError: boolean = false;
   isLoading: boolean = false;
 
-  constructor() { }
-
   togglePasswordVisibility() {
     this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
   }

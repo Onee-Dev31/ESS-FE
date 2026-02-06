@@ -2,10 +2,10 @@
 
 $primary-color: $primary;
 $primary-hover: $primary-dark;
-$text-dark: #333;
-$text-muted: $text-sub;
-$text-label: #555;
-$bg-light: #f1f5f9;
+$text-dark: $text;
+$text-muted-local: $text-sub;
+$text-label-local: $text-header;
+$bg-light-local: $bg-slate;
 
 :host {
   display: flex;
@@ -86,7 +86,7 @@ $bg-light: #f1f5f9;
     label {
       display: block;
       margin-bottom: 6px;
-      color: $text-label;
+      color: $text-header;
       font-size: 0.9rem;
       font-weight: 500;
     }
@@ -98,7 +98,7 @@ $bg-light: #f1f5f9;
     input {
       width: 100%;
       border: none;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid $border;
       padding: 10px 0;
       font-size: 1rem;
       outline: none;
@@ -115,7 +115,7 @@ $bg-light: #f1f5f9;
       }
 
       &::placeholder {
-        color: #ccc;
+        color: $text-muted;
       }
     }
   }
@@ -126,7 +126,7 @@ $bg-light: #f1f5f9;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #999;
+    color: $text-muted;
     padding: 8px;
     transition: color 0.2s;
 
@@ -241,7 +241,7 @@ $bg-light: #f1f5f9;
 
 .welcome-panel {
   flex: 1.3;
-  background-color: $bg-light;
+  background-color: $bg-light-local;
   position: relative;
   padding: 0;
   overflow: hidden;
