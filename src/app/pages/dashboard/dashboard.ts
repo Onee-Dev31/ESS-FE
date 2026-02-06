@@ -16,7 +16,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { DialogService } from '../../services/dialog';
-import { MedicalStat, WelfareItem, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
+import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
@@ -60,12 +60,12 @@ export class DashboardComponent implements OnInit {
   isPolicyModalOpen = signal<boolean>(false);
   isTimeOffModalOpen = signal<boolean>(false);
   isTooltipModalOpen = signal<boolean>(false);
-  tooltipModalContent = signal<string>('');
+  tooltipModalId = signal<string>('');
   selectedLeaveTypeId = signal<string>('');
 
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
-  welfareStats = toSignal(this.dashboardService.getWelfareStats());
+
   leaveStats = toSignal(this.dashboardService.getLeaveStats());
   holidays = toSignal(this.dashboardService.getHolidays());
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
@@ -87,43 +87,6 @@ export class DashboardComponent implements OnInit {
       }
 
       return { ...stat, balanceColor, progressColor };
-    });
-  });
-
-  welfareStatsDisplay = computed(() => {
-    const stats = this.welfareStats();
-    if (!stats) return null;
-    return stats.map(item => {
-      let iconName = 'fas fa-star';
-      let cardClass = '';
-      let titleColor = '';
-      let amountColor = '';
-
-      switch (item.id) {
-        case 'allowance':
-          iconName = 'fas fa-dollar-sign';
-          cardClass = 'card-green';
-          titleColor = '#15803d';
-          amountColor = '#15803d';
-          break;
-        case 'transport':
-          iconName = 'fas fa-car';
-          cardClass = 'card-blue';
-          titleColor = '#1e40af';
-          amountColor = '#1e40af';
-          break;
-        case 'taxi':
-          iconName = 'fas fa-taxi';
-          cardClass = 'card-yellow';
-          titleColor = '#9a3412';
-          amountColor = '#9a3412';
-          break;
-        case 'wedding': iconName = 'fas fa-heart'; break;
-        case 'ordination': iconName = 'fas fa-hands-praying'; break;
-        case 'funeral': iconName = 'fas fa-church'; break;
-        case 'wreath': iconName = 'fas fa-spa'; break;
-      }
-      return { ...item, iconName, cardClass, titleColor, amountColor };
     });
   });
 
@@ -287,14 +250,14 @@ export class DashboardComponent implements OnInit {
     this.selectedLeaveTypeId.set('');
   }
 
-  openTooltip(content: string) {
-    this.tooltipModalContent.set(content);
+  openTooltip(id: string) {
+    this.tooltipModalId.set(id);
     this.isTooltipModalOpen.set(true);
   }
 
   closeTooltip() {
     this.isTooltipModalOpen.set(false);
-    this.tooltipModalContent.set('');
+    this.tooltipModalId.set('');
   }
 
   navigateTo(path: string | undefined) {

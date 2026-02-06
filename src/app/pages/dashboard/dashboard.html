@@ -231,40 +231,135 @@
             </button>
             }
           </div>
-          @if (welfareStatsDisplay(); as wstats) {
           <div class="bottom-stats-grid">
-            @for (item of wstats; track item.title) {
-            <div class="card mini-stat-card" [ngClass]="item.cardClass || ''" (click)="navigateTo(item.route)"
-              [style.cursor]="item.route ? 'pointer' : 'default'">
+            <!-- Allowance -->
+            <div class="card mini-stat-card card-green" (click)="navigateTo('/allowance')" style="cursor: pointer">
               <div class="card-body">
-                <div class="mini-icon">
-                  <i [class]="item.iconName"></i>
-                </div>
+                <div class="mini-icon"><i class="fas fa-dollar-sign"></i></div>
                 <div class="card-info">
-                  <h6 [style.color]="item.titleColor">
-                    <span class="title-text">{{ item.title }}</span>
-                    @if (item.tooltip) {
+                  <h6 style="color: #15803d">
+                    <span class="title-text">ค่าเบี้ยเลี้ยง</span>
+                  </h6>
+                  <h3 style="color: #15803d">10,500</h3>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
+
+            <!-- Transport -->
+            <div class="card mini-stat-card card-blue" (click)="navigateTo('/vehicle')" style="cursor: pointer">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-car"></i></div>
+                <div class="card-info">
+                  <h6 style="color: #1e40af">
+                    <span class="title-text">ค่ารถ</span>
                     <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip(item.tooltip); $event.stopPropagation()">
+                      <button class="btn-info-circle" (click)="openTooltip('transport'); $event.stopPropagation()">
                         <i class="fa-solid fa-circle-info"></i>
                       </button>
                     </div>
-                    }
                   </h6>
-                  <h3 [style.color]="item.amountColor">{{ item.amount }}</h3>
+                  <h3 style="color: #1e40af">584</h3>
                 </div>
-                <div class="card-arrow" [class.disabled-arrow]="!item.route">
-                  <i class="fas fa-chevron-right"></i>
-                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
               </div>
             </div>
-            }
+
+            <!-- Taxi -->
+            <div class="card mini-stat-card card-yellow" (click)="navigateTo('/vehicle-taxi')" style="cursor: pointer">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-taxi"></i></div>
+                <div class="card-info">
+                  <h6 style="color: #9a3412">
+                    <span class="title-text">ค่าแท็กซี่</span>
+                    <div class="tooltip-container">
+                      <button class="btn-info-circle" (click)="openTooltip('taxi'); $event.stopPropagation()">
+                        <i class="fa-solid fa-circle-info"></i>
+                      </button>
+                    </div>
+                  </h6>
+                  <h3 style="color: #9a3412">876</h3>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
+
+            <!-- Wedding -->
+            <div class="card mini-stat-card" style="cursor: default">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-heart"></i></div>
+                <div class="card-info">
+                  <h6>
+                    <span class="title-text">ค่าสมรส</span>
+                    <div class="tooltip-container">
+                      <button class="btn-info-circle" (click)="openTooltip('wedding'); $event.stopPropagation()">
+                        <i class="fa-solid fa-circle-info"></i>
+                      </button>
+                    </div>
+                  </h6>
+                  <h3>3,500</h3>
+                </div>
+                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
+
+            <!-- Ordination -->
+            <div class="card mini-stat-card" style="cursor: default">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-hands-praying"></i></div>
+                <div class="card-info">
+                  <h6>
+                    <span class="title-text">ค่าอุปสมบท</span>
+                    <div class="tooltip-container">
+                      <button class="btn-info-circle" (click)="openTooltip('ordination'); $event.stopPropagation()">
+                        <i class="fa-solid fa-circle-info"></i>
+                      </button>
+                    </div>
+                  </h6>
+                  <h3>10,500</h3>
+                </div>
+                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
+
+            <!-- Funeral -->
+            <div class="card mini-stat-card" style="cursor: default">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-church"></i></div>
+                <div class="card-info">
+                  <h6>
+                    <span class="title-text">ค่าฌาปนกิจ</span>
+                    <div class="tooltip-container">
+                      <button class="btn-info-circle" (click)="openTooltip('funeral'); $event.stopPropagation()">
+                        <i class="fa-solid fa-circle-info"></i>
+                      </button>
+                    </div>
+                  </h6>
+                  <h3>584</h3>
+                </div>
+                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
+
+            <!-- Wreath -->
+            <div class="card mini-stat-card" style="cursor: default">
+              <div class="card-body">
+                <div class="mini-icon"><i class="fas fa-spa"></i></div>
+                <div class="card-info">
+                  <h6>
+                    <span class="title-text">ค่าพวงหรีด</span>
+                    <div class="tooltip-container">
+                      <button class="btn-info-circle" (click)="openTooltip('wreath'); $event.stopPropagation()">
+                        <i class="fa-solid fa-circle-info"></i>
+                      </button>
+                    </div>
+                  </h6>
+                  <h3>876</h3>
+                </div>
+                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
+              </div>
+            </div>
           </div>
-          } @else {
-          <div class="bottom-stats-grid">
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-          </div>
-          }
         </div>
 
         <div class="leave-section">
@@ -379,7 +474,51 @@
   }
 
   @if (isTooltipModalOpen()) {
-  <app-tooltip-modal [content]="tooltipModalContent()" (onClose)="closeTooltip()">
+  <app-tooltip-modal (onClose)="closeTooltip()">
+    <ng-container [ngSwitch]="tooltipModalId()">
+      <div *ngSwitchCase="'transport'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120
+            บาท/ครั้ง</span></div>
+        <div class="tooltip-condition-item"><span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120
+            บาท/ครั้ง</span></div>
+      </div>
+      <div *ngSwitchCase="'taxi'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div>
+        <div class="tooltip-condition-item"><span>- ค่า Taxi
+            สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></div>
+      </div>
+      <div *ngSwitchCase="'wedding'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div>
+        <div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>
+      </div>
+      <div *ngSwitchCase="'ordination'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div>
+        <div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>
+      </div>
+      <div *ngSwitchCase="'funeral'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div>
+        <div class="tooltip-condition-item"><span>- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา
+            10,000 บาท/คน</span></div>
+      </div>
+      <div *ngSwitchCase="'wreath'">
+        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        </div>
+        <div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div>
+        <div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา
+            1,500
+            บาท/คน</span></div>
+      </div>
+    </ng-container>
   </app-tooltip-modal>
   }
 </div>

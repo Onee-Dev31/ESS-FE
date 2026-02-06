@@ -13,13 +13,7 @@ export interface MedicalStat {
     type: 'outpatient' | 'dental' | 'optical' | 'inpatient'; // Added for specific styling identification
 }
 
-export interface WelfareItem {
-    id: string; // Added to identify the item
-    title: string;
-    amount: string;
-    tooltip?: string;
-    route?: string;
-}
+
 
 export interface LeaveItem {
     type: 'vacation' | 'business' | 'sick' | 'sterilization' | 'funeral'; // Added for styling

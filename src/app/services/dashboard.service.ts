@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
 import { LoadingService } from './loading';
 import { ApprovalsHelperService } from './approvals-helper.service';
-import { MedicalStat, WelfareItem, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate } from '../interfaces/dashboard.interface';
+import { MedicalStat, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
@@ -56,38 +56,7 @@ export class DashboardService {
         return this.loadingService.wrap(of(stats).pipe(delay(1000)));
     }
 
-    getWelfareStats(): Observable<WelfareItem[]> {
-        const stats: WelfareItem[] = [
-            { id: 'allowance', title: 'ค่าเบี้ยเลี้ยง', amount: '10,500', route: '/allowance' },
-            {
-                id: 'transport', title: 'ค่ารถ', amount: '584',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div><div class="tooltip-condition-item"><span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span></div>',
-                route: '/vehicle'
-            },
-            {
-                id: 'taxi', title: 'ค่าแท็กซี่', amount: '876',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div><div class="tooltip-condition-item"><span>- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></div>',
-                route: '/vehicle-taxi'
-            },
-            {
-                id: 'wedding', title: 'ค่าสมรส', amount: '3,500',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
-            },
-            {
-                id: 'ordination', title: 'ค่าอุปสมบท', amount: '10,500',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div><div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>'
-            },
-            {
-                id: 'funeral', title: 'ค่าฌาปนกิจ', amount: '584',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา 10,000 บาท/คน</span></div>'
-            },
-            {
-                id: 'wreath', title: 'ค่าพวงหรีด', amount: '876',
-                tooltip: '<div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong></div><div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div><div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา 1,500 บาท/คน</span></div>'
-            }
-        ];
-        return this.loadingService.wrap(of(stats).pipe(delay(1000)));
-    }
+
 
     getLeaveStats(): Observable<LeaveItem[]> {
         const leaves: LeaveItem[] = [
