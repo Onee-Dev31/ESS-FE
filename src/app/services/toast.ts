@@ -1,12 +1,5 @@
-/**
- * @file Toast
- * @description Logic for Toast
- */
-
-// Section: Imports
 import { Injectable, signal } from '@angular/core';
 
-// Section: Logic
 export interface Toast {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';

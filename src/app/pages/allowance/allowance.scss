@@ -1,10 +1,5 @@
-// File: Allowance
-// Description: Styles for Allowance
-
-// Section: Dependencies
 @use '../../../styles/theme' as *;
 
-// Allowance Page Layout
 .allowance-page {
   padding: 24px;
   background-color: $bg-page;
@@ -28,8 +23,6 @@
   .toolbar-container {
     @include toolbar-container;
   }
-
-
 
   .card-list-view {
     @include mobile-cards-view;

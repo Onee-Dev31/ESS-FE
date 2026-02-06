@@ -1,12 +1,7 @@
-// File: Layout Structure
-// Description: Structural components for page layouts
-
 @use 'sass:color';
 @use 'variables' as *;
 @use 'mixins' as *;
 
-
-// Content Card
 .content-card {
     flex: 1;
     min-height: 0;
@@ -22,7 +17,6 @@
     }
 }
 
-// Top Header Strip
 .top-header-strip {
     display: flex;
     justify-content: space-between;
@@ -95,7 +89,6 @@
     }
 }
 
-// Form Actions Footer
 .form-actions-footer {
     padding: 12px 24px;
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
@@ -126,7 +119,6 @@
     }
 }
 
-// Details Grid
 .details-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -146,7 +138,6 @@
     }
 }
 
-// Section Header Row
 .section-header-row {
     display: flex;
     justify-content: space-between;

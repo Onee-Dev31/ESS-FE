@@ -1,9 +1,3 @@
-/**
- * @file Vehicle Taxi Spec
- * @description Logic for Vehicle Taxi Spec
- */
-
-// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VehicleTaxiComponent } from './vehicle-taxi';

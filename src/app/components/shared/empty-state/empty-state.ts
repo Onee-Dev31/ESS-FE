@@ -1,13 +1,6 @@
-/**
- * @file Empty State
- * @description Logic for Empty State
- */
-
-// Section: Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Section: Logic
 @Component({
   selector: 'app-empty-state',
   standalone: true,

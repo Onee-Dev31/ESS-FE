@@ -1,8 +1,6 @@
 @use './variables' as *;
 @use './responsive-layout' as responsive;
 
-// Utility Styles - Moved from styles.scss
-
 .text-primary {
     color: $primary !important;
 }
@@ -102,8 +100,6 @@ select,
 textarea {
     font-family: $font-main;
 }
-
-// Form Controls
 
 .form-control {
     width: 100%;

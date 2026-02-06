@@ -1,9 +1,3 @@
-/**
- * @file Base Request Service
- * @description Logic for Base Request Service
- */
-
-// Section: Imports
 import { inject } from '@angular/core';
 import { Observable, of, BehaviorSubject, delay, take } from 'rxjs';
 import { LoadingService } from './loading';

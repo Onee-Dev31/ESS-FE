@@ -1,9 +1,3 @@
-/**
- * @file Sidebar Component
- * @description Logic for Sidebar Component
- */
-
-// Section: Imports
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -23,7 +17,6 @@ interface MenuItem {
     role?: string;
 }
 
-// Section: Logic
 @Component({
     selector: 'app-sidebar',
     standalone: true,

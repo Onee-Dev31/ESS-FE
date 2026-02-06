@@ -2,9 +2,6 @@
 @use './variables' as *;
 @use './responsive-layout' as responsive;
 
-// Component Styles - Moved from styles.scss
-
-// UI Cards
 .card {
     background: #fff;
     border-radius: 1rem;
@@ -76,8 +73,6 @@
         transform: translateX(0) scale(0.95);
     }
 }
-
-// Premium Buttons
 
 button {
     cursor: pointer;
@@ -189,8 +184,6 @@ button {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 }
-
-// Status Badges
 
 .status-badge {
     padding: 5px 12px;

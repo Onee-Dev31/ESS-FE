@@ -1,9 +1,3 @@
-/**
- * @file Navbar
- * @description Logic for Navbar
- */
-
-// Section: Imports
 import { Component, HostListener, ElementRef, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -18,7 +12,6 @@ interface NotificationItem {
   time: string;
 }
 
-// Section: Logic
 @Component({
   selector: 'app-navbar',
   standalone: true,

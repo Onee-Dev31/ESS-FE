@@ -1,10 +1,4 @@
-// File: Variables
-// Description: Styles for Variables
-
-// Section: Dependencies
 @use 'sass:color';
-
-// Brand & Theme Colors
 
 $primary: #1a73e8;
 $primary-dark: #1557b0;
@@ -28,23 +22,17 @@ $color-info: #1a73e8;
 $color-purple: #800080;
 $color-amber: #d97706;
 
-// Page Backgrounds
-
 $bg-page: #f8f9fa;
 $bg-card: #ffffff;
 $bg-gray: #fcfcfc;
 $bg-slate: #f4f7f9;
 $header-bg: #f8fafc;
 
-// Typography & Text
-
 $text: #202124;
 $text-sub: #5f6368;
 $text-muted: #94a3b8;
 $text-light: $text-muted;
 $text-header: #475569;
-
-// Borders & Elevation
 
 $border: #dee2e6;
 $border-color: #e9ecef;
@@ -53,8 +41,6 @@ $radius: 12px;
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
-
-// Status Badges
 
 $status-new-bg: rgba(217, 119, 6, 0.1);
 $status-new-text: #d97706;
@@ -70,8 +56,6 @@ $status-success-text: #16a34a;
 
 $status-danger-bg: rgba(220, 38, 38, 0.1);
 $status-danger-text: #dc2626;
-
-// Responsive Breakpoints
 
 @mixin mobile {
     @media (max-width: 575.98px) {
@@ -97,8 +81,6 @@ $status-danger-text: #dc2626;
     }
 }
 
-// Visual Effects (Glassmorphism)
-
 @mixin glass-blur($amount: 4px, $bg: rgba(0, 0, 0, 0.65)) {
     background-color: $bg;
     backdrop-filter: blur($amount);
@@ -110,8 +92,6 @@ $status-danger-text: #dc2626;
     backdrop-filter: blur($blur);
     -webkit-backdrop-filter: blur($blur);
 }
-
-// Core Layout Mixins
 
 @mixin content-card {
     background: white;

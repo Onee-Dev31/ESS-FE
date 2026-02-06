@@ -1,9 +1,3 @@
-/**
- * @file Vehicle Form
- * @description Logic for Vehicle Form
- */
-
-// Section: Imports
 import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,10 +11,8 @@ interface VehicleLogItem extends AttendanceLog {
   amount: number;
 }
 
-
 import { MasterDataService } from '../../../services/master-data.service';
 
-// Section: Logic
 @Component({
   selector: 'app-vehicle-form',
   standalone: true,
@@ -71,7 +63,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     });
   }
 
-
   generateCalendar() {
     const existingRequest = this.loadedRequest;
 
@@ -98,7 +89,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       this.cdr.markForCheck();
     });
   }
-
 
   calculateVehicleAmount(log: VehicleLogItem) {
     if (!log.selected) {
@@ -145,7 +135,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
       .filter(log => log.selected)
       .reduce((sum, current) => sum + current.amount, 0);
   }
-
 
   onSubmit() {
     const selectedLogs = this.logs.filter(log => log.selected);
@@ -202,4 +191,3 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     this.onClose.emit();
   }
 }
-

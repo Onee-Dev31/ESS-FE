@@ -1,9 +1,3 @@
-/**
- * @file Time Off Service
- * @description Logic for Time Off Service
- */
-
-// Section: Imports
 import { Injectable } from '@angular/core';
 import { TimeOffRequest } from '../interfaces/time-off.interface';
 import { TimeOffMock } from '../mocks/time-off.mock';
@@ -12,7 +6,6 @@ import { BaseRequestService } from './base-request.service';
 
 export type { TimeOffRequest };
 
-// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

@@ -1,9 +1,3 @@
-/**
- * @file Medicalexpenses
- * @description Logic for Medicalexpenses
- */
-
-// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,7 +31,6 @@ interface FlatMedicalRow extends MedicalItem {
   attachedFile?: string | null;
 }
 
-// Section: Logic
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
@@ -70,7 +63,6 @@ export class MedicalexpensesComponent implements OnInit {
   isPolicyModalOpen = signal<boolean>(false);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
-
 
   processedData = computed(() => {
     let data = [...this.allRequests()];
@@ -134,7 +126,6 @@ export class MedicalexpensesComponent implements OnInit {
     }
     return rows;
   });
-
 
   paginatedRows = computed(() => {
     const start = this.listing.currentPage() * this.listing.pageSize();

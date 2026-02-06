@@ -1,8 +1,3 @@
-/**
- * @file Index
- * @description Logic for Index
- */
-
 export * from './allowance.mock';
 export * from './medical.mock';
 export * from './mock-helper';

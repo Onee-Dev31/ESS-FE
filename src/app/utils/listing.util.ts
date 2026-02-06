@@ -1,12 +1,5 @@
-/**
- * @file Listing Util
- * @description Logic for Listing Util
- */
-
-// Section: Imports
 import { signal, computed, WritableSignal, isSignal, Signal } from '@angular/core';
 
-// Section: Logic
 export interface ListingState {
     currentPage: WritableSignal<number>;
     pageSize: WritableSignal<number>;
@@ -102,37 +95,37 @@ export class TableSortHelper {
     ) {
         const direction = sortDesc ? -1 : 1;
         return [...data].sort((a, b) => {
-            // ID Sorting
+
             if (sortId === (keyMap.id || 'id') || sortId === 'requestId') {
                 return (a.id || a.requestId).localeCompare(b.id || b.requestId) * direction;
             }
-            // Create Date Sorting
+
             if (sortId === (keyMap.createDate || 'createDate')) {
                 return a.createDate.localeCompare(b.createDate) * direction;
             }
-            // Status Sorting
+
             if (sortId === (keyMap.status || 'status')) {
                 return a.status.localeCompare(b.status) * direction;
             }
-            // Amount Sorting
+
             if (sortId === (keyMap.amount || 'amount')) {
                 const sumA = a.items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
                 const sumB = b.items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
                 return (sumA - sumB) * direction;
             }
-            // Description (Item 0)
+
             if (sortId === (keyMap.desc || 'description')) {
                 const descA = a.items[0]?.description || '';
                 const descB = b.items[0]?.description || '';
                 return descA.localeCompare(descB) * direction;
             }
-            // Date (Item 0)
+
             if (sortId === (keyMap.date || 'date')) {
                 const dateA = a.items[0]?.date || '';
                 const dateB = b.items[0]?.date || '';
                 return dateA.localeCompare(dateB) * direction;
             }
-            // Destination (Item 0)
+
             if (sortId === (keyMap.destination || 'destination')) {
                 const destA = a.items[0]?.destination || '';
                 const destB = b.items[0]?.destination || '';

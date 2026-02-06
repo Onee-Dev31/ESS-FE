@@ -1,14 +1,7 @@
-/**
- * @file Allowance Mock
- * @description Logic for Allowance Mock
- */
-
-// Section: Imports
 import { AllowanceRequest } from '../interfaces/allowance.interface';
 import { WELFARE_TYPES } from '../constants/welfare-types.constant';
 import { MockHelper } from './mock-helper';
 
-// Section: Logic
 export class AllowanceMock {
     static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): AllowanceRequest[] {
         return Array.from({ length: count }, (_, i) => {

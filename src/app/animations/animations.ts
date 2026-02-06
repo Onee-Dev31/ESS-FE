@@ -1,9 +1,3 @@
-/**
- * @file Animations
- * @description Animations for the application
- */
-
-// Section: Imports
 import {
     trigger,
     transition,
@@ -15,9 +9,6 @@ import {
     animateChild,
 } from '@angular/animations';
 
-// Section: Animations
-
-// 1. Route Page Transitions (Fade and Slide)
 export const fadeSlideAnimation = trigger('routeAnimations', [
     transition('* <=> *', [
         style({ position: 'relative' }),
@@ -44,7 +35,6 @@ export const fadeSlideAnimation = trigger('routeAnimations', [
     ]),
 ]);
 
-// 2. Staggered List Animation
 export const listAnimation = trigger('listAnimation', [
     transition('* <=> *', [
         query(':enter', [
@@ -56,7 +46,6 @@ export const listAnimation = trigger('listAnimation', [
     ]),
 ]);
 
-// 3. Modal Entrance Animation
 export const modalAnimation = trigger('modalAnimation', [
     transition(':enter', [
         style({ opacity: 0, transform: 'scale(0.95) translateY(10px)' }),
@@ -67,7 +56,6 @@ export const modalAnimation = trigger('modalAnimation', [
     ]),
 ]);
 
-// 4. Simple Fade In
 export const fadeIn = trigger('fadeIn', [
     transition(':enter', [
         style({ opacity: 0 }),

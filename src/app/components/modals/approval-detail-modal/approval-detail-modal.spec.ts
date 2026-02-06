@@ -1,9 +1,3 @@
-/**
- * @file Approval Detail Modal Spec
- * @description Logic for Approval Detail Modal Spec
- */
-
-// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -24,7 +18,6 @@ describe('ApprovalDetailModalComponent', () => {
     fixture = TestBed.createComponent(ApprovalDetailModalComponent);
     component = fixture.componentInstance;
 
-    // Provide mock data
     component.approvalItem = {
       requestNo: 'REQ-001',
       requestDate: '2024-01-01',

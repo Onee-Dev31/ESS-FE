@@ -1,9 +1,3 @@
-/**
- * @file Medicalexpenses Form
- * @description Logic for Medicalexpenses Form
- */
-
-// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +11,6 @@ import dayjs from 'dayjs';
 
 import { MasterDataService, ClaimType } from '../../../services/master-data.service';
 
-// Section: Logic
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,
@@ -70,7 +63,6 @@ export class MedicalexpensesForm implements OnInit {
     if (end.isBefore(start)) return 0;
     return end.diff(start, 'day') + 1;
   });
-
 
   ngOnInit() {
     this.userService.getUserProfile().subscribe(profile => {
@@ -134,7 +126,6 @@ export class MedicalexpensesForm implements OnInit {
     input.click();
   }
 
-
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -165,7 +156,6 @@ export class MedicalexpensesForm implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
-
   save() {
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
@@ -188,7 +178,6 @@ export class MedicalexpensesForm implements OnInit {
     }
 
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
-
 
     this.userService.getUserProfile().subscribe(profile => {
       const titleName = profile.name.split(' ')[0];

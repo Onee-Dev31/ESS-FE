@@ -1,19 +1,5 @@
-// File: Modal Components
-// Description: Styles for Modal Components
-
-// Section: Dependencies
 @use 'sass:color';
 @use 'variables' as *;
-
-// Modal Layout Mixins
-
-
-
-
-
-
-
-
 
 @mixin modal-overlay-styles {
     position: fixed;
@@ -31,7 +17,7 @@
 
     @include mobile {
         padding: 0;
-        align-items: flex-start; // Changed from flex-end to start for better scrolling experience
+        align-items: flex-start;
     }
 
     .modal-container {
@@ -66,13 +52,9 @@
     }
 }
 
-
-
-// Modal Components
 .modal-overlay {
     @include modal-overlay-styles;
 }
-
 
 @mixin modal-header {
     display: flex;
@@ -103,9 +85,6 @@
     }
 }
 
-
-
-// Modal Animations
 @keyframes popIn {
     from {
         transform: scale(0.9) translateY(20px);
@@ -118,7 +97,6 @@
     }
 }
 
-
 @keyframes fadeInOverlay {
     from {
         opacity: 0;
@@ -128,7 +106,6 @@
         opacity: 1;
     }
 }
-
 
 .modal-content-card {
     flex: 1;

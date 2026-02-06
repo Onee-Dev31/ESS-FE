@@ -1,19 +1,11 @@
-/**
- * @file Loading
- * @description Logic for Loading
- */
-
-// Section: Imports
 import { Injectable, signal, computed } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 
-// Section: Logic
 @Injectable({
   providedIn: 'root'
 })
 export class LoadingService {
   private loadingStates = signal<Map<string, boolean>>(new Map());
-
 
   start(key: string): void {
     const current = new Map(this.loadingStates());
@@ -21,13 +13,11 @@ export class LoadingService {
     this.loadingStates.set(current);
   }
 
-
   stop(key: string): void {
     const current = new Map(this.loadingStates());
     current.set(key, false);
     this.loadingStates.set(current);
   }
-
 
   isLoading(key?: string): boolean {
     if (!key) {
@@ -36,21 +26,17 @@ export class LoadingService {
     return this.loadingStates().get(key) || false;
   }
 
-
   loading(key: string) {
     return computed(() => this.loadingStates().get(key) || false);
   }
-
 
   isAnyLoading(): boolean {
     return Array.from(this.loadingStates().values()).some(v => v);
   }
 
-
   clearAll(): void {
     this.loadingStates.set(new Map());
   }
-
 
   private readonly GLOBAL_KEY = 'global-loading';
 

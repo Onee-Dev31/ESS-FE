@@ -1,9 +1,3 @@
-/**
- * @file Business Constant
- * @description Logic for Business Constant
- */
-
-// Section: Logic
 export const BUSINESS_CONFIG = {
     DEFAULT_PREFIX: '2701',
     LEAVE_TYPE_MAP: {

@@ -1,9 +1,3 @@
-/**
- * @file Dashboard Service
- * @description Logic for Dashboard Service
- */
-
-// Section: Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
@@ -14,7 +8,6 @@ import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
 
-// Section: Logic
 @Injectable({
     providedIn: 'root'
 })
@@ -55,8 +48,6 @@ export class DashboardService {
         ];
         return this.loadingService.wrap(of(stats).pipe(delay(1000)));
     }
-
-
 
     getLeaveStats(): Observable<LeaveItem[]> {
         const leaves: LeaveItem[] = [

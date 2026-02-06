@@ -1,16 +1,9 @@
-/**
- * @file User Service
- * @description Logic for User Service
- */
-
-// Section: Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { UserMock } from '../mocks/auth-user.mock';
 
-// Section: Logic
 export interface UserProfile {
     name: string;
     email: string;

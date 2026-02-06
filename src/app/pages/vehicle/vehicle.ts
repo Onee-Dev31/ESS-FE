@@ -1,9 +1,3 @@
-/**
- * @file Vehicle
- * @description Logic for Vehicle
- */
-
-// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -26,7 +20,6 @@ import {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
-// Section: Logic
 @Component({
   selector: 'app-vehicle',
   standalone: true,
@@ -39,17 +32,13 @@ export class VehicleComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
 
-
-
   isModalOpen = false;
   selectedRequestId = '';
 
   allRequests = signal<VehicleRequest[]>([]);
   sorting = signal<SortingState>([{ id: 'id', desc: true }]);
 
-
   listing = createListingState();
-
 
   processedData = computed(() => {
     const list = [...this.allRequests()];
@@ -77,7 +66,6 @@ export class VehicleComponent implements OnInit {
     }
     return filtered;
   });
-
 
   comps = createListingComputeds(this.processedData, this.listing);
 

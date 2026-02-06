@@ -1,15 +1,8 @@
-/**
- * @file Mock Helper
- * @description Logic for Mock Helper
- */
-
-// Section: Imports
 import { Requester } from '../interfaces/core.interface';
 import { REQUEST_STATUS_LIST } from '../constants/request-status.constant';
 import { USERS_MOCK, ADMIN_USER_MOCK } from './requesters.mock';
 import dayjs from 'dayjs';
 
-// Section: Logic
 export class MockHelper {
     static getRandomStatus(type: 'allowance' | 'taxi' | 'vehicle'): string {
         return REQUEST_STATUS_LIST[Math.floor(Math.random() * REQUEST_STATUS_LIST.length)];

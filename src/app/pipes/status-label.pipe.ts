@@ -1,9 +1,3 @@
-/**
- * @file Status Label Pipe
- * @description Logic for Status Label Pipe
- */
-
-// Section: Imports
 import { Pipe, PipeTransform } from '@angular/core';
 import { REQUEST_STATUS_LABEL } from '../constants/request-status.constant';
 
@@ -11,7 +5,7 @@ import { REQUEST_STATUS_LABEL } from '../constants/request-status.constant';
     name: 'statusLabel',
     standalone: true
 })
-// Section: Logic
+
 export class StatusLabelPipe implements PipeTransform {
     transform(value: string): string {
         return REQUEST_STATUS_LABEL[value] || value;

@@ -1,12 +1,8 @@
-﻿// File: Dashboard
-// Description: Styles for Dashboard
+﻿
 
-// Section: Dependencies
 @use 'sass:color';
 @use '../../../styles/theme' as *;
 @use '../../../styles/responsive-layout' as responsive;
-
-
 
 $dark: #0f172a;
 $muted: #64748b;
@@ -26,7 +22,6 @@ $balance: #15803d;
   transform: translateZ(0);
   background-clip: padding-box;
 }
-
 
 .dashboard-wrapper {
   padding: 15px;
@@ -57,7 +52,6 @@ $balance: #15803d;
     font-size: 20px;
   }
 }
-
 
 .section-title {
   font-size: 16px;
@@ -1268,7 +1262,6 @@ $balance: #15803d;
       transition: all 0.2s ease;
       border: 1px solid transparent;
 
-
       &.circle-green-outline {
         background: #ecfdf5;
         color: #059669;
@@ -1543,7 +1536,6 @@ $balance: #15803d;
     padding: 24px;
   }
 
-
   .attendance-list-clean {
     display: flex;
     flex-direction: column;
@@ -1604,7 +1596,6 @@ $balance: #15803d;
   .card-body {
     padding: 24px;
 
-
     .perf-subtitle {
       font-size: 15px;
       font-weight: 600;
@@ -1661,10 +1652,6 @@ $balance: #15803d;
   }
 }
 
-
-
-
-
 .calendar-panel {
   min-height: 400px;
   position: relative;
@@ -1716,8 +1703,6 @@ $balance: #15803d;
   .dashboard-wrapper {
     padding: 10px;
   }
-
-
 
   .page-title {
     font-size: 16px;

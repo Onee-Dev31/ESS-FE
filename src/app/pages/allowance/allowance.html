@@ -1,4 +1,3 @@
-<!-- Allowance Template -->
 <div class="allowance-page">
   <app-page-header title="ค่าเบี้ยเลี้ยง">
   </app-page-header>
@@ -61,7 +60,6 @@
       </div>
     </div>
 
-
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -102,7 +100,6 @@
             </div>
           </div>
 
-
         </div>
       </div>
 
@@ -112,7 +109,6 @@
       </div>
       }
     </div>
-
 
     <div class="table-responsive">
       @if (isLoading()) {
@@ -169,7 +165,6 @@
               </span>
             </td>
 
-
           </tr>
           <tr *ngIf="displayedRows().length === 0">
             <td colspan="7" class="no-data-cell">
@@ -183,12 +178,10 @@
       }
     </div>
 
-
     <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
       [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
     </app-pagination>
   </div>
-
 
   <div class="modal-overlay" *ngIf="isModalOpen">
     <div class="modal-container">

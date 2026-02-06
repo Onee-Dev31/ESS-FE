@@ -1,9 +1,3 @@
-/**
- * @file Allowance
- * @description Logic for Allowance
- */
-
-// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -35,7 +29,6 @@ interface FlatAllowanceRow extends AllowanceItem {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
-// Section: Logic
 @Component({
   selector: 'app-allowance',
   standalone: true,
@@ -107,7 +100,6 @@ export class AllowanceComponent implements OnInit {
     }
     return filtered;
   });
-
 
   comps = createListingComputeds(this.processedData, this.listing);
 
@@ -208,6 +200,5 @@ export class AllowanceComponent implements OnInit {
   goToPage(page: number) {
     this.listing.currentPage.set(page);
   }
-
 
 }

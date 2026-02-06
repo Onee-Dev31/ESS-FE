@@ -1,9 +1,3 @@
-/**
- * @file Auth Guard Spec
- * @description Logic for Auth Guard Spec
- */
-
-// Section: Imports
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 

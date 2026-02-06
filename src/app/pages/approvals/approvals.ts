@@ -1,9 +1,3 @@
-/**
- * @file Approvals
- * @description Logic for Approvals
- */
-
-// Section: Imports
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -30,7 +24,6 @@ import { createListingState, createListingComputeds, TableSortHelper } from '../
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
 
-// Section: Logic
 @Component({
   selector: 'app-approvals',
   standalone: true,
@@ -76,7 +69,6 @@ export class ApprovalsComponent implements OnInit {
     setTimeout(() => {
       this.loadingService.stop('approvals-list');
     }, 1500);
-
 
     this.route.data.subscribe(data => {
       this.category = data['category'] || 'all';
@@ -204,7 +196,6 @@ export class ApprovalsComponent implements OnInit {
     return `${core.requestNo || 'row'}-${index}`;
   }
 
-
   toggleExportMenu() {
     this.showExportMenu.set(!this.showExportMenu());
   }
@@ -272,4 +263,3 @@ export class ApprovalsComponent implements OnInit {
     }
   }
 }
-

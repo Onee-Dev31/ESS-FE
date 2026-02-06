@@ -1,23 +1,15 @@
-/**
- * @file Export
- * @description Logic for Export
- */
-
-// Section: Imports
 import { Injectable } from '@angular/core';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
-// Section: Logic
 @Injectable({
   providedIn: 'root'
 })
 export class ExportService {
 
   constructor() { }
-
 
   async exportToPDF(elementId: string, filename: string = 'export'): Promise<void> {
     try {
@@ -26,7 +18,6 @@ export class ExportService {
         console.error(`Element with ID "${elementId}" not found`);
         return;
       }
-
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -52,7 +43,6 @@ export class ExportService {
     }
   }
 
-
   async exportToExcel(
     data: any[],
     columns: { header: string; key: string; width?: number }[],
@@ -62,13 +52,11 @@ export class ExportService {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-
       worksheet.columns = columns.map(col => ({
         header: col.header,
         key: col.key,
         width: col.width || 15
       }));
-
 
       worksheet.getRow(1).font = { bold: true, size: 12 };
       worksheet.getRow(1).fill = {
@@ -80,11 +68,9 @@ export class ExportService {
       worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
       worksheet.getRow(1).height = 25;
 
-
       data.forEach(item => {
         worksheet.addRow(item);
       });
-
 
       worksheet.eachRow((row: ExcelJS.Row, rowNumber: number) => {
         row.eachCell((cell: ExcelJS.Cell) => {
@@ -97,7 +83,6 @@ export class ExportService {
         });
       });
 
-
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -108,7 +93,6 @@ export class ExportService {
       throw error;
     }
   }
-
 
   printElement(elementId: string): void {
     try {
@@ -123,7 +107,6 @@ export class ExportService {
         console.error('Failed to open print window');
         return;
       }
-
 
       const styles = Array.from(document.styleSheets)
         .map(styleSheet => {
@@ -159,7 +142,6 @@ export class ExportService {
       printWindow.document.close();
       printWindow.focus();
 
-
       setTimeout(() => {
         printWindow.print();
         printWindow.close();
@@ -169,7 +151,6 @@ export class ExportService {
       throw error;
     }
   }
-
 
   async exportTableToExcel(tableId: string, filename: string = 'export'): Promise<void> {
     try {
@@ -182,12 +163,10 @@ export class ExportService {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-
       const headerRow = table.querySelector('thead tr');
       if (headerRow) {
         const headers = Array.from(headerRow.querySelectorAll('th')).map(th => th.textContent?.trim() || '');
         worksheet.addRow(headers);
-
 
         worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
         worksheet.getRow(1).fill = {
@@ -199,18 +178,15 @@ export class ExportService {
         worksheet.getRow(1).height = 25;
       }
 
-
       const dataRows = table.querySelectorAll('tbody tr');
       dataRows.forEach(tr => {
         const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent?.trim() || '');
         worksheet.addRow(cells);
       });
 
-
       worksheet.columns.forEach((column: Partial<ExcelJS.Column>) => {
         column.width = 15;
       });
-
 
       worksheet.eachRow((row: ExcelJS.Row) => {
         row.eachCell((cell: ExcelJS.Cell) => {

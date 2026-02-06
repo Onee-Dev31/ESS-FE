@@ -1,8 +1,3 @@
-/**
- * @file Auth Service
- * @description Logic for Auth Service
- */
-
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -19,7 +14,6 @@ import { UserMock } from '../mocks/auth-user.mock';
 import { LoadingService } from './loading';
 import { ToastService } from './toast';
 
-// Section: Logic
 @Injectable({
     providedIn: 'root'
 })
@@ -52,7 +46,7 @@ export class AuthService {
         const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
 
         return of(!!user).pipe(
-            delay(1000), // Simulate network delay for premium feel
+            delay(1000),
             tap(isValid => {
                 if (isValid && user) {
                     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
@@ -115,4 +109,3 @@ export class AuthService {
         return localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
     }
 }
-

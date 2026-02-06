@@ -1,9 +1,3 @@
-/**
- * @file Login Spec
- * @description Logic for Login Spec
- */
-
-// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoginComponent } from './login';

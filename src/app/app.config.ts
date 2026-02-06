@@ -1,9 +1,3 @@
-/**
- * @file App Config
- * @description Logic for App Config
- */
-
-// Section: Imports
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
@@ -18,7 +12,6 @@ import { errorInterceptor } from './interceptors/error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { GlobalErrorHandler } from './core/global-error-handler';
 
-// Section: Logic
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),

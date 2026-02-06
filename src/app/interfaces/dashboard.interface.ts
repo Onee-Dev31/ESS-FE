@@ -1,22 +1,14 @@
-/**
- * @file Dashboard Interface
- * @description Logic for Dashboard Interface
- */
-
-// Section: Logic
 export interface MedicalStat {
     label: string;
     subLabel: string;
     used: string;
     balance: string;
     percent: number;
-    type: 'outpatient' | 'dental' | 'optical' | 'inpatient'; // Added for specific styling identification
+    type: 'outpatient' | 'dental' | 'optical' | 'inpatient';
 }
 
-
-
 export interface LeaveItem {
-    type: 'vacation' | 'business' | 'sick' | 'sterilization' | 'funeral'; // Added for styling
+    type: 'vacation' | 'business' | 'sick' | 'sterilization' | 'funeral';
     label: string;
     count: string;
     balance: number;

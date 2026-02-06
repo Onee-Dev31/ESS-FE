@@ -1,13 +1,6 @@
-/**
- * @file Medical Mock
- * @description Logic for Medical Mock
- */
-
-// Section: Imports
 import { MedicalRequest } from '../interfaces/medical.interface';
 import { MockHelper } from './mock-helper';
 
-// Section: Logic
 export class MedicalMock {
     static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): MedicalRequest[] {
         const diseaseTypes = ['เอ็นอักเสบ', 'ไข้หวัดใหญ่', 'ปวดฟัน/อุดฟัน', 'ปวดศีรษะ', 'ท้องเสีย'];

@@ -1,9 +1,3 @@
-/**
- * @file Allowance Spec
- * @description Logic for Allowance Spec
- */
-
-// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AllowanceComponent } from './allowance';

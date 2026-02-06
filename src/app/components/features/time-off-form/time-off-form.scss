@@ -1,7 +1,3 @@
-// File: Time Off Form
-// Description: Styles for Time Off Form
-
-// Section: Dependencies
 @use 'sass:color';
 @use '../../../../styles/theme' as *;
 
@@ -29,7 +25,6 @@
     width: 100%;
     height: 100%;
     background: transparent;
-
 
     overflow: hidden;
 
@@ -112,7 +107,6 @@
         @extend .hidden-input;
     }
 }
-
 
 .attachment-table-container {
     @extend .attachment-table-container;
@@ -240,8 +234,6 @@
     }
 }
 
-
-
 .custom-input-wrapper {
     @include custom-input-wrapper;
 }
@@ -328,8 +320,6 @@ textarea.custom-form-control {
     }
 }
 
-
-
 .calculated-days-display {
     margin-top: 0;
 
@@ -363,9 +353,6 @@ textarea.custom-form-control {
         }
     }
 }
-
-
-
 
 .form-actions-footer {
     @extend .form-actions-footer;
@@ -412,17 +399,13 @@ textarea.custom-form-control {
         border-radius: 0;
 
         .content-card {
-            padding-bottom: 80px !important; // Add space for footer
+            padding-bottom: 80px !important;
         }
-
-
 
         .content-card {
             padding: 15px;
         }
     }
-
-
 
     .leave-type-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -452,9 +435,6 @@ textarea.custom-form-control {
         z-index: 10;
         position: relative;
         background: #f8fafc;
-
-        // Visual Order: [Save] [Cancel]
-        // Save (Left) | Cancel (Right)
 
         .btn-save-custom,
         .btn-submit,
@@ -490,6 +470,5 @@ textarea.custom-form-control {
             order: 2;
         }
     }
-
 
 }

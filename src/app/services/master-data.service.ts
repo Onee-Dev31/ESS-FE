@@ -1,9 +1,3 @@
-/**
- * @file Master Data Service
- * @description Logic for Master Data Service
- */
-
-// Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
@@ -11,7 +5,6 @@ import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
 
 import { DateConfig } from '../interfaces/core.interface';
 
-// Section: Logic
 export interface ClaimType {
     id: string;
     label: string;

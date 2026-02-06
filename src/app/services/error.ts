@@ -1,13 +1,6 @@
-/**
- * @file Error
- * @description Logic for Error
- */
-
-// Section: Imports
 import { Injectable, inject } from '@angular/core';
 import { ToastService } from './toast';
 
-// Section: Logic
 export interface ErrorContext {
   component?: string;
   action?: string;
@@ -20,13 +13,11 @@ export interface ErrorContext {
 export class ErrorService {
   private toastService = inject(ToastService);
 
-
   handle(error: any, context?: ErrorContext): void {
     const message = this.getUserFriendlyMessage(error, context);
     this.toastService.error(message);
     this.logError(error, context);
   }
-
 
   private logError(error: any, context?: ErrorContext): void {
     console.error('[ErrorService]', {
@@ -36,13 +27,11 @@ export class ErrorService {
     });
   }
 
-
   private getUserFriendlyMessage(error: any, context?: ErrorContext): string {
 
     if (error?.status === 0 || error?.message?.includes('Http failure')) {
       return 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
     }
-
 
     if (error?.status) {
       switch (error.status) {
@@ -61,15 +50,12 @@ export class ErrorService {
       }
     }
 
-
     if (context?.action?.includes('export')) {
       return 'ไม่สามารถ export ไฟล์ได้ กรุณาลองใหม่อีกครั้ง';
     }
 
-
     return error?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
   }
-
 
   async handleAsync<T>(
     operation: () => Promise<T>,

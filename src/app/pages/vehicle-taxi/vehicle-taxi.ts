@@ -1,9 +1,3 @@
-/**
- * @file Vehicle Taxi
- * @description Logic for Vehicle Taxi
- */
-
-// Section: Imports
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -38,7 +32,6 @@ interface FlatTaxiRow extends TaxiItem {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
-// Section: Logic
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
@@ -52,7 +45,6 @@ export class VehicleTaxiComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-
 
   isLoading = this.loadingService.loading('taxi-list');
 

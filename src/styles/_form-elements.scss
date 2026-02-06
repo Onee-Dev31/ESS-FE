@@ -1,11 +1,7 @@
-// File: Form Elements
-// Description: Styles for Input fields and controls
-
 @use 'sass:color';
 @use 'variables' as *;
 @use 'mixins' as *;
 
-// Mixins
 @mixin custom-input-wrapper {
     display: flex;
     border: 1px solid #d1d5db;
@@ -67,7 +63,6 @@
     }
 }
 
-
 @mixin input-field-group {
     display: flex;
     flex-direction: column;
@@ -85,7 +80,6 @@
     }
 }
 
-// Components
 .custom-form-control {
     width: 100%;
     height: 40px;

@@ -1,9 +1,3 @@
-/**
- * @file Storage Constants
- * @description Logic for Storage Constants
- */
-
-// Section: Logic
 export const STORAGE_KEYS = {
     IS_LOGGED_IN: 'isLoggedIn',
     CURRENT_USER: 'currentUser',

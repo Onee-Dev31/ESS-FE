@@ -1,10 +1,5 @@
-// File: Medicalexpenses
-// Description: Styles for Medicalexpenses
-
-// Section: Dependencies
 @use '../../../styles/theme' as *;
 
-// Medical Expenses Page Layout
 .medical-page {
     padding: 24px;
     background-color: $bg-page;
@@ -36,7 +31,6 @@
         }
     }
 
-    // Table Styling
     .modern-table {
         @include modern-table;
         min-width: 1200px;
@@ -45,7 +39,6 @@
             th {
                 white-space: nowrap;
 
-                // Numeric columns should be right-aligned
                 &.col-amount {
                     text-align: right;
                 }

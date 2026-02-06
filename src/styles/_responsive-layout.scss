@@ -1,12 +1,7 @@
-// File: Responsive Layout
-// Description: Styles for Responsive Layout
-
-// Section: Dependencies
 @forward 'variables';
 
 @use 'variables' as *;
 @use 'sass:color';
-
 
 .toolbar-container {
     padding: 0 20px 20px 20px;
@@ -190,8 +185,6 @@
         }
     }
 
-
-
     .btn-clear {
         background-color: $bg-page;
         color: $text-muted;
@@ -217,7 +210,6 @@
         }
     }
 }
-
 
 .card-list-view {
     display: none;
@@ -326,7 +318,6 @@
                     text-align: right;
                 }
             }
-
 
             .reason-box {
                 background: $bg-slate;
@@ -474,7 +465,6 @@
     }
 }
 
-
 .modern-table {
     .sortable-header {
         cursor: pointer;
@@ -498,8 +488,6 @@
         font-style: italic;
     }
 }
-
-
 
 .mobile-only {
     @include desktop {

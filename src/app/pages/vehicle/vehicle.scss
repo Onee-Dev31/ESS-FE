@@ -1,10 +1,5 @@
-// File: Vehicle
-// Description: Styles for Vehicle
-
-// Section: Dependencies
 @use '../../../styles/theme' as *;
 
-// Vehicle Page Layout
 .vehicle-page {
   padding: 24px;
   background-color: $bg-page;
@@ -42,8 +37,6 @@
     }
   }
 
-
-  // Table Styling
   .modern-table {
     @include modern-table;
 

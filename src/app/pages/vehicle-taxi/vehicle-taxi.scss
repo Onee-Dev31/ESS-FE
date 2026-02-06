@@ -1,10 +1,5 @@
-// File: Vehicle Taxi
-// Description: Styles for Vehicle Taxi
-
-// Section: Dependencies
 @use '../../../styles/theme' as *;
 
-// Vehicle Taxi Page Layout
 .vehicle-taxi-page {
   padding: 24px;
   background-color: $bg-page;
@@ -94,10 +89,7 @@
       }
     }
 
-
   }
-
-
 
   .modal-overlay {
     @extend .modal-overlay;

@@ -1,9 +1,3 @@
-/**
- * @file Taxi Service
- * @description Logic for Taxi Service
- */
-
-// Section: Imports
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { TaxiItem, TaxiRequest, TaxiLogItem } from '../interfaces/taxi.interface';
@@ -13,7 +7,6 @@ import { BaseRequestService } from './base-request.service';
 
 export type { TaxiItem, TaxiRequest, TaxiLogItem };
 
-// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

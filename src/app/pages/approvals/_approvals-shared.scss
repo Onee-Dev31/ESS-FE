@@ -1,7 +1,3 @@
-// File: Approvals Shared
-// Description: Styles for Approvals Shared
-
-// Section: Dependencies
 @use "sass:color";
 @use '../../../styles/theme' as *;
 
@@ -216,7 +212,6 @@
             }
         }
 
-
         .card-list-view {
             display: none;
 
@@ -228,9 +223,7 @@
 
             .mobile-card {
 
-
                 .card-header {
-
 
                     .request-id {
                         display: flex;
@@ -250,7 +243,6 @@
                 }
 
                 .card-body {
-
 
                     .info-row {
                         display: flex;
@@ -452,10 +444,6 @@
             text-align: right;
         }
     }
-
-
-
-
 
     .act-btn {
         width: 32px;

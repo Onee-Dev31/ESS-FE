@@ -1,9 +1,3 @@
-/**
- * @file Vehicle Form Spec
- * @description Logic for Vehicle Form Spec
- */
-
-// Section: Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VehicleFormComponent } from './vehicle-form';

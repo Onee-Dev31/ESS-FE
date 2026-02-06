@@ -1,8 +1,3 @@
-// File: Styles
-// Description: Main Styles Entry Point
-
-// Section: Dependencies
-// Section: Dependencies
 @use "sass:color";
 @use './styles/theme' as *;
 @use './styles/responsive-layout' as responsive;
@@ -11,8 +6,6 @@
 @use './styles/components';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
-
-// Toast Notifications (Keep here for now or move to separate file if needed)
 .toast-container {
   position: fixed !important;
   top: 20px !important;

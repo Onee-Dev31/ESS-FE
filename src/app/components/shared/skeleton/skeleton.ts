@@ -1,13 +1,6 @@
-/**
- * @file Skeleton
- * @description Logic for Skeleton
- */
-
-// Section: Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Section: Logic
 @Component({
   selector: 'app-skeleton',
   standalone: true,

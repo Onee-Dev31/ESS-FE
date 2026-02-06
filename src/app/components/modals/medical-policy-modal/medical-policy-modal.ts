@@ -1,13 +1,6 @@
-/**
- * @file Medical Policy Modal
- * @description Logic for Medical Policy Modal
- */
-
-// Section: Imports
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Section: Logic
 @Component({
     selector: 'app-medical-policy-modal',
     standalone: true,

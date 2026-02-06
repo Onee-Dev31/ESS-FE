@@ -1,13 +1,6 @@
-// File: Table Components
-// Description: Styles for Table Components
-
-// Section: Dependencies
 @use 'sass:color';
 @use 'variables' as *;
-@use 'button-components' as *; // To use btn-icon mixin
-
-// Table Structure Mixins
-
+@use 'button-components' as *;
 
 @mixin excel-table-base {
     width: 100%;
@@ -39,7 +32,6 @@
     }
 }
 
-
 @mixin excel-table-header {
     th {
         background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
@@ -55,7 +47,6 @@
         }
     }
 }
-
 
 @mixin modern-table {
     width: 100%;
@@ -120,8 +111,6 @@
         }
     }
 
-
-
     .top-align {
         vertical-align: top;
         padding-top: 16px;
@@ -178,8 +167,6 @@
     }
 }
 
-
-// Ready-to-use Table Components
 .attachment-table-container {
     flex: 1;
     overflow-x: auto;
@@ -322,11 +309,9 @@
     }
 }
 
-
 .modern-table {
     @include modern-table;
 }
-
 
 .col-xs {
     width: 50px;

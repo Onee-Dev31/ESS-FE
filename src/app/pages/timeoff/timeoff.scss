@@ -1,10 +1,5 @@
-// File: Timeoff
-// Description: Styles for Timeoff
-
-// Section: Dependencies
 @use '../../../styles/theme' as *;
 
-// Time Off Page Layout
 .timeoff-page {
     position: relative;
 
@@ -64,8 +59,6 @@
         }
     }
 
-
-    // Table Styling
     .modern-table {
         @include modern-table;
 
@@ -166,6 +159,5 @@
             }
         }
     }
-
 
 }

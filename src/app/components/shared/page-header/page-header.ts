@@ -1,14 +1,7 @@
-/**
- * @file Page Header
- * @description Logic for Page Header
- */
-
-// Section: Imports
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
-// Section: Logic
 @Component({
     selector: 'app-page-header',
     standalone: true,

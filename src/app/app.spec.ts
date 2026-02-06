@@ -1,9 +1,3 @@
-/**
- * @file App Spec
- * @description Logic for App Spec
- */
-
-// Section: Imports
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 

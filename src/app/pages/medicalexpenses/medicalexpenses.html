@@ -1,11 +1,9 @@
-<!-- Medicalexpenses Template -->
 <div class="medical-page">
     <app-page-header title="ค่ารักษาพยาบาล">
         <button class="btn-icon-sky" (click)="isPolicyModalOpen.set(true)" title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
             <i class="fas fa-info-circle"></i>
         </button>
     </app-page-header>
-
 
     <div class="content-card">
         <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
@@ -80,8 +78,6 @@
                 </div>
             </div>
         </div>
-
-
 
         <div class="table-responsive">
             @if (isLoading()) {
@@ -180,7 +176,6 @@
             }
         </div>
 
-
         <div class="card-list-view">
             @if (isLoading()) {
             <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -251,7 +246,6 @@
 
 <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
 </app-medical-policy-modal>
-
 
 <div class="modal-overlay" *ngIf="isModalOpen()">
     <div class="modal-container">

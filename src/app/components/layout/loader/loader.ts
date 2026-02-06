@@ -1,14 +1,7 @@
-/**
- * @file Loader
- * @description Logic for Loader
- */
-
-// Section: Imports
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from '../../../services/loading';
 
-// Section: Logic
 @Component({
   selector: 'app-loader',
   standalone: true,

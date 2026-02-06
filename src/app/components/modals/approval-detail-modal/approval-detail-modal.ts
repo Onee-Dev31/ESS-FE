@@ -1,9 +1,3 @@
-/**
- * @file Approval Detail Modal
- * @description Logic for Approval Detail Modal
- */
-
-// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +10,6 @@ import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
 import { modalAnimation, fadeIn } from '../../../animations/animations';
 
-// Section: Logic
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,

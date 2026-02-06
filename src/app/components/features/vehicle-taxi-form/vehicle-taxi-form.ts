@@ -1,9 +1,3 @@
-/**
- * @file Vehicle Taxi Form
- * @description Logic for Vehicle Taxi Form
- */
-
-// Section: Imports
 import { Component, EventEmitter, OnInit, OnChanges, SimpleChanges, Output, Input, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +10,6 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 
 import { MasterDataService } from '../../../services/master-data.service';
 
-// Section: Logic
 @Component({
   selector: 'app-vehicle-taxi-form',
   standalone: true,
@@ -70,7 +63,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     });
   }
 
-
   generateMockData() {
     const existingRequest = this.loadedRequest;
 
@@ -102,7 +94,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
       .filter(item => item.selected)
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
-
 
   save() {
     const selectedItems = this.items.filter(item => item.selected);
@@ -176,7 +167,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     }
   }
 
-
   cancel() {
     this.onClose.emit();
   }
@@ -191,7 +181,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.currentUploadItem = null;
   }
 
-
   handleFileSave(fileName: string | null) {
     if (this.currentUploadItem) {
       this.currentUploadItem.attachedFile = fileName;
@@ -202,4 +191,3 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges {
     this.closeUploadModal();
   }
 }
-

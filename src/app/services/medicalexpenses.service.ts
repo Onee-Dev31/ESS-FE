@@ -1,9 +1,3 @@
-/**
- * @file Medicalexpenses Service
- * @description Logic for Medicalexpenses Service
- */
-
-// Section: Imports
 import { Injectable } from '@angular/core';
 import { MedicalItem, MedicalRequest } from '../interfaces/medical.interface';
 export type { MedicalItem, MedicalRequest };
@@ -11,7 +5,6 @@ import { MedicalMock } from '../mocks/medical.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 
-// Section: Logic
 @Injectable({
     providedIn: 'root'
 })

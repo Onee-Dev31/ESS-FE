@@ -1,13 +1,6 @@
-/**
- * @file File Preview Modal
- * @description Logic for File Preview Modal
- */
-
-// Section: Imports
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Section: Logic
 export interface FilePreviewItem {
     fileName: string;
     date: string;

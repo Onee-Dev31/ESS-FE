@@ -1,12 +1,5 @@
-/**
- * @file Allowance Interface
- * @description Logic for Allowance Interface
- */
-
-// Section: Imports
 import { Requester } from './core.interface';
 
-// Section: Logic
 export interface AllowanceItem {
     date: string;
     dayType?: string;

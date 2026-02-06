@@ -1,12 +1,5 @@
-/**
- * @file Time Off Interface
- * @description Logic for Time Off Interface
- */
-
-// Section: Imports
 import { Requester } from './core.interface';
 
-// Section: Logic
 export interface TimeOffRequest {
     id: string;
     createDate: string;

@@ -1,14 +1,7 @@
-/**
- * @file Time Off Mock
- * @description Logic for Time Off Mock
- */
-
-// Section: Imports
 import { TimeOffRequest, LEAVE_TYPES } from '../interfaces/time-off.interface';
 import { MockHelper } from './mock-helper';
 import dayjs from 'dayjs';
 
-// Section: Logic
 export class TimeOffMock {
     static generateRequestsByRole(count: number, role: 'Admin' | 'Member'): TimeOffRequest[] {
         return Array.from({ length: count }, (_, i) => {

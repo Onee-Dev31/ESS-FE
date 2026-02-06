@@ -1,9 +1,3 @@
-/**
- * @file Time Off Form
- * @description Logic for Time Off Form
- */
-
-// Section: Imports
 import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +12,6 @@ import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-pr
 
 import { MasterDataService } from '../../../services/master-data.service';
 
-// Section: Logic
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
@@ -49,7 +42,6 @@ export class TimeOffForm implements OnInit {
   leavePeriod = signal<string>('full-day');
   shiftStartTime = signal<string>('');
   shiftEndTime = signal<string>('');
-
 
   calculatedDays = computed(() => {
     const period = this.leavePeriod();
@@ -163,7 +155,6 @@ export class TimeOffForm implements OnInit {
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
-
 
   save() {
     if (!this.selectedLeaveType()) {

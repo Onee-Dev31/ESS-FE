@@ -1,4 +1,3 @@
-<!-- Medicalexpenses Form Template -->
 <div class="form-root">
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
@@ -44,7 +43,6 @@
                 </div>
             </div>
         </section>
-
 
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <h4 class="section-heading">2. กรอกรายละเอียด</h4>
@@ -111,7 +109,6 @@
             </div>
         </section>
 
-
         <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
             <div class="section-header-row">
                 <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
@@ -164,7 +161,6 @@
             </div>
         </div>
     </main>
-
 
     <div class="form-actions-footer">
         <button class="btn-back-custom" (click)="close()">

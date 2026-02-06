@@ -1,12 +1,5 @@
-/**
- * @file Dialog
- * @description Logic for Dialog
- */
-
-// Section: Imports
 import { Injectable, signal } from '@angular/core';
 
-// Section: Logic
 export interface DialogConfig {
   title: string;
   message: string;

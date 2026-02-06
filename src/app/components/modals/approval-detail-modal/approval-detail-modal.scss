@@ -1,7 +1,3 @@
-// File: Approval Detail Modal
-// Description: Styles for Approval Detail Modal
-
-// Section: Dependencies
 @use "sass:color";
 @use '../../../../styles/theme' as *;
 
@@ -29,7 +25,7 @@ $bg-slate: $bg-slate;
         height: auto;
         min-height: auto;
         position: relative;
-        margin: 40px auto; // Simplified margin
+        margin: 40px auto;
         display: block;
         overflow: visible;
     }
@@ -168,7 +164,6 @@ $bg-slate: $bg-slate;
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
-
 
                 .progress-line-bg {
                     position: absolute;
@@ -798,8 +793,6 @@ $bg-slate: $bg-slate;
         }
     }
 }
-
-// ... remaining lines truncated for summary ...
 
 .comment-thread {
     display: flex;

@@ -1,9 +1,3 @@
-/**
- * @file Layout
- * @description Logic for Layout
- */
-
-// Section: Imports
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -13,7 +7,6 @@ import { SidebarService } from '../sidebar/sidebar';
 import { ChildrenOutletContexts } from '@angular/router';
 import { fadeSlideAnimation } from '../../animations/animations';
 
-// Section: Logic
 @Component({
   selector: 'app-layout',
   standalone: true,

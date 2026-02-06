@@ -1,9 +1,3 @@
-/**
- * @file Menu Config
- * @description Logic for Menu Config
- */
-
-// Section: Logic
 export interface MenuItem {
     name: string;
     icon: string;

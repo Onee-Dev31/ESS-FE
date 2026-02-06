@@ -1,12 +1,5 @@
-/**
- * @file Status Util
- * @description Logic for Status Util
- */
-
-// Section: Imports
 import { REQUEST_STATUS } from '../constants/request-status.constant';
 
-// Section: Logic
 export class StatusUtil {
     static getStatusBadgeClass(status: string): string {
         const s = status?.trim();

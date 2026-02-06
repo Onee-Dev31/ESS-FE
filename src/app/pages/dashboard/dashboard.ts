@@ -1,9 +1,3 @@
-/**
- * @file Dashboard
- * @description Logic for Dashboard
- */
-
-// Section: Imports
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -33,7 +27,6 @@ interface PerformanceItem { year: string; grade: string; }
 
 dayjs.locale('th');
 
-// Section: Logic
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -71,7 +64,6 @@ export class DashboardComponent implements OnInit {
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
-  // UI Mappers
   medicalStatsDisplay = computed(() => {
     const stats = this.medicalStats();
     if (!stats) return null;

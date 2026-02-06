@@ -1,9 +1,3 @@
-/**
- * @file Timeoff
- * @description Logic for Timeoff
- */
-
-// Section: Imports
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,7 +24,6 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 
-// Section: Logic
 @Component({
   selector: 'app-timeoff',
   standalone: true,
@@ -134,7 +127,6 @@ export class TimeoffComponent implements OnInit {
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
-
 
   statuses = COMMON_STATUS_OPTIONS;
 
