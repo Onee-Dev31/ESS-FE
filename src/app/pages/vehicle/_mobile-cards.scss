@@ -1,0 +1,7 @@
+@use '../../../styles/theme' as *;
+
+@mixin vehicle-mobile-cards {
+    .card-list-view {
+        @include mobile-cards-view;
+    }
+}

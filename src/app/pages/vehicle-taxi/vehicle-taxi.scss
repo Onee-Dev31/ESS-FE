@@ -1,95 +1,11 @@
-@use '../../../styles/theme' as *;
+@use './layout';
+@use './table';
+@use './mobile-cards';
 
 .vehicle-taxi-page {
-  padding: 24px;
-  background-color: $bg-page;
-  min-height: 100vh;
-  box-sizing: border-box;
-
-  @include large-tablet {
-    padding: 12px;
-    padding-bottom: 5px;
-  }
-
-  .content-card {
-    @include content-card;
-    margin-top: 16px;
-  }
-
-  .card-header-title {
-    @include card-header-title;
-  }
-
-  .toolbar-container {
-    @include toolbar-container;
-  }
-
-  .card-list-view {
-    @include mobile-cards-view;
-
-    .mobile-card .card-header .header-content {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      .create-date {
-        font-size: 0.75rem;
-        color: #94a3b8;
-      }
-    }
-
-    .action-btn.folder {
-      @include icon-btn-sky;
-
-      &:hover {
-        transform: scale(1.05);
-      }
-    }
-  }
-
-  .table-responsive {
-    display: block;
-    overflow-x: auto;
-
-    @include large-tablet {
-      display: none !important;
-    }
-  }
-
-  .modern-table {
-    @include modern-table;
-
-    &.taxi-table {
-      .col-id {
-        width: 120px;
-      }
-
-      .col-date {
-        width: 150px;
-      }
-
-      .col-desc {
-        width: auto;
-      }
-
-      .col-dest {
-        width: 200px;
-      }
-
-      .col-amount {
-        width: 150px;
-      }
-
-      .col-status {
-        width: 200px;
-      }
-
-      .col-actions {
-        width: 150px;
-      }
-    }
-
-  }
+  @include layout.vehicle-taxi-layout;
+  @include table.vehicle-taxi-table;
+  @include mobile-cards.vehicle-taxi-mobile-cards;
 
   .modal-overlay {
     @extend .modal-overlay;

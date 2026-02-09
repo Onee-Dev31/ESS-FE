@@ -1,0 +1,47 @@
+@use '../../../../styles/theme' as *;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.vehicle-form-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: $bg-card;
+    font-family: $font-main;
+    overflow: hidden;
+
+    input,
+    button,
+    select,
+    textarea {
+        font-family: $font-main;
+    }
+
+    .top-header-strip {
+        @extend .top-header-strip;
+    }
+
+    .content-card {
+        flex: 1;
+        padding: 15px 15px;
+
+        @include desktop {
+            padding: 20px 24px;
+        }
+
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        overflow: hidden;
+    }
+
+    .filter-section {
+        @extend .filter-section;
+    }
+}

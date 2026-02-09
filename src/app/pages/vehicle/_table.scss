@@ -1,0 +1,37 @@
+@use '../../../styles/theme' as *;
+
+@mixin vehicle-table {
+    .modern-table {
+        @include modern-table;
+
+        .col-id {
+            width: 150px;
+        }
+
+        .col-date {
+            width: 150px;
+        }
+
+        .col-amount {
+            width: 150px;
+        }
+
+        .col-status {
+            width: 200px;
+        }
+
+        .col-actions {
+            width: 150px;
+        }
+
+        td,
+        th {
+            &:nth-child(4) {
+                max-width: 300px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+}

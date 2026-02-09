@@ -1,347 +1,73 @@
 @use 'sass:color';
 @use 'variables' as *;
-@use 'button-components' as *;
-
-@mixin excel-table-base {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-
-    th,
-    td {
-        border-bottom: 1px solid $border;
-        border-right: 1px solid $border;
-        height: 40px;
-        vertical-align: middle;
-        box-sizing: border-box;
-        padding: 8px;
-        font-size: 0.9rem;
-
-        &:last-child {
-            border-right: none;
-        }
-    }
-
-    @include tablet {
-
-        th,
-        td {
-            padding: 12px;
-            font-size: 0.9rem;
-        }
-    }
-}
-
-@mixin excel-table-header {
-    th {
-        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-        text-align: center;
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.025em;
-
-        &.col-xs {
-            width: 50px;
-        }
-    }
-}
+@use 'mixins' as *;
 
 @mixin modern-table {
     width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-
-    .sortable-header {
-        cursor: pointer;
-        transition: background-color 0.2s;
-        user-select: none;
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.05) !important;
-        }
-
-        i {
-            margin-left: 6px;
-            font-size: 0.75rem;
-            opacity: 0.6;
-            vertical-align: middle;
-            display: inline-block;
-        }
-    }
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: 12px;
+    overflow: hidden;
 
     thead {
-        background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
-        box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
-
-        tr th {
-            padding: 16px 12px;
-            font-weight: 600;
-            color: #ffffff;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #1557b0;
-        }
-    }
-
-    tbody tr {
-        border-bottom: 1px solid #f1f5f9;
-
-        &:hover {
+        tr {
             background: #f8fafc;
         }
 
-        td {
-            padding: 16px 12px;
-            font-size: 0.95rem;
-            color: #1e293b;
-
-            &.text-right {
-                text-align: right !important;
-            }
-
-            &.text-center {
-                text-align: center !important;
-            }
-
-            &.text-left {
-                text-align: left !important;
-            }
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: $text-header;
+            border-bottom: 2px solid $border;
+            white-space: nowrap;
         }
     }
 
-    .top-align {
-        vertical-align: top;
-        padding-top: 16px;
-    }
-
-    .merged-col {
-        background-color: white !important;
-    }
-
-    .action-btns {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            background: transparent;
-            transition: all 0.2s;
-            cursor: pointer;
-
-            &.edit {
-                color: #2563eb;
-                background: #eff6ff;
-
-                &:hover {
-                    background: #dbeafe;
-                }
-            }
-
-            &.delete {
-                color: #dc2626;
-                background: #fef2f2;
-
-                &:hover {
-                    background: #fee2e2;
-                }
-            }
-
-            &.view {
-                color: $primary;
-                background: rgba($primary, 0.1);
-
-                &:hover {
-                    background: rgba($primary, 0.2);
-                }
-            }
-        }
-    }
-}
-
-.attachment-table-container {
-    flex: 1;
-    overflow-x: auto;
-    max-width: 100%;
-    border: 1px solid $border;
-    border-radius: 8px;
-    margin-top: 1rem;
-
-    .excel-table {
-        @include excel-table-base;
-        @include excel-table-header;
-
-        .clickable-file {
-            cursor: pointer;
-
-            .file-name-container {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                background: #f1f3f4;
-                padding: 6px 12px;
-                border-radius: 4px;
-                max-width: 400px;
-                transition: all 0.2s;
-
-                @include tablet {
-                    max-width: 150px;
-                }
-
-                .file-text {
-                    flex: 1;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    font-size: 0.85rem;
-                    color: $text;
-                }
-
-                &:hover {
-                    background: #e2e8f0;
-
-                    .file-text {
-                        color: $primary;
-                        text-decoration: underline;
-                    }
-                }
-            }
-        }
-
-        .btn-delete-row {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px;
-            border-radius: 4px;
+    tbody {
+        tr {
+            transition: background 0.2s;
 
             &:hover {
-                background: #fef2f2;
+                background: #f1f5f9;
             }
 
-            @include tablet {
-                color: #888;
-
-                &:hover {
-                    color: $danger;
-                }
+            &:last-child td {
+                border-bottom: none;
             }
         }
 
-        .desc-input-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-
-            .desc-control {
-                width: 100%;
-                padding: 6px 10px;
-                border: 1px solid transparent;
-                border-radius: 4px;
-                font-size: 0.9rem;
-                background: transparent;
-
-                &.is-invalid {
-                    border: 1px solid $danger;
-                    background-color: rgba($danger, 0.05);
-
-                    &:focus {
-                        box-shadow: 0 0 0 2px rgba($danger, 0.1);
-                    }
-                }
-
-                &:focus {
-                    background: #fff;
-                    border-color: $primary;
-                    outline: none;
-                }
-            }
-
-            .error-msg {
-                color: $danger;
-                font-size: 0.75rem;
-                font-weight: 500;
-            }
-        }
-
-        .file-delete-icon {
-            color: $text-sub;
-            cursor: pointer;
+        td {
+            padding: 16px;
             font-size: 0.9rem;
-
-            &:hover {
-                color: $danger;
-            }
+            color: $text;
+            border-bottom: 1px solid $border-color;
+            vertical-align: middle;
         }
+    }
 
-        td {
-            &.clickable-file {
-                cursor: pointer;
-                transition: all 0.2s;
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+    }
 
-                &:hover {
-                    background: rgba($primary, 0.02);
-
-                    .file-text {
-                        color: $primary;
-                        text-decoration: underline;
-                    }
-                }
-            }
-        }
+    .action-cell {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
     }
 
     @include tablet {
-        margin-top: 1rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        overflow-x: auto;
+        display: none;
     }
 }
 
-.modern-table {
+.data-grid {
     @include modern-table;
-}
-
-.col-xs {
-    width: 50px;
-}
-
-.col-id {
-    width: 140px;
-}
-
-.col-sm {
-    width: 80px;
-}
-
-.col-md {
-    width: 120px;
-}
-
-.col-lg {
-    width: 150px;
-}
-
-.col-date {
-    width: 120px;
-}
-
-.col-amount {
-    width: 90px;
-}
-
-.col-actions {
-    width: 100px;
-    text-align: center;
 }

@@ -1,0 +1,142 @@
+@use '../../../../styles/theme' as *;
+
+.form-section-wrapper {
+    min-width: 0;
+    width: 100%;
+
+    .section-header-row {
+        @extend .section-header-row;
+    }
+
+    .section-heading {
+        @include section-heading;
+        font-size: 0.95rem;
+        color: #3c4043;
+        letter-spacing: -0.01em;
+    }
+
+    .hidden-input {
+        @extend .hidden-input;
+    }
+}
+
+.details-grid {
+    @extend .details-grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.input-field-group {
+    @include input-field-group;
+    width: 100%;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+}
+
+.custom-input-wrapper {
+    @include custom-input-wrapper;
+}
+
+.custom-form-control {
+    @extend .custom-form-control;
+    padding: 0.75rem;
+    transition: border-color 0.2s;
+}
+
+textarea.custom-form-control {
+    @extend .custom-form-control;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.left-half {
+    grid-column: span 1;
+}
+
+.leave-period-options {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+
+    .period-option {
+        position: relative;
+        cursor: pointer;
+        flex: 1;
+
+        input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .option-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            min-height: 80px;
+            font-weight: 500;
+            color: #475569;
+
+            i {
+                font-size: 1.5rem;
+                color: #94a3b8;
+                transition: color 0.2s ease;
+            }
+        }
+
+        &:hover .option-label {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        &.active .option-label {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1e40af;
+            font-weight: 600;
+
+            i {
+                color: #3b82f6;
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .details-grid-custom {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .leave-period-options {
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .period-option .option-label {
+            flex-direction: row;
+            min-height: auto;
+            padding: 0.75rem;
+        }
+    }
+}
+
+.attachment-table-container {
+    @extend .attachment-table-container;
+}

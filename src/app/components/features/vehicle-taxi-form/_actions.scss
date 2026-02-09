@@ -1,0 +1,57 @@
+@use '../../../../styles/theme' as *;
+
+.vehicle-taxi-form-page {
+    .action-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        @media (min-width: 768px) {
+            gap: 20px;
+        }
+
+        flex-shrink: 0;
+
+        .btn-submit {
+            flex-shrink: 0;
+        }
+
+        .info-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+
+            .right-info,
+            .request-id-badge {
+                font-size: 0.75rem;
+
+                @media (min-width: 768px) {
+                    font-size: 0.85rem;
+                }
+
+                font-weight: 600;
+                padding: 6px 12px;
+
+                @media (min-width: 768px) {
+                    padding: 6px 14px;
+                }
+
+                border-radius: 20px;
+            }
+
+            .right-info {
+                background: #e8f0fe;
+                color: $primary;
+            }
+
+            .request-id-badge {
+                background: #eed686;
+                color: #4e342e;
+            }
+        }
+    }
+}

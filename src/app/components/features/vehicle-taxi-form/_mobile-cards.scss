@@ -1,0 +1,140 @@
+@use '../../../../styles/theme' as *;
+
+.vehicle-taxi-form-page {
+    .mobile-cards-view {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 4px;
+
+        .log-card {
+            background: $bg-card;
+            border: 1px solid $border;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: $shadow;
+            transition: all 0.2s;
+
+            &.highlight-card {
+                border-color: $warning;
+                background: rgba($warning, 0.05);
+                box-shadow: 0 4px 15px rgba($warning, 0.1);
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid rgba($border, 0.5);
+
+                .date-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+
+                    .day-dot {
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                    }
+
+                    .date {
+                        font-weight: 700;
+                        color: $text;
+                        font-size: 0.95rem;
+                    }
+
+                    .day-type {
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                    }
+                }
+
+                .header-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+
+                    .btn-card-upload {
+                        background: #f0ebf8;
+                        color: #673ab7;
+                        border: 1px solid #d1c4e9;
+                        padding: 4px 10px;
+                        border-radius: 8px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+
+                        &.has-file {
+                            background: #e6f4ea;
+                            color: $success;
+                            border-color: #c4ebd0;
+                        }
+                    }
+
+                    .card-checkbox {
+                        width: 20px;
+                        height: 20px;
+                        accent-color: $primary;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .card-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin-bottom: 16px;
+
+                .grid-item {
+                    &.full-width {
+                        grid-column: span 2;
+                    }
+
+                    label {
+                        display: block;
+                        font-size: 0.75rem;
+                        color: $text-sub;
+                        margin-bottom: 4px;
+                    }
+
+                    .val {
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        color: $text;
+
+                        &.highlight-green {
+                            color: $success;
+                            font-weight: 700;
+                        }
+                    }
+
+                    .card-input {
+                        width: 100%;
+                        padding: 8px 10px;
+                        border: 1.5px solid $border;
+                        border-radius: 8px;
+                        font-size: 0.9rem;
+                        background: $bg-slate;
+
+                        &:focus {
+                            outline: none;
+                            border-color: $primary;
+                            background: $bg-card;
+                            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+                        }
+
+                        &.is-invalid {
+                            border-color: $danger;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

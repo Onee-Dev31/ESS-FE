@@ -1,0 +1,33 @@
+@use '../../../styles/theme' as *;
+
+@mixin medical-layout {
+    padding: 24px;
+    background-color: $bg-page;
+    min-height: 100vh;
+
+    @include large-tablet {
+        padding: 12px;
+        padding-bottom: 5px;
+    }
+
+    .content-card {
+        @include content-card;
+        margin-top: 16px;
+    }
+
+    .card-header-title {
+        @include card-header-title;
+    }
+
+    .toolbar-container {
+        @include toolbar-container;
+    }
+
+    .table-responsive {
+        margin-top: 24px;
+
+        @include large-tablet {
+            display: none;
+        }
+    }
+}

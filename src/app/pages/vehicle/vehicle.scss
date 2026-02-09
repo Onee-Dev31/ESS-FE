@@ -1,75 +1,11 @@
-@use '../../../styles/theme' as *;
+@use './layout';
+@use './table';
+@use './mobile-cards';
 
 .vehicle-page {
-  padding: 24px;
-  background-color: $bg-page;
-  min-height: 100vh;
-  box-sizing: border-box;
-
-  @include large-tablet {
-    padding: 12px;
-    padding-bottom: 5px;
-  }
-
-  .content-card {
-    @include content-card;
-    margin-top: 16px;
-  }
-
-  .card-header-title {
-    @include card-header-title;
-  }
-
-  .toolbar-container {
-    @include toolbar-container;
-  }
-
-  .card-list-view {
-    @include mobile-cards-view;
-  }
-
-  .table-responsive {
-    display: block;
-    overflow-x: auto;
-
-    @include large-tablet {
-      display: none !important;
-    }
-  }
-
-  .modern-table {
-    @include modern-table;
-
-    .col-id {
-      width: 150px;
-    }
-
-    .col-date {
-      width: 150px;
-    }
-
-    .col-amount {
-      width: 150px;
-    }
-
-    .col-status {
-      width: 200px;
-    }
-
-    .col-actions {
-      width: 150px;
-    }
-
-    td,
-    th {
-      &:nth-child(4) {
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
-  }
+  @include layout.vehicle-layout;
+  @include table.vehicle-table;
+  @include mobile-cards.vehicle-mobile-cards;
 
   .modal-overlay {
     @extend .modal-overlay;

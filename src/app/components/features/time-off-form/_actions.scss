@@ -1,0 +1,50 @@
+@use '../../../../styles/theme' as *;
+
+.form-actions-footer {
+    @extend .form-actions-footer;
+}
+
+@media (max-width: 600px) {
+    .form-actions-footer {
+        flex-direction: row !important;
+        gap: 12px;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+        z-index: 10;
+        position: relative;
+        background: #f8fafc;
+
+        .btn-save-custom,
+        .btn-submit,
+        .btn-confirm {
+            order: 1;
+            flex: 1;
+            width: auto;
+        }
+
+        .btn-back-custom,
+        .btn-cancel {
+            order: 2;
+            flex: 1;
+            width: auto;
+        }
+    }
+
+    .action-buttons {
+        flex-direction: row;
+
+        button {
+            flex: 1;
+            height: 48px;
+            width: auto;
+        }
+
+        .btn-submit,
+        .btn-confirm {
+            order: 1;
+        }
+
+        .btn-cancel {
+            order: 2;
+        }
+    }
+}

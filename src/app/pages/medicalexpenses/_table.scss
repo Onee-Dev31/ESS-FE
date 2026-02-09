@@ -1,0 +1,58 @@
+@use '../../../styles/theme' as *;
+
+@mixin medical-table {
+    .modern-table {
+        @include modern-table;
+        min-width: 1200px;
+
+        thead {
+            th {
+                white-space: nowrap;
+
+                &.col-amount {
+                    text-align: right;
+                }
+            }
+        }
+
+        .col-id {
+            width: 110px;
+        }
+
+        .col-date {
+            width: 100px;
+        }
+
+        .col-limit {
+            width: 150px;
+        }
+
+        .col-disease {
+            width: 150px;
+        }
+
+        .col-hospital {
+            width: 160px;
+        }
+
+        .col-date-sm {
+            width: 100px;
+        }
+
+        .col-amount {
+            width: 130px;
+        }
+
+        .col-status {
+            width: 120px;
+        }
+
+        .col-attach {
+            width: 80px;
+        }
+
+        .file-icon-link {
+            @include icon-btn-sky;
+        }
+    }
+}

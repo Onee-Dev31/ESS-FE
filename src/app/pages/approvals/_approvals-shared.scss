@@ -1,487 +1,118 @@
-@use "sass:color";
+@use 'sass:color';
 @use '../../../styles/theme' as *;
+@use './shared/base-layout';
+@use './shared/tabs';
 
 @mixin approvals-layout {
-    .approvals-wrapper {
-        padding: 1rem;
+    @include base-layout.approvals-wrapper;
+    @include tabs.tab-navigation;
 
-        @include desktop {
-            padding: 2.5rem;
+    .search-box {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-muted;
         }
 
-        background: $bg-slate;
-        min-height: 100vh;
-        font-family: $font-main;
-
-        .card {
-            background: $bg-card;
-            border-radius: $radius;
-            padding: 1.5rem;
-
-            @include desktop {
-                padding: 2rem;
-            }
-
-            box-shadow: $shadow;
-            overflow: hidden;
-        }
-
-        .page-header {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid $border-color;
-
-            @include desktop {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .title-with-back {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-            }
-
-            .main-title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: $text;
-            }
-
-        }
-
-        .utility-btns {
-            display: flex;
-            gap: 0.5rem;
-
-            @include desktop {
-                gap: 20px;
-            }
-
-            .btn-outline {
-                background: $bg-card;
-                border: 1px solid $border;
-                padding: 0.6rem 1rem;
-                border-radius: 8px;
-                cursor: pointer;
-                font-family: inherit;
-                font-weight: 500;
-                flex: 1;
-
-                @include desktop {
-                    flex: none;
-                }
-
-                .btn-text {
-                    display: none;
-
-                    @include desktop {
-                        display: inline;
-                        margin-left: 4px;
-                    }
-                }
-            }
-        }
-
-        .table-controls {
-            margin-bottom: 1.5rem;
-
-            .search-box {
-                position: relative;
-                width: 100%;
-                max-width: 320px;
-                margin-bottom: 1.5rem;
-
-                input {
-                    width: 100%;
-                    padding: 0.6rem 1rem 0.6rem 2.2rem;
-                    border: 1px solid $border;
-                    border-radius: 8px;
-                    outline: none;
-                }
-
-                .search-icon {
-                    position: absolute;
-                    left: 0.8rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: $text-muted;
-                }
-            }
-
-            .tab-navigation {
-                display: flex;
-                border-bottom: 1px solid $border-color;
-                overflow-x: auto;
-                white-space: nowrap;
-
-                &::-webkit-scrollbar {
-                    display: none;
-                }
-
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-
-                @media (max-width: 768px) {
-                    border-bottom: none;
-                    gap: 10px;
-                    padding: 5px;
-                    flex-wrap: wrap;
-                    overflow-x: visible;
-                    white-space: normal;
-                }
-
-                .tab-item {
-                    background: none;
-                    border: none;
-                    padding: 0.8rem 1rem;
-
-                    @include desktop {
-                        padding: 0.8rem 1.5rem;
-                    }
-
-                    color: $text-muted;
-                    font-weight: 600;
-                    cursor: pointer;
-                    position: relative;
-                    flex-shrink: 0;
-
-                    &.active {
-                        color: $primary;
-
-                        &::after {
-                            content: '';
-                            position: absolute;
-                            bottom: -1px;
-                            left: 0;
-                            width: 100%;
-                            height: 2px;
-                            background: $primary;
-                        }
-                    }
-
-                    .badge {
-                        background: $border-color;
-                        padding: 2px 8px;
-                        border-radius: 10px;
-                        font-size: 11px;
-                        margin-left: 5px;
-                    }
-
-                    &.active .badge {
-                        background: $primary;
-                        color: white;
-                    }
-
-                    @media (max-width: 768px) {
-                        background-color: $bg-slate;
-                        color: $text-sub;
-                        border-radius: 30px;
-                        padding: 8px 16px;
-                        font-weight: 500;
-                        font-size: 14px;
-                        border: 1px solid transparent;
-
-                        &.active {
-                            background-color: $primary;
-                            color: white;
-                            box-shadow: 0 4px 10px rgba($primary, 0.25);
-                            font-weight: 600;
-
-                            &::after {
-                                display: none;
-                            }
-
-                            .badge {
-                                background: rgba(255, 255, 255, 0.25);
-                                color: white;
-                            }
-                        }
-
-                        .badge {
-                            background: rgba(0, 0, 0, 0.05);
-                            color: $text-sub;
-                            margin-left: 6px;
-                        }
-                    }
-                }
-            }
-        }
-
-        .card-list-view {
-            display: none;
-
-            @media (max-width: 1310px) {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .mobile-card {
-
-                .card-header {
-
-                    .request-id {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 2px;
-
-                        .label {
-                            display: none;
-                        }
-
-                        .value {
-                            font-weight: 700;
-                            color: $text;
-                            font-size: 1rem;
-                        }
-                    }
-                }
-
-                .card-body {
-
-                    .info-row {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 12px;
-                        font-size: 0.95rem;
-
-                        .label {
-                            color: $text-sub;
-                            font-weight: 500;
-                        }
-
-                        .value {
-                            color: $text;
-                            font-weight: 600;
-                            text-align: right;
-
-                            &.amount {
-                                color: $success;
-                                font-size: 1.1rem;
-                                font-weight: 800;
-                            }
-                        }
-                    }
-
-                    .requester-block {
-                        background: $bg-slate;
-                        padding: 12px;
-                        border-radius: 10px;
-                        margin: 12px 0;
-
-                        .req-name {
-                            font-weight: 700;
-                            color: $text;
-                            font-size: 0.95rem;
-                            margin-bottom: 4px;
-                        }
-
-                        .req-details,
-                        .req-company {
-                            font-size: 0.85rem;
-                            color: $text-sub;
-                        }
-                    }
-
-                    .description-block {
-                        margin: 12px 0;
-
-                        .desc-label {
-                            font-size: 0.85rem;
-                            color: $text-sub;
-                            margin-bottom: 4px;
-                            font-weight: 600;
-                        }
-
-                        .desc-content {
-                            font-size: 0.95rem;
-                            color: $text;
-                            line-height: 1.5;
-                        }
-                    }
-
-                    .amount-row {
-                        border-top: 1px dashed $border-color;
-                        margin-top: 12px;
-                        padding-top: 12px;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-
-                        .label {
-                            color: $text-sub;
-                        }
-
-                        .value.amount {
-                            color: $primary;
-                            font-weight: 800;
-                            font-size: 1.2rem;
-                        }
-                    }
-
-                    .card-actions {
-                        display: flex;
-                        justify-content: flex-end;
-                        gap: 12px;
-                        margin-top: 16px;
-                        padding-top: 16px;
-                        border-top: 1px solid $border-color;
-                    }
-                }
-            }
-        }
-
-        .data-grid-container {
+        input {
             width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 0 -1.5rem;
-            padding: 0 1.5rem;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid $border;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
 
-            @media (min-width: 768px) {
-                margin: 0;
-                padding: 0;
+            &:focus {
+                border-color: $primary;
             }
-
-            @media (max-width: 1310px) {
-                display: none;
-            }
-        }
-
-        .data-grid {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 950px;
-
-            th {
-                padding: 1rem;
-                color: $text-muted;
-                font-size: 11px;
-                text-transform: uppercase;
-                border-bottom: 2px solid $border-color;
-                text-align: center;
-
-                &.sortable-header {
-                    cursor: pointer;
-                    transition: background 0.2s;
-
-                    &:hover {
-                        background: $bg-slate;
-                    }
-                }
-            }
-
-            td {
-                padding: 1.2rem 1rem;
-                border-bottom: 1px solid $border-color;
-                text-align: center;
-                font-size: 13px;
-                white-space: nowrap;
-
-                &.request-no-link {
-                    cursor: pointer;
-                    color: $primary;
-                    font-weight: 600;
-
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
-            }
-
-            .description-cell {
-                max-width: 200px;
-                text-align: left;
-                white-space: normal;
-
-                .truncate-text {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    color: $text-sub;
-                }
-            }
-
-            th:nth-child(5) {
-                text-align: left;
-            }
-        }
-
-        .requester-info {
-            text-align: left;
-            white-space: normal;
-
-            .name {
-                font-weight: 700;
-                color: $text;
-                margin-bottom: 5px;
-                font-size: 14px;
-            }
-
-            .details-box {
-                font-size: 11px;
-                color: $text-sub;
-                line-height: 1.5;
-
-                .detail-item {
-                    margin-bottom: 2px;
-
-                    &:last-child {
-                        margin-bottom: 0;
-                    }
-                }
-            }
-        }
-
-        .amount-cell {
-            font-weight: 700;
-            color: $primary;
-            text-align: right;
         }
     }
 
-    .act-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
+    .data-grid-container {
+        padding: 0 24px 24px;
 
-        &.v-btn {
-            background: $color-info;
+        .data-grid {
+            @include modern-table;
+        }
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+
+        &.approved,
+        &.Approved {
+            background: $status-success-bg;
+            color: $status-success-text;
         }
 
-        &.a-btn {
-            background: $color-save;
+        &.pending,
+        &.Pending {
+            background: $status-pending-bg;
+            color: $status-pending-text;
         }
 
-        &.r-btn {
-            background: $color-delete;
+        &.rejected,
+        &.Rejected {
+            background: $status-danger-bg;
+            color: $status-danger-text;
         }
 
-        &.b-btn {
-            background: $color-warning;
-        }
-
-        &:hover {
-            filter: brightness(0.9);
-            transform: translateY(-1px);
+        &.referred-back {
+            background: $status-new-bg;
+            color: $status-new-text;
         }
     }
 
     .action-cell {
         display: flex;
-        gap: 6px;
+        gap: 8px;
         justify-content: center;
+
+        .act-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &.v-btn {
+                background: rgba($primary, 0.1);
+                color: $primary;
+            }
+
+            &.a-btn {
+                background: rgba($success, 0.1);
+                color: $success;
+            }
+
+            &.r-btn {
+                background: rgba($danger, 0.1);
+                color: $danger;
+            }
+
+            &.b-btn {
+                background: rgba($warning, 0.1);
+                color: $warning;
+            }
+
+            &:hover {
+                transform: translateY(-2px);
+                filter: brightness(0.95);
+            }
+        }
     }
 }

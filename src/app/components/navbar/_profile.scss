@@ -1,0 +1,85 @@
+@use './variables' as *;
+@use '../../../styles/theme' as *;
+
+.navbar .nav-right .nav-actions {
+    .user-profile {
+        margin-left: 8px;
+        position: relative;
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #f1f5f9;
+            transition: all 0.2s;
+
+            &:hover {
+                border-color: $primary;
+            }
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            width: 200px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            z-index: 1000;
+
+            .dropdown-user-info {
+                padding: 12px 16px;
+                border-bottom: 1px solid #f1f5f9;
+                background: #f8fafc;
+
+                .name {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #334155;
+                }
+
+                .role {
+                    font-size: 12px;
+                    color: #64748b;
+                }
+            }
+
+            .dropdown-menu-list {
+                list-style: none;
+                padding: 5px 0;
+                margin: 0;
+
+                li {
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    color: #475569;
+                    cursor: pointer;
+                    transition: 0.2s;
+
+                    &:hover {
+                        background: #f1f5f9;
+                        color: $primary;
+                    }
+
+                    &.divider {
+                        height: 1px;
+                        margin: 4px 0;
+                        padding: 0;
+                        background: #f1f5f9;
+                        pointer-events: none;
+                    }
+
+                    &.logout:hover {
+                        color: $danger;
+                        background: #fef2f2;
+                    }
+                }
+            }
+        }
+    }
+}

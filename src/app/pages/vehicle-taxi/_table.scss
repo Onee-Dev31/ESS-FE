@@ -1,0 +1,37 @@
+@use '../../../styles/theme' as *;
+
+@mixin vehicle-taxi-table {
+    .modern-table {
+        @include modern-table;
+
+        &.taxi-table {
+            .col-id {
+                width: 120px;
+            }
+
+            .col-date {
+                width: 150px;
+            }
+
+            .col-desc {
+                width: auto;
+            }
+
+            .col-dest {
+                width: 200px;
+            }
+
+            .col-amount {
+                width: 150px;
+            }
+
+            .col-status {
+                width: 200px;
+            }
+
+            .col-actions {
+                width: 150px;
+            }
+        }
+    }
+}

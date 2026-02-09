@@ -1,0 +1,220 @@
+@use 'sass:color';
+@use './variables' as *;
+@use '../../../../styles/theme' as *;
+
+.vehicle-taxi-form-page {
+    .table-container {
+        width: 100% !important;
+        display: block !important;
+        flex: 1 1 100%;
+        align-self: stretch;
+        min-height: 0;
+        overflow: auto;
+        border: 1px solid $border;
+        border-radius: 8px;
+
+        @include tablet {
+            border: none;
+            background: transparent;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .excel-table {
+            width: 100% !important;
+            min-width: 100% !important;
+            display: table;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed !important;
+            margin: 0 !important;
+
+            th,
+            td {
+                border-bottom: 1px solid $border;
+                border-right: 1px solid $border;
+                height: 40px;
+
+                @media (min-width: 768px) {
+                    height: 44px;
+                }
+
+                vertical-align: middle;
+                box-sizing: border-box;
+            }
+
+            .col-select {
+                width: $col-select;
+            }
+
+            .col-date {
+                width: $col-date;
+            }
+
+            .col-day-type {
+                width: $col-day-type;
+            }
+
+            .col-shift {
+                width: $col-shift;
+            }
+
+            .col-time {
+                width: $col-time;
+            }
+
+            .col-desc {
+                width: $col-desc;
+            }
+
+            .col-dest {
+                width: $col-dest;
+            }
+
+            .col-dist {
+                width: $col-dist;
+            }
+
+            .col-amount {
+                width: $col-amount;
+            }
+
+            .col-file {
+                width: $col-file;
+            }
+
+            th {
+                background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                text-align: center;
+                color: white;
+                border-top: 1px solid color.adjust($primary, $lightness: -10%);
+
+                .required {
+                    color: rgba(white, 0.8);
+                    margin-left: 2px;
+                }
+            }
+
+            .sub-header th {
+                top: 40px;
+
+                @media (min-width: 768px) {
+                    top: 44px;
+                }
+
+                font-size: 0.8rem;
+                z-index: 9;
+            }
+
+            .text-center {
+                text-align: center;
+
+                input[type='checkbox'] {
+                    cursor: pointer;
+                    margin: 0 auto;
+                    display: block;
+                }
+            }
+
+            .bg-gray {
+                background-color: $bg-slate;
+            }
+
+            .font-bold {
+                font-weight: 700;
+            }
+
+            .holiday-label {
+                color: $danger;
+                font-weight: 700;
+            }
+
+            .regular-label {
+                color: $text;
+                font-weight: 700;
+            }
+
+            .shift-code {
+                font-size: 12px;
+                color: $text-sub;
+            }
+
+            .highlight-row td {
+                background-color: rgba($warning, 0.05) !important;
+            }
+
+            .time-input {
+                width: 100%;
+                text-align: center;
+                border: none;
+                background: transparent;
+                outline: none;
+            }
+
+            .desc-cell {
+                padding: 0 8px;
+                position: relative;
+
+                .input-container {
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
+                }
+
+                .table-input {
+                    width: 100%;
+                    height: 32px;
+                    border: 1px solid transparent;
+                    border-radius: 4px;
+                    padding: 0 8px;
+                    background: transparent;
+
+                    &.is-invalid {
+                        border: 1px solid $danger !important;
+                        background-color: rgba($danger, 0.05);
+                    }
+
+                    &:focus:not(:disabled) {
+                        background: $bg-card;
+                        border: 1px solid $primary;
+                        outline: none;
+                    }
+                }
+            }
+
+            .btn-icon-folder {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 1.1rem;
+                color: #9575cd;
+                transition: transform 0.2s;
+
+                &:hover {
+                    transform: scale(1.1);
+                }
+
+                &.has-file {
+                    color: $success;
+                }
+            }
+
+            tfoot {
+                .total-val {
+                    background: $status-success-bg !important;
+                    color: $status-success-text;
+                    font-weight: 700;
+                }
+
+                .total-label {
+                    text-align: right;
+                    padding-right: 20px;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+}

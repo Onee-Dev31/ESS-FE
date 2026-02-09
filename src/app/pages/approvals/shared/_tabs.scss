@@ -1,0 +1,54 @@
+@use '../../../../styles/theme' as *;
+
+@mixin tab-navigation {
+    .tab-navigation {
+        display: flex;
+        gap: 8px;
+
+        @include tablet {
+            overflow-x: auto;
+            padding-bottom: 4px;
+            width: 100%;
+        }
+
+        .tab-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: $text-sub;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.2s;
+
+            &.active {
+                background: rgba($primary, 0.1);
+                color: $primary;
+                border-color: rgba($primary, 0.2);
+            }
+
+            &:hover:not(.active) {
+                background: rgba(0, 0, 0, 0.02);
+                color: $text;
+            }
+
+            .badge {
+                padding: 2px 8px;
+                background: rgba(0, 0, 0, 0.05);
+                border-radius: 999px;
+                font-size: 0.75rem;
+                color: $text-muted;
+            }
+
+            &.active .badge {
+                background: rgba($primary, 0.1);
+                color: $primary;
+            }
+        }
+    }
+}
