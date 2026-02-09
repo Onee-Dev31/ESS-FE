@@ -232,132 +232,30 @@
           </div>
           <div class="bottom-stats-grid">
 
-            <div class="card mini-stat-card card-green" (click)="navigateTo('/allowance')" style="cursor: pointer">
+            @for (stat of welfareStats(); track stat.label) {
+            <div class="card mini-stat-card" [ngClass]="stat.colorClass || ''"
+              [style.cursor]="stat.path ? 'pointer' : 'default'" (click)="stat.path && navigateTo(stat.path)">
               <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="mini-icon"><i [class]="stat.icon"></i></div>
                 <div class="card-info">
                   <h6>
-                    <span class="title-text">ค่าเบี้ยเลี้ยง</span>
-                  </h6>
-                  <h3>10,500</h3>
-                </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-
-
-            <div class="card mini-stat-card card-blue" (click)="navigateTo('/vehicle')" style="cursor: pointer">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-car"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่ารถ</span>
+                    <span class="title-text">{{ stat.label }}</span>
+                    @if (stat.tooltip) {
                     <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('transport'); $event.stopPropagation()">
+                      <button class="btn-info-circle" (click)="openTooltip(stat.tooltip); $event.stopPropagation()">
                         <i class="fa-solid fa-circle-info"></i>
                       </button>
                     </div>
+                    }
                   </h6>
-                  <h3>584</h3>
+                  <h3>{{ stat.value }}</h3>
                 </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+                <div class="card-arrow" [class.disabled-arrow]="!stat.path">
+                  <i class="fas fa-chevron-right"></i>
+                </div>
               </div>
             </div>
-
-
-            <div class="card mini-stat-card card-yellow" (click)="navigateTo('/vehicle-taxi')" style="cursor: pointer">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-taxi"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่าแท็กซี่</span>
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('taxi'); $event.stopPropagation()">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
-                  </h6>
-                  <h3>876</h3>
-                </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-
-
-            <div class="card mini-stat-card" style="cursor: default">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-heart"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่าสมรส</span>
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('wedding'); $event.stopPropagation()">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
-                  </h6>
-                  <h3>3,500</h3>
-                </div>
-                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-
-
-            <div class="card mini-stat-card" style="cursor: default">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-hands-praying"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่าอุปสมบท</span>
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('ordination'); $event.stopPropagation()">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
-                  </h6>
-                  <h3>10,500</h3>
-                </div>
-                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-
-
-            <div class="card mini-stat-card" style="cursor: default">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-church"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่าฌาปนกิจ</span>
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('funeral'); $event.stopPropagation()">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
-                  </h6>
-                  <h3>584</h3>
-                </div>
-                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-
-
-            <div class="card mini-stat-card" style="cursor: default">
-              <div class="card-body">
-                <div class="mini-icon"><i class="fas fa-spa"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">ค่าพวงหรีด</span>
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip('wreath'); $event.stopPropagation()">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
-                  </h6>
-                  <h3>876</h3>
-                </div>
-                <div class="card-arrow disabled-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
+            }
           </div>
         </div>
 

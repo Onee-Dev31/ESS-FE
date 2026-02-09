@@ -13,7 +13,7 @@
 
     thead {
         tr {
-            background: #f8fafc;
+            background: $header-bg;
         }
 
         th {
@@ -65,7 +65,7 @@
     }
 
     .text-primary-link {
-        color: #1a73e8 !important;
+        color: $primary !important;
         font-weight: 700 !important;
         cursor: pointer;
 
