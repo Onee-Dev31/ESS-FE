@@ -1,0 +1,80 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+
+.utility-btns {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        i {
+            font-size: 0.9rem;
+
+            &.mr-1 {
+                margin-right: 8px;
+            }
+
+            &.ml-1 {
+                margin-left: 8px;
+            }
+        }
+
+        .btn-text {
+            line-height: 1;
+        }
+
+        &:hover {
+            background: #f8fafc;
+            border-color: $primary;
+            color: $primary;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba($primary, 0.08);
+        }
+
+        &:active {
+            transform: translateY(0);
+            background: #f1f5f9;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        &:focus-visible {
+            outline: 2px solid rgba($primary, 0.3);
+            outline-offset: 2px;
+        }
+    }
+
+    .export-dropdown {
+        position: relative;
+    }
+}
+
+// Tablet and below adjustments
+@include tablet {
+    .utility-btns {
+        .btn-text {
+            display: none; // Hide text on small screens to save space
+        }
+
+        .btn-outline {
+            padding: 8px 12px;
+
+            i {
+                margin: 0;
+            }
+        }
+    }
+}

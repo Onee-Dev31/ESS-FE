@@ -3,7 +3,7 @@
     <div class="utility-btns">
       <div class="export-dropdown">
         <button class="btn-outline" (click)="toggleExportMenu()">
-          📥 <span class="btn-text">Export</span>
+          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
           <i class="fas fa-chevron-down ml-1"></i>
         </button>
         <div class="dropdown-menu" [class.show]="showExportMenu()">
@@ -18,7 +18,9 @@
           </button>
         </div>
       </div>
-      <button class="btn-outline" (click)="refresh()">🔄 <span class="btn-text">Refresh</span></button>
+      <button class="btn-outline" (click)="refresh()">
+        <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
+      </button>
     </div>
   </app-page-header>
 
