@@ -55,6 +55,37 @@
         font-size: 0.75rem;
         font-weight: 600;
         display: inline-flex;
+        border: 1px solid transparent;
+
+        &.status-new {
+            background: $status-new-bg;
+            color: $status-new-text;
+            border-color: rgba($status-new-text, 0.3);
+        }
+
+        &.status-verified {
+            background: $status-verified-bg;
+            color: $status-verified-text;
+            border-color: rgba($status-verified-text, 0.3);
+        }
+
+        &.status-pending {
+            background: $status-pending-bg;
+            color: $status-pending-text;
+            border-color: rgba($status-pending-text, 0.3);
+        }
+
+        &.status-approved {
+            background: $status-success-bg;
+            color: $status-success-text;
+            border-color: rgba($status-success-text, 0.3);
+        }
+
+        &.status-rejected {
+            background: $status-danger-bg;
+            color: $status-danger-text;
+            border-color: rgba($status-danger-text, 0.3);
+        }
     }
 
     .action-cell,

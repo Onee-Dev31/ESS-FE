@@ -106,11 +106,11 @@
                         </th>
                         <th colspan="2" class="text-center">
                             วันที่เข้ารับการรักษา</th>
-                        <th rowspan="2" class="col-amount sortable-header text-right"
+                        <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('requestedAmount')">
                             จำนวนเงินที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestedAmount')"></i>
                         </th>
-                        <th rowspan="2" class="col-amount sortable-header text-right"
+                        <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('approvedAmount')">
                             จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
@@ -141,13 +141,13 @@
                             {{ row.original.requestDate }}
                         </td>
 
-                        <td class="text-left">{{ row.original.limitType }}</td>
-                        <td class="text-left">{{ row.original.diseaseType }}</td>
-                        <td class="text-left">{{ row.original.hospital }}</td>
+                        <td class="text-center">{{ row.original.limitType }}</td>
+                        <td class="text-center">{{ row.original.diseaseType }}</td>
+                        <td class="text-center">{{ row.original.hospital }}</td>
                         <td class="text-center">{{ row.original.treatmentDateFrom }}</td>
                         <td class="text-center">{{ row.original.treatmentDateTo }}</td>
-                        <td class="text-right font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
-                        <td class="text-right font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
+                        <td class="text-center font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
+                        <td class="text-center font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
 
                         <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
@@ -217,12 +217,6 @@
                                 <div class="detail-row">
                                     <i class="far fa-calendar-alt"></i> {{ item.treatmentDateFrom }} - {{
                                     item.treatmentDateTo }}
-                                </div>
-                                <div class="detail-row" *ngIf="item.attachedFile">
-                                    <a (click)="openPreview(item.attachedFile)"
-                                        style="cursor: pointer; color: #008ebc;">
-                                        <i class="fas fa-paperclip"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>
