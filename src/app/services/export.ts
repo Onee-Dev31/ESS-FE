@@ -50,13 +50,11 @@ export class ExportService {
     filename: string = 'export'
   ): Promise<void> {
     try {
-      // Dynamic import
       const ExcelJS = await import('exceljs');
       const { saveAs } = await import('file-saver');
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
-      // ... rest of code uses ExcelJS and saveAs
 
       worksheet.columns = columns.map(col => ({
         header: col.header,
