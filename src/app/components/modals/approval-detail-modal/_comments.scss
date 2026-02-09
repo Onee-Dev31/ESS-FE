@@ -1,0 +1,63 @@
+@use './variables' as *;
+
+.comment-thread {
+    display: flex;
+    gap: 15px;
+    margin-top: 1rem;
+
+    &.side-mode {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 0.5rem;
+        flex: 1;
+        display: flex;
+
+        .avatar-circle {
+            display: none;
+        }
+
+        .comment-bubble {
+            border-radius: 8px;
+            background: #fff;
+            border: 1px solid #eef2f6;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            flex: 1;
+        }
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        background: $primary-blue;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .comment-bubble {
+        background: #f1f3f5;
+        padding: 12px 16px;
+        border-radius: 0 12px 12px 12px;
+        flex: 1;
+
+        .comment-top {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+        }
+    }
+}

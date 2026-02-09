@@ -1,0 +1,60 @@
+@use 'sass:color';
+@use '../../../styles/theme' as *;
+@use '../../../styles/responsive-layout' as responsive;
+@use './variables' as *;
+
+.work-meta-group {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px dashed rgba($primary, 0.3);
+        padding-bottom: 8px;
+        width: 100%;
+
+        &:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        &.vertical {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+
+            .meta-label {
+                font-size: 13px;
+                margin-bottom: 0;
+                color: $primary;
+            }
+
+            .meta-value {
+                font-size: 15px;
+                color: $primary;
+            }
+        }
+
+        .meta-label {
+            color: $primary;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .meta-value {
+            color: $primary;
+            font-weight: 700;
+            font-size: 15px;
+        }
+    }
+}

@@ -1,0 +1,70 @@
+@use 'sass:color';
+@use './variables' as *;
+
+.detail-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+
+    @media (max-width: 991px) {
+        display: none;
+    }
+
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 500px;
+
+        th {
+            background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 20%) 100%);
+            padding: 12px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid $border-color;
+        }
+
+        .modal-total-row {
+            background: $bg-gray;
+            font-size: 16px;
+            font-weight: 800;
+            color: $primary-blue;
+        }
+
+        .shift-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: $bg-slate;
+            color: $text-header;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+    }
+}
+
+.file-icon-link {
+    cursor: pointer;
+    color: $primary-blue;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #ebf5fa;
+        color: color.adjust($primary-blue, $lightness: -10%);
+        transform: scale(1.1);
+    }
+
+    i {
+        pointer-events: none;
+    }
+}

@@ -1,0 +1,44 @@
+@use 'sass:color';
+@use '../../../../styles/theme' as theme;
+@use '../../../../styles/responsive-layout' as responsive;
+
+// Re-export variables for partials
+$primary: theme.$primary;
+$success: theme.$success;
+$danger: theme.$danger;
+$warning: theme.$warning;
+$text: theme.$text;
+$text-header: theme.$text-header;
+$text-muted: theme.$text-muted;
+$text-sub: theme.$text-sub;
+$border-color: theme.$border-color;
+$border: theme.$border;
+$bg-card: theme.$bg-card;
+$bg-slate: theme.$bg-slate;
+$bg-gray: theme.$bg-gray;
+$header-bg: theme.$header-bg;
+$radius: theme.$radius;
+$shadow: theme.$shadow;
+
+$primary-blue: $primary;
+$primary-green: $success;
+$primary-red: $danger;
+$primary-orange: $warning;
+
+@mixin approval-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-muted;
+    transition: color 0.2s;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        color: $danger;
+        background: rgba($danger, 0.1);
+        border-radius: 4px;
+    }
+}

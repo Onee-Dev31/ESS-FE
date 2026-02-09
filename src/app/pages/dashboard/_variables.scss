@@ -1,0 +1,22 @@
+@use 'sass:color';
+@use '../../../styles/theme' as *;
+@use '../../../styles/responsive-layout' as responsive;
+
+$dark: $text;
+$muted: $text-muted;
+$border-color: transparent;
+$radius-lg: 20px;
+$bg-light: $bg-slate;
+$balance: $status-success-text;
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin smooth-corners {
+    overflow: hidden;
+    transform: translateZ(0);
+    background-clip: padding-box;
+}

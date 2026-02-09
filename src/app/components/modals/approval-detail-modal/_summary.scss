@@ -1,0 +1,78 @@
+@use 'sass:color';
+@use './variables' as *;
+
+.summary-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 1rem;
+
+    .summary-card {
+        background: $header-bg;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &.status-card {
+            &.pending {
+                background: rgba($warning, 0.1);
+
+                .s-value {
+                    color: color.adjust($warning, $lightness: -10%);
+                }
+
+                label {
+                    color: rgba($warning, 0.6);
+                }
+            }
+
+            &.approved {
+                background: rgba($success, 0.1);
+
+                .s-value {
+                    color: $success;
+                }
+
+                label {
+                    color: rgba($success, 0.6);
+                }
+            }
+
+            &.rejected {
+                background: rgba($danger, 0.1);
+
+                .s-value {
+                    color: $danger;
+                }
+
+                label {
+                    color: rgba($danger, 0.6);
+                }
+            }
+
+            &.referred-back {
+                background: rgba($primary-orange, 0.1);
+
+                .s-value {
+                    color: $primary-orange;
+                }
+
+                label {
+                    color: rgba($primary-orange, 0.6);
+                }
+            }
+        }
+
+        label {
+            display: block;
+            font-size: 10px;
+            color: $text-muted;
+            margin-bottom: 2px;
+        }
+
+        .s-value {
+            font-size: 13px;
+            font-weight: 700;
+        }
+    }
+}
