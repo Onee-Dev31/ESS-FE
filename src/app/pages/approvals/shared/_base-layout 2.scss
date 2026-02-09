@@ -1,0 +1,55 @@
+@use '../../../../styles/theme' as *;
+
+@mixin approvals-base-layout {
+    .approvals-wrapper {
+        padding: 1rem;
+
+        @include desktop {
+            padding: 2.5rem;
+        }
+
+        background: $bg-slate;
+        min-height: 100vh;
+        font-family: $font-main;
+
+        .card {
+            background: $bg-card;
+            border-radius: $radius;
+            padding: 1.5rem;
+
+            @include desktop {
+                padding: 2rem;
+            }
+
+            box-shadow: $shadow;
+            overflow: hidden;
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid $border-color;
+
+            @include desktop {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .title-with-back {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .main-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: $text;
+            }
+        }
+    }
+}

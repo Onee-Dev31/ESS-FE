@@ -1,0 +1,128 @@
+@use '../../../../styles/theme' as *;
+
+@mixin approvals-tabs {
+    .table-controls {
+        margin-bottom: 1.5rem;
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 1.5rem;
+
+            input {
+                width: 100%;
+                padding: 0.6rem 1rem 0.6rem 2.2rem;
+                border: 1px solid $border;
+                border-radius: 8px;
+                outline: none;
+            }
+
+            .search-icon {
+                position: absolute;
+                left: 0.8rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: $text-muted;
+            }
+        }
+
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid $border-color;
+            overflow-x: auto;
+            white-space: nowrap;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+
+            @media (max-width: 768px) {
+                border-bottom: none;
+                gap: 10px;
+                padding: 5px;
+                flex-wrap: wrap;
+                overflow-x: visible;
+                white-space: normal;
+            }
+
+            .tab-item {
+                background: none;
+                border: none;
+                padding: 0.8rem 1rem;
+
+                @include desktop {
+                    padding: 0.8rem 1.5rem;
+                }
+
+                color: $text-muted;
+                font-weight: 600;
+                cursor: pointer;
+                position: relative;
+                flex-shrink: 0;
+
+                &.active {
+                    color: $primary;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -1px;
+                        left: 0;
+                        width: 100%;
+                        height: 2px;
+                        background: $primary;
+                    }
+                }
+
+                .badge {
+                    background: $border-color;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-size: 11px;
+                    margin-left: 5px;
+                }
+
+                &.active .badge {
+                    background: $primary;
+                    color: white;
+                }
+
+                @media (max-width: 768px) {
+                    background-color: $bg-slate;
+                    color: $text-sub;
+                    border-radius: 30px;
+                    padding: 8px 16px;
+                    font-weight: 500;
+                    font-size: 14px;
+                    border: 1px solid transparent;
+
+                    &.active {
+                        background-color: $primary;
+                        color: white;
+                        box-shadow: 0 4px 10px rgba($primary, 0.25);
+                        font-weight: 600;
+
+                        &::after {
+                            display: none;
+                        }
+
+                        .badge {
+                            background: rgba(255, 255, 255, 0.25);
+                            color: white;
+                        }
+                    }
+
+                    .badge {
+                        background: rgba(0, 0, 0, 0.05);
+                        color: $text-sub;
+                        margin-left: 6px;
+                    }
+                }
+            }
+        }
+    }
+}

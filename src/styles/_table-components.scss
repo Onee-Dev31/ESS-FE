@@ -57,10 +57,21 @@
         display: inline-flex;
     }
 
-    .action-cell {
+    .action-cell,
+    .action-btns {
         display: flex;
         gap: 8px;
         justify-content: center;
+    }
+
+    .text-primary-link {
+        color: #1a73e8 !important;
+        font-weight: 700 !important;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
     @include tablet {

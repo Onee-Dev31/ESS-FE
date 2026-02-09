@@ -35,11 +35,160 @@
         }
     }
 
-    .data-grid-container {
-        padding: 0 24px 24px;
+    .card-list-view {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
 
-        .data-grid {
-            @include modern-table;
+        @include tablet {
+            display: flex;
+        }
+
+        .mobile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            &:active {
+                transform: scale(0.98);
+            }
+
+            .card-header {
+                background: #f8fafc;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f1f5f9;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .request-id {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    .label {
+                        font-size: 0.75rem;
+                        color: $text-muted;
+                        font-weight: 500;
+                    }
+
+                    .value {
+                        font-weight: 700 !important;
+                        color: #1a73e8 !important;
+                        font-size: 0.95rem;
+                    }
+                }
+            }
+
+            .card-body {
+                padding: 16px;
+
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                    font-size: 0.85rem;
+
+                    .label {
+                        color: $text-muted;
+                    }
+
+                    .value {
+                        font-weight: 600;
+                        color: $text;
+
+                        &.highlight {
+                            color: $primary;
+                        }
+
+                        &.amount {
+                            font-size: 1.1rem;
+                            font-weight: 800;
+                            color: #1e293b;
+                        }
+                    }
+                }
+
+                .requester-block {
+                    margin: 16px 0;
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 12px;
+
+                    .req-name {
+                        font-weight: 700;
+                        color: $text;
+                        font-size: 0.95rem;
+                        margin-bottom: 4px;
+                    }
+
+                    .req-details {
+                        font-size: 0.8rem;
+                        color: $text-sub;
+                        margin-bottom: 2px;
+                    }
+
+                    .req-company {
+                        font-size: 0.75rem;
+                        color: $text-muted;
+                    }
+                }
+
+                .description-block {
+                    margin-bottom: 16px;
+
+                    .desc-label {
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        color: $text-muted;
+                        margin-bottom: 4px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                    }
+
+                    .desc-content {
+                        font-size: 0.9rem;
+                        line-height: 1.5;
+                        color: $text;
+                        background: #f1f5f9;
+                        padding: 10px 12px;
+                        border-radius: 8px;
+                    }
+                }
+
+                .amount-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    padding-top: 12px;
+                    border-top: 1px dashed #e2e8f0;
+                    margin-bottom: 16px;
+
+                    .label {
+                        font-size: 0.85rem;
+                        color: $text-muted;
+                        font-weight: 500;
+                    }
+
+                    .value.amount {
+                        font-size: 1.35rem;
+                        font-weight: 800;
+                        color: #1a73e8;
+                        font-family: 'Inter', sans-serif;
+
+                        &::before {
+                            content: '฿';
+                            font-size: 1rem;
+                            font-weight: 600;
+                            margin-right: 2px;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -73,10 +222,34 @@
         }
     }
 
-    .action-cell {
+    .data-grid-container {
+        padding: 0 24px 24px;
+
+        .data-grid {
+            @include modern-table;
+
+            tbody tr td.request-no-link {
+                color: #1a73e8 !important;
+                font-weight: 700 !important;
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    .action-cell,
+    .card-actions {
         display: flex;
-        gap: 8px;
+        gap: 10px;
         justify-content: center;
+
+        @include mobile {
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
 
         .act-btn {
             width: 32px;

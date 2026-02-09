@@ -243,9 +243,9 @@
                 gap: 2px;
 
                 .ticket-no {
-                    font-weight: 700;
+                    font-weight: 700 !important;
                     font-size: 1rem;
-                    color: $text;
+                    color: #1a73e8 !important;
                 }
 
                 .create-date {
@@ -290,8 +290,8 @@
                 }
 
                 .value {
-                    font-weight: 700;
-                    color: $text;
+                    font-weight: 700 !important;
+                    color: #1a73e8 !important;
                     font-size: 0.95rem;
                 }
             }
