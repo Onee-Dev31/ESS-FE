@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,6 +31,7 @@ import { listAnimation } from '../../animations/animations';
   animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);

@@ -1,8 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import * as ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
+import type { Row, Cell, Column as ExcelColumn } from 'exceljs';
 import { DialogService } from './dialog';
 
 @Injectable({
@@ -18,6 +15,10 @@ export class ExportService {
         console.error(`Element with ID "${elementId}" not found`);
         return;
       }
+
+      // Dynamic import
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -49,8 +50,13 @@ export class ExportService {
     filename: string = 'export'
   ): Promise<void> {
     try {
+      // Dynamic import
+      const ExcelJS = await import('exceljs');
+      const { saveAs } = await import('file-saver');
+
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
+      // ... rest of code uses ExcelJS and saveAs
 
       worksheet.columns = columns.map(col => ({
         header: col.header,
@@ -72,8 +78,8 @@ export class ExportService {
         worksheet.addRow(item);
       });
 
-      worksheet.eachRow((row: ExcelJS.Row, rowNumber: number) => {
-        row.eachCell((cell: ExcelJS.Cell) => {
+      worksheet.eachRow((row: any, rowNumber: number) => {
+        row.eachCell((cell: any) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -160,8 +166,13 @@ export class ExportService {
         return;
       }
 
+      // Dynamic import
+      const ExcelJS = await import('exceljs');
+      const { saveAs } = await import('file-saver');
+
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
+      // ... rest of code uses ExcelJS and saveAs
 
       const headerRow = table.querySelector('thead tr');
       if (headerRow) {
@@ -184,12 +195,12 @@ export class ExportService {
         worksheet.addRow(cells);
       });
 
-      worksheet.columns.forEach((column: Partial<ExcelJS.Column>) => {
+      worksheet.columns.forEach((column: any) => {
         column.width = 15;
       });
 
-      worksheet.eachRow((row: ExcelJS.Row) => {
-        row.eachCell((cell: ExcelJS.Cell) => {
+      worksheet.eachRow((row: any) => {
+        row.eachCell((cell: any) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
