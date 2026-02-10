@@ -13,8 +13,24 @@
 
   <div class="nav-right">
     <div class="search-box desktop-search">
-      <input type="text" placeholder="Search..." />
+      <input type="text" placeholder="Search..." [value]="searchQuery()" (input)="onSearchInput($event)"
+        (focus)="isSearchFocused.set(true)" />
       <i class="fas fa-search search-icon"></i>
+
+      <!-- Search Results Dropdown -->
+      <div class="search-results-dropdown" *ngIf="isSearchFocused() && filteredSearchResults().length > 0">
+        <div class="search-result-item" *ngFor="let result of filteredSearchResults()"
+          (click)="navigateTo(result.path)">
+          <div class="result-icon">
+            <i class="fas" [ngClass]="result.icon"></i>
+          </div>
+          <div class="result-content">
+            <div class="result-label">{{ result.label }}</div>
+            <div class="result-category">{{ result.category }}</div>
+          </div>
+          <i class="fas fa-chevron-right result-arrow"></i>
+        </div>
+      </div>
     </div>
 
     <div class="nav-actions">
