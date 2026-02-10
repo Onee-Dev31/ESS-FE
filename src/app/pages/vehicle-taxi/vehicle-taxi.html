@@ -35,7 +35,9 @@
               <select class="form-control" [ngModel]="listing.filterStatus()"
                 (ngModelChange)="listing.filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
-                <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+                @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+                }
               </select>
             </div>
           </div>
@@ -54,10 +56,10 @@
       </div>
     </div>
 
-    @if (isLoading()) {
-    <app-skeleton type="table" [rows]="5"></app-skeleton>
-    } @else {
     <div class="table-responsive">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
       <table class="modern-table taxi-table">
         <thead>
           <tr>
@@ -85,24 +87,29 @@
             <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
-          <tr *ngFor="let item of req.items; let i = index">
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="font-bold text-center top-align merged-col">
+        @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+        <tbody>
+          @for (item of req.items; track $index) {
+          <tr>
+            @if ($index === 0) {
+            <td [attr.rowspan]="req.items.length" class="font-bold text-center top-align merged-col">
               <span class="text-primary-link">{{ req.id }}</span>
             </td>
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               {{ req.createDate }}
             </td>
+            }
             <td class="text-center top-align">{{ item.date }}</td>
             <td class="text-center top-align">{{ item.description }}</td>
             <td class="text-center top-align">{{ item.destination }}</td>
             <td class="text-center font-bold top-align">{{ item.amount | number: '1.2-2' }}</td>
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            @if ($index === 0) {
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                 {{ req.status | statusLabel }}
               </span>
             </td>
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               <div class="action-btns">
                 <button class="btn-icon view" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
                   <i class="far fa-folder-open"></i>
@@ -115,9 +122,13 @@
                 </button>
               </div>
             </td>
+            }
           </tr>
+          }
         </tbody>
-        <tbody *ngIf="comps.totalItems() === 0">
+        }
+        @empty {
+        <tbody>
           <tr>
             <td colspan="8" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -126,15 +137,17 @@
             </td>
           </tr>
         </tbody>
+        }
       </table>
+      }
     </div>
-    }
 
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
+      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+      <div class="mobile-card">
         <div class="card-header">
           <div class="header-content">
             <span class="ticket-no">{{ req.id }}</span>
@@ -155,7 +168,8 @@
           </div>
 
           <div class="nested-list">
-            <div class="nested-item" *ngFor="let item of req.items">
+            @for (item of req.items; track $index) {
+            <div class="nested-item">
               <div class="item-header">
                 <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
                 <span class="item-amount">฿{{ item.amount | number:'1.2-2' }}</span>
@@ -165,6 +179,7 @@
                 <div class="detail-row"><i class="fas fa-map-marker-alt"></i> {{ item.destination }}</div>
               </div>
             </div>
+            }
           </div>
           <div class="card-footer-actions">
             <button class="btn-edit-sm" (click)="openModal(req.id)">
@@ -176,11 +191,11 @@
           </div>
         </div>
       </div>
-
-      <div *ngIf="comps.paginatedData().length === 0">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
-      </div>
+      }
+      @empty {
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      </app-empty-state>
+      }
       }
     </div>
 
@@ -192,11 +207,17 @@
     </div>
   </div>
 
-  <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">
+  @if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreviewModal()">
   </app-file-preview-modal>
+  }
 </div>
 
-<div class="modal-overlay" *ngIf="isModalOpen()">
+@if (isModalOpen()) {
+<div class="modal-overlay">
   <div class="modal-container">
     <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
     </app-vehicle-taxi-form>
+  </div>
+</div>
+}

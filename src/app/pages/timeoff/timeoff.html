@@ -36,8 +36,9 @@
                             <select class="form-control select-status" [ngModel]="listing.filterStatus()"
                                 (ngModelChange)="listing.filterStatus.set($event)">
                                 <option value="">ทั้งหมด</option>
-                                <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}
-                                </option>
+                                @for (status of statuses; track status.value) {
+                                <option [value]="status.value">{{ status.label }}</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -60,17 +61,19 @@
             @if (isLoading()) {
             <app-skeleton type="card" [rows]="3"></app-skeleton>
             } @else {
-            <div class="mobile-card" *ngFor="let request of comps.paginatedData()">
+            @for (request of comps.paginatedData(); track request.id) {
+            <div class="mobile-card">
                 <div class="card-header">
                     <div class="header-content">
                         <span class="ticket-no">{{ request.leaveType }}</span>
                     </div>
 
                     <div class="card-actions-top">
-                        <button class="action-btn folder" *ngIf="request.attachments && request.attachments.length > 0"
-                            (click)="openPreview(request.attachments)" title="ดูเอกสาร">
+                        @if (request.attachments && request.attachments.length > 0) {
+                        <button class="action-btn folder" (click)="openPreview(request.attachments)" title="ดูเอกสาร">
                             <i class="far fa-folder-open"></i>
                         </button>
+                        }
                         <div class="status-badge" [ngClass]="getStatusClass(request.status)">
                             {{ request.status | statusLabel }}
                         </div>
@@ -86,16 +89,20 @@
                         <span class="label">วันที่ลา:</span>
                         <span class="value" style="text-align: right;">
                             {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
-                            <div class="text-muted small" *ngIf="request.shiftStartTime">
+                            @if (request.shiftStartTime) {
+                            <div class="text-muted small">
                                 ({{ request.shiftStartTime }} - {{ request.shiftEndTime }})
                             </div>
+                            }
                         </span>
                     </div>
-                    <div class="info-row" *ngIf="request.days">
+                    @if (request.days) {
+                    <div class="info-row">
                         <span class="label">จำนวนวัน:</span>
                         <span class="value">{{ request.days }} วัน <span class="text-muted">({{
                                 getPeriodLabel(request.leavePeriod) }})</span></span>
                     </div>
+                    }
 
                     <div class="reason-box">
                         <strong>เหตุผล:</strong>
@@ -103,28 +110,25 @@
                     </div>
 
                     <div class="card-footer-actions">
-                        <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
-                            <button class="btn-edit-sm" (click)="openForm(request.status)">
-                                <i class="far fa-edit"></i> แก้ไข
-                            </button>
-                            <button class="btn-delete-sm" (click)="deleteRequest(request)">
-                                <i class="far fa-trash-alt"></i> ลบ
-                            </button>
-                        </ng-container>
-
-                        <button class="btn-view-sm" *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
-                            (click)="openForm(request.status)">
+                        @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                        <button class="btn-edit-sm" (click)="openForm(request.status)">
+                            <i class="far fa-edit"></i> แก้ไข
+                        </button>
+                        <button class="btn-delete-sm" (click)="deleteRequest(request)">
+                            <i class="far fa-trash-alt"></i> ลบ
+                        </button>
+                        } @else {
+                        <button class="btn-view-sm" (click)="openForm(request.status)">
                             <i class="far fa-eye"></i> ดูรายละเอียด
                         </button>
+                        }
                     </div>
                 </div>
             </div>
-
-            <div *ngIf="comps.paginatedData().length === 0">
-                <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                    icon="fas fa-inbox">
-                </app-empty-state>
-            </div>
+            } @empty {
+            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+            </app-empty-state>
+            }
             }
         </div>
 
@@ -166,19 +170,23 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody *ngFor="let request of comps.paginatedData()">
+                @for (request of comps.paginatedData(); track request.id) {
+                <tbody>
                     <tr>
                         <td class="text-center merged-col">
                             <span class="text-primary-link">{{ request.id }}</span>
                         </td>
                         <td class="text-center">
                             <div class="font-bold">{{ formatDate(request.startDate) }}</div>
-                            <div class="small text-muted" *ngIf="request.shiftStartTime">{{ request.shiftStartTime }}
-                            </div>
+                            @if (request.shiftStartTime) {
+                            <div class="small text-muted">{{ request.shiftStartTime }}</div>
+                            }
                         </td>
                         <td class="text-center">
                             <div class="font-bold">{{ formatDate(request.endDate) }}</div>
-                            <div class="small text-muted" *ngIf="request.shiftEndTime">{{ request.shiftEndTime }}</div>
+                            @if (request.shiftEndTime) {
+                            <div class="small text-muted">{{ request.shiftEndTime }}</div>
+                            }
                         </td>
                         <td class="text-center">
                             <span class="days-badge">{{ request.days }}</span>
@@ -200,31 +208,32 @@
                         </td>
                         <td class="text-center merged-col">
                             <div class="action-btns">
+                                @if (request.attachments && request.attachments.length > 0) {
                                 <button class="btn-icon view" title="ดูเอกสารแนบ"
-                                    *ngIf="request.attachments && request.attachments.length > 0"
                                     (click)="openPreview(request.attachments)">
                                     <i class="far fa-folder-open"></i>
                                 </button>
+                                }
 
-                                <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
-                                    <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
-                                        <i class="far fa-edit"></i>
-                                    </button>
-                                    <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
-                                        <i class="far fa-trash-alt"></i>
-                                    </button>
-                                </ng-container>
-
-                                <button class="btn-icon view" title="ดูรายละเอียด"
-                                    *ngIf="request.status !== 'NEW' && request.status !== 'คำขอใหม่'"
-                                    (click)="openForm(request.status)">
+                                @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                                <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
+                                    <i class="far fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                                } @else {
+                                <button class="btn-icon view" title="ดูรายละเอียด" (click)="openForm(request.status)">
                                     <i class="far fa-eye"></i>
                                 </button>
+                                }
                             </div>
                         </td>
                     </tr>
                 </tbody>
-                <tbody *ngIf="comps.paginatedData().length === 0">
+                }
+                @empty {
+                <tbody>
                     <tr>
                         <td colspan="9" class="no-data-cell">
                             <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -232,6 +241,7 @@
                         </td>
                     </tr>
                 </tbody>
+                }
             </table>
 
             }
@@ -246,11 +256,15 @@
     </div>
 </div>
 
-<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>
+}
 
-<div class="modal-overlay" *ngIf="isFormOpen()">
+@if (isFormOpen()) {
+<div class="modal-overlay">
     <div class="modal-container">
         <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>
     </div>
 </div>
+}

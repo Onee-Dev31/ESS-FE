@@ -63,7 +63,8 @@
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      <div class="mobile-card" *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
+      @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+      <div class="mobile-card">
         <div class="card-header">
           <div class="header-content">
             <span class="ticket-no">{{ row.original.id }}</span>
@@ -82,7 +83,8 @@
           </div>
 
           <div class="nested-list">
-            <div class="nested-item" *ngFor="let item of row.original.items; let i = index">
+            @for (item of row.original.items; track $index) {
+            <div class="nested-item">
               <div class="item-header">
                 <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
                 <span class="item-amount">฿{{ item.amount | number : '1.2-2' }}</span>
@@ -93,6 +95,7 @@
                 </div>
               </div>
             </div>
+            }
           </div>
 
           <div class="card-footer-actions">
@@ -105,11 +108,11 @@
           </div>
         </div>
       </div>
-
-      <div *ngIf="table.getRowModel().rows.length === 0">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
-      </div>
+      }
+      @empty {
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      </app-empty-state>
+      }
       }
     </div>
 
@@ -153,17 +156,18 @@
             <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        <tbody *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
-          <tr *ngFor="let item of row.original.items; let i = index"
-            [class.group-end]="i === row.original.items.length - 1">
-
-            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
+        @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+        <tbody>
+          @for (item of row.original.items; track $index) {
+          <tr [class.group-end]="$index === row.original.items.length - 1">
+            @if ($index === 0) {
+            <td [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
               <span class="text-primary-link">{{ row.original.id }}</span>
             </td>
-
-            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
+            <td [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
               {{ row.original.createDate | date : 'dd/MM/yyyy' }}
             </td>
+            }
 
             <td class="text-center">{{ item.date }}</td>
 
@@ -178,13 +182,14 @@
               {{ item.amount | number : '1.2-2' }}
             </td>
 
-            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
+            @if ($index === 0) {
+            <td [attr.rowspan]="row.original.items.length" class="merged-col text-center">
               <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
                 {{ row.original.status | statusLabel }}
               </span>
             </td>
 
-            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
+            <td [attr.rowspan]="row.original.items.length" class="merged-col text-center">
               <div class="action-btns">
                 <button class="btn-icon edit" (click)="openModal(row.original.id)">
                   <i class="far fa-edit"></i>
@@ -194,9 +199,13 @@
                 </button>
               </div>
             </td>
+            }
           </tr>
+          }
         </tbody>
-        <tbody *ngIf="table.getRowModel().rows.length === 0">
+        }
+        @empty {
+        <tbody>
           <tr>
             <td colspan="7" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -205,6 +214,7 @@
             </td>
           </tr>
         </tbody>
+        }
       </table>
       }
     </div>
@@ -216,8 +226,11 @@
     </div>
   </div>
 
-  <div class="modal-overlay" *ngIf="isModalOpen">
+  @if (isModalOpen) {
+  <div class="modal-overlay">
     <div class="modal-container">
       <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-form>
     </div>
   </div>
+  }
+</div>

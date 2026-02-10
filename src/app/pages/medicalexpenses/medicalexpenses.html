@@ -24,7 +24,9 @@
                         <div class="select-input-group">
                             <select class="form-control" [ngModel]="fromMonth()"
                                 (ngModelChange)="fromMonth.set($event)">
-                                <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                                @for (m of months; track m.value) {
+                                <option [value]="m.value">{{ m.label }}</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -41,7 +43,9 @@
                         <span class="filter-label">ถึงเดือน *</span>
                         <div class="select-input-group">
                             <select class="form-control" [ngModel]="toMonth()" (ngModelChange)="toMonth.set($event)">
-                                <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                                @for (m of months; track m.value) {
+                                <option [value]="m.value">{{ m.label }}</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -60,7 +64,9 @@
                             <select class="form-control" [ngModel]="listing.filterStatus()"
                                 (ngModelChange)="listing.filterStatus.set($event)">
                                 <option value="">ทั้งหมด</option>
-                                <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+                                @for (opt of statusOptions; track opt.value) {
+                                <option [value]="opt.value">{{ opt.label }}</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -83,16 +89,19 @@
             @if (isLoading()) {
             <app-skeleton type="card" [rows]="3"></app-skeleton>
             } @else {
-            <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
+            @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+            <div class="mobile-card">
                 <div class="card-header">
                     <div class="header-content">
                         <span class="ticket-no">{{ req.id }}</span>
                     </div>
                     <div class="card-actions-top">
-                        <button class="action-btn folder" *ngIf="req.items[0]?.attachedFile"
-                            (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
+                        @if (req.items[0]?.attachedFile) {
+                        <button class="action-btn folder" (click)="openPreview(req.items[0].attachedFile)"
+                            title="ดูเอกสาร">
                             <i class="far fa-folder-open"></i>
                         </button>
+                        }
                         <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                             {{ req.status | statusLabel }}
                         </span>
@@ -105,7 +114,8 @@
                     </div>
 
                     <div class="nested-list">
-                        <div class="nested-item" *ngFor="let item of req.items">
+                        @for (item of req.items; track $index) {
+                        <div class="nested-item">
                             <div class="item-header">
                                 <span class="item-title">{{ item.diseaseType }}</span>
                                 <span class="item-amount">฿{{ item.requestedAmount | number:'1.2-2' }}</span>
@@ -123,15 +133,16 @@
                                 </div>
                             </div>
                         </div>
+                        }
                     </div>
                 </div>
             </div>
             }
-            <div *ngIf="comps.totalItems() === 0 && !isLoading()">
-                <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                    icon="fas fa-inbox">
-                </app-empty-state>
-            </div>
+            }
+            @if (comps.totalItems() === 0 && !isLoading()) {
+            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+            </app-empty-state>
+            }
         </div>
 
         <div class="table-responsive">
@@ -185,16 +196,18 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
-                    <tr *ngFor="let item of req.items; let i = index">
-
-                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+                @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+                <tbody>
+                    @for (item of req.items; track $index) {
+                    <tr>
+                        @if ($index === 0) {
+                        <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
                             <span class="text-primary-link">{{ req.id }}</span>
                         </td>
-
-                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+                        <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
                             {{ req.createDate }}
                         </td>
+                        }
 
                         <td class="text-center">{{ item.limitType }}</td>
                         <td class="text-center">{{ item.diseaseType }}</td>
@@ -204,18 +217,21 @@
                         <td class="text-center font-bold">{{ item.requestedAmount | number: '1.2-2' }}</td>
                         <td class="text-center font-bold">{{ item.approvedAmount | number: '1.2-2' }}</td>
 
-                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
+                        @if ($index === 0) {
+                        <td [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
                             <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                                 {{ req.status | statusLabel }}
                             </span>
                         </td>
 
-                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
+                        <td [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
                             <div class="action-btns">
-                                <button class="btn-icon view" *ngIf="req.items[0]?.attachedFile"
-                                    (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
+                                @if (req.items[0]?.attachedFile) {
+                                <button class="btn-icon view" (click)="openPreview(req.items[0].attachedFile)"
+                                    title="ดูเอกสาร">
                                     <i class="far fa-folder-open"></i>
                                 </button>
+                                }
                                 <button class="btn-icon edit" (click)="editRequest(req.id)" title="แก้ไข">
                                     <i class="far fa-edit"></i>
                                 </button>
@@ -224,9 +240,13 @@
                                 </button>
                             </div>
                         </td>
+                        }
                     </tr>
+                    }
                 </tbody>
-                <tbody *ngIf="comps.paginatedData().length === 0">
+                }
+                @empty {
+                <tbody>
                     <tr>
                         <td colspan="11" class="no-data-cell">
                             <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -235,6 +255,7 @@
                         </td>
                     </tr>
                 </tbody>
+                }
             </table>
 
             }
@@ -252,12 +273,17 @@
 <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
 </app-medical-policy-modal>
 
-<div class="modal-overlay" *ngIf="isModalOpen()">
+@if (isModalOpen()) {
+<div class="modal-overlay">
     <div class="modal-container">
         <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
         </app-medicalexpenses-form>
     </div>
 </div>
+}
 
-<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>
+}
+```

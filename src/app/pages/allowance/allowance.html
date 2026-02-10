@@ -64,8 +64,8 @@
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
-
+      @for (req of comps.paginatedData(); track trackByReqId($index, req)) {
+      <div class="mobile-card">
         <div class="card-header">
           <div class="header-content">
             <span class="ticket-no">{{ req.id }}</span>
@@ -84,7 +84,8 @@
           </div>
 
           <div class="nested-list">
-            <div class="nested-item" *ngFor="let item of req.items">
+            @for (item of req.items; track $index) {
+            <div class="nested-item">
               <div class="item-header">
                 <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
                 <span class="item-amount">฿{{ item.amount | number: '1.2-2' }}</span>
@@ -98,15 +99,15 @@
                 </div>
               </div>
             </div>
+            }
           </div>
-
         </div>
       </div>
-
-      <div *ngIf="comps.paginatedData().length === 0">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
-      </div>
+      }
+      @empty {
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      </app-empty-state>
+      }
       }
     </div>
 
@@ -141,16 +142,18 @@
             <th class="col-actions text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
-          <tr *ngFor="let item of req.items; let i = index">
-
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+        @for (req of comps.paginatedData(); track trackByReqId($index, req)) {
+        <tbody>
+          @for (item of req.items; track $index) {
+          <tr>
+            @if ($index === 0) {
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               <span class="text-primary-link">{{ req.id }}</span>
             </td>
-
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               {{ req.createDate | date: 'dd/MM/yyyy' }}
             </td>
+            }
 
             <td class="text-center top-align">{{ item.date }}</td>
             <td class="desc-cell top-align text-center">{{ item.description }}</td>
@@ -159,13 +162,14 @@
               {{ item.amount | number: '1.2-2' }}
             </td>
 
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="v-middle text-center merged-col">
+            @if ($index === 0) {
+            <td [attr.rowspan]="req.items.length" class="v-middle text-center merged-col">
               <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                 {{ req.status | statusLabel }}
               </span>
             </td>
 
-            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
               <div class="action-btns">
                 <button class="btn-icon edit" (click)="editRequest(req.id)" title="แก้ไข">
                   <i class="far fa-edit"></i>
@@ -175,10 +179,13 @@
                 </button>
               </div>
             </td>
-
+            }
           </tr>
+          }
         </tbody>
-        <tbody *ngIf="comps.paginatedData().length === 0">
+        }
+        @empty {
+        <tbody>
           <tr>
             <td colspan="7" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -187,6 +194,7 @@
             </td>
           </tr>
         </tbody>
+        }
       </table>
       }
     </div>
@@ -198,12 +206,16 @@
     </div>
   </div>
 
-  <div class="modal-overlay" *ngIf="isModalOpen">
+  @if (isModalOpen) {
+  <div class="modal-overlay">
     <div class="modal-container">
       <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>
     </div>
   </div>
+  }
 
-  <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+  @if (isPolicyModalOpen()) {
+  <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)">
   </app-medical-policy-modal>
+  }
 </div>

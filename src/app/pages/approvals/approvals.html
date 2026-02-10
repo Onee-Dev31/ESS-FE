@@ -100,10 +100,10 @@
         </div>
       </div>
       }
-      <div *ngIf="comps.totalItems() === 0">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
-      </div>
+      @empty {
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      </app-empty-state>
+      }
     </div>
 
     <div class="data-grid-container">
@@ -137,8 +137,8 @@
             <th class="text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody *ngFor="let row of table.getRowModel().rows; let rowIndex = index; trackBy: trackByRowId"
-          [@listAnimation]>
+        @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+        <tbody [@listAnimation]>
           <tr>
             <td class="text-center font-inter request-no-link text-primary-link" (click)="viewDetail(row.original)">
               {{ row.original.requestNo }}
@@ -182,12 +182,20 @@
             </td>
           </tr>
         </tbody>
+        }
+        @empty {
+        <tbody>
+          <tr>
+            <td colspan="8" class="no-data-cell">
+              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                icon="fas fa-inbox">
+              </app-empty-state>
+            </td>
+          </tr>
+        </tbody>
+        }
       </table>
       }
-      <div *ngIf="comps.totalItems() === 0 && !isLoading()">
-        <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-        </app-empty-state>
-      </div>
     </div>
 
     <div class="pagination-wrapper">

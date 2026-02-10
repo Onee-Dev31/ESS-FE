@@ -1,148 +1,123 @@
 # ESS-FE (Employee Self Service Frontend)
 
-Welcome to the **ESS-FE** project! This is the frontend application for the Employee Self Service system, built with **Angular (v21+)**, modern architectural patterns, and a focus on performance and maintainability.
+[![Angular](https://img.shields.io/badge/Angular-21+-DD0031.svg?style=for-the-badge&logo=angular)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Status](https://img.shields.io/badge/Status-Premium_Ready-success.svg?style=for-the-badge)](https://github.com/Onee-Dev31/ESS-FE)
+
+**ESS-FE** คือระบบ Employee Self Service (Frontend) เวอร์ชันปรับปรุงใหม่ที่เน้นความทันสมัย ลื่นไหล และความปลอดภัยระดับองค์กร พัฒนาด้วย **Angular 21** และ **Signal-based Reactivity**
 
 ---
 
-## 🚀 Tech Stack & Key Libraries
+## 🇹🇭 สรุปภาพรวมโครงการ (Project Summary)
 
-This project utilizes a cutting-edge stack to ensure a premium user experience and developer productivity.
+โปรเจกต์นี้เป็นการปรับโฉมระบบบริการตนเองของพนักงาน (ESS) ให้มีความเป็น **Premium Dashboard** มากยิ่งขึ้น โดยมีการปรับปรุงหลักดังนี้:
+- **Modern UI/UX**: ปรับปรุงหน้าจอ Dashboard, รายการลา, และการเบิกสวัสดิการต่างๆ ให้มีความสะอาดตาและใช้งานง่าย
+- **Quick Navigation**: ระบบค้นหาเมนูทางลัดที่ช่วยให้เข้าถึงหน้างานที่ต้องการได้ภายในไม่กี่วินาที
+- **Standardized Tables**: ระบบตารางข้อมูลที่รองรับการเรียงลำดับ การกรอง และการแสดงผลที่เป็นมาตรฐานเดียวกันทุกหน้า
+- **Role-Based Filtering**: ระบบความปลอดภัยที่กรองเมนูและข้อมูลตามบทบาทของผู้ใช้งาน (เช่น Member จะไม่เห็นเมนูการอนุมัติ)
+
+---
+
+## �️ Developer Guide: การนำ Pattern ไปใช้งานใหม่ (Copy & Reuse)
+
+หากต้องการเพิ่มระบบเบิกใหม่ (เช่น "เบิกอุปกรณ์ไอที") แนะนำให้ใช้ "Copy Logic" จากหน้า `Vehicle` หรือ `Allowance` ตามขั้นตอนดังนี้:
+
+### 1. **Create Service** (ต่อยอดจาก `BaseRequestService`)
+สร้าง Service ใหม่โดย `extends BaseRequestService<T>`. ระบบจะจัดการเรื่อง Loading, Mock Data และ CRUD สิทธิการเข้าถึงให้โดยอัตโนมัติ
+
+### 2. **Setup Component** (ใช้ `listing.util.ts`)
+ในตัว Component ให้ใช้ `createListingState()` และ `createListingComputeds()` เพื่อจัดการ Pagination และ Search โดยไม่ต้องเขียน Logic ซ้ำ
+
+### 3. **Standardized HTML Table** (โครงสร้างตารางมาตรฐาน)
+เพื่อให้ Hover และสไตล์ตารางออกมาเนี๊ยบเหมือนหน้าอื่นๆ ให้ใช้โครงสร้างที่มี `<tbody>` แยกตามรายแถว (per row) ดังนี้:
+```html
+<table class="modern-table">
+  <thead>...</thead>
+  <!-- หัวใจสำคัญคือการใช้ *ngFor ที่ tbody เพื่อให้ Hover ติดทั้งกลุ่มข้อมูล -->
+  <tbody *ngFor="let item of data">
+    <tr>...</tr>
+  </tbody>
+</table>
+```
+
+### 4. **Register for Quick-Search**
+อย่าลืมนำลิงก์ใหม่ไปเพิ่มใน `NavbarComponent` (ส่วน `allMenuItems`) เพื่อให้สามารถค้นหาหน้าใหม่นี้เจอผ่านระบบ Quick-Search
+
+---
+
+## �🚀 Recent Enhancements (การอัปเดตล่าสุด)
+
+### 1. **Navbar Quick-Search Menu**
+ระบบค้นหาอัจฉริยะที่มุมขวาบนของ Navbar:
+- รองรับการค้นหาเมนูด้วยคีย์เวิร์ด (เช่น "เบิก", "ลา", "Approval")
+- แสดงผลลัพธ์เป็น Dropdown พร้อมไอคอนและหมวดหมู่
+- กรองผลลัพธ์ตามสิทธิ์การเข้าถึง (Role-Based)
+
+### 2. **UI Standardization Polish**
+ปรับปรุงพื้นฐาน UI ให้มีความสม่ำเสมอทั่วทั้งระบบ:
+- **Request ID Styling**: ใช้ตัวหนาสีน้ำเงิน (#1a73e8) สำหรับเลขที่เอกสารทุกหน้า
+- **Standard Table Actions**: เพิ่มปุ่ม Edit/Delete ในตาราง Medical Expenses และ Allowance ให้เป็นมาตรฐานเดียวกัน
+- **Pagination**: ปรับปรุงการวางตำแหน่งและ Style ของ Pagination ให้ตรงกันทุกหน้า
+
+---
+
+## 🛠️ Tech Stack & Key Libraries
 
 - **Framework**: [Angular v21](https://angular.dev/) (Standalone Components, Signals, Control Flow)
-- **State Management**: Angular Signals (`signal`, `computed`, `effect`)
-- **UI Components**:
-  - **Icons**: `@ng-icons` (Heroicons, Bootstrap Icons, etc.)
-  - **Calendar**: `@fullcalendar/angular`
-  - **Data Tables**: `@tanstack/angular-table` (Headless UI logic)
-  - **Charts/Export**: `jspdf`, `exceljs`, `html2canvas`
-- **Utilities**: `dayjs` (Date manipulation), `date-holidays`
-- **Testing**: `vitest` (Unit Testing), `cypress` (E2E Testing)
+- **State Management**: Angular Signals (Fine-grained reactivity)
+- **Data Handling**: `@tanstack/angular-table` for robust headless table logic
+- **UI & Icons**: FontAwesome 7 & `@ng-icons`
+- **Charts & Export**: Combined use of `jspdf`, `exceljs`, and `html2canvas` for hi-res reporting
+
+---
+
+## 📂 Project Architecture
+
+โครงสร้างโปรเจกต์เน้นความยืดหยุ่นและการแยกส่วนชัดเจน (Separation of Concerns):
+
+```text
+src/app/
+├── components/          # Reusable UI components
+│   ├── features/        # Business-logic heavy (Forms, Search Logic)
+│   ├── layout/          # Page Wrappers & Page Headers
+│   ├── modals/          # Complex Dialogs (Approval Detail, File Preview)
+│   └── shared/          # Generic items (Button, Pagination, Skeleton)
+├── pages/               # Primary Route Components (Screens)
+│   ├── dashboard/       # Main overview with lazily loaded widgets
+│   ├── approvals/       # Universal Approval handling system
+│   └── ...medicalexpenses, allowance, vehicle, timeoff
+├── services/            # BaseRequestService and domain-specific services
+└── utils/               # Listing utilities and data helpers
+```
 
 ---
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- npm (v10+, project uses `npm@11.7.0`)
+- Node.js (v18+)
+- npm (v10+), This project uses `npm@11.7.0`
 
 ### Installation
 ```bash
-# Clone the repository
-git clone <repository-url>
-
-# Install dependencies
 npm install
 ```
 
-### Development Server
-Run the app in development mode with HMR (Hot Module Replacement) enabled.
+### Execution
 ```bash
-npm start
-# OR
-ng serve
-```
-Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-### 🏗️ Build
-Build the project for production. The build artifacts will be stored in the `dist/` directory.
-```bash
-npm run build
-```
-
-### ✅ Testing
-Run the unit test suite to verify system integrity.
-```bash
-npm test
+# Development server
+npm start # runs `ng serve`
 ```
 
 ---
 
-## 📂 Project Architecture
+## 📏 Coding Standards
 
-The project follows a **Fractal / Domain-Driven Design (DDD)** inspired structure, emphasizing Separation of Concerns (SoC).
-
-```text
-src/app/
-├── components/          # Reusable UI components
-│   ├── features/        # Business-logic heavy components (Forms, Complex Widgets)
-│   ├── layout/          # Main Layout, Loader, Wrappers
-│   ├── modals/          # All modal dialogs (Approval Details, File Preview)
-│   ├── navbar/          # Navigation Bar
-│   ├── shared/          # Generic dumb components (Buttons, Skeleton, Inputs)
-│   └── sidebar/         # Sidebar Navigation
-├── config/              # Global configuration files (Menu, Constants)
-├── constants/           # Static constant values (Storage Keys, API Endpoints)
-├── guards/              # Route Guards (AuthGuard, RoleGuard)
-├── interfaces/          # TypeScript Interfaces & Types
-├── pages/               # Route Components (The "Screens" of the app)
-│   ├── dashboard/       # Dashboard with Charts & Widgets
-│   ├── approvals/       # Universal Approvals Page (Handles generic & medical)
-│   └── ...
-├── pipes/               # Data transformation pipes
-├── services/            # Business Logic & API Communication
-└── utils/               # Pure utility functions (Helpers)
-```
-
-### Key Architectural Decisions
-
-#### 1. Standalone Components
-Almost entire codebase uses **Standalone Components**. We do not use `NgModule`. This simplifies dependency injection and lazy loading.
-
-#### 2. Signal-Based Reactivity
-We prioritize **Signals** over `BehaviorSubject` for local state management.
-- **Example**: `isLoading = signal(false)`, `total = computed(() => ...)`
-- **Why?**: Signals provide finer-grained reactivity and better performance by reducing unnecessary change detection cycles.
-
-#### 3. Listing Utilities (`listing.util.ts`)
-To avoid repetitive boilerplate code for tables (Pagination, Search, Filtering), we use a shared utility `createListingState()` and `createListingComputeds()`.
-- **Usage**: See `ApprovalsComponent` or `VehicleComponent`.
-
-#### 4. Robust Loading States (`SkeletonComponent`)
-We use a shared `<app-skeleton>` component to improve Perceived Performance.
-- **Important**: In complex layouts like `DashboardComponent`, ensure `SkeletonComponent` is used within explicitly recognized control flow blocks (`@if`, `@else`) or is otherwise "visible" to compilation tools to avoid compilation warnings.
+1. **Standalone First**: ทุก Component เป็น Standalone ไม่ต้องประกาศใน Module
+2. **Signals Only**: ใช้ Signal แทน RxJS BehaviorSubject ในส่วนที่เป็น UI State
+3. **Control Flow**: ใช้ `@if`, `@for`, `@switch` แทน `*ngIf`, `*ngFor`
+4. **Kebab-Case**: ชื่อไฟล์ต้องเป็น kebab-case เสมอ เพื่อความสอดคล้องกับ Angular conventions
 
 ---
 
-## 🧩 Key Feature Implementation Details
 
-### Approvals Module (`/pages/approvals`)
-The Approvals page is designed to be **Universal**. It handles both generic approvals (Leave, Taxi, Allowance) and specific ones (Medical Expenses) using the same component.
-- **Routing**: The distinction is made via Route Data.
-  - `path: 'approvals'` -> `{ category: 'all' }`
-  - `path: 'approvals-medicalexpenses'` -> `{ category: 'medical' }`
-- **Logic**: `ApprovalsComponent` reads this `category` from `ActivatedRoute.data` to filter data correctly via `ApprovalsHelperService`.
-
-### Dashboard (`/pages/dashboard`)
-The dashboard aggregates data from multiple services. It uses `@defer` and `@placeholder` blocks to load heavy widgets (like the Calendar) lazily, enhancing initial load speed.
-
----
-
-## 📏 Coding Standards & Best Practices
-
-1. **Naming Convention**:
-   - Files: `kebab-case.ts` (e.g., `approval-detail-modal.ts`)
-   - Classes: `PascalCase` (e.g., `ApprovalDetailModalComponent`)
-   - Variables/Methods: `camelCase` (e.g., `getApprovalDetails()`)
-
-2. **Control Flow**:
-   - Always use the new Angular Control Flow syntax (`@if`, `@for`, `@switch`) instead of structural directives (`*ngIf`, `*ngFor`).
-
-3. **CSS/SCSS**:
-   - Use SCSS modules or component-scoped styles.
-   - Avoid global style pollution unless adding utility classes to `styles.scss`.
-
-4. **Git Workflow**:
-   - Commit messages should be descriptive.
-   - Run `npm test` before pushing to ensure no regressions.
-
----
-
-## 🤝 Contribution
-
-If you are the next developer picking up this project:
-1. **Check `task.md` (if available)**: It often contains the checklist of recent work.
-2. **Review `walkthrough.md`**: For a quick catch-up on the latest implemented features.
-3. **Run Tests**: Ensure the baseline is green before starting your work.
-
-**Happy Coding! 🚀**
