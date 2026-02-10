@@ -187,10 +187,12 @@
       }
     </div>
 
-    <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-      [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
-      (onPageSizeChange)="listing.pageSize.set($event)">
-    </app-pagination>
+    <div class="pagination-wrapper">
+      <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+        [totalItems]="comps.totalItems()" (onPageChange)="listing.currentPage.set($event)"
+        (onPageSizeChange)="listing.pageSize.set($event)">
+      </app-pagination>
+    </div>
   </div>
 
   <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreviewModal()">

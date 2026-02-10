@@ -149,7 +149,7 @@
                             (click)="toggleSort('leavePeriod')">
                             ประเภทวันลา <i class="fas ml-1" [ngClass]="getSortIcon('leavePeriod')"></i>
                         </th>
-                        <th rowspan="2" class="col-reason sortable-header" (click)="toggleSort('reason')">
+                        <th rowspan="2" class="col-reason sortable-header text-center" (click)="toggleSort('reason')">
                             เหตุผล <i class="fas ml-1" [ngClass]="getSortIcon('reason')"></i>
                         </th>
                         <th rowspan="2" class="text-center col-status sortable-header" (click)="toggleSort('status')">
@@ -239,10 +239,12 @@
             }
         </div>
 
-        <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-            [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
-            (onPageSizeChange)="setPageSize($event)">
-        </app-pagination>
+        <div class="pagination-wrapper">
+            <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+                [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
+                (onPageSizeChange)="setPageSize($event)">
+            </app-pagination>
+        </div>
     </div>
 </div>
 

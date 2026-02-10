@@ -30,5 +30,13 @@
                 align-items: stretch;
             }
         }
+
+        .pagination-wrapper {
+            padding: 1.5rem 24px 1.5rem;
+
+            @include tablet {
+                padding: 1rem 16px 0.5rem;
+            }
+        }
     }
 }

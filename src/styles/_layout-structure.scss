@@ -15,6 +15,18 @@
     @include mobile {
         padding: 15px;
     }
+
+    .pagination-wrapper {
+        padding: 1.5rem 0 0.5rem 0;
+    }
+}
+
+.pagination-wrapper {
+    padding: 0 24px 24px;
+
+    @include tablet {
+        padding: 0 16px 16px;
+    }
 }
 
 .top-header-strip {

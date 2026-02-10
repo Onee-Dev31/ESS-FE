@@ -1,11 +1,10 @@
 @use '../../../../styles/theme' as *;
 
 .pagination-container {
-    padding: 1.5rem;
+    padding: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
     flex-wrap: wrap;
     gap: 1rem;
 

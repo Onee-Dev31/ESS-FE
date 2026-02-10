@@ -79,6 +79,61 @@
             </div>
         </div>
 
+        <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
+            <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
+                <div class="card-header">
+                    <div class="header-content">
+                        <span class="ticket-no">{{ req.id }}</span>
+                    </div>
+                    <div class="card-actions-top">
+                        <button class="action-btn folder" *ngIf="req.items[0]?.attachedFile"
+                            (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
+                            <i class="far fa-folder-open"></i>
+                        </button>
+                        <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+                            {{ req.status | statusLabel }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label">วันที่สร้างรายการ:</span>
+                        <span class="value">{{ req.createDate }}</span>
+                    </div>
+
+                    <div class="nested-list">
+                        <div class="nested-item" *ngFor="let item of req.items">
+                            <div class="item-header">
+                                <span class="item-title">{{ item.diseaseType }}</span>
+                                <span class="item-amount">฿{{ item.requestedAmount | number:'1.2-2' }}</span>
+                            </div>
+                            <div class="item-detail">
+                                <div class="detail-row">
+                                    <i class="fas fa-hospital"></i> {{ item.hospital }}
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-notes-medical"></i> {{ item.limitType }}
+                                </div>
+                                <div class="detail-row">
+                                    <i class="far fa-calendar-alt"></i> {{ item.treatmentDateFrom }} - {{
+                                    item.treatmentDateTo }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+            <div *ngIf="comps.totalItems() === 0 && !isLoading()">
+                <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                    icon="fas fa-inbox">
+                </app-empty-state>
+            </div>
+        </div>
+
         <div class="table-responsive">
             @if (isLoading()) {
             <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -176,65 +231,12 @@
             }
         </div>
 
-        <div class="card-list-view">
-            @if (isLoading()) {
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-            } @else {
-            <div class="mobile-card" *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
-                <div class="card-header">
-                    <div class="header-content">
-                        <span class="ticket-no">{{ req.id }}</span>
-                    </div>
-                    <div class="card-actions-top">
-                        <button class="action-btn folder" *ngIf="req.items[0]?.attachedFile"
-                            (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
-                            <i class="far fa-folder-open"></i>
-                        </button>
-                        <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                            {{ req.status | statusLabel }}
-                        </span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="info-row">
-                        <span class="label">วันที่สร้างรายการ:</span>
-                        <span class="value">{{ req.createDate }}</span>
-                    </div>
-
-                    <div class="nested-list">
-                        <div class="nested-item" *ngFor="let item of req.items">
-                            <div class="item-header">
-                                <span class="item-title">{{ item.diseaseType }}</span>
-                                <span class="item-amount">฿{{ item.requestedAmount | number:'1.2-2' }}</span>
-                            </div>
-                            <div class="item-detail">
-                                <div class="detail-row">
-                                    <i class="fas fa-hospital"></i> {{ item.hospital }}
-                                </div>
-                                <div class="detail-row">
-                                    <i class="fas fa-notes-medical"></i> {{ item.limitType }}
-                                </div>
-                                <div class="detail-row">
-                                    <i class="far fa-calendar-alt"></i> {{ item.treatmentDateFrom }} - {{
-                                    item.treatmentDateTo }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
+        <div class="pagination-wrapper">
+            <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
+                [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
+                (onPageSizeChange)="setPageSize($event)">
+            </app-pagination>
         </div>
-
-        <div *ngIf="comps.totalItems() === 0">
-            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-            </app-empty-state>
-        </div>
-
-        <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-            [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
-            (onPageSizeChange)="setPageSize($event)">
-        </app-pagination>
     </div>
 </div>
 

@@ -16,7 +16,7 @@
         min-width: 500px;
 
         th {
-            background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 20%) 100%);
+            background:$primary-dark;
             padding: 12px;
             text-align: left;
             color: white;
