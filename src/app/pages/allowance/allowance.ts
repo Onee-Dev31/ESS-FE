@@ -73,7 +73,7 @@ export class AllowanceComponent implements OnInit {
       const direction = desc ? -1 : 1;
 
       filtered.sort((requestA, requestB) => {
-        let valueA: any, valueB: any;
+        let valueA: number | string, valueB: number | string;
         switch (id) {
           case 'requestId': return requestA.id.localeCompare(requestB.id) * direction;
           case 'createDate': return requestA.createDate.localeCompare(requestB.createDate) * direction;
@@ -196,9 +196,11 @@ export class AllowanceComponent implements OnInit {
     return req.id;
   }
 
-  trackByRowId(index: number, row: any): string {
-    const original = row.original || row;
-    return `${original.requestId}-${original.date}-${index}`;
+  trackByRowId(index: number, itemOrRow: AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>): string {
+    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
+    const id = (item as FlatAllowanceRow).requestId || (item as AllowanceRequest).id || 'row';
+    const date = (item as FlatAllowanceRow).date || '';
+    return `${id}-${date}-${index}`;
   }
 
   getStatusClass(status: string): string {

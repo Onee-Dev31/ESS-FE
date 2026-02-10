@@ -1,3 +1,6 @@
+import { AllowanceRequest } from './allowance.interface';
+import { MedicalRequest } from './medical.interface';
+
 export interface UnifiedItem {
     date: string;
     description?: string;
@@ -27,5 +30,5 @@ export interface ApprovalItem {
     status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
     rawStatus: string;
     type?: 'allowance' | 'taxi' | 'transport' | 'medical';
-    originalData?: any;
+    originalData?: AllowanceRequest | MedicalRequest | any; // Keep any as fallback for now since Taxi/Vehicle are in services
 }

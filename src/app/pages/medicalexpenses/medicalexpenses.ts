@@ -121,7 +121,7 @@ export class MedicalexpensesComponent implements OnInit {
         if (typeof valA === 'string' && typeof valB === 'string') {
           return valA.localeCompare(valB) * direction;
         }
-        return (((valA as any) || 0) - ((valB as any) || 0)) * direction;
+        return (((valA as unknown as number) || 0) - ((valB as unknown as number) || 0)) * direction;
       });
     }
     return rows;
@@ -228,9 +228,10 @@ export class MedicalexpensesComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  trackByRowId(index: number, item: any): string {
-    const core = item?.original || item;
-    return `${core.id || core.requestId || 'row'}-${index}`;
+  trackByRowId(index: number, itemOrRow: MedicalRequest | FlatMedicalRow | import('@tanstack/angular-table').Row<FlatMedicalRow>): string {
+    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
+    const id = (item as FlatMedicalRow).requestId || (item as MedicalRequest).id || 'row';
+    return `${id}-${index}`;
   }
   openPreview(attachment?: string | null) {
     if (!attachment) return;

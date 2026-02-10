@@ -71,8 +71,95 @@ export function clearListingFilters(state: ListingState) {
     state.currentPage.set(0);
 }
 
+export class ListingUtil {
+
+    // Calculate total pages based on total items and page size
+    static calculateTotalPages(totalItems: number, pageSize: number): number {
+        return Math.ceil(totalItems / pageSize);
+    }
+
+    // Get current page data slice
+    static paginateData<T>(data: T[], currentPage: number, pageSize: number): T[] {
+        const startIndex = (currentPage - 1) * pageSize;
+        return data.slice(startIndex, startIndex + pageSize);
+    }
+
+    // Generate page numbers array for pagination controls
+    static getPageNumbers(currentPage: number, totalPages: number): number[] {
+        const pages: number[] = [];
+        const maxPagesToShow = 5;
+
+        if (totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (currentPage <= 3) {
+                for (let i = 1; i <= 5; i++) pages.push(i);
+            } else if (currentPage >= totalPages - 2) {
+                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+            } else {
+                for (let i = currentPage - 2; i <= currentPage + 2; i++) pages.push(i);
+            }
+        }
+        return pages;
+    }
+
+    // Filter data based on search text and fields
+    static filterData<T>(data: T[], searchText: string, fields: string[]): T[] {
+        if (!searchText) return data;
+
+        const lowerSearch = searchText.toLowerCase();
+        return data.filter(item =>
+            fields.some(field => {
+                const value = (item as any)[field];
+                return String(value).toLowerCase().includes(lowerSearch);
+            })
+        );
+    }
+
+    static toggleSort<T>(table: any, columnId: string) {
+        if (table.sortColumn() === columnId) {
+            table.sortDirection.update((d: 'asc' | 'desc') => d === 'asc' ? 'desc' : 'asc');
+        } else {
+            table.sortColumn.set(columnId);
+            table.sortDirection.set('asc');
+        }
+    }
+
+    static getSortIcon(table: any, columnId: string) {
+        if (table.sortColumn() !== columnId) return 'fa-sort text-muted';
+        return table.sortDirection() === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+    }
+
+    static sortData<T>(
+        data: T[],
+        sortColumn: string,
+        sortDirection: 'asc' | 'desc'
+    ): T[] {
+        if (!sortColumn) return data;
+
+        return [...data].sort((a, b) => {
+            // Check if we are sorting by totalAmount (for medical expenses logic)
+            if (sortColumn === 'totalAmount' && 'items' in (a as object)) {
+                const sumA = (a as any).items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                const sumB = (b as any).items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                return sortDirection === 'asc' ? sumA - sumB : sumB - sumA;
+            }
+
+            const valA = (a as any)[sortColumn];
+            const valB = (b as any)[sortColumn];
+
+            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+}
+
 export class TableSortHelper {
     static toggleSort(table: any, columnId: string) {
+        // Implementation for TanStack table or similar
         const column = table.getColumn(columnId);
         if (column) column.toggleSorting(column.getIsSorted() === 'asc');
     }

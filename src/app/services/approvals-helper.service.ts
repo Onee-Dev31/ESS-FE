@@ -87,7 +87,7 @@ export class ApprovalsHelperService {
                 position: '-',
                 profileImage: 'assets/images/user-placeholder.png'
             },
-            requestType: typeLabels[type] as any,
+            requestType: typeLabels[type] as 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่',
             typeId: 99,
             requestDetail: details,
             amount: totalAmount,
@@ -116,7 +116,7 @@ export class ApprovalsHelperService {
             requestBy: req.requester || defaultUser,
             requestType: 'ค่ารักษาพยาบาล',
             typeId: 99,
-            requestDetail: req.items.map((i: any) => i.diseaseType).join(', '),
+            requestDetail: req.items.map((i) => i.diseaseType).join(', '),
             amount: req.totalRequestedAmount || 0,
             status: this.mapStatus(req.status),
             rawStatus: this.normalizeStatus(req.status),

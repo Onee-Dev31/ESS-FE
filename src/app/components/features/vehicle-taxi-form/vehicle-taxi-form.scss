@@ -1,6 +1,6 @@
 @use './variables';
-@use './layout';
-@use './actions';
+@use '../../../../styles/display-components';
+@use '../../../../styles/action-components';
 @use './table';
 @use './mobile-cards';
 @use './upload-modal';

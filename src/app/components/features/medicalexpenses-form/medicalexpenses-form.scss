@@ -1,6 +1,6 @@
 @use './layout';
 @use './claim-grid';
 @use './form-fields';
-@use './display';
-@use './actions';
+@use '../../../../styles/display-components';
+@use '../../../../styles/action-components';
 @use '../../../../styles/attachment-components';

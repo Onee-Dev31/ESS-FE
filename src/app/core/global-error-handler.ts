@@ -5,8 +5,7 @@ import { ErrorService } from '../services/error';
 export class GlobalErrorHandler implements ErrorHandler {
     private errorService = inject(ErrorService);
 
-    handleError(error: any): void {
-
+    handleError(error: unknown): void {
         console.error('[Global Error Handler]', error);
 
         this.errorService.handle(error, {

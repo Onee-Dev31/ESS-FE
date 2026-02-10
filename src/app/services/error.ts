@@ -13,13 +13,13 @@ export interface ErrorContext {
 export class ErrorService {
   private toastService = inject(ToastService);
 
-  handle(error: any, context?: ErrorContext): void {
+  handle(error: unknown, context?: ErrorContext): void {
     const message = this.getUserFriendlyMessage(error, context);
     this.toastService.error(message);
     this.logError(error, context);
   }
 
-  private logError(error: any, context?: ErrorContext): void {
+  private logError(error: unknown, context?: ErrorContext): void {
     console.error('[ErrorService]', {
       error,
       context,
@@ -28,7 +28,7 @@ export class ErrorService {
   }
 
   private getUserFriendlyMessage(error: any, context?: ErrorContext): string {
-
+    // Keep error: any for now to easily access status/message without type guards for this cleanup
     if (error?.status === 0 || error?.message?.includes('Http failure')) {
       return 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
     }

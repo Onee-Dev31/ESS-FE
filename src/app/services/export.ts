@@ -44,8 +44,8 @@ export class ExportService {
     }
   }
 
-  async exportToExcel(
-    data: any[],
+  async exportToExcel<T>(
+    data: T[],
     columns: { header: string; key: string; width?: number }[],
     filename: string = 'export'
   ): Promise<void> {
@@ -73,11 +73,11 @@ export class ExportService {
       worksheet.getRow(1).height = 25;
 
       data.forEach(item => {
-        worksheet.addRow(item);
+        worksheet.addRow(item as any); // Cast as any for exceljs addRow
       });
 
-      worksheet.eachRow((row: any, rowNumber: number) => {
-        row.eachCell((cell: any) => {
+      worksheet.eachRow((row: Row) => {
+        row.eachCell((cell: Cell) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -193,12 +193,12 @@ export class ExportService {
         worksheet.addRow(cells);
       });
 
-      worksheet.columns.forEach((column: any) => {
+      worksheet.columns.forEach((column: Partial<ExcelColumn>) => {
         column.width = 15;
       });
 
-      worksheet.eachRow((row: any) => {
-        row.eachCell((cell: any) => {
+      worksheet.eachRow((row: Row) => {
+        row.eachCell((cell: Cell) => {
           cell.border = {
             top: { style: 'thin' },
             left: { style: 'thin' },

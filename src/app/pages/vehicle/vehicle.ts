@@ -154,9 +154,9 @@ export class VehicleComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  trackByRowId(index: number, row: any): string {
-    const original = row.original || row;
-    return `${original.id}-${index}`;
+  trackByRowId(index: number, itemOrRow: VehicleRequest | import('@tanstack/angular-table').Row<VehicleRequest>): string {
+    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
+    return `${item.id}-${index}`;
   }
 
   getStatusClass(status: string): string {

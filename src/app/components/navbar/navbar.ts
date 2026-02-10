@@ -104,8 +104,9 @@ export class NavbarComponent {
     }
   }
 
-  onSearchInput(event: any) {
-    this.searchQuery.set(event.target.value);
+  onSearchInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
   }
 
   navigateTo(path: string) {
@@ -120,8 +121,9 @@ export class NavbarComponent {
   }
 
   @HostListener('document:click', ['$event'])
-  clickout(event: any) {
-    if (!this.eRef.nativeElement.contains(event.target)) {
+  clickout(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!this.eRef.nativeElement.contains(target)) {
       this.isProfileOpen = false;
       this.isNotificationOpen = false;
       this.isSearchFocused.set(false);

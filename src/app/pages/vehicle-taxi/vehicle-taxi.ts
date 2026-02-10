@@ -226,9 +226,11 @@ export class VehicleTaxiComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  trackByRowId(index: number, row: any): string {
-    const original = row.original || row;
-    return `${original.requestId}-${original.date}-${index}`;
+  trackByRowId(index: number, itemOrRow: TaxiRequest | FlatTaxiRow | import('@tanstack/angular-table').Row<FlatTaxiRow>): string {
+    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
+    const id = (item as FlatTaxiRow).requestId || (item as TaxiRequest).id || 'row';
+    const date = (item as FlatTaxiRow).date || '';
+    return `${id}-${date}-${index}`;
   }
 
   getStatusClass(status: string): string {

@@ -192,9 +192,9 @@ export class ApprovalsComponent implements OnInit {
     return this.approvalsHelper.getStatusClass(status);
   }
 
-  trackByRowId(index: number, item: any): string {
-    const core = item?.original || item;
-    return `${core.requestNo || 'row'}-${index}`;
+  trackByRowId(index: number, itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>): string {
+    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
+    return `${item.requestNo}-${index}`;
   }
 
   toggleExportMenu() {

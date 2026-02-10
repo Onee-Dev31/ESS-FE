@@ -1,5 +1,7 @@
-@use '../../../../styles/theme' as *;
+@use 'variables' as *;
+@use 'sass:color';
 
+// From Medical Expenses
 .mt-4 {
     margin-top: 1.5rem;
 }
@@ -59,6 +61,57 @@
     }
 }
 
+// From Time Off
+.calculated-row {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.calculated-days-display {
+    margin-top: 0;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #475569;
+        font-size: 0.9rem;
+    }
+
+    .days-value {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        padding: 0.6rem 1rem;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+
+        .days-number {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .days-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #3b82f6;
+        }
+    }
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// Shared
 .pulse-icon {
     animation: pulse 2s infinite;
 }

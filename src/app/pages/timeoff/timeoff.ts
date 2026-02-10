@@ -79,8 +79,8 @@ export class TimeoffComponent implements OnInit {
 
       filtered.sort((a, b) => {
         const key = id as keyof TimeOffRequest;
-        let valA: any = a[key];
-        let valB: any = b[key];
+        let valA: string | number = a[key] as string | number;
+        let valB: string | number = b[key] as string | number;
 
         if (id === 'days') {
           valA = Number(a.days || 0);
@@ -126,7 +126,7 @@ export class TimeoffComponent implements OnInit {
   }));
 
   isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<any[]>([]);
+  previewFiles = signal<{ fileName: string; date: string }[]>([]);
 
   statuses = COMMON_STATUS_OPTIONS;
 
@@ -181,7 +181,7 @@ export class TimeoffComponent implements OnInit {
     this.loadRequests();
   }
 
-  openPreview(attachments: any[]) {
+  openPreview(attachments: { name: string }[]) {
     if (!attachments || attachments.length === 0) return;
     const previewItems = attachments.map(att => ({
       fileName: att.name || 'Attachment',

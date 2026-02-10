@@ -28,13 +28,14 @@ export class FileUploadModal implements OnChanges {
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
       const maxSizeInBytes = 4 * 1024 * 1024;
       if (file.size > maxSizeInBytes) {
         this.toastService.warning('ขนาดไฟล์ต้องไม่เกิน 4MB (ไฟล์ที่เลือกมีขนาด ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB)');
-        event.target.value = '';
+        input.value = '';
         return;
       }
 
