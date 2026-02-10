@@ -138,7 +138,7 @@
             <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
               สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
-
+            <th class="col-actions text-center">จัดการ</th>
           </tr>
         </thead>
         <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
@@ -163,6 +163,17 @@
               <span class="status-badge" [ngClass]="getStatusClass(req.status)">
                 {{ req.status | statusLabel }}
               </span>
+            </td>
+
+            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+              <div class="action-btns">
+                <button class="btn-icon edit" (click)="editRequest(req.id)" title="แก้ไข">
+                  <i class="far fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="deleteRequest(req.id)" title="ลบ">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </div>
             </td>
 
           </tr>

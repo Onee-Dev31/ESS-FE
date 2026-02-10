@@ -195,6 +195,18 @@ export class MedicalexpensesComponent implements OnInit {
     }
   }
 
+  editRequest(targetId: string) {
+    this.openModal(targetId);
+  }
+
+  deleteRequest(targetId: string) {
+    if (confirm('ยืนยันการลบรายการเบิกนี้?')) {
+      this.medicalService.deleteRequest(targetId).subscribe(() => {
+        this.loadData();
+      });
+    }
+  }
+
   closeModal() {
     this.isModalOpen.set(false);
     this.loadData();

@@ -172,8 +172,8 @@
                         <th rowspan="2" class="col-status sortable-header text-center" (click)="toggleSort('status')">
                             สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
                         </th>
-                        <th rowspan="2" class="col-attach text-center">
-                            เอกสารแนบ
+                        <th rowspan="2" class="col-actions text-center">
+                            จัดการ
                         </th>
                     </tr>
                     <tr>
@@ -210,12 +210,19 @@
                             </span>
                         </td>
 
-                        <td class="text-center">
-                            <a class="file-icon-link" *ngIf="item.attachedFile" (click)="openPreview(item.attachedFile)"
-                                title="ดูเอกสาร">
-                                <i class="far fa-folder-open "></i>
-                            </a>
-                            <span class="text-muted" *ngIf="!item.attachedFile">-</span>
+                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
+                            <div class="action-btns">
+                                <button class="btn-icon view" *ngIf="req.items[0]?.attachedFile"
+                                    (click)="openPreview(req.items[0].attachedFile)" title="ดูเอกสาร">
+                                    <i class="far fa-folder-open"></i>
+                                </button>
+                                <button class="btn-icon edit" (click)="editRequest(req.id)" title="แก้ไข">
+                                    <i class="far fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete" (click)="deleteRequest(req.id)" title="ลบ">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

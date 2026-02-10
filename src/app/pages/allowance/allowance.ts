@@ -162,6 +162,19 @@ export class AllowanceComponent implements OnInit {
     });
   }
 
+  editRequest(targetId: string) {
+    this.selectedRequestId = targetId;
+    this.isModalOpen = true;
+  }
+
+  deleteRequest(targetId: string) {
+    if (confirm('ยืนยันการลบรายการเบิกเบี้ยเลี้ยงนี้?')) {
+      this.allowanceService.deleteRequest(targetId).subscribe(() => {
+        this.loadData();
+      });
+    }
+  }
+
   closeModal() {
     this.isModalOpen = false;
     this.loadData();

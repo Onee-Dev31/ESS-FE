@@ -137,10 +137,10 @@
             <th class="text-center">จัดการ</th>
           </tr>
         </thead>
-        <tbody [@listAnimation]="table.getRowModel().rows.length">
-          @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+        <tbody *ngFor="let row of table.getRowModel().rows; let rowIndex = index; trackBy: trackByRowId"
+          [@listAnimation]>
           <tr>
-            <td class="text-center font-inter request-no-link" (click)="viewDetail(row.original)">
+            <td class="text-center font-inter request-no-link text-primary-link" (click)="viewDetail(row.original)">
               {{ row.original.requestNo }}
             </td>
             <td class="text-center text-muted">{{ row.original.requestDate }}</td>
@@ -181,7 +181,6 @@
               </div>
             </td>
           </tr>
-          }
         </tbody>
       </table>
       }
