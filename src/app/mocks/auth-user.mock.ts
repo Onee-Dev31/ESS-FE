@@ -41,7 +41,12 @@ export class UserMock {
     static readonly PROFILE = UserMock.MEMBER_PROFILE;
 
     static readonly MOCK_USERS = [
-        { username: 'admin', password: '123', name: UserMock.ADMIN_PROFILE.name, role: USER_ROLES.ADMIN, employeeId: UserMock.ADMIN_PROFILE.employeeId },
-        { username: 'member', password: '123', name: UserMock.MEMBER_PROFILE.name, role: USER_ROLES.MEMBER, employeeId: UserMock.MEMBER_PROFILE.employeeId }
+        { username: 'employee', password: '123', name: 'พนักงาน ทดสอบ', role: USER_ROLES.EMPLOYEE, employeeId: 'OTD00001' },
+        { username: 'supervisor', password: '123', name: 'ต้นสังกัด ทดสอบ', role: USER_ROLES.SUPERVISOR, employeeId: 'OTD00002' },
+        { username: 'hr', password: '123', name: 'ฝ่ายบุคคล ทดสอบ', role: USER_ROLES.HR, employeeId: 'OTD00003' },
+        { username: 'executive', password: '123', name: 'ผู้บริหาร ทดสอบ', role: USER_ROLES.EXECUTIVE, employeeId: 'OTD00004' },
+        { username: 'accounting', password: '123', name: 'ฝ่ายบัญชี ทดสอบ', role: USER_ROLES.ACCOUNTING, employeeId: 'OTD00005' },
+        { username: 'admin', password: '123', name: 'Admin (HR)', role: USER_ROLES.HR, employeeId: 'OTD00003' },
+        { username: 'member', password: '123', name: 'Member (Employee)', role: USER_ROLES.EMPLOYEE, employeeId: 'OTD00001' }
     ];
 }

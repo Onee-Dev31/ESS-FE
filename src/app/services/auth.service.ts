@@ -37,7 +37,14 @@ export class AuthService {
     userRole = this._userRole.asReadonly();
     isLoggedIn = this._isLoggedIn.asReadonly();
 
-    isAdmin = computed(() => this._userRole() === USER_ROLES.ADMIN);
+    isAdmin = computed(() => {
+        const role = this._userRole();
+        return role === USER_ROLES.HR || role === USER_ROLES.EXECUTIVE || role === USER_ROLES.SUPERVISOR;
+    });
+    isHR = computed(() => this._userRole() === USER_ROLES.HR);
+    isAccounting = computed(() => this._userRole() === USER_ROLES.ACCOUNTING);
+    isSupervisor = computed(() => this._userRole() === USER_ROLES.SUPERVISOR);
+    isExecutive = computed(() => this._userRole() === USER_ROLES.EXECUTIVE);
 
     login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
         this.loadingService.show();

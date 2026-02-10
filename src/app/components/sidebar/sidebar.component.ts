@@ -14,7 +14,7 @@ interface MenuItem {
     name: string;
     icon: string;
     subItems: SubMenuItem[];
-    role?: string;
+    role?: string | string[];
 }
 
 @Component({
@@ -59,7 +59,7 @@ export class Sidebar {
         {
             name: 'อนุมัติ',
             icon: 'fa-check-circle',
-            role: USER_ROLES.ADMIN,
+            role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR],
             subItems: [
                 { label: 'สวัสดิการ', path: '/approvals' },
                 { label: 'ค่ารักษาพยาบาล', path: '/approvals-medicalexpenses' }
@@ -69,7 +69,15 @@ export class Sidebar {
 
     menuItems = computed(() => {
         const userRole = this.authService.userRole();
-        return this.allMenuItems.filter(item => !item.role || item.role === userRole);
+        if (!userRole) return [];
+
+        return this.allMenuItems.filter(item => {
+            if (!item.role) return true;
+            if (Array.isArray(item.role)) {
+                return item.role.includes(userRole);
+            }
+            return item.role === userRole;
+        });
     });
 
     toggleMenu(menuName: string) {

@@ -47,13 +47,13 @@ export const routes: Routes = [
                 path: 'approvals',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN, category: 'all', animation: 'Approvals' }
+                data: { role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
             },
             {
                 path: 'approvals-medicalexpenses',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: USER_ROLES.ADMIN, category: 'medical', animation: 'ApprovalsMedical' }
+                data: { role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
             },
             {
                 path: 'medicalexpenses',

@@ -18,7 +18,7 @@ interface SearchMenuItem {
   path: string;
   category: string;
   icon: string;
-  role?: string;
+  role?: string | string[];
 }
 
 @Component({
@@ -53,8 +53,8 @@ export class NavbarComponent {
     { label: 'ค่ารถ (เบิก)', path: '/vehicle', category: 'สวัสดิการ', icon: 'fa-car' },
     { label: 'ค่าแท็กซี่ (เบิก)', path: '/vehicle-taxi', category: 'สวัสดิการ', icon: 'fa-taxi' },
     { label: 'รายการลา / คำขอลา', path: '/timeoff', category: 'การลา', icon: 'fa-calendar-alt' },
-    { label: 'อนุมัติสวัสดิการ', path: '/approvals', category: 'อนุมัติ', icon: 'fa-check-circle', role: USER_ROLES.ADMIN },
-    { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope', role: USER_ROLES.ADMIN },
+    { label: 'อนุมัติสวัสดิการ', path: '/approvals', category: 'อนุมัติ', icon: 'fa-check-circle', role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR] },
+    { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope', role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR] },
   ];
 
   filteredSearchResults = computed(() => {
@@ -65,7 +65,13 @@ export class NavbarComponent {
 
     return this.allSearchMenus.filter(item => {
       // Role check
-      if (item.role && item.role !== currentUserRole) return false;
+      if (item.role) {
+        if (Array.isArray(item.role)) {
+          if (!item.role.includes(currentUserRole || '')) return false;
+        } else {
+          if (item.role !== currentUserRole) return false;
+        }
+      }
 
       // Text search
       return item.label.toLowerCase().includes(query) ||
