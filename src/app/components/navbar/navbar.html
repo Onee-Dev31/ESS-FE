@@ -34,7 +34,7 @@
     </div>
 
     <div class="nav-actions">
-      <button class="icon-btn mobile-search-btn">
+      <button class="icon-btn mobile-search-btn" (click)="toggleMobileSearch()">
         <i class="fas fa-search"></i>
       </button>
 
@@ -97,3 +97,33 @@
     </div>
   </div>
 </nav>
+
+<!-- Mobile Search Overlay -->
+<div class="mobile-search-overlay" *ngIf="isMobileSearchOpen()">
+  <div class="search-header">
+    <div class="mobile-search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Search..." [value]="searchQuery()" (input)="onSearchInput($event)" autofocus />
+    </div>
+    <button class="close-btn" (click)="toggleMobileSearch()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="mobile-search-results" *ngIf="searchQuery()">
+    <div class="search-result-item" *ngFor="let result of filteredSearchResults()" (click)="navigateTo(result.path)">
+      <div class="result-icon">
+        <i class="fas" [ngClass]="result.icon"></i>
+      </div>
+      <div class="result-content">
+        <div class="result-label">{{ result.label }}</div>
+        <div class="result-category">{{ result.category }}</div>
+      </div>
+      <i class="fas fa-chevron-right result-arrow"></i>
+    </div>
+    <div class="no-results" *ngIf="filteredSearchResults().length === 0">
+      <i class="fas fa-search"></i>
+      <p>ไม่พบผลการค้นหา</p>
+    </div>
+  </div>
+</div>

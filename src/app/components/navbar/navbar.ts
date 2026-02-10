@@ -44,6 +44,7 @@ export class NavbarComponent {
   // Search Logic
   searchQuery = signal('');
   isSearchFocused = signal(false);
+  isMobileSearchOpen = signal(false);
 
   private allSearchMenus: SearchMenuItem[] = [
     { label: 'แดชบอร์ด', path: '/dashboard', category: 'Main', icon: 'fa-home' },
@@ -96,6 +97,13 @@ export class NavbarComponent {
     if (this.isProfileOpen) this.isNotificationOpen = false;
   }
 
+  toggleMobileSearch() {
+    this.isMobileSearchOpen.update(v => !v);
+    if (!this.isMobileSearchOpen()) {
+      this.clearSearch();
+    }
+  }
+
   onSearchInput(event: any) {
     this.searchQuery.set(event.target.value);
   }
@@ -103,6 +111,7 @@ export class NavbarComponent {
   navigateTo(path: string) {
     this.router.navigate([path]);
     this.clearSearch();
+    this.isMobileSearchOpen.set(false);
   }
 
   clearSearch() {
