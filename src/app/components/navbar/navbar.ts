@@ -18,6 +18,7 @@ interface SearchMenuItem {
   path: string;
   category: string;
   icon: string;
+  role?: string;
 }
 
 @Component({
@@ -48,21 +49,27 @@ export class NavbarComponent {
     { label: 'แดชบอร์ด', path: '/dashboard', category: 'Main', icon: 'fa-home' },
     { label: 'ค่ารักษาพยาบาล (เบิก)', path: '/medicalexpenses', category: 'สวัสดิการ', icon: 'fa-heartbeat' },
     { label: 'เบี้ยเลี้ยง (เบิก)', path: '/allowance', category: 'สวัสดิการ', icon: 'fa-money-bill-wave' },
-    { label: 'ค่ารถ / ค่ายานพาหนะ', path: '/vehicle', category: 'สวัสดิการ', icon: 'fa-car' },
+    { label: 'ค่ารถ (เบิก)', path: '/vehicle', category: 'สวัสดิการ', icon: 'fa-car' },
     { label: 'ค่าแท็กซี่ (เบิก)', path: '/vehicle-taxi', category: 'สวัสดิการ', icon: 'fa-taxi' },
     { label: 'รายการลา / คำขอลา', path: '/timeoff', category: 'การลา', icon: 'fa-calendar-alt' },
-    { label: 'อนุมัติสวัสดิการ', path: '/approvals', category: 'อนุมัติ', icon: 'fa-check-circle' },
-    { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope' },
+    { label: 'อนุมัติสวัสดิการ', path: '/approvals', category: 'อนุมัติ', icon: 'fa-check-circle', role: USER_ROLES.ADMIN },
+    { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope', role: USER_ROLES.ADMIN },
   ];
 
   filteredSearchResults = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
 
-    return this.allSearchMenus.filter(item =>
-      item.label.toLowerCase().includes(query) ||
-      item.category.toLowerCase().includes(query)
-    ).slice(0, 5); // Limit to 5 results
+    const currentUserRole = this.authService.userRole();
+
+    return this.allSearchMenus.filter(item => {
+      // Role check
+      if (item.role && item.role !== currentUserRole) return false;
+
+      // Text search
+      return item.label.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query);
+    }).slice(0, 5); // Limit to 5 results
   });
 
   notifications: NotificationItem[] = [
