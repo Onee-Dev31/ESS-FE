@@ -1,5 +1,6 @@
-@use '../../../../styles/theme' as *;
 @use 'sass:color';
+@use 'variables' as *;
+@use 'mixins' as *;
 
 .attachment-table-container {
     margin-top: 16px;
