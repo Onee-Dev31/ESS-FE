@@ -155,8 +155,7 @@
                         <th rowspan="2" class="text-center col-status sortable-header" (click)="toggleSort('status')">
                             สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
                         </th>
-                        <th rowspan="2" class="text-center col-attach">เอกสารแนบ</th>
-                        <th rowspan="2" class="text-center col-actions">จัดการ</th>
+                        <th rowspan="2" class="text-center col-actions">Actions</th>
                     </tr>
                     <tr>
                         <th class="text-center col-date sortable-header" (click)="toggleSort('startDate')">
@@ -167,9 +166,11 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *ngFor="let request of comps.paginatedData()">
-                        <td class="text-center text-primary-link">{{ request.id }}</td>
+                <tbody *ngFor="let request of comps.paginatedData()">
+                    <tr>
+                        <td class="text-center merged-col">
+                            <span class="text-primary-link">{{ request.id }}</span>
+                        </td>
                         <td class="text-center">
                             <div class="font-bold">{{ formatDate(request.startDate) }}</div>
                             <div class="small text-muted" *ngIf="request.shiftStartTime">{{ request.shiftStartTime }}
@@ -192,24 +193,19 @@
                             <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
                         </td>
                         <td class="reason-cell text-center">{{ request.reason }}</td>
-                        <td class="text-center">
+                        <td class="text-center merged-col">
                             <span class="status-badge" [ngClass]="getStatusClass(request.status)">
                                 {{ request.status | statusLabel }}
                             </span>
                         </td>
-                        <td class="text-center">
-                            <a class="file-icon-link" *ngIf="request.attachments && request.attachments.length > 0"
-                                (click)="openPreview(request.attachments)" title="ดูเอกสาร">
-                                <i class="far fa-folder-open"></i>
-                                <span class="attach-count"
-                                    *ngIf="request.attachments && request.attachments.length > 1">{{
-                                    request.attachments.length }}</span>
-                            </a>
-                            <span class="text-muted"
-                                *ngIf="!request.attachments || request.attachments.length === 0">-</span>
-                        </td>
-                        <td class="text-center">
+                        <td class="text-center merged-col">
                             <div class="action-btns">
+                                <button class="btn-icon view" title="ดูเอกสารแนบ"
+                                    *ngIf="request.attachments && request.attachments.length > 0"
+                                    (click)="openPreview(request.attachments)">
+                                    <i class="far fa-folder-open"></i>
+                                </button>
+
                                 <ng-container *ngIf="request.status === 'NEW' || request.status === 'คำขอใหม่'">
                                     <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
                                         <i class="far fa-edit"></i>
@@ -227,8 +223,10 @@
                             </div>
                         </td>
                     </tr>
-                    <tr *ngIf="comps.paginatedData().length === 0">
-                        <td colspan="10" class="no-data-cell">
+                </tbody>
+                <tbody *ngIf="comps.paginatedData().length === 0">
+                    <tr>
+                        <td colspan="9" class="no-data-cell">
                             <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
                                 icon="fas fa-inbox"></app-empty-state>
                         </td>

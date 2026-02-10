@@ -185,40 +185,42 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
+                <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByRowId">
+                    <tr *ngFor="let item of req.items; let i = index">
 
-                        <td class="text-center font-bold text-primary-link">
-                            {{ row.original.requestId }}
+                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+                            <span class="text-primary-link">{{ req.id }}</span>
                         </td>
 
-                        <td class="text-center">
-                            {{ row.original.requestDate }}
+                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+                            {{ req.createDate }}
                         </td>
 
-                        <td class="text-center">{{ row.original.limitType }}</td>
-                        <td class="text-center">{{ row.original.diseaseType }}</td>
-                        <td class="text-center">{{ row.original.hospital }}</td>
-                        <td class="text-center">{{ row.original.treatmentDateFrom }}</td>
-                        <td class="text-center">{{ row.original.treatmentDateTo }}</td>
-                        <td class="text-center font-bold">{{ row.original.requestedAmount | number: '1.2-2' }}</td>
-                        <td class="text-center font-bold">{{ row.original.approvedAmount | number: '1.2-2' }}</td>
+                        <td class="text-center">{{ item.limitType }}</td>
+                        <td class="text-center">{{ item.diseaseType }}</td>
+                        <td class="text-center">{{ item.hospital }}</td>
+                        <td class="text-center">{{ item.treatmentDateFrom }}</td>
+                        <td class="text-center">{{ item.treatmentDateTo }}</td>
+                        <td class="text-center font-bold">{{ item.requestedAmount | number: '1.2-2' }}</td>
+                        <td class="text-center font-bold">{{ item.approvedAmount | number: '1.2-2' }}</td>
 
-                        <td class="text-center">
-                            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                                {{ row.original.status | statusLabel }}
+                        <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center v-middle merged-col">
+                            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+                                {{ req.status | statusLabel }}
                             </span>
                         </td>
 
                         <td class="text-center">
-                            <a class="file-icon-link" *ngIf="row.original.attachedFile"
-                                (click)="openPreview(row.original.attachedFile)" title="ดูเอกสาร">
+                            <a class="file-icon-link" *ngIf="item.attachedFile" (click)="openPreview(item.attachedFile)"
+                                title="ดูเอกสาร">
                                 <i class="far fa-folder-open "></i>
                             </a>
-                            <span class="text-muted" *ngIf="!row.original.attachedFile">-</span>
+                            <span class="text-muted" *ngIf="!item.attachedFile">-</span>
                         </td>
                     </tr>
-                    <tr *ngIf="table.getRowModel().rows.length === 0">
+                </tbody>
+                <tbody *ngIf="comps.paginatedData().length === 0">
+                    <tr>
                         <td colspan="11" class="no-data-cell">
                             <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
                                 icon="fas fa-inbox">

@@ -28,14 +28,23 @@
     }
 
     tbody {
-        tr {
-            transition: background 0.2s;
+        transition: background 0.2s;
 
-            &:hover {
-                background: #f1f5f9;
+        &:hover {
+            background: #f1f5f9;
+
+            tr {
+                background: transparent;
             }
 
-            &:last-child td {
+            td {
+                background: transparent !important;
+            }
+        }
+
+        tr {
+            transition: background 0.2s;
+            &:not(:last-child) td:not(.merged-col) {
                 border-bottom: none;
             }
         }
@@ -46,6 +55,10 @@
             color: $text;
             border-bottom: 1px solid $border-color;
             vertical-align: middle;
+        }
+
+        &:last-of-type tr:last-child td {
+            border-bottom: none;
         }
     }
 

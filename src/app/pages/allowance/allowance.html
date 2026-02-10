@@ -141,32 +141,34 @@
 
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let row of displayedRows(); trackBy: trackByRowId">
+        <tbody *ngFor="let req of comps.paginatedData(); trackBy: trackByReqId">
+          <tr *ngFor="let item of req.items; let i = index">
 
-            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="text-center top-align merged-col">
-              <span class="text-primary-link">{{ row.requestId }}</span>
+            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+              <span class="text-primary-link">{{ req.id }}</span>
             </td>
 
-            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="text-center top-align merged-col">
-              {{ row.createDate | date: 'dd/MM/yyyy' }}
+            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+              {{ req.createDate | date: 'dd/MM/yyyy' }}
             </td>
 
-            <td class="text-center top-align">{{ row.date }}</td>
-            <td class="desc-cell top-align text-center">{{ row.description }}</td>
-            <td class="text-center top-align">{{ row.hours }}</td>
+            <td class="text-center top-align">{{ item.date }}</td>
+            <td class="desc-cell top-align text-center">{{ item.description }}</td>
+            <td class="text-center top-align">{{ item.hours }}</td>
             <td class="text-center font-bold">
-              {{ row.amount | number: '1.2-2' }}
+              {{ item.amount | number: '1.2-2' }}
             </td>
 
-            <td *ngIf="row.isFirstInGroup" [attr.rowspan]="row.groupLength" class="v-middle text-center merged-col">
-              <span class="status-badge" [ngClass]="getStatusClass(row.status)">
-                {{ row.status | statusLabel }}
+            <td *ngIf="i === 0" [attr.rowspan]="req.items.length" class="v-middle text-center merged-col">
+              <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+                {{ req.status | statusLabel }}
               </span>
             </td>
 
           </tr>
-          <tr *ngIf="displayedRows().length === 0">
+        </tbody>
+        <tbody *ngIf="comps.paginatedData().length === 0">
+          <tr>
             <td colspan="7" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
                 icon="fas fa-inbox">

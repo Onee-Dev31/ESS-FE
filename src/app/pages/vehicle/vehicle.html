@@ -153,51 +153,51 @@
             <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <ng-container *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
-            <tr *ngFor="let item of row.original.items; let i = index"
-              [class.group-end]="i === row.original.items.length - 1">
+        <tbody *ngFor="let row of table.getRowModel().rows; trackBy: trackByRowId">
+          <tr *ngFor="let item of row.original.items; let i = index"
+            [class.group-end]="i === row.original.items.length - 1">
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
-                <span class="text-primary-link">{{ row.original.id }}</span>
-              </td>
+            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
+              <span class="text-primary-link">{{ row.original.id }}</span>
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
-                {{ row.original.createDate | date : 'dd/MM/yyyy' }}
-              </td>
+            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
+              {{ row.original.createDate | date : 'dd/MM/yyyy' }}
+            </td>
 
-              <td class="text-center">{{ item.date }}</td>
+            <td class="text-center">{{ item.date }}</td>
 
-              <td class="text-center">
-                <div class="desc-wrapper">
-                  <i class="fas fa-car-side text-muted"></i>
-                  {{ item.description }}
-                </div>
-              </td>
+            <td class="text-center">
+              <div class="desc-wrapper">
+                <i class="fas fa-car-side text-muted"></i>
+                {{ item.description }}
+              </div>
+            </td>
 
-              <td class="text-center font-semibold">
-                {{ item.amount | number : '1.2-2' }}
-              </td>
+            <td class="text-center font-semibold">
+              {{ item.amount | number : '1.2-2' }}
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
-                <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                  {{ row.original.status | statusLabel }}
-                </span>
-              </td>
+            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
+              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                {{ row.original.status | statusLabel }}
+              </span>
+            </td>
 
-              <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
-                <div class="action-btns">
-                  <button class="btn-icon edit" (click)="openModal(row.original.id)">
-                    <i class="far fa-edit"></i>
-                  </button>
-                  <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
-                    <i class="far fa-trash-alt"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </ng-container>
-          <tr *ngIf="table.getRowModel().rows.length === 0">
+            <td *ngIf="i === 0" [attr.rowspan]="row.original.items.length" class="merged-col text-center">
+              <div class="action-btns">
+                <button class="btn-icon edit" (click)="openModal(row.original.id)">
+                  <i class="far fa-edit"></i>
+                </button>
+                <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="table.getRowModel().rows.length === 0">
+          <tr>
             <td colspan="7" class="no-data-cell">
               <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
                 icon="fas fa-inbox">
