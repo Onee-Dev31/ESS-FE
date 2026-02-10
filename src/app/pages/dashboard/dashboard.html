@@ -213,6 +213,7 @@
           </div>
         </section>
 
+        @defer (on viewport) {
         <div class="welfare-section">
           <div class="section-header-flex">
             <p class="section-title mb-0">สวัสดิการ</p>
@@ -258,7 +259,13 @@
             }
           </div>
         </div>
+        } @placeholder {
+        <div class="welfare-section">
+          <app-skeleton type="card" [rows]="1"></app-skeleton>
+        </div>
+        }
 
+        @defer (on viewport) {
         <div class="leave-section">
           <div class="section-header-flex">
             <p class="section-title">ลาหยุดงาน</p>
@@ -302,6 +309,11 @@
           </div>
           }
         </div>
+        } @placeholder {
+        <div class="leave-section">
+          <app-skeleton type="card" [rows]="3"></app-skeleton>
+        </div>
+        }
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>
           <div class="card schedule-card">
