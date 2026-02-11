@@ -2,6 +2,13 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+@mixin input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
 @mixin custom-input-wrapper {
     display: flex;
     border: 1px solid #d1d5db;
