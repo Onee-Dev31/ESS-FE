@@ -1,9 +1,9 @@
 @use "sass:color";
 @use './styles/theme' as *;
 @use './styles/responsive-layout' as responsive;
-@use './styles/export-dropdown';
+
 @use './styles/utilities';
-@use './styles/components';
+@use './styles/ui-components';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
 
 .toast-container {

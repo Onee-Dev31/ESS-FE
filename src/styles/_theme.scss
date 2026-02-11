@@ -1,11 +1,7 @@
 @forward 'variables';
 @forward 'mixins';
 @forward 'layout-structure';
-@forward 'form-elements';
-@forward 'filters';
-@forward 'table-components';
-@forward 'modal-components';
-@forward 'button-components';
+@forward 'component-mixins';
 @forward 'utilities';
 
 // การตั้งค่าธีมสีและสไตล์พื้นฐานของแอปพลิเคชัน

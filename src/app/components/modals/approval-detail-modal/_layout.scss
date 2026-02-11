@@ -1,7 +1,8 @@
 @use './variables' as *;
+@use '../../../../styles/theme' as theme;
 
 .approval-detail-overlay {
-    @extend .modal-overlay;
+    @include theme.modal-overlay-styles;
 
 
     @media (max-width: 1024px) {

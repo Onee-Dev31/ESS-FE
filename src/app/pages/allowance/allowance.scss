@@ -70,6 +70,6 @@
 
   // ==================== MODAL ====================
   .modal-overlay {
-    @extend .modal-overlay;
+    @include modal-overlay-styles;
   }
 }

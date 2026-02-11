@@ -2,7 +2,7 @@
 @use '../../../../styles/_responsive-layout.scss' as responsive;
 
 .tooltip-overlay {
-    @extend .modal-overlay;
+    @include modal-overlay-styles;
 }
 
 .modal-overlay {

@@ -1,6 +1,190 @@
-@use './layout';
-@use './claim-grid';
-@use './form-fields';
-@use '../../../../styles/display-components';
-@use '../../../../styles/action-components';
-@use '../../../../styles/attachment-components';
+@use '../../../../styles/theme' as *;
+@use '../../../../styles/ui-components';
+
+// ==========================================
+// Layout Styles (from _layout.scss)
+// ==========================================
+
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.form-root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    overflow: hidden;
+
+    .top-header-strip {
+        @extend .top-header-strip;
+    }
+
+    .content-card {
+        @extend .content-card;
+        max-height: calc(100vh - 200px);
+
+        @include mobile {
+            max-height: calc(100vh - 180px);
+        }
+    }
+}
+
+@include tablet {
+    .form-root {
+        .content-card {
+            padding: 12px 15px;
+        }
+    }
+}
+
+// ==========================================
+// Claim Grid (from _claim-grid.scss)
+// ==========================================
+
+.claim-type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+
+    .claim-type-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-color: #ddd;
+        }
+
+        &.active {
+            border: 2px solid $primary;
+            background-color: #f8faff;
+        }
+
+        .card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            .type-info {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .type-label {
+                    font-weight: 700;
+                    font-size: 0.95rem;
+                    color: #333;
+                }
+
+                .balance-value {
+                    font-size: 1.3rem;
+                    font-weight: 800;
+                    margin: 4px 0;
+                }
+
+                .balance-label {
+                    font-size: 0.75rem;
+                    color: #888;
+                    font-weight: 600;
+                }
+            }
+
+            .type-icon-wrapper {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+            }
+        }
+    }
+}
+
+// ==========================================
+// Form Fields (from _form-fields.scss)
+// ==========================================
+
+.form-section-wrapper {
+    min-width: 0;
+    width: 100%;
+
+    .section-header-row {
+        @extend .section-header-row;
+    }
+
+    .section-heading {
+        @include section-heading;
+    }
+
+    .hidden-input {
+        @extend .hidden-input;
+    }
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem 1.25rem;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid $border;
+    box-sizing: border-box;
+    width: 100%;
+
+    .input-field-group:nth-child(1),
+    .input-field-group:nth-child(2) {
+        grid-column: span 2;
+    }
+}
+
+@include tablet {
+    .details-grid {
+        grid-template-columns: 1fr !important;
+        padding: 1rem;
+        gap: 1rem;
+
+        .input-field-group {
+            grid-column: span 1 !important;
+            min-width: 0;
+        }
+    }
+}
+
+.input-field-group {
+    @include input-field-group;
+}
+
+.search-input-wrapper {
+    @extend .search-input-wrapper;
+}
+
+.custom-input-wrapper {
+    @include custom-input-wrapper;
+}
+
+.amount-input-wrapper {
+    @extend .amount-input-wrapper;
+}
+
+.custom-form-control {
+    @extend .custom-form-control;
+}
+
+.attachment-table-container {
+    @extend .attachment-table-container;
+}
