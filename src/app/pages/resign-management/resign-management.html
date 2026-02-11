@@ -1,0 +1,128 @@
+<div class="page">
+    <div class="page-header">
+        <h2 class="title">รายการพนักงาน</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th class="col-name">Name</th>
+                    <th>Department</th>
+                    <th>Company</th>
+                    <th class="col-type">Type</th>
+                    <th class="col-action">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
+                    <td class="col-name">
+                        <div class="name-block">
+                            <div class="fullname">
+                                <span class="code">{{ emp.empCode }}</span>
+                                <span class="fn">{{ emp.firstName }}</span>
+                                <span class="ln">{{ emp.lastName }}</span>
+                            </div>
+
+                            <div class="nickname" *ngIf="emp.nickName">
+                                ({{ emp.nickName }})
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ emp.department }}</td>
+                    <td class="company">{{ emp.company }}</td>
+
+                    <td class="col-type">
+                        <span class="badge" [attr.data-type]="emp.type">{{ emp.type }}</span>
+                    </td>
+
+                    <td class="col-action">
+                        <button class="btn btn-ghost" (click)="onView(emp)">
+                            <i class="fa-solid fa-circle-info"></i>Info
+                        </button>
+                    </td>
+                </tr>
+
+                <tr *ngIf="employee.length === 0">
+                    <td class="empty" colspan="5">ไม่มีข้อมูลพนักงาน</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pager">
+            <div class="pager-left">
+                <span>แสดง</span>
+                <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+                    <option *ngFor="let s of pageSizeOptions" [ngValue]="s">{{ s }}</option>
+                </select>
+                <span>รายการ/หน้า</span>
+
+                <span class="muted">
+                    ทั้งหมด {{ totalItems }} รายการ • หน้า {{ page }} / {{ totalPages }}
+                </span>
+            </div>
+
+            <div class="pager-right">
+                <button class="pbtn" (click)="prevPage()" [disabled]="page === 1">Prev</button>
+
+                <button class="pbtn" *ngFor="let p of pageNumbers" (click)="setPage(p)" [class.active]="p === page">
+                    {{ p }}
+                </button>
+
+                <button class="pbtn" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== View Modal ===== -->
+    <div class="modal-backdrop" *ngIf="isViewOpen" (click)="closeViewModal()"></div>
+
+    <div class="modal" *ngIf="isViewOpen" role="dialog" aria-modal="true">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-title">Employee Detail</div>
+
+            <div class="detail-grid" *ngIf="selected as emp">
+                <div class="label">Name Thai:</div>
+                <div class="value">{{ emp.firstName }} {{ emp.lastName }}</div>
+
+                <div class="label">Name Eng:</div>
+                <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
+
+                <div class="label">Nickname:</div>
+                <div class="value">{{ emp.nickName || '-' }}</div>
+
+                <div class="label">Department:</div>
+                <div class="value">{{ emp.department }}</div>
+
+                <div class="label">Company:</div>
+                <div class="value">{{ emp.company }}</div>
+
+                <div class="label">Type:</div>
+                <div class="value">{{ emp.type }}</div>
+                <div class="label">AdUser:</div>
+                <div class="value"> {{ emp.adUser || '-' }}</div>
+
+                <!-- NEW required fields -->
+                <div class="label req">Last Date:</div>
+                <div class="value">
+                    <input class="input" type="date" [(ngModel)]="lastDate" />
+                </div>
+
+                <div class="label req">Effective Date:</div>
+                <div class="value">
+                    <input class="input" type="date" [(ngModel)]="effectiveDate" />
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-ghost" (click)="closeViewModal()">close</button>
+                <button class="btn btn-primary" [disabled]="!lastDate || !effectiveDate" (click)="onConfirmModal()">
+                    ยืนยัน
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

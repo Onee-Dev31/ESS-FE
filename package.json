@@ -51,6 +51,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
     "rxjs": "~7.8.0",
+    "sweetalert2": "^11.26.18",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

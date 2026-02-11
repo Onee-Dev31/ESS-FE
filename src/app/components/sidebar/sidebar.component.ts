@@ -64,7 +64,15 @@ export class Sidebar {
                 { label: 'สวัสดิการ', path: '/approvals' },
                 { label: 'ค่ารักษาพยาบาล', path: '/approvals-medicalexpenses' }
             ]
-        }
+        },
+        {
+            name: 'จัดการพนักงาน',
+            icon: 'fa-person-walking-dashed-line-arrow-right',
+            role: [USER_ROLES.HR],
+            subItems: [
+                { label: 'ลาออกบอกพี่แพรว', path: '/resign-management' }
+            ]
+        },
     ];
 
     menuItems = computed(() => {

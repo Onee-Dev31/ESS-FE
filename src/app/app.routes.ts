@@ -65,8 +65,12 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/timeoff/timeoff').then(m => m.TimeoffComponent),
                 data: { animation: 'TimeOff' }
             },
-
             {
+                path: 'resign-management',
+                loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
+                data: { animation: 'Dashboard' }
+            },
+            {   
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'

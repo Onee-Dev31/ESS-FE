@@ -1,0 +1,145 @@
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Employee } from './employeeData.interface';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2'
+import { MOCK_EMPLOYEES } from '../../utils/mock-employee.util';
+
+@Component({
+  selector: 'app-resign-management',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
+  templateUrl: './resign-management.html',
+  styleUrl: './resign-management.scss',
+})
+export class ResignManagement {
+  employee: Employee[] = [];
+  isViewOpen = false;
+  selected?: Employee;
+
+  lastDate: string = '';
+  effectiveDate: string = '';
+
+  page = 1;                 // หน้าเริ่มต้น
+  pageSize = 5;             // จำนวนต่อหน้า
+  pageSizeOptions = [5, 10, 20, 50];
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+  ) {
+    this.employee = MOCK_EMPLOYEES; // ใช้ข้อมูลจำลองจาก mock-employee.util.ts
+  }
+
+  ngOnInit() {
+
+  }
+
+  trackByEmpCode(_: number, item: Employee) {
+    return item.empCode;
+  }
+
+  onView(emp: Employee) {
+    this.selected = emp;
+    // reset required fields ทุกครั้งที่เปิด
+    this.lastDate = '';
+    this.effectiveDate = '';
+    this.isViewOpen = true;
+  }
+
+  closeViewModal() {
+    this.isViewOpen = false;
+    this.selected = undefined;
+  }
+
+  async onConfirmModal(): Promise<void> {
+    if (!this.selected) return;
+
+    if (!this.lastDate || !this.effectiveDate) {
+      await Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอก Last Date และ Effective Date', 'warning');
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'ยืนยันการทำรายการใช่หรือไม่?',
+      text: `พนักงาน: ${this.selected.empCode} ${this.selected.firstName} ${this.selected.lastName}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: 'กำลังบันทึก...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      // TODO: call API
+      // await this.service.confirm(...)
+
+      Swal.close();
+      await Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+      this.closeViewModal();
+      return;
+    } catch (e: any) {
+      Swal.close();
+      await Swal.fire('ผิดพลาด', e?.message ?? 'เกิดข้อผิดพลาด', 'error');
+      return;
+    }
+  }
+
+  get totalItems(): number {
+    return this.employee.length;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+  }
+
+  get pagedEmployees(): Employee[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.employee.slice(start, start + this.pageSize);
+  }
+
+  get pageNumbers(): number[] {
+    // ทำเป็นเลขหน้าแบบสั้น ๆ (ไม่ยาวเป็นร้อย)
+    const total = this.totalPages;
+    const current = this.page;
+
+    const windowSize = 5;
+    let start = Math.max(1, current - Math.floor(windowSize / 2));
+    let end = Math.min(total, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
+
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  }
+
+  setPage(p: number) {
+    this.page = Math.min(Math.max(1, p), this.totalPages);
+  }
+
+  prevPage() {
+    if (this.page > 1) this.page--;
+  }
+
+  nextPage() {
+    if (this.page < this.totalPages) this.page++;
+  }
+
+  onPageSizeChange() {
+    this.page = 1; // เปลี่ยนจำนวนต่อหน้าแล้วกลับไปหน้า 1
+  }
+
+  // ตัวอย่าง: ถ้ามีลบ/เพิ่มข้อมูล อย่าลืม clamp หน้า
+  clampPage() {
+    if (this.page > this.totalPages) this.page = this.totalPages;
+  }
+}
