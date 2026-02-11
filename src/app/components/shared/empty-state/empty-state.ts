@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/** ส่วนแสดงข้อความและไอคอนเมื่อไม่พบข้อมูล (Empty State) */
 @Component({
   selector: 'app-empty-state',
   standalone: true,

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, computed } from '@angul
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+/** ส่วนประกอบสำหรับการแบ่งหน้า (Pagination) เพื่อจัดการปริมาณข้อมูลที่แสดงในตาราง */
 @Component({
   selector: 'app-pagination',
   standalone: true,

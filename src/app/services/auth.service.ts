@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการการเข้าสู่ระบบ (Authentication), การจัดการ Token และสิทธิ์ของผู้ใช้ (Roles) */
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -46,6 +47,7 @@ export class AuthService {
     isSupervisor = computed(() => this._userRole() === USER_ROLES.SUPERVISOR);
     isExecutive = computed(() => this._userRole() === USER_ROLES.EXECUTIVE);
 
+    /** ตรวจสอบสิทธิ์การเข้าใช้งาน (Login) และบันทึกข้อมูลลง LocalStorage */
     login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
         this.loadingService.show();
         const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
@@ -81,6 +83,7 @@ export class AuthService {
         );
     }
 
+    /** ล้างข้อมูลการเข้าสู่ระบบ (Logout) และรีเซ็ตสถานะทั้งหมด */
     logout() {
         localStorage.removeItem(STORAGE_KEYS.IS_LOGGED_IN);
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
@@ -94,6 +97,7 @@ export class AuthService {
         this.refreshAllMockData();
     }
 
+    /** อัปเดตข้อมูล Mock Data ใหม่ตามสิทธิ์ของผู้ใช้ปัจจุบัน */
     private refreshAllMockData() {
         this.allowanceService.refreshMockData();
         this.medicalService.refreshMockData();

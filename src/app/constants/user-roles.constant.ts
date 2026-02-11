@@ -1,7 +1,8 @@
+/** กำหนดค่าคงที่สำหรับสิทธิ์การใช้งาน (User Roles) ภายในระบบ */
 export const USER_ROLES = {
-    EMPLOYEE: 'Employee',      // พนักงาน
-    SUPERVISOR: 'Supervisor',  // ต้นสังกัด
-    HR: 'HR',                 // ฝ่ายบุคคล
-    EXECUTIVE: 'Executive',    // ผู้บริหาร
-    ACCOUNTING: 'Accounting'   // ฝ่ายบัญชี
+    EMPLOYEE: 'Employee',
+    SUPERVISOR: 'Supervisor',
+    HR: 'HR',
+    EXECUTIVE: 'Executive',
+    ACCOUNTING: 'Accounting'
 } as const;

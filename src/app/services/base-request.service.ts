@@ -5,11 +5,13 @@ import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BUSINESS_CONFIG } from '../constants/business.constant';
 import { RequestBase } from '../interfaces/core.interface';
 
+/** คลาสพื้นฐาน (Abstract Class) สำหรับการจัดการบริการคำขอต่าง ๆ (CRUD) พร้อมระบบจัดเก็บข้อมูลใน LocalStorage */
 export abstract class BaseRequestService<T extends RequestBase> {
     protected loadingService = inject(LoadingService);
     protected abstract readonly STORAGE_KEY: string;
     protected requestsSubject = new BehaviorSubject<T[]>([]);
 
+    /** เริ่มต้นข้อมูลจาก LocalStorage หากไม่มีข้อมูลจะสร้างจาก Mock Generator */
     protected initializeData(mockGenerator: () => T[]) {
         const stored = localStorage.getItem(this.STORAGE_KEY);
         if (stored) {
@@ -26,6 +28,7 @@ export abstract class BaseRequestService<T extends RequestBase> {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     }
 
+    /** กรองและอัปเดตข้อมูลที่จะแสดงผลตามสิทธิ์ของผู้ใช้งาน (Admin/Member) */
     protected updateSubject(masterData: T[]) {
         const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
         const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
@@ -76,6 +79,7 @@ export abstract class BaseRequestService<T extends RequestBase> {
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
+    /** ลบคำขอ */
     deleteRequest(id: string): Observable<void> {
         let masterData = this.getMasterData();
         masterData = masterData.filter(r => r.id !== id);
@@ -84,6 +88,7 @@ export abstract class BaseRequestService<T extends RequestBase> {
         return this.loadingService.wrap(of(void 0).pipe(delay(200)));
     }
 
+    /** สร้างรหัสคำขอใหม่โดยอ้างอิงจากเลขลำดับล่าสุด */
     generateNextId(prefix: string = BUSINESS_CONFIG.DEFAULT_PREFIX): Observable<string> {
         const masterData = this.getMasterData();
         const lastIdNum = masterData.reduce((max, item) => {

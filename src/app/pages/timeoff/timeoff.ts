@@ -24,6 +24,7 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 
+/** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-timeoff',
   standalone: true,
@@ -49,6 +50,7 @@ export class TimeoffComponent implements OnInit {
 
   sorting = signal<SortingState>([{ id: 'createDate', desc: true }]);
 
+  /** ประมวลผลข้อมูลรายการลา (Filtering และ Sorting) */
   processedData = computed(() => {
     let filtered = [...this.requests()];
 
@@ -134,6 +136,7 @@ export class TimeoffComponent implements OnInit {
     this.loadRequests();
   }
 
+  /** โหลดข้อมูลรายการคำขอลาผ่าน Service */
   loadRequests() {
     this.loadingService.start('timeoff-list');
     this.timeoffService.getRequests().subscribe({
@@ -148,6 +151,7 @@ export class TimeoffComponent implements OnInit {
     });
   }
 
+  /** ขอลบรายการลา (แสดง Dialog ยืนยันก่อนลบ) */
   async deleteRequest(request: TimeOffRequest) {
     const confirmed = await this.dialogService.confirm({
       title: 'ยืนยันการลบ',
@@ -171,6 +175,7 @@ export class TimeoffComponent implements OnInit {
     this.listing.currentPage.set(page);
   }
 
+  /** เปิดฟอร์มสำหรับยื่นคำขอลาใหม่ */
   openForm(status: string = 'NEW') {
     this.selectedRequestStatus.set(status);
     this.isFormOpen.set(true);

@@ -2,7 +2,7 @@
 @use '../../../../styles/theme' as theme;
 @use '../../../../styles/responsive-layout' as responsive;
 
-// Re-export variables for partials
+
 $primary: theme.$primary;
 $primary-dark: theme.$primary-dark;
 $success: theme.$success;

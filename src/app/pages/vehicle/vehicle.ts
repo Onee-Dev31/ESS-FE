@@ -20,6 +20,7 @@ import {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
+/** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่ารถ (Vehicle Allowance) */
 @Component({
   selector: 'app-vehicle',
   standalone: true,

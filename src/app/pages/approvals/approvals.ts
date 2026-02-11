@@ -24,6 +24,7 @@ import { createListingState, createListingComputeds, TableSortHelper } from '../
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
 
+/** หน้าจัดการรายการอนุมัติ (Approvals) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approvals',
   standalone: true,
@@ -64,6 +65,7 @@ export class ApprovalsComponent implements OnInit {
     this.listing.filterStatus.set('Pending');
   }
 
+  /** เริ่มต้นโหลดข้อมูลและจัดการ Route Parameter */
   ngOnInit() {
 
     this.loadingService.start('approvals-list');
@@ -78,12 +80,14 @@ export class ApprovalsComponent implements OnInit {
     });
   }
 
+  /** รีเฟรชข้อมูลรายการอนุมัติจาก Service */
   refresh() {
     this.approvalsHelper.getApprovals(this.category).subscribe(allData => {
       this.approvals.set(allData);
     });
   }
 
+  /** จัดการการคำนวณ Filter ข้อมูล (ค้นหาและสถานะ) */
   comps = createListingComputeds(
     this.approvals,
     this.listing,
@@ -163,6 +167,7 @@ export class ApprovalsComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
+  /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.initialAction.set(null);
@@ -202,6 +207,7 @@ export class ApprovalsComponent implements OnInit {
     this.showExportMenu.set(!this.showExportMenu());
   }
 
+  /** ส่งออกตารางรายการปัจจุบันเป็น PDF */
   async exportPDF() {
     this.showExportMenu.set(false);
     this.loadingService.start('export');
@@ -215,6 +221,7 @@ export class ApprovalsComponent implements OnInit {
     }
   }
 
+  /** ส่งออกข้อมูลปัจจุบันเป็น Excel (.xlsx) */
   async exportExcel() {
     this.showExportMenu.set(false);
     this.loadingService.start('export');

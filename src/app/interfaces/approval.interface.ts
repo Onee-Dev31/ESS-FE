@@ -1,6 +1,7 @@
 import { AllowanceRequest } from './allowance.interface';
 import { MedicalRequest } from './medical.interface';
 
+/** ข้อมูลรายการย่อย (เช่น รายการย่อยในบิลรักษาพยาบาล) */
 export interface UnifiedItem {
     date: string;
     description?: string;
@@ -12,6 +13,7 @@ export interface UnifiedItem {
     attachedFile?: string;
 }
 
+/** ข้อมูลหลักของรายการขออนุมัติ (สวัสดิการ, ค่าเดินทาง, ฯลฯ) */
 export interface ApprovalItem {
     requestNo: string;
     requestDate: string;
@@ -30,5 +32,5 @@ export interface ApprovalItem {
     status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
     rawStatus: string;
     type?: 'allowance' | 'taxi' | 'transport' | 'medical';
-    originalData?: AllowanceRequest | MedicalRequest | any; // Keep any as fallback for now since Taxi/Vehicle are in services
+    originalData?: AllowanceRequest | MedicalRequest | any;
 }

@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยง (Allowance) และคำนวณเบี้ยเลี้ยงตามชั่วโมงงาน */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';

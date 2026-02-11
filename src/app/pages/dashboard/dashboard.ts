@@ -27,6 +27,7 @@ interface PerformanceItem { year: string; grade: string; }
 
 dayjs.locale('th');
 
+/** หน้าแดชบอร์ดหลักสำหรับแสดงข้อมูลภาพรวม สถิติ และปฏิทินของพนักงาน */
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -65,6 +66,7 @@ export class DashboardComponent implements OnInit {
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
+  /** แปลงข้อมูลสถิติการเบิกค่ารักษาพยาบาลเพื่อใช้ในการแสดงผล (ProgressBar และสี) */
   medicalStatsDisplay = computed(() => {
     const stats = this.medicalStats();
     if (!stats) return null;
@@ -83,6 +85,7 @@ export class DashboardComponent implements OnInit {
     });
   });
 
+  /** ฟอร์แมตข้อมูลสถิติการลา (สี, ไอคอน, ธีม) ตามประเภทการลา */
   leaveStatsDisplay = computed(() => {
     const stats = this.leaveStats();
     if (!stats) return null;
@@ -141,6 +144,7 @@ export class DashboardComponent implements OnInit {
     ];
   });
 
+  /** อุปกรณ์ IT ที่พนักงานครอบครอง (MOCK DATA) */
   itList = computed<ProfileItem[]>(() => {
     const profile = this.userProfile();
     if (!profile?.itAssets) return [];
@@ -180,6 +184,7 @@ export class DashboardComponent implements OnInit {
     return `${years} ปี`;
   });
 
+  /** การตั้งค่าปฏิทินสถานะการทำงาน (FullCalendar) */
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
@@ -269,6 +274,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  /** ล้างข้อมูลใน LocalStorage เพื่อรีเซ็ตสถานะระบบใหม่ */
   async clearStorage() {
     const confirmed = await this.dialogService.confirm({
       title: 'ยืนยันการล้างข้อมูล',

@@ -1,5 +1,7 @@
+/** ตัวแปร (Variables) และ Mixins สำหรับจัดการ Design System */
 @use 'sass:color';
 
+/** สีหลักและสีพื้นฐาน (Brand Colors) */
 $primary: #1a73e8;
 $primary-dark: #1557b0;
 $primary-light: #4285f4;
@@ -9,6 +11,7 @@ $danger: #d93025;
 $warning: #f1b44c;
 $info: #17a2b8;
 
+/** สีสำหรับปุ่มการทำงานต่าง ๆ */
 $btn-create-bg: #1a73e8;
 $btn-search-bg: #1a73e8;
 $btn-delete-bg: #d93025;
@@ -28,6 +31,7 @@ $bg-gray: #fcfcfc;
 $bg-slate: #f4f7f9;
 $header-bg: #f8fafc;
 
+/** สีตัวอักษรและระดับความสำคัญ */
 $text: #202124;
 $text-sub: #5f6368;
 $text-muted: #94a3b8;
@@ -57,6 +61,7 @@ $status-success-text: #16a34a;
 $status-danger-bg: rgba(220, 38, 38, 0.1);
 $status-danger-text: #dc2626;
 
+/** Mixins สำหรับการทำ Responsive (Mobile First / Desktop First) */
 @mixin mobile {
     @media (max-width: 575.98px) {
         @content;
@@ -81,6 +86,7 @@ $status-danger-text: #dc2626;
     }
 }
 
+/** Mixins สำหรับลูกเล่น Glassmorphism (พื้นหลังเบลอ) */
 @mixin glass-blur($amount: 4px, $bg: rgba(0, 0, 0, 0.65)) {
     background-color: $bg;
     backdrop-filter: blur($amount);

@@ -1,5 +1,6 @@
 @forward 'variables';
 
+// การจัดการเลย์เอาต์ตามขนาดหน้าจอ (Responsive Mobile/Tablet)
 @use 'variables' as *;
 @use 'sass:color';
 

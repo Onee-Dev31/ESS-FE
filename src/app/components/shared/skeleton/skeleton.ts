@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/** ส่วนประกอบแสดงสถานะการโหลดข้อมูล (Skeleton Screen) ให้ผู้ใช้เห็นว่าระบบกำลังทำงาน */
 @Component({
   selector: 'app-skeleton',
   standalone: true,

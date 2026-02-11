@@ -63,7 +63,8 @@
     }
 }
 
-@mixin input-field-group {
+// รูปแบบพื้นฐานของฟิลด์กรอกข้อมูลและเลย์เอาต์ของฟอร์ม
+.form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;

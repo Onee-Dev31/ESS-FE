@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการสถานะการโหลด (Loading Spinner) ของหน้าจอต่าง ๆ */
 import { Injectable, signal, computed } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 

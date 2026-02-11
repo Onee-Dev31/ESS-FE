@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่ารักษาพยาบาล (Medical Expenses) */
 import { Injectable } from '@angular/core';
 import { MedicalItem, MedicalRequest } from '../interfaces/medical.interface';
 export type { MedicalItem, MedicalRequest };

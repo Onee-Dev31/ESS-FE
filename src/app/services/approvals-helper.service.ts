@@ -17,6 +17,7 @@ import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constant
 @Injectable({
     providedIn: 'root'
 })
+/** Service ตัวช่วยจัดการข้อมูลและ Mapping ข้อมูลสำหรับการอนุมัติ (Approvals) */
 export class ApprovalsHelperService {
 
     private dateUtil = inject(DateUtilityService);
@@ -26,6 +27,7 @@ export class ApprovalsHelperService {
     private medicalService = inject(MedicalexpensesService);
 
 
+    /** ดึงข้อมูลรายการจากทุกหมวดหมู่ (เบี้ยเลี้ยง, รถ, แท็กซี่, การรักษา) */
     getApprovals(category: 'all' | 'medical'): Observable<ApprovalItem[]> {
         if (category === 'medical') {
             return this.medicalService.getRequests().pipe(
@@ -60,6 +62,7 @@ export class ApprovalsHelperService {
         return [...allowanceItems, ...taxiItems, ...vehicleItems];
     }
 
+    /** Mapping ข้อมูลจาก Service ต่าง ๆ ให้อยู่ในรูปแบบ ApprovalItem แบบครอบจักรวาล */
     private mapToApproval(item: AllowanceRequest | TaxiRequest | VehicleRequest, type: 'allowance' | 'taxi' | 'transport'): ApprovalItem {
         const typeLabels = {
             allowance: 'ค่าเบี้ยเลี้ยง',
@@ -135,6 +138,7 @@ export class ApprovalsHelperService {
         return 'Pending';
     }
 
+    /** กำหนด Class สีตามสถานะ (CSS Class) */
     getStatusClass(status: string): string {
         switch (status) {
             case 'Pending': return 'pending';
@@ -156,6 +160,7 @@ export class ApprovalsHelperService {
         }
     }
 
+    /** ฟังก์ชันจัดเรียงข้อมูล (Sorting) สำหรับตารางรายการอนุมัติ */
     sortData(data: ApprovalItem[], sortId: string, desc: boolean): ApprovalItem[] {
         const direction = desc ? -1 : 1;
         return [...data].sort((itemA, itemB) => {

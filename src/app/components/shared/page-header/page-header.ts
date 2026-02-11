@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
+/** ส่วนหัวของหน้า (Page Header) พร้อมปุ่มย้อนกลับและรายการ Action */
 @Component({
     selector: 'app-page-header',
     standalone: true,

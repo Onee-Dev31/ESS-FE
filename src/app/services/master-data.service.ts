@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลพื้นฐาน (Master Data) ของระบบ เช่น ประเภทการลา และประเภทการเบิก */
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { shareReplay, delay } from 'rxjs/operators';
@@ -22,6 +23,7 @@ export class MasterDataService {
     private claimTypesCache$: Observable<ClaimType[]> | null = null;
     private dateConfigCache$: Observable<DateConfig> | null = null;
 
+    /** ดึงรายการประเภทการลาทั้งหมด (รองรับการทำ Cache) */
     getLeaveTypes(): Observable<LeaveType[]> {
         if (!this.leaveTypesCache$) {
             this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(
@@ -32,6 +34,7 @@ export class MasterDataService {
         return this.leaveTypesCache$;
     }
 
+    /** ดึงรายการประเภทการเบิกค่ารักษาพยาบาล */
     getMedicalClaimTypes(): Observable<ClaimType[]> {
         if (!this.claimTypesCache$) {
             const types: ClaimType[] = [

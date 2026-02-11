@@ -1,3 +1,4 @@
+// สไตล์สำหรับตารางข้อมูลหลักของระบบ (Main Data Table)
 @use 'sass:color';
 @use 'variables' as *;
 @use 'mixins' as *;
@@ -44,6 +45,7 @@
 
         tr {
             transition: background 0.2s;
+
             &:not(:last-child) td:not(.merged-col) {
                 border-bottom: none;
             }

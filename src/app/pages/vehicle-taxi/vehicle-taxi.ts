@@ -32,6 +32,7 @@ interface FlatTaxiRow extends TaxiItem {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
+/** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,

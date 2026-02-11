@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../services/loading';
 import { take, finalize } from 'rxjs/operators';
 
+/** หน้าเข้าสู่ระบบ (Login Page) สำหรับพนักงานและ Admin */
 @Component({
   selector: 'app-login',
   standalone: true,

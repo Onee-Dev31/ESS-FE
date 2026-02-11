@@ -1,3 +1,6 @@
+// Mixins ส่วนกลางสำหรับใช้ซ้ำ (เช่น Responsive, Glassmorphism)
+@use 'variables' as *;
+
 @mixin close-btn-style {
     border: none;
     background: white;

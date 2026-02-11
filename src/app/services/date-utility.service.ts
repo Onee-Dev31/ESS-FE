@@ -12,17 +12,20 @@ dayjs.locale('th');
     providedIn: 'root'
 })
 
+/** Service สำหรับจัดการและฟอร์แมตวันที่ (รองรับ พ.ศ. และ Dayjs) */
 export class DateUtilityService {
 
     formatDateToThaiMonth(dateStr: string | Date): string {
         return dayjs(dateStr).format('DD-MMM-YYYY');
     }
 
+    /** แปลงวันที่ ISO เป็นรูปแบบ พ.ศ. (DD/MM/BBBB) */
     formatDateToBE(isoDate: string): string {
         if (!isoDate) return '';
         return dayjs(isoDate).format('DD/MM/BBBB');
     }
 
+    /** แปลงวันที่ พ.ศ. กลับเป็นรูปแบบ ISO (YYYY-MM-DD) สำหรับ API */
     formatBEToISO(beDate: string): string {
         if (!beDate) return '';
         const parts = beDate.split('/');
@@ -42,6 +45,7 @@ export class DateUtilityService {
         return start.isBefore(end) || start.isSame(end);
     }
 
+    /** คำนวณเวลาที่ผ่านไปเป็นภาษาไทย (เช่น "3 วันที่แล้ว") */
     getTimeAgo(date: string | Date): string {
         return dayjs(date).fromNow();
     }

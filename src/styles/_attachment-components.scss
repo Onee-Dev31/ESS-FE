@@ -2,7 +2,8 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
-.attachment-table-container {
+// สไตล์สำหรับส่วนจัดการไฟล์แนบและการแสดงตัวอย่างไฟล์
+.attachments-wrapper {
     margin-top: 16px;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
@@ -245,11 +246,10 @@
                         }
 
                         &:last-child {
-                            // Description column
                             grid-area: desc;
                             width: 100%;
-                            min-width: 0; // Crucial for grid item to shrink
-                            overflow: hidden; // Prevent spillover
+                            min-width: 0;
+                            overflow: hidden;
 
                             .desc-input-wrapper {
                                 width: 100%;

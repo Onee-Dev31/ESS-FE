@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
 
+/** ส่วนแสดงผลข้อความแจ้งเตือน (Toast Notification) */
 @Component({
   selector: 'app-toast',
   standalone: true,

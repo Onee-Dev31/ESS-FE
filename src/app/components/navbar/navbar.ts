@@ -21,6 +21,7 @@ interface SearchMenuItem {
   role?: string | string[];
 }
 
+/** Component แถบเมนูด้านบน (Navbar) จัดการการค้นหา, รายการแจ้งเตือน และโปรไฟล์ผู้ใช้ */
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -41,7 +42,7 @@ export class NavbarComponent {
   userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
 
-  // Search Logic
+
   searchQuery = signal('');
   isSearchFocused = signal(false);
   isMobileSearchOpen = signal(false);
@@ -57,6 +58,7 @@ export class NavbarComponent {
     { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope', role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR] },
   ];
 
+  /** คำนวณรายการค้นหาที่กรองตามตัวอักษรและสิทธิ์ (Role) */
   filteredSearchResults = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
@@ -64,7 +66,7 @@ export class NavbarComponent {
     const currentUserRole = this.authService.userRole();
 
     return this.allSearchMenus.filter(item => {
-      // Role check
+
       if (item.role) {
         if (Array.isArray(item.role)) {
           if (!item.role.includes(currentUserRole || '')) return false;
@@ -73,10 +75,10 @@ export class NavbarComponent {
         }
       }
 
-      // Text search
+
       return item.label.toLowerCase().includes(query) ||
         item.category.toLowerCase().includes(query);
-    }).slice(0, 5); // Limit to 5 results
+    }).slice(0, 5);
   });
 
   notifications: NotificationItem[] = [
@@ -103,6 +105,7 @@ export class NavbarComponent {
     if (this.isProfileOpen) this.isNotificationOpen = false;
   }
 
+  /** เปิด/ปิด การค้นหาบนหน้าจอมือถือ */
   toggleMobileSearch() {
     this.isMobileSearchOpen.update(v => !v);
     if (!this.isMobileSearchOpen()) {
@@ -136,6 +139,7 @@ export class NavbarComponent {
     }
   }
 
+  /** ล้างข้อมูลการเข้าสู่ระบบและกลับไปยังหน้า Login */
   logout() {
     this.isProfileOpen = false;
     this.authService.logout();

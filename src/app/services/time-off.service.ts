@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลคำขอลา (Time Off) */
 import { Injectable } from '@angular/core';
 import { TimeOffRequest } from '../interfaces/time-off.interface';
 import { TimeOffMock } from '../mocks/time-off.mock';

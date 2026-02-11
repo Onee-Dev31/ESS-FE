@@ -1,3 +1,4 @@
+/** Service สำหรับการ Export ข้อมูลเป็นไฟล์ PDF, Excel และการพิมพ์ (Print) */
 import { Injectable, inject } from '@angular/core';
 import type { Row, Cell, Column as ExcelColumn } from 'exceljs';
 import { DialogService } from './dialog';
@@ -8,6 +9,7 @@ import { DialogService } from './dialog';
 export class ExportService {
   private dialog = inject(DialogService);
 
+  /** ส่งออก HTML Element เป็นไฟล์ PDF */
   async exportToPDF(elementId: string, filename: string = 'export'): Promise<void> {
     try {
       const element = document.getElementById(elementId);
@@ -16,7 +18,7 @@ export class ExportService {
         return;
       }
 
-      // Dynamic import
+
       const html2canvas = (await import('html2canvas')).default;
       const jsPDF = (await import('jspdf')).default;
 
@@ -44,6 +46,7 @@ export class ExportService {
     }
   }
 
+  /** ส่งออกข้อมูล Array เป็นไฟล์ Excel (.xlsx) */
   async exportToExcel<T>(
     data: T[],
     columns: { header: string; key: string; width?: number }[],
@@ -73,7 +76,7 @@ export class ExportService {
       worksheet.getRow(1).height = 25;
 
       data.forEach(item => {
-        worksheet.addRow(item as any); // Cast as any for exceljs addRow
+        worksheet.addRow(item as any);
       });
 
       worksheet.eachRow((row: Row) => {
@@ -98,6 +101,7 @@ export class ExportService {
     }
   }
 
+  /** สั่งพิมพ์ (Print) เนื้อหาภายใน HTML Element */
   printElement(elementId: string): void {
     try {
       const element = document.getElementById(elementId);
@@ -164,13 +168,13 @@ export class ExportService {
         return;
       }
 
-      // Dynamic import
+
       const ExcelJS = await import('exceljs');
       const { saveAs } = await import('file-saver');
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
-      // ... rest of code uses ExcelJS and saveAs
+
 
       const headerRow = table.querySelector('thead tr');
       if (headerRow) {

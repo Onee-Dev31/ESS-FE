@@ -1,5 +1,7 @@
+/** Utility สำหรับจัดการข้อมูลรายการ (Listing) เช่น Pagination, Filtering, และ Sorting */
 import { signal, computed, WritableSignal, isSignal, Signal } from '@angular/core';
 
+/** Interface สำหรับเก็บสถานะของรายการ */
 export interface ListingState {
     currentPage: WritableSignal<number>;
     pageSize: WritableSignal<number>;
@@ -9,6 +11,7 @@ export interface ListingState {
     searchText: WritableSignal<string>;
 }
 
+/** สร้าง State เริ่มต้นของรายการ */
 export function createListingState(initialPageSize = 10): ListingState {
     return {
         currentPage: signal(0),
@@ -20,6 +23,7 @@ export function createListingState(initialPageSize = 10): ListingState {
     };
 }
 
+/** สร้าง Computed Signals สำหรับข้อมูลที่กรองและแบ่งหน้าแล้ว */
 export function createListingComputeds<T>(
     data: Signal<T[]> | (() => T[]),
     state: ListingState,
@@ -63,6 +67,7 @@ export function createListingComputeds<T>(
     };
 }
 
+/** ล้างค่า Filters ทั้งหมด */
 export function clearListingFilters(state: ListingState) {
     state.filterStatus.set('');
     state.filterStartDate.set('');
@@ -71,20 +76,18 @@ export function clearListingFilters(state: ListingState) {
     state.currentPage.set(0);
 }
 
+/** Helper methods สำหรับจัดการการคำนวณและกรองข้อมูล */
 export class ListingUtil {
 
-    // Calculate total pages based on total items and page size
     static calculateTotalPages(totalItems: number, pageSize: number): number {
         return Math.ceil(totalItems / pageSize);
     }
 
-    // Get current page data slice
     static paginateData<T>(data: T[], currentPage: number, pageSize: number): T[] {
         const startIndex = (currentPage - 1) * pageSize;
         return data.slice(startIndex, startIndex + pageSize);
     }
 
-    // Generate page numbers array for pagination controls
     static getPageNumbers(currentPage: number, totalPages: number): number[] {
         const pages: number[] = [];
         const maxPagesToShow = 5;
@@ -105,7 +108,6 @@ export class ListingUtil {
         return pages;
     }
 
-    // Filter data based on search text and fields
     static filterData<T>(data: T[], searchText: string, fields: (keyof T)[]): T[] {
         if (!searchText) return data;
 
@@ -140,7 +142,6 @@ export class ListingUtil {
         if (!sortColumn) return data;
 
         return [...data].sort((a, b) => {
-            // Check if we are sorting by totalAmount (for medical expenses logic)
             if (sortColumn === 'totalAmount' && 'items' in (a as object)) {
                 const itemsA = (a as any).items || [];
                 const itemsB = (b as any).items || [];
@@ -159,9 +160,9 @@ export class ListingUtil {
     }
 }
 
+/** Helper สำหรับการจัดการ Sort ของ TanStack Table หรือตารางทั่วไป */
 export class TableSortHelper {
     static toggleSort(table: any, columnId: string) {
-        // Implementation for TanStack table or similar
         const column = table.getColumn(columnId);
         if (column) column.toggleSorting(column.getIsSorted() === 'asc');
     }

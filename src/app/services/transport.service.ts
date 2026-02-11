@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่ารถ (Transport) */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { RequestItem, VehicleRequest, AttendanceLog } from '../interfaces/transport.interface';

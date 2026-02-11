@@ -62,11 +62,11 @@
     }
 }
 
-// Tablet and below adjustments
+
 @include tablet {
     .utility-btns {
         .btn-text {
-            display: none; // Hide text on small screens to save space
+            display: none;
         }
 
         .btn-outline {

@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Taxi) */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { TaxiItem, TaxiRequest, TaxiLogItem } from '../interfaces/taxi.interface';

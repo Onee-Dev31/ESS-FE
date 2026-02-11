@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../../services/dialog';
 
+/** ส่วนแสดงหน้าต่างยืนยัน (Confirmation Dialog) สำหรับการทำรายการสำคัญ */
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,

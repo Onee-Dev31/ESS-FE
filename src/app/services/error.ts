@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการและแสดงผลข้อผิดพลาด (Error Handling) ของแอปพลิเคชัน */
 import { Injectable, inject } from '@angular/core';
 import { ToastService } from './toast';
 
@@ -11,6 +12,7 @@ export interface ErrorContext {
   providedIn: 'root'
 })
 export class ErrorService {
+  /** จัดการ Error โดยแสดง Toast และ Log ข้อมูล */
   private toastService = inject(ToastService);
 
   handle(error: unknown, context?: ErrorContext): void {
@@ -27,6 +29,7 @@ export class ErrorService {
     });
   }
 
+  /** แปลง Error เป็นข้อความภาษาไทยที่เข้าใจง่ายสำหรับผู้ใช้ */
   private getUserFriendlyMessage(error: unknown, context?: ErrorContext): string {
     const errorWithStatus = error as { status?: number; message?: string };
     if (errorWithStatus?.status === 0 || errorWithStatus?.message?.includes('Http failure')) {
@@ -57,6 +60,7 @@ export class ErrorService {
     return errorWithStatus?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
   }
 
+  /** รัน Async operation พร้อมจัดการ Error อัตโนมัติ */
   async handleAsync<T>(
     operation: () => Promise<T>,
     context?: ErrorContext

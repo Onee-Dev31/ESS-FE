@@ -1,3 +1,4 @@
+/** Service สำหรับจัดการหน้าต่างยืนยัน (Confirmation Dialog) */
 import { Injectable, signal } from '@angular/core';
 
 export interface DialogConfig {

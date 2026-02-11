@@ -1,3 +1,4 @@
+/** Service สำหรับแสดงข้อความแจ้งเตือน (Toast) มุมขวาบนของหน้าจอ */
 import { Injectable, signal } from '@angular/core';
 
 export interface Toast {

@@ -52,7 +52,7 @@
 
             &:hover {
                 background: #f1f5f9;
-                color: #1a73e8; // Hardcoding primary here since it's a global style file that might not import variables correctly if not @use-d
+                color: #1a73e8;
             }
 
             &:active {

@@ -31,6 +31,7 @@ interface FlatMedicalRow extends MedicalItem {
   attachedFile?: string | null;
 }
 
+/** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่ารักษาพยาบาล (Medical Expenses) */
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,

@@ -3,7 +3,7 @@
 .approval-detail-overlay {
     @extend .modal-overlay;
 
-    // Force flex-start on tablet and mobile to prevent header cut-off
+
     @media (max-width: 1024px) {
         display: flex !important;
         align-items: flex-start !important;
@@ -21,7 +21,7 @@
     box-shadow: $shadow;
 
     @media (max-width: 1024px) {
-        margin: 40px auto !important; // Enforce space from the top
+        margin: 40px auto !important;
         max-height: none !important;
         height: auto !important;
         min-height: auto !important;

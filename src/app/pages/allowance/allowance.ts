@@ -29,6 +29,7 @@ interface FlatAllowanceRow extends AllowanceItem {
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
+/** หน้าแสดงรายการคำขอเบี้ยเลี้ยง (Allowance) พร้อมระบบตารางข้อมูลและตัวกรอง */
 @Component({
   selector: 'app-allowance',
   standalone: true,
@@ -103,6 +104,7 @@ export class AllowanceComponent implements OnInit {
 
   comps = createListingComputeds(this.processedData, this.listing);
 
+  /** แปลงข้อมูลจากรูปแบบ Request (ที่มีหลายรายการย่อย) เป็นแถวตารางแบบแบน (Flat Rows) */
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
     this.comps.paginatedData().forEach((request: AllowanceRequest) => {

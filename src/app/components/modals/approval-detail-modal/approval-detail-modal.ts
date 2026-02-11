@@ -15,6 +15,7 @@ interface PreviewFile {
   date: string;
 }
 
+/** Component แสดงรายละเอียดรายการขออนุมัติ และจัดการการอนุมัติ/ตีกลับ (Modal Detail) */
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,
@@ -97,6 +98,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
+  /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ (เช่น รายการย่อยในบิลรักษาพยาบาล) */
   loadDetails() {
     const item = this.approvalItem;
     if (!item?.type) return;
@@ -134,6 +136,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.reasonText.set('');
   }
 
+  /** ยืนยันการดำเนินการ (อนุมัติ/ปฏิเสธ) พร้อมตรวจสอบว่ามีการระบุเหตุผลหรือไม่ */
   confirmAction() {
     const item = this.approvalItem;
     const action = this.actionType();
@@ -148,6 +151,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.updateStatus(item, action, reason);
   }
 
+  /** อัปเดตสถานะไปยัง Service และแสดงข้อความตอบกลับไปยังผู้ใช้ */
   private updateStatus(item: ApprovalItem, newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
     if (!item.type) return;
 
