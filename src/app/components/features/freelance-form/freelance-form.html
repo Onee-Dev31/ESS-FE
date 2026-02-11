@@ -1,0 +1,172 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="handleClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <!-- Header with close button -->
+        <div class="form-header">
+            <h2>ข้อมูลพนักงาน</h2>
+            <button class="btn-close" (click)="handleClose()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+
+            <form class="freelance-form">
+                <!-- Row 1: ชื่อจริง, นามสกุลไทย, ชื่อเล่น -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>ชื่อจริง</label>
+                        <input type="text" class="form-input" placeholder="ชื่อจริงภาษาไทย"
+                            [(ngModel)]="formData.firstNameTh" name="firstNameTh">
+                    </div>
+                    <div class="form-field">
+                        <label>นามสกุลไทย</label>
+                        <input type="text" class="form-input" placeholder="นามสกุลภาษาไทย"
+                            [(ngModel)]="formData.lastNameTh" name="lastNameTh">
+                    </div>
+                    <div class="form-field">
+                        <label>ชื่อเล่น</label>
+                        <input type="text" class="form-input" placeholder="ชื่อเล่น" [(ngModel)]="formData.nickname"
+                            name="nickname">
+                    </div>
+                </div>
+
+                <!-- Row 2: First name, Last name, เบอร์โทรศัพท์ -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>First name</label>
+                        <input type="text" class="form-input" placeholder="ชื่อจริงภาษาอังกฤษ"
+                            [(ngModel)]="formData.firstNameEn" name="firstNameEn">
+                    </div>
+                    <div class="form-field">
+                        <label>Last name</label>
+                        <input type="text" class="form-input" placeholder="นามสกุลภาษาอังกฤษ"
+                            [(ngModel)]="formData.lastNameEn" name="lastNameEn">
+                    </div>
+                    <div class="form-field">
+                        <label>เบอร์โทรศัพท์</label>
+                        <input type="tel" class="form-input" placeholder="098774455" [(ngModel)]="formData.phone"
+                            name="phone">
+                    </div>
+                </div>
+
+                <!-- Row 3: Email, บริษัท, แผนก -->
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Email</label>
+                        <input type="email" class="form-input" placeholder="mama555@gmail.com"
+                            [(ngModel)]="formData.email" name="email">
+                    </div>
+                    <div class="form-field">
+                        <label>บริษัท</label>
+                        <select class="form-input" [(ngModel)]="formData.company" name="company">
+                            <option value="">เลือก วัน เอ็นเตอร์เทรส</option>
+                            <option value="OTD">OTD</option>
+                            <option value="GTV">GTV</option>
+                            <option value="OTV">OTV</option>
+                            <option value="ATM">ATM</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>แผนก</label>
+                        <select class="form-input" [(ngModel)]="formData.department" name="department">
+                            <option value="">10806 - IT Department</option>
+                            <option value="10806 - IT Department">10806 - IT Department</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 4: วันที่เริ่มสัญญา, วันที่สิ้นสุดสัญญา, เงินเดือน, รายได้อื่น, ยอดรวม -->
+                <div class="form-row five-cols">
+                    <div class="form-field">
+                        <label>วันที่เริ่มสัญญา</label>
+                        <input type="date" class="form-input" [(ngModel)]="formData.startDate" name="startDate">
+                    </div>
+                    <div class="form-field">
+                        <label>วันที่สิ้นสุดสัญญา</label>
+                        <input type="date" class="form-input" [(ngModel)]="formData.endDate" name="endDate">
+                    </div>
+                    <div class="form-field">
+                        <label>เงินเดือน</label>
+                        <input type="number" class="form-input" placeholder="10,000.00" [(ngModel)]="formData.salary"
+                            name="salary" (ngModelChange)="calculateTotal()">
+                    </div>
+                    <div class="form-field">
+                        <label>รายได้อื่น</label>
+                        <input type="number" class="form-input" placeholder="10,000.00"
+                            [(ngModel)]="formData.otherIncome" name="otherIncome" (ngModelChange)="calculateTotal()">
+                    </div>
+                    <div class="form-field">
+                        <label>ยอดรวม</label>
+                        <input type="number" class="form-input readonly" placeholder="40,000.00"
+                            [value]="formData.totalIncome" readonly>
+                    </div>
+                </div>
+
+                <!-- Row 5: เลขที่บัตรฯ, เลขที่ Supplier, AD User, รหัสพนักงาน -->
+                <div class="form-row four-cols">
+                    <div class="form-field">
+                        <label>เลขที่บัญชี</label>
+                        <input type="text" class="form-input" placeholder="1234567890000"
+                            [(ngModel)]="formData.employeeId" name="employeeId">
+                    </div>
+                    <div class="form-field">
+                        <label>เลขที่ Supplier</label>
+                        <input type="text" class="form-input disabled" placeholder="2Axxxxxx" disabled>
+                    </div>
+                    <div class="form-field">
+                        <label>AD User</label>
+                        <input type="text" class="form-input disabled" placeholder="2Axxxxxx" disabled>
+                    </div>
+                    <div class="form-field">
+                        <label>รหัสพนักงาน</label>
+                        <input type="text" class="form-input" placeholder="FOTD000001" [(ngModel)]="formData.fotdNumber"
+                            name="fotdNumber">
+                    </div>
+                </div>
+
+                <!-- Row 6: หมายเหตุ -->
+                <div class="form-row">
+                    <div class="form-field full-width">
+                        <label>หมายเหตุ</label>
+                        <textarea class="form-input" rows="3" placeholder="Enter a description..."
+                            [(ngModel)]="formData.description" name="description"></textarea>
+                    </div>
+                </div>
+
+                <!-- Row 7: แนบไฟล์ -->
+                <div class="form-row">
+                    <div class="form-field full-width">
+                        <label>แบบไฟล์</label>
+                        <label class="file-upload-wrapper">
+                            <input type="file" multiple (change)="onFileSelect($event)" class="hidden-input">
+
+                            <div class="file-select-box">
+                                <i class="fas fa-folder-open"></i>
+                                <span>D://zzzzz.png</span>
+                            </div>
+
+                            <div class="btn-upload">Upload</div>
+                        </label>
+
+                        <!-- Uploaded files list -->
+                        <div class="uploaded-files" *ngIf="uploadedFiles.length > 0">
+                            <div class="file-item" *ngFor="let file of uploadedFiles; let i = index">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>{{ file.name }}</span>
+                                <button type="button" class="btn-remove" (click)="removeFile(i)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Action buttons - NOW OUTSIDE modal-content -->
+        <div class="form-actions">
+            <button type="button" class="btn-save" (click)="handleSave()">Save</button>
+            <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
+        </div>
+    </div>
+</div>

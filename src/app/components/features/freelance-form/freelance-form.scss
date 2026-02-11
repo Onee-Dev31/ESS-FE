@@ -1,0 +1,422 @@
+@use '../../../../styles/theme' as *;
+
+// ==================== MODAL OVERLAY ====================
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 980px;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: grid !important;
+    /* Use Grid for better scroll control */
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+
+    @include tablet {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+}
+
+/* Specificity override for global styles */
+.modal-container .modal-content {
+    padding: 0 36px;
+    display: block !important;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 40px !important;
+    flex: initial !important;
+}
+
+/* Hidden input but accessible for label trigger */
+.hidden-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+// ==================== FORM HEADER ====================
+.modal-container .form-header {
+    display: flex !important;
+    border-bottom: none !important;
+    /* Reset border */
+    overflow: visible !important;
+    /* Override global hidden */
+    flex: none !important;
+    /* Override global flex: 1 */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    /* Remove margin, use padding */
+    padding: 24px 36px 24px;
+    /* Add padding directly to header */
+    flex-shrink: 0;
+    /* Prevent header from shrinking */
+
+    h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 500;
+        /* More refined weight */
+        color: #582d96;
+    }
+
+    .btn-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        /* Circle close button */
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        font-size: 1rem;
+
+        &:hover {
+            color: #ef4444;
+            background: #f3f4f6;
+        }
+    }
+}
+
+// ==================== FORM LAYOUT ====================
+.freelance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Increased gap */
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    /* Increased gap */
+
+    &.four-cols {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    &.five-cols {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    @include tablet {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #1f2937 !important;
+        margin-left: 4px;
+    }
+
+    .form-input {
+        height: 48px !important;
+        padding: 0 20px !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 50px !important;
+        font-size: 0.95rem !important;
+        color: #1f2937 !important;
+        background: white !important;
+        transition: all 0.2s;
+        font-family: $font-main;
+
+        &::placeholder {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: #a78bfa !important;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+        }
+
+        &.readonly,
+        &.disabled,
+        &:disabled {
+            background: #e5e7eb !important;
+            color: #6b7280 !important;
+            border-color: #d1d5db !important;
+            cursor: not-allowed;
+            opacity: 1;
+        }
+    }
+
+    textarea.form-input {
+        height: auto !important;
+        padding: 16px 20px !important;
+        resize: vertical;
+        min-height: 100px;
+        line-height: 1.6;
+        border-radius: 16px !important;
+    }
+
+    select.form-input {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 20px center;
+        background-size: 18px;
+        padding-right: 48px !important;
+    }
+
+    input[type="date"].form-input {
+        cursor: pointer;
+        position: relative;
+        padding-right: 16px !important;
+    }
+}
+
+// ==================== FILE UPLOAD ====================
+.file-upload-wrapper {
+    width: 100%;
+    cursor: pointer;
+    display: flex !important;
+    gap: 16px;
+    align-items: center;
+    min-height: 48px;
+    margin-top: 8px;
+
+    @include mobile {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .file-select-box {
+        pointer-events: none;
+        flex: 1;
+        height: 48px;
+        padding: 0 20px;
+        border: 1px solid #cbd5e1;
+        border-radius: 50px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #475569;
+        font-size: 0.95rem;
+
+        &:hover {
+            border-color: #9ca3af;
+            background: #f9fafb;
+        }
+
+        span {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        &::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.7;
+        }
+    }
+
+    .btn-upload {
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        padding: 0 32px;
+        background: #5850ec;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+.uploaded-files {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 10px;
+        background: transparent;
+        border: none;
+
+        i.fa-file-pdf {
+            color: #9ca3af;
+            font-size: 1.2rem;
+        }
+
+        span {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #4b5563;
+            font-weight: 400;
+        }
+
+        .btn-remove {
+            display: none;
+        }
+    }
+}
+
+// ==================== ACTION BUTTONS ====================
+.modal-container .form-actions {
+    display: flex !important;
+    overflow: visible !important;
+    flex: none !important;
+    justify-content: flex-end !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 16px;
+    padding: 24px 36px;
+    background: white;
+    border-top: 1px solid transparent;
+    border-radius: 0 0 16px 16px;
+    z-index: 10;
+    position: relative;
+    flex-shrink: 0;
+
+    @media (max-width: 767px) {
+        padding: 16px 18px;
+        flex-direction: column-reverse !important;
+    }
+
+    button {
+        height: 48px;
+        padding: 0 40px;
+        min-width: 140px;
+        width: auto !important;
+        /* Force auto width */
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        flex: 0 0 auto !important;
+        /* Prevent flex grow/shrink */
+
+        @media (max-width: 767px) {
+            width: 100% !important;
+            flex: 1 1 auto !important;
+        }
+    }
+
+    .btn-save {
+        background: #10b981 !important;
+        /* Vibrant Green (Emerald-500) */
+        color: white !important;
+
+        &:hover {
+            background: #059669 !important;
+            /* Darker Green (Emerald-600) */
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+    }
+
+    .btn-clear {
+        background: #94a3b8 !important;
+        /* Slate-400 */
+        color: white !important;
+
+        &:hover {
+            background: #64748b !important;
+            /* Slate-500 */
+        }
+    }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 767px) {
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-container {
+        border-radius: 12px;
+    }
+
+    .modal-content {
+        padding: 20px 16px;
+    }
+
+    .form-header {
+        margin-bottom: 24px;
+
+        h2 {
+            font-size: 1.2rem;
+        }
+    }
+
+    .form-field label {
+        font-size: 0.78rem;
+    }
+
+    .form-field .form-input {
+        height: 42px;
+        font-size: 0.86rem;
+    }
+}

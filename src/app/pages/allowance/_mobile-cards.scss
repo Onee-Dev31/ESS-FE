@@ -1,7 +1,0 @@
-@use '../../../styles/theme' as *;
-
-@mixin allowance-mobile-cards {
-    .card-list-view {
-        @include mobile-cards-view;
-    }
-}

@@ -1,9 +1,101 @@
-@use './layout';
-@use './table';
-@use './mobile-cards';
+@use '../../../styles/theme' as *;
 
 .medical-page {
-    @include layout.medical-layout;
-    @include table.medical-table;
-    @include mobile-cards.medical-mobile-cards;
+    // ==================== LAYOUT ====================
+    padding: 24px;
+    background-color: $bg-page;
+    min-height: 100vh;
+
+    @include large-tablet {
+        padding: 12px;
+        padding-bottom: 5px;
+    }
+
+    .content-card {
+        @include content-card;
+        margin-top: 16px;
+    }
+
+    .card-header-title {
+        @include card-header-title;
+    }
+
+    .toolbar-container {
+        @include toolbar-container;
+    }
+
+    .table-responsive {
+        @include large-tablet {
+            display: none;
+        }
+    }
+
+    // ==================== TABLE STYLES ====================
+    .modern-table {
+        @include modern-table;
+        min-width: 1200px;
+
+        thead {
+            th {
+                white-space: nowrap;
+
+                &.col-amount {
+                    text-align: right;
+                }
+            }
+        }
+
+        .col-id {
+            width: 110px;
+        }
+
+        .col-date {
+            width: 100px;
+        }
+
+        .col-limit {
+            width: 150px;
+        }
+
+        .col-disease {
+            width: 150px;
+        }
+
+        .col-hospital {
+            width: 160px;
+        }
+
+        .col-date-sm {
+            width: 100px;
+        }
+
+        .col-amount {
+            width: 130px;
+        }
+
+        .col-status {
+            width: 120px;
+        }
+
+        .col-attach {
+            width: 80px;
+        }
+
+        .file-icon-link {
+            @include icon-btn-sky;
+        }
+    }
+
+    // ==================== MOBILE CARD VIEW ====================
+    .card-list-view {
+        @include mobile-cards-view;
+
+        .action-btn.folder {
+            @include icon-btn-sky;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+    }
 }

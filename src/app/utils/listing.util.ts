@@ -57,13 +57,18 @@ export function createListingComputeds<T>(
     const canPreviousPage = computed(() => state.currentPage() > 0);
     const canNextPage = computed(() => state.currentPage() < totalPages() - 1);
 
+    const startIndex = computed(() => state.currentPage() * state.pageSize());
+    const endIndex = computed(() => Math.min(startIndex() + state.pageSize(), totalItems()));
+
     return {
         filteredData,
         totalItems,
         totalPages,
         paginatedData,
         canPreviousPage,
-        canNextPage
+        canNextPage,
+        startIndex,
+        endIndex
     };
 }
 

@@ -47,13 +47,13 @@ export const routes: Routes = [
                 path: 'approvals',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
+                data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
             },
             {
                 path: 'approvals-medicalexpenses',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [roleGuard],
-                data: { role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
+                data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
             },
             {
                 path: 'medicalexpenses',
@@ -66,11 +66,16 @@ export const routes: Routes = [
                 data: { animation: 'TimeOff' }
             },
             {
+                path: 'freelance-management',
+                loadComponent: () => import('./pages/freelance-management/freelance-management').then(m => m.FreelanceManagementComponent),
+                data: { animation: 'FreelanceManagement' }
+            },
+            {
                 path: 'resign-management',
                 loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
                 data: { animation: 'Dashboard' }
             },
-            {   
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'

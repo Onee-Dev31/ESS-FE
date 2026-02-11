@@ -40,7 +40,5 @@
         overflow: hidden;
     }
 
-    .filter-section {
-        @extend .filter-section;
-    }
+    /* Filter controls are now handled by global filters SCSS */
 }

@@ -57,9 +57,16 @@ export class Sidebar {
             ]
         },
         {
+            name: 'จัดการฟรีแลนซ์',
+            icon: 'fa-user-tie',
+            subItems: [
+                { label: 'รายชื่อฟรีแลนซ์', path: '/freelance-management' }
+            ]
+        },
+        {
             name: 'อนุมัติ',
             icon: 'fa-check-circle',
-            role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR],
+            role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR],
             subItems: [
                 { label: 'สวัสดิการ', path: '/approvals' },
                 { label: 'ค่ารักษาพยาบาล', path: '/approvals-medicalexpenses' }
@@ -68,9 +75,9 @@ export class Sidebar {
         {
             name: 'จัดการพนักงาน',
             icon: 'fa-person-walking-dashed-line-arrow-right',
-            role: [USER_ROLES.HR],
+            role: [USER_ROLES.ADMIN, USER_ROLES.HR],
             subItems: [
-                { label: 'ลาออกบอกพี่แพรว', path: '/resign-management' }
+                { label: 'ลาออกบอกพี่แพรว', path: '/resign-management' },
             ]
         },
     ];
