@@ -4,7 +4,7 @@ import { ToastService } from './toast';
 export interface ErrorContext {
   component?: string;
   action?: string;
-  data?: any;
+  data?: unknown;
 }
 
 @Injectable({
@@ -27,14 +27,14 @@ export class ErrorService {
     });
   }
 
-  private getUserFriendlyMessage(error: any, context?: ErrorContext): string {
-    // Keep error: any for now to easily access status/message without type guards for this cleanup
-    if (error?.status === 0 || error?.message?.includes('Http failure')) {
+  private getUserFriendlyMessage(error: unknown, context?: ErrorContext): string {
+    const errorWithStatus = error as { status?: number; message?: string };
+    if (errorWithStatus?.status === 0 || errorWithStatus?.message?.includes('Http failure')) {
       return 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
     }
 
-    if (error?.status) {
-      switch (error.status) {
+    if (errorWithStatus?.status) {
+      switch (errorWithStatus.status) {
         case 400:
           return 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่อีกครั้ง';
         case 401:
@@ -46,7 +46,7 @@ export class ErrorService {
         case 500:
           return 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง';
         default:
-          return `เกิดข้อผิดพลาด (${error.status})`;
+          return `เกิดข้อผิดพลาด (${errorWithStatus.status})`;
       }
     }
 
@@ -54,7 +54,7 @@ export class ErrorService {
       return 'ไม่สามารถ export ไฟล์ได้ กรุณาลองใหม่อีกครั้ง';
     }
 
-    return error?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+    return errorWithStatus?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
   }
 
   async handleAsync<T>(

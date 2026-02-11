@@ -106,13 +106,13 @@ export class ListingUtil {
     }
 
     // Filter data based on search text and fields
-    static filterData<T>(data: T[], searchText: string, fields: string[]): T[] {
+    static filterData<T>(data: T[], searchText: string, fields: (keyof T)[]): T[] {
         if (!searchText) return data;
 
         const lowerSearch = searchText.toLowerCase();
         return data.filter(item =>
             fields.some(field => {
-                const value = (item as any)[field];
+                const value = item[field];
                 return String(value).toLowerCase().includes(lowerSearch);
             })
         );
@@ -132,7 +132,7 @@ export class ListingUtil {
         return table.sortDirection() === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
     }
 
-    static sortData<T>(
+    static sortData<T extends Record<string, any>>(
         data: T[],
         sortColumn: string,
         sortDirection: 'asc' | 'desc'
@@ -142,13 +142,15 @@ export class ListingUtil {
         return [...data].sort((a, b) => {
             // Check if we are sorting by totalAmount (for medical expenses logic)
             if (sortColumn === 'totalAmount' && 'items' in (a as object)) {
-                const sumA = (a as any).items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
-                const sumB = (b as any).items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                const itemsA = (a as any).items || [];
+                const itemsB = (b as any).items || [];
+                const sumA = itemsA.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                const sumB = itemsB.reduce((s: number, i: any) => s + (i.amount || 0), 0);
                 return sortDirection === 'asc' ? sumA - sumB : sumB - sumA;
             }
 
-            const valA = (a as any)[sortColumn];
-            const valB = (b as any)[sortColumn];
+            const valA = a[sortColumn];
+            const valB = b[sortColumn];
 
             if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
             if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
@@ -174,8 +176,8 @@ export class TableSortHelper {
         };
     }
 
-    static sortVehicleLikeData(
-        data: any[],
+    static sortVehicleLikeData<T extends { id?: string, requestId?: string, createDate?: string, status?: string, items?: any[] }>(
+        data: T[],
         sortId: string,
         sortDesc: boolean,
         keyMap: { id?: string, createDate?: string, status?: string, amount?: string, desc?: string, date?: string, destination?: string } = {}
@@ -184,38 +186,48 @@ export class TableSortHelper {
         return [...data].sort((a, b) => {
 
             if (sortId === (keyMap.id || 'id') || sortId === 'requestId') {
-                return (a.id || a.requestId).localeCompare(b.id || b.requestId) * direction;
+                const idA = a.id || a.requestId || '';
+                const idB = b.id || b.requestId || '';
+                return idA.localeCompare(idB) * direction;
             }
 
             if (sortId === (keyMap.createDate || 'createDate')) {
-                return a.createDate.localeCompare(b.createDate) * direction;
+                return (a.createDate || '').localeCompare(b.createDate || '') * direction;
             }
 
             if (sortId === (keyMap.status || 'status')) {
-                return a.status.localeCompare(b.status) * direction;
+                return (a.status || '').localeCompare(b.status || '') * direction;
             }
 
             if (sortId === (keyMap.amount || 'amount')) {
-                const sumA = a.items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
-                const sumB = b.items.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                const itemsA = a.items || [];
+                const itemsB = b.items || [];
+                const sumA = itemsA.reduce((s: number, i: any) => s + (i.amount || 0), 0);
+                const sumB = itemsB.reduce((s: number, i: any) => s + (i.amount || 0), 0);
                 return (sumA - sumB) * direction;
             }
 
             if (sortId === (keyMap.desc || 'description')) {
-                const descA = a.items[0]?.description || '';
-                const descB = b.items[0]?.description || '';
+                const itemsA = a.items || [];
+                const itemsB = b.items || [];
+                const descA = itemsA[0]?.description || '';
+                const descB = itemsB[0]?.description || '';
                 return descA.localeCompare(descB) * direction;
             }
 
             if (sortId === (keyMap.date || 'date')) {
-                const dateA = a.items[0]?.date || '';
-                const dateB = b.items[0]?.date || '';
+                const itemsA = a.items || [];
+                const itemsB = b.items || [];
+                const dateA = itemsA[0]?.date || '';
+                const dateB = itemsB[0]?.date || '';
                 return dateA.localeCompare(dateB) * direction;
             }
 
             if (sortId === (keyMap.destination || 'destination')) {
-                const destA = a.items[0]?.destination || '';
-                const destB = b.items[0]?.destination || '';
+                const itemsA = a.items || [];
+                const itemsB = b.items || [];
+                const destA = itemsA[0]?.destination || '';
+                const destB = itemsB[0]?.destination || '';
                 return destA.localeCompare(destB) * direction;
             }
             return 0;

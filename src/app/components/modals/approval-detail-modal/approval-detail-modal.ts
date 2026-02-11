@@ -10,6 +10,11 @@ import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
 import { modalAnimation, fadeIn } from '../../../animations/animations';
 
+interface PreviewFile {
+  fileName: string;
+  date: string;
+}
+
 @Component({
   selector: 'app-approval-detail-modal',
   standalone: true,
@@ -73,7 +78,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   isPreviewModalOpen = signal(false);
-  previewFiles = signal<any[]>([]);
+  previewFiles = signal<PreviewFile[]>([]);
 
   selectedRequestDetails = computed(() => ({
     type: this.currentDetailType(),
@@ -104,7 +109,7 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.detailedStatus.set(data.status);
 
       if (item.type === 'medical') {
-        const unifiedItems: UnifiedItem[] = (data.items || []).map((m: any) => ({
+        const unifiedItems: UnifiedItem[] = (data.items || []).map((m: { treatmentDateFrom?: string; diseaseType?: string; hospital?: string; requestedAmount?: number; attachedFile?: string }) => ({
           date: m.treatmentDateFrom || data.createDate,
           description: `${m.diseaseType} (${m.hospital})` || '',
           amount: m.requestedAmount || 0,
@@ -112,7 +117,7 @@ export class ApprovalDetailModalComponent implements OnInit {
         }));
         this.currentDetailItems.set(unifiedItems);
       } else {
-        this.currentDetailItems.set(data.items as UnifiedItem[]);
+        this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
       }
     });
   }
@@ -143,7 +148,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.updateStatus(item, action, reason);
   }
 
-  private updateStatus(item: ApprovalItem, newStatus: any, reason?: string) {
+  private updateStatus(item: ApprovalItem, newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
     if (!item.type) return;
 
     let statusCode = REQUEST_STATUS.WAITING_CHECK;

@@ -140,8 +140,9 @@ export class ApprovalsComponent implements OnInit {
     return this.approvals().filter(item => item.status === tab).length;
   }
 
-  onSearch(event: any) {
-    this.listing.searchText.set(event.target.value);
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.listing.searchText.set(input.value);
     this.listing.currentPage.set(0);
   }
 
