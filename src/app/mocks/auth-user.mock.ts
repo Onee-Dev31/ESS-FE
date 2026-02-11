@@ -46,7 +46,7 @@ export class UserMock {
         { username: 'hr', password: '123', name: 'ฝ่ายบุคคล ทดสอบ', role: USER_ROLES.HR, employeeId: 'OTD00003' },
         { username: 'executive', password: '123', name: 'ผู้บริหาร ทดสอบ', role: USER_ROLES.EXECUTIVE, employeeId: 'OTD00004' },
         { username: 'accounting', password: '123', name: 'ฝ่ายบัญชี ทดสอบ', role: USER_ROLES.ACCOUNTING, employeeId: 'OTD00005' },
-        { username: 'admin', password: '123', name: 'Admin (HR)', role: USER_ROLES.HR, employeeId: 'OTD00003' },
+        { username: 'admin', password: '123', name: 'Admin', role: USER_ROLES.ADMIN, employeeId: 'OTD00001' },
         { username: 'member', password: '123', name: 'Member (Employee)', role: USER_ROLES.EMPLOYEE, employeeId: 'OTD00001' }
     ];
 }
