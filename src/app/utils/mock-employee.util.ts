@@ -12,9 +12,10 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'FullTime',
         adUser: 'punaporn.j',
+        position: 'ตำแหน่งที่ 1'
     },
     {
-        empCode: 'OTD0002',
+        empCode: 'OTD01050',
         firstName: 'ธราดล',
         lastName: 'แก้วนาน',
         firstNameEng: 'Tharadl',
@@ -24,6 +25,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'Contract',
         adUser: 'tharadl.g',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0003',
@@ -36,6 +38,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'Freelance',
         adUser: 'ortai.b',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0004',
@@ -48,6 +51,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'FullTime',
         adUser: 'sutas.y',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0005',
@@ -60,6 +64,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'FullTime',
         adUser: 'kittipong.t',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0006',
@@ -72,6 +77,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'Freelance',
         adUser: 'patcharapa.s',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0007',
@@ -84,6 +90,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'Contract',
         adUser: 'nattawut.c',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0008',
@@ -96,6 +103,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'FullTime',
         adUser: 'sasithorn.i',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0009',
@@ -108,6 +116,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'FullTime',
         adUser: 'phanuwat.r',
+        position: 'ตำแหน่งที่ 1'
     },
     {
         empCode: 'OTD0010',
@@ -120,5 +129,6 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'OTD',
         type: 'Freelance',
         adUser: 'warissara.b',
+        position: 'ตำแหน่งที่ 1'
     },
 ];

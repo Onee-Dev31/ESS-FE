@@ -142,4 +142,10 @@ export class ResignManagement {
   clampPage() {
     if (this.page > this.totalPages) this.page = this.totalPages;
   }
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
+  }
 }

@@ -9,4 +9,5 @@ export interface Employee {
     company: string;
     type: 'FullTime' | 'Freelance' | 'Contract';
     adUser?: string;
+    position: string;
 };

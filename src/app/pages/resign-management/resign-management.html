@@ -18,15 +18,23 @@
             <tbody>
                 <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
                     <td class="col-name">
+                        <div class="profile">
+                            <img src="user.png" />
+                        </div>
                         <div class="name-block">
                             <div class="fullname">
-                                <span class="code">{{ emp.empCode }}</span>
                                 <span class="fn">{{ emp.firstName }}</span>
                                 <span class="ln">{{ emp.lastName }}</span>
+                                <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+
                             </div>
 
-                            <div class="nickname" *ngIf="emp.nickName">
-                                ({{ emp.nickName }})
+                            <div class="code">
+                                {{ emp.empCode }}
+                            </div>
+
+                            <div class="position">
+                                {{ emp.position }}
                             </div>
                         </div>
                     </td>
@@ -80,37 +88,47 @@
     <div class="modal-backdrop" *ngIf="isViewOpen" (click)="closeViewModal()"></div>
 
     <div class="modal" *ngIf="isViewOpen" role="dialog" aria-modal="true">
-        <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-card" (click)="$event.stopPropagation()" *ngIf="selected as emp">
             <div class="modal-title">Employee Detail</div>
 
-            <div class="detail-grid" *ngIf="selected as emp">
-                <div class="label">Name Thai:</div>
+            <div class="profile">
+                <!-- <img src="user.png" /> -->
+                <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
+                    (error)="onImgError($event)" />
+            </div>
+
+            <div class="detail-grid">
+                <div class="label">Name Thai</div>
                 <div class="value">{{ emp.firstName }} {{ emp.lastName }}</div>
 
-                <div class="label">Name Eng:</div>
+                <div class="label">Name Eng</div>
                 <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
 
-                <div class="label">Nickname:</div>
+                <div class="label">Nickname</div>
                 <div class="value">{{ emp.nickName || '-' }}</div>
 
-                <div class="label">Department:</div>
+                <div class="label">Department</div>
                 <div class="value">{{ emp.department }}</div>
 
-                <div class="label">Company:</div>
+                <div class="label">Company</div>
                 <div class="value">{{ emp.company }}</div>
 
-                <div class="label">Type:</div>
-                <div class="value">{{ emp.type }}</div>
-                <div class="label">AdUser:</div>
+                <div class="label">Type</div>
+                <div class="value">
+                    <div class="badge" [attr.data-type]="emp.type">{{ emp.type }}</div>
+                </div>
+                <div class="label">AdUser</div>
                 <div class="value"> {{ emp.adUser || '-' }}</div>
 
+                <div class="divider"></div>
+
                 <!-- NEW required fields -->
-                <div class="label req">Last Date:</div>
+                <div class="label">Last Date</div>
                 <div class="value">
                     <input class="input" type="date" [(ngModel)]="lastDate" />
                 </div>
 
-                <div class="label req">Effective Date:</div>
+                <div class="label">Effective Date</div>
                 <div class="value">
                     <input class="input" type="date" [(ngModel)]="effectiveDate" />
                 </div>
