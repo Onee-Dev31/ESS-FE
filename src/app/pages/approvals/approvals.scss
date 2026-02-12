@@ -307,7 +307,125 @@
         padding: 0 24px 24px;
 
         .data-grid {
-            @include modern-table;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border: 1px solid $border;
+            border-radius: 12px;
+            overflow: hidden;
+
+            thead {
+                tr {
+                    background: $header-bg;
+                }
+
+                th {
+                    padding: 14px 16px;
+                    text-align: left;
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    color: $text-header;
+                    border-bottom: 2px solid $border;
+                    white-space: nowrap;
+                }
+            }
+
+            tbody {
+                transition: background 0.2s;
+
+                &:hover {
+                    background: #f1f5f9;
+
+                    tr {
+                        background: transparent;
+                    }
+
+                    td {
+                        background: transparent !important;
+                    }
+                }
+
+                tr {
+                    transition: background 0.2s;
+
+                    &:not(:last-child) td:not(.merged-col) {
+                        border-bottom: none;
+                    }
+                }
+
+                td {
+                    padding: 16px;
+                    font-size: 0.9rem;
+                    color: $text;
+                    border-bottom: 1px solid $border-color;
+                    vertical-align: middle;
+                }
+
+                &:last-of-type tr:last-child td {
+                    border-bottom: none;
+                }
+            }
+
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                display: inline-flex;
+                border: 1px solid transparent;
+
+                &.status-new {
+                    background: $status-new-bg;
+                    color: $status-new-text;
+                    border-color: rgba($status-new-text, 0.3);
+                }
+
+                &.status-verified {
+                    background: $status-verified-bg;
+                    color: $status-verified-text;
+                    border-color: rgba($status-verified-text, 0.3);
+                }
+
+                &.status-pending {
+                    background: $status-pending-bg;
+                    color: $status-pending-text;
+                    border-color: rgba($status-pending-text, 0.3);
+                }
+
+                &.status-approved {
+                    background: $status-success-bg;
+                    color: $status-success-text;
+                    border-color: rgba($status-success-text, 0.3);
+                }
+
+                &.status-rejected {
+                    background: $status-danger-bg;
+                    color: $status-danger-text;
+                    border-color: rgba($status-danger-text, 0.3);
+                }
+            }
+
+            .action-cell,
+            .action-btns {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+            }
+
+            .text-primary-link {
+                color: $primary !important;
+                font-weight: 700 !important;
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            @include tablet {
+                display: none;
+            }
 
             tbody tr td.request-no-link {
                 color: $primary !important;
