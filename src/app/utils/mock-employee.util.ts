@@ -16,16 +16,16 @@ export const MOCK_EMPLOYEES: Employee[] = [
     },
     {
         empCode: 'OTD01050',
-        firstName: 'ธราดล',
-        lastName: 'แก้วนาน',
-        firstNameEng: 'Tharadl',
-        lastNameEng: 'Kaewnan',
-        nickName: 'โด้',
-        department: 'Infrastructure',
-        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
+        firstName: 'จรินทร์ทิพย์',
+        lastName: 'พิพัฒน์เกษมสิน',
+        firstNameEng: 'Patcharaporn',
+        lastNameEng: 'Pruitthiakkaravanich',
+        nickName: 'แพรววี่',
+        department: '18228 ฝ่ายขายEFM & Chill Online & A-Time Online',
+        company: 'จีเอ็มเอ็ม สตูดิโอส์ อินเตอร์เนชั่นแนล  จำกัด [GSI]',
         type: 'Contract',
         adUser: 'tharadl.g',
-        position: 'ตำแหน่งที่ 1'
+        position: 'ผู้ช่วยผู้อำนวยการ-ฝ่ายบริหารสำนักงาน/จัดซื้อ Operation Official Merchandise'
     },
     {
         empCode: 'OTD0003',
