@@ -60,8 +60,11 @@
     }
 
     .col-name {
-        // width: 36%;
-        min-width: 260px;
+        width: 40%;
+        // min-width: 260px;
+    }
+
+    .profile-name {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -91,19 +94,25 @@
         white-space: nowrap;
     }
 
-    // .col-type {
-    //     width: 120px;
-    //     text-align: left;
-    // }
 
-    // .col-action {
-    //     width: 220px;
-    //     white-space: nowrap;
-    // }
+    .col-department {
+        width: 25%;
+    }
+
+    .col-company {
+        width: 25%;
+    }
+
+    .col-type,
+    .col-action {
+        width: 50px;
+        white-space: nowrap;
+    }
 
     .name-block {
         display: flex;
         flex-direction: column;
+        width: 70%;
         // gap: 4px;
     }
 

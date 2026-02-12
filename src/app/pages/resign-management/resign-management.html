@@ -11,8 +11,8 @@
                 <thead>
                     <tr>
                         <th class="col-name">Name</th>
-                        <th>Department</th>
-                        <th>Company</th>
+                        <th class="col-department">Department</th>
+                        <th class="col-company">Company</th>
                         <th class="col-type">Type</th>
                         <th class="col-action">Action</th>
                     </tr>
@@ -21,31 +21,34 @@
                 <tbody>
                     <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
                         <td class="col-name">
-                            <div class="profile">
-                                <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode.trim() + '.jpg'"
-                                    (error)="onImgError($event)" />
-                            </div>
-                            <div class="name-block">
-                                <div class="fullname">{{ emp.firstName }} {{ emp.lastName }}
-                                    <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
-                                    <!-- <span class="fn">{{ emp.firstName }}</span>
+                            <div class="profile-name">
+                                <div class="profile">
+                                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode.trim() + '.jpg'"
+                                        (error)="onImgError($event)" />
+                                </div>
+                                <div class="name-block">
+                                    <div class="fullname">{{ emp.firstName }} {{ emp.lastName }}
+
+                                        <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                        <!-- <span class="fn">{{ emp.firstName }}</span>
                                     <span class="ln">{{ emp.lastName }}</span>
                                     <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span> -->
 
-                                </div>
+                                    </div>
 
-                                <div class="code">
-                                    {{ emp.empCode }}
-                                </div>
+                                    <div class="code">
+                                        {{ emp.empCode }}
+                                    </div>
 
-                                <div class="position">
-                                    {{ emp.position }}
+                                    <div class="position">
+                                        {{ emp.position }}
+                                    </div>
                                 </div>
                             </div>
                         </td>
 
-                        <td>{{ emp.department }}</td>
-                        <td class="company">{{ emp.company }}</td>
+                        <td class="col-department">{{ emp.department }}</td>
+                        <td class="col-company">{{ emp.company }}</td>
 
                         <td class="col-type">
                             <span class="badge" [attr.data-type]="emp.type">{{ emp.type }}</span>
