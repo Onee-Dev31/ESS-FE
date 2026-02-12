@@ -312,6 +312,53 @@
     outline: none;
 }
 
+/* fix ขนาดแต่ละช่องให้ตายตัว */
+::ng-deep .ant-picker-cell {
+    width: 30px !important;
+    height: 35px !important;
+    padding: 0 !important;
+}
+
+/* fix inner ให้เต็ม cell และเป็นวงกลม */
+::ng-deep .ant-picker-cell-inner {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    transition: background-color 0.2s ease;
+}
+
+/* ทำให้วันที่ที่เลือกเป็นวงกลม */
+::ng-deep .ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: #4e4e4e !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* hover ตอนชี้เมาส์ */
+::ng-deep .ant-picker-cell-inner:hover {
+    background-color: #b3b3b3 !important;
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* month & year mode */
+::ng-deep .ant-picker-month-panel .ant-picker-cell-inner,
+::ng-deep .ant-picker-year-panel .ant-picker-cell-inner,
+::ng-deep .ant-picker-decade-panel .ant-picker-cell-inner {
+    border-radius: 10% !important;
+}
+
+
 .modal-actions {
     display: flex;
     justify-content: center;

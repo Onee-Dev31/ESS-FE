@@ -1,16 +1,23 @@
 import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Employee } from './employeeData.interface';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2'
 import { MOCK_EMPLOYEES } from '../../utils/mock-employee.util';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { en_US, NzI18nService, zh_CN } from 'ng-zorro-antd/i18n';
+
+
 
 @Component({
   selector: 'app-resign-management',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    NzButtonModule,
+    NzDatePickerModule
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
@@ -20,8 +27,8 @@ export class ResignManagement {
   isViewOpen = false;
   selected?: Employee;
 
-  lastDate: string = '';
-  effectiveDate: string = '';
+  lastDate: Date | null = null;
+  effectiveDate: Date | null = null;
 
   page = 1;                 // หน้าเริ่มต้น
   pageSize = 5;             // จำนวนต่อหน้า
@@ -29,12 +36,13 @@ export class ResignManagement {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
+    private i18n: NzI18nService
   ) {
     this.employee = MOCK_EMPLOYEES; // ใช้ข้อมูลจำลองจาก mock-employee.util.ts
   }
 
   ngOnInit() {
-
+    this.i18n.setLocale(en_US);
   }
 
   trackByEmpCode(_: number, item: Employee) {
@@ -44,8 +52,8 @@ export class ResignManagement {
   onView(emp: Employee) {
     this.selected = emp;
     // reset required fields ทุกครั้งที่เปิด
-    this.lastDate = '';
-    this.effectiveDate = '';
+    this.lastDate = null;
+    this.effectiveDate = null;
     this.isViewOpen = true;
   }
 
@@ -80,8 +88,18 @@ export class ResignManagement {
         didOpen: () => Swal.showLoading(),
       });
 
+      const payload = {
+        empCode: this.selected.empCode,
+        lastDate: formatDate(this.lastDate!, 'yyyy-MM-dd', 'en-US'),
+        effectiveDate: formatDate(this.effectiveDate!, 'yyyy-MM-dd', 'en-US')
+      };
+
+      console.log("payload :", payload)
+
+
       // TODO: call API
       // await this.service.confirm(...)
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       Swal.close();
       await Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
@@ -142,10 +160,15 @@ export class ResignManagement {
   clampPage() {
     if (this.page > this.totalPages) this.page = this.totalPages;
   }
+
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
     if (!img.src.includes('user.png')) {
       img.src = 'user.png';
     }
+  }
+
+  onChange(result: Date): void {
+    console.log('onChange: ', result);
   }
 }

@@ -125,12 +125,15 @@
                 <!-- NEW required fields -->
                 <div class="label">Last Date</div>
                 <div class="value">
-                    <input class="input" type="date" [(ngModel)]="lastDate" />
+                    <nz-date-picker class="input" [(ngModel)]="lastDate" nzFormat="dd/MM/yyyy" nzPlaceHolder=""
+                        (ngModelChange)="onChange($event)">
+                    </nz-date-picker>
                 </div>
 
                 <div class="label">Effective Date</div>
                 <div class="value">
-                    <input class="input" type="date" [(ngModel)]="effectiveDate" />
+                    <nz-date-picker class="input" [(ngModel)]="effectiveDate" nzFormat="dd/MM/yyyy" nzPlaceHolder="">
+                    </nz-date-picker>
                 </div>
             </div>
 
