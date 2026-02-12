@@ -130,3 +130,10 @@
     transform: scale(0.95) !important;
   }
 }
+
+
+/* -- CSS Datepicker [antd] > Page resign-management  -- */
+.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border: none !important;
+  display: none !important;
+}
