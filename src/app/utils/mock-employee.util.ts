@@ -9,7 +9,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Jungpeamsook',
         nickName: 'เพียว',
         department: 'IT',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'punaporn.j',
         position: 'ตำแหน่งที่ 1'
@@ -22,7 +22,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Kaewnan',
         nickName: 'โด้',
         department: 'Infrastructure',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'Contract',
         adUser: 'tharadl.g',
         position: 'ตำแหน่งที่ 1'
@@ -35,7 +35,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Bua Sri',
         nickName: 'อ๊อฟ',
         department: 'Finance',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'Freelance',
         adUser: 'ortai.b',
         position: 'ตำแหน่งที่ 1'
@@ -48,7 +48,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Yala',
         nickName: 'ต้น',
         department: 'HR',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'sutas.y',
         position: 'ตำแหน่งที่ 1'
@@ -61,7 +61,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Thongdee',
         nickName: 'ก้อง',
         department: 'IT',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'kittipong.t',
         position: 'ตำแหน่งที่ 1'
@@ -74,7 +74,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Srisawat',
         nickName: 'แพร',
         department: 'Marketing',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'Freelance',
         adUser: 'patcharapa.s',
         position: 'ตำแหน่งที่ 1'
@@ -87,7 +87,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Chaimongkol',
         nickName: 'นัท',
         department: 'Support',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'Contract',
         adUser: 'nattawut.c',
         position: 'ตำแหน่งที่ 1'
@@ -100,7 +100,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Inkaew',
         nickName: 'ฝน',
         department: 'HR',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'sasithorn.i',
         position: 'ตำแหน่งที่ 1'
@@ -113,7 +113,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Rungrueang',
         nickName: 'บอย',
         department: 'Finance',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'phanuwat.r',
         position: 'ตำแหน่งที่ 1'
@@ -126,7 +126,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         lastNameEng: 'Boonmee',
         nickName: 'มิ้น',
         department: 'IT',
-        company: 'OTD',
+        company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'Freelance',
         adUser: 'warissara.b',
         position: 'ตำแหน่งที่ 1'

@@ -91,14 +91,85 @@
         <div class="modal-card" (click)="$event.stopPropagation()" *ngIf="selected as emp">
             <div class="modal-title">Employee Detail</div>
 
-            <div class="profile">
-                <!-- <img src="user.png" /> -->
+            <!-- <div class="profile">
                 <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
                     (error)="onImgError($event)" />
-            </div>
+            </div> -->
 
             <div class="detail-grid">
-                <div class="label">Name Thai</div>
+                <div class="card-scene">
+                    <div class="card-flip" (click)="isFlipped = !isFlipped" [class.is-flipped]="isFlipped">
+
+                        <!-- FRONT (ของเดิมคุณ) -->
+                        <div class="credit-card face front">
+                            <!-- 🔽 ของเดิมคุณทั้งหมด ใส่ไว้ตรงนี้ -->
+                            <div class="card-top">
+                                <div class="chip">
+                                    <div class="profile">
+                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
+                                            (error)="onImgError($event)" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="value">{{ emp.firstName }} {{ emp.lastName }} ({{ emp.nickName || '-'
+                                        }})</div>
+                                    <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
+                                </div>
+
+                                <div class="value">{{emp.adUser}}</div>
+                            </div>
+
+                            <div class="card-middle">
+                                <div>
+                                    <div class="label">Position</div>
+                                    <div class="value">{{ emp.position }}</div>
+                                </div>
+
+                                <div>
+                                    <div class="label">Department</div>
+                                    <div class="value">{{ emp.department }}</div>
+                                </div>
+                            </div>
+
+                            <div class="card-middle">
+                                <div>
+                                    <div class="label">Company</div>
+                                    <div class="value">{{ emp.company }}</div>
+                                </div>
+
+                                <div>
+                                    <div class="label">Type</div>
+                                    <div class="value">
+                                        <div class="badge" [attr.data-type]="emp.type">{{ emp.type }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BACK -->
+                        <div class="credit-card face back">
+                            <div class="back-content">
+                                <div>
+                                    <div class="label">Last Date</div>
+                                    <nz-date-picker class="input" [(ngModel)]="lastDate" nzFormat="dd/MM/yyyy"
+                                        (ngModelChange)="onChange($event)">
+                                    </nz-date-picker>
+                                </div>
+
+                                <div>
+                                    <div class="label">Effective Date</div>
+                                    <nz-date-picker class="input" [(ngModel)]="effectiveDate" nzFormat="dd/MM/yyyy">
+                                    </nz-date-picker>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- <div class="label">Name Thai</div>
                 <div class="value">{{ emp.firstName }} {{ emp.lastName }}</div>
 
                 <div class="label">Name Eng</div>
@@ -120,10 +191,10 @@
                 <div class="label">AdUser</div>
                 <div class="value"> {{ emp.adUser || '-' }}</div>
 
-                <div class="divider"></div>
+                <div class="divider"></div> -->
 
                 <!-- NEW required fields -->
-                <div class="label">Last Date</div>
+                <!-- <div class="label">Last Date</div>
                 <div class="value">
                     <nz-date-picker class="input" [(ngModel)]="lastDate" nzFormat="dd/MM/yyyy" nzPlaceHolder=""
                         (ngModelChange)="onChange($event)">
@@ -134,7 +205,7 @@
                 <div class="value">
                     <nz-date-picker class="input" [(ngModel)]="effectiveDate" nzFormat="dd/MM/yyyy" nzPlaceHolder="">
                     </nz-date-picker>
-                </div>
+                </div> -->
             </div>
 
             <div class="modal-actions">

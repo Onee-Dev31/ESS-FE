@@ -294,7 +294,7 @@
 
 .value {
     text-align: left;
-    color: #272727;
+    color: #ffffff;
     font-weight: 500;
     font-size: 14px;
 }
@@ -448,3 +448,145 @@
     background: #2d7ff0;
     color: #fff;
 }
+
+.credit-card {
+    width: 490px;
+    height: 300px;
+    border-radius: 18px;
+    padding: 20px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+
+    /* พื้นหลังแบบหรู */
+    background: linear-gradient(135deg, #111, #1f1f1f 40%, #000);
+
+    /* เงา */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ลาย texture ให้ดูเหมือนการ์ดจริง */
+.credit-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05), transparent 40%);
+    pointer-events: none;
+}
+
+/* ส่วนบน */
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chip {
+    .profile {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+    }
+
+    .profile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+}
+
+.brand {
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 18px;
+}
+
+/* เลขการ์ด */
+.card-number {
+    margin-top: 40px;
+    font-size: 22px;
+    letter-spacing: 3px;
+}
+
+/* ด้านล่าง */
+.card-bottom {
+    margin-top: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.label {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+.value {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.name {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.card-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-scene {
+    width: 490px;
+    height: 300px;
+    perspective: 1200px;
+}
+
+.card-flip {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s;
+}
+
+.card-flip.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+/* ด้านหลัง */
+.back-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+}
+
+.big {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+// .card-scene:hover .card-flip {
+//     transform: rotateY(180deg);
+// }

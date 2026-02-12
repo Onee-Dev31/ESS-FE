@@ -26,7 +26,7 @@ export class ResignManagement {
   employee: Employee[] = [];
   isViewOpen = false;
   selected?: Employee;
-
+  isFlipped = false;
   lastDate: Date | null = null;
   effectiveDate: Date | null = null;
 
