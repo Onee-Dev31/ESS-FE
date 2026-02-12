@@ -1,3 +1,5 @@
+@use '../../../styles/theme' as *;
+
 .page {
     padding: 20px;
 }
@@ -16,6 +18,12 @@
         font-size: 13px;
         opacity: 0.75;
     }
+}
+
+
+.content-card {
+    @include content-card;
+    margin-top: 16px;
 }
 
 .table-wrap {
@@ -203,7 +211,7 @@
 }
 
 .modal-card {
-    width: min(550px, 92vw);
+    width: fit-content;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
@@ -237,8 +245,8 @@
 /* layout ซ้าย label ขวา value แบบในรูป */
 .detail-grid {
     display: grid;
-    grid-template-columns: 200px 1fr;
-    row-gap: 12px;
+    grid-template-columns: 120px 1fr 120px 1fr;
+    row-gap: 6px;
     column-gap: 18px;
     margin-bottom: 22px;
     align-items: center;

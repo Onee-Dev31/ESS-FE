@@ -1,87 +1,90 @@
 <div class="page">
-    <div class="page-header">
-        <h2 class="title">รายการพนักงาน</h2>
-    </div>
+    <app-page-header [title]="pageTitle()">
+    </app-page-header>
 
-    <div class="table-wrap">
-        <table class="emp-table">
-            <thead>
-                <tr>
-                    <th class="col-name">Name</th>
-                    <th>Department</th>
-                    <th>Company</th>
-                    <th class="col-type">Type</th>
-                    <th class="col-action">Action</th>
-                </tr>
-            </thead>
+    <div class="content-card">
+        <div class="table-wrap">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
+            <table class="emp-table">
+                <thead>
+                    <tr>
+                        <th class="col-name">Name</th>
+                        <th>Department</th>
+                        <th>Company</th>
+                        <th class="col-type">Type</th>
+                        <th class="col-action">Action</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
-                    <td class="col-name">
-                        <div class="profile">
-                            <img src="user.png" />
-                        </div>
-                        <div class="name-block">
-                            <div class="fullname">
-                                <span class="fn">{{ emp.firstName }}</span>
-                                <span class="ln">{{ emp.lastName }}</span>
-                                <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
-
+                <tbody>
+                    <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
+                        <td class="col-name">
+                            <div class="profile">
+                                <img src="user.png" />
                             </div>
+                            <div class="name-block">
+                                <div class="fullname">
+                                    <span class="fn">{{ emp.firstName }}</span>
+                                    <span class="ln">{{ emp.lastName }}</span>
+                                    <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
 
-                            <div class="code">
-                                {{ emp.empCode }}
+                                </div>
+
+                                <div class="code">
+                                    {{ emp.empCode }}
+                                </div>
+
+                                <div class="position">
+                                    {{ emp.position }}
+                                </div>
                             </div>
+                        </td>
 
-                            <div class="position">
-                                {{ emp.position }}
-                            </div>
-                        </div>
-                    </td>
+                        <td>{{ emp.department }}</td>
+                        <td class="company">{{ emp.company }}</td>
 
-                    <td>{{ emp.department }}</td>
-                    <td class="company">{{ emp.company }}</td>
+                        <td class="col-type">
+                            <span class="badge" [attr.data-type]="emp.type">{{ emp.type }}</span>
+                        </td>
 
-                    <td class="col-type">
-                        <span class="badge" [attr.data-type]="emp.type">{{ emp.type }}</span>
-                    </td>
+                        <td class="col-action">
+                            <button class="btn btn-ghost" (click)="onView(emp)">
+                                <i class="fa-solid fa-circle-info"></i>Info
+                            </button>
+                        </td>
+                    </tr>
 
-                    <td class="col-action">
-                        <button class="btn btn-ghost" (click)="onView(emp)">
-                            <i class="fa-solid fa-circle-info"></i>Info
-                        </button>
-                    </td>
-                </tr>
+                    <tr *ngIf="employee.length === 0">
+                        <td class="empty" colspan="5">ไม่มีข้อมูลพนักงาน</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pager">
+                <div class="pager-left">
+                    <span>แสดง</span>
+                    <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+                        <option *ngFor="let s of pageSizeOptions" [ngValue]="s">{{ s }}</option>
+                    </select>
+                    <span>รายการ/หน้า</span>
 
-                <tr *ngIf="employee.length === 0">
-                    <td class="empty" colspan="5">ไม่มีข้อมูลพนักงาน</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="pager">
-            <div class="pager-left">
-                <span>แสดง</span>
-                <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
-                    <option *ngFor="let s of pageSizeOptions" [ngValue]="s">{{ s }}</option>
-                </select>
-                <span>รายการ/หน้า</span>
+                    <span class="muted">
+                        ทั้งหมด {{ totalItems }} รายการ • หน้า {{ page }} / {{ totalPages }}
+                    </span>
+                </div>
 
-                <span class="muted">
-                    ทั้งหมด {{ totalItems }} รายการ • หน้า {{ page }} / {{ totalPages }}
-                </span>
-            </div>
+                <div class="pager-right">
+                    <button class="pbtn" (click)="prevPage()" [disabled]="page === 1">Prev</button>
 
-            <div class="pager-right">
-                <button class="pbtn" (click)="prevPage()" [disabled]="page === 1">Prev</button>
+                    <button class="pbtn" *ngFor="let p of pageNumbers" (click)="setPage(p)" [class.active]="p === page">
+                        {{ p }}
+                    </button>
 
-                <button class="pbtn" *ngFor="let p of pageNumbers" (click)="setPage(p)" [class.active]="p === page">
-                    {{ p }}
-                </button>
-
-                <button class="pbtn" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
-            </div>
+                    <button class="pbtn" (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+                </div>
+            </div>}
         </div>
-
     </div>
 
     <!-- ===== View Modal ===== -->

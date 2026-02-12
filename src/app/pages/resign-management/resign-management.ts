@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, inject, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { Employee } from './employeeData.interface';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +7,9 @@ import { MOCK_EMPLOYEES } from '../../utils/mock-employee.util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService, zh_CN } from 'ng-zorro-antd/i18n';
+import { LoadingService } from '../../services/loading';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 
 
 
@@ -17,12 +20,21 @@ import { en_US, NzI18nService, zh_CN } from 'ng-zorro-antd/i18n';
     CommonModule,
     FormsModule,
     NzButtonModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    SkeletonComponent,
+    PageHeaderComponent
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
 })
 export class ResignManagement {
+  pageTitle = signal<string>('รายการพนักงาน');
+
+  private loadingService = inject(LoadingService);
+
+  isLoading = this.loadingService.loading('resign-table');
+
+
   employee: Employee[] = [];
   isViewOpen = false;
   selected?: Employee;
@@ -34,15 +46,21 @@ export class ResignManagement {
   pageSize = 5;             // จำนวนต่อหน้า
   pageSizeOptions = [5, 10, 20, 50];
 
+
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private i18n: NzI18nService
+    private i18n: NzI18nService,
   ) {
     this.employee = MOCK_EMPLOYEES; // ใช้ข้อมูลจำลองจาก mock-employee.util.ts
+    this.i18n.setLocale(en_US);
   }
 
   ngOnInit() {
-    this.i18n.setLocale(en_US);
+    this.loadingService.start('resign-table');
+    setTimeout(() => {
+      this.loadingService.stop('resign-table');
+    }, 1500);
   }
 
   trackByEmpCode(_: number, item: Employee) {
