@@ -27,6 +27,11 @@ export const routes: Routes = [
                     }
                 ]
             },
+            {
+                path: 'welcome',
+                loadComponent: () => import('./pages/welcome/welcome').then(m => m.WelcomeComponent),
+                data: { animation: 'Welcome' }
+            },
 
             {
                 path: 'vehicle',
