@@ -24,6 +24,7 @@ interface FreelanceFormData {
     fotdNumber: string;
     description: string;
     attachments: File[];
+    lastWorkingDate?: string;
 }
 
 @Component({
@@ -98,6 +99,33 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
 
     handleSave() {
         this.onSave.emit(this.formData);
+    }
+
+    showResignModal = false;
+    resignDate = '';
+    lastWorkingDate = '';
+
+    handleResign() {
+        this.showResignModal = true;
+    }
+
+    confirmResign() {
+        if (!this.resignDate || !this.lastWorkingDate) {
+            return;
+        }
+        this.onSave.emit({
+            ...this.formData,
+            id: 'RESIGN',
+            endDate: this.resignDate,
+            lastWorkingDate: this.lastWorkingDate
+        });
+        this.closeResignModal();
+    }
+
+    closeResignModal() {
+        this.showResignModal = false;
+        this.resignDate = '';
+        this.lastWorkingDate = '';
     }
 
     handleClose() {

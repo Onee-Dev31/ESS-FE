@@ -165,8 +165,37 @@
 
         <!-- Action buttons - NOW OUTSIDE modal-content -->
         <div class="form-actions">
+            <button type="button" class="btn-resign" (click)="handleResign()">ลาออก</button>
             <button type="button" class="btn-save" (click)="handleSave()">Save</button>
             <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
+        </div>
+    </div>
+</div>
+
+<!-- Resign Date Modal -->
+<div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal" (click)="closeResignModal()">
+    <div class="modal-container small-modal" (click)="$event.stopPropagation()">
+        <div class="form-header">
+            <h2>ระบุวันที่ลาออก</h2>
+            <button class="btn-close" (click)="closeResignModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="form-row">
+                <div class="form-field">
+                    <label>วันที่ลาออก</label>
+                    <input type="date" class="form-input" [(ngModel)]="resignDate">
+                </div>
+                <div class="form-field">
+                    <label>วันสุดท้ายที่มาทำงาน</label>
+                    <input type="date" class="form-input" [(ngModel)]="lastWorkingDate">
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
+            <button type="button" class="btn-clear" (click)="closeResignModal()">ยกเลิก</button>
         </div>
     </div>
 </div>

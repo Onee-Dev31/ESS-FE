@@ -36,7 +36,7 @@
         <div class="action-toolbar">
             <div class="toolbar-left">
                 <button class="btn-create" (click)="openCreateForm()">
-                    <i class="fas fa-plus"></i> ลาออก
+                    <i class="fas fa-plus"></i> เพิ่มพนักงาน
                 </button>
             </div>
             <div class="toolbar-right">
@@ -46,7 +46,7 @@
                     <option value="01">มกราคม</option>
                     <option value="02">กุมภาพันธ์</option>
                 </select>
-                <button class="btn-send-data" (click)="sendData()">
+                <button class="btn-send-data" (click)="openCreateForm()" >
                     <i class="fas fa-upload"></i> ส่งข้อมูล
                 </button>
             </div>
