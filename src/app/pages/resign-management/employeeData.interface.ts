@@ -10,4 +10,6 @@ export interface Employee {
     type: 'FullTime' | 'Freelance' | 'Contract';
     adUser?: string;
     position: string;
+    lastDate?: string;
+    effectiveDate?: string;
 };

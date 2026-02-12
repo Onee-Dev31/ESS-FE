@@ -10,6 +10,8 @@ import { en_US, NzI18nService, zh_CN } from 'ng-zorro-antd/i18n';
 import { LoadingService } from '../../services/loading';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+
 
 
 
@@ -22,7 +24,8 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
     NzButtonModule,
     NzDatePickerModule,
     SkeletonComponent,
-    PageHeaderComponent
+    PageHeaderComponent,
+    NzModalModule
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
@@ -39,8 +42,8 @@ export class ResignManagement {
   isViewOpen = false;
   selected?: Employee;
   isFlipped = false;
-  lastDate: Date | null = null;
-  effectiveDate: Date | null = null;
+  lastDate: any = '';
+  effectiveDate: any = '';
 
   page = 1;                 // หน้าเริ่มต้น
   pageSize = 5;             // จำนวนต่อหน้า
@@ -70,14 +73,23 @@ export class ResignManagement {
   onView(emp: Employee) {
     this.selected = emp;
     // reset required fields ทุกครั้งที่เปิด
-    this.lastDate = null;
-    this.effectiveDate = null;
+    this.lastDate = emp.lastDate;
+    this.effectiveDate = emp.effectiveDate;
     this.isViewOpen = true;
   }
 
   closeViewModal() {
     this.isViewOpen = false;
     this.selected = undefined;
+    this.isFlipped = false;
+  }
+
+  cancel() {
+    this.isFlipped = false
+    if (!this.selected) {
+      this.lastDate = null
+      this.effectiveDate = null
+    }
   }
 
   async onConfirmModal(): Promise<void> {
@@ -88,6 +100,8 @@ export class ResignManagement {
       return;
     }
 
+    this.isViewOpen = false
+
     const result = await Swal.fire({
       title: 'ยืนยันการทำรายการใช่หรือไม่?',
       text: `พนักงาน: ${this.selected.empCode} ${this.selected.firstName} ${this.selected.lastName}`,
@@ -97,7 +111,11 @@ export class ResignManagement {
       cancelButtonText: 'ยกเลิก',
     });
 
-    if (!result.isConfirmed) return;
+
+    if (!result.isConfirmed) {
+      this.isViewOpen = true
+      return;
+    }
 
     try {
       Swal.fire({
@@ -189,4 +207,23 @@ export class ResignManagement {
   onChange(result: Date): void {
     console.log('onChange: ', result);
   }
+
+  convertToFullDate(dateStr: string): Date | null {
+    if (!dateStr) return null;
+
+    const [day, month, year] = dateStr.split('/');
+
+    // ใส่เวลาปัจจุบัน
+    const now = new Date();
+
+    return new Date(
+      +year,
+      +month - 1,
+      +day,
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds()
+    );
+  }
+
 }

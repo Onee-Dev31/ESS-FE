@@ -88,39 +88,39 @@
     </div>
 
     <!-- ===== View Modal ===== -->
-    <div class="modal-backdrop" *ngIf="isViewOpen" (click)="closeViewModal()"></div>
 
-    <div class="modal" *ngIf="isViewOpen" role="dialog" aria-modal="true">
-        <div class="modal-card" (click)="$event.stopPropagation()" *ngIf="selected as emp">
-            <div class="modal-title">Employee Detail</div>
+    <nz-modal [(nzVisible)]="isViewOpen" [nzFooter]="null" [nzClosable]="true" [nzCentered]="true" [nzWidth]="560"
+        (nzOnCancel)="closeViewModal()" [nzMaskClosable]="false">
 
-            <!-- <div class="profile">
-                <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
-                    (error)="onImgError($event)" />
-            </div> -->
+        <ng-container *nzModalContent>
+            <div *ngIf="selected as emp">
 
-            <div class="detail-grid">
                 <div class="card-scene">
-                    <div class="card-flip" (click)="isFlipped = !isFlipped" [class.is-flipped]="isFlipped">
+                    <div class="card-flip" [class.is-flipped]="isFlipped">
 
                         <!-- FRONT (ของเดิมคุณ) -->
                         <div class="credit-card face front">
-                            <!-- 🔽 ของเดิมคุณทั้งหมด ใส่ไว้ตรงนี้ -->
                             <div class="card-top">
-                                <div class="chip">
-                                    <div class="profile">
-                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
-                                            (error)="onImgError($event)" />
+                                <div class="profile-fullname">
+                                    <div class="chip">
+                                        <div class="profile">
+                                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selected.empCode.trim() + '.jpg'"
+                                                (error)="onImgError($event)" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="value">{{ emp.firstName }} {{ emp.lastName }}
+                                            <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                        </div>
+                                        <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <div class="value">{{ emp.firstName }} {{ emp.lastName }} ({{ emp.nickName || '-'
-                                        }})</div>
-                                    <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
+                                    <div class="label">AD User</div>
+                                    <div class="value">{{emp.adUser}}</div>
                                 </div>
-
-                                <div class="value">{{emp.adUser}}</div>
                             </div>
 
                             <div class="card-middle">
@@ -148,10 +148,29 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div *ngIf="emp.lastDate || emp.effectiveDate">
+                                <hr>
+                                <div class="card-middle">
+                                    <div>
+                                        <div class="label">Last Date</div>
+                                        <div class="value">{{ emp.lastDate }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="label">Effective Date</div>
+                                        <div class="value">{{ emp.effectiveDate }} </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="flip-btn" (click)="isFlipped = true; $event.stopPropagation()">
+                                Flip →
+                            </button>
                         </div>
 
                         <!-- BACK -->
-                        <div class="credit-card face back">
+                        <div class="credit-card face back"
+                            style="display: flex; flex-direction: column; justify-content: space-between;">
                             <div class="back-content">
                                 <div>
                                     <div class="label">Last Date</div>
@@ -166,58 +185,23 @@
                                     </nz-date-picker>
                                 </div>
                             </div>
+                            <div class="modal-actions">
+                                <button class="btn btn-ghost" (click)="cancel()">cancel</button>
+                                <button class="btn btn-primary" [disabled]="!lastDate || !effectiveDate"
+                                    (click)="onConfirmModal()">
+                                    ยืนยัน
+                                </button>
+                            </div>
+
                         </div>
 
                     </div>
                 </div>
 
-
-                <!-- <div class="label">Name Thai</div>
-                <div class="value">{{ emp.firstName }} {{ emp.lastName }}</div>
-
-                <div class="label">Name Eng</div>
-                <div class="value">{{ emp.firstNameEng }} {{ emp.lastNameEng }}</div>
-
-                <div class="label">Nickname</div>
-                <div class="value">{{ emp.nickName || '-' }}</div>
-
-                <div class="label">Department</div>
-                <div class="value">{{ emp.department }}</div>
-
-                <div class="label">Company</div>
-                <div class="value">{{ emp.company }}</div>
-
-                <div class="label">Type</div>
-                <div class="value">
-                    <div class="badge" [attr.data-type]="emp.type">{{ emp.type }}</div>
-                </div>
-                <div class="label">AdUser</div>
-                <div class="value"> {{ emp.adUser || '-' }}</div>
-
-                <div class="divider"></div> -->
-
-                <!-- NEW required fields -->
-                <!-- <div class="label">Last Date</div>
-                <div class="value">
-                    <nz-date-picker class="input" [(ngModel)]="lastDate" nzFormat="dd/MM/yyyy" nzPlaceHolder=""
-                        (ngModelChange)="onChange($event)">
-                    </nz-date-picker>
-                </div>
-
-                <div class="label">Effective Date</div>
-                <div class="value">
-                    <nz-date-picker class="input" [(ngModel)]="effectiveDate" nzFormat="dd/MM/yyyy" nzPlaceHolder="">
-                    </nz-date-picker>
-                </div> -->
             </div>
+        </ng-container>
 
-            <div class="modal-actions">
-                <button class="btn btn-ghost" (click)="closeViewModal()">close</button>
-                <button class="btn btn-primary" [disabled]="!lastDate || !effectiveDate" (click)="onConfirmModal()">
-                    ยืนยัน
-                </button>
-            </div>
-        </div>
-    </div>
+    </nz-modal>
+
 
 </div>

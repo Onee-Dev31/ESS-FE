@@ -12,7 +12,7 @@ export const MOCK_EMPLOYEES: Employee[] = [
         company: 'บริษัท เดอะ วัน เอ็นเตอร์ไพรส์ จำกัด (มหาชน) [OTD]',
         type: 'FullTime',
         adUser: 'punaporn.j',
-        position: 'ตำแหน่งที่ 1'
+        position: 'ตำแหน่งที่ 1',
     },
     {
         empCode: 'OTD01050',
@@ -24,8 +24,10 @@ export const MOCK_EMPLOYEES: Employee[] = [
         department: '18228 ฝ่ายขายEFM & Chill Online & A-Time Online',
         company: 'จีเอ็มเอ็ม สตูดิโอส์ อินเตอร์เนชั่นแนล  จำกัด [GSI]',
         type: 'Contract',
-        adUser: 'tharadl.g',
-        position: 'ผู้ช่วยผู้อำนวยการ-ฝ่ายบริหารสำนักงาน/จัดซื้อ Operation Official Merchandise'
+        adUser: 'Patcharaporn.Pru',
+        position: 'ผู้ช่วยผู้อำนวยการ-ฝ่ายบริหารสำนักงาน/จัดซื้อ Operation Official Merchandise',
+        lastDate: '09-02-2000',
+        effectiveDate: '10-02-2000'
     },
     {
         empCode: 'OTD0003',
