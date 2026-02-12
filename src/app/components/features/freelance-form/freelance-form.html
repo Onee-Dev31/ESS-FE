@@ -49,8 +49,8 @@
                     </div>
                 </div>
 
-                <!-- Row 3: Email, บริษัท, แผนก -->
-                <div class="form-row">
+                <!-- Row 3: Email, บริษัท, แผนก, ตำแหน่ง -->
+                <div class="form-row four-cols">
                     <div class="form-field">
                         <label>Email</label>
                         <input type="email" class="form-input" placeholder="mama555@gmail.com"
@@ -72,6 +72,10 @@
                             <option value="">10806 - IT Department</option>
                             <option value="10806 - IT Department">10806 - IT Department</option>
                         </select>
+                    </div>
+                    <div class="form-field">
+                        <label>ตำแหน่ง</label>
+                        <input class="form-input" [(ngModel)]="formData.position" name="position">
                     </div>
                 </div>
 
