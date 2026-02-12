@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
+import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -213,12 +213,7 @@ export class FreelanceManagementComponent implements OnInit {
         this.listing.currentPage.set(page);
     }
 
-    clearFilters() {
-        clearListingFilters(this.listing);
-        this.filterCompany.set('');
-        this.filterDepartment.set('');
-        this.filterMonth.set('');
-    }
+
 
     toggleSelectAll(event: Event) {
         const checked = (event.target as HTMLInputElement).checked;

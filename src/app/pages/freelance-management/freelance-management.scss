@@ -48,8 +48,9 @@
                 flex: 1;
                 gap: 1rem;
 
-                @include mobile {
-                    flex-direction: column;
+                @include tablet {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
                     width: 100%;
                 }
 
@@ -60,6 +61,12 @@
                     border-radius: 8px;
                     padding: 0 1rem;
                     font-size: 0.95rem;
+
+                    &:first-child {
+                        @include tablet {
+                            grid-column: 1 / -1;
+                        }
+                    }
 
                     &::placeholder {
                         color: #94a3b8;
@@ -127,6 +134,13 @@
             border-bottom: 1px solid #f1f5f9;
             margin-bottom: 1rem;
 
+            @include mobile {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
             .toolbar-left {
                 display: flex;
                 align-items: center;
@@ -134,8 +148,6 @@
 
                 @include mobile {
                     width: 100%;
-                    flex-direction: column;
-                    align-items: flex-start;
                 }
 
                 .btn-create {
@@ -145,6 +157,13 @@
                     font-weight: 600;
                     padding: 8px 16px;
                     border-radius: 4px;
+                    white-space: nowrap;
+
+                    @include mobile {
+                        width: 100%;
+                        justify-content: center;
+                        display: flex;
+                    }
 
                     &:hover {
                         background-color: #f5f5f5 !important;
@@ -160,8 +179,8 @@
 
                 @include mobile {
                     width: 100%;
-                    flex-direction: column;
-                    align-items: flex-end;
+                    display: grid;
+                    grid-template-columns: 1fr;
                     gap: 10px;
                 }
 
@@ -235,35 +254,6 @@
     .modern-table {
         @include modern-table;
 
-        // Column widths
-        .col-id {
-            width: 120px;
-        }
-
-        .col-date {
-            width: 150px;
-        }
-
-        .col-days {
-            width: 150px;
-        }
-
-        .col-type {
-            width: 200px;
-        }
-
-        .col-period {
-            width: 120px;
-        }
-
-        .col-status {
-            width: 180px;
-        }
-
-        .col-actions {
-            width: 130px;
-        }
-
         // Employee info cell
         .employee-info {
             display: flex;
@@ -280,47 +270,6 @@
                 color: #1a202c;
                 font-weight: 500;
             }
-        }
-
-        // Leave type cell (from timeoff mixin)
-        .leave-type-cell {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            i {
-                color: $primary;
-                font-size: 1rem;
-            }
-
-            &.centered {
-                justify-content: center;
-            }
-        }
-
-        // Days badge (from timeoff mixin)
-        .days-badge {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        // Period text (from timeoff mixin)
-        .period-text {
-            font-size: 0.85rem;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        // Reason cell (from timeoff mixin)
-        .reason-cell {
-            max-width: 250px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         // Boxed value (for freelance data)
