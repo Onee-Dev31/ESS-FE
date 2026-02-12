@@ -22,13 +22,15 @@
                     <tr *ngFor="let emp of pagedEmployees; trackBy: trackByEmpCode">
                         <td class="col-name">
                             <div class="profile">
-                                <img src="user.png" />
+                                <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode.trim() + '.jpg'"
+                                    (error)="onImgError($event)" />
                             </div>
                             <div class="name-block">
-                                <div class="fullname">
-                                    <span class="fn">{{ emp.firstName }}</span>
+                                <div class="fullname">{{ emp.firstName }} {{ emp.lastName }}
+                                    <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                    <!-- <span class="fn">{{ emp.firstName }}</span>
                                     <span class="ln">{{ emp.lastName }}</span>
-                                    <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                    <span class="nickname" *ngIf="emp.nickName"> ({{ emp.nickName }})</span> -->
 
                                 </div>
 
