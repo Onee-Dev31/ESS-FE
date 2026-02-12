@@ -13,6 +13,7 @@ interface FreelanceFormData {
     email: string;
     company: string;
     department: string;
+    position: string;
     startDate: string;
     endDate: string;
     salary: number;
@@ -51,6 +52,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         email: '',
         company: '',
         department: '',
+        position: '',
         startDate: '',
         endDate: '',
         salary: 0,
