@@ -164,8 +164,23 @@
         margin-right: 8px;
     }
 
+    .btn-ghost {
+        gap: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid #ddd;
+        background: #4650dd;
+        color: white;
+    }
+
     .btn-ghost:hover {
-        background: #36b6c9;
+        background: #3941b6;
     }
 
     .btn-primary {
@@ -652,9 +667,26 @@
 
 /* ================= BACK CONTENT ================= */
 
+.back {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.back-header {
+    margin-bottom: 16px;
+}
+
 .back-content {
     display: flex;
     justify-content: space-around;
+    gap: 10px;
+}
+
+.back-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
     gap: 10px;
 }
 
