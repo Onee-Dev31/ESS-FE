@@ -10,6 +10,23 @@
         @include content-card;
         margin-top: 16px;
         padding-bottom: 2rem;
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: $primary;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-right: 0.75rem;
+            box-shadow: 0 2px 4px rgba($primary, 0.3);
+            vertical-align: middle;
+            transform: translateY(-1px);
+        }
     }
 
     .card-header-title {
@@ -275,6 +292,8 @@
     .form-section {
         margin-bottom: 2rem;
 
+
+
         .section-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -364,6 +383,16 @@
         justify-content: flex-end;
         padding-top: 1rem;
         border-top: 1px solid $border-color;
+        align-items: center; // Ensure vertical alignment
+
+        .action-header {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: $text;
+            margin-right: auto;
+        }
 
         .btn-submit {
             background-color: $primary;
@@ -407,7 +436,7 @@
             @include modern-table;
 
             th {
-                background-color: #f8fafc; 
+                background-color: #f8fafc;
             }
 
             .service-tags {
@@ -416,14 +445,14 @@
                 gap: 0.5rem;
 
                 .tag {
-                    background: #e0f2fe; 
+                    background: #e0f2fe;
                     color: #0369a1;
                     padding: 0.25rem 0.75rem;
                     border-radius: 999px;
                     font-size: 0.85rem;
                     font-weight: 500;
-                    border: none; 
-                    box-shadow: none; 
+                    border: none;
+                    box-shadow: none;
                 }
             }
 
@@ -431,7 +460,7 @@
                 background-color: #f0f9ff;
                 color: #0ea5e9;
                 border: 1px solid #bae6fd;
-                padding: 0.35rem 0.75rem; 
+                padding: 0.35rem 0.75rem;
                 border-radius: 999px;
                 box-shadow: none;
 
@@ -541,25 +570,25 @@
 
             th {
                 background-color: #f8fafc;
-                text-align: left; 
-                padding-left: 1rem; 
+                text-align: left;
+                padding-left: 1rem;
 
                 &:last-child {
-                    text-align: center; 
+                    text-align: center;
                 }
             }
 
             td {
-                text-align: left; 
-                padding-left: 1rem; 
+                text-align: left;
+                padding-left: 1rem;
 
                 &:last-child {
-                    text-align: center; 
+                    text-align: center;
                 }
             }
 
             .service-tags {
-                justify-content: flex-start; 
+                justify-content: flex-start;
             }
 
             .details-list {

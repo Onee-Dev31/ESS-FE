@@ -5,7 +5,10 @@
         <div class="card-header-title">แบบฟอร์มขอรับบริการ IT</div>
 
         <div class="form-section">
-            <h3 class="section-title">ประเภทบริการ (Service Type)</h3>
+            <h3 class="section-title">
+                <span class="step-badge">1</span>
+                ประเภทบริการ (Service Type)
+            </h3>
             <div class="checkbox-grid">
                 @for (service of serviceOptions(); track service.value; let i = $index) {
                 <label class="checkbox-item" [class.checked]="service.checked">
@@ -18,7 +21,10 @@
 
             @if (isRequestSystemSelected()) {
             <div class="sub-options-section">
-                <h4 class="sub-section-title">กรุณาเลือกประเภท (Category)</h4>
+                <h4 class="sub-section-title">
+                    <span class="step-badge">2</span>
+                    กรุณาเลือกประเภท (Category)
+                </h4>
                 <div class="checkbox-grid">
                     <label class="checkbox-item" [class.checked]="isUserCategorySelected()">
                         <input type="checkbox" [checked]="isUserCategorySelected()"
@@ -38,7 +44,10 @@
 
             @if (isUserSelected()) {
             <div class="sub-options-section">
-                <h4 class="sub-section-title">รายละเอียดเพิ่มเติม (USER Options)</h4>
+                <h4 class="sub-section-title">
+                    <span class="step-badge">3</span>
+                    รายละเอียดเพิ่มเติม (USER Options)
+                </h4>
                 <div class="checkbox-grid">
                     @for (option of userSubOptions(); track option.value; let i = $index) {
                     <label class="checkbox-item" [class.checked]="option.checked">
@@ -53,7 +62,10 @@
 
             @if (isSystemSelected()) {
             <div class="sub-options-section">
-                <h4 class="sub-section-title">รายละเอียดเพิ่มเติม (System Options)</h4>
+                <h4 class="sub-section-title">
+                    <span class="step-badge">3</span>
+                    รายละเอียดเพิ่มเติม (System Options)
+                </h4>
                 <div class="checkbox-grid">
                     @for (option of systemSubOptions(); track option.value; let i = $index) {
                     <label class="checkbox-item" [class.checked]="option.checked">
@@ -68,6 +80,10 @@
         </div>
 
         <div class="form-actions">
+            <div class="action-header">
+                <span class="step-badge">4</span>
+                ยืนยันการส่งคำขอ (Confirm Submission)
+            </div>
             <button class="btn-submit" (click)="submit()">
                 <i class="fas fa-paper-plane"></i> ส่งคำขอ
             </button>
