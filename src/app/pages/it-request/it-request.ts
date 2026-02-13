@@ -18,12 +18,14 @@ export class ITRequestComponent {
         { label: 'File Sharing', value: 'fileshare', checked: false },
         { label: 'ขอแก้ไขสิทธิการเข้าระบบงาน', value: 'access_edit', checked: false },
         { label: 'ขอ Unlock User', value: 'unlock_user', checked: false },
-        { label: 'USER', value: 'user', checked: false },
-        { label: 'System', value: 'system', checked: false },
+        { label: 'ขอใช้ระบบงาน (Request System)', value: 'request_system', checked: false },
         { label: 'แจ้งซ่อม', value: 'repair', checked: false },
         { label: 'แจ้งปัญหา', value: 'problem', checked: false },
         { label: 'บริการอื่นๆ', value: 'other', checked: false }
     ]);
+
+    isUserCategorySelected = signal(false);
+    isSystemCategorySelected = signal(false);
 
     userSubOptions = signal([
         { label: 'ห้องประชุม', value: 'meeting_room', checked: false },
@@ -40,14 +42,17 @@ export class ITRequestComponent {
         { label: 'AGM', value: 'agm', checked: false }
     ]);
 
+    isRequestSystemSelected = computed(() => {
+        const option = this.serviceOptions().find(o => o.value === 'request_system');
+        return option ? option.checked : false;
+    });
+
     isUserSelected = computed(() => {
-        const userOption = this.serviceOptions().find(o => o.value === 'user');
-        return userOption ? userOption.checked : false;
+        return this.isRequestSystemSelected() && this.isUserCategorySelected();
     });
 
     isSystemSelected = computed(() => {
-        const systemOption = this.serviceOptions().find(o => o.value === 'system');
-        return systemOption ? systemOption.checked : false;
+        return this.isRequestSystemSelected() && this.isSystemCategorySelected();
     });
 
     hasUserSubOptionsSelected = computed(() => {
@@ -78,10 +83,11 @@ export class ITRequestComponent {
                 newItems[index].checked = isChecking;
             }
 
-            if (newItems[index].value === 'user' && !newItems[index].checked) {
+            // If unchecking 'request_system', reset sub-categories
+            if (newItems[index].value === 'request_system' && !isChecking) {
+                this.isUserCategorySelected.set(false);
+                this.isSystemCategorySelected.set(false);
                 this.userSubOptions.update(subs => subs.map(s => ({ ...s, checked: false })));
-            }
-            if (newItems[index].value === 'system' && !newItems[index].checked) {
                 this.systemSubOptions.update(subs => subs.map(s => ({ ...s, checked: false })));
             }
 
@@ -181,6 +187,8 @@ export class ITRequestComponent {
 
         // Reset form
         this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.isUserCategorySelected.set(false);
+        this.isSystemCategorySelected.set(false);
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.repairFormData.set({ device: '', brand: '', model: '', symptom: '' });

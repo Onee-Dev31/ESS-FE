@@ -16,6 +16,26 @@
                 }
             </div>
 
+            @if (isRequestSystemSelected()) {
+            <div class="sub-options-section">
+                <h4 class="sub-section-title">กรุณาเลือกประเภท (Category)</h4>
+                <div class="checkbox-grid">
+                    <label class="checkbox-item" [class.checked]="isUserCategorySelected()">
+                        <input type="checkbox" [checked]="isUserCategorySelected()"
+                            (change)="isUserCategorySelected.set(!isUserCategorySelected())">
+                        <span class="checkmark"></span>
+                        <span class="label-text">USER</span>
+                    </label>
+                    <label class="checkbox-item" [class.checked]="isSystemCategorySelected()">
+                        <input type="checkbox" [checked]="isSystemCategorySelected()"
+                            (change)="isSystemCategorySelected.set(!isSystemCategorySelected())">
+                        <span class="checkmark"></span>
+                        <span class="label-text">System</span>
+                    </label>
+                </div>
+            </div>
+            }
+
             @if (isUserSelected()) {
             <div class="sub-options-section">
                 <h4 class="sub-section-title">รายละเอียดเพิ่มเติม (USER Options)</h4>
