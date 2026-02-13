@@ -47,10 +47,13 @@
             .modal-header {
                 padding: 1.5rem 2rem;
                 display: flex;
+                flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.05);
                 background: linear-gradient(to bottom, #ffffff, #f8fafc);
+                width: 100%;
+                box-sizing: border-box;
 
                 h2 {
                     font-size: 1.25rem;
@@ -58,6 +61,7 @@
                     color: $text-header;
                     margin: 0;
                     letter-spacing: -0.5px;
+                    flex: 1;
                 }
 
                 .btn-close-modal {
@@ -74,6 +78,8 @@
                     font-size: 1rem;
                     transition: all 0.2s;
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    margin-left: 1rem;
+                    flex-shrink: 0;
 
                     &:hover {
                         color: $danger;
@@ -90,8 +96,8 @@
                 flex-direction: column;
                 gap: 1.25rem;
                 background: #fff;
-                max-height: 60vh; // Prevent scrolling
-                overflow-y: auto; // Allow body scroll if long
+                max-height: 60vh;
+                overflow-y: auto;
 
                 .summary-section {
                     background: #f8fafc;
@@ -383,72 +389,25 @@
     }
 
     .draft-card {
+        @include content-card;
         margin-top: 2rem;
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border: 1px solid #bae6fd;
-        border-radius: 16px;
-        box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.1), 0 4px 6px -2px rgba(14, 165, 233, 0.05);
-        animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            background: #38bdf8;
-        }
 
         .card-header-title {
-            color: #0c4a6e;
-            border-bottom: 1px solid rgba(186, 230, 253, 0.5);
-            padding-bottom: 1rem;
-            margin-bottom: 0;
-            padding-left: 0.5rem;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            @include card-header-title;
 
             i {
-                color: #0ea5e9;
-                font-size: 1.1rem;
+                color: $primary;
+                margin-right: 8px;
             }
         }
 
-        .table-responsive {
-            padding: 0 0.5rem;
-        }
+
 
         .data-table {
-            border-spacing: 0;
+            @include modern-table;
 
             th {
-                color: #64748b;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                font-size: 0.85rem;
-                padding: 1.5rem 1rem 1rem;
-                font-weight: 700;
-                border-bottom: 2px solid #e0f2fe;
-            }
-
-            td {
-                vertical-align: top;
-                padding: 1.5rem 1rem;
-                background-color: transparent;
-                border-bottom: none;
-
-                &:first-child {
-                    border-left: none;
-                }
-
-                &:last-child {
-                    border-right: none;
-                }
+                background-color: #f8fafc; // Ensure header background matches theme
             }
 
             .service-tags {
@@ -457,24 +416,25 @@
                 gap: 0.5rem;
 
                 .tag {
-                    background: #fff;
-                    color: #0284c7;
-                    border: 1px solid #bae6fd;
-                    padding: 0.35rem 1rem;
-                    border-radius: 8px;
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    background: #e0f2fe; // Light blue standard
+                    color: #0369a1;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 999px;
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                    border: none; // remove custom border
+                    box-shadow: none; // remove custom shadow
                 }
             }
 
             .status-badge.draft {
-                background-color: #fff;
+                // Using manual style to match other badges
+                background-color: #f0f9ff;
                 color: #0ea5e9;
-                border: 1px solid #7dd3fc;
-                box-shadow: 0 2px 4px rgba(14, 165, 233, 0.1);
-                padding: 0.5rem 1rem;
+                border: 1px solid #bae6fd;
+                padding: 0.35rem 0.75rem; // consistent padding
                 border-radius: 999px;
+                box-shadow: none;
 
                 i {
                     animation: pulse 2s infinite;
