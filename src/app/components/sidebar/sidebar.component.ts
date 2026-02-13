@@ -33,10 +33,11 @@ export class Sidebar {
 
     private allMenuItems: MenuItem[] = [
         {
-            name: 'Dashboard',
+            name: 'Home',
             icon: 'fa-home',
             subItems: [
-                { label: 'Default', path: '/dashboard' }
+                { label: 'Dashboard', path: '/dashboard' },
+                {label:'Welcome', path:'/welcome'}
             ]
         },
         {
