@@ -138,21 +138,51 @@ export class ITRequestComponent {
         this.showSummaryModal.set(false);
     }
 
+    draftRequest = computed(() => {
+        const selectedServices = this.serviceOptions().filter(s => s.checked);
+        if (selectedServices.length === 0) return null;
+
+        const selectedUserOptions = this.userSubOptions().filter(s => s.checked);
+        const selectedSystemOptions = this.systemSubOptions().filter(s => s.checked);
+
+        return {
+            id: 'draft',
+            date: new Date(),
+            services: selectedServices.map(s => s.label),
+            userOptions: this.isUserSelected() ? selectedUserOptions.map(o => o.label) : [],
+            systemOptions: this.isSystemSelected() ? selectedSystemOptions.map(o => o.label) : [],
+            repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
+            status: 'Draft' // Or 'Selecting...'
+        };
+    });
+
+    submittedRequests = signal<any[]>([]);
+
     confirmSubmission() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
         const selectedUserOptions = this.userSubOptions().filter(s => s.checked);
         const selectedSystemOptions = this.systemSubOptions().filter(s => s.checked);
 
-        const payload = {
-            services: selectedServices,
-            userOptions: this.isUserSelected() ? selectedUserOptions : [],
-            systemOptions: this.isSystemSelected() ? selectedSystemOptions : [],
-            repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null
+        const newRequest = {
+            id: Date.now(),
+            date: new Date(),
+            services: selectedServices.map(s => s.label),
+            userOptions: this.isUserSelected() ? selectedUserOptions.map(o => o.label) : [],
+            systemOptions: this.isSystemSelected() ? selectedSystemOptions.map(o => o.label) : [],
+            repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
+            status: 'Pending'
         };
 
-        console.log('Final Submission Payload:', payload);
+        this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+
+        console.log('Final Submission Payload:', newRequest);
         alert('ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
-        // TODO: Reset form or navigate away
+
+        // Reset form
+        this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.repairFormData.set({ device: '', brand: '', model: '', symptom: '' });
     }
 }

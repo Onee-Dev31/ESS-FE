@@ -54,6 +54,118 @@
         </div>
     </div>
 
+
+
+    @if (draftRequest(); as draft) {
+    <div class="content-card draft-card">
+        <div class="card-header-title">รายการที่เลือก (Selected Items)</div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%">บริการ</th>
+                        <th style="width: 50%">รายละเอียด</th>
+                        <th style="width: 25%">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="service-tags">
+                                @for (service of draft.services; track service) {
+                                <span class="tag">{{ service }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="details-list">
+                                @if (draft.userOptions.length > 0) {
+                                <div class="detail-item"><small class="text-muted">USER:</small> {{
+                                    draft.userOptions.join(', ') }}</div>
+                                }
+                                @if (draft.systemOptions.length > 0) {
+                                <div class="detail-item"><small class="text-muted">System:</small> {{
+                                    draft.systemOptions.join(', ') }}</div>
+                                }
+                                @if (draft.repairData) {
+                                <div class="detail-item repair-info">
+                                    <i class="fas fa-tools"></i>
+                                    {{ draft.repairData.device }}
+                                    @if (draft.repairData.brand) { - {{ draft.repairData.brand }} }
+                                    @if (draft.repairData.model) { {{ draft.repairData.model }} }
+                                    <span class="text-muted">({{ draft.repairData.symptom }})</span>
+                                </div>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge draft">
+                                <i class="fas fa-edit"></i> กำลังเลือก...
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+    @if (submittedRequests().length > 0) {
+    <div class="content-card history-card">
+        <div class="card-header-title">ประวัติการขอรับบริการ (Request History)</div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 18%">วันที่/เวลา</th>
+                        <th style="width: 25%">บริการ</th>
+                        <th style="width: 40%">รายละเอียด</th>
+                        <th style="width: 17%">สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (req of submittedRequests(); track req.id) {
+                    <tr>
+                        <td class="text-muted">{{ req.date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>
+                            <div class="service-tags">
+                                @for (service of req.services; track service) {
+                                <span class="tag">{{ service }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="details-list">
+                                @if (req.userOptions.length > 0) {
+                                <div class="detail-item"><small class="text-muted">USER:</small> {{
+                                    req.userOptions.join(', ') }}</div>
+                                }
+                                @if (req.systemOptions.length > 0) {
+                                <div class="detail-item"><small class="text-muted">System:</small> {{
+                                    req.systemOptions.join(', ') }}</div>
+                                }
+                                @if (req.repairData) {
+                                <i class="fas fa-tools"></i>
+                                {{ req.repairData.device }}
+                                @if (req.repairData.brand) { - {{ req.repairData.brand }} }
+                                @if (req.repairData.model) { {{ req.repairData.model }} }
+                                <span class="text-muted">({{ req.repairData.symptom }})</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge pending">
+                                <i class="fas fa-clock"></i> {{ req.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
     @if (showRepairModal()) {
     <div class="modal-overlay">
         <div class="modal-container">
