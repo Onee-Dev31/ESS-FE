@@ -1,0 +1,186 @@
+<div class="it-request-page">
+    <app-page-header title="IT Request"></app-page-header>
+
+    <div class="content-card">
+        <div class="card-header-title">แบบฟอร์มขอรับบริการ IT</div>
+
+        <div class="form-section">
+            <h3 class="section-title">ประเภทบริการ (Service Type)</h3>
+            <div class="checkbox-grid">
+                @for (service of serviceOptions(); track service.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="service.checked">
+                    <input type="checkbox" [checked]="service.checked" (change)="toggleService(i)">
+                    <span class="checkmark"></span>
+                    <span class="label-text">{{ service.label }}</span>
+                </label>
+                }
+            </div>
+
+            @if (isUserSelected()) {
+            <div class="sub-options-section">
+                <h4 class="sub-section-title">รายละเอียดเพิ่มเติม (USER Options)</h4>
+                <div class="checkbox-grid">
+                    @for (option of userSubOptions(); track option.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="option.checked">
+                        <input type="checkbox" [checked]="option.checked" (change)="toggleUserSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ option.label }}</span>
+                    </label>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (isSystemSelected()) {
+            <div class="sub-options-section">
+                <h4 class="sub-section-title">รายละเอียดเพิ่มเติม (System Options)</h4>
+                <div class="checkbox-grid">
+                    @for (option of systemSubOptions(); track option.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="option.checked">
+                        <input type="checkbox" [checked]="option.checked" (change)="toggleSystemSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ option.label }}</span>
+                    </label>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="form-actions">
+            <button class="btn-submit" (click)="submit()">
+                <i class="fas fa-paper-plane"></i> ส่งคำขอ
+            </button>
+        </div>
+    </div>
+
+    @if (showRepairModal()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>รายละเอียดการแจ้งซ่อม</h2>
+                <button class="btn-close-modal" (click)="closeRepairModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ความประสงค์จะซ่อมอุปกรณ์</label>
+                    <input type="text" [(ngModel)]="repairFormData().device" class="form-control"
+                        placeholder="ระบุอุปกรณ์">
+                </div>
+                <div class="form-group">
+                    <label>Brand (ยี่ห้อ)</label>
+                    <input type="text" [(ngModel)]="repairFormData().brand" class="form-control"
+                        placeholder="ระบุยี่ห้อ">
+                </div>
+                <div class="form-group">
+                    <label>Model (รุ่น)</label>
+                    <input type="text" [(ngModel)]="repairFormData().model" class="form-control" placeholder="ระบุรุ่น">
+                </div>
+                <div class="form-group">
+                    <label>ลักษณะอาการที่พบ</label>
+                    <textarea [(ngModel)]="repairFormData().symptom" class="form-control" rows="4"
+                        placeholder="ระบุอาการ"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeRepairModal()">ยกเลิก</button>
+                <button class="btn-confirm" (click)="confirmRepairRequest()">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (showSummaryModal()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>สรุปรายละเอียดคำขอ</h2>
+                <button class="btn-close-modal" (click)="closeSummaryModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-section">
+                    <h3>บริการที่เลือก</h3>
+                    <div class="summary-list">
+                        @for (service of serviceOptions(); track service.value) {
+                        @if (service.checked) {
+                        <div class="summary-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span>{{ service.label }}</span>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+
+                @if (isUserSelected() && hasUserSubOptionsSelected()) {
+                <div class="summary-section">
+                    <h3>รายละเอียด USER</h3>
+                    <div class="summary-list">
+                        @for (opt of userSubOptions(); track opt.value) {
+                        @if (opt.checked) {
+                        <div class="summary-item sub-item">
+                            <i class="fas fa-arrow-right text-muted"></i>
+                            <span>{{ opt.label }}</span>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+                }
+
+                @if (isSystemSelected() && hasSystemSubOptionsSelected()) {
+                <div class="summary-section">
+                    <h3>รายละเอียด System</h3>
+                    <div class="summary-list">
+                        @for (opt of systemSubOptions(); track opt.value) {
+                        @if (opt.checked) {
+                        <div class="summary-item sub-item">
+                            <i class="fas fa-arrow-right text-muted"></i>
+                            <span>{{ opt.label }}</span>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+                }
+
+                @if (repairFormData().device) { <!-- Check if repair data exists/was filled -->
+                @for (service of serviceOptions(); track service.value) {
+                @if (service.value === 'repair' && service.checked) {
+                <div class="summary-section">
+                    <h3>รายละเอียดการแจ้งซ่อม</h3>
+                    <div class="repair-details-grid">
+                        <div class="detail-item">
+                            <span class="label">อุปกรณ์:</span>
+                            <span class="value">{{ repairFormData().device }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">ยี่ห้อ:</span>
+                            <span class="value">{{ repairFormData().brand }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">รุ่น:</span>
+                            <span class="value">{{ repairFormData().model }}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <span class="label">อาการ:</span>
+                            <span class="value">{{ repairFormData().symptom }}</span>
+                        </div>
+                    </div>
+                </div>
+                }
+                }
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
+                <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>

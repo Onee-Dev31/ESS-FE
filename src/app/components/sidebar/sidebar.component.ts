@@ -36,7 +36,7 @@ export class Sidebar {
             name: 'Dashboard',
             icon: 'fa-home',
             subItems: [
-                { label: 'Default', path: '/dashboard/default' }
+                { label: 'Default', path: '/dashboard' }
             ]
         },
         {
@@ -54,6 +54,13 @@ export class Sidebar {
             icon: 'fa-calendar-alt',
             subItems: [
                 { label: 'คำขอลา', path: '/timeoff' }
+            ]
+        },
+        {
+            name: 'IT Service',
+            icon: 'fa-desktop',
+            subItems: [
+                { label: 'แจ้งปัญหา/ขออุปกรณ์', path: '/it-request' }
             ]
         },
         {

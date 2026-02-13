@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
@@ -10,4 +11,9 @@ import { CommonModule } from '@angular/common';
 })
 export class WelcomeComponent {
 
+  constructor(private router: Router) { }
+
+  navigateToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
 }

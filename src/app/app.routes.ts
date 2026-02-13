@@ -71,6 +71,11 @@ export const routes: Routes = [
                 data: { animation: 'TimeOff' }
             },
             {
+                path: 'it-request',
+                loadComponent: () => import('./pages/it-request/it-request').then(m => m.ITRequestComponent),
+                data: { animation: 'ITRequest' }
+            },
+            {
                 path: 'freelance-management',
                 loadComponent: () => import('./pages/freelance-management/freelance-management').then(m => m.FreelanceManagementComponent),
                 data: { animation: 'FreelanceManagement' }
