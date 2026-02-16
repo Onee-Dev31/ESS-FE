@@ -12,6 +12,15 @@ import { errorInterceptor } from './interceptors/error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { GlobalErrorHandler } from './core/global-error-handler';
 
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeTh from '@angular/common/locales/th';
+import { provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
+
+
+
+registerLocaleData(localeTh);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
@@ -20,7 +29,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([authInterceptor, errorInterceptor])
     ),
-    provideRouter(routes), provideIcons({
+    provideRouter(routes),
+
+    { provide: LOCALE_ID, useValue: 'th' },
+    provideNzI18n(th_TH)
+
+    , provideIcons({
       heroCurrencyDollarSolid,
       tablerCar,
       bootstrapTaxiFrontFill,

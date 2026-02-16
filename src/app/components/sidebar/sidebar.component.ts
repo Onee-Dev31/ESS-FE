@@ -99,8 +99,9 @@ export class Sidebar {
         // },
         {
             name: 'จัดการพนักงาน',
-            icon: 'fa-person-walking-dashed-line-arrow-right',
-            iconType: 'fa',
+            icon: 'person',
+            // icon: 'fa-person-walking-dashed-line-arrow-right',
+            iconType: 'material',
             role: [USER_ROLES.ADMIN, USER_ROLES.HR],
             subItems: [
                 { label: 'พนังงานประจำ', path: '/resign-management' },

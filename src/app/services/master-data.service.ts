@@ -5,6 +5,8 @@ import { shareReplay, delay } from 'rxjs/operators';
 import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
 
 import { DateConfig } from '../interfaces/core.interface';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 export interface ClaimType {
     id: string;
@@ -19,9 +21,13 @@ export interface ClaimType {
 })
 export class MasterDataService {
 
+    private baseUrl = environment.api_url;
+
     private leaveTypesCache$: Observable<LeaveType[]> | null = null;
     private claimTypesCache$: Observable<ClaimType[]> | null = null;
     private dateConfigCache$: Observable<DateConfig> | null = null;
+
+    constructor(private _http: HttpClient) { }
 
     /** ดึงรายการประเภทการลาทั้งหมด (รองรับการทำ Cache) */
     getLeaveTypes(): Observable<LeaveType[]> {
@@ -66,5 +72,19 @@ export class MasterDataService {
             );
         }
         return this.dateConfigCache$;
+    }
+
+    /* MASTER API*/
+
+    getBankMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/banks`);
+    }
+
+    getCompanyMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/companies`);
+    }
+
+    getDepartmentMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/company-costcent`);
     }
 }
