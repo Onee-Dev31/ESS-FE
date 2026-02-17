@@ -9,7 +9,14 @@
 
           <div class="nav-link" (click)="toggleMenu(item.name)" [class.active]="openMenu === item.name">
             <div class="link-content">
-              <i [class]="'fas ' + item.icon + ' nav-icon'"></i>
+              <!-- <i [class]="'fas ' + item.icon + ' nav-icon'"></i> -->
+              <i *ngIf="item.iconType === 'fa'" [class]="'fas ' + item.icon + ' nav-icon'">
+              </i>
+
+              <!-- Material -->
+              <mat-icon *ngIf="item.iconType === 'material'" class="nav-icon" style="font-size: 1.6rem;">
+                {{ item.icon }}
+              </mat-icon>
               <span class="link-text">{{ item.name }}</span>
               <i class="fas fa-chevron-down arrow-icon"></i>
             </div>

@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MasterDataService } from '../../../services/master-data.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 interface FreelanceFormData {
     id?: string;
@@ -19,7 +22,8 @@ interface FreelanceFormData {
     salary: number;
     otherIncome: number;
     totalIncome: number;
-    employeeId: string;
+    accountNumber: string;
+    bank: string;
     supplierCode: string;
     adUser: string;
     fotdNumber: string;
@@ -31,7 +35,12 @@ interface FreelanceFormData {
 @Component({
     selector: 'app-freelance-form',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        NzDatePickerModule,
+        NzSelectModule
+    ],
     templateUrl: './freelance-form.html',
     styleUrls: ['./freelance-form.scss'],
     encapsulation: ViewEncapsulation.None
@@ -41,6 +50,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     @Input() editData: any = null;
     @Output() onClose = new EventEmitter<void>();
     @Output() onSave = new EventEmitter<FreelanceFormData>();
+
+    private masterService = inject(MasterDataService);
+
+    dateFormat = 'dd//MM/yyyy';
 
     formData: FreelanceFormData = {
         firstNameTh: '',
@@ -58,7 +71,8 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         salary: 0,
         otherIncome: 0,
         totalIncome: 0,
-        employeeId: '',
+        accountNumber: '',
+        bank: '',
         supplierCode: '',
         adUser: '',
         fotdNumber: '',
@@ -68,7 +82,16 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
 
     uploadedFiles: { name: string; file: File }[] = [];
 
+    //MASTER
+    bankList: any[] = []
+    companyList: any[] = []
+    departmentList: any[] = []
+    filteredDepartmentList: any[] = [];
+
     ngOnInit() {
+        this.getBanks()
+        this.getCompanies()
+        this.getDepartments()
         if (this.editData) {
             this.formData = { ...this.formData, ...this.editData };
         }
@@ -80,9 +103,9 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         }
     }
 
-    calculateTotal() {
-        this.formData.totalIncome = (this.formData.salary || 0) + (this.formData.otherIncome || 0);
-    }
+    // calculateTotal() {
+    //     this.formData.totalIncome = (this.formData.salary || 0) + (this.formData.otherIncome || 0);
+    // }
 
     onFileSelect(event: any) {
         const files = event.target.files;
@@ -133,4 +156,118 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     handleClose() {
         this.onClose.emit();
     }
+
+    openPicker(event: any) {
+        event.target.showPicker();
+    }
+
+    // MASTER
+
+    getBanks() {
+        this.masterService.getBankMaster().subscribe({
+            next: (data) => {
+                console.log(data);
+                this.bankList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    getCompanies() {
+        this.masterService.getCompanyMaster().subscribe({
+            next: (data) => {
+                console.log(data);
+                this.companyList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    getDepartments() {
+        this.masterService.getDepartmentMaster().subscribe({
+            next: (data) => {
+                console.log(data);
+                this.departmentList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    // function
+    onCompanyChange(companyCode: string) {
+        this.formData.department = '';
+
+        if (!companyCode) {
+            this.filteredDepartmentList = [];
+            return;
+        }
+
+        this.filteredDepartmentList = this.departmentList.filter(
+            dept => dept.COMPANY_CODE === companyCode
+        );
+    }
+
+    salaryDisplay = '';
+    otherIncomeDisplay = '';
+
+    onMoneyInput(field: 'salary' | 'otherIncome', event: any) {
+        let value = event.target.value;
+
+        // 1️⃣ เอาเฉพาะตัวเลขกับจุด
+        value = value.replace(/[^0-9.]/g, '');
+
+        // 2️⃣ ให้มีจุดได้แค่ 1 จุด
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+
+        // 3️⃣ จำกัดทศนิยม 2 ตำแหน่ง
+        const [integer, decimal] = value.split('.');
+        const limitedDecimal = decimal?.substring(0, 2);
+
+        // 4️⃣ ใส่ comma ให้จำนวนเต็ม
+        const formattedInteger = integer
+            ? parseInt(integer, 10).toLocaleString('en-US')
+            : '';
+
+        const formattedValue =
+            limitedDecimal !== undefined
+                ? `${formattedInteger}.${limitedDecimal}`
+                : formattedInteger;
+
+        // 5️⃣ อัปเดต display
+        if (field === 'salary') {
+            this.salaryDisplay = formattedValue;
+        } else {
+            this.otherIncomeDisplay = formattedValue;
+        }
+
+        // 6️⃣ เก็บค่าเป็น number จริง
+        const numericValue = parseFloat(value) || 0;
+        this.formData[field] = numericValue;
+
+        // 7️⃣ คำนวณรวม
+        this.calculateTotal();
+    }
+
+    calculateTotal() {
+        this.formData.totalIncome =
+            (this.formData.salary || 0) +
+            (this.formData.otherIncome || 0);
+    }
+
+    formatMoney(value: number): string {
+        return (value || 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
 }
