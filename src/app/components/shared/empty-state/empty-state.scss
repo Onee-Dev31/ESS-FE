@@ -1,4 +1,15 @@
-@use '../../../../styles/theme' as *;
+// สีหลัก (Brand Colors)
+$primary: #1a73e8;
+
+// สีตัวอักษร (Text Colors)
+$text: #202124;
+$text-muted: #94a3b8;
+
+// เส้นขอบ (Border Colors)
+$border-color: #e9ecef;
+
+// อื่นๆ (Others)
+$radius: 16px;
 
 .empty-state-container {
     display: flex;

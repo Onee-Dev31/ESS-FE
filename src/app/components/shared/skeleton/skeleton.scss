@@ -1,4 +1,6 @@
-@use '../../../../styles/_theme' as *;
+// Variables
+$bg-card: #ffffff;
+$border: #dee2e6;
 
 @keyframes shimmer {
     0% {

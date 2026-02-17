@@ -1,8 +1,0 @@
-@forward 'variables';
-@forward 'mixins';
-@forward 'layout-structure';
-@forward 'component-mixins';
-@forward 'utilities';
-
-// การตั้งค่าธีมสีและสไตล์พื้นฐานของแอปพลิเคชัน
-@use 'variables' as *;

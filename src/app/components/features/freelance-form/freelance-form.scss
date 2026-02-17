@@ -1,4 +1,67 @@
-@use '../../../../styles/theme' as *;
+@use 'sass:color';
+
+// Variables
+$primary: #1a73e8;
+$danger: #dc2626;
+$text: #202124;
+$text-sub: #5f6368;
+$bg-card: #ffffff;
+$bg-slate: #f4f7f9;
+$border: #dee2e6;
+$border-color: #e9ecef;
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+$font-main: 'Helvetica Neue', Arial, sans-serif;
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin close-btn-style {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: $text-sub;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: $text;
+    }
+}
+
+.top-header-strip {
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-bottom: 1px solid $border;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $primary;
+    }
+
+    .btn-close {
+        @include close-btn-style;
+    }
+}
 
 // ==================== MODAL OVERLAY ====================
 .modal-overlay {
@@ -130,7 +193,7 @@
     &.four-cols {
         grid-template-columns: repeat(4, 1fr);
     }
-     
+
 
     &.five-cols {
         grid-template-columns: repeat(5, 1fr);

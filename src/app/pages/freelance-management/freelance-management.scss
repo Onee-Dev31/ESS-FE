@@ -1,4 +1,204 @@
-@use '../../../styles/theme' as *;
+// ============================================
+// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
+// ============================================
+
+// สีหลักและสีพื้นฐาน (Brand Colors)
+$primary: #1a73e8;
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: #202124;
+$text-sub: #5f6368;
+$text-header: #475569;
+
+// เส้นขอบ (Border Colors)
+$border: #dee2e6;
+
+// Responsive Mixins
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin large-tablet {
+    @media (max-width: 1728px) {
+        @content;
+    }
+}
+
+// Content Card Mixin
+@mixin content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+
+    @include tablet {
+        padding: 16px;
+        border-radius: 12px;
+    }
+}
+
+// Card Header Title Mixin
+@mixin card-header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 16px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 20px;
+        background: $primary;
+        border-radius: 2px;
+    }
+}
+
+// Modern Table Mixin
+@mixin modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: 12px;
+    overflow: hidden;
+
+    thead {
+        tr {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: $text-header;
+            border-bottom: 2px solid $border;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        transition: background 0.2s;
+
+        &:hover {
+            background: #f1f5f9;
+
+            tr {
+                background: transparent;
+            }
+
+            td {
+                background: transparent !important;
+            }
+        }
+
+        tr {
+            transition: background 0.2s;
+
+            &:not(:last-child) td:not(.merged-col) {
+                border-bottom: none;
+            }
+        }
+
+        td {
+            padding: 16px;
+            font-size: 0.9rem;
+            color: $text;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        &:last-of-type tr:last-child td {
+            border-bottom: none;
+        }
+    }
+
+    @include tablet {
+        display: none;
+    }
+}
+
+// Mobile Cards View Mixin
+@mixin mobile-cards-view {
+    display: none;
+
+    @include large-tablet {
+        display: flex !important;
+        flex-direction: column;
+        gap: 16px;
+        padding: 10px 0;
+    }
+
+    .mobile-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+
+        .card-header {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .header-content {
+                .ticket-no {
+                    font-weight: 700;
+                    color: $primary;
+                    font-size: 1.05rem;
+                    letter-spacing: -0.01em;
+                }
+            }
+
+            .card-actions-top {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+
+        .card-body {
+            padding: 16px;
+
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 14px;
+                font-size: 0.9rem;
+
+                .label {
+                    color: #64748b;
+                }
+
+                .value {
+                    font-weight: 600;
+                    color: #1e293b;
+                }
+            }
+        }
+    }
+}
+
+// ============================================
 
 .freelance-page {
     padding: 24px;

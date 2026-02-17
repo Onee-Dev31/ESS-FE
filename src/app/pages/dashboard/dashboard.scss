@@ -1,6 +1,64 @@
 ﻿@use 'sass:color';
-@use '../../../styles/theme' as *;
-@use '../../../styles/responsive-layout' as responsive;
+
+// ============================================
+// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
+// ============================================
+
+// สีหลักและสีพื้นฐาน (Brand Colors)
+$primary: #1a73e8;
+$primary-dark: #1557b0;
+$success: #16a34a;
+$danger: #dc2626;
+$warning: #f59e0b;
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: #202124;
+$text-sub: #5f6368;
+$text-muted: #94a3b8;
+$text-header: #475569;
+
+// สีพื้นหลัง (Background Colors)
+$bg-slate: #f4f7f9;
+
+// Fonts
+$font-main: 'Helvetica Neue', Arial, sans-serif;
+
+// เส้นขอบ (Border Colors)
+$border: #dee2e6;
+
+// อื่นๆ (Others)
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+$radius: 16px;
+
+// Status Colors
+$status-success-text: #16a34a;
+
+// Responsive Mixins
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: 1025px) {
+        @content;
+    }
+}
+
+@mixin large-desktop {
+    @media (min-width: 1441px) {
+        @content;
+    }
+}
+
+// ============================================
 
 // ==================== VARIABLES & MIXINS ====================
 $dark: $text;

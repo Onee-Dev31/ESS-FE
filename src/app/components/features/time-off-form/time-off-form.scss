@@ -1,5 +1,180 @@
-@use '../../../../styles/theme' as *;
-@use '../../../../styles/ui-components';
+@use 'sass:color';
+
+// Variables
+$primary: #1a73e8;
+$danger: #dc2626;
+$text: #202124;
+$text-sub: #5f6368;
+$bg-card: #ffffff;
+$bg-slate: #f4f7f9;
+$border: #dee2e6;
+$border-color: #e9ecef;
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+$font-main: 'Helvetica Neue', Arial, sans-serif;
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin close-btn-style {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: $text-sub;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: $text;
+    }
+}
+
+@mixin section-heading {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@mixin input-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+@mixin custom-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+// Button Styles
+@mixin btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    height: 40px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+@mixin btn-primary {
+    @include btn-base;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3), 0 2px 4px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(0);
+    }
+}
+
+@mixin btn-secondary {
+    @include btn-base;
+    background: white;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+
+    &:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        background: #f3f4f6;
+        transform: translateY(0);
+    }
+}
+
+@mixin btn-outline {
+    @include btn-base;
+    background: transparent;
+    color: #3b82f6;
+    border: 1.5px solid #3b82f6;
+    box-shadow: none;
+
+    &:hover {
+        background: rgba(59, 130, 246, 0.05);
+        border-color: #2563eb;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        background: rgba(59, 130, 246, 0.1);
+        transform: translateY(0);
+    }
+}
+
+// Input Field Styles
+@mixin input-field {
+    height: 40px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: #1f2937;
+    background: white;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    &:hover {
+        border-color: #9ca3af;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+
+    &:disabled {
+        background: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+}
 
 // ==========================================
 // Layout Styles (from _layout.scss)
@@ -27,12 +202,39 @@
     }
 
     .top-header-strip {
-        @extend .top-header-strip;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
+        color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .btn-close-modal {
+            @include close-btn-style;
+            color: white;
+            font-size: 1.25rem;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
     }
 
     .content-card {
-        @extend .content-card;
-        padding: 20px;
+        flex: 1;
+        padding: 20px 24px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow-y: auto;
+        max-height: calc(100vh - 180px);
 
         .selection-placeholder {
             margin: 2.5rem 0;
@@ -232,26 +434,26 @@
     width: 100%;
 
     .section-header-row {
-        @extend .section-header-row;
-    }
-
-    .section-heading {
-        @include section-heading;
-        font-size: 0.95rem;
-        color: #3c4043;
-        letter-spacing: -0.01em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
     }
 
     .hidden-input {
-        @extend .hidden-input;
+        display: none;
     }
 }
 
 .details-grid {
-    @extend .details-grid;
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-top: 1rem;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
 }
 
 .input-field-group {
@@ -270,13 +472,12 @@
 }
 
 .custom-form-control {
-    @extend .custom-form-control;
+    @include input-field;
     padding: 0.75rem;
-    transition: border-color 0.2s;
 }
 
 textarea.custom-form-control {
-    @extend .custom-form-control;
+    @include input-field;
     min-height: 100px;
     resize: vertical;
 }
@@ -365,7 +566,10 @@ textarea.custom-form-control {
 }
 
 .attachment-table-container {
-    @extend .attachment-table-container;
+    margin-top: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 // ==========================================

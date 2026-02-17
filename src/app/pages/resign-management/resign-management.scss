@@ -1,4 +1,27 @@
-@use '../../../styles/theme' as *;
+// ============================================
+// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
+// ============================================
+
+// สีหลักและสีพื้นฐาน (Brand Colors)
+$primary: #1a73e8;
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: #202124;
+$text-sub: #5f6368;
+$text-header: #475569;
+
+// เส้นขอบ (Border Colors)
+$border: #dee2e6;
+
+// Content Card Mixin
+@mixin content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+}
+
+// ============================================
 
 .page {
     padding: 20px;

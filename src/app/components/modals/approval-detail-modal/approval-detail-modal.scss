@@ -1,26 +1,47 @@
 @use 'sass:color';
-@use '../../../../styles/theme' as theme;
-@use '../../../../styles/responsive-layout' as responsive;
 
 // Variables
-$primary: theme.$primary;
-$primary-dark: theme.$primary-dark;
-$success: theme.$success;
-$danger: theme.$danger;
-$warning: theme.$warning;
-$text: theme.$text;
-$text-header: theme.$text-header;
-$text-muted: theme.$text-muted;
-$text-sub: theme.$text-sub;
-$border-color: theme.$border-color;
-$border: theme.$border;
-$bg-card: theme.$bg-card;
-$bg-slate: theme.$bg-slate;
-$bg-gray: theme.$bg-gray;
-$header-bg: theme.$header-bg;
-$radius: theme.$radius;
-$shadow: theme.$shadow;
+$primary: #1a73e8;
+$primary-dark: #1557b0;
+$success: #16a34a;
+$danger: #dc2626;
+$warning: #f59e0b;
+$text: #202124;
+$text-sub: #5f6368;
+$text-muted: #94a3b8;
+$text-header: #475569;
+$bg-slate: #f4f7f9;
+$bg-card: #ffffff;
+$bg-gray: #f8f9fa;
+$border: #dee2e6;
+$border-color: #e9ecef;
+$header-bg: #f8fafc;
+$radius: 16px;
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
+// Responsive Mixins
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin modal-overlay-styles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+// Color Aliases
 $primary-blue: $primary;
 $primary-green: $success;
 $primary-red: $danger;
@@ -46,7 +67,7 @@ $primary-orange: $warning;
 
 // Layout
 .approval-detail-overlay {
-    @include theme.modal-overlay-styles;
+    @include modal-overlay-styles;
 
 
     @media (max-width: 1024px) {

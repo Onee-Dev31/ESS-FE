@@ -1,4 +1,31 @@
-@use '../../../styles/theme' as *;
+// ============================================
+// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
+// ============================================
+
+// สีหลักและสีพื้นฐาน (Brand Colors)
+$primary: #1a73e8;
+$primary-dark: #1557b0;
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: #202124;
+$text-sub: #5f6368;
+$text-muted: #94a3b8;
+$text-header: #475569;
+
+// สีพื้นหลัง (Background Colors)
+$bg-slate: #f4f7f9;
+
+// เส้นขอบ (Border Colors)
+$border: #dee2e6;
+
+// Mixin สำหรับ Glassmorphism Effect
+@mixin glass-card($blur: 10px, $bg: rgba(255, 255, 255, 0.95)) {
+    background: $bg;
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+}
+
+// ============================================
 
 $primary-color: $primary;
 $primary-hover: $primary-dark;

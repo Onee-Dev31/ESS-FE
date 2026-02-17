@@ -1,5 +1,51 @@
-@use '../../../../styles/_theme.scss' as *;
-@use '../../../../styles/_responsive-layout.scss' as responsive;
+// Variables
+$primary: #1a73e8;
+$text: #202124;
+$bg-card: #ffffff;
+$border: #dee2e6;
+$radius: 16px;
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+
+// Responsive Mixins
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+// UI Mixins
+@mixin modal-overlay-styles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+@mixin close-btn-style {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: $text;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+}
 
 .tooltip-overlay {
     @include modal-overlay-styles;

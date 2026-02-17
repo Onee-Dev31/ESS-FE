@@ -1,4 +1,650 @@
-@use '../../../styles/theme' as *;
+// ============================================
+// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
+// ============================================
+
+// สีหลักและสีพื้นฐาน (Brand Colors)
+$primary: #1a73e8;
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: #202124;
+$text-sub: #5f6368;
+$text-header: #475569;
+
+// สีพื้นหลัง (Background Colors)
+$bg-page: #f8f9fa;
+$header-bg: #f8fafc;
+
+// เส้นขอบ (Border Colors)
+$border: #dee2e6;
+$border-color: #e9ecef;
+
+// Responsive Mixins
+@mixin mobile {
+  @media (max-width: 575.98px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin large-tablet {
+  @media (max-width: 1728px) {
+    @content;
+  }
+}
+
+// UI Component Mixins
+@mixin modal-overlay-styles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+
+  @include mobile {
+    padding: 0;
+  }
+
+  .modal-content-wrapper {
+    background: white;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 95vh;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: relative;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    @include tablet {
+      max-width: 95%;
+      max-height: 90vh;
+      border-radius: 16px;
+    }
+
+    @include mobile {
+      height: 100%;
+      max-height: 100vh;
+      max-width: 100%;
+      border-radius: 0;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@mixin toolbar-container {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+
+  @include tablet {
+    padding: 20px 16px;
+    border-radius: 12px;
+    gap: 16px;
+  }
+
+  .toolbar-top-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.6);
+
+    @include tablet {
+      width: 100%;
+      padding-bottom: 12px;
+    }
+  }
+
+  .toolbar-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    @include tablet {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+    }
+  }
+
+  .right-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+
+    @include tablet {
+      width: 100%;
+      flex-direction: column;
+    }
+  }
+}
+
+// Button Styles
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  height: 40px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  @include tablet {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3), 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(0);
+  }
+}
+
+@mixin btn-secondary {
+  @include btn-base;
+  background: white;
+  color: #374151;
+  border: 1.5px solid #d1d5db;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: #f3f4f6;
+    transform: translateY(0);
+  }
+}
+
+@mixin btn-outline {
+  @include btn-base;
+  background: transparent;
+  color: #3b82f6;
+  border: 1.5px solid #3b82f6;
+  box-shadow: none;
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: #2563eb;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateY(0);
+  }
+}
+
+// Input Field Styles
+@mixin input-field {
+  height: 40px;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  background: white;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+}
+
+@mixin select-dropdown {
+  @include input-field;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+  }
+}
+
+@mixin modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 12px;
+  overflow: hidden;
+
+  thead {
+    tr {
+      background: $header-bg;
+    }
+
+    th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $text-header;
+      border-bottom: 2px solid $border;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f8fafc;
+      }
+
+      &:not(:last-child) td {
+        border-bottom: 1px solid #f1f5f9;
+      }
+    }
+
+    td {
+      padding: 16px;
+      font-size: 0.9rem;
+      color: $text;
+    }
+  }
+}
+
+@mixin mobile-cards-view {
+  display: none;
+
+  @include tablet {
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
+    padding: 10px 0;
+  }
+
+  .mobile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+
+    .card-header {
+      background: #f8fafc;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .header-content {
+        .ticket-no {
+          font-weight: 700;
+          color: $primary;
+          font-size: 1.05rem;
+        }
+      }
+
+      .card-actions-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+
+    .card-body {
+      padding: 16px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        font-size: 0.9rem;
+
+        .label {
+          color: #64748b;
+        }
+
+        .value {
+          font-weight: 600;
+          color: #1e293b;
+        }
+      }
+    }
+  }
+}
+
+@mixin large-tablet {
+  @media (max-width: 1728px) {
+    @content;
+  }
+}
+
+// Content Card Mixin
+@mixin content-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+
+  @include tablet {
+    padding: 16px;
+    border-radius: 12px;
+  }
+}
+
+// Card Header Title Mixin
+@mixin card-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+  position: relative;
+  padding-left: 16px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: $primary;
+    border-radius: 2px;
+  }
+}
+
+.vehicle-taxi-page {
+
+  // ==================== LAYOUT ====================
+  tr {
+    background: $header-bg;
+  }
+
+  th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-header;
+    border-bottom: 2px solid $border;
+    white-space: nowrap;
+  }
+}
+
+tbody {
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f1f5f9;
+
+    tr {
+      background: transparent;
+    }
+
+    td {
+      background: transparent !important;
+    }
+  }
+
+  tr {
+    transition: background 0.2s;
+
+    &:not(:last-child) td:not(.merged-col) {
+      border-bottom: none;
+    }
+  }
+
+  td {
+    padding: 16px;
+    font-size: 0.9rem;
+    color: $text;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+  }
+
+  &:last-of-type tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+
+// Mobile Cards View Mixin
+@mixin mobile-cards-view {
+  display: none;
+
+  @include tablet {
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
+    padding: 10px 0;
+  }
+
+  .mobile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+
+    .card-header {
+      background: $header-bg;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .header-content {
+        .ticket-no {
+          font-weight: 700;
+          color: $primary;
+          font-size: 1.05rem;
+          letter-spacing: -0.01em;
+        }
+      }
+
+      .card-actions-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+    }
+
+    .card-body {
+      padding: 16px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        font-size: 0.9rem;
+
+        .label {
+          color: #64748b;
+        }
+
+        .value {
+          font-weight: 600;
+          color: #1e293b;
+        }
+      }
+    }
+  }
+}
+
+// Icon Button Sky Mixin
+@mixin icon-btn-sky {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(14, 165, 233, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
+// Modal Overlay Mixin
+@mixin modal-overlay-styles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+
+  @include mobile {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .modal-container {
+    background: white;
+    width: 95%;
+    max-width: 1600px;
+    max-height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    @media (max-width: 600px) {
+      width: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    >* {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      min-height: 0;
+    }
+  }
+}
+
+// ============================================
 
 .vehicle-taxi-page {
   // ==================== LAYOUT ====================
@@ -29,8 +675,8 @@
     display: block;
     overflow-x: auto;
 
-    @include large-tablet {
-      display: none !important;
+    @include tablet {
+      display: none;
     }
   }
 
@@ -96,5 +742,95 @@
   // ==================== MODAL ====================
   .modal-overlay {
     @include modal-overlay-styles;
+  }
+}
+
+// ============================================
+// Button & Input Styling - AUTO-APPLIED
+// ============================================
+
+// Main action buttons
+.btn-create {
+  @include btn-primary;
+  max-width: fit-content;
+}
+
+.btn-search {
+  @include btn-primary;
+}
+
+.btn-clear {
+  @include btn-outline;
+}
+
+.btn-edit-sm,
+.btn-icon.edit {
+  @include btn-secondary;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  border-radius: 6px;
+}
+
+.btn-delete-sm,
+.btn-icon.delete {
+  @include btn-outline;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  border-radius: 6px;
+  color: #ef4444;
+  border-color: #ef4444;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: #dc2626;
+  }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+// Input fields
+.form-control {
+  @include input-field;
+}
+
+.select-status,
+select.form-control {
+  @include select-dropdown;
+}
+
+// Search input group
+.search-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  input.form-control {
+    min-width: 200px;
+  }
+
+  @include tablet {
+    width: 100%;
+
+    input.form-control {
+      min-width: unset;
+      flex: 1;
+    }
+  }
+}
+
+// Filter groups styling
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
   }
 }

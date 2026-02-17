@@ -1,4 +1,7 @@
-@use '../../../../styles/theme' as *;
+// Variables
+$primary: #1a73e8;
+$text-sub: #5f6368;
+$font-main: 'Helvetica Neue', Arial, sans-serif;
 
 .file-preview-modal-overlay {
     position: fixed;

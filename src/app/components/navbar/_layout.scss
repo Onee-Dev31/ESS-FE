@@ -1,5 +1,11 @@
 @use './variables' as *;
-@use '../../../styles/theme' as *;
+// Variables
+$primary: #1a73e8;
+$text: #202124;
+$text-light: #5f6368;
+$bg-card: #ffffff;
+$bg-page: #f4f7f9;
+$border: #dee2e6;
 
 .navbar {
     display: flex;

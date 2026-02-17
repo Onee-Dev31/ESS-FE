@@ -1,5 +1,9 @@
 @use './variables' as *;
-@use '../../../styles/theme' as *;
+// Variables
+$primary: #1a73e8;
+$danger: #dc2626;
+$text: #202124;
+$text-sub: #5f6368;
 
 .navbar .nav-right .nav-actions {
     .user-profile {

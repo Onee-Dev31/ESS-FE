@@ -1,4 +1,7 @@
-@use '../../../../styles/_theme' as *;
+// Variables
+$success: #16a34a;
+$danger: #dc2626;
+$text: #202124;
 
 .toast-container {
     position: fixed;

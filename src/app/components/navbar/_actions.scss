@@ -1,5 +1,11 @@
 @use './variables' as *;
-@use '../../../styles/theme' as *;
+// Variables
+$primary: #1a73e8;
+$success: #16a34a;
+$danger: #dc2626;
+$warning: #f59e0b;
+$text: #202124;
+$text-light: #5f6368;
 
 .navbar {
     .nav-right {

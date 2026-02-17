@@ -1,5 +1,33 @@
 @use 'sass:color';
-@use '../../../../styles/theme' as *;
+
+// Variables
+$primary: #1a73e8;
+$danger: #dc2626;
+$success: #16a34a;
+$text: #202124;
+$text-sub: #5f6368;
+$bg-card: #ffffff;
+$border: #dee2e6;
+$font-main: 'Helvetica Neue', Arial, sans-serif;
+
+@mixin close-btn-style {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: $text-sub;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: $text;
+  }
+}
 
 .upload-modal-overlay {
   position: fixed;

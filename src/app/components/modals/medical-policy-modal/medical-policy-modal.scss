@@ -1,4 +1,30 @@
-@use '../../../../styles/theme' as *;
+// Variables
+$primary: #1a73e8;
+$text: #202124;
+$text-sub: #5f6368;
+$bg-card: #ffffff;
+$border: #dee2e6;
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+$font-main: 'Helvetica Neue', Arial, sans-serif;
+
+@mixin close-btn-style {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: $text-sub;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: $text;
+    }
+}
 
 .modal-backdrop {
     position: fixed;
