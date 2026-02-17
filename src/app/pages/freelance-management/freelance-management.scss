@@ -1,9 +1,9 @@
-// ============================================
-// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
-// ============================================
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
-// สีหลักและสีพื้นฐาน (Brand Colors)
-$primary: #1a73e8;
+// ============================================
+// Freelance Management Page Styles
+// ============================================
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
 $text: #202124;
@@ -446,7 +446,7 @@ $border: #dee2e6;
         display: block;
         padding: 0 1.5rem 1.5rem 1.5rem;
 
-        @include large-tablet {
+        @include tablet {
             display: none !important;
         }
     }

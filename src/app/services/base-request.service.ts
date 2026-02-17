@@ -92,10 +92,11 @@ export abstract class BaseRequestService<T extends RequestBase> {
     generateNextId(prefix: string = BUSINESS_CONFIG.DEFAULT_PREFIX): Observable<string> {
         const masterData = this.getMasterData();
         const lastIdNum = masterData.reduce((max, item) => {
+            if (!item || !item.id) return max; // Safety check
             const parts = item.id.split('#');
             const numPart = parts.length > 1 ? parts[1] : item.id.replace(/[^0-9]/g, '');
             const num = parseInt(numPart || '0');
-            return num > max ? num : max;
+            return isNaN(num) ? max : (num > max ? num : max);
         }, 0);
         return of(`${prefix}#${(lastIdNum + 1).toString().padStart(3, '0')}`);
     }

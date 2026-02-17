@@ -1,7 +1,9 @@
-@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
-// Variables
-$primary: #1a73e8;
+// ============================================
+// IT Request Page Styles
+// ============================================
 $primary-dark: #1557b0;
 $success: #16a34a;
 $danger: #dc2626;

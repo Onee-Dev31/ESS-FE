@@ -267,31 +267,29 @@
                 (onPageSizeChange)="setPageSize($event)">
             </app-pagination>
         </div>
-    </div>
-</div>
-
-<app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
-</app-medical-policy-modal>
-
-@if (isModalOpen()) {
-<div class="modal-overlay">
-    <div class="modal-container">
-        @defer {
-        <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
-        </app-medicalexpenses-form>
-        } @loading {
-        <div class="p-4 text-center">
-            <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+        @if (isModalOpen()) {
+        <div class="modal-overlay">
+            <div class="modal-container">
+                @defer {
+                <app-medicalexpenses-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+                </app-medicalexpenses-form>
+                } @loading {
+                <div class="p-4 text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+                </div>
+                }
+            </div>
         </div>
         }
-    </div>
-</div>
-}
 
-@if (isPreviewModalOpen()) {
-@defer {
-<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-</app-file-preview-modal>
-}
-}
-```
+        @if (isPreviewModalOpen()) {
+        @defer {
+        <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+        </app-file-preview-modal>
+        }
+        }
+    </div>
+
+    <app-medical-policy-modal *ngIf="isPolicyModalOpen()" (onClose)="isPolicyModalOpen.set(false)">
+    </app-medical-policy-modal>
+    ```

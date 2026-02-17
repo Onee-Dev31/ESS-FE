@@ -1,29 +1,28 @@
 <div class="form-root">
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
-        <div class="header-right-meta">
-            <div class="header-meta-list">
-                <div class="meta-item">
-                    <i class="far fa-calendar-alt"></i>
-                    <span class="meta-label">วันที่ขอ :</span>
-                    <span class="meta-value">{{ currentDate() }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-hashtag"></i>
-                    <span class="meta-label">ลำดับที่ :</span>
-                    <span class="meta-value">{{ requestId }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="far fa-user"></i>
-                    <span class="meta-label">รหัสพนักงาน :</span>
-                    <span class="meta-value">{{ employeeId() }}</span>
-                </div>
-            </div>
-            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
-        </div>
+        <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
     </header>
 
     <main class="content-card">
+
+        <div class="item-info-bar">
+            <div class="badge-item">
+                <i class="far fa-calendar-alt"></i>
+                <span class="label">วันที่ขอ :</span>
+                <span class="value">{{ currentDate() }}</span>
+            </div>
+            <div class="badge-item">
+                <i class="fas fa-hashtag"></i>
+                <span class="label">ลำดับที่ :</span>
+                <span class="value">{{ requestId }}</span>
+            </div>
+            <div class="badge-item">
+                <i class="far fa-user"></i>
+                <span class="label">รหัสพนักงาน :</span>
+                <span class="value">{{ employeeId() }}</span>
+            </div>
+        </div>
 
         <section class="form-section-wrapper">
             <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>

@@ -1,9 +1,9 @@
-// ============================================
-// ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
-// ============================================
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
-// สีหลักและสีพื้นฐาน (Brand Colors)
-$primary: #1a73e8;
+// ============================================
+// Vehicle Taxi Page Styles
+// ============================================
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
 $text: #202124;
@@ -17,6 +17,30 @@ $header-bg: #f8fafc;
 // เส้นขอบ (Border Colors)
 $border: #dee2e6;
 $border-color: #e9ecef;
+
+// Status colors
+$status-success-bg: #dcfce7;
+$status-success-text: #16a34a;
+$status-danger-bg: #fee2e2;
+$status-danger-text: #dc2626;
+$status-warning-bg: #fef3c7;
+$status-warning-text: #d97706;
+$status-new-bg: #e0f2fe;
+$status-new-text: #0284c7;
+$status-verified-bg: #dcfce7;
+$status-verified-text: #16a34a;
+$status-pending-bg: #fef3c7;
+$status-pending-text: #d97706;
+$status-rejected-bg: #fee2e2;
+$status-rejected-text: #dc2626;
+$status-approved-bg: #dbeafe;
+$status-approved-text: #2563eb;
+$status-progress-bg: #f3e8ff;
+$status-progress-text: #9333ea;
+$status-completed-bg: #d1fae5;
+$status-completed-text: #059669;
+$status-cancelled-bg: #f1f5f9;
+$status-cancelled-text: #64748b;
 
 // Responsive Mixins
 @mixin mobile {
@@ -329,16 +353,34 @@ $border-color: #e9ecef;
   }
 
   tbody {
+    transition: background 0.2s;
+
+    &:hover {
+      background: #f8fafc;
+
+      tr {
+        background: transparent;
+      }
+
+      td {
+        background: transparent !important;
+      }
+    }
+
     tr {
       transition: background 0.2s;
-
-      &:hover {
-        background: #f8fafc;
-      }
 
       &:not(:last-child) td {
         border-bottom: 1px solid #f1f5f9;
       }
+
+      &:last-child td {
+        border-bottom: 1px solid #e9ecef;
+      }
+    }
+
+    &:last-child tr:last-child td {
+      border-bottom: none;
     }
 
     td {
@@ -707,6 +749,53 @@ tbody {
 
       .col-status {
         width: 200px;
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+
+        &.status-new,
+        &.status-NEW {
+          background: $status-new-bg;
+          color: $status-new-text;
+          border-color: rgba($status-new-text, 0.3);
+        }
+
+        &.status-verified,
+        &.status-WAITING_CHECK {
+          background: $status-verified-bg;
+          color: $status-verified-text;
+          border-color: rgba($status-verified-text, 0.3);
+        }
+
+        &.status-pending,
+        &.status-PENDING_APPROVAL {
+          background: $status-pending-bg;
+          color: $status-pending-text;
+          border-color: rgba($status-pending-text, 0.3);
+        }
+
+        &.status-approved,
+        &.status-APPROVED {
+          background: $status-approved-bg;
+          color: $status-approved-text;
+          border-color: rgba($status-approved-text, 0.3);
+        }
+
+        &.status-rejected,
+        &.status-REJECTED,
+        &.status-cancelled {
+          background: $status-rejected-bg;
+          color: $status-rejected-text;
+          border-color: rgba($status-rejected-text, 0.3);
+        }
       }
 
       .col-actions {

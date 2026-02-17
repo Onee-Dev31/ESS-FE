@@ -1,0 +1,438 @@
+@use 'sass:map';
+@use './variables' as *;
+
+// ============================================
+// RESPONSIVE MIXINS
+// ============================================
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin large-tablet {
+    @media (max-width: 1728px) {
+        @content;
+    }
+}
+
+// ============================================
+// APPLE-STYLE UI MIXINS
+// ============================================
+
+// 1. Toolbar / Filter Bar
+@mixin toolbar-container {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+
+    @include tablet {
+        padding: 20px 16px;
+        border-radius: 12px;
+        gap: 16px;
+    }
+
+    .toolbar-top-row {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f1f5f9;
+
+        @include tablet {
+            width: 100%;
+            padding-bottom: 12px;
+        }
+    }
+
+    .toolbar-bottom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 24px;
+        flex-wrap: wrap;
+
+        @include tablet {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+        }
+    }
+
+    .right-filters {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        flex: 1;
+
+        @include tablet {
+            width: 100%;
+            flex-direction: column;
+        }
+    }
+}
+
+// 2. Modern Table
+@mixin modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+    thead {
+        tr {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 16px 24px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background 0.2s;
+
+            &:hover td {
+                background: #f8fafc;
+            }
+        }
+
+        td {
+            padding: 20px 24px;
+            font-size: 0.95rem;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        // Remove border from last row
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+}
+
+// 3. Buttons
+@mixin btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 24px;
+    height: 44px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+@mixin btn-primary {
+    @include btn-base;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+
+    &:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.2), 0 4px 6px -2px rgba(37, 99, 235, 0.1);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+@mixin btn-secondary {
+    @include btn-base;
+    background: white;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+
+    &:hover {
+        background: #f8fafc;
+        border-color: $primary;
+        color: $primary;
+        transform: translateY(-1px);
+    }
+}
+
+@mixin btn-outline {
+    @include btn-base;
+    background: transparent;
+    color: $primary;
+    border: 1.5px solid $primary;
+    box-shadow: none;
+
+    &:hover {
+        background: rgba(59, 130, 246, 0.05);
+        border-color: #2563eb;
+        transform: translateY(-1px);
+    }
+}
+
+@mixin icon-btn-sky {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #bae6fd;
+        transform: scale(1.05);
+    }
+}
+
+// 4. Inputs
+@mixin input-field {
+    height: 44px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #1f2937;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+
+    &:hover {
+        border-color: #94a3b8;
+    }
+
+    &:focus {
+        outline: none;
+        background: #fff;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+@mixin select-dropdown {
+    @include input-field;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+// 5. Mobile Cards
+@mixin mobile-cards-view {
+    display: none;
+
+    @include tablet {
+        display: flex !important;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .mobile-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        border: none;
+        overflow: hidden;
+
+        .card-header {
+            background: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .header-content {
+                .ticket-no {
+                    font-weight: 700;
+                    color: $primary;
+                    font-size: 1.1rem;
+                }
+            }
+
+            .card-actions-top {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+
+        .card-body {
+            padding: 20px;
+
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 16px;
+                align-items: flex-start;
+
+                .label {
+                    color: #94a3b8;
+                    font-size: 0.85rem;
+                    width: 40%;
+                }
+
+                .value {
+                    font-weight: 500;
+                    color: #334155;
+                    font-size: 1rem;
+                    width: 60%;
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+
+// 6. Modal Overlay
+@mixin modal-overlay-styles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+
+    @include mobile {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .modal-container {
+        background: white;
+        width: 100%;
+        max-width: 1200px;
+        max-height: 95vh;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        @include tablet {
+            max-width: 95%;
+            max-height: 90vh;
+            border-radius: 16px;
+        }
+
+        @include mobile {
+            width: 100%;
+            height: 100%;
+            max-height: 100vh;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        >* {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+            min-height: 0;
+        }
+    }
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// 7. Content Card
+@mixin content-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+
+    @include tablet {
+        padding: 16px;
+        border-radius: 12px;
+    }
+}
+
+@mixin card-header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 16px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 20px;
+        background: $primary;
+        border-radius: 2px;
+    }
+}
