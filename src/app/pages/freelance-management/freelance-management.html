@@ -8,26 +8,12 @@
                 <input nz-input type="text" class="form-control" placeholder="ชื่อ, นามสกุล, ชื่อเล่น"
                     [ngModel]="listing.searchText()" (ngModelChange)="listing.searchText.set($event)">
 
-                <!-- <select class="form-control" [ngModel]="filterCompany()" (ngModelChange)="filterCompany.set($event)">
-                    <option value="">-เลือกบริษัท-</option>
-                    <option value="OTD">OTD</option>
-                    <option value="GTV">GTV</option>
-                    <option value="OTV">OTV</option>
-                    <option value="ATM">ATM</option>
-                </select> -->
-
                 <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [ngModel]="filterCompany()"
                     (ngModelChange)="onCompanyChange($event)" name="company" class="form-control">
                     <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
                     <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
                         [nzValue]="company" />
                 </nz-select>
-
-                <!-- <select class="form-control" [ngModel]="filterDepartment()"
-                    (ngModelChange)="filterDepartment.set($event)">
-                    <option value="">-เลือกแผนก-</option>
-                    <option value="10806 - IT Department">10806 - IT Department</option>
-                </select> -->
 
                 <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก" [ngModel]="filterDepartment()"
                     (ngModelChange)="filterDepartment.set($event)" name="department" class="form-control"
@@ -113,8 +99,8 @@
                         <td class="text-center">
                             <div class="boxed-value">{{ item.otherIncome | number }}</div>
                         </td>
-                        <td class="text-center">{{ item.startDate }}</td>
-                        <td class="text-center">{{ item.endDate }}</td>
+                        <td class="text-center">{{ item.startDate | date:'dd/MM/yyyy' }}</td>
+                        <td class="text-center">{{ item.endDate | date:'dd/MM/yyyy'}}</td>
                         <td class="text-center">
                             <button class="btn-icon-pencil" title="แก้ไข" (click)="openEditForm(item)">
                                 <i class="fas fa-pencil-alt"></i>
