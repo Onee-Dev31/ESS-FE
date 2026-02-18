@@ -14,6 +14,9 @@ import {
 } from '@tanstack/angular-table';
 import { LoadingService } from '../../services/loading';
 import { FreelanceService } from '../../services/freelance-management.service';
+import { SwalService } from '../../services/swal.service';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { MasterDataService } from '../../services/master-data.service';
 
 interface FreelanceMember {
     id: string;
@@ -40,7 +43,8 @@ interface FreelanceMember {
         PageHeaderComponent,
         SkeletonComponent,
         EmptyStateComponent,
-        FreelanceFormComponent
+        FreelanceFormComponent,
+        NzSelectModule
     ],
     templateUrl: './freelance-management.html',
     styleUrl: './freelance-management.scss'
@@ -48,19 +52,26 @@ interface FreelanceMember {
 export class FreelanceManagementComponent implements OnInit {
     private loadingService = inject(LoadingService);
     private freelanceService = inject(FreelanceService);
+    private swalService = inject(SwalService);
+    private masterService = inject(MasterDataService);
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
     listing = createListingState();
     sorting = signal<SortingState>([]);
 
+    // MASTER
+    companyList: any[] = []
+    departmentList: any[] = []
+    // filteredDepartmentList: any[] = [];
+
     // Modal state
     isFormOpen = signal<boolean>(false);
     editingItem = signal<FreelanceMember | null>(null);
 
     // New Filters
-    filterCompany = signal<string>('');
-    filterDepartment = signal<string>('');
+    filterCompany = signal<any>('');
+    filterDepartment = signal<any>('');
     filterMonth = signal<string>('');
 
     processedData = computed(() => {
@@ -79,11 +90,11 @@ export class FreelanceManagementComponent implements OnInit {
         }
 
         if (company) {
-            filtered = filtered.filter(item => item.company === company);
+            filtered = filtered.filter(item => item.company === company.COMPANY_CODE);
         }
 
         if (department) {
-            filtered = filtered.filter(item => item.department === department);
+            filtered = filtered.filter(item => item.department === department.COSTCENT + ' - ' + department.NAMECOSTCENT);
         }
 
         const sortState = this.sorting()[0];
@@ -101,6 +112,16 @@ export class FreelanceManagementComponent implements OnInit {
         }
 
         return filtered;
+    });
+
+    filteredDepartmentList = computed(() => {
+        const company = this.filterCompany();
+
+        if (!company) return [];
+
+        return this.departmentList.filter(dep =>
+            dep.COMPANY_CODE === company.COMPANY_CODE
+        );
     });
 
     comps = createListingComputeds(this.processedData, this.listing);
@@ -129,74 +150,77 @@ export class FreelanceManagementComponent implements OnInit {
     }));
 
     ngOnInit() {
-        this.loadData();
+        // this.loadData();
+        this.getCompanies();
+        this.getDepartments();
+        this.getFreelance();
     }
 
-    loadData() {
-        this.loadingService.start('freelance-list');
-        // Updated Mock data based on screenshot
-        setTimeout(() => {
-            this.data.set([
-                {
-                    id: '1',
-                    employeeId: 'FOTD00001',
-                    name: 'Lili Daniels',
-                    nickname: 'Lilly',
-                    phone: '098-555-5555',
-                    company: 'OTD',
-                    department: '10806 - IT Department',
-                    salary: 100000,
-                    otherIncome: 100000,
-                    startDate: '10-Jan-2026',
-                    endDate: '10-Jan-2027',
-                    selected: false
-                },
-                {
-                    id: '2',
-                    employeeId: 'FOTD00002',
-                    name: 'Henrietta Whitney',
-                    nickname: 'Henry',
-                    phone: '098-555-5555',
-                    company: 'GTV',
-                    department: '10806 - IT Department',
-                    salary: 20000,
-                    otherIncome: 100000,
-                    startDate: '15-Feb-2026',
-                    endDate: '15-Feb-2027',
-                    selected: false
-                },
-                {
-                    id: '3',
-                    employeeId: 'FOTD00003',
-                    name: 'Seth McDaniel',
-                    nickname: 'Set',
-                    phone: '098-555-5555',
-                    company: 'OTV',
-                    department: '10806 - IT Department',
-                    salary: 30000,
-                    otherIncome: 100000,
-                    startDate: '01-Mar-2026',
-                    endDate: '01-Mar-2027',
-                    selected: false
-                },
-                {
-                    id: '4',
-                    employeeId: 'FOTD00004',
-                    name: 'Edward King',
-                    nickname: 'Ed',
-                    phone: '098-555-5555',
-                    company: 'ATM',
-                    department: '10806 - IT Department',
-                    salary: 40000,
-                    otherIncome: 100000,
-                    startDate: '05-Apr-2026',
-                    endDate: '05-Apr-2027',
-                    selected: false
-                }
-            ]);
-            this.loadingService.stop('freelance-list');
-        }, 1000);
-    }
+    // loadData() {
+    //     this.loadingService.start('freelance-list');
+    //     // Updated Mock data based on screenshot
+    //     setTimeout(() => {
+    //         this.data.set([
+    //             {
+    //                 id: '1',
+    //                 employeeId: 'FOTD00001',
+    //                 name: 'Lili Daniels',
+    //                 nickname: 'Lilly',
+    //                 phone: '098-555-5555',
+    //                 company: 'OTD',
+    //                 department: '10806 - IT Department',
+    //                 salary: 100000,
+    //                 otherIncome: 100000,
+    //                 startDate: '10-Jan-2026',
+    //                 endDate: '10-Jan-2027',
+    //                 selected: false
+    //             },
+    //             {
+    //                 id: '2',
+    //                 employeeId: 'FOTD00002',
+    //                 name: 'Henrietta Whitney',
+    //                 nickname: 'Henry',
+    //                 phone: '098-555-5555',
+    //                 company: 'GTV',
+    //                 department: '10806 - IT Department',
+    //                 salary: 20000,
+    //                 otherIncome: 100000,
+    //                 startDate: '15-Feb-2026',
+    //                 endDate: '15-Feb-2027',
+    //                 selected: false
+    //             },
+    //             {
+    //                 id: '3',
+    //                 employeeId: 'FOTD00003',
+    //                 name: 'Seth McDaniel',
+    //                 nickname: 'Set',
+    //                 phone: '098-555-5555',
+    //                 company: 'OTV',
+    //                 department: '10806 - IT Department',
+    //                 salary: 30000,
+    //                 otherIncome: 100000,
+    //                 startDate: '01-Mar-2026',
+    //                 endDate: '01-Mar-2027',
+    //                 selected: false
+    //             },
+    //             {
+    //                 id: '4',
+    //                 employeeId: 'FOTD00004',
+    //                 name: 'Edward King',
+    //                 nickname: 'Ed',
+    //                 phone: '098-555-5555',
+    //                 company: 'ATM',
+    //                 department: '10806 - IT Department',
+    //                 salary: 40000,
+    //                 otherIncome: 100000,
+    //                 startDate: '05-Apr-2026',
+    //                 endDate: '05-Apr-2027',
+    //                 selected: false
+    //             }
+    //         ]);
+    //         this.loadingService.stop('freelance-list');
+    //     }, 1000);
+    // }
 
     toggleSort(columnId: string) {
         TableSortHelper.toggleSort(this.table, columnId);
@@ -214,8 +238,6 @@ export class FreelanceManagementComponent implements OnInit {
     goToPage(page: number) {
         this.listing.currentPage.set(page);
     }
-
-
 
     toggleSelectAll(event: Event) {
         const checked = (event.target as HTMLInputElement).checked;
@@ -272,6 +294,7 @@ export class FreelanceManagementComponent implements OnInit {
         // formData.append('resign_date', fData.lastWorkingDate ?? '');
 
         formData.append('acc_book_no', fData.accountNumber); //
+        formData.append('namebank', fData.bank); //
         formData.append('costcent', fData.department.COSTCENT); //
         formData.append('namecostcent', fData.department.NAMECOSTCENT); //
 
@@ -294,7 +317,6 @@ export class FreelanceManagementComponent implements OnInit {
             });
         }
 
-
         const obj: any = {};
         formData.forEach((value, key) => {
             obj[key] = value;
@@ -307,9 +329,16 @@ export class FreelanceManagementComponent implements OnInit {
         this.freelanceService.createFreelance(formData).subscribe({
             next: (res) => {
                 console.log(res);
+                this.swalService.success('เพิ่มพนักงานฟรีแลนซ์สำเร็จ')
             },
             error: (error) => {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error.error.message);
+                const message = error?.error?.message || '';
+                if (message.includes('duplicate key')) {
+                    this.swalService.warning('ชื่อนามสกุลมีอยู่ในระบบแล้ว');
+                } else {
+                    this.swalService.error('เกิดข้อผิดพลาด', message);
+                }
             }
         });
 
@@ -320,5 +349,75 @@ export class FreelanceManagementComponent implements OnInit {
 
     sendData() {
         console.log('Sending selected data:', this.data().filter(item => item.selected));
+    }
+
+    // FUNCTION
+    onCompanyChange(company: any) {
+        this.filterCompany.set(company);
+        this.filterDepartment.set(null);
+    }
+
+    // GET
+    getFreelance() {
+        this.freelanceService.getFreelance(1, 0).subscribe({
+            next: (res) => {
+                console.log(res);
+
+                const items = res?.items ?? res?.data ?? res ?? [];
+                // 🔹 map ให้ตรงกับ interface FreelanceMember
+                const mapped: FreelanceMember[] = items.map((item: any) => ({
+                    id: item.ID,
+                    employeeId: item.EMP_NO,
+                    name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
+                    nickname: item.NICKNAME,
+                    phone: item.MOBILE,
+                    company: item.COMPANY_CODE,
+                    department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
+                    salary: item.SALARY,
+                    otherIncome: item.OTHER_INCOME,
+                    startDate: item.CONTRACT_START_DATE,
+                    endDate: item.CONTRACT_END_DATE,
+                    selected: false
+                }));
+
+                // 🔥 set เข้า signal
+                this.data.set(mapped);
+
+
+
+                this.listing.pageSize.set(10);
+                this.listing.currentPage.set(0);
+
+                this.loadingService.stop('freelance-list');
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    // GET MASTER
+    getCompanies() {
+        this.masterService.getCompanyMaster().subscribe({
+            next: (data) => {
+                // console.log(data);
+                this.companyList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    getDepartments() {
+        this.masterService.getDepartmentMaster().subscribe({
+            next: (data) => {
+                // console.log(data);
+                this.departmentList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
     }
 }
