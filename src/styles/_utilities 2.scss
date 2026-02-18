@@ -1,4 +1,3 @@
-@use './mixins' as *;
 // ==========================================
 // Width Utilities
 // ==========================================
@@ -137,19 +136,4 @@
 
 .text-right {
     text-align: right !important;
-}
-
-// Responsive Visibility
-.desktop-only {
-    @include large-tablet {
-        display: none !important;
-    }
-}
-
-.mobile-only {
-    display: none !important;
-
-    @include large-tablet {
-        display: block !important;
-    }
 }

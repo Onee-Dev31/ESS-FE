@@ -18,9 +18,10 @@ import { FormsModule } from '@angular/forms';
         <div class="page-size-selector">
           <span>จำนวนแถวต่อหน้า:</span>
           <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange.emit($event)">
-            <option [value]="10">10</option>
-            <option [value]="20">20</option>
-            <option [value]="50">50</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+            <option [ngValue]="ALL_PAGE_SIZE">ทั้งหมด</option>
           </select>
         </div>
         <div class="page-buttons">
@@ -52,6 +53,8 @@ export class PaginationComponent {
 
   @Output() onPageChange = new EventEmitter<number>();
   @Output() onPageSizeChange = new EventEmitter<number>();
+
+  readonly ALL_PAGE_SIZE = 10000;
 
   get totalPages(): number {
     return Math.ceil(this.totalItems / this.pageSize) || 1;

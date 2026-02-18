@@ -27,8 +27,8 @@ $border: #dee2e6;
     }
 }
 
-@mixin large-tablet {
-    @media (max-width: 1728px) {
+@mixin tablet {
+    @media (max-width: 1024px) {
         @content;
     }
 }

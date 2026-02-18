@@ -281,7 +281,7 @@
 
 @if (isFormOpen()) {
 <div class="modal-overlay">
-    <div class="modal-content-wrapper">
+    <div class="modal-container">
         @defer {
         <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>
         } @loading {

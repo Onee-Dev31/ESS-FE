@@ -19,70 +19,54 @@
                 }
             </div>
 
-            @if (isRequestSystemSelected()) {
+
             <div class="sub-options-section">
                 <h4 class="sub-section-title">
                     <span class="step-badge">2</span>
-                    กรุณาเลือกประเภท (Category) <i class="fas fa-layer-group ml-2 text-muted"></i>
+                    ระบุผู้ขอสิทธิ์ (Open For)
                 </h4>
-                <div class="checkbox-grid">
-                    <label class="checkbox-item" [class.checked]="isUserCategorySelected()">
-                        <input type="checkbox" [checked]="isUserCategorySelected()"
-                            (change)="isUserCategorySelected.set(!isUserCategorySelected())">
-                        <span class="checkmark"></span>
-                        <span class="label-text"><i class="fas fa-user mr-1"></i> USER</span>
-                    </label>
-                    <label class="checkbox-item" [class.checked]="isSystemCategorySelected()">
-                        <input type="checkbox" [checked]="isSystemCategorySelected()"
-                            (change)="isSystemCategorySelected.set(!isSystemCategorySelected())">
-                        <span class="checkmark"></span>
-                        <span class="label-text"><i class="fas fa-server mr-1"></i> System</span>
-                    </label>
+
+                <!-- Open For Dropdown -->
+                <div class="form-group mb-4" style="max-width: 400px;">
+                    <label class="form-label">เปิดสิทธิ์ให้ (Open For)</label>
+                    <div class="d-flex gap-2">
+                        <select class="form-control" [ngModel]="selectedOpenFor()"
+                            (ngModelChange)="selectedOpenFor.set($event)">
+                            @for (opt of openForOptions(); track opt.value) {
+                            <option [value]="opt.value">{{ opt.label }}</option>
+                            }
+                        </select>
+                        @if (selectedOpenFor() === 'other') {
+                        <input type="text" class="form-control" placeholder="ระบุชื่อ-สกุล"
+                            [ngModel]="otherOpenForName()" (ngModelChange)="otherOpenForName.set($event)">
+                        }
+                    </div>
                 </div>
             </div>
-            }
 
-            @if (isUserSelected()) {
             <div class="sub-options-section">
                 <h4 class="sub-section-title">
                     <span class="step-badge">3</span>
-                    รายละเอียดเพิ่มเติม (USER Options)
+                    รายละเอียด (Details) <i class="fas fa-info-circle ml-2 text-muted"></i>
                 </h4>
-                <div class="checkbox-grid">
-                    @for (option of userSubOptions(); track option.value; let i = $index) {
-                    <label class="checkbox-item" [class.checked]="option.checked">
-                        <input type="checkbox" [checked]="option.checked" (change)="toggleUserSubOption(i)">
-                        <span class="checkmark"></span>
-                        <span class="label-text">{{ option.label }}</span>
-                    </label>
-                    }
+                <div class="form-group mb-4">
+                    <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
+                        [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
                 </div>
             </div>
-            }
-
-            @if (isSystemSelected()) {
-            <div class="sub-options-section">
-                <h4 class="sub-section-title">
-                    <span class="step-badge">3</span>
-                    รายละเอียดเพิ่มเติม (System Options)
-                </h4>
-                <div class="checkbox-grid">
-                    @for (option of systemSubOptions(); track option.value; let i = $index) {
-                    <label class="checkbox-item" [class.checked]="option.checked">
-                        <input type="checkbox" [checked]="option.checked" (change)="toggleSystemSubOption(i)">
-                        <span class="checkmark"></span>
-                        <span class="label-text">{{ option.label }}</span>
-                    </label>
-                    }
-                </div>
-            </div>
-            }
         </div>
 
-        <div class="form-actions">
-            <button class="btn-submit" (click)="submit()">
-                <i class="fas fa-paper-plane"></i> ส่งคำขอ
-            </button>
+
+        <div class="form-section">
+            <h3 class="section-title">
+                <span class="step-badge">4</span>
+                ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
+            </h3>
+            <div class="form-actions">
+                <button class="btn-submit" (click)="submit()">
+                    ยืนยันการทำรายการ
+                </button>
+            </div>
         </div>
     </div>
 
@@ -111,13 +95,13 @@
                         </td>
                         <td>
                             <div class="details-list">
-                                @if (draft.userOptions.length > 0) {
-                                <div class="detail-item"><small class="text-muted">USER:</small> {{
-                                    draft.userOptions.join(', ') }}</div>
+                                @if (draft.openFor) {
+                                <div class="detail-item"><small class="text-muted">Open For:</small> {{ draft.openFor }}
+                                </div>
                                 }
-                                @if (draft.systemOptions.length > 0) {
-                                <div class="detail-item"><small class="text-muted">System:</small> {{
-                                    draft.systemOptions.join(', ') }}</div>
+                                @if (draft.details) {
+                                <div class="detail-item"><small class="text-muted">Details:</small> {{ draft.details }}
+                                </div>
                                 }
                                 @if (draft.repairData) {
                                 <div class="detail-item repair-info">
@@ -168,13 +152,13 @@
                         </td>
                         <td>
                             <div class="details-list">
-                                @if (req.userOptions.length > 0) {
-                                <div class="detail-item"><small class="text-muted">USER:</small> {{
-                                    req.userOptions.join(', ') }}</div>
+                                @if (req.openFor) {
+                                <div class="detail-item"><small class="text-muted">Open For:</small> {{ req.openFor }}
+                                </div>
                                 }
-                                @if (req.systemOptions.length > 0) {
-                                <div class="detail-item"><small class="text-muted">System:</small> {{
-                                    req.systemOptions.join(', ') }}</div>
+                                @if (req.details) {
+                                <div class="detail-item"><small class="text-muted">Details:</small> {{ req.details }}
+                                </div>
                                 }
                                 @if (req.repairData) {
                                 <i class="fas fa-tools"></i>
@@ -260,34 +244,11 @@
                     </div>
                 </div>
 
-                @if (isUserSelected() && hasUserSubOptionsSelected()) {
+                @if (requestDetails()) {
                 <div class="summary-section">
-                    <h3>รายละเอียด USER</h3>
-                    <div class="summary-list">
-                        @for (opt of userSubOptions(); track opt.value) {
-                        @if (opt.checked) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-arrow-right text-muted"></i>
-                            <span>{{ opt.label }}</span>
-                        </div>
-                        }
-                        }
-                    </div>
-                </div>
-                }
-
-                @if (isSystemSelected() && hasSystemSubOptionsSelected()) {
-                <div class="summary-section">
-                    <h3>รายละเอียด System</h3>
-                    <div class="summary-list">
-                        @for (opt of systemSubOptions(); track opt.value) {
-                        @if (opt.checked) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-arrow-right text-muted"></i>
-                            <span>{{ opt.label }}</span>
-                        </div>
-                        }
-                        }
+                    <h3>รายละเอียด (Details)</h3>
+                    <div class="detail-text p-3 bg-light rounded text-muted">
+                        {{ requestDetails() }}
                     </div>
                 </div>
                 }

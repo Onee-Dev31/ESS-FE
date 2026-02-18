@@ -179,7 +179,7 @@ $status-danger-text: #dc2626;
         gap: 16px;
         padding: 16px;
 
-        @include tablet {
+        @include large-tablet {
             display: flex;
         }
 
@@ -390,7 +390,7 @@ $status-danger-text: #dc2626;
     .data-grid-container {
         padding: 0 24px 24px;
 
-        @include tablet {
+        @include large-tablet {
             display: none;
         }
 

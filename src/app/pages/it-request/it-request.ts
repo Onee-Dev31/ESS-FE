@@ -42,26 +42,17 @@ export class ITRequestComponent {
         { label: 'AGM', value: 'agm', checked: false }
     ]);
 
-    isRequestSystemSelected = computed(() => {
-        const option = this.serviceOptions().find(o => o.value === 'request_system');
-        return option ? option.checked : false;
-    });
+    // Open For State
+    openForOptions = signal([
+        { label: 'อื่นๆ (Other)', value: 'other' },
+        { label: 'ตนเอง (Self)', value: 'self' },
+        { label: 'พนักงาน ก (Employee A)', value: 'employee_a' },
+        { label: 'พนักงาน ข (Employee B)', value: 'employee_b' },
+    ]);
+    selectedOpenFor = signal<string>('self');
+    otherOpenForName = signal<string>('');
 
-    isUserSelected = computed(() => {
-        return this.isRequestSystemSelected() && this.isUserCategorySelected();
-    });
-
-    isSystemSelected = computed(() => {
-        return this.isRequestSystemSelected() && this.isSystemCategorySelected();
-    });
-
-    hasUserSubOptionsSelected = computed(() => {
-        return this.userSubOptions().some(o => o.checked);
-    });
-
-    hasSystemSubOptionsSelected = computed(() => {
-        return this.systemSubOptions().some(o => o.checked);
-    });
+    requestDetails = signal('');
 
     showRepairModal = signal(false);
 
@@ -82,15 +73,6 @@ export class ITRequestComponent {
             } else {
                 newItems[index].checked = isChecking;
             }
-
-            // If unchecking 'request_system', reset sub-categories
-            if (newItems[index].value === 'request_system' && !isChecking) {
-                this.isUserCategorySelected.set(false);
-                this.isSystemCategorySelected.set(false);
-                this.userSubOptions.update(subs => subs.map(s => ({ ...s, checked: false })));
-                this.systemSubOptions.update(subs => subs.map(s => ({ ...s, checked: false })));
-            }
-
             return newItems;
         });
     }
@@ -113,27 +95,21 @@ export class ITRequestComponent {
         this.showRepairModal.set(false);
     }
 
-    toggleUserSubOption(index: number) {
-        this.userSubOptions.update(items => {
-            const newItems = [...items];
-            newItems[index].checked = !newItems[index].checked;
-            return newItems;
-        });
-    }
-
-    toggleSystemSubOption(index: number) {
-        this.systemSubOptions.update(items => {
-            const newItems = [...items];
-            newItems[index].checked = !newItems[index].checked;
-            return newItems;
-        });
-    }
-
     submit() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
 
         if (selectedServices.length === 0) {
             alert('กรุณาเลือกบริการอย่างน้อย 1 รายการ');
+            return;
+        }
+
+        if (this.selectedOpenFor() === 'other' && !this.otherOpenForName().trim()) {
+            alert('กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
+            return;
+        }
+
+        if (!this.requestDetails().trim()) {
+            alert('กรุณากรอกรายละเอียด (Details)');
             return;
         }
 
@@ -148,16 +124,21 @@ export class ITRequestComponent {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
         if (selectedServices.length === 0) return null;
 
-        const selectedUserOptions = this.userSubOptions().filter(s => s.checked);
-        const selectedSystemOptions = this.systemSubOptions().filter(s => s.checked);
+        let openForDisplay = '';
+        const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
+        if (this.selectedOpenFor() === 'other') {
+            openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
+        } else {
+            openForDisplay = selected ? selected.label : '';
+        }
 
         return {
             id: 'draft',
             date: new Date(),
             services: selectedServices.map(s => s.label),
-            userOptions: this.isUserSelected() ? selectedUserOptions.map(o => o.label) : [],
-            systemOptions: this.isSystemSelected() ? selectedSystemOptions.map(o => o.label) : [],
+            details: this.requestDetails(),
             repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
+            openFor: openForDisplay,
             status: 'Draft' // Or 'Selecting...'
         };
     });
@@ -166,16 +147,22 @@ export class ITRequestComponent {
 
     confirmSubmission() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
-        const selectedUserOptions = this.userSubOptions().filter(s => s.checked);
-        const selectedSystemOptions = this.systemSubOptions().filter(s => s.checked);
+
+        let openForDisplay = '';
+        const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
+        if (this.selectedOpenFor() === 'other') {
+            openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
+        } else {
+            openForDisplay = selected ? selected.label : '';
+        }
 
         const newRequest = {
             id: Date.now(),
             date: new Date(),
             services: selectedServices.map(s => s.label),
-            userOptions: this.isUserSelected() ? selectedUserOptions.map(o => o.label) : [],
-            systemOptions: this.isSystemSelected() ? selectedSystemOptions.map(o => o.label) : [],
+            details: this.requestDetails(),
             repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
+            openFor: openForDisplay,
             status: 'Pending'
         };
 

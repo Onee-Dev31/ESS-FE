@@ -216,13 +216,13 @@
   <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreviewModal()">
   </app-file-preview-modal>
   }
-</div>
 
-@if (isModalOpen()) {
-<div class="modal-overlay">
-  <div class="modal-container">
-    <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
-    </app-vehicle-taxi-form>
+  @if (isModalOpen()) {
+  <div class="modal-overlay">
+    <div class="modal-container">
+      <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+      </app-vehicle-taxi-form>
+    </div>
   </div>
+  }
 </div>
-}
