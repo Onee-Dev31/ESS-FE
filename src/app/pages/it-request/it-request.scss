@@ -13,9 +13,9 @@ $text: #202124;
 $text-sub: #5f6368;
 $text-muted: #94a3b8;
 $text-header: #475569;
-$bg-page: #f8f9fa;
+$bg-page: #f5f5f7; // Apple's light gray background
 $bg-card: #ffffff;
-$header-bg: #f8fafc;
+$header-bg: #f5f5f7;
 $border: #dee2e6;
 $border-color: #e9ecef;
 
@@ -65,15 +65,103 @@ $status-cancelled-text: #64748b;
 }
 
 .it-request-page {
-    padding: 24px;
+    padding: 40px;
     background-color: $bg-page;
     min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+
+        label,
+        .form-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: $text-header;
+            margin-left: 0.25rem;
+        }
+
+        .form-control {
+            padding: 0.85rem 1rem;
+            border: 1px solid #d2d2d7; // Apple gray border
+            background-color: #ffffff;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 17px; // Apple standard body size
+            color: #1d1d1f; // Apple dark gray text
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: none; // Apple inputs are usually flat
+            appearance: none;
+
+            &:focus {
+                outline: none;
+                border-color: #0071e3; // Apple Blue
+                box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); // Soft blue halo
+            }
+
+            &::placeholder {
+                color: #86868b;
+                font-weight: 400;
+            }
+
+            &:hover:not(:focus) {
+                border-color: #86868b;
+            }
+
+            // For Select inputs (targeting the select element specifically)
+            &:is(select) {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230071e3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 1.2rem;
+                padding-right: 2.5rem;
+                cursor: pointer;
+            }
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        // Animation for dynamic inputs
+        &.slide-in-right {
+            animation: slideInRight 0.3s ease-out;
+        }
+    }
+
+    .input-pair-row {
+        display: flex;
+        gap: 1rem;
+        width: 100%;
+        max-width: 800px;
+        transition: all 0.3s ease;
+
+        .form-control {
+            flex: 1;
+            width: auto;
+            min-width: 0; // Prevent flex overflow
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+
+            .form-control {
+                width: 100%;
+            }
+        }
+    }
 
     .content-card {
         background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        padding: 24px;
+        border-radius: 18px; // Slightly more rounded
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); // Very subtle shadow
+        padding: 40px; // Generous padding
 
         @media (max-width: 1024px) {
             padding: 16px;
@@ -87,17 +175,17 @@ $status-cancelled-text: #64748b;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             background-color: $primary;
             color: white;
             border-radius: 50%;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 700;
             margin-right: 0.75rem;
-            box-shadow: 0 2px 4px rgba($primary, 0.3);
+            box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
             vertical-align: middle;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
     }
 
@@ -260,47 +348,6 @@ $status-cancelled-text: #64748b;
                     display: flex;
                     flex-direction: column;
                     gap: 0.6rem;
-
-                    label {
-                        font-size: 0.95rem;
-                        font-weight: 600;
-                        color: $text-header;
-                        margin-left: 0.25rem;
-                    }
-
-                    .form-control {
-                        padding: 0.85rem 1.25rem;
-                        border: 1px solid #e2e8f0;
-                        background-color: #f8fafc;
-                        border-radius: 12px;
-                        font-family: inherit;
-                        font-size: 1rem;
-                        color: $text;
-                        transition: all 0.2s ease;
-                        width: 100%;
-                        box-sizing: border-box;
-
-                        &:focus {
-                            outline: none;
-                            background-color: #fff;
-                            border-color: $primary;
-                            box-shadow: 0 0 0 4px rgba($primary, 0.1);
-                        }
-
-                        &::placeholder {
-                            color: #94a3b8;
-                        }
-
-                        &:hover:not(:focus) {
-                            border-color: #cbd5e1;
-                            background-color: #f1f5f9;
-                        }
-                    }
-
-                    textarea.form-control {
-                        resize: vertical;
-                        min-height: 100px;
-                    }
                 }
             }
 
@@ -362,42 +409,67 @@ $status-cancelled-text: #64748b;
     }
 
     .form-section {
-        margin-bottom: 2rem;
+        margin-bottom: 3.5rem;
 
         .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: $text;
-            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: $text-header;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
         }
 
         .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .checkbox-item {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 1.2rem;
+            background-color: #f5f5f7;
             border: 1px solid transparent;
             border-radius: 999px;
             cursor: pointer;
             transition: all 0.2s ease;
-            background-color: #f3f4f6;
-            color: #4b5563;
+            position: relative;
+            min-height: auto;
+            min-width: auto;
+            box-shadow: none;
+            font-size: 15px;
 
             &:hover {
-                background-color: #e5e7eb;
+                background-color: #e8e8ed;
+                transform: none;
+            }
+
+            &.checked {
+                background-color: #0071e3;
+                color: white;
+                box-shadow: none;
+
+                .label-text {
+                    color: white;
+                    font-weight: 500;
+                }
+            }
+
+            &:hover {
+                border-color: $primary;
+                background-color: #f8fafc;
+                transform: translateY(-1px);
             }
 
             &.checked {
                 background-color: $primary;
+                border-color: $primary;
                 color: white;
-                box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
-                transform: translateY(-1px);
+                box-shadow: 0 4px 6px -1px rgba($primary, 0.25);
 
                 .label-text {
                     color: white;
@@ -409,30 +481,88 @@ $status-cancelled-text: #64748b;
                 display: none;
             }
 
+            // Hide card-specific elements
+            .icon-wrapper,
+            .check-indicator,
             .checkmark {
                 display: none;
             }
 
             .label-text {
                 font-size: 0.95rem;
-                pointer-events: none;
+                color: $text;
+                transition: color 0.2s;
+            }
+
+            &.checked .label-text {
+                color: white;
             }
         }
 
         .sub-options-section {
             margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid $border-color;
+            padding: 0;
+            background-color: transparent;
+            border: none;
             animation: slideDown 0.3s ease-out;
 
             .sub-section-title {
-                font-size: 1rem;
+                font-size: 0.9rem;
                 font-weight: 600;
-                color: $text;
-                margin-bottom: 1rem;
+                color: $text-muted;
+                margin-bottom: 1.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
+
+            .type-selector {
+                display: flex;
+                gap: 2rem;
+                justify-content: flex-start;
+                margin-bottom: 2rem;
+
+                .type-btn {
+                    padding: 0.75rem 2rem;
+                    border-radius: 999px;
+                    border: 1px solid #d2d2d7;
+                    background: white;
+                    color: $text;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+
+                    &:hover {
+                        background: #f5f5f7;
+                        transform: translateY(-1px);
+                    }
+
+                    &.active {
+                        background: $primary;
+                        color: white;
+                        border-color: $primary;
+                        box-shadow: 0 4px 10px rgba($primary, 0.3);
+                    }
+                }
+            }
+
+            .slide-down {
+                animation: slideDown 0.3s ease-out;
+            }
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
     }
 
@@ -453,7 +583,7 @@ $status-cancelled-text: #64748b;
         justify-content: flex-end;
         padding-top: 1rem;
         border-top: 1px solid $border-color;
-        align-items: center; // Ensure vertical alignment
+        align-items: center;
 
         .action-header {
             display: flex;
@@ -465,24 +595,31 @@ $status-cancelled-text: #64748b;
         }
 
         .btn-submit {
-            background-color: $primary;
+            background: #0071e3;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 999px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            font-size: 17px;
 
             &:hover {
-                background-color: color.adjust($primary, $lightness: -5%);
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba($primary, 0.2);
+                background: #0077ed;
+                transform: scale(1.02);
+                box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
             }
 
-            padding: 0.75rem 2rem;
+            &:active {
+                transform: translateY(0);
+            }
+
+            padding: 12px 32px;
             font-size: 1rem;
 
             i {
-                margin-right: 0.5rem;
+                margin-right: 0.75rem;
             }
         }
     }

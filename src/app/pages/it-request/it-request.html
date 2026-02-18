@@ -19,40 +19,81 @@
                 }
             </div>
 
-
+            @if (isSystemCategorySelected()) {
             <div class="sub-options-section">
-                <h4 class="sub-section-title">
-                    <span class="step-badge">2</span>
-                    ระบุผู้ขอสิทธิ์ (Open For)
-                </h4>
+                <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
 
-                <!-- Open For Dropdown -->
-                <div class="form-group mb-4" style="max-width: 400px;">
-                    <label class="form-label">เปิดสิทธิ์ให้ (Open For)</label>
-                    <div class="d-flex gap-2">
-                        <select class="form-control" [ngModel]="selectedOpenFor()"
-                            (ngModelChange)="selectedOpenFor.set($event)">
-                            @for (opt of openForOptions(); track opt.value) {
-                            <option [value]="opt.value">{{ opt.label }}</option>
-                            }
-                        </select>
-                        @if (selectedOpenFor() === 'other') {
-                        <input type="text" class="form-control" placeholder="ระบุชื่อ-สกุล"
-                            [ngModel]="otherOpenForName()" (ngModelChange)="otherOpenForName.set($event)">
+                <div class="type-selector mb-4">
+                    <button class="type-btn" [class.active]="selectedSystemTypes().includes('user')"
+                        (click)="toggleSystemType('user')">
+                        <i class="fas fa-users mr-2"></i> User (ผู้ใช้งาน)
+                    </button>
+                    <button class="type-btn" [class.active]="selectedSystemTypes().includes('system')"
+                        (click)="toggleSystemType('system')">
+                        <i class="fas fa-server mr-2"></i> System (ระบบ)
+                    </button>
+                </div>
+
+                @if (selectedSystemTypes().includes('system')) {
+                <div class="checkbox-grid slide-down">
+                    @for (opt of systemSubOptions(); track opt.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="opt.checked">
+                        <input type="checkbox" [checked]="opt.checked" (change)="toggleSystemSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ opt.label }}</span>
+                    </label>
+                    }
+                </div>
+                }
+
+                @if (selectedSystemTypes().includes('user')) {
+                <div class="checkbox-grid slide-down">
+                    @for (opt of userSubOptions(); track opt.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="opt.checked">
+                        <input type="checkbox" [checked]="opt.checked" (change)="toggleUserSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ opt.label }}</span>
+                    </label>
+                    }
+                </div>
+                }
+            </div>
+            }
+
+        </div>
+
+        <div class="form-section">
+            <h3 class="section-title">
+                <span class="step-badge">2</span>
+                ระบุผู้ขอสิทธิ์ (Open For)
+            </h3>
+
+            <!-- Open For Dropdown -->
+            <div class="form-group">
+                <label class="form-label">เปิดสิทธิ์ให้ (Open For)</label>
+                <div class="input-pair-row">
+                    <select class="form-control" [ngModel]="selectedOpenFor()"
+                        (ngModelChange)="selectedOpenFor.set($event)">
+                        @for (opt of openForOptions(); track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
                         }
-                    </div>
+                    </select>
+                    @if (selectedOpenFor() === 'other') {
+                    <input type="text" class="form-control slide-in-right" placeholder="ระบุชื่อ-สกุล"
+                        [ngModel]="otherOpenForName()" (ngModelChange)="otherOpenForName.set($event)">
+                    }
                 </div>
             </div>
+        </div>
 
-            <div class="sub-options-section">
-                <h4 class="sub-section-title">
-                    <span class="step-badge">3</span>
-                    รายละเอียด (Details) <i class="fas fa-info-circle ml-2 text-muted"></i>
-                </h4>
-                <div class="form-group mb-4">
-                    <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
-                        [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
-                </div>
+        <div class="form-section">
+            <h3 class="section-title">
+                <span class="step-badge">3</span>
+                รายละเอียด (Details) <i class="fas fa-info-circle ml-2 text-muted"></i>
+            </h3>
+            <div class="form-group mb-4">
+                <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
+                    [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
             </div>
         </div>
 
@@ -72,59 +113,7 @@
 
 
 
-    @if (draftRequest(); as draft) {
-    <div class="content-card draft-card">
-        <div class="card-header-title">รายการที่เลือก (Selected Items)</div>
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%"><i class="fas fa-concierge-bell mr-1"></i> บริการ</th>
-                        <th style="width: 50%"><i class="fas fa-info-circle mr-1"></i> รายละเอียด</th>
-                        <th style="width: 25%"><i class="fas fa-tasks mr-1"></i> สถานะ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="service-tags">
-                                @for (service of draft.services; track service) {
-                                <span class="tag">{{ service }}</span>
-                                }
-                            </div>
-                        </td>
-                        <td>
-                            <div class="details-list">
-                                @if (draft.openFor) {
-                                <div class="detail-item"><small class="text-muted">Open For:</small> {{ draft.openFor }}
-                                </div>
-                                }
-                                @if (draft.details) {
-                                <div class="detail-item"><small class="text-muted">Details:</small> {{ draft.details }}
-                                </div>
-                                }
-                                @if (draft.repairData) {
-                                <div class="detail-item repair-info">
-                                    <i class="fas fa-tools"></i>
-                                    {{ draft.repairData.device }}
-                                    @if (draft.repairData.brand) { - {{ draft.repairData.brand }} }
-                                    @if (draft.repairData.model) { {{ draft.repairData.model }} }
-                                    <span class="text-muted">({{ draft.repairData.symptom }})</span>
-                                </div>
-                                }
-                            </div>
-                        </td>
-                        <td>
-                            <span class="status-badge draft">
-                                <i class="fas fa-edit"></i> กำลังเลือก...
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    }
+
 
     @if (submittedRequests().length > 0) {
     <div class="content-card history-card">

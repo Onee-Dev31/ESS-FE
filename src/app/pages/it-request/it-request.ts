@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
@@ -13,33 +13,33 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 export class ITRequestComponent {
 
     serviceOptions = signal([
-        { label: 'บริการ Internet', value: 'internet', checked: false },
-        { label: 'บริการ Email', value: 'email', checked: false },
-        { label: 'File Sharing', value: 'fileshare', checked: false },
-        { label: 'ขอแก้ไขสิทธิการเข้าระบบงาน', value: 'access_edit', checked: false },
-        { label: 'ขอ Unlock User', value: 'unlock_user', checked: false },
-        { label: 'ขอใช้ระบบงาน (Request System)', value: 'request_system', checked: false },
-        { label: 'แจ้งซ่อม', value: 'repair', checked: false },
-        { label: 'แจ้งปัญหา', value: 'problem', checked: false },
-        { label: 'บริการอื่นๆ', value: 'other', checked: false }
+        { label: 'บริการ Internet', value: 'internet', checked: false, icon: 'fa-wifi' },
+        { label: 'บริการ Email', value: 'email', checked: false, icon: 'fa-envelope' },
+        { label: 'File Sharing', value: 'fileshare', checked: false, icon: 'fa-share-alt' },
+        { label: 'ขอแก้ไขสิทธิ', value: 'access_edit', checked: false, icon: 'fa-user-lock' },
+        { label: 'ขอ Unlock User', value: 'unlock_user', checked: false, icon: 'fa-unlock-alt' },
+        { label: 'ขอใช้ระบบ', value: 'request_system', checked: false, icon: 'fa-desktop' },
+        { label: 'แจ้งซ่อม', value: 'repair', checked: false, icon: 'fa-tools' },
+        { label: 'แจ้งปัญหา', value: 'problem', checked: false, icon: 'fa-exclamation-triangle' },
+        { label: 'บริการอื่นๆ', value: 'other', checked: false, icon: 'fa-ellipsis-h' }
     ]);
 
     isUserCategorySelected = signal(false);
     isSystemCategorySelected = signal(false);
 
     userSubOptions = signal([
-        { label: 'ห้องประชุม', value: 'meeting_room', checked: false },
-        { label: 'ห้องนวด', value: 'massage_room', checked: false }
+        { label: 'ห้องประชุม', value: 'meeting_room', checked: false, icon: 'fa-handshake' },
+        { label: 'ห้องนวด', value: 'massage_room', checked: false, icon: 'fa-spa' }
     ]);
 
     systemSubOptions = signal([
-        { label: 'Oracle', value: 'oracle', checked: false },
-        { label: 'BMS', value: 'bms', checked: false },
-        { label: 'ONEE', value: 'onee', checked: false },
-        { label: 'ONENEWS', value: 'onenews', checked: false },
-        { label: 'ONE', value: 'one', checked: false },
-        { label: 'CLF', value: 'clf', checked: false },
-        { label: 'AGM', value: 'agm', checked: false }
+        { label: 'Oracle', value: 'oracle', checked: false, icon: 'fa-database' },
+        { label: 'BMS', value: 'bms', checked: false, icon: 'fa-server' },
+        { label: 'ONEE', value: 'onee', checked: false, icon: 'fa-globe' },
+        { label: 'ONENEWS', value: 'onenews', checked: false, icon: 'fa-newspaper' },
+        { label: 'ONE', value: 'one', checked: false, icon: 'fa-tv' },
+        { label: 'CLF', value: 'clf', checked: false, icon: 'fa-film' },
+        { label: 'AGM', value: 'agm', checked: false, icon: 'fa-users' }
     ]);
 
     // Open For State
@@ -63,6 +63,18 @@ export class ITRequestComponent {
         symptom: ''
     });
 
+    selectedSystemTypes = signal<string[]>([]);
+
+    toggleSystemType(type: string) {
+        this.selectedSystemTypes.update(types => {
+            if (types.includes(type)) {
+                return types.filter(t => t !== type);
+            } else {
+                return [...types, type];
+            }
+        });
+    }
+
     toggleService(index: number) {
         this.serviceOptions.update(items => {
             const newItems = [...items];
@@ -73,6 +85,31 @@ export class ITRequestComponent {
             } else {
                 newItems[index].checked = isChecking;
             }
+            return newItems;
+        });
+
+        const selectedValues = this.serviceOptions().filter(s => s.checked).map(s => s.value);
+        this.isSystemCategorySelected.set(selectedValues.includes('request_system'));
+
+        if (!selectedValues.includes('request_system')) {
+            this.selectedSystemTypes.set([]);
+            this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+            this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        }
+    }
+
+    toggleUserSubOption(index: number) {
+        this.userSubOptions.update(items => {
+            const newItems = [...items];
+            newItems[index].checked = !newItems[index].checked;
+            return newItems;
+        });
+    }
+
+    toggleSystemSubOption(index: number) {
+        this.systemSubOptions.update(items => {
+            const newItems = [...items];
+            newItems[index].checked = !newItems[index].checked;
             return newItems;
         });
     }
@@ -120,28 +157,7 @@ export class ITRequestComponent {
         this.showSummaryModal.set(false);
     }
 
-    draftRequest = computed(() => {
-        const selectedServices = this.serviceOptions().filter(s => s.checked);
-        if (selectedServices.length === 0) return null;
 
-        let openForDisplay = '';
-        const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
-        if (this.selectedOpenFor() === 'other') {
-            openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
-        } else {
-            openForDisplay = selected ? selected.label : '';
-        }
-
-        return {
-            id: 'draft',
-            date: new Date(),
-            services: selectedServices.map(s => s.label),
-            details: this.requestDetails(),
-            repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
-            openFor: openForDisplay,
-            status: 'Draft' // Or 'Selecting...'
-        };
-    });
 
     submittedRequests = signal<any[]>([]);
 
@@ -172,7 +188,6 @@ export class ITRequestComponent {
         alert('ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
 
-        // Reset form
         this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.isUserCategorySelected.set(false);
         this.isSystemCategorySelected.set(false);

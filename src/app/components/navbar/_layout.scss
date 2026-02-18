@@ -51,6 +51,13 @@ $border: #dee2e6;
         justify-content: center;
         margin: 0 auto;
 
+        .nav-logo {
+            height: 32px;
+            width: auto;
+            margin-right: 12px;
+            object-fit: contain;
+        }
+
         .nav-title {
             font-size: 16px;
             font-weight: 800;
