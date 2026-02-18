@@ -196,12 +196,19 @@ $border: #dee2e6;
 @mixin mobile-cards-view {
     display: none;
 
-    @include large-tablet {
+    @include tablet {
         display: flex !important;
         flex-direction: column;
         gap: 16px;
         padding: 10px 0;
     }
+
+    // @include large-tablet {
+    //     display: flex !important;
+    //     flex-direction: column;
+    //     gap: 16px;
+    //     padding: 10px 0;
+    // }
 
     .mobile-card {
         background: white;
@@ -587,9 +594,13 @@ $border: #dee2e6;
         display: block;
         padding: 0 1.5rem 1.5rem 1.5rem;
 
-        @include large-tablet {
+        @include tablet {
             display: none !important;
         }
+
+        // @include large-tablet {
+        //     display: none !important;
+        // }
     }
 
     .modern-table {

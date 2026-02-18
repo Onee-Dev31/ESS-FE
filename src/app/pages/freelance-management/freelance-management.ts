@@ -14,6 +14,7 @@ import {
 } from '@tanstack/angular-table';
 import { LoadingService } from '../../services/loading';
 import { FreelanceService } from '../../services/freelance-management.service';
+import { SwalService } from '../../services/swal.service';
 
 interface FreelanceMember {
     id: string;
@@ -48,6 +49,7 @@ interface FreelanceMember {
 export class FreelanceManagementComponent implements OnInit {
     private loadingService = inject(LoadingService);
     private freelanceService = inject(FreelanceService);
+    private swalService = inject(SwalService);
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
@@ -215,8 +217,6 @@ export class FreelanceManagementComponent implements OnInit {
         this.listing.currentPage.set(page);
     }
 
-
-
     toggleSelectAll(event: Event) {
         const checked = (event.target as HTMLInputElement).checked;
         this.data.update(items => items.map(item => ({ ...item, selected: checked })));
@@ -272,6 +272,7 @@ export class FreelanceManagementComponent implements OnInit {
         // formData.append('resign_date', fData.lastWorkingDate ?? '');
 
         formData.append('acc_book_no', fData.accountNumber); //
+        formData.append('namebank', fData.bank); //
         formData.append('costcent', fData.department.COSTCENT); //
         formData.append('namecostcent', fData.department.NAMECOSTCENT); //
 
@@ -294,7 +295,6 @@ export class FreelanceManagementComponent implements OnInit {
             });
         }
 
-
         const obj: any = {};
         formData.forEach((value, key) => {
             obj[key] = value;
@@ -307,9 +307,16 @@ export class FreelanceManagementComponent implements OnInit {
         this.freelanceService.createFreelance(formData).subscribe({
             next: (res) => {
                 console.log(res);
+                this.swalService.success('เพิ่มพนักงานฟรีแลนซ์สำเร็จ')
             },
             error: (error) => {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error.error.message);
+                const message = error?.error?.message || '';
+                if (message.includes('duplicate key')) {
+                    this.swalService.warning('ชื่อนามสกุลมีอยู่ในระบบแล้ว');
+                } else {
+                    this.swalService.error('เกิดข้อผิดพลาด', message);
+                }
             }
         });
 
