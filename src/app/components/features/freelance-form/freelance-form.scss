@@ -47,7 +47,6 @@
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: grid !important;
-    /* Use Grid for better scroll control */
     grid-template-rows: auto minmax(0, 1fr) auto !important;
 
     @include tablet {
@@ -56,7 +55,6 @@
     }
 }
 
-/* Specificity override for global styles */
 .modal-container .modal-content {
     padding: 0 36px;
     display: block !important;
@@ -64,11 +62,10 @@
     overflow-y: auto !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 40px !important;
+    padding-bottom: 30px !important;
     flex: initial !important;
 }
 
-/* Hidden input but accessible for label trigger */
 .hidden-input {
     width: 0.1px;
     height: 0.1px;
@@ -82,42 +79,29 @@
 .modal-container .form-header {
     display: flex !important;
     border-bottom: none !important;
-    /* Reset border */
     overflow: visible !important;
-    /* Override global hidden */
     flex: none !important;
-    /* Override global flex: 1 */
     justify-content: center;
-    /* Center the title */
     align-items: center;
     position: relative;
-    /* For absolute positioning of close button */
     margin-bottom: 0;
-    /* Remove margin, use padding */
     padding: 24px 36px 24px;
-    /* Add padding directly to header */
     flex-shrink: 0;
-    /* Prevent header from shrinking */
 
     h2 {
         margin: 0;
         font-size: 1.5rem;
         font-weight: 500;
-        /* More refined weight */
         color: #582d96;
     }
 
     .btn-close {
         position: absolute;
-        /* Absolute position */
         right: 36px;
-        /* Match padding-right */
         top: 24px;
-        /* Match padding-top */
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        /* Circle close button */
         border: none;
         background: transparent;
         color: #9ca3af;
@@ -140,14 +124,12 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    /* Increased gap */
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
-    /* Increased gap */
 
     &.four-cols {
         grid-template-columns: repeat(4, 1fr);
@@ -471,7 +453,6 @@
 
     @media (max-width: 767px) {
         padding: 16px 18px;
-        // flex-direction: column-reverse !important; 
         flex-direction: row !important;
     }
 
@@ -489,15 +470,11 @@
         flex: 0 0 auto !important;
 
         @media (max-width: 767px) {
-            // width: 100% !important;
             width: auto !important;
             flex: 1 1 auto !important;
             padding: 0 8px;
-            /* Reduced padding for mobile */
             min-width: auto;
-            /* Allow shrinking */
             font-size: 0.9rem;
-            /* Slightly smaller font */
         }
     }
 

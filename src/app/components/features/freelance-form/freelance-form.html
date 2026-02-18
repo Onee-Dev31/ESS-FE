@@ -1,16 +1,16 @@
 <div class="modal-overlay" *ngIf="isOpen">
     <!-- <div class="modal-overlay" *ngIf="isOpen" (click)="handleClose()"> -->
-    <div class="modal-container" (click)="$event.stopPropagation()">
+    <form class="modal-container" (click)="$event.stopPropagation()" #f="ngForm">
         <!-- Header with close button -->
         <div class="form-header">
             <h2>ข้อมูลพนักงาน</h2>
-            <button class="btn-close" (click)="handleClose()">
+            <button type="button" class="btn-close" (click)="handleClose()">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <div class="modal-content">
-            <form #f="ngForm" class="freelance-form">
+            <div class="freelance-form">
                 <div class="form-row">
                     <div class="form-field">
                         <label>ชื่อจริง</label>
@@ -224,17 +224,16 @@
                         </div>
                     </div>
                 </div>
-
-
-                <!-- Action buttons - NOW OUTSIDE modal-content -->
-                <div class="form-actions">
-                    <button type="button" class="btn-resign" (click)="handleResign()">ลาออก</button>
-                    <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid">Save</button>
-                    <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <!-- Action buttons - NOW OUTSIDE modal-content -->
+        <div class="form-actions">
+            <button type="button" class="btn-resign" (click)="handleResign()">ลาออก</button>
+            <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid">Save</button>
+            <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
+        </div>
+    </form>
 
     <!-- Resign Date Modal -->
     <div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal" (click)="closeResignModal()">
