@@ -46,7 +46,7 @@
       <div class="mobile-card">
         <div class="card-header">
           <div class="request-id">
-            <span class="label">No.</span>
+            <span class="label"><i class="fas fa-hashtag"></i> No.</span>
             <span class="value">{{ req.requestNo }}</span>
           </div>
           <span class="status-badge" [ngClass]="getStatusClass(req.status)">
@@ -55,31 +55,31 @@
         </div>
         <div class="card-body">
           <div class="info-row">
-            <span class="label">Date Created:</span>
+            <span class="label"><i class="far fa-clock"></i> Date Created:</span>
             <span class="value">{{ req.requestDate }}</span>
           </div>
 
           <div class="requester-block">
-            <div class="req-name">{{ req.requestBy.name }}</div>
+            <div class="req-name"><i class="fas fa-user-circle"></i> {{ req.requestBy.name }}</div>
             <div class="req-details">
-              <span>{{ req.requestBy.employeeId }}</span> &bull;
-              <span>{{ req.requestBy.department }}</span>
+              <span><i class="fas fa-id-badge"></i> {{ req.requestBy.employeeId }}</span> &bull;
+              <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span>
             </div>
-            <div class="req-company">{{ req.requestBy.company }}</div>
+            <div class="req-company"><i class="fas fa-city"></i> {{ req.requestBy.company }}</div>
           </div>
 
           <div class="info-row mt-2">
-            <span class="label">Type:</span>
+            <span class="label"><i class="fas fa-tag"></i> Type:</span>
             <span class="value highlight">{{ req.requestType }}</span>
           </div>
 
           <div class="description-block">
-            <div class="desc-label">Description:</div>
+            <div class="desc-label"><i class="fas fa-align-left"></i> Description:</div>
             <div class="desc-content">{{ req.requestDetail }}</div>
           </div>
 
           <div class="amount-row">
-            <span class="label">Amount</span>
+            <span class="label"><i class="fas fa-coins"></i> Amount</span>
             <span class="value amount">{{ req.amount | number }}</span>
           </div>
 
@@ -114,25 +114,28 @@
         <thead>
           <tr>
             <th class="sortable-header" (click)="toggleSort('requestNo')">
-              เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
+              <i class="fas fa-hashtag mr-1"></i> เลขที่เอกสาร <i class="fas ml-1"
+                [ngClass]="getSortIcon('requestNo')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDate')">
-              วันที่สราง <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+              <i class="far fa-clock mr-1"></i> วันที่สราง <i class="fas ml-1"
+                [ngClass]="getSortIcon('requestDate')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestBy')">
-              ผู้ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+              <i class="fas fa-user mr-1"></i> ผู้ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestType')">
-              ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+              <i class="fas fa-tag mr-1"></i> ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDetail')">
-              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('requestDetail')"></i>
+              <i class="fas fa-info-circle mr-1"></i> รายละเอียด <i class="fas ml-1"
+                [ngClass]="getSortIcon('requestDetail')"></i>
             </th>
             <th class="sortable-header text-right" (click)="toggleSort('amount')">
-              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+              <i class="fas fa-coins mr-1"></i> จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
             <th class="sortable-header text-center" (click)="toggleSort('status')">
-              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+              <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
             <th class="text-center">จัดการ</th>
           </tr>

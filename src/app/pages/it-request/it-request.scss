@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
@@ -41,6 +42,27 @@ $status-completed-bg: #d1fae5;
 $status-completed-text: #059669;
 $status-cancelled-bg: #f1f5f9;
 $status-cancelled-text: #64748b;
+
+// Utility Classes
+.mr-1 {
+    margin-right: 0.25rem;
+}
+
+.ml-1 {
+    margin-left: 0.25rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.text-muted {
+    color: $text-muted !important;
+}
+
+.text-success {
+    color: $success !important;
+}
 
 .it-request-page {
     padding: 24px;

@@ -79,7 +79,7 @@
 
         <div class="card-body">
           <div class="info-row">
-            <span class="label">วันที่สร้างรายการ:</span>
+            <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
             <span class="value">{{ req.createDate | date: 'dd/MM/yyyy' }}</span>
           </div>
 
@@ -119,27 +119,32 @@
         <thead>
           <tr>
             <th class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
-              เลขที่การเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
+              <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก <i class="fas ml-1"
+                [ngClass]="getSortIcon('requestId')"></i>
             </th>
             <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
-              วันที่สร้างรายการ <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
+              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ <i class="fas ml-1"
+                [ngClass]="getSortIcon('createDate')"></i>
             </th>
             <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
-              วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
+              <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก <i class="fas ml-1"
+                [ngClass]="getSortIcon('date')"></i>
             </th>
             <th class="col-desc sortable-header text-center" (click)="toggleSort('description')">
-              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('description')"></i>
+              <i class="fas fa-align-left mr-1"></i> รายละเอียด <i class="fas ml-1"
+                [ngClass]="getSortIcon('description')"></i>
             </th>
             <th class="col-hours sortable-header text-center" (click)="toggleSort('hours')">
-              จำนวนชั่วโมง <i class="fas ml-1" [ngClass]="getSortIcon('hours')"></i>
+              <i class="fas fa-hourglass-half mr-1"></i> จำนวนชั่วโมง <i class="fas ml-1"
+                [ngClass]="getSortIcon('hours')"></i>
             </th>
             <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
-              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+              <i class="fas fa-coins mr-1"></i> จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
             <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
-              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+              <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
-            <th class="col-actions text-center">จัดการ</th>
+            <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
         @for (req of comps.paginatedData(); track trackByReqId($index, req)) {

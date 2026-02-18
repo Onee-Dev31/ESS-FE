@@ -86,7 +86,15 @@
                         <span class="value">{{ request.id }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">วันที่ลา:</span>
+                        <span class="label"><i class="far fa-clock"></i> วันที่ทำรายการ:</span>
+                        <span class="value">{{ request.createDate }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-suitcase-rolling"></i> ประเภทการลา:</span>
+                        <span class="value">{{ request.leaveType }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="far fa-calendar-check"></i> วันที่ลา:</span>
                         <span class="value" style="text-align: right;">
                             {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
                             @if (request.shiftStartTime) {
@@ -98,7 +106,7 @@
                     </div>
                     @if (request.days) {
                     <div class="info-row">
-                        <span class="label">จำนวนวัน:</span>
+                        <span class="label"><i class="fas fa-hourglass-half"></i> จำนวนวัน:</span>
                         <span class="value">{{ request.days }} วัน <span class="text-muted">({{
                                 getPeriodLabel(request.leavePeriod) }})</span></span>
                     </div>
@@ -139,34 +147,42 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" class="col-id sortable-header" (click)="toggleSort('id')">
-                            รหัสคำขอ <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+                        <th rowspan="2" class="w-px-100 sortable-header" (click)="toggleSort('id')">
+                            <i class="fas fa-hashtag mr-1"></i> รหัสคำขอ <i class="fas ml-1"
+                                [ngClass]="getSortIcon('id')"></i>
                         </th>
-                        <th colspan="2" class="text-center">วัน-เวลา ที่ขอลา</th>
-                        <th rowspan="2" class="text-center col-days sortable-header" (click)="toggleSort('days')">
-                            จำนวนวัน <i class="fas ml-1" [ngClass]="getSortIcon('days')"></i>
+                        <th colspan="2" class="w-px-250 text-center"><i class="far fa-clock mr-1"></i> วัน-เวลา ที่ขอลา
                         </th>
-                        <th rowspan="2" class="text-center col-type sortable-header" (click)="toggleSort('leaveType')">
-                            ประเภทการลา <i class="fas ml-1" [ngClass]="getSortIcon('leaveType')"></i>
+                        <th rowspan="2" class="text-center w-px-100 sortable-header" (click)="toggleSort('days')">
+                            <i class="fas fa-calendar-day mr-1"></i> จำนวน <i class="fas ml-1"
+                                [ngClass]="getSortIcon('days')"></i>
                         </th>
-                        <th rowspan="2" class="text-center col-period sortable-header"
-                            (click)="toggleSort('leavePeriod')">
-                            ประเภทวันลา <i class="fas ml-1" [ngClass]="getSortIcon('leavePeriod')"></i>
+                        <th rowspan="2" class="text-center w-15 sortable-header" (click)="toggleSort('leaveType')">
+                            <i class="fas fa-suitcase-rolling mr-1"></i> ประเภทการลา <i class="fas ml-1"
+                                [ngClass]="getSortIcon('leaveType')"></i>
                         </th>
-                        <th rowspan="2" class="col-reason sortable-header text-center" (click)="toggleSort('reason')">
-                            เหตุผล <i class="fas ml-1" [ngClass]="getSortIcon('reason')"></i>
+                        <th rowspan="2" class="text-center w-10 sortable-header" (click)="toggleSort('leavePeriod')">
+                            <i class="fas fa-hourglass-half mr-1"></i> ช่วงเวลา <i class="fas ml-1"
+                                [ngClass]="getSortIcon('leavePeriod')"></i>
                         </th>
-                        <th rowspan="2" class="text-center col-status sortable-header" (click)="toggleSort('status')">
-                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                        <th rowspan="2" class="w-auto sortable-header text-center" (click)="toggleSort('reason')">
+                            <i class="fas fa-comment-alt mr-1"></i> เหตุผล <i class="fas ml-1"
+                                [ngClass]="getSortIcon('reason')"></i>
                         </th>
-                        <th rowspan="2" class="text-center col-actions">Actions</th>
+                        <th rowspan="2" class="text-center w-px-140 sortable-header" (click)="toggleSort('status')">
+                            <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1"
+                                [ngClass]="getSortIcon('status')"></i>
+                        </th>
+                        <th rowspan="2" class="text-center w-px-160">Actions</th>
                     </tr>
                     <tr>
-                        <th class="text-center col-date sortable-header" (click)="toggleSort('startDate')">
-                            จาก <i class="fas ml-1" [ngClass]="getSortIcon('startDate')"></i>
+                        <th class="text-center w-px-120 sortable-header" (click)="toggleSort('startDate')">
+                            <i class="fas fa-calendar-check mr-1"></i> จาก <i class="fas ml-1"
+                                [ngClass]="getSortIcon('startDate')"></i>
                         </th>
-                        <th class="text-center col-date sortable-header" (click)="toggleSort('endDate')">
-                            ถึง <i class="fas ml-1" [ngClass]="getSortIcon('endDate')"></i>
+                        <th class="text-center w-px-120 sortable-header" (click)="toggleSort('endDate')">
+                            <i class="fas fa-calendar-times mr-1"></i> ถึง <i class="fas ml-1"
+                                [ngClass]="getSortIcon('endDate')"></i>
                         </th>
                     </tr>
                 </thead>
@@ -265,7 +281,7 @@
 
 @if (isFormOpen()) {
 <div class="modal-overlay">
-    <div class="modal-container">
+    <div class="modal-content-wrapper">
         @defer {
         <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>
         } @loading {

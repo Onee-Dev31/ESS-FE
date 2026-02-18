@@ -4,6 +4,7 @@
 // Import Global Partials
 @use './styles/variables' as *;
 @use './styles/mixins' as *;
+@use './styles/utilities' as *;
 
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');

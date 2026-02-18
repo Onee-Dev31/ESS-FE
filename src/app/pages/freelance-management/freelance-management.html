@@ -46,7 +46,7 @@
                     <option value="01">มกราคม</option>
                     <option value="02">กุมภาพันธ์</option>
                 </select>
-                <button class="btn-send-data" (click)="openCreateForm()" >
+                <button class="btn-send-data" (click)="openCreateForm()">
                     <i class="fas fa-upload"></i> ส่งข้อมูล
                 </button>
             </div>
@@ -139,25 +139,25 @@
 
                 <div class="card-body">
                     <div class="info-row">
-                        <span class="label">เบอร์โทรศัพท์:</span>
+                        <span class="label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์:</span>
                         <span class="value">{{ item.phone }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">บริษัท / แผนก:</span>
+                        <span class="label"><i class="fas fa-building"></i> บริษัท / แผนก:</span>
                         <span class="value">{{ item.company }} / {{ item.department }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">เงินเดือน:</span>
+                        <span class="label"><i class="fas fa-money-bill-wave"></i> เงินเดือน:</span>
                         <span class="value">{{ item.salary | number }} บาท</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">รายได้อื่น:</span>
+                        <span class="label"><i class="fas fa-hand-holding-usd"></i> รายได้อื่น:</span>
                         <span class="value">
                             <div class="boxed-value">{{ item.otherIncome | number }}</div>
                         </span>
                     </div>
                     <div class="info-row">
-                        <span class="label">ระยะเวลาสัญญา:</span>
+                        <span class="label"><i class="far fa-calendar-alt"></i> ระยะเวลาสัญญา:</span>
                         <span class="value">{{ item.startDate }} - {{ item.endDate }}</span>
                     </div>
 

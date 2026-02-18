@@ -212,6 +212,12 @@ $status-danger-text: #dc2626;
                         font-size: 0.75rem;
                         color: $text-muted;
                         font-weight: 500;
+
+                        i {
+                            margin-right: 4px;
+                            color: $primary;
+                            opacity: 0.8;
+                        }
                     }
 
                     .value {
@@ -233,6 +239,14 @@ $status-danger-text: #dc2626;
 
                     .label {
                         color: $text-muted;
+
+                        i {
+                            width: 16px;
+                            text-align: center;
+                            margin-right: 6px;
+                            color: $primary;
+                            opacity: 0.7;
+                        }
                     }
 
                     .value {
@@ -262,6 +276,12 @@ $status-danger-text: #dc2626;
                         color: $text;
                         font-size: 0.95rem;
                         margin-bottom: 4px;
+
+                        i {
+                            color: $primary;
+                            margin-right: 6px;
+                            opacity: 0.8;
+                        }
                     }
 
                     .req-details {
@@ -286,6 +306,11 @@ $status-danger-text: #dc2626;
                         margin-bottom: 4px;
                         text-transform: uppercase;
                         letter-spacing: 0.05em;
+
+                        i {
+                            margin-right: 4px;
+                            color: $primary;
+                        }
                     }
 
                     .desc-content {
@@ -370,11 +395,8 @@ $status-danger-text: #dc2626;
         }
 
         .data-grid {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: #fff;
-            border: 1px solid $border;
+            @include modern-table;
+            border: 1px solid #cbd5e1 !important; // Force darker border
             border-radius: 12px;
             overflow: hidden;
 
@@ -421,7 +443,7 @@ $status-danger-text: #dc2626;
                     padding: 16px;
                     font-size: 0.9rem;
                     color: $text;
-                    border-bottom: 1px solid $border-color;
+                    border-bottom: 1px solid #f1f5f9;
                     vertical-align: middle;
                 }
 
@@ -515,39 +537,20 @@ $status-danger-text: #dc2626;
         }
 
         .act-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-
             &.v-btn {
-                background: rgba($primary, 0.1);
-                color: $primary;
+                @include icon-btn-ghost(#64748b);
             }
 
             &.a-btn {
-                background: rgba($success, 0.1);
-                color: $success;
+                @include icon-btn-ghost($success);
             }
 
             &.r-btn {
-                background: rgba($danger, 0.1);
-                color: $danger;
+                @include icon-btn-ghost($danger);
             }
 
             &.b-btn {
-                background: rgba($warning, 0.1);
-                color: $warning;
-            }
-
-            &:hover {
-                transform: translateY(-2px);
-                filter: brightness(0.95);
+                @include icon-btn-ghost($warning);
             }
         }
     }
@@ -684,5 +687,19 @@ $status-danger-text: #dc2626;
                 margin: 0;
             }
         }
+    }
+}
+
+// Pagination wrapper spacing
+.pagination-wrapper {
+    margin-top: 0;
+    padding: 0 24px 24px;
+
+    @include mobile {
+        padding: 0 16px 16px;
+    }
+
+    @include tablet {
+        padding: 0 12px 12px;
     }
 }

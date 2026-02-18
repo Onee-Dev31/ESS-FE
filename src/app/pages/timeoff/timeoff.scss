@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
@@ -67,24 +68,27 @@ $status-cancelled-text: #64748b;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    padding: 20px;
+    z-index: 10000;
+    padding: 40px 20px 20px 20px;
     animation: fadeIn 0.3s ease-out;
 
     @include mobile {
         padding: 0;
+        z-index: 10000;
     }
 
     .modal-content-wrapper {
         background: white;
         width: 100%;
         max-width: 1200px;
-        max-height: 95vh;
+        max-height: 90vh;
         border-radius: 24px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         overflow: hidden;
         position: relative;
         animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
 
         @include tablet {
             max-width: 95%;
@@ -176,7 +180,6 @@ $status-cancelled-text: #64748b;
 
         @include tablet {
             width: 100%;
-            flex-direction: column;
         }
     }
 }
@@ -388,7 +391,7 @@ $status-cancelled-text: #64748b;
 @mixin mobile-cards-view {
     display: none;
 
-    @include tablet {
+    @include large-tablet {
         display: flex !important;
         flex-direction: column;
         gap: 16px;
@@ -397,18 +400,50 @@ $status-cancelled-text: #64748b;
 
     .mobile-card {
         background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.03);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.08);
+
+            .card-header {
+                background: #f0f9ff;
+            }
+
+            .card-header::after {
+                opacity: 1;
+            }
+        }
 
         .card-header {
-            background: #f8fafc;
-            padding: 12px 16px;
+            background: #fff;
             border-bottom: 1px solid #f1f5f9;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            transition: background 0.3s ease;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
 
             .header-content {
                 .ticket-no {
@@ -426,7 +461,10 @@ $status-cancelled-text: #64748b;
         }
 
         .card-body {
-            padding: 16px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
 
             .info-row {
                 display: flex;
@@ -436,6 +474,9 @@ $status-cancelled-text: #64748b;
 
                 .label {
                     color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
 
                 .value {
@@ -443,7 +484,125 @@ $status-cancelled-text: #64748b;
                     color: #1e293b;
                 }
             }
+
+            .card-footer-actions {
+                margin-top: auto;
+                padding-top: 16px;
+                border-top: 1px solid #f1f5f9;
+                display: flex;
+                gap: 12px;
+
+                button {
+                    flex: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 9px 16px;
+                    border-radius: 12px;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: none;
+
+                    i {
+                        font-size: 1rem;
+                    }
+
+                    &:active {
+                        transform: scale(0.98);
+                    }
+                }
+
+                .btn-edit-sm {
+                    background: #f0f9ff;
+                    color: #0ea5e9;
+
+                    &:hover {
+                        background: #e0f2fe;
+                        color: #0284c7;
+                    }
+                }
+
+                .btn-delete-sm {
+                    background: #fef2f2;
+                    color: #ef4444;
+
+                    &:hover {
+                        background: #fee2e2;
+                        color: #dc2626;
+                    }
+                }
+
+                .btn-view-sm {
+                    background: #f1f5f9;
+                    color: #475569;
+
+                    &:hover {
+                        background: #e2e8f0;
+                        color: #1e293b;
+                    }
+                }
+            }
         }
+    }
+}
+
+// Status Badges
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    &::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
+
+    &.status-new,
+    &.status-waiting,
+    &.NEW,
+    &.WAITING_CHECK {
+        background: #e0f2fe;
+        color: #0284c7;
+        border-color: #bae6fd;
+    }
+
+    &.status-approved,
+    &.status-verified,
+    &.APPROVED,
+    &.VERIFIED {
+        background: #dcfce7;
+        color: #16a34a;
+        border-color: #bbf7d0;
+    }
+
+    &.status-rejected,
+    &.status-cancelled,
+    &.REJECTED,
+    &.CANCELLED {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+    &.status-pending,
+    &.PENDING_APPROVAL {
+        background: #ffedd5;
+        color: #ea580c;
+        border-color: #fed7aa;
     }
 }
 
@@ -551,7 +710,7 @@ $status-cancelled-text: #64748b;
     }
 
     .table-responsive {
-        @include tablet {
+        @include large-tablet {
             display: none;
         }
     }
@@ -560,80 +719,7 @@ $status-cancelled-text: #64748b;
     .modern-table {
         @include modern-table;
 
-        .col-id {
-            width: 120px;
-        }
-
-        .col-date {
-            width: 150px;
-        }
-
-        .col-days {
-            width: 150px;
-        }
-
-        .col-type {
-            width: 200px;
-        }
-
-        .col-period {
-            width: 120px;
-        }
-
-        .col-status {
-            width: 180px;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid transparent;
-
-            &.status-new,
-            &.status-NEW {
-                background: $status-new-bg;
-                color: $status-new-text;
-                border-color: rgba($status-new-text, 0.3);
-            }
-
-            &.status-verified,
-            &.status-WAITING_CHECK {
-                background: $status-verified-bg;
-                color: $status-verified-text;
-                border-color: rgba($status-verified-text, 0.3);
-            }
-
-            &.status-pending,
-            &.status-PENDING_APPROVAL {
-                background: $status-pending-bg;
-                color: $status-pending-text;
-                border-color: rgba($status-pending-text, 0.3);
-            }
-
-            &.status-approved,
-            &.status-APPROVED {
-                background: $status-approved-bg;
-                color: $status-approved-text;
-                border-color: rgba($status-approved-text, 0.3);
-            }
-
-            &.status-rejected,
-            &.status-REJECTED,
-            &.status-cancelled {
-                background: $status-rejected-bg;
-                color: $status-rejected-text;
-                border-color: rgba($status-rejected-text, 0.3);
-            }
-        }
-
-        .col-actions {
-            width: 130px;
-        }
+        // Column widths are now handled by utility classes in HTML (e.g., .w-px-120, .w-auto)
 
         .leave-type-cell {
             display: flex;
@@ -721,16 +807,33 @@ $status-cancelled-text: #64748b;
     @include btn-outline;
 }
 
-.btn-edit-sm,
-.btn-icon.edit {
-    @include btn-secondary;
-    padding: 8px 12px;
-    font-size: 0.875rem;
-    height: 36px;
+.action-btns {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
-.btn-delete-sm,
-.btn-icon.delete {
+.btn-icon {
+    &.view {
+        @include icon-btn-ghost(#64748b); // Slate
+    }
+
+    &.edit {
+        @include icon-btn-ghost(#0ea5e9); // Sky
+    }
+
+    &.delete {
+        @include icon-btn-ghost(#ef4444); // Red
+    }
+}
+
+// Keep legacy classes for backward compatibility if needed, but override styling
+.btn-edit-sm,
+.btn-icon.edit {
+    // existing styles overridden above for .btn-icon.edit
+}
+
+.btn-delete-sm {
     @include btn-outline;
     padding: 8px 12px;
     font-size: 0.875rem;
@@ -741,10 +844,6 @@ $status-cancelled-text: #64748b;
     &:hover {
         background: rgba(239, 68, 68, 0.05);
         border-color: #dc2626;
-    }
-
-    &:active {
-        background: rgba(239, 68, 68, 0.1);
     }
 }
 
@@ -772,8 +871,12 @@ select.form-control {
         width: 100%;
 
         input.form-control {
-            min-width: unset;
             flex: 1;
+        }
+
+        button {
+            padding: 0 12px;
+            flex-shrink: 0;
         }
     }
 }
@@ -789,4 +892,14 @@ select.form-control {
         font-weight: 500;
         color: #374151;
     }
+}
+
+// Modal Styling
+.modal-overlay {
+    @include modal-overlay-styles;
+}
+
+// Pagination wrapper spacing
+.pagination-wrapper {
+    margin-top: 24px;
 }

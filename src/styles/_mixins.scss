@@ -81,7 +81,10 @@
 
         @include tablet {
             width: 100%;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 12px;
+            align-items: flex-end;
         }
     }
 }
@@ -236,6 +239,7 @@
     border-radius: 10px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: none;
+    min-width: 0; // Prevent overflow in flex/grid containers
 
     &:hover {
         border-color: #94a3b8;
@@ -434,5 +438,36 @@
         height: 20px;
         background: $primary;
         border-radius: 2px;
+    }
+}
+
+// 8. Ghost Icon Button
+@mixin icon-btn-ghost($color-theme) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    border: 1px solid transparent;
+    background: rgba($color-theme, 0.1); // Visible by default
+    color: $color-theme; // Visible by default
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+
+    &:hover {
+        background: rgba($color-theme, 0.2); // Darker on hover
+        // color: $color-theme; // Already set
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    i {
+        font-size: 1rem;
+        pointer-events: none;
     }
 }

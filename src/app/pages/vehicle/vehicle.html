@@ -78,7 +78,7 @@
 
         <div class="card-body">
           <div class="info-row">
-            <span class="label">วันที่สร้างรายการ:</span>
+            <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
             <span class="value">{{ row.original.createDate | date : 'dd/MM/yyyy' }}</span>
           </div>
 
@@ -91,7 +91,7 @@
               </div>
               <div class="item-detail">
                 <div class="detail-row">
-                  <i class="fas fa-car-side"></i> {{ item.description }}
+                  <i class="fas fa-info-circle"></i> {{ item.description }}
                 </div>
               </div>
             </div>
@@ -123,37 +123,37 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th class="col-id sortable-header text-center" (click)="toggleSort('id')">
-              เลขที่การเบิก
+            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('id')">
+              <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก
               <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
             </th>
 
-            <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
-              วันที่สร้างรายการ
+            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('createDate')">
+              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ
               <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
             </th>
 
-            <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
-              วันที่ขอเบิก
+            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('date')">
+              <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก
               <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
 
-            <th class="sortable-header text-center" (click)="toggleSort('desc')">
-              รายละเอียด
+            <th class="w-auto sortable-header text-center" (click)="toggleSort('desc')">
+              <i class="fas fa-align-left mr-1"></i> รายละเอียด
               <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
             </th>
 
-            <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
-              จำนวนเงิน
+            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('amount')">
+              <i class="fas fa-coins mr-1"></i> จำนวนเงิน
               <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
 
-            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
-              สถานะ
+            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('status')">
+              <i class="fas fa-tasks mr-1"></i> สถานะ
               <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
 
-            <th class="col-actions text-center">Actions</th>
+            <th class="w-px-120 text-center">Actions</th>
           </tr>
         </thead>
         @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {

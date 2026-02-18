@@ -90,19 +90,30 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     departmentList: any[] = []
     filteredDepartmentList: any[] = [];
 
+    isDataLoaded = false;
+
     ngOnInit() {
-        this.getBanks()
-        this.getCompanies()
-        this.getDepartments()
         if (this.editData) {
             this.formData = { ...this.formData, ...this.editData };
         }
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
+            if (!this.isDataLoaded) {
+                this.loadMasterData();
+            }
+        }
         if (changes['editData'] && changes['editData'].currentValue) {
             this.formData = { ...this.formData, ...changes['editData'].currentValue };
         }
+    }
+
+    loadMasterData() {
+        this.getBanks();
+        this.getCompanies();
+        this.getDepartments();
+        this.isDataLoaded = true;
     }
 
     // calculateTotal() {

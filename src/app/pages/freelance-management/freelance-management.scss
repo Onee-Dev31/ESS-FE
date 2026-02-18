@@ -1,5 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
+@use 'sass:color';
 
 // ============================================
 // Freelance Management Page Styles
@@ -42,6 +43,63 @@ $border: #dee2e6;
     @include tablet {
         padding: 16px;
         border-radius: 12px;
+    }
+}
+
+// Status Badges
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    &::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
+
+    &.status-new,
+    &.status-waiting,
+    &.NEW,
+    &.WAITING_CHECK {
+        background: #e0f2fe;
+        color: #0284c7;
+        border-color: #bae6fd;
+    }
+
+    &.status-approved,
+    &.status-verified,
+    &.APPROVED,
+    &.VERIFIED {
+        background: #dcfce7;
+        color: #16a34a;
+        border-color: #bbf7d0;
+    }
+
+    &.status-rejected,
+    &.status-cancelled,
+    &.REJECTED,
+    &.CANCELLED {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+    &.status-pending,
+    &.PENDING_APPROVAL {
+        background: #ffedd5;
+        color: #ea580c;
+        border-color: #fed7aa;
     }
 }
 
@@ -147,18 +205,50 @@ $border: #dee2e6;
 
     .mobile-card {
         background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.03);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.08);
+
+            .card-header {
+                background: #f0f9ff;
+            }
+
+            .card-header::after {
+                opacity: 1;
+            }
+        }
 
         .card-header {
-            background: #f8fafc;
-            padding: 12px 16px;
+            background: #fff;
             border-bottom: 1px solid #f1f5f9;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            transition: background 0.3s ease;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
 
             .header-content {
                 .ticket-no {
@@ -177,7 +267,10 @@ $border: #dee2e6;
         }
 
         .card-body {
-            padding: 16px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
 
             .info-row {
                 display: flex;
@@ -187,11 +280,59 @@ $border: #dee2e6;
 
                 .label {
                     color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    i {
+                        color: #94a3b8;
+                        font-size: 0.85rem;
+                        width: 16px;
+                        text-align: center;
+                    }
                 }
 
                 .value {
                     font-weight: 600;
                     color: #1e293b;
+                }
+            }
+
+            .card-footer-actions {
+                margin-top: auto;
+                padding-top: 16px;
+                border-top: 1px solid #f1f5f9;
+                display: flex;
+                gap: 12px;
+
+                button {
+                    flex: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 8px 16px;
+                    border-radius: 10px;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+
+                    i {
+                        font-size: 1rem;
+                    }
+                }
+
+                .btn-edit-sm {
+                    background: #f0f9ff;
+                    color: #0ea5e9;
+                    border: 1px solid transparent;
+
+                    &:hover {
+                        background: #e0f2fe;
+                        color: #0284c7;
+                        transform: translateY(-1px);
+                    }
                 }
             }
         }
@@ -446,7 +587,7 @@ $border: #dee2e6;
         display: block;
         padding: 0 1.5rem 1.5rem 1.5rem;
 
-        @include tablet {
+        @include large-tablet {
             display: none !important;
         }
     }

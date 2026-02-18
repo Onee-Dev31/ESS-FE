@@ -109,7 +109,7 @@
                 </div>
                 <div class="card-body">
                     <div class="info-row">
-                        <span class="label">วันที่สร้างรายการ:</span>
+                        <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
                         <span class="value">{{ req.createDate }}</span>
                     </div>
 
@@ -153,46 +153,57 @@
                 <thead>
                     <tr>
                         <th rowspan="2" class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
-                            เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestId')"></i>
+                            <i class="fas fa-hashtag mr-1"></i> เลขที่เอกสาร <i class="fas ml-1"
+                                [ngClass]="getSortIcon('requestId')"></i>
                         </th>
                         <th rowspan="2" class="col-date sortable-header text-center"
                             (click)="toggleSort('requestDate')">
-                            วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
+                            <i class="far fa-clock mr-1"></i> วันที่ขอเบิก <i class="fas ml-1"
+                                [ngClass]="getSortIcon('requestDate')"></i>
                         </th>
                         <th rowspan="2" class="col-limit sortable-header text-center" (click)="toggleSort('limitType')">
-                            ประเภทวงเงิน <i class="fas ml-1" [ngClass]="getSortIcon('limitType')"></i>
+                            <i class="fas fa-wallet mr-1"></i> ประเภทวงเงิน <i class="fas ml-1"
+                                [ngClass]="getSortIcon('limitType')"></i>
                         </th>
                         <th rowspan="2" class="col-disease sortable-header text-center"
                             (click)="toggleSort('diseaseType')">
-                            ประเภทโรค <i class="fas ml-1" [ngClass]="getSortIcon('diseaseType')"></i>
+                            <i class="fas fa-notes-medical mr-1"></i> ประเภทโรค <i class="fas ml-1"
+                                [ngClass]="getSortIcon('diseaseType')"></i>
                         </th>
                         <th rowspan="2" class="col-hospital sortable-header text-center"
                             (click)="toggleSort('hospital')">
-                            สถานพยาบาล <i class="fas ml-1" [ngClass]="getSortIcon('hospital')"></i>
+                            <i class="fas fa-hospital mr-1"></i> สถานพยาบาล <i class="fas ml-1"
+                                [ngClass]="getSortIcon('hospital')"></i>
                         </th>
                         <th colspan="2" class="text-center">
-                            วันที่เข้ารับการรักษา</th>
+                            <i class="far fa-calendar-alt mr-1"></i> วันที่เข้ารับการรักษา
+                        </th>
                         <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('requestedAmount')">
-                            จำนวนเงินที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestedAmount')"></i>
+                            <i class="fas fa-coins mr-1"></i> จำนวนเงินที่ขอเบิก <i class="fas ml-1"
+                                [ngClass]="getSortIcon('requestedAmount')"></i>
                         </th>
                         <th rowspan="2" class="col-amount sortable-header text-center"
                             (click)="toggleSort('approvedAmount')">
-                            จำนวนเงินที่เบิกได้ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
+                            <i class="fas fa-check-circle mr-1"></i> จำนวนเงินที่เบิกได้ <i class="fas ml-1"
+                                [ngClass]="getSortIcon('approvedAmount')"></i>
                         </th>
                         <th rowspan="2" class="col-status sortable-header text-center" (click)="toggleSort('status')">
-                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+                            <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1"
+                                [ngClass]="getSortIcon('status')"></i>
                         </th>
                         <th rowspan="2" class="col-actions text-center">
-                            จัดการ
+                            Actions
                         </th>
                     </tr>
                     <tr>
                         <th class="col-date-sm text-center sortable-header" (click)="toggleSort('treatmentDateFrom')">
-                            ตั้งแต่ <i class="fas ml-1" [ngClass]="getSortIcon('treatmentDateFrom')"></i>
+                            <i class="fas fa-calendar-check mr-1"></i> ตั้งแต่ <i class="fas ml-1"
+                                [ngClass]="getSortIcon('treatmentDateFrom')"></i>
                         </th>
                         <th class="col-date-sm text-center sortable-header" (click)="toggleSort('treatmentDateTo')">
-                            ถึง <i class="fas ml-1" [ngClass]="getSortIcon('treatmentDateTo')"></i>
+                            <i class="fas fa-calendar-times mr-1"></i> ถึง <i class="fas ml-1"
+                                [ngClass]="getSortIcon('treatmentDateTo')"></i>
                         </th>
                     </tr>
                 </thead>
