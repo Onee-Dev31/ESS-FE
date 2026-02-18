@@ -94,13 +94,13 @@
                     <div class="form-field">
                         <label>เงินเดือน</label>
                         <input nz-input type="text" class="form-input" [(ngModel)]="salaryDisplay" name="salary"
-                            (input)="onMoneyInput('salary', $event)" placeholder="1x,xxx.xx">
+                            (input)="onMoneyInput('salary', $event)" placeholder="">
                     </div>
 
                     <div class="form-field">
                         <label>รายได้อื่น</label>
                         <input nz-input type="text" class="form-input" [(ngModel)]="otherIncomeDisplay"
-                            name="otherIncome" (input)="onMoneyInput('otherIncome', $event)" placeholder="1x,xxx.xx">
+                            name="otherIncome" (input)="onMoneyInput('otherIncome', $event)" placeholder="">
                     </div>
 
                     <div class="form-field">
@@ -148,7 +148,7 @@
 
                             <div class="file-select-box">
                                 <i class="fas fa-folder-open"></i>
-                                <span>D://zzzzz.png</span>
+                                <span></span>
                             </div>
 
                             <div class="btn-upload">Upload</div>
@@ -159,8 +159,12 @@
                             <div class="file-item" *ngFor="let file of uploadedFiles; let i = index">
                                 <i class="fas fa-file-pdf"></i>
                                 <span>{{ file.name }}</span>
+
+                                <input nz-input type="text" [(ngModel)]="file.description" name="description{{i}}"
+                                    placeholder="อธิบายไฟล์" class="form-input">
+
                                 <button type="button" class="btn-remove" (click)="removeFile(i)">
-                                    <i class="fas fa-times"></i>
+                                    <mat-icon>close</mat-icon>
                                 </button>
                             </div>
                         </div>

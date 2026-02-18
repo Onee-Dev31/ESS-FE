@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MasterDataService } from '../../../services/master-data.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { MatIconModule } from '@angular/material/icon';
 
 interface FreelanceFormData {
     id?: string;
@@ -28,7 +29,7 @@ interface FreelanceFormData {
     adUser: string;
     fotdNumber: string;
     description: string;
-    attachments: File[];
+    attachments: { name: string; file: File; description: string; }[];
     lastWorkingDate?: string;
 }
 
@@ -39,7 +40,8 @@ interface FreelanceFormData {
         CommonModule,
         FormsModule,
         NzDatePickerModule,
-        NzSelectModule
+        NzSelectModule,
+        MatIconModule
     ],
     templateUrl: './freelance-form.html',
     styleUrls: ['./freelance-form.scss'],
@@ -80,7 +82,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         attachments: []
     };
 
-    uploadedFiles: { name: string; file: File }[] = [];
+    uploadedFiles: { name: string; file: File; description: string; }[] = [];
 
     //MASTER
     bankList: any[] = []
@@ -112,7 +114,8 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         if (files && files.length > 0) {
             const newFiles = Array.from(files).map((file: any) => ({
                 name: file.name,
-                file: file
+                file: file,
+                description: ''
             }));
             this.uploadedFiles = [...this.uploadedFiles, ...newFiles];
         }
@@ -123,6 +126,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     handleSave() {
+        this.formData.attachments = this.uploadedFiles
         this.onSave.emit(this.formData);
     }
 
