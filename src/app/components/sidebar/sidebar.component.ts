@@ -104,7 +104,7 @@ export class Sidebar {
             iconType: 'material',
             role: [USER_ROLES.ADMIN, USER_ROLES.HR],
             subItems: [
-                { label: 'พนังงานประจำ', path: '/resign-management' },
+                { label: 'พนักงานประจำ', path: '/resign-management' },
                 { label: 'พนักงานฟรีแลนซ์', path: '/freelance-management' }
             ]
         },
