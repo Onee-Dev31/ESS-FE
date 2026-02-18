@@ -19,21 +19,28 @@ export class FreelanceService {
         return this._http.post(`${this.baseUrl}/Freelance/operation`, formData);
     }
 
-    getFreelance(page?: number, pageSize?: number): Observable<any> {
+    getFreelance(params: {
+        page?: number;
+        pageSize?: number;
+        searchText?: string;
+        companyCode?: string;
+        costCent?: string;
+    }): Observable<any> {
 
-        let params = new HttpParams();
+        const queryParams: any = {};
 
-        if (page !== undefined && page !== null) {
-            params = params.set('page', page.toString());
-        }
+        if (params.page) queryParams.page = params.page;
+        if (params.pageSize) queryParams.pageSize = params.pageSize;
+        if (params.searchText) queryParams.searchText = params.searchText;
+        if (params.companyCode) queryParams.companyCode = params.companyCode;
+        if (params.costCent) queryParams.costCent = params.costCent;
 
-        if (pageSize !== undefined && pageSize !== null) {
-            params = params.set('pageSize', pageSize.toString());
-        }
+        console.log("params >>> ", queryParams)
 
-        console.log("params : ", params)
+        return this._http.get<any>(`${this.baseUrl}/Freelance`, {
+            params: queryParams
+        });
 
-        return this._http.get(`${this.baseUrl}/Freelance`, { params });
     }
 
 

@@ -74,11 +74,55 @@ export class FreelanceManagementComponent implements OnInit {
     filterDepartment = signal<any>('');
     filterMonth = signal<string>('');
 
+    appliedCompany = signal<any>(null);
+    appliedDepartment = signal<any>(null);
+    appliedSearch = signal<string>('');
+
+    // processedData = computed(() => {
+    //     let filtered = [...this.data()];
+    //     const search = this.listing.searchText().toLowerCase();
+    //     const company = this.filterCompany();
+    //     const department = this.filterDepartment();
+
+    //     if (search) {
+    //         filtered = filtered.filter(item =>
+    //             item.name.toLowerCase().includes(search) ||
+    //             item.nickname.toLowerCase().includes(search) ||
+    //             item.employeeId.toLowerCase().includes(search) ||
+    //             item.phone.includes(search)
+    //         );
+    //     }
+
+    //     if (company) {
+    //         filtered = filtered.filter(item => item.company === company.COMPANY_CODE);
+    //     }
+
+    //     if (department) {
+    //         filtered = filtered.filter(item => item.department === department.COSTCENT + ' - ' + department.NAMECOSTCENT);
+    //     }
+
+    //     const sortState = this.sorting()[0];
+    //     if (sortState) {
+    //         const { id, desc } = sortState;
+    //         const direction = desc ? -1 : 1;
+    //         filtered.sort((a, b) => {
+    //             const valA = a[id as keyof FreelanceMember];
+    //             const valB = b[id as keyof FreelanceMember];
+    //             if (valA === undefined || valB === undefined) return 0;
+    //             if (valA < valB) return -1 * direction;
+    //             if (valA > valB) return 1 * direction;
+    //             return 0;
+    //         });
+    //     }
+
+    //     return filtered;
+    // });
+
     processedData = computed(() => {
         let filtered = [...this.data()];
-        const search = this.listing.searchText().toLowerCase();
-        const company = this.filterCompany();
-        const department = this.filterDepartment();
+        const search = this.appliedSearch().toLowerCase();
+        const company = this.appliedCompany();
+        const department = this.appliedDepartment();
 
         if (search) {
             filtered = filtered.filter(item =>
@@ -90,13 +134,19 @@ export class FreelanceManagementComponent implements OnInit {
         }
 
         if (company) {
-            filtered = filtered.filter(item => item.company === company.COMPANY_CODE);
+            filtered = filtered.filter(item =>
+                item.company === company.COMPANY_CODE
+            );
         }
 
         if (department) {
-            filtered = filtered.filter(item => item.department === department.COSTCENT + ' - ' + department.NAMECOSTCENT);
+            filtered = filtered.filter(item =>
+                item.department ===
+                department.COSTCENT + ' - ' + department.NAMECOSTCENT
+            );
         }
 
+        // sort เหมือนเดิม
         const sortState = this.sorting()[0];
         if (sortState) {
             const { id, desc } = sortState;
@@ -230,14 +280,23 @@ export class FreelanceManagementComponent implements OnInit {
         return TableSortHelper.getSortIcon(this.table, columnId);
     }
 
-    setPageSize(size: number) {
-        this.listing.pageSize.set(size);
-        this.listing.currentPage.set(0);
-    }
+    // setPageSize(size: number) {
+    //     this.listing.pageSize.set(size);
+    //     this.listing.currentPage.set(0);
+    // }
+
+    // goToPage(page: number) {
+    //     this.listing.currentPage.set(page);
+    // }
 
     goToPage(page: number) {
-        this.listing.currentPage.set(page);
+        this.getFreelance(page + 1, this.listing.pageSize());
     }
+    setPageSize(size: number) {
+        this.listing.pageSize.set(size);
+        this.getFreelance(1, size);
+    }
+
 
     toggleSelectAll(event: Event) {
         const checked = (event.target as HTMLInputElement).checked;
@@ -357,9 +416,35 @@ export class FreelanceManagementComponent implements OnInit {
         this.filterDepartment.set(null);
     }
 
+    applyFilter() {
+        // this.appliedCompany.set(this.filterCompany());
+        // this.appliedDepartment.set(this.filterDepartment());
+        // this.appliedSearch.set(this.listing.searchText());
+
+        // this.listing.currentPage.set(0);
+
+        this.getFreelance(1, this.listing.pageSize());
+    }
+
+
     // GET
-    getFreelance() {
-        this.freelanceService.getFreelance(1, 0).subscribe({
+    getFreelance(
+        page: number = 1,
+        pageSize: number = 10
+    ) {
+
+        const searchText = this.listing.searchText();
+        const company = this.filterCompany();
+        const department = this.filterDepartment();
+
+        this.loadingService.start('freelance-list');
+        this.freelanceService.getFreelance({
+            page,
+            pageSize,
+            searchText: searchText || undefined,
+            companyCode: company?.COMPANY_CODE,
+            costCent: department?.COSTCENT
+        }).subscribe({
             next: (res) => {
                 console.log(res);
 
@@ -383,15 +468,15 @@ export class FreelanceManagementComponent implements OnInit {
                 // 🔥 set เข้า signal
                 this.data.set(mapped);
 
+                // this.listing.pageSize.set(10);
+                this.listing.currentPage.set(page - 1);
 
-
-                this.listing.pageSize.set(10);
-                this.listing.currentPage.set(0);
 
                 this.loadingService.stop('freelance-list');
             },
             error: (error) => {
                 console.error('Error fetching data:', error);
+                this.loadingService.stop('freelance-list');
             }
         });
     }

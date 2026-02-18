@@ -23,7 +23,7 @@
                         [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept" />
                 </nz-select>
             </div>
-            <button class="btn-search-purple">
+            <button class="btn-search-purple" (click)="applyFilter()">
                 <i class="fas fa-search"></i> ค้นหา
             </button>
         </div>
