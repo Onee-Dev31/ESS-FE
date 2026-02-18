@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MasterDataService } from '../../../services/master-data.service';
@@ -25,12 +25,12 @@ interface FreelanceFormData {
     totalIncome: number;
     accountNumber: string;
     bank: string;
-    supplierCode: string;
-    adUser: string;
     fotdNumber: string;
     description: string;
     attachments: { name: string; file: File; description: string; }[];
     lastWorkingDate?: string;
+    supplierCode: string;
+    adUser: string;
 }
 
 @Component({
@@ -54,6 +54,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     @Output() onSave = new EventEmitter<FreelanceFormData>();
 
     private masterService = inject(MasterDataService);
+    private cdr = inject(ChangeDetectorRef);
 
     dateFormat = 'dd//MM/yyyy';
 
@@ -96,16 +97,23 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         if (this.editData) {
             this.formData = { ...this.formData, ...this.editData };
         }
+        this.loadMasterData();
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
             if (!this.isDataLoaded) {
-                this.loadMasterData();
+
             }
         }
         if (changes['editData'] && changes['editData'].currentValue) {
             this.formData = { ...this.formData, ...changes['editData'].currentValue };
+
+            setTimeout(() => {
+                this.mapCompanyAndDepartment();
+                this.syncMoneyDisplay();
+                this.cdr.detectChanges();
+            });
         }
     }
 
@@ -116,9 +124,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         this.isDataLoaded = true;
     }
 
-    // calculateTotal() {
-    //     this.formData.totalIncome = (this.formData.salary || 0) + (this.formData.otherIncome || 0);
-    // }
 
     onFileSelect(event: any) {
         const files = event.target.files;
@@ -169,8 +174,42 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     handleClose() {
+        this.resetForm();     
+        this.editData = null;
         this.onClose.emit();
     }
+
+    private resetForm() {
+        this.formData = {
+            firstNameTh: '',
+            lastNameTh: '',
+            nickname: '',
+            firstNameEn: '',
+            lastNameEn: '',
+            phone: '',
+            email: '',
+            company: '',
+            department: '',
+            position: '',
+            startDate: '',
+            endDate: '',
+            salary: 0,
+            otherIncome: 0,
+            totalIncome: 0,
+            accountNumber: '',
+            bank: '',
+            supplierCode: '',
+            adUser: '',
+            fotdNumber: '',
+            description: '',
+            attachments: []
+        };
+
+        this.uploadedFiles = [];
+        this.salaryDisplay = '';
+        this.otherIncomeDisplay = '';
+    }
+
 
     openPicker(event: any) {
         event.target.showPicker();
@@ -215,8 +254,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     // function
-    onCompanyChange(company: any) {
-        this.formData.department = '';
+    onCompanyChange(company: any, isUserChange = true) {
+        if (isUserChange) {
+            this.formData.department = '';
+        }
 
         if (!company) {
             this.filteredDepartmentList = [];
@@ -284,5 +325,44 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
             maximumFractionDigits: 2
         });
     }
+
+    private mapCompanyAndDepartment() {
+
+
+        if (!this.formData.company) return;
+
+        // 🔹 map company
+        const selectedCompany = this.companyList.find(
+            c => c.COMPANY_CODE === this.formData.company
+        );
+
+        if (selectedCompany) {
+            this.formData.company = selectedCompany;
+            this.onCompanyChange(selectedCompany, false);
+        }
+
+        // 🔹 map department
+        const selectedDepartment = this.departmentList.find(
+            d => d.COSTCENT === this.formData.department
+        );
+
+        if (selectedDepartment) {
+            this.formData.department = selectedDepartment;
+        }
+    }
+
+    private syncMoneyDisplay() {
+
+        this.salaryDisplay = this.formData.salary
+            ? this.formatMoney(this.formData.salary)
+            : '';
+
+        this.otherIncomeDisplay = this.formData.otherIncome
+            ? this.formatMoney(this.formData.otherIncome)
+            : '';
+
+        this.calculateTotal();
+    }
+
 
 }

@@ -43,5 +43,8 @@ export class FreelanceService {
 
     }
 
+    getFreelanceById(id: any): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Freelance/${id}`);
+    }
 
 }

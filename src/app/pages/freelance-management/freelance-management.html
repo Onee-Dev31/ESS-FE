@@ -11,7 +11,7 @@
                 <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [ngModel]="filterCompany()"
                     (ngModelChange)="onCompanyChange($event)" name="company" class="form-control">
                     <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
-                    <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
+                    <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
                         [nzValue]="company" />
                 </nz-select>
 

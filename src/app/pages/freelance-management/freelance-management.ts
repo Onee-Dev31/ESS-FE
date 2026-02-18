@@ -17,6 +17,7 @@ import { FreelanceService } from '../../services/freelance-management.service';
 import { SwalService } from '../../services/swal.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MasterDataService } from '../../services/master-data.service';
+import { firstValueFrom } from 'rxjs';
 
 interface FreelanceMember {
     id: string;
@@ -31,6 +32,33 @@ interface FreelanceMember {
     startDate: string;
     endDate: string;
     selected?: boolean;
+}
+
+interface FreelanceFormData {
+    id?: string;
+    firstNameTh: string;
+    lastNameTh: string;
+    nickname: string;
+    firstNameEn: string;
+    lastNameEn: string;
+    phone: string;
+    email: string;
+    company: string;
+    department: string;
+    position: string;
+    startDate: string;
+    endDate: string;
+    salary: number;
+    otherIncome: number;
+    totalIncome: number;
+    accountNumber: string;
+    bank: string;
+    supplierCode: string;
+    adUser: string;
+    fotdNumber: string;
+    description: string;
+    attachments: { name: string; file: File; description: string; }[];
+    lastWorkingDate?: string;
 }
 
 @Component({
@@ -67,7 +95,7 @@ export class FreelanceManagementComponent implements OnInit {
 
     // Modal state
     isFormOpen = signal<boolean>(false);
-    editingItem = signal<FreelanceMember | null>(null);
+    editingItem = signal<FreelanceFormData | null>(null);
 
     // New Filters
     filterCompany = signal<any>('');
@@ -316,8 +344,46 @@ export class FreelanceManagementComponent implements OnInit {
         this.isFormOpen.set(true);
     }
 
-    openEditForm(item: FreelanceMember) {
-        this.editingItem.set(item);
+    async openEditForm(item: FreelanceMember) {
+
+        const res = await firstValueFrom(
+            this.getFreelanceById(item.id)
+        );
+
+        const info = res.info
+        const file = res.files
+        console.log(info)
+
+        const formData = {
+            id: info.ID,
+            firstNameTh: info.FIRSTNAME_TH,
+            lastNameTh: info.LASTNAME_TH,
+            firstNameEn: info.FIRSTNAME_EN,
+            lastNameEn: info.LASTNAME_EN,
+            nickname: info.NICKNAME,
+            phone: info.MOBILE,
+            email: info.EMAIL,
+            company: info.COMPANY_CODE,
+            department: info.COSTCENT,
+            position: info.POSITION,
+            startDate: info.CONTRACT_START_DATE,
+            endDate: info.CONTRACT_END_DATE,
+            salary: info.SALARY,
+            otherIncome: info.OTHER_INCOME || 0,
+            totalIncome: info.TOTAL_AMT,
+            accountNumber: info.ACC_BOOK_NO,
+            bank: info.NAMEBANK,
+            supplierCode: info.SUPPLIER_CODE || '-',
+            adUser: info.AD_USER || '-',
+            fotdNumber: info.EMP_NO,
+            description: info.REMARK,
+            attachments: [],
+            lastWorkingDate: info.RESIGN_DATE
+        }
+
+        console.log(formData);
+
+        this.editingItem.set(formData);
         this.isFormOpen.set(true);
     }
 
@@ -381,9 +447,9 @@ export class FreelanceManagementComponent implements OnInit {
             obj[key] = value;
         });
 
-        console.log(obj);
-        console.log('Descriptions:', formData.getAll('fileDescriptions'));
-        console.log('Files:', formData.getAll('files'));
+        // console.log(obj);
+        // console.log('Descriptions:', formData.getAll('fileDescriptions'));
+        // console.log('Files:', formData.getAll('files'));
 
         this.freelanceService.createFreelance(formData).subscribe({
             next: (res) => {
@@ -479,6 +545,10 @@ export class FreelanceManagementComponent implements OnInit {
                 this.loadingService.stop('freelance-list');
             }
         });
+    }
+
+    getFreelanceById(id: any) {
+        return this.freelanceService.getFreelanceById(id);
     }
 
     // GET MASTER

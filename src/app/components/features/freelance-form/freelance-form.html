@@ -104,7 +104,7 @@
                     <div class="form-field">
                         <label>บริษัท</label>
                         <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [(ngModel)]="formData.company"
-                            name="company" class="form-input" (ngModelChange)="onCompanyChange($event)" required
+                            name="company" class="form-input" (ngModelChange)="onCompanyChange($event, true)" required
                             #company="ngModel" [class.input-error]="company.invalid && company.touched">
                             <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
                             <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
@@ -166,7 +166,7 @@
                 <div class="form-row four-cols">
                     <div class="form-field">
                         <label>เลขที่บัญชี</label>
-                        <input nz-input type="text" class="form-input" placeholder="1234567890000"
+                        <input nz-input type="text" class="form-input" placeholder=""
                             [(ngModel)]="formData.accountNumber" name="accountNumber">
                     </div>
                     <div class="form-field">
@@ -177,13 +177,15 @@
                             <nz-option *ngFor="let bank of bankList" [nzLabel]="bank" [nzValue]="bank" />
                         </nz-select>
                     </div>
-                    <div class="form-field">
+                    <div class="form-field" *ngIf="!!editData">
                         <label>เลขที่ Supplier</label>
-                        <input nz-input type="text" class="form-input disabled" placeholder="2Axxxxxx" disabled>
+                        <input nz-input type="text" class="form-input disabled" name="supplierCode"
+                            [(ngModel)]="formData.supplierCode" placeholder="" disabled>
                     </div>
-                    <div class="form-field">
+                    <div class="form-field" *ngIf="!!editData">
                         <label>AD User</label>
-                        <input nz-input type="text" class="form-input disabled" placeholder="2Axxxxxx" disabled>
+                        <input nz-input type="text" class="form-input disabled" name="adUser"
+                            [(ngModel)]="formData.adUser" placeholder="" disabled>
                     </div>
                     <!-- <div class="form-field">
                         <label>รหัสพนักงาน</label>
