@@ -5,22 +5,37 @@
         <div class="search-title">ค้นหา</div>
         <div class="filter-row">
             <div class="filter-group-main">
-                <input type="text" class="form-control" placeholder="ชื่อ, นามสกุล, ชื่อเล่น"
+                <input nz-input type="text" class="form-control" placeholder="ชื่อ, นามสกุล, ชื่อเล่น"
                     [ngModel]="listing.searchText()" (ngModelChange)="listing.searchText.set($event)">
 
-                <select class="form-control" [ngModel]="filterCompany()" (ngModelChange)="filterCompany.set($event)">
+                <!-- <select class="form-control" [ngModel]="filterCompany()" (ngModelChange)="filterCompany.set($event)">
                     <option value="">-เลือกบริษัท-</option>
                     <option value="OTD">OTD</option>
                     <option value="GTV">GTV</option>
                     <option value="OTV">OTV</option>
                     <option value="ATM">ATM</option>
-                </select>
+                </select> -->
 
-                <select class="form-control" [ngModel]="filterDepartment()"
+                <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [ngModel]="filterCompany()"
+                    (ngModelChange)="onCompanyChange($event)" name="company" class="form-control">
+                    <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
+                    <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
+                        [nzValue]="company" />
+                </nz-select>
+
+                <!-- <select class="form-control" [ngModel]="filterDepartment()"
                     (ngModelChange)="filterDepartment.set($event)">
                     <option value="">-เลือกแผนก-</option>
                     <option value="10806 - IT Department">10806 - IT Department</option>
-                </select>
+                </select> -->
+
+                <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก" [ngModel]="filterDepartment()"
+                    (ngModelChange)="filterDepartment.set($event)" name="department" class="form-control"
+                    [class.disabled]="!filterCompany()" [nzDisabled]="!filterCompany()">
+                    <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
+                    <nz-option *ngFor="let dept of filteredDepartmentList()"
+                        [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept" />
+                </nz-select>
             </div>
             <button class="btn-search-purple">
                 <i class="fas fa-search"></i> ค้นหา
@@ -40,12 +55,12 @@
                 </button>
             </div>
             <div class="toolbar-right">
-                <select class="form-control select-month" [ngModel]="filterMonth()"
+                <nz-select class="form-control select-month" [ngModel]="filterMonth()"
                     (ngModelChange)="filterMonth.set($event)">
-                    <option value="">-เลือกเดือน-</option>
-                    <option value="01">มกราคม</option>
-                    <option value="02">กุมภาพันธ์</option>
-                </select>
+                    <nz-option nzLabel="-เลือกเดือน-" nzValue="" nzDisabled />
+                    <nz-option nzLabel="มกราคม" nzValue="01" />
+                    <nz-option nzLabel="กุมภาพันธ์" nzValue="02" />
+                </nz-select>
                 <button class="btn-send-data" (click)="openCreateForm()">
                     <i class="fas fa-upload"></i> ส่งข้อมูล
                 </button>

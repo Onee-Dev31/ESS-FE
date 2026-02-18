@@ -15,6 +15,8 @@ import {
 import { LoadingService } from '../../services/loading';
 import { FreelanceService } from '../../services/freelance-management.service';
 import { SwalService } from '../../services/swal.service';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { MasterDataService } from '../../services/master-data.service';
 
 interface FreelanceMember {
     id: string;
@@ -41,7 +43,8 @@ interface FreelanceMember {
         PageHeaderComponent,
         SkeletonComponent,
         EmptyStateComponent,
-        FreelanceFormComponent
+        FreelanceFormComponent,
+        NzSelectModule
     ],
     templateUrl: './freelance-management.html',
     styleUrl: './freelance-management.scss'
@@ -50,19 +53,25 @@ export class FreelanceManagementComponent implements OnInit {
     private loadingService = inject(LoadingService);
     private freelanceService = inject(FreelanceService);
     private swalService = inject(SwalService);
+    private masterService = inject(MasterDataService);
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
     listing = createListingState();
     sorting = signal<SortingState>([]);
 
+    // MASTER
+    companyList: any[] = []
+    departmentList: any[] = []
+    // filteredDepartmentList: any[] = [];
+
     // Modal state
     isFormOpen = signal<boolean>(false);
     editingItem = signal<FreelanceMember | null>(null);
 
     // New Filters
-    filterCompany = signal<string>('');
-    filterDepartment = signal<string>('');
+    filterCompany = signal<any>('');
+    filterDepartment = signal<any>('');
     filterMonth = signal<string>('');
 
     processedData = computed(() => {
@@ -81,7 +90,7 @@ export class FreelanceManagementComponent implements OnInit {
         }
 
         if (company) {
-            filtered = filtered.filter(item => item.company === company);
+            filtered = filtered.filter(item => item.company === company.COMPANY_CODE);
         }
 
         if (department) {
@@ -103,6 +112,18 @@ export class FreelanceManagementComponent implements OnInit {
         }
 
         return filtered;
+    });
+
+    filteredDepartmentList = computed(() => {
+        const company = this.filterCompany();
+
+        console.log(company)
+
+        if (!company) return [];
+
+        return this.departmentList.filter(dep =>
+            dep.COMPANY_CODE === company.COMPANY_CODE
+        );
     });
 
     comps = createListingComputeds(this.processedData, this.listing);
@@ -132,6 +153,8 @@ export class FreelanceManagementComponent implements OnInit {
 
     ngOnInit() {
         this.loadData();
+        this.getCompanies();
+        this.getDepartments();
     }
 
     loadData() {
@@ -327,5 +350,37 @@ export class FreelanceManagementComponent implements OnInit {
 
     sendData() {
         console.log('Sending selected data:', this.data().filter(item => item.selected));
+    }
+
+    // FUNCTION
+    onCompanyChange(company: any) {
+        this.filterCompany.set(company);
+        this.filterDepartment.set(null);
+    }
+
+    // GET MASTER
+
+    getCompanies() {
+        this.masterService.getCompanyMaster().subscribe({
+            next: (data) => {
+                // console.log(data);
+                this.companyList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    getDepartments() {
+        this.masterService.getDepartmentMaster().subscribe({
+            next: (data) => {
+                // console.log(data);
+                this.departmentList = data
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
     }
 }
