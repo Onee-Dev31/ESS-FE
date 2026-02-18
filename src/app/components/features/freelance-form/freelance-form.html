@@ -1,4 +1,5 @@
-<div class="modal-overlay" *ngIf="isOpen" (click)="handleClose()">
+<div class="modal-overlay" *ngIf="isOpen">
+    <!-- <div class="modal-overlay" *ngIf="isOpen" (click)="handleClose()"> -->
     <div class="modal-container" (click)="$event.stopPropagation()">
         <!-- Header with close button -->
         <div class="form-header">
@@ -9,92 +10,143 @@
         </div>
 
         <div class="modal-content">
-            <form class="freelance-form">
+            <form #f="ngForm" class="freelance-form">
                 <div class="form-row">
                     <div class="form-field">
                         <label>ชื่อจริง</label>
                         <input nz-input placeholder="ชื่อจริงภาษาไทย" [(ngModel)]="formData.firstNameTh"
-                            name="firstNameTh" class="form-input" />
+                            name="firstNameTh" class="form-input" required #firstNameTh="ngModel"
+                            [class.input-error]="firstNameTh.invalid && firstNameTh.touched" />
+                        <div class="error" *ngIf="firstNameTh.invalid && firstNameTh.touched">
+                            กรุณากรอกชื่อจริง
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>นามสกุล</label>
                         <input nz-input type="text" class="form-input" placeholder="นามสกุลภาษาไทย"
-                            [(ngModel)]="formData.lastNameTh" name="lastNameTh">
+                            [(ngModel)]="formData.lastNameTh" name="lastNameTh" required #lastNameTh="ngModel"
+                            [class.input-error]="lastNameTh.invalid && lastNameTh.touched">
+                        <div class="error" *ngIf="lastNameTh.invalid && lastNameTh.touched">
+                            กรุณากรอกนามสกุล
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>ชื่อเล่น</label>
                         <input nz-input type="text" class="form-input" placeholder="ชื่อเล่น"
-                            [(ngModel)]="formData.nickname" name="nickname">
+                            [(ngModel)]="formData.nickname" name="nickname" required #nickname="ngModel"
+                            [class.input-error]="nickname.invalid && nickname.touched">
+                        <div class="error" *ngIf="nickname.invalid && nickname.touched">
+                            กรุณากรอกชื่อเล่น
+                        </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-field">
                         <label>First name</label>
                         <input nz-input type="text" class="form-input" placeholder="ชื่อจริงภาษาอังกฤษ"
-                            [(ngModel)]="formData.firstNameEn" name="firstNameEn">
+                            [(ngModel)]="formData.firstNameEn" name="firstNameEn" required #firstNameEn="ngModel"
+                            [class.input-error]="firstNameEn.invalid && firstNameEn.touched">
+                        <div class="error" *ngIf="firstNameEn.invalid && firstNameEn.touched">
+                            กรุณากรอกชื่อภาษาอังกฤษ
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>Last name</label>
                         <input nz-input type="text" class="form-input" placeholder="นามสกุลภาษาอังกฤษ"
-                            [(ngModel)]="formData.lastNameEn" name="lastNameEn">
+                            [(ngModel)]="formData.lastNameEn" name="lastNameEn" required #lastNameEn="ngModel"
+                            [class.input-error]="lastNameEn.invalid && lastNameEn.touched">
+                        <div class="error" *ngIf="lastNameEn.invalid && lastNameEn.touched">
+                            กรุณากรอกนามสกุลภาษาอังกฤษ
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>เบอร์โทรศัพท์</label>
                         <input nz-input type="tel" class="form-input" placeholder="เบอร์โทรศัพท์"
-                            [(ngModel)]="formData.phone" name="phone">
+                            [(ngModel)]="formData.phone" name="phone" required #phone="ngModel"
+                            [class.input-error]="phone.invalid && phone.touched">
+                        <div class="error" *ngIf="phone.invalid && phone.touched">
+                            กรุณากรอกเบอร์โทรศัพท์
+                        </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-field">
                         <label>Email</label>
                         <input nz-input type="email" class="form-input" placeholder="xxxxx@gmail.com"
-                            [(ngModel)]="formData.email" name="email">
+                            [(ngModel)]="formData.email" name="email" required #email="ngModel"
+                            [class.input-error]="email.invalid && email.touched">
+                        <div class="error" *ngIf="email.invalid && email.touched">
+                            กรุณากรอกอีเมล
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>วันที่เริ่มสัญญา</label>
                         <nz-date-picker [(ngModel)]="formData.startDate" nzFormat="dd/MM/yyyy" name="startDate"
-                            class="form-input">
+                            class="form-input" required #startDate="ngModel"
+                            [class.input-error]="startDate.invalid && startDate.touched">
                         </nz-date-picker>
+                        <div class="error" *ngIf="startDate.invalid && startDate.touched">
+                            กรุณาเลือกวันที่เริ่มสัญญา
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>วันที่สิ้นสุดสัญญา</label>
                         <nz-date-picker [(ngModel)]="formData.endDate" nzFormat="dd/MM/yyyy" name="endDate"
-                            class="form-input">
+                            class="form-input" required #endDate="ngModel"
+                            [class.input-error]="endDate.invalid && endDate.touched">
                         </nz-date-picker>
+                        <div class="error" *ngIf="endDate.invalid && endDate.touched">
+                            กรุณาเลือกวันที่สิ้นสุดสัญญา
+                        </div>
                     </div>
                 </div>
                 <div class="form-row ">
                     <div class="form-field">
                         <label>บริษัท</label>
                         <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [(ngModel)]="formData.company"
-                            name="company" class="form-input" (ngModelChange)="onCompanyChange($event)">
+                            name="company" class="form-input" (ngModelChange)="onCompanyChange($event)" required
+                            #company="ngModel" [class.input-error]="company.invalid && company.touched">
                             <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
                             <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
-                                [nzValue]="company.COMPANY_CODE" />
+                                [nzValue]="company" />
                         </nz-select>
+                        <div class="error" *ngIf="company.invalid && company.touched">
+                            กรุณาเลือกบริษัท
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>แผนก</label>
                         <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก" [(ngModel)]="formData.department"
                             name="department" class="form-input" [nzDisabled]="!formData.company"
-                            [class.disabled]="!formData.company">
+                            [class.disabled]="!formData.company" required #department="ngModel"
+                            [class.input-error]="department.invalid && department.touched">
                             <nz-option nzLabel="เลือกแผนก" nzValue="" nzDisabled />
-                            <nz-option *ngFor="let dept of departmentList"
-                                [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept.COSTCENT" />
+                            <nz-option *ngFor="let dept of filteredDepartmentList"
+                                [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept" />
                         </nz-select>
+                        <div class="error" *ngIf="department.invalid && department.touched">
+                            กรุณาเลือกแผนก
+                        </div>
                     </div>
                     <div class="form-field">
                         <label>ตำแหน่ง</label>
-                        <input nz-input class="form-input" [(ngModel)]="formData.position" name="position">
+                        <input nz-input class="form-input" [(ngModel)]="formData.position" name="position" required
+                            #position="ngModel" [class.input-error]="position.invalid && position.touched">
+                        <div class="error" *ngIf="position.invalid && position.touched">
+                            กรุณากรอกชื่อตำแหน่ง
+                        </div>
                     </div>
                 </div>
-
 
                 <div class="form-row">
                     <div class="form-field">
                         <label>เงินเดือน</label>
                         <input nz-input type="text" class="form-input" [(ngModel)]="salaryDisplay" name="salary"
-                            (input)="onMoneyInput('salary', $event)" placeholder="">
+                            (input)="onMoneyInput('salary', $event)" placeholder="" required #salary="ngModel"
+                            [class.input-error]="salary.invalid && salary.touched">
+                        <div class="error" *ngIf="salary.invalid && salary.touched">
+                            กรุณากรอกเงินเดือน
+                        </div>
                     </div>
 
                     <div class="form-field">
@@ -120,7 +172,7 @@
                     <div class="form-field">
                         <label>ธนาคาร</label>
                         <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกธนาคาร" [(ngModel)]="formData.bank"
-                            name="department" class="form-input">
+                            name="bank" class="form-input">
                             <nz-option nzLabel="เลือกธนาคาร" nzValue="" nzDisabled />
                             <nz-option *ngFor="let bank of bankList" [nzLabel]="bank" [nzValue]="bank" />
                         </nz-select>
@@ -175,7 +227,7 @@
                 <!-- Action buttons - NOW OUTSIDE modal-content -->
                 <div class="form-actions">
                     <button type="button" class="btn-resign" (click)="handleResign()">ลาออก</button>
-                    <button type="button" class="btn-save" (click)="handleSave()">Save</button>
+                    <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid">Save</button>
                     <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
                 </div>
             </form>

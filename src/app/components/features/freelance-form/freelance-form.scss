@@ -82,7 +82,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
     background: white;
     border-radius: 16px;
     width: 100%;
-    max-width: 980px;
+    max-width: 1080px;
     max-height: 90vh;
     overflow: hidden;
     position: relative;
@@ -361,6 +361,16 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 
     .ant-select:not(.ant-select-customize-input) .ant-select-selector {
         border: 1px solid #d9d9d900;
+    }
+
+    .form-input.input-error {
+        border-color: #ff4d4f !important;
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+    }
+
+    .error {
+        color: rgb(255, 166, 166);
+        text-align: center;
     }
 }
 

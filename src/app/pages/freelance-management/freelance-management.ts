@@ -13,6 +13,7 @@ import {
     SortingState,
 } from '@tanstack/angular-table';
 import { LoadingService } from '../../services/loading';
+import { FreelanceService } from '../../services/freelance-management.service';
 
 interface FreelanceMember {
     id: string;
@@ -46,6 +47,7 @@ interface FreelanceMember {
 })
 export class FreelanceManagementComponent implements OnInit {
     private loadingService = inject(LoadingService);
+    private freelanceService = inject(FreelanceService);
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
@@ -243,8 +245,75 @@ export class FreelanceManagementComponent implements OnInit {
         this.editingItem.set(null);
     }
 
-    handleFormSave(formData: any) {
-        console.log('Form data:', formData);
+    handleFormSave(fData: any) {
+        console.log('Form data:', fData);
+
+        const formData = new FormData();
+
+        // 🔹 action
+        formData.append('action', fData.attachments.length > 0 ? 'create_with_files' : 'create');
+
+        // 🔹 text fields
+        formData.append('firstname_th', fData.firstNameTh); //
+        formData.append('lastname_th', fData.lastNameTh); //
+        formData.append('firstname_en', fData.firstNameEn); //
+        formData.append('lastname_en', fData.lastNameEn); //
+        formData.append('nickname', fData.nickname); //
+        formData.append('mobile', fData.phone); //
+        formData.append('email', fData.email); //
+        formData.append('position', fData.position); //
+        formData.append('salary', fData.salary.toString()); //
+        formData.append('other_income', fData.otherIncome.toString()); //
+        formData.append('total_amt', fData.totalIncome.toString()); //
+        // formData.append('remark', fData.description);
+
+        formData.append('contract_start_date', new Date(fData.startDate).toISOString().split('T')[0]); // 2025-01-01
+        formData.append('contract_end_date', new Date(fData.endDate).toISOString().split('T')[0]); // 2025-01-01
+        // formData.append('resign_date', fData.lastWorkingDate ?? '');
+
+        formData.append('acc_book_no', fData.accountNumber); //
+        formData.append('costcent', fData.department.COSTCENT); //
+        formData.append('namecostcent', fData.department.NAMECOSTCENT); //
+
+        formData.append('candidate_id', '0');
+        formData.append('company_code', fData.company.COMPANY_CODE); //
+        formData.append('company_name', fData.company.COMPANY_NAME); //
+        formData.append('emp_status', 'Active');
+        formData.append('jobgrade', 'ZZ'); //
+        // formData.append('freelanceId', '');
+
+        // 🔹 files + descriptions
+        if (Array.isArray(fData.attachments)) {
+            fData.attachments.forEach((item: any) => {
+
+                if (item?.file instanceof File) {
+                    formData.append('files', item.file);
+                    formData.append('fileDescriptions', item.description || '');
+                }
+
+            });
+        }
+
+
+        const obj: any = {};
+        formData.forEach((value, key) => {
+            obj[key] = value;
+        });
+
+        console.log(obj);
+        console.log('Descriptions:', formData.getAll('fileDescriptions'));
+        console.log('Files:', formData.getAll('files'));
+
+        this.freelanceService.createFreelance(formData).subscribe({
+            next: (res) => {
+                console.log(res);
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+
+
         // TODO: Implement save logic
         this.closeForm();
     }

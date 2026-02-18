@@ -170,7 +170,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getBanks() {
         this.masterService.getBankMaster().subscribe({
             next: (data) => {
-                console.log(data);
+                // console.log(data);
                 this.bankList = data
             },
             error: (error) => {
@@ -182,7 +182,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getCompanies() {
         this.masterService.getCompanyMaster().subscribe({
             next: (data) => {
-                console.log(data);
+                // console.log(data);
                 this.companyList = data
             },
             error: (error) => {
@@ -194,7 +194,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getDepartments() {
         this.masterService.getDepartmentMaster().subscribe({
             next: (data) => {
-                console.log(data);
+                // console.log(data);
                 this.departmentList = data
             },
             error: (error) => {
@@ -204,16 +204,16 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     // function
-    onCompanyChange(companyCode: string) {
+    onCompanyChange(company: any) {
         this.formData.department = '';
 
-        if (!companyCode) {
+        if (!company) {
             this.filteredDepartmentList = [];
             return;
         }
 
         this.filteredDepartmentList = this.departmentList.filter(
-            dept => dept.COMPANY_CODE === companyCode
+            dept => dept.COMPANY_CODE === company.COMPANY_CODE
         );
     }
 
