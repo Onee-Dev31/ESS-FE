@@ -15,11 +15,20 @@ import { GlobalErrorHandler } from './core/global-error-handler';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeTh from '@angular/common/locales/th';
-import { provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
-
-
+import { NzI18nInterface, provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
 
 registerLocaleData(localeTh);
+
+const customTh: NzI18nInterface = {
+  ...th_TH,
+  DatePicker: {
+    ...th_TH.DatePicker,
+    lang: {
+      ...th_TH.DatePicker.lang,
+      rangeQuarterPlaceholder: ['เลือกไตรมาสเริ่มต้น', 'เลือกไตรมาสสิ้นสุด']
+    }
+  }
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,7 +41,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
 
     { provide: LOCALE_ID, useValue: 'th' },
-    provideNzI18n(th_TH)
+    provideNzI18n(customTh)
 
     , provideIcons({
       heroCurrencyDollarSolid,

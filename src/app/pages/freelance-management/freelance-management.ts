@@ -46,8 +46,10 @@ interface FreelanceFormData {
     company: string;
     department: string;
     position: string;
-    startDate: string;
-    endDate: string;
+    startDate: Date | null;
+    endDate: Date | null;  
+    // startDate: string;
+    // endDate: string;
     salary: number;
     otherIncome: number;
     totalIncome: number;
@@ -344,6 +346,8 @@ export class FreelanceManagementComponent implements OnInit {
         this.isFormOpen.set(true);
     }
 
+    original_formData_freelance: any;
+
     async openEditForm(item: FreelanceMember) {
 
         const res = await firstValueFrom(
@@ -352,7 +356,7 @@ export class FreelanceManagementComponent implements OnInit {
 
         const info = res.info
         const file = res.files
-        console.log(info, file)
+        // console.log(info, file)
 
         let convertedFiles: any[] = [];
 
@@ -376,8 +380,10 @@ export class FreelanceManagementComponent implements OnInit {
             company: info.COMPANY_CODE,
             department: info.COSTCENT,
             position: info.POSITION,
-            startDate: info.CONTRACT_START_DATE,
-            endDate: info.CONTRACT_END_DATE,
+            startDate: info.CONTRACT_START_DATE ? new Date(info.CONTRACT_START_DATE) : null,
+            endDate: info.CONTRACT_END_DATE ? new Date(info.CONTRACT_END_DATE) : null,
+            // startDate: info.CONTRACT_START_DATE,
+            // endDate: info.CONTRACT_END_DATE,
             salary: info.SALARY,
             otherIncome: info.OTHER_INCOME || 0,
             totalIncome: info.TOTAL_AMT,
@@ -391,7 +397,9 @@ export class FreelanceManagementComponent implements OnInit {
             lastWorkingDate: info.RESIGN_DATE
         }
 
-        console.log(formData);
+        this.original_formData_freelance = structuredClone(formData);
+
+        // console.log(formData);
 
         this.editingItem.set(formData);
         this.isFormOpen.set(true);
@@ -403,63 +411,115 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     handleFormSave(fData: any) {
+
+        const is_update = fData.id ? true : false
+
+        console.log(is_update)
         console.log('Form data:', fData);
+
+        let changedData: any = fData;
+
+        if (is_update) {
+            console.log('original Form data:', this.original_formData_freelance);
+            const diff = this.getChangedFields(fData, this.original_formData_freelance);
+            console.log('Changed fields:', diff);
+            changedData = diff;
+        }
 
         const formData = new FormData();
 
         // 🔹 action
-        formData.append('action', fData.attachments.length > 0 ? 'create_with_files' : 'create');
+        formData.append('action', is_update ? 'update' : fData.attachments.length > 0 ? 'create_with_files' : 'create');
+        (is_update && formData.append('freelanceId', fData.id));
 
         // 🔹 text fields
-        formData.append('firstname_th', fData.firstNameTh); //
-        formData.append('lastname_th', fData.lastNameTh); //
-        formData.append('firstname_en', fData.firstNameEn); //
-        formData.append('lastname_en', fData.lastNameEn); //
-        formData.append('nickname', fData.nickname); //
-        formData.append('mobile', fData.phone); //
-        formData.append('email', fData.email); //
-        formData.append('position', fData.position); //
-        formData.append('salary', fData.salary.toString()); //
-        formData.append('other_income', fData.otherIncome.toString()); //
-        formData.append('total_amt', fData.totalIncome.toString()); //
-        // formData.append('remark', fData.description);
+        (!is_update || changedData.firstNameTh !== undefined) && formData.append('firstname_th', fData.firstNameTh);
+        (!is_update || changedData.lastNameTh !== undefined) && formData.append('lastname_th', fData.lastNameTh);
+        (!is_update || changedData.firstNameEn !== undefined) && formData.append('firstname_en', fData.firstNameEn);
+        (!is_update || changedData.lastNameEn !== undefined) && formData.append('lastname_en', fData.lastNameEn);
+        (!is_update || changedData.nickname !== undefined) && formData.append('nickname', fData.nickname);
 
-        formData.append('contract_start_date', new Date(fData.startDate).toISOString().split('T')[0]); // 2025-01-01
-        formData.append('contract_end_date', new Date(fData.endDate).toISOString().split('T')[0]); // 2025-01-01
-        // formData.append('resign_date', fData.lastWorkingDate ?? '');
+        (!is_update || changedData.phone !== undefined) && formData.append('mobile', fData.phone);
+        (!is_update || changedData.email !== undefined) && formData.append('email', fData.email);
+        (!is_update || changedData.position !== undefined) && formData.append('position', fData.position);
 
-        formData.append('acc_book_no', fData.accountNumber); //
-        formData.append('namebank', fData.bank); //
-        formData.append('costcent', fData.department.COSTCENT); //
-        formData.append('namecostcent', fData.department.NAMECOSTCENT); //
+        (!is_update || changedData.salary !== undefined) && formData.append('salary', fData.salary.toString());
+        (!is_update || changedData.otherIncome !== undefined) && formData.append('other_income', fData.otherIncome.toString());
+        (!is_update || changedData.totalIncome !== undefined) && formData.append('total_amt', fData.totalIncome.toString());
 
-        formData.append('candidate_id', '0');
-        formData.append('company_code', fData.company.COMPANY_CODE); //
-        formData.append('company_name', fData.company.COMPANY_NAME); //
-        formData.append('emp_status', 'Active');
-        formData.append('jobgrade', 'ZZ'); //
-        // formData.append('freelanceId', '');
+        (!is_update || changedData.startDate !== undefined) && formData.append('contract_start_date', this.formatDateLocal(fData.startDate));
+        (!is_update || changedData.endDate !== undefined) && formData.append('contract_end_date', this.formatDateLocal(fData.endDate));
+        // (!is_update || changedData.startDate !== undefined) && formData.append('contract_start_date', new Date(fData.startDate).toISOString().split('T')[0]);
+        // (!is_update || changedData.endDate !== undefined) && formData.append('contract_end_date', new Date(fData.endDate).toISOString().split('T')[0]);
 
-        // 🔹 files + descriptions
+        (!is_update || changedData.lastWorkingDate !== undefined) && formData.append('resign_date', fData.lastWorkingDate ?? '');
+
+        (!is_update || changedData.accountNumber !== undefined) && formData.append('acc_book_no', fData.accountNumber ?? '');
+        (!is_update || changedData.bank !== undefined) && formData.append('namebank', fData.bank ?? '');
+        (!is_update || changedData.department.COSTCENT !== undefined) && formData.append('costcent', fData.department.COSTCENT ?? '');
+
+        (!is_update || changedData.company.COMPANY_CODE !== undefined) && formData.append('company_code', fData.company.COMPANY_CODE ?? '');
+        (!is_update || changedData.company.COMPANY_NAME !== undefined) && formData.append('company_name', fData.company.COMPANY_NAME ?? '');
+        (!is_update && formData.append('candidate_id', '0'));
+        (!is_update && formData.append('emp_status', 'Active'));
+        (!is_update && formData.append('jobgrade', 'ZZ'));
+
         if (Array.isArray(fData.attachments)) {
-            fData.attachments.forEach((item: any) => {
 
-                if (item?.file instanceof File) {
+            const originalFiles = this.original_formData_freelance.attachments || [];
+
+            // 1️⃣ ส่งไฟล์ใหม่
+            fData.attachments.forEach((item: any) => {
+                if (item?.file instanceof File && !item.fileId) {
                     formData.append('files', item.file);
                     formData.append('fileDescriptions', item.description || '');
                 }
-
             });
+
+            if (is_update) {
+
+                // 2️⃣ หาไฟล์ที่ถูกลบ
+                const deletedFiles = originalFiles.filter((oldFile: any) =>
+                    !fData.attachments.some((newFile: any) =>
+                        newFile.fileId === oldFile.fileId
+                    )
+                );
+
+                deletedFiles.forEach((file: any) => {
+                    formData.append('deleteFileIds', file.fileId.toString());
+                });
+
+                // 3️⃣ หาไฟล์ที่ description เปลี่ยน
+                const updatedDescriptions = fData.attachments.filter((newFile: any) => {
+                    if (!newFile.fileId) return false;
+
+                    const oldFile = originalFiles.find((f: any) =>
+                        f.fileId === newFile.fileId
+                    );
+
+                    return oldFile && (oldFile.description || '') !== (newFile.description || '');
+                });
+
+                if (updatedDescriptions.length > 0) {
+
+                    const fileIdForDesc = updatedDescriptions.map((f: any) => f.fileId).join(',');
+                    const newFileDescription = updatedDescriptions.map((f: any) => f.description || '').join(',');
+
+                    formData.append('fileIdForDesc', fileIdForDesc);
+                    formData.append('newFileDescription', newFileDescription);
+                }
+            }
         }
+
 
         const obj: any = {};
         formData.forEach((value, key) => {
             obj[key] = value;
         });
 
-        // console.log(obj);
-        // console.log('Descriptions:', formData.getAll('fileDescriptions'));
-        // console.log('Files:', formData.getAll('files'));
+        console.log(obj);
+        console.log('Descriptions:', formData.getAll('fileDescriptions'));
+        console.log('Files:', formData.getAll('files'));
 
         this.freelanceService.createFreelance(formData).subscribe({
             next: (res) => {
@@ -512,7 +572,7 @@ export class FreelanceManagementComponent implements OnInit {
             { type: fileData.FILE_TYPE }
         );
 
-        console.log(file)
+        // console.log(file)
 
         return {
             name: fileData.FILE_NAME,
@@ -522,6 +582,28 @@ export class FreelanceManagementComponent implements OnInit {
             fileId: fileData.FileID
         };
     }
+
+    private getChangedFields(current: any, original: any) {
+        const changes: any = {};
+
+        Object.keys(current).forEach(key => {
+            if (current[key] !== original[key]) {
+                changes[key] = {
+                    oldValue: original[key],
+                    newValue: current[key]
+                };
+            }
+        });
+        return changes;
+    }
+
+    private formatDateLocal(date: Date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
 
 
     // GET
