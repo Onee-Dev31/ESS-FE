@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { LayoutComponent } from './components/layout/layout';
 import { authGuard } from './guards/auth-guard';
-import { roleGuard } from './guards/role-guard';
+import { menuGuard, roleGuard } from './guards/role-guard';
 import { USER_ROLES } from './constants/user-roles.constant';
 
 export const routes: Routes = [
@@ -30,59 +30,70 @@ export const routes: Routes = [
             {
                 path: 'welcome',
                 loadComponent: () => import('./pages/welcome/welcome').then(m => m.WelcomeComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'Welcome' }
             },
 
             {
                 path: 'vehicle',
                 loadComponent: () => import('./pages/vehicle/vehicle').then(m => m.VehicleComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'Vehicle' }
             },
             {
                 path: 'allowance',
                 loadComponent: () => import('./pages/allowance/allowance').then(m => m.AllowanceComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'Allowance' }
             },
             {
                 path: 'vehicle-taxi',
                 loadComponent: () => import('./pages/vehicle-taxi/vehicle-taxi').then(m => m.VehicleTaxiComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'VehicleTaxi' }
             },
             {
                 path: 'approvals',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
-                canActivate: [roleGuard],
-                data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
+                canActivate: [menuGuard],
+                // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
+                data: { animation: 'Approvals' }
             },
             {
                 path: 'approvals-medicalexpenses',
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
-                canActivate: [roleGuard],
-                data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
+                canActivate: [menuGuard],
+                // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
+                data: { animation: 'ApprovalsMedical' }
             },
             {
                 path: 'medicalexpenses',
                 loadComponent: () => import('./pages/medicalexpenses/medicalexpenses').then(m => m.MedicalexpensesComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'MedicalExpenses' }
             },
             {
                 path: 'timeoff',
                 loadComponent: () => import('./pages/timeoff/timeoff').then(m => m.TimeoffComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'TimeOff' }
             },
             {
                 path: 'it-request',
                 loadComponent: () => import('./pages/it-request/it-request').then(m => m.ITRequestComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'ITRequest' }
             },
             {
                 path: 'freelance-management',
                 loadComponent: () => import('./pages/freelance-management/freelance-management').then(m => m.FreelanceManagementComponent),
+                canActivate: [menuGuard],
                 data: { animation: 'FreelanceManagement' }
             },
             {
                 path: 'resign-management',
                 loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
+                canActivate: [menuGuard],
                 data: { animation: 'Dashboard' }
             },
             {

@@ -97,7 +97,10 @@ export class AuthService {
                     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
                     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
                     localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
-                    // localStorage.setItem(STORAGE_KEYS.EMPLOYEE_ID, user.employeeId || '');
+
+                    this._isLoggedIn.set(true);
+                    this._currentUser.set(response.adUser);
+                    this._userRole.set(response.permission.Role);
                 }
             }),
             finalize(() => {
@@ -141,4 +144,17 @@ export class AuthService {
     getEmployeeId(): string | null {
         return localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
     }
+
+    getAllowedPaths(): string[] {
+        const data = localStorage.getItem(STORAGE_KEYS.ALL_DATA);
+        if (!data) return [];
+
+        const parsed = JSON.parse(data);
+        const menus = parsed?.menus || [];
+
+        return menus
+            .filter((m: any) => m.RoutePath && m.RoutePath !== '/')
+            .map((m: any) => m.RoutePath.replace(/^\/+/, ''));
+    }
+
 }

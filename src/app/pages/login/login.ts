@@ -56,6 +56,9 @@ export class LoginComponent {
       next: (res) => {
         console.log('Login success:', res);
         this.router.navigate(['/dashboard']);
+        // setTimeout(() => {
+        //   this.router.navigate(['/dashboard']);
+        // }, 500);
       },
       error: (err) => {
         console.log('Login error:', err);

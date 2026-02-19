@@ -90,13 +90,6 @@ export class Sidebar {
                 { label: 'แจ้งปัญหา/ขออุปกรณ์', path: '/it-request' }
             ]
         },
-        // {
-        //     name: 'จัดการฟรีแลนซ์',
-        //     icon: 'fa-user-tie',
-        //     subItems: [
-        //         { label: 'รายชื่อฟรีแลนซ์', path: '/freelance-management' }
-        //     ]
-        // },
         {
             name: 'จัดการพนักงาน',
             icon: 'person',
@@ -114,13 +107,30 @@ export class Sidebar {
         const userRole = this.authService.userRole();
         if (!userRole) return [];
 
-        return this.allMenuItems.filter(item => {
-            if (!item.role) return true;
-            if (Array.isArray(item.role)) {
-                return item.role.includes(userRole);
-            }
-            return item.role === userRole;
-        });
+        const menusString = localStorage.getItem('allData');
+        const menus = menusString ? JSON.parse(menusString).menus : null;
+
+        // console.log(menus, this.allMenuItems);
+
+        const formattedMenus = menus
+            .filter((menu: any) => menu.ParentMenuID === null) // หา parent
+            .map((parent: any) => {
+                return {
+                    name: parent.Label,
+                    icon: parent.Icon,
+                    iconType: parent.Icon.includes('fa') ? 'fa' : 'material',
+                    subItems: menus
+                        .filter((child: any) => child.ParentMenuID === parent.MenuID)
+                        .map((child: any) => ({
+                            label: child.Label,
+                            path: child.RoutePath
+                        }))
+                };
+            });
+
+        // console.log(formattedMenus);
+        return formattedMenus
+
     });
 
     toggleMenu(menuName: string) {

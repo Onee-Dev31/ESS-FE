@@ -5,6 +5,8 @@ import { MasterDataService } from '../../../services/master-data.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { SwalService } from '../../../services/swal.service';
 
 interface FreelanceFormData {
     id?: string;
@@ -41,7 +43,8 @@ interface FreelanceFormData {
         FormsModule,
         NzDatePickerModule,
         NzSelectModule,
-        MatIconModule
+        MatIconModule,
+        MatTooltipModule
     ],
     templateUrl: './freelance-form.html',
     styleUrls: ['./freelance-form.scss'],
@@ -54,6 +57,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     @Output() onSave = new EventEmitter<FreelanceFormData>();
 
     private masterService = inject(MasterDataService);
+    private swalService = inject(SwalService);
     private cdr = inject(ChangeDetectorRef);
 
     dateFormat = 'dd//MM/yyyy';
@@ -88,6 +92,44 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         fileId?: number;
     }[] = [];
 
+    private readonly MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    private readonly ALLOWED_EXTENSIONS = [
+        // documents
+        'pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'rtf',
+
+        // images
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp',
+        'tiff', 'tif', 'svg', 'heic', 'heif'
+    ];
+
+    private readonly ALLOWED_MIME_TYPES = [
+        // pdf
+        'application/pdf',
+
+        // word
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+
+        // powerpoint
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+
+        // text
+        'text/plain',
+        'application/rtf',
+
+        // images
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/bmp',
+        'image/webp',
+        'image/tiff',
+        'image/svg+xml',
+        'image/heic',
+        'image/heif'
+    ];
+
     //MASTER
     bankList: any[] = []
     companyList: any[] = []
@@ -104,6 +146,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.resetForm();
         if (changes['isOpen'] && changes['isOpen'].currentValue === true) {
             if (!this.isDataLoaded) {
 
@@ -111,13 +154,13 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         }
         if (changes['editData'] && changes['editData'].currentValue) {
             this.formData = { ...this.formData, ...changes['editData'].currentValue };
+            this.mapCompanyAndDepartment();
+            this.syncMoneyDisplay();
+            this.uploadedFiles = this.formData.attachments
 
             setTimeout(() => {
-                this.mapCompanyAndDepartment();
-                this.syncMoneyDisplay();
-                this.uploadedFiles = this.formData.attachments
                 this.cdr.detectChanges();
-            });
+            }, 500);
         }
     }
 
@@ -128,27 +171,104 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         this.isDataLoaded = true;
     }
 
+    onFileSelect(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
 
-    onFileSelect(event: any) {
-        const files = event.target.files;
-        if (files && files.length > 0) {
-            const newFiles = Array.from(files).map((file: any) => ({
+        const validFiles: any[] = [];
+
+        Array.from(input.files).forEach((file: File) => {
+            console.log(file)
+
+            const extension = file.name.split('.').pop()?.toLowerCase();
+
+            // ❌ ประเภทไฟล์ไม่ถูกต้อง
+            if (!extension || !this.ALLOWED_EXTENSIONS.includes(extension)) {
+                this.swalService.warning(
+                    `ไฟล์ ${file.name} ไม่รองรับประเภทนี้`
+                );
+                return;
+            }
+
+            // ❌ ขนาดเกิน
+            if (file.size > this.MAX_SIZE) {
+                this.swalService.warning(
+                    `ไฟล์ ${file.name} ต้องไม่เกิน 5MB`
+                );
+                return;
+            }
+
+            // ❌ เช็ค MIME type
+            if (!this.ALLOWED_MIME_TYPES.includes(file.type)) {
+                this.swalService.warning('ไฟล์ไม่ถูกต้องหรือถูกแก้ไขประเภทไฟล์');
+                input.value = '';
+                return;
+            }
+
+
+            // ✅ ผ่าน validation
+            validFiles.push({
                 name: file.name,
                 file: file,
-                description: ''
-            }));
-            this.uploadedFiles = [...this.uploadedFiles, ...newFiles];
-        }
+                description: '',
+                isReplaced: false
+            });
+
+        });
+
+        // เพิ่มเฉพาะไฟล์ที่ผ่าน
+        this.uploadedFiles = [...this.uploadedFiles, ...validFiles];
+
+        // reset input
+        input.value = '';
     }
 
     removeFile(index: number) {
         this.uploadedFiles = this.uploadedFiles.filter((_, i) => i !== index);
     }
 
+    replaceFile(event: Event, index: number) {
+        const input = event.target as HTMLInputElement;
+
+        if (!input.files || input.files.length === 0) return;
+
+        const newFile = input.files[0];
+        const extension = newFile.name.split('.').pop()?.toLowerCase();
+
+        // ❌ ตรวจสอบนามสกุล
+        if (!extension || !this.ALLOWED_EXTENSIONS.includes(extension)) {
+            this.swalService.warning('ประเภทไฟล์ไม่รองรับ');
+            input.value = '';
+            return;
+        }
+
+        // ❌ ตรวจสอบขนาด
+        if (newFile.size > this.MAX_SIZE) {
+            this.swalService.warning('ไฟล์ต้องมีขนาดไม่เกิน 5MB');
+            input.value = '';
+            return;
+        }
+
+        // ❌ เช็ค MIME type
+        if (!this.ALLOWED_MIME_TYPES.includes(newFile.type)) {
+            this.swalService.warning('ไฟล์ไม่ถูกต้องหรือถูกแก้ไขประเภทไฟล์');
+            input.value = '';
+            return;
+        }
+
+        // ✅ ผ่าน validation → replace
+        this.uploadedFiles[index] = {
+            ...this.uploadedFiles[index],
+            file: newFile,
+            name: newFile.name
+        };
+
+        input.value = '';
+    }
+
     handleSave() {
         this.formData.attachments = this.uploadedFiles
         this.onSave.emit(this.formData);
-        this.resetForm();
     }
 
     showResignModal = false;
@@ -156,6 +276,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     lastWorkingDate = '';
 
     handleResign() {
+        console.log('Resigned')
         this.showResignModal = true;
     }
 

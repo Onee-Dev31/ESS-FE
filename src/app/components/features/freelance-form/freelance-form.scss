@@ -115,6 +115,7 @@
         &:hover {
             color: #ef4444;
             background: #f3f4f6;
+            transform: rotate(90deg);
         }
     }
 }
@@ -425,10 +426,39 @@
         }
 
         .btn-remove {
-            // display: none;
             background: transparent;
             border: transparent;
             cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1rem;
+
+            &:hover {
+                color: #ef4444;
+                background: #f3f4f6;
+            }
+        }
+
+
+        .change-icon {
+            color: #10b981;
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+
+            &:hover {
+                color: #0e9d6d;
+                transform: scale(1.2) rotate(15deg);
+            }
+
+            &:active {
+                color: #0a7b55;
+                transform: scale(1.3) rotate(15deg);
+            }
         }
     }
 }

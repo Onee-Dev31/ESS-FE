@@ -16,6 +16,7 @@ export class FreelanceService {
     constructor(private _http: HttpClient) { }
 
     createFreelance(formData: FormData): Observable<any> {
+        console.log(formData)
         return this._http.post(`${this.baseUrl}/Freelance/operation`, formData);
     }
 

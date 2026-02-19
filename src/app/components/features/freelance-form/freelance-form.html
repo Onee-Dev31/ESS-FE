@@ -198,7 +198,9 @@
                     <div class="form-field full-width">
                         <label>แบบไฟล์</label>
                         <label class="file-upload-wrapper">
-                            <input type="file" multiple (change)="onFileSelect($event)" class="hidden-input">
+                            <input type="file" multiple
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png,.gif,.bmp,.webp,.tiff,.tif,.svg,.heic,.heif"
+                                (change)="onFileSelect($event)" class="hidden-input">
 
                             <div class="file-select-box">
                                 <i class="fas fa-folder-open"></i>
@@ -214,10 +216,22 @@
                                 <i class="fas fa-file-pdf"></i>
                                 <span>{{ file.name }}</span>
 
+                                <!-- ปุ่มเปลี่ยนไฟล์ -->
+                                <mat-icon class="change-icon" (click)="fileInput.click()" matTooltip="เปลี่ยนไฟล์"
+                                    matTooltipPosition="above">
+                                    change_circle
+                                </mat-icon>
+
+                                <!-- hidden input -->
+                                <input type="file" #fileInput hidden
+                                    accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.rtf,.jpg,.jpeg,.png,.gif,.bmp,.webp,.tiff,.tif,.svg,.heic,.heif"
+                                    (change)="replaceFile($event, i)" />
+
                                 <input nz-input type="text" [(ngModel)]="file.description" name="description{{i}}"
                                     placeholder="อธิบายไฟล์" class="form-input">
 
-                                <button type="button" class="btn-remove" (click)="removeFile(i)">
+                                <button type="button" class="btn-remove" (click)="removeFile(i)" matTooltip="ลบไฟล์"
+                                    matTooltipPosition="above">
                                     <mat-icon>close</mat-icon>
                                 </button>
                             </div>
