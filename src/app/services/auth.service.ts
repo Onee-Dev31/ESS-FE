@@ -14,12 +14,14 @@ import { TimeOffService } from './time-off.service';
 import { UserMock } from '../mocks/auth-user.mock';
 import { LoadingService } from './loading';
 import { ToastService } from './toast';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private http = inject(HttpClient);
+    private baseUrl = environment.api_url;
+    private _http = inject(HttpClient);
     private allowanceService = inject(AllowanceService);
     private medicalService = inject(MedicalexpensesService);
     private taxiService = inject(TaxiService);
@@ -27,6 +29,7 @@ export class AuthService {
     private timeOffService = inject(TimeOffService);
     private loadingService = inject(LoadingService);
     private toastService = inject(ToastService);
+
 
     private readonly MOCK_USERS = UserMock.MOCK_USERS;
 
@@ -48,38 +51,58 @@ export class AuthService {
     isExecutive = computed(() => this._userRole() === USER_ROLES.EXECUTIVE);
 
     /** ตรวจสอบสิทธิ์การเข้าใช้งาน (Login) และบันทึกข้อมูลลง LocalStorage */
-    login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
+    // login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
+    //     this.loadingService.show();
+    //     const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
+
+    //     return of(!!user).pipe(
+    //         delay(1000),
+    //         tap(isValid => {
+    //             if (isValid && user) {
+    //                 localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+    //                 localStorage.setItem(STORAGE_KEYS.CURRENT_USER, user.name || '');
+    //                 localStorage.setItem(STORAGE_KEYS.USER_ROLE, user.role || '');
+    //                 localStorage.setItem(STORAGE_KEYS.EMPLOYEE_ID, user.employeeId || '');
+
+    //                 if (rememberMe) {
+    //                     localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, 'true');
+    //                     localStorage.setItem(STORAGE_KEYS.REMEMBERED_EMAIL, email);
+    //                 } else {
+    //                     localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+    //                     localStorage.removeItem(STORAGE_KEYS.REMEMBERED_EMAIL);
+    //                 }
+
+    //                 this._isLoggedIn.set(true);
+    //                 this._currentUser.set(user.name);
+    //                 this._userRole.set(user.role);
+
+    //                 this.refreshAllMockData();
+    //                 this.toastService.success(`Welcome back, ${user.name}!`);
+    //             } else {
+    //                 this.toastService.error('Invalid username or password.');
+    //             }
+    //         }),
+    //         finalize(() => this.loadingService.hide())
+    //     );
+    // }
+    login(username: string, password: string): Observable<any> {
         this.loadingService.show();
-        const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
-
-        return of(!!user).pipe(
-            delay(1000),
-            tap(isValid => {
-                if (isValid && user) {
+        return this._http.post<any>(`${this.baseUrl}/auth/login`, {
+            username,
+            password
+        }).pipe(
+            tap(response => {
+                if (response) {
+                    localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(response));
                     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
-                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, user.name || '');
-                    localStorage.setItem(STORAGE_KEYS.USER_ROLE, user.role || '');
-                    localStorage.setItem(STORAGE_KEYS.EMPLOYEE_ID, user.employeeId || '');
-
-                    if (rememberMe) {
-                        localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, 'true');
-                        localStorage.setItem(STORAGE_KEYS.REMEMBERED_EMAIL, email);
-                    } else {
-                        localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
-                        localStorage.removeItem(STORAGE_KEYS.REMEMBERED_EMAIL);
-                    }
-
-                    this._isLoggedIn.set(true);
-                    this._currentUser.set(user.name);
-                    this._userRole.set(user.role);
-
-                    this.refreshAllMockData();
-                    this.toastService.success(`Welcome back, ${user.name}!`);
-                } else {
-                    this.toastService.error('Invalid username or password.');
+                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
+                    localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
+                    // localStorage.setItem(STORAGE_KEYS.EMPLOYEE_ID, user.employeeId || '');
                 }
             }),
-            finalize(() => this.loadingService.hide())
+            finalize(() => {
+                this.loadingService.hide();
+            })
         );
     }
 
@@ -89,6 +112,7 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
         localStorage.removeItem(STORAGE_KEYS.EMPLOYEE_ID);
+        localStorage.removeItem(STORAGE_KEYS.ALL_DATA);
 
         this._isLoggedIn.set(false);
         this._currentUser.set(null);

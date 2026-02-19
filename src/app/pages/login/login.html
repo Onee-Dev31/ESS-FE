@@ -20,7 +20,7 @@
         <input
           type="text"
           id="username"
-          formControlName="email"
+          formControlName="username"
           placeholder="Enter your username"
         />
       </div>
@@ -40,13 +40,13 @@
         </div>
       </div>
 
-      <div class="action-row">
+      <!-- <div class="action-row">
         <label class="remember-me">
           <input type="checkbox" formControlName="rememberMe" />
           <span>Remember Me</span>
         </label>
         <a href="#" class="forgot-password">Forgot Password?</a>
-      </div>
+      </div> -->
 
       <button type="submit" class="login-button" [disabled]="!loginForm.valid || isLoading">
         <span *ngIf="!isLoading">Login</span>
@@ -54,10 +54,10 @@
       </button>
     </form>
 
-    <div class="signup-section">
+    <!-- <div class="signup-section">
       <p>Don't have an account?</p>
       <button class="signup-button">Sign up</button>
-    </div>
+    </div> -->
   </div>
 
   <div class="welcome-panel">

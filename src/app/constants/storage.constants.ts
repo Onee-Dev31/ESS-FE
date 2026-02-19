@@ -7,6 +7,8 @@ export const STORAGE_KEYS = {
     REMEMBER_ME: 'rememberMe',
     REMEMBERED_EMAIL: 'rememberedEmail',
 
+    ALL_DATA: 'allData',
+
     MOCK_MEDICAL_DATA: 'MOCK_MEDICAL_DATA_V3',
     MOCK_TAXI_DATA: 'MOCK_TAXI_DATA_V3',
     MOCK_TRANSPORT_DATA: 'MOCK_TRANSPORT_DATA_V3',
