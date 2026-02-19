@@ -83,7 +83,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         attachments: []
     };
 
-    uploadedFiles: { name: string; file: File; description: string; }[] = [];
+    uploadedFiles: {
+        name: string; file: File; description: string; url?: string;
+        fileId?: number;
+    }[] = [];
 
     //MASTER
     bankList: any[] = []
@@ -112,6 +115,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
             setTimeout(() => {
                 this.mapCompanyAndDepartment();
                 this.syncMoneyDisplay();
+                this.uploadedFiles = this.formData.attachments
                 this.cdr.detectChanges();
             });
         }
@@ -144,6 +148,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     handleSave() {
         this.formData.attachments = this.uploadedFiles
         this.onSave.emit(this.formData);
+        this.resetForm();
     }
 
     showResignModal = false;
@@ -174,7 +179,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     handleClose() {
-        this.resetForm();     
+        this.resetForm();
         this.editData = null;
         this.onClose.emit();
     }

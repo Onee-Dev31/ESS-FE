@@ -1,6 +1,6 @@
 /** Service สำหรับจัดการข้อมูลพื้นฐาน (Master Data) ของระบบ เช่น ประเภทการลา และประเภทการเบิก */
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 import { DateConfig } from '../interfaces/core.interface';
 import { environment } from '../../environments/environment';
@@ -45,6 +45,18 @@ export class FreelanceService {
 
     getFreelanceById(id: any): Observable<any> {
         return this._http.get(`${this.baseUrl}/Freelance/${id}`);
+    }
+
+    async convertToFile(fileInfo: any): Promise<File> {
+        const blob = await firstValueFrom(
+            this._http.get(fileInfo.FILE_DIR, { responseType: 'blob' })
+        );
+
+        return new File(
+            [blob],
+            fileInfo.FILE_NAME,
+            { type: fileInfo.FILE_TYPE }
+        );
     }
 
 }

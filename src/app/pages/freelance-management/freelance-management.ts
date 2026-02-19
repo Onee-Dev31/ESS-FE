@@ -352,7 +352,17 @@ export class FreelanceManagementComponent implements OnInit {
 
         const info = res.info
         const file = res.files
-        console.log(info)
+        console.log(info, file)
+
+        let convertedFiles: any[] = [];
+
+        if (file?.length) {
+            convertedFiles = await Promise.all(
+                file.map((f: any) =>
+                    this.convertUrlToFile(f)
+                )
+            );
+        }
 
         const formData = {
             id: info.ID,
@@ -377,7 +387,7 @@ export class FreelanceManagementComponent implements OnInit {
             adUser: info.AD_USER || '-',
             fotdNumber: info.EMP_NO,
             description: info.REMARK,
-            attachments: [],
+            attachments: convertedFiles || [],
             lastWorkingDate: info.RESIGN_DATE
         }
 
@@ -483,13 +493,34 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     applyFilter() {
-        // this.appliedCompany.set(this.filterCompany());
-        // this.appliedDepartment.set(this.filterDepartment());
-        // this.appliedSearch.set(this.listing.searchText());
-
-        // this.listing.currentPage.set(0);
-
         this.getFreelance(1, this.listing.pageSize());
+    }
+
+    private async convertUrlToFile(fileData: any) {
+
+        const response = await fetch(fileData.FILE_DIR);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch file: ' + fileData.FILE_NAME);
+        }
+
+        const blob = await response.blob();
+
+        const file = new File(
+            [blob],
+            fileData.FILE_NAME,
+            { type: fileData.FILE_TYPE }
+        );
+
+        console.log(file)
+
+        return {
+            name: fileData.FILE_NAME,
+            file: file,
+            description: fileData.DESCRIPTION || '',
+            // url: fullUrl,        // ✅ สำหรับเปิดดูใน tab ใหม่
+            fileId: fileData.FileID
+        };
     }
 
 
