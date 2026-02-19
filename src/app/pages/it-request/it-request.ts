@@ -28,7 +28,6 @@ export class ITRequestComponent {
         { label: 'บริการอื่นๆ', value: 'other', checked: false, disabled: false, icon: 'fa-ellipsis-h' }
     ]);
 
-    isUserCategorySelected = signal(false);
     isSystemCategorySelected = signal(false);
 
     userSubOptions = signal([
@@ -67,6 +66,13 @@ export class ITRequestComponent {
         symptom: ''
     });
 
+    problemFormData = signal({
+        topic: '',
+        detail: ''
+    });
+
+    activeModalMode = signal<'repair' | 'problem' | null>(null);
+
     selectedSystemTypes = signal<string[]>([]);
 
     toggleSystemType(type: string) {
@@ -86,29 +92,15 @@ export class ITRequestComponent {
             if (!newItems[index].disabled) {
                 const isChecking = !newItems[index].checked;
 
-                if (newItems[index].value === 'repair' && isChecking) {
+                if ((newItems[index].value === 'repair' || newItems[index].value === 'problem') && isChecking) {
+                    this.activeModalMode.set(newItems[index].value as 'repair' | 'problem');
                     this.showRepairModal.set(true);
                 } else {
                     newItems[index].checked = isChecking;
                 }
             }
 
-            const repairSet = ['repair', 'problem'];
-            const hasRepairActive = newItems.some(i => repairSet.includes(i.value) && i.checked);
-            const hasServiceActive = newItems.some(i => !repairSet.includes(i.value) && i.checked);
-
-            return newItems.map(item => {
-                const isRepairType = repairSet.includes(item.value);
-
-                if (hasRepairActive) {
-                    item.disabled = !isRepairType;
-                } else if (hasServiceActive) {
-                    item.disabled = isRepairType;
-                } else {
-                    item.disabled = false;
-                }
-                return item;
-            });
+            return this.applyServiceExclusion(newItems);
         });
 
         const selectedValues = this.serviceOptions().filter(s => s.checked).map(s => s.value);
@@ -139,31 +131,19 @@ export class ITRequestComponent {
 
     showSummaryModal = signal(false);
 
-    closeRepairModal() {
-        this.showRepairModal.set(false);
+
+
+    get isRepairSelected() {
+        return this.serviceOptions().some(s => s.value === 'repair' && s.checked);
     }
 
-    confirmRepairRequest() {
-        this.serviceOptions.update(items => {
-            const newItems = items.map(item => {
-                if (item.value === 'repair') {
-                    return { ...item, checked: true };
-                }
-                return item;
-            });
+    get isProblemSelected() {
+        return this.serviceOptions().some(s => s.value === 'problem' && s.checked);
+    }
 
-            const repairSet = ['repair', 'problem'];
-            const hasRepairActive = newItems.some(i => repairSet.includes(i.value) && i.checked);
-
-            return newItems.map(item => {
-                const isRepairType = repairSet.includes(item.value);
-                if (hasRepairActive) {
-                    item.disabled = !isRepairType;
-                }
-                return item;
-            });
-        });
-        this.showRepairModal.set(false);
+    get nextRequestId() {
+        const nextId = this.submittedRequests().length + 1;
+        return `#REQ2602-${String(nextId).padStart(4, '0')}`;
     }
 
     submit() {
@@ -204,7 +184,7 @@ export class ITRequestComponent {
             return;
         }
 
-        if (!this.requestDetails().trim()) {
+        if (!this.isRepairSelected && !this.isProblemSelected && !this.requestDetails().trim()) {
             this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
             return;
         }
@@ -218,7 +198,50 @@ export class ITRequestComponent {
 
 
 
-    submittedRequests = signal<any[]>([]);
+    submittedRequests = signal<any[]>([
+        {
+            id: 3,
+            displayId: '#REQ2602-0003',
+            date: new Date('2026-02-19T10:45:00'),
+            services: ['แจ้งปัญหา'],
+            problemData: {
+                topic: 'ระบบ ONEE เข้าใช้งานไม่ได้',
+                detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา'
+            },
+            openFor: 'พนักงาน ข (Employee B)',
+            status: 'Pending',
+            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] }
+        },
+        {
+            id: 2,
+            displayId: '#REQ2602-0002',
+            date: new Date('2026-02-19T08:15:00'),
+            services: ['แจ้งซ่อม'],
+            repairData: {
+                device: 'Printer',
+                brand: 'Brother',
+                model: 'HL-L2370DN',
+                symptom: 'กระดาษติดบ่อย และหมึกจาง'
+            },
+            openFor: 'พนักงาน ก (Employee A)',
+            status: 'Pending',
+            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] }
+        },
+        {
+            id: 1,
+            displayId: '#REQ2602-0001',
+            date: new Date('2026-02-18T09:30:00'),
+            services: ['บริการ Internet', 'บริการ Email'],
+            details: 'ความเร็ว Internet ช้าลง และเปิด App Email ไม่ขึ้น',
+            openFor: 'ตนเอง (Self)',
+            status: 'Approved',
+            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] },
+            emailAccount: {
+                email: 'employee.test@onemail.com',
+                password: 'InitialPassword123!'
+            }
+        }
+    ]);
 
     confirmSubmission() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
@@ -231,27 +254,114 @@ export class ITRequestComponent {
             openForDisplay = selected ? selected.label : '';
         }
 
+        const systemData = {
+            selectedTypes: [...this.selectedSystemTypes()],
+            userOptions: this.userSubOptions().filter(o => o.checked).map(o => o.label),
+            systemOptions: this.systemSubOptions().filter(o => o.checked).map(o => o.label)
+        };
+
         const newRequest = {
             id: Date.now(),
+            displayId: this.nextRequestId,
             date: new Date(),
             services: selectedServices.map(s => s.label),
             details: this.requestDetails(),
-            repairData: selectedServices.some(s => s.value === 'repair') ? this.repairFormData() : null,
+            repairData: selectedServices.some(s => s.value === 'repair') ? { ...this.repairFormData() } : null,
+            problemData: selectedServices.some(s => s.value === 'problem') ? { ...this.problemFormData() } : null,
+            systemData: systemData,
             openFor: openForDisplay,
             status: 'Pending'
         };
 
         this.submittedRequests.update(reqs => [newRequest, ...reqs]);
 
-        console.log('Final Submission Payload:', newRequest);
         this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
 
-        this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.isUserCategorySelected.set(false);
+        this.serviceOptions.update(items => {
+            const resetItems = items.map(i => ({ ...i, checked: false }));
+            return this.applyServiceExclusion(resetItems);
+        });
         this.isSystemCategorySelected.set(false);
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.repairFormData.set({ device: '', brand: '', model: '', symptom: '' });
+        this.problemFormData.set({ topic: '', detail: '' });
+    }
+
+    closeRepairModal() {
+        // If canceling, uncheck the service
+        if (this.activeModalMode()) {
+            this.serviceOptions.update(items => {
+                const newItems = items.map(item => {
+                    if (item.value === this.activeModalMode()) {
+                        return { ...item, checked: false };
+                    }
+                    return item;
+                });
+                return this.applyServiceExclusion(newItems);
+            });
+        }
+        this.showRepairModal.set(false);
+        this.activeModalMode.set(null);
+    }
+
+    confirmModalData() {
+        if (this.activeModalMode() === 'repair') {
+            const { device, brand, model, symptom } = this.repairFormData();
+            if (!device || !brand || !model || !symptom) {
+                this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+                return;
+            }
+        } else if (this.activeModalMode() === 'problem') {
+            const { topic, detail } = this.problemFormData();
+            if (!topic || !detail) {
+                this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+                return;
+            }
+        }
+
+        this.serviceOptions.update(items => {
+            const newItems = items.map(item => {
+                if (item.value === this.activeModalMode()) {
+                    return { ...item, checked: true };
+                }
+                return item;
+            });
+            return this.applyServiceExclusion(newItems);
+        });
+
+        this.showRepairModal.set(false);
+        this.activeModalMode.set(null);
+    }
+
+    private applyServiceExclusion(items: any[]) {
+        const repairSet = ['repair', 'problem'];
+        const hasRepairActive = items.some(i => repairSet.includes(i.value) && i.checked);
+        const hasServiceActive = items.some(i => !repairSet.includes(i.value) && i.checked);
+
+        return items.map(item => {
+            const isRepairType = repairSet.includes(item.value);
+            if (hasRepairActive) {
+                item.disabled = !isRepairType;
+            } else if (hasServiceActive) {
+                item.disabled = isRepairType;
+            } else {
+                item.disabled = false;
+            }
+            return item;
+        });
+    }
+    showHistoryDetailModal = signal(false);
+    selectedRequest = signal<any>(null);
+
+    viewRequestDetails(request: any) {
+        this.selectedRequest.set(request);
+        this.showHistoryDetailModal.set(true);
+    }
+
+    closeHistoryDetailModal() {
+        this.showHistoryDetailModal.set(false);
+        this.selectedRequest.set(null);
     }
 }

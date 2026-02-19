@@ -90,12 +90,77 @@
         <div class="form-section">
             <h3 class="section-title">
                 <span class="step-badge">3</span>
-                รายละเอียด (Details) <i class="fas fa-info-circle ml-2 text-muted"></i>
+                รายละเอียด (Details)
             </h3>
+
+            <!-- Repair Details Display -->
+            @if (repairFormData().device) {
+            @for (service of serviceOptions(); track service.value) {
+            @if (service.value === 'repair' && service.checked) {
+            <div class="repair-summary-card mb-4">
+                <div class="card-header-row">
+                    <h4 class="text-secondary mb-0"><i class="fas fa-tools mr-2"></i> รายละเอียดการแจ้งซ่อม</h4>
+                    <button class="btn-edit-repair" (click)="activeModalMode.set('repair'); showRepairModal.set(true)">
+                        <i class="fas fa-pen"></i> แก้ไข
+                    </button>
+                </div>
+                <div class="repair-details-grid mt-3">
+                    <div class="detail-item">
+                        <span class="label">อุปกรณ์:</span>
+                        <span class="value">{{ repairFormData().device }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">ยี่ห้อ:</span>
+                        <span class="value">{{ repairFormData().brand }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">รุ่น:</span>
+                        <span class="value">{{ repairFormData().model }}</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="label">อาการ:</span>
+                        <span class="value">{{ repairFormData().symptom }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+            }
+            }
+
+
+            <!-- Problem Details Display -->
+            @if (problemFormData().topic) {
+            @for (service of serviceOptions(); track service.value) {
+            @if (service.value === 'problem' && service.checked) {
+            <div class="repair-summary-card mb-4">
+                <div class="card-header-row">
+                    <h4 class="text-secondary mb-0"><i class="fas fa-exclamation-triangle mr-2"></i>
+                        รายละเอียดการแจ้งปัญหา</h4>
+                    <button class="btn-edit-repair" (click)="activeModalMode.set('problem'); showRepairModal.set(true)">
+                        <i class="fas fa-pen"></i> แก้ไข
+                    </button>
+                </div>
+                <div class="repair-details-grid mt-3">
+                    <div class="detail-item full-width">
+                        <span class="label">หัวข้อปัญหา:</span>
+                        <span class="value">{{ problemFormData().topic }}</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="label">รายละเอียด:</span>
+                        <span class="value">{{ problemFormData().detail }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+            }
+            }
+
+            @if (!isRepairSelected && !isProblemSelected) {
             <div class="form-group mb-4">
                 <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
                     [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
             </div>
+            }
         </div>
 
 
@@ -104,72 +169,39 @@
                 <span class="step-badge">4</span>
                 ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
             </h3>
-            <div class="submit-section-container">
-                <div class="submit-left">
-                    <!-- Repair Details Display -->
-                    @if (repairFormData().device) {
-                    @for (service of serviceOptions(); track service.value) {
-                    @if (service.value === 'repair' && service.checked) {
-                    <div class="repair-summary-card mb-0">
-                        <div class="card-header-row">
-                            <h4 class="text-secondary mb-0"><i class="fas fa-tools mr-2"></i> รายละเอียดการแจ้งซ่อม</h4>
-                            <button class="btn-edit-repair" (click)="showRepairModal.set(true)">
-                                <i class="fas fa-pen"></i> แก้ไข
-                            </button>
-                        </div>
-                        <div class="repair-details-grid mt-3">
-                            <div class="detail-item">
-                                <span class="label">อุปกรณ์:</span>
-                                <span class="value">{{ repairFormData().device }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">ยี่ห้อ:</span>
-                                <span class="value">{{ repairFormData().brand }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">รุ่น:</span>
-                                <span class="value">{{ repairFormData().model }}</span>
-                            </div>
-                            <div class="detail-item full-width">
-                                <span class="label">อาการ:</span>
-                                <span class="value">{{ repairFormData().symptom }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    }
-                    }
-                    }
-                </div>
-
-                <div class="submit-right">
-                    <button class="btn-submit" (click)="submit()">
-                        ยืนยันการทำรายการ
-                    </button>
-                </div>
+            <div class="form-actions">
+                <button class="btn-submit" (click)="submit()">
+                    ยืนยันการทำรายการ
+                </button>
             </div>
         </div>
     </div>
 
-
-
-
-
-    @if (submittedRequests().length > 0) {
     <div class="content-card history-card">
         <div class="card-header-title">ประวัติการขอรับบริการ (Request History)</div>
+
+        @if (submittedRequests().length === 0) {
+        <div class="text-center p-4 text-muted">
+            <i class="fas fa-history fa-3x mb-3 text-gray-300"></i>
+            <p>ไม่พบประวัติการขอรับบริการ</p>
+        </div>
+        } @else {
         <div class="table-responsive">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 18%"><i class="far fa-clock mr-1"></i> วันที่/เวลา</th>
-                        <th style="width: 25%"><i class="fas fa-concierge-bell mr-1"></i> บริการ</th>
-                        <th style="width: 40%"><i class="fas fa-info-circle mr-1"></i> รายละเอียด</th>
-                        <th style="width: 17%"><i class="fas fa-tasks mr-1"></i> สถานะ</th>
+                        <th style="width: 15%">Request ID</th>
+                        <th style="width: 15%"><i class="far fa-clock mr-1"></i> วันที่/เวลา</th>
+                        <th style="width: 20%"><i class="fas fa-concierge-bell mr-1"></i> บริการ</th>
+                        <th style="width: 35%"><i class="fas fa-info-circle mr-1"></i> รายละเอียด</th>
+                        <th style="width: 10%"><i class="fas fa-tasks mr-1"></i> สถานะ</th>
+                        <th style="width: 5%"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @for (req of submittedRequests(); track req.id) {
                     <tr>
+                        <td class="text-primary font-weight-bold">{{ req.displayId }}</td>
                         <td class="text-muted">{{ req.date | date:'dd/MM/yyyy HH:mm' }}</td>
                         <td>
                             <div class="service-tags">
@@ -181,31 +213,225 @@
                         <td>
                             <div class="details-list">
                                 @if (req.openFor) {
-                                <div class="detail-item"><small class="text-muted">Open For:</small> {{ req.openFor }}
+                                <div class="detail-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <small class="text-muted">Open For:</small> {{ req.openFor }}
                                 </div>
                                 }
                                 @if (req.details) {
-                                <div class="detail-item"><small class="text-muted">Details:</small> {{ req.details }}
+                                <div class="detail-item">
+                                    <i class="fas fa-align-left"></i>
+                                    <small class="text-muted">Details:</small> {{ req.details }}
                                 </div>
                                 }
                                 @if (req.repairData) {
-                                <i class="fas fa-tools"></i>
-                                {{ req.repairData.device }}
-                                @if (req.repairData.brand) { - {{ req.repairData.brand }} }
-                                @if (req.repairData.model) { {{ req.repairData.model }} }
-                                <span class="text-muted">({{ req.repairData.symptom }})</span>
+                                <div class="detail-item">
+                                    <i class="fas fa-tools"></i>
+                                    <small class="text-muted">Repair:</small>
+                                    {{ req.repairData.device }}
+                                    @if (req.repairData.brand) { - {{ req.repairData.brand }} }
+                                    @if (req.repairData.model) { {{ req.repairData.model }} }
+                                    <span class="text-muted ml-1">({{ req.repairData.symptom }})</span>
+                                </div>
+                                }
+                                @if (req.problemData) {
+                                <div class="detail-item">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <small class="text-muted">Problem:</small>
+                                    {{ req.problemData.topic }}
+                                    <span class="text-muted ml-1">({{ req.problemData.detail }})</span>
+                                </div>
                                 }
                             </div>
                         </td>
                         <td>
-                            <span class="status-badge pending">
-                                <i class="fas fa-clock"></i> {{ req.status }}
+                            <span class="status-badge" [class]="req.status.toLowerCase()">
+                                <i class="fas" [class.fa-check-circle]="req.status === 'Approved'"
+                                    [class.fa-clock]="req.status === 'Pending'"></i>
+                                {{ req.status }}
                             </span>
+                        </td>
+                        <td class="text-right">
+                            <button class="btn-icon" (click)="viewRequestDetails(req)" title="ดูรายละเอียด">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
                     }
                 </tbody>
             </table>
+        </div>
+        }
+    </div>
+
+    <!-- History Detail Modal -->
+    @if (showHistoryDetailModal() && selectedRequest()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}</h3>
+                <button class="btn-close-modal" (click)="closeHistoryDetailModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 1. Open For -->
+                <div class="summary-section">
+                    <h3>ผู้ขอสิทธิ์ (Open For)</h3>
+                    <div class="detail-item">
+                        <span class="value">{{ selectedRequest().openFor }}</span>
+                    </div>
+                </div>
+
+                <!-- 2. Status & Date -->
+                <div class="summary-section">
+                    <h3>สถานะและวันที่</h3>
+                    <div class="repair-details-grid">
+                        <div class="detail-item">
+                            <span class="label">วันที่ขอรับบริการ:</span>
+                            <span class="value">{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">สถานะ:</span>
+                            <span class="value">
+                                <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
+                                    <i class="fas" [class.fa-check-circle]="selectedRequest().status === 'Approved'"
+                                        [class.fa-clock]="selectedRequest().status === 'Pending'"></i>
+                                    {{ selectedRequest().status }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Selected Service -->
+                <div class="summary-section">
+                    <h3>บริการที่เลือก</h3>
+                    <div class="summary-list">
+                        @for (service of selectedRequest().services; track service) {
+                        <div class="summary-item">
+                            @if (selectedRequest().status === 'Pending') {
+                            <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
+                            } @else {
+                            <i class="fas fa-check-circle text-success"></i>
+                            }
+                            <span>{{ service }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- 4. Selected System (if applicable) -->
+                @if (selectedRequest().systemData && selectedRequest().systemData.selectedTypes.length > 0) {
+                <div class="summary-section">
+                    <h3>ระบบที่เลือก (Selected Systems)</h3>
+                    <div class="summary-list">
+                        <!-- Basic Systems (User) -->
+                        @if (selectedRequest().systemData.selectedTypes.includes('user')) {
+                        @for (opt of selectedRequest().systemData.userOptions; track opt) {
+                        <div class="summary-item sub-item">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>{{ opt }}</span>
+                        </div>
+                        }
+                        }
+                        <!-- Specific Systems (System) -->
+                        @if (selectedRequest().systemData.selectedTypes.includes('system')) {
+                        @for (opt of selectedRequest().systemData.systemOptions; track opt) {
+                        <div class="summary-item sub-item">
+                            <i class="fas fa-check text-primary"></i>
+                            <span>{{ opt }}</span>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+                }
+
+                <!-- 5. Repair Details (if applicable) -->
+                @if (selectedRequest().repairData) {
+                <div class="summary-section">
+                    <h3>รายละเอียดการแจ้งซ่อม</h3>
+                    <div class="repair-details-grid">
+                        <div class="detail-item">
+                            <span class="label">อุปกรณ์:</span>
+                            <span class="value">{{ selectedRequest().repairData.device }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">ยี่ห้อ:</span>
+                            <span class="value">{{ selectedRequest().repairData.brand }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">รุ่น:</span>
+                            <span class="value">{{ selectedRequest().repairData.model }}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <span class="label">อาการ:</span>
+                            <span class="value">{{ selectedRequest().repairData.symptom }}</span>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Problem Details (if applicable) -->
+                @if (selectedRequest().problemData) {
+                <div class="summary-section">
+                    <h3>รายละเอียดการแจ้งปัญหา</h3>
+                    <div class="repair-details-grid">
+                        <div class="detail-item full-width">
+                            <span class="label">หัวข้อปัญหา:</span>
+                            <span class="value">{{ selectedRequest().problemData.topic }}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <span class="label">รายละเอียด:</span>
+                            <span class="value">{{ selectedRequest().problemData.detail }}</span>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- 6. Account Credentials (if applicable) -->
+                @if (selectedRequest().emailAccount) {
+                <div class="summary-section">
+                    <h3>ข้อมูลบัญชีผู้ใช้งาน (Account Credentials)</h3>
+                    <div class="credentials-card">
+                        <div class="credential-item">
+                            <i class="fas fa-envelope"></i>
+                            <div class="cred-info">
+                                <span class="cred-label">Email:</span>
+                                <span class="cred-value">{{ selectedRequest().emailAccount.email }}</span>
+                            </div>
+                        </div>
+                        <div class="credential-item">
+                            <i class="fas fa-key"></i>
+                            <div class="cred-info">
+                                <span class="cred-label">Password:</span>
+                                <span class="cred-value">{{ selectedRequest().emailAccount.password }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-note">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>กรุณาเปลี่ยนรหัสผ่านทันทีหลังจากการเข้าใช้งานครั้งแรก</span>
+                    </div>
+                </div>
+                }
+
+                <!-- 7. Request Details -->
+                @if (selectedRequest().details) {
+                <div class="summary-section">
+                    <h3>รายละเอียด (Details)</h3>
+                    <div class="detail-text p-3 bg-light rounded text-muted">
+                        {{ selectedRequest().details }}
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
+            </div>
         </div>
     </div>
     }
@@ -214,12 +440,14 @@
     <div class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2>รายละเอียดการแจ้งซ่อม</h2>
+                <h2>{{ activeModalMode() === 'repair' ? 'รายละเอียดการแจ้งซ่อม' : 'รายละเอียดการแจ้งปัญหา (Report
+                    Problem)' }}</h2>
                 <button class="btn-close-modal" (click)="closeRepairModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
+                @if (activeModalMode() === 'repair') {
                 <div class="form-group">
                     <label>ความประสงค์จะซ่อมอุปกรณ์</label>
                     <input type="text" [(ngModel)]="repairFormData().device" class="form-control"
@@ -239,10 +467,24 @@
                     <textarea [(ngModel)]="repairFormData().symptom" class="form-control" rows="4"
                         placeholder="ระบุอาการ"></textarea>
                 </div>
+                }
+
+                @if (activeModalMode() === 'problem') {
+                <div class="form-group">
+                    <label>หัวข้อปัญหา (Topic)</label>
+                    <input type="text" [(ngModel)]="problemFormData().topic" class="form-control"
+                        placeholder="ระบุหัวข้อปัญหา">
+                </div>
+                <div class="form-group">
+                    <label>รายละเอียด (Detail)</label>
+                    <textarea [(ngModel)]="problemFormData().detail" class="form-control" rows="4"
+                        placeholder="ระบุรายละเอียดปัญหา"></textarea>
+                </div>
+                }
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" (click)="closeRepairModal()">ยกเลิก</button>
-                <button class="btn-confirm" (click)="confirmRepairRequest()">ยืนยัน</button>
+                <button class="btn-confirm" (click)="confirmModalData()">ยืนยัน</button>
             </div>
         </div>
     </div>
@@ -252,7 +494,7 @@
     <div class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2>สรุปรายละเอียดคำขอ</h2>
+                <h2>สรุปรายละเอียดคำขอ <span class="req-id">{{ nextRequestId }}</span></h2>
                 <button class="btn-close-modal" (click)="closeSummaryModal()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -339,6 +581,27 @@
                         <div class="detail-item full-width">
                             <span class="label">อาการ:</span>
                             <span class="value">{{ repairFormData().symptom }}</span>
+                        </div>
+                    </div>
+                </div>
+                }
+                }
+                }
+
+                <!-- Problem Details (if applicable) -->
+                @if (problemFormData().topic) {
+                @for (service of serviceOptions(); track service.value) {
+                @if (service.value === 'problem' && service.checked) {
+                <div class="summary-section">
+                    <h3>รายละเอียดการแจ้งปัญหา</h3>
+                    <div class="repair-details-grid">
+                        <div class="detail-item full-width">
+                            <span class="label">หัวข้อปัญหา:</span>
+                            <span class="value">{{ problemFormData().topic }}</span>
+                        </div>
+                        <div class="detail-item full-width">
+                            <span class="label">รายละเอียด:</span>
+                            <span class="value">{{ problemFormData().detail }}</span>
                         </div>
                     </div>
                 </div>
