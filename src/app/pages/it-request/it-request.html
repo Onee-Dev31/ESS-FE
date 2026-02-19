@@ -190,12 +190,13 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 15%">Request ID</th>
-                        <th style="width: 15%"><i class="far fa-clock mr-1"></i> วันที่/เวลา</th>
-                        <th style="width: 20%"><i class="fas fa-concierge-bell mr-1"></i> บริการ</th>
-                        <th style="width: 35%"><i class="fas fa-info-circle mr-1"></i> รายละเอียด</th>
+                        <th style="width: 10%">Request ID</th>
+                        <th style="width: 13%"><i class="far fa-clock mr-1"></i> วันที่/เวลา</th>
+                        <th style="width: 15%"><i class="fas fa-concierge-bell mr-1"></i> บริการ</th>
+                        <th style="width: 20%"><i class="fas fa-user-tag mr-1"></i> Request for</th>
+                        <th style="width: 22%"><i class="fas fa-info-circle mr-1"></i> รายละเอียด</th>
                         <th style="width: 10%"><i class="fas fa-tasks mr-1"></i> สถานะ</th>
-                        <th style="width: 5%"></th>
+                        <th style="width: 10%"><i class="fas fa-eye mr-1"></i> More details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -211,13 +212,15 @@
                             </div>
                         </td>
                         <td>
+                            @if (req.openFor) {
+                            <div class="detail-item">
+                                <i class="fas fa-user-circle text-primary"></i>
+                                {{ req.openFor }}
+                            </div>
+                            }
+                        </td>
+                        <td>
                             <div class="details-list">
-                                @if (req.openFor) {
-                                <div class="detail-item">
-                                    <i class="fas fa-user-circle"></i>
-                                    <small class="text-muted">Open For:</small> {{ req.openFor }}
-                                </div>
-                                }
                                 @if (req.details) {
                                 <div class="detail-item">
                                     <i class="fas fa-align-left"></i>
@@ -251,9 +254,9 @@
                                 {{ req.status }}
                             </span>
                         </td>
-                        <td class="text-right">
+                        <td class="text-center">
                             <button class="btn-icon" (click)="viewRequestDetails(req)" title="ดูรายละเอียด">
-                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-eye "></i>
                             </button>
                         </td>
                     </tr>
@@ -278,116 +281,139 @@
             <div class="modal-body">
                 <!-- 1. Open For -->
                 <div class="summary-section">
-                    <h3>ผู้ขอสิทธิ์ (Open For)</h3>
-                    <div class="detail-item">
-                        <span class="value">{{ selectedRequest().openFor }}</span>
-                    </div>
+                    <h3><i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>ชื่อผู้ขอสิทธิ์</th>
+                            <td>{{ selectedRequest().openFor }}</td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- 2. Status & Date -->
                 <div class="summary-section">
-                    <h3>สถานะและวันที่</h3>
-                    <div class="repair-details-grid">
-                        <div class="detail-item">
-                            <span class="label">วันที่ขอรับบริการ:</span>
-                            <span class="value">{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">สถานะ:</span>
-                            <span class="value">
+                    <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ (Status & Date)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>วันที่ขอรับบริการ</th>
+                            <td>{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        </tr>
+                        <tr>
+                            <th>สถานะ</th>
+                            <td>
                                 <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
                                     <i class="fas" [class.fa-check-circle]="selectedRequest().status === 'Approved'"
                                         [class.fa-clock]="selectedRequest().status === 'Pending'"></i>
                                     {{ selectedRequest().status }}
                                 </span>
-                            </span>
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- 3. Selected Service -->
                 <div class="summary-section">
-                    <h3>บริการที่เลือก</h3>
-                    <div class="summary-list">
-                        @for (service of selectedRequest().services; track service) {
-                        <div class="summary-item">
-                            @if (selectedRequest().status === 'Pending') {
-                            <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
-                            } @else {
-                            <i class="fas fa-check-circle text-success"></i>
-                            }
-                            <span>{{ service }}</span>
-                        </div>
-                        }
-                    </div>
+                    <h3><i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected Services)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>บริการ</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (service of selectedRequest().services; track service) {
+                                    <div class="summary-item">
+                                        @if (selectedRequest().status === 'Pending') {
+                                        <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
+                                        } @else {
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        }
+                                        <span>{{ service }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- 4. Selected System (if applicable) -->
                 @if (selectedRequest().systemData && selectedRequest().systemData.selectedTypes.length > 0) {
                 <div class="summary-section">
-                    <h3>ระบบที่เลือก (Selected Systems)</h3>
-                    <div class="summary-list">
-                        <!-- Basic Systems (User) -->
+                    <h3><i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)</h3>
+                    <table class="info-table vertical-table">
                         @if (selectedRequest().systemData.selectedTypes.includes('user')) {
-                        @for (opt of selectedRequest().systemData.userOptions; track opt) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                        </div>
+                        <tr>
+                            <th>Basic Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of selectedRequest().systemData.userOptions; track opt) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                         }
-                        }
-                        <!-- Specific Systems (System) -->
                         @if (selectedRequest().systemData.selectedTypes.includes('system')) {
-                        @for (opt of selectedRequest().systemData.systemOptions; track opt) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                        </div>
+                        <tr>
+                            <th>Specific Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of selectedRequest().systemData.systemOptions; track opt) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                         }
-                        }
-                    </div>
+                    </table>
                 </div>
                 }
 
                 <!-- 5. Repair Details (if applicable) -->
                 @if (selectedRequest().repairData) {
                 <div class="summary-section">
-                    <h3>รายละเอียดการแจ้งซ่อม</h3>
-                    <div class="repair-details-grid">
-                        <div class="detail-item">
-                            <span class="label">อุปกรณ์:</span>
-                            <span class="value">{{ selectedRequest().repairData.device }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">ยี่ห้อ:</span>
-                            <span class="value">{{ selectedRequest().repairData.brand }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">รุ่น:</span>
-                            <span class="value">{{ selectedRequest().repairData.model }}</span>
-                        </div>
-                        <div class="detail-item full-width">
-                            <span class="label">อาการ:</span>
-                            <span class="value">{{ selectedRequest().repairData.symptom }}</span>
-                        </div>
-                    </div>
+                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม (More Details)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>อุปกรณ์</th>
+                            <td>{{ selectedRequest().repairData.device }}</td>
+                        </tr>
+                        <tr>
+                            <th>ยี่ห้อ</th>
+                            <td>{{ selectedRequest().repairData.brand }}</td>
+                        </tr>
+                        <tr>
+                            <th>รุ่น</th>
+                            <td>{{ selectedRequest().repairData.model }}</td>
+                        </tr>
+                        <tr>
+                            <th>อาการ</th>
+                            <td>{{ selectedRequest().repairData.symptom }}</td>
+                        </tr>
+                    </table>
                 </div>
                 }
 
                 <!-- Problem Details (if applicable) -->
                 @if (selectedRequest().problemData) {
                 <div class="summary-section">
-                    <h3>รายละเอียดการแจ้งปัญหา</h3>
-                    <div class="repair-details-grid">
-                        <div class="detail-item full-width">
-                            <span class="label">หัวข้อปัญหา:</span>
-                            <span class="value">{{ selectedRequest().problemData.topic }}</span>
-                        </div>
-                        <div class="detail-item full-width">
-                            <span class="label">รายละเอียด:</span>
-                            <span class="value">{{ selectedRequest().problemData.detail }}</span>
-                        </div>
-                    </div>
+                    <h3><i class="fas fa-exclamation-triangle mr-2 text-primary"></i> รายละเอียดการแจ้งปัญหา (More
+                        Details)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>หัวข้อปัญหา</th>
+                            <td>{{ selectedRequest().problemData.topic }}</td>
+                        </tr>
+                        <tr>
+                            <th>รายละเอียด</th>
+                            <td>{{ selectedRequest().problemData.detail }}</td>
+                        </tr>
+                    </table>
                 </div>
                 }
 
@@ -502,60 +528,82 @@
             <div class="modal-body">
                 <!-- 1. Open For -->
                 <div class="summary-section">
-                    <h3>ผู้ขอสิทธิ์ (Open For)</h3>
-                    <div class="detail-item">
-                        <span class="value">
-                            {{ selectedOpenFor() === 'self' ? 'ตนเอง (Self)' : 'อื่นๆ (Other)' }}
-                            @if (selectedOpenFor() === 'other') {
-                            : {{ otherOpenForName() }}
-                            }
-                        </span>
-                    </div>
+                    <h3><i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>ชื่อผู้ขอสิทธิ์</th>
+                            <td>
+                                {{ selectedOpenFor() === 'self' ? 'ตนเอง (Self)' : 'อื่นๆ (Other)' }}
+                                @if (selectedOpenFor() === 'other') {
+                                : {{ otherOpenForName() }}
+                                }
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- 2. Selected Service -->
                 <div class="summary-section">
-                    <h3>บริการที่เลือก</h3>
-                    <div class="summary-list">
-                        @for (service of serviceOptions(); track service.value) {
-                        @if (service.checked) {
-                        <div class="summary-item">
-                            <i class="fas fa-check-circle text-success"></i>
-                            <span>{{ service.label }}</span>
-                        </div>
-                        }
-                        }
-                    </div>
+                    <h3><i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected Services)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>บริการ</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (service of serviceOptions(); track service.value) {
+                                    @if (service.checked) {
+                                    <div class="summary-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>{{ service.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- 3. Selected System (if applicable) -->
                 @if (isSystemCategorySelected()) {
                 <div class="summary-section">
-                    <h3>ระบบที่เลือก (Selected Systems)</h3>
-                    <div class="summary-list">
-                        <!-- Basic Systems (User) -->
+                    <h3><i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)</h3>
+                    <table class="info-table vertical-table">
                         @if (selectedSystemTypes().includes('user')) {
-                        @for (opt of userSubOptions(); track opt.value) {
-                        @if (opt.checked) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt.label }}</span>
-                        </div>
+                        <tr>
+                            <th>Basic Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of userSubOptions(); track opt.value) {
+                                    @if (opt.checked) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                         }
-                        }
-                        }
-                        <!-- Specific Systems (System) -->
                         @if (selectedSystemTypes().includes('system')) {
-                        @for (opt of systemSubOptions(); track opt.value) {
-                        @if (opt.checked) {
-                        <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt.label }}</span>
-                        </div>
+                        <tr>
+                            <th>Specific Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of systemSubOptions(); track opt.value) {
+                                    @if (opt.checked) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                         }
-                        }
-                        }
-                    </div>
+                    </table>
                 </div>
                 }
 
@@ -564,25 +612,25 @@
                 @for (service of serviceOptions(); track service.value) {
                 @if (service.value === 'repair' && service.checked) {
                 <div class="summary-section">
-                    <h3>รายละเอียดการแจ้งซ่อม</h3>
-                    <div class="repair-details-grid">
-                        <div class="detail-item">
-                            <span class="label">อุปกรณ์:</span>
-                            <span class="value">{{ repairFormData().device }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">ยี่ห้อ:</span>
-                            <span class="value">{{ repairFormData().brand }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">รุ่น:</span>
-                            <span class="value">{{ repairFormData().model }}</span>
-                        </div>
-                        <div class="detail-item full-width">
-                            <span class="label">อาการ:</span>
-                            <span class="value">{{ repairFormData().symptom }}</span>
-                        </div>
-                    </div>
+                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม (More Details)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>อุปกรณ์</th>
+                            <td>{{ repairFormData().device }}</td>
+                        </tr>
+                        <tr>
+                            <th>ยี่ห้อ</th>
+                            <td>{{ repairFormData().brand }}</td>
+                        </tr>
+                        <tr>
+                            <th>รุ่น</th>
+                            <td>{{ repairFormData().model }}</td>
+                        </tr>
+                        <tr>
+                            <th>อาการ</th>
+                            <td>{{ repairFormData().symptom }}</td>
+                        </tr>
+                    </table>
                 </div>
                 }
                 }
@@ -593,17 +641,18 @@
                 @for (service of serviceOptions(); track service.value) {
                 @if (service.value === 'problem' && service.checked) {
                 <div class="summary-section">
-                    <h3>รายละเอียดการแจ้งปัญหา</h3>
-                    <div class="repair-details-grid">
-                        <div class="detail-item full-width">
-                            <span class="label">หัวข้อปัญหา:</span>
-                            <span class="value">{{ problemFormData().topic }}</span>
-                        </div>
-                        <div class="detail-item full-width">
-                            <span class="label">รายละเอียด:</span>
-                            <span class="value">{{ problemFormData().detail }}</span>
-                        </div>
-                    </div>
+                    <h3><i class="fas fa-exclamation-triangle mr-2 text-primary"></i> รายละเอียดการแจ้งปัญหา (More
+                        Details)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>หัวข้อปัญหา</th>
+                            <td>{{ problemFormData().topic }}</td>
+                        </tr>
+                        <tr>
+                            <th>รายละเอียด</th>
+                            <td>{{ problemFormData().detail }}</td>
+                        </tr>
+                    </table>
                 </div>
                 }
                 }

@@ -38,9 +38,13 @@ $status-approved-bg: #dbeafe;
 $status-approved-text: #2563eb;
 $status-progress-bg: #f3e8ff;
 $status-progress-text: #9333ea;
-$status-completed-bg: #d1fae5;
 $status-completed-text: #059669;
 $status-cancelled-text: #64748b;
+
+// Information Table Styles
+$table-header-bg: #f8fafc;
+$table-border: #e2e8f0;
+$table-label-bg: #f1f5f9;
 
 /* ==========================================================================
    2. UTILITY CLASSES
@@ -65,6 +69,52 @@ $status-cancelled-text: #64748b;
 
 .text-success {
     color: $success !important;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1.5px solid transparent;
+
+    &.status-new,
+    &.new {
+        background: $status-new-bg;
+        color: $status-new-text;
+        border-color: rgba($status-new-text, 0.4);
+    }
+
+    &.status-verified,
+    &.verified {
+        background: $status-verified-bg;
+        color: $status-verified-text;
+        border-color: rgba($status-verified-text, 0.4);
+    }
+
+    &.status-pending,
+    &.pending {
+        background: $status-pending-bg;
+        color: $status-pending-text;
+        border-color: rgba($status-pending-text, 0.4);
+    }
+
+    &.status-approved,
+    &.approved {
+        background: $status-success-bg;
+        color: $status-success-text;
+        border-color: rgba($status-success-text, 0.4);
+    }
+
+    &.status-rejected,
+    &.rejected {
+        background: $status-danger-bg;
+        color: $status-danger-text;
+        border-color: rgba($status-danger-text, 0.4);
+    }
 }
 
 /* ==========================================================================
@@ -700,7 +750,7 @@ $status-cancelled-text: #64748b;
 
                 th {
                     padding: 14px 16px;
-                    text-align: left;
+                    text-align: center;
                     padding-left: 1rem;
                     font-size: 0.875rem;
                     font-weight: 600;
@@ -737,7 +787,7 @@ $status-cancelled-text: #64748b;
                     color: $text;
                     border-bottom: 1px solid $border-color;
                     vertical-align: middle;
-                    text-align: left;
+                    text-align: center;
 
                     &:last-child {
                         text-align: center;
@@ -749,51 +799,6 @@ $status-cancelled-text: #64748b;
                 }
             }
 
-            .status-badge {
-                padding: 6px 12px;
-                border-radius: 9999px;
-                font-size: 0.75rem;
-                font-weight: 600;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                border: 1.5px solid transparent;
-
-                &.status-new,
-                &.new {
-                    background: $status-new-bg;
-                    color: $status-new-text;
-                    border-color: rgba($status-new-text, 0.4);
-                }
-
-                &.status-verified,
-                &.verified {
-                    background: $status-verified-bg;
-                    color: $status-verified-text;
-                    border-color: rgba($status-verified-text, 0.4);
-                }
-
-                &.status-pending,
-                &.pending {
-                    background: $status-pending-bg;
-                    color: $status-pending-text;
-                    border-color: rgba($status-pending-text, 0.4);
-                }
-
-                &.status-approved,
-                &.approved {
-                    background: $status-success-bg;
-                    color: $status-success-text;
-                    border-color: rgba($status-success-text, 0.4);
-                }
-
-                &.status-rejected,
-                &.rejected {
-                    background: $status-danger-bg;
-                    color: $status-danger-text;
-                    border-color: rgba($status-danger-text, 0.4);
-                }
-            }
 
             .action-cell,
             .action-btns {
@@ -1109,5 +1114,105 @@ $status-cancelled-text: #64748b;
 
     i {
         font-size: 1rem;
+    }
+}
+
+/* ==========================================================================
+   10. INFORMATION TABLE (Structured Data)
+   ========================================================================== */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid $table-border;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    background: #fff;
+
+    th,
+    td {
+        padding: 0.85rem 1.25rem;
+        text-align: left;
+        border: 1px solid $table-border;
+        font-size: 0.95rem;
+    }
+
+    th {
+        background-color: $table-header-bg;
+        font-weight: 700;
+        color: #1e293b;
+        width: 30%;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+    }
+
+    td {
+        color: #334155;
+        font-weight: 500;
+    }
+
+    &.vertical-table {
+        tr {
+            border-bottom: 1px solid $table-border;
+
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+
+        th {
+            background-color: $table-label-bg;
+            width: 35%;
+            font-size: 0.9rem;
+            text-transform: none;
+            letter-spacing: normal;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        td {
+            background-color: #ffffff;
+        }
+    }
+}
+
+/* ==========================================================================
+   11. VIEW DETAILS BUTTON
+   ========================================================================== */
+.btn-view-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+
+    i {
+        font-size: 0.75rem;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover {
+        background: $primary;
+        border-color: $primary;
+        color: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+
+        i {
+            transform: translateX(2px);
+        }
+    }
+
+    &:active {
+        transform: translateY(1px);
     }
 }
