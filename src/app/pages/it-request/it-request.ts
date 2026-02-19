@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { SwalService } from '../../services/swal.service';
 
 @Component({
     selector: 'app-it-request',
@@ -12,16 +13,19 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 })
 export class ITRequestComponent {
 
+    // Inject SwalService
+    private swalService = inject(SwalService);
+
     serviceOptions = signal([
-        { label: 'บริการ Internet', value: 'internet', checked: false, icon: 'fa-wifi' },
-        { label: 'บริการ Email', value: 'email', checked: false, icon: 'fa-envelope' },
-        { label: 'File Sharing', value: 'fileshare', checked: false, icon: 'fa-share-alt' },
-        { label: 'ขอแก้ไขสิทธิ', value: 'access_edit', checked: false, icon: 'fa-user-lock' },
-        { label: 'ขอ Unlock User', value: 'unlock_user', checked: false, icon: 'fa-unlock-alt' },
-        { label: 'ขอใช้ระบบ', value: 'request_system', checked: false, icon: 'fa-desktop' },
-        { label: 'แจ้งซ่อม', value: 'repair', checked: false, icon: 'fa-tools' },
-        { label: 'แจ้งปัญหา', value: 'problem', checked: false, icon: 'fa-exclamation-triangle' },
-        { label: 'บริการอื่นๆ', value: 'other', checked: false, icon: 'fa-ellipsis-h' }
+        { label: 'บริการ Internet', value: 'internet', checked: false, disabled: false, icon: 'fa-wifi' },
+        { label: 'บริการ Email', value: 'email', checked: false, disabled: false, icon: 'fa-envelope' },
+        { label: 'File Sharing', value: 'fileshare', checked: false, disabled: false, icon: 'fa-share-alt' },
+        { label: 'ขอแก้ไขสิทธิ', value: 'access_edit', checked: false, disabled: false, icon: 'fa-user-lock' },
+        { label: 'ขอ Unlock User', value: 'unlock_user', checked: false, disabled: false, icon: 'fa-unlock-alt' },
+        { label: 'ขอใช้ระบบ', value: 'request_system', checked: false, disabled: false, icon: 'fa-desktop' },
+        { label: 'แจ้งซ่อม', value: 'repair', checked: false, disabled: false, icon: 'fa-tools' },
+        { label: 'แจ้งปัญหา', value: 'problem', checked: false, disabled: false, icon: 'fa-exclamation-triangle' },
+        { label: 'บริการอื่นๆ', value: 'other', checked: false, disabled: false, icon: 'fa-ellipsis-h' }
     ]);
 
     isUserCategorySelected = signal(false);
@@ -78,14 +82,33 @@ export class ITRequestComponent {
     toggleService(index: number) {
         this.serviceOptions.update(items => {
             const newItems = [...items];
-            const isChecking = !newItems[index].checked;
 
-            if (newItems[index].value === 'repair' && isChecking) {
-                this.showRepairModal.set(true);
-            } else {
-                newItems[index].checked = isChecking;
+            if (!newItems[index].disabled) {
+                const isChecking = !newItems[index].checked;
+
+                if (newItems[index].value === 'repair' && isChecking) {
+                    this.showRepairModal.set(true);
+                } else {
+                    newItems[index].checked = isChecking;
+                }
             }
-            return newItems;
+
+            const repairSet = ['repair', 'problem'];
+            const hasRepairActive = newItems.some(i => repairSet.includes(i.value) && i.checked);
+            const hasServiceActive = newItems.some(i => !repairSet.includes(i.value) && i.checked);
+
+            return newItems.map(item => {
+                const isRepairType = repairSet.includes(item.value);
+
+                if (hasRepairActive) {
+                    item.disabled = !isRepairType;
+                } else if (hasServiceActive) {
+                    item.disabled = isRepairType;
+                } else {
+                    item.disabled = false;
+                }
+                return item;
+            });
         });
 
         const selectedValues = this.serviceOptions().filter(s => s.checked).map(s => s.value);
@@ -122,9 +145,20 @@ export class ITRequestComponent {
 
     confirmRepairRequest() {
         this.serviceOptions.update(items => {
-            return items.map(item => {
+            const newItems = items.map(item => {
                 if (item.value === 'repair') {
                     return { ...item, checked: true };
+                }
+                return item;
+            });
+
+            const repairSet = ['repair', 'problem'];
+            const hasRepairActive = newItems.some(i => repairSet.includes(i.value) && i.checked);
+
+            return newItems.map(item => {
+                const isRepairType = repairSet.includes(item.value);
+                if (hasRepairActive) {
+                    item.disabled = !isRepairType;
                 }
                 return item;
             });
@@ -136,17 +170,42 @@ export class ITRequestComponent {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
 
         if (selectedServices.length === 0) {
-            alert('กรุณาเลือกบริการอย่างน้อย 1 รายการ');
+            this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกบริการอย่างน้อย 1 รายการ');
             return;
         }
 
+        const isRequestSystem = selectedServices.some(s => s.value === 'request_system');
+        if (isRequestSystem) {
+            if (this.selectedSystemTypes().length === 0) {
+                this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกประเภทระบบ (Basic หรือ Specific)');
+                return;
+            }
+
+            const hasUserType = this.selectedSystemTypes().includes('user');
+            const hasSystemType = this.selectedSystemTypes().includes('system');
+
+            const userSubSelected = this.userSubOptions().some(o => o.checked);
+            const systemSubSelected = this.systemSubOptions().some(o => o.checked);
+
+            if (hasUserType && !userSubSelected) {
+                this.swalService.warning('แจ้งเตือน', 'กรุณาระบุระบบพื้นฐาน (Basic System) ที่ต้องการ');
+                return;
+            }
+
+            if (hasSystemType && !systemSubSelected) {
+                this.swalService.warning('แจ้งเตือน', 'กรุณาระบุระบบเฉพาะ (Specific System) ที่ต้องการ');
+                return;
+            }
+
+        }
+
         if (this.selectedOpenFor() === 'other' && !this.otherOpenForName().trim()) {
-            alert('กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
+            this.swalService.warning('แจ้งเตือน', 'กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
             return;
         }
 
         if (!this.requestDetails().trim()) {
-            alert('กรุณากรอกรายละเอียด (Details)');
+            this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
             return;
         }
 
@@ -185,7 +244,7 @@ export class ITRequestComponent {
         this.submittedRequests.update(reqs => [newRequest, ...reqs]);
 
         console.log('Final Submission Payload:', newRequest);
-        alert('ส่งคำขอเรียบร้อยแล้ว');
+        this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
 
         this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));

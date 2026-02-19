@@ -377,6 +377,15 @@ tbody {
 
   .toolbar-container {
     @include toolbar-container;
+
+    .toolbar-bottom-row .right-filters {
+      @include tablet {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+    }
   }
 
   .table-responsive {
@@ -500,6 +509,11 @@ tbody {
 
 .btn-clear {
   @include btn-outline;
+
+  @include tablet {
+    flex: 1 0 45%;
+    min-width: 140px;
+  }
 }
 
 .action-btns {
@@ -572,6 +586,7 @@ select.form-control {
 
     input.form-control {
       flex: 1;
+      min-width: 0;
     }
 
     button {
@@ -592,6 +607,20 @@ select.form-control {
     font-size: 0.875rem;
     font-weight: 500;
     color: #374151;
+  }
+
+  .date-input-group,
+  .select-input-group {
+    width: 100%;
+
+    .form-control {
+      width: 100%;
+    }
+  }
+
+  @include tablet {
+    flex: 1 1 150px;
+    min-width: 140px;
   }
 }
 

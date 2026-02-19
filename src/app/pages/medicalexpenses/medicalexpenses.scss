@@ -412,8 +412,10 @@ $status-cancelled-text: #64748b;
                 justify-content: flex-start;
 
                 @include tablet {
+                    display: flex;
                     flex-direction: row;
                     flex-wrap: wrap;
+                    gap: 12px;
                 }
             }
         }
@@ -595,6 +597,14 @@ $status-cancelled-text: #64748b;
     .card-list-view {
         @include mobile-cards-view;
         gap: 20px;
+
+        .action-btn.folder {
+            @include icon-btn-sky;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
 
         .mobile-card {
             background: white;
@@ -798,10 +808,19 @@ $status-cancelled-text: #64748b;
     box-shadow: none;
 
     &:hover {
-        background: #fef2f2;
+        background: rgba(239, 68, 68, 0.05);
         border-color: #dc2626;
     }
+
+    &:active {
+        background: rgba(239, 68, 68, 0.1);
+    }
 }
+
+.btn-icon-sky {
+    @include icon-btn-sky;
+}
+
 
 // Input fields
 .form-control {
@@ -841,6 +860,7 @@ select.form-control {
 
         input.form-control {
             flex: 1;
+            min-width: 0;
         }
 
         button {
@@ -865,9 +885,18 @@ select.form-control {
         color: #64748b;
     }
 
+    .date-input-group,
+    .select-input-group {
+        width: 100%;
+
+        .form-control {
+            width: 100%;
+        }
+    }
+
     @include tablet {
-        flex: 1;
-        min-width: 150px;
+        flex: 1 1 150px;
+        min-width: 140px;
     }
 }
 
