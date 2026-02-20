@@ -247,7 +247,7 @@
                 *ngIf="!!editData && formData.emp_status !== 'Resigned'">ลาออก</button>
             <button type="button" class="btn-active" (click)="handleActive()"
                 *ngIf="!!editData && formData.emp_status === 'Resigned'">Active</button>
-            <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid">Save</button>
+            <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid" [class.disable]="f.invalid" >Save</button>
         </div>
     </form>
 

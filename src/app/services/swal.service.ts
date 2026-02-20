@@ -54,4 +54,20 @@ export class SwalService {
             cancelButtonColor: '#9ca3af'
         });
     }
+
+    loading(title: string = 'กำลังดำเนินการ...', text?: string) {
+        Swal.fire({
+            title,
+            text: text || 'กรุณารอสักครู่',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+
+    close() {
+        Swal.close();
+    }
 }

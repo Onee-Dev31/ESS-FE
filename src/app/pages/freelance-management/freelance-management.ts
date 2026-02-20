@@ -90,10 +90,11 @@ export class FreelanceManagementComponent implements OnInit {
     data = signal<FreelanceMember[]>([]);
     sorting = signal<SortingState>([]);
 
+    isSaving = false;
+
     // MASTER
     companyList: any[] = []
     departmentList: any[] = []
-    // filteredDepartmentList: any[] = [];
 
     // Modal state
     isFormOpen = signal<boolean>(false);
@@ -379,7 +380,10 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     handleFormSave(fData: any) {
-        this.loadingService.start('freelance-list');
+        // this.loadingService.start('freelance-list');
+        if (this.isSaving) return;   // ✅ กันกดซ้ำ
+        this.isSaving = true;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
         const is_update = fData.id ? true : false
         const is_resign = fData.btn_action === "RESIGN" ? true : false
@@ -530,8 +534,8 @@ export class FreelanceManagementComponent implements OnInit {
         this.freelanceService.createFreelance(formData)
             .pipe(
                 finalize(() => {
-                    this.loadingService.stop('freelance-list');
-                    // this.getFreelance();
+                    this.swalService.close();
+                    this.isSaving = false;
                     this.loadInitialData();
                     this.closeForm();
                 })
