@@ -97,6 +97,12 @@ export const routes: Routes = [
                 data: { animation: 'Dashboard' }
             },
             {
+                path: 'setting',
+                loadComponent: () => import('./pages/setting/setting').then(m => m.Setting),
+                // canActivate: [menuGuard],
+                data: { animation: 'Dashboard' }
+            },
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'

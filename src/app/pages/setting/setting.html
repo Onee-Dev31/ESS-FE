@@ -1,0 +1,107 @@
+<div class="setting-page">
+    <app-page-header title="Role Permission Management"></app-page-header>
+
+    <div class="content-card">
+
+        <div class="card-header-title">
+            Role & Menu Permission
+        </div>
+
+        <div class="action-toolbar">
+            <div class="toolbar-left">
+                <button class="btn-create" *ngIf="!isEditMode" (click)="isEditMode = true">
+                    <i class="fas fa-pen"></i> แก้ไข
+                </button>
+
+                <ng-container *ngIf="isEditMode">
+                    <button class="btn-send-data mr-2" (click)="savePermission()">
+                        <i class="fas fa-save"></i> บันทึก
+                    </button>
+
+                    <button class="btn-search-purple" (click)="cancelEdit()">
+                        ยกเลิก
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table">
+
+                <!-- HEADER -->
+                <thead>
+                    <tr>
+                        <th style="min-width:220px">Menu</th>
+
+                        <th *ngFor="let role of roles" class="text-center">
+                            <div class="role-header">
+                                <div>{{ role.name }}</div>
+
+                                <div class="mt-1" *ngIf="isEditMode">
+                                    <input type="checkbox" [checked]="isAllChecked(role.id)"
+                                        (change)="toggleAllForRole(role.id, $event.target.checked)">
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+
+                <!-- BODY -->
+                <tbody>
+                    <ng-container *ngFor="let menu of menus">
+
+                        <tr [class.parent-row]="menu.level === 0">
+
+                            <!-- Menu Name -->
+                            <td>
+                                <div class="menu-cell" [class.menu-head]="menu.level === 0"
+                                    [class.menu-child]="menu.level > 0"
+                                    [style.padding-left.px]="menu.level > 0 ? 16 : 0">
+
+                                    <!-- Head -->
+                                    <ng-container *ngIf="menu.level === 0">
+                                        <div class="menu">
+                                            <!-- <mat-icon name="folder" class="menu-icon-head"> folder</mat-icon> -->
+                                            <span>{{ menu.name }}</span>
+                                        </div>
+                                    </ng-container>
+
+                                    <!-- Child -->
+                                    <ng-container *ngIf="menu.level > 0">
+                                        <div class="submenu">
+                                            <mat-icon name="check_small"
+                                                class="menu-icon-child">chevron_right</mat-icon>
+                                            <span>{{ menu.name }}</span>
+                                        </div>
+                                    </ng-container>
+
+                                </div>
+                            </td>
+
+                            <td *ngFor="let role of roles" class="text-center">
+
+                                <!-- VIEW MODE -->
+                                <ng-container *ngIf="!isEditMode">
+                                    <span class="permission-badge" [class.active]="hasPermission(role.id, menu.id)">
+                                        {{ hasPermission(role.id, menu.id) ? '✔' : '' }}
+                                    </span>
+                                </ng-container>
+
+                                <!-- EDIT MODE -->
+                                <ng-container *ngIf="isEditMode">
+                                    <input type="checkbox" [checked]="hasPermission(role.id, menu.id)"
+                                        (change)="togglePermission(role.id, menu.id, $event.target.checked)">
+                                </ng-container>
+
+                            </td>
+
+                        </tr>
+
+                    </ng-container>
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>

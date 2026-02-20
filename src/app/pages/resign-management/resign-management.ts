@@ -49,8 +49,6 @@ export class ResignManagement {
   pageSize = 5;             // จำนวนต่อหน้า
   pageSizeOptions = [5, 10, 20, 50];
 
-
-
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private i18n: NzI18nService,
