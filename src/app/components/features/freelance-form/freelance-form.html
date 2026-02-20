@@ -213,7 +213,8 @@
                         <!-- Uploaded files list -->
                         <div class="uploaded-files" *ngIf="uploadedFiles.length > 0">
                             <div class="file-item" *ngFor="let file of uploadedFiles; let i = index">
-                                <i class="fas fa-file-pdf"></i>
+                                <i class="fa-solid fa-file-lines"></i>
+                                <!-- <i class="fas fa-file-pdf"></i> -->
                                 <span>{{ file.name }}</span>
 
                                 <!-- ปุ่มเปลี่ยนไฟล์ -->
@@ -247,7 +248,8 @@
                 *ngIf="!!editData && formData.emp_status !== 'Resigned'">ลาออก</button>
             <button type="button" class="btn-active" (click)="handleActive()"
                 *ngIf="!!editData && formData.emp_status === 'Resigned'">Active</button>
-            <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid" [class.disable]="f.invalid" >Save</button>
+            <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid"
+                [class.disable]="f.invalid">Save</button>
         </div>
     </form>
 
