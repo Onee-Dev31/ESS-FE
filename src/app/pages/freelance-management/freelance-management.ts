@@ -48,8 +48,6 @@ interface FreelanceFormData {
     position: string;
     startDate: Date | null;
     endDate: Date | null;
-    // startDate: string;
-    // endDate: string;
     salary: number;
     otherIncome: number;
     totalIncome: number;
@@ -60,7 +58,9 @@ interface FreelanceFormData {
     fotdNumber: string;
     description: string;
     attachments: { name: string; file: File; description: string; }[];
+    resignDate?: string;
     lastWorkingDate?: string;
+    emp_status: string;
 }
 
 @Component({
@@ -196,72 +196,6 @@ export class FreelanceManagementComponent implements OnInit {
         this.getFreelance();
     }
 
-    // loadData() {
-    //     this.loadingService.start('freelance-list');
-    //     // Updated Mock data based on screenshot
-    //     setTimeout(() => {
-    //         this.data.set([
-    //             {
-    //                 id: '1',
-    //                 employeeId: 'FOTD00001',
-    //                 name: 'Lili Daniels',
-    //                 nickname: 'Lilly',
-    //                 phone: '098-555-5555',
-    //                 company: 'OTD',
-    //                 department: '10806 - IT Department',
-    //                 salary: 100000,
-    //                 otherIncome: 100000,
-    //                 startDate: '10-Jan-2026',
-    //                 endDate: '10-Jan-2027',
-    //                 selected: false
-    //             },
-    //             {
-    //                 id: '2',
-    //                 employeeId: 'FOTD00002',
-    //                 name: 'Henrietta Whitney',
-    //                 nickname: 'Henry',
-    //                 phone: '098-555-5555',
-    //                 company: 'GTV',
-    //                 department: '10806 - IT Department',
-    //                 salary: 20000,
-    //                 otherIncome: 100000,
-    //                 startDate: '15-Feb-2026',
-    //                 endDate: '15-Feb-2027',
-    //                 selected: false
-    //             },
-    //             {
-    //                 id: '3',
-    //                 employeeId: 'FOTD00003',
-    //                 name: 'Seth McDaniel',
-    //                 nickname: 'Set',
-    //                 phone: '098-555-5555',
-    //                 company: 'OTV',
-    //                 department: '10806 - IT Department',
-    //                 salary: 30000,
-    //                 otherIncome: 100000,
-    //                 startDate: '01-Mar-2026',
-    //                 endDate: '01-Mar-2027',
-    //                 selected: false
-    //             },
-    //             {
-    //                 id: '4',
-    //                 employeeId: 'FOTD00004',
-    //                 name: 'Edward King',
-    //                 nickname: 'Ed',
-    //                 phone: '098-555-5555',
-    //                 company: 'ATM',
-    //                 department: '10806 - IT Department',
-    //                 salary: 40000,
-    //                 otherIncome: 100000,
-    //                 startDate: '05-Apr-2026',
-    //                 endDate: '05-Apr-2027',
-    //                 selected: false
-    //             }
-    //         ]);
-    //         this.loadingService.stop('freelance-list');
-    //     }, 1000);
-    // }
-
     toggleSort(columnId: string) {
         TableSortHelper.toggleSort(this.table, columnId);
     }
@@ -269,15 +203,6 @@ export class FreelanceManagementComponent implements OnInit {
     getSortIcon(columnId: string) {
         return TableSortHelper.getSortIcon(this.table, columnId);
     }
-
-    // setPageSize(size: number) {
-    //     this.listing.pageSize.set(size);
-    //     this.listing.currentPage.set(0);
-    // }
-
-    // goToPage(page: number) {
-    //     this.listing.currentPage.set(page);
-    // }
 
     goToPage(page: number) {
         this.getFreelance(page + 1, this.listing.pageSize());
@@ -342,8 +267,6 @@ export class FreelanceManagementComponent implements OnInit {
             position: info.POSITION,
             startDate: info.CONTRACT_START_DATE ? new Date(info.CONTRACT_START_DATE) : null,
             endDate: info.CONTRACT_END_DATE ? new Date(info.CONTRACT_END_DATE) : null,
-            // startDate: info.CONTRACT_START_DATE,
-            // endDate: info.CONTRACT_END_DATE,
             salary: info.SALARY,
             otherIncome: info.OTHER_INCOME || 0,
             totalIncome: info.TOTAL_AMT,
@@ -354,7 +277,9 @@ export class FreelanceManagementComponent implements OnInit {
             fotdNumber: info.EMP_NO,
             description: info.REMARK,
             attachments: convertedFiles || [],
-            lastWorkingDate: info.RESIGN_DATE
+            resignDate: info.RESIGN_DATE,
+            lastWorkingDate: info.LAST_DATE,
+            emp_status: info.EMP_STATUS
         }
 
         this.original_formData_freelance = structuredClone(formData);
@@ -374,6 +299,8 @@ export class FreelanceManagementComponent implements OnInit {
         this.loadingService.start('freelance-list');
 
         const is_update = fData.id ? true : false
+        const is_resign = fData.btn_action === "RESIGN" ? true : false
+        const is_Activate = fData.btn_action === "ACTIVATE" ? true : false
 
         console.log(is_update)
         console.log('Form data:', fData);
@@ -411,8 +338,6 @@ export class FreelanceManagementComponent implements OnInit {
         (!is_update || changedData.startDate !== undefined) && formData.append('contract_start_date', this.formatDateLocal(fData.startDate));
         (!is_update || changedData.endDate !== undefined) && formData.append('contract_end_date', this.formatDateLocal(fData.endDate));
 
-        (!is_update || changedData.lastWorkingDate !== undefined) && formData.append('resign_date', fData.lastWorkingDate ?? '');
-
         (!is_update || changedData.accountNumber !== undefined) && formData.append('acc_book_no', fData.accountNumber ?? '');
         (!is_update || changedData.bank !== undefined) && formData.append('namebank', fData.bank ?? '');
         (!is_update || changedData.department !== undefined) && formData.append('costcent', fData.department.COSTCENT ?? '');
@@ -423,6 +348,12 @@ export class FreelanceManagementComponent implements OnInit {
         (!is_update && formData.append('candidate_id', '0'));
         (!is_update && formData.append('emp_status', 'Active'));
         (!is_update && formData.append('jobgrade', 'ZZ'));
+
+        (is_resign) && formData.append('resign_date', this.formatDateLocal(fData.resignDate));
+        (is_resign) && formData.append('last_date', this.formatDateLocal(fData.lastWorkingDate));
+        (is_resign) && formData.append('emp_status', 'Resigned');
+
+        (is_Activate) && formData.append('emp_status', 'Active');
 
         if (Array.isArray(fData.attachments)) {
 
@@ -501,7 +432,6 @@ export class FreelanceManagementComponent implements OnInit {
 
             }
         }
-
 
         const obj: any = {};
         formData.forEach((value, key) => {

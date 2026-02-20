@@ -537,6 +537,17 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
     }
+
+    .btn-active {
+        margin-right: auto !important;
+        background: #4340fd !important;
+        color: white !important;
+
+        &:hover {
+            background: #3533d2 !important;
+            box-shadow: 0 4px 12px rgba(88, 68, 239, 0.3);
+        }
+    }
 }
 
 // ==================== RESIGN MODAL ====================
@@ -587,8 +598,9 @@
                 transition: all 0.2s;
 
                 &:hover {
+                    color: #ef4444;
                     background: #f3f4f6;
-                    color: #4b5563;
+                    transform: rotate(90deg);
                 }
             }
         }

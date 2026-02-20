@@ -20,8 +20,8 @@ interface FreelanceFormData {
     company: string;
     department: string;
     position: string;
-    startDate: string;
-    endDate: string;
+    startDate: Date | null;
+    endDate: Date | null;
     salary: number;
     otherIncome: number;
     totalIncome: number;
@@ -30,9 +30,12 @@ interface FreelanceFormData {
     fotdNumber: string;
     description: string;
     attachments: { name: string; file: File; description: string; }[];
-    lastWorkingDate?: string;
+    resignDate?: Date | null;
+    lastWorkingDate?: Date | null;
     supplierCode: string;
     adUser: string;
+    btn_action?: string;
+    emp_status?: string;
 }
 
 @Component({
@@ -62,6 +65,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
 
     dateFormat = 'dd//MM/yyyy';
 
+    showResignModal = false;
+    resignDate: Date | null = null;
+    lastWorkingDate: Date | null = null;
+
     formData: FreelanceFormData = {
         firstNameTh: '',
         lastNameTh: '',
@@ -73,8 +80,8 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         company: '',
         department: '',
         position: '',
-        startDate: '',
-        endDate: '',
+        startDate: null,
+        endDate: null,
         salary: 0,
         otherIncome: 0,
         totalIncome: 0,
@@ -85,6 +92,11 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         fotdNumber: '',
         description: '',
         attachments: []
+    };
+
+    formResignData: any = {
+        resignDate: null,
+        lastWorkingDate: null
     };
 
     uploadedFiles: {
@@ -153,7 +165,17 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
             }
         }
         if (changes['editData'] && changes['editData'].currentValue) {
-            this.formData = { ...this.formData, ...changes['editData'].currentValue };
+            const data = changes['editData'].currentValue;
+
+            this.formData = {
+                ...this.formData,
+                ...data,
+                startDate: data.startDate ? new Date(data.startDate) : null,
+                endDate: data.endDate ? new Date(data.endDate) : null,
+                lastWorkingDate: data.lastWorkingDate
+                    ? new Date(data.lastWorkingDate)
+                    : null
+            };
             this.mapCompanyAndDepartment();
             this.syncMoneyDisplay();
             this.uploadedFiles = this.formData.attachments
@@ -271,32 +293,55 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         this.onSave.emit(this.formData);
     }
 
-    showResignModal = false;
-    resignDate = '';
-    lastWorkingDate = '';
-
     handleResign() {
-        console.log('Resigned')
+        console.log('Open Resigned')
         this.showResignModal = true;
     }
 
+    handleActive() {
+        console.log('handleActive')
+        this.swalService.confirm('ยืนยันการ Activate อีกครั้ง')
+            .then(result => {
+                if (!result.isConfirmed) return;
+
+                this.onSave.emit({
+                    ...this.formData,
+                    btn_action: 'ACTIVATE'
+                });
+            });
+    }
+
+    // confirmResign() {
+    //     if (!this.resignDate || !this.lastWorkingDate) {
+    //         return;
+    //     }
+    //     this.onSave.emit({
+    //         ...this.formData,
+    //         id: 'RESIGN',
+    //         endDate: this.resignDate,
+    //         lastWorkingDate: this.lastWorkingDate
+    //     });
+
+    //     this.closeResignModal();
+    // }
     confirmResign() {
-        if (!this.resignDate || !this.lastWorkingDate) {
-            return;
-        }
+        console.log(this.formResignData.resignDate, this.formResignData.lastWorkingDate)
+        if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
+
         this.onSave.emit({
             ...this.formData,
-            id: 'RESIGN',
-            endDate: this.resignDate,
-            lastWorkingDate: this.lastWorkingDate
+            btn_action: 'RESIGN',
+            resignDate: this.formResignData.resignDate,
+            lastWorkingDate: this.formResignData.lastWorkingDate
         });
+
         this.closeResignModal();
     }
 
     closeResignModal() {
         this.showResignModal = false;
-        this.resignDate = '';
-        this.lastWorkingDate = '';
+        this.formResignData.resignDate = null
+        this.formResignData.lastWorkingDate = null
     }
 
     handleClose() {
@@ -317,8 +362,8 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
             company: '',
             department: '',
             position: '',
-            startDate: '',
-            endDate: '',
+            startDate: null,
+            endDate: null,
             salary: 0,
             otherIncome: 0,
             totalIncome: 0,
@@ -490,5 +535,11 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         this.calculateTotal();
     }
 
+    private formatDateLocal(date: Date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
 }

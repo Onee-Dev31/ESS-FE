@@ -243,14 +243,17 @@
 
         <!-- Action buttons - NOW OUTSIDE modal-content -->
         <div class="form-actions">
-            <button type="button" class="btn-resign" (click)="handleResign()">ลาออก</button>
+            <button type="button" class="btn-resign" (click)="handleResign()"
+                *ngIf="!!editData && formData.emp_status !== 'Resigned'">ลาออก</button>
+            <button type="button" class="btn-active" (click)="handleActive()"
+                *ngIf="!!editData && formData.emp_status === 'Resigned'">Active</button>
             <button type="button" class="btn-save" (click)="handleSave()" [disabled]="f.invalid">Save</button>
-            <button type="button" class="btn-clear" (click)="handleClose()">Clear</button>
         </div>
     </form>
 
     <!-- Resign Date Modal -->
-    <div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal" (click)="closeResignModal()">
+    <div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal">
+        <!-- <div class="modal-overlay resign-modal-overlay" *ngIf="showResignModal" (click)="closeResignModal()"> -->
         <div class="modal-container small-modal" (click)="$event.stopPropagation()">
             <div class="form-header">
                 <h2>ระบุวันที่ลาออก</h2>
@@ -259,16 +262,31 @@
                 </button>
             </div>
             <div class="modal-content">
-                <div class="form-row">
-                    <div class="form-field">
-                        <label>วันที่ลาออก</label>
-                        <input type="date" class="form-input" [(ngModel)]="resignDate">
+                <form #resignForm="ngForm" class="resign-form">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>วันที่ลาออก</label>
+                            <nz-date-picker [(ngModel)]="formResignData.resignDate" nzFormat="dd/MM/yyyy"
+                                name="resignDate" class="form-input" required #resignDate="ngModel"
+                                [class.input-error]="resignDate.invalid && resignDate.touched">
+                            </nz-date-picker>
+                            <div class="error" *ngIf="resignDate.invalid && resignDate.touched">
+                                กรุณาเลือกวันที่ลาออก
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>วันสุดท้ายที่มาทำงาน</label>
+                            <nz-date-picker [(ngModel)]="formResignData.lastWorkingDate" nzFormat="dd/MM/yyyy"
+                                name="lastWorkingDate" class="form-input" required #lastWorkingDate="ngModel"
+                                [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched">
+                            </nz-date-picker>
+                            <div class="error" *ngIf="lastWorkingDate.invalid && lastWorkingDate.touched">
+                                กรุณาเลือกวันสุดท้ายที่มาทำงาน
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-field">
-                        <label>วันสุดท้ายที่มาทำงาน</label>
-                        <input type="date" class="form-input" [(ngModel)]="lastWorkingDate">
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="form-actions">
                 <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
