@@ -9,6 +9,8 @@ export interface ListingState {
     filterStartDate: WritableSignal<string>;
     filterEndDate: WritableSignal<string>;
     searchText: WritableSignal<string>;
+    totalItems: WritableSignal<number>;
+    totalPages: WritableSignal<number>;
 }
 
 /** สร้าง State เริ่มต้นของรายการ */
@@ -19,7 +21,9 @@ export function createListingState(initialPageSize = 10): ListingState {
         filterStatus: signal(''),
         filterStartDate: signal(''),
         filterEndDate: signal(''),
-        searchText: signal('')
+        searchText: signal(''),
+        totalItems: signal(0),
+        totalPages: signal(1),
     };
 }
 
@@ -59,6 +63,49 @@ export function createListingComputeds<T>(
 
     const startIndex = computed(() => state.currentPage() * state.pageSize());
     const endIndex = computed(() => Math.min(startIndex() + state.pageSize(), totalItems()));
+
+    return {
+        filteredData,
+        totalItems,
+        totalPages,
+        paginatedData,
+        canPreviousPage,
+        canNextPage,
+        startIndex,
+        endIndex
+    };
+}
+export function createListingComputeds_v2<T>(
+    data: Signal<T[]> | (() => T[]),
+    state: ListingState
+) {
+    const sourceData: () => T[] = isSignal(data)
+        ? data
+        : (data as () => T[]);
+
+    // server-side → ไม่ filter ไม่ slice
+    const filteredData = computed<T[]>(() => sourceData());
+
+    const totalItems = computed(() => state.totalItems());
+    const totalPages = computed(() => state.totalPages());
+
+    const paginatedData = computed<T[]>(() => sourceData());
+
+    const canPreviousPage = computed(() => state.currentPage() > 0);
+    const canNextPage = computed(() =>
+        state.currentPage() < totalPages() - 1
+    );
+
+    // ✅ แก้ตรงนี้
+    const startIndex = computed(() =>
+        totalItems() === 0
+            ? 0
+            : state.currentPage() * state.pageSize() + 1
+    );
+
+    const endIndex = computed(() =>
+        state.currentPage() * state.pageSize() + sourceData().length
+    );
 
     return {
         filteredData,

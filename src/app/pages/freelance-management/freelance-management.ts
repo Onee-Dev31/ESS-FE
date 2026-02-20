@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
+import { createListingState, createListingComputeds_v2, TableSortHelper } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -31,6 +31,7 @@ interface FreelanceMember {
     otherIncome: number;
     startDate: string;
     endDate: string;
+    empStatus: string;
     selected?: boolean;
 }
 
@@ -87,7 +88,6 @@ export class FreelanceManagementComponent implements OnInit {
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
-    listing = createListingState();
     sorting = signal<SortingState>([]);
 
     // MASTER
@@ -106,7 +106,21 @@ export class FreelanceManagementComponent implements OnInit {
 
     appliedCompany = signal<any>(null);
     appliedDepartment = signal<any>(null);
-    appliedSearch = signal<string>('');
+    appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
+
+    activeData = signal<FreelanceMember[]>([]);
+    resignData = signal<FreelanceMember[]>([]);
+
+    activeListing = createListingState();
+    resignListing = createListingState();
+
+    activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
+    resignComps = createListingComputeds_v2(this.resignData, this.resignListing);
+
+    activeSorting = signal<SortingState>([]);
+    resignSorting = signal<SortingState>([]);
+
+    searchText = signal('');        // ค่าที่พิมพ์อยู่
 
     processedData = computed(() => {
         let filtered = [...this.data()];
@@ -164,10 +178,33 @@ export class FreelanceManagementComponent implements OnInit {
         );
     });
 
-    comps = createListingComputeds(this.processedData, this.listing);
 
-    table = createAngularTable(() => ({
-        data: this.comps.paginatedData(),
+
+    activeTable = createAngularTable(() => ({
+        data: this.activeComps.paginatedData(),
+        columns: [
+            { id: 'select', header: '' },
+            { accessorKey: 'name', header: 'พนักงาน' },
+            { accessorKey: 'phone', header: 'เบอร์โทรศัพท์' },
+            { accessorKey: 'company', header: 'บริษัท' },
+            { accessorKey: 'department', header: 'แผนก' },
+            { accessorKey: 'salary', header: 'เงินเดือน' },
+            { accessorKey: 'otherIncome', header: 'รายได้อื่น' },
+            { accessorKey: 'startDate', header: 'วันที่เริ่มต้น' },
+            { accessorKey: 'endDate', header: 'วันที่สิ้นสุด' },
+            { id: 'actions', header: '' }
+        ],
+        state: { sorting: this.sorting() },
+        onSortingChange: (updaterOrValue) => {
+            const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+            this.sorting.set(next);
+        },
+        getCoreRowModel: getCoreRowModel(),
+        manualPagination: true,
+    }));
+
+    resignTable = createAngularTable(() => ({
+        data: this.resignComps.paginatedData(),
         columns: [
             { id: 'select', header: '' },
             { accessorKey: 'name', header: 'พนักงาน' },
@@ -193,23 +230,69 @@ export class FreelanceManagementComponent implements OnInit {
         // this.loadData();
         this.getCompanies();
         this.getDepartments();
-        this.getFreelance();
+        // this.getFreelance();
+        this.loadInitialData();
     }
 
-    toggleSort(columnId: string) {
-        TableSortHelper.toggleSort(this.table, columnId);
+    toggleSort(tableType: 'active' | 'resign', columnId: string) {
+        const table =
+            tableType === 'active' ? this.activeTable : this.resignTable;
+
+        TableSortHelper.toggleSort(table, columnId);
+    }
+    getSortIcon(tableType: 'active' | 'resign', columnId: string) {
+        const table =
+            tableType === 'active' ? this.activeTable : this.resignTable;
+
+        return TableSortHelper.getSortIcon(table, columnId);
     }
 
-    getSortIcon(columnId: string) {
-        return TableSortHelper.getSortIcon(this.table, columnId);
+    goToPage(tableType: 'active' | 'resign', page: number) {
+
+        if (tableType === 'active') {
+            this.activeListing.currentPage.set(page);
+
+            this.fetchFreelanceByStatus(
+                'Active',
+                page + 1,
+                this.activeListing.pageSize()
+            ).subscribe(res => this.dataActiveFromApi(res));
+
+        } else {
+
+            this.resignListing.currentPage.set(page);
+
+            this.fetchFreelanceByStatus(
+                'Resigned',
+                page + 1,
+                this.resignListing.pageSize()
+            ).subscribe(res => this.dataResignFromApi(res));
+        }
     }
 
-    goToPage(page: number) {
-        this.getFreelance(page + 1, this.listing.pageSize());
-    }
-    setPageSize(size: number) {
-        this.listing.pageSize.set(size);
-        this.getFreelance(1, size);
+    setPageSize(tableType: 'active' | 'resign', size: number) {
+
+        if (tableType === 'active') {
+            this.activeListing.pageSize.set(size);
+            this.activeListing.currentPage.set(0);
+
+            this.fetchFreelanceByStatus(
+                'Active',
+                1,
+                size
+            ).subscribe(res => this.dataActiveFromApi(res));
+
+        } else {
+
+            this.resignListing.pageSize.set(size);
+            this.resignListing.currentPage.set(0);
+
+            this.fetchFreelanceByStatus(
+                'Resigned',
+                1,
+                size
+            ).subscribe(res => this.dataResignFromApi(res));
+        }
     }
 
 
@@ -448,7 +531,8 @@ export class FreelanceManagementComponent implements OnInit {
             .pipe(
                 finalize(() => {
                     this.loadingService.stop('freelance-list');
-                    this.getFreelance();
+                    // this.getFreelance();
+                    this.loadInitialData();
                     this.closeForm();
                 })
             ).subscribe({
@@ -471,6 +555,9 @@ export class FreelanceManagementComponent implements OnInit {
                     } else {
                         this.swalService.error('เกิดข้อผิดพลาด', message);
                     }
+                },
+                complete: () => {
+                    console.log("COMPLETE");
                 }
             });
     }
@@ -486,7 +573,10 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     applyFilter() {
-        this.getFreelance(1, this.listing.pageSize());
+        this.activeListing.currentPage.set(0);
+        this.resignListing.currentPage.set(0);
+
+        this.loadInitialData();
     }
 
     private async convertUrlToFile(fileData: any) {
@@ -537,57 +627,139 @@ export class FreelanceManagementComponent implements OnInit {
         return `${year}-${month}-${day}`;
     };
 
-    // GET
-    getFreelance(
-        page: number = 1,
-        pageSize: number = 10
-    ) {
+    loadInitialData() {
+        this.loadingService.start('freelance-list');
 
-        const searchText = this.listing.searchText();
+        const pageA = this.activeListing.currentPage() + 1;
+        const sizeA = this.activeListing.pageSize();
+
+        const pageR = this.resignListing.currentPage() + 1;
+        const sizeR = this.resignListing.pageSize();
+
+        this.fetchFreelanceByStatus('Active', pageA, sizeA)
+            .subscribe(res => {
+                console.log("Active >>", res)
+                this.dataActiveFromApi(res);
+            });
+
+        this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
+            .subscribe(res => {
+                console.log("Resigned >>", res)
+                this.dataResignFromApi(res);
+                this.loadingService.stop('freelance-list');
+            });
+    }
+
+    private dataActiveFromApi(res: any) {
+        console.log("Active >>", res)
+        const items = res.items ?? []
+        this.activeData.set(this.mapApiData(items));
+
+        this.activeListing.totalItems.set(res.total ?? 0);
+        this.activeListing.totalPages.set(res.totalPages ?? 1);
+        this.activeListing.currentPage.set((res.page ?? 1) - 1);
+    }
+
+    private dataResignFromApi(res: any) {
+        console.log("Resigned >>", res)
+        const items = res.items ?? []
+        this.resignData.set(this.mapApiData(items));
+
+        this.resignListing.totalItems.set(res.total ?? 0);
+        this.resignListing.currentPage.set((res.page ?? 1) - 1);
+        this.resignListing.totalPages.set(res.totalPages ?? 1);
+    }
+
+    private mapApiData(items: any[]): FreelanceMember[] {
+        console.log("items >> ", items)
+        return items.map((item: any) => ({
+            id: item.ID,
+            employeeId: item.EMP_NO,
+            name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
+            nickname: item.NICKNAME,
+            phone: item.MOBILE,
+            company: item.COMPANY_CODE,
+            department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
+            salary: item.SALARY,
+            otherIncome: item.OTHER_INCOME,
+            startDate: item.CONTRACT_START_DATE,
+            endDate: item.CONTRACT_END_DATE,
+            empStatus: item.EMP_STATUS,
+            selected: false
+        }));
+    }
+    // GET
+    // getFreelance(
+    //     page: number = 1,
+    //     pageSize: number = 10
+    // ) {
+
+    //     const searchText = this.searchText();
+    //     const company = this.filterCompany();
+    //     const department = this.filterDepartment();
+
+    //     this.loadingService.start('freelance-list');
+    //     this.freelanceService.getFreelance({
+    //         page,
+    //         pageSize,
+    //         searchText: searchText || undefined,
+    //         companyCode: company?.COMPANY_CODE,
+    //         costCent: department?.COSTCENT
+    //     }).subscribe({
+    //         next: (res) => {
+    //             console.log(res);
+
+    //             const items = res?.items ?? res?.data ?? res ?? [];
+    //             // 🔹 map ให้ตรงกับ interface FreelanceMember
+    //             const mapped: FreelanceMember[] = items.map((item: any) => ({
+    //                 id: item.ID,
+    //                 employeeId: item.EMP_NO,
+    //                 name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
+    //                 nickname: item.NICKNAME,
+    //                 phone: item.MOBILE,
+    //                 company: item.COMPANY_CODE,
+    //                 department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
+    //                 salary: item.SALARY,
+    //                 otherIncome: item.OTHER_INCOME,
+    //                 startDate: item.CONTRACT_START_DATE,
+    //                 endDate: item.CONTRACT_END_DATE,
+    //                 empStatus: item.EMP_STATUS,
+    //                 selected: false
+    //             }));
+
+    //             // 🔥 set เข้า signal
+    //             this.data.set(mapped);
+
+    //             // this.listing.pageSize.set(10);
+    //             this.activeListing.currentPage.set(page - 1);
+    //             this.resignListing.currentPage.set(page - 1);
+
+
+    //             this.loadingService.stop('freelance-list');
+    //         },
+    //         error: (error) => {
+    //             console.error('Error fetching data:', error);
+    //             this.loadingService.stop('freelance-list');
+    //         }
+    //     });
+    // }
+
+    private fetchFreelanceByStatus(
+        status: 'Active' | 'Resigned',
+        page: number,
+        pageSize: number
+    ) {
+        const searchText = this.searchText();
         const company = this.filterCompany();
         const department = this.filterDepartment();
 
-        this.loadingService.start('freelance-list');
-        this.freelanceService.getFreelance({
+        return this.freelanceService.getFreelance({
             page,
             pageSize,
             searchText: searchText || undefined,
             companyCode: company?.COMPANY_CODE,
-            costCent: department?.COSTCENT
-        }).subscribe({
-            next: (res) => {
-                console.log(res);
-
-                const items = res?.items ?? res?.data ?? res ?? [];
-                // 🔹 map ให้ตรงกับ interface FreelanceMember
-                const mapped: FreelanceMember[] = items.map((item: any) => ({
-                    id: item.ID,
-                    employeeId: item.EMP_NO,
-                    name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
-                    nickname: item.NICKNAME,
-                    phone: item.MOBILE,
-                    company: item.COMPANY_CODE,
-                    department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
-                    salary: item.SALARY,
-                    otherIncome: item.OTHER_INCOME,
-                    startDate: item.CONTRACT_START_DATE,
-                    endDate: item.CONTRACT_END_DATE,
-                    selected: false
-                }));
-
-                // 🔥 set เข้า signal
-                this.data.set(mapped);
-
-                // this.listing.pageSize.set(10);
-                this.listing.currentPage.set(page - 1);
-
-
-                this.loadingService.stop('freelance-list');
-            },
-            error: (error) => {
-                console.error('Error fetching data:', error);
-                this.loadingService.stop('freelance-list');
-            }
+            costCent: department?.COSTCENT,
+            empStatus: status
         });
     }
 

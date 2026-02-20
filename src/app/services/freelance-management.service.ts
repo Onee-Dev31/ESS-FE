@@ -26,6 +26,7 @@ export class FreelanceService {
         searchText?: string;
         companyCode?: string;
         costCent?: string;
+        empStatus?: string;
     }): Observable<any> {
 
         const queryParams: any = {};
@@ -35,6 +36,7 @@ export class FreelanceService {
         if (params.searchText) queryParams.searchText = params.searchText;
         if (params.companyCode) queryParams.companyCode = params.companyCode;
         if (params.costCent) queryParams.costCent = params.costCent;
+        if (params.empStatus) queryParams.empStatus = params.empStatus;
 
         console.log("params >>> ", queryParams)
 
