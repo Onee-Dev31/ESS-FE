@@ -14,13 +14,19 @@ export class ResignManagementService {
   getEmployee(params: {
     page?: number;
     pageSize?: number;
+    searchText?: string;
+    company?: any;
+    department?: any;
   }): Observable<any> {
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
     if (params.pageSize) queryParams.perPage = params.pageSize;
+    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.company) queryParams.companyCode = params.company.COMPANY_CODE;
+    if (params.department) queryParams.costCent = params.department.COSTCENT;
 
-    console.log("params >>> ", queryParams)
+    // console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/employees`, {
       params: queryParams

@@ -48,7 +48,7 @@ export class LoginComponent {
 
     const { username, password } = this.loginForm.value;
 
-    console.log('Login request:', { username, password });
+    // console.log('Login request:', { username, password });
 
     this.authService.login(username || '', password || '').pipe(
       take(1)
@@ -56,9 +56,6 @@ export class LoginComponent {
       next: (res) => {
         console.log('Login success:', res);
         this.router.navigate(['/dashboard']);
-        // setTimeout(() => {
-        //   this.router.navigate(['/dashboard']);
-        // }, 500);
       },
       error: (err) => {
         console.log('Login error:', err);

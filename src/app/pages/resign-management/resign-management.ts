@@ -71,14 +71,14 @@ export class ResignManagement {
   activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
 
   // New Filters
-  filterCompany = signal<any>('');
-  filterDepartment = signal<any>('');
+  filterCompany = signal<any>(null);
+  filterDepartment = signal<any>(null);
   filterMonth = signal<string>('');
 
   appliedCompany = signal<any>(null);
   appliedDepartment = signal<any>(null);
   appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
-  searchText = signal('');
+  searchText = signal<string>('');
 
   employee: Employee[] = [];
   isViewOpen = false;
@@ -283,8 +283,7 @@ export class ResignManagement {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    console.log("items >> ", items)
-
+    // console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -321,14 +320,8 @@ export class ResignManagement {
   }
 
   applyFilter() {
-    const searchText = this.searchText();
-    const company = this.filterCompany();
-    const department = this.filterDepartment();
-    console.log(searchText, company, department)
     this.activeListing.currentPage.set(0);
-    // this.resignListing.currentPage.set(0);
-
-    // this.loadInitialData();
+    this.getEmployee(1, this.activeListing.pageSize());
   }
 
 
@@ -340,9 +333,15 @@ export class ResignManagement {
   ) {
 
     this.loadingService.start('resign-table');
+    const searchText = this.searchText();
+    const company = this.filterCompany();
+    const department = this.filterDepartment();
     this.resignService.getEmployee({
       page,
       pageSize,
+      searchText,
+      company,
+      department
     }).subscribe({
       next: (res) => {
         console.log(res);
