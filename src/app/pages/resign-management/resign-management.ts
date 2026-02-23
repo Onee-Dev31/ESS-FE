@@ -103,10 +103,6 @@ export class ResignManagement {
     this.getCompanies();
     this.getDepartments();
     this.loadInitialData();
-    this.loadingService.start('resign-table');
-    setTimeout(() => {
-      this.loadingService.stop('resign-table');
-    }, 1500);
   }
 
 

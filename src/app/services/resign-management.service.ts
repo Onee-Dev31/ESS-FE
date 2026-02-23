@@ -36,16 +36,12 @@ export class ResignManagementService {
   }
 
   resignEmployee(payload: any): Observable<any> {
-    console.log(payload)
-
-    // return of({ success: true }).pipe(
-    //   delay(5000)
-    // );
+    // console.log(payload)
     return this._http.post(`${this.baseUrl}/employee-resignations`, payload);
   }
 
   updateEmployeeResign(id: string, payload: any): Observable<any> {
-    console.log(payload)
+    // console.log(payload)
     return this._http.put(`${this.baseUrl}/employee-resignations/${id}`, payload);
   }
 

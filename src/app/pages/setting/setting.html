@@ -5,102 +5,104 @@
 
         <div class="card-header-title">
             Role & Menu Permission
-        </div> 
+        </div>
 
-        <!-- <div class="action-toolbar">
-            <div class="toolbar-left">
-                <button class="btn-create" *ngIf="!isEditMode" (click)="isEditMode = true">
-                    <i class="fas fa-pen"></i> แก้ไข
-                </button>
+        <div>
+            <div class="layout">
 
-                <ng-container *ngIf="isEditMode">
-                    <button class="btn-send-data mr-2" (click)="savePermission()">
-                        <i class="fas fa-save"></i> บันทึก
-                    </button>
+                <!-- LEFT SIDEBAR -->
+                <div class="sidebar">
+                    <ul>
+                        <li *ngFor="let menu of menus">
 
-                    <button class="btn-search-purple" (click)="cancelEdit()">
-                        ยกเลิก
-                    </button>
-                </ng-container>
-            </div>
-        </div> -->
+                            <div class="menu-parent">
 
-        <!-- <div class="table-responsive">
-            <table class="modern-table">
-
-
-                <thead>
-                    <tr>
-                        <th style="min-width:220px">Menu</th>
-
-                        <th *ngFor="let role of roles" class="text-center">
-                            <div class="role-header">
-                                <div>{{ role.name }}</div>
-
-                                <div class="mt-1" *ngIf="isEditMode">
-                                    <input type="checkbox" [checked]="isAllChecked(role.id)"
-                                        (change)="toggleAllForRole(role.id, $event.target.checked)">
-                                </div>
+                                <i *ngIf="menu.iconType === 'fa'" [class]="'fas ' + menu.Icon + ' nav-icon'">
+                                </i>
+                                <mat-icon *ngIf="menu.iconType === 'material'">
+                                    {{ menu.Icon }}
+                                </mat-icon>
+                                <!-- <mat-icon *ngIf=" menu.Icon">{{ menu.Icon }}</mat-icon> -->
+                                {{ menu.Label }}
                             </div>
-                        </th>
-                    </tr>
-                </thead>
 
+                            <ul *ngIf="menu.children?.length">
+                                <li *ngFor="let child of menu.children"
+                                    [class.active]="selectedMenu?.MenuID === child.MenuID" (click)="selectMenu(child)">
+                                    {{ child.Label }}
+                                </li>
+                            </ul>
 
-                <tbody>
-                    <ng-container *ngFor="let menu of menus">
+                        </li>
+                    </ul>
+                </div>
 
-                        <tr [class.parent-row]="menu.level === 0">
+                <!-- RIGHT CONTENT -->
+                <div class="content">
+                    <ng-container *ngIf="selectedMenu; else empty">
 
+                        <div class="header">
+                            <h2>{{ selectedMenu.Label }}</h2>
+                            <p>Menu Key: {{ selectedMenu.MenuKey }}</p>
+                            <p>Route: {{ selectedMenu.RoutePath }}</p>
+                        </div>
 
-                            <td>
-                                <div class="menu-cell" [class.menu-head]="menu.level === 0"
-                                    [class.menu-child]="menu.level > 0"
-                                    [style.padding-left.px]="menu.level > 0 ? 16 : 0">
+                        <!-- 🔽 Permission Table -->
+                        <nz-table *ngIf="selectedMenuPermissions.length" #permTable [nzData]="selectedMenuPermissions"
+                            [nzBordered]="true" [nzSize]="'small'" nzShowPagination="false" class="permission-table">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>View</th>
+                                    <th>Create</th>
+                                    <th>Update</th>
+                                    <th>Delete</th>
+                                    <th>Approve</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of permTable.data">
+                                    <td>{{ item.RoleName }}</td>
 
+                                    <td>
+                                        <label nz-checkbox [nzChecked]="item.CanView"></label>
+                                    </td>
 
-                                    <ng-container *ngIf="menu.level === 0">
-                                        <div class="menu">
-                                            <span>{{ menu.name }}</span>
-                                        </div>
-                                    </ng-container>
+                                    <td>
+                                        <label nz-checkbox [nzChecked]="item.CanCreate"></label>
+                                    </td>
 
+                                    <td>
+                                        <label nz-checkbox [nzChecked]="item.CanUpdate"></label>
+                                    </td>
 
-                                    <ng-container *ngIf="menu.level > 0">
-                                        <div class="submenu">
-                                            <mat-icon name="check_small"
-                                                class="menu-icon-child">chevron_right</mat-icon>
-                                            <span>{{ menu.name }}</span>
-                                        </div>
-                                    </ng-container>
+                                    <td>
+                                        <label nz-checkbox [nzChecked]="item.CanDelete"></label>
+                                    </td>
 
-                                </div>
-                            </td>
+                                    <td>
+                                        <label nz-checkbox [nzChecked]="item.CanApprove"></label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </nz-table>
 
-                            <td *ngFor="let role of roles" class="text-center">
-
-
-                                <ng-container *ngIf="!isEditMode">
-                                    <span class="permission-badge" [class.active]="hasPermission(role.id, menu.id)">
-                                        {{ hasPermission(role.id, menu.id) ? '✔' : '' }}
-                                    </span>
-                                </ng-container>
-
-
-                                <ng-container *ngIf="isEditMode">
-                                    <input type="checkbox" [checked]="hasPermission(role.id, menu.id)"
-                                        (change)="togglePermission(role.id, menu.id, $event.target.checked)">
-                                </ng-container>
-
-                            </td>
-
-                        </tr>
+                        <!-- กรณีไม่มี permission -->
+                        <div *ngIf="!selectedMenuPermissions.length" class="empty">
+                            ไม่มีข้อมูล Permission
+                        </div>
 
                     </ng-container>
-                </tbody>
 
-            </table>
-        </div> -->
+                    <ng-template #empty>
+                        <div class="empty">กรุณาเลือกเมนู</div>
+                    </ng-template>
+                </div>
+
+            </div>
+        </div>
+
+
 
     </div>
 </div>

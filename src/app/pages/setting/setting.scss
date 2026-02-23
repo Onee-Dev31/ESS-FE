@@ -483,175 +483,81 @@ $border: #dee2e6;
         }
     }
 
-    .content-card.resign {
-        margin-top: 0.8rem;
-
-        .card-header-title {
-            @include card-header-title(#000000, #bb00ff);
-        }
+    .layout {
+        // background: #f9fafb;
+        display: flex;
+        margin: 12px;
+        border-radius: 12px;
     }
 
+    .sidebar {
+        width: 260px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        color: rgb(0, 0, 0);
+        padding: 16px;
+        overflow-y: auto;
 
-    // ==================== MOBILE CARD VIEW ====================
-    .card-list-view {
-        @include mobile-cards-view;
-        padding: 1rem;
-
-        .card-footer-actions {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #f1f5f9;
-            display: grid;
-            gap: 12px;
-        }
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
-    // ==================== TABLE SECTION ====================
-    .table-responsive {
-        display: block;
-        padding: 0 1.5rem 1.5rem 1.5rem;
-
-        @include tablet {
-            display: none !important;
-        }
-
-        // @include large-tablet {
-        //     display: none !important;
-        // }
+    .sidebar::-webkit-scrollbar {
+        display: none;
     }
 
-    .modern-table {
-        @include modern-table;
-
-        // Employee info cell
-        .employee-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-
-            .employee-id {
-                font-size: 0.75rem;
-                color: #64748b;
-                font-weight: 600;
-            }
-
-            .employee-name {
-                color: #1a202c;
-                font-weight: 500;
-            }
-        }
-
-        // Boxed value (for freelance data)
-        .boxed-value {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 0.4rem 0.75rem;
-            display: inline-block;
-            min-width: 80px;
-            color: #475569;
-            background: #f8fafc;
-        }
-
-        // Edit button
-        .btn-icon-pencil {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0.5rem;
-            font-size: 1rem;
-            transition: color 0.2s;
-
-            &:hover {
-                color: #1e293b;
-            }
-        }
+    .sidebar ul {
+        list-style: none;
+        padding-left: 0;
     }
 
-    /* =====================================
-    Permission Indicator (View Mode)
-    ===================================== */
-
-    .permission-indicator {
-        width: 18px;
-        height: 18px;
-        display: inline-block;
-        border-radius: 50%;
-        border: 2px solid #cbd5e1;
-        background: transparent;
-        transition: all 0.2s ease;
-
-        &.active {
-            background: #00812f;
-            box-shadow: 0 0 0 3px rgba(0, 142, 52, 0.15);
-        }
-    }
-
-
-    /* =====================================
-    Modern Checkbox (Edit Mode)
-    ===================================== */
-
-    .modern-checkbox {
-        position: relative;
-        display: inline-flex;
+    .menu-parent {
+        font-weight: bold;
+        margin-top: 16px;
+        display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 10px;
+        height: 40px;
+    }
+
+    .sidebar li ul li {
+        padding: 8px 12px;
         cursor: pointer;
+        border-radius: 6px;
+    }
 
-        input {
-            display: none;
-        }
+    .sidebar li ul li:hover {
+        background: #4e46e55f;
+    }
 
-        span {
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            border: 2px solid #cbd5e1;
-            background: #fff;
-            transition: all 0.2s ease;
-            position: relative;
-        }
+    .sidebar li ul li.active {
+        background: #4f46e5;
+        color: white;
+    }
 
-        input:checked+span {
-            background: #2563eb;
-            border-color: #2563eb;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
-        }
+    .content {
+        flex: 1;
+        margin: 0 16px;
 
-        input:checked+span::after {
-            content: '';
-            position: absolute;
-            left: 5px;
-            top: 1px;
-            width: 4px;
-            height: 9px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-
-        &:hover span {
-            border-color: #2563eb;
+        .header {
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
         }
     }
 
-    // ==================== PAGINATION ====================
-    .pagination-wrapper {
-        padding: 1rem 1.5rem;
-    }
-
-    // ==================== UTILITY CLASSES ====================
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
+    .empty {
+        color: #9ca3af;
     }
 }
 
 
+
+//SELECT (antd)
 ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
     border-color: #40a9ff00;
     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
@@ -666,45 +572,4 @@ $border: #dee2e6;
     position: relative;
     background-color: #fff;
     border: 1px solid #cfcfcf00;
-}
-
-.permission-badge {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    border: 2px solid #e2e8f0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: transparent;
-    background: #f8fafc;
-    transition: all 0.2s ease;
-}
-
-.permission-badge.active {
-    background: linear-gradient(135deg, #01b443, #007f2f);
-    color: white;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
-    border-radius: 100%;
-    cursor: default;
-}
-
-
-.menu-cell {
-    .menu {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 700;
-    }
-
-    .submenu {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 700;
-    }
-
 }
