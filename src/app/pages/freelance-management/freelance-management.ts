@@ -179,8 +179,6 @@ export class FreelanceManagementComponent implements OnInit {
         );
     });
 
-
-
     activeTable = createAngularTable(() => ({
         data: this.activeComps.paginatedData(),
         columns: [
@@ -692,61 +690,8 @@ export class FreelanceManagementComponent implements OnInit {
             selected: false
         }));
     }
+    
     // GET
-    // getFreelance(
-    //     page: number = 1,
-    //     pageSize: number = 10
-    // ) {
-
-    //     const searchText = this.searchText();
-    //     const company = this.filterCompany();
-    //     const department = this.filterDepartment();
-
-    //     this.loadingService.start('freelance-list');
-    //     this.freelanceService.getFreelance({
-    //         page,
-    //         pageSize,
-    //         searchText: searchText || undefined,
-    //         companyCode: company?.COMPANY_CODE,
-    //         costCent: department?.COSTCENT
-    //     }).subscribe({
-    //         next: (res) => {
-    //             console.log(res);
-
-    //             const items = res?.items ?? res?.data ?? res ?? [];
-    //             // 🔹 map ให้ตรงกับ interface FreelanceMember
-    //             const mapped: FreelanceMember[] = items.map((item: any) => ({
-    //                 id: item.ID,
-    //                 employeeId: item.EMP_NO,
-    //                 name: `${item.FIRSTNAME_TH} ${item.LASTNAME_TH}`,
-    //                 nickname: item.NICKNAME,
-    //                 phone: item.MOBILE,
-    //                 company: item.COMPANY_CODE,
-    //                 department: `${item.COSTCENT} - ${item.NAMECOSTCENT}`,
-    //                 salary: item.SALARY,
-    //                 otherIncome: item.OTHER_INCOME,
-    //                 startDate: item.CONTRACT_START_DATE,
-    //                 endDate: item.CONTRACT_END_DATE,
-    //                 empStatus: item.EMP_STATUS,
-    //                 selected: false
-    //             }));
-
-    //             // 🔥 set เข้า signal
-    //             this.data.set(mapped);
-
-    //             // this.listing.pageSize.set(10);
-    //             this.activeListing.currentPage.set(page - 1);
-    //             this.resignListing.currentPage.set(page - 1);
-
-
-    //             this.loadingService.stop('freelance-list');
-    //         },
-    //         error: (error) => {
-    //             console.error('Error fetching data:', error);
-    //             this.loadingService.stop('freelance-list');
-    //         }
-    //     });
-    // }
 
     private fetchFreelanceByStatus(
         status: 'Active' | 'Resigned',

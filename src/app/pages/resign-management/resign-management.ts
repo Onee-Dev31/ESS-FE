@@ -1,4 +1,4 @@
-import { Component, inject, Inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { Employee } from './employeeData.interface';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,8 +11,27 @@ import { LoadingService } from '../../services/loading';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { ResignManagementService } from '../../services/resign-management.service';
+import { SwalService } from '../../services/swal.service';
+import { createListingComputeds_v2, createListingState } from '../../utils/listing.util';
+import { EmptyStateComponent } from "../../components/shared/empty-state/empty-state";
+import { PaginationComponent } from "../../components/shared/pagination/pagination";
+import { MasterDataService } from '../../services/master-data.service';
+import { NzSelectModule } from "ng-zorro-antd/select";
 
-
+interface EmployeeFormData {
+  empCode: string; //CODEMPID
+  firstNameTh: string; //NAMFIRSTT
+  lastNameTh: string; //NAMLASTT
+  firstNameEn: string; //NAMFIRSTE
+  lastNameEn: string; //NAMLASTE
+  nickName: string; //NICKNAME
+  department: string; //DEPARTMENT
+  company: string; //COMPANY_NAME [COMPANY_CODE]
+  type: string; // ? 
+  adUser: string; //AD_USER
+  position: string; //POST
+}
 
 
 @Component({
@@ -25,7 +44,10 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
     NzDatePickerModule,
     SkeletonComponent,
     PageHeaderComponent,
-    NzModalModule
+    NzModalModule,
+    EmptyStateComponent,
+    PaginationComponent,
+    NzSelectModule
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
@@ -34,9 +56,29 @@ export class ResignManagement {
   pageTitle = signal<string>('รายการพนักงาน');
 
   private loadingService = inject(LoadingService);
+  private resignService = inject(ResignManagementService);
+  private swalService = inject(SwalService);
+  private masterService = inject(MasterDataService);
 
   isLoading = this.loadingService.loading('resign-table');
 
+  // MASTER
+  companyList: any[] = []
+  departmentList: any[] = []
+
+  activeData = signal<EmployeeFormData[]>([]);
+  activeListing = createListingState();
+  activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
+
+  // New Filters
+  filterCompany = signal<any>('');
+  filterDepartment = signal<any>('');
+  filterMonth = signal<string>('');
+
+  appliedCompany = signal<any>(null);
+  appliedDepartment = signal<any>(null);
+  appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
+  searchText = signal('');
 
   employee: Employee[] = [];
   isViewOpen = false;
@@ -58,17 +100,32 @@ export class ResignManagement {
   }
 
   ngOnInit() {
+    this.getEmployee();
+    this.getCompanies();
+    this.getDepartments();
     this.loadingService.start('resign-table');
     setTimeout(() => {
       this.loadingService.stop('resign-table');
     }, 1500);
   }
 
+
+  filteredDepartmentList = computed(() => {
+    const company = this.filterCompany();
+
+    if (!company) return [];
+
+    return this.departmentList.filter(dep =>
+      dep.COMPANY_CODE === company.COMPANY_CODE
+    );
+  });
+
+
   trackByEmpCode(_: number, item: Employee) {
     return item.empCode;
   }
 
-  onView(emp: Employee) {
+  onView(emp: any) {
     this.selected = emp;
     // reset required fields ทุกครั้งที่เปิด
     this.lastDate = emp.lastDate;
@@ -222,6 +279,110 @@ export class ResignManagement {
       now.getMinutes(),
       now.getSeconds()
     );
+  }
+
+  // Function
+  private mapApiData(items: any[]): EmployeeFormData[] {
+    console.log("items >> ", items)
+
+    return items.map((item: any) => ({
+      empCode: item.CODEMPID,
+      firstNameTh: item.NAMFIRSTT,
+      lastNameTh: item.NAMLASTT,
+      firstNameEn: item.NAMFIRSTE,
+      lastNameEn: item.NAMLASTE,
+      nickName: item.NICKNAME,
+      department: item.DEPARTMENT,
+      company: item.COMPANY_NAME + ' [' + item.COMPANY_CODE + ']',
+      type: '',
+      adUser: item.AD_USER,
+      position: item.POST
+    }));
+  }
+
+  goToPage(page: number) {
+    this.activeListing.pageSize()
+    this.getEmployee(
+      page + 1, // ถ้า backend เริ่มที่ 1
+      this.activeListing.pageSize()
+    );
+  }
+
+  setPageSize(size: number) {
+    this.activeListing.pageSize.set(size);
+    this.activeListing.currentPage.set(0);
+
+    this.getEmployee(1, size);
+  }
+
+  onCompanyChange(company: any) {
+    this.filterCompany.set(company);
+    this.filterDepartment.set(null);
+  }
+
+  applyFilter() {
+    const searchText = this.searchText();
+    const company = this.filterCompany();
+    const department = this.filterDepartment();
+    console.log(searchText, company, department)
+    this.activeListing.currentPage.set(0);
+    // this.resignListing.currentPage.set(0);
+
+    // this.loadInitialData();
+  }
+
+
+  //GET
+
+  getEmployee(
+    page: number = 1,
+    pageSize: number = 10
+  ) {
+
+    this.loadingService.start('resign-table');
+    this.resignService.getEmployee({
+      page,
+      pageSize,
+    }).subscribe({
+      next: (res) => {
+        console.log(res);
+        const items = res.data ?? []
+        this.activeData.set(this.mapApiData(items));
+        this.activeListing.totalItems.set(res.totalRows ?? 0);
+        this.activeListing.totalPages.set(res.totalPages ?? 1);
+        this.activeListing.currentPage.set((res.page ?? 1) - 1);
+        this.loadingService.stop('resign-table');
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+        this.loadingService.stop('resign-table');
+      }
+    });
+  }
+
+  // GET MASTER
+  getCompanies() {
+    this.masterService.getCompanyMaster().subscribe({
+      next: (data) => {
+        // console.log(data);
+        this.companyList = data
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+
+  getDepartments() {
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (data) => {
+        // console.log(data);
+        this.departmentList = data
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
   }
 
 }
