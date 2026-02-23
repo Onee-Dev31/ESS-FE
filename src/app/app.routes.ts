@@ -79,8 +79,20 @@ export const routes: Routes = [
                 data: { animation: 'TimeOff' }
             },
             {
-                path: 'it-request',
-                loadComponent: () => import('./pages/it-request/it-request').then(m => m.ITRequestComponent),
+                path: 'it-problem-report',
+                loadComponent: () => import('./pages/it-problem-report/it-problem-report').then(m => m.ItProblemReportComponent),
+                canActivate: [menuGuard],
+                data: { animation: 'ITRequest' }
+            },
+            {
+                path: 'it-repair-request',
+                loadComponent: () => import('./pages/it-repair-request/it-repair-request').then(m => m.ItRepairRequestComponent),
+                canActivate: [menuGuard],
+                data: { animation: 'ITRequest' }
+            },
+            {
+                path: 'it-service-request',
+                loadComponent: () => import('./pages/it-service-request/it-service-request').then(m => m.ITServiceRequestComponent),
                 canActivate: [menuGuard],
                 data: { animation: 'ITRequest' }
             },

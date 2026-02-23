@@ -1,0 +1,130 @@
+import { Component, signal, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { SwalService } from '../../services/swal.service';
+
+@Component({
+  selector: 'app-it-problem-report',
+  standalone: true,
+  imports: [CommonModule, FormsModule, PageHeaderComponent],
+  templateUrl: './it-problem-report.html',
+  styleUrl: './it-problem-report.scss'
+})
+export class ItProblemReportComponent {
+  private swalService = inject(SwalService);
+  private router = inject(Router);
+
+  problemFormData = signal({
+    topic: '',
+    detail: '',
+    categories: [] as string[],
+    attachments: [] as { name: string, size?: number }[]
+  });
+
+  availableCategories = [
+    'Oracle', 'Onee App', 'BMS', 'ระบบอื่นๆ', 'อุปกรณ์ Hardware', 'Software โปรแกรมต่างๆ'
+  ];
+
+  toggleCategory(cat: string) {
+    const current = this.problemFormData();
+    const isSelected = current.categories.includes(cat);
+    this.problemFormData.set({
+      ...current,
+      categories: isSelected
+        ? current.categories.filter(c => c !== cat)
+        : [...current.categories, cat]
+    });
+  }
+
+  onFileSelected(event: any) {
+    const files: FileList = event.target.files;
+    if (files && files.length > 0) {
+      const newAttachments = Array.from(files).map(f => ({ name: f.name, size: f.size }));
+      const currentAttachments = this.problemFormData().attachments;
+      this.problemFormData.set({
+        ...this.problemFormData(),
+        attachments: [...currentAttachments, ...newAttachments]
+      });
+    }
+  }
+
+  removeAttachment(index: number) {
+    const currentAttachments = [...this.problemFormData().attachments];
+    currentAttachments.splice(index, 1);
+    this.problemFormData.set({
+      ...this.problemFormData(),
+      attachments: currentAttachments
+    });
+  }
+
+  showSummaryModal = signal(false);
+
+  submittedRequests = signal<any[]>([
+    {
+      id: 3,
+      displayId: '#PRB2602-0003',
+      date: new Date('2026-02-19T10:45:00'),
+      topics: 'ระบบ ONEE เข้าใช้งานไม่ได้',
+      detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา',
+      categories: ['Onee App', 'Software โปรแกรมต่างๆ'],
+      attachments: [{ name: 'error-screenshot.png' }],
+      status: 'Pending'
+    }
+  ]);
+
+  get nextRequestId() {
+    const nextId = this.submittedRequests().length + 1;
+    return `#PRB2602-${String(nextId).padStart(4, '0')}`;
+  }
+
+  submit() {
+    const data = this.problemFormData();
+    if (!data.topic.trim() || !data.detail.trim()) {
+      this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
+      return;
+    }
+    this.showSummaryModal.set(true);
+  }
+
+  closePage() {
+    this.router.navigate(['/it-service-request']);
+  }
+
+  closeSummaryModal() {
+    this.showSummaryModal.set(false);
+  }
+
+  confirmSubmission() {
+    const data = this.problemFormData();
+    const newRequest = {
+      id: Date.now(),
+      displayId: this.nextRequestId,
+      date: new Date(),
+      topics: data.topic,
+      detail: data.detail,
+      categories: data.categories,
+      attachments: data.attachments,
+      status: 'Pending'
+    };
+
+    this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+    this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งปัญหาเรียบร้อยแล้ว');
+    this.showSummaryModal.set(false);
+    this.problemFormData.set({ topic: '', detail: '', categories: [], attachments: [] });
+  }
+
+  showHistoryDetailModal = signal(false);
+  selectedRequest = signal<any>(null);
+
+  viewRequestDetails(request: any) {
+    this.selectedRequest.set(request);
+    this.showHistoryDetailModal.set(true);
+  }
+
+  closeHistoryDetailModal() {
+    this.showHistoryDetailModal.set(false);
+    this.selectedRequest.set(null);
+  }
+}

@@ -1,0 +1,220 @@
+<div class="it-request-page">
+    <app-page-header title="IT Repair Request (แจ้งซ่อมอุปกรณ์)"></app-page-header>
+
+    <!-- Form Card -->
+    <div class="repair-form-card">
+        <!-- Card Header -->
+        <div class="repair-card-header">
+            <div class="header-icon-wrap">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div>
+                <h4 class="header-title">รายละเอียดการแจ้งซ่อม</h4>
+                <p class="header-subtitle">กรอกข้อมูลอุปกรณ์ที่ต้องการซ่อมให้ครบถ้วน เพื่อให้ทีม IT
+                    สามารถดำเนินการได้ทันที</p>
+            </div>
+        </div>
+
+        <!-- Field: อุปกรณ์ -->
+        <div class="form-field-row">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fas fa-laptop field-icon"></i>
+                    ความประสงค์จะซ่อมอุปกรณ์
+                    <span class="required-badge">*</span>
+                </label>
+            </div>
+            <div class="field-input-col">
+                <input type="text" [ngModel]="repairFormData().device"
+                    (ngModelChange)="repairFormData.set({...repairFormData(), device: $event})" class="styled-input"
+                    placeholder="เช่น คอมพิวเตอร์, Printer, สายเน็ต...">
+            </div>
+        </div>
+
+        <!-- Field: ยี่ห้อ + รุ่น (2 คอลัมน์) -->
+        <div class="form-field-row">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fas fa-tag field-icon"></i>
+                    ยี่ห้อ / รุ่น
+                </label>
+            </div>
+            <div class="field-input-col">
+                <div class="inline-pair">
+                    <input type="text" [ngModel]="repairFormData().brand"
+                        (ngModelChange)="repairFormData.set({...repairFormData(), brand: $event})" class="styled-input"
+                        placeholder="ยี่ห้อ (Brand)...">
+                    <input type="text" [ngModel]="repairFormData().model"
+                        (ngModelChange)="repairFormData.set({...repairFormData(), model: $event})" class="styled-input"
+                        placeholder="รุ่น (Model)...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Field: อาการ -->
+        <div class="form-field-row">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fas fa-exclamation-circle field-icon"></i>
+                    ลักษณะอาการที่พบ
+                    <span class="required-badge">*</span>
+                </label>
+            </div>
+            <div class="field-input-col">
+                <textarea [ngModel]="repairFormData().symptom"
+                    (ngModelChange)="repairFormData.set({...repairFormData(), symptom: $event})"
+                    class="styled-input styled-textarea" rows="5"
+                    placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."></textarea>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions-row">
+            <button class="btn-secondary-action" (click)="closePage()">
+                <i class="fas fa-times mr-2"></i> ยกเลิก
+            </button>
+            <button class="btn-primary-action" (click)="submit()">
+                <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
+            </button>
+        </div>
+    </div>
+
+    <!-- History Card -->
+    <div class="content-card history-card">
+        <div class="card-header-title">ประวัติการแจ้งซ่อม (Repair History)</div>
+        @if (submittedRequests().length === 0) {
+        <div class="text-center p-4 text-muted">
+            <i class="fas fa-history fa-3x mb-3 text-gray-300"></i>
+            <p>ไม่พบประวัติการแจ้งซ่อม</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">Request ID</th>
+                        <th style="width: 20%"><i class="far fa-clock mr-1"></i> วันที่/เวลา</th>
+                        <th style="width: 20%"><i class="fas fa-laptop mr-1"></i> อุปกรณ์</th>
+                        <th style="width: 25%"><i class="fas fa-exclamation-circle mr-1"></i> อาการ</th>
+                        <th style="width: 10%"><i class="fas fa-tasks mr-1"></i> สถานะ</th>
+                        <th style="width: 10%"><i class="fas fa-eye mr-1"></i> ดูรายละเอียด</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (req of submittedRequests(); track req.id) {
+                    <tr>
+                        <td class="text-primary font-weight-bold">{{ req.displayId }}</td>
+                        <td class="text-muted">{{ req.date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>{{ req.device }} {{ req.brand }}</td>
+                        <td>{{ req.symptom }}</td>
+                        <td>
+                            <span class="status-badge" [class]="req.status.toLowerCase()">
+                                <i class="fas" [class.fa-check-circle]="req.status === 'Approved'"
+                                    [class.fa-clock]="req.status === 'Pending'"></i>
+                                {{ req.status }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn-icon" (click)="viewRequestDetails(req)" title="ดูรายละเอียด">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+
+    <!-- Summary Modal -->
+    @if (showSummaryModal()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>ยืนยันการแจ้งซ่อม <span class="req-id">{{ nextRequestId }}</span></h2>
+                <button class="btn-close-modal" (click)="closeSummaryModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-section">
+                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>อุปกรณ์</th>
+                            <td>{{ repairFormData().device }}</td>
+                        </tr>
+                        <tr>
+                            <th>ยี่ห้อ</th>
+                            <td>{{ repairFormData().brand }}</td>
+                        </tr>
+                        <tr>
+                            <th>รุ่น</th>
+                            <td>{{ repairFormData().model }}</td>
+                        </tr>
+                        <tr>
+                            <th>อาการ</th>
+                            <td>{{ repairFormData().symptom }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
+                <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Detail Modal -->
+    @if (showHistoryDetailModal() && selectedRequest()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}</h3>
+                <button class="btn-close-modal" (click)="closeHistoryDetailModal()"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-section">
+                    <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>วันที่แจ้ง</th>
+                            <td>{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        </tr>
+                        <tr>
+                            <th>สถานะ</th>
+                            <td>
+                                <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
+                                    {{ selectedRequest().status }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="summary-section">
+                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>อุปกรณ์</th>
+                            <td>{{ selectedRequest().device }}</td>
+                        </tr>
+                        <tr>
+                            <th>ยี่ห้อ / รุ่น</th>
+                            <td>{{ selectedRequest().brand }} / {{ selectedRequest().model }}</td>
+                        </tr>
+                        <tr>
+                            <th>อาการ</th>
+                            <td>{{ selectedRequest().symptom }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+    }
+</div>

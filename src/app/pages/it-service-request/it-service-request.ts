@@ -5,13 +5,13 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SwalService } from '../../services/swal.service';
 
 @Component({
-    selector: 'app-it-request',
+    selector: 'app-it-service-request',
     standalone: true,
     imports: [CommonModule, FormsModule, PageHeaderComponent],
-    templateUrl: './it-request.html',
-    styleUrl: './it-request.scss'
+    templateUrl: './it-service-request.html',
+    styleUrl: './it-service-request.scss'
 })
-export class ITRequestComponent {
+export class ITServiceRequestComponent {
 
     // Inject SwalService
     private swalService = inject(SwalService);
@@ -23,8 +23,6 @@ export class ITRequestComponent {
         { label: 'ขอแก้ไขสิทธิ', value: 'access_edit', checked: false, disabled: false, icon: 'fa-user-lock' },
         { label: 'ขอ Unlock User', value: 'unlock_user', checked: false, disabled: false, icon: 'fa-unlock-alt' },
         { label: 'ขอใช้ระบบ', value: 'request_system', checked: false, disabled: false, icon: 'fa-desktop' },
-        { label: 'แจ้งซ่อม', value: 'repair', checked: false, disabled: false, icon: 'fa-tools' },
-        { label: 'แจ้งปัญหา', value: 'problem', checked: false, disabled: false, icon: 'fa-exclamation-triangle' },
         { label: 'บริการอื่นๆ', value: 'other', checked: false, disabled: false, icon: 'fa-ellipsis-h' }
     ]);
 
@@ -90,17 +88,10 @@ export class ITRequestComponent {
             const newItems = [...items];
 
             if (!newItems[index].disabled) {
-                const isChecking = !newItems[index].checked;
-
-                if ((newItems[index].value === 'repair' || newItems[index].value === 'problem') && isChecking) {
-                    this.activeModalMode.set(newItems[index].value as 'repair' | 'problem');
-                    this.showRepairModal.set(true);
-                } else {
-                    newItems[index].checked = isChecking;
-                }
+                newItems[index].checked = !newItems[index].checked;
             }
 
-            return this.applyServiceExclusion(newItems);
+            return newItems;
         });
 
         const selectedValues = this.serviceOptions().filter(s => s.checked).map(s => s.value);
@@ -133,13 +124,7 @@ export class ITRequestComponent {
 
 
 
-    get isRepairSelected() {
-        return this.serviceOptions().some(s => s.value === 'repair' && s.checked);
-    }
 
-    get isProblemSelected() {
-        return this.serviceOptions().some(s => s.value === 'problem' && s.checked);
-    }
 
     get nextRequestId() {
         const nextId = this.submittedRequests().length + 1;
@@ -184,7 +169,7 @@ export class ITRequestComponent {
             return;
         }
 
-        if (!this.isRepairSelected && !this.isProblemSelected && !this.requestDetails().trim()) {
+        if (!this.requestDetails().trim()) {
             this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
             return;
         }
@@ -266,8 +251,8 @@ export class ITRequestComponent {
             date: new Date(),
             services: selectedServices.map(s => s.label),
             details: this.requestDetails(),
-            repairData: selectedServices.some(s => s.value === 'repair') ? { ...this.repairFormData() } : null,
-            problemData: selectedServices.some(s => s.value === 'problem') ? { ...this.problemFormData() } : null,
+            repairData: null,
+            problemData: null,
             systemData: systemData,
             openFor: openForDisplay,
             status: 'Pending'
@@ -278,15 +263,10 @@ export class ITRequestComponent {
         this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
 
-        this.serviceOptions.update(items => {
-            const resetItems = items.map(i => ({ ...i, checked: false }));
-            return this.applyServiceExclusion(resetItems);
-        });
+        this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.isSystemCategorySelected.set(false);
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.repairFormData.set({ device: '', brand: '', model: '', symptom: '' });
-        this.problemFormData.set({ topic: '', detail: '' });
     }
 
     closeRepairModal() {

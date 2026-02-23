@@ -87,7 +87,9 @@ export class Sidebar {
             icon: 'fa-desktop',
             iconType: 'fa',
             subItems: [
-                { label: 'แจ้งปัญหา/ขออุปกรณ์', path: '/it-request' }
+                { label: 'ขอรับบริการ IT', path: '/it-service-request' },
+                { label: 'แจ้งปัญหาการใช้งาน', path: '/it-problem-report' },
+                { label: 'แจ้งซ่อมอุปกรณ์', path: '/it-repair-request' }
             ]
         },
         {
@@ -118,13 +120,21 @@ export class Sidebar {
                 return {
                     name: parent.Label,
                     icon: parent.Icon,
-                    iconType: parent.Icon.includes('fa') ? 'fa' : 'material',
+                    iconType: parent.Icon && parent.Icon.includes('fa') ? 'fa' : 'material',
                     subItems: menus
                         .filter((child: any) => child.ParentMenuID === parent.MenuID)
                         .map((child: any) => ({
                             label: child.Label,
-                            path: child.RoutePath
+                            path: child.RoutePath ? (child.RoutePath.startsWith('/') ? child.RoutePath : `/${child.RoutePath}`) : ''
                         }))
+                        .sort((a: any, b: any) => {
+                            const MENU_PRIORITY: Record<string, number> = {
+                                '/it-problem-report': 1,
+                                '/it-repair-request': 2,
+                                '/it-service-request': 3,
+                            };
+                            return (MENU_PRIORITY[a.path] ?? 99) - (MENU_PRIORITY[b.path] ?? 99);
+                        })
                 };
             });
 
