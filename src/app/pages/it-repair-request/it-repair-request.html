@@ -25,9 +25,43 @@
                 </label>
             </div>
             <div class="field-input-col">
-                <input type="text" [ngModel]="repairFormData().device"
-                    (ngModelChange)="repairFormData.set({...repairFormData(), device: $event})" class="styled-input"
-                    placeholder="เช่น คอมพิวเตอร์, Printer, สายเน็ต...">
+                <div class="searchable-dropdown-wrapper">
+                    <div class="input-with-icon">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" [ngModel]="searchTerm()" (input)="onDeviceInput($event)"
+                            (focus)="isDropdownOpen.set(true)" class="styled-input dropdown-input"
+                            placeholder="ค้นหาหรือพิมพ์ชื่ออุปกรณ์ที่ต้องการซ่อม...">
+
+                        @if (searchTerm()) {
+                        <button class="btn-clear-input" (click)="clearDevice($event)" title="ล้างค่า">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        }
+
+                        <button class="dropdown-toggle" (click)="toggleDropdown()">
+                            <i class="fas" [class.fa-chevron-down]="!isDropdownOpen()"
+                                [class.fa-chevron-up]="isDropdownOpen()"></i>
+                        </button>
+                    </div>
+
+                    @if (isDropdownOpen()) {
+                    <div class="dropdown-menu-container">
+                        @for (cat of filteredCategories(); track cat.group) {
+                        <div class="category-group">
+                            <div class="category-header">{{ cat.group }}</div>
+                            @for (item of cat.items; track item) {
+                            <div class="dropdown-item" (click)="selectDevice(item)">
+                                {{ item }}
+                            </div>
+                            }
+                        </div>
+                        }
+                        @if (filteredCategories().length === 0) {
+                        <div class="no-results">คลิกเพื่อใช้ค่าที่พิมพ์: "{{ searchTerm() }}"</div>
+                        }
+                    </div>
+                    }
+                </div>
             </div>
         </div>
 
@@ -51,7 +85,7 @@
             </div>
         </div>
 
-        <!-- Field: อาการ -->
+        <!-- Field: อาการ + ไฟล์แนบ -->
         <div class="form-field-row">
             <div class="field-label-col">
                 <label class="field-label">
@@ -59,12 +93,44 @@
                     ลักษณะอาการที่พบ
                     <span class="required-badge">*</span>
                 </label>
+                <div class="mt-1 text-muted font-weight-normal" style="font-size: 0.75rem; padding-left: 22px;">
+                    <i class="fas fa-paperclip mr-1"></i> แนบรูปภาพประกอบ (ถ้ามี)
+                </div>
             </div>
             <div class="field-input-col">
-                <textarea [ngModel]="repairFormData().symptom"
-                    (ngModelChange)="repairFormData.set({...repairFormData(), symptom: $event})"
-                    class="styled-input styled-textarea" rows="5"
-                    placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."></textarea>
+                <div class="unified-input-group">
+                    <textarea [ngModel]="repairFormData().symptom"
+                        (ngModelChange)="repairFormData.set({...repairFormData(), symptom: $event})"
+                        class="styled-input styled-textarea" rows="4"
+                        placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."></textarea>
+
+                    <div class="file-upload-section">
+                        <input type="file" #fileInput (change)="onFileSelected($event)" multiple style="display: none;">
+                        <div class="upload-trigger-row">
+                            <button class="btn-mini-upload" (click)="fileInput.click()">
+                                <i class="fas fa-camera mr-1"></i> เพิ่มรูปภาพ/ไฟล์แนบ
+                            </button>
+                            @if (repairFormData().attachments.length > 0) {
+                            <span class="attachment-count">
+                                <i class="fas fa-file-alt mr-1"></i> แนบแล้ว {{ repairFormData().attachments.length }}
+                                ไฟล์
+                            </span>
+                            }
+                        </div>
+
+                        @if (repairFormData().attachments.length > 0) {
+                        <div class="file-tag-container mt-2">
+                            @for (file of repairFormData().attachments; track $index) {
+                            <div class="file-tag">
+                                <span>{{ file.name }}</span>
+                                <button class="remove-btn" (click)="removeAttachment($index)"><i
+                                        class="fas fa-times"></i></button>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -73,7 +139,8 @@
             <button class="btn-secondary-action" (click)="closePage()">
                 <i class="fas fa-times mr-2"></i> ยกเลิก
             </button>
-            <button class="btn-primary-action" (click)="submit()">
+            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
+                [class.disabled-btn]="!isFormValid()">
                 <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
             </button>
         </div>
@@ -155,6 +222,28 @@
                             <th>อาการ</th>
                             <td>{{ repairFormData().symptom }}</td>
                         </tr>
+                        <tr>
+                            <th>ไฟล์แนบ</th>
+                            <td>
+                                @if (repairFormData().attachments.length > 0) {
+                                <ul class="list-unstyled mb-0">
+                                    @for (file of repairFormData().attachments; track file.name) {
+                                    <li class="attachment-item mb-2">
+                                        <div class="file-info">
+                                            <i class="fas fa-paperclip"></i>
+                                            <span>{{ file.name }}</span>
+                                        </div>
+                                        <button class="btn-view-file" (click)="viewFile(file)">
+                                            <i class="fas fa-eye"></i> ดูไฟล์
+                                        </button>
+                                    </li>
+                                    }
+                                </ul>
+                                } @else {
+                                <span class="text-muted">-</span>
+                                }
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -207,6 +296,28 @@
                         <tr>
                             <th>อาการ</th>
                             <td>{{ selectedRequest().symptom }}</td>
+                        </tr>
+                        <tr>
+                            <th>ไฟล์แนบ</th>
+                            <td>
+                                @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
+                                <ul class="list-unstyled mb-0">
+                                    @for (file of selectedRequest().attachments; track file.name) {
+                                    <li class="attachment-item mb-2">
+                                        <div class="file-info">
+                                            <i class="fas fa-paperclip"></i>
+                                            <span>{{ file.name }}</span>
+                                        </div>
+                                        <button class="btn-view-file" (click)="viewFile(file)">
+                                            <i class="fas fa-eye"></i> ดูไฟล์
+                                        </button>
+                                    </li>
+                                    }
+                                </ul>
+                                } @else {
+                                <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
                     </table>
                 </div>

@@ -20,7 +20,7 @@ export class ItProblemReportComponent {
     topic: '',
     detail: '',
     categories: [] as string[],
-    attachments: [] as { name: string, size?: number }[]
+    attachments: [] as { name: string, size?: number, file: File }[]
   });
 
   availableCategories = [
@@ -41,12 +41,26 @@ export class ItProblemReportComponent {
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
     if (files && files.length > 0) {
-      const newAttachments = Array.from(files).map(f => ({ name: f.name, size: f.size }));
+      const newAttachments = Array.from(files).map(f => ({
+        name: f.name,
+        size: f.size,
+        file: f
+      }));
       const currentAttachments = this.problemFormData().attachments;
       this.problemFormData.set({
         ...this.problemFormData(),
         attachments: [...currentAttachments, ...newAttachments]
       });
+    }
+  }
+
+  viewFile(fileObj: any) {
+    if (fileObj.file) {
+      const url = URL.createObjectURL(fileObj.file);
+      window.open(url, '_blank');
+    } else {
+      // For dummy data which doesn't have a real File object
+      this.swalService.info('แจ้งเตือน', 'ไฟล์นี้เป็นข้อมูลตัวอย่าง ไม่สามารถเปิดดูได้จริง');
     }
   }
 
@@ -63,8 +77,8 @@ export class ItProblemReportComponent {
 
   submittedRequests = signal<any[]>([
     {
-      id: 3,
-      displayId: '#PRB2602-0003',
+      id: 1,
+      displayId: '#PRB2602-0001',
       date: new Date('2026-02-19T10:45:00'),
       topics: 'ระบบ ONEE เข้าใช้งานไม่ได้',
       detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา',

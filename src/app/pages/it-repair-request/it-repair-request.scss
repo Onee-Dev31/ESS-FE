@@ -1316,6 +1316,158 @@ $table-label-bg: #f1f5f9;
         }
     }
 
+    .searchable-dropdown-wrapper {
+        position: relative;
+        width: 100%;
+
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            .search-icon {
+                position: absolute;
+                left: 14px;
+                color: #94a3b8;
+                font-size: 0.9rem;
+                pointer-events: none;
+            }
+
+            .dropdown-input {
+                padding-left: 40px !important;
+                padding-right: 65px !important;
+            }
+
+            .btn-clear-input {
+                position: absolute;
+                right: 35px;
+                background: none;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                z-index: 2;
+
+                &:hover {
+                    color: #ef4444;
+                    transform: scale(1.1);
+                }
+            }
+
+            .dropdown-toggle {
+                position: absolute;
+                right: 5px;
+                background: none;
+                border: none;
+                color: #64748b;
+                cursor: pointer;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.2s;
+                z-index: 2;
+
+                &:hover {
+                    color: #f43f5e;
+                }
+            }
+        }
+
+        .dropdown-menu-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            margin-top: 5px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            max-height: 350px;
+            overflow-y: auto;
+            animation: fadeInScale 0.2s ease-out;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #e2e8f0;
+                border-radius: 10px;
+            }
+
+            .category-group {
+                padding: 10px 0;
+                border-bottom: 1px solid #f1f5f9;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .category-header {
+                    padding: 5px 16px;
+                    font-size: 0.72rem;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: #94a3b8;
+                    font-weight: 800;
+                    background: #f8fafc;
+                    margin-bottom: 5px;
+                }
+
+                .dropdown-item {
+                    padding: 8px 16px;
+                    font-size: 0.9rem;
+                    color: #1e293b;
+                    cursor: pointer;
+                    transition: all 0.15s;
+                    display: flex;
+                    align-items: center;
+
+                    &:hover {
+                        background: #fff1f2;
+                        color: #f43f5e;
+                        padding-left: 20px;
+                    }
+                }
+            }
+
+            .no-results {
+                padding: 20px;
+                text-align: center;
+                color: #64748b;
+                font-size: 0.85rem;
+                font-style: italic;
+                cursor: pointer;
+
+                &:hover {
+                    background: #f8fafc;
+                    color: #f43f5e;
+                }
+            }
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
     .styled-input {
         width: 100%;
         padding: 10px 14px;
@@ -1409,6 +1561,16 @@ $table-label-bg: #f1f5f9;
             &:active {
                 transform: translateY(0);
             }
+
+            &.disabled-btn {
+                background: #e2e8f0 !important;
+                color: #94a3b8 !important;
+                border: none !important;
+                cursor: not-allowed !important;
+                box-shadow: none !important;
+                transform: none !important;
+                filter: none !important;
+            }
         }
     }
 
@@ -1429,6 +1591,174 @@ $table-label-bg: #f1f5f9;
 
         .form-actions-row {
             padding: 16px 20px;
+        }
+    }
+
+    .unified-input-group {
+        border: 1.5px solid #d1d5db;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        transition: all 0.2s ease;
+
+        &:focus-within {
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1);
+        }
+
+        .styled-textarea {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 12px 14px;
+            background: transparent;
+            min-height: 90px;
+
+            &:focus {
+                box-shadow: none !important;
+            }
+        }
+
+        .file-upload-section {
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .upload-trigger-row {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+
+                .btn-mini-upload {
+                    background: #ffffff;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    padding: 5px 12px;
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    color: #475569;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+
+                    i {
+                        font-size: 0.85rem;
+                        color: #f43f5e;
+                    }
+
+                    &:hover {
+                        background: #f1f5f9;
+                        border-color: #f43f5e;
+                        color: #f43f5e;
+                    }
+                }
+
+                .attachment-count {
+                    font-size: 0.75rem;
+                    color: #64748b;
+                    font-weight: 500;
+                }
+            }
+
+            .file-tag-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+
+                .file-tag {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    padding: 2px 8px;
+                    font-size: 0.7rem;
+                    color: #475569;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    .remove-btn {
+                        background: none;
+                        border: none;
+                        color: #ef4444;
+                        cursor: pointer;
+                        padding: 0;
+                        font-size: 0.75rem;
+
+                        &:hover {
+                            color: #dc2626;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   MODAL & ATTACHMENT OVERRIDES (Final Fix)
+   ========================================================================== */
+:host ::ng-deep {
+    .attachment-item {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        background: #f8fafc !important;
+        border: 1px dashed #cbd5e1 !important;
+        padding: 8px 12px !important;
+        border-radius: 10px !important;
+        margin-bottom: 8px !important;
+        list-style: none !important;
+
+        &::before {
+            content: none !important;
+        }
+
+        &:hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            border-style: solid !important;
+        }
+
+        .file-info {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            color: #445469 !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+
+            i {
+                color: #3b82f6 !important;
+            }
+        }
+    }
+
+    .btn-view-file {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        background: #ffffff !important;
+        color: #2563eb !important;
+        border: 1.5px solid #d1e9ff !important;
+        border-radius: 9px !important;
+        padding: 6px 14px !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.08) !important;
+        transition: all 0.2s ease !important;
+
+        &:hover {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25) !important;
         }
     }
 }
