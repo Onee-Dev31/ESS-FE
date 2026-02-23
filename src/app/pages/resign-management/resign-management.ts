@@ -3,7 +3,6 @@ import { Employee } from './employeeData.interface';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2'
-import { MOCK_EMPLOYEES } from '../../utils/mock-employee.util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService, zh_CN } from 'ng-zorro-antd/i18n';
@@ -87,29 +86,20 @@ export class ResignManagement {
 
   MODE_EDIT: boolean = false;
 
-  employee: Employee[] = [];
   isViewOpen = false;
   selected?: Employee;
   isFlipped = false;
-  // lastDate: any = '';
-  // effectiveDate: any = '';
   lastDate = signal<Date | null>(null);
   effectiveDate = signal<Date | null>(null);
-
-  page = 1;                 // หน้าเริ่มต้น
-  pageSize = 5;             // จำนวนต่อหน้า
-  pageSizeOptions = [5, 10, 20, 50];
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private i18n: NzI18nService,
   ) {
-    // this.employee = MOCK_EMPLOYEES; // ใช้ข้อมูลจำลองจาก mock-employee.util.ts
     this.i18n.setLocale(en_US);
   }
 
   ngOnInit() {
-    // this.getEmployee();
     this.getCompanies();
     this.getDepartments();
     this.loadInitialData();
@@ -284,55 +274,6 @@ export class ResignManagement {
       await Swal.fire('ผิดพลาด', e?.message ?? 'เกิดข้อผิดพลาด', 'error');
       return;
     }
-  }
-
-  get totalItems(): number {
-    return this.employee.length;
-  }
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
-  }
-
-  get pagedEmployees(): Employee[] {
-    const start = (this.page - 1) * this.pageSize;
-    return this.employee.slice(start, start + this.pageSize);
-  }
-
-  get pageNumbers(): number[] {
-    // ทำเป็นเลขหน้าแบบสั้น ๆ (ไม่ยาวเป็นร้อย)
-    const total = this.totalPages;
-    const current = this.page;
-
-    const windowSize = 5;
-    let start = Math.max(1, current - Math.floor(windowSize / 2));
-    let end = Math.min(total, start + windowSize - 1);
-    start = Math.max(1, end - windowSize + 1);
-
-    const pages: number[] = [];
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  }
-
-  setPage(p: number) {
-    this.page = Math.min(Math.max(1, p), this.totalPages);
-  }
-
-  prevPage() {
-    if (this.page > 1) this.page--;
-  }
-
-  nextPage() {
-    if (this.page < this.totalPages) this.page++;
-  }
-
-  onPageSizeChange() {
-    this.page = 1; // เปลี่ยนจำนวนต่อหน้าแล้วกลับไปหน้า 1
-  }
-
-  // ตัวอย่าง: ถ้ามีลบ/เพิ่มข้อมูล อย่าลืม clamp หน้า
-  clampPage() {
-    if (this.page > this.totalPages) this.page = this.totalPages;
   }
 
   onImgError(event: Event) {
