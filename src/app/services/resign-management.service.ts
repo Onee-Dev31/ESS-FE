@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { delay, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,16 +15,18 @@ export class ResignManagementService {
     page?: number;
     pageSize?: number;
     searchText?: string;
-    company?: any;
-    department?: any;
+    companyCode?: any;
+    costCent?: any;
+    empStatus?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
     if (params.pageSize) queryParams.perPage = params.pageSize;
     if (params.searchText) queryParams.searchText = params.searchText;
-    if (params.company) queryParams.companyCode = params.company.COMPANY_CODE;
-    if (params.department) queryParams.costCent = params.department.COSTCENT;
+    if (params.companyCode) queryParams.companyCode = params.companyCode;
+    if (params.costCent) queryParams.costCent = params.costCent;
+    if (params.empStatus) queryParams.empStatus = params.empStatus;
 
     // console.log("params >>> ", queryParams)
 
@@ -32,5 +34,24 @@ export class ResignManagementService {
       params: queryParams
     });
   }
+
+  resignEmployee(payload: any): Observable<any> {
+    console.log(payload)
+
+    // return of({ success: true }).pipe(
+    //   delay(5000)
+    // );
+    return this._http.post(`${this.baseUrl}/employee-resignations`, payload);
+  }
+
+  updateEmployeeResign(id: string, payload: any): Observable<any> {
+    console.log(payload)
+    return this._http.put(`${this.baseUrl}/employee-resignations/${id}`, payload);
+  }
+
+  deleteEmployeeResign(id: string): Observable<any> {
+    return this._http.delete(`${this.baseUrl}/employee-resignations/${id}`);
+  }
+
 
 }

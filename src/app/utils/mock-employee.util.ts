@@ -1,6 +1,6 @@
 import { Employee } from "../pages/resign-management/employeeData.interface";
 
-export const MOCK_EMPLOYEES: Employee[] = [
+export const MOCK_EMPLOYEES: any[] = [
     {
         empCode: 'OTD0001',
         firstName: 'ปัณณพร',

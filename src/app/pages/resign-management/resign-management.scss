@@ -265,6 +265,34 @@ $border: #dee2e6;
     }
 }
 
+.content-card.resign {
+    margin-top: 0.8rem;
+
+    .card-header-title {
+        @include card-header-title(#000000, #bb00ff);
+    }
+
+    .table-responsive {
+        .modern-table {
+            .col-action {
+                .Info-delete {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+                    color: red;
+                    cursor: pointer;
+
+                    .fa-minus:hover {
+                        color: rgb(192, 0, 0);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 .table-wrap {
     background: #fff;
     border: 1px solid #e9e9e9;
@@ -797,16 +825,15 @@ $border: #dee2e6;
 
 
     .col-department {
-        width: 25%;
+        width: 22%;
     }
 
     .col-company {
-        width: 25%;
+        width: 22%;
     }
 
-    .col-type,
     .col-action {
-        width: 50px;
+        width: 70px;
         white-space: nowrap;
     }
 
@@ -814,7 +841,6 @@ $border: #dee2e6;
         display: flex;
         flex-direction: column;
         width: 70%;
-        // gap: 4px;
     }
 
     .fullname {
@@ -901,6 +927,12 @@ $border: #dee2e6;
     overflow: hidden;
     background: linear-gradient(135deg, #313131, #1f1f1f 40%, #000);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    .error-text {
+        color: rgb(255, 135, 135);
+        text-align: center;
+        padding: 12px;
+    }
 
     .badge {
         display: inline-flex;
