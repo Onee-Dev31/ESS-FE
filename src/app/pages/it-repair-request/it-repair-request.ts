@@ -1,4 +1,4 @@
-import { Component, signal, inject, computed } from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,15 @@ import { SwalService } from '../../services/swal.service';
 export class ItRepairRequestComponent {
   private swalService = inject(SwalService);
   private router = inject(Router);
+
+  @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (this.isDropdownOpen() && this.dropdownWrapper && !this.dropdownWrapper.nativeElement.contains(event.target)) {
+      this.isDropdownOpen.set(false);
+    }
+  }
 
   repairFormData = signal({
     device: '',

@@ -25,7 +25,7 @@
                 </label>
             </div>
             <div class="field-input-col">
-                <div class="searchable-dropdown-wrapper">
+                <div class="searchable-dropdown-wrapper" #dropdownWrapper>
                     <div class="input-with-icon">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text" [ngModel]="searchTerm()" (input)="onDeviceInput($event)"
