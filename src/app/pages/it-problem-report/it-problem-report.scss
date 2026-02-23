@@ -1369,6 +1369,9 @@ $table-label-bg: #f1f5f9;
         .check-icon {
             font-size: 0.7rem;
             opacity: 0;
+            width: 0;
+            overflow: hidden;
+            margin-right: 0;
             transform: scale(0.7);
             transition: all 0.15s ease;
         }
