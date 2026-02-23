@@ -105,7 +105,8 @@
                         placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."></textarea>
 
                     <div class="file-upload-section">
-                        <input type="file" #fileInput (change)="onFileSelected($event)" multiple style="display: none;">
+                        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*"
+                            capture="environment" multiple style="display: none;">
                         <div class="upload-trigger-row">
                             <button class="btn-mini-upload" (click)="fileInput.click()">
                                 <i class="fas fa-camera mr-1"></i> เพิ่มรูปภาพ/ไฟล์แนบ
