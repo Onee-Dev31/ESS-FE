@@ -14,4 +14,8 @@ export class SettingService {
   getMenu(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/all-menus`);
   }
+
+  createMenu(payload: any): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/menu`, payload);
+  }
 }

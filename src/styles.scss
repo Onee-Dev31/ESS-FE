@@ -154,15 +154,32 @@ body {
   }
 }
 
+
+//antd picker
 .ant-picker-cell-today .ant-picker-cell-inner::before {
   border: none !important;
   display: none !important;
 }
 
+//antd modal
 .ant-modal-content {
   border-radius: 20px !important;
 }
 
+//swal2
 .swal2-container {
   z-index: 20000 !important;
+}
+
+// antd tooltip
+.ant-tooltip-inner {
+  background: #ffffff !important;
+  padding: 16px;
+  color: #000000;
+  border-radius: 16px;
+}
+
+.ant-tooltip-arrow::before,
+.ant-tooltip-arrow::after {
+  background-color: #ffffff !important;
 }
