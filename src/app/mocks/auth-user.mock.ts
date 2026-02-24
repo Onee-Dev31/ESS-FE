@@ -27,7 +27,7 @@ export class UserMock {
         department: '11206 - Program Development',
         company: 'OTV-บริษัท วัน สามสิบเอ็ด จำกัด',
         position: 'Senior Developer',
-        phone: '9409',
+        phone: '0863214321',
         floor: '15',
         itAssets: {
             account: 'praewnapaboo',

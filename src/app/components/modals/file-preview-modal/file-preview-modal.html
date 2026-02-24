@@ -35,10 +35,25 @@
                         <h4>{{ selectedFile.fileName }}</h4>
                     </div>
                     <div class="image-box">
-                        <div class="mock-image">
-                            <i class="fas fa-image fa-3x"></i>
-                            <span>Preview: {{ selectedFile.fileName }}</span>
-                        </div>
+                        <ng-container [ngSwitch]="true">
+                            <!-- Image View -->
+                            <ng-container *ngSwitchCase="isImage(selectedFile)">
+                                <img [src]="selectedFile.url" class="preview-image" [alt]="selectedFile.fileName">
+                            </ng-container>
+
+                            <!-- PDF View -->
+                            <ng-container *ngSwitchCase="isPdf(selectedFile)">
+                                <embed [src]="getSafeUrl(selectedFile.url)" type="application/pdf" class="preview-pdf">
+                            </ng-container>
+
+                            <!-- Other Files -->
+                            <ng-container *ngSwitchDefault>
+                                <div class="mock-image">
+                                    <i class="fas fa-file-alt fa-3x"></i>
+                                    <span>{{ selectedFile.fileName }}</span>
+                                </div>
+                            </ng-container>
+                        </ng-container>
                     </div>
                 </div>
             </div>

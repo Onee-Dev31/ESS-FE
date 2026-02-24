@@ -1,9 +1,12 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 export interface FilePreviewItem {
     fileName: string;
     date: string;
+    url?: string;
+    type?: string;
 }
 
 @Component({
@@ -14,6 +17,8 @@ export interface FilePreviewItem {
     styleUrls: ['./file-preview-modal.scss']
 })
 export class FilePreviewModalComponent implements OnInit {
+    private sanitizer = inject(DomSanitizer);
+
     @Input() files: FilePreviewItem[] = [];
     @Output() onClose = new EventEmitter<void>();
 
@@ -31,5 +36,20 @@ export class FilePreviewModalComponent implements OnInit {
 
     close() {
         this.onClose.emit();
+    }
+
+    isImage(file: FilePreviewItem | null): boolean {
+        if (!file || !file.type) return false;
+        return file.type.startsWith('image/');
+    }
+
+    isPdf(file: FilePreviewItem | null): boolean {
+        if (!file || !file.type) return false;
+        return file.type === 'application/pdf';
+    }
+
+    getSafeUrl(url: string | undefined): SafeResourceUrl {
+        if (!url) return '';
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 }

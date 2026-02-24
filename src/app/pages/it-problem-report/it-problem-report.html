@@ -30,6 +30,7 @@
             </div>
         </div>
 
+
         <!-- Field: รายละเอียด -->
         <div class="form-field-row">
             <div class="field-label-col">
@@ -61,6 +62,7 @@
                     placeholder="อธิบายรายละเอียดปัญหาที่พบ..."></textarea>
             </div>
         </div>
+
 
         <!-- Field: หมวดหมู่ -->
         <div class="form-field-row">
@@ -114,6 +116,21 @@
                     }
                 </div>
                 }
+            </div>
+        </div>
+
+        <!-- Field: เบอร์โทรติดต่อ -->
+        <div class="form-field-row">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fas fa-phone-alt field-icon"></i>
+                    เบอร์โทรติดต่อ
+                </label>
+            </div>
+            <div class="field-input-col">
+                <input type="text" [ngModel]="problemFormData().phoneNumber"
+                    (ngModelChange)="onPhoneNumberChange($event)" class="styled-input"
+                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
         </div>
 
@@ -266,6 +283,12 @@
                                 </span>
                             </td>
                         </tr>
+                        @if (selectedRequest().phoneNumber) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
+                        </tr>
+                        }
                     </table>
                 </div>
                 <div class="summary-section">
@@ -324,4 +347,7 @@
         </div>
     </div>
     }
+
+    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
 </div>

@@ -1,27 +1,50 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
+import { UserService, UserProfile } from '../../services/user.service';
+import { PhoneUtil } from '../../utils/phone.util';
+import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-it-problem-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss'
 })
-export class ItProblemReportComponent {
+export class ItProblemReportComponent implements OnInit {
   private swalService = inject(SwalService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   problemFormData = signal({
     topic: '',
     detail: '',
+    phoneNumber: '',
     categories: [] as string[],
     attachments: [] as { name: string, size?: number, file: File }[]
   });
+
+  ngOnInit() {
+    this.userService.getUserProfile().subscribe((profile: UserProfile) => {
+      if (profile?.phone) {
+        const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
+        this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
+      }
+    });
+  }
+
+  onPhoneNumberChange(value: string) {
+    const formatted = PhoneUtil.formatPhoneNumber(value);
+    this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
+  }
+
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   availableCategories = [
     'Oracle', 'Onee App', 'BMS', 'ระบบอื่นๆ', 'อุปกรณ์ Hardware', 'Software โปรแกรมต่างๆ'
@@ -57,11 +80,21 @@ export class ItProblemReportComponent {
   viewFile(fileObj: any) {
     if (fileObj.file) {
       const url = URL.createObjectURL(fileObj.file);
-      window.open(url, '_blank');
+      this.previewFiles.set([{
+        fileName: fileObj.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: url,
+        type: fileObj.file.type
+      }]);
+      this.isPreviewModalOpen.set(true);
     } else {
       // For dummy data which doesn't have a real File object
       this.swalService.info('แจ้งเตือน', 'ไฟล์นี้เป็นข้อมูลตัวอย่าง ไม่สามารถเปิดดูได้จริง');
     }
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 
   removeAttachment(index: number) {
@@ -82,6 +115,7 @@ export class ItProblemReportComponent {
       date: new Date('2026-02-19T10:45:00'),
       topics: 'ระบบ ONEE เข้าใช้งานไม่ได้',
       detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา',
+      phoneNumber: '081-234-5678',
       categories: ['Onee App', 'Software โปรแกรมต่างๆ'],
       attachments: [{ name: 'error-screenshot.png' }],
       status: 'Pending'
@@ -118,6 +152,7 @@ export class ItProblemReportComponent {
       date: new Date(),
       topics: data.topic,
       detail: data.detail,
+      phoneNumber: data.phoneNumber,
       categories: data.categories,
       attachments: data.attachments,
       status: 'Pending'
@@ -126,7 +161,7 @@ export class ItProblemReportComponent {
     this.submittedRequests.update(reqs => [newRequest, ...reqs]);
     this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งปัญหาเรียบร้อยแล้ว');
     this.showSummaryModal.set(false);
-    this.problemFormData.set({ topic: '', detail: '', categories: [], attachments: [] });
+    this.problemFormData.set({ topic: '', detail: '', phoneNumber: '', categories: [], attachments: [] });
   }
 
   showHistoryDetailModal = signal(false);

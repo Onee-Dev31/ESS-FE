@@ -85,6 +85,7 @@
             </div>
         </div>
 
+
         <!-- Field: อาการ + ไฟล์แนบ -->
         <div class="form-field-row">
             <div class="field-label-col">
@@ -132,6 +133,21 @@
                         }
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Field: เบอร์โทรติดต่อ -->
+        <div class="form-field-row ">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fas fa-phone-alt field-icon"></i>
+                    เบอร์โทรติดต่อ
+                </label>
+            </div>
+            <div class="field-input-col">
+                <input type="text" [ngModel]="repairFormData().phoneNumber"
+                    (ngModelChange)="onPhoneNumberChange($event)" class="styled-input"
+                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
         </div>
 
@@ -223,6 +239,12 @@
                             <th>อาการ</th>
                             <td>{{ repairFormData().symptom }}</td>
                         </tr>
+                        @if (repairFormData().phoneNumber) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ repairFormData().phoneNumber }}</td>
+                        </tr>
+                        }
                         <tr>
                             <th>ไฟล์แนบ</th>
                             <td>
@@ -281,6 +303,12 @@
                                 </span>
                             </td>
                         </tr>
+                        @if (selectedRequest().phoneNumber) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
+                        </tr>
+                        }
                     </table>
                 </div>
                 <div class="summary-section">

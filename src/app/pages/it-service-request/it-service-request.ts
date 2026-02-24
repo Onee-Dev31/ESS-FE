@@ -1,8 +1,10 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
+import { UserService, UserProfile } from '../../services/user.service';
+import { PhoneUtil } from '../../utils/phone.util';
 
 @Component({
     selector: 'app-it-service-request',
@@ -11,10 +13,11 @@ import { SwalService } from '../../services/swal.service';
     templateUrl: './it-service-request.html',
     styleUrl: './it-service-request.scss'
 })
-export class ITServiceRequestComponent {
+export class ITServiceRequestComponent implements OnInit {
 
-    // Inject SwalService
+    // Inject Services
     private swalService = inject(SwalService);
+    private userService = inject(UserService);
 
     serviceOptions = signal([
         { label: 'บริการ Internet', value: 'internet', checked: false, disabled: false, icon: 'fa-wifi' },
@@ -54,6 +57,21 @@ export class ITServiceRequestComponent {
     otherOpenForName = signal<string>('');
 
     requestDetails = signal('');
+    phoneNumber = signal('');
+
+    ngOnInit() {
+        this.userService.getUserProfile().subscribe((profile: UserProfile) => {
+            if (profile?.phone) {
+                const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
+                this.phoneNumber.set(formatted);
+            }
+        });
+    }
+
+    onPhoneNumberChange(value: string) {
+        const formatted = PhoneUtil.formatPhoneNumber(value);
+        this.phoneNumber.set(formatted);
+    }
 
     showRepairModal = signal(false);
 
@@ -194,6 +212,7 @@ export class ITServiceRequestComponent {
                 detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา'
             },
             openFor: 'พนักงาน ข (Employee B)',
+            phoneNumber: '089-999-8888',
             status: 'Pending',
             systemData: { selectedTypes: [], userOptions: [], systemOptions: [] }
         },
@@ -255,6 +274,7 @@ export class ITServiceRequestComponent {
             problemData: null,
             systemData: systemData,
             openFor: openForDisplay,
+            phoneNumber: this.phoneNumber(),
             status: 'Pending'
         };
 
@@ -267,6 +287,7 @@ export class ITServiceRequestComponent {
         this.isSystemCategorySelected.set(false);
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.phoneNumber.set('');
     }
 
     closeRepairModal() {

@@ -1,9 +1,11 @@
-import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild } from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
+import { UserService, UserProfile } from '../../services/user.service';
+import { PhoneUtil } from '../../utils/phone.util';
 
 @Component({
   selector: 'app-it-repair-request',
@@ -12,8 +14,9 @@ import { SwalService } from '../../services/swal.service';
   templateUrl: './it-repair-request.html',
   styleUrl: './it-repair-request.scss'
 })
-export class ItRepairRequestComponent {
+export class ItRepairRequestComponent implements OnInit {
   private swalService = inject(SwalService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
@@ -30,8 +33,23 @@ export class ItRepairRequestComponent {
     brand: '',
     model: '',
     symptom: '',
+    phoneNumber: '',
     attachments: [] as { name: string, size?: number, file: File }[]
   });
+
+  ngOnInit() {
+    this.userService.getUserProfile().subscribe((profile: UserProfile) => {
+      if (profile?.phone) {
+        const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
+        this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
+      }
+    });
+  }
+
+  onPhoneNumberChange(value: string) {
+    const formatted = PhoneUtil.formatPhoneNumber(value);
+    this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
+  }
 
   // Searchable Dropdown Logic
   searchTerm = signal('');
@@ -112,6 +130,7 @@ export class ItRepairRequestComponent {
       brand: 'Brother',
       model: 'HL-L2370DN',
       symptom: 'กระดาษติดบ่อย และหมึกจาง',
+      phoneNumber: '062-111-2222',
       attachments: [{ name: 'printer-error.jpg' }],
       status: 'Pending'
     }
@@ -185,7 +204,7 @@ export class ItRepairRequestComponent {
     this.submittedRequests.update(reqs => [newRequest, ...reqs]);
     this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว');
     this.showSummaryModal.set(false);
-    this.repairFormData.set({ device: '', brand: '', model: '', symptom: '', attachments: [] });
+    this.repairFormData.set({ device: '', brand: '', model: '', symptom: '', phoneNumber: '', attachments: [] });
   }
 
   showHistoryDetailModal = signal(false);
