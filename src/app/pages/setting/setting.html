@@ -147,5 +147,5 @@
         (onSubmit)="handleMenuSubmit($event)" (onClose)="closeForm()"></app-menu-form>
 
     <app-menu-all-form [isOpen]="isFormMenuAllOpen()" (onClose)="closeAllMenuForm()" [menus]="menus"
-        [rolePermissions]="rolePermissions"></app-menu-all-form>
+        [rolePermissions]="rolePermissions" (onSubmit)="handleAllMenuSubmit($event)"></app-menu-all-form>
 </div>

@@ -8,108 +8,112 @@
         </div>
 
         <div class="modal-content">
-            <!-- <div class="freelance-form">
-                <div class="form-row">
-                    <div class="form-field">
-                        <label>MenuKey</label>
-                        <input nz-input placeholder="" [(ngModel)]="formData.menuKey" name="menuKey" class="form-input"
-                            required #menuKey="ngModel" [class.input-error]="menuKey.invalid && menuKey.touched" />
-                        <div class="error" *ngIf="menuKey.invalid && menuKey.touched">
-                            กรุณากรอก MenuKey
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label>ชื่อเมนู</label>
-                        <input nz-input placeholder="" [(ngModel)]="formData.label" name="label" class="form-input"
-                            required #label="ngModel" [class.input-error]="label.invalid && label.touched" />
-                        <div class="error" *ngIf="label.invalid && label.touched">
-                            กรุณากรอกชื่อเมนู
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label>Icon
-                            <span nz-tooltip [nzTooltipTitle]="iconHelpTpl" nzTooltipTrigger="click" class="help-icon">
-                                ?
+
+            <ul cdkDropList [cdkDropListData]="menus" class="parent-list" (cdkDropListDropped)="dropParent($event)">
+
+                <li *ngFor="let menu of menus" cdkDrag>
+
+                    <div class="menu-parent">
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <span class="drag-handle parent-handle" cdkDragHandle>
+                                <i class="fa-solid fa-bars"></i>
                             </span>
-                        </label>
-                        <input nz-input placeholder="" [(ngModel)]="formData.icon" name="icon" class="form-input"
-                            required #icon="ngModel" [class.input-error]="icon.invalid && icon.touched" />
-                        <div class="error" *ngIf="icon.invalid && icon.touched">
-                            กรุณากรอกไอคอน
-                        </div>
-                        <ng-template #iconHelpTpl>
-                            <div class="icon-help">
-                                <div class="help-section">
-                                    <div class="help-desc">
-                                        ใช้ชื่อ icon จาก<br>
-                                        <a href="https://fontawesome.com/icons" target="_blank"
-                                            rel="noopener noreferrer">
-                                            FontAwesome
-                                        </a> เช่น <b><code>fa-user</code></b><br>
-                                        <a href="https://fonts.google.com/icons" target="_blank"
-                                            rel="noopener noreferrer">
-                                            Material
-                                        </a> เช่น <b><code>home</code></b>
-                                    </div>
+                            <div class="form-field">
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-tag input-icon"></i>
+                                    <input id="label-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Label"
+                                        name="label-{{menu.MenuID}}" class="form-input" />
                                 </div>
                             </div>
-                        </ng-template>
-                    </div>
-                </div>
-                <div class="form-row four-cols">
-                    <div class="form-field">
-                        <label>routePath</label>
-                        <input nz-input placeholder="/" [(ngModel)]="formData.routePath" name="routePath"
-                            class="form-input" required #routePath="ngModel"
-                            [class.input-error]="routePath.invalid && routePath.touched" />
-                        <div class="error" *ngIf="routePath.invalid && routePath.touched">
-                            กรุณากรอก routePath
+                            <div class="form-field">
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-icons input-icon"></i>
+                                    <input id="icon-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Icon"
+                                        name="icon-{{menu.MenuID}}" class="form-input" placeholder="fa-solid fa-home" />
+
+                                </div>
+                            </div>
+                            <div class="form-field toggle visible">
+                                <label><i class="fa-solid fa-eye" style="margin-right: 3px;"></i>Visible</label>
+
+                                <nz-switch [(ngModel)]="menu.IsVisible" nzCheckedChildren="ON" nzUnCheckedChildren="OFF"
+                                    name="IsVisible-{{menu.MenuID}}">
+                                </nz-switch>
+                            </div>
+                            <div class="form-field toggle enabled">
+                                <label>Enabled</label>
+
+                                <nz-switch [(ngModel)]="menu.IsEnabled" nzCheckedChildren="ON" nzUnCheckedChildren="OFF"
+                                    name="isEnabled-{{menu.MenuID}}">
+                                </nz-switch>
+                            </div>
                         </div>
+                        <span class="toggle-btn" (click)="toggleMenu(menu); $event.stopPropagation()">
+                            <i *ngIf="menu.isExpanded" class="fa-solid fa-caret-down"></i>
+
+                            <i *ngIf="!menu.isExpanded" class="fa-solid fa-caret-left"></i>
+                        </span>
                     </div>
-                    <div class="form-field">
-                        <label>parentMenu</label>
-                        <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [(ngModel)]="formData.parentMenuID"
-                            name="parentMenuID" class="form-input" required #parentMenuID="ngModel"
-                            [class.input-error]="parentMenuID.invalid && parentMenuID.touched">
-                            <nz-option nzLabel="ไม่เลือก" [nzValue]="0" />
-                            <nz-option *ngFor="let menu of menusParent" [nzLabel]="menu.Label"
-                                [nzValue]="menu.MenuID" />
-                        </nz-select>
-                        <div class="error" *ngIf="parentMenuID.invalid && parentMenuID.touched">
-                            กรุณาเลือก menu
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label>isVisible</label>
-                        <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [(ngModel)]="formData.isVisible"
-                            name="isVisible" class="form-input" required #isVisible="ngModel"
-                            [class.input-error]="isVisible.invalid && isVisible.touched">
-                            <nz-option nzLabel="true" [nzValue]="1" />
-                            <nz-option nzLabel="false" [nzValue]="0" />
-                        </nz-select>
-                        <div class="error" *ngIf="isVisible.invalid && isVisible.touched">
-                            กรุณาเลือก menu
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label>isEnabled</label>
-                        <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [(ngModel)]="formData.isEnabled"
-                            name="isEnabled" class="form-input" required #isEnabled="ngModel"
-                            [class.input-error]="isEnabled.invalid && isEnabled.touched">
-                            <nz-option nzLabel="true" [nzValue]="1" />
-                            <nz-option nzLabel="false" [nzValue]="0" />
-                        </nz-select>
-                        <div class="error" *ngIf="isEnabled.invalid && isEnabled.touched">
-                            กรุณาเลือก menu
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+
+                    <!-- CHILD LIST -->
+                    <ul cdkDropList [id]="'child-' + menu.MenuID" [cdkDropListData]="menu.children" class="child-list"
+                        (cdkDropListDropped)="dropChild($event, menu)" [cdkDropListConnectedTo]="childDropLists"
+                        [class.collapsed]="!menu.isExpanded">
+
+
+                        <li *ngFor="let child of menu.children" cdkDrag>
+                            <div style="display: flex; gap: 6px;">
+                                <span class="drag-handle child-handle" cdkDragHandle>
+                                    <i class="fa-solid fa-grip-lines"></i>
+                                </span>
+
+                                <!-- {{ child.Label }} -->
+                                <div class="form-field">
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-tag input-icon"></i>
+                                        <input id="label-{{child.MenuID}}" nz-input [(ngModel)]="child.Label"
+                                            name="label-{{child.MenuID}}" class="form-input" />
+                                    </div>
+                                </div>
+                                <div class="form-field">
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-icons input-icon"></i>
+                                        <input id="icon-{{child.MenuID}}" nz-input [(ngModel)]="child.Icon"
+                                            name="icon-{{child.MenuID}}" class="form-input"
+                                            placeholder="fa-solid fa-home" />
+
+                                    </div>
+                                </div>
+                                <div class="form-field toggle visible">
+                                    <label><i class="fa-solid fa-eye" style="margin-right: 3px;"></i>Visible</label>
+
+                                    <nz-switch [(ngModel)]="child.IsVisible" nzCheckedChildren="ON"
+                                        nzUnCheckedChildren="OFF" name="IsVisible-{{child.MenuID}}">
+                                    </nz-switch>
+                                </div>
+                                <div class="form-field toggle enabled">
+                                    <label>Enabled</label>
+
+                                    <nz-switch [(ngModel)]="child.IsEnabled" nzCheckedChildren="ON"
+                                        nzUnCheckedChildren="OFF" name="isEnabled-{{child.MenuID}}">
+                                    </nz-switch>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li *ngIf="menu.children.length === 0" class="empty-child-placeholder">
+                            วางเมนูที่นี่
+                        </li>
+
+                    </ul>
+
+                </li>
+            </ul>
+
         </div>
 
         <div class="form-actions">
-            <!-- <button type="button" class="btn-save" (click)="handleSubmit()" [disabled]="f.invalid"
-                [class.disable]="f.invalid">Save</button> -->
+            <button type="button" class="btn-save" (click)="handleSubmit()">Save</button>
         </div>
     </form>
 

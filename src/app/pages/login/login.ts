@@ -55,7 +55,13 @@ export class LoginComponent {
     ).subscribe({
       next: (res) => {
         console.log('Login success:', res);
-        this.router.navigate(['/dashboard']);
+        console.log('>>', res.menus)
+        // const firstChildWithRoute = res.menus.find(
+        //   (m: any) => m.ParentMenuID !== null && m.RoutePath
+        // );
+        // const routePath = firstChildWithRoute?.RoutePath || null;
+        // console.log(routePath)
+        this.router.navigate(['/welcome']);
       },
       error: (err) => {
         console.log('Login error:', err);

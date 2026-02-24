@@ -83,7 +83,6 @@ export class Setting implements OnInit {
   }
 
   handleSave() {
-
     this.swalService.confirm('ยืนยันการบันทึกสิทธิ์')
       .then(result => {
         if (!result.isConfirmed) return;
@@ -132,6 +131,36 @@ export class Setting implements OnInit {
     );
 
     this.IS_EDIT_MODE = false;
+  }
+
+  handleAllMenuSubmit(data: any) {
+    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+        const payload = {
+          menus: data.map((menu: any) => ({
+            ...menu,
+            modifiedBy: this.authService.currentUser()
+          }))
+        }
+
+        console.log("payload > ", payload)
+
+        this.settingService.updateMenu(payload).subscribe({
+          next: (res) => {
+            console.log(res)
+
+            if (res?.success) {
+              this.swalService.success(res.message)
+            }
+            this.getMenu();
+            this.closeAllMenuForm();
+          }
+        });
+      });
+
   }
 
   //FUNCTION

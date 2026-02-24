@@ -23,4 +23,8 @@ export class SettingService {
 
     return this._http.post(`${this.baseUrl}/Master/menu-role-permissions`, payload);
   }
+
+  updateMenu(payload: any): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/update-menu-data`, payload);
+  }
 }
