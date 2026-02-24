@@ -375,11 +375,10 @@ $border: #dee2e6;
         }
 
         .action-toolbar {
-            padding: 1rem 1.5rem;
+            padding: 1rem 0rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f1f5f9;
             margin-bottom: 1rem;
 
             @include mobile {
@@ -455,7 +454,7 @@ $border: #dee2e6;
                     }
                 }
 
-                .btn-send-data {
+                .btn-send {
                     background: #1a73e8;
                     color: #fff;
                     border: none;
@@ -479,14 +478,80 @@ $border: #dee2e6;
                         box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
                     }
                 }
+
+                .btn-edit {
+                    background: #f2cf06;
+                    color: #fff;
+                    border: none;
+                    border-radius: 50px;
+                    padding: 0 1.5rem;
+                    height: 40px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+
+                    @include mobile {
+                        width: 100%;
+                        justify-content: center;
+                    }
+
+                    &:hover {
+                        background: #dfbe06;
+                        box-shadow: 0 2px 8px rgba(232, 205, 26, 0.25);
+                    }
+                }
+
+                .btn-cancel {
+                    background: #b7b7b7;
+                    color: #fff;
+                    border: none;
+                    border-radius: 50px;
+                    padding: 0 1.5rem;
+                    height: 40px;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+
+                    @include mobile {
+                        width: 100%;
+                        justify-content: center;
+                    }
+
+                    &:hover {
+                        background: #949494;
+                        box-shadow: 0 2px 8px rgba(151, 151, 151, 0.25);
+                    }
+                }
             }
+        }
+
+
+        // ==================== TABLE SECTION ====================
+        .table-responsive {
+            display: block;
+            margin-top: 16px;
+
+            // @include tablet {
+            //     display: none !important;
+            // }
+        }
+
+        .modern-table {
+            @include modern-table;
         }
     }
 
     .layout {
         // background: #f9fafb;
         display: flex;
-        margin: 12px;
+        margin: 0 12px;
+        padding: 12px 12px;
         border-radius: 12px;
         gap: 16px;
     }
@@ -498,20 +563,16 @@ $border: #dee2e6;
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         color: rgb(0, 0, 0);
-        padding: 16px;
-        overflow-y: auto;
-
-        scrollbar-width: none;
-        -ms-overflow-style: none;
     }
 
-    .sidebar::-webkit-scrollbar {
-        display: none;
+    .sidebar-header {
+        border-bottom: 1px solid #eee;
+        padding: 16px;
     }
 
     .sidebar ul {
         list-style: none;
-        padding-left: 0;
+        padding: 0 16px;
     }
 
     .menu-parent {
@@ -590,12 +651,31 @@ $border: #dee2e6;
     .content {
         flex: 1;
 
-        .header {
+        .menu-header {
             background: white;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             padding: 1rem 1.5rem;
+        }
+
+        .menu-detail {
+            p {
+                margin: 0;
+            }
+
+            .tag {
+                user-select: none;
+                background: #049e3c;
+                color: white;
+                padding: 1px 6px;
+                border-radius: 6px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            }
+
+            .tag.inActive {
+                background: #cf0707;
+            }
         }
     }
 

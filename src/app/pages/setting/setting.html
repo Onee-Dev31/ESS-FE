@@ -1,121 +1,147 @@
 <div class="setting-page">
     <app-page-header title="Role Permission Management"></app-page-header>
 
-    <div class="content-card">
+    <div class="content-card" #Header>
 
         <div class="card-header-title">
             Role & Menu Permission
         </div>
 
-        <div>
-            <div class="layout">
+        <!-- <div> -->
+        <div class="layout">
 
-                <!-- LEFT SIDEBAR -->
-                <div class="sidebar">
-                    <ul>
-                        <li>
-                            <button class="btn-create" (click)="handleAddMenu()">
-                                <i class="fas fa-plus"></i> เพิ่มเมนู
-                            </button>
-                        </li>
-                        <li *ngFor="let menu of menus">
-
-                            <div class="menu-parent" [class.active]="selectedMenu?.MenuID === menu.MenuID"
-                                (click)="selectMenu(menu)">
-
-                                <i *ngIf="menu.iconType === 'fa'" [class]="'fas ' + menu.Icon + ' nav-icon'">
-                                </i>
-                                <mat-icon *ngIf="menu.iconType === 'material'">
-                                    {{ menu.Icon }}
-                                </mat-icon>
-                                {{ menu.Label }}
-                            </div>
-
-                            <ul *ngIf="menu.children?.length">
-                                <li *ngFor="let child of menu.children"
-                                    [class.active]="selectedMenu?.MenuID === child.MenuID" (click)="selectMenu(child)">
-                                    {{ child.Label }}
-                                </li>
-                            </ul>
-                            <hr class="session">
-                        </li>
-                    </ul>
+            <!-- LEFT SIDEBAR -->
+            <div class="sidebar">
+                <!-- ปุ่มเพิ่มเมนู (Sticky) -->
+                <div class="sidebar-header">
+                    <button class="btn-create" (click)="handleAddMenu()">
+                        <i class="fas fa-plus"></i> เพิ่มเมนู
+                    </button>
                 </div>
+                <ul>
 
-                <!-- RIGHT CONTENT -->
-                <div class="content">
-                    <ng-container *ngIf="selectedMenu; else empty">
+                    <li *ngFor="let menu of menus">
 
-                        <div class="header">
-                            <h2>{{ selectedMenu.Label }}</h2>
-                            <p>Menu Key: {{ selectedMenu.MenuKey }}</p>
-                            <p>Route: {{ selectedMenu.RoutePath }}</p>
+                        <div class="menu-parent" [class.active]="selectedMenu?.MenuID === menu.MenuID"
+                            (click)="selectMenu(menu)">
+
+                            <i *ngIf="menu.iconType === 'fa'" [class]="'fas ' + menu.Icon + ' nav-icon'">
+                            </i>
+                            <mat-icon *ngIf="menu.iconType === 'material'">
+                                {{ menu.Icon }}
+                            </mat-icon>
+                            {{ menu.Label }}
                         </div>
 
-                        <!-- 🔽 Permission Table -->
-                        <nz-table *ngIf="selectedMenuPermissions.length" #permTable [nzData]="selectedMenuPermissions"
-                            [nzBordered]="true" [nzSize]="'small'" nzShowPagination="false" class="permission-table">
+                        <ul *ngIf="menu.children?.length">
+                            <li *ngFor="let child of menu.children"
+                                [class.active]="selectedMenu?.MenuID === child.MenuID" (click)="selectMenu(child)">
+                                {{ child.Label }}
+                            </li>
+                        </ul>
+                        <hr class="session">
+                    </li>
+                </ul>
+            </div>
+
+            <!-- RIGHT CONTENT -->
+            <div class="content">
+                <ng-container *ngIf="selectedMenu; else empty">
+
+                    <div class="menu-header">
+                        <h2>{{ selectedMenu.Label }}</h2>
+                        <div class="menu-detail">
+                            <p>Menu Key: {{ selectedMenu.MenuKey }}</p>
+                            <p>Route: {{ selectedMenu.RoutePath ? selectedMenu.RoutePath : '-'}}</p>
+                            <p>IsEnabled : <span class="tag"
+                                    [class.inActive]="!selectedMenu.IsEnabled">{{selectedMenu.IsEnabled}}</span></p>
+                            <p>IsVisible : <span class="tag"
+                                    [class.inActive]="!selectedMenu.IsVisible">{{selectedMenu.IsVisible}}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="modern-table" *ngIf="selectedMenuPermissions.length; else noPermission">
+
                             <thead>
                                 <tr>
                                     <th>Role</th>
-                                    <th>View</th>
-                                    <th>Create</th>
-                                    <th>Update</th>
-                                    <th>Delete</th>
-                                    <th>Approve</th>
+                                    <th class="text-center">View</th>
+                                    <th class="text-center">Create</th>
+                                    <th class="text-center">Update</th>
+                                    <th class="text-center">Delete</th>
+                                    <th class="text-center">Approve</th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                <tr *ngFor="let item of permTable.data">
+                                <tr *ngFor="let item of selectedMenuPermissions">
+
                                     <td>{{ item.RoleName }}</td>
 
-                                    <td>
-                                        <label nz-checkbox [nzChecked]="item.CanView"></label>
+                                    <td class="text-center">
+                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanView">
                                     </td>
 
-                                    <td>
-                                        <label nz-checkbox [nzChecked]="item.CanCreate"></label>
+                                    <td class="text-center">
+                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanCreate">
                                     </td>
 
-                                    <td>
-                                        <label nz-checkbox [nzChecked]="item.CanUpdate"></label>
+                                    <td class="text-center">
+                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanUpdate">
                                     </td>
 
-                                    <td>
-                                        <label nz-checkbox [nzChecked]="item.CanDelete"></label>
+                                    <td class="text-center">
+                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanDelete">
                                     </td>
 
-                                    <td>
-                                        <label nz-checkbox [nzChecked]="item.CanApprove"></label>
+                                    <td class="text-center">
+                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanApprove">
                                     </td>
+
                                 </tr>
                             </tbody>
-                        </nz-table>
 
-                        <!-- กรณีไม่มี permission -->
-                        <div *ngIf="!selectedMenuPermissions.length" class="empty">
-                            ไม่มีข้อมูล Permission
+                        </table>
+
+                        <ng-template #noPermission>
+                            <div class="no-data-cell">
+                                ไม่มีข้อมูล Permission
+                            </div>
+                        </ng-template>
+
+                    </div>
+
+                    <div class="action-toolbar">
+                        <div class="toolbar-left"></div>
+                        <div class="toolbar-right">
+                            <button class="btn-edit" (click)="enableEdit()" *ngIf="!IS_EDIT_MODE">
+                                แก้ไข
+                            </button>
+                            <button class="btn-cancel" *ngIf="IS_EDIT_MODE" (click)="handleCancel()">
+                                ยกเลิก
+                            </button>
+
+                            <button class="btn-send" (click)="handleSave()" *ngIf="IS_EDIT_MODE">
+                                บันทึก
+                            </button>
                         </div>
+                    </div>
+                </ng-container>
 
-                    </ng-container>
-
-                    <ng-template #empty>
-                        <div class="empty">กรุณาเลือกเมนู</div>
-                    </ng-template>
-                </div>
-
+                <ng-template #empty>
+                    <div class="empty">กรุณาเลือกเมนู</div>
+                </ng-template>
             </div>
+
         </div>
+        <!-- </div> -->
 
 
 
     </div>
 
-    <app-menu-form 
-    [isOpen]="isFormOpen()" 
-    [menusParent]="menusParent" 
-    [ORDER_NO]="ORDER_NO"
-    (onSubmit)="handleMenuSubmit($event)"
-    (onClose)="closeForm()" 
-        ></app-menu-form>
+    <app-menu-form [isOpen]="isFormOpen()" [menusParent]="menusParent" [ORDER_NO]="ORDER_NO"
+        (onSubmit)="handleMenuSubmit($event)" (onClose)="closeForm()"></app-menu-form>
 </div>

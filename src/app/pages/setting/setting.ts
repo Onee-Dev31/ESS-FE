@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { FormsModule } from '@angular/forms';
@@ -29,10 +29,13 @@ export class Setting implements OnInit {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
+  @ViewChild('Header') header!: ElementRef;
+
   menus: any[] = [];
   rolePermissions: any[] = [];
   selectedMenu: any = null;
   selectedMenuPermissions: any[] = [];
+  originalPermissions: any[] = [];
   menusParent: any[] = [];
 
   ORDER_NO: number = 0;
@@ -40,6 +43,8 @@ export class Setting implements OnInit {
   rolePermissionMap = new Map<number, any[]>();
 
   isFormOpen = signal<boolean>(false);
+
+  IS_EDIT_MODE = false;
 
   ngOnInit() {
     this.getMenu()
@@ -63,7 +68,6 @@ export class Setting implements OnInit {
 
     console.log(payload)
 
-    // ตัวอย่างเรียก API
     this.settingService.createMenu(payload).subscribe({
       next: (res) => {
         console.log(res)
@@ -72,9 +76,66 @@ export class Setting implements OnInit {
       }
     });
   }
+
+  enableEdit() {
+    this.IS_EDIT_MODE = true;
+  }
+
+  handleSave() {
+
+    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+        const newData = this.selectedMenuPermissions
+
+        const rolePermissionsMap = this.selectedMenuPermissions.map(item => ({
+          RoleID: item.RoleID,
+          Permissions: {
+            View: item.CanView,
+            canCreate: item.CanCreate,
+            canUpdate: item.CanUpdate,
+            canDelete: item.CanDelete,
+            canApprove: item.CanApprove
+          }
+        }));
+
+        const payload = {
+          menuID: newData[0].MenuID,
+          rolePermissions: rolePermissionsMap
+        }
+
+        console.log('payload:', payload);
+
+        this.settingService.updateMenuRolePermission(payload).subscribe({
+          next: (res) => {
+            console.log(res)
+
+            if (res?.success) {
+              this.swalService.success(res.message)
+            }
+            this.getMenu();
+          }
+        });
+        this.IS_EDIT_MODE = false;
+      });
+
+
+  }
+
+  handleCancel() {
+    // revert กลับค่าเดิม
+    this.selectedMenuPermissions = JSON.parse(
+      JSON.stringify(this.originalPermissions)
+    );
+
+    this.IS_EDIT_MODE = false;
+  }
+
   //FUNCTION
   private buildPermissionMap() {
-    this.rolePermissionMap.clear(); // ล้างก่อนกันข้อมูลซ้ำ
+    this.rolePermissionMap.clear();
 
     this.rolePermissions.forEach(p => {
       if (!this.rolePermissionMap.has(p.MenuID)) {
@@ -128,10 +189,25 @@ export class Setting implements OnInit {
 
     this.selectedMenu = menu;
 
-    this.selectedMenuPermissions =
+    const perms =
       (this.rolePermissionMap.get(menu.MenuID) || [])
         .sort((a, b) => a.RoleID - b.RoleID);
 
+    // clone สำหรับแก้ไข
+    this.selectedMenuPermissions = JSON.parse(JSON.stringify(perms));
+
+    // เก็บ original ไว้
+    this.originalPermissions = JSON.parse(JSON.stringify(perms));
+
+    setTimeout(() => {
+      this.header?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+
+
+    this.IS_EDIT_MODE = false;
     console.log('Selected Menu:', menu);
     console.log('Permissions:', this.selectedMenuPermissions);
   }
