@@ -372,6 +372,18 @@ $border: #dee2e6;
             @include card-header-title(#000000, #0062ff);
             padding: 1.5rem 1.5rem 0.5rem 1.5rem;
             margin: 0;
+
+            span {
+                font-size: 16px;
+                color: #0062ff;
+                cursor: pointer;
+
+                &:hover {
+                    color: #014abf;
+                    border-bottom: 1px solid #014abf;
+                }
+            }
+
         }
 
         .action-toolbar {
@@ -686,7 +698,79 @@ $border: #dee2e6;
     }
 }
 
+/* ===== Summary Container ===== */
+.summary-container {
+    max-height: 75vh;
+    overflow: auto;
+    // padding: 8px;
+}
 
+/* ===== Table Base ===== */
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 900px;
+    background: #fff;
+}
+
+/* ===== Header ===== */
+.summary-table thead {
+    background: linear-gradient(to right, #1e293b, #334155);
+    color: #fff;
+}
+
+.summary-table th {
+    padding: 12px 14px;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* ===== Body ===== */
+.summary-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+    transition: background 0.2s ease;
+}
+
+/* ===== First Column (Menu) ===== */
+.summary-table th:first-child,
+.summary-table td:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    background: #ffffff;
+    font-weight: 500;
+    z-index: 2;
+    border-right: 1px solid #e5e7eb;
+    color: #000000;
+}
+
+/* ===== Hover Effect ===== */
+.summary-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+/* ===== Zebra ===== */
+.summary-table tbody tr:nth-child(even) td {
+    background: #fcfcfd;
+}
+
+/* ===== Permission Style ===== */
+.summary-table td {
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* ===== Full Access Highlight ===== */
+.summary-table td:has(span.full-access) {
+    background: #ecfdf5 !important;
+    color: #065f46;
+    font-weight: 600;
+}
 
 //SELECT (antd)
 ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {

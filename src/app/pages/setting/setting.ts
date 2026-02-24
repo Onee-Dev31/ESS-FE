@@ -13,11 +13,23 @@ import { MasterDataService } from '../../services/master-data.service';
 import { MenuForm } from "../../components/features/menu-form/menu-form";
 import { AuthService } from '../../services/auth.service';
 import { MenuAllForm } from "../../components/features/menu-all-form/menu-all-form";
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-setting',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzTableModule, NzCheckboxModule, NzButtonModule, PageHeaderComponent, MatIconModule, MenuForm, MenuAllForm],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzTableModule,
+    NzCheckboxModule,
+    NzButtonModule,
+    PageHeaderComponent,
+    MatIconModule,
+    MenuForm,
+    MenuAllForm,
+    NzModalModule
+  ],
   templateUrl: './setting.html',
   styleUrl: './setting.scss',
 })
@@ -46,6 +58,7 @@ export class Setting implements OnInit {
 
   isFormOpen = signal<boolean>(false);
   isFormMenuAllOpen = signal<boolean>(false);
+  isViewSummaryOpen = signal<boolean>(false);
 
   IS_EDIT_MODE = false;
 
@@ -213,6 +226,7 @@ export class Setting implements OnInit {
     return 'material';
   }
 
+  // เลือกเมนู
   selectMenu(menu: any) {
     // console.log(this.menus, this.rolePermissionMap)
     if (!menu.IsEnabled) return;
@@ -240,20 +254,85 @@ export class Setting implements OnInit {
     this.IS_EDIT_MODE = false;
   }
 
+  // เพิ่มเมนู
   handleAddMenu() {
     this.isFormOpen.set(true);
   }
-
   closeForm() {
     this.isFormOpen.set(false);
   }
 
+  // แก้ไขเมนู
   handleEditMenu() {
     this.isFormMenuAllOpen.set(true);
   }
-
   closeAllMenuForm() {
     this.isFormMenuAllOpen.set(false);
+  }
+
+  //Summary
+  handleSummaryMenu() {
+    this.isViewSummaryOpen.set(true);
+  }
+  closeSummaryMenu() {
+    this.isViewSummaryOpen.set(false);
+  }
+
+  // SUMMARY
+  summaryRoles: string[] = [];
+  summaryTable: any[] = [];
+  summaryMenu() {
+    // 1. ดึง Role ไม่ซ้ำ
+    this.summaryRoles = [
+      ...new Set(this.rolePermissions.map(r => r.RoleName))
+    ].sort();
+
+    // 2. group permission ตาม MenuID
+    const permissionMap = this.rolePermissions.reduce((acc: any, item: any) => {
+      if (!acc[item.MenuID]) {
+        acc[item.MenuID] = {};
+      }
+
+      acc[item.MenuID][item.RoleName] = {
+        R: item.CanView,
+        C: item.CanCreate,
+        U: item.CanUpdate,
+        D: item.CanDelete,
+        A: item.CanApprove
+      };
+
+      return acc;
+    }, {});
+
+    // 3. flatten เมนู (เอาทั้ง parent + child)
+    const flattenMenus = (menus: any[]): any[] => {
+      return menus.flatMap(m =>
+        m.children?.length ? [m, ...flattenMenus(m.children)] : [m]
+      );
+    };
+
+    const allMenus = flattenMenus(this.menus);
+
+    // 4. สร้าง table
+    this.summaryTable = allMenus.map(menu => ({
+      label: menu.Label,
+      permissions: permissionMap[menu.MenuID] || {}
+    }));
+
+    this.isViewSummaryOpen.set(true);
+  }
+
+  formatPermission(p: any): string {
+    if (!p) return '-';
+
+    let result = '';
+    if (p.R) result += 'R';
+    if (p.C) result += 'C';
+    if (p.U) result += 'U';
+    if (p.D) result += 'D';
+    if (p.A) result += 'A';
+
+    return result || '-';
   }
 
   //GET MASTER

@@ -4,7 +4,7 @@
     <div class="content-card" #Header>
 
         <div class="card-header-title">
-            Role & Menu Permission
+            Role & Menu Permission <span (click)="summaryMenu()">สรุป</span>
         </div>
 
 
@@ -54,10 +54,10 @@
                         <div class="menu-detail">
                             <p>Menu Key: {{ selectedMenu.MenuKey }}</p>
                             <p>Route: {{ selectedMenu.RoutePath ? selectedMenu.RoutePath : '-'}}</p>
-                            <p>IsEnabled : <span class="tag"
-                                    [class.inActive]="!selectedMenu.IsEnabled">{{selectedMenu.IsEnabled}}</span></p>
                             <p>IsVisible : <span class="tag"
                                     [class.inActive]="!selectedMenu.IsVisible">{{selectedMenu.IsVisible}}</span></p>
+                            <p>IsEnabled : <span class="tag"
+                                    [class.inActive]="!selectedMenu.IsEnabled">{{selectedMenu.IsEnabled}}</span></p>
                         </div>
                     </div>
 
@@ -148,4 +148,39 @@
 
     <app-menu-all-form [isOpen]="isFormMenuAllOpen()" (onClose)="closeAllMenuForm()" [menus]="menus"
         [rolePermissions]="rolePermissions" (onSubmit)="handleAllMenuSubmit($event)"></app-menu-all-form>
+
+    <nz-modal [nzVisible]="isViewSummaryOpen()" [nzFooter]="null" [nzClosable]="true" [nzCentered]="true"
+        [nzWidth]="'80%'" (nzOnCancel)="closeSummaryMenu()" [nzMaskClosable]="false">
+
+        <ng-container *nzModalContent>
+            <div class="summary-container">
+
+                <table class="modern-table summary-table">
+
+                    <thead>
+                        <tr>
+                            <th>Menu</th>
+                            <th *ngFor="let role of summaryRoles">
+                                {{ role }}
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let row of summaryTable">
+                            <td>{{ row.label }}</td>
+
+                            <td *ngFor="let role of summaryRoles" class="text-center">
+                                {{ formatPermission(row.permissions[role]) }}
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </ng-container>
+
+    </nz-modal>
+
 </div>
