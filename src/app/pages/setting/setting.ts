@@ -12,11 +12,12 @@ import { SwalService } from '../../services/swal.service';
 import { MasterDataService } from '../../services/master-data.service';
 import { MenuForm } from "../../components/features/menu-form/menu-form";
 import { AuthService } from '../../services/auth.service';
+import { MenuAllForm } from "../../components/features/menu-all-form/menu-all-form";
 
 @Component({
   selector: 'app-setting',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzTableModule, NzCheckboxModule, NzButtonModule, PageHeaderComponent, MatIconModule, MenuForm],
+  imports: [CommonModule, FormsModule, NzTableModule, NzCheckboxModule, NzButtonModule, PageHeaderComponent, MatIconModule, MenuForm, MenuAllForm],
   templateUrl: './setting.html',
   styleUrl: './setting.scss',
 })
@@ -32,17 +33,19 @@ export class Setting implements OnInit {
   @ViewChild('Header') header!: ElementRef;
 
   menus: any[] = [];
+  menusParent: any[] = [];
   rolePermissions: any[] = [];
+
   selectedMenu: any = null;
   selectedMenuPermissions: any[] = [];
   originalPermissions: any[] = [];
-  menusParent: any[] = [];
 
   ORDER_NO: number = 0;
 
   rolePermissionMap = new Map<number, any[]>();
 
   isFormOpen = signal<boolean>(false);
+  isFormMenuAllOpen = signal<boolean>(false);
 
   IS_EDIT_MODE = false;
 
@@ -51,8 +54,6 @@ export class Setting implements OnInit {
   }
 
   handleMenuSubmit(data: any) {
-    console.log('Received from child:', data);
-
     const payload = {
       menuKey: data.menuKey,
       label: data.label,
@@ -70,7 +71,7 @@ export class Setting implements OnInit {
 
     this.settingService.createMenu(payload).subscribe({
       next: (res) => {
-        console.log(res)
+        // console.log(res)
         this.closeForm();
         this.getMenu();
       }
@@ -110,7 +111,7 @@ export class Setting implements OnInit {
 
         this.settingService.updateMenuRolePermission(payload).subscribe({
           next: (res) => {
-            console.log(res)
+            // console.log(res)
 
             if (res?.success) {
               this.swalService.success(res.message)
@@ -208,17 +209,22 @@ export class Setting implements OnInit {
 
 
     this.IS_EDIT_MODE = false;
-    console.log('Selected Menu:', menu);
-    console.log('Permissions:', this.selectedMenuPermissions);
   }
 
   handleAddMenu() {
-    console.log("add menu")
     this.isFormOpen.set(true);
   }
 
   closeForm() {
     this.isFormOpen.set(false);
+  }
+
+  handleEditMenu() {
+    this.isFormMenuAllOpen.set(true);
+  }
+
+  closeAllMenuForm() {
+    this.isFormMenuAllOpen.set(false);
   }
 
   //GET MASTER

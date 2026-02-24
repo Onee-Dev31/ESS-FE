@@ -7,7 +7,7 @@
             Role & Menu Permission
         </div>
 
-        <!-- <div> -->
+
         <div class="layout">
 
             <!-- LEFT SIDEBAR -->
@@ -17,11 +17,12 @@
                     <button class="btn-create" (click)="handleAddMenu()">
                         <i class="fas fa-plus"></i> เพิ่มเมนู
                     </button>
+                    <button class="btn-create" (click)="handleEditMenu()">
+                        <i class="fa-solid fa-pen-to-square"></i> แก้ไขเมนู
+                    </button>
                 </div>
                 <ul>
-
                     <li *ngFor="let menu of menus">
-
                         <div class="menu-parent" [class.active]="selectedMenu?.MenuID === menu.MenuID"
                             (click)="selectMenu(menu)">
 
@@ -136,7 +137,7 @@
             </div>
 
         </div>
-        <!-- </div> -->
+
 
 
 
@@ -144,4 +145,7 @@
 
     <app-menu-form [isOpen]="isFormOpen()" [menusParent]="menusParent" [ORDER_NO]="ORDER_NO"
         (onSubmit)="handleMenuSubmit($event)" (onClose)="closeForm()"></app-menu-form>
+
+    <app-menu-all-form [isOpen]="isFormMenuAllOpen()" (onClose)="closeAllMenuForm()" [menus]="menus"
+        [rolePermissions]="rolePermissions"></app-menu-all-form>
 </div>

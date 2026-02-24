@@ -568,6 +568,8 @@ $border: #dee2e6;
     .sidebar-header {
         border-bottom: 1px solid #eee;
         padding: 16px;
+        display: flex;
+        gap: 5px;
     }
 
     .sidebar ul {

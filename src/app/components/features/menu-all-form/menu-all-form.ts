@@ -1,27 +1,26 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-import { MatIconModule  } from "@angular/material/icon";
+import { MatIconModule } from '@angular/material/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 
 @Component({
-  selector: 'app-menu-form',
-  standalone: true,
+  selector: 'app-menu-all-form',
   imports: [
     CommonModule,
     FormsModule,
     NzTooltipModule,
-    MatIconModule ,
+    MatIconModule,
     NzSelectModule
   ],
-  templateUrl: './menu-form.html',
-  styleUrl: './menu-form.scss',
+  templateUrl: './menu-all-form.html',
+  styleUrl: './menu-all-form.scss',
 })
-export class MenuForm implements OnChanges {
+export class MenuAllForm {
   @Input() isOpen = false;
-  @Input() menusParent: any = null;
-  @Input() ORDER_NO: any = null;
+  @Input() menus: any = null;
+  @Input() rolePermissions: any = null;
   @Output() onClose = new EventEmitter<void>();
   @Output() onSubmit = new EventEmitter<any>();
 
@@ -41,9 +40,9 @@ export class MenuForm implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
       console.log('Modal opened');
-      console.log('menusParent:', this.menusParent);
-      console.log('ORDER_NO:', this.ORDER_NO);
-      this.formData.orderNo = this.ORDER_NO + 1
+      console.log('menus', this.menus);
+      console.log('rolePermissions', this.rolePermissions);
+
     }
   }
 
