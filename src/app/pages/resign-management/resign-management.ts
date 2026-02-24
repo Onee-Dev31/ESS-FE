@@ -264,6 +264,7 @@ export class ResignManagement {
         });
       }
       this.closeViewModal();
+      this.MODE_EDIT = false;
       return;
     } catch (e: any) {
       this.swalService.close();
