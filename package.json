@@ -4,12 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "dev": "ng serve --host 0.0.0.0 --configuration=dev",
     "build": "ng build",
-    "build:prod": "ng build --configuration production",
+    "build:prod": "ng build --configuration production --output-hashing=all --delete-output-path --verbose",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "cypress run",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open"  
   },
   "prettier": {
     "printWidth": 100,
