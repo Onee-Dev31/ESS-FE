@@ -154,8 +154,7 @@ export class SettingMenu implements OnInit {
 
         this.settingService.updateMenu(payload).subscribe({
           next: (res) => {
-            console.log(res)
-
+            // console.log(res)
             if (res?.success) {
               this.swalService.success(res.message)
             }
@@ -323,7 +322,7 @@ export class SettingMenu implements OnInit {
       permissions: permissionMap[menu.MenuID] || {}
     }));
 
-    console.log("summaryTable >>> ", this.summaryTable)
+    // console.log("summaryTable >>> ", this.summaryTable)
     this.isViewSummaryOpen.set(true);
   }
 
@@ -344,7 +343,7 @@ export class SettingMenu implements OnInit {
   getMenu() {
     this.settingService.getMenu().subscribe({
       next: (res) => {
-        console.log(res.data);
+        // console.log(res.data);
 
         const rawMenus = res.data.menus;
 

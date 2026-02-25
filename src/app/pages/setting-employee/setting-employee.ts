@@ -97,7 +97,7 @@ export class SettingEmployee {
   });
 
   openRoleModal(emp: any) {
-    console.log(emp)
+    // console.log(emp)
 
     if (!emp.adUser) {
       this.swalService.warning('ไม่มี Aduser')
@@ -120,7 +120,7 @@ export class SettingEmployee {
   }
 
   async onConfirmModal(data: any): Promise<void> {
-    console.log(data)
+    // console.log(data)
 
     if (!this.selected) return;
 
@@ -138,7 +138,7 @@ export class SettingEmployee {
     }
 
     this.settingPermissionRolesByAdUser(this.selected.emp, data).subscribe(res => {
-      console.log(res)
+      // console.log(res)
       if (res.success) {
         this.swalService.success(res.message)
       }
@@ -209,7 +209,7 @@ export class SettingEmployee {
       1,
       this.activeListing.pageSize()
     ).subscribe(res => {
-      console.log(res)
+      // console.log(res)
       this.setEmployeeFromApi(res)
     }
     );
@@ -225,7 +225,7 @@ export class SettingEmployee {
     this.fetchEmployee(page, size)
       .subscribe({
         next: (res) => {
-          console.log(res)
+          // console.log(res)
           this.setEmployeeFromApi(res);
           this.loadingService.stop('employee-table');
         },
@@ -269,6 +269,7 @@ export class SettingEmployee {
       ...(roles !== undefined ? { batchRoles: roles } : {})
     };
 
+    console.log("payload", payload)
 
     return this.settingService.settingUserRole(payload)
   }
@@ -299,7 +300,7 @@ export class SettingEmployee {
   getRoleMaster() {
     this.masterService.getRoleMaster().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.roleList.set(res.data);
       },
       error: (error) => {

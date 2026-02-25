@@ -200,7 +200,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         const validFiles: any[] = [];
 
         Array.from(input.files).forEach((file: File) => {
-            console.log(file)
+            // console.log(file)
 
             const extension = file.name.split('.').pop()?.toLowerCase();
 
@@ -294,12 +294,12 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     handleResign() {
-        console.log('Open Resigned')
+        // console.log('Open Resigned')
         this.showResignModal = true;
     }
 
     handleActive() {
-        console.log('handleActive')
+        // console.log('handleActive')
         this.swalService.confirm('ยืนยันการ Activate อีกครั้ง')
             .then(result => {
                 if (!result.isConfirmed) return;
@@ -325,7 +325,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     //     this.closeResignModal();
     // }
     confirmResign() {
-        console.log(this.formResignData.resignDate, this.formResignData.lastWorkingDate)
+        // console.log(this.formResignData.resignDate, this.formResignData.lastWorkingDate)
         if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
 
         this.onSave.emit({

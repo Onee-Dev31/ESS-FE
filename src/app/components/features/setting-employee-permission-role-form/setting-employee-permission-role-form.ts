@@ -47,9 +47,9 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
-      console.log('Modal opened');
-      console.log('selected', this.selected);
-      // this.permissionRoleByEmployee = this.selected.roles
+      // console.log('Modal opened');
+      // console.log('selected', this.selected);
+
 
       this.emp = this.selected.emp
       const userRoleIds = new Set(this.selected.roles.map((r: any) => r.RoleID));
@@ -65,12 +65,12 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
   }
 
   handleClose() {
-    console.log("-- handleClose --")
+    // console.log("-- handleClose --")
     this.onClose.emit();
   }
 
   handleSubmit() {
-    console.log("-- handleSubmit --")
+    // console.log("-- handleSubmit --")
     const batchRoles = this.permissionRoleByEmployee
       .filter(r => r.checked)
       .map(r => ({
@@ -78,7 +78,7 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
         IsActive: r.checked ? 1 : 0
       }));
 
-    console.log(batchRoles)
+    // console.log(batchRoles)
     this.onSubmit.emit(batchRoles);
   }
 
@@ -89,7 +89,7 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
   getRoleMaster() {
     this.masterService.getRoleMaster().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.roleList = res.data
       },
       error: (error) => {
