@@ -34,9 +34,9 @@ export class MenuAllForm {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
-      console.log('Modal opened');
-      console.log('menus', this.menus);
-      console.log('rolePermissions', this.rolePermissions);
+      // console.log('Modal opened');
+      // console.log('menus', this.menus);
+      // console.log('rolePermissions', this.rolePermissions);
       this.menusInternal = JSON.parse(JSON.stringify(this.menus));
 
       this.menusInternal = this.menusInternal.map((menu: any) => ({
@@ -56,7 +56,7 @@ export class MenuAllForm {
 
   handleSubmit() {
     const formData = this.flattenMenus(this.menusInternal)
-    console.log(formData)
+    // console.log(formData)
     this.onSubmit.emit(formData);
   }
 
@@ -113,7 +113,7 @@ export class MenuAllForm {
 
   // FUNCTION
   flattenMenus(tree: any[]): any[] {
-    console.log("tree > ", tree)
+    // console.log("tree > ", tree)
     const result: any[] = [];
     let runningOrder = 1;
 
