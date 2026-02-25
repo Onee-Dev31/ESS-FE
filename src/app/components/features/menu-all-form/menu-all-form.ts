@@ -30,13 +30,16 @@ export class MenuAllForm {
   @Output() onClose = new EventEmitter<void>();
   @Output() onSubmit = new EventEmitter<any>();
 
+  menusInternal: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
       console.log('Modal opened');
       console.log('menus', this.menus);
       console.log('rolePermissions', this.rolePermissions);
-      this.menus = this.menus.map((menu: any) => ({
+      this.menusInternal = JSON.parse(JSON.stringify(this.menus));
+
+      this.menusInternal = this.menusInternal.map((menu: any) => ({
         ...menu,
         isExpanded: true,
         children: menu.children ?? []
@@ -47,11 +50,12 @@ export class MenuAllForm {
   }
 
   handleClose() {
+    this.childDropLists = [];
     this.onClose.emit();
   }
 
   handleSubmit() {
-    const formData = this.flattenMenus(this.menus)
+    const formData = this.flattenMenus(this.menusInternal)
     console.log(formData)
     this.onSubmit.emit(formData);
   }
@@ -63,12 +67,12 @@ export class MenuAllForm {
   dropParent(event: CdkDragDrop<any[]>) {
 
     moveItemInArray(
-      this.menus,
+      this.menusInternal,
       event.previousIndex,
       event.currentIndex
     );
 
-    this.menus.forEach((menu: any, index: any) => {
+    this.menusInternal.forEach((menu: any, index: any) => {
       menu.OrderNo = index + 1;
     });
   }
@@ -76,7 +80,7 @@ export class MenuAllForm {
   childDropLists: string[] = [];
 
   generateDropListIds() {
-    this.childDropLists = this.menus.map((m: { MenuID: string; }) => 'child-' + m.MenuID);
+    this.childDropLists = this.menusInternal.map((m: { MenuID: string; }) => 'child-' + m.MenuID);
   }
 
   dropChild(event: CdkDragDrop<any[]>, parentMenu: any) {

@@ -85,7 +85,7 @@
     align-items: center;
     position: relative;
     margin-bottom: 0;
-    padding: 24px 36px 24px;
+    padding: 24px 30px 24px;
     flex-shrink: 0;
 
     h2 {
@@ -278,10 +278,12 @@
 }
 
 .form-field.toggle {
-    width: 100px;
     align-items: center;
     padding: 10px;
     border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
 
     &.visible {
         background: #dcdcdc;
@@ -721,6 +723,11 @@
         padding: 20px 16px;
     }
 
+    .modal-container .modal-content {
+        padding: 0 16px;
+    }
+
+
     .form-header {
         margin-bottom: 24px;
 
@@ -755,6 +762,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    .menu-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 6px;
+        flex: 1 1 400px;
+        min-width: 100px;
+    }
+
+    @media (max-width: 480px) {
+
+        .input-group {
+            flex-direction: column;
+        }
+
+        // .form-field.toggle {
+        //     flex: 1 1 100%;
+        // }
+
+    }
+
 }
 
 /* Child container */

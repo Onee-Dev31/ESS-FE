@@ -9,32 +9,36 @@
 
         <div class="modal-content">
 
-            <ul cdkDropList [cdkDropListData]="menus" class="parent-list" (cdkDropListDropped)="dropParent($event)">
+            <ul cdkDropList [cdkDropListData]="menusInternal" class="parent-list"
+                (cdkDropListDropped)="dropParent($event)">
 
-                <li *ngFor="let menu of menus" cdkDrag>
+                <li *ngFor="let menu of menusInternal" cdkDrag>
 
                     <div class="menu-parent">
-                        <div style="display: flex; gap: 6px; align-items: center;">
-                            <span class="drag-handle parent-handle" cdkDragHandle>
-                                <i class="fa-solid fa-bars"></i>
-                            </span>
-                            <div class="form-field">
-                                <div class="input-with-icon">
-                                    <i class="fa-solid fa-tag input-icon"></i>
-                                    <input id="label-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Label"
-                                        name="label-{{menu.MenuID}}" class="form-input" />
+                        <span class="drag-handle parent-handle" cdkDragHandle>
+                            <i class="fa-solid fa-bars"></i>
+                        </span>
+                        <div class="menu-row">
+                            <div class="input-group">
+                                <div class="form-field">
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-tag input-icon"></i>
+                                        <input id="label-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Label"
+                                            name="label-{{menu.MenuID}}" class="form-input" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-field">
-                                <div class="input-with-icon">
-                                    <i class="fa-solid fa-icons input-icon"></i>
-                                    <input id="icon-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Icon"
-                                        name="icon-{{menu.MenuID}}" class="form-input" placeholder="fa-solid fa-home" />
+                                <div class="form-field">
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-icons input-icon"></i>
+                                        <input id="icon-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Icon"
+                                            name="icon-{{menu.MenuID}}" class="form-input"
+                                            placeholder="fa-solid fa-home" />
 
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-field toggle visible">
-                                <label><i class="fa-solid fa-eye" style="margin-right: 3px;"></i>Visible</label>
+                                <label>Visible</label>
 
                                 <nz-switch [(ngModel)]="menu.IsVisible" nzCheckedChildren="ON" nzUnCheckedChildren="OFF"
                                     name="IsVisible-{{menu.MenuID}}">
@@ -62,41 +66,42 @@
 
 
                         <li *ngFor="let child of menu.children" cdkDrag>
-                            <div style="display: flex; gap: 6px;">
+                            <div class="menu-parent">
                                 <span class="drag-handle child-handle" cdkDragHandle>
                                     <i class="fa-solid fa-grip-lines"></i>
                                 </span>
+                                <div class="menu-row">
+                                    <div class="input-group">
+                                        <div class="form-field">
+                                            <div class="input-with-icon">
+                                                <i class="fa-solid fa-tag input-icon"></i>
+                                                <input id="label-{{child.MenuID}}" nz-input [(ngModel)]="child.Label"
+                                                    name="label-{{child.MenuID}}" class="form-input" />
+                                            </div>
+                                        </div>
+                                        <div class="form-field">
+                                            <div class="input-with-icon">
+                                                <i class="fa-solid fa-icons input-icon"></i>
+                                                <input id="icon-{{child.MenuID}}" nz-input [(ngModel)]="child.Icon"
+                                                    name="icon-{{child.MenuID}}" class="form-input"
+                                                    placeholder="fa-solid fa-home" />
 
-                                <!-- {{ child.Label }} -->
-                                <div class="form-field">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-tag input-icon"></i>
-                                        <input id="label-{{child.MenuID}}" nz-input [(ngModel)]="child.Label"
-                                            name="label-{{child.MenuID}}" class="form-input" />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-field">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-icons input-icon"></i>
-                                        <input id="icon-{{child.MenuID}}" nz-input [(ngModel)]="child.Icon"
-                                            name="icon-{{child.MenuID}}" class="form-input"
-                                            placeholder="fa-solid fa-home" />
-
+                                    <div class="form-field toggle visible">
+                                        <label>Visible</label>
+                                        <nz-switch [(ngModel)]="child.IsVisible" nzCheckedChildren="ON"
+                                            nzUnCheckedChildren="OFF" name="IsVisible-{{child.MenuID}}">
+                                        </nz-switch>
                                     </div>
-                                </div>
-                                <div class="form-field toggle visible">
-                                    <label><i class="fa-solid fa-eye" style="margin-right: 3px;"></i>Visible</label>
+                                    <div class="form-field toggle enabled">
+                                        <label>Enabled</label>
 
-                                    <nz-switch [(ngModel)]="child.IsVisible" nzCheckedChildren="ON"
-                                        nzUnCheckedChildren="OFF" name="IsVisible-{{child.MenuID}}">
-                                    </nz-switch>
-                                </div>
-                                <div class="form-field toggle enabled">
-                                    <label>Enabled</label>
-
-                                    <nz-switch [(ngModel)]="child.IsEnabled" nzCheckedChildren="ON"
-                                        nzUnCheckedChildren="OFF" name="isEnabled-{{child.MenuID}}">
-                                    </nz-switch>
+                                        <nz-switch [(ngModel)]="child.IsEnabled" nzCheckedChildren="ON"
+                                            nzUnCheckedChildren="OFF" name="isEnabled-{{child.MenuID}}">
+                                        </nz-switch>
+                                    </div>
                                 </div>
                             </div>
                         </li>

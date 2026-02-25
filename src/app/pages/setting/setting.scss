@@ -703,6 +703,12 @@ $border: #dee2e6;
     max-height: 75vh;
     overflow: auto;
     // padding: 8px;
+
+    .level-0-row {
+        background-color: #f3f3f3;
+        font-weight: 600;
+        border-top: 2px solid #dcdfe6;
+    }
 }
 
 /* ===== Table Base ===== */
@@ -749,15 +755,19 @@ $border: #dee2e6;
     color: #000000;
 }
 
+.summary-table tr.level-0-row td:first-child {
+    background: #f3f3f3;
+}
+
 /* ===== Hover Effect ===== */
 .summary-table tbody tr:hover td {
     background: #f8fafc;
 }
 
 /* ===== Zebra ===== */
-.summary-table tbody tr:nth-child(even) td {
-    background: #fcfcfd;
-}
+// .summary-table tbody tr:nth-child(even) td {
+//     background: #fcfcfd;
+// }
 
 /* ===== Permission Style ===== */
 .summary-table td {

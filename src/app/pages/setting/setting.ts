@@ -283,9 +283,12 @@ export class Setting implements OnInit {
   summaryTable: any[] = [];
   summaryMenu() {
     // 1. ดึง Role ไม่ซ้ำ
-    this.summaryRoles = [
-      ...new Set(this.rolePermissions.map(r => r.RoleName))
-    ].sort();
+    this.summaryRoles = this.rolePermissions
+      .sort((a, b) => a.RoleId - b.RoleId)   // sort ตาม RoleId ก่อน
+      .map(r => r.RoleName)                  // ค่อย map เป็นชื่อ
+      .filter((value, index, self) => self.indexOf(value) === index); // unique
+
+    // console.log("summaryRoles >>> ", this.summaryRoles)
 
     // 2. group permission ตาม MenuID
     const permissionMap = this.rolePermissions.reduce((acc: any, item: any) => {
@@ -294,8 +297,8 @@ export class Setting implements OnInit {
       }
 
       acc[item.MenuID][item.RoleName] = {
-        R: item.CanView,
         C: item.CanCreate,
+        R: item.CanView,
         U: item.CanUpdate,
         D: item.CanDelete,
         A: item.CanApprove
@@ -304,30 +307,41 @@ export class Setting implements OnInit {
       return acc;
     }, {});
 
+    // console.log("permissionMap >>> ", permissionMap)
+
     // 3. flatten เมนู (เอาทั้ง parent + child)
-    const flattenMenus = (menus: any[]): any[] => {
-      return menus.flatMap(m =>
-        m.children?.length ? [m, ...flattenMenus(m.children)] : [m]
-      );
+    const flattenMenus = (menus: any[], level: number = 0): any[] => {
+      return menus.flatMap(m => [
+        { ...m, level },
+        ...(m.children?.length
+          ? flattenMenus(m.children, level + 1)
+          : [])
+      ]);
     };
 
     const allMenus = flattenMenus(this.menus);
 
+    // console.log("allMenus >>> ", allMenus)
+
     // 4. สร้าง table
     this.summaryTable = allMenus.map(menu => ({
       label: menu.Label,
+      level: menu.level,
       permissions: permissionMap[menu.MenuID] || {}
     }));
 
+    console.log("summaryTable >>> ", this.summaryTable)
     this.isViewSummaryOpen.set(true);
   }
+
+
 
   formatPermission(p: any): string {
     if (!p) return '-';
 
     let result = '';
-    if (p.R) result += 'R';
     if (p.C) result += 'C';
+    if (p.R) result += 'R';
     if (p.U) result += 'U';
     if (p.D) result += 'D';
     if (p.A) result += 'A';

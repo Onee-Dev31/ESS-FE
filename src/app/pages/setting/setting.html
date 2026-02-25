@@ -167,8 +167,8 @@
                     </thead>
 
                     <tbody>
-                        <tr *ngFor="let row of summaryTable">
-                            <td>{{ row.label }}</td>
+                        <tr *ngFor="let row of summaryTable" [ngClass]="{ 'level-0-row': row.level === 0 }">
+                            <td><span [style.padding-left.px]="row.level * 10">{{ row.label }}</span></td>
 
                             <td *ngFor="let role of summaryRoles" class="text-center">
                                 {{ formatPermission(row.permissions[role]) }}
