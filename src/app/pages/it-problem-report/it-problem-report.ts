@@ -58,11 +58,10 @@ export class ItProblemReportComponent implements OnInit {
   toggleCategory(cat: string) {
     const current = this.problemFormData();
     const isSelected = current.categories.includes(cat);
+
     this.problemFormData.set({
       ...current,
-      categories: isSelected
-        ? current.categories.filter(c => c !== cat)
-        : [...current.categories, cat]
+      categories: isSelected ? [] : [cat]
     });
   }
 
