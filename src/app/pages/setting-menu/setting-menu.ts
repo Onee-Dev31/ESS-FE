@@ -160,6 +160,7 @@ export class SettingMenu implements OnInit {
               this.swalService.success(res.message)
             }
             this.getMenu();
+            this.selectedMenu = null
             this.closeAllMenuForm();
           }
         });

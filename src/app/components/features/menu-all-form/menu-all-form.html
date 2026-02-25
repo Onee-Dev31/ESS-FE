@@ -36,6 +36,13 @@
 
                                     </div>
                                 </div>
+                                <div class="form-field">
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-link input-icon"></i>
+                                        <input id="icon-{{menu.MenuID}}" nz-input [(ngModel)]="menu.RoutePath"
+                                            name="icon-{{menu.MenuID}}" class="form-input" placeholder="" />
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-field toggle visible">
                                 <label>Visible</label>
@@ -86,6 +93,13 @@
                                                     name="icon-{{child.MenuID}}" class="form-input"
                                                     placeholder="fa-solid fa-home" />
 
+                                            </div>
+                                        </div>
+                                        <div class="form-field">
+                                            <div class="input-with-icon">
+                                                <i class="fa-solid fa-link input-icon"></i>
+                                                <input id="icon-{{child}}" nz-input [(ngModel)]="child.RoutePath"
+                                                    name="icon-{{child.MenuID}}" class="form-input" placeholder="" />
                                             </div>
                                         </div>
                                     </div>
