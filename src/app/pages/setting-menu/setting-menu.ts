@@ -16,7 +16,7 @@ import { MenuAllForm } from "../../components/features/menu-all-form/menu-all-fo
 import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @Component({
-  selector: 'app-setting',
+  selector: 'app-setting-menu',
   standalone: true,
   imports: [
     CommonModule,
@@ -30,10 +30,10 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
     MenuAllForm,
     NzModalModule
   ],
-  templateUrl: './setting.html',
-  styleUrl: './setting.scss',
+  templateUrl: './setting-menu.html',
+  styleUrl: './setting-menu.scss',
 })
-export class Setting implements OnInit {
+export class SettingMenu implements OnInit {
 
   private loadingService = inject(LoadingService);
   private settingService = inject(SettingService);
@@ -229,7 +229,8 @@ export class Setting implements OnInit {
   // เลือกเมนู
   selectMenu(menu: any) {
     // console.log(this.menus, this.rolePermissionMap)
-    if (!menu.IsEnabled) return;
+
+    // if (!menu.IsEnabled) return;
 
     this.selectedMenu = menu;
 
@@ -333,8 +334,6 @@ export class Setting implements OnInit {
     console.log("summaryTable >>> ", this.summaryTable)
     this.isViewSummaryOpen.set(true);
   }
-
-
 
   formatPermission(p: any): string {
     if (!p) return '-';

@@ -109,8 +109,14 @@ export const routes: Routes = [
                 data: { animation: 'Dashboard' }
             },
             {
-                path: 'setting',
-                loadComponent: () => import('./pages/setting/setting').then(m => m.Setting),
+                path: 'menu-setting',
+                loadComponent: () => import('./pages/setting-menu/setting-menu').then(m => m.SettingMenu),
+                // canActivate: [menuGuard],
+                data: { animation: 'Dashboard' }
+            },
+            {
+                path: 'employee-setting',
+                loadComponent: () => import('./pages/setting-employee/setting-employee').then(m => m.SettingEmployee),
                 // canActivate: [menuGuard],
                 data: { animation: 'Dashboard' }
             },
