@@ -41,7 +41,7 @@ export class ItServiceMockService {
     private tickets = signal<Ticket[]>([
         {
             ticketId: '1',
-            ticketNumber: '#REQ-00023',
+            ticketNumber: '#Ticket00023',
             subject: 'ขอติดตั้งโปรแกรม Oracle',
             ticketType: 'ขอใช้บริการ',
             description: 'รบกวนติดตั้งโปรแกรม Oracle Client สำหรับใช้งานฐานข้อมูล...',
@@ -64,7 +64,7 @@ export class ItServiceMockService {
         },
         {
             ticketId: '2',
-            ticketNumber: '#REQ-00022',
+            ticketNumber: '#Ticket00022',
             subject: 'หน้าจอคอมพิวเตอร์กะพริบ',
             ticketType: 'แจ้งซ่อม',
             description: 'หน้าจอฟลิกเกอร์ตลอดเวลาหลังจากใช้งานไปได้สักพัก...',
@@ -90,7 +90,7 @@ export class ItServiceMockService {
     addTicket(newTicket: Partial<Ticket>) {
         const fullTicket: Ticket = {
             ticketId: Date.now().toString(),
-            ticketNumber: `#REQ-${String(this.tickets().length + 1).padStart(5, '0')}`,
+            ticketNumber: `#Ticket${String(this.tickets().length + 1).padStart(5, '0')}`,
             subject: newTicket.subject || 'Untitled Ticket',
             ticketType: newTicket.ticketType || 'ทั่วไป',
             description: newTicket.description || '',
