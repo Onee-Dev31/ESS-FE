@@ -87,4 +87,8 @@ export class MasterDataService {
     getDepartmentMaster(): Observable<any> {
         return this._http.get(`${this.baseUrl}/Master/company-costcent`);
     }
+
+    getRoleMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/roles/active`);
+    }
 }
