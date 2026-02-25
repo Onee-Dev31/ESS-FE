@@ -1,10 +1,12 @@
 import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
+import { ItServiceMockService } from '../../services/it-service-mock.service';
 
 @Component({
     selector: 'app-it-service-request',
@@ -18,6 +20,8 @@ export class ITServiceRequestComponent implements OnInit {
     // Inject Services
     private swalService = inject(SwalService);
     private userService = inject(UserService);
+    private itServiceMock = inject(ItServiceMockService);
+    private router = inject(Router);
 
     serviceOptions = signal([
         { label: 'บริการ Internet', value: 'internet', checked: false, disabled: false, icon: 'fa-wifi' },
@@ -330,8 +334,20 @@ export class ITServiceRequestComponent implements OnInit {
 
         this.submittedRequests.update(reqs => [newRequest, ...reqs]);
 
+        // Mock shared state
+        this.itServiceMock.addTicket({
+            subject: selectedServices.map(s => s.label).join(', '),
+            ticketType: 'ขอใช้บริการ',
+            description: this.requestDetails(),
+            status: 'Assigned Tickets',
+            requesterName: 'พนักงาน (Self)',
+        });
+
         this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
         this.showSummaryModal.set(false);
+
+        // Redirect to list page
+        this.router.navigate(['/it-service-list']);
 
         this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.isSystemCategorySelected.set(false);

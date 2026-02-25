@@ -124,7 +124,9 @@ $table-label-bg: #f1f5f9;
 .it-request-page {
     padding: 40px;
     background-color: $bg-page;
-    min-height: 100vh;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
     font-family: $font-main;
 
     .form-group {

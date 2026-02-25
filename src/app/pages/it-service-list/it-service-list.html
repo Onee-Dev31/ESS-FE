@@ -1,0 +1,173 @@
+<div class="it-service-container">
+
+    <!-- Left Sidebar (Ticket List) -->
+    <aside class="ticket-sidebar">
+        <div class="sidebar-header">
+            <h2>Tickets</h2>
+            <button class="filter-btn">
+                <i class="fas fa-chevron-down"></i> All Tickets
+            </button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search by Ticket Number and Name" [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)">
+        </div>
+
+        <div class="ticket-list">
+            <div class="ticket-item" *ngFor="let ticket of mockTickets()"
+                [class.active]="selectedTicket().ticketId === ticket.ticketId" (click)="selectTicket(ticket)">
+                <div class="avatar" [style.background-color]="ticket.requesterColor">
+                    {{ ticket.requesterInitials }}
+                </div>
+                <div class="ticket-info">
+                    <div class="ticket-header">
+                        <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+                        <div class="ticket-meta-right">
+                            <i class="fas fa-thumbtack pin-icon"></i>
+                            <i class="fas fa-comment text-icon"></i>
+                        </div>
+                    </div>
+                    <div class="ticket-title-row">
+                        <div class="ticket-title">{{ ticket.subject }}</div>
+                        <span class="ticket-time">{{ ticket.createdDate | date:'shortTime' }}</span>
+                    </div>
+                    <div class="ticket-footer">
+                        <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
+                        <span class="ticket-status-inline" [ngClass]="{
+                            'status-assigned': ticket.status === 'Assigned Tickets',
+                            'status-in-process': ticket.status === 'In Process Tickets',
+                            'status-closed': ticket.status === 'Closed Tickets',
+                            'status-overdue': ticket.status === 'Overdue Tickets'
+                        }">
+                            <i class="fas fa-sync-alt"></i> {{ ticket.status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area (Ticket Details) -->
+    <main class="ticket-main-content">
+
+        <div class="main-header">
+            <div class="header-left">
+                <div class="avatar-large" [style.background-color]="selectedTicket().requesterColor">
+                    {{ selectedTicket().requesterInitials }}
+                </div>
+                <h2>{{ selectedTicket().subject }}</h2>
+            </div>
+            <div class="header-right">
+                <div class="status-badge" [ngClass]="{
+                            'status-assigned': selectedTicket().status === 'Assigned Tickets',
+                            'status-in-process': selectedTicket().status === 'In Process Tickets',
+                            'status-closed': selectedTicket().status === 'Closed Tickets',
+                            'status-overdue': selectedTicket().status === 'Overdue Tickets'
+                }">
+                    <i class="fas fa-check-circle"></i> {{ selectedTicket().status }}
+                </div>
+            </div>
+        </div>
+
+        <div class="content-sections">
+            <!-- Details Section -->
+            <section class="card-section">
+                <div class="card-header">
+                    <h3>รายละเอียด</h3>
+                    <div class="services-badges">
+                        <span class="badge badge-outline">{{ selectedTicket().ticketType }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>{{ selectedTicket().description }}</p>
+                </div>
+            </section>
+
+            <!-- Attachments Section -->
+            <section class="card-section">
+                <div class="card-header">
+                    <h3>เอกสารแนบ</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="attachment-list" *ngIf="selectedTicket().attachments.length > 0; else noAttachments">
+                        <li *ngFor="let file of selectedTicket().attachments" class="attachment-item"
+                            (click)="viewFile(file)">
+                            <i class="fas fa-paperclip"></i> <span class="file-name">{{ file.fileName }}</span>
+                        </li>
+                    </ul>
+                    <ng-template #noAttachments>
+                        <p class="text-muted">ไม่มีเอกสารแนบ</p>
+                    </ng-template>
+                </div>
+            </section>
+
+            <!-- IT Notes Section -->
+            <section class="card-section">
+                <div class="card-header">
+                    <h3>Note จาก IT ({{ selectedTicket().assigneeName }})</h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ selectedTicket().itNotes }}</p>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons-bottom">
+                <button class="btn btn-action btn-add-note">
+                    <i class="fas fa-sticky-note"></i> เพิ่ม Note
+                </button>
+                <button class="btn btn-action btn-forward">
+                    <i class="fas fa-share"></i> ส่งต่อ
+                </button>
+                <button class="btn btn-action btn-close-ticket">
+                    <i class="fas fa-check-circle"></i> ปิดงาน
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Panel (User & IT Info) -->
+    <aside class="info-sidebar">
+        <div class="info-card">
+            <div class="profile-section">
+                <p class="info-card-label">ผู้รับผิดชอบ</p>
+                <div class="profile-avatar">{{ selectedTicket().assigneeAduser?.substring(0, 2)?.toUpperCase() }}</div>
+                <h3 class="profile-email">{{ selectedTicket().assigneeEmail }}</h3>
+
+                <div class="ticket-ref-box">
+                    <span class="ref-label">Ticket number :</span>
+                    <span class="ref-value">{{ selectedTicket().ticketNumber }}</span>
+                    <button class="icon-btn btn-green"><i class="fas fa-copy"></i></button>
+                    <button class="icon-btn btn-green"><i class="fas fa-file-download"></i></button>
+                </div>
+            </div>
+
+            <div class="user-details-form">
+                <div class="form-group row">
+                    <label>Name :</label>
+                    <input type="text" [value]="selectedTicket().assigneeName" readonly>
+                    <div class="arrow-toggle">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label>Email :</label>
+                    <input type="email" [value]="selectedTicket().assigneeEmail" readonly>
+                    <i class="fas fa-copy copy-icon"></i>
+                </div>
+                <div class="form-group row">
+                    <label>Phone :</label>
+                    <input type="text" [value]="selectedTicket().assigneePhone" readonly>
+                    <i class="fas fa-copy copy-icon"></i>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    @if (isPreviewModalOpen()) {
+    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
+    }
+</div>

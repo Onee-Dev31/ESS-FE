@@ -8,6 +8,7 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { ItServiceMockService } from '../../services/it-service-mock.service';
 
 @Component({
   selector: 'app-it-repair-request',
@@ -20,6 +21,7 @@ export class ItRepairRequestComponent implements OnInit {
   private swalService = inject(SwalService);
   private userService = inject(UserService);
   private router = inject(Router);
+  private itServiceMock = inject(ItServiceMockService);
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
 
@@ -232,8 +234,27 @@ export class ItRepairRequestComponent implements OnInit {
     };
 
     this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+
+    this.itServiceMock.addTicket({
+      subject: `Repair: ${data.device} ${data.brand} ${data.model}`,
+      ticketType: 'แจ้งซ่อม',
+      description: data.symptom,
+      status: 'Assigned Tickets',
+      requesterName: 'พนักงาน (Self)',
+      attachments: data.attachments.map(a => ({
+        fileName: a.name,
+        filePath: URL.createObjectURL(a.file),
+        fileType: a.file.type,
+        fileSize: a.file.size || 0
+      }))
+    });
+
     this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว');
     this.showSummaryModal.set(false);
+
+    // Redirect to list page
+    this.router.navigate(['/it-service-list']);
+
     this.repairFormData.set({ device: '', brand: '', model: '', symptom: '', phoneNumber: '', attachments: [] });
   }
 

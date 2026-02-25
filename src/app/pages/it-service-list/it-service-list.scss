@@ -1,0 +1,581 @@
+.it-service-container {
+    display: flex;
+    height: calc(100vh - 64px);
+    background-color: #f5f6f8;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+// ==========================
+// Left Sidebar: Ticket List
+// ==========================
+.ticket-sidebar {
+    width: 380px;
+    background-color: #fff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #eee;
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .filter-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            &:hover {
+                background-color: #f9f9f9;
+            }
+        }
+    }
+
+    .search-box {
+        padding: 12px 20px;
+        position: relative;
+        border-bottom: 1px solid #eee;
+
+        .search-icon {
+            position: absolute;
+            left: 32px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 10px 10px 36px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+
+            &:focus {
+                outline: none;
+                border-color: #1a73e8;
+                background-color: #fff;
+            }
+        }
+    }
+
+    .ticket-list {
+        flex: 1;
+        overflow-y: auto;
+
+        .ticket-item {
+            display: flex;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: #fcfcfc;
+            }
+
+            &.active {
+                background-color: #e8f0fe;
+                border-left: 4px solid #1a73e8;
+                padding-left: 16px;
+            }
+
+            .avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: 0.9rem;
+                margin-right: 12px;
+                flex-shrink: 0;
+            }
+
+            .ticket-info {
+                flex: 1;
+                min-width: 0;
+
+                .ticket-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 4px;
+
+                    .ticket-number {
+                        font-size: 0.8rem;
+                        color: #1a73e8;
+                        font-weight: 500;
+                    }
+
+                    .ticket-meta-right {
+                        display: flex;
+                        gap: 12px;
+                        color: #888;
+                        font-size: 0.8rem;
+                    }
+                }
+
+                .ticket-title-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 4px;
+                    gap: 8px;
+
+                    .ticket-title {
+                        font-weight: 600;
+                        font-size: 0.95rem;
+                        color: #333;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        flex: 1;
+                    }
+
+                    .ticket-time {
+                        color: #999;
+                        font-size: 0.75rem;
+                        white-space: nowrap;
+                        flex-shrink: 0;
+                    }
+                }
+
+                .ticket-footer {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 0.8rem;
+                    color: #666;
+
+                    .ticket-type {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 120px;
+                    }
+
+                    .ticket-status-inline {
+                        margin-left: auto;
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        font-weight: 500;
+
+                        &.status-assigned {
+                            background-color: #e3f2fd;
+                            color: #1976d2;
+                        }
+
+                        &.status-in-process {
+                            background-color: #fff3e0;
+                            color: #f57c00;
+                        }
+
+                        &.status-closed {
+                            background-color: #e8f5e9;
+                            color: #388e3c;
+                        }
+
+                        &.status-overdue {
+                            background-color: #ffebee;
+                            color: #d32f2f;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ==========================
+// Main Content Area
+// ==========================
+.ticket-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+
+    .main-header {
+        background-color: #1a73e8;
+        color: white;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .avatar-large {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 1.2rem;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            h2 {
+                margin: 0;
+                font-size: 1.3rem;
+                font-weight: 600;
+            }
+        }
+
+        .header-right {
+            .status-badge {
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                &.status-assigned {
+                    background-color: #ffffff;
+                    color: #1a73e8;
+                    font-weight: 600;
+                }
+
+                &.status-in-process {
+                    background-color: #f57c00;
+                    color: white;
+                }
+
+                &.status-closed {
+                    background-color: #388e3c;
+                    color: white;
+                }
+
+                &.status-overdue {
+                    background-color: #d32f2f;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .content-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .card-section {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eaeaea;
+            overflow: hidden;
+
+            .card-header {
+                background-color: #1a73e8;
+                color: white;
+                padding: 12px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                h3 {
+                    margin: 0;
+                    font-size: 1.05rem;
+                    font-weight: 500;
+                }
+
+                .services-badges {
+                    display: flex;
+                    gap: 10px;
+
+                    .badge-outline {
+                        border: 1px solid rgba(255, 255, 255, 0.5);
+                        padding: 4px 12px;
+                        border-radius: 16px;
+                        font-size: 0.8rem;
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+                }
+            }
+
+            .card-body {
+                padding: 20px;
+                min-height: 100px;
+                color: #444;
+                font-size: 0.95rem;
+                line-height: 1.5;
+
+                .attachment-list {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+
+                    .attachment-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 8px 12px;
+                        margin-bottom: 8px;
+                        border-radius: 6px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #eee;
+                        cursor: pointer;
+                        transition: all 0.2s;
+
+                        i {
+                            color: #666;
+                        }
+
+                        .file-name {
+                            color: #333;
+                        }
+
+                        &:hover {
+                            background-color: #e8f0fe;
+                            border-color: #1a73e8;
+
+                            i,
+                            .file-name {
+                                color: #1a73e8;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .action-buttons-bottom {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 20px;
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+
+            &:hover {
+                opacity: 0.85;
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+
+        .btn-add-note {
+            background-color: #1a73e8;
+            color: #fff;
+        }
+
+        .btn-forward {
+            background-color: #f57c00;
+            color: #fff;
+        }
+
+        .btn-close-ticket {
+            background-color: #388e3c;
+            color: #fff;
+        }
+    }
+}
+
+// ==========================
+// Right Info Sidebar
+// ==========================
+.info-sidebar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+
+    .info-card-label {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: black;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 8px 4px;
+    }
+
+    .info-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        height: 100%;
+
+        .profile-section {
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background-color: #e57373;
+                color: white;
+                font-size: 2rem;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 16px;
+            }
+
+            .profile-email {
+                margin: 0 0 16px 0;
+                font-size: 1rem;
+                color: #333;
+                font-weight: 600;
+            }
+
+            .ticket-ref-box {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-size: 0.85rem;
+
+                .ref-label {
+                    color: #666;
+                }
+
+                .ref-value {
+                    color: #1a73e8;
+                    font-weight: 500;
+                }
+
+                .icon-btn {
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 0.75rem;
+
+                    &:hover {
+                        background-color: color-mix(in srgb, #1a73e8, black 10%);
+                    }
+                }
+            }
+        }
+
+        .user-details-form {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+
+            .arrow-toggle {
+                width: 24px;
+                height: 24px;
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #666;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .form-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                label {
+                    width: 50px;
+                    white-space: nowrap;
+                    font-size: 0.9rem;
+                    color: #555;
+                    text-align: right;
+                }
+
+                input {
+                    flex: 1;
+                    padding: 8px 8px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                    color: #333;
+                    background-color: #fcfcfc;
+                    min-width: 0;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+
+                .copy-icon {
+                    color: #1a73e8;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                }
+            }
+        }
+
+        .empty-box-area {
+            flex: 1;
+            border: 2px solid #333;
+            border-radius: 4px;
+            min-height: 150px;
+            margin-top: 10px;
+        }
+    }
+}
