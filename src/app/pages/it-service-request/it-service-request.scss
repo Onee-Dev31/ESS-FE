@@ -1297,6 +1297,26 @@ $table-label-bg: #f1f5f9;
             }
         }
 
+        .btn-secondary-action {
+            padding: 10px 22px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            background: #fff;
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+
+            &:hover {
+                background: #f1f5f9;
+                border-color: #94a3b8;
+                color: #374151;
+            }
+        }
+
         .btn-primary-action {
             padding: 10px 24px;
             border: none;
@@ -1319,6 +1339,16 @@ $table-label-bg: #f1f5f9;
 
             &:active {
                 transform: translateY(0);
+            }
+
+            &.disabled-btn {
+                background: #e2e8f0 !important;
+                color: #94a3b8 !important;
+                border: none !important;
+                cursor: not-allowed !important;
+                box-shadow: none !important;
+                transform: none !important;
+                filter: none !important;
             }
         }
     }

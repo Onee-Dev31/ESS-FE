@@ -15,7 +15,8 @@
 
         <div class="form-section">
             <h3 class="section-title">
-                ประเภทบริการ (Service Type) <i class="fas fa-laptop-medical ml-2 text-muted"></i>
+                ประเภทบริการ (Service Type) <span class="required-badge">*</span>
+                <i class="fas fa-laptop-medical ml-2 text-muted"></i>
             </h3>
             <div class="checkbox-grid">
                 @for (service of serviceOptions(); track service.value; let i = $index) {
@@ -78,7 +79,7 @@
 
             <!-- Open For Dropdown -->
             <div class="form-group">
-                <label class="form-label">เปิดสิทธิ์ให้ (Open For)</label>
+                <label class="form-label">เปิดสิทธิ์ให้ (Open For) <span class="required-badge">*</span></label>
                 <div class="input-pair-row">
                     <select class="form-control" [ngModel]="selectedOpenFor()"
                         (ngModelChange)="selectedOpenFor.set($event)">
@@ -121,7 +122,11 @@
         <!-- Actions Footer -->
         <div class="form-actions-row">
             <span class="actions-hint"><i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลให้ครบถ้วนก่อนส่ง</span>
-            <button class="btn-primary-action" (click)="submit()">
+            <button class="btn-secondary-action" (click)="clearForm()">
+                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+            </button>
+            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
+                [class.disabled-btn]="!isFormValid()">
                 <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
             </button>
         </div>

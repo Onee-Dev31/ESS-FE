@@ -1539,6 +1539,16 @@ $table-label-bg: #f1f5f9;
             &:active {
                 transform: translateY(0);
             }
+
+            &.disabled-btn {
+                background: #e2e8f0 !important;
+                color: #94a3b8 !important;
+                border: none !important;
+                cursor: not-allowed !important;
+                box-shadow: none !important;
+                transform: none !important;
+                filter: none !important;
+            }
         }
     }
 

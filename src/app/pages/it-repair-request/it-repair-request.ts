@@ -6,11 +6,13 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
+import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-it-repair-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent],
   templateUrl: './it-repair-request.html',
   styleUrl: './it-repair-request.scss'
 })
@@ -50,6 +52,9 @@ export class ItRepairRequestComponent implements OnInit {
     const formatted = PhoneUtil.formatPhoneNumber(value);
     this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
   }
+
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   // Searchable Dropdown Logic
   searchTerm = signal('');
@@ -169,10 +174,20 @@ export class ItRepairRequestComponent implements OnInit {
   viewFile(fileObj: any) {
     if (fileObj.file) {
       const url = URL.createObjectURL(fileObj.file);
-      window.open(url, '_blank');
+      this.previewFiles.set([{
+        fileName: fileObj.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: url,
+        type: fileObj.file.type
+      }]);
+      this.isPreviewModalOpen.set(true);
     } else {
       this.swalService.info('แจ้งเตือน', 'ไฟล์นี้เป็นข้อมูลตัวอย่าง ไม่สามารถเปิดดูได้จริง');
     }
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 
   submit() {
@@ -181,6 +196,21 @@ export class ItRepairRequestComponent implements OnInit {
       return;
     }
     this.showSummaryModal.set(true);
+  }
+
+  clearForm() {
+    this.repairFormData.set({
+      device: '',
+      brand: '',
+      model: '',
+      symptom: '',
+      phoneNumber: '',
+      attachments: []
+    });
+    this.searchTerm.set('');
+    this.isDropdownOpen.set(false);
+    // Re-fetch phone number from profile if available
+    this.ngOnInit();
   }
 
   closePage() {

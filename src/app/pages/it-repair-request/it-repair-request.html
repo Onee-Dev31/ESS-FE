@@ -124,7 +124,8 @@
                         <div class="file-tag-container mt-2">
                             @for (file of repairFormData().attachments; track $index) {
                             <div class="file-tag">
-                                <span>{{ file.name }}</span>
+                                <span class="cursor-pointer" (click)="viewFile(file)" title="คลิกเพื่อดูตัวอย่าง">{{
+                                    file.name }}</span>
                                 <button class="remove-btn" (click)="removeAttachment($index)"><i
                                         class="fas fa-times"></i></button>
                             </div>
@@ -153,8 +154,8 @@
 
         <!-- Actions -->
         <div class="form-actions-row">
-            <button class="btn-secondary-action" (click)="closePage()">
-                <i class="fas fa-times mr-2"></i> ยกเลิก
+            <button class="btn-secondary-action" (click)="clearForm()">
+                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
             </button>
             <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
                 [class.disabled-btn]="!isFormValid()">
@@ -356,5 +357,9 @@
             </div>
         </div>
     </div>
+    }
+    @if (isPreviewModalOpen()) {
+    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
     }
 </div>

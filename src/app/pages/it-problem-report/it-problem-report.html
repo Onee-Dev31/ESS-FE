@@ -70,6 +70,7 @@
                 <label class="field-label">
                     <i class="fas fa-tags field-icon"></i>
                     หมวดหมู่ปัญหา
+                    <span class="required-badge">*</span>
                 </label>
                 <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p>
             </div>
@@ -136,10 +137,11 @@
 
         <!-- Actions -->
         <div class="form-actions-row">
-            <button class="btn-secondary-action" (click)="closePage()">
-                <i class="fas fa-times mr-2"></i> ยกเลิก
+            <button class="btn-secondary-action" (click)="clearForm()">
+                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
             </button>
-            <button class="btn-primary-action" (click)="submit()">
+            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
+                [class.disabled-btn]="!isFormValid()">
                 <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
             </button>
         </div>

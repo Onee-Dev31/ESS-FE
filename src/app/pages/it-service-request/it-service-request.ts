@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
@@ -58,6 +58,35 @@ export class ITServiceRequestComponent implements OnInit {
 
     requestDetails = signal('');
     phoneNumber = signal('');
+
+    isFormValid = computed(() => {
+        const services = this.serviceOptions();
+        const hasService = services.some(s => s.checked);
+        const openFor = this.selectedOpenFor();
+        const otherNameValid = openFor !== 'other' || this.otherOpenForName().trim().length > 0;
+
+        // Sub-validation for "Request System" (ขอใช้ระบบ)
+        const isRequestSystemChecked = services.find(s => s.value === 'request_system')?.checked;
+        let subValidationPassed = true;
+
+        if (isRequestSystemChecked) {
+            const types = this.selectedSystemTypes();
+            const hasType = types.length > 0;
+
+            const hasUserType = types.includes('user');
+            const hasSystemType = types.includes('system');
+
+            const userSubSelected = this.userSubOptions().some(o => o.checked);
+            const systemSubSelected = this.systemSubOptions().some(o => o.checked);
+
+            // Must have at least one type selected, and if a type is selected, must have sub-options
+            subValidationPassed = hasType &&
+                (!hasUserType || userSubSelected) &&
+                (!hasSystemType || systemSubSelected);
+        }
+
+        return hasService && otherNameValid && subValidationPassed;
+    });
 
     ngOnInit() {
         this.userService.getUserProfile().subscribe((profile: UserProfile) => {
@@ -197,6 +226,27 @@ export class ITServiceRequestComponent implements OnInit {
 
     closeSummaryModal() {
         this.showSummaryModal.set(false);
+    }
+
+    clearForm() {
+        this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.isSystemCategorySelected.set(false);
+        this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        this.selectedOpenFor.set('self');
+        this.otherOpenForName.set('');
+        this.requestDetails.set('');
+        this.selectedSystemTypes.set([]);
+
+        // Re-fetch phone number from profile
+        this.userService.getUserProfile().subscribe((profile: UserProfile) => {
+            if (profile?.phone) {
+                const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
+                this.phoneNumber.set(formatted);
+            } else {
+                this.phoneNumber.set('');
+            }
+        });
     }
 
 

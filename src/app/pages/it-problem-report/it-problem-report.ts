@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -42,6 +42,11 @@ export class ItProblemReportComponent implements OnInit {
     const formatted = PhoneUtil.formatPhoneNumber(value);
     this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
   }
+
+  isFormValid = computed(() => {
+    const { topic, detail, categories } = this.problemFormData();
+    return topic.trim().length > 0 && detail.trim().length > 0 && categories.length > 0;
+  });
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
@@ -134,6 +139,18 @@ export class ItProblemReportComponent implements OnInit {
       return;
     }
     this.showSummaryModal.set(true);
+  }
+
+  clearForm() {
+    this.problemFormData.set({
+      topic: '',
+      detail: '',
+      phoneNumber: '',
+      categories: [],
+      attachments: []
+    });
+    // Re-fetch phone number from profile if available
+    this.ngOnInit();
   }
 
   closePage() {
