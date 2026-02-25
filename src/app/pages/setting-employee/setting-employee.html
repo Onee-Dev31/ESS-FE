@@ -90,6 +90,42 @@
             </table>
             }
         </div>
+        <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
+            @for (emp of activeComps.paginatedData(); track emp.empCode) {
+            <div class="mobile-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <span class="ticket-no">{{ emp.fullNameTh }}</span>
+                        <div class="text-muted small">{{ emp.empCode }}</div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-building"></i> แผนก:</span>
+                        <span class="value">{{ emp.department }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
+                        <span class="value">{{ emp.company }} </span>
+                    </div>
+
+                    <div class="card-footer-actions" style="grid-template-columns: 1fr;">
+                        <button class="btn-edit-sm" title="กำหนดสิทธิ์" (click)="openRoleModal(emp)">
+                            <i class="fa-solid fa-shield-halved"></i> กำหนดสิทธิ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+            } @empty {
+            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์" icon="fas fa-users-slash">
+            </app-empty-state>
+            }
+            }
+        </div>
         <div class="pagination-wrapper">
             <app-pagination [currentPage]="activeListing.currentPage()" [pageSize]="activeListing.pageSize()"
                 [totalItems]="activeListing.totalItems()" (onPageChange)="goToPage($event)"
