@@ -41,11 +41,11 @@ export class MenuAllForm {
 
       this.menusInternal = this.menusInternal.map((menu: any) => ({
         ...menu,
-        isExpanded: true,
+        isExpanded: false,
+        // isExpanded: true,
         children: menu.children ?? []
       }));
       this.generateDropListIds();
-
     }
   }
 
