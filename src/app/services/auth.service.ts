@@ -15,31 +15,41 @@ import { UserMock } from '../mocks/auth-user.mock';
 import { LoadingService } from './loading';
 import { ToastService } from './toast';
 import { environment } from '../../environments/environment';
+import { PhoneUtil } from '../utils/phone.util';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private baseUrl = environment.api_url;
+
     private _http = inject(HttpClient);
+    private loadingService = inject(LoadingService);
+    private toastService = inject(ToastService);
+
     private allowanceService = inject(AllowanceService);
     private medicalService = inject(MedicalexpensesService);
     private taxiService = inject(TaxiService);
     private transportService = inject(TransportService);
     private timeOffService = inject(TimeOffService);
-    private loadingService = inject(LoadingService);
-    private toastService = inject(ToastService);
-
-
-    private readonly MOCK_USERS = UserMock.MOCK_USERS;
 
     private _currentUser = signal<string | null>(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
     private _userRole = signal<string | null>(localStorage.getItem(STORAGE_KEYS.USER_ROLE));
     private _isLoggedIn = signal<boolean>(localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true');
+    private _userData = signal<any | null>(this.getStoredUser());
+
 
     currentUser = this._currentUser.asReadonly();
     userRole = this._userRole.asReadonly();
     isLoggedIn = this._isLoggedIn.asReadonly();
+    userData = this._userData.asReadonly();
+
+    readonly userPhone = computed(() => {
+        const user = this._userData();
+        return user?.USR_MOBILE
+            ? PhoneUtil.formatPhoneNumber(user.USR_MOBILE)
+            : '';
+    });
 
     isAdmin = computed(() => {
         const role = this._userRole();
@@ -50,41 +60,17 @@ export class AuthService {
     isSupervisor = computed(() => this._userRole() === USER_ROLES.SUPERVISOR);
     isExecutive = computed(() => this._userRole() === USER_ROLES.EXECUTIVE);
 
-    /** ตรวจสอบสิทธิ์การเข้าใช้งาน (Login) และบันทึกข้อมูลลง LocalStorage */
-    // login(email: string, password: string, rememberMe: boolean = false): Observable<boolean> {
-    //     this.loadingService.show();
-    //     const user = this.MOCK_USERS.find(u => u.username === email && u.password === password);
+    private getStoredUser(): any | null {
+        const data = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+        if (!data) return null;
 
-    //     return of(!!user).pipe(
-    //         delay(1000),
-    //         tap(isValid => {
-    //             if (isValid && user) {
-    //                 localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
-    //                 localStorage.setItem(STORAGE_KEYS.CURRENT_USER, user.name || '');
-    //                 localStorage.setItem(STORAGE_KEYS.USER_ROLE, user.role || '');
-    //                 localStorage.setItem(STORAGE_KEYS.EMPLOYEE_ID, user.employeeId || '');
+        try {
+            return JSON.parse(data);
+        } catch {
+            return null;
+        }
+    }
 
-    //                 if (rememberMe) {
-    //                     localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, 'true');
-    //                     localStorage.setItem(STORAGE_KEYS.REMEMBERED_EMAIL, email);
-    //                 } else {
-    //                     localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
-    //                     localStorage.removeItem(STORAGE_KEYS.REMEMBERED_EMAIL);
-    //                 }
-
-    //                 this._isLoggedIn.set(true);
-    //                 this._currentUser.set(user.name);
-    //                 this._userRole.set(user.role);
-
-    //                 this.refreshAllMockData();
-    //                 this.toastService.success(`Welcome back, ${user.name}!`);
-    //             } else {
-    //                 this.toastService.error('Invalid username or password.');
-    //             }
-    //         }),
-    //         finalize(() => this.loadingService.hide())
-    //     );
-    // }
     login(username: string, password: string): Observable<any> {
         this.loadingService.show();
         return this._http.post<any>(`${this.baseUrl}/auth/login`, {
@@ -97,10 +83,12 @@ export class AuthService {
                     localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
                     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
                     localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
+                    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.employee) || '');
 
                     this._isLoggedIn.set(true);
                     this._currentUser.set(response.adUser);
                     this._userRole.set(response.permission.Role);
+                    this._userData.set(response.employee);
                 }
             }),
             finalize(() => {
@@ -116,10 +104,12 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEYS.USER_ROLE);
         localStorage.removeItem(STORAGE_KEYS.EMPLOYEE_ID);
         localStorage.removeItem(STORAGE_KEYS.ALL_DATA);
+        localStorage.removeItem(STORAGE_KEYS.USER_DATA);
 
         this._isLoggedIn.set(false);
         this._currentUser.set(null);
         this._userRole.set(null);
+        this._userData.set(null);
 
         this.refreshAllMockData();
     }

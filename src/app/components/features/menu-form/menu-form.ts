@@ -40,9 +40,9 @@ export class MenuForm implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
-      console.log('Modal opened');
-      console.log('menusParent:', this.menusParent);
-      console.log('ORDER_NO:', this.ORDER_NO);
+      // console.log('Modal opened');
+      // console.log('menusParent:', this.menusParent);
+      // console.log('ORDER_NO:', this.ORDER_NO);
       this.formData.orderNo = this.ORDER_NO + 1
     }
   }
@@ -52,7 +52,7 @@ export class MenuForm implements OnChanges {
   }
 
   handleSubmit() {
-    console.log(this.formData)
+    // console.log(this.formData)
     this.onSubmit.emit(this.formData);
   }
 

@@ -15,6 +15,7 @@ interface MenuItem {
     name: string;
     icon: string;
     iconType?: string,
+    path?: string | null;
     subItems: SubMenuItem[];
     role?: string | string[];
 }
@@ -121,6 +122,7 @@ export class Sidebar {
                     name: parent.Label,
                     icon: parent.Icon,
                     iconType: parent.Icon && parent.Icon.includes('fa') ? 'fa' : 'material',
+                    path: parent.RoutePath && parent.RoutePath.trim() !== '' ? (parent.RoutePath.startsWith('/') ? parent.RoutePath : `/${parent.RoutePath}`) : null,
                     subItems: menus
                         .filter((child: any) => child.ParentMenuID === parent.MenuID)
                         .map((child: any) => ({
@@ -143,9 +145,20 @@ export class Sidebar {
 
     });
 
-    toggleMenu(menuName: string) {
-        this.openMenu = this.openMenu === menuName ? null : menuName;
+    toggleMenu(item: MenuItem) {
+        if (item.path) {
+            this.router.navigate([item.path]);
+        }
+
+        if (this.openMenu === item.name) {
+            if (item.name === 'IT Service') return;
+            this.openMenu = null;
+            return;
+        }
+
+        this.openMenu = item.name;
     }
+
 
     isSubMenuActive(path: string): boolean {
         return this.router.url === path;

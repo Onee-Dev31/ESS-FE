@@ -103,25 +103,18 @@ export class SettingMenu implements OnInit {
 
         const newData = this.selectedMenuPermissions
 
-        const rolePermissionsMap = this.selectedMenuPermissions.map(item => ({
+        const payload = this.selectedMenuPermissions.map(item => ({
           RoleID: item.RoleID,
-          Permissions: {
-            View: item.CanView,
-            canCreate: item.CanCreate,
-            canUpdate: item.CanUpdate,
-            canDelete: item.CanDelete,
-            canApprove: item.CanApprove
-          }
+          View: item.CanView,
+          CanCreate: item.CanCreate,
+          CanUpdate: item.CanUpdate,
+          CanDelete: item.CanDelete,
+          CanApprove: item.CanApprove
         }));
 
-        const payload = {
-          menuID: newData[0].MenuID,
-          rolePermissions: rolePermissionsMap
-        }
+        console.log('payload:', newData[0].MenuID, payload);
 
-        console.log('payload:', payload);
-
-        this.settingService.updateMenuRolePermission(payload).subscribe({
+        this.settingService.updateMenuRolePermission(newData[0].MenuID, payload).subscribe({
           next: (res) => {
             // console.log(res)
 
@@ -133,8 +126,6 @@ export class SettingMenu implements OnInit {
         });
         this.IS_EDIT_MODE = false;
       });
-
-
   }
 
   handleCancel() {
@@ -163,12 +154,12 @@ export class SettingMenu implements OnInit {
 
         this.settingService.updateMenu(payload).subscribe({
           next: (res) => {
-            console.log(res)
-
+            // console.log(res)
             if (res?.success) {
               this.swalService.success(res.message)
             }
             this.getMenu();
+            this.selectedMenu = null
             this.closeAllMenuForm();
           }
         });
@@ -331,7 +322,7 @@ export class SettingMenu implements OnInit {
       permissions: permissionMap[menu.MenuID] || {}
     }));
 
-    console.log("summaryTable >>> ", this.summaryTable)
+    // console.log("summaryTable >>> ", this.summaryTable)
     this.isViewSummaryOpen.set(true);
   }
 
@@ -352,7 +343,7 @@ export class SettingMenu implements OnInit {
   getMenu() {
     this.settingService.getMenu().subscribe({
       next: (res) => {
-        console.log(res.data);
+        // console.log(res.data);
 
         const rawMenus = res.data.menus;
 

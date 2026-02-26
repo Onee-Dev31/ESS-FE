@@ -1,0 +1,257 @@
+<app-it-dashboard-summary (statusChange)="onStatusChange($event)"></app-it-dashboard-summary>
+<div class="tk-page">
+
+    <!-- LEFT: ticket list -->
+    <aside class="tk-left">
+        <div class="tk-left__top">
+            <div class="tk-left__title">Tickets</div>
+            <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
+                <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
+                <nz-option nzValue="open" nzLabel="Open"></nz-option>
+                <nz-option nzValue="inprocess" nzLabel="In Process"></nz-option>
+                <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+                <nz-option nzValue="done" nzLabel="Done"></nz-option>
+            </nz-select>
+            <!-- <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
+
+            </nz-select> -->
+        </div>
+
+        <div class="tk-left__search">
+            <span class="material-symbols-outlined ic">search</span>
+            <input [(ngModel)]="keyword" placeholder="Search by Ticket Number and Name" />
+        </div>
+
+        <div class="tk-left__list">
+            <div class="tk-item" *ngFor="let t of filteredTickets(); trackBy: trackById"
+                [class.active]="t.id === selectedId" (click)="selectTicket(t)">
+                <div class="tk-item__avatar" [style.background]="t.avatarBg">
+                    {{ t.avatar }}
+                </div>
+
+                <div class="tk-item__body">
+                    <div class="tk-item__top">
+                        <div class="tk-item__no">#{{ t.ticketNo }}</div>
+                        <div class="tk-item__time">{{ t.time }}</div>
+                    </div>
+
+                    <div class="tk-item__title">{{ t.title }}</div>
+
+                    <div class="tk-item__meta">
+                        <span class="tk-pill" [class.pill-orange]="t.status==='inprocess' || t.status ==='open'"
+                            [class.pill-blue]="t.status==='assigned'" [class.pill-green]="t.status==='done'">
+                            <span class="dot"></span>
+                            {{ statusLabel(t.status) }}
+                        </span>
+                        <span class="tk-item__type">{{ t.typeLabel }}</span>
+                    </div>
+                </div>
+
+                <div class="tk-item__icons">
+                    <button nz-button nzType="text" nzSize="small" class="ic-btn">
+                        <nz-icon nzType="comment" nzTheme="outline" /> </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CENTER: ticket content -->
+    <main class="tk-center">
+        <ng-container *ngIf="selectedTicket as t; else emptyState">
+
+            <!-- HERO -->
+            <section class="tk-hero">
+                <div class="tk-hero__left">
+                    <div class="tk-hero__avatar" [style.background]="t.avatarBg">{{ t.avatar }}</div>
+                    <div>
+                        <div class="tk-hero__title">{{ t.title }}</div>
+                        <div class="tk-hero__sub">
+                            <span class="muted">Ticket</span>
+                            <b class="mono">#{{ t.ticketNo }}</b>
+
+                            <span class="sep">•</span>
+                            <span class="muted">{{ t.createdAt }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tk-hero__right">
+                    <span class="tk-pill pill-lg" [class.pill-orange]="t.status==='inprocess'"
+                        [class.pill-blue]="t.status==='assigned'" [class.pill-green]="t.status==='done'">
+                        <span class="dot"></span>
+                        {{ statusLabel(t.status) }}
+                    </span>
+                </div>
+            </section>
+
+            <!-- DETAILS -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">
+                        รายละเอียด
+                    </div>
+                </div>
+
+                <div class="tk-card__body">
+                    <div class="tk-text">
+                        {{ t.description }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- ATTACHMENTS -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">เอกสารแนบ</div>
+                </div>
+
+                <div class="tk-card__body">
+                    <div class="att-list" *ngIf="t.attachments.length; else noFile">
+                        <div class="att" *ngFor="let f of t.attachments">
+                            <div class="att__ic">
+                                <span class="material-symbols-outlined">description</span>
+                            </div>
+                            <div class="att__body">
+                                <div class="att__name">{{ f.name }}</div>
+                                <div class="att__sub">{{ f.size }} • {{ f.type }}</div>
+                            </div>
+                            <div class="att__actions">
+                                <button nz-button nzType="default" nzSize="small" (click)="previewFile(f)">
+                                    <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
+                                    ดู
+                                </button>
+                                <button nz-button nzType="default" nzSize="small" (click)="downloadFile(f)">
+                                    <nz-icon nzType="download" nzTheme="outline"></nz-icon>
+                                    ดาวน์โหลด
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-template #noFile>
+                        <div class="tk-empty">ไม่มีเอกสารแนบ</div>
+                    </ng-template>
+                </div>
+            </section>
+
+            <!-- NOTES -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">Note</div>
+                    <button style="border-radius: 10px;" nz-button nzType="primary" (click)="openAddNote()">
+                        <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
+                        เพิ่ม Note
+                    </button>
+                </div>
+
+                <div class="tk-card__body">
+                    <div class="note-list" *ngIf="t.notes.length; else noNote">
+                        <div class="note" *ngFor="let n of t.notes">
+                            <div class="note__top">
+                                <div class="note__who">
+                                    <span class="bubble" [style.background]="n.avatarBg">{{ n.avatar }}</span>
+                                    <b>{{ n.by }}</b>
+                                    <span class="muted">{{ n.byRole }}</span>
+                                </div>
+                                <div class="muted">{{ n.time }}</div>
+                            </div>
+                            <div class="note__msg">{{ n.message }}</div>
+                        </div>
+                    </div>
+
+                    <ng-template #noNote>
+                        <div class="tk-empty">ยังไม่มี Note</div>
+                    </ng-template>
+                </div>
+            </section>
+
+            <!-- bottom actions (optional, keep like original) -->
+            <section class="tk-actions">
+                <button nz-button nzType="default" (click)="openAddNote()">
+                    <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
+                    เพิ่ม Note
+                </button>
+                <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
+                    <nz-icon nzType="export" nzTheme="outline"></nz-icon>
+                    ส่งต่อ
+                </button>
+                <button nz-button nzType="primary" nzDanger (click)="closeTicket()">
+                    <nz-icon nzType="check-circle" nzTheme="fill"></nz-icon>
+                    ปิดงาน
+                </button>
+            </section>
+
+        </ng-container>
+
+        <ng-template #emptyState>
+            <div class="tk-empty-center">
+                <div class="big">เลือก Ticket ทางซ้ายเพื่อดูรายละเอียด</div>
+            </div>
+        </ng-template>
+    </main>
+
+    <!-- RIGHT: assignee/requester -->
+    <aside class="tk-right" *ngIf="selectedTicket as t">
+        <div class="tk-right__sticky">
+
+            <section class="side-card">
+                <div class="side-title">ผู้รับผิดชอบ</div>
+
+                <div class="side-profile">
+                    <div class="side-avatar" [style.background]="t.assignee.avatarBg">
+                        {{ t.assignee.avatar }}
+                    </div>
+                    <div class="side-name">{{ t.assignee.name }}</div>
+                    <div class="side-email">{{ t.assignee.email }}</div>
+                </div>
+
+                <div class="side-fields">
+                    <div class="sf">
+                        <div class="sf__label">Ticket number</div>
+                        <div class="sf__value mono">
+                            #{{ t.ticketNo }}
+                            <button nz-button nzType="text" nzSize="small" class="copy" (click)="copy('#'+t.ticketNo)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sf">
+                        <div class="sf__label">Name</div>
+                        <div class="sf__value">
+                            {{ t.requester.name }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.name)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sf">
+                        <div class="sf__label">Email</div>
+                        <div class="sf__value">
+                            {{ t.requester.email }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.email)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sf">
+                        <div class="sf__label">Phone</div>
+                        <div class="sf__value">
+                            {{ t.requester.phone }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.phone)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </aside>
+
+</div>

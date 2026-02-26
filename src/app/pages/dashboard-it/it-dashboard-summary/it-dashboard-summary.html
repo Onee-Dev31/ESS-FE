@@ -1,0 +1,55 @@
+<!-- KPI CARDS -->
+<section class="kpi-row">
+    <div class="kpi" *ngFor="let k of kpis; trackBy: trackByKey" [class.active]="activeStatus === k.key"
+        (click)="selectStatus(k.key)">
+        <div class="kpi-top">
+            <div class="kpi-title">{{ k.title }}</div>
+
+            <span class="kpi-pill" [class.pill-blue]="k.key==='open'" [class.pill-cyan]="k.key==='assigned'"
+                [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='done'"
+                [class.pill-gray]="k.key==='all'">
+                <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
+            </span>
+        </div>
+
+        <div class="kpi-value">{{ k.value | number }} <span>
+                <div class="kpi-delta" [class.up]="k.delta >= 0" [class.down]="k.delta < 0">
+                    <span>{{ getPercent(k) }}%</span>
+                </div>
+            </span>
+        </div>
+
+        <div class="kpi-hint">{{ k.hint }}</div>
+    </div>
+</section>
+
+<!-- ================= CHART ROW ================= -->
+
+<div class="chart-row">
+
+    <!-- Status Pie -->
+    <div class="chart-card">
+        <div class="chart-title">Status Distribution</div>
+
+        <div echarts class="echart" [options]="statusPieOption" (chartInit)="onStatusChartInit($event)"
+            (chartClick)="onStatusPieClick($event)">
+        </div>
+    </div>
+
+    <!-- Service Pie -->
+    <div class="chart-card">
+        <div class="chart-title">Service Type</div>
+
+        <div echarts class="echart" [options]="servicePieOption">
+        </div>
+    </div>
+
+    <!-- Company Bar -->
+    <div class="chart-card bar-card">
+        <div class="chart-title">Top 5 Companies</div>
+
+        <div echarts class="echart bar" [options]="companyBarOption">
+        </div>
+    </div>
+
+</div>

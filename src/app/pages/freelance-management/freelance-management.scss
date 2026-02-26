@@ -356,7 +356,7 @@ $border: #dee2e6;
     box-sizing: border-box;
 
     @include large-tablet {
-        padding: 12px;
+        padding: 20px;
         padding-bottom: 5px;
     }
 
@@ -384,7 +384,7 @@ $border: #dee2e6;
 
         .filter-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 1.5rem;
             flex-wrap: wrap;
 
@@ -393,18 +393,14 @@ $border: #dee2e6;
             }
 
             .filter-group-main {
-                display: flex;
+                display: grid;
                 flex: 1;
                 gap: 1rem;
-
-                @include tablet {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    width: 100%;
-                }
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 
                 .form-control {
-                    flex: 1;
+                    width: 100%;
+                    min-width: 0;
                     height: 42px;
                     border: 1px solid #e2e8f0;
                     border-radius: 8px;

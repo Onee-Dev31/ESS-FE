@@ -4,7 +4,6 @@ import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
 import { AuthService } from '../../services/auth.service';
 import { USER_ROLES } from '../../constants/user-roles.constant';
-import * as signalR from '@microsoft/signalr';
 import { ToastService } from '../../services/toast';
 import { SignalrService } from '../../services/signalr.service';
 

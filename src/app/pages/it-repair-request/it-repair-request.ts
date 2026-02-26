@@ -1,4 +1,4 @@
-import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,8 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { ItServiceMockService } from '../../services/it-service-mock.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-it-repair-request',
@@ -20,6 +22,8 @@ export class ItRepairRequestComponent implements OnInit {
   private swalService = inject(SwalService);
   private userService = inject(UserService);
   private router = inject(Router);
+  private itServiceMock = inject(ItServiceMockService);
+  private authService = inject(AuthService);
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
 
@@ -39,13 +43,23 @@ export class ItRepairRequestComponent implements OnInit {
     attachments: [] as { name: string, size?: number, file: File }[]
   });
 
-  ngOnInit() {
-    this.userService.getUserProfile().subscribe((profile: UserProfile) => {
-      if (profile?.phone) {
-        const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
-        this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
+  constructor() {
+    effect(() => {
+      const userData = this.authService.userData();
+
+      if (userData?.USR_MOBILE) {
+        const formatted = PhoneUtil.formatPhoneNumber(userData?.USR_MOBILE);
+
+        this.repairFormData.update(data => ({
+          ...data,
+          phoneNumber: formatted
+        }));
       }
     });
+  }
+
+  ngOnInit() {
+
   }
 
   onPhoneNumberChange(value: string) {
@@ -232,8 +246,27 @@ export class ItRepairRequestComponent implements OnInit {
     };
 
     this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+
+    this.itServiceMock.addTicket({
+      subject: `Repair: ${data.device} ${data.brand} ${data.model}`,
+      ticketType: 'แจ้งซ่อม',
+      description: data.symptom,
+      status: 'Assigned Tickets',
+      requesterName: 'พนักงาน (Self)',
+      attachments: data.attachments.map(a => ({
+        fileName: a.name,
+        filePath: URL.createObjectURL(a.file),
+        fileType: a.file.type,
+        fileSize: a.file.size || 0
+      }))
+    });
+
     this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว');
     this.showSummaryModal.set(false);
+
+    // Redirect to list page
+    this.router.navigate(['/it-service-list']);
+
     this.repairFormData.set({ device: '', brand: '', model: '', symptom: '', phoneNumber: '', attachments: [] });
   }
 

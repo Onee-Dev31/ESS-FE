@@ -28,6 +28,12 @@ export const routes: Routes = [
                 ]
             },
             {
+                path: 'it-dashboard',
+                loadComponent: () => import('./pages/dashboard-it/dashboard-it').then(m => m.DashboardIT),
+                canActivate: [menuGuard],
+                data: { animation: 'Welcome' }
+            },
+            {
                 path: 'welcome',
                 loadComponent: () => import('./pages/welcome/welcome').then(m => m.WelcomeComponent),
                 canActivate: [menuGuard],
@@ -107,6 +113,12 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
                 canActivate: [menuGuard],
                 data: { animation: 'Dashboard' }
+            },
+            {
+                path: 'it-service-list',
+                loadComponent: () => import('./pages/it-service-list/it-service-list').then(m => m.ItService),
+                canActivate: [menuGuard],
+                data: { animation: 'ITRequest' }
             },
             {
                 path: 'menu-setting',

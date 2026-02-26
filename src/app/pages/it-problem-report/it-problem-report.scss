@@ -127,6 +127,10 @@ $table-label-bg: #f1f5f9;
     min-height: 100vh;
     font-family: $font-main;
 
+    @media (max-width: 768px) {
+        padding: 10px;
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -871,6 +875,7 @@ $table-label-bg: #f1f5f9;
     }
 }
 
+
 /* ==========================================================================
    7. REPAIR & PROBLEM SUMMARY CARDS
    ========================================================================== */
@@ -1355,7 +1360,7 @@ $table-label-bg: #f1f5f9;
     .cat-tag {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        // gap: 6px;
         padding: 6px 14px;
         border: 1.5px solid #d1d5db;
         border-radius: 999px;
