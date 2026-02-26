@@ -29,6 +29,10 @@ export class ItService {
     this.selectedTicket.set(ticket);
   }
 
+  clearSelection() {
+    this.selectedTicket.set(undefined);
+  }
+
   viewFile(file: any) {
     this.previewFiles.set([{
       fileName: file.fileName,
