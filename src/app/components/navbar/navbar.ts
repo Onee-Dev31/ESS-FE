@@ -58,7 +58,7 @@ export class NavbarComponent {
   ngOnInit() {
     this.notifyAudio.volume = 0.7;
     this.signalrService
-    .on('NewTicket','/welcome')
+    .on('NewTicket','/it-service-list')
     .subscribe(data => {
 
       this.zone.run(() => {

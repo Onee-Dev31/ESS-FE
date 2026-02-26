@@ -228,7 +228,6 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log("formData", [...formData.entries()]);
-    this.signalrService.sendTestRealtime()
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.createTicket(formData)
@@ -241,6 +240,7 @@ export class ItProblemReportComponent implements OnInit {
           // console.log(res);
           if (res.success) {
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
+              this.signalrService.sendTestRealtime()
               this.clearForm();
               this.router.navigate(['/it-service-list']);
             });
