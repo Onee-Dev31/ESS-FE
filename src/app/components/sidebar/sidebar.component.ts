@@ -149,8 +149,16 @@ export class Sidebar {
         if (item.path) {
             this.router.navigate([item.path]);
         }
-        this.openMenu = this.openMenu === item.name ? null : item.name;
+
+        if (this.openMenu === item.name) {
+            if (item.name === 'IT Service') return;
+            this.openMenu = null;
+            return;
+        }
+
+        this.openMenu = item.name;
     }
+
 
     isSubMenuActive(path: string): boolean {
         return this.router.url === path;

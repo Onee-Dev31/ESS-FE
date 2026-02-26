@@ -28,6 +28,12 @@ export const routes: Routes = [
                 ]
             },
             {
+                path: 'it-dashboard',
+                loadComponent: () => import('./pages/dashboard-it/dashboard-it').then(m => m.DashboardIT),
+                canActivate: [menuGuard],
+                data: { animation: 'Welcome' }
+            },
+            {
                 path: 'welcome',
                 loadComponent: () => import('./pages/welcome/welcome').then(m => m.WelcomeComponent),
                 canActivate: [menuGuard],

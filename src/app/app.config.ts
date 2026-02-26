@@ -16,6 +16,7 @@ import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeTh from '@angular/common/locales/th';
 import { NzI18nInterface, provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
+import { provideAppNzIcons } from './icons.provider';
 
 registerLocaleData(localeTh);
 
@@ -51,6 +52,7 @@ export const appConfig: ApplicationConfig = {
       matSelfImprovement,
       tablerGrave2,
       tablerFlower
-    })
+    }),
+    provideAppNzIcons(),
   ]
 };
