@@ -88,8 +88,8 @@ export class ItDashboardSummary {
 
   // ====== 3) Top Companies Bar ======
   private buildCompanyBar() {
-    const labels = ['ONEE', 'GTV', 'FLD', 'ARTS'];
-    const values = [120, 85, 60, 40];
+    const labels = ['ONEE', 'GTV', 'FLD', 'ARTS', 'O31'];
+    const values = [120, 85, 60, 40,20];
 
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
