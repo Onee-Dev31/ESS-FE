@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
 
 @Injectable({
@@ -19,6 +19,34 @@ export class ItServiceService {
 
   getDeviceCategory(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/device-categories`);
+  }
+
+  getServiceType(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/service-types`);
+  }
+
+  getOpenFor(
+    { currentEmpId, costCent, companyCode }: {
+      currentEmpId?: string;
+      costCent?: string;
+      companyCode?: string;
+    }): Observable<any> {
+
+    let params = new HttpParams();
+
+    if (currentEmpId) {
+      params = params.set('currentEmpId', currentEmpId);
+    }
+
+    if (costCent) {
+      params = params.set('costCent', costCent);
+    }
+
+    if (companyCode) {
+      params = params.set('companyCode', companyCode);
+    }
+
+    return this._http.get(`${this.baseUrl}/Master/open-for`, { params });
   }
 
   //GET
@@ -50,8 +78,6 @@ export class ItServiceService {
 
   }
 
-
-  //it-problem-report
   createTicket(formData: FormData): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
     return this._http.post(`${this.baseUrl}/tickets`, formData);

@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,6 +7,9 @@ import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
 import { ItServiceMockService } from '../../services/it-service-mock.service';
+import { ItServiceService } from '../../services/it-service.service';
+import { AuthService } from '../../services/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-it-service-request',
@@ -21,34 +24,22 @@ export class ITServiceRequestComponent implements OnInit {
     private swalService = inject(SwalService);
     private userService = inject(UserService);
     private itServiceMock = inject(ItServiceMockService);
+    private itServiceService = inject(ItServiceService);
+    private authService = inject(AuthService);
+    private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
 
-    serviceOptions = signal([
-        { label: 'บริการ Internet', value: 'internet', checked: false, disabled: false, icon: 'fa-wifi' },
-        { label: 'บริการ Email', value: 'email', checked: false, disabled: false, icon: 'fa-envelope' },
-        { label: 'File Sharing', value: 'fileshare', checked: false, disabled: false, icon: 'fa-share-alt' },
-        { label: 'ขอแก้ไขสิทธิ', value: 'access_edit', checked: false, disabled: false, icon: 'fa-user-lock' },
-        { label: 'ขอ Unlock User', value: 'unlock_user', checked: false, disabled: false, icon: 'fa-unlock-alt' },
-        { label: 'ขอใช้ระบบ', value: 'request_system', checked: false, disabled: false, icon: 'fa-desktop' },
-        { label: 'บริการอื่นๆ', value: 'other', checked: false, disabled: false, icon: 'fa-ellipsis-h' }
-    ]);
+    phoneModel = '';
+    phoneNumber = signal('');
+    requestDetails = signal('');
+
+
+    // MASTER
+    serviceOptions = signal<any[]>([])
+    userSubOptions = signal<any[]>([])
+    systemSubOptions = signal<any[]>([])
 
     isSystemCategorySelected = signal(false);
-
-    userSubOptions = signal([
-        { label: 'ห้องประชุม', value: 'meeting_room', checked: false, icon: 'fa-handshake' },
-        { label: 'ห้องนวด', value: 'massage_room', checked: false, icon: 'fa-spa' }
-    ]);
-
-    systemSubOptions = signal([
-        { label: 'Oracle', value: 'oracle', checked: false, icon: 'fa-database' },
-        { label: 'BMS', value: 'bms', checked: false, icon: 'fa-server' },
-        { label: 'ONEE', value: 'onee', checked: false, icon: 'fa-globe' },
-        { label: 'ONENEWS', value: 'onenews', checked: false, icon: 'fa-newspaper' },
-        { label: 'ONE', value: 'one', checked: false, icon: 'fa-tv' },
-        { label: 'CLF', value: 'clf', checked: false, icon: 'fa-film' },
-        { label: 'AGM', value: 'agm', checked: false, icon: 'fa-users' }
-    ]);
 
     // Open For State
     openForOptions = signal([
@@ -59,9 +50,6 @@ export class ITServiceRequestComponent implements OnInit {
     ]);
     selectedOpenFor = signal<string>('self');
     otherOpenForName = signal<string>('');
-
-    requestDetails = signal('');
-    phoneNumber = signal('');
 
     isFormValid = computed(() => {
         const services = this.serviceOptions();
@@ -89,16 +77,30 @@ export class ITServiceRequestComponent implements OnInit {
                 (!hasSystemType || systemSubSelected);
         }
 
-        return hasService && otherNameValid && subValidationPassed;
+        const detailValid = this.requestDetails().trim().length > 0;
+        const phoneValid = this.phoneNumber().trim().length > 0;
+        return hasService && otherNameValid && subValidationPassed && detailValid && phoneValid;
     });
 
     ngOnInit() {
-        this.userService.getUserProfile().subscribe((profile: UserProfile) => {
-            if (profile?.phone) {
-                const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
-                this.phoneNumber.set(formatted);
-            }
-        });
+        this.getServiceType();
+        this.getOpenFor();
+        const userData = this.authService.userData();
+        if (userData?.USR_MOBILE) {
+            const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
+            this.phoneModel = formatted;
+            this.phoneNumber.set(formatted);
+        }
+    }
+
+    onPhoneInput(event: Event) {
+        const input = event.target as HTMLInputElement;
+        let digitsOnly = input.value.replace(/\D/g, '');
+        digitsOnly = digitsOnly.slice(0, 10);
+        const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
+        input.value = formatted;
+        this.phoneModel = formatted;
+        this.phoneNumber.set(formatted);
     }
 
     onPhoneNumberChange(value: string) {
@@ -126,6 +128,8 @@ export class ITServiceRequestComponent implements OnInit {
 
     toggleSystemType(type: string) {
         this.selectedSystemTypes.update(types => {
+
+            console.log("types", types)
             if (types.includes(type)) {
                 return types.filter(t => t !== type);
             } else {
@@ -242,6 +246,13 @@ export class ITServiceRequestComponent implements OnInit {
         this.requestDetails.set('');
         this.selectedSystemTypes.set([]);
 
+        this.phoneNumber.set('');
+
+        const original = this.authService.userPhone();
+        this.phoneModel = '';
+        this.cdr.detectChanges();
+        this.phoneModel = original;
+
         // Re-fetch phone number from profile
         this.userService.getUserProfile().subscribe((profile: UserProfile) => {
             if (profile?.phone) {
@@ -312,48 +323,76 @@ export class ITServiceRequestComponent implements OnInit {
             openForDisplay = selected ? selected.label : '';
         }
 
-        const systemData = {
-            selectedTypes: [...this.selectedSystemTypes()],
-            userOptions: this.userSubOptions().filter(o => o.checked).map(o => o.label),
-            systemOptions: this.systemSubOptions().filter(o => o.checked).map(o => o.label)
-        };
+        const userOptions = this.userSubOptions().filter(o => o.checked)
+        const systemOptions = this.systemSubOptions().filter(o => o.checked)
 
-        const newRequest = {
-            id: Date.now(),
-            displayId: this.nextRequestId,
-            date: new Date(),
-            services: selectedServices.map(s => s.label),
-            details: this.requestDetails(),
-            repairData: null,
-            problemData: null,
-            systemData: systemData,
-            openFor: openForDisplay,
-            phoneNumber: this.phoneNumber(),
-            status: 'Pending'
-        };
+        const formData = new FormData();
+        formData.append('ticketTypeId', '3');
 
-        this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+        formData.append('openForCodeempid', this.selectedOpenFor());
+        formData.append('description', this.requestDetails());
+        formData.append('requesterAduser', this.authService.currentUser() || '-');
+        formData.append('contactPhone', this.phoneNumber());
 
-        // Mock shared state
-        this.itServiceMock.addTicket({
-            subject: selectedServices.map(s => s.label).join(', '),
-            ticketType: 'ขอใช้บริการ',
-            description: this.requestDetails(),
-            status: 'Assigned Tickets',
-            requesterName: 'พนักงาน (Self)',
+        selectedServices.forEach(service => {
+            formData.append('serviceTypeIds', service.id.toString());
         });
 
-        this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
-        this.showSummaryModal.set(false);
+        userOptions.forEach(service => {
+            formData.append('serviceTypeIds', service.id.toString());
+        });
 
-        // Redirect to list page
-        this.router.navigate(['/it-service-list']);
+        systemOptions.forEach(service => {
+            formData.append('serviceTypeIds', service.id.toString());
+        });
 
-        this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.isSystemCategorySelected.set(false);
-        this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.phoneNumber.set('');
+        console.log("formData", [...formData.entries()]);
+
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.itServiceService.createTicket(formData)
+            .pipe(
+                finalize(() => {
+                    this.closeSummaryModal();
+                })
+            ).subscribe({
+                next: (res) => {
+                    // console.log(res);
+                    if (res.success) {
+                        // this.signalrService.sendTestRealtime()
+                        this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
+                            this.clearForm();
+                            this.router.navigate(['/it-service-list']);
+                        });
+                    }
+                },
+                error: (error) => {
+                    console.error('Error fetching data:', error.error.message);
+                    // const message = error?.error?.message || '';
+                }
+            });
+
+        // this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+
+        // Mock shared state
+        // this.itServiceMock.addTicket({
+        //     subject: selectedServices.map(s => s.label).join(', '),
+        //     ticketType: 'ขอใช้บริการ',
+        //     description: this.requestDetails(),
+        //     status: 'Assigned Tickets',
+        //     requesterName: 'พนักงาน (Self)',
+        // });
+
+        // this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
+        // this.showSummaryModal.set(false);
+
+        // // Redirect to list page
+        // this.router.navigate(['/it-service-list']);
+
+        // this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        // this.isSystemCategorySelected.set(false);
+        // this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        // this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
+        // this.phoneNumber.set('');
     }
 
     closeRepairModal() {
@@ -430,5 +469,54 @@ export class ITServiceRequestComponent implements OnInit {
     closeHistoryDetailModal() {
         this.showHistoryDetailModal.set(false);
         this.selectedRequest.set(null);
+    }
+
+
+    // GET MASTER
+    getServiceType() {
+        this.itServiceService.getServiceType().subscribe({
+            next: (res) => {
+                console.log(res.data);
+                const mappedServices_main = res.data.mainServices.map((item: any) => ({
+                    ...item,
+                    checked: false,
+                    disabled: false
+                }));
+
+                this.serviceOptions.set(mappedServices_main);
+
+                const mappedServices_user = res.data.userSubOptions.map((item: any) => ({
+                    ...item,
+                    checked: false
+                }));
+
+                this.userSubOptions.set(mappedServices_user);
+
+                const mappedServices_system = res.data.systemSubOptions.map((item: any) => ({
+                    ...item,
+                    checked: false
+                }));
+
+                this.systemSubOptions.set(mappedServices_system);
+
+
+                // this.availableCategories = res.data
+                // this.cdr.detectChanges();
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+    getOpenFor() {
+        this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
+            next: (res) => {
+                console.log(res.data);
+                this.openForOptions.set(res.data)
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
     }
 }

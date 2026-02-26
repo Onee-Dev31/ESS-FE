@@ -620,6 +620,11 @@ $table-label-bg: #f1f5f9;
                 animation: slideDown 0.3s ease-out;
             }
         }
+
+        .required-badge {
+            color: #ef4444;
+            font-size: 0.85rem;
+        }
     }
 
     @keyframes slideInRight {

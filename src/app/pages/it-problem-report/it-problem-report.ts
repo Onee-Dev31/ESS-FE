@@ -28,7 +28,7 @@ export class ItProblemReportComponent implements OnInit {
   private swalService = inject(SwalService);
   private userService = inject(UserService);
   private router = inject(Router);
-  
+
   private signalrService = inject(SignalrService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -240,8 +240,8 @@ export class ItProblemReportComponent implements OnInit {
         next: (res) => {
           // console.log(res);
           if (res.success) {
+            this.signalrService.sendTestRealtime()
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
-              this.signalrService.sendTestRealtime()
               this.clearForm();
               this.router.navigate(['/it-service-list']);
             });

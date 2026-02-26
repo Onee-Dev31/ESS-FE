@@ -98,6 +98,7 @@
         <div class="form-section">
             <h3 class="section-title">
                 รายละเอียด (Details)
+                <span class="required-badge">*</span>
             </h3>
 
             <div class="form-group mb-4">
@@ -106,9 +107,9 @@
             </div>
 
             <div class="form-group mb-4 mt-3">
-                <label class="form-label">เบอร์โทรติดต่อ (Phone Number)</label>
-                <input type="text" class="form-control" [ngModel]="phoneNumber()"
-                    (ngModelChange)="onPhoneNumberChange($event)" placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
+                <label class="form-label">เบอร์โทรติดต่อ (Phone Number) <span class="required-badge">*</span></label>
+                <input type="text" class="form-control" [value]="phoneModel" (input)="onPhoneInput($event)"
+                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
         </div>
 
