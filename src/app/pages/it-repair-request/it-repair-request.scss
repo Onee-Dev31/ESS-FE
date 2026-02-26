@@ -129,6 +129,10 @@ $table-label-bg: #f1f5f9;
     box-sizing: border-box;
     font-family: $font-main;
 
+    @media (max-width: 768px) {
+        padding: 10px;
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;

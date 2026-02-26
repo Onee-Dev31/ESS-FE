@@ -50,8 +50,8 @@
                         <div class="category-group">
                             <div class="category-header">{{ cat.group }}</div>
                             @for (item of cat.items; track item) {
-                            <div class="dropdown-item" (click)="selectDevice(item)">
-                                {{ item }}
+                            <div class="dropdown-item" (click)="selectDevice(item, cat)">
+                                {{ item.name }}
                             </div>
                             }
                         </div>
@@ -143,11 +143,11 @@
                 <label class="field-label">
                     <i class="fas fa-phone-alt field-icon"></i>
                     เบอร์โทรติดต่อ
+                    <span class="required-badge">*</span>
                 </label>
             </div>
             <div class="field-input-col">
-                <input type="text" [ngModel]="repairFormData().phoneNumber"
-                    (ngModelChange)="onPhoneNumberChange($event)" class="styled-input"
+                <input type="text" [value]="phoneModel" (input)="onPhoneInput($event)" class="styled-input"
                     placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
         </div>
@@ -169,7 +169,9 @@
     <div class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2>ยืนยันการแจ้งซ่อม <span class="req-id">{{ nextRequestId }}</span></h2>
+                <h2>ยืนยันการแจ้งซ่อม
+                    <!-- <span class="req-id">{{ nextRequestId }}</span> -->
+                </h2>
                 <button class="btn-close-modal" (click)="closeSummaryModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -178,7 +180,7 @@
                     <table class="info-table vertical-table">
                         <tr>
                             <th>อุปกรณ์</th>
-                            <td>{{ repairFormData().device }}</td>
+                            <td>{{ repairFormData().device.name }}</td>
                         </tr>
                         <tr>
                             <th>ยี่ห้อ</th>
