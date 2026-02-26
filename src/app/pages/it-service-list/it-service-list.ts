@@ -19,7 +19,7 @@ export class ItService {
 
   mockTickets = this.itServiceMock.ticketsSignal;
 
-  selectedTicket = signal<Ticket>(this.mockTickets()[0]);
+  selectedTicket = signal<Ticket | undefined>(undefined);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
