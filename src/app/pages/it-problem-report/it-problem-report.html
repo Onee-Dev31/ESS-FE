@@ -44,10 +44,10 @@
                 <!-- Selected category chips (appear inside box) -->
                 @if (problemFormData().categories.length > 0) {
                 <div class="selected-chips-bar">
-                    @for (cat of problemFormData().categories; track cat) {
+                    @for (cat of problemFormData().categories; track cat.id) {
                     <span class="selected-chip">
                         <i class="fas fa-tag chip-icon"></i>
-                        {{ cat }}
+                        {{ cat.sub_category_name }}
                         <button type="button" class="chip-remove" (click)="toggleCategory(cat)">
                             <i class="fas fa-times"></i>
                         </button>
@@ -76,12 +76,12 @@
             </div>
             <div class="field-input-col">
                 <div class="category-tags">
-                    @for (cat of availableCategories; track cat) {
+                    @for (cat of availableCategories; track cat.id) {
                     <button type="button" class="cat-tag"
                         [class.cat-tag--active]="problemFormData().categories.includes(cat)"
                         (click)="toggleCategory(cat)">
                         <i class="fas fa-check-circle check-icon"></i>
-                        {{ cat }}
+                        {{ cat.sub_category_name }}
                     </button>
                     }
                 </div>
@@ -98,7 +98,8 @@
                 <p class="field-hint">รองรับไฟล์รูปภาพ, PDF, และเอกสารทั่วไป</p>
             </div>
             <div class="field-input-col">
-                <div class="dropzone" (click)="fileInput.click()">
+                <div class="dropzone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
+                    (drop)="onDrop($event)">
                     <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
                     <p class="dropzone-text">คลิกหรือลากไฟล์มาวางที่นี่</p>
                     <p class="dropzone-hint">รองรับหลายไฟล์พร้อมกัน</p>
@@ -126,6 +127,7 @@
                 <label class="field-label">
                     <i class="fas fa-phone-alt field-icon"></i>
                     เบอร์โทรติดต่อ
+                    <span class="required-badge">*</span>
                 </label>
             </div>
             <div class="field-input-col">
@@ -152,7 +154,9 @@
     <div class="modal-overlay">
         <div class="modal-container">
             <div class="modal-header">
-                <h2>ยืนยันการแจ้งปัญหา <span class="req-id">{{ nextRequestId }}</span></h2>
+                <h2>ยืนยันการแจ้งปัญหา
+                    <!-- <span class="req-id">{{ nextRequestId }}</span> -->
+                </h2>
                 <button class="btn-close-modal" (click)="closeSummaryModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -172,8 +176,8 @@
                             <td>
                                 @if (problemFormData().categories.length > 0) {
                                 <div class="d-flex flex-wrap gap-1">
-                                    @for (cat of problemFormData().categories; track cat) {
-                                    <span class="badge badge-primary mr-1">{{ cat }}</span>
+                                    @for (cat of problemFormData().categories; track cat.id) {
+                                    <span class="badge badge-primary mr-1">{{ cat.sub_category_name }}</span>
                                     }
                                 </div>
                                 } @else {
