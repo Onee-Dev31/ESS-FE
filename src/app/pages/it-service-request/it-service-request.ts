@@ -177,15 +177,6 @@ export class ITServiceRequestComponent implements OnInit {
 
     showSummaryModal = signal(false);
 
-
-
-
-
-    get nextRequestId() {
-        const nextId = this.submittedRequests().length + 1;
-        return `#REQ2602-${String(nextId).padStart(4, '0')}`;
-    }
-
     submit() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
 
@@ -263,54 +254,6 @@ export class ITServiceRequestComponent implements OnInit {
             }
         });
     }
-
-
-
-    submittedRequests = signal<any[]>([
-        {
-            id: 3,
-            displayId: '#REQ2602-0003',
-            date: new Date('2026-02-19T10:45:00'),
-            services: ['แจ้งปัญหา'],
-            problemData: {
-                topic: 'ระบบ ONEE เข้าใช้งานไม่ได้',
-                detail: 'ล็อกอินแล้วขึ้น Error 500 ตลอดเวลา'
-            },
-            openFor: 'พนักงาน ข (Employee B)',
-            phoneNumber: '089-999-8888',
-            status: 'Pending',
-            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] }
-        },
-        {
-            id: 2,
-            displayId: '#REQ2602-0002',
-            date: new Date('2026-02-19T08:15:00'),
-            services: ['แจ้งซ่อม'],
-            repairData: {
-                device: 'Printer',
-                brand: 'Brother',
-                model: 'HL-L2370DN',
-                symptom: 'กระดาษติดบ่อย และหมึกจาง'
-            },
-            openFor: 'พนักงาน ก (Employee A)',
-            status: 'Pending',
-            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] }
-        },
-        {
-            id: 1,
-            displayId: '#REQ2602-0001',
-            date: new Date('2026-02-18T09:30:00'),
-            services: ['บริการ Internet', 'บริการ Email'],
-            details: 'ความเร็ว Internet ช้าลง และเปิด App Email ไม่ขึ้น',
-            openFor: 'ตนเอง (Self)',
-            status: 'Approved',
-            systemData: { selectedTypes: [], userOptions: [], systemOptions: [] },
-            emailAccount: {
-                email: 'employee.test@onemail.com',
-                password: 'InitialPassword123!'
-            }
-        }
-    ]);
 
     confirmSubmission() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
