@@ -40,6 +40,7 @@
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
+    "@microsoft/signalr": "^10.0.0",
     "@ng-icons/akar-icons": "^33.0.0",
     "@ng-icons/bootstrap-icons": "^33.0.0",
     "@ng-icons/core": "^33.0.0",

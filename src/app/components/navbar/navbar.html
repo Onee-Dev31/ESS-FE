@@ -47,13 +47,13 @@
       <div class="notification-dropdown" (click)="$event.stopPropagation()">
         <button class="icon-btn" (click)="toggleNotification()">
           <i class="fas fa-bell"></i>
-          <span class="badge">{{ notifications.length }}</span>
+          <span class="badge">{{ notifications().length }}</span>
         </button>
 
         <div class="dropdown-menu" *ngIf="isNotificationOpen">
           <div class="dropdown-header">การแจ้งเตือนล่าสุด</div>
 
-          <a href="javascript:void(0)" class="dropdown-item" *ngFor="let item of notifications">
+          <a href="javascript:void(0)" class="dropdown-item" *ngFor="let item of notifications()">
             <div class="icon-circle" [ngClass]="{
                 blue: item.status === 'pending',
                 green: item.status === 'approved',

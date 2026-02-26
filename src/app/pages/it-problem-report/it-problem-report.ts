@@ -9,6 +9,10 @@ import { PhoneUtil } from '../../utils/phone.util';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 
+import { HttpClient } from '@angular/common/http';
+import * as signalR from '@microsoft/signalr';
+import { SignalrService } from '../../services/signalr.service';
+
 @Component({
   selector: 'app-it-problem-report',
   standalone: true,
@@ -20,6 +24,8 @@ export class ItProblemReportComponent implements OnInit {
   private swalService = inject(SwalService);
   private userService = inject(UserService);
   private router = inject(Router);
+  
+  private signalrService = inject(SignalrService);
 
   problemFormData = signal({
     topic: '',
@@ -173,6 +179,8 @@ export class ItProblemReportComponent implements OnInit {
       attachments: data.attachments,
       status: 'Pending'
     };
+    console.log(`sendTestRealtime ---> `,newRequest)
+    this.signalrService.sendTestRealtime()
 
     this.submittedRequests.update(reqs => [newRequest, ...reqs]);
     this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งปัญหาเรียบร้อยแล้ว');

@@ -1,9 +1,12 @@
-import { Component, HostListener, ElementRef, inject, computed, signal } from '@angular/core';
+import { Component, HostListener, ElementRef, inject, computed, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
 import { AuthService } from '../../services/auth.service';
 import { USER_ROLES } from '../../constants/user-roles.constant';
+import * as signalR from '@microsoft/signalr';
+import { ToastService } from '../../services/toast';
+import { SignalrService } from '../../services/signalr.service';
 
 interface NotificationItem {
   id: number;
@@ -36,6 +39,12 @@ export class NavbarComponent {
   private router = inject(Router);
   private eRef = inject(ElementRef);
 
+  // hubConnection!: signalR.HubConnection;
+  private zone = inject(NgZone);
+  private toastService = inject(ToastService);
+  private signalrService = inject(SignalrService);
+  private notifyAudio = new Audio('/notification1.wav');
+
   isProfileOpen = false;
   isNotificationOpen = false;
 
@@ -46,6 +55,36 @@ export class NavbarComponent {
   searchQuery = signal('');
   isSearchFocused = signal(false);
   isMobileSearchOpen = signal(false);
+
+  ngOnInit() {
+    this.notifyAudio.volume = 0.7;
+    this.signalrService
+    .on('NewTicket','/welcome')
+    .subscribe(data => {
+
+      this.zone.run(() => {
+
+          const message = data.message || 'มี Ticket ใหม่เข้ามา';
+
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'แจ้งเตือนใหม่',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่'
+          };
+
+          this.notifications.update(list => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => {});
+          }
+      });
+    });
+  }
+
 
   private allSearchMenus: SearchMenuItem[] = [
     { label: 'แดชบอร์ด', path: '/dashboard', category: 'Main', icon: 'fa-home' },
@@ -81,7 +120,7 @@ export class NavbarComponent {
     }).slice(0, 5);
   });
 
-  notifications: NotificationItem[] = [
+  notifications = signal<NotificationItem[]>([
     {
       id: 1,
       title: 'รายการรออนุมัติ',
@@ -89,7 +128,39 @@ export class NavbarComponent {
       status: 'pending',
       time: 'เมื่อสักครู่'
     }
-  ];
+  ]);
+
+  // startSignalR() {
+  //   this.hubConnection = new signalR.HubConnectionBuilder()
+  //     .withUrl('https://localhost:7081/notificationHub')
+  //     .withAutomaticReconnect()
+  //     .build();
+
+  //   this.hubConnection.start()
+  //     .then(() => console.log('🔔 Navbar SignalR Connected'))
+  //     .catch(err => console.error(err));
+
+  //   this.hubConnection.on("NewTicket", (data) => {
+  //     this.zone.run(() => {
+  //       const newNoti: NotificationItem = {
+  //         id: Date.now(),
+  //         title: 'แจ้งเตือนใหม่',
+  //         message: data.message || 'มี Ticket ใหม่เข้ามา',
+  //         status: 'pending', // ตรงกับ union type
+  //         time: 'เมื่อสักครู่'
+  //       };
+
+  //       this.notifications.update(list => [newNoti, ...list]);
+  //       this.toastService.info(
+  //         data.message || "มี Ticket ใหม่เข้ามา"
+  //       );
+  //       const audio = new Audio('/notification1.wav');
+  //       audio.play().catch(err => console.warn('Audio blocked:', err));
+  //       audio.volume = 0.7;
+  //       audio.play().catch(() => {});
+  //     })
+  //   });
+  // }
 
   toggleSidebar() {
     this.sidebarService.toggle();
