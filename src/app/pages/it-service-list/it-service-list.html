@@ -1,7 +1,7 @@
 <div class="it-service-container">
 
     <!-- Left Sidebar (Ticket List) -->
-    <aside class="ticket-sidebar">
+    <aside class="ticket-sidebar" [class.hide-on-mobile]="selectedTicket()">
         <div class="sidebar-header">
             <h2>Tickets</h2>
             <button class="filter-btn">
@@ -55,6 +55,9 @@
 
             <div class="main-header">
                 <div class="header-left">
+                    <button class="btn-back-mobile" (click)="clearSelection()" title="กลับหน้ารายการ">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                     <div class="avatar-large" [style.background-color]="ticket.requesterColor">
                         {{ ticket.requesterInitials }}
                     </div>
@@ -184,7 +187,7 @@
 
     <!-- Empty State Placeholder -->
     <ng-template #noTicketSelected>
-        <div class="empty-selection-placeholder">
+        <div class="empty-selection-placeholder hide-on-mobile">
             <div class="empty-content">
                 <div class="empty-icon-wrapper">
                     <i class="fas fa-ticket-alt"></i>
