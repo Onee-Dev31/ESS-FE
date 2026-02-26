@@ -160,11 +160,25 @@ export class ItDashboardSummary {
         }
       ]
     };
+    const firstCompany = labels[0];
+    this.selectedCompany = firstCompany;
+    this.showDeptBar = true;
+    this.buildDeptBar(firstCompany, this.deptTop5Map[firstCompany] ?? []);
+
   }
 
   // ===== Helper: donut option (ใช้ร่วมกัน 2 pie) =====
   private makeDonutOption(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
     return {
+      legend: {
+        top: 8,
+        left: 'center',
+        orient: 'horizontal',
+        itemWidth: 18,
+        itemHeight: 10,
+        icon: 'roundRect',
+        textStyle: { fontSize: 12, fontWeight: 600 },
+      },
       tooltip: { trigger: 'item' },
       color: ['#2563eb', '#0ea5e9', '#f97316', '#22c55e'], // 👈 ใส่ตรงนี้
       series: [
@@ -286,14 +300,14 @@ export class ItDashboardSummary {
     // e.name จะเป็น label ของ category เช่น 'ONEE'
     const company = (e?.name ?? '').toString();
     if (!company) return;
-    console.log("company : ",company);
-    
+    console.log("company : ", company);
+
     // toggle: คลิกซ้ำ = ซ่อน
-    if (this.selectedCompany === company && this.showDeptBar) {
-      this.showDeptBar = false;
-      this.selectedCompany = null;
-      return;
-    }
+    // if (this.selectedCompany === company && this.showDeptBar) {
+    //   this.showDeptBar = false;
+    //   this.selectedCompany = null;
+    //   return;
+    // }
 
     this.selectedCompany = company;
     this.showDeptBar = true;
