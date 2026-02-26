@@ -1,4 +1,3 @@
-export type TicketStatus = 'inprocess' | 'assigned' | 'done';
 
 export interface Attachment {
     name: string;
@@ -29,7 +28,7 @@ export interface TicketItem {
     ticketNo: string;
     title: string;
     description: string;
-    status: TicketStatus;
+    status: StatusKey;
     typeLabel: string;
     time: string;
     createdAt: string;
@@ -44,32 +43,32 @@ export interface TicketItem {
     notes: NoteItem[];
 }
 
-export type StatusKey = 'open' | 'assigned' | 'inprocess' | 'closed' | 'all';
+export type StatusKey = 'open' | 'assigned' | 'inprocess' | 'done' | 'all';
 export type ChartMode = 'line' | 'bar';
 
 export interface KpiCard {
-  key: StatusKey;
-  title: string;
-  value: number;
-  delta: number; // +/- percent
-  hint: string;
-  icon: string; // nzType
+    key: StatusKey;
+    title: string;
+    value: number;
+    delta: number; // +/- percent
+    hint: string;
+    icon: string; // nzType
 }
 
 export interface PieSlice {
-  label: string;
-  value: number;
-  percent: number;
-  d: string;
-  color: string;
+    label: string;
+    value: number;
+    percent: number;
+    d: string;
+    color: string;
 }
 
 export interface BarItem {
-  label: string;
-  value: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+    label: string;
+    value: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 

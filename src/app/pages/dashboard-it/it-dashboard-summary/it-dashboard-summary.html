@@ -6,7 +6,7 @@
             <div class="kpi-title">{{ k.title }}</div>
 
             <span class="kpi-pill" [class.pill-blue]="k.key==='open'" [class.pill-cyan]="k.key==='assigned'"
-                [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='closed'"
+                [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='done'"
                 [class.pill-gray]="k.key==='all'">
                 <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
             </span>
@@ -14,7 +14,7 @@
 
         <div class="kpi-value">{{ k.value | number }} <span>
                 <div class="kpi-delta" [class.up]="k.delta >= 0" [class.down]="k.delta < 0">
-                    <span>{{ abs(k.delta) }}%</span>
+                    <span>{{ getPercent(k) }}%</span>
                 </div>
             </span>
         </div>
@@ -31,85 +31,24 @@
     <div class="chart-card">
         <div class="chart-title">Status Distribution</div>
 
-        <svg [attr.viewBox]="'0 0 ' + pieSize + ' ' + pieSize">
-            <g *ngFor="let s of statusPie">
-                <path class="pie-slice" [class.active]="activePieSlice === s" [attr.d]="s.d" [attr.fill]="s.color"
-                    (mouseenter)="hoverPie = s" (mouseleave)="hoverPie = null" [attr.transform]="getSliceTransform(s)">
-                </path>
-            </g>
-
-            <text *ngIf="activePieSlice" [attr.x]="pieSize/2" [attr.y]="pieSize/2 - 5" text-anchor="middle" font-size="16"
-                font-weight="700">
-                {{ activePieSlice?.value ?? '' }}
-            </text>
-
-            <text *ngIf="activePieSlice" [attr.x]="pieSize/2" [attr.y]="pieSize/2 + 15" text-anchor="middle" font-size="12"
-                fill="#666">
-                {{ activePieSlice?.label ?? '' }}
-            </text>
-        </svg>
+        <div echarts class="echart" [options]="statusPieOption" (chartInit)="onStatusChartInit($event)"
+            (chartClick)="onStatusPieClick($event)">
+        </div>
     </div>
 
     <!-- Service Pie -->
     <div class="chart-card">
         <div class="chart-title">Service Type</div>
 
-        <svg [attr.viewBox]="'0 0 ' + pieSize + ' ' + pieSize">
-            <g *ngFor="let s of servicePie">
-                <path class="pie-slice" [class.active]="hoverServicePie === s" [attr.d]="s.d" [attr.fill]="s.color"
-                    (mouseenter)="hoverServicePie = s" (mouseleave)="hoverServicePie = null"
-                    [attr.transform]="getSliceTransformService(s)">
-                </path>
-            </g>
-
-            <!-- donut hole -->
-            <circle [attr.cx]="pieSize/2" [attr.cy]="pieSize/2" [attr.r]="pieSize*0.28" fill="#fff">
-            </circle>
-
-            <!-- center hover -->
-            <g *ngIf="hoverServicePie" class="pie-center">
-                <text [attr.x]="pieSize/2" [attr.y]="pieSize/2 - 6" text-anchor="middle" class="center-value">
-                    {{ hoverServicePie.value }}
-                </text>
-                <text [attr.x]="pieSize/2" [attr.y]="pieSize/2 + 14" text-anchor="middle" class="center-label">
-                    {{ hoverServicePie.label }}
-                </text>
-            </g>
-        </svg>
+        <div echarts class="echart" [options]="servicePieOption">
+        </div>
     </div>
 
     <!-- Company Bar -->
     <div class="chart-card bar-card">
-        <div class="chart-title">Top Companies</div>
-        <div class="bar-holder">
-            <svg [attr.viewBox]="'0 0 ' + barWidth + ' ' + barHeight" (mouseleave)="hoverBar=null">
+        <div class="chart-title">Top 5 Companies</div>
 
-                <!-- baseline -->
-                <line [attr.x1]="leftPadX" [attr.x2]="rightPadX" [attr.y1]="baseLineY" [attr.y2]="baseLineY"
-                    class="bar-axis">
-                </line>
-
-                <rect *ngFor="let b of bars" class="bar-rect" [class.active]="hoverBar === b" [attr.x]="b.x"
-                    [attr.y]="b.y" [attr.width]="b.width" [attr.height]="b.height" (mouseenter)="hoverBar = b">
-                </rect>
-
-                <!-- tooltip -->
-                <g *ngIf="hoverBar" class="bar-tip">
-                    <rect [attr.x]="hoverBar.x + hoverBar.width/2 - 60" [attr.y]="hoverBar.y - 42" width="120"
-                        height="32" rx="10">
-                    </rect>
-                    <text [attr.x]="hoverBar.x + hoverBar.width/2" [attr.y]="hoverBar.y - 22" text-anchor="middle">
-                        {{ hoverBar.label }} : {{ hoverBar.value }}
-                    </text>
-                </g>
-
-                <!-- labels ติดล่าง -->
-                <text *ngFor="let b of bars" class="bar-label" [attr.x]="b.x + b.width/2" [attr.y]="baseLineY + 18"
-                    text-anchor="middle">
-                    {{ b.label }}
-                </text>
-
-            </svg>
+        <div echarts class="echart bar" [options]="companyBarOption">
         </div>
     </div>
 

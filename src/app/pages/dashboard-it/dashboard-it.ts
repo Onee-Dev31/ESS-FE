@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Attachment, TicketItem, TicketStatus } from '../../interfaces/it-dashboard.interface';
+import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { tickets } from '../../utils/it-dashboard-mock';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -17,15 +17,16 @@ import { ItDashboardSummary } from './it-dashboard-summary/it-dashboard-summary'
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
-  ItDashboardSummary],
+    ItDashboardSummary],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT {
+
   keyword = '';
   TicketStatus: any;
 
-  filterStatus: 'all' | TicketStatus = 'all';
+  filterStatus: StatusKey | null = 'all';
   selectedTicket: TicketItem | null = null;
 
   selectedId = 1;
@@ -34,6 +35,10 @@ export class DashboardIT {
 
   constructor(private msg: NzMessageService) { }
 
+  onStatusChange(status: StatusKey | null) {
+    this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
+    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+  }
   getSelectedTicket(): TicketItem | null {
     return this.tickets.find(x => x.id === this.selectedId) ?? null;
   }
@@ -57,11 +62,12 @@ export class DashboardIT {
     });
   }
 
-  statusLabel(s: TicketStatus) {
+  statusLabel(s: StatusKey) {
     switch (s) {
       case 'inprocess': return 'In Process Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
+      case 'open': return 'Open';
       default: return s;
     }
   }

@@ -51,11 +51,13 @@
     "@tanstack/angular-table": "^8.21.3",
     "date-holidays": "^3.26.7",
     "dayjs": "^1.11.19",
+    "echarts": "^6.0.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
     "ng-zorro-antd": "^21.1.0",
+    "ngx-echarts": "^21.0.0",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.26.18",
     "tslib": "^2.3.0"

@@ -17,7 +17,8 @@ import { registerLocaleData } from '@angular/common';
 import localeTh from '@angular/common/locales/th';
 import { NzI18nInterface, provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
 import { provideAppNzIcons } from './icons.provider';
-
+import { provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts';
 registerLocaleData(localeTh);
 
 const customTh: NzI18nInterface = {
@@ -34,6 +35,7 @@ const customTh: NzI18nInterface = {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
+    provideEchartsCore({ echarts }),
     provideBrowserGlobalErrorListeners(),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideHttpClient(
