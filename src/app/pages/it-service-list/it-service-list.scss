@@ -842,20 +842,27 @@
         z-index: 100;
         box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
         justify-content: center;
+        padding: 12px;
 
         .action-buttons-group {
             width: 100%;
             justify-content: space-between;
+            gap: 8px;
 
             .btn-action {
                 flex: 1;
-                padding: 10px 12px;
-                font-size: 0.85rem;
+                padding: 8px 4px;
+                font-size: 0.8rem;
                 justify-content: center;
-                gap: 5px;
+                align-items: center;
+                flex-direction: column;
+                gap: 4px;
+                text-align: center;
+                line-height: 1.2;
 
                 i {
-                    font-size: 0.9rem;
+                    font-size: 1.1rem;
+                    margin: 0;
                 }
             }
         }
