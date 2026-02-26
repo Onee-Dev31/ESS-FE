@@ -211,22 +211,6 @@ export class ItProblemReportComponent implements OnInit {
 
   confirmSubmission() {
     const data = this.problemFormData();
-<<<<<<< HEAD
-    const newRequest = {
-      id: Date.now(),
-      displayId: this.nextRequestId,
-      date: new Date(),
-      topics: data.topic,
-      detail: data.detail,
-      phoneNumber: data.phoneNumber,
-      categories: data.categories,
-      attachments: data.attachments,
-      status: 'Pending'
-    };
-    console.log(`sendTestRealtime ---> `,newRequest)
-    this.signalrService.sendTestRealtime()
-=======
->>>>>>> e776fdcf4360d0e2073b0ff3828c97207426c10e
 
     const formData = new FormData();
     formData.append('subject', data.topic);
@@ -244,6 +228,7 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log("formData", [...formData.entries()]);
+    this.signalrService.sendTestRealtime()
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.createTicket(formData)
