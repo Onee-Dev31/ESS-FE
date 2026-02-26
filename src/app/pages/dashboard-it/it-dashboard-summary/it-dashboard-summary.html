@@ -47,9 +47,15 @@
     <!-- Company Bar -->
     <div class="chart-card bar-card">
         <div class="chart-title">Top 5 Companies</div>
-
-        <div echarts class="echart bar" [options]="companyBarOption">
+        <div echarts class="echart bar" [options]="companyBarOption" (chartClick)="onCompanyBarClick($event)">
         </div>
     </div>
+    <div class="chart-card bar-card" *ngIf="showDeptBar">
+        <div class="chart-title">Top 5 Deparment</div>
+        <div class="dept-drill">
+            <div echarts class="echart dept" [options]="deptBarOption"></div>
+        </div>
+    </div>
+
 
 </div>

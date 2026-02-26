@@ -36,6 +36,10 @@ export class ItDashboardSummary {
     { key: 'done', title: 'Closed Tickets', value: 45, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
     { key: 'all', title: 'All Tickets', value: 174, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
   ];
+  showDeptBar = false;
+  selectedCompany: string | null = null;
+
+  deptBarOption!: EChartsOption;
 
   trackByKey = (_: number, x: KpiCard) => x.key;
   // ===== ECharts Options =====
@@ -62,6 +66,44 @@ export class ItDashboardSummary {
     this.buildCompanyBar();
   }
 
+  // mock: top 5 dept ต่อ company (ต่อ API ทีหลังได้)
+  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {
+    ONEE: [
+      { label: 'บัญชวย', value: 100 },
+      { label: 'HR', value: 4 },
+      { label: 'management', value: 0 },
+      { label: 'Financial', value: 16 },
+      { label: 'Legal', value: 0 },
+    ],
+    GTV: [
+      { label: 'Operation', value: 80 },
+      { label: 'Content', value: 1 },
+      { label: 'Engineering', value: 2 },
+      { label: 'Studio', value: 1 },
+      { label: 'Admin', value: 1 },
+    ],
+    FLD: [
+      { label: 'Field Service', value: 30 },
+      { label: 'Warehouse', value: 10 },
+      { label: 'Dispatch', value: 10 },
+      { label: 'QA', value: 5 },
+      { label: 'Admin', value: 5 },
+    ],
+    ARTS: [
+      { label: 'Design', value: 2 },
+      { label: 'Creative', value: 1 },
+      { label: 'Motion', value: 1 },
+      { label: 'Production', value: 35 },
+      { label: 'Admin', value: 1 },
+    ],
+    O31: [
+      { label: 'DesignO31', value: 10 },
+      { label: 'CreativeO31', value: 4 },
+      { label: 'MotionO31', value: 3 },
+      { label: 'ProductionO31', value: 2 },
+      { label: 'AdminO31', value: 1 },
+    ],
+  };
   // ====== 1) Status Donut ======
   private buildStatusPie() {
     const data: PieDatum[] = [
@@ -89,7 +131,7 @@ export class ItDashboardSummary {
   // ====== 3) Top Companies Bar ======
   private buildCompanyBar() {
     const labels = ['ONEE', 'GTV', 'FLD', 'ARTS', 'O31'];
-    const values = [120, 85, 60, 40,20];
+    const values = [120, 85, 60, 40, 20];
 
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
@@ -238,5 +280,62 @@ export class ItDashboardSummary {
     ];
 
     this.statusChart?.setOption(opt, { notMerge: false, lazyUpdate: true });
+  }
+
+  onCompanyBarClick(e: any) {
+    // e.name จะเป็น label ของ category เช่น 'ONEE'
+    const company = (e?.name ?? '').toString();
+    if (!company) return;
+    console.log("company : ",company);
+    
+    // toggle: คลิกซ้ำ = ซ่อน
+    if (this.selectedCompany === company && this.showDeptBar) {
+      this.showDeptBar = false;
+      this.selectedCompany = null;
+      return;
+    }
+
+    this.selectedCompany = company;
+    this.showDeptBar = true;
+
+    // สร้างกราฟ top 5 dept
+    const depts = this.deptTop5Map[company] ?? [];
+    this.buildDeptBar(company, depts);
+  }
+
+  private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
+    // sort มาก->น้อย เผื่อข้อมูลไม่เรียง
+    const data = [...rows].sort((a, b) => b.value - a.value).slice(0, 5);
+
+    const labels = data.map(x => x.label);
+    const values = data.map(x => x.value);
+
+    this.deptBarOption = {
+      title: {
+        text: `Top 5 Departments - ${company}`,
+        left: 'left',
+        top: 0,
+        textStyle: { fontSize: 14, fontWeight: 800 }
+      },
+      grid: { left: 10, right: 18, top: 36, bottom: 10, containLabel: true },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      xAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisLine: { show: false } },
+      yAxis: {
+        type: 'category',
+        data: labels,
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { fontWeight: 700 }
+      },
+      series: [
+        {
+          type: 'bar',
+          data: values,
+          barWidth: 16,
+          itemStyle: { borderRadius: [10, 10, 10, 10] },
+          emphasis: { focus: 'series' }
+        }
+      ]
+    };
   }
 }
