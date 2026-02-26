@@ -1,4 +1,4 @@
-import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect } from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,8 @@ import { FilePreviewModalComponent, FilePreviewItem } from '../../components/mod
 import dayjs from 'dayjs';
 import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { AuthService } from '../../services/auth.service';
+import { ItServiceService } from '../../services/it-service.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-it-repair-request',
@@ -24,6 +26,8 @@ export class ItRepairRequestComponent implements OnInit {
   private router = inject(Router);
   private itServiceMock = inject(ItServiceMockService);
   private authService = inject(AuthService);
+  private itServiceService = inject(ItServiceService);
+  private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
 
@@ -35,7 +39,8 @@ export class ItRepairRequestComponent implements OnInit {
   }
 
   repairFormData = signal({
-    device: '',
+    device: { typeId: '', name: '' },
+    category: { categoryId: '', group: '' },
     brand: '',
     model: '',
     symptom: '',
@@ -43,23 +48,30 @@ export class ItRepairRequestComponent implements OnInit {
     attachments: [] as { name: string, size?: number, file: File }[]
   });
 
-  constructor() {
-    effect(() => {
-      const userData = this.authService.userData();
+  phoneModel = '';
 
-      if (userData?.USR_MOBILE) {
-        const formatted = PhoneUtil.formatPhoneNumber(userData?.USR_MOBILE);
-
-        this.repairFormData.update(data => ({
-          ...data,
-          phoneNumber: formatted
-        }));
-      }
-    });
-  }
+  // MASTER
+  deviceCategories: any[] = [];
 
   ngOnInit() {
+    this.getDeviceCategory();
 
+    const userData = this.authService.userData();
+    if (userData?.USR_MOBILE) {
+      const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
+      this.phoneModel = formatted;
+      this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
+    }
+  }
+
+  onPhoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let digitsOnly = input.value.replace(/\D/g, '');
+    digitsOnly = digitsOnly.slice(0, 10);
+    const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
+    input.value = formatted;
+    this.phoneModel = formatted;
+    this.repairFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
   }
 
   onPhoneNumberChange(value: string) {
@@ -74,28 +86,28 @@ export class ItRepairRequestComponent implements OnInit {
   searchTerm = signal('');
   isDropdownOpen = signal(false);
 
-  deviceCategories = [
-    {
-      group: 'Computer & Accessories',
-      items: ['Laptop / Notebook', 'Desktop PC', 'Monitor', 'Keyboard', 'Mouse', 'Docking Station', 'UPS (เครื่องสำรองไฟ)', 'External Hard Drive']
-    },
-    {
-      group: 'Printing & Office',
-      items: ['Printer', 'Photocopier', 'Scanner', 'Shredder (เครื่องทำลายเอกสาร)']
-    },
-    {
-      group: 'Network & Communication',
-      items: ['IP Phone', 'Wi-Fi Access Point', 'Router / Switch', 'LAN Cable / Port']
-    },
-    {
-      group: 'Meeting Room & AV',
-      items: ['Projector', 'Television', 'Webcam / Conference Cam', 'Microphone', 'Speaker', 'HDMI / DisplayPort Cable']
-    },
-    {
-      group: 'Mobile & Others',
-      items: ['Tablet / iPad', 'Smartphone', 'Power Adapter / Charger', 'Headset / Headphone']
-    }
-  ];
+  // deviceCategories = [
+  //   {
+  //     group: 'Computer & Accessories',
+  //     items: ['Laptop / Notebook', 'Desktop PC', 'Monitor', 'Keyboard', 'Mouse', 'Docking Station', 'UPS (เครื่องสำรองไฟ)', 'External Hard Drive']
+  //   },
+  //   {
+  //     group: 'Printing & Office',
+  //     items: ['Printer', 'Photocopier', 'Scanner', 'Shredder (เครื่องทำลายเอกสาร)']
+  //   },
+  //   {
+  //     group: 'Network & Communication',
+  //     items: ['IP Phone', 'Wi-Fi Access Point', 'Router / Switch', 'LAN Cable / Port']
+  //   },
+  //   {
+  //     group: 'Meeting Room & AV',
+  //     items: ['Projector', 'Television', 'Webcam / Conference Cam', 'Microphone', 'Speaker', 'HDMI / DisplayPort Cable']
+  //   },
+  //   {
+  //     group: 'Mobile & Others',
+  //     items: ['Tablet / iPad', 'Smartphone', 'Power Adapter / Charger', 'Headset / Headphone']
+  //   }
+  // ];
 
   filteredCategories = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
@@ -103,13 +115,18 @@ export class ItRepairRequestComponent implements OnInit {
 
     return this.deviceCategories.map(cat => ({
       ...cat,
-      items: cat.items.filter(item => item.toLowerCase().includes(term))
+      items: cat.items.filter((item: any) => item.name.toLowerCase().includes(term))
     })).filter(cat => cat.items.length > 0);
   });
 
-  selectDevice(deviceName: string) {
-    this.repairFormData.update(prev => ({ ...prev, device: deviceName }));
-    this.searchTerm.set(deviceName);
+  selectDevice(device: any, category: any) {
+    console.log(category)
+    this.repairFormData.update(prev => ({
+      ...prev, device: device, category: {
+        categoryId: category.categoryId, group: category.group
+      }
+    }));
+    this.searchTerm.set(device.name);
     this.isDropdownOpen.set(false);
   }
 
@@ -128,37 +145,17 @@ export class ItRepairRequestComponent implements OnInit {
     if (event) {
       event.stopPropagation();
     }
-    this.repairFormData.update(prev => ({ ...prev, device: '' }));
+    this.repairFormData.update(prev => ({ ...prev, device: { typeId: '', name: '' } }));
     this.searchTerm.set('');
     this.isDropdownOpen.set(false);
   }
 
   isFormValid = computed(() => {
-    const { device, symptom, attachments } = this.repairFormData();
-    return device.trim().length > 0 && (symptom.trim().length > 0 || attachments.length > 0);
+    const { device, symptom, attachments, phoneNumber } = this.repairFormData();
+    return (device.typeId !== '' && device.name !== '') && (symptom.trim().length > 0 || attachments.length > 0) && phoneNumber != '';
   });
 
   showSummaryModal = signal(false);
-
-  submittedRequests = signal<any[]>([
-    {
-      id: 1,
-      displayId: '#REP2602-0001',
-      date: new Date('2026-02-19T08:15:00'),
-      device: 'Printer',
-      brand: 'Brother',
-      model: 'HL-L2370DN',
-      symptom: 'กระดาษติดบ่อย และหมึกจาง',
-      phoneNumber: '062-111-2222',
-      attachments: [{ name: 'printer-error.jpg' }],
-      status: 'Pending'
-    }
-  ]);
-
-  get nextRequestId() {
-    const nextId = this.submittedRequests().length + 1;
-    return `#REP2602-${String(nextId).padStart(4, '0')}`;
-  }
 
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
@@ -209,12 +206,21 @@ export class ItRepairRequestComponent implements OnInit {
       this.swalService.warning('แจ้งเตือน', 'กรุณาระบุอุปกรณ์ และรายละเอียดอาการหรือแนบรูปภาพให้ครบถ้วน');
       return;
     }
+
+    this.repairFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
+
     this.showSummaryModal.set(true);
   }
 
   clearForm() {
+    const original = this.authService.userPhone();
+    this.phoneModel = '';
+    this.cdr.detectChanges();
+    this.phoneModel = original;
+
     this.repairFormData.set({
-      device: '',
+      device: { typeId: '', name: '' },
+      category: { categoryId: '', group: '' },
       brand: '',
       model: '',
       symptom: '',
@@ -223,8 +229,6 @@ export class ItRepairRequestComponent implements OnInit {
     });
     this.searchTerm.set('');
     this.isDropdownOpen.set(false);
-    // Re-fetch phone number from profile if available
-    this.ngOnInit();
   }
 
   closePage() {
@@ -237,37 +241,51 @@ export class ItRepairRequestComponent implements OnInit {
 
   confirmSubmission() {
     const data = this.repairFormData();
-    const newRequest = {
-      id: Date.now(),
-      displayId: this.nextRequestId,
-      date: new Date(),
-      ...data,
-      status: 'Pending'
-    };
 
-    this.submittedRequests.update(reqs => [newRequest, ...reqs]);
+    console.log(data)
 
-    this.itServiceMock.addTicket({
-      subject: `Repair: ${data.device} ${data.brand} ${data.model}`,
-      ticketType: 'แจ้งซ่อม',
-      description: data.symptom,
-      status: 'Assigned Tickets',
-      requesterName: 'พนักงาน (Self)',
-      attachments: data.attachments.map(a => ({
-        fileName: a.name,
-        filePath: URL.createObjectURL(a.file),
-        fileType: a.file.type,
-        fileSize: a.file.size || 0
-      }))
+    const formData = new FormData();
+
+    formData.append('deviceTypeId', data.device.typeId);
+    formData.append('deviceCategoryId', data.category.categoryId);
+    formData.append('brand', data.brand);
+    formData.append('model', data.model);
+    formData.append('symptom', data.symptom);
+    formData.append('contactPhone', data.phoneNumber);
+    formData.append('requesterAduser', this.authService.currentUser() || '-');
+    formData.append('ticketTypeId', '1');
+
+    data.attachments.forEach((item: any) => {
+      if (item?.file instanceof File) {
+        formData.append('files', item.file);
+        // formData.append('fileDescriptions', item.name || '');
+      }
     });
 
-    this.swalService.success('สำเร็จ', 'ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว');
-    this.showSummaryModal.set(false);
+    console.log("formData", [...formData.entries()]);
 
-    // Redirect to list page
-    this.router.navigate(['/it-service-list']);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.itServiceService.createTicket(formData)
+      .pipe(
+        finalize(() => {
+          this.closeSummaryModal();
+        })
+      ).subscribe({
+        next: (res) => {
+          console.log(res);
+          if (res.success) {
+            this.swalService.success('ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว', res.ticketNumber).then(() => {
+              this.clearForm();
+              this.router.navigate(['/it-service-list']);
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error.error.message);
+          // const message = error?.error?.message || '';
+        }
+      });
 
-    this.repairFormData.set({ device: '', brand: '', model: '', symptom: '', phoneNumber: '', attachments: [] });
   }
 
   showHistoryDetailModal = signal(false);
@@ -281,5 +299,19 @@ export class ItRepairRequestComponent implements OnInit {
   closeHistoryDetailModal() {
     this.showHistoryDetailModal.set(false);
     this.selectedRequest.set(null);
+  }
+
+  // GET MASTER
+  getDeviceCategory() {
+    this.itServiceService.getDeviceCategory().subscribe({
+      next: (res) => {
+        // console.log(res);
+        this.deviceCategories = res.data
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
   }
 }

@@ -131,8 +131,7 @@
                 </label>
             </div>
             <div class="field-input-col">
-                <input type="text" [ngModel]="problemFormData().phoneNumber"
-                    (ngModelChange)="onPhoneNumberChange($event)" class="styled-input"
+                <input type="text" [value]="phoneModel" (input)="onPhoneInput($event)" class="styled-input"
                     placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
         </div>
@@ -185,6 +184,12 @@
                                 }
                             </td>
                         </tr>
+                        @if (problemFormData().phoneNumber) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ problemFormData().phoneNumber }}</td>
+                        </tr>
+                        }
                         <tr>
                             <th>ไฟล์แนบ</th>
                             <td>
@@ -207,6 +212,7 @@
                                 }
                             </td>
                         </tr>
+
                     </table>
                 </div>
             </div>
