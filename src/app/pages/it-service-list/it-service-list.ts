@@ -2,13 +2,14 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
+import { RatingModalComponent } from '../../components/modals/rating-modal/rating-modal';
 import dayjs from 'dayjs';
 import { ItServiceMockService, Ticket } from '../../services/it-service-mock.service';
 
 @Component({
   selector: 'app-it-service',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
@@ -21,6 +22,7 @@ export class ItService {
   selectedTicket = signal<Ticket>(this.mockTickets()[0]);
 
   isPreviewModalOpen = signal<boolean>(false);
+  isRatingModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
   selectTicket(ticket: Ticket) {
@@ -39,5 +41,19 @@ export class ItService {
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+  }
+
+  openRating() {
+    this.isRatingModalOpen.set(true);
+  }
+
+  closeRating() {
+    this.isRatingModalOpen.set(false);
+  }
+
+  handleRate(event: { rating: number, comment: string }) {
+    console.log('Rating submitted:', event);
+    // Here you would typically call a service to save the rating
+    this.closeRating();
   }
 }

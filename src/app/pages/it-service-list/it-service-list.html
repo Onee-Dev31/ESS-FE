@@ -56,7 +56,16 @@
                 <div class="avatar-large" [style.background-color]="selectedTicket().requesterColor">
                     {{ selectedTicket().requesterInitials }}
                 </div>
-                <h2>{{ selectedTicket().subject }}</h2>
+                <div class="header-title-group">
+                    <h2>{{ selectedTicket().subject }}</h2>
+                    <div class="header-subtitle">
+                        <span class="badge badge-header">{{ selectedTicket().ticketType }}</span>
+                        <span class="header-date"><i class="far fa-calendar-alt"></i> {{ selectedTicket().createdDate |
+                            date:'longDate' }}</span>
+                        <span class="header-time"><i class="far fa-clock"></i> {{ selectedTicket().createdDate |
+                            date:'shortTime' }}</span>
+                    </div>
+                </div>
             </div>
             <div class="header-right">
                 <div class="status-badge" [ngClass]="{
@@ -74,26 +83,25 @@
             <!-- Details Section -->
             <section class="card-section">
                 <div class="card-header">
-                    <h3>รายละเอียด</h3>
-                    <div class="services-badges">
-                        <span class="badge badge-outline">{{ selectedTicket().ticketType }}</span>
-                    </div>
+                    <h3><i class="fas fa-info-circle"></i> รายละเอียด</h3>
                 </div>
                 <div class="card-body">
-                    <p>{{ selectedTicket().description }}</p>
+                    <p class="description-text">{{ selectedTicket().description }}</p>
                 </div>
             </section>
 
             <!-- Attachments Section -->
             <section class="card-section">
                 <div class="card-header">
-                    <h3>เอกสารแนบ</h3>
+                    <h3><i class="fas fa-paperclip"></i> เอกสารแนบ</h3>
                 </div>
                 <div class="card-body">
                     <ul class="attachment-list" *ngIf="selectedTicket().attachments.length > 0; else noAttachments">
                         <li *ngFor="let file of selectedTicket().attachments" class="attachment-item"
                             (click)="viewFile(file)">
-                            <i class="fas fa-paperclip"></i> <span class="file-name">{{ file.fileName }}</span>
+                            <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                            <span class="file-name">{{ file.fileName }}</span>
+                            <i class="fas fa-download download-small"></i>
                         </li>
                     </ul>
                     <ng-template #noAttachments>
@@ -105,23 +113,28 @@
             <!-- IT Notes Section -->
             <section class="card-section">
                 <div class="card-header">
-                    <h3>Note จาก IT ({{ selectedTicket().assigneeName }})</h3>
+                    <h3><i class="fas fa-user-edit"></i> Note จาก IT ({{ selectedTicket().assigneeName }})</h3>
                 </div>
                 <div class="card-body">
-                    <p>{{ selectedTicket().itNotes }}</p>
+                    <p class="it-notes-text">{{ selectedTicket().itNotes }}</p>
                 </div>
             </section>
+        </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons-bottom">
+        <!-- Anchored Action Bar -->
+        <div class="action-footer-bar">
+            <div class="action-left-info">
+
+            </div>
+            <div class="action-buttons-group">
                 <button class="btn btn-action btn-add-note">
                     <i class="fas fa-sticky-note"></i> เพิ่ม Note
                 </button>
                 <button class="btn btn-action btn-forward">
-                    <i class="fas fa-share"></i> ส่งต่อ
+                    <i class="fas fa-history"></i> Reopen
                 </button>
-                <button class="btn btn-action btn-close-ticket">
-                    <i class="fas fa-check-circle"></i> ปิดงาน
+                <button class="btn btn-action btn-close-ticket" (click)="openRating()">
+                    <i class="fas fa-star"></i> Rate Us
                 </button>
             </div>
         </div>
@@ -169,5 +182,10 @@
     @if (isPreviewModalOpen()) {
     <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
     </app-file-preview-modal>
+    }
+
+    @if (isRatingModalOpen()) {
+    <app-rating-modal (onClose)="closeRating()" (onRate)="handleRate($event)">
+    </app-rating-modal>
     }
 </div>

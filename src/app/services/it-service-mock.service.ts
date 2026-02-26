@@ -54,7 +54,9 @@ export class ItServiceMockService {
             requesterInitials: 'MP',
             requesterColor: '#F44336',
             attachments: [
+                { fileName: 'request_form.pdf', filePath: '/uploads/Tickets/form.pdf', fileType: 'application/pdf', fileSize: 1024 },
                 { fileName: 'request_form.pdf', filePath: '/uploads/Tickets/form.pdf', fileType: 'application/pdf', fileSize: 1024 }
+                
             ],
             itNotes: 'กำลังตรวจสอบสิทธิ์การใช้งาน...',
             assigneeName: 'กิตติพงษ์ (บอส)',
