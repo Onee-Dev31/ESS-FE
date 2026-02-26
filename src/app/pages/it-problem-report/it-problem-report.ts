@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,19 +40,23 @@ export class ItProblemReportComponent implements OnInit {
   // MASTER
   availableCategories: any[] = [];
 
+  constructor() {
+    effect(() => {
+      const userData = this.authService.userData();
+
+      if (userData?.USR_MOBILE) {
+        const formatted = PhoneUtil.formatPhoneNumber(userData?.USR_MOBILE);
+
+        this.problemFormData.update(data => ({
+          ...data,
+          phoneNumber: formatted
+        }));
+      }
+    });
+  }
+
   ngOnInit() {
     this.getSubProblem();
-
-
-
-
-    // * คนที่มีเบอร์ให้เอาลงมาใส่ตรงนี้เลย *
-    // this.userService.getUserProfile().subscribe((profile: UserProfile) => {
-    //   if (profile?.phone) {
-    //     const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
-    //     this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
-    //   }
-    // });
   }
 
   onPhoneNumberChange(value: string) {
@@ -94,21 +98,6 @@ export class ItProblemReportComponent implements OnInit {
     const files: FileList = event.target.files;
     this.addFiles(files);
   }
-  // onFileSelected(event: any) {
-  //   const files: FileList = event.target.files;
-  //   if (files && files.length > 0) {
-  //     const newAttachments = Array.from(files).map(f => ({
-  //       name: f.name,
-  //       size: f.size,
-  //       file: f
-  //     }));
-  //     const currentAttachments = this.problemFormData().attachments;
-  //     this.problemFormData.set({
-  //       ...this.problemFormData(),
-  //       attachments: [...currentAttachments, ...newAttachments]
-  //     });
-  //   }
-  // }
 
   private addFiles(files: FileList) {
     if (files && files.length > 0) {
@@ -177,6 +166,16 @@ export class ItProblemReportComponent implements OnInit {
     return `#PRB2602-${String(nextId).padStart(4, '0')}`;
   }
 
+  private getDefaultPhone(): string {
+    const userData = this.authService.userData();
+
+    if (userData?.USR_MOBILE) {
+      return PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
+    }
+
+    return '';
+  }
+
   submit() {
     const data = this.problemFormData();
     if (!data.topic.trim() || !data.detail.trim()) {
@@ -190,12 +189,10 @@ export class ItProblemReportComponent implements OnInit {
     this.problemFormData.set({
       topic: '',
       detail: '',
-      phoneNumber: '', // *
+      phoneNumber: this.getDefaultPhone(),
       categories: [],
       attachments: []
     });
-    // * Re-fetch phone number from profile if available
-    // this.ngOnInit();
   }
 
   closePage() {
@@ -224,7 +221,7 @@ export class ItProblemReportComponent implements OnInit {
       }
     });
 
-    console.log([...formData.entries()]);
+    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.createTicket(formData)
@@ -234,7 +231,7 @@ export class ItProblemReportComponent implements OnInit {
         })
       ).subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           if (res.success) {
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
@@ -245,9 +242,6 @@ export class ItProblemReportComponent implements OnInit {
         error: (error) => {
           console.error('Error fetching data:', error.error.message);
           // const message = error?.error?.message || '';
-        },
-        complete: () => {
-          console.log("COMPLETE");
         }
       });
 
