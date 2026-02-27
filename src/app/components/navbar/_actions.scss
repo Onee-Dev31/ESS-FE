@@ -206,6 +206,80 @@ $text-light: #5f6368;
                 }
             }
 
+            /* Theme Toggle (Uiverse: 89 - athulknr) */
+            .theme-toggle-uiverse {
+                transform: scale(0.65);
+                transform-origin: center right;
+
+                #theme-toggle-button {
+                    font-size: 17px;
+                    position: relative;
+                    display: inline-block;
+                    width: 4em;
+                    cursor: pointer;
+                    margin: 0;
+                }
+
+                #toggle-89 {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+                }
+
+                #container,
+                #patches,
+                #stars,
+                #button,
+                #sun,
+                #moon,
+                #cloud {
+                    transition-property: all;
+                    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-duration: 0.25s;
+                }
+
+                #toggle-89:checked+svg #container {
+                    fill: #2b4360;
+                }
+
+                #toggle-89:checked+svg #button {
+                    transform: translate(28px, 2.333px);
+                }
+
+                #sun {
+                    opacity: 1;
+                }
+
+                #toggle-89:checked+svg #sun {
+                    opacity: 0;
+                }
+
+                #moon {
+                    opacity: 0;
+                }
+
+                #toggle-89:checked+svg #moon {
+                    opacity: 1;
+                }
+
+                #cloud {
+                    opacity: 1;
+                }
+
+                #toggle-89:checked+svg #cloud {
+                    opacity: 0;
+                }
+
+                #stars {
+                    opacity: 0;
+                }
+
+                #toggle-89:checked+svg #stars {
+                    opacity: 1;
+                }
+            }
+
             .notification-dropdown {
                 position: relative;
 
