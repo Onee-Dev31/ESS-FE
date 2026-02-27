@@ -217,7 +217,7 @@ export class ItProblemReportComponent implements OnInit {
     formData.append('subject', data.topic);
     formData.append('description', data.detail);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
-    formData.append('subCategoryId', data.categories[0].category_id);
+    formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
     formData.append('ticketTypeId', '2');
 
@@ -272,7 +272,7 @@ export class ItProblemReportComponent implements OnInit {
   getSubProblem() {
     this.itServiceService.getSubProblem().subscribe({
       next: (res) => {
-        // console.log(res);
+        console.log(res);
         this.availableCategories = res.data
         this.cdr.detectChanges();
       },
