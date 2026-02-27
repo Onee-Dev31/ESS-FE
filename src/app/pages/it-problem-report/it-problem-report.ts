@@ -238,7 +238,7 @@ export class ItProblemReportComponent implements OnInit {
         })
       ).subscribe({
         next: (res) => {
-          // console.log(res);
+          console.log(res);
           if (res.success) {
             this.signalrService.sendTestRealtime()
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {

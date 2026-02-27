@@ -168,6 +168,7 @@
                         font-size: 0.75rem;
                         white-space: nowrap;
                         flex-shrink: 0;
+                        text-align: right;
                     }
                 }
 
@@ -205,6 +206,11 @@
                             color: #f57c00;
                         }
 
+                        &.status-resolved {
+                            background-color: #fff3e0;
+                            color: #a221b1;
+                        }
+
                         &.status-closed {
                             background-color: #e8f5e9;
                             color: #388e3c;
@@ -238,7 +244,10 @@
     }
 
     .main-header {
-        background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+        // background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+        background: linear-gradient(135deg,
+                var(--header-color) 0%,
+                color-mix(in srgb, var(--header-color) 80%, black) 100%);
         color: white;
         border-radius: 16px;
         padding: 24px 30px;

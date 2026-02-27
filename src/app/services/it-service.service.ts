@@ -50,32 +50,62 @@ export class ItServiceService {
   }
 
   //GET
-  getTickets(params: {
+  // getTickets(params: {
+  //   page?: number;
+  //   pageSize?: number;
+  //   searchText?: string;
+  //   status?: string;
+  //   priority?: string;
+  //   requesterAduser?: string;
+  //   assigneeAduser?: string;
+  // }): Observable<any> {
+
+  //   const queryParams: any = {};
+
+  //   if (params.page) queryParams.page = params.page;
+  //   if (params.pageSize) queryParams.pageSize = params.pageSize;
+  //   if (params.searchText) queryParams.searchText = params.searchText;
+  //   if (params.status) queryParams.status = params.status;
+  //   if (params.priority) queryParams.priority = params.priority;
+  //   if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+  //   if (params.assigneeAduser) queryParams.assigneeAduser = params.assigneeAduser;
+
+  //   // console.log("params >>> ", queryParams)
+
+  //   return this._http.get<any>(`${this.baseUrl}/tickets`, {
+  //     params: queryParams
+  //   });
+
+  // }
+
+  getMyTickets(params: {
     page?: number;
     pageSize?: number;
-    searchText?: string;
+    requesterAduser?: string;
+    requesterCodeempid?: string;
     status?: string;
     priority?: string;
-    requesterAduser?: string;
-    assigneeAduser?: string;
   }): Observable<any> {
 
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
     if (params.pageSize) queryParams.pageSize = params.pageSize;
-    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+    if (params.requesterCodeempid) queryParams.requesterCodeempid = params.requesterCodeempid;
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
-    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
-    if (params.assigneeAduser) queryParams.assigneeAduser = params.assigneeAduser;
 
-    // console.log("params >>> ", queryParams)
+    console.log("params >>> ", queryParams)
 
-    return this._http.get<any>(`${this.baseUrl}/tickets`, {
+    return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
       params: queryParams
     });
 
+  }
+
+  getTicketById(ticketId: string) {
+    return this._http.get(`${this.baseUrl}/tickets/${ticketId}`);
   }
 
   createTicket(formData: FormData): Observable<any> {

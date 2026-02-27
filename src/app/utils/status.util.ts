@@ -15,3 +15,18 @@ export class StatusUtil {
         }
     }
 }
+
+export class ticketTypyColor {
+    static getColor(typeId: number): string {
+        switch (typeId) {
+            case 2:
+                return '#f59e0b';
+            case 1:
+                return '#f43f5e';
+            case 3:
+                return '#3b82f6';
+            default:
+                return '#9E9E9E';
+        }
+    }
+}

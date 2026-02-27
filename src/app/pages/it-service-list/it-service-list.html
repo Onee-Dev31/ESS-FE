@@ -15,30 +15,33 @@
         </div>
 
         <div class="ticket-list">
-            <div class="ticket-item" *ngFor="let ticket of mockTickets()"
-                [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket)">
-                <div class="avatar" [style.background-color]="ticket.requesterColor">
-                    {{ ticket.requesterInitials }}
-                </div>
+            <div class="ticket-item" *ngFor="let ticket of Tickets()"
+                [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
                         <div class="ticket-meta-right">
-                            <i class="fas fa-thumbtack pin-icon"></i>
                             <i class="fas fa-comment text-icon"></i>
                         </div>
                     </div>
                     <div class="ticket-title-row">
                         <div class="ticket-title">{{ ticket.subject }}</div>
-                        <span class="ticket-time">{{ ticket.createdDate | date:'shortTime' }}</span>
+                        <span class="ticket-time">
+                            @if (isToday(ticket.createdDate)) {
+                            {{ ticket.createdDate | date:'HH:mm' }}
+                            } @else {
+                            {{ ticket.createdDate | date:'EEE dd':'':'en' }}
+                            }
+                        </span>
                     </div>
                     <div class="ticket-footer">
                         <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
                         <span class="ticket-status-inline" [ngClass]="{
-                            'status-assigned': ticket.status === 'Assigned Tickets',
-                            'status-in-process': ticket.status === 'In Process Tickets',
-                            'status-closed': ticket.status === 'Closed Tickets',
-                            'status-overdue': ticket.status === 'Overdue Tickets'
+                            'status-assigned': ticket.status === 'Open',
+                            'status-in-process': ticket.status === 'In Process',
+                            'status-resolved': ticket.status === 'Resolved',
+                            'status-closed': ticket.status === 'Closed',
+                            'status-overdue': ticket.status === 'Cancelled'
                         }">
                             <i class="fas fa-sync-alt"></i> {{ ticket.status }}
                         </span>
@@ -53,14 +56,14 @@
         <!-- Main Content Area (Ticket Details) -->
         <main class="ticket-main-content">
 
-            <div class="main-header">
+            <div class="main-header" [style.--header-color]="ticket.requesterColor">
                 <div class="header-left">
                     <button class="btn-back-mobile" (click)="clearSelection()" title="กลับหน้ารายการ">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <div class="avatar-large" [style.background-color]="ticket.requesterColor">
+                    <!-- <div class="avatar-large" [style.background-color]="ticket.requesterColor">
                         {{ ticket.requesterInitials }}
-                    </div>
+                    </div> -->
                     <div class="header-title-group">
                         <h2>{{ ticket.subject }}</h2>
                         <div class="header-subtitle">
@@ -146,7 +149,7 @@
         </main>
 
         <!-- Right Panel (User & IT Info) -->
-        <aside class="info-sidebar">
+        <aside class="info-sidebar" *ngIf="ticket.status !== 'Open'">
             <div class="info-card">
                 <div class="profile-section">
                     <p class="info-card-label">ผู้รับผิดชอบ</p>
