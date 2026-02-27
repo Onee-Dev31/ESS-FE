@@ -6,7 +6,7 @@ export const tickets: TicketItem[] = [
     ticketNo: 'Ticket00023',
     title: 'ขอติดตั้งโปรแกรม Oracle',
     description: 'รบกวนติดตั้งโปรแกรม Oracle Client สำหรับใช้งานฐานข้อมูล…\n\nรายละเอียดเพิ่มเติม: ต้องการเชื่อมต่อกับ Oracle DB สำหรับงานบัญชี/รายงาน และขอให้ตรวจสอบสิทธิ์การเข้าถึงด้วยครับ',
-    status: 'inprocess',
+    status: 'open',
     typeLabel: 'ขอใช้บริการ',
     time: '10:00',
     createdAt: 'วันนี้ 10:00',
@@ -48,7 +48,7 @@ export const tickets: TicketItem[] = [
     ticketNo: 'Ticket00022',
     title: 'หน้าจอคอมพิวเตอร์กระพริบ',
     description: 'หน้าจอคอมพิวเตอร์มีอาการกระพริบเป็นบางช่วง โดยเฉพาะตอนเปิดโปรแกรม Office และ Browser',
-    status: 'assigned',
+    status: 'open',
     typeLabel: 'แจ้งซ่อม',
     time: '09:00',
     createdAt: 'วันนี้ 09:00',
@@ -64,11 +64,11 @@ export const tickets: TicketItem[] = [
       avatarBg: 'var(--primary)'
     },
     assignee: {
-      name: 'IT Helpdesk',
-      email: 'helpdesk@onee.com',
-      phone: '02-xxx-xxxx',
-      avatar: 'IT',
-      avatarBg: 'var(--success)'
+      name: '',
+      email: '',
+      phone: '-',
+      avatar: '',
+      avatarBg: 'var(--bg-slate)'
     },
 
     attachments: [],
@@ -79,7 +79,7 @@ export const tickets: TicketItem[] = [
     ticketNo: 'Ticket00025',
     title: 'แจ้งปัญหาเข้าใช้งานระบบ Portal',
     description: 'รบกวนเพิ่มสิทธิ์การเข้าใช้งานระบบ Onee Portal ให้หน่อยครับ รหัสพนักงาน OTD01128',
-    status: 'done',
+    status: 'open',
     typeLabel: 'เพิ่มสิทธิ์เข้าใช้งานระบบ',
     time: '10:00',
     createdAt: 'วันนี้ 10:00',

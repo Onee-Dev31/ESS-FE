@@ -164,18 +164,25 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions">
+                <button *ngIf="!t.assignee.name" nz-button nzType="primary" style="margin-right: auto;"
+                    (click)="acknowledgeTicket()">
+                    <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+                    รับเรื่อง
+                </button>
                 <button nz-button nzType="default" (click)="openAddNote()">
                     <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
                     เพิ่ม Note
                 </button>
-                <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
-                    <nz-icon nzType="export" nzTheme="outline"></nz-icon>
-                    ส่งต่อ
-                </button>
-                <button nz-button nzType="primary" nzDanger (click)="closeTicket()">
-                    <nz-icon nzType="check-circle" nzTheme="fill"></nz-icon>
-                    ปิดงาน
-                </button>
+                <ng-container *ngIf="t.assignee.name">
+                    <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
+                        <nz-icon nzType="export" nzTheme="outline"></nz-icon>
+                        ส่งต่อ
+                    </button>
+                    <button nz-button nzType="primary" nzDanger (click)="closeTicket()">
+                        <nz-icon nzType="check-circle" nzTheme="fill"></nz-icon>
+                        ปิดงาน
+                    </button>
+                </ng-container>
             </section>
 
         </ng-container>
@@ -194,7 +201,7 @@
             <section class="side-card">
                 <div class="side-title">ผู้รับผิดชอบ</div>
 
-                <div class="side-profile">
+                <div class="side-profile" *ngIf="t.assignee.name; else noAssignee">
                     <div class="side-avatar" [style.background]="t.assignee.avatarBg">
                         {{ t.assignee.avatar }}
                     </div>
@@ -202,7 +209,15 @@
                     <div class="side-email">{{ t.assignee.email }}</div>
                 </div>
 
-                <div class="side-fields">
+                <ng-template #noAssignee>
+                    <div class="side-profile no-assignee">
+                        <div class="side-avatar empty">?</div>
+                        <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
+                        <div class="side-email muted">กรุณากดรับเรื่อง</div>
+                    </div>
+                </ng-template>
+
+                <div class="side-fields" *ngIf="t.assignee.name">
                     <div class="sf">
                         <div class="sf__label">Ticket number</div>
                         <div class="sf__value mono">
@@ -252,3 +267,82 @@
     </aside>
 
 </div>
+
+<!-- ASSIGN TICKET MODAL -->
+<nz-modal [(nzVisible)]="isAssignModalVisible" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
+    nzWrapClassName="assign-modal-wrap" (nzOnCancel)="closeAssignModal()">
+    <ng-container *nzModalContent>
+        <div class="assign-modal-header">
+            <div class="amh-top">
+                <div class="amh-title-group">
+                    <span class="amh-title">Assign Ticket</span>
+                    <span class="amh-count" *ngIf="selectedAssigneeEmpCodes.length > 0">
+                        {{ selectedAssigneeEmpCodes.length }} selected
+                    </span>
+                </div>
+                <span class="material-symbols-outlined amh-close" (click)="closeAssignModal()">close</span>
+            </div>
+            <div class="amh-search">
+                <span class="material-symbols-outlined">search</span>
+                <input placeholder="ค้นหาชื่อคน" [(ngModel)]="assignSearchKeyword" />
+            </div>
+        </div>
+
+        <div class="assign-modal-body">
+            <!-- SELECTED CHIPS -->
+            <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
+                <div class="chip" *ngFor="let empCode of selectedAssigneeEmpCodes">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + empCode + '.jpg'"
+                        (error)="onImgError($event)" />
+                    <span>{{ empCode }}</span>
+                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(empCode)">close</span>
+                </div>
+            </div>
+
+            <div class="assign-list-container">
+                <div class="assign-group" *ngFor="let g of filteredAssigneeGroups">
+                    <div class="assign-group-header">
+                        <div class="assign-group-label">{{ g.name }}</div>
+                        <button class="grp-toggle-btn" (click)="toggleGroup(g)">
+                            {{ isGroupSelected(g) ? 'Unselect All' : 'Select All' }}
+                        </button>
+                    </div>
+
+                    <div class="assign-item" *ngFor="let empCode of g.members"
+                        [class.selected]="selectedAssigneeEmpCodes.includes(empCode)" (click)="toggleAssignee(empCode)">
+
+                        <div class="assign-chk">
+                            <span class="material-symbols-outlined"
+                                *ngIf="selectedAssigneeEmpCodes.includes(empCode)">check_box</span>
+                            <span class="material-symbols-outlined"
+                                *ngIf="!selectedAssigneeEmpCodes.includes(empCode)">check_box_outline_blank</span>
+                        </div>
+
+                        <div class="assign-avatar">
+                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + empCode + '.jpg'"
+                                loading="lazy" decoding="async" (error)="onImgError($event)"
+                                (click)="openImage(empCode); $event.stopPropagation()" />
+                        </div>
+
+                        <div class="assign-info">
+                            <div class="assign-name">{{ empCode }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-results" *ngIf="filteredAssigneeGroups.length === 0">
+                    <span class="material-symbols-outlined">person_off</span>
+                    <div class="msg">ไม่พบรายชื่อพนักงาน</div>
+                </div>
+            </div>
+
+            <div class="assign-modal-footer">
+                <button nz-button class="assign-submit" [disabled]="selectedAssigneeEmpCodes.length === 0"
+                    (click)="submitAssign()">
+                    {{ selectedAssigneeEmpCodes.length > 0 ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People' :
+                    'Assign Ticket' }}
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</nz-modal>
