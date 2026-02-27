@@ -7,12 +7,12 @@
 // ============================================
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: #202124;
-$text-sub: #5f6368;
-$text-header: #475569;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-header: var(--text-sub);
 
 // เส้นขอบ (Border Colors)
-$border: #dee2e6;
+$border: var(--border);
 
 // Responsive Mixins
 @mixin mobile {
@@ -35,7 +35,7 @@ $border: #dee2e6;
 
 // Content Card Mixin
 @mixin content-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     padding: 24px;
@@ -108,7 +108,7 @@ $border: #dee2e6;
     font-size: 1.25rem;
     font-weight: 700;
     color: $color;
-    // color: #1e293b;
+    // color: var(--text-header);
     margin-bottom: 24px;
     position: relative;
     padding-left: 16px;
@@ -131,14 +131,14 @@ $border: #dee2e6;
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #fff;
+    background: var(--bg-card);
     border: 1px solid $border;
     border-radius: 12px;
     overflow: hidden;
 
     thead {
         tr {
-            background: #f8fafc;
+            background: var(--bg-table-head);
         }
 
         th {
@@ -156,7 +156,7 @@ $border: #dee2e6;
         transition: background 0.2s;
 
         &:hover {
-            background: #f1f5f9;
+            background: var(--border-toolbar);
 
             tr {
                 background: transparent;
@@ -212,7 +212,7 @@ $border: #dee2e6;
     // }
 
     .mobile-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 20px;
         border: 1px solid rgba(0, 0, 0, 0.04);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -237,8 +237,8 @@ $border: #dee2e6;
         }
 
         .card-header {
-            background: #fff;
-            border-bottom: 1px solid #f1f5f9;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-toolbar);
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
@@ -253,7 +253,7 @@ $border: #dee2e6;
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+                background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
                 opacity: 0;
                 transition: opacity 0.3s;
             }
@@ -287,13 +287,13 @@ $border: #dee2e6;
                 font-size: 0.9rem;
 
                 .label {
-                    color: #64748b;
+                    color: var(--text-table-head);
                     display: flex;
                     align-items: center;
                     gap: 6px;
 
                     i {
-                        color: #94a3b8;
+                        color: var(--text-muted);
                         font-size: 0.85rem;
                         width: 16px;
                         text-align: center;
@@ -302,14 +302,14 @@ $border: #dee2e6;
 
                 .value {
                     font-weight: 600;
-                    color: #1e293b;
+                    color: var(--text-header);
                 }
             }
 
             .card-footer-actions {
                 margin-top: auto;
                 padding-top: 16px;
-                border-top: 1px solid #f1f5f9;
+                border-top: 1px solid var(--border-toolbar);
                 display: flex;
                 gap: 12px;
 
@@ -351,7 +351,7 @@ $border: #dee2e6;
 
 .freelance-page {
     padding: 24px;
-    background-color: #f8f9fa;
+    background-color: var(--bg-page);
     min-height: 100vh;
     box-sizing: border-box;
 
@@ -362,8 +362,8 @@ $border: #dee2e6;
 
     // ==================== SEARCH SECTION ====================
     .search-section {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-table-head);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
         padding: 1rem 1.5rem;
@@ -378,7 +378,7 @@ $border: #dee2e6;
         .search-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-header);
             margin-bottom: 1.25rem;
         }
 
@@ -402,7 +402,7 @@ $border: #dee2e6;
                     width: 100%;
                     min-width: 0;
                     height: 42px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-table-head);
                     border-radius: 8px;
                     padding: 0 1rem;
                     font-size: 0.95rem;
@@ -414,14 +414,14 @@ $border: #dee2e6;
                     }
 
                     &::placeholder {
-                        color: #94a3b8;
+                        color: var(--text-muted);
                     }
 
                     &.readonly,
                     &.disabled,
                     &:disabled {
                         background: #f5f5f5 !important;
-                        color: #6b7280 !important;
+                        color: var(--text-muted) !important;
                         border-color: #d1d5db !important;
                         cursor: not-allowed;
                         opacity: 1;
@@ -431,7 +431,7 @@ $border: #dee2e6;
 
             .btn-search-purple {
                 background: #582d96;
-                color: #fff;
+                color: #ffffff;
                 border: none;
                 border-radius: 50px;
                 padding: 0 2rem;
@@ -470,13 +470,13 @@ $border: #dee2e6;
     // ==================== CONTENT CARD ====================
     .content-card {
         @include content-card;
-        background: #ffffff;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         padding: 0;
 
         .card-header-title {
-            @include card-header-title(#000000, #0062ff);
+            @include card-header-title(var(--text), #0062ff);
             padding: 1.5rem 1.5rem 0.5rem 1.5rem;
             margin: 0;
         }
@@ -486,7 +486,7 @@ $border: #dee2e6;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-toolbar);
             margin-bottom: 1rem;
 
             @include mobile {
@@ -506,9 +506,9 @@ $border: #dee2e6;
                 }
 
                 .btn-create {
-                    background-color: #fff !important;
-                    color: #1a1a1a !important;
-                    border: 1px solid #1a1a1a !important;
+                    background-color: #ffffff !important;
+                    color: var(--text) !important;
+                    border: 1px solid var(--text) !important;
                     font-weight: 600;
                     padding: 8px 16px;
                     border-radius: 4px;
@@ -530,7 +530,7 @@ $border: #dee2e6;
                     &:active {
                         transform: translateY(2px);
                         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset;
-                        background-color: #f0f0f0 !important;
+                        background-color: var(--border-color) !important;
                     }
                 }
             }
@@ -550,12 +550,12 @@ $border: #dee2e6;
                 .select-month {
                     width: 200px;
                     height: 40px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-table-head);
                     border-radius: 50px;
                     padding: 0 1.25rem;
                     background-color: #ffffff;
                     font-size: 0.9rem;
-                    color: #475569;
+                    color: var(--text-sub);
 
                     @include mobile {
                         width: 100%;
@@ -563,8 +563,8 @@ $border: #dee2e6;
                 }
 
                 .btn-send-data {
-                    background: #1a73e8;
-                    color: #fff;
+                    background: var(--primary);
+                    color: #ffffff;
                     border: none;
                     border-radius: 50px;
                     padding: 0 1.5rem;
@@ -594,7 +594,7 @@ $border: #dee2e6;
         margin-top: 0.8rem;
 
         .card-header-title {
-            @include card-header-title(#000000, #bb00ff);
+            @include card-header-title(var(--text), #bb00ff);
         }
     }
 
@@ -607,7 +607,7 @@ $border: #dee2e6;
         .card-footer-actions {
             margin-top: 1rem;
             padding-top: 1rem;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--border-toolbar);
             display: grid;
             gap: 12px;
         }
@@ -638,7 +638,7 @@ $border: #dee2e6;
 
             .employee-id {
                 font-size: 0.75rem;
-                color: #64748b;
+                color: var(--text-table-head);
                 font-weight: 600;
             }
 
@@ -650,27 +650,27 @@ $border: #dee2e6;
 
         // Boxed value (for freelance data)
         .boxed-value {
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-table-head);
             border-radius: 6px;
             padding: 0.4rem 0.75rem;
             display: inline-block;
             min-width: 80px;
-            color: #475569;
-            background: #f8fafc;
+            color: var(--text-sub);
+            background: var(--bg-table-head);
         }
 
         // Edit button
         .btn-icon-pencil {
             background: transparent;
             border: none;
-            color: #94a3b8;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 0.5rem;
             font-size: 1rem;
             transition: color 0.2s;
 
             &:hover {
-                color: #1e293b;
+                color: var(--text-header);
             }
         }
     }
@@ -704,6 +704,6 @@ $border: #dee2e6;
 
 ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
     position: relative;
-    background-color: #fff;
+    background-color: #ffffff;
     border: 1px solid #cfcfcf00;
 }

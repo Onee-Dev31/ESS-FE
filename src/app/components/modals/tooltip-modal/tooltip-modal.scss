@@ -1,9 +1,9 @@
 @use '../../../../styles/mixins' as *;
 // Variables
-$primary: #1a73e8;
-$text: #202124;
-$bg-card: #ffffff;
-$border: #dee2e6;
+$primary: var(--primary);
+$text: var(--text);
+$bg-card: var(--bg-card);
+$border: var(--border);
 $radius: 16px;
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
@@ -52,7 +52,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
         max-width: 350px !important;
         min-height: auto;
         height: auto;
-        background: white;
+        background: var(--bg-card);
         border-radius: $radius;
         box-shadow: $shadow;
 
@@ -68,19 +68,19 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
         .modal-header {
             padding: 16px 24px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-table-head);
             display: flex;
             flex-direction: row !important;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to right, #ffffff, #f0f9ff);
+            background: linear-gradient(to right, var(--bg-card), #f0f9ff);
             width: 100%;
             min-height: auto !important;
 
             h3 {
                 font-size: 18px;
                 font-weight: 700;
-                color: #1e293b;
+                color: var(--text-header);
                 margin: 0;
                 letter-spacing: -0.5px;
             }
@@ -93,7 +93,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
         .modal-body {
             padding: 24px;
-            color: #334155;
+            color: var(--text-header);
             font-size: 15px;
             line-height: 1.5;
             max-height: 60vh;
@@ -112,7 +112,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
                     display: block;
                     text-align: center;
                     margin-bottom: 8px;
-                    color: #1e293b;
+                    color: var(--text-header);
                 }
 
                 .list-unstyled {
@@ -163,7 +163,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
                 }
 
                 .text-blue-500 {
-                    color: #3b82f6;
+                    color: var(--primary);
                 }
 
                 .text-yellow-600 {
@@ -175,7 +175,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
                 }
 
                 .text-orange-500 {
-                    color: #f97316;
+                    color: var(--warning);
                 }
 
                 .text-purple-500 {
@@ -183,11 +183,11 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
                 }
 
                 .text-gray-600 {
-                    color: #4b5563;
+                    color: var(--text-sub);
                 }
 
                 .text-green-500 {
-                    color: #22c55e;
+                    color: var(--success);
                 }
 
                 .tooltip-condition-item {

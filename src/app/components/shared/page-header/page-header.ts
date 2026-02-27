@@ -23,8 +23,8 @@ import { Router } from '@angular/router';
         display: flex;
         align-items: center;
         padding: 1rem 1.5rem;
-        background: white;
-        border-bottom: 1px solid #edf2f7;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-color);
         gap: 1rem;
         position: sticky;
         top: 0;
@@ -34,7 +34,7 @@ import { Router } from '@angular/router';
             margin: 0;
             font-size: 1.25rem;
             font-weight: 700;
-            color: #2d3748;
+            color: var(--text-header);
             flex: 1;
         }
 
@@ -42,9 +42,9 @@ import { Router } from '@angular/router';
             width: 36px;
             height: 36px;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            color: #4a5568;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-sub);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,9 +52,9 @@ import { Router } from '@angular/router';
             transition: all 0.2s;
 
             &:hover {
-                background: #f7fafc;
-                border-color: #cbd5e0;
-                color: #2d3748;
+                background: var(--bg-slate);
+                border-color: var(--border);
+                color: var(--text-header);
                 transform: translateX(-2px);
             }
         }

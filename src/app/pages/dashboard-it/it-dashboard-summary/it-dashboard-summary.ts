@@ -133,6 +133,9 @@ export class ItDashboardSummary {
     const labels = ['ONEE', 'GTV', 'FLD', 'ARTS', 'O31'];
     const values = [120, 85, 60, 40, 20];
 
+    // Create computed styles to get actual color values for ECharts which doesn't fully support CSS var() in all places
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
+
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -141,7 +144,7 @@ export class ItDashboardSummary {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700 }
+        axisLabel: { fontWeight: 700, color: textColor }
       },
       yAxis: {
         type: 'value',
@@ -154,7 +157,6 @@ export class ItDashboardSummary {
           type: 'bar',
           data: values,
           barWidth: 46,
-          // สีไม่กำหนดก็ได้ แต่ถ้าชอบโทนเดิม:
           itemStyle: { borderRadius: [12, 12, 12, 12] },
           emphasis: { focus: 'series' }
         }
@@ -204,13 +206,13 @@ export class ItDashboardSummary {
           type: 'text',
           left: 'center',
           top: '46%',
-          style: { text: String(centerValue), fontSize: 28, fontWeight: 800 }
+          style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' }
         },
         {
           type: 'text',
           left: 'center',
           top: '58%',
-          style: { text: centerLabel, fontSize: 12, fill: '#64748b' }
+          style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' }
         }
       ]
     };
@@ -252,13 +254,13 @@ export class ItDashboardSummary {
           type: 'text',
           left: 'center',
           top: '46%',
-          style: { text: String(centerValue), fontSize: 28, fontWeight: 800 }
+          style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' }
         },
         {
           type: 'text',
           left: 'center',
           top: '58%',
-          style: { text: centerLabel, fontSize: 12, fill: '#64748b' }
+          style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' }
         }
       ]
     };
@@ -343,8 +345,8 @@ export class ItDashboardSummary {
     // ✅ update graphic text แล้ว setOption แบบไม่กระพริบ
     const opt = this.statusPieOption as any;
     opt.graphic = [
-      { type: 'text', left: 'center', top: '46%', style: { text: String(centerValue), fontSize: 28, fontWeight: 800 } },
-      { type: 'text', left: 'center', top: '58%', style: { text: centerLabel, fontSize: 12, fill: '#64748b' } }
+      { type: 'text', left: 'center', top: '46%', style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' } },
+      { type: 'text', left: 'center', top: '58%', style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' } }
     ];
 
     this.statusChart?.setOption(opt, { notMerge: false, lazyUpdate: true });
@@ -378,12 +380,13 @@ export class ItDashboardSummary {
     const labels = data.map(x => x.label);
     const values = data.map(x => x.value);
 
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
     this.deptBarOption = {
       title: {
         text: `Top 5 Departments - ${company}`,
         left: 'left',
         top: 0,
-        textStyle: { fontSize: 14, fontWeight: 800 }
+        textStyle: { fontSize: 14, fontWeight: 800, color: textColor }
       },
       grid: { left: 10, right: 18, top: 36, bottom: 10, containLabel: true },
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -393,7 +396,7 @@ export class ItDashboardSummary {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700 }
+        axisLabel: { fontWeight: 700, color: textColor }
       },
       series: [
         {

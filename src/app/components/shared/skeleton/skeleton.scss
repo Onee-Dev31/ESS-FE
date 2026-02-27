@@ -1,6 +1,6 @@
 // Variables
-$bg-card: #ffffff;
-$border: #dee2e6;
+$bg-card: var(--bg-card);
+$border: var(--border);
 
 @keyframes shimmer {
     0% {
@@ -15,7 +15,7 @@ $border: #dee2e6;
 .skeleton-base {
     background: linear-gradient(90deg,
             #f0f2f5 0%,
-            #f8f9fa 50%,
+            var(--bg-page) 50%,
             #f0f2f5 100%);
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
@@ -32,7 +32,7 @@ $border: #dee2e6;
     gap: 16px;
     margin-bottom: 24px;
     padding: 16px 24px;
-    background: white;
+    background: var(--bg-card);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
@@ -53,7 +53,7 @@ $border: #dee2e6;
     display: flex;
     gap: 16px;
     padding: 24px;
-    background: white;
+    background: var(--bg-card);
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.03);

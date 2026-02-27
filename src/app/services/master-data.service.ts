@@ -44,10 +44,10 @@ export class MasterDataService {
     getMedicalClaimTypes(): Observable<ClaimType[]> {
         if (!this.claimTypesCache$) {
             const types: ClaimType[] = [
-                { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: '#ff6b6b' },
-                { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: '#4d96ff' },
-                { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: '#6bc1ff' },
-                { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: '#6bcb77' },
+                { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: 'var(--danger)' },
+                { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: 'var(--primary)' },
+                { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: 'var(--primary)' },
+                { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: 'var(--success)' },
             ];
             this.claimTypesCache$ = of(types).pipe(
                 delay(500),

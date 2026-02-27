@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { USER_ROLES } from '../../constants/user-roles.constant';
 import { ToastService } from '../../services/toast';
 import { SignalrService } from '../../services/signalr.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface NotificationItem {
   id: number;
@@ -42,6 +43,7 @@ export class NavbarComponent {
   private zone = inject(NgZone);
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
+  themeService = inject(ThemeService);
   private notifyAudio = new Audio('/notification1.wav');
 
   isProfileOpen = false;
@@ -58,10 +60,10 @@ export class NavbarComponent {
   ngOnInit() {
     this.notifyAudio.volume = 0.7;
     this.signalrService
-    .on('NewTicket','/it-service-list')
-    .subscribe(data => {
+      .on('NewTicket', '/it-service-list')
+      .subscribe(data => {
 
-      this.zone.run(() => {
+        this.zone.run(() => {
 
           const message = data.message || 'มี Ticket ใหม่เข้ามา';
 
@@ -78,10 +80,10 @@ export class NavbarComponent {
             this.toastService.info(message);
 
             this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
+            this.notifyAudio.play().catch(() => { });
           }
+        });
       });
-    });
   }
 
 

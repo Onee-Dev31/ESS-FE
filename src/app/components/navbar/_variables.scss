@@ -1,9 +1,9 @@
 // Variables
-$primary: #1a73e8;
-$text: #202124;
-$text-sub: #5f6368;
-$bg-card: #ffffff;
-$border: #dee2e6;
+$primary: var(--primary);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$bg-card: var(--bg-card);
+$border: var(--border);
 $radius: 16px;
 
 $navbar-height: 70px;

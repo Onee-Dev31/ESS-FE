@@ -5,33 +5,33 @@
 // ============================================
 
 // สีหลักและสีพื้นฐาน (Brand Colors)
-$primary: #1a73e8;
+$primary: var(--primary);
 $primary-dark: #1557b0;
-$success: #16a34a;
-$danger: #dc2626;
-$warning: #f59e0b;
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-header: #475569;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
 
 // สีพื้นหลัง (Background Colors)
-$bg-slate: #f4f7f9;
+$bg-slate: var(--bg-slate);
 
 // Fonts
 $font-main: 'Helvetica Neue', Arial, sans-serif;
 
 // เส้นขอบ (Border Colors)
-$border: #dee2e6;
+$border: var(--border);
 
 // อื่นๆ (Others)
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 $radius: 16px;
 
 // Status Colors
-$status-success-text: #16a34a;
+$status-success-text: var(--status-success-text);
 
 // Responsive Mixins
 @mixin mobile {
@@ -352,9 +352,9 @@ $balance: $status-success-text;
                 min-width: 15px;
                 height: 15px;
                 background: #cc0000;
-                color: white;
+                color: #ffffff;
                 border-radius: 50%;
-                border: 2px solid white;
+                border: 2px solid var(--bg-card);
                 font-size: 8px;
                 @include flex-center;
                 font-weight: 800;
@@ -366,7 +366,7 @@ $balance: $status-success-text;
 
 // ==================== BANNER AVATAR SECTION ====================
 .banner-avatar-section {
-    background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%));
+    background: linear-gradient(135deg, $primary, color-mix(in srgb, $primary, black 10%));
     border-radius: $radius-lg;
     padding: 20px;
     display: flex;
@@ -417,7 +417,7 @@ $balance: $status-success-text;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.4);
-        color: white;
+        color: #ffffff;
         @include flex-center;
         cursor: pointer;
         transition: all 0.2s;
@@ -425,9 +425,9 @@ $balance: $status-success-text;
         z-index: 10;
 
         &:hover {
-            background: white;
+            background: var(--bg-card);
             color: $primary;
-            border-color: white;
+            border-color: #ffffff;
         }
     }
 
@@ -451,15 +451,15 @@ $balance: $status-success-text;
             height: 100%;
             object-fit: cover;
             border-radius: 50%;
-            border: 4px solid #fff;
+            border: 4px solid var(--bg-card);
         }
     }
 }
 
 // ==================== PROFILE CARD ====================
 .profile-card {
-    background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%));
-    color: white;
+    background: linear-gradient(135deg, $primary, color-mix(in srgb, $primary, black 10%));
+    color: #ffffff;
     border-radius: $radius-lg;
     box-shadow: $shadow;
     border: none;
@@ -510,16 +510,16 @@ $balance: $status-success-text;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.4);
-        color: white;
+        color: #ffffff;
         @include flex-center;
         cursor: pointer;
         transition: all 0.2s;
         font-size: 14px;
 
         &:hover {
-            background: white;
+            background: var(--bg-card);
             color: $primary;
-            border-color: white;
+            border-color: #ffffff;
         }
     }
 
@@ -644,7 +644,7 @@ $balance: $status-success-text;
                 }
 
                 .display-value {
-                    color: white;
+                    color: #ffffff;
                     font-weight: 500;
                     word-break: break-word;
                     line-height: 1.4;
@@ -657,7 +657,7 @@ $balance: $status-success-text;
 
 // ==================== STATS GRID ====================
 .stats-grid-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: $radius;
     box-shadow: $shadow;
     margin-bottom: 25px;
@@ -703,7 +703,7 @@ $balance: $status-success-text;
     }
 
     .stats-action-area.card-footer {
-        background: #fafafa;
+        background: var(--bg-slate);
         border-radius: 0 0 $radius $radius;
         padding: 12px 15px;
         margin: 15px -15px -15px -15px;
@@ -791,7 +791,7 @@ $balance: $status-success-text;
             .inline-value {
                 font-size: 16px;
                 font-weight: 700;
-                color: #334155;
+                color: var(--text-header);
                 font-family: $font-main;
 
                 &.bold-value {
@@ -804,7 +804,7 @@ $balance: $status-success-text;
 
     .stat-progress {
         height: 6px;
-        background: #e2e8f0;
+        background: var(--border-table-head);
         border-radius: 10px;
         overflow: hidden;
         width: 100%;
@@ -839,7 +839,7 @@ $balance: $status-success-text;
     min-height: 100px;
     cursor: pointer;
     border: none;
-    background: white;
+    background: var(--bg-card);
     border-radius: $radius;
     box-shadow: $shadow;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -862,7 +862,7 @@ $balance: $status-success-text;
         height: 45px;
         border-radius: 10px;
         @include flex-center;
-        background: #f1f5f9;
+        background: var(--border-toolbar);
         color: $muted;
         font-size: 20px;
         flex-shrink: 0;
@@ -911,7 +911,7 @@ $balance: $status-success-text;
 
         h6,
         h3 {
-            color: #1e40af !important;
+            color: var(--primary) !important;
         }
     }
 
@@ -940,13 +940,13 @@ $balance: $status-success-text;
     box-shadow: $shadow;
     border-radius: $radius-lg;
     overflow: hidden;
-    background: #fff;
+    background: var(--bg-card);
     margin-bottom: 24px;
 
     .card-header {
-        background: linear-gradient(to right, #ffffff, #f8fafc);
+        background: linear-gradient(to right, var(--bg-card), var(--bg-table-head));
         padding: 20px 24px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-toolbar);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -976,16 +976,16 @@ $balance: $status-success-text;
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px dashed #e2e8f0;
+            border-bottom: 1px dashed var(--border-table-head);
 
             .att-label {
-                color: #64748b;
+                color: var(--text-table-head);
                 font-size: 15px;
                 font-weight: 500;
             }
 
             .att-value {
-                color: #0f172a;
+                color: var(--text-header);
                 font-weight: 600;
                 font-size: 16px;
             }
@@ -993,8 +993,8 @@ $balance: $status-success-text;
     }
 
     .card-footer {
-        background: #fff;
-        border-top: 1px solid #f1f5f9;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-toolbar);
         padding: 16px 24px;
     }
 }
@@ -1006,7 +1006,7 @@ $balance: $status-success-text;
     flex-direction: column;
     justify-content: space-between;
     min-height: 150px;
-    background: white;
+    background: var(--bg-card);
     border-radius: $radius;
     box-shadow: $shadow;
     transition: transform 0.2s;
@@ -1037,7 +1037,7 @@ $balance: $status-success-text;
                 width: 32px;
                 height: 32px;
                 @include flex-center;
-                background: #f1f5f9;
+                background: var(--border-toolbar);
                 border-radius: 8px;
                 color: $muted;
             }
@@ -1062,10 +1062,10 @@ $balance: $status-success-text;
     }
 
     $leave-themes: (
-        'green': #22c55e,
-        'purple': #4650dd,
-        'blue': #3b82f6,
-        'pink': #ef4444
+        'green': var(--success),
+        'purple': var(--primary),
+        'blue': var(--primary),
+        'pink': var(--danger)
     );
 
 @each $name, $color in $leave-themes {
@@ -1110,16 +1110,16 @@ $balance: $status-success-text;
     }
 
     .holiday-list-panel {
-        background: #f8fafc;
+        background: var(--bg-table-head);
         padding: 20px;
         width: 100%;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-toolbar);
 
         @media (min-width: 1024px) {
             width: 300px;
             flex-shrink: 0;
             border-bottom: none;
-            border-right: 1px solid #f1f5f9;
+            border-right: 1px solid var(--border-toolbar);
             padding: 25px;
             overflow-y: auto;
             max-height: 600px;
@@ -1162,7 +1162,7 @@ $balance: $status-success-text;
     .calendar-panel {
         flex: 1;
         padding: 15px;
-        background: white;
+        background: var(--bg-card);
         min-height: 400px;
 
         @media (min-width: 768px) {
@@ -1184,8 +1184,8 @@ $balance: $status-success-text;
         gap: 10px;
         font-size: 12px;
         color: $muted;
-        background: #fff;
-        border-top: 1px solid #f1f5f9;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border-toolbar);
 
         @media (min-width: 768px) {
             padding: 15px 25px;
@@ -1206,7 +1206,7 @@ $balance: $status-success-text;
         }
 
         .box-gray {
-            background: #94a3b8;
+            background: var(--text-muted);
         }
 
         .box-red {
@@ -1222,15 +1222,15 @@ $balance: $status-success-text;
         }
 
         .box-blue {
-            background: #3b82f6;
+            background: var(--primary);
         }
     }
 }
 
 // ==================== WORK META GROUP ====================
 .work-meta-group {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-table-head);
+    border: 1px solid var(--border-table-head);
     border-radius: 12px;
     padding: 10px;
     margin-bottom: 15px;
@@ -1286,7 +1286,7 @@ $balance: $status-success-text;
 
 // ==================== CARDS ====================
 .card:not(.profile-card) {
-    background: white;
+    background: var(--bg-card);
     border-radius: $radius;
     box-shadow: $shadow;
     display: flex;
@@ -1315,7 +1315,7 @@ $balance: $status-success-text;
     .card-footer {
         padding: 12px 15px;
         border-top: none;
-        background: #fafafa;
+        background: var(--bg-slate);
         border-radius: 0 0 $radius $radius;
     }
 
@@ -1368,7 +1368,7 @@ $balance: $status-success-text;
 // ==================== BUTTONS ====================
 .action-btn {
     background: $primary;
-    color: white;
+    color: #ffffff;
     border: none;
     padding: 8px 20px;
     border-radius: 8px;
@@ -1380,7 +1380,7 @@ $balance: $status-success-text;
     white-space: nowrap;
 
     &:hover {
-        background: color.adjust($primary, $lightness: -5%);
+        background: color-mix(in srgb, $primary, black 5%);
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba($primary, 0.3);
     }
@@ -1403,7 +1403,7 @@ $balance: $status-success-text;
 
     &:hover {
         background: $primary;
-        color: white;
+        color: #ffffff;
     }
 }
 
@@ -1425,7 +1425,7 @@ $balance: $status-success-text;
 
 .btn-danger {
     background-color: $danger;
-    color: white;
+    color: #ffffff;
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
@@ -1452,7 +1452,7 @@ $balance: $status-success-text;
 .btn-info-circle {
     background: none;
     border: none;
-    color: #94a3b8;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 0;
     border-radius: 50%;
@@ -1486,13 +1486,13 @@ $balance: $status-success-text;
     box-shadow: $shadow;
     border-radius: $radius-lg;
     overflow: hidden;
-    background: #fff;
+    background: var(--bg-card);
     margin-bottom: 24px;
 
     .card-header {
-        background: linear-gradient(to right, #ffffff, #f8fafc);
+        background: linear-gradient(to right, var(--bg-card), var(--bg-table-head));
         padding: 20px 24px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-toolbar);
         border-left: 4px solid $primary;
 
         .card-heading {
@@ -1512,7 +1512,7 @@ $balance: $status-success-text;
         .perf-subtitle {
             font-size: 15px;
             font-weight: 600;
-            color: #334155;
+            color: var(--text-header);
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -1537,25 +1537,25 @@ $balance: $status-success-text;
                 justify-content: space-between;
                 align-items: center;
                 padding: 12px 16px;
-                background: #f8fafc;
+                background: var(--bg-table-head);
                 border-radius: 8px;
-                border: 1px solid #f1f5f9;
+                border: 1px solid var(--border-toolbar);
                 transition: transform 0.2s;
 
                 &:hover {
                     transform: translateX(5px);
-                    border-color: #cbd5e1;
+                    border-color: var(--text-muted);
                 }
 
                 .perf-year {
                     font-weight: 600;
-                    color: #64748b;
+                    color: var(--text-table-head);
                 }
 
                 .perf-grade {
                     font-weight: 800;
-                    color: #0f172a;
-                    background: #e2e8f0;
+                    color: var(--text-header);
+                    background: var(--border-table-head);
                     padding: 4px 12px;
                     border-radius: 8px;
                     font-size: 14px;
@@ -1568,7 +1568,7 @@ $balance: $status-success-text;
 // ==================== IT STORY CARD ====================
 .it-story-card {
     .card-header {
-        background: #fafafa;
+        background: var(--bg-slate);
         border-radius: 12px 12px 0 0;
         padding: 15px 20px;
     }
@@ -1579,7 +1579,7 @@ $balance: $status-success-text;
 
     .profile-display-group {
         margin-bottom: 15px;
-        border-bottom: 1px dashed #f1f5f9;
+        border-bottom: 1px dashed var(--border-toolbar);
         padding-bottom: 15px;
         display: flex;
         flex-direction: column;
@@ -1610,9 +1610,9 @@ $balance: $status-success-text;
 ::ng-deep {
     .fc {
         font-family: $font-main;
-        --fc-border-color: #f1f5f9;
+        --fc-border-color: var(--border-toolbar);
         --fc-today-bg-color: transparent;
-        --fc-neutral-bg-color: #f8fafc;
+        --fc-neutral-bg-color: var(--bg-table-head);
         --fc-page-bg-color: #ffffff;
 
         .fc-toolbar {
@@ -1631,9 +1631,9 @@ $balance: $status-success-text;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
                 .fc-button {
-                    background: white;
-                    border: 1px solid #e2e8f0;
-                    color: #64748b;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-table-head);
+                    color: var(--text-table-head);
                     font-weight: 600;
                     padding: 8px 16px;
                     text-transform: capitalize;
@@ -1643,14 +1643,14 @@ $balance: $status-success-text;
                     }
 
                     &:hover {
-                        background: #f8fafc;
+                        background: var(--bg-table-head);
                         color: $dark;
                         z-index: 1;
                     }
 
                     &.fc-button-active {
                         background: $primary;
-                        color: white;
+                        color: #ffffff;
                         border-color: $primary;
                     }
                 }
@@ -1663,14 +1663,14 @@ $balance: $status-success-text;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
 
         .fc-daygrid-day {
             transition: background-color 0.2s;
 
             &:hover {
-                background-color: #fcfcfc;
+                background-color: var(--bg-slate);
             }
 
             &.fc-day-today {
@@ -1713,14 +1713,14 @@ $balance: $status-success-text;
             }
 
             &.circle-red-outline {
-                color: #ef4444;
+                color: var(--danger);
                 background: #fef2f2;
             }
         }
 
         :host ::ng-deep .fc-day-today & .date-circle {
             background: $primary !important;
-            color: white !important;
+            color: #ffffff !important;
             box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
             border: none;
         }
@@ -1751,7 +1751,7 @@ $balance: $status-success-text;
             }
 
             &.text-red {
-                color: #ef4444;
+                color: var(--danger);
                 font-weight: 500;
             }
         }
@@ -1761,7 +1761,7 @@ $balance: $status-success-text;
 .calendar-panel {
     min-height: 400px;
     position: relative;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 8px;
     overflow: hidden;
 
@@ -1775,8 +1775,8 @@ $balance: $status-success-text;
         justify-content: center;
         gap: 15px;
         color: $muted;
-        background: #f8fafc;
-        border: 1px dashed #e2e8f0;
+        background: var(--bg-table-head);
+        border: 1px dashed var(--border-table-head);
         border-radius: 8px;
     }
 
@@ -1788,7 +1788,7 @@ $balance: $status-success-text;
     .skeleton-calendar {
         width: 90%;
         height: 300px;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background: linear-gradient(90deg, var(--border-color) 25%, #e0e0e0 50%, var(--border-color) 75%);
         background-size: 200% 100%;
         animation: skeleton-loading 1.5s infinite;
         border-radius: 4px;

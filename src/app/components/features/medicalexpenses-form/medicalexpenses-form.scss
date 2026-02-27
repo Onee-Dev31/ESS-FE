@@ -43,7 +43,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background: #fff;
+    background: var(--bg-card);
     overflow: hidden;
 
     .top-header-strip {
@@ -51,8 +51,8 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
-        color: white;
+        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+        color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         h2 {
@@ -63,7 +63,7 @@
 
         .btn-close-modal {
             @include close-btn-style;
-            color: white;
+            color: #ffffff;
             font-size: 1.25rem;
 
             &:hover {
@@ -75,7 +75,7 @@
     .content-card {
         flex: 1;
         padding: 20px 24px;
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow-y: auto;
@@ -94,8 +94,8 @@
     align-items: center;
     gap: 12px;
     padding: 16px 24px;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    background: var(--bg-table-head);
+    border-top: 1px solid var(--border-table-head);
 
     @include mobile {
         flex-direction: column-reverse;
@@ -177,7 +177,7 @@
     .icon-box {
         position: absolute;
         right: 12px;
-        color: #6b7280;
+        color: var(--text-muted);
         pointer-events: none;
         display: flex;
         align-items: center;
@@ -230,8 +230,8 @@
     gap: 1.25rem;
 
     .claim-type-card {
-        background: #fff;
-        border: 1px solid #eee;
+        background: var(--bg-card);
+        border: 1px solid var(--border-toolbar);
         border-radius: 12px;
         padding: 1.25rem;
         cursor: pointer;
@@ -241,12 +241,12 @@
         &:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #ddd;
+            border-color: var(--border);
         }
 
         &.active {
             border: 2px solid $primary;
-            background-color: #f8faff;
+            background-color: var(--bg-slate);
         }
 
         .card-content {
@@ -262,7 +262,7 @@
                 .type-label {
                     font-weight: 700;
                     font-size: 0.95rem;
-                    color: #333;
+                    color: var(--text);
                 }
 
                 .balance-value {
@@ -273,7 +273,7 @@
 
                 .balance-label {
                     font-size: 0.75rem;
-                    color: #888;
+                    color: var(--text-muted);
                     font-weight: 600;
                 }
             }
@@ -316,10 +316,10 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px 24px;
-    background: #ffffff;
+    background: var(--bg-card);
     padding: 24px;
     border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-table-head);
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 24px;
@@ -377,10 +377,10 @@
 
 .attachment-table-container {
     margin-top: 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-table-head);
     border-radius: 12px;
     overflow: hidden;
-    background: white;
+    background: var(--bg-card);
 
     .excel-table {
         width: 100%;
@@ -388,12 +388,12 @@
         font-size: 0.9rem;
 
         th {
-            background: #f8fafc;
+            background: var(--bg-table-head);
             padding: 12px 16px;
             font-weight: 600;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            color: #64748b;
+            border-bottom: 1px solid var(--border-table-head);
+            color: var(--text-table-head);
             white-space: nowrap;
 
             &.col-xs {
@@ -404,9 +404,9 @@
 
         td {
             padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-toolbar);
             vertical-align: middle;
-            color: #334155;
+            color: var(--text-header);
 
             &.text-center {
                 text-align: center;
@@ -417,7 +417,7 @@
             transition: all 0.2s;
 
             &:hover {
-                background-color: #f8fafc;
+                background-color: var(--bg-table-head);
             }
 
             &:last-child td {
@@ -445,14 +445,14 @@
                 }
 
                 &:hover .file-text {
-                    color: color.adjust($primary, $lightness: -10%);
+                    color: color-mix(in srgb, $primary, black 10%);
                 }
             }
         }
 
         .desc-control {
             width: 100%;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-table-head);
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.9rem;
@@ -465,7 +465,7 @@
             }
 
             &.is-invalid {
-                border-color: #ef4444;
+                border-color: var(--danger);
             }
         }
     }
@@ -483,24 +483,24 @@
         align-items: center;
         gap: 8px;
         font-size: 0.9rem;
-        color: #4b5563;
-        background: #f3f4f6;
+        color: var(--text-sub);
+        background: var(--bg-slate);
         padding: 8px 12px;
         border-radius: 8px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--border);
 
         i {
-            color: #3b82f6;
+            color: var(--primary);
         }
 
         .label {
-            color: #6b7280;
+            color: var(--text-muted);
             margin-right: 4px;
         }
 
         .value {
             font-weight: 600;
-            color: #111827;
+            color: var(--text-header);
         }
     }
 }
@@ -511,18 +511,18 @@
     justify-content: center;
     align-items: center;
     padding: 3rem 1rem;
-    background: #f8fafc;
+    background: var(--bg-table-head);
     border-radius: 16px;
-    border: 2px dashed #e2e8f0;
+    border: 2px dashed var(--border-table-head);
     margin: 2rem 0;
 
     .placeholder-content {
         text-align: center;
-        color: #64748b;
+        color: var(--text-table-head);
 
         .pulse-icon {
             font-size: 3rem;
-            color: #cbd5e1;
+            color: var(--text-muted);
             margin-bottom: 1.5rem;
             animation: pulse-subtle 2s infinite;
         }
@@ -530,13 +530,13 @@
         p {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #334155;
+            color: var(--text-header);
             margin: 0 0 0.5rem 0;
         }
 
         .sub-text {
             font-size: 0.9rem;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
     }
 }

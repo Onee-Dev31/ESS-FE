@@ -2,21 +2,21 @@
 @use '../../../../styles/mixins' as *;
 
 // Variables
-$primary: #1a73e8;
+$primary: var(--primary);
 $primary-dark: #1557b0;
-$success: #16a34a;
-$danger: #dc2626;
-$warning: #f59e0b;
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-header: #475569;
-$bg-slate: #f4f7f9;
-$bg-card: #ffffff;
-$bg-gray: #f8f9fa;
-$border: #dee2e6;
-$border-color: #e9ecef;
-$header-bg: #f8fafc;
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
+$bg-slate: var(--bg-slate);
+$bg-card: var(--bg-card);
+$bg-gray: var(--bg-page);
+$border: var(--border);
+$border-color: var(--border-color);
+$header-bg: var(--bg-table-head);
 $radius: 16px;
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
@@ -288,7 +288,7 @@ $primary-orange: $warning;
                 padding: 8px 20px;
                 border-radius: 8px;
                 border: none;
-                color: white;
+                color: #ffffff;
                 font-weight: 600;
                 cursor: pointer;
                 font-size: 13px;
@@ -375,7 +375,7 @@ $primary-orange: $warning;
                 top: 24px;
                 left: 10%;
                 height: 4px;
-                background: linear-gradient(90deg, $primary-green 0%, color.adjust($primary-green, $lightness: -10%) 100%);
+                background: linear-gradient(90deg, $primary-green 0%, color-mix(in srgb, $primary-green, black 10%) 100%);
                 border-radius: 2px;
                 z-index: 1;
                 transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -440,9 +440,9 @@ $primary-orange: $warning;
 
                 &.completed {
                     .step-icon-circle {
-                        background: linear-gradient(135deg, $primary-green 0%, color.adjust($primary-green, $lightness: -10%) 100%);
-                        border-color: color.adjust($primary-green, $lightness: -10%);
-                        color: white;
+                        background: linear-gradient(135deg, $primary-green 0%, color-mix(in srgb, $primary-green, black 10%) 100%);
+                        border-color: color-mix(in srgb, $primary-green, black 10%);
+                        color: #ffffff;
                         box-shadow: 0 6px 16px rgba($primary-green, 0.35);
                         transform: scale(1.05);
                     }
@@ -478,9 +478,9 @@ $primary-orange: $warning;
 
                 &.rejected {
                     .step-icon-circle {
-                        background: linear-gradient(135deg, $primary-red 0%, color.adjust($primary-red, $lightness: -10%) 100%);
-                        border-color: color.adjust($primary-red, $lightness: -10%);
-                        color: white;
+                        background: linear-gradient(135deg, $primary-red 0%, color-mix(in srgb, $primary-red, black 10%) 100%);
+                        border-color: color-mix(in srgb, $primary-red, black 10%);
+                        color: #ffffff;
                         box-shadow: 0 6px 16px rgba($primary-red, 0.35);
                     }
 
@@ -512,7 +512,7 @@ $primary-orange: $warning;
                 background: rgba($warning, 0.1);
 
                 .s-value {
-                    color: color.adjust($warning, $lightness: -10%);
+                    color: color-mix(in srgb, $warning, black 10%);
                 }
 
                 label {
@@ -590,7 +590,7 @@ $primary-orange: $warning;
             background: $primary-dark;
             padding: 12px;
             text-align: left;
-            color: white;
+            color: #ffffff;
             font-weight: 600;
         }
 
@@ -631,7 +631,7 @@ $primary-orange: $warning;
 
     &:hover {
         background-color: #ebf5fa;
-        color: color.adjust($primary-blue, $lightness: -10%);
+        color: color-mix(in srgb, $primary-blue, black 10%);
         transform: scale(1.1);
     }
 
@@ -750,7 +750,7 @@ $primary-orange: $warning;
     margin-top: 10px;
     padding: 10px;
     background: rgba($warning, 0.1);
-    color: color.adjust($warning, $lightness: -20%);
+    color: color-mix(in srgb, $warning, black 20%);
     border-radius: 6px;
     font-size: 12px;
     text-align: right;
@@ -872,11 +872,11 @@ $primary-orange: $warning;
 
         .btn-confirm {
             background: $primary-blue;
-            color: white;
+            color: #ffffff;
             border: none;
 
             &:hover {
-                background: color.adjust($primary-blue, $lightness: -10%);
+                background: color-mix(in srgb, $primary-blue, black 10%);
                 transform: translateY(-1px);
             }
         }
@@ -913,7 +913,7 @@ $primary-orange: $warning;
 
         .comment-bubble {
             border-radius: 8px;
-            background: #fff;
+            background: var(--bg-card);
             border: 1px solid #eef2f6;
             padding: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -925,7 +925,7 @@ $primary-orange: $warning;
         width: 40px;
         height: 40px;
         background: $primary-blue;
-        color: white;
+        color: #ffffff;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -942,7 +942,7 @@ $primary-orange: $warning;
 
         .comment-top {
             font-size: 11px;
-            color: #888;
+            color: var(--text-muted);
             margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -952,7 +952,7 @@ $primary-orange: $warning;
             margin: 0;
             font-size: 13px;
             line-height: 1.5;
-            color: #333;
+            color: var(--text);
         }
     }
 }

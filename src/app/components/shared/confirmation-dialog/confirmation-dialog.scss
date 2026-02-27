@@ -24,7 +24,7 @@
 }
 
 .dialog-container {
-    background: white !important;
+    background: var(--bg-card) !important;
     border-radius: 16px !important;
     padding: 32px !important;
     max-width: 440px !important;
@@ -110,7 +110,7 @@
 }
 
 .btn-cancel {
-    background: #f5f5f7 !important;
+    background: var(--bg-page) !important;
     color: #1d1d1f !important;
 
     &:hover {
@@ -119,8 +119,8 @@
 }
 
 .btn-confirm {
-    background: #0071e3 !important;
-    color: white !important;
+    background: var(--primary) !important;
+    color: #ffffff !important;
 
     &:hover {
         background: #0077ed !important;

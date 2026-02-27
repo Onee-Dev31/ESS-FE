@@ -4,7 +4,7 @@
 
 .top-header-strip {
     padding: 16px 24px;
-    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--bg-table-head) 0%, var(--bg-card) 100%);
     border-bottom: 1px solid $border;
     display: flex;
     justify-content: space-between;
@@ -38,7 +38,7 @@
 }
 
 .modal-container {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     width: 100%;
     max-width: 1080px;
@@ -104,7 +104,7 @@
         border-radius: 50%;
         border: none;
         background: transparent;
-        color: #9ca3af;
+        color: var(--text-muted);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -113,8 +113,8 @@
         font-size: 1rem;
 
         &:hover {
-            color: #ef4444;
-            background: #f3f4f6;
+            color: var(--danger);
+            background: var(--bg-slate);
             transform: rotate(90deg);
         }
     }
@@ -159,23 +159,23 @@
     label {
         font-size: 0.9rem;
         font-weight: 400;
-        color: #1f2937 !important;
+        color: var(--text) !important;
         margin-left: 4px;
     }
 
     .form-input {
         height: 48px !important;
         padding: 0 20px !important;
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid var(--text-muted) !important;
         border-radius: 50px !important;
         font-size: 0.95rem !important;
-        color: #1f2937 !important;
-        background: white !important;
+        color: var(--text) !important;
+        background: var(--bg-card) !important;
         transition: all 0.2s;
         font-family: $font-main;
 
         &::placeholder {
-            color: #64748b;
+            color: var(--text-table-head);
             font-weight: 400;
         }
 
@@ -189,7 +189,7 @@
         &.disabled,
         &:disabled {
             background: #f5f5f5 !important;
-            color: #6b7280 !important;
+            color: var(--text-muted) !important;
             border-color: #d1d5db !important;
             cursor: not-allowed;
             opacity: 1;
@@ -254,7 +254,7 @@
     }
 
     .help-desc {
-        color: #475569;
+        color: var(--text-sub);
     }
 }
 
@@ -278,19 +278,19 @@
         flex: 1;
         height: 48px;
         padding: 0 20px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--text-muted);
         border-radius: 50px;
-        background: white;
+        background: var(--bg-card);
         display: flex;
         align-items: center;
         justify-content: space-between;
         cursor: pointer;
         transition: all 0.2s;
-        color: #475569;
+        color: var(--text-sub);
         font-size: 0.95rem;
 
         &:hover {
-            border-color: #9ca3af;
+            border-color: var(--text-muted);
             background: #f9fafb;
         }
 
@@ -321,7 +321,7 @@
         height: 48px;
         padding: 0 32px;
         background: #5850ec;
-        color: white;
+        color: #ffffff;
         border: none;
         border-radius: 12px;
         font-weight: 500;
@@ -356,19 +356,19 @@
         border: none;
 
         i.fa-file-pdf {
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 1.2rem;
         }
 
         i.fa-file-lines {
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 1.2rem;
         }
 
         span {
             flex: 1;
             font-size: 0.9rem;
-            color: #4b5563;
+            color: var(--text-sub);
             font-weight: 400;
         }
 
@@ -386,8 +386,8 @@
             font-size: 1rem;
 
             &:hover {
-                color: #ef4444;
-                background: #f3f4f6;
+                color: var(--danger);
+                background: var(--bg-slate);
             }
         }
 
@@ -420,8 +420,8 @@
     flex-wrap: nowrap !important;
     gap: 16px;
     padding: 24px 36px;
-    background: white;
-    border-top: 1px solid #f1f5f9;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-toolbar);
     border-radius: 0 0 16px 16px;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
     z-index: 10;
@@ -457,7 +457,7 @@
 
     .btn-save {
         background: #10b981 !important;
-        color: white !important;
+        color: #ffffff !important;
 
         &:hover {
             background: #059669 !important;
@@ -489,18 +489,18 @@
     }
 
     .btn-clear {
-        background: #94a3b8 !important;
-        color: white !important;
+        background: var(--text-muted) !important;
+        color: #ffffff !important;
 
         &:hover {
-            background: #64748b !important;
+            background: var(--text-table-head) !important;
         }
     }
 
     .btn-resign {
         margin-right: auto !important;
-        background: #ef4444 !important;
-        color: white !important;
+        background: var(--danger) !important;
+        color: #ffffff !important;
 
         &:hover {
             background: #dc2626 !important;
@@ -511,7 +511,7 @@
     .btn-active {
         margin-right: auto !important;
         background: #4340fd !important;
-        color: white !important;
+        color: #ffffff !important;
 
         &:hover {
             background: #3533d2 !important;
@@ -529,7 +529,7 @@
     .modal-container.small-modal {
         width: 100%;
         max-width: 480px;
-        background: #ffffff;
+        background: var(--bg-card);
         border-radius: 24px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.8);
@@ -548,7 +548,7 @@
             h2 {
                 font-size: 1.35rem;
                 font-weight: 600;
-                color: #ef4444;
+                color: var(--danger);
                 margin: 0;
                 text-align: center;
             }
@@ -557,7 +557,7 @@
                 position: absolute;
                 top: 24px;
                 right: 24px;
-                color: #9ca3af;
+                color: var(--text-muted);
                 background: transparent;
                 width: 32px;
                 height: 32px;
@@ -568,8 +568,8 @@
                 transition: all 0.2s;
 
                 &:hover {
-                    color: #ef4444;
-                    background: #f3f4f6;
+                    color: var(--danger);
+                    background: var(--bg-slate);
                     transform: rotate(90deg);
                 }
             }
@@ -587,7 +587,7 @@
 
                     label {
                         font-size: 0.9rem;
-                        color: #64748b;
+                        color: var(--text-table-head);
                         margin-bottom: 8px;
                         font-weight: 500;
                     }
@@ -595,15 +595,15 @@
                     .form-input {
                         width: 100%;
                         height: 48px !important;
-                        border: 1px solid #e2e8f0 !important;
+                        border: 1px solid var(--border-table-head) !important;
                         border-radius: 14px !important;
                         padding: 0 16px !important;
                         font-size: 1rem;
-                        color: #334155;
+                        color: var(--text-header);
                         transition: all 0.2s;
 
                         &:focus {
-                            border-color: #ef4444 !important;
+                            border-color: var(--danger) !important;
                             box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
                         }
                     }
@@ -630,8 +630,8 @@
             }
 
             .btn-confirm-resign {
-                background: #ef4444 !important;
-                color: white;
+                background: var(--danger) !important;
+                color: #ffffff;
                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 
                 &:hover {
@@ -646,12 +646,12 @@
             }
 
             .btn-clear {
-                background: #f1f5f9 !important;
-                color: #64748b !important;
+                background: var(--border-toolbar) !important;
+                color: var(--text-table-head) !important;
 
                 &:hover {
-                    background: #e2e8f0 !important;
-                    color: #475569 !important;
+                    background: var(--border-table-head) !important;
+                    color: var(--text-sub) !important;
                 }
             }
         }

@@ -6,45 +6,45 @@
    1. VARIABLES & THEME
    ========================================================================== */
 $primary-dark: #1557b0;
-$success: #16a34a;
-$danger: #dc2626;
-$warning: #f59e0b;
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-header: #475569;
-$bg-page: #f5f5f7;
-$bg-card: #ffffff;
-$header-bg: #f5f5f7;
-$border: #dee2e6;
-$border-color: #e9ecef;
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
+$bg-page: var(--bg-page);
+$bg-card: var(--bg-card);
+$header-bg: var(--bg-page);
+$border: var(--border);
+$border-color: var(--border-color);
 
 // Status colors
-$status-success-bg: #dcfce7;
-$status-success-text: #16a34a;
-$status-danger-bg: #fee2e2;
-$status-danger-text: #dc2626;
-$status-warning-bg: #fef3c7;
-$status-warning-text: #d97706;
-$status-new-bg: #e0f2fe;
-$status-new-text: #0284c7;
-$status-verified-bg: #dcfce7;
-$status-verified-text: #16a34a;
-$status-pending-bg: #fef3c7;
-$status-pending-text: #d97706;
-$status-rejected-bg: #fee2e2;
-$status-rejected-text: #dc2626;
-$status-approved-bg: #dbeafe;
-$status-approved-text: #2563eb;
-$status-progress-bg: #f3e8ff;
-$status-progress-text: #9333ea;
-$status-completed-text: #059669;
-$status-cancelled-text: #64748b;
+$status-success-bg: var(--status-success-bg);
+$status-success-text: var(--status-success-text);
+$status-danger-bg: var(--status-danger-bg);
+$status-danger-text: var(--status-danger-text);
+$status-warning-bg: var(--status-warning-bg);
+$status-warning-text: var(--status-warning-text);
+$status-new-bg: var(--status-new-bg);
+$status-new-text: var(--status-new-text);
+$status-verified-bg: var(--status-verified-bg);
+$status-verified-text: var(--status-verified-text);
+$status-pending-bg: var(--status-pending-bg);
+$status-pending-text: var(--status-pending-text);
+$status-rejected-bg: var(--status-rejected-bg);
+$status-rejected-text: var(--status-rejected-text);
+$status-approved-bg: var(--status-approved-bg);
+$status-approved-text: var(--primary);
+$status-progress-bg: var(--status-progress-bg);
+$status-progress-text: var(--status-progress-text);
+$status-completed-text: var(--status-completed-text);
+$status-cancelled-text: var(--text-table-head);
 
 // Information Table Styles
-$table-header-bg: #f8fafc;
-$table-border: #e2e8f0;
-$table-label-bg: #f1f5f9;
+$table-header-bg: var(--bg-table-head);
+$table-border: var(--border-table-head);
+$table-label-bg: var(--border-toolbar);
 
 /* ==========================================================================
    2. UTILITY CLASSES
@@ -161,7 +161,7 @@ $table-label-bg: #f1f5f9;
 
             &:focus {
                 outline: none;
-                border-color: #0071e3;
+                border-color: var(--primary);
                 box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
             }
 
@@ -219,7 +219,7 @@ $table-label-bg: #f1f5f9;
     }
 
     .content-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 18px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
         padding: 40px;
@@ -239,7 +239,7 @@ $table-label-bg: #f1f5f9;
             width: 32px;
             height: 32px;
             background-color: $primary;
-            color: white;
+            color: #ffffff;
             border-radius: 50%;
             font-size: $font-size-header;
             font-weight: 700;
@@ -253,7 +253,7 @@ $table-label-bg: #f1f5f9;
     .card-header-title {
         font-size: $font-size-header;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-header);
         margin-bottom: 24px;
         position: relative;
         padding-left: 16px;
@@ -291,7 +291,7 @@ $table-label-bg: #f1f5f9;
                 justify-content: space-between;
                 align-items: center;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                background: linear-gradient(to bottom, #ffffff, #f8fafc);
+                background: linear-gradient(to bottom, var(--bg-card), var(--bg-table-head));
                 width: 100%;
                 box-sizing: border-box;
 
@@ -310,8 +310,8 @@ $table-label-bg: #f1f5f9;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background: white;
-                    border: 1px solid #e2e8f0;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-table-head);
                     border-radius: 50%;
                     color: $text-muted;
                     cursor: pointer;
@@ -335,15 +335,15 @@ $table-label-bg: #f1f5f9;
                 display: flex;
                 flex-direction: column;
                 gap: 1.25rem;
-                background: #fff;
+                background: var(--bg-card);
                 max-height: 60vh;
                 overflow-y: auto;
 
                 .summary-section {
-                    background: #f8fafc;
+                    background: var(--bg-table-head);
                     border-radius: 12px;
                     padding: 1rem;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-table-head);
 
                     h3 {
                         font-size: $font-size-label;
@@ -351,7 +351,7 @@ $table-label-bg: #f1f5f9;
                         color: $text-header;
                         margin: 0 0 0.75rem 0;
                         padding-bottom: 0.5rem;
-                        border-bottom: 1px dashed #cbd5e1;
+                        border-bottom: 1px dashed var(--text-muted);
                     }
 
                     .summary-list {
@@ -421,7 +421,7 @@ $table-label-bg: #f1f5f9;
                 justify-content: flex-end;
                 gap: 1rem;
                 border-top: 1px solid rgba(0, 0, 0, 0.05);
-                background: #f8fafc;
+                background: var(--bg-table-head);
                 flex-wrap: nowrap;
 
                 button {
@@ -440,21 +440,21 @@ $table-label-bg: #f1f5f9;
                 }
 
                 .btn-cancel {
-                    background: white;
-                    border: 1px solid #e2e8f0;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-table-head);
                     color: $text-muted;
 
                     &:hover {
-                        background: #f1f5f9;
+                        background: var(--border-toolbar);
                         color: $text;
                         transform: translateY(-1px);
                     }
                 }
 
                 .btn-confirm {
-                    background: linear-gradient(135deg, $primary, color.adjust($primary, $lightness: -10%));
+                    background: linear-gradient(135deg, $primary, color-mix(in srgb, $primary, black 10%));
                     border: none;
-                    color: white;
+                    color: #ffffff;
                     box-shadow: 0 4px 6px -1px rgba($primary, 0.3);
 
                     &:hover {
@@ -498,7 +498,7 @@ $table-label-bg: #f1f5f9;
             align-items: center;
             justify-content: center;
             padding: 0.6rem 1.2rem;
-            background-color: #f5f5f7;
+            background-color: var(--bg-page);
             border: 1px solid transparent;
             border-radius: 999px;
             cursor: pointer;
@@ -522,30 +522,30 @@ $table-label-bg: #f1f5f9;
             }
 
             &.checked {
-                background-color: #0071e3;
-                color: white;
+                background-color: var(--primary);
+                color: #ffffff;
                 box-shadow: none;
 
                 .label-text {
-                    color: white;
+                    color: #ffffff;
                     font-weight: 500;
                 }
             }
 
             &:hover {
                 border-color: $primary;
-                background-color: #f8fafc;
+                background-color: var(--bg-table-head);
                 transform: translateY(-1px);
             }
 
             &.checked {
                 background-color: $primary;
                 border-color: $primary;
-                color: white;
+                color: #ffffff;
                 box-shadow: 0 4px 6px -1px rgba($primary, 0.25);
 
                 .label-text {
-                    color: white;
+                    color: #ffffff;
                     font-weight: 500;
                 }
             }
@@ -567,7 +567,7 @@ $table-label-bg: #f1f5f9;
             }
 
             &.checked .label-text {
-                color: white;
+                color: #ffffff;
             }
         }
 
@@ -597,7 +597,7 @@ $table-label-bg: #f1f5f9;
                     padding: 0.75rem 2rem;
                     border-radius: 999px;
                     border: 1px solid #d2d2d7;
-                    background: white;
+                    background: var(--bg-card);
                     color: $text;
                     font-size: $font-size-header;
                     font-weight: 500;
@@ -607,13 +607,13 @@ $table-label-bg: #f1f5f9;
                     align-items: center;
 
                     &:hover {
-                        background: #f5f5f7;
+                        background: var(--bg-page);
                         transform: translateY(-1px);
                     }
 
                     &.active {
                         background: $primary;
-                        color: white;
+                        color: #ffffff;
                         border-color: $primary;
                         box-shadow: 0 4px 10px rgba($primary, 0.3);
                     }
@@ -668,8 +668,8 @@ $table-label-bg: #f1f5f9;
     }
 
     .btn-submit {
-        background: #0071e3;
-        color: white;
+        background: var(--primary);
+        color: #ffffff;
         border: none;
         border-radius: 999px;
         cursor: pointer;
@@ -701,7 +701,7 @@ $table-label-bg: #f1f5f9;
        6. REQUEST HISTORY SECTION
        ========================================================================== */
     .history-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         padding: 24px;
@@ -717,7 +717,7 @@ $table-label-bg: #f1f5f9;
         .card-header-title {
             font-size: $font-size-header;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-header);
             margin-bottom: 24px;
             position: relative;
             padding-left: 16px;
@@ -742,7 +742,7 @@ $table-label-bg: #f1f5f9;
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            background: #fff;
+            background: var(--bg-card);
             border: 1px solid $border;
             border-radius: 12px;
             overflow: hidden;
@@ -761,7 +761,7 @@ $table-label-bg: #f1f5f9;
                     color: $text-header;
                     border-bottom: 2px solid $border;
                     white-space: nowrap;
-                    background-color: #f8fafc;
+                    background-color: var(--bg-table-head);
 
                     &:last-child {
                         text-align: center;
@@ -774,7 +774,7 @@ $table-label-bg: #f1f5f9;
                     transition: background 0.2s;
 
                     &:hover {
-                        background: #f8fafc;
+                        background: var(--bg-table-head);
 
                         td {
                             background: transparent !important;
@@ -850,14 +850,14 @@ $table-label-bg: #f1f5f9;
 
                 .detail-item {
                     font-size: $font-size-body;
-                    color: #334155;
+                    color: var(--text-header);
                     display: flex;
                     align-items: center;
                     gap: 0.5rem;
                     width: 100%;
 
                     i {
-                        color: #64748b;
+                        color: var(--text-table-head);
                         font-size: $font-size-label;
                         width: 18px;
                         text-align: center;
@@ -866,7 +866,7 @@ $table-label-bg: #f1f5f9;
                     small {
                         font-weight: 600;
                         min-width: 70px;
-                        color: #64748b;
+                        color: var(--text-table-head);
                         flex-shrink: 0;
                     }
                 }
@@ -881,8 +881,8 @@ $table-label-bg: #f1f5f9;
    ========================================================================== */
 // Repair Summary Card
 .repair-summary-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-table-head);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 24px;
@@ -894,27 +894,27 @@ $table-label-bg: #f1f5f9;
         align-items: center;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-toolbar);
 
         h4 {
             font-size: $font-size-header;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text-header);
             margin: 0;
             display: flex;
             align-items: center;
 
             i {
-                color: #3b82f6;
+                color: var(--primary);
                 margin-right: 0.5rem;
             }
         }
     }
 
     .btn-edit-repair {
-        background: #f1f5f9;
-        color: #475569;
-        border: 1px solid #cbd5e1;
+        background: var(--border-toolbar);
+        color: var(--text-sub);
+        border: 1px solid var(--text-muted);
         padding: 0.4rem 0.8rem;
         border-radius: 6px;
         font-size: $font-size-label;
@@ -925,8 +925,8 @@ $table-label-bg: #f1f5f9;
         gap: 0.4rem;
 
         &:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--border-table-head);
+            color: var(--text-header);
         }
 
         i {
@@ -950,18 +950,18 @@ $table-label-bg: #f1f5f9;
 
             .label {
                 font-size: $font-size-label;
-                color: #64748b;
+                color: var(--text-table-head);
                 font-weight: 500;
             }
 
             .value {
                 font-size: $font-size-label;
-                color: #0f172a;
+                color: var(--text-header);
                 font-weight: 500;
-                background: #f8fafc;
+                background: var(--bg-table-head);
                 padding: 0.5rem 0.75rem;
                 border-radius: 6px;
-                border: 1px solid #e2e8f0;
+                border: 1px solid var(--border-table-head);
             }
 
             &.full-width {
@@ -1001,7 +1001,7 @@ $table-label-bg: #f1f5f9;
         .req-id {
             font-size: $font-size-label;
             padding: 0.35rem 0.85rem;
-            background: #eff6ff;
+            background: var(--status-new-bg);
             color: $primary;
             border-radius: 6px;
             border: 1px solid #dbeafe;
@@ -1021,16 +1021,16 @@ $table-label-bg: #f1f5f9;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
+    background: var(--border-toolbar);
+    color: var(--text-table-head);
+    border: 1px solid var(--border-table-head);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: $font-size-body;
 
     &:hover {
-        background: #eff6ff;
+        background: var(--status-new-bg);
         color: $primary;
         border-color: #dbeafe;
         transform: translateY(-2px);
@@ -1056,8 +1056,8 @@ $table-label-bg: #f1f5f9;
    ========================================================================== */
 // Credentials Card
 .credentials-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-table-head);
+    border: 1px solid var(--border-table-head);
     border-radius: 12px;
     padding: 1.25rem;
     display: flex;
@@ -1076,7 +1076,7 @@ $table-label-bg: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: white;
+            background: var(--bg-card);
             color: $primary;
             border-radius: 10px;
             font-size: $font-size-header;
@@ -1091,7 +1091,7 @@ $table-label-bg: #f1f5f9;
             .cred-label {
                 font-size: $font-size-hint;
                 font-weight: 600;
-                color: #64748b;
+                color: var(--text-table-head);
                 text-transform: uppercase;
                 letter-spacing: 0.025em;
             }
@@ -1099,7 +1099,7 @@ $table-label-bg: #f1f5f9;
             .cred-value {
                 font-size: $font-size-header;
                 font-weight: 700;
-                color: #1e293b;
+                color: var(--text-header);
                 font-family: 'Courier New', monospace;
             }
         }
@@ -1132,7 +1132,7 @@ $table-label-bg: #f1f5f9;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 1.5rem;
-    background: #fff;
+    background: var(--bg-card);
 
     th,
     td {
@@ -1145,7 +1145,7 @@ $table-label-bg: #f1f5f9;
     th {
         background-color: $table-header-bg;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-header);
         width: 30%;
         text-transform: uppercase;
         font-size: $font-size-label;
@@ -1153,7 +1153,7 @@ $table-label-bg: #f1f5f9;
     }
 
     td {
-        color: #334155;
+        color: var(--text-header);
         font-weight: 500;
     }
 
@@ -1173,7 +1173,7 @@ $table-label-bg: #f1f5f9;
             text-transform: none;
             letter-spacing: normal;
             font-weight: 600;
-            color: #475569;
+            color: var(--text-sub);
         }
 
         td {
@@ -1191,10 +1191,10 @@ $table-label-bg: #f1f5f9;
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem 0.85rem;
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: var(--border-toolbar);
+    border: 1px solid var(--border-table-head);
     border-radius: 8px;
-    color: #475569;
+    color: var(--text-sub);
     font-size: $font-size-label;
     font-weight: 600;
     cursor: pointer;
@@ -1226,7 +1226,7 @@ $table-label-bg: #f1f5f9;
    PROBLEM FORM CARD (New Layout)
    ========================================================================== */
 .problem-form-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 18px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     padding: 0;
@@ -1251,7 +1251,7 @@ $table-label-bg: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: #ffffff;
             font-size: $font-size-header;
             flex-shrink: 0;
             box-shadow: 0 4px 8px rgba(245, 158, 11, 0.35);
@@ -1260,7 +1260,7 @@ $table-label-bg: #f1f5f9;
         .header-title {
             font-size: $font-size-header;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-header);
             margin: 0 0 4px;
         }
 
@@ -1277,7 +1277,7 @@ $table-label-bg: #f1f5f9;
         grid-template-columns: 200px 1fr;
         align-items: flex-start;
         padding: 20px 32px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-toolbar);
         gap: 24px;
 
         &:last-of-type {
@@ -1294,24 +1294,24 @@ $table-label-bg: #f1f5f9;
             gap: 8px;
             font-size: $font-size-label;
             font-weight: 600;
-            color: #374151;
+            color: var(--text);
             margin: 0;
 
             .field-icon {
-                color: #9ca3af;
+                color: var(--text-muted);
                 width: 14px;
                 text-align: center;
             }
 
             .required-badge {
-                color: #ef4444;
+                color: var(--danger);
                 font-size: $font-size-label;
             }
         }
 
         .field-hint {
             font-size: $font-size-hint;
-            color: #94a3b8;
+            color: var(--text-muted);
             margin: 4px 0 0 22px;
         }
 
@@ -1327,19 +1327,19 @@ $table-label-bg: #f1f5f9;
         border: 1.5px solid #d1d5db;
         border-radius: 10px;
         font-size: $font-size-label;
-        color: #1f2937;
-        background: #fff;
+        color: var(--text);
+        background: var(--bg-card);
         transition: border-color 0.2s, box-shadow 0.2s;
         font-family: inherit;
 
         &:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
         }
 
         &::placeholder {
-            color: #9ca3af;
+            color: var(--text-muted);
             font-weight: 400;
         }
     }
@@ -1366,7 +1366,7 @@ $table-label-bg: #f1f5f9;
         border-radius: 999px;
         background: #f9fafb;
        font-size: $font-size-label;
-        color: #374151;
+        color: var(--text);
         cursor: pointer;
         transition: all 0.15s ease;
         font-weight: 500;
@@ -1382,14 +1382,14 @@ $table-label-bg: #f1f5f9;
         }
 
         &:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            color: #1d4ed8;
+            border-color: var(--primary);
+            background: var(--status-new-bg);
+            color: var(--primary);
         }
 
         &.cat-tag--active {
-            background: #3b82f6;
-            border-color: #2563eb;
+            background: var(--primary);
+            border-color: var(--primary);
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 
@@ -1414,17 +1414,17 @@ $table-label-bg: #f1f5f9;
         transition: border-color 0.2s, background 0.2s;
 
         &:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
+            border-color: var(--primary);
+            background: var(--status-new-bg);
 
             .dropzone-icon {
-                color: #3b82f6;
+                color: var(--primary);
             }
         }
 
         .dropzone-icon {
             font-size: 2rem;
-            color: #94a3b8;
+            color: var(--text-muted);
             display: block;
             margin-bottom: 8px;
             transition: color 0.2s;
@@ -1432,14 +1432,14 @@ $table-label-bg: #f1f5f9;
 
         .dropzone-text {
             font-size: $font-size-label;
-            color: #374151;
+            color: var(--text);
             font-weight: 500;
             margin: 0 0 4px;
         }
 
         .dropzone-hint {
             font-size: $font-size-hint;
-            color: #94a3b8;
+            color: var(--text-muted);
             margin: 0;
         }
     }
@@ -1457,19 +1457,19 @@ $table-label-bg: #f1f5f9;
         align-items: center;
         gap: 10px;
         padding: 8px 12px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-table-head);
+        border: 1px solid var(--border-table-head);
         border-radius: 8px;
 
         .file-icon {
-            color: #64748b;
+            color: var(--text-table-head);
             font-size: $font-size-body;
         }
 
         .file-name {
             flex: 1;
             font-size: $font-size-label;
-            color: #374151;
+            color: var(--text);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1478,7 +1478,7 @@ $table-label-bg: #f1f5f9;
         .file-remove {
             background: none;
             border: none;
-            color: #94a3b8;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 2px 6px;
             border-radius: 4px;
@@ -1486,7 +1486,7 @@ $table-label-bg: #f1f5f9;
             transition: color 0.2s, background 0.2s;
 
             &:hover {
-                color: #ef4444;
+                color: var(--danger);
                 background: #fee2e2;
             }
         }
@@ -1498,15 +1498,15 @@ $table-label-bg: #f1f5f9;
         justify-content: flex-end;
         gap: 12px;
         padding: 20px 32px;
-        background: #f8fafc;
+        background: var(--bg-table-head);
         border-top: 1px solid #e9ecef;
 
         .btn-secondary-action {
             padding: 10px 22px;
             border: 1.5px solid #d1d5db;
             border-radius: 10px;
-            background: #fff;
-            color: #6b7280;
+            background: var(--bg-card);
+            color: var(--text-muted);
             font-size: $font-size-label;
             font-weight: 500;
             cursor: pointer;
@@ -1515,9 +1515,9 @@ $table-label-bg: #f1f5f9;
             align-items: center;
 
             &:hover {
-                background: #f1f5f9;
-                border-color: #94a3b8;
-                color: #374151;
+                background: var(--border-toolbar);
+                border-color: var(--text-muted);
+                color: var(--text);
             }
         }
 
@@ -1525,8 +1525,8 @@ $table-label-bg: #f1f5f9;
             padding: 10px 24px;
             border: none;
             border-radius: 10px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary));
+            color: #ffffff;
             font-size: $font-size-label;
             font-weight: 600;
             cursor: pointer;
@@ -1546,8 +1546,8 @@ $table-label-bg: #f1f5f9;
             }
 
             &.disabled-btn {
-                background: #e2e8f0 !important;
-                color: #94a3b8 !important;
+                background: var(--border-table-head) !important;
+                color: var(--text-muted) !important;
                 border: none !important;
                 cursor: not-allowed !important;
                 box-shadow: none !important;
@@ -1600,11 +1600,11 @@ $table-label-bg: #f1f5f9;
         border-radius: 999px;
         font-size: $font-size-label;
         font-weight: 600;
-        color: #1e40af;
+        color: var(--primary);
 
         .chip-icon {
             font-size: $font-size-hint;
-            color: #3b82f6;
+            color: var(--primary);
         }
 
         .chip-remove {
@@ -1620,7 +1620,7 @@ $table-label-bg: #f1f5f9;
             transition: color 0.15s;
 
             &:hover {
-                color: #ef4444;
+                color: var(--danger);
             }
         }
     }
@@ -1655,8 +1655,8 @@ $table-label-bg: #f1f5f9;
         gap: 8px;
         padding: 6px 16px;
         min-width: 90px;
-        background: #ffffff !important;
-        color: #2563eb !important;
+        background: var(--bg-card) !important;
+        color: var(--primary) !important;
         border: 1.5px solid #d1e9ff !important;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(37, 99, 235, 0.08);
@@ -1670,14 +1670,14 @@ $table-label-bg: #f1f5f9;
 
         i {
             font-size: $font-size-label;
-            color: #3b82f6;
+            color: var(--primary);
             transition: all 0.2s ease;
         }
 
         &:hover {
-            background: #2563eb !important;
+            background: var(--primary) !important;
             color: #ffffff !important;
-            border-color: #2563eb !important;
+            border-color: var(--primary) !important;
             transform: translateY(-2px);
             box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
 
@@ -1703,16 +1703,16 @@ $table-label-bg: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #f8fafc;
-            border: 1px dashed #cbd5e1;
+            background: var(--bg-table-head);
+            border: 1px dashed var(--text-muted);
             padding: 8px 12px;
             border-radius: 10px;
             margin-bottom: 8px;
             transition: all 0.2s ease;
 
             &:hover {
-                background: #f1f5f9;
-                border-color: #94a3b8;
+                background: var(--border-toolbar);
+                border-color: var(--text-muted);
                 border-style: solid;
             }
 
@@ -1726,7 +1726,7 @@ $table-label-bg: #f1f5f9;
                 overflow: hidden;
 
                 i {
-                    color: #3b82f6;
+                    color: var(--primary);
                     font-size: $font-size-header;
                 }
 
@@ -1748,8 +1748,8 @@ $table-label-bg: #f1f5f9;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        background: #f8fafc !important;
-        border: 1px dashed #cbd5e1 !important;
+        background: var(--bg-table-head) !important;
+        border: 1px dashed var(--text-muted) !important;
         padding: 8px 12px !important;
         border-radius: 10px !important;
         margin-bottom: 8px !important;
@@ -1760,8 +1760,8 @@ $table-label-bg: #f1f5f9;
         }
 
         &:hover {
-            background: #f1f5f9 !important;
-            border-color: #94a3b8 !important;
+            background: var(--border-toolbar) !important;
+            border-color: var(--text-muted) !important;
         }
 
         .file-info {
@@ -1773,7 +1773,7 @@ $table-label-bg: #f1f5f9;
             font-weight: 600 !important;
 
             i {
-                color: #3b82f6 !important;
+                color: var(--primary) !important;
             }
         }
     }
@@ -1781,8 +1781,8 @@ $table-label-bg: #f1f5f9;
     .btn-view-file {
         appearance: none !important;
         -webkit-appearance: none !important;
-        background: #ffffff !important;
-        color: #2563eb !important;
+        background: var(--bg-card) !important;
+        color: var(--primary) !important;
         border: 1.5px solid #d1e9ff !important;
         border-radius: 9px !important;
         padding: 6px 14px !important;
@@ -1796,7 +1796,7 @@ $table-label-bg: #f1f5f9;
         transition: all 0.2s ease !important;
 
         &:hover {
-            background: #2563eb !important;
+            background: var(--primary) !important;
             color: #ffffff !important;
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25) !important;

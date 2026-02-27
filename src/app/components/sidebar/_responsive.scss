@@ -16,7 +16,7 @@
             padding: 15px 0 5px 0 !important;
             font-size: 9px;
             font-weight: 700;
-            color: #cbd5e1;
+            color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -30,7 +30,7 @@
 
             &:hover:not(.active) {
                 padding-left: 0;
-                background: #f8fafc;
+                background: var(--bg-table-head);
             }
 
             .link-content {
@@ -48,7 +48,7 @@
                 transform: translateY(-50%);
                 width: 4px;
                 height: 24px;
-                background: #4650dd;
+                background: var(--primary);
                 border-radius: 4px 0 0 4px;
             }
         }
@@ -78,7 +78,7 @@
         }
 
         .sub-menu {
-            background: #f8fafc;
+            background: var(--bg-table-head);
 
             .sub-item {
                 padding: 8px 4px;
@@ -91,7 +91,7 @@
                 }
 
                 &.active {
-                    color: #4650dd;
+                    color: var(--primary);
                     font-weight: 700;
                     background: rgba(70, 80, 221, 0.05);
                 }

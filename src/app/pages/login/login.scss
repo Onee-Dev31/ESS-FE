@@ -3,20 +3,20 @@
 // ============================================
 
 // สีหลักและสีพื้นฐาน (Brand Colors)
-$primary: #1a73e8;
+$primary: var(--primary);
 $primary-dark: #1557b0;
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-header: #475569;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
 
 // สีพื้นหลัง (Background Colors)
-$bg-slate: #f4f7f9;
+$bg-slate: var(--bg-slate);
 
 // เส้นขอบ (Border Colors)
-$border: #dee2e6;
+$border: var(--border);
 
 // Mixin สำหรับ Glassmorphism Effect
 @mixin glass-card($blur: 10px, $bg: rgba(255, 255, 255, 0.95)) {
@@ -256,7 +256,7 @@ $bg-light-local: $bg-slate;
         width: 100%;
         padding: 16px;
         background: $primary-color;
-        color: white;
+        color: #ffffff;
         border: none;
         border-radius: 8px;
         font-weight: 600;
@@ -350,7 +350,7 @@ $bg-light-local: $bg-slate;
 .loader {
     width: 20px;
     height: 20px;
-    border: 2px solid #fff;
+    border: 2px solid var(--bg-card);
     border-bottom-color: transparent;
     border-radius: 50%;
     display: inline-block;

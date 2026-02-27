@@ -54,9 +54,9 @@ body {
   justify-content: space-between !important;
   gap: 12px !important;
   padding: 16px 20px !important;
-  background: white !important;
+  background: var(--bg-card) !important;
   border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: var(--shadow) !important;
   border-left: 4px solid !important;
   pointer-events: auto !important;
   min-width: 300px !important;
@@ -126,7 +126,7 @@ body {
 .toast-message {
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  color: #1d1d1f !important;
+  color: var(--text) !important;
   line-height: 1.4 !important;
 }
 
@@ -135,7 +135,7 @@ body {
   border: none !important;
   padding: 4px !important;
   cursor: pointer !important;
-  color: #86868b !important;
+  color: var(--text-sub) !important;
   font-size: 0.875rem !important;
   display: flex !important;
   align-items: center !important;
@@ -145,8 +145,8 @@ body {
   flex-shrink: 0 !important;
 
   &:hover {
-    background: #f5f5f7 !important;
-    color: #1d1d1f !important;
+    background: var(--bg-slate) !important;
+    color: var(--text) !important;
   }
 
   &:active {
@@ -173,14 +173,14 @@ body {
 
 // antd tooltip
 .ant-tooltip-inner {
-  background: #ffffff !important;
+  background: var(--bg-card) !important;
   padding: 16px;
-  color: #000000;
+  color: var(--text);
   border-radius: 16px;
+  box-shadow: var(--shadow) !important;
 }
 
 .ant-tooltip-arrow::before,
 .ant-tooltip-arrow::after {
-  background-color: #ffffff !important;
+  background-color: var(--bg-card) !important;
 }
-

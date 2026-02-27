@@ -1,44 +1,171 @@
-// Colors
-$primary: #1a73e8;
-$success: #16a34a;
-$danger: #dc2626;
-$warning: #f59e0b;
-$text: #202124;
-$text-sub: #5f6368;
-$text-header: #475569;
-$text-muted: #94a3b8;
-$border: #dee2e6;
-$border-color: #e9ecef;
-$header-bg: #f8fafc;
-$bg-page: #f8f9fa;
-$bg-card: #ffffff;
-$bg-slate: #f4f7f9;
+// CSS Custom Properties (Variables)
+:root {
+    // Brand & Semantic
+    --primary: #1a73e8;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #f59e0b;
+
+    // Text Colors
+    --text: #202124;
+    --text-sub: #5f6368;
+    --text-header: #475569;
+    --text-muted: #94a3b8;
+
+    // Backgrounds & Borders
+    --bg-page: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-slate: #f4f7f9;
+    --header-bg: #f8fafc;
+    --border: #dee2e6;
+    --border-color: #e9ecef;
+
+    // Shadows
+    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+
+    // Status Badge Backgrounds (Light mode)
+    --status-success-bg: #dcfce7;
+    --status-success-text: #16a34a;
+    --status-danger-bg: #fee2e2;
+    --status-danger-text: #dc2626;
+    --status-warning-bg: #fef3c7;
+    --status-warning-text: #d97706;
+    --status-new-bg: #e0f2fe;
+    --status-new-text: #0284c7;
+    --status-verified-bg: #dcfce7;
+    --status-verified-text: #16a34a;
+    --status-pending-bg: #fef3c7;
+    --status-pending-text: #d97706;
+    --status-rejected-bg: #fee2e2;
+    --status-rejected-text: #dc2626;
+    --status-approved-bg: #dbeafe;
+    --status-approved-text: #2563eb;
+    --status-progress-bg: #f3e8ff;
+    --status-progress-text: #9333ea;
+    --status-completed-bg: #d1fae5;
+    --status-completed-text: #059669;
+    --status-cancelled-bg: #f1f5f9;
+    --status-cancelled-text: #64748b;
+
+    // Layout values
+    --bg-toolbar: #ffffff;
+    --border-toolbar: #f1f5f9;
+    --bg-table-head: #f8fafc;
+    --text-table-head: #64748b;
+    --bg-table-hover: #f8fafc;
+    --border-table: #f1f5f9;
+    --border-table-head: #e2e8f0;
+    --input-bg: #f8fafc;
+    --input-border: #e2e8f0;
+    --input-border-hover: #94a3b8;
+    --input-text: #1f2937;
+    --input-focus-bg: #ffffff;
+}
+
+[data-theme='dark'] {
+    // Brand & Semantic
+    --primary: #6366f1; // #8ab4f8
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+
+    // Text Colors
+    --text: #e2e8f0;
+    --text-sub: #94a3b8;
+    --text-header: #f8fafc;
+    --text-muted: #64748b;
+
+    // Backgrounds & Borders
+    --bg-page: #0f172a;
+    --bg-card: #1e293b;
+    --bg-slate: #0f172a;
+    --header-bg: #1e293b;
+    --border: #334155;
+    --border-color: #334155;
+
+    // Shadows
+    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+
+    // Status Badge Backgrounds (Dark mode adjustments - reducing lightness of BG)
+    --status-success-bg: rgba(22, 163, 74, 0.2);
+    --status-success-text: #4ade80;
+    --status-danger-bg: rgba(220, 38, 38, 0.2);
+    --status-danger-text: #f87171;
+    --status-warning-bg: rgba(217, 119, 6, 0.2);
+    --status-warning-text: #fbbf24;
+    --status-new-bg: rgba(2, 132, 199, 0.2);
+    --status-new-text: #38bdf8;
+    --status-verified-bg: rgba(22, 163, 74, 0.2);
+    --status-verified-text: #4ade80;
+    --status-pending-bg: rgba(217, 119, 6, 0.2);
+    --status-pending-text: #fbbf24;
+    --status-rejected-bg: rgba(220, 38, 38, 0.2);
+    --status-rejected-text: #f87171;
+    --status-approved-bg: rgba(37, 99, 235, 0.2);
+    --status-approved-text: #60a5fa;
+    --status-progress-bg: rgba(147, 51, 234, 0.2);
+    --status-progress-text: #c084fc;
+    --status-completed-bg: rgba(5, 150, 105, 0.2);
+    --status-completed-text: #34d399;
+    --status-cancelled-bg: rgba(100, 116, 139, 0.2);
+    --status-cancelled-text: #94a3b8;
+
+    // Layout values
+    --bg-toolbar: #1e293b;
+    --border-toolbar: #334155;
+    --bg-table-head: #0f172a;
+    --text-table-head: #94a3b8;
+    --bg-table-hover: #334155;
+    --border-table: #334155;
+    --border-table-head: #475569;
+    --input-bg: #0f172a;
+    --input-border: #334155;
+    --input-border-hover: #475569;
+    --input-text: #e2e8f0;
+    --input-focus-bg: #1e293b;
+}
+
+// Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility
+$primary: var(--primary);
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-header: var(--text-header);
+$text-muted: var(--text-muted);
+$border: var(--border);
+$border-color: var(--border-color);
+$header-bg: var(--header-bg);
+$bg-page: var(--bg-page);
+$bg-card: var(--bg-card);
+$bg-slate: var(--bg-slate);
 $font-main: 'Inter', 'IBM Plex Sans Thai Looped', sans-serif;
-$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+$shadow: var(--shadow);
 
 // Status Badge Colors
-$status-success-bg: #dcfce7;
-$status-success-text: #16a34a;
-$status-danger-bg: #fee2e2;
-$status-danger-text: #dc2626;
-$status-warning-bg: #fef3c7;
-$status-warning-text: #d97706;
-$status-new-bg: #e0f2fe;
-$status-new-text: #0284c7;
-$status-verified-bg: #dcfce7;
-$status-verified-text: #16a34a;
-$status-pending-bg: #fef3c7;
-$status-pending-text: #d97706;
-$status-rejected-bg: #fee2e2;
-$status-rejected-text: #dc2626;
-$status-approved-bg: #dbeafe;
-$status-approved-text: #2563eb;
-$status-progress-bg: #f3e8ff;
-$status-progress-text: #9333ea;
-$status-completed-bg: #d1fae5;
-$status-completed-text: #059669;
-$status-cancelled-bg: #f1f5f9;
-$status-cancelled-text: #64748b;
+$status-success-bg: var(--status-success-bg);
+$status-success-text: var(--status-success-text);
+$status-danger-bg: var(--status-danger-bg);
+$status-danger-text: var(--status-danger-text);
+$status-warning-bg: var(--status-warning-bg);
+$status-warning-text: var(--status-warning-text);
+$status-new-bg: var(--status-new-bg);
+$status-new-text: var(--status-new-text);
+$status-verified-bg: var(--status-verified-bg);
+$status-verified-text: var(--status-verified-text);
+$status-pending-bg: var(--status-pending-bg);
+$status-pending-text: var(--status-pending-text);
+$status-rejected-bg: var(--status-rejected-bg);
+$status-rejected-text: var(--status-rejected-text);
+$status-approved-bg: var(--status-approved-bg);
+$status-approved-text: var(--status-approved-text);
+$status-progress-bg: var(--status-progress-bg);
+$status-progress-text: var(--status-progress-text);
+$status-completed-bg: var(--status-completed-bg);
+$status-completed-text: var(--status-completed-text);
+$status-cancelled-bg: var(--status-cancelled-bg);
+$status-cancelled-text: var(--status-cancelled-text);
 
 // font-size
 $font-size-header: 18px;

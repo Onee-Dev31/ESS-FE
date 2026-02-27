@@ -46,8 +46,8 @@ $col-desc: auto;
         justify-content: space-between;
         align-items: center;
         padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
-        color: white;
+        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+        color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         h2 {
@@ -58,7 +58,7 @@ $col-desc: auto;
 
         .btn-close-modal {
             @include close-btn-style;
-            color: white;
+            color: #ffffff;
             font-size: 1.25rem;
 
             &:hover {
@@ -70,7 +70,7 @@ $col-desc: auto;
     .content-card {
         flex: 1;
         padding: 15px 15px;
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: $shadow;
 
@@ -219,13 +219,13 @@ $col-desc: auto;
         }
 
         th {
-            background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
+            background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
             position: sticky;
             top: 0;
             z-index: 10;
             text-align: center;
-            color: white;
-            border-top: 1px solid color.adjust($primary, $lightness: -10%);
+            color: #ffffff;
+            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
         }
 
         .sub-header th {

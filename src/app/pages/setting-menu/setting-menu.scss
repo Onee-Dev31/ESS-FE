@@ -7,12 +7,12 @@
 // ============================================
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: #202124;
-$text-sub: #5f6368;
-$text-header: #475569;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-header: var(--text-sub);
 
 // เส้นขอบ (Border Colors)
-$border: #dee2e6;
+$border: var(--border);
 
 // Responsive Mixins
 @mixin mobile {
@@ -35,7 +35,7 @@ $border: #dee2e6;
 
 // Content Card Mixin
 @mixin content-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     padding: 24px;
@@ -108,7 +108,7 @@ $border: #dee2e6;
     font-size: 1.25rem;
     font-weight: 700;
     color: $color;
-    // color: #1e293b;
+    // color: var(--text-header);
     margin-bottom: 24px;
     position: relative;
     padding-left: 16px;
@@ -131,14 +131,14 @@ $border: #dee2e6;
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    background: #fff;
+    background: var(--bg-card);
     border: 1px solid $border;
     border-radius: 12px;
     overflow: hidden;
 
     thead {
         tr {
-            background: #f8fafc;
+            background: var(--bg-table-head);
         }
 
         th {
@@ -158,7 +158,7 @@ $border: #dee2e6;
             transition: background 0.2s ease;
 
             &:hover {
-                background: #f1f5f9;
+                background: var(--border-toolbar);
             }
 
             &:not(:last-child) td:not(.merged-col) {
@@ -167,11 +167,11 @@ $border: #dee2e6;
         }
 
         tr.parent-row {
-            background: #f8fafc; // สีอ่อน
+            background: var(--bg-table-head); // สีอ่อน
 
             td {
                 font-weight: 600;
-                color: #0f172a;
+                color: var(--text-header);
             }
 
             &:hover {
@@ -211,7 +211,7 @@ $border: #dee2e6;
     }
 
     .mobile-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 20px;
         border: 1px solid rgba(0, 0, 0, 0.04);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -236,8 +236,8 @@ $border: #dee2e6;
         }
 
         .card-header {
-            background: #fff;
-            border-bottom: 1px solid #f1f5f9;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-toolbar);
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
@@ -252,7 +252,7 @@ $border: #dee2e6;
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+                background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
                 opacity: 0;
                 transition: opacity 0.3s;
             }
@@ -286,13 +286,13 @@ $border: #dee2e6;
                 font-size: 0.9rem;
 
                 .label {
-                    color: #64748b;
+                    color: var(--text-table-head);
                     display: flex;
                     align-items: center;
                     gap: 6px;
 
                     i {
-                        color: #94a3b8;
+                        color: var(--text-muted);
                         font-size: 0.85rem;
                         width: 16px;
                         text-align: center;
@@ -301,14 +301,14 @@ $border: #dee2e6;
 
                 .value {
                     font-weight: 600;
-                    color: #1e293b;
+                    color: var(--text-header);
                 }
             }
 
             .card-footer-actions {
                 margin-top: auto;
                 padding-top: 16px;
-                border-top: 1px solid #f1f5f9;
+                border-top: 1px solid var(--border-toolbar);
                 display: flex;
                 gap: 12px;
 
@@ -350,7 +350,7 @@ $border: #dee2e6;
 
 .setting-page {
     padding: 24px;
-    background-color: #f8f9fa;
+    background-color: var(--bg-page);
     min-height: 100vh;
     box-sizing: border-box;
 
@@ -362,14 +362,14 @@ $border: #dee2e6;
     // ==================== CONTENT CARD ====================
     .content-card {
         @include content-card;
-        background: #ffffff;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         padding: 0;
         margin-top: 16px;
 
         .card-header-title {
-            @include card-header-title(#000000, #0062ff);
+            @include card-header-title(var(--text), #0062ff);
             padding: 1.5rem 1.5rem 0.5rem 1.5rem;
             margin: 0;
 
@@ -410,9 +410,9 @@ $border: #dee2e6;
                 }
 
                 .btn-create {
-                    background-color: #fff !important;
-                    color: #1a1a1a !important;
-                    border: 1px solid #1a1a1a !important;
+                    background-color: #ffffff !important;
+                    color: var(--text) !important;
+                    border: 1px solid var(--text) !important;
                     font-weight: 600;
                     padding: 8px 16px;
                     border-radius: 4px;
@@ -434,7 +434,7 @@ $border: #dee2e6;
                     &:active {
                         transform: translateY(2px);
                         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset;
-                        background-color: #f0f0f0 !important;
+                        background-color: var(--border-color) !important;
                     }
                 }
             }
@@ -454,12 +454,12 @@ $border: #dee2e6;
                 .select-month {
                     width: 200px;
                     height: 40px;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-table-head);
                     border-radius: 50px;
                     padding: 0 1.25rem;
                     background-color: #ffffff;
                     font-size: 0.9rem;
-                    color: #475569;
+                    color: var(--text-sub);
 
                     @include mobile {
                         width: 100%;
@@ -467,8 +467,8 @@ $border: #dee2e6;
                 }
 
                 .btn-send {
-                    background: #1a73e8;
-                    color: #fff;
+                    background: var(--primary);
+                    color: #ffffff;
                     border: none;
                     border-radius: 50px;
                     padding: 0 1.5rem;
@@ -493,7 +493,7 @@ $border: #dee2e6;
 
                 .btn-edit {
                     background: #f2cf06;
-                    color: #fff;
+                    color: #ffffff;
                     border: none;
                     border-radius: 50px;
                     padding: 0 1.5rem;
@@ -518,7 +518,7 @@ $border: #dee2e6;
 
                 .btn-cancel {
                     background: #b7b7b7;
-                    color: #fff;
+                    color: #ffffff;
                     border: none;
                     border-radius: 50px;
                     padding: 0 1.5rem;
@@ -570,15 +570,15 @@ $border: #dee2e6;
 
     .sidebar {
         width: 260px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-table-head);
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         color: rgb(0, 0, 0);
     }
 
     .sidebar-header {
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--border-toolbar);
         padding: 16px;
         display: flex;
         gap: 5px;
@@ -607,7 +607,7 @@ $border: #dee2e6;
 
         &.active {
             background: #4f46e5;
-            color: white;
+            color: #ffffff;
         }
     }
 
@@ -618,9 +618,9 @@ $border: #dee2e6;
 
         .btn-create {
             width: 100%;
-            background-color: #fff !important;
-            color: #1a1a1a !important;
-            border: 1px solid #1a1a1a !important;
+            background-color: #ffffff !important;
+            color: var(--text) !important;
+            border: 1px solid var(--text) !important;
             font-weight: 600;
             padding: 8px 16px;
             border-radius: 4px;
@@ -636,7 +636,7 @@ $border: #dee2e6;
             &:active {
                 transform: translateY(2px);
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset;
-                background-color: #f0f0f0 !important;
+                background-color: var(--border-color) !important;
             }
         }
     }
@@ -659,15 +659,15 @@ $border: #dee2e6;
 
     .sidebar li ul li.active {
         background: #4f46e5;
-        color: white;
+        color: #ffffff;
     }
 
     .content {
         flex: 1;
 
         .menu-header {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-table-head);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             padding: 1rem 1.5rem;
@@ -681,7 +681,7 @@ $border: #dee2e6;
             .tag {
                 user-select: none;
                 background: #049e3c;
-                color: white;
+                color: #ffffff;
                 padding: 1px 6px;
                 border-radius: 6px;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
@@ -694,7 +694,7 @@ $border: #dee2e6;
     }
 
     .empty {
-        color: #9ca3af;
+        color: var(--text-muted);
     }
 }
 
@@ -717,13 +717,13 @@ $border: #dee2e6;
     border-collapse: collapse;
     font-size: 14px;
     min-width: 900px;
-    background: #fff;
+    background: var(--bg-card);
 }
 
 /* ===== Header ===== */
 .summary-table thead {
-    background: linear-gradient(to right, #1e293b, #334155);
-    color: #fff;
+    background: linear-gradient(to right, var(--text-header), var(--text-header));
+    color: #ffffff;
 }
 
 .summary-table th {
@@ -731,13 +731,13 @@ $border: #dee2e6;
     text-align: center;
     font-weight: 600;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--border);
 }
 
 /* ===== Body ===== */
 .summary-table td {
     padding: 10px 14px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-toolbar);
     text-align: center;
     transition: background 0.2s ease;
 }
@@ -748,11 +748,11 @@ $border: #dee2e6;
     text-align: left;
     position: sticky;
     left: 0;
-    background: #ffffff;
+    background: var(--bg-card);
     font-weight: 500;
     z-index: 2;
-    border-right: 1px solid #e5e7eb;
-    color: #000000;
+    border-right: 1px solid var(--border);
+    color: var(--text);
 }
 
 .summary-table tr.level-0-row td:first-child {
@@ -761,7 +761,7 @@ $border: #dee2e6;
 
 /* ===== Hover Effect ===== */
 .summary-table tbody tr:hover td {
-    background: #f8fafc;
+    background: var(--bg-table-head);
 }
 
 /* ===== Zebra ===== */
@@ -795,6 +795,6 @@ $border: #dee2e6;
 
 ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
     position: relative;
-    background-color: #fff;
+    background-color: #ffffff;
     border: 1px solid #cfcfcf00;
 }

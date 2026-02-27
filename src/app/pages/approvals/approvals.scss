@@ -4,42 +4,42 @@
 // ============================================
 // Approvals Page Styles
 // ============================================
-$success: #1e8e3e;
-$danger: #d93025;
-$warning: #f1b44c;
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
 
 // สีพื้นหลัง (Background Colors)
-$bg-slate: #f4f7f9;
-$header-bg: #f8fafc;
+$bg-slate: var(--bg-slate);
+$header-bg: var(--bg-table-head);
 
 // สีตัวอักษรและระดับความสำคัญ (Text Colors)
-$text: #202124;
-$text-sub: #5f6368;
-$text-muted: #94a3b8;
-$text-header: #475569;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
 
 // เส้นขอบ (Border Colors)
-$border: #dee2e6;
-$border-color: #e9ecef;
+$border: var(--border);
+$border-color: var(--border-color);
 
 // อื่นๆ (Others)
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
 // สีสำหรับสถานะต่างๆ (Status Colors)
 $status-new-bg: rgba(217, 119, 6, 0.1);
-$status-new-text: #d97706;
+$status-new-text: var(--status-new-text);
 
 $status-verified-bg: rgba(13, 148, 136, 0.1);
-$status-verified-text: #0d9488;
+$status-verified-text: var(--status-verified-text);
 
 $status-pending-bg: rgba(26, 115, 232, 0.1);
-$status-pending-text: #1a73e8;
+$status-pending-text: var(--primary);
 
 $status-success-bg: rgba(22, 163, 74, 0.1);
-$status-success-text: #16a34a;
+$status-success-text: var(--status-success-text);
 
 $status-danger-bg: rgba(220, 38, 38, 0.1);
-$status-danger-text: #dc2626;
+$status-danger-text: var(--status-danger-text);
 
 // Responsive Mixins
 @mixin mobile {
@@ -71,7 +71,7 @@ $status-danger-text: #dc2626;
     }
 
     .card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 16px;
         box-shadow: $shadow;
         overflow: hidden;
@@ -184,10 +184,10 @@ $status-danger-text: #dc2626;
         }
 
         .mobile-card {
-            background: white;
+            background: var(--bg-card);
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f1f5f9;
+            border: 1px solid var(--border-toolbar);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
 
@@ -198,7 +198,7 @@ $status-danger-text: #dc2626;
             .card-header {
                 background: $header-bg;
                 padding: 12px 16px;
-                border-bottom: 1px solid #f1f5f9;
+                border-bottom: 1px solid var(--border-toolbar);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -260,7 +260,7 @@ $status-danger-text: #dc2626;
                         &.amount {
                             font-size: 1.1rem;
                             font-weight: 800;
-                            color: #1e293b;
+                            color: var(--text-header);
                         }
                     }
                 }
@@ -317,7 +317,7 @@ $status-danger-text: #dc2626;
                         font-size: 0.9rem;
                         line-height: 1.5;
                         color: $text;
-                        background: #f1f5f9;
+                        background: var(--border-toolbar);
                         padding: 10px 12px;
                         border-radius: 8px;
                     }
@@ -328,7 +328,7 @@ $status-danger-text: #dc2626;
                     justify-content: space-between;
                     align-items: baseline;
                     padding-top: 12px;
-                    border-top: 1px dashed #e2e8f0;
+                    border-top: 1px dashed var(--border-table-head);
                     margin-bottom: 16px;
 
                     .label {
@@ -396,7 +396,7 @@ $status-danger-text: #dc2626;
 
         .data-grid {
             @include modern-table;
-            border: 1px solid #cbd5e1 !important; // Force darker border
+            border: 1px solid var(--text-muted) !important; // Force darker border
             border-radius: 12px;
             overflow: hidden;
 
@@ -420,7 +420,7 @@ $status-danger-text: #dc2626;
                 transition: background 0.2s;
 
                 &:hover {
-                    background: #f1f5f9;
+                    background: var(--border-toolbar);
 
                     tr {
                         background: transparent;
@@ -443,7 +443,7 @@ $status-danger-text: #dc2626;
                     padding: 16px;
                     font-size: 0.9rem;
                     color: $text;
-                    border-bottom: 1px solid #f1f5f9;
+                    border-bottom: 1px solid var(--border-toolbar);
                     vertical-align: middle;
                 }
 
@@ -538,7 +538,7 @@ $status-danger-text: #dc2626;
 
         .act-btn {
             &.v-btn {
-                @include icon-btn-ghost(#64748b);
+                @include icon-btn-ghost(var(--text-table-head));
             }
 
             &.a-btn {
@@ -567,10 +567,10 @@ $status-danger-text: #dc2626;
         align-items: center;
         justify-content: center;
         padding: 8px 16px;
-        background: white;
-        border: 1px solid #e2e8f0;
+        background: var(--bg-card);
+        border: 1px solid var(--border-table-head);
         border-radius: 10px;
-        color: #475569;
+        color: var(--text-sub);
         font-size: 0.875rem;
         font-weight: 600;
         cursor: pointer;
@@ -594,7 +594,7 @@ $status-danger-text: #dc2626;
         }
 
         &:hover {
-            background: #f8fafc;
+            background: var(--bg-table-head);
             border-color: $primary;
             color: $primary;
             transform: translateY(-1px);
@@ -603,7 +603,7 @@ $status-danger-text: #dc2626;
 
         &:active {
             transform: translateY(0);
-            background: #f1f5f9;
+            background: var(--border-toolbar);
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
@@ -621,10 +621,10 @@ $status-danger-text: #dc2626;
             top: 100%;
             right: 0;
             margin-top: 8px;
-            background: white;
+            background: var(--bg-card);
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            border: 1px solid #f1f5f9;
+            border: 1px solid var(--border-toolbar);
             min-width: 180px;
             padding: 6px;
             z-index: 50;
@@ -661,8 +661,8 @@ $status-danger-text: #dc2626;
                 }
 
                 &:hover {
-                    background: #f8fafc;
-                    color: #1a73e8;
+                    background: var(--bg-table-head);
+                    color: var(--primary);
                 }
             }
         }

@@ -52,11 +52,11 @@ export class ItServiceMockService {
             requesterAduser: 'michael.p',
             requesterName: 'Michael Prown',
             requesterInitials: 'MP',
-            requesterColor: '#F44336',
+            requesterColor: 'var(--danger)',
             attachments: [
                 { fileName: 'request_form.pdf', filePath: '/uploads/Tickets/form.pdf', fileType: 'application/pdf', fileSize: 1024 },
                 { fileName: 'request_form.pdf', filePath: '/uploads/Tickets/form.pdf', fileType: 'application/pdf', fileSize: 1024 }
-                
+
             ],
             itNotes: 'กำลังตรวจสอบสิทธิ์การใช้งาน...',
             assigneeName: 'กิตติพงษ์ (บอส)',
@@ -77,7 +77,7 @@ export class ItServiceMockService {
             requesterAduser: 'maliwan.g',
             requesterName: 'Maliwan G.',
             requesterInitials: 'MG',
-            requesterColor: '#E91E63',
+            requesterColor: 'var(--danger)',
             attachments: [],
             itNotes: 'รอยืนยันเวลาเพื่อเข้าไปเปลี่ยนจอให้ใหม่',
             assigneeName: 'วิศรุต (เต้)',
@@ -103,7 +103,7 @@ export class ItServiceMockService {
             requesterAduser: 'current.user',
             requesterName: newTicket.requesterName || 'Current User',
             requesterInitials: 'CU',
-            requesterColor: '#1a73e8',
+            requesterColor: 'var(--primary)',
             attachments: newTicket.attachments || [],
             itNotes: '',
             assigneeName: 'IT Support',

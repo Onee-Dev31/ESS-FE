@@ -1,5 +1,5 @@
 // สีหลัก (Brand Colors)
-$primary: #1a73e8;
+$primary: var(--primary);
 
 .pagination-container {
     padding: 0;
@@ -18,11 +18,11 @@ $primary: #1a73e8;
 
     .pagination-info {
         font-size: 0.9rem;
-        color: #64748b;
+        color: var(--text-table-head);
         font-weight: 500;
 
         strong {
-            color: #334155;
+            color: var(--text-header);
             font-weight: 600;
         }
     }
@@ -43,11 +43,11 @@ $primary: #1a73e8;
 
             select {
                 padding: 0.5rem 0.5rem;
-                border: 1px solid #e2e8f0;
+                border: 1px solid var(--border-table-head);
                 border-radius: 8px;
                 outline: none;
-                background-color: white;
-                color: #475569;
+                background-color: #ffffff;
+                color: var(--text-sub);
                 font-size: 0.9rem;
                 font-weight: 500;
                 cursor: pointer;
@@ -72,18 +72,18 @@ $primary: #1a73e8;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border: 1px solid #e2e8f0;
-                background: white;
+                border: 1px solid var(--border-table-head);
+                background: var(--bg-card);
                 border-radius: 8px;
                 cursor: pointer;
-                color: #64748b;
+                color: var(--text-table-head);
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 font-weight: 500;
 
                 &:hover:not(:disabled) {
                     border-color: $primary;
                     color: $primary;
-                    background: #eff6ff;
+                    background: var(--status-new-bg);
                     transform: translateY(-1px);
                     box-shadow: 0 2px 4px rgba($primary, 0.1);
                 }
@@ -91,7 +91,7 @@ $primary: #1a73e8;
                 &:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
-                    background: #f8fafc;
+                    background: var(--bg-table-head);
                 }
 
                 i {
@@ -101,7 +101,7 @@ $primary: #1a73e8;
 
             strong {
                 font-size: 0.9rem;
-                color: #334155;
+                color: var(--text-header);
                 margin: 0 0.5rem;
             }
         }

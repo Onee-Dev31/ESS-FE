@@ -28,7 +28,7 @@ tbody {
   transition: background 0.2s;
 
   &:hover {
-    background: #f1f5f9;
+    background: var(--border-toolbar);
 
     tr {
       background: transparent;
@@ -42,7 +42,7 @@ tbody {
   // Override modern-table's default behavior which removes borders from the last row.
   // Since we have multiple tbodies (one per request), we WANT the last row of each tbody to have a border.
   tr:last-child td {
-    border-bottom: 1px solid #f1f5f9 !important;
+    border-bottom: 1px solid var(--border-toolbar) !important;
   }
 
   tr {
@@ -63,7 +63,7 @@ tbody {
 
     // Ensure merged columns also have the distinct border at the bottom
     &.merged-col {
-      border-bottom: 1px solid #f1f5f9 !important;
+      border-bottom: 1px solid var(--border-toolbar) !important;
     }
   }
 }
@@ -82,7 +82,7 @@ tbody {
   }
 
   .mobile-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 20px;
     border: 1px solid rgba(0, 0, 0, 0.04);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -107,8 +107,8 @@ tbody {
     }
 
     .card-header {
-      background: #fff;
-      border-bottom: 1px solid #f1f5f9;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-toolbar);
       padding: 16px 20px;
       display: flex;
       justify-content: space-between;
@@ -123,7 +123,7 @@ tbody {
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+        background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
         opacity: 0;
         transition: opacity 0.3s;
       }
@@ -157,7 +157,7 @@ tbody {
         font-size: 0.9rem;
 
         .label {
-          color: #64748b;
+          color: var(--text-table-head);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -165,7 +165,7 @@ tbody {
 
         .value {
           font-weight: 600;
-          color: #1e293b;
+          color: var(--text-header);
         }
       }
 
@@ -176,10 +176,10 @@ tbody {
         margin-top: 8px;
 
         .nested-item {
-          background: #f8fafc;
+          background: var(--bg-table-head);
           border-radius: 12px;
           padding: 16px;
-          border: 1px solid #f1f5f9;
+          border: 1px solid var(--border-toolbar);
 
           .item-header {
             display: flex;
@@ -190,7 +190,7 @@ tbody {
 
             .item-title {
               font-weight: 600;
-              color: #334155;
+              color: var(--text-header);
               font-size: 1rem;
             }
 
@@ -212,12 +212,12 @@ tbody {
               align-items: center;
               gap: 10px;
               font-size: 0.9rem;
-              color: #64748b;
+              color: var(--text-table-head);
 
               i {
                 width: 16px;
                 text-align: center;
-                color: #94a3b8;
+                color: var(--text-muted);
               }
             }
           }
@@ -227,7 +227,7 @@ tbody {
       .card-footer-actions {
         margin-top: auto;
         padding-top: 16px;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--border-toolbar);
         display: flex;
         gap: 12px;
 
@@ -266,7 +266,7 @@ tbody {
 
         .btn-delete-sm {
           background: #fef2f2;
-          color: #ef4444;
+          color: var(--danger);
 
           &:hover {
             background: #fee2e2;
@@ -275,12 +275,12 @@ tbody {
         }
 
         .btn-view-sm {
-          background: #f1f5f9;
-          color: #475569;
+          background: var(--border-toolbar);
+          color: var(--text-sub);
 
           &:hover {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--border-table-head);
+            color: var(--text-header);
           }
         }
       }
@@ -400,7 +400,7 @@ tbody {
   // ==================== TABLE STYLES ====================
   .modern-table {
     @include modern-table;
-    border: 1px solid #cbd5e1; // Darker border for better visibility
+    border: 1px solid var(--text-muted); // Darker border for better visibility
 
     .col-id {
       width: 150px;
@@ -524,7 +524,7 @@ tbody {
 
 .btn-icon {
   &.view {
-    @include icon-btn-ghost(#64748b);
+    @include icon-btn-ghost(var(--text-table-head));
   }
 
   &.edit {
@@ -532,7 +532,7 @@ tbody {
   }
 
   &.delete {
-    @include icon-btn-ghost(#ef4444);
+    @include icon-btn-ghost(var(--danger));
   }
 }
 
@@ -548,8 +548,8 @@ tbody {
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
-  color: #ef4444;
-  border-color: #ef4444;
+  color: var(--danger);
+  border-color: var(--danger);
 
   &:hover {
     background: rgba(239, 68, 68, 0.05);
@@ -606,7 +606,7 @@ select.form-control {
   .filter-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text);
   }
 
   .date-input-group,

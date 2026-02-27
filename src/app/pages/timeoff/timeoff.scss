@@ -5,37 +5,37 @@
 // ============================================
 // Timeoff Page Styles
 // ============================================
-$text: #202124;
-$text-sub: #5f6368;
-$text-header: #475569;
-$bg-page: #f8f9fa;
-$header-bg: #f8fafc;
-$border: #dee2e6;
-$border-color: #e9ecef;
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-header: var(--text-sub);
+$bg-page: var(--bg-page);
+$header-bg: var(--bg-table-head);
+$border: var(--border);
+$border-color: var(--border-color);
 
 // Status colors
-$status-success-bg: #dcfce7;
-$status-success-text: #16a34a;
-$status-danger-bg: #fee2e2;
-$status-danger-text: #dc2626;
-$status-warning-bg: #fef3c7;
-$status-warning-text: #d97706;
-$status-new-bg: #e0f2fe;
-$status-new-text: #0284c7;
-$status-verified-bg: #dcfce7;
-$status-verified-text: #16a34a;
-$status-pending-bg: #fef3c7;
-$status-pending-text: #d97706;
-$status-rejected-bg: #fee2e2;
-$status-rejected-text: #dc2626;
-$status-approved-bg: #dbeafe;
-$status-approved-text: #2563eb;
-$status-progress-bg: #f3e8ff;
-$status-progress-text: #9333ea;
-$status-completed-bg: #d1fae5;
-$status-completed-text: #059669;
-$status-cancelled-bg: #f1f5f9;
-$status-cancelled-text: #64748b;
+$status-success-bg: var(--status-success-bg);
+$status-success-text: var(--status-success-text);
+$status-danger-bg: var(--status-danger-bg);
+$status-danger-text: var(--status-danger-text);
+$status-warning-bg: var(--status-warning-bg);
+$status-warning-text: var(--status-warning-text);
+$status-new-bg: var(--status-new-bg);
+$status-new-text: var(--status-new-text);
+$status-verified-bg: var(--status-verified-bg);
+$status-verified-text: var(--status-verified-text);
+$status-pending-bg: var(--status-pending-bg);
+$status-pending-text: var(--status-pending-text);
+$status-rejected-bg: var(--status-rejected-bg);
+$status-rejected-text: var(--status-rejected-text);
+$status-approved-bg: var(--status-approved-bg);
+$status-approved-text: var(--primary);
+$status-progress-bg: var(--status-progress-bg);
+$status-progress-text: var(--status-progress-text);
+$status-completed-bg: var(--status-completed-bg);
+$status-completed-text: var(--status-completed-text);
+$status-cancelled-bg: var(--border-toolbar);
+$status-cancelled-text: var(--text-table-head);
 
 // Responsive mixins are used from global _mixins.scss
 
@@ -85,7 +85,7 @@ $status-cancelled-text: #64748b;
     }
 
     .mobile-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 20px;
         border: 1px solid rgba(0, 0, 0, 0.04);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -110,8 +110,8 @@ $status-cancelled-text: #64748b;
         }
 
         .card-header {
-            background: #fff;
-            border-bottom: 1px solid #f1f5f9;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-toolbar);
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
@@ -126,7 +126,7 @@ $status-cancelled-text: #64748b;
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, $primary, color.adjust($primary, $lightness: 20%));
+                background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
                 opacity: 0;
                 transition: opacity 0.3s;
             }
@@ -159,7 +159,7 @@ $status-cancelled-text: #64748b;
                 font-size: 0.9rem;
 
                 .label {
-                    color: #64748b;
+                    color: var(--text-table-head);
                     display: flex;
                     align-items: center;
                     gap: 8px;
@@ -167,14 +167,14 @@ $status-cancelled-text: #64748b;
 
                 .value {
                     font-weight: 600;
-                    color: #1e293b;
+                    color: var(--text-header);
                 }
             }
 
             .card-footer-actions {
                 margin-top: auto;
                 padding-top: 16px;
-                border-top: 1px solid #f1f5f9;
+                border-top: 1px solid var(--border-toolbar);
                 display: flex;
                 gap: 12px;
 
@@ -213,7 +213,7 @@ $status-cancelled-text: #64748b;
 
                 .btn-delete-sm {
                     background: #fef2f2;
-                    color: #ef4444;
+                    color: var(--danger);
 
                     &:hover {
                         background: #fee2e2;
@@ -222,12 +222,12 @@ $status-cancelled-text: #64748b;
                 }
 
                 .btn-view-sm {
-                    background: #f1f5f9;
-                    color: #475569;
+                    background: var(--border-toolbar);
+                    color: var(--text-sub);
 
                     &:hover {
-                        background: #e2e8f0;
-                        color: #1e293b;
+                        background: var(--border-table-head);
+                        color: var(--text-header);
                     }
                 }
             }
@@ -293,7 +293,7 @@ $status-cancelled-text: #64748b;
 }
 
 @mixin content-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     padding: 24px;
@@ -307,7 +307,7 @@ $status-cancelled-text: #64748b;
 @mixin card-header-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-header);
     margin-bottom: 24px;
     position: relative;
     padding-left: 16px;
@@ -432,8 +432,8 @@ $status-cancelled-text: #64748b;
         }
 
         .days-badge {
-            background: #f1f5f9;
-            color: #475569;
+            background: var(--border-toolbar);
+            color: var(--text-sub);
             padding: 4px 10px;
             border-radius: 12px;
             font-weight: 700;
@@ -442,7 +442,7 @@ $status-cancelled-text: #64748b;
 
         .period-text {
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-table-head);
             font-weight: 600;
         }
 
@@ -461,14 +461,14 @@ $status-cancelled-text: #64748b;
         .reason-box {
             margin-top: 12px;
             padding: 10px;
-            background: #f8fafc;
+            background: var(--bg-table-head);
             border-radius: 8px;
             font-size: 0.85rem;
-            color: #475569;
-            border: 1px solid #f1f5f9;
+            color: var(--text-sub);
+            border: 1px solid var(--border-toolbar);
 
             strong {
-                color: #1e293b;
+                color: var(--text-header);
                 display: block;
                 margin-bottom: 4px;
             }
@@ -515,7 +515,7 @@ $status-cancelled-text: #64748b;
 
 .btn-icon {
     &.view {
-        @include icon-btn-ghost(#64748b); // Slate
+        @include icon-btn-ghost(var(--text-table-head)); // Slate
     }
 
     &.edit {
@@ -523,7 +523,7 @@ $status-cancelled-text: #64748b;
     }
 
     &.delete {
-        @include icon-btn-ghost(#ef4444); // Red
+        @include icon-btn-ghost(var(--danger)); // Red
     }
 }
 
@@ -535,8 +535,8 @@ $status-cancelled-text: #64748b;
     padding: 8px 12px;
     font-size: 0.875rem;
     height: 36px;
-    color: #ef4444;
-    border-color: #ef4444;
+    color: var(--danger);
+    border-color: var(--danger);
 
     &:hover {
         background: rgba(239, 68, 68, 0.05);
@@ -589,7 +589,7 @@ select.form-control {
     .filter-label {
         font-size: 0.875rem;
         font-weight: 500;
-        color: #374151;
+        color: var(--text);
     }
 
     .date-input-group,

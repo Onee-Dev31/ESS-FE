@@ -1,7 +1,7 @@
 // Variables
-$success: #16a34a;
-$danger: #dc2626;
-$text: #202124;
+$success: var(--success);
+$danger: var(--danger);
+$text: var(--text);
 
 .toast-container {
     position: fixed;

@@ -26,9 +26,9 @@ export interface LeaveType {
 }
 
 export const LEAVE_TYPES: LeaveType[] = [
-    { id: 'vacation', label: 'ลาพักร้อน', icon: 'fas fa-plane-departure', color: '#ef4444', remaining: 10 },
-    { id: 'personal', label: 'ลากิจ', icon: 'fas fa-briefcase', color: '#3b82f6', remaining: 6 },
-    { id: 'sick', label: 'ลาป่วย', icon: 'fas fa-stethoscope', color: '#4049c7', remaining: 30 },
-    { id: 'sterilization', label: 'ลาทำหมัน', icon: 'fas fa-user-md', color: '#9333ea', remaining: 1 },
-    { id: 'funeral', label: 'ลาเพื่อจัดการงานศพ', icon: 'fas fa-ribbon', color: '#35b653', remaining: 5 },
+    { id: 'vacation', label: 'ลาพักร้อน', icon: 'fas fa-plane-departure', color: 'var(--danger)', remaining: 10 },
+    { id: 'personal', label: 'ลากิจ', icon: 'fas fa-briefcase', color: 'var(--primary)', remaining: 6 },
+    { id: 'sick', label: 'ลาป่วย', icon: 'fas fa-stethoscope', color: 'var(--primary)', remaining: 30 },
+    { id: 'sterilization', label: 'ลาทำหมัน', icon: 'fas fa-user-md', color: 'var(--warning)', remaining: 1 },
+    { id: 'funeral', label: 'ลาเพื่อจัดการงานศพ', icon: 'fas fa-ribbon', color: 'var(--success)', remaining: 5 },
 ];

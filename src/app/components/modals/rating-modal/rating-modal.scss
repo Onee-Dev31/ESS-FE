@@ -13,7 +13,7 @@
     animation: fadeIn 0.3s ease;
 
     .rating-card {
-        background: #fff;
+        background: var(--bg-card);
         width: 100%;
         max-width: 450px;
         margin: 20px;
@@ -34,19 +34,19 @@
                 margin: 0;
                 font-size: 1.25rem;
                 font-weight: 700;
-                color: #1a1a1a;
+                color: var(--text);
             }
 
             .btn-close {
                 background: none;
                 border: none;
                 font-size: 1.2rem;
-                color: #999;
+                color: var(--text-muted);
                 cursor: pointer;
                 transition: color 0.2s;
 
                 &:hover {
-                    color: #333;
+                    color: var(--text);
                 }
             }
         }
@@ -76,7 +76,7 @@
             .rating-label {
                 font-size: 1.1rem;
                 font-weight: 600;
-                color: #4b5563;
+                color: var(--text-sub);
                 margin-bottom: 24px;
                 min-height: 1.5rem;
             }
@@ -87,8 +87,8 @@
                     height: 120px;
                     padding: 16px;
                     border-radius: 12px;
-                    border: 1px solid #e2e8f0;
-                    background-color: #f8fafc;
+                    border: 1px solid var(--border-table-head);
+                    background-color: var(--bg-table-head);
                     font-size: 1rem;
                     resize: none;
                     box-sizing: border-box;
@@ -96,8 +96,8 @@
 
                     &:focus {
                         outline: none;
-                        border-color: #1d4ed8;
-                        background-color: #fff;
+                        border-color: var(--primary);
+                        background-color: #ffffff;
                         box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
                     }
                 }
@@ -121,22 +121,22 @@
             }
 
             .btn-cancel {
-                background-color: #f1f5f9;
-                color: #64748b;
+                background-color: var(--border-toolbar);
+                color: var(--text-table-head);
 
                 &:hover {
-                    background-color: #e2e8f0;
-                    color: #475569;
+                    background-color: var(--border-table-head);
+                    color: var(--text-sub);
                 }
             }
 
             .btn-submit {
-                background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-                color: white;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
+                color: #ffffff;
 
                 &:disabled {
-                    background: #e2e8f0;
-                    color: #94a3b8;
+                    background: var(--border-table-head);
+                    color: var(--text-muted);
                     cursor: not-allowed;
                 }
 

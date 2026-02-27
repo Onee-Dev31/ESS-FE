@@ -53,8 +53,8 @@ $col-file: 50px;
         justify-content: space-between;
         align-items: center;
         padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
-        color: white;
+        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+        color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         h2 {
@@ -65,7 +65,7 @@ $col-file: 50px;
 
         .btn-close-modal {
             @include close-btn-style;
-            color: white;
+            color: #ffffff;
             font-size: 1.25rem;
 
             &:hover {
@@ -78,7 +78,7 @@ $col-file: 50px;
         flex: 1;
         min-height: 0;
         padding: 20px 24px;
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: $shadow;
 
@@ -241,16 +241,16 @@ $col-file: 50px;
             }
 
             th {
-                background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
+                background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
                 position: sticky;
                 top: 0;
                 z-index: 10;
                 text-align: center;
-                color: white;
-                border-top: 1px solid color.adjust($primary, $lightness: -10%);
+                color: #ffffff;
+                border-top: 1px solid color-mix(in srgb, $primary, black 10%);
 
                 .required {
-                    color: rgba(white, 0.8);
+                    color: rgba(var(--bg-card), 0.8);
                     margin-left: 2px;
                 }
             }
@@ -589,7 +589,7 @@ $col-file: 50px;
                 border-radius: 6px;
                 padding: 20px;
                 text-align: center;
-                background: #f8f9fa;
+                background: var(--bg-page);
                 min-height: 100px;
                 display: flex;
                 flex-direction: column;
@@ -623,7 +623,7 @@ $col-file: 50px;
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    background: #fff;
+                    background: var(--bg-card);
                     padding: 8px 12px;
                     border-radius: 4px;
                     border: 1px solid $border;

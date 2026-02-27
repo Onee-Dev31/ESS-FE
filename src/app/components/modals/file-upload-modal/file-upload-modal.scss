@@ -1,13 +1,13 @@
 @use 'sass:color';
 
 // Variables
-$primary: #1a73e8;
-$danger: #dc2626;
-$success: #16a34a;
-$text: #202124;
-$text-sub: #5f6368;
-$bg-card: #ffffff;
-$border: #dee2e6;
+$primary: var(--primary);
+$danger: var(--danger);
+$success: var(--success);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$bg-card: var(--bg-card);
+$border: var(--border);
 $font-main: 'Helvetica Neue', Arial, sans-serif;
 
 @mixin close-btn-style {
@@ -43,7 +43,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
   backdrop-filter: blur(2px);
 
   .upload-modal-content {
-    background: #fff;
+    background: var(--bg-card);
     width: 400px;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -82,7 +82,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
         border-radius: 8px;
         padding: 20px;
         text-align: center;
-        background: #f8f9fa;
+        background: var(--bg-page);
         min-height: 100px;
         display: flex;
         flex-direction: column;
@@ -112,7 +112,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
           }
 
           .file-hint {
-            color: #999;
+            color: var(--text-muted);
             margin-top: 4px;
             font-size: 0.75rem;
           }
@@ -122,7 +122,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
           display: flex;
           align-items: center;
           gap: 10px;
-          background: #fff;
+          background: var(--bg-card);
           padding: 8px 12px;
           border-radius: 4px;
           border: 1px solid $border;
@@ -184,10 +184,10 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 
       .btn-confirm {
         background: $primary;
-        color: #fff;
+        color: #ffffff;
 
         &:hover {
-          background: color.adjust($primary, $lightness: -5%);
+          background: color-mix(in srgb, $primary, black 5%);
         }
 
         &:disabled {

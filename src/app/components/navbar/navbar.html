@@ -44,6 +44,14 @@
         <span class="status-dot"></span>
       </button>
 
+      <!-- Theme Toggle Button -->
+      <button class="icon-btn theme-toggle-btn" (click)="themeService.toggleTheme()">
+        <i class="fas" [ngClass]="{
+            'fa-moon': !themeService.isDarkMode(),
+            'fa-sun': themeService.isDarkMode()
+          }"></i>
+      </button>
+
       <div class="notification-dropdown" (click)="$event.stopPropagation()">
         <button class="icon-btn" (click)="toggleNotification()">
           <i class="fas fa-bell"></i>

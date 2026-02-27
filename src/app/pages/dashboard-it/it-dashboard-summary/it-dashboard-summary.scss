@@ -11,7 +11,7 @@
 }
 
 .kpi {
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 16px;
     border: 1px solid rgba(15, 23, 42, .06);
     box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
@@ -40,7 +40,7 @@
     bottom: 14px;
     width: 4px;
     border-radius: 99px;
-    background: #2563eb;
+    background: var(--primary);
 }
 
 .kpi-top {
@@ -53,7 +53,7 @@
 .kpi-title {
     font-weight: 900;
     font-size: 13px;
-    color: #334155;
+    color: var(--text-header);
 }
 
 .kpi-pill {
@@ -64,7 +64,7 @@
     align-items: center;
     justify-content: center;
     border: 1px solid rgba(15, 23, 42, .08);
-    background: #f8fafc;
+    background: var(--bg-table-head);
 }
 
 .kpi-pill nz-icon {
@@ -73,7 +73,7 @@
 
 .pill-blue {
     background: rgba(37, 99, 235, .12);
-    color: #2563eb;
+    color: var(--primary);
     border-color: rgba(37, 99, 235, .22);
 }
 
@@ -85,19 +85,19 @@
 
 .pill-orange {
     background: rgba(249, 115, 22, .12);
-    color: #f97316;
+    color: var(--warning);
     border-color: rgba(249, 115, 22, .22);
 }
 
 .pill-green {
     background: rgba(34, 197, 94, .12);
-    color: #22c55e;
+    color: var(--success);
     border-color: rgba(34, 197, 94, .22);
 }
 
 .pill-gray {
     background: rgba(100, 116, 139, .12);
-    color: #64748b;
+    color: var(--text-table-head);
     border-color: rgba(100, 116, 139, .22);
 }
 
@@ -105,7 +105,7 @@
     margin-top: 8px;
     font-size: 28px;
     font-weight: 950;
-    color: #0f172a;
+    color: var(--text-header);
     letter-spacing: -.5px;
 }
 
@@ -125,7 +125,7 @@
     padding: 4px 8px;
     border-radius: 999px;
     border: 1px solid rgba(15, 23, 42, .08);
-    background: #fff;
+    background: var(--bg-card);
 }
 
 .kpi-delta.up {
@@ -145,15 +145,15 @@
 }
 
 .kpi-sub {
-    color: #64748b;
+    color: var(--text-table-head);
     font-size: 12px;
 }
 
 .kpi-hint {
     margin-top: 10px;
     font-size: 12px;
-    color: #1f2937;
-    background: #f7f9fe;
+    color: var(--text);
+    background: var(--bg-slate);
     border: 1px dashed rgba(100, 116, 139, .35);
     border-radius: 12px;
     padding: 8px 10px;
@@ -168,7 +168,7 @@
 
 .chart-card {
     flex: 1;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -182,7 +182,7 @@
 .chart-title {
     font-weight: 800;
     margin-bottom: 10px;
-    color: #1e293b;
+    color: var(--text-header);
 }
 
 /* ✅ ขนาดกราฟ */
@@ -218,7 +218,7 @@
 
 .dept-drill {
     margin-top: 12px;
-    background: #f7f9fe;
+    background: var(--bg-slate);
     border: 1px solid rgba(15, 23, 42, .06);
     border-radius: 14px;
     padding: 12px;

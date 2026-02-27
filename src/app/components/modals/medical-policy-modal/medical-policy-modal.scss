@@ -1,9 +1,9 @@
 // Variables
-$primary: #1a73e8;
-$text: #202124;
-$text-sub: #5f6368;
-$bg-card: #ffffff;
-$border: #dee2e6;
+$primary: var(--primary);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$bg-card: var(--bg-card);
+$border: var(--border);
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 $font-main: 'Helvetica Neue', Arial, sans-serif;
 
@@ -41,7 +41,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 }
 
 .modal-container {
-    background: #ffffff;
+    background: var(--bg-card);
     width: 95%;
     max-width: 900px;
     height: 85vh;
@@ -67,7 +67,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 
 .modal-header {
     padding: 24px 32px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-toolbar);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -78,7 +78,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
         gap: 16px;
 
         .header-icon {
-            color: #3b82f6;
+            color: var(--primary);
             font-size: 1.5rem;
         }
 
@@ -86,13 +86,13 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
             h3 {
                 margin: 0;
                 font-size: 1.25rem;
-                color: #0f172a;
+                color: var(--text-header);
                 font-weight: 700;
             }
 
             .header-subtitle {
                 font-size: 0.85rem;
-                color: #64748b;
+                color: var(--text-table-head);
             }
         }
     }
@@ -108,7 +108,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
     flex: 1;
     font-size: 1rem;
     line-height: 1.8;
-    color: #334155;
+    color: var(--text-header);
     font-family: $font-main;
 
     .policy-section {
@@ -117,7 +117,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
         .main-title {
             font-size: 1.4rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-header);
             margin-bottom: 1.5rem;
         }
     }
@@ -128,14 +128,14 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
         p {
             margin: 0 0 1.2rem 0;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-header);
             font-size: 1.15rem;
         }
     }
 
     .table-container {
         margin: 24px 0;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border-table-head);
         border-radius: 12px;
         overflow: hidden;
     }
@@ -146,27 +146,27 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 
         th,
         td {
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-table-head);
             padding: 12px;
             text-align: center;
         }
 
         th {
-            background: #f8fafc;
+            background: var(--bg-table-head);
             font-weight: 700;
-            color: #475569;
+            color: var(--text-sub);
         }
 
         .jc-cell {
             text-align: left;
             padding-left: 20px;
-            background: #fcfcfc;
+            background: var(--bg-slate);
             font-weight: 600;
         }
 
         .amount-cell {
             font-weight: 700;
-            color: #2563eb;
+            color: var(--primary);
         }
     }
 
@@ -215,7 +215,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
                 top: 10px;
                 width: 6px;
                 height: 6px;
-                background: #475569;
+                background: var(--text-sub);
             }
         }
     }
@@ -280,14 +280,14 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
 
 .modal-footer {
     padding: 20px 32px;
-    background: #f8fafc;
-    border-top: 1px solid #f1f5f9;
+    background: var(--bg-table-head);
+    border-top: 1px solid var(--border-toolbar);
     display: flex;
     justify-content: flex-end;
 
     .btn-confirm {
-        background: #3b82f6;
-        color: white;
+        background: var(--primary);
+        color: #ffffff;
         border: none;
         padding: 10px 40px;
         border-radius: 8px;
@@ -296,7 +296,7 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
         transition: background 0.2s;
 
         &:hover {
-            background: #2563eb;
+            background: var(--primary);
         }
     }
 }
@@ -311,11 +311,11 @@ $font-main: 'Helvetica Neue', Arial, sans-serif;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: var(--text-muted);
         border-radius: 4px;
 
         &:hover {
-            background: #94a3b8;
+            background: var(--text-muted);
         }
     }
 }
@@ -326,5 +326,5 @@ u {
 
 b,
 strong {
-    color: #0f172a;
+    color: var(--text-header);
 }

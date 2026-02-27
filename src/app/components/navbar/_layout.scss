@@ -1,18 +1,18 @@
 @use './variables' as *;
 // Variables
-$primary: #1a73e8;
-$text: #202124;
+$primary: var(--primary);
+$text: var(--text);
 $text-light: #5f6368;
-$bg-card: #ffffff;
-$bg-page: #f4f7f9;
-$border: #dee2e6;
+$bg-card: var(--bg-card);
+$bg-page: var(--bg-page);
+$border: var(--border);
 
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: $navbar-height;
-    background: white;
+    background: var(--bg-card);
     padding: 0 16px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     position: relative;

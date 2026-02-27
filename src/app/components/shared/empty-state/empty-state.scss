@@ -1,12 +1,12 @@
 // สีหลัก (Brand Colors)
-$primary: #1a73e8;
+$primary: var(--primary);
 
 // สีตัวอักษร (Text Colors)
-$text: #202124;
-$text-muted: #94a3b8;
+$text: var(--text);
+$text-muted: var(--text-muted);
 
 // เส้นขอบ (Border Colors)
-$border-color: #e9ecef;
+$border-color: var(--border-color);
 
 // อื่นๆ (Others)
 $radius: 16px;

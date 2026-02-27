@@ -42,8 +42,8 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
-        color: white;
+        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+        color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         h2 {
@@ -54,7 +54,7 @@
 
         .btn-close-modal {
             @include close-btn-style;
-            color: white;
+            color: #ffffff;
             font-size: 1.25rem;
 
             &:hover {
@@ -66,7 +66,7 @@
     .content-card {
         flex: 1;
         padding: 15px 15px;
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         box-shadow: $shadow;
 
@@ -203,7 +203,7 @@
         }
 
         .divider {
-            color: #ccc;
+            color: var(--border-color);
             font-weight: 300;
 
             @media (max-width: 600px) {
@@ -218,7 +218,7 @@
     height: 24px;
     border-radius: 50%;
     background: $primary;
-    color: white;
+    color: #ffffff;
     border: none;
     display: flex;
     align-items: center;
@@ -229,7 +229,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-        background: color.adjust($primary, $lightness: -10%);
+        background: color-mix(in srgb, $primary, black 10%);
         transform: scale(1.05);
         box-shadow: 0 3px 10px rgba($primary, 0.35);
     }
@@ -431,13 +431,13 @@
         }
 
         th {
-            background: linear-gradient(135deg, $primary 0%, color.adjust($primary, $lightness: 10%) 100%);
+            background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
             position: sticky;
             top: 0;
             z-index: 10;
             text-align: center;
-            color: white;
-            border-top: 1px solid color.adjust($primary, $lightness: -10%);
+            color: #ffffff;
+            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
         }
 
         .sub-header th {

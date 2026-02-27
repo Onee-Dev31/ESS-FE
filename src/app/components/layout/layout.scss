@@ -14,7 +14,7 @@
 
     .sidebar-container {
       height: 100%;
-      background: #ffffff;
+      background: var(--bg-card);
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
       z-index: 1000;
@@ -25,7 +25,7 @@
       flex: 1;
       height: 100%;
       overflow-y: auto;
-      background: #f8fafc;
+      background: var(--bg-table-head);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
 
