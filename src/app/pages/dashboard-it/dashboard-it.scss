@@ -324,6 +324,7 @@
     box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
     border: 1px solid rgba(15, 23, 42, .06);
     overflow: hidden;
+    height: 40%;
 }
 
 .tk-card__head {
@@ -481,7 +482,7 @@
 }
 
 .tk-empty-center {
-    height: 52vh;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -510,6 +511,7 @@
     box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
     border: 1px solid rgba(15, 23, 42, .06);
     padding: 14px;
+    height: 40%;
 }
 
 .side-title {
