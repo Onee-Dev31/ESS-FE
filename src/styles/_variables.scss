@@ -55,11 +55,19 @@
     --bg-table-hover: #f8fafc;
     --border-table: #f1f5f9;
     --border-table-head: #e2e8f0;
-    --input-bg: #f8fafc;
+    --input-bg: #ffffff;
+    --input-bg-hover: #eeeeee;
+    --input-bg-active: #e1e1e1;
     --input-border: #e2e8f0;
     --input-border-hover: #94a3b8;
     --input-text: #1f2937;
+    --input-text-placeholder: #94a3b8;
     --input-focus-bg: #ffffff;
+
+    --input-disabled-bg: #f5f5f5;
+    --input-disabled-border: #d1d5db;
+    --input-hover-bg: #f1f5f9;
+    --input-active-bg: #e2e8f0;
 }
 
 [data-theme='dark'] {
@@ -119,10 +127,18 @@
     --border-table: #334155;
     --border-table-head: #475569;
     --input-bg: #0f172a;
+    --input-bg-hover: #334155;
+    --input-bg-active: #475569;
     --input-border: #334155;
     --input-border-hover: #475569;
     --input-text: #e2e8f0;
+    --input-text-placeholder: #64748b;
     --input-focus-bg: #1e293b;
+
+    --input-disabled-bg: #313a48;
+    --input-disabled-border: #8b95a5;
+    --input-hover-bg: #f1f5f9;
+    --input-active-bg: #e2e8f0;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility

@@ -406,6 +406,8 @@ $border: var(--border);
                     border-radius: 8px;
                     padding: 0 1rem;
                     font-size: 0.95rem;
+                    color: var(--input-text);
+                    background-color: var(--input-bg);
 
                     &:first-child {
                         @include tablet {
@@ -420,9 +422,9 @@ $border: var(--border);
                     &.readonly,
                     &.disabled,
                     &:disabled {
-                        background: #f5f5f5 !important;
+                        background: var(--input-disabled-bg) !important;
                         color: var(--text-muted) !important;
-                        border-color: #d1d5db !important;
+                        border-color: var(--input-disabled-border) !important;
                         cursor: not-allowed;
                         opacity: 1;
                     }
@@ -474,6 +476,7 @@ $border: var(--border);
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         padding: 0;
+        margin-top: 16px;
 
         .card-header-title {
             @include card-header-title(var(--text), #0062ff);
@@ -506,9 +509,9 @@ $border: var(--border);
                 }
 
                 .btn-create {
-                    background-color: #ffffff !important;
-                    color: var(--text) !important;
-                    border: 1px solid var(--text) !important;
+                    background-color: var(--status-verified-bg) !important;
+                    color: var(--status-verified-text) !important;
+                    border: 1px solid var(--status-verified-text) !important;
                     font-weight: 600;
                     padding: 8px 16px;
                     border-radius: 4px;
@@ -523,7 +526,7 @@ $border: var(--border);
                     }
 
                     &:hover {
-                        background-color: #f5f5f5 !important;
+                        background-color: color-mix(in srgb, var(--status-verified-bg) 60%, var(--bg-page)) !important;
                         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                     }
 
@@ -692,18 +695,68 @@ $border: var(--border);
 
 
 // SELECT (antd) 
-::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-    border-color: #40a9ff00;
-    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-}
+// // input
+// ::ng-deep .ant-select {
+//     color: var(--input-text);
+// }
 
-::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-    border-color: #40a9ff00;
-    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-}
+// ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+//     position: relative;
+//     background-color: transparent;
+//     border: 1px solid #cfcfcf00;
+// }
 
-::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    position: relative;
-    background-color: #ffffff;
-    border: 1px solid #cfcfcf00;
-}
+// ::ng-deep .ant-select-selection-placeholder {
+//     color: var(--input-text-placeholder);
+// }
+
+// //input > diable
+// ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
+//     border-color: #40a9ff00;
+//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+// }
+
+// ::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+//     border-color: #40a9ff00;
+//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+// }
+
+// ::ng-deep .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+//     position: relative;
+//     background-color: var(--input-disabled-bg);
+//     border: 1px solid #cfcfcf00;
+// }
+
+// // >
+// ::ng-deep .ant-select-arrow .anticon>svg {
+//     color: rgba(255, 255, 255, 0);
+// }
+
+// // x
+// ::ng-deep .ant-select-clear,
+// .ant-select-clear:hover {
+//     background-color: transparent;
+//     color: var(--input-text) !important;
+// }
+
+// // option
+// ::ng-deep .ant-select-dropdown {
+//     background-color: var(--bg-page);
+// }
+
+// ::ng-deep .ant-select-item {
+//     color: var(--input-text);
+// }
+
+// ::ng-deep .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+//     background-color: var(--input-bg-hover);
+// }
+
+// ::ng-deep .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+//     background-color: var(--input-bg-active);
+// }
+
+// //empty
+// ::ng-deep .ant-empty-small {
+//     color: var(--input-text)
+// }

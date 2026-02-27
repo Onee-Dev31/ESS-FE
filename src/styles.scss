@@ -6,8 +6,12 @@
 @use './styles/mixins' as *;
 @use './styles/utilities' as *;
 
+// ANTD
+@use './styles/antd' as *;
+
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&display=swap');
+
 
 html {
   height: 100%;

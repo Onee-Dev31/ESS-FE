@@ -1,0 +1,70 @@
+@use './variables' as *;
+
+/*
+  ANTD : SELECT
+*/
+// input
+.ant-select {
+    color: var(--input-text);
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    position: relative;
+    background-color: transparent;
+    border: 1px solid #cfcfcf00;
+}
+
+.ant-select-selection-placeholder {
+    color: var(--input-text-placeholder);
+}
+
+//input > diable
+.ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
+    border-color: #40a9ff00;
+    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+    border-color: #40a9ff00;
+    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+}
+
+.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    position: relative;
+    background-color: var(--input-disabled-bg);
+    border: 1px solid #cfcfcf00;
+}
+
+// >
+.ant-select-arrow .anticon>svg {
+    color: rgba(255, 255, 255, 0);
+}
+
+// x
+.ant-select-clear,
+.ant-select-clear:hover {
+    background-color: transparent;
+    color: var(--input-text) !important;
+}
+
+// option
+.ant-select-dropdown {
+    background-color: var(--bg-page);
+}
+
+.ant-select-item {
+    color: var(--input-text);
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: var(--input-bg-hover);
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: var(--input-bg-active);
+}
+
+//empty
+.ant-empty-small {
+    color: var(--input-text)
+}
