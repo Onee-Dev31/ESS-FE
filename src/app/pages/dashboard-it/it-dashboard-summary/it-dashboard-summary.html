@@ -13,7 +13,9 @@
         </div>
 
         <div class="kpi-value">{{ k.value | number }} <span>
-                <div class="kpi-delta" [class.up]="k.delta >= 0" [class.down]="k.delta < 0">
+                <div class="kpi-delta" [class.pill-blue]="k.key==='open'" [class.pill-cyan]="k.key==='assigned'"
+                    [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='done'"
+                    [class.pill-gray]="k.key==='all'">
                     <span>{{ getPercent(k) }}%</span>
                 </div>
             </span>
@@ -50,7 +52,7 @@
         <div echarts class="echart bar" [options]="companyBarOption" (chartClick)="onCompanyBarClick($event)">
         </div>
     </div>
-    <div class="chart-card bar-card" *ngIf="showDeptBar">
+    <div class="chart-card bar-card">
         <div class="chart-title">Top 5 Deparment</div>
         <div class="dept-drill">
             <div echarts class="echart dept" [options]="deptBarOption"></div>

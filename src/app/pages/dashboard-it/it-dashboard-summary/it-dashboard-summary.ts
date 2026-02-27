@@ -125,7 +125,7 @@ export class ItDashboardSummary {
     ];
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.servicePieOption = this.makeDonutOption('Service Type', data, total, 'Total');
+    this.servicePieOption = this.makeDonutOptionService('Service Type', data, total, 'Total');
   }
 
   // ====== 3) Top Companies Bar ======
@@ -177,10 +177,64 @@ export class ItDashboardSummary {
         itemWidth: 18,
         itemHeight: 10,
         icon: 'roundRect',
-        textStyle: { fontSize: 12, fontWeight: 600 },
+        textStyle: {
+          fontSize: 10,
+          fontWeight: 400,
+          overflow: 'truncate'   // กันข้อความยาวเกิน
+        },
+        width: '100%',            // 👈 บังคับความกว้าง
+        type: 'plain',
       },
       tooltip: { trigger: 'item' },
       color: ['#2563eb', '#0ea5e9', '#f97316', '#22c55e'], // 👈 ใส่ตรงนี้
+      series: [
+        {
+          type: 'pie',
+          radius: ['55%', '82%'],
+          center: ['50%', '56%'],
+          label: { show: false },
+          labelLine: { show: false },
+          avoidLabelOverlap: true,
+          emphasis: { scale: true, scaleSize: 8 },
+          data
+        }
+      ],
+      graphic: [
+        {
+          type: 'text',
+          left: 'center',
+          top: '46%',
+          style: { text: String(centerValue), fontSize: 28, fontWeight: 800 }
+        },
+        {
+          type: 'text',
+          left: 'center',
+          top: '58%',
+          style: { text: centerLabel, fontSize: 12, fill: '#64748b' }
+        }
+      ]
+    };
+  }
+
+  private makeDonutOptionService(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
+    return {
+      legend: {
+        top: 8,
+        left: 'center',
+        orient: 'horizontal',
+        itemWidth: 18,
+        itemHeight: 10,
+        icon: 'roundRect',
+        textStyle: {
+          fontSize: 10,
+          fontWeight: 400,
+          overflow: 'truncate'   // กันข้อความยาวเกิน
+        },
+        width: '100%',            // 👈 บังคับความกว้าง
+        type: 'plain',
+      },
+      tooltip: { trigger: 'item' },
+      color: ['#3b82f6', '#f43f5e', '#f59e0b'], // 👈 ใส่ตรงนี้
       series: [
         {
           type: 'pie',
