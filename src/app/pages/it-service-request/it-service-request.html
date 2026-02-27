@@ -73,41 +73,44 @@
         </div>
 
         <div class="form-section">
-            <h3 class="section-title">
+            <!-- <h3 class="section-title">
                 ระบุผู้ขอสิทธิ์ (Open For)
-            </h3>
+            </h3> -->
 
             <!-- Open For Dropdown -->
             <div class="form-group">
-                <label class="form-label">เปิดสิทธิ์ให้ (Open For) <span class="required-badge">*</span></label>
+                <label class="form-label">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    เปิดสิทธิ์ให้ (Open For)
+                    <span class="required-badge">*</span></label>
                 <div class="input-pair-row">
-                    <select class="form-control" [ngModel]="selectedOpenFor()"
-                        (ngModelChange)="selectedOpenFor.set($event)">
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
+                        (ngModelChange)="selectedOpenFor.set($event)" name="openFor" class="form-control-select">
                         @for (opt of openForOptions(); track opt.value) {
-                        <option [value]="opt.value">{{ opt.label }}</option>
+                        <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
                         }
-                    </select>
-                    @if (selectedOpenFor() === 'other') {
-                    <input type="text" class="form-control slide-in-right" placeholder="ระบุชื่อ-สกุล"
-                        [ngModel]="otherOpenForName()" (ngModelChange)="otherOpenForName.set($event)">
-                    }
+                    </nz-select>
                 </div>
             </div>
         </div>
 
         <div class="form-section">
-            <h3 class="section-title">
-                รายละเอียด (Details)
-                <span class="required-badge">*</span>
-            </h3>
-
             <div class="form-group mb-4">
+                <label class="form-label">
+                    <i class="fas fa-align-left"></i>
+                    รายละเอียด (Details)
+                    <span class="required-badge">*</span>
+                </label>
                 <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
                     [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
             </div>
 
             <div class="form-group mb-4 mt-3">
-                <label class="form-label">เบอร์โทรติดต่อ (Phone Number) <span class="required-badge">*</span></label>
+                <label class="form-label">
+                    <i class="fas fa-phone-alt field-icon"></i>
+                    เบอร์โทรติดต่อ (Phone Number)
+                    <span class="required-badge">*</span>
+                </label>
                 <input type="text" class="form-control" [value]="phoneModel" (input)="onPhoneInput($event)"
                     placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
             </div>
@@ -310,10 +313,7 @@
                         <tr>
                             <th>ชื่อผู้ขอสิทธิ์</th>
                             <td>
-                                {{ selectedOpenFor() === 'self' ? 'ตนเอง (Self)' : 'อื่นๆ (Other)' }}
-                                @if (selectedOpenFor() === 'other') {
-                                : {{ otherOpenForName() }}
-                                }
+                                {{ selectedOpenFor() }}
                             </td>
                         </tr>
                         @if (phoneNumber()) {

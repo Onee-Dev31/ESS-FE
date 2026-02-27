@@ -10,11 +10,12 @@ import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
     selector: 'app-it-service-request',
     standalone: true,
-    imports: [CommonModule, FormsModule, PageHeaderComponent],
+    imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule],
     templateUrl: './it-service-request.html',
     styleUrl: './it-service-request.scss'
 })
@@ -38,24 +39,15 @@ export class ITServiceRequestComponent implements OnInit {
     serviceOptions = signal<any[]>([])
     userSubOptions = signal<any[]>([])
     systemSubOptions = signal<any[]>([])
+    openForOptions = signal<any[]>([])
+    selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
 
     isSystemCategorySelected = signal(false);
-
-    // Open For State
-    openForOptions = signal([
-        { label: 'อื่นๆ (Other)', value: 'other' },
-        { label: 'ตนเอง (Self)', value: 'self' },
-        { label: 'พนักงาน ก (Employee A)', value: 'employee_a' },
-        { label: 'พนักงาน ข (Employee B)', value: 'employee_b' },
-    ]);
-    selectedOpenFor = signal<string>('self');
-    otherOpenForName = signal<string>('');
 
     isFormValid = computed(() => {
         const services = this.serviceOptions();
         const hasService = services.some(s => s.checked);
-        const openFor = this.selectedOpenFor();
-        const otherNameValid = openFor !== 'other' || this.otherOpenForName().trim().length > 0;
+        // const otherNameValid = openFor !== 'other' || this.otherOpenForName().trim().length > 0;
 
         // Sub-validation for "Request System" (ขอใช้ระบบ)
         const isRequestSystemChecked = services.find(s => s.value === 'request_system')?.checked;
@@ -79,7 +71,8 @@ export class ITServiceRequestComponent implements OnInit {
 
         const detailValid = this.requestDetails().trim().length > 0;
         const phoneValid = this.phoneNumber().trim().length > 0;
-        return hasService && otherNameValid && subValidationPassed && detailValid && phoneValid;
+        const openForValid = this.selectedOpenFor() !== null;
+        return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
     });
 
     ngOnInit() {
@@ -210,10 +203,10 @@ export class ITServiceRequestComponent implements OnInit {
 
         }
 
-        if (this.selectedOpenFor() === 'other' && !this.otherOpenForName().trim()) {
-            this.swalService.warning('แจ้งเตือน', 'กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
-            return;
-        }
+        // if (this.selectedOpenFor() === 'other' && !this.otherOpenForName().trim()) {
+        //     this.swalService.warning('แจ้งเตือน', 'กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
+        //     return;
+        // }
 
         if (!this.requestDetails().trim()) {
             this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
@@ -233,7 +226,7 @@ export class ITServiceRequestComponent implements OnInit {
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.selectedOpenFor.set('self');
-        this.otherOpenForName.set('');
+        // this.otherOpenForName.set('');
         this.requestDetails.set('');
         this.selectedSystemTypes.set([]);
 
@@ -261,7 +254,7 @@ export class ITServiceRequestComponent implements OnInit {
         let openForDisplay = '';
         const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
         if (this.selectedOpenFor() === 'other') {
-            openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
+            // openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
         } else {
             openForDisplay = selected ? selected.label : '';
         }

@@ -74,7 +74,7 @@ $table-label-bg: #f1f5f9;
 .status-badge {
     padding: 6px 12px;
     border-radius: 9999px;
-    font-size: 0.75rem;
+    font-size: $font-size-hint;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -139,7 +139,7 @@ $table-label-bg: #f1f5f9;
 
         label,
         .form-label {
-            font-size: 0.95rem;
+            font-size: $font-size-label;
             font-weight: 600;
             color: $text-header;
             margin-left: 0.25rem;
@@ -151,7 +151,7 @@ $table-label-bg: #f1f5f9;
             background-color: #ffffff;
             border-radius: 12px;
             font-family: inherit;
-            font-size: 17px;
+            font-size: $font-size-label;
             color: #1d1d1f;
             transition: all 0.2s ease;
             width: 100%;
@@ -241,7 +241,7 @@ $table-label-bg: #f1f5f9;
             background-color: $primary;
             color: white;
             border-radius: 50%;
-            font-size: 1rem;
+            font-size: $font-size-header;
             font-weight: 700;
             margin-right: 0.75rem;
             box-shadow: 0 4px 6px -1px rgba($primary, 0.4);
@@ -251,7 +251,7 @@ $table-label-bg: #f1f5f9;
     }
 
     .card-header-title {
-        font-size: 1.25rem;
+        font-size: $font-size-header;
         font-weight: 700;
         color: #1e293b;
         margin-bottom: 24px;
@@ -296,7 +296,7 @@ $table-label-bg: #f1f5f9;
                 box-sizing: border-box;
 
                 h2 {
-                    font-size: 1.25rem;
+                    font-size: $font-size-header;
                     font-weight: 700;
                     color: $text-header;
                     margin: 0;
@@ -315,7 +315,7 @@ $table-label-bg: #f1f5f9;
                     border-radius: 50%;
                     color: $text-muted;
                     cursor: pointer;
-                    font-size: 1rem;
+                    font-size: $font-size-header;
                     transition: all 0.2s;
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
                     margin-left: 1rem;
@@ -346,7 +346,7 @@ $table-label-bg: #f1f5f9;
                     border: 1px solid #e2e8f0;
 
                     h3 {
-                        font-size: 0.95rem;
+                        font-size: $font-size-label;
                         font-weight: 600;
                         color: $text-header;
                         margin: 0 0 0.75rem 0;
@@ -363,16 +363,16 @@ $table-label-bg: #f1f5f9;
                             display: flex;
                             align-items: center;
                             gap: 0.75rem;
-                            font-size: 0.95rem;
+                            font-size: $font-size-label;
                             color: $text;
 
                             i {
-                                font-size: 1rem;
+                                font-size: $font-size-header;
                             }
 
                             &.sub-item {
                                 padding-left: 1rem;
-                                font-size: 0.9rem;
+                                font-size: $font-size-body;
                                 color: $text-sub;
                             }
                         }
@@ -393,13 +393,13 @@ $table-label-bg: #f1f5f9;
                             }
 
                             .label {
-                                font-size: 0.8rem;
+                                font-size: $font-size-label;
                                 color: $text-muted;
                                 font-weight: 500;
                             }
 
                             .value {
-                                font-size: 0.95rem;
+                                font-size: $font-size-label;
                                 color: $text;
                                 font-weight: 500;
                             }
@@ -427,7 +427,7 @@ $table-label-bg: #f1f5f9;
                 button {
                     padding: 0.75rem 1.75rem;
                     border-radius: 12px;
-                    font-size: 0.95rem;
+                    font-size: $font-size-label;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.2s;
@@ -478,7 +478,7 @@ $table-label-bg: #f1f5f9;
         margin-bottom: 3.5rem;
 
         .section-title {
-            font-size: 1.15rem;
+            font-size: $font-size-header;
             font-weight: 700;
             color: $text-header;
             margin-bottom: 1.25rem;
@@ -507,7 +507,7 @@ $table-label-bg: #f1f5f9;
             min-height: auto;
             min-width: auto;
             box-shadow: none;
-            font-size: 15px;
+            font-size: $font-size-label;
 
             &.disabled {
                 opacity: 0.5;
@@ -561,7 +561,7 @@ $table-label-bg: #f1f5f9;
             }
 
             .label-text {
-                font-size: 0.95rem;
+                font-size: $font-size-label;
                 color: $text;
                 transition: color 0.2s;
             }
@@ -579,7 +579,7 @@ $table-label-bg: #f1f5f9;
             animation: slideDown 0.3s ease-out;
 
             .sub-section-title {
-                font-size: 0.9rem;
+                font-size: $font-size-body;
                 font-weight: 600;
                 color: $text-muted;
                 margin-bottom: 1.5rem;
@@ -599,7 +599,7 @@ $table-label-bg: #f1f5f9;
                     border: 1px solid #d2d2d7;
                     background: white;
                     color: $text;
-                    font-size: 1rem;
+                    font-size: $font-size-header;
                     font-weight: 500;
                     cursor: pointer;
                     transition: all 0.2s ease;
@@ -659,7 +659,7 @@ $table-label-bg: #f1f5f9;
         .action-header {
             display: flex;
             align-items: center;
-            font-size: 1.1rem;
+            font-size: $font-size-header;
             font-weight: 600;
             color: $text;
             margin-right: auto;
@@ -676,7 +676,7 @@ $table-label-bg: #f1f5f9;
         transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
         font-weight: 500;
         letter-spacing: -0.01em;
-        font-size: 17px;
+        font-size: $font-size-label;
 
         &:hover {
             background: #0077ed;
@@ -689,7 +689,7 @@ $table-label-bg: #f1f5f9;
         }
 
         padding: 12px 32px;
-        font-size: 1rem;
+        font-size: $font-size-header;
 
         i {
             margin-right: 0.75rem;
@@ -715,7 +715,7 @@ $table-label-bg: #f1f5f9;
         animation: slideDown 0.4s ease-out;
 
         .card-header-title {
-            font-size: 1.25rem;
+            font-size: $font-size-header;
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 24px;
@@ -756,7 +756,7 @@ $table-label-bg: #f1f5f9;
                     padding: 14px 16px;
                     text-align: center;
                     padding-left: 1rem;
-                    font-size: 0.875rem;
+                    font-size: $font-size-label;
                     font-weight: 600;
                     color: $text-header;
                     border-bottom: 2px solid $border;
@@ -787,7 +787,7 @@ $table-label-bg: #f1f5f9;
                 td {
                     padding: 16px;
                     padding-left: 1rem;
-                    font-size: 0.9rem;
+                    font-size: $font-size-body;
                     color: $text;
                     border-bottom: 1px solid $border-color;
                     vertical-align: middle;
@@ -836,7 +836,7 @@ $table-label-bg: #f1f5f9;
                     color: #0369a1;
                     padding: 0.25rem 0.75rem;
                     border-radius: 9999px;
-                    font-size: 0.85rem;
+                    font-size: $font-size-label;
                     font-weight: 500;
                 }
             }
@@ -849,7 +849,7 @@ $table-label-bg: #f1f5f9;
                 text-align: left;
 
                 .detail-item {
-                    font-size: 0.9rem;
+                    font-size: $font-size-body;
                     color: #334155;
                     display: flex;
                     align-items: center;
@@ -858,7 +858,7 @@ $table-label-bg: #f1f5f9;
 
                     i {
                         color: #64748b;
-                        font-size: 0.8rem;
+                        font-size: $font-size-label;
                         width: 18px;
                         text-align: center;
                     }
@@ -897,7 +897,7 @@ $table-label-bg: #f1f5f9;
         border-bottom: 1px solid #f1f5f9;
 
         h4 {
-            font-size: 1rem;
+            font-size: $font-size-header;
             font-weight: 600;
             color: #1e293b;
             margin: 0;
@@ -917,7 +917,7 @@ $table-label-bg: #f1f5f9;
         border: 1px solid #cbd5e1;
         padding: 0.4rem 0.8rem;
         border-radius: 6px;
-        font-size: 0.85rem;
+        font-size: $font-size-label;
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
@@ -930,7 +930,7 @@ $table-label-bg: #f1f5f9;
         }
 
         i {
-            font-size: 0.8rem;
+            font-size: $font-size-label;
         }
     }
 
@@ -949,13 +949,13 @@ $table-label-bg: #f1f5f9;
             gap: 0.25rem;
 
             .label {
-                font-size: 0.85rem;
+                font-size: $font-size-label;
                 color: #64748b;
                 font-weight: 500;
             }
 
             .value {
-                font-size: 0.95rem;
+                font-size: $font-size-label;
                 color: #0f172a;
                 font-weight: 500;
                 background: #f8fafc;
@@ -974,7 +974,7 @@ $table-label-bg: #f1f5f9;
 
 // Request ID Badge in Modal
 .req-id {
-    font-size: 0.75em;
+    font-size: $font-size-label;
     color: #0369a1;
     background: #e0f2fe;
     padding: 4px 10px;
@@ -999,7 +999,7 @@ $table-label-bg: #f1f5f9;
         gap: 1rem;
 
         .req-id {
-            font-size: 0.85rem;
+            font-size: $font-size-label;
             padding: 0.35rem 0.85rem;
             background: #eff6ff;
             color: $primary;
@@ -1027,7 +1027,7 @@ $table-label-bg: #f1f5f9;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 0.9rem;
+    font-size: $font-size-body;
 
     &:hover {
         background: #eff6ff;
@@ -1079,7 +1079,7 @@ $table-label-bg: #f1f5f9;
             background: white;
             color: $primary;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: $font-size-header;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
@@ -1089,7 +1089,7 @@ $table-label-bg: #f1f5f9;
             gap: 0.1rem;
 
             .cred-label {
-                font-size: 0.75rem;
+                font-size: $font-size-hint;
                 font-weight: 600;
                 color: #64748b;
                 text-transform: uppercase;
@@ -1097,7 +1097,7 @@ $table-label-bg: #f1f5f9;
             }
 
             .cred-value {
-                font-size: 1rem;
+                font-size: $font-size-header;
                 font-weight: 700;
                 color: #1e293b;
                 font-family: 'Courier New', monospace;
@@ -1114,11 +1114,11 @@ $table-label-bg: #f1f5f9;
     background: #fff9db;
     border: 1px solid #fff3bf;
     border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: $font-size-label;
     color: #856404;
 
     i {
-        font-size: 1rem;
+        font-size: $font-size-header;
     }
 }
 
@@ -1139,7 +1139,7 @@ $table-label-bg: #f1f5f9;
         padding: 0.85rem 1.25rem;
         text-align: left;
         border: 1px solid $table-border;
-        font-size: 0.95rem;
+        font-size: $font-size-label;
     }
 
     th {
@@ -1148,7 +1148,7 @@ $table-label-bg: #f1f5f9;
         color: #1e293b;
         width: 30%;
         text-transform: uppercase;
-        font-size: 0.8rem;
+        font-size: $font-size-label;
         letter-spacing: 0.05em;
     }
 
@@ -1169,7 +1169,7 @@ $table-label-bg: #f1f5f9;
         th {
             background-color: $table-label-bg;
             width: 35%;
-            font-size: 0.9rem;
+            font-size: $font-size-label;
             text-transform: none;
             letter-spacing: normal;
             font-weight: 600;
@@ -1195,14 +1195,14 @@ $table-label-bg: #f1f5f9;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     color: #475569;
-    font-size: 0.8rem;
+    font-size: $font-size-label;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
 
     i {
-        font-size: 0.75rem;
+        font-size: $font-size-hint;
         transition: transform 0.2s ease;
     }
 
@@ -1252,20 +1252,20 @@ $table-label-bg: #f1f5f9;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: $font-size-header;
             flex-shrink: 0;
             box-shadow: 0 4px 8px rgba(245, 158, 11, 0.35);
         }
 
         .header-title {
-            font-size: 1.1rem;
+            font-size: $font-size-header;
             font-weight: 700;
             color: #1e293b;
             margin: 0 0 4px;
         }
 
         .header-subtitle {
-            font-size: 0.82rem;
+           font-size: $font-size-label;
             color: #78716c;
             margin: 0;
             line-height: 1.5;
@@ -1292,7 +1292,7 @@ $table-label-bg: #f1f5f9;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.88rem;
+            font-size: $font-size-label;
             font-weight: 600;
             color: #374151;
             margin: 0;
@@ -1305,12 +1305,12 @@ $table-label-bg: #f1f5f9;
 
             .required-badge {
                 color: #ef4444;
-                font-size: 0.85rem;
+                font-size: $font-size-label;
             }
         }
 
         .field-hint {
-            font-size: 0.75rem;
+            font-size: $font-size-hint;
             color: #94a3b8;
             margin: 4px 0 0 22px;
         }
@@ -1326,7 +1326,7 @@ $table-label-bg: #f1f5f9;
         padding: 10px 14px;
         border: 1.5px solid #d1d5db;
         border-radius: 10px;
-        font-size: 0.9rem;
+        font-size: $font-size-label;
         color: #1f2937;
         background: #fff;
         transition: border-color 0.2s, box-shadow 0.2s;
@@ -1365,14 +1365,14 @@ $table-label-bg: #f1f5f9;
         border: 1.5px solid #d1d5db;
         border-radius: 999px;
         background: #f9fafb;
-        font-size: 0.82rem;
+       font-size: $font-size-label;
         color: #374151;
         cursor: pointer;
         transition: all 0.15s ease;
         font-weight: 500;
 
         .check-icon {
-            font-size: 0.7rem;
+            font-size: $font-size-label;
             opacity: 0;
             width: 0;
             overflow: hidden;
@@ -1431,14 +1431,14 @@ $table-label-bg: #f1f5f9;
         }
 
         .dropzone-text {
-            font-size: 0.88rem;
+            font-size: $font-size-label;
             color: #374151;
             font-weight: 500;
             margin: 0 0 4px;
         }
 
         .dropzone-hint {
-            font-size: 0.75rem;
+            font-size: $font-size-hint;
             color: #94a3b8;
             margin: 0;
         }
@@ -1463,12 +1463,12 @@ $table-label-bg: #f1f5f9;
 
         .file-icon {
             color: #64748b;
-            font-size: 0.9rem;
+            font-size: $font-size-body;
         }
 
         .file-name {
             flex: 1;
-            font-size: 0.85rem;
+            font-size: $font-size-label;
             color: #374151;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1482,7 +1482,7 @@ $table-label-bg: #f1f5f9;
             cursor: pointer;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: $font-size-label;
             transition: color 0.2s, background 0.2s;
 
             &:hover {
@@ -1507,7 +1507,7 @@ $table-label-bg: #f1f5f9;
             border-radius: 10px;
             background: #fff;
             color: #6b7280;
-            font-size: 0.9rem;
+            font-size: $font-size-label;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -1527,7 +1527,7 @@ $table-label-bg: #f1f5f9;
             border-radius: 10px;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: #fff;
-            font-size: 0.9rem;
+            font-size: $font-size-label;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -1598,12 +1598,12 @@ $table-label-bg: #f1f5f9;
         background: #dbeafe;
         border: 1px solid #93c5fd;
         border-radius: 999px;
-        font-size: 0.78rem;
+        font-size: $font-size-label;
         font-weight: 600;
         color: #1e40af;
 
         .chip-icon {
-            font-size: 0.65rem;
+            font-size: $font-size-hint;
             color: #3b82f6;
         }
 
@@ -1613,7 +1613,7 @@ $table-label-bg: #f1f5f9;
             padding: 0 0 0 4px;
             color: #60a5fa;
             cursor: pointer;
-            font-size: 0.65rem;
+            font-size: $font-size-hint;
             line-height: 1;
             display: flex;
             align-items: center;
@@ -1661,7 +1661,7 @@ $table-label-bg: #f1f5f9;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(37, 99, 235, 0.08);
 
-        font-size: 0.75rem;
+        font-size: $font-size-hint;
         font-weight: 800;
         line-height: 1;
         white-space: nowrap;
@@ -1669,7 +1669,7 @@ $table-label-bg: #f1f5f9;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
         i {
-            font-size: 0.95rem;
+            font-size: $font-size-label;
             color: #3b82f6;
             transition: all 0.2s ease;
         }
@@ -1721,13 +1721,13 @@ $table-label-bg: #f1f5f9;
                 align-items: center;
                 gap: 10px;
                 color: #445469;
-                font-size: 0.8rem;
+                font-size: $font-size-label;
                 font-weight: 500;
                 overflow: hidden;
 
                 i {
                     color: #3b82f6;
-                    font-size: 1rem;
+                    font-size: $font-size-header;
                 }
 
                 span {
@@ -1769,7 +1769,7 @@ $table-label-bg: #f1f5f9;
             align-items: center !important;
             gap: 10px !important;
             color: #445469 !important;
-            font-size: 0.85rem !important;
+            font-size: $font-size-label !important;
             font-weight: 600 !important;
 
             i {
@@ -1786,7 +1786,7 @@ $table-label-bg: #f1f5f9;
         border: 1.5px solid #d1e9ff !important;
         border-radius: 9px !important;
         padding: 6px 14px !important;
-        font-size: 0.72rem !important;
+        font-size: $font-size-label !important;
         font-weight: 800 !important;
         display: inline-flex !important;
         align-items: center !important;
