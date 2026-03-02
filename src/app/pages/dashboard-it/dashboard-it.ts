@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { tickets } from '../../utils/it-dashboard-mock';
@@ -10,6 +10,11 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ItDashboardSummary } from './it-dashboard-summary/it-dashboard-summary';
+import { ItServiceService } from '../../services/it-service.service';
+import { StatusColor, ticketTypyColor } from '../../utils/status.util';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FilePreviewItem, FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -20,21 +25,27 @@ import { ItDashboardSummary } from './it-dashboard-summary/it-dashboard-summary'
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    ItDashboardSummary],
+    ItDashboardSummary, FilePreviewModalComponent],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
-export class DashboardIT {
+export class DashboardIT implements OnInit {
+
+  private itServiceService = inject(ItServiceService);
+  StatusColor = StatusColor;
+
 
   keyword = '';
   TicketStatus: any;
 
   filterStatus: StatusKey | null = 'all';
-  selectedTicket: TicketItem | null = null;
 
   selectedId = 1;
 
-  tickets: TicketItem[] = tickets;
+  Tickets = signal<any[]>([])
+  selectedTicket = signal<any | undefined>(undefined);
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   isAssignModalVisible = false;
   assignSearchKeyword = '';
@@ -72,35 +83,126 @@ export class DashboardIT {
 
   constructor(
     private msg: NzMessageService,
-    private auth: AuthService
+    private auth: AuthService,
+    private sanitizer: DomSanitizer
   ) { }
+
+  ngOnInit() {
+    this.getAllTickets();
+  }
 
   onStatusChange(status: StatusKey | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+    // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
   }
-  getSelectedTicket(): TicketItem | null {
-    return this.tickets.find(x => x.id === this.selectedId) ?? null;
-  }
+  // getSelectedTicket(): TicketItem | null {
+  //   return this.tickets.find(x => x.id === this.selectedId) ?? null;
+  // }
 
   trackById = (_: number, item: TicketItem) => item.id;
 
-  selectTicket(t: TicketItem) {
-    this.selectedId = t.id;
-    this.selectedTicket = t;
+  // selectTicket(ticketId: string) {
+  //   // this.selectedId = t.id;
+  //   // this.selectedTicket = t;
+  //   console.log(ticketId)
+  // }
+
+  selectTicket(ticketId: string) {
+    console.log(ticketId)
+    this.getTicketById(ticketId).subscribe(async (res: any) => {
+      console.log(res)
+
+      // let convertedFiles: any[] = [];
+
+      // if (res.attachments?.length) {
+      //   convertedFiles = await Promise.all(
+      //     res.attachments.map((f: any) =>
+      //       this.convertUrlToFile(f)
+      //     )
+      //   );
+      // }
+
+      let convertedFiles: any[] = [];
+
+      if (res.attachments?.length) {
+        convertedFiles = await Promise.all(
+          res.attachments.map((f: any) =>
+            this.convertUrlToFile({
+              id: f.id,
+              fileName: f.file_name,
+              filePath: f.file_path,
+              fileType: f.file_type,
+              fileSize: f.file_size,
+              fileDescription: f.file_description,
+              uploadedByaAduser: f.uploaded_by_aduser,
+              created_date: f.created_at
+            })
+          )
+        );
+      }
+
+
+
+      const ticket = res.ticket;
+      const replies = res.replies;
+      const services = res.services;
+      const attachments = convertedFiles
+
+      // res.attachments.map((item: any) => ({
+      //   id: item.id,
+      //   ticketId: item.ticket_id,
+      //   fileName: item.file_name,
+      //   filePath: item.file_path,
+      //   fileType: item.file_type,
+      //   fileSize: item.file_size,
+      //   fileDescription: item.file_description,
+      //   uploadedByaAduser: item.uploaded_by_aduser,
+      //   created_date: item.created_at
+      // }));
+      const assignGroups = res.assignGroups;
+
+      const objectData = {
+        ticketId: ticket.id,
+        ticketNumber: ticket.ticket_number,
+        subject: ticket.subject,
+        description: ticket.description,
+        ticketType: ticket.ticket_type_name_th,
+        status: ticket.status,
+        priority: ticket.priority,
+        source: ticket.source,
+        createdDate: new Date(ticket.created_at).toISOString(),
+        requesterAduser: ticket.requester_aduser,
+        requesterName: ticket.requester_name,
+        // requesterInitials: 'MP', //ชื่อย่อ
+        requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
+        attachments: attachments,
+        itNotes: [],
+        assigneeName: '',
+        assigneeAduser: '',
+        assigneeEmail: '',
+        assigneePhone: '',
+      }
+
+      console.log("selectedTicket:", objectData)
+      this.selectedTicket.set(objectData);
+    }
+    );
+
+
+
   }
 
-  filteredTickets(): TicketItem[] {
-    const kw = (this.keyword ?? '').trim().toLowerCase();
+  // filteredTickets(): TicketItem[] {
+  //   const kw = (this.keyword ?? '').trim().toLowerCase();
 
-    return this.tickets.filter(t => {
-      const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
-      const matchKw = !kw
-        ? true
-        : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
-      return matchStatus && matchKw;
-    });
-  }
+  //   return this.tickets.filter(t => {
+  //     const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
+  //     const matchKw = !kw
+  //       ? true
+  //       : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
+  //     return matchStatus && matchKw;
+  //   });
+  // }
 
   statusLabel(s: StatusKey) {
     switch (s) {
@@ -122,8 +224,12 @@ export class DashboardIT {
     this.msg.info('TODO: เปิด Modal เพิ่ม Note');
   }
 
-  previewFile(f: Attachment) {
+  safeUrl!: SafeResourceUrl;
+
+  previewFile(f: any) {
     this.msg.info(`ดูไฟล์: ${f.name}`);
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(f.file_path);
+    console.log(this.safeUrl)
   }
 
   downloadFile(f: Attachment) {
@@ -138,20 +244,20 @@ export class DashboardIT {
 
   acknowledgeTicket() {
     const user = this.auth.userData();
-    if (this.selectedTicket && user) {
-      this.selectedTicket.status = 'assigned';
-      this.selectedTicket.assignee = {
-        name: user.USR_NAME_TH || user.USR_NAME_EN || 'Me',
-        email: user.USR_EMAIL || '',
-        phone: user.USR_MOBILE || '-',
-        avatar: (user.USR_NAME_EN || 'ME').substring(0, 2),
-        avatarBg: 'var(--primary)'
-      };
-      this.msg.success('คุณได้รับเรื่องเรียบร้อยแล้ว');
-    } else {
-      // Fallback or if not logged in
-      this.forwardTicket();
-    }
+    // if (this.selectedTicket && user) {
+    //   this.selectedTicket.status = 'assigned';
+    //   this.selectedTicket.assignee = {
+    //     name: user.USR_NAME_TH || user.USR_NAME_EN || 'Me',
+    //     email: user.USR_EMAIL || '',
+    //     phone: user.USR_MOBILE || '-',
+    //     avatar: (user.USR_NAME_EN || 'ME').substring(0, 2),
+    //     avatarBg: 'var(--primary)'
+    //   };
+    //   this.msg.success('คุณได้รับเรื่องเรียบร้อยแล้ว');
+    // } else {
+    //   // Fallback or if not logged in
+    //   this.forwardTicket();
+    // }
   }
 
   closeTicket() {
@@ -201,25 +307,136 @@ export class DashboardIT {
     }
     const selectedNames = this.selectedAssigneeEmpCodes.join(', ');
 
-    if (this.selectedTicket && this.selectedTicket.assignee) {
-      this.selectedTicket.status = 'assigned'; // Update status
-      const first = this.selectedAssigneeEmpCodes[0];
-      this.selectedTicket.assignee.name = selectedNames;
-      this.selectedTicket.assignee.email = `${first.toLowerCase()}@oneeclick.com`;
-      this.selectedTicket.assignee.avatar = first.substring(0, 2);
-      this.selectedTicket.assignee.avatarBg = 'var(--primary)';
-    }
+    // if (this.selectedTicket && this.selectedTicket.assignee) {
+    //   this.selectedTicket.status = 'assigned'; // Update status
+    //   const first = this.selectedAssigneeEmpCodes[0];
+    //   this.selectedTicket.assignee.name = selectedNames;
+    //   this.selectedTicket.assignee.email = `${first.toLowerCase()}@oneeclick.com`;
+    //   this.selectedTicket.assignee.avatar = first.substring(0, 2);
+    //   this.selectedTicket.assignee.avatarBg = 'var(--primary)';
+    // }
 
     this.msg.success(`มอบหมายงานให้ ${this.selectedAssigneeEmpCodes.length} ท่าน เรียบร้อยแล้ว`);
     this.isAssignModalVisible = false;
   }
 
-  onImgError(event: any) {
-    event.target.style.display = 'none';
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
   }
 
   openImage(empCode: string) {
     console.log('Open image:', empCode);
+  }
+  // FUNCTION
+
+  isToday(dateValue: string | Date): boolean {
+    const date = new Date(dateValue);
+    const now = new Date();
+
+    return (
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  }
+
+  private async convertUrlToFile(fileData: any) {
+
+    try {
+
+      const response = await fetch(fileData.filePath);
+
+      if (!response.ok) {
+        throw new Error('Fetch failed');
+      }
+
+      const blob = await response.blob();
+
+      const file = new File(
+        [blob],
+        fileData.fileName,
+        { type: fileData.fileType }
+      );
+
+      return {
+        fileId: fileData.id,
+        name: fileData.fileName,
+        file: file,
+        description: fileData.fileDescription || '',
+        uploadedByAduser: fileData.uploadedByaAduser,
+        createdDate: fileData.created_date,
+        filePath: fileData.filePath,
+        size: fileData.fileSize,
+        type: fileData.fileType,
+        isError: false
+      };
+
+    } catch (error) {
+
+      console.warn('File fetch failed:', fileData.fileName);
+
+      // 🔥 fallback return
+      return {
+        fileId: fileData.id,
+        name: fileData.fileName,
+        file: null,  // ไม่มี blob
+        description: fileData.fileDescription || '',
+        uploadedByAduser: fileData.uploadedByaAduser,
+        createdDate: fileData.created_date,
+        filePath: fileData.filePath,
+        size: fileData.fileSize,
+        type: fileData.fileType,
+        isError: true
+      };
+    }
+  }
+
+  viewFile(file: any) {
+
+    console.log("file", file)
+    this.previewFiles.set([{
+      fileName: file.fileName,
+      date: dayjs().format('DD/MM/YYYY HH:mm'),
+      url: file.filePath,
+      type: file.type || 'image/png'
+    }]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
+
+
+  // GET MASTER
+  getAllTickets() {
+    this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.Tickets.set(res.data.map((ticket: any) => ({
+          ...ticket,
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticket_number,
+          ticketType: ticket.ticket_type_name_th,
+          status: ticket.status,
+          createdDate: new Date(ticket.created_at).toISOString(),
+          requesterEmpId: ticket.requester_codeempid,
+          subject: ticket.subject
+        })))
+
+        console.log(this.Tickets())
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+
+  getTicketById(ticketId: string) {
+    return this.itServiceService.getTicketById(ticketId)
   }
 }
 
