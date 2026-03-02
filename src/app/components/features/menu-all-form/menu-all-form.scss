@@ -92,7 +92,7 @@
         margin: 0;
         font-size: 1.5rem;
         font-weight: 500;
-        color: #582d96;
+        color: var(--status-progress-text);
     }
 
     .btn-close {
@@ -240,15 +240,6 @@
         padding-right: 16px !important;
     }
 
-    .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-        border-color: #40a9ff00;
-        box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-    }
-
-    .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-        border: 1px solid #d9d9d900;
-    }
-
     .form-input.input-error {
         border-color: #ff4d4f !important;
         box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
@@ -284,13 +275,15 @@
     display: flex;
     flex-direction: row;
     width: fit-content;
+    color: var(--text);
 
     &.visible {
-        background: #dcdcdc;
+        background: var(--bg-card);
     }
 
     &.enabled {
-        background: #cdcdcd;
+        background: color-mix(in srgb, var(--bg-card) 60%, var(--text-muted)) !important;
+
     }
 }
 
@@ -820,7 +813,7 @@
     padding: 10px 14px;
     margin-bottom: 6px;
     border-radius: 6px;
-    background: #f5f7fa;
+    background: var(--status-cancelled-bg);
     transition: all 0.2s ease;
     user-select: none;
 }
@@ -839,9 +832,9 @@
 
 .menu-parent:hover,
 .child-list li:hover {
-    background: #e3f2fd;
+    // background: var(--status-cancelled-bg);
+    background: color-mix(in srgb, var(--status-cancelled-bg) 90%, var( --text)) !important;
 }
-
 
 /* ============================= */
 /* ===== Drag Handle =========== */

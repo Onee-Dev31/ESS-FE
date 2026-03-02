@@ -179,3 +179,25 @@
     border-radius: 10px;
     transition: all .25s ease;
 }
+
+
+/*
+  ANTD : CHECKBOX
+*/
+
+/* ===== Disabled + NOT checked (false) ===== */
+.ant-checkbox-disabled:not(.ant-checkbox-checked) .ant-checkbox-inner {
+    background-color: color-mix(in srgb, var(--primary), var(--bg-page) 90%);
+    border-color: var(--status-approved-text);
+}
+
+/* ===== Disabled + checked (true) ===== */
+.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: color-mix(in srgb, var(--primary), var(--bg-page) 10%);
+    border-color: var(--status-approved-text);
+}
+
+/* สีเครื่องหมายถูก */
+.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: #94a3b8;
+}

@@ -17,7 +17,7 @@
                     <button class="btn-create" (click)="handleAddMenu()">
                         <i class="fas fa-plus"></i> เพิ่มเมนู
                     </button>
-                    <button class="btn-create" (click)="handleEditMenu()">
+                    <button class="btn-edit" (click)="handleEditMenu()">
                         <i class="fa-solid fa-pen-to-square"></i> แก้ไขเมนู
                     </button>
                 </div>
@@ -82,23 +82,28 @@
                                     <td>{{ item.RoleName }}</td>
 
                                     <td class="text-center">
-                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanView">
+                                        <!-- <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanView"> -->
+                                        <label nz-checkbox [(ngModel)]="item.CanView"  [disabled]="!IS_EDIT_MODE"></label>
                                     </td>
 
                                     <td class="text-center">
-                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanCreate">
+                                        <!-- <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanCreate"> -->
+                                        <label nz-checkbox [(ngModel)]="item.CanCreate"  [disabled]="!IS_EDIT_MODE"></label>
                                     </td>
 
                                     <td class="text-center">
-                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanUpdate">
+                                        <!-- <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanUpdate"> -->
+                                           <label nz-checkbox [(ngModel)]="item.CanUpdate"  [disabled]="!IS_EDIT_MODE"></label>
                                     </td>
 
                                     <td class="text-center">
-                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanDelete">
+                                        <!-- <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanDelete"> -->
+                                           <label nz-checkbox [(ngModel)]="item.CanDelete"  [disabled]="!IS_EDIT_MODE"></label>
                                     </td>
 
                                     <td class="text-center">
-                                        <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanApprove">
+                                        <!-- <input type="checkbox" [disabled]="!IS_EDIT_MODE" [(ngModel)]="item.CanApprove"> -->
+                                           <label nz-checkbox [(ngModel)]="item.CanApprove"  [disabled]="!IS_EDIT_MODE"></label>
                                     </td>
 
                                 </tr>
