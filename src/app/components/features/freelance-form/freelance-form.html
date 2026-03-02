@@ -106,7 +106,7 @@
                         <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [(ngModel)]="formData.company"
                             name="company" class="form-input" (ngModelChange)="onCompanyChange($event, true)" required
                             #company="ngModel" [class.input-error]="company.invalid && company.touched">
-                            <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled />
+                            <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
                             <nz-option *ngFor="let company of companyList" [nzLabel]="company.COMPANY_NAME"
                                 [nzValue]="company" />
                         </nz-select>

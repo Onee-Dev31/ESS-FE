@@ -18,6 +18,10 @@
     color: var(--input-text-placeholder);
 }
 
+.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    color: var(--text-muted);
+}
+
 //input > diable
 .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
     border-color: #40a9ff00;
@@ -45,6 +49,7 @@
 .ant-select-clear:hover {
     background-color: transparent;
     color: var(--input-text) !important;
+    font-size: 15px;
 }
 
 // option
@@ -67,4 +72,110 @@
 //empty
 .ant-empty-small {
     color: var(--input-text)
+}
+
+
+/*
+  ANTD : PICKER
+*/
+
+//antd picker
+
+.ant-picker {
+    border: 1px solid var(--border-table-head);
+    color: var(--input-text);
+    background-color: var(--input-bg);
+}
+
+.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border: none !important;
+    display: none !important;
+}
+
+.ant-picker-input>input {
+    color: var(--text)
+}
+
+.ant-picker-clear {
+    background-color: transparent;
+    color: var(--input-text) !important;
+}
+
+.ant-picker-suffix {
+    color: var(--text)
+}
+
+.ant-picker:hover input:not(:placeholder-shown)~.ant-picker-suffix {
+    opacity: 0;
+}
+
+/* fix ขนาดแต่ละช่องให้ตายตัว */
+.ant-picker-cell {
+    width: 30px !important;
+    height: 35px !important;
+    padding: 0 !important;
+}
+
+/* fix inner ให้เต็ม cell และเป็นวงกลม */
+.ant-picker-cell-inner {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    transition: background-color 0.2s ease;
+}
+
+/* ทำให้วันที่ที่เลือกเป็นวงกลม */
+.ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: #4e4e4e !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* hover ตอนชี้เมาส์ */
+.ant-picker-cell-inner:hover {
+    background-color: #b3b3b3 !important;
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* month & year mode */
+.ant-picker-month-panel .ant-picker-cell-inner,
+.ant-picker-year-panel .ant-picker-cell-inner,
+.ant-picker-decade-panel .ant-picker-cell-inner {
+    border-radius: 10% !important;
+}
+
+/*
+  ANTD : MODAL
+*/
+.ant-modal-body {
+    background-color: var(--bg-card);
+    border-radius: 17px;
+}
+
+.ant-modal-close-x {
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.ant-modal-close-x:hover {
+    background: rgba(202, 202, 202, 0.5);
+    transform: scale(1);
+    border-radius: 10px;
+    transition: all .25s ease;
 }

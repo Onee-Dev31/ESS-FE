@@ -25,7 +25,8 @@ interface FreelanceMember {
     name: string;
     nickname: string;
     phone: string;
-    company: string;
+    company: any | null;
+    // company: string;
     department: string;
     salary: number;
     otherIncome: number;
@@ -44,7 +45,8 @@ interface FreelanceFormData {
     lastNameEn: string;
     phone: string;
     email: string;
-    company: string;
+    company: any | null;
+    // company: string;
     department: string;
     position: string;
     startDate: Date | null;
@@ -101,7 +103,7 @@ export class FreelanceManagementComponent implements OnInit {
     editingItem = signal<FreelanceFormData | null>(null);
 
     // New Filters
-    filterCompany = signal<any>('');
+    filterCompany = signal<any>(null);
     filterDepartment = signal<any>('');
     filterMonth = signal<string>('');
 

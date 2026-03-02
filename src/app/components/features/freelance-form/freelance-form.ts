@@ -17,7 +17,8 @@ interface FreelanceFormData {
     lastNameEn: string;
     phone: string;
     email: string;
-    company: string;
+    company: any | null;
+    // company: string;
     department: string;
     position: string;
     startDate: Date | null;
@@ -77,7 +78,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         lastNameEn: '',
         phone: '',
         email: '',
-        company: '',
+        company: null,
         department: '',
         position: '',
         startDate: null,
@@ -359,7 +360,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
             lastNameEn: '',
             phone: '',
             email: '',
-            company: '',
+            company: null,
             department: '',
             position: '',
             startDate: null,

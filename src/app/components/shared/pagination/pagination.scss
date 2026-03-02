@@ -46,7 +46,7 @@ $primary: var(--primary);
                 border: 1px solid var(--border-table-head);
                 border-radius: 8px;
                 outline: none;
-                background-color: #ffffff;
+                background-color: var(--bg-card);
                 color: var(--text-sub);
                 font-size: 0.9rem;
                 font-weight: 500;

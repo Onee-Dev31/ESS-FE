@@ -556,7 +556,7 @@ $border: var(--border);
                     border: 1px solid var(--border-table-head);
                     border-radius: 50px;
                     padding: 0 1.25rem;
-                    background-color: var(--bg-card);
+                    background-color: var(--input-bg);
                     font-size: 0.9rem;
                     color: var(--text-header);
 
@@ -692,71 +692,3 @@ $border: var(--border);
         text-align: center;
     }
 }
-
-
-// SELECT (antd) 
-// // input
-// ::ng-deep .ant-select {
-//     color: var(--input-text);
-// }
-
-// ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-//     position: relative;
-//     background-color: transparent;
-//     border: 1px solid #cfcfcf00;
-// }
-
-// ::ng-deep .ant-select-selection-placeholder {
-//     color: var(--input-text-placeholder);
-// }
-
-// //input > diable
-// ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-//     border-color: #40a9ff00;
-//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-// }
-
-// ::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-//     border-color: #40a9ff00;
-//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-// }
-
-// ::ng-deep .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-//     position: relative;
-//     background-color: var(--input-disabled-bg);
-//     border: 1px solid #cfcfcf00;
-// }
-
-// // >
-// ::ng-deep .ant-select-arrow .anticon>svg {
-//     color: rgba(255, 255, 255, 0);
-// }
-
-// // x
-// ::ng-deep .ant-select-clear,
-// .ant-select-clear:hover {
-//     background-color: transparent;
-//     color: var(--input-text) !important;
-// }
-
-// // option
-// ::ng-deep .ant-select-dropdown {
-//     background-color: var(--bg-page);
-// }
-
-// ::ng-deep .ant-select-item {
-//     color: var(--input-text);
-// }
-
-// ::ng-deep .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-//     background-color: var(--input-bg-hover);
-// }
-
-// ::ng-deep .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-//     background-color: var(--input-bg-active);
-// }
-
-// //empty
-// ::ng-deep .ant-empty-small {
-//     color: var(--input-text)
-// }
