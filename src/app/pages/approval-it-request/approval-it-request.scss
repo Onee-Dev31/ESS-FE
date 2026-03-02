@@ -1,0 +1,754 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// Approvals Page Styles
+// ============================================
+$success: var(--success);
+$danger: var(--danger);
+$warning: var(--warning);
+
+// สีพื้นหลัง (Background Colors)
+$bg-slate: var(--bg-slate);
+$header-bg: var(--bg-table-head);
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-muted: var(--text-muted);
+$text-header: var(--text-sub);
+
+// เส้นขอบ (Border Colors)
+$border: var(--border);
+$border-color: var(--border-color);
+
+// อื่นๆ (Others)
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+
+// สีสำหรับสถานะต่างๆ (Status Colors)
+$status-new-bg: rgba(217, 119, 6, 0.1);
+$status-new-text: var(--status-new-text);
+
+$status-verified-bg: rgba(13, 148, 136, 0.1);
+$status-verified-text: var(--status-verified-text);
+
+$status-pending-bg: rgba(26, 115, 232, 0.1);
+$status-pending-text: var(--primary);
+
+$status-success-bg: rgba(22, 163, 74, 0.1);
+$status-success-text: var(--status-success-text);
+
+$status-danger-bg: rgba(220, 38, 38, 0.1);
+$status-danger-text: var(--status-danger-text);
+
+// Responsive Mixins
+@mixin mobile {
+    @media (max-width: 575.98px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+// ============================================
+
+.approvals-wrapper {
+    // ==================== BASE LAYOUT ====================
+    padding: 24px;
+    background: $bg-slate;
+    min-height: 100vh;
+
+    @include mobile {
+        padding: 16px;
+    }
+
+    @include tablet {
+        padding: 12px;
+    }
+
+    .card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        box-shadow: $shadow;
+        overflow: hidden;
+        margin-top: 24px;
+    }
+
+    .table-controls {
+        padding: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+
+        @include tablet {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    // ==================== TAB NAVIGATION ====================
+    .tab-navigation {
+        display: flex;
+        gap: 8px;
+
+        @include tablet {
+            overflow-x: auto;
+            padding-bottom: 4px;
+            width: 100%;
+        }
+
+        .tab-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: $text-sub;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.2s;
+
+            &.active {
+                background: rgba($primary, 0.1);
+                color: $primary;
+                border-color: rgba($primary, 0.2);
+            }
+
+            &:hover:not(.active) {
+                background: rgba(0, 0, 0, 0.02);
+                color: $text;
+            }
+
+            .badge {
+                padding: 2px 8px;
+                background: rgba(0, 0, 0, 0.05);
+                border-radius: 999px;
+                font-size: 0.75rem;
+                color: $text-muted;
+            }
+
+            &.active .badge {
+                background: rgba($primary, 0.1);
+                color: $primary;
+            }
+        }
+    }
+
+    // ==================== SEARCH BOX ====================
+    .search-box {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-muted;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid $border;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, color 0.2s;
+            background: var(--input-bg);
+            color: var(--input-text);
+            color-scheme: light dark;
+
+            &::placeholder {
+                color: var(--input-text-placeholder);
+            }
+
+            &:focus {
+                border-color: $primary;
+                background: var(--input-focus-bg);
+            }
+        }
+    }
+
+    // ==================== MOBILE CARD VIEW ====================
+    .card-list-view {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
+
+        @include large-tablet {
+            display: flex;
+        }
+
+        .mobile-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-toolbar);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            &:active {
+                transform: scale(0.98);
+            }
+
+            .card-header {
+                background: $header-bg;
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--border-toolbar);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .request-id {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    .label {
+                        font-size: 0.75rem;
+                        color: $text-muted;
+                        font-weight: 500;
+
+                        i {
+                            margin-right: 4px;
+                            color: $primary;
+                            opacity: 0.8;
+                        }
+                    }
+
+                    .value {
+                        font-weight: 700 !important;
+                        color: $primary !important;
+                        font-size: 0.95rem;
+                    }
+                }
+            }
+
+            .card-body {
+                padding: 16px;
+
+                .info-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 8px;
+                    font-size: 0.85rem;
+
+                    .label {
+                        color: $text-muted;
+
+                        i {
+                            width: 16px;
+                            text-align: center;
+                            margin-right: 6px;
+                            color: $primary;
+                            opacity: 0.7;
+                        }
+                    }
+
+                    .value {
+                        font-weight: 600;
+                        color: $text;
+
+                        &.highlight {
+                            color: $primary;
+                        }
+
+                        &.amount {
+                            font-size: 1.1rem;
+                            font-weight: 800;
+                            color: var(--text-header);
+                        }
+                    }
+                }
+
+                .requester-block {
+                    margin: 16px 0;
+                    padding: 12px;
+                    background: $header-bg;
+                    border-radius: 12px;
+
+                    .req-name {
+                        font-weight: 700;
+                        color: $text;
+                        font-size: 0.95rem;
+                        margin-bottom: 4px;
+
+                        i {
+                            color: $primary;
+                            margin-right: 6px;
+                            opacity: 0.8;
+                        }
+                    }
+
+                    .req-details {
+                        font-size: 0.8rem;
+                        color: $text-sub;
+                        margin-bottom: 2px;
+                    }
+
+                    .req-company {
+                        font-size: 0.75rem;
+                        color: $text-muted;
+                    }
+                }
+
+                .description-block {
+                    margin-bottom: 16px;
+
+                    .desc-label {
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        color: $text-muted;
+                        margin-bottom: 4px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+
+                        i {
+                            margin-right: 4px;
+                            color: $primary;
+                        }
+                    }
+
+                    .desc-content {
+                        font-size: 0.9rem;
+                        line-height: 1.5;
+                        color: $text;
+                        background: var(--border-toolbar);
+                        padding: 10px 12px;
+                        border-radius: 8px;
+                    }
+                }
+
+                .amount-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    padding-top: 12px;
+                    border-top: 1px dashed var(--border-table-head);
+                    margin-bottom: 16px;
+
+                    .label {
+                        font-size: 0.85rem;
+                        color: $text-muted;
+                        font-weight: 500;
+                    }
+
+                    .value.amount {
+                        font-size: 1.35rem;
+                        font-weight: 800;
+                        color: $primary;
+                        font-family: $font-main;
+
+                        &::before {
+                            content: '฿';
+                            font-size: 1rem;
+                            font-weight: 600;
+                            margin-right: 2px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ==================== STATUS BADGES ====================
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+
+        &.approved,
+        &.Approved {
+            background: $status-success-bg;
+            color: $status-success-text;
+        }
+
+        &.pending,
+        &.Pending {
+            background: $status-pending-bg;
+            color: $status-pending-text;
+        }
+
+        &.rejected,
+        &.Rejected {
+            background: $status-danger-bg;
+            color: $status-danger-text;
+        }
+
+        &.referred-back {
+            background: $status-new-bg;
+            color: $status-new-text;
+        }
+    }
+
+    // ==================== DATA GRID / TABLE ====================
+    .data-grid-container {
+        padding: 0 24px 24px;
+
+        @include large-tablet {
+            display: none;
+        }
+
+        .data-grid {
+            @include modern-table;
+            border: 1px solid var(--text-muted) !important; // Force darker border
+            border-radius: 12px;
+            overflow: hidden;
+
+            thead {
+                tr {
+                    background: $header-bg;
+                }
+
+                th {
+                    padding: 14px 16px;
+                    text-align: left;
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    color: $text-header;
+                    border-bottom: 2px solid $border;
+                    white-space: nowrap;
+                }
+            }
+
+            tbody {
+                transition: background 0.2s;
+
+                &:hover {
+                    background: var(--border-toolbar);
+
+                    tr {
+                        background: transparent;
+                    }
+
+                    td {
+                        background: transparent !important;
+                    }
+                }
+
+                tr {
+                    transition: background 0.2s;
+
+                    &:not(:last-child) td:not(.merged-col) {
+                        border-bottom: none;
+                    }
+                }
+
+                td {
+                    padding: 16px;
+                    font-size: 0.9rem;
+                    color: $text;
+                    border-bottom: 1px solid var(--border-toolbar);
+                    vertical-align: middle;
+                }
+
+                &:last-of-type tr:last-child td {
+                    border-bottom: none;
+                }
+            }
+
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                display: inline-flex;
+                border: 1px solid transparent;
+
+                &.status-new {
+                    background: $status-new-bg;
+                    color: $status-new-text;
+                    border-color: rgba($status-new-text, 0.3);
+                }
+
+                &.status-verified {
+                    background: $status-verified-bg;
+                    color: $status-verified-text;
+                    border-color: rgba($status-verified-text, 0.3);
+                }
+
+                &.status-pending {
+                    background: $status-pending-bg;
+                    color: $status-pending-text;
+                    border-color: rgba($status-pending-text, 0.3);
+                }
+
+                &.status-approved {
+                    background: $status-success-bg;
+                    color: $status-success-text;
+                    border-color: rgba($status-success-text, 0.3);
+                }
+
+                &.status-rejected {
+                    background: $status-danger-bg;
+                    color: $status-danger-text;
+                    border-color: rgba($status-danger-text, 0.3);
+                }
+            }
+
+            .action-cell,
+            .action-btns {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+            }
+
+            .text-primary-link {
+                color: $primary !important;
+                font-weight: 700 !important;
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            @include tablet {
+                display: none;
+            }
+
+            tbody tr td.request-no-link {
+                color: $primary !important;
+                font-weight: 700 !important;
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    // ==================== ACTION BUTTONS ====================
+    .action-cell,
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+
+        @include mobile {
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .act-btn {
+            &.v-btn {
+                @include icon-btn-ghost(var(--text-table-head));
+            }
+
+            &.a-btn {
+                @include icon-btn-ghost($success);
+            }
+
+            &.r-btn {
+                @include icon-btn-ghost($danger);
+            }
+
+            &.b-btn {
+                @include icon-btn-ghost($warning);
+            }
+        }
+    }
+
+    // ==================== ICON-ONLY VIEW BUTTON ====================
+    .btn-icon-view {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 8px;
+        border: 1px solid var(--border-table-head);
+        background: var(--bg-card);
+        color: var(--text-sub);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+        i {
+            line-height: 1;
+        }
+
+        &:hover {
+            background: rgba($primary, 0.1);
+            border-color: rgba($primary, 0.4);
+            color: $primary;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba($primary, 0.15);
+        }
+
+        &:active {
+            transform: translateY(0);
+            background: rgba($primary, 0.15);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        &:focus-visible {
+            outline: 2px solid rgba($primary, 0.35);
+            outline-offset: 2px;
+        }
+    }
+}
+
+// ==================== UTILITY BUTTONS ====================
+.utility-btns {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-table-head);
+        border-radius: 10px;
+        color: var(--text-sub);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        i {
+            font-size: 0.9rem;
+
+            &.mr-1 {
+                margin-right: 8px;
+            }
+
+            &.ml-1 {
+                margin-left: 8px;
+            }
+        }
+
+        .btn-text {
+            line-height: 1;
+        }
+
+        &:hover {
+            background: var(--bg-table-head);
+            border-color: $primary;
+            color: $primary;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba($primary, 0.08);
+        }
+
+        &:active {
+            transform: translateY(0);
+            background: var(--border-toolbar);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        &:focus-visible {
+            outline: 2px solid rgba($primary, 0.3);
+            outline-offset: 2px;
+        }
+    }
+
+    .export-dropdown {
+        position: relative;
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border-toolbar);
+            min-width: 180px;
+            padding: 6px;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+            &.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                padding: 10px 12px;
+                border: none;
+                background: transparent;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                color: #202124;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: left;
+
+                i {
+                    font-size: 1rem;
+                    width: 20px;
+                    text-align: center;
+                }
+
+                &:hover {
+                    background: var(--bg-table-head);
+                    color: var(--primary);
+                }
+            }
+        }
+    }
+
+    .pagination-wrapper {
+        margin-top: 24px;
+        padding: 0 24px 24px;
+    }
+}
+
+@include tablet {
+    .utility-btns {
+        .btn-text {
+            display: none;
+        }
+
+        .btn-outline {
+            padding: 8px 12px;
+
+            i {
+                margin: 0;
+            }
+        }
+    }
+}
+
+// Pagination wrapper spacing
+.pagination-wrapper {
+    margin-top: 0;
+    padding: 0 24px 24px;
+
+    @include mobile {
+        padding: 0 16px 16px;
+    }
+
+    @include tablet {
+        padding: 0 12px 12px;
+    }
+}

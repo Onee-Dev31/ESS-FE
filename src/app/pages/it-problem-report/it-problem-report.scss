@@ -1360,16 +1360,21 @@ $table-label-bg: var(--border-toolbar);
     .cat-tag {
         display: inline-flex;
         align-items: center;
-        // gap: 6px;
-        padding: 6px 14px;
+        justify-content: center;
+        padding: 6px 16px;
         border: 1.5px solid var(--border);
         background: var(--bg-table-head);
-        border-radius: 999px;
+        border-radius: 999px !important;
         font-size: $font-size-label;
         color: var(--text);
         cursor: pointer;
         transition: all 0.15s ease;
         font-weight: 500;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        user-select: none;
+        white-space: nowrap;
 
         .check-icon {
             font-size: $font-size-label;

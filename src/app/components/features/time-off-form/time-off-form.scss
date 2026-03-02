@@ -42,6 +42,7 @@
     width: 100%;
     height: 100%;
     background: transparent;
+    color: var(--text);
 
     overflow: hidden;
 
@@ -268,13 +269,13 @@
         }
 
         &.active {
-            border: 2px solid $primary;
+            border: 2px solid var(--primary);
             background: var(--bg-card);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px rgba(var(--primary), 0.1);
 
             .leave-footer {
-                background: $primary;
-                color: var(--text-on-primary, #ffffff);
+                background: var(--primary);
+                color: #ffffff;
             }
         }
 
@@ -298,11 +299,12 @@
                     align-items: center;
                     justify-content: center;
                     background: var(--bg-table-head);
+                    border: 1px solid var(--border-toolbar);
                     border-radius: 16px;
                     transition: all 0.3s ease;
 
                     i {
-                        font-size: 1.75rem;
+                        color: var(--primary);
                     }
                 }
             }
@@ -452,7 +454,7 @@
         font-size: 0.95rem;
         color: var(--text-header);
         background: var(--bg-card);
-        border: 1px solid var(--text-muted);
+        border: 1px solid var(--border);
         border-radius: 8px;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -484,7 +486,7 @@
     font-size: 0.95rem;
     color: var(--text-header);
     background: var(--bg-card);
-    border: 1px solid var(--text-muted);
+    border: 1px solid var(--border);
     border-radius: 8px;
     transition: all 0.2s;
 
@@ -681,10 +683,11 @@ textarea.custom-form-control {
         .desc-control {
             width: 100%;
             padding: 8px 12px;
-            border: 1px solid var(--text-muted);
+            border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 0.9rem;
             color: var(--text-header);
+            background-color: var(--bg-card);
             transition: all 0.2s;
 
             &::placeholder {

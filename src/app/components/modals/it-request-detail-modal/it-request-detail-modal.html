@@ -1,0 +1,82 @@
+<div class="modal-overlay approval-detail-overlay" (click)="close()" @fadeIn>
+    <div class="modal-container-large it-request-modal" (click)="$event.stopPropagation()" @modalAnimation>
+
+        <div class="modal-header">
+            <h2 class="request-title">สรุปรายละเอียดคำขอ</h2>
+            <button class="btn-close-x" (click)="close()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="modal-body">
+
+            <!-- Section 1: ข้อมูลผู้ขอสิทธิ์ (Request For) -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-user-circle"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
+                        <div class="info-value">{{ approvalItem.originalData?.requestFor ||
+                            approvalItem.requestBy.name || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">เบอร์โทรติดต่อ</div>
+                        <div class="info-value">{{ approvalItem.originalData?.phone || '-' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: บริการที่เลือก (Selected Services) -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-server"></i> บริการที่เลือก (Selected Services)
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">บริการ</div>
+                        <div class="info-value">
+                            <span class="service-tag">
+                                <i class="fas fa-check-circle text-success mr-1"></i>
+                                {{ approvalItem.originalData?.requestCategory || approvalItem.requestType ||
+                                'ขอใช้ระบบ' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: ระบบที่เลือก (Selected Systems) -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label align-top">Basic Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li><i class="fas fa-check"></i> ห้องประชุม</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label align-top">Specific Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li><i class="fas fa-check"></i> Oracle</li>
+                                <li><i class="fas fa-check"></i> BMS</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-outline btn-reject" (click)="editRequest()">Reject</button>
+            <button class="btn-primary" (click)="confirmApprove()">Approve</button>
+        </div>
+
+    </div>
+</div>

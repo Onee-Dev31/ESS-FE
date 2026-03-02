@@ -25,12 +25,12 @@ export interface ApprovalItem {
         position?: string;
         profileImage?: string;
     };
-    requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล';
+    requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล' | 'IT Request';
     typeId: number;
     requestDetail: string;
     amount: number;
     status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
     rawStatus: string;
-    type?: 'allowance' | 'taxi' | 'transport' | 'medical';
+    type?: 'allowance' | 'taxi' | 'transport' | 'medical' | 'it-request';
     originalData?: AllowanceRequest | MedicalRequest | any;
 }

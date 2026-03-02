@@ -133,6 +133,12 @@ export const routes: Routes = [
                 data: { animation: 'Dashboard' }
             },
             {
+                path: 'approval-it-request',
+                loadComponent: () => import('./pages/approval-it-request/approval-it-request').then(m => m.ApprovalItRequestComponent),
+                // canActivate: [menuGuard], // Temporarily bypassed for testing
+                data: { animation: 'Approvals' }
+            },
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'

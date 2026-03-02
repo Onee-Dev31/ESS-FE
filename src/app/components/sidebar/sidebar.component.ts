@@ -129,20 +129,60 @@ export class Sidebar {
                             label: child.Label,
                             path: child.RoutePath ? (child.RoutePath.startsWith('/') ? child.RoutePath : `/${child.RoutePath}`) : ''
                         }))
-                        // .sort((a: any, b: any) => {
-                        //     const MENU_PRIORITY: Record<string, number> = {
-                        //         '/it-problem-report': 1,
-                        //         '/it-repair-request': 2,
-                        //         '/it-service-request': 3,
-                        //     };
-                        //     return (MENU_PRIORITY[a.path] ?? 99) - (MENU_PRIORITY[b.path] ?? 99);
-                        // })
+                        .reduce((acc: any[], current: any) => {
+                            const existingIndex = acc.findIndex((t: any) => t.label === current.label);
+                            if (existingIndex !== -1) {
+                                const existing = acc[existingIndex];
+                                if ((!existing.path || existing.path === '/') && current.path && current.path !== '/') {
+                                    acc[existingIndex] = current;
+                                }
+                            } else {
+                                acc.push(current);
+                            }
+                            return acc;
+                        }, [])
+                        .sort((a: any, b: any) => {
+                            const MENU_PRIORITY: Record<string, number> = {
+                                '/it-problem-report': 1,
+                                '/it-repair-request': 2,
+                                '/it-service-request': 3,
+                            };
+                            return (MENU_PRIORITY[a.path] ?? 99) - (MENU_PRIORITY[b.path] ?? 99);
+                        })
                 };
             });
 
-        // console.log(formattedMenus);
-        return formattedMenus
+        // Merge duplicate parent menu names (e.g., if there are two 'IT Request' items)
+        const mergedMenus = formattedMenus.reduce((acc: any[], current: any) => {
+            const existingMenuIndex = acc.findIndex(item => item.name === current.name);
+            if (existingMenuIndex !== -1) {
+                const existingMenu = acc[existingMenuIndex];
 
+                // If the existing parent menu lacks a valid path but the current one has it, swap their paths.
+                if ((!existingMenu.path || existingMenu.path === '/') && current.path && current.path !== '/') {
+                    existingMenu.path = current.path;
+                }
+
+                // Merge subItems, preventing duplicates by label priority (keep one with a valid path if multiple)
+                current.subItems.forEach((newSub: any) => {
+                    const existingSubIndex = existingMenu.subItems.findIndex((sub: any) => sub.label === newSub.label);
+                    if (existingSubIndex === -1) {
+                        existingMenu.subItems.push(newSub);
+                    } else {
+                        // If duplicate sub-item exists, prefer the one with a non-empty/non-root path
+                        const existingSub = existingMenu.subItems[existingSubIndex];
+                        if ((!existingSub.path || existingSub.path === '/') && newSub.path && newSub.path !== '/') {
+                            existingMenu.subItems[existingSubIndex] = newSub;
+                        }
+                    }
+                });
+            } else {
+                acc.push(current);
+            }
+            return acc;
+        }, []);
+
+        return mergedMenus;
     });
 
     toggleMenu(item: MenuItem) {
