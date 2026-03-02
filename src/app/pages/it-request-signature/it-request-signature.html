@@ -1,0 +1,160 @@
+<div class="signature-page-wrapper">
+
+    <!-- Page Header -->
+    <div class="sig-page-header">
+        <div class="header-left">
+            <div class="page-icon"><i class="fas fa-file-signature"></i></div>
+            <div>
+                <h1 class="page-title">ลงนามอนุมัติคำขอ IT</h1>
+                <p class="page-subtitle">IT Request Approval Signature</p>
+            </div>
+        </div>
+        <div class="request-badge">
+            <i class="fas fa-hashtag"></i> {{ requestNo() }}
+        </div>
+    </div>
+
+    @if (isNotFound()) {
+    <div class="not-found-state">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>ไม่พบข้อมูล Request No. <strong>{{ requestNo() }}</strong></p>
+    </div>
+    } @else if (requestData(); as req) {
+
+    <div class="content-layout">
+
+        <!-- Left: Request Details -->
+        <div class="request-details-panel">
+
+            <!-- Section 1: ข้อมูลผู้ขอสิทธิ์ -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-user-circle"></i>
+                    ข้อมูลผู้ขอสิทธิ์ <span class="sub">(Request For)</span>
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
+                        <div class="info-value">{{ req.requestFor }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">เบอร์โทรติดต่อ</div>
+                        <div class="info-value">{{ req.phone }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">วันที่ขอ</div>
+                        <div class="info-value">{{ req.requestDate }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: บริการที่เลือก -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-server"></i>
+                    บริการที่เลือก <span class="sub">(Selected Services)</span>
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">บริการ</div>
+                        <div class="info-value">
+                            <span class="service-tag">
+                                <i class="fas fa-check-circle text-success"></i>
+                                {{ req.requestCategory }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: ระบบที่เลือก -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-desktop"></i>
+                    ระบบที่เลือก <span class="sub">(Selected Systems)</span>
+                </div>
+                <div class="section-content">
+                    @if (req.basicSystems.length) {
+                    <div class="info-row">
+                        <div class="info-label align-top">Basic Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                @for (s of req.basicSystems; track s) {
+                                <li><i class="fas fa-check"></i> {{ s }}</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+                    @if (req.specificSystems.length) {
+                    <div class="info-row">
+                        <div class="info-label align-top">Specific Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                @for (s of req.specificSystems; track s) {
+                                <li><i class="fas fa-check"></i> {{ s }}</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right: Signature Pad -->
+        <div class="signature-panel">
+            <div class="section-header">
+                <i class="fas fa-pen-nib"></i>
+                ลายเซนต์ผู้อนุมัติ <span class="sub">(Approver Signature)</span>
+            </div>
+
+            <div class="canvas-wrapper" [class.has-signature]="hasSignature()">
+                <canvas #signatureCanvas class="signature-canvas" (mousedown)="startDrawing($event)"
+                    (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
+                    (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()">
+                </canvas>
+
+                @if (!hasSignature()) {
+                <div class="canvas-placeholder">
+                    <i class="fas fa-signature"></i>
+                    <span>เซนชื่อในพื้นที่นี้</span>
+                </div>
+                }
+            </div>
+
+            <div class="signer-name-field">
+                <div class="name-input-wrapper">
+                    <i class="fas fa-user name-icon"></i>
+                    <input type="text" class="signer-name-input" placeholder="ชื่อ - นามสกุลเต็ม" [value]="signerName()"
+                        (input)="signerName.set($any($event.target).value)" />
+                </div>
+                <div class="name-label">ชื่อ - นามสกุลผู้อนุมัติ</div>
+            </div>
+
+
+            <div class="signature-actions">
+                <button class="btn-clear" (click)="clearSignature()" [disabled]="!hasSignature()">
+                    <i class="fas fa-eraser"></i> ล้างลายเซนต์
+                </button>
+
+                <button class="btn-submit" (click)="submit()" [disabled]="!hasSignature() || isSubmitting()">
+                    @if (isSubmitting()) {
+                    <i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...
+                    } @else {
+                    <i class="fas fa-check-circle"></i> Approve & Submit
+                    }
+                </button>
+            </div>
+
+            <p class="signature-note">
+                <i class="fas fa-info-circle"></i>
+                ลายเซนต์นี้จะถูกบันทึกเป็นหลักฐานการอนุมัติ
+            </p>
+        </div>
+
+    </div>
+    }
+
+</div>
