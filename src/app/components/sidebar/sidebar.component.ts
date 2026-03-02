@@ -191,7 +191,7 @@ export class Sidebar {
         }
 
         if (this.openMenu === item.name) {
-            if (item.name === 'IT Service') return;
+            // if (item.name === 'IT Service') return;
             this.openMenu = null;
             return;
         }
