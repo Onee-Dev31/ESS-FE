@@ -438,7 +438,7 @@
 <div class="modal-overlay">
   <div class="modal-container">
     @defer {
-    <app-time-off-form [requestStatus]="selectedRequestStatus()"
+    <app-time-off-form [selectedDate]="selectedDate()" [requestStatus]="selectedRequestStatus()"
       (onClose)="closeForm()">
     </app-time-off-form>
     } @loading {

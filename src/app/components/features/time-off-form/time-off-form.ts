@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject, ChangeDetectorRef, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject, ChangeDetectorRef, SimpleChanges, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
@@ -11,11 +11,12 @@ import dayjs from 'dayjs';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
 
 import { MasterDataService } from '../../../services/master-data.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-time-off-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent, NzDatePickerModule],
   templateUrl: './time-off-form.html',
   styleUrl: './time-off-form.scss'
 })
@@ -29,6 +30,7 @@ export class TimeOffForm implements OnInit {
 
   @Input() initialLeaveTypeId: string = '';
   @Input() requestStatus: string = 'NEW';
+  @Input() selectedDate: string = '';
   @Output() onClose = new EventEmitter<void>();
 
   currentDate = signal<string>('');
@@ -61,34 +63,53 @@ export class TimeOffForm implements OnInit {
     const selectedType = this.leaveTypes.find(t => t.id === this.selectedLeaveType());
     return selectedType?.id === 'vacation' || selectedType?.id === 'funeral';
   });
-
+  loadingTypes = signal(true);
   attachments = signal<{ id: number; name: string; description: string }[]>([]);
   constructor(
     private cdr: ChangeDetectorRef,
-
+    private zone: NgZone
   ) {
   }
+
   ngOnInit() {
     this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
-    this.resetDates();
+
+    // ✅ วันที่จาก selectedDate ถ้ามี
+    if (this.selectedDate?.trim()) {
+      this.startDate.set(this.selectedDate.trim());
+      this.endDate.set(this.selectedDate.trim());
+    } else {
+      this.resetDates();
+    }
 
     this.masterDataService.getLeaveTypes().subscribe(types => {
-      this.leaveTypes = types;
-      if (this.initialLeaveTypeId) {
-        this.selectLeaveType(this.initialLeaveTypeId);
-      }
+      this.zone.run(() => {
+        this.leaveTypes = [...(types || [])]; 
+        if (this.initialLeaveTypeId) {
+          this.selectLeaveType(this.initialLeaveTypeId);
+        }
+
+        this.cdr.markForCheck();  
+      });
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedDate'] && !changes['selectedDate'].firstChange) {
-      this.initDatesFromInput(); // ✅ เปิดใหม่/เปลี่ยนวันแล้วอัปเดตทันที
+    if (changes['selectedDate']) {
+      this.setDatesBySelectedDate(); 
     }
   }
-  private initDatesFromInput() {
-    const d = this.currentDate || this.dateUtil.getCurrentDateISO();
-    this.startDate.set('d');
-    this.endDate.set('d');
+
+  private setDatesBySelectedDate() {
+    const d = this.selectedDate?.trim();
+    console.log(d);
+
+    if (d) {
+      this.startDate.set(d);
+      this.endDate.set(d);
+    } else {
+      this.resetDates(); // today
+    }
   }
 
   private resetDates() {
@@ -99,6 +120,8 @@ export class TimeOffForm implements OnInit {
 
   private updateEndDate() {
     const start = this.startDate();
+    console.log("start : ", start);
+
     if (!start) return;
 
     const period = this.leavePeriod();
@@ -226,5 +249,14 @@ export class TimeOffForm implements OnInit {
         error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
       });
     });
+  }
+
+  formatThaiDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 }

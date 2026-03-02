@@ -178,7 +178,7 @@ export class DashboardComponent implements OnInit {
   holidayMap: Record<string, { id: any; name: string; year?: string }> = {};
   holidayColor: any;
   isFormOpen = signal(false);
-  selectedDate = signal<string>('');        
+  selectedDate = signal<string>('');
   selectedRequestStatus = signal<string>('');
   welfareStats = computed(() => [
     { label: 'ค่าเบี้ยเลี้ยง', value: '10,500', icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },

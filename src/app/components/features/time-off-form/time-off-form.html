@@ -96,11 +96,10 @@
                 <div class="input-field-group left-half">
                     <label>ตั้งแต่วันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
-                        <input type="date" class="input-field" [ngModel]="startDate()"
-                            (ngModelChange)="startDate.set($event); onStartDateChange()">
-                        <div class="icon-box">
-                            <i class="far fa-calendar-alt"></i>
-                        </div>
+                        <nz-date-picker [ngModel]="startDate()" nzFormat="dd/MM/yyyy"
+                            (ngModelChange)="startDate.set($event)">
+                        </nz-date-picker>
+                    
                     </div>
                 </div>
 
@@ -118,11 +117,10 @@
                 <div class="input-field-group left-half">
                     <label>ถึงวันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
-                        <input type="date" class="input-field" [ngModel]="endDate()"
+                        <nz-date-picker [ngModel]="endDate()" nzFormat="dd/MM/yyyy"
                             (ngModelChange)="endDate.set($event)">
-                        <div class="icon-box">
-                            <i class="far fa-calendar-alt"></i>
-                        </div>
+                        </nz-date-picker>
+                       
                     </div>
                 </div>
 

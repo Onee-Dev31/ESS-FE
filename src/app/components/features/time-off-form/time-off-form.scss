@@ -822,3 +822,12 @@ textarea.custom-form-control {
         }
     }
 }
+
+::ng-deep .ant-picker {
+    border: 1px solid var(--border-table-head);
+    color: var(--input-text);
+    background-color: var(--input-bg);
+    width: 100%;
+    border-radius: 6px;
+    height: 40px;
+}
