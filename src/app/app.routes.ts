@@ -139,6 +139,11 @@ export const routes: Routes = [
                 data: { animation: 'Approvals' }
             },
             {
+                path: 'it-request-signature',
+                loadComponent: () => import('./pages/it-request-signature/it-request-signature').then(m => m.ItRequestSignature),
+                data: { animation: 'ITRequest' }
+            },
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'
