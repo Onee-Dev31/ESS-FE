@@ -1,7 +1,8 @@
+@use '../../../../styles/variables' as *;
+
 // Variables
 $primary: var(--primary);
 $text-sub: var(--text-sub);
-$font-main: 'Helvetica Neue', Arial, sans-serif;
 
 .file-preview-modal-overlay {
     position: fixed;

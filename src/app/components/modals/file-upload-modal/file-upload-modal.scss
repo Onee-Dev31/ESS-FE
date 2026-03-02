@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use '../../../../styles/variables' as *;
 
 // Variables
 $primary: var(--primary);
@@ -8,7 +9,6 @@ $text: var(--text);
 $text-sub: var(--text-sub);
 $bg-card: var(--bg-card);
 $border: var(--border);
-$font-main: 'Helvetica Neue', Arial, sans-serif;
 
 @mixin close-btn-style {
   width: 32px;

@@ -19,7 +19,7 @@ $bg-slate: var(--bg-slate);
 $border: var(--border);
 
 // Mixin สำหรับ Glassmorphism Effect
-@mixin glass-card($blur: 10px, $bg: rgba(255, 255, 255, 0.95)) {
+@mixin glass-card($blur: 10px, $bg: color-mix(in srgb, var(--bg-card), transparent 5%)) {
     background: $bg;
     backdrop-filter: blur($blur);
     -webkit-backdrop-filter: blur($blur);
@@ -83,7 +83,7 @@ $bg-light-local: $bg-slate;
     border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
-    @include glass-card(10px, rgba(255, 255, 255, 0.95));
+    @include glass-card(10px);
     transition: all 0.3s ease;
 }
 
@@ -177,24 +177,37 @@ $bg-light-local: $bg-slate;
         input {
             width: 100%;
             border: none;
-            border-bottom: 2px solid $border;
-            padding: 10px 0;
+            border-bottom: 2px solid var(--border);
+            padding: 12px 0 8px 0;
             font-size: 1rem;
             outline: none;
-            background: transparent;
-            transition: border-color 0.3s ease;
-            color: $text-dark;
+            background: transparent !important;
+            transition: all 0.3s ease;
+            color: var(--text);
+            color-scheme: dark light;
+
+            &:-webkit-autofill,
+            &:-webkit-autofill:hover,
+            &:-webkit-autofill:focus {
+                -webkit-text-fill-color: var(--text) !important;
+                -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+                box-shadow: 0 0 0px 1000px transparent inset !important;
+                background-color: transparent !important;
+                transition: background-color 5000s ease-in-out 0s;
+            }
 
             &::-ms-reveal {
                 display: none;
             }
 
             &:focus {
-                border-color: $primary-color;
+                border-color: var(--primary);
+                background: rgba(var(--primary), 0.02) !important;
             }
 
             &::placeholder {
-                color: $text-muted;
+                color: var(--text-muted);
+                opacity: 0.7;
             }
         }
     }
@@ -335,15 +348,15 @@ $bg-light-local: $bg-slate;
     box-sizing: border-box;
 
     &.error-msg {
-        background-color: #fee2e2;
-        color: #dc2626;
-        border: 1px solid #fecaca;
+        background-color: var(--status-danger-bg);
+        color: var(--status-danger-text);
+        border: 1px solid color-mix(in srgb, var(--status-danger-text), transparent 80%);
     }
 
     &.success-msg {
-        background-color: #dcfce7;
-        color: #16a34a;
-        border: 1px solid #bbf7d0;
+        background-color: var(--status-success-bg);
+        color: var(--status-success-text);
+        border: 1px solid color-mix(in srgb, var(--status-success-text), transparent 80%);
     }
 }
 

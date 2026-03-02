@@ -1,4 +1,5 @@
 ﻿@use 'sass:color';
+@use '../../../styles/variables' as *;
 
 // ============================================
 // ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
@@ -20,8 +21,7 @@ $text-header: var(--text-sub);
 // สีพื้นหลัง (Background Colors)
 $bg-slate: var(--bg-slate);
 
-// Fonts
-$font-main: 'Helvetica Neue', Arial, sans-serif;
+// Fonts (Standardized)
 
 // เส้นขอบ (Border Colors)
 $border: var(--border);

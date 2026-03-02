@@ -1,3 +1,5 @@
+@use '../../../../styles/variables' as *;
+
 // Variables
 $primary: var(--primary);
 $text: var(--text);
@@ -5,7 +7,6 @@ $text-sub: var(--text-sub);
 $bg-card: var(--bg-card);
 $border: var(--border);
 $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-$font-main: 'Helvetica Neue', Arial, sans-serif;
 
 @mixin close-btn-style {
     width: 32px;
