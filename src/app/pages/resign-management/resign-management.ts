@@ -316,7 +316,7 @@ export class ResignManagement {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    // console.log("items >> ", items)
+    console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -422,7 +422,8 @@ export class ResignManagement {
   //GET
   private dataActiveFromApi(res: any) {
     // console.log("Active >>", res)
-    const items = res.items ?? []
+    const items = res.data.items ?? []
+    console.log(items)
     this.activeData.set(this.mapApiData(items));
 
     this.activeListing.totalItems.set(res.total ?? 0);
@@ -432,7 +433,7 @@ export class ResignManagement {
 
   private dataResignFromApi(res: any) {
     // console.log("Resigned >>", res)
-    const items = res.items ?? []
+    const items = res.data.items ?? []
     this.resignData.set(this.mapApiData(items));
 
     this.resignListing.totalItems.set(res.total ?? 0);
