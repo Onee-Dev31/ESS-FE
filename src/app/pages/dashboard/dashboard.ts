@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DayCellContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
@@ -20,6 +20,12 @@ import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import { BUSINESS_CONFIG } from '../../constants/business.constant';
+import { TeamCalendarService } from '../../services/team-calendar.service';
+import { forkJoin } from 'rxjs';
+import { NgZone } from '@angular/core';
+import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
+import Swal from 'sweetalert2';
+import { color } from 'echarts';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
@@ -50,6 +56,14 @@ export class DashboardComponent implements OnInit {
   private dialogService = inject(DialogService);
   private authService = inject(AuthService);
 
+  constructor(
+    private teamCalendarService: TeamCalendarService,
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone,
+
+  ) {
+  }
+
   userRole = this.authService.userRole;
 
   isPolicyModalOpen = signal<boolean>(false);
@@ -62,7 +76,6 @@ export class DashboardComponent implements OnInit {
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
 
   leaveStats = toSignal(this.dashboardService.getLeaveStats());
-  holidays = toSignal(this.dashboardService.getHolidays());
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
@@ -160,7 +173,13 @@ export class DashboardComponent implements OnInit {
   attendanceList: AttendanceItem[] = [];
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
-
+  allHolidays: Array<{ id: any; date: string; name: string }> = [];
+  holidays: Array<{ id: any; date: string; name: string }> = [];
+  holidayMap: Record<string, { id: any; name: string; year?: string }> = {};
+  holidayColor: any;
+  isFormOpen = signal(false);
+  selectedDate = signal<string>('');        
+  selectedRequestStatus = signal<string>('');
   welfareStats = computed(() => [
     { label: 'ค่าเบี้ยเลี้ยง', value: '10,500', icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
     { label: 'ค่ารถ', value: '584', icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
@@ -184,23 +203,94 @@ export class DashboardComponent implements OnInit {
     return `${years} ปี`;
   });
 
-  /** การตั้งค่าปฏิทินสถานะการทำงาน (FullCalendar) */
+  private currentViewMonthStart: dayjs.Dayjs | null = null;
+
+  private applyHolidayListForMonth(monthStart: dayjs.Dayjs) {
+    const start = monthStart.startOf('month');
+    const end = start.endOf('month');
+
+    this.holidays = (this.allHolidays || []).filter(h => {
+      const t = dayjs(h.date).valueOf();
+      return t >= start.valueOf() && t <= end.valueOf();
+    });
+  }
+
+  onDatesSet(info: DatesSetArg) {
+    this.zone.run(() => {
+      // ✅ เดือนจริงของ view
+      this.currentViewMonthStart = dayjs(info.view.currentStart).startOf('month');
+
+      // ✅ ถ้า holiday ยังไม่โหลดมา อย่าเพิ่ง filter (ไม่งั้นจะได้ list ว่าง)
+      if (!this.allHolidays?.length) return;
+
+      this.applyHolidayListForMonth(this.currentViewMonthStart);
+      this.cdr.detectChanges();
+    });
+  }
+  onEventClick(arg: EventClickArg) {
+    const p: any = arg.event.extendedProps;
+
+    // กันคลิก holiday ถ้ามี
+    if (p?.type !== 'leave') return;
+
+    // ✅ ตัวอย่างใช้ SweetAlert2
+    Swal.fire({
+      title: `${p.fullName || ''} ${p.nickName ? '(' + p.nickName + ')' : ''}`,
+      html: `
+      <div style="text-align:left; line-height:1.7">
+        <div><b>วันที่:</b> ${this.formatThaiDate(p.leaveDate)}</div>
+        <div><b>เวลา:</b> ${p.timeText || '-'}</div>
+        <div><b>ประเภท:</b> ${p.label || '-'}</div>
+        ${p.dept ? `<div><b>แผนก:</b> ${p.dept}</div>` : ''}
+      </div>
+    `,
+      icon: 'info',
+      confirmButtonText: 'ปิด'
+    });
+  }
+  onDateClick(arg: DateClickArg) {
+    // กันคลิกวันที่ของเดือนอื่นที่โชว์จาง ๆ (optional)
+    if (arg.view.type === 'dayGridMonth' && !arg.dayEl.classList.contains('fc-day')) return;
+
+    this.zone.run(() => {
+      const dateStr = dayjs(arg.date).format('YYYY-MM-DD');
+
+      // ✅ ถ้าวันหยุด/เสาร์อาทิตย์ แล้วไม่อยากให้เปิดฟอร์ม ก็ใส่เงื่อนไขได้
+      // if (this.holidayMap?.[dateStr]) return;
+
+      this.selectedDate.set(dateStr);
+      this.selectedRequestStatus.set('NEW');   // หรือค่า default ที่คุณใช้
+      this.isFormOpen.set(true);
+
+      this.cdr.detectChanges();
+    });
+  }
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
     plugins: [dayGridPlugin, interactionPlugin],
-    headerToolbar: {
-      left: 'prev',
-      center: 'title',
-      right: 'next'
-    },
+    headerToolbar: { left: 'prev', center: 'title', right: 'next' },
     locale: 'th',
     firstDay: 0,
     contentHeight: 'auto',
     fixedWeekCount: false,
+    eventDisplay: 'block',
+    dayMaxEvents: 3,
+    moreLinkClick: 'popover',
+    datesSet: (info) => this.onDatesSet(info),
+    eventDidMount: (info) => {
+      info.el.title = info.event.title;
+    },
+    eventClick: (arg) => this.onEventClick(arg),
+    dateClick: (arg) => this.onDateClick(arg),
+    eventContent: (arg) => {
+      return { html: `<div style="white-space:pre-line">${arg.event.title}</div>` };
+    },
+
     dayCellContent: (arg: DayCellContentArg) => {
       const dateStr = dayjs(arg.date).format('YYYY-MM-DD');
       const dayNumber = arg.dayNumberText;
-      const data = this.specialDates[dateStr];
+
+      const holiday = this.holidayMap?.[dateStr];
       const isWeekend = arg.date.getDay() === 0 || arg.date.getDay() === 6;
 
       let circleClass = '';
@@ -208,16 +298,11 @@ export class DashboardComponent implements OnInit {
       let noteText = '';
       let codeText = '001';
 
-      if (data?.type === 'holiday') {
+      if (holiday) {
         circleClass = 'circle-green-outline';
         textClass = 'text-green';
-        noteText = data.note || '';
-        codeText = data.code || '001';
-      } else if (data?.type === 'leave') {
-        circleClass = 'circle-orange-outline';
-        textClass = 'text-orange';
-        noteText = data.note || '';
-        codeText = data.code || '001';
+        noteText = holiday.name;
+        codeText = 'OFF'; // หรือ HOL
       } else if (isWeekend) {
         circleClass = 'circle-red-outline';
         textClass = 'text-red';
@@ -229,20 +314,93 @@ export class DashboardComponent implements OnInit {
 
       return {
         html: `
-          <div class="date-cell-custom">
-            <div class="date-circle ${circleClass}">${dayNumber}</div>
-            <div class="date-code ${textClass}">${codeText}</div>
-            ${noteText ? `<div class="date-note ${textClass}">${noteText}</div>` : ''}
-          </div>
-        `
+        <div class="date-cell-custom">
+          <div class="date-circle ${circleClass}">${dayNumber}</div>
+          <div class="date-code ${textClass}">${codeText}</div>
+          ${noteText ? `<div class="date-note ${textClass}">${noteText}</div>` : ''}
+        </div>
+      `
       };
     }
   };
 
+
+
   ngOnInit() {
     this.attendanceList = this.dashboardService.getAttendanceList();
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.specialDates = this.dashboardService.getSpecialDates();
+    // this.specialDates = this.dashboardService.getSpecialDates();
+    // console.log("specialDates  ; ", this.specialDates);
+    this.getTeamCalendar();
+
+  }
+
+  getTeamCalendar() {
+    const userData = this.authService.userData();
+
+    forkJoin({
+      holidays: this.teamCalendarService.getHoliday(),
+      team: this.teamCalendarService.getTeamCalendar(userData.CODEMPID),
+      color: this.teamCalendarService.getHolidayColor()
+    }).subscribe(({ holidays, team, color }) => {
+      console.log("team : ", team);
+
+      this.allHolidays = (holidays || []).map((h: any) => ({
+        id: h.ID,
+        date: dayjs(h.HOLIDAY_DATE).format('YYYY-MM-DD'),
+        name: h.HOLIDAY_NAME
+      }));
+
+      this.holidayMap = {};
+      this.allHolidays.forEach(h => {
+        this.holidayMap[h.date] = { id: h.id, name: h.name };
+      });
+      const colorMap: Record<string, string> = {};
+      (color || []).forEach((c: any) => {
+        colorMap[c.Type] = c.Rgb;
+      });
+      const holidayDates = new Set(Object.keys(this.holidayMap));
+
+      const events: any[] = [];
+      (team || []).forEach((emp: any) => {
+        (emp.Leaves || []).forEach((lv: any, idx: number) => {
+          const start = dayjs(lv.LeaveDate).format('YYYY-MM-DD');
+          if (holidayDates.has(start)) return;
+
+          events.push({
+            id: `leave-${emp.EmpId}-${idx}-${start}`,
+            title: `${lv.Nickname || emp.NameFirst} (${lv.LabelDescription || lv.Label || lv.LeaveType})\n${lv.DepartmentName}`,
+            start,
+            allDay: true,
+            display: 'block',
+            classNames: ['leave-event'],
+            backgroundColor: colorMap[lv.LeaveType] || undefined,
+            borderColor: colorMap[lv.LeaveType] || undefined,
+            extendedProps: {
+              type: 'leave',
+              empId: emp.EmpId,
+              leaveType: lv.LeaveType,
+              fullName: lv.EmployeeName,
+              nickName: lv.Nickname,
+              label: lv.LabelDescription || lv.Label || lv.LeaveType,
+              timeText: lv.TimeText || '09:00 - 18:00',
+              reason: lv.Reason || lv.Remark || '',
+              leaveDate: start,
+              dept: lv.DepartmentName,
+            }
+          });
+        });
+      });
+
+      // ✅ อัปเดต events เข้า calendar
+      this.calendarOptions = { ...this.calendarOptions, events };
+
+      // ✅ สำคัญ: หลัง holiday โหลดเสร็จ ให้ sync list ซ้ายกับเดือนที่กำลังเปิดอยู่ "ทันที"
+      const monthToUse = this.currentViewMonthStart ?? dayjs().startOf('month');
+      this.applyHolidayListForMonth(monthToUse);
+
+      this.cdr.detectChanges();
+    });
   }
 
   openTimeOffForm(leaveLabel: string) {
@@ -287,5 +445,19 @@ export class DashboardComponent implements OnInit {
       localStorage.clear();
       window.location.reload();
     }
+  }
+
+  formatThaiDate(dateStr: string): string {
+    const d = new Date(dateStr);
+
+    const day = d.getDate();
+    const month = d.toLocaleString('th-TH', { month: 'long' });
+    const year = d.getFullYear() + 543;
+
+    return `${day} ${month} ${year}`;
+  }
+
+  closeForm() {
+    this.isFormOpen.set(false);
   }
 }

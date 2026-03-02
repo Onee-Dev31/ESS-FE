@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TimeOffService, TimeOffRequest } from '../../services/time-off.service';
@@ -179,6 +179,7 @@ export class TimeoffComponent implements OnInit {
   openForm(status: string = 'NEW') {
     this.selectedRequestStatus.set(status);
     this.isFormOpen.set(true);
+
   }
 
   closeForm() {

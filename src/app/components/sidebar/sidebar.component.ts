@@ -141,14 +141,14 @@ export class Sidebar {
                             }
                             return acc;
                         }, [])
-                        .sort((a: any, b: any) => {
-                            const MENU_PRIORITY: Record<string, number> = {
-                                '/it-problem-report': 1,
-                                '/it-repair-request': 2,
-                                '/it-service-request': 3,
-                            };
-                            return (MENU_PRIORITY[a.path] ?? 99) - (MENU_PRIORITY[b.path] ?? 99);
-                        })
+                        // .sort((a: any, b: any) => {
+                        //     const MENU_PRIORITY: Record<string, number> = {
+                        //         '/it-problem-report': 1,
+                        //         '/it-repair-request': 2,
+                        //         '/it-service-request': 3,
+                        //     };
+                        //     return (MENU_PRIORITY[a.path] ?? 99) - (MENU_PRIORITY[b.path] ?? 99);
+                        // })
                 };
             });
 

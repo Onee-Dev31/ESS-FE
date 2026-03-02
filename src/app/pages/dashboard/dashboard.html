@@ -317,20 +317,31 @@
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>
           <div class="card schedule-card">
+            <div class="schedule-footer">
+              <div class="legend-item"><span class="legend-box box-gray"></span> เวลาทำงานปกติ</div>
+              <div class="legend-item"><span class="legend-box box-red"></span> วันหยุด</div>
+              <div class="legend-item">
+                <span class="legend-box box-green"></span> วันหยุดประเพณี
+              </div>
+            </div>
             <div class="schedule-body">
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-                <ul class="holiday-list">
-                  @for (h of holidays(); track h.date) {
+                <ul class="holiday-list" *ngIf="holidays.length; else noHoliday">
+                  @for (h of holidays; track h.id) {
                   <li class="holiday-item">
                     <span class="status-dot dot-green"></span>
                     <div class="holiday-info">
-                      <span class="h-date">{{ h.date }}</span>
+                      <span class="h-date">{{ formatThaiDate(h.date) }}</span>
                       <span class="h-name">{{ h.name }}</span>
                     </div>
                   </li>
                   }
                 </ul>
+
+                <ng-template #noHoliday>
+                  <div class="no-holiday">ไม่มีการประกาศวันหยุดประเพณี</div>
+                </ng-template>
               </div>
 
               <div class="calendar-panel">
@@ -354,15 +365,6 @@
               </div>
             </div>
 
-            <div class="schedule-footer">
-              <div class="legend-item"><span class="legend-box box-gray"></span> เวลาทำงานปกติ</div>
-              <div class="legend-item"><span class="legend-box box-red"></span> วันหยุด</div>
-              <div class="legend-item">
-                <span class="legend-box box-green"></span> วันหยุดประเพณี
-              </div>
-              <div class="legend-item"><span class="legend-box box-orange"></span> การลา</div>
-              <div class="legend-item"><span class="legend-box box-blue"></span> Shut down</div>
-            </div>
           </div>
         </div>
       </div>
@@ -431,3 +433,19 @@
   </app-tooltip-modal>
   }
 </div>
+
+@if (isFormOpen()) {
+<div class="modal-overlay">
+  <div class="modal-container">
+    @defer {
+    <app-time-off-form [requestStatus]="selectedRequestStatus()"
+      (onClose)="closeForm()">
+    </app-time-off-form>
+    } @loading {
+    <div class="p-4 text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+    </div>
+    }
+  </div>
+</div>
+}

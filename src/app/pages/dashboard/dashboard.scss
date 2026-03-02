@@ -1,6 +1,6 @@
 ﻿@use 'sass:color';
 @use '../../../styles/variables' as *;
-
+@use '../../../styles/mixins' as *;
 // ============================================
 // ตัวแปรสีและสไตล์พื้นฐาน (Color & Style Variables)
 // ============================================
@@ -1608,6 +1608,14 @@ $balance: $status-success-text;
 
 // ==================== FULLCALENDAR STYLES ====================
 ::ng-deep {
+    .fc-more-popover-misc {
+        display: none;
+    }
+
+    .fc-h-event .fc-event-main {
+        color: #1e2b37;
+    }
+
     .fc {
         font-family: $font-main;
         --fc-border-color: var(--border-toolbar);
@@ -1668,7 +1676,7 @@ $balance: $status-success-text;
 
         .fc-daygrid-day {
             transition: background-color 0.2s;
-
+            cursor: pointer;
             &:hover {
                 background-color: var(--bg-slate);
             }
@@ -1685,8 +1693,6 @@ $balance: $status-success-text;
         align-items: center;
         justify-content: flex-start;
         padding-top: 4px;
-        height: 100%;
-        min-height: 50px;
 
         .date-circle {
             width: 28px;
@@ -1730,7 +1736,7 @@ $balance: $status-success-text;
         }
 
         .date-note {
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.2;
             text-align: center;
             width: 100%;
@@ -1836,4 +1842,8 @@ $balance: $status-success-text;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
     }
+}
+
+.modal-overlay {
+    @include modal-overlay-styles;
 }

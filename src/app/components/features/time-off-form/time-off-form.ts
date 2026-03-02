@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject, ChangeDetectorRef, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
@@ -63,7 +63,11 @@ export class TimeOffForm implements OnInit {
   });
 
   attachments = signal<{ id: number; name: string; description: string }[]>([]);
+  constructor(
+    private cdr: ChangeDetectorRef,
 
+  ) {
+  }
   ngOnInit() {
     this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
     this.resetDates();
@@ -74,6 +78,17 @@ export class TimeOffForm implements OnInit {
         this.selectLeaveType(this.initialLeaveTypeId);
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedDate'] && !changes['selectedDate'].firstChange) {
+      this.initDatesFromInput(); // ✅ เปิดใหม่/เปลี่ยนวันแล้วอัปเดตทันที
+    }
+  }
+  private initDatesFromInput() {
+    const d = this.currentDate || this.dateUtil.getCurrentDateISO();
+    this.startDate.set('d');
+    this.endDate.set('d');
   }
 
   private resetDates() {
@@ -104,6 +119,7 @@ export class TimeOffForm implements OnInit {
     if (this.isHalfDayDisabled()) {
       this.leavePeriod.set('full-day');
     }
+    this.cdr.detectChanges();
   }
 
   onStartDateChange() {
