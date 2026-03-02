@@ -30,8 +30,8 @@
     --status-danger-text: #dc2626;
     --status-warning-bg: #fef3c7;
     --status-warning-text: #d97706;
-    --status-new-bg: #e0f2fe;
-    --status-new-text: #0284c7;
+    // --status-new-bg: #e0f2fe;
+    // --status-new-text: #0284c7;
     --status-verified-bg: #dcfce7;
     --status-verified-text: #16a34a;
     --status-pending-bg: #fef3c7;
@@ -40,12 +40,28 @@
     --status-rejected-text: #dc2626;
     --status-approved-bg: #dbeafe;
     --status-approved-text: #2563eb;
-    --status-progress-bg: #f3e8ff;
-    --status-progress-text: #9333ea;
+    // --status-progress-bg: #f3e8ff;
+    // --status-progress-text: #9333ea;
     --status-completed-bg: #d1fae5;
     --status-completed-text: #059669;
-    --status-cancelled-bg: #f1f5f9;
-    --status-cancelled-text: #64748b;
+    // --status-cancelled-bg: #f1f5f9;
+    // --status-cancelled-text: #64748b;
+
+    // Status Color
+    --status-new-bg: rgba(14, 165, 233, 0.15);
+    --status-new-text: #0284c7;
+    --status-open-bg: rgba(37, 99, 235, 0.15);
+    --status-open-text: #2563eb;
+    --status-process-bg: rgba(147, 51, 234, 0.15);
+    --status-process-text: #9333ea;
+    --status-resolved-bg: rgba(5, 150, 105, 0.15);
+    --status-resolved-text: #059669;
+    --status-closed-bg: rgba(75, 85, 99, 0.15);
+    --status-closed-text: #4b5563;
+    --status-cancel-bg: rgba(220, 38, 38, 0.15);
+    --status-cancel-text: #dc2626;
+    --status-assigned-bg: rgba(217, 119, 6, 0.15);
+    --status-assigned-text: #d97706;
 
     // Layout values
     --bg-toolbar: #ffffff;
@@ -101,8 +117,8 @@
     --status-danger-text: #f87171;
     --status-warning-bg: rgba(217, 119, 6, 0.2);
     --status-warning-text: #fbbf24;
-    --status-new-bg: rgba(2, 132, 199, 0.2);
-    --status-new-text: #38bdf8;
+    // --status-new-bg: rgba(2, 132, 199, 0.2);
+    // --status-new-text: #38bdf8;
     --status-verified-bg: rgba(22, 163, 74, 0.2);
     --status-verified-text: #4ade80;
     --status-pending-bg: rgba(217, 119, 6, 0.2);
@@ -111,12 +127,28 @@
     --status-rejected-text: #f87171;
     --status-approved-bg: rgba(37, 99, 235, 0.2);
     --status-approved-text: #60a5fa;
-    --status-progress-bg: rgba(147, 51, 234, 0.2);
-    --status-progress-text: #c084fc;
+    // --status-progress-bg: rgba(147, 51, 234, 0.2);
+    // --status-progress-text: #c084fc;
     --status-completed-bg: rgba(5, 150, 105, 0.2);
     --status-completed-text: #34d399;
-    --status-cancelled-bg: rgba(100, 116, 139, 0.2);
-    --status-cancelled-text: #94a3b8;
+    // --status-cancelled-bg: rgba(100, 116, 139, 0.2);
+    // --status-cancelled-text: #94a3b8;
+
+    // Status Color
+    --status-new-bg: rgba(56, 189, 248, 0.18);
+    --status-new-text: #7dd3fc;
+    --status-open-bg: rgba(96, 165, 250, 0.18);
+    --status-open-text: #93c5fd;
+    --status-process-bg: rgba(192, 132, 252, 0.18);
+    --status-process-text: #d8b4fe;
+    --status-resolved-bg: rgba(52, 211, 153, 0.18);
+    --status-resolved-text: #6ee7b7;
+    --status-closed-bg: rgba(156, 163, 175, 0.18);
+    --status-closed-text: #d1d5db;
+    --status-cancel-bg: rgba(248, 113, 113, 0.18);
+    --status-cancel-text: #fca5a5;
+    --status-assigned-bg: rgba(251, 191, 36, 0.18);
+    --status-assigned-text: #fcd34d;
 
     // Layout values
     --bg-toolbar: #1e293b;
