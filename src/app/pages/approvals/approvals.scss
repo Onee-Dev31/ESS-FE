@@ -341,7 +341,7 @@ $status-danger-text: var(--status-danger-text);
                         font-size: 1.35rem;
                         font-weight: 800;
                         color: $primary;
-                        font-family: 'Inter', sans-serif;
+                        font-family: $font-main;
 
                         &::before {
                             content: '฿';

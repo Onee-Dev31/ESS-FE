@@ -148,12 +148,12 @@ $table-label-bg: var(--border-toolbar);
 
         .form-control {
             padding: 0.85rem 1rem;
-            border: 1px solid #d2d2d7;
-            background-color: #ffffff;
+            border: 1px solid var(--border);
+            background-color: var(--bg-card);
             border-radius: 12px;
             font-family: inherit;
             font-size: $font-size-label;
-            color: #1d1d1f;
+            color: var(--text-header);
             transition: all 0.2s ease;
             width: 100%;
             box-sizing: border-box;
@@ -167,12 +167,12 @@ $table-label-bg: var(--border-toolbar);
             }
 
             &::placeholder {
-                color: #86868b;
+                color: var(--text-muted);
                 font-weight: 400;
             }
 
             &:hover:not(:focus) {
-                border-color: #86868b;
+                border-color: var(--text-muted);
             }
 
             &:is(select) {
@@ -283,8 +283,8 @@ $table-label-bg: var(--border-toolbar);
         z-index: 1000;
 
         .modal-container {
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
 
             .modal-header {
                 padding: 1.5rem 2rem;
@@ -292,7 +292,7 @@ $table-label-bg: var(--border-toolbar);
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                border-bottom: 1px solid var(--border);
                 background: linear-gradient(to bottom, var(--bg-card), var(--bg-table-head));
                 width: 100%;
                 box-sizing: border-box;
@@ -500,8 +500,8 @@ $table-label-bg: var(--border-toolbar);
             align-items: center;
             justify-content: center;
             padding: 0.6rem 1.2rem;
-            background-color: var(--bg-page);
-            border: 1px solid transparent;
+            background-color: var(--bg-table-head);
+            border: 1px solid var(--border);
             border-radius: 999px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -519,7 +519,7 @@ $table-label-bg: var(--border-toolbar);
             }
 
             &:hover:not(.disabled) {
-                background-color: #e8e8ed;
+                background-color: var(--border-toolbar);
                 transform: none;
             }
 
@@ -598,7 +598,7 @@ $table-label-bg: var(--border-toolbar);
                 .type-btn {
                     padding: 0.75rem 2rem;
                     border-radius: 999px;
-                    border: 1px solid #d2d2d7;
+                    border: 1px solid var(--border);
                     background: var(--bg-card);
                     color: $text;
                     font-size: $font-size-body;
@@ -1410,20 +1410,36 @@ $table-label-bg: var(--border-toolbar);
 /* base style ให้เหมือน form-control */
 ::ng-deep .ant-select .ant-select-selector {
     padding: 0.85rem 1rem !important;
-    border: 1px solid #d2d2d7 !important;
+    border: 1px solid var(--border) !important;
     border-radius: 12px !important;
-    background-color: #ffffff !important;
+    background-color: var(--bg-card) !important;
+    color: var(--text-header) !important;
     transition: all 0.2s ease !important;
     box-shadow: none !important;
+    height: auto !important;
+    min-height: 45px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 /* hover */
 ::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-    border-color: #86868b !important;
+    border-color: var(--text-muted) !important;
 }
 
 /* focus */
 ::ng-deep .ant-select.ant-select-focused .ant-select-selector {
     border-color: var(--primary) !important;
     box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15) !important;
+}
+
+/* selection item color */
+::ng-deep .ant-select-selection-item,
+::ng-deep .ant-select-selection-placeholder {
+    color: var(--text-header) !important;
+    line-height: normal !important;
+}
+
+::ng-deep .ant-select-selection-placeholder {
+    color: var(--text-muted) !important;
 }

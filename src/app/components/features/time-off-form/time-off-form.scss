@@ -161,8 +161,8 @@
                 justify-content: center;
                 width: 100%;
                 min-height: 250px;
-                background: #fdfdfd;
-                border: 2px dashed #e1e4e8;
+                background: var(--bg-table-head);
+                border: 2px dashed var(--border);
                 border-radius: 16px;
                 text-align: center;
                 transition: all 0.3s ease;
@@ -171,7 +171,7 @@
 
                 i {
                     font-size: 3.5rem;
-                    color: #7fb1f8;
+                    color: $primary;
                     transform: rotate(-15deg);
                     margin-bottom: 0.5rem;
                     display: block;
@@ -234,7 +234,7 @@
 
     .leave-type-card {
         background: var(--bg-card);
-        border: 1px solid rgba(0, 0, 0, 0.04);
+        border: 1px solid var(--border);
         border-radius: 20px;
         padding: 0;
         cursor: pointer;
@@ -250,10 +250,10 @@
         &:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: rgba(37, 99, 235, 0.2);
+            border-color: var(--primary);
 
             .leave-footer {
-                background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+                background: var(--status-new-bg);
                 color: $primary;
 
                 i {
@@ -263,6 +263,7 @@
 
             .leave-icon {
                 transform: scale(1.1) rotate(5deg);
+                background: var(--bg-page);
             }
         }
 
@@ -273,7 +274,7 @@
 
             .leave-footer {
                 background: $primary;
-                color: #ffffff;
+                color: var(--text-on-primary, #ffffff);
             }
         }
 
@@ -384,7 +385,7 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 12px;
-        padding-top: 12px; // Add visual separation
+        padding-top: 12px;
     }
 
     .hidden-input {
@@ -494,6 +495,7 @@
     }
 }
 
+
 textarea.custom-form-control {
     min-height: 100px;
     resize: vertical;
@@ -600,8 +602,6 @@ textarea.custom-form-control {
                 color: var(--text-table-head);
                 border-bottom: 1px solid var(--border-table-head);
                 white-space: nowrap;
-
-                // Utility classes are used for width control now (e.g. .w-35, .w-px-50)
             }
         }
 
@@ -669,7 +669,7 @@ textarea.custom-form-control {
             transition: all 0.2s;
 
             &:hover {
-                background-color: #fee2e2;
+                background-color: var(--status-danger-bg);
                 color: $danger;
             }
         }
@@ -711,7 +711,6 @@ textarea.custom-form-control {
     display: flex;
     justify-content: flex-end;
     gap: 16px;
-    // border-radius: 0 0 24px 24px; // Matched in container
 
     .btn-back-custom {
         @include btn-secondary;

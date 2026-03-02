@@ -72,34 +72,34 @@ $border: var(--border);
     &.status-waiting,
     &.NEW,
     &.WAITING_CHECK {
-        background: #e0f2fe;
-        color: #0284c7;
-        border-color: #bae6fd;
+        background: var(--status-new-bg);
+        color: var(--primary);
+        border-color: var(--primary);
     }
 
     &.status-approved,
     &.status-verified,
     &.APPROVED,
     &.VERIFIED {
-        background: #dcfce7;
-        color: #16a34a;
-        border-color: #bbf7d0;
+        background: var(--status-success-bg);
+        color: var(--status-success-text);
+        border-color: var(--status-success-text);
     }
 
     &.status-rejected,
     &.status-cancelled,
     &.REJECTED,
     &.CANCELLED {
-        background: #fee2e2;
-        color: #dc2626;
-        border-color: #fecaca;
+        background: var(--status-danger-bg);
+        color: var(--status-danger-text);
+        border-color: var(--status-danger-text);
     }
 
     &.status-pending,
     &.PENDING_APPROVAL {
-        background: #ffedd5;
-        color: #ea580c;
-        border-color: #fed7aa;
+        background: var(--status-warning-bg);
+        color: var(--status-warning-text);
+        border-color: var(--status-warning-text);
     }
 }
 
@@ -179,7 +179,7 @@ $border: var(--border);
             padding: 16px;
             font-size: 0.9rem;
             color: $text;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
 
@@ -556,9 +556,9 @@ $border: var(--border);
                     border: 1px solid var(--border-table-head);
                     border-radius: 50px;
                     padding: 0 1.25rem;
-                    background-color: #ffffff;
+                    background-color: var(--bg-card);
                     font-size: 0.9rem;
-                    color: var(--text-sub);
+                    color: var(--text-header);
 
                     @include mobile {
                         width: 100%;
@@ -646,7 +646,7 @@ $border: var(--border);
             }
 
             .employee-name {
-                color: #1a202c;
+                color: var(--text);
                 font-weight: 500;
             }
         }

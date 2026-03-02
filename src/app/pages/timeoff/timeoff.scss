@@ -101,7 +101,7 @@ $status-cancelled-text: var(--text-table-head);
             border-color: rgba(0, 0, 0, 0.08);
 
             .card-header {
-                background: #f0f9ff;
+                background: var(--status-new-bg);
             }
 
             .card-header::after {
@@ -202,22 +202,22 @@ $status-cancelled-text: var(--text-table-head);
                 }
 
                 .btn-edit-sm {
-                    background: #f0f9ff;
-                    color: #0ea5e9;
+                    background: var(--status-new-bg);
+                    color: var(--status-new-text);
 
                     &:hover {
-                        background: #e0f2fe;
-                        color: #0284c7;
+                        background: var(--status-progress-bg);
+                        color: var(--primary);
                     }
                 }
 
                 .btn-delete-sm {
-                    background: #fef2f2;
-                    color: var(--danger);
+                    background: var(--status-danger-bg);
+                    color: var(--status-danger-text);
 
                     &:hover {
-                        background: #fee2e2;
-                        color: #dc2626;
+                        background: var(--status-rejected-bg);
+                        color: var(--danger);
                     }
                 }
 
@@ -261,34 +261,34 @@ $status-cancelled-text: var(--text-table-head);
     &.status-waiting,
     &.NEW,
     &.WAITING_CHECK {
-        background: #e0f2fe;
-        color: #0284c7;
-        border-color: #bae6fd;
+        background: var(--status-new-bg);
+        color: var(--status-new-text);
+        border-color: var(--border);
     }
 
     &.status-approved,
     &.status-verified,
     &.APPROVED,
     &.VERIFIED {
-        background: #dcfce7;
-        color: #16a34a;
-        border-color: #bbf7d0;
+        background: var(--status-success-bg);
+        color: var(--status-success-text);
+        border-color: var(--border);
     }
 
     &.status-rejected,
     &.status-cancelled,
     &.REJECTED,
     &.CANCELLED {
-        background: #fee2e2;
-        color: #dc2626;
-        border-color: #fecaca;
+        background: var(--status-danger-bg);
+        color: var(--status-danger-text);
+        border-color: var(--border);
     }
 
     &.status-pending,
     &.PENDING_APPROVAL {
-        background: #ffedd5;
-        color: #ea580c;
-        border-color: #fed7aa;
+        background: var(--status-pending-bg);
+        color: var(--status-pending-text);
+        border-color: var(--border);
     }
 }
 
@@ -326,8 +326,8 @@ $status-cancelled-text: var(--text-table-head);
 }
 
 @mixin icon-btn-sky {
-    background: #e0f2fe;
-    color: #0284c7;
+    background: var(--status-new-bg);
+    color: var(--status-new-text);
     border: none;
     padding: 6px 10px;
     border-radius: 8px;
@@ -336,7 +336,7 @@ $status-cancelled-text: var(--text-table-head);
     transition: all 0.2s;
 
     &:hover {
-        background: #bae6fd;
+        background: var(--status-progress-bg);
         transform: scale(1.05);
     }
 }
