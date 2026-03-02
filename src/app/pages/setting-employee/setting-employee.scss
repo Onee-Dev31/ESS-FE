@@ -702,6 +702,8 @@ $border: var(--border);
                 border-radius: 8px;
                 padding: 0 1rem;
                 font-size: 0.95rem;
+                color: var(--input-text);
+                background-color: var(--input-bg);
 
                 &:first-child {
                     @include tablet {
@@ -716,9 +718,9 @@ $border: var(--border);
                 &.readonly,
                 &.disabled,
                 &:disabled {
-                    background: #f5f5f5 !important;
+                    background: var(--input-disabled-bg) !important;
                     color: var(--text-muted) !important;
-                    border-color: #d1d5db !important;
+                    border-color: var(--input-disabled-border) !important;
                     cursor: not-allowed;
                     opacity: 1;
                 }
@@ -991,21 +993,21 @@ $border: var(--border);
 
 /* ================= FLIP ================= */
 
-::ng-deep .ant-modal-close-x {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px;
-}
+// ::ng-deep .ant-modal-close-x {
+//     width: 36px;
+//     height: 36px;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     margin: 10px;
+// }
 
-::ng-deep .ant-modal-close-x:hover {
-    background: rgba(202, 202, 202, 0.5);
-    transform: scale(1);
-    border-radius: 10px;
-    transition: all .25s ease;
-}
+// ::ng-deep .ant-modal-close-x:hover {
+//     background: rgba(202, 202, 202, 0.5);
+//     transform: scale(1);
+//     border-radius: 10px;
+//     transition: all .25s ease;
+// }
 
 .card-scene {
     width: 510px;
@@ -1111,68 +1113,68 @@ $border: var(--border);
 }
 
 
-/* 
--- PART Datepicker -- 
-*/
-/* fix ขนาดแต่ละช่องให้ตายตัว */
-::ng-deep .ant-picker-cell {
-    width: 30px !important;
-    height: 35px !important;
-    padding: 0 !important;
-}
+// /* 
+// -- PART Datepicker -- 
+// */
+// /* fix ขนาดแต่ละช่องให้ตายตัว */
+// ::ng-deep .ant-picker-cell {
+//     width: 30px !important;
+//     height: 35px !important;
+//     padding: 0 !important;
+// }
 
-/* fix inner ให้เต็ม cell และเป็นวงกลม */
-::ng-deep .ant-picker-cell-inner {
-    width: 100% !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50% !important;
-    transition: background-color 0.2s ease;
-}
+// /* fix inner ให้เต็ม cell และเป็นวงกลม */
+// ::ng-deep .ant-picker-cell-inner {
+//     width: 100% !important;
+//     height: 100% !important;
+//     display: flex !important;
+//     align-items: center;
+//     justify-content: center;
+//     border-radius: 50% !important;
+//     transition: background-color 0.2s ease;
+// }
 
-/* ทำให้วันที่ที่เลือกเป็นวงกลม */
-::ng-deep .ant-picker-cell-selected .ant-picker-cell-inner {
-    background-color: #4e4e4e !important;
-    color: #ffffff !important;
-    border-radius: 50% !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+// /* ทำให้วันที่ที่เลือกเป็นวงกลม */
+// ::ng-deep .ant-picker-cell-selected .ant-picker-cell-inner {
+//     background-color: #4e4e4e !important;
+//     color: #ffffff !important;
+//     border-radius: 50% !important;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+// }
 
-/* hover ตอนชี้เมาส์ */
-::ng-deep .ant-picker-cell-inner:hover {
-    background-color: #b3b3b3 !important;
-    border-radius: 50% !important;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+// /* hover ตอนชี้เมาส์ */
+// ::ng-deep .ant-picker-cell-inner:hover {
+//     background-color: #b3b3b3 !important;
+//     border-radius: 50% !important;
+//     width: 30px;
+//     height: 30px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+// }
 
-/* month & year mode */
-::ng-deep .ant-picker-month-panel .ant-picker-cell-inner,
-::ng-deep .ant-picker-year-panel .ant-picker-cell-inner,
-::ng-deep .ant-picker-decade-panel .ant-picker-cell-inner {
-    border-radius: 10% !important;
-}
+// /* month & year mode */
+// ::ng-deep .ant-picker-month-panel .ant-picker-cell-inner,
+// ::ng-deep .ant-picker-year-panel .ant-picker-cell-inner,
+// ::ng-deep .ant-picker-decade-panel .ant-picker-cell-inner {
+//     border-radius: 10% !important;
+// }
 
-// SELECT (antd) 
-::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-    border-color: #40a9ff00;
-    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-}
+// // SELECT (antd) 
+// ::ng-deep .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
+//     border-color: #40a9ff00;
+//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+// }
 
-::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-    border-color: #40a9ff00;
-    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
-}
+// ::ng-deep .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+//     border-color: #40a9ff00;
+//     box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+// }
 
-::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    position: relative;
-    background-color: #ffffff;
-    border: 1px solid #cfcfcf00;
-}
+// ::ng-deep .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+//     position: relative;
+//     background-color: #ffffff;
+//     border: 1px solid #cfcfcf00;
+// }
