@@ -54,6 +54,7 @@ export class DashboardIT implements OnInit {
   }
 
   IS_OPEN_IT_SERVICE = signal(0);
+  IS_DENY_TICKET = signal(false);
 
   keyword = '';
   TicketStatus: any;
@@ -79,6 +80,10 @@ export class DashboardIT implements OnInit {
   close() {
     this.IS_OPEN_IT_SERVICE.set(0)
   }
+  closeDenyTicket() {
+    this.IS_DENY_TICKET.set(false)
+  }
+
   onStatusChange(status: StatusKey | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
     // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
@@ -385,6 +390,11 @@ export class DashboardIT implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
+  // FUNCTION
+  handleDeny() {
+    console.log("DENY")
+    this.IS_DENY_TICKET.set(true)
+  }
 
   // GET MASTER
   getAllTickets() {

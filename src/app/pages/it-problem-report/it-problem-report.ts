@@ -12,15 +12,13 @@ import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
-
-import { HttpClient } from '@angular/common/http';
-import * as signalR from '@microsoft/signalr';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SignalrService } from '../../services/signalr.service';
 
 @Component({
   selector: 'app-it-problem-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent, NzSelectModule],
   templateUrl: './it-problem-report.html',
   styleUrl: './it-problem-report.scss'
 })
@@ -46,12 +44,15 @@ export class ItProblemReportComponent implements OnInit {
 
   // MASTER
   availableCategories: any[] = [];
+  openForOptions = signal<any[]>([])
+  selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
 
   // CONDITION
   @Input() openBy!: string;
 
   ngOnInit() {
     this.getSubProblem();
+    this.getOpenFor();
     const userData = this.authService.userData();
     if (userData?.USR_MOBILE) {
       const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
@@ -280,6 +281,18 @@ export class ItProblemReportComponent implements OnInit {
         console.log(res);
         this.availableCategories = res.data
         this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+
+  getOpenFor() {
+    this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
+      next: (res) => {
+        console.log(res.data);
+        this.openForOptions.set(res.data)
       },
       error: (error) => {
         console.error('Error fetching data:', error);
