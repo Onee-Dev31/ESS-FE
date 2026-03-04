@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
+import { HttpClient, } from '@angular/common/http';
 
 @Component({
   selector: 'app-save-signature',
@@ -16,10 +18,11 @@ import { AuthService } from '../../services/auth.service';
 })
 export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('signatureCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
-
+  private baseUrl = environment.api_url;
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
+  private http = inject(HttpClient);
 
   signerName = signal<string>('');
   hasSignature = signal<boolean>(false);
@@ -64,6 +67,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.initCanvas();
+    this.loadSignature();
     window.addEventListener('resize', this.onResize.bind(this));
   }
 
@@ -189,18 +193,60 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
       this.toastService.warning('กรุณาเซนชื่อก่อนบันทึก');
       return;
     }
+
     this.isSaving.set(true);
+
     const base64 = this.canvasRef.nativeElement.toDataURL('image/png');
 
-    // TODO: Call API to save signature
-    console.log('[SaveSignature] name:', this.signerName());
-    console.log('[SaveSignature] signature (base64):', base64.substring(0, 60) + '...');
+    const payload = {
+      codeEmpId: this.loginUser()?.CODEMPID,
+      base64Signature: base64,
+      isActive: true
+    };
 
-    setTimeout(() => {
-      this.savedSignatureUrl.set(base64);
-      this.isSaving.set(false);
-      this.isSaved.set(true);
-      this.toastService.success('บันทึกลายเซนต์เรียบร้อยแล้ว');
-    }, 600);
+    this.http.post(`${this.baseUrl}/employee-signature`, payload).subscribe({
+      next: () => {
+        this.savedSignatureUrl.set(base64);
+        this.isSaving.set(false);
+        this.isSaved.set(true);
+        this.toastService.success('บันทึกลายเซนต์เรียบร้อยแล้ว');
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.toastService.error('บันทึกลายเซนต์ไม่สำเร็จ');
+      }
+    });
+  }
+  loadSignature() {
+    const empId = this.loginUser()?.CODEMPID;
+    if (!empId) return;
+
+    this.http.get<any>(`${this.baseUrl}/employee-signature/${empId}`)
+      .subscribe({
+        next: (res) => {
+          const base64 = res?.data?.Base64Signature;
+          if (!base64) return;
+
+          const img = new Image();
+
+          img.onload = () => {
+            const canvas = this.canvasRef.nativeElement;
+
+            this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            this.fillCanvasBg();
+
+            this.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            this.hasSignature.set(true);
+            this.isSaved.set(true);
+            this.savedSignatureUrl.set(base64);
+          };
+
+          img.src = base64;
+      },
+      error: () => {
+        console.log('no signature');
+      }
+    });
   }
 }
