@@ -1,5 +1,6 @@
-<div class="it-request-page">
-    <app-page-header title="IT Repair Request (แจ้งซ่อมอุปกรณ์)"></app-page-header>
+<div class="it-request-page"
+    [style]="openBy === 'IT' ? 'padding: 0; height: fit-content;  background-color: transparent;' : 'padding: 40px; min-height: 100vh;'">
+    <app-page-header *ngIf="openBy !== 'IT'" title="IT Repair Request (แจ้งซ่อมอุปกรณ์)"></app-page-header>
 
     <!-- Form Card -->
     <div class="repair-form-card">

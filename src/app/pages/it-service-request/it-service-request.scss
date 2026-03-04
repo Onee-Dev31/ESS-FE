@@ -122,9 +122,9 @@ $table-label-bg: var(--border-toolbar);
    ========================================================================== */
 
 .it-request-page {
-    padding: 40px;
+    // padding: 40px;
+    // min-height: 100vh;
     background-color: $bg-page;
-    min-height: 100vh;
     font-family: $font-main;
 
     @media (max-width: 768px) {

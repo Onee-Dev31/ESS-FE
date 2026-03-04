@@ -15,6 +15,9 @@ import { StatusColor, ticketTypyColor } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FilePreviewItem, FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { ItProblemReportComponent } from "../it-problem-report/it-problem-report";
+import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request";
+import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
 
 @Component({
   selector: 'app-dashboard-it',
@@ -25,7 +28,7 @@ import dayjs from 'dayjs';
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    ItDashboardSummary, FilePreviewModalComponent],
+    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
@@ -35,45 +38,12 @@ export class DashboardIT implements OnInit {
   StatusColor = StatusColor;
 
 
-  keyword = '';
-  TicketStatus: any;
-
-  filterStatus: StatusKey | null = 'all';
-
-  selectedId = 1;
-
   Tickets = signal<any[]>(tickets)
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
-  isAssignModalVisible = false;
-  assignSearchKeyword = '';
-  selectedAssigneeEmpCodes: string[] = [];
-
   assigneeGroups: any[] = [];
-
-  // assigneeGroups = [
-  //   {
-  //     name: 'BMS-Oracle-Onee App',
-  //     members: [
-  //       'FONE0004', 'OTD01036', 'OTD01056', 'OTD01095', 'OTD01097'
-  //     ]
-  //   },
-  //   {
-  //     name: 'ระบบอื่นๆ',
-  //     members: [
-  //       'FONE0015', 'OTD01050', 'OTD01072', 'OTD01125', 'OTD01128', 'STD0001'
-  //     ]
-  //   },
-  //   {
-  //     name: 'Hardware & Software',
-  //     members: [
-  //       'OTD01022', 'OTD01116', 'OTD01117', 'OTD01119', 'OTD01120'
-  //     ]
-  //   }
-  // ];
-
   get filteredAssigneeGroups() {
     const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
     if (!kw) return this.assigneeGroups;
@@ -82,6 +52,18 @@ export class DashboardIT implements OnInit {
       members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw))
     })).filter(g => g.members.length > 0);
   }
+
+  IS_OPEN_IT_SERVICE = signal(0);
+
+  keyword = '';
+  TicketStatus: any;
+
+  filterStatus: StatusKey | null = 'all';
+
+  selectedId = 1;
+  isAssignModalVisible = false;
+  assignSearchKeyword = '';
+  selectedAssigneeEmpCodes: string[] = [];
 
   constructor(
     private msg: NzMessageService,
@@ -94,21 +76,15 @@ export class DashboardIT implements OnInit {
     this.getAssignItDropdown();
   }
 
+  close() {
+    this.IS_OPEN_IT_SERVICE.set(0)
+  }
   onStatusChange(status: StatusKey | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
     // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
   }
-  // getSelectedTicket(): TicketItem | null {
-  //   return this.tickets.find(x => x.id === this.selectedId) ?? null;
-  // }
 
   trackById = (_: number, item: TicketItem) => item.id;
-
-  // selectTicket(ticketId: string) {
-  //   // this.selectedId = t.id;
-  //   // this.selectedTicket = t;
-  //   console.log(ticketId)
-  // }
 
   selectTicket(ticketId: string) {
     console.log(ticketId)

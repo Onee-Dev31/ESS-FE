@@ -3,6 +3,205 @@
 @use '../../../styles/mixins' as *;
 
 
+
+.btn-command {
+    padding: 18px 18px 0 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    gap: 12px;
+
+    button {
+        border-radius: 16px;
+        padding: 2px 10px;
+        cursor: pointer;
+        color: var(--text);
+    }
+
+    .problem {
+        --btn-border: var(--btn-problem-border);
+        --btn-bg: var(--btn-problem-bg);
+    }
+
+    .repair {
+        --btn-border: var(--btn-repair-border);
+        --btn-bg: var(--btn-repair-bg);
+    }
+
+    .service {
+        --btn-border: var(--btn-service-border);
+        --btn-bg: var(--btn-service-bg);
+    }
+
+    .btn-type {
+        border: 1px solid var(--btn-border);
+        background: var(--btn-bg);
+        transition: .2s;
+    }
+
+    .btn-type:hover {
+        background: color-mix(in srgb, var(--btn-bg), var(--text) 5%);
+        transform: translateY(-0.5px);
+    }
+
+    .btn-type:active {
+        background: color-mix(in srgb, var(--btn-bg), var(--text) 10%);
+        transform: translateY(2px);
+    }
+
+}
+
+.modal-overlay {
+    @include modal-overlay-styles;
+
+
+    .top-header-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: var(--bg-card);
+        color: var(--text-header);
+        border-bottom: 1px solid var(--border-toolbar);
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            &::before {
+                content: '';
+                display: block;
+                width: 4px;
+                height: 24px;
+                background: $primary;
+                border-radius: 2px;
+            }
+        }
+
+        .header-right-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            .header-meta-list {
+                display: flex;
+                gap: 12px;
+
+                @include mobile {
+                    display: none; // Hide meta on mobile if needed, or adjust
+                }
+
+                .meta-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 0.9rem;
+                    color: var(--text-table-head);
+                    background: var(--bg-table-head);
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                    white-space: nowrap;
+
+                    i {
+                        color: $primary;
+                    }
+
+                    .meta-value {
+                        font-weight: 600;
+                        color: var(--text-header);
+                    }
+                }
+            }
+
+            .btn-close-modal {
+                @include close-btn-style;
+                color: var(--text-muted);
+                width: 36px;
+                height: 36px;
+                font-size: 1.25rem;
+                flex-shrink: 0; // Prevent shrinking
+
+                &:hover {
+                    background: var(--border-toolbar);
+                    color: $danger;
+                    transform: rotate(90deg);
+                }
+            }
+        }
+    }
+
+    .content-card {
+        flex: 1;
+        padding: 20px 24px;
+        background: var(--bg-card);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow-y: auto;
+        max-height: calc(100vh - 180px);
+
+        .selection-placeholder {
+            margin: 2.5rem 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+
+            .placeholder-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                min-height: 250px;
+                background: var(--bg-table-head);
+                border: 2px dashed var(--border);
+                border-radius: 16px;
+                text-align: center;
+                transition: all 0.3s ease;
+                gap: 1.25rem;
+                padding: 2.5rem;
+
+                i {
+                    font-size: 3.5rem;
+                    color: $primary;
+                    transform: rotate(-15deg);
+                    margin-bottom: 0.5rem;
+                    display: block;
+                }
+
+                p {
+                    font-size: 1.15rem;
+                    color: var(--text-sub);
+                    font-weight: 700;
+                    margin: 0;
+                    line-height: 1.4;
+                }
+
+                .sub-text {
+                    font-size: 0.95rem;
+                    color: var(--text-muted);
+                    font-weight: 400;
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
 ::ng-deep .ant-select {
     width: 50% !important;
 }
@@ -787,7 +986,8 @@
     .side-detail {
         display: flex;
         flex-direction: column;
-        align-items: center;;
+        align-items: center;
+        ;
         margin-top: 10px;
     }
 

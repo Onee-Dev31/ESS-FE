@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -34,6 +34,8 @@ export class ITServiceRequestComponent implements OnInit {
     phoneNumber = signal('');
     requestDetails = signal('');
 
+    // CONDITION
+    @Input() openBy!: string;
 
     // MASTER
     serviceOptions = signal<any[]>([])

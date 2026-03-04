@@ -1,6 +1,19 @@
+<div class="btn-command">
+    <button class="btn-type problem" (click)="this.IS_OPEN_IT_SERVICE.set(2);">
+        <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+        แจ้งปัญหา
+    </button>
+    <button class="btn-type repair" (click)="this.IS_OPEN_IT_SERVICE.set(1);">
+        <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+        แจ้งซ่อม
+    </button>
+    <button class="btn-type service" (click)="this.IS_OPEN_IT_SERVICE.set(3);">
+        <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+        แจ้งขอใช้บริการ
+    </button>
+</div>
 <app-it-dashboard-summary (statusChange)="onStatusChange($event)"></app-it-dashboard-summary>
 <div class="tk-page">
-
     <!-- LEFT: ticket list -->
     <aside class="tk-left">
         <div class="tk-left__top">
@@ -170,16 +183,20 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions">
-                <button *ngIf="t.assigneeName" nz-button nzType="primary" style="margin-right: auto;"
+                <!-- <button nz-button nzType="primary" style="margin-right: auto;"
                     (click)="acknowledgeTicket()">
                     <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
                     รับเรื่อง
-                </button>
-                <button nz-button nzType="default" (click)="openAddNote()">
+                </button> -->
+                <!-- <button nz-button nzType="default" (click)="openAddNote()">
                     <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
                     เพิ่ม Note
-                </button>
+                </button> -->
                 <ng-container *ngIf="!t.assigneeName">
+                    <button nz-button nzType="primary" (click)="acknowledgeTicket()">
+                        <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+                        รับเรื่อง
+                    </button>
                     <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
                         <nz-icon nzType="export" nzTheme="outline"></nz-icon>
                         ส่งต่อ
@@ -384,3 +401,33 @@
         </div>
     </ng-container>
 </nz-modal>
+
+@if (IS_OPEN_IT_SERVICE()) {
+<div class="modal-overlay">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>{{IS_OPEN_IT_SERVICE() === 2 ? 'IT Problem Report (แจ้งปัญหาการใช้งาน)'
+                    :IS_OPEN_IT_SERVICE() === 1 ? 'IT Repair Request (แจ้งซ่อมอุปกรณ์)'
+                    :IS_OPEN_IT_SERVICE() === 3 ? 'IT Service Request (ขอรับบริการ IT)'
+                    : '' }}
+                </h2>
+                <div class="header-right-meta">
+                    <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+                </div>
+            </header>
+            <div class="content-card">
+                @if (IS_OPEN_IT_SERVICE() === 2) {
+                <app-it-problem-report openBy="IT"></app-it-problem-report>
+                }
+                @else if (IS_OPEN_IT_SERVICE() === 1) {
+                <app-it-repair-request openBy="IT"></app-it-repair-request>
+                }
+                @else if (IS_OPEN_IT_SERVICE() === 3) {
+                <app-it-service-request openBy="IT"></app-it-service-request>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}

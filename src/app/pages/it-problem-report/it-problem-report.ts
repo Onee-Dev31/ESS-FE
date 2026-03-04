@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, effect, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -42,15 +42,16 @@ export class ItProblemReportComponent implements OnInit {
     categories: [] as any[],
     attachments: [] as { name: string, size?: number, file: File }[]
   });
-
   phoneModel = '';
 
   // MASTER
   availableCategories: any[] = [];
 
+  // CONDITION
+  @Input() openBy!: string;
+
   ngOnInit() {
     this.getSubProblem();
-
     const userData = this.authService.userData();
     if (userData?.USR_MOBILE) {
       const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);

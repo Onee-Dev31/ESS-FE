@@ -1,4 +1,4 @@
-import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect, ChangeDetectorRef } from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect, ChangeDetectorRef, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,6 +28,10 @@ export class ItRepairRequestComponent implements OnInit {
   private authService = inject(AuthService);
   private itServiceService = inject(ItServiceService);
   private cdr = inject(ChangeDetectorRef);
+
+  // CONDITION
+  @Input() openBy!: string;
+
 
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
 

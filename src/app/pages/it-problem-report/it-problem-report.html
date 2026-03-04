@@ -1,5 +1,5 @@
-<div class="it-request-page">
-    <app-page-header title="IT Problem Report (แจ้งปัญหาการใช้งาน)"></app-page-header>
+<div class="it-request-page" [style]="openBy === 'IT' ? 'padding: 0; height: fit-content;' : 'padding: 40px; min-height: 100vh;'">
+    <app-page-header *ngIf="openBy !== 'IT'" title="IT Problem Report (แจ้งปัญหาการใช้งาน)"></app-page-header>
 
     <!-- Form Card -->
     <div class="problem-form-card">

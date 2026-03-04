@@ -30,8 +30,6 @@
     --status-danger-text: #dc2626;
     --status-warning-bg: #fef3c7;
     --status-warning-text: #d97706;
-    // --status-new-bg: #e0f2fe;
-    // --status-new-text: #0284c7;
     --status-verified-bg: #dcfce7;
     --status-verified-text: #16a34a;
     --status-pending-bg: #fef3c7;
@@ -40,12 +38,8 @@
     --status-rejected-text: #dc2626;
     --status-approved-bg: #dbeafe;
     --status-approved-text: #2563eb;
-    // --status-progress-bg: #f3e8ff;
-    // --status-progress-text: #9333ea;
     --status-completed-bg: #d1fae5;
     --status-completed-text: #059669;
-    // --status-cancelled-bg: #f1f5f9;
-    // --status-cancelled-text: #64748b;
 
     // Status Color
     --status-new-bg: rgba(14, 165, 233, 0.15);
@@ -84,6 +78,15 @@
     --input-disabled-border: #d1d5db;
     --input-hover-bg: #f1f5f9;
     --input-active-bg: #e2e8f0;
+
+    // IT-SERVICE
+    --btn-problem-bg: #ffedce;
+    --btn-problem-border: #f59e0b;
+    --btn-repair-bg: #ffd0d8;
+    --btn-repair-border: #f43f5e;
+    --btn-service-bg: #d2e3ff;
+    --btn-service-border: #3b82f6;
+
 }
 
 [data-theme='dark'] {
@@ -171,6 +174,16 @@
     --input-disabled-border: #8b95a5;
     --input-hover-bg: #f1f5f9;
     --input-active-bg: #e2e8f0;
+
+    // IT-SERVICE
+    --btn-problem-bg: #3a2e1f;
+    --btn-problem-border: #f59e0b;
+
+    --btn-repair-bg: #3a1f26;
+    --btn-repair-border: #f43f5e;
+
+    --btn-service-bg: #1f2e3a;
+    --btn-service-border: #3b82f6;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility

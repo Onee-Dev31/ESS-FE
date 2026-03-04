@@ -122,10 +122,9 @@ $table-label-bg: var(--border-toolbar);
    ========================================================================== */
 
 .it-request-page {
-    padding: 40px;
+    // padding: 40px;
+    // min-height: 100vh;
     background-color: $bg-page;
-    height: 100%;
-    overflow: hidden;
     box-sizing: border-box;
     font-family: $font-main;
 
