@@ -1,86 +1,65 @@
 import {
   Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, signal, inject
+  ViewChild, ElementRef, signal, inject, computed
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
-
-interface MockRequestData {
-  requestNo: string;
-  requestDate: string;
-  requestFor: string;
-  phone: string;
-  requestCategory: string;
-  basicSystems: string[];
-  specificSystems: string[];
-}
-
-// Mock data - replace with API call later
-const MOCK_REQUESTS: MockRequestData[] = [
-  {
-    requestNo: 'REQ-IT-2603-0004',
-    requestDate: '26/03/2025',
-    requestFor: 'นาง สมบูรณ์ หูนสุข',
-    phone: '-',
-    requestCategory: 'Account & Password (ขอรีเซ็ตรหัสผ่าน)',
-    basicSystems: ['ห้องประชุม'],
-    specificSystems: ['Oracle', 'BMS'],
-  },
-  {
-    requestNo: 'REQ-IT-2603-0005',
-    requestDate: '26/03/2025',
-    requestFor: 'นาย ทดสอบ ระบบ',
-    phone: '081-234-5678',
-    requestCategory: 'New Account (ขอสิทธิ์ระบบใหม่)',
-    basicSystems: ['Email', 'เครื่องพิมพ์'],
-    specificSystems: ['SAP'],
-  },
-];
+import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-it-request-signature',
+  selector: 'app-save-signature',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './it-request-signature.html',
-  styleUrl: './it-request-signature.scss',
+  templateUrl: './save-signature.html',
+  styleUrl: './save-signature.scss',
 })
-export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
+export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('signatureCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
 
-  requestNo = signal<string>('');
-  requestData = signal<MockRequestData | null>(null);
-  isNotFound = signal<boolean>(false);
-  hasSignature = signal<boolean>(false);
-  isSubmitting = signal<boolean>(false);
   signerName = signal<string>('');
+  hasSignature = signal<boolean>(false);
+  isSaving = signal<boolean>(false);
+  isSaved = signal<boolean>(false);
+  savedSignatureUrl = signal<string | null>(null);
+
+  // from query param e.g. ?name=สมชาย
+  prefillName = signal<string>('');
+
+  // ข้อมูล login จาก AuthService
+  loginUser = computed(() => this.authService.userData());
+  loginNameTH = computed(() => {
+    const u = this.authService.userData();
+    if (!u) return '-';
+    return [u.NAMFIRSTT, u.NAMLASTT].filter(Boolean).join(' ') || '-';
+  });
+  loginNameEN = computed(() => {
+    const u = this.authService.userData();
+    if (!u) return '-';
+    return [u.NAMFIRSTE, u.NAMLASTE].filter(Boolean).join(' ') || '-';
+  });
 
   private ctx!: CanvasRenderingContext2D;
   private isDrawing = false;
   private lastX = 0;
   private lastY = 0;
+  private themeObserver?: MutationObserver;
 
   ngOnInit() {
-    const no = this.route.snapshot.queryParamMap.get('requestNo') ?? '';
-    this.requestNo.set(no);
+    const nameFromParam = this.route.snapshot.queryParamMap.get('name') ?? '';
+    const userData = this.authService.userData();
 
-    if (no) {
-      const found = MOCK_REQUESTS.find(r => r.requestNo === no);
-      if (found) {
-        this.requestData.set(found);
-      } else {
-        // TODO: Call API here when ready
-        // this.itRequestService.getByRequestNo(no).subscribe(...)
-        this.isNotFound.set(true);
-      }
-    } else {
-      // No requestNo param — show first mock for demo
-      this.requestData.set(MOCK_REQUESTS[0]);
-      this.requestNo.set(MOCK_REQUESTS[0].requestNo);
-    }
+    const nameFromLogin = userData?.USR_FNAME
+      ? `${userData.USR_FNAME} ${userData.USR_LNAME ?? ''}`.trim()
+      : (this.authService.currentUser() ?? '');
+
+    const resolvedName = nameFromParam || nameFromLogin;
+    this.prefillName.set(resolvedName);
+    this.signerName.set(resolvedName);
   }
 
   ngAfterViewInit() {
@@ -93,8 +72,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.themeObserver?.disconnect();
   }
 
-  private themeObserver?: MutationObserver;
-
   private initCanvas() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
@@ -103,7 +80,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.fillCanvasBg();
     this.setupCtxStyle();
 
-    // Watch for theme changes to update stroke color
     this.themeObserver = new MutationObserver(() => {
       this.setupCtxStyle();
     });
@@ -160,7 +136,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   startDrawing(event: MouseEvent | TouchEvent) {
     event.preventDefault();
     this.isDrawing = true;
-    // Re-read stroke color in case theme changed
     this.ctx.strokeStyle = this.getStrokeColor();
     const pos = this.getPosition(event);
     this.lastX = pos.x;
@@ -178,6 +153,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.lastX = pos.x;
     this.lastY = pos.y;
     this.hasSignature.set(true);
+    this.isSaved.set(false);
   }
 
   stopDrawing() {
@@ -189,32 +165,36 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     this.fillCanvasBg();
     this.hasSignature.set(false);
+    this.isSaved.set(false);
+    this.savedSignatureUrl.set(null);
   }
 
-  getSignatureBase64(): string {
-    return this.canvasRef.nativeElement.toDataURL('image/png');
-  }
-
-  submit() {
-    if (!this.hasSignature()) {
-      this.toastService.warning('กรุณาเซนชื่อก่อนยืนยัน');
-      return;
-    }
-    this.isSubmitting.set(true);
-    const signatureBase64 = this.getSignatureBase64();
-
-    // TODO: Call API to submit approval + signature
-    console.log('[IT Signature] requestNo:', this.requestNo());
-    console.log('[IT Signature] signature (base64):', signatureBase64.substring(0, 60) + '...');
-
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-      this.toastService.success('บันทึกลายเซนต์และอนุมัติเรียบร้อยแล้ว');
-    }, 800);
+  editSignature() {
+    this.isSaved.set(false);
+    this.savedSignatureUrl.set(null);
   }
 
   editAction() {
-    // TODO: Navigate back to edit the IT request
     this.toastService.info('ฟังก์ชันแก้ไขกำลังอยู่ในระหว่างพัฒนา');
+  }
+
+  saveSignature() {
+    if (!this.hasSignature()) {
+      this.toastService.warning('กรุณาเซนชื่อก่อนบันทึก');
+      return;
+    }
+    this.isSaving.set(true);
+    const base64 = this.canvasRef.nativeElement.toDataURL('image/png');
+
+    // TODO: Call API to save signature
+    console.log('[SaveSignature] name:', this.signerName());
+    console.log('[SaveSignature] signature (base64):', base64.substring(0, 60) + '...');
+
+    setTimeout(() => {
+      this.savedSignatureUrl.set(base64);
+      this.isSaving.set(false);
+      this.isSaved.set(true);
+      this.toastService.success('บันทึกลายเซนต์เรียบร้อยแล้ว');
+    }, 600);
   }
 }
