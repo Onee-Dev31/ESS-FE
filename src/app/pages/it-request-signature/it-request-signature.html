@@ -139,6 +139,10 @@
                     <i class="fas fa-eraser"></i> ล้างลายเซนต์
                 </button>
 
+                <button class="btn-edit-action" (click)="editAction()">
+                    <i class="fas fa-pen"></i> แก้ไข
+                </button>
+
                 <button class="btn-submit" (click)="submit()" [disabled]="!hasSignature() || isSubmitting()">
                     @if (isSubmitting()) {
                     <i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...

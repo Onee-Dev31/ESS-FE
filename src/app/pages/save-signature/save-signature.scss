@@ -2,10 +2,10 @@
 @use '../../../styles/mixins' as *;
 
 // ============================================
-// IT Request Signature Page
+// Save Signature Page
 // ============================================
 
-.signature-page-wrapper {
+.save-sig-wrapper {
     padding: 24px;
     min-height: 100vh;
     background: var(--bg-slate);
@@ -34,7 +34,7 @@
         width: 52px;
         height: 52px;
         border-radius: 14px;
-        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #fff));
+        background: linear-gradient(135deg, var(--success), color-mix(in srgb, var(--success) 70%, #fff));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -56,41 +56,6 @@
         font-size: 0.85rem;
         color: var(--text-sub);
     }
-
-    .request-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        background: var(--bg-card);
-        border: 1px solid var(--border-table-head);
-        border-radius: 99px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: var(--primary);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-    }
-}
-
-// ==================== NOT FOUND STATE ====================
-.not-found-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 64px 24px;
-    color: var(--text-muted);
-
-    i {
-        font-size: 3rem;
-        color: var(--danger);
-        opacity: 0.6;
-    }
-
-    p {
-        font-size: 1rem;
-        color: var(--text-sub);
-    }
 }
 
 // ==================== 2-COLUMN LAYOUT ====================
@@ -98,19 +63,18 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    align-items: stretch;
+    align-items: start;
 
     @media (max-width: 900px) {
         grid-template-columns: 1fr;
     }
 }
 
-// ==================== REQUEST DETAIL PANEL ====================
-.request-details-panel {
+// ==================== LEFT PANEL ====================
+.info-panel {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 100%;
 }
 
 // ==================== SHARED: INFO SECTION ====================
@@ -153,6 +117,7 @@
     .info-row {
         display: flex;
         gap: 12px;
+        align-items: center;
         margin-bottom: 14px;
 
         &:last-child {
@@ -160,55 +125,158 @@
         }
 
         .info-label {
-            width: 160px;
+            width: 140px;
             flex-shrink: 0;
             font-size: 0.85rem;
             font-weight: 500;
             color: var(--text-sub);
-
-            &.align-top {
-                padding-top: 2px;
-            }
         }
 
         .info-value {
             flex: 1;
+        }
+
+        .inline-input {
+            width: 100%;
+            padding: 9px 13px;
+            border: 1.5px solid var(--border-table-head);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
             font-size: 0.9rem;
             font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color-scheme: light dark;
+
+            &::placeholder {
+                color: var(--text-muted);
+                font-weight: 400;
+            }
+
+            &:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+            }
+        }
+
+        .text-value {
+            font-size: 0.88rem;
             color: var(--text);
+            font-weight: 500;
+            word-break: break-word;
+        }
+    }
+}
 
-            .service-tag {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                color: var(--text);
+// ==================== LOGIN USER CARD ====================
+.login-user-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
 
-                i {
-                    color: var(--success);
-                }
+    .login-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 60%, #6366f1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+        i {
+            font-size: 1.6rem;
+            color: #fff;
+        }
+    }
+
+    .login-meta {
+        flex: 1;
+        min-width: 0;
+
+        .login-name-th {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .login-name-en {
+            font-size: 0.82rem;
+            color: var(--text-sub);
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .login-ad {
+            margin-top: 4px;
+            font-size: 0.78rem;
+            color: var(--primary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            i {
+                font-size: 0.7rem;
+                opacity: 0.8;
             }
+        }
+    }
+}
 
-            .system-list {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
+.login-details {
+    .info-row {
+        .info-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
 
-                li {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    color: var(--text);
-                    font-size: 0.9rem;
-
-                    i.fa-check {
-                        color: var(--success);
-                        font-size: 0.8rem;
-                    }
-                }
+            i {
+                color: var(--primary);
+                font-size: 0.78rem;
+                opacity: 0.7;
+                width: 14px;
+                text-align: center;
             }
+        }
+    }
+}
+
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+
+    .signature-preview-img {
+        max-width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .preview-meta {
+        font-size: 0.85rem;
+        color: var(--text-sub);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        i {
+            color: var(--primary);
+            opacity: 0.7;
         }
     }
 }
@@ -222,7 +290,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    height: 100%;
 
     >.section-header {
         border-bottom: 1px solid var(--border-color);
@@ -232,7 +299,7 @@
 .canvas-wrapper {
     position: relative;
     margin: 20px;
-    flex: 1;
+    height: 260px;
     min-height: 200px;
     border: 2px dashed var(--border-table-head);
     border-radius: 12px;
@@ -242,7 +309,7 @@
     transition: border-color 0.2s;
 
     &.has-signature {
-        border-color: var(--primary);
+        border-color: var(--success);
         border-style: solid;
     }
 
@@ -281,7 +348,7 @@
     }
 }
 
-// ==================== SIGNATURE ACTIONS ====================
+// ==================== ACTIONS ====================
 .signature-actions {
     display: flex;
     gap: 12px;
@@ -317,7 +384,7 @@
         }
     }
 
-    .btn-edit-action {
+    .btn-edit {
         background: transparent;
         border: 1px solid var(--warning);
         color: var(--warning);
@@ -327,8 +394,8 @@
         }
     }
 
-    .btn-submit {
-        background: var(--primary);
+    .btn-save {
+        background: var(--success);
         color: #fff;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
@@ -352,67 +419,8 @@
     gap: 6px;
 
     i {
-        color: var(--primary);
+        color: var(--success);
         opacity: 0.7;
         flex-shrink: 0;
-    }
-}
-
-// ==================== SIGNER NAME FIELD ====================
-.signer-name-field {
-    padding: 4px 20px 16px;
-
-    .name-input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .name-icon {
-        position: absolute;
-        left: 14px;
-        color: var(--primary);
-        font-size: 0.95rem;
-        opacity: 0.7;
-        pointer-events: none;
-    }
-
-    .signer-name-input {
-        width: 100%;
-        padding: 12px 14px 12px 40px;
-        border: 1.5px solid var(--border-table-head);
-        border-radius: 10px;
-        background: var(--bg-slate);
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: var(--text);
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        color-scheme: light dark;
-
-        &::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        &:focus {
-            border-color: var(--primary);
-            background: var(--bg-card);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-        }
-
-        &:not(:placeholder-shown) {
-            background: var(--bg-card);
-            border-color: var(--border-table-head);
-        }
-    }
-
-    .name-label {
-        margin-top: 6px;
-        font-size: 0.72rem;
-        color: var(--text-muted);
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        padding-left: 2px;
     }
 }
