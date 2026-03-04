@@ -362,6 +362,8 @@ export class ResignManagement {
   setPageSize(tableType: 'active' | 'resign', size: number) {
 
     if (tableType === 'active') {
+      console.log("size : ",size);
+      
       this.activeListing.pageSize.set(size);
       this.activeListing.currentPage.set(0);
 
@@ -426,9 +428,9 @@ export class ResignManagement {
     console.log(items)
     this.activeData.set(this.mapApiData(items));
 
-    this.activeListing.totalItems.set(res.total ?? 0);
-    this.activeListing.totalPages.set(res.totalPages ?? 1);
-    this.activeListing.currentPage.set((res.page ?? 1) - 1);
+    this.activeListing.totalItems.set(res.data.total ?? 0);
+    this.activeListing.totalPages.set(res.data.totalPages ?? 1);
+    this.activeListing.currentPage.set((res.data.page ?? 1) - 1);
   }
 
   private dataResignFromApi(res: any) {
@@ -436,9 +438,9 @@ export class ResignManagement {
     const items = res.data.items ?? []
     this.resignData.set(this.mapApiData(items));
 
-    this.resignListing.totalItems.set(res.total ?? 0);
-    this.resignListing.currentPage.set((res.page ?? 1) - 1);
-    this.resignListing.totalPages.set(res.totalPages ?? 1);
+    this.resignListing.totalItems.set(res.data.total ?? 0);
+    this.resignListing.currentPage.set((res.data.page ?? 1) - 1);
+    this.resignListing.totalPages.set(res.data.totalPages ?? 1);
   }
 
   private fetchEmployeeByStatus(
