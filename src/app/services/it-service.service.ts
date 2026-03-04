@@ -79,8 +79,6 @@ export class ItServiceService {
 
   constructor(private _http: HttpClient) { }
 
-
-  // MASTER
   getSubProblem(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/sub-categories`);
   }
@@ -91,6 +89,10 @@ export class ItServiceService {
 
   getServiceType(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/service-types`);
+  }
+
+  getAssignItDropdown(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Master/assign-dropdown?groupIds=1%2C2%2C3`);
   }
 
   getOpenFor(

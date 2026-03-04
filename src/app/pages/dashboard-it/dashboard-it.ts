@@ -42,7 +42,7 @@ export class DashboardIT implements OnInit {
 
   selectedId = 1;
 
-  Tickets = signal<any[]>([])
+  Tickets = signal<any[]>(tickets)
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
@@ -51,33 +51,35 @@ export class DashboardIT implements OnInit {
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: string[] = [];
 
-  assigneeGroups = [
-    {
-      name: 'BMS-Oracle-Onee App',
-      members: [
-        'FONE0004', 'OTD01036', 'OTD01056', 'OTD01095', 'OTD01097'
-      ]
-    },
-    {
-      name: 'ระบบอื่นๆ',
-      members: [
-        'FONE0015', 'OTD01050', 'OTD01072', 'OTD01125', 'OTD01128', 'STD0001'
-      ]
-    },
-    {
-      name: 'Hardware & Software',
-      members: [
-        'OTD01022', 'OTD01116', 'OTD01117', 'OTD01119', 'OTD01120'
-      ]
-    }
-  ];
+  assigneeGroups: any[] = [];
+
+  // assigneeGroups = [
+  //   {
+  //     name: 'BMS-Oracle-Onee App',
+  //     members: [
+  //       'FONE0004', 'OTD01036', 'OTD01056', 'OTD01095', 'OTD01097'
+  //     ]
+  //   },
+  //   {
+  //     name: 'ระบบอื่นๆ',
+  //     members: [
+  //       'FONE0015', 'OTD01050', 'OTD01072', 'OTD01125', 'OTD01128', 'STD0001'
+  //     ]
+  //   },
+  //   {
+  //     name: 'Hardware & Software',
+  //     members: [
+  //       'OTD01022', 'OTD01116', 'OTD01117', 'OTD01119', 'OTD01120'
+  //     ]
+  //   }
+  // ];
 
   get filteredAssigneeGroups() {
     const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
     if (!kw) return this.assigneeGroups;
     return this.assigneeGroups.map(g => ({
       ...g,
-      members: g.members.filter(m => m.toLowerCase().includes(kw))
+      members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw))
     })).filter(g => g.members.length > 0);
   }
 
@@ -89,6 +91,7 @@ export class DashboardIT implements OnInit {
 
   ngOnInit() {
     this.getAllTickets();
+    this.getAssignItDropdown();
   }
 
   onStatusChange(status: StatusKey | null) {
@@ -111,16 +114,6 @@ export class DashboardIT implements OnInit {
     console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
-
-      // let convertedFiles: any[] = [];
-
-      // if (res.attachments?.length) {
-      //   convertedFiles = await Promise.all(
-      //     res.attachments.map((f: any) =>
-      //       this.convertUrlToFile(f)
-      //     )
-      //   );
-      // }
 
       let convertedFiles: any[] = [];
 
@@ -171,8 +164,14 @@ export class DashboardIT implements OnInit {
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
+        requesterCode: ticket.requester_code,
         requesterAduser: ticket.requester_aduser,
         requesterName: ticket.requester_name,
+        requesterEmail: ticket.requester_email,
+        requesterDept: ticket.requester_dept,
+        requesterCompanyCode: ticket.requester_companyCode,
+        requesterCompanyName: ticket.requester_companyName,
+        requesterPhone: ticket.contact_phone,
         // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
@@ -437,6 +436,48 @@ export class DashboardIT implements OnInit {
 
   getTicketById(ticketId: string) {
     return this.itServiceService.getTicketById(ticketId)
+  }
+
+  getAssignItDropdown() {
+    this.itServiceService.getAssignItDropdown().subscribe({
+      next: (res) => {
+        console.log(res)
+
+        const rows = res.data
+
+        const groupMap: Record<any, any> = {};
+        const assigneeGroup: any = [];
+
+        // สร้าง group
+        rows.forEach((r: any) => {
+          if (r.type === 'GROUP') {
+            groupMap[r.id] = {
+              name: r.display_name,
+              members: []
+            };
+          }
+        });
+
+        // ใส่ employee
+        rows.forEach((r: any) => {
+          if (r.type === 'EMPLOYEE' && groupMap[r.group_id]) {
+            groupMap[r.group_id].members.push({
+              id: r.id,
+              name: r.display_name,
+
+            });
+          }
+        });
+        // แปลงเป็น array
+        Object.values(groupMap).forEach(g => assigneeGroup.push(g));
+
+        console.log(assigneeGroup);
+        this.assigneeGroups = assigneeGroup
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    })
   }
 }
 
