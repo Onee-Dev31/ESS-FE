@@ -147,4 +147,29 @@ export class AuthService {
             .map((m: any) => m.RoutePath.replace(/^\/+/, ''));
     }
 
+    getMagicUser() {
+        return this._http.get<any>(`${this.baseUrl}/auth/me`, {
+            withCredentials: true
+        });
+    }
+    
+    initializeFromBackend() {
+        return this.getMagicUser().pipe(
+            tap(res => {
+            if (!res?.success) return;
+
+            localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(res));
+            localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, res.adUser || '');
+            localStorage.setItem(STORAGE_KEYS.USER_ROLE, res.permission?.Role || '');
+            localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(res.employee) || '');
+
+            this._isLoggedIn.set(true);
+            this._currentUser.set(res.adUser);
+            this._userRole.set(res.permission?.Role);
+            this._userData.set(res.employee);
+            })
+        );
+    }
+
 }
