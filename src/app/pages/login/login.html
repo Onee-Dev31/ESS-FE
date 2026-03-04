@@ -6,34 +6,21 @@
       <p>Employee Self-Service System</p>
     </div>
 
-    <div
-      *ngIf="loginMessage"
-      [ngClass]="{ 'error-msg': isError, 'success-msg': !isError }"
-      class="alert"
-    >
+    <div *ngIf="loginMessage" [ngClass]="{ 'error-msg': isError, 'success-msg': !isError }" class="alert">
       {{ loginMessage }}
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
       <div class="input-group">
         <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          formControlName="username"
-          placeholder="Enter your username"
-        />
+        <input type="text" id="username" formControlName="username" placeholder="Enter your username" />
       </div>
 
       <div class="input-group password-group">
         <label for="password">Password</label>
         <div class="input-wrapper">
-          <input
-            [type]="passwordFieldType"
-            id="password"
-            formControlName="password"
-            placeholder="Enter your password"
-          />
+          <input [type]="passwordFieldType" id="password" formControlName="password"
+            placeholder="Enter your password" />
           <span class="password-toggle" (click)="togglePasswordVisibility()">
             <i [class]="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
           </span>
@@ -61,8 +48,6 @@
   </div>
 
   <div class="welcome-panel">
-    <div class="illustration-container">
-      <img src="./people.png" alt="Team onee" class="people-img" />
-    </div>
+    <img src="./people.png" alt="Team onee" class="people-img" />
   </div>
 </div>
