@@ -249,6 +249,10 @@ export class ItProblemReportComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error fetching data:', error.error.message);
+          this.swalService.warning('เกิดข้อผิดพลาด', error.error.message).then(() => {
+            this.clearForm();
+            this.router.navigate(['/it-service-list']);
+          });
           // const message = error?.error?.message || '';
         }
       });

@@ -56,6 +56,7 @@
 
     <!-- CENTER: ticket content -->
     <main class="tk-center">
+        <!-- <ng-container *ngIf="selectedTicket() as t; else emptyState"> -->
         <ng-container *ngIf="selectedTicket() as t; else emptyState">
 
             <!-- HERO -->
@@ -140,11 +141,22 @@
                         <div class="note" *ngFor="let n of t.itNotes">
                             <div class="note__top">
                                 <div class="note__who">
-                                    <span class="bubble" [style.background]="n.avatarBg">{{ n.avatar }}</span>
-                                    <b>{{ n.by }}</b>
-                                    <span class="muted">{{ n.byRole }}</span>
+                                    <div class="avatar">
+                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + n.employee.empCode + '.jpg'"
+                                            (error)="onImgError($event)" />
+                                    </div>
+                                    <div>
+                                        <b>{{ n.employee.name }}</b>
+                                        <div class="muted">{{ n.employee.role }}</div>
+                                    </div>
                                 </div>
-                                <div class="muted">{{ n.time }}</div>
+                                <div class="muted"> @if (isToday(n.createdDate)) {
+                                    {{ n.createdDate | date:'HH:mm' }}
+                                    } @else {
+                                    {{ n.createdDate | date:'EEE dd HH:mm':'':'en' }}
+                                    }
+                                </div>
+
                             </div>
                             <div class="note__msg">{{ n.message }}</div>
                         </div>
@@ -193,8 +205,33 @@
     <!-- RIGHT: assignee/requester -->
     <aside class="tk-right" *ngIf="selectedTicket() as t">
         <div class="tk-right">
+            <section class="side-card requester">
+                <div class="side-title">ผู้ขอใช้บริการ</div>
+
+                <div class="side-profile" *ngIf="t.requesterName;">
+                    <div class="side-avatar">
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+                            (error)="onImgError($event)" />
+                    </div>
+                    <div class="side-detail">
+                        <div>{{t.requesterName}}</div>
+                        <div>{{t.requesterDept}}</div>
+                        <div>{{t.requesterCompanyName}}</div>
+                    </div>
+                </div>
+
+
+                <div class="side-contact">
+                    <p>ช่องทางการติต่อ</p>
+                    <div>อีเมล: {{t.requesterEmail}}</div>
+                    <div>ติดต่อ: {{t.requesterPhone}}</div>
+                </div>
+
+
+            </section>
 
             <section class="side-card">
+
                 <div class="side-title">ผู้รับผิดชอบ</div>
 
                 <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
@@ -309,24 +346,24 @@
                         </button>
                     </div>
 
-                    <div class="assign-item" *ngFor="let empCode of g.members"
-                        [class.selected]="selectedAssigneeEmpCodes.includes(empCode)" (click)="toggleAssignee(empCode)">
+                    <div class="assign-item" *ngFor="let emp of g.members"
+                        [class.selected]="selectedAssigneeEmpCodes.includes(emp.id)" (click)="toggleAssignee(emp.id)">
 
                         <div class="assign-chk">
                             <span class="material-symbols-outlined"
-                                *ngIf="selectedAssigneeEmpCodes.includes(empCode)">check_box</span>
+                                *ngIf="selectedAssigneeEmpCodes.includes(emp.id)">check_box</span>
                             <span class="material-symbols-outlined"
-                                *ngIf="!selectedAssigneeEmpCodes.includes(empCode)">check_box_outline_blank</span>
+                                *ngIf="!selectedAssigneeEmpCodes.includes(emp.id)">check_box_outline_blank</span>
                         </div>
 
                         <div class="assign-avatar">
-                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + empCode + '.jpg'"
+                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
                                 loading="lazy" decoding="async" (error)="onImgError($event)"
-                                (click)="openImage(empCode); $event.stopPropagation()" />
+                                (click)="openImage(emp.id); $event.stopPropagation()" />
                         </div>
 
                         <div class="assign-info">
-                            <div class="assign-name">{{ empCode }}</div>
+                            <div class="assign-name">{{ emp.name }}</div>
                         </div>
                     </div>
                 </div>
