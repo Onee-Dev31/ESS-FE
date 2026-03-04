@@ -111,11 +111,15 @@
     flex-direction: column;
     gap: 16px;
     height: 100%;
+
+    .info-section:last-child {
+        flex: 1;
+    }
 }
 
 // ==================== SHARED: INFO SECTION ====================
 .info-section {
-    background: var(--bg-card);
+    // background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;

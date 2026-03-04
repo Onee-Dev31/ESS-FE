@@ -5,6 +5,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 interface MockRequestData {
   requestNo: string;
@@ -63,6 +65,11 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private lastX = 0;
   private lastY = 0;
 
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  currentApprover = signal<string>('');
+
   ngOnInit() {
     const no = this.route.snapshot.queryParamMap.get('requestNo') ?? '';
     this.requestNo.set(no);
@@ -81,6 +88,16 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       this.requestData.set(MOCK_REQUESTS[0]);
       this.requestNo.set(MOCK_REQUESTS[0].requestNo);
     }
+
+    this.authService.getMagicUser().subscribe({
+      next: (res) => {
+        console.log('Current user:', res);
+        this.currentApprover.set(res.adUser);
+      },
+      error: () => {
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   ngAfterViewInit() {

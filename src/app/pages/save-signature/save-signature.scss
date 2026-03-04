@@ -1,14 +1,21 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
 // ============================================
 // Save Signature Page
 // ============================================
 
 .save-sig-wrapper {
     padding: 24px;
-    min-height: 100vh;
-    background: var(--bg-slate);
+
+    box-sizing: border-box;
 
     @media (max-width: 768px) {
         padding: 16px;
@@ -20,9 +27,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
     gap: 16px;
     flex-wrap: wrap;
+    flex-shrink: 0;
 
     .header-left {
         display: flex;
@@ -63,7 +71,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    align-items: start;
+    align-items: stretch;
 
     @media (max-width: 900px) {
         grid-template-columns: 1fr;
@@ -74,7 +82,32 @@
 .info-panel {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    height: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    .info-section {
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+    }
+
+    .section-header {
+        background: var(--bg-slate);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-content {
+        background: transparent;
+    }
 }
 
 // ==================== SHARED: INFO SECTION ====================
@@ -290,16 +323,18 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
+    min-height: 360px;
 
     >.section-header {
         border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
     }
 }
 
 .canvas-wrapper {
     position: relative;
     margin: 20px;
-    height: 260px;
+    flex: 1;
     min-height: 200px;
     border: 2px dashed var(--border-table-head);
     border-radius: 12px;
@@ -313,7 +348,15 @@
         border-style: solid;
     }
 
-    &:hover {
+    &.is-saved {
+        cursor: default;
+
+        &:hover {
+            border-color: var(--success); // คง success color ไม่เปลี่ยน
+        }
+    }
+
+    &:not(.is-saved):hover {
         border-color: color-mix(in srgb, var(--primary) 60%, transparent);
     }
 }

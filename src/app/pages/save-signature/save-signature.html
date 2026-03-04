@@ -14,14 +14,14 @@
     <div class="content-layout">
 
         <!-- Left: Signer Info -->
-        <div class="info-panel">
+        <div class="info-panel" #infoPanel>
 
             <!-- Login User Card -->
             @if (loginUser()) {
             <div class="info-section">
                 <div class="section-header">
                     <i class="fas fa-id-card"></i>
-                    ข้อมูลผู้ใช้งาน <span class="sub">(Login Info)</span>
+                    ข้อมูลผู้ใช้งาน
                 </div>
                 <div class="section-content">
                     <div class="login-user-card">
@@ -59,34 +59,16 @@
                 </div>
             </div>
             }
-
-            
-
-            <!-- Preview หลัง save -->
-            @if (isSaved() && savedSignatureUrl()) {
-            <div class="info-section">
-                <div class="section-header">
-                    <i class="fas fa-check-circle" style="color: var(--success)"></i>
-                    ลายเซนต์ที่บันทึก <span class="sub">(Saved Signature)</span>
-                </div>
-                <div class="section-content preview-section">
-                    <img [src]="savedSignatureUrl()!" alt="Saved Signature" class="signature-preview-img" />
-                    <div class="preview-meta">
-                        <i class="fas fa-user"></i> {{ signerName() || '-' }}
-                    </div>
-                </div>
-            </div>
-            }
         </div>
 
         <!-- Right: Signature Pad -->
-        <div class="signature-panel">
+        <div class="signature-panel" #signaturePanel>
             <div class="section-header">
                 <i class="fas fa-pen-nib"></i>
                 ลายเซนต์ <span class="sub">(Signature Pad)</span>
             </div>
 
-            <div class="canvas-wrapper" [class.has-signature]="hasSignature()">
+            <div class="canvas-wrapper" [class.has-signature]="hasSignature()" [class.is-saved]="isSaved()">
                 <canvas #signatureCanvas class="signature-canvas" (mousedown)="startDrawing($event)"
                     (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
                     (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()">
