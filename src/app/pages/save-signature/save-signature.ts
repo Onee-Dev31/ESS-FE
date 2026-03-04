@@ -134,6 +134,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startDrawing(event: MouseEvent | TouchEvent) {
+    if (this.isSaved()) return;
     event.preventDefault();
     this.isDrawing = true;
     this.ctx.strokeStyle = this.getStrokeColor();
@@ -175,7 +176,12 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
   }
 
   editAction() {
-    this.toastService.info('ฟังก์ชันแก้ไขกำลังอยู่ในระหว่างพัฒนา');
+    // Reset saved state เพื่อให้วาดลายเซนต์ใหม่ได้
+    this.isSaved.set(false);
+    this.isSaving.set(false);
+    this.savedSignatureUrl.set(null);
+    this.clearSignature();
+    this.toastService.info('พร้อมวาดลายเซนต์ใหม่แล้ว');
   }
 
   saveSignature() {
