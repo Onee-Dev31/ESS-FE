@@ -19,7 +19,18 @@ import { NzI18nInterface, provideNzI18n, th_TH } from 'ng-zorro-antd/i18n';
 import { provideAppNzIcons } from './icons.provider';
 import { provideEchartsCore } from 'ngx-echarts';
 import * as echarts from 'echarts';
+
+// import { APP_INITIALIZER } from '@angular/core';
+// import { firstValueFrom } from 'rxjs';
+// import { AuthService } from './services/auth.service';
+
 registerLocaleData(localeTh);
+
+// function initAuth(authService: AuthService) {
+//   return () =>
+//     firstValueFrom(authService.initializeFromBackend())
+//       .catch(() => Promise.resolve());
+// }
 
 const customTh: NzI18nInterface = {
   ...th_TH,
@@ -56,5 +67,11 @@ export const appConfig: ApplicationConfig = {
       tablerFlower
     }),
     provideAppNzIcons(),
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: initAuth,
+    //   deps: [AuthService],
+    //   multi: true
+    // },
   ]
 };

@@ -21,7 +21,7 @@ export class App implements OnInit {
   private authService = inject(AuthService);
 
   ngOnInit() {
-    this.authService.initializeFromBackend().subscribe();
+    // this.authService.initializeFromBackend().subscribe();
     this.signalrService.startConnection();
     if ('Notification' in window) {
       Notification.requestPermission();

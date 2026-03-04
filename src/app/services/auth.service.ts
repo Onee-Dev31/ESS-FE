@@ -17,6 +17,9 @@ import { ToastService } from './toast';
 import { environment } from '../../environments/environment';
 import { PhoneUtil } from '../utils/phone.util';
 
+import { catchError } from 'rxjs/operators';
+
+
 @Injectable({
     providedIn: 'root'
 })
@@ -168,8 +171,11 @@ export class AuthService {
             this._currentUser.set(res.adUser);
             this._userRole.set(res.permission?.Role);
             this._userData.set(res.employee);
+            }),
+            catchError(() => {
+                // ถ้า 401 ไม่ต้องทำอะไรเลย
+                return of(null);
             })
         );
     }
-
 }

@@ -72,6 +72,8 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     const no = this.route.snapshot.queryParamMap.get('requestNo') ?? '';
+    const magic = this.route.snapshot.queryParamMap.get('magic');
+
     this.requestNo.set(no);
 
     if (no) {
@@ -79,25 +81,33 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       if (found) {
         this.requestData.set(found);
       } else {
-        // TODO: Call API here when ready
-        // this.itRequestService.getByRequestNo(no).subscribe(...)
         this.isNotFound.set(true);
       }
     } else {
-      // No requestNo param — show first mock for demo
       this.requestData.set(MOCK_REQUESTS[0]);
       this.requestNo.set(MOCK_REQUESTS[0].requestNo);
     }
 
-    this.authService.getMagicUser().subscribe({
-      next: (res) => {
-        console.log('Current user:', res);
-        this.currentApprover.set(res.adUser);
-      },
-      error: () => {
-        this.router.navigate(['/login']);
-      }
-    });
+    // ============================================
+    // 🔥 Magic Login ทำงานเฉพาะตอน ?magic=1 เท่านั้น
+    // ============================================
+    if (magic === '1') {
+      this.authService.initializeFromBackend().subscribe({
+        next: (res) => {
+          console.log('Magic login success:', res);
+
+          // ลบ magic param ออกจาก URL ให้สะอาด
+          this.router.navigate([], {
+            queryParams: { magic: null },
+            queryParamsHandling: 'merge'
+          });
+        },
+        error: () => {
+          console.warn('Magic login failed');
+          this.router.navigate(['/login']);
+        }
+      });
+    }
   }
 
   ngAfterViewInit() {
