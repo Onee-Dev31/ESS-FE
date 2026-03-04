@@ -348,7 +348,7 @@ $table-label-bg: var(--border-toolbar);
                     border: 1px solid var(--border-table-head);
 
                     h3 {
-                        font-size: $font-size-header;
+                        font-size: $font-size-label;
                         font-weight: 600;
                         color: $text-header;
                         margin: 0 0 0.75rem 0;
@@ -429,7 +429,7 @@ $table-label-bg: var(--border-toolbar);
                 button {
                     padding: 0.75rem 1.75rem;
                     border-radius: 12px;
-                    font-size: $font-size-header;
+                    font-size: $font-size-label;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.2s;

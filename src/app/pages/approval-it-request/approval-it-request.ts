@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -61,10 +61,14 @@ export class ApprovalItRequestComponent implements OnInit {
 
   pageTitle = signal<string>('IT Request Approvals');
   showExportMenu = signal<boolean>(false);
+  constructor(
+    private itServiceService: ItServiceService,
+    private cdr: ChangeDetectorRef,
 
-  constructor() {
+  ) {
     this.listing.filterStatus.set('Pending');
   }
+
 
   ngOnInit() {
     this.refresh();

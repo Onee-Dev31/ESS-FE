@@ -19,34 +19,36 @@
             <input [(ngModel)]="keyword" placeholder="Search by Ticket Number and Name" />
         </div>
 
-        <div class="tk-left__list">
-            <div class="tk-item" *ngFor="let t of filteredTickets(); trackBy: trackById"
-                [class.active]="t.id === selectedId" (click)="selectTicket(t)">
-                <div class="tk-item__avatar" [style.background]="t.avatarBg">
-                    {{ t.avatar }}
+        <div class="ticket-list">
+            <div class="ticket-item" *ngFor="let ticket of Tickets()"
+                [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
+                <div class="avatar">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
+                        (error)="onImgError($event)" />
                 </div>
-
-                <div class="tk-item__body">
-                    <div class="tk-item__top">
-                        <div class="tk-item__no">#{{ t.ticketNo }}</div>
-                        <div class="tk-item__time">{{ t.time }}</div>
+                <div class="ticket-info">
+                    <div class="ticket-header">
+                        <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+                        <div class="ticket-meta-right">
+                            <i class="fas fa-comment text-icon"></i>
+                        </div>
                     </div>
-
-                    <div class="tk-item__title">{{ t.title }}</div>
-
-                    <div class="tk-item__meta">
-                        <span class="tk-pill" [class.pill-orange]="t.status==='inprocess' || t.status ==='open'"
-                            [class.pill-blue]="t.status==='assigned'" [class.pill-green]="t.status==='done'">
-                            <span class="dot"></span>
-                            {{ statusLabel(t.status) }}
+                    <div class="ticket-title-row">
+                        <div class="ticket-title">{{ ticket.subject }}</div>
+                        <span class="ticket-time">
+                            @if (isToday(ticket.createdDate)) {
+                            {{ ticket.createdDate | date:'HH:mm' }}
+                            } @else {
+                            {{ ticket.createdDate | date:'EEE dd':'':'en' }}
+                            }
                         </span>
-                        <span class="tk-item__type">{{ t.typeLabel }}</span>
                     </div>
-                </div>
-
-                <div class="tk-item__icons">
-                    <button nz-button nzType="text" nzSize="small" class="ic-btn">
-                        <nz-icon nzType="comment" nzTheme="outline" /> </button>
+                    <div class="ticket-footer">
+                        <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
+                        <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.status)">
+                            <i class="fas fa-sync-alt"></i> {{ ticket.status }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,20 +56,25 @@
 
     <!-- CENTER: ticket content -->
     <main class="tk-center">
-        <ng-container *ngIf="selectedTicket as t; else emptyState">
+        <ng-container *ngIf="selectedTicket() as t; else emptyState">
 
             <!-- HERO -->
             <section class="tk-hero">
                 <div class="tk-hero__left">
                     <div class="tk-hero__avatar" [style.background]="t.avatarBg">{{ t.avatar }}</div>
                     <div>
-                        <div class="tk-hero__title">{{ t.title }}</div>
+                        <div class="tk-hero__title">{{ t.subject }}</div>
                         <div class="tk-hero__sub">
                             <span class="muted">Ticket</span>
-                            <b class="mono">#{{ t.ticketNo }}</b>
+                            <b class="mono">#{{ t.ticketNumber }}</b>
 
                             <span class="sep">•</span>
-                            <span class="muted">{{ t.createdAt }}</span>
+                            <span class="muted">
+                                <span class="header-date"><i class="far fa-calendar-alt"></i> {{ t.createdDate |
+                                    date:'longDate' }}</span>
+                                <span class="header-time"><i class="far fa-clock"></i> {{ t.createdDate |
+                                    date:'shortTime' }}</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -97,36 +104,23 @@
             </section>
 
             <!-- ATTACHMENTS -->
+            <!-- Attachments Section -->
             <section class="tk-card">
                 <div class="tk-card__head">
-                    <div class="tk-card__title">เอกสารแนบ</div>
-                </div>
-
-                <div class="tk-card__body">
-                    <div class="att-list" *ngIf="t.attachments.length; else noFile">
-                        <div class="att" *ngFor="let f of t.attachments">
-                            <div class="att__ic">
-                                <span class="material-symbols-outlined">description</span>
-                            </div>
-                            <div class="att__body">
-                                <div class="att__name">{{ f.name }}</div>
-                                <div class="att__sub">{{ f.size }} • {{ f.type }}</div>
-                            </div>
-                            <div class="att__actions">
-                                <button nz-button nzType="default" nzSize="small" (click)="previewFile(f)">
-                                    <nz-icon nzType="eye" nzTheme="outline"></nz-icon>
-                                    ดู
-                                </button>
-                                <button nz-button nzType="default" nzSize="small" (click)="downloadFile(f)">
-                                    <nz-icon nzType="download" nzTheme="outline"></nz-icon>
-                                    ดาวน์โหลด
-                                </button>
-                            </div>
-                        </div>
+                    <div class="tk-card__title">
+                        เอกสารแนบ
                     </div>
-
-                    <ng-template #noFile>
-                        <div class="tk-empty">ไม่มีเอกสารแนบ</div>
+                </div>
+                <div class="tk-card__body">
+                    <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+                        <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
+                            <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                            <span class="file-name">{{ file.name }}</span>
+                            <i class="fas fa-download download-small"></i>
+                        </li>
+                    </ul>
+                    <ng-template #noAttachments>
+                        <p class="text-muted">ไม่มีเอกสารแนบ</p>
                     </ng-template>
                 </div>
             </section>
@@ -142,8 +136,8 @@
                 </div>
 
                 <div class="tk-card__body">
-                    <div class="note-list" *ngIf="t.notes.length; else noNote">
-                        <div class="note" *ngFor="let n of t.notes">
+                    <div class="note-list" *ngIf="t.itNotes.length; else noNote">
+                        <div class="note" *ngFor="let n of t.itNotes">
                             <div class="note__top">
                                 <div class="note__who">
                                     <span class="bubble" [style.background]="n.avatarBg">{{ n.avatar }}</span>
@@ -164,7 +158,7 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions">
-                <button *ngIf="!t.assignee.name" nz-button nzType="primary" style="margin-right: auto;"
+                <button *ngIf="t.assigneeName" nz-button nzType="primary" style="margin-right: auto;"
                     (click)="acknowledgeTicket()">
                     <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
                     รับเรื่อง
@@ -173,7 +167,7 @@
                     <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
                     เพิ่ม Note
                 </button>
-                <ng-container *ngIf="t.assignee.name">
+                <ng-container *ngIf="!t.assigneeName">
                     <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
                         <nz-icon nzType="export" nzTheme="outline"></nz-icon>
                         ส่งต่อ
@@ -192,16 +186,18 @@
                 <div class="big">เลือก Ticket ทางซ้ายเพื่อดูรายละเอียด</div>
             </div>
         </ng-template>
+        <iframe *ngIf="safeUrl" [src]="safeUrl" width="100%" height="600">
+        </iframe>
     </main>
 
     <!-- RIGHT: assignee/requester -->
-    <aside class="tk-right" *ngIf="selectedTicket as t">
-        <div class="tk-right__sticky">
+    <aside class="tk-right" *ngIf="selectedTicket() as t">
+        <div class="tk-right">
 
             <section class="side-card">
                 <div class="side-title">ผู้รับผิดชอบ</div>
 
-                <div class="side-profile" *ngIf="t.assignee.name; else noAssignee">
+                <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
                     <div class="side-avatar" [style.background]="t.assignee.avatarBg">
                         {{ t.assignee.avatar }}
                     </div>
@@ -217,7 +213,7 @@
                     </div>
                 </ng-template>
 
-                <div class="side-fields" *ngIf="t.assignee.name">
+                <div class="side-fields" *ngIf="t.assigneeName">
                     <div class="sf">
                         <div class="sf__label">Ticket number</div>
                         <div class="sf__value mono">
@@ -265,6 +261,11 @@
 
         </div>
     </aside>
+
+    @if (isPreviewModalOpen()) {
+    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
+    }
 
 </div>
 

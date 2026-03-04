@@ -30,3 +30,32 @@ export class ticketTypyColor {
         }
     }
 }
+export class StatusColor {
+
+    private static statusMap: Record<string, string> = {
+        New: 'new',
+        Open: 'open',
+        Assigned: 'assigned',
+        'In Process': 'process',
+        Resolved: 'resolved',
+        Closed: 'closed',
+        Cancelled: 'cancel'
+    };
+
+    static getStyle(status: string) {
+
+        const key = this.statusMap[status];
+
+        if (!key) {
+            return {
+                background: 'rgba(158,158,158,0.2)',
+                color: '#9E9E9E'
+            };
+        }
+
+        return {
+            background: `var(--status-${key}-bg)`,
+            color: `var(--status-${key}-text)`
+        };
+    }
+}

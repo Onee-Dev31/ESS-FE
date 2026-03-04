@@ -283,8 +283,8 @@ $table-label-bg: var(--border-toolbar);
         z-index: 1000;
 
         .modal-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.6);
 
             .modal-header {
                 padding: 1.5rem 2rem;
@@ -292,7 +292,7 @@ $table-label-bg: var(--border-toolbar);
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-                border-bottom: 1px solid var(--border);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
                 background: linear-gradient(to bottom, var(--bg-card), var(--bg-table-head));
                 width: 100%;
                 box-sizing: border-box;
@@ -369,7 +369,7 @@ $table-label-bg: var(--border-toolbar);
                             color: $text;
 
                             i {
-                                font-size: $font-size-label;
+                                font-size: $font-size-header;
                             }
 
                             &.sub-item {
@@ -401,7 +401,7 @@ $table-label-bg: var(--border-toolbar);
                             }
 
                             .value {
-                                font-size: $font-size-label;
+                                font-size: $font-size-header;
                                 color: $text;
                                 font-weight: 500;
                             }
@@ -472,6 +472,7 @@ $table-label-bg: var(--border-toolbar);
             }
         }
     }
+
 
     /* ==========================================================================
        5. FORM SECTIONS & INPUT COMPONENTS

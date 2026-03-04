@@ -150,6 +150,10 @@ export class ItService implements OnInit {
 
   // GET
   getMyTicket() {
+
+    // { requesterCodeempid: this.userData.CODEMPID }
+    // { requesterAduser: this.userData.AD_USER }
+
     this.itServiceService.getMyTickets({ requesterCodeempid: this.userData.CODEMPID }).subscribe({
       next: (res) => {
         console.log(res);
