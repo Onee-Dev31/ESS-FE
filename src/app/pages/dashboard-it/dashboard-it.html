@@ -58,8 +58,8 @@
                     </div>
                     <div class="ticket-footer">
                         <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
-                        <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.status)">
-                            <i class="fas fa-sync-alt"></i> {{ ticket.status }}
+                        <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
+                            <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
                         </span>
                     </div>
                 </div>
@@ -75,7 +75,10 @@
             <!-- HERO -->
             <section class="tk-hero">
                 <div class="tk-hero__left">
-                    <div class="tk-hero__avatar" [style.background]="t.avatarBg">{{ t.avatar }}</div>
+                    <div class="avatar">
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterEmpId + '.jpg'"
+                            (error)="onImgError($event)" />
+                    </div>
                     <div>
                         <div class="tk-hero__title">{{ t.subject }}</div>
                         <div class="tk-hero__sub">
@@ -94,8 +97,7 @@
                 </div>
 
                 <div class="tk-hero__right">
-                    <span class="tk-pill pill-lg" [class.pill-orange]="t.status==='inprocess'"
-                        [class.pill-blue]="t.status==='assigned'" [class.pill-green]="t.status==='done'">
+                    <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
                         <span class="dot"></span>
                         {{ statusLabel(t.status) }}
                     </span>
@@ -183,21 +185,21 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions">
-                <button nz-button nzType="primary" nzDanger style="margin-right: auto;" (click)="handleDeny()">
+                <button class="btn btn-deny" style="margin-right: auto;" (click)="handleDeny()">
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
                     deny
                 </button>
                 <ng-container *ngIf="!t.assigneeName">
-                    <button nz-button nzType="primary" (click)="acknowledgeTicket()">
-                        <nz-icon nzType="inbox" nzTheme="outline"></nz-icon>
+                    <button class="btn btn-accept" (click)="acknowledgeTicket()">
+                        <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>
-                    <button nz-button nzType="default" class="btn-warn" (click)="forwardTicket()">
-                        <nz-icon nzType="export" nzTheme="outline"></nz-icon>
+                    <button class="btn btn-send" (click)="forwardTicket()">
+                        <i class="fa-solid fa-share" style="margin-right: 4px;"></i>
                         ส่งต่อ
                     </button>
-                    <button nz-button nzType="primary" style="background-color: green;" (click)="closeTicket()">
-                        <nz-icon nzType="check-circle" nzTheme="fill"></nz-icon>
+                    <button class="btn btn-done" (click)="closeTicket()">
+                        <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i>
                         ปิดงาน
                     </button>
                 </ng-container>

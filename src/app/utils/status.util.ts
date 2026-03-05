@@ -59,3 +59,35 @@ export class StatusColor {
         };
     }
 }
+
+export class StatusColor_Reverse {
+
+    private static statusMap: Record<string, string> = {
+        New: 'new',
+        Open: 'open',
+        Assigned: 'assigned',
+        'In Process': 'process',
+        Resolved: 'resolved',
+        Closed: 'closed',
+        Cancelled: 'cancel'
+    };
+
+    static getStyle(status: string) {
+
+        const key = this.statusMap[status];
+
+        console.log(key)
+
+        if (!key) {
+            return {
+                background: 'rgba(158,158,158,0.2)',
+                color: '#9E9E9E'
+            };
+        }
+
+        return {
+            // border: `1px solid var(--status-${key}-text)`,
+            background: `color-mix(in srgb, var(--status-${key}-text), var(--text-reverse) 20%)`,
+        };
+    }
+}

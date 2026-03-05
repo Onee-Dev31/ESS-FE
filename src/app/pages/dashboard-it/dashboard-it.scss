@@ -384,19 +384,19 @@ textarea.form-input {
                 padding-left: 16px;
             }
 
-            .avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                color: #ffffff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                font-size: 0.9rem;
-                margin-right: 12px;
-                flex-shrink: 0;
-            }
+            // .avatar {
+            //     width: 40px;
+            //     height: 40px;
+            //     border-radius: 50%;
+            //     color: #ffffff;
+            //     display: flex;
+            //     align-items: center;
+            //     justify-content: center;
+            //     font-weight: 600;
+            //     font-size: 0.9rem;
+            //     margin-right: 12px;
+            //     flex-shrink: 0;
+            // }
 
             .avatar {
                 width: 40px;
@@ -645,7 +645,7 @@ textarea.form-input {
     padding: 5px 10px;
     border-radius: 999px;
     font-size: 12px;
-    border: 1px solid rgba(15, 23, 42, .10);
+    font-weight: 700;
     background: var(--bg-card);
 }
 
@@ -653,7 +653,7 @@ textarea.form-input {
     width: 7px;
     height: 7px;
     border-radius: 999px;
-    background: var(--text-muted);
+    background: white;
 }
 
 .pill-lg {
@@ -703,11 +703,11 @@ textarea.form-input {
 
 /* hero */
 .tk-hero {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 55%, #0ea5e9 140%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 55%);
     border-radius: 16px;
     padding: 16px;
-    color: #ffffff;
-    box-shadow: 0 16px 44px rgba(37, 99, 235, .22);
+    color: var(--text-reverse);
+    box-shadow: 0 16px 44px color-mix(in srgb, var(--primary) 30%, transparent);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -719,6 +719,22 @@ textarea.form-input {
     align-items: center;
     gap: 12px;
     min-width: 0;
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--bg-soft);
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
 }
 
 .tk-hero__avatar {
@@ -748,15 +764,18 @@ textarea.form-input {
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+
+    .muted {
+        .header-date {
+            padding-right: 4px;
+        }
+    }
+
+    .sep {
+        opacity: .55;
+    }
 }
 
-.muted {
-    opacity: .85;
-}
-
-.sep {
-    opacity: .55;
-}
 
 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -1032,10 +1051,47 @@ textarea.form-input {
     border-radius: 12px;
 }
 
-.btn-warn {
-    border-color: rgba(249, 115, 22, .35);
-    color: #ea580c;
+.btn {
+    border-radius: 16px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: var(--text-reverse);
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    transition: .2s;
+
+    &:hover {
+        background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);
+        // transform: translateY(-0.5px);
+    }
+
+    &:active {
+        background: color-mix(in srgb, var(--btn-bg), var(--text) 20%);
+        transform: translateY(2px);
+    }
+
+    &.btn-deny {
+        --btn-border: var(--status-rejected-bg);
+        --btn-bg: var(--status-rejected-text);
+    }
+
+    &.btn-accept {
+        --btn-border: var(--status-approved-bg);
+        --btn-bg: var(--status-approved-text);
+    }
+
+    &.btn-send {
+        --btn-border: var(--status-warning-bg);
+        --btn-bg: var(--status-warning-text);
+    }
+
+    &.btn-done {
+        --btn-border: var(--status-completed-bg);
+        --btn-bg: var(--status-completed-text);
+    }
+
 }
+
 
 /* empty */
 .tk-empty,

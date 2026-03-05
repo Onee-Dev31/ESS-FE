@@ -11,7 +11,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ItDashboardSummary } from './it-dashboard-summary/it-dashboard-summary';
 import { ItServiceService } from '../../services/it-service.service';
-import { StatusColor, ticketTypyColor } from '../../utils/status.util';
+import { StatusColor, ticketTypyColor, StatusColor_Reverse } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FilePreviewItem, FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
@@ -36,6 +36,7 @@ export class DashboardIT implements OnInit {
 
   private itServiceService = inject(ItServiceService);
   StatusColor = StatusColor;
+  StatusColor_Reverse = StatusColor_Reverse;
 
 
   Tickets = signal<any[]>(tickets)

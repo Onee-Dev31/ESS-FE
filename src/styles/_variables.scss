@@ -11,6 +11,7 @@
     --text-sub: #5f6368;
     --text-header: #475569;
     --text-muted: #94a3b8;
+    --text-reverse: #ffffff;
 
     // Backgrounds & Borders
     --bg-page: #f8f9fa;
@@ -101,7 +102,8 @@
     --text-sub: #94a3b8;
     --text-header: #f8fafc;
     --text-muted: #64748b;
-
+    --text-reverse: #000000;
+    
     // Backgrounds & Borders
     --bg-page: #0f172a;
     --bg-card: #1e293b;
@@ -138,20 +140,20 @@
     // --status-cancelled-text: #94a3b8;
 
     // Status Color
-    --status-new-bg: rgba(56, 189, 248, 0.18);
-    --status-new-text: #7dd3fc;
-    --status-open-bg: rgba(96, 165, 250, 0.18);
-    --status-open-text: #93c5fd;
-    --status-process-bg: rgba(192, 132, 252, 0.18);
-    --status-process-text: #d8b4fe;
-    --status-resolved-bg: rgba(52, 211, 153, 0.18);
-    --status-resolved-text: #6ee7b7;
-    --status-closed-bg: rgba(156, 163, 175, 0.18);
-    --status-closed-text: #d1d5db;
-    --status-cancel-bg: rgba(248, 113, 113, 0.18);
-    --status-cancel-text: #fca5a5;
-    --status-assigned-bg: rgba(251, 191, 36, 0.18);
-    --status-assigned-text: #fcd34d;
+    --status-new-bg: rgba(56, 189, 248, 0.30);
+    --status-new-text: #22d3ee;
+    --status-open-bg: rgba(59, 130, 246, 0.30);
+    --status-open-text: #3b82f6;
+    --status-process-bg: rgba(168, 85, 247, 0.30);
+    --status-process-text: #a855f7;
+    --status-resolved-bg: rgba(34, 197, 94, 0.30);
+    --status-resolved-text: #22c55e;
+    --status-closed-bg: rgba(156, 163, 175, 0.28);
+    --status-closed-text: #e5e7eb;
+    --status-cancel-bg: rgba(239, 68, 68, 0.30);
+    --status-cancel-text: #ef4444;
+    --status-assigned-bg: rgba(245, 158, 11, 0.30);
+    --status-assigned-text: #f59e0b;
 
     // Layout values
     --bg-toolbar: #1e293b;
