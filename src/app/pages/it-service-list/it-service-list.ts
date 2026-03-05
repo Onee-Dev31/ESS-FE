@@ -7,11 +7,14 @@ import dayjs from 'dayjs';
 import { ItServiceMockService, Ticket } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
-import { ticketTypyColor } from '../../utils/status.util';
+import { StatusColor, ticketTypyColor, StatusColor_Reverse } from '../../utils/status.util';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { StatusKey } from '../../interfaces/it-dashboard.interface';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 @Component({
   selector: 'app-it-service',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent, NzSelectModule, NzIconModule],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
@@ -21,16 +24,21 @@ export class ItService implements OnInit {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private userData = this.authService.userData()
+  StatusColor = StatusColor;
+  StatusColor_Reverse = StatusColor_Reverse;
+
   searchQuery = signal('');
 
   mockTickets = this.itServiceMock.ticketsSignal;
   Tickets = signal<any[]>([])
-  selectedTicket = signal<Ticket | undefined>(undefined);
+  selectedTicket = signal<any | undefined>(undefined);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
+  filterStatus: StatusKey | null = 'all';
+  keyword = '';
 
   ngOnInit() {
     this.getMyTicket();
@@ -125,8 +133,37 @@ export class ItService implements OnInit {
     this.closeRating();
   }
 
+  // FUNCTION ACTION
 
-  // FUNCTION
+  openAddNote() {
+    console.log('TODO: เปิด Modal เพิ่ม Note');
+  }
+
+
+  copy(text: string) {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    console.log('คัดลอกแล้ว');
+  }
+
+  // FUNCTION MAP
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
+  }
+
+  statusLabel(s: StatusKey) {
+    switch (s) {
+      case 'inprocess': return 'In Process Tickets';
+      case 'assigned': return 'Assigned Tickets';
+      case 'done': return 'Done';
+      case 'open': return 'Open';
+      default: return s;
+    }
+  }
 
   mapPriorityColor(priority: string) {
     switch (priority) {

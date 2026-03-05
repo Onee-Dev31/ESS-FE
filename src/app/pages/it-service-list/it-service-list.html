@@ -1,22 +1,29 @@
-<div class="it-service-container">
-
-    <!-- Left Sidebar (Ticket List) -->
-    <aside class="ticket-sidebar" [class.hide-on-mobile]="selectedTicket()">
-        <div class="sidebar-header">
-            <h2>Tickets</h2>
-            <button class="filter-btn">
-                <i class="fas fa-chevron-down"></i> All Tickets
-            </button>
+<div class="tk-page">
+    <!-- LEFT: ticket list -->
+    <aside class="tk-left">
+        <div class="tk-left__top">
+            <div class="tk-left__title">Tickets</div>
+            <!-- <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
+                <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
+                <nz-option nzValue="open" nzLabel="Open"></nz-option>
+                <nz-option nzValue="inprocess" nzLabel="In Process"></nz-option>
+                <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+                <nz-option nzValue="done" nzLabel="Done"></nz-option>
+            </nz-select> -->
         </div>
-        <div class="search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" placeholder="Search by Ticket Number and Name" [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)">
+
+        <div class="tk-left__search">
+            <span class="material-symbols-outlined ic">search</span>
+            <input [(ngModel)]="keyword" placeholder="Search by Ticket Number and Name" />
         </div>
 
         <div class="ticket-list">
             <div class="ticket-item" *ngFor="let ticket of Tickets()"
                 [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
+                <div class="avatar">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
+                        (error)="onImgError($event)" />
+                </div>
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
@@ -36,14 +43,8 @@
                     </div>
                     <div class="ticket-footer">
                         <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
-                        <span class="ticket-status-inline" [ngClass]="{
-                            'status-assigned': ticket.status === 'Open',
-                            'status-in-process': ticket.status === 'In Process',
-                            'status-resolved': ticket.status === 'Resolved',
-                            'status-closed': ticket.status === 'Closed',
-                            'status-overdue': ticket.status === 'Cancelled'
-                        }">
-                            <i class="fas fa-sync-alt"></i> {{ ticket.status }}
+                        <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
+                            <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
                         </span>
                     </div>
                 </div>
@@ -51,145 +52,236 @@
         </div>
     </aside>
 
-    <!-- Main Content Area & Right Panel -->
-    <ng-container *ngIf="selectedTicket() as ticket; else noTicketSelected">
-        <!-- Main Content Area (Ticket Details) -->
-        <main class="ticket-main-content">
+    <ng-container *ngIf="selectedTicket() as t; else emptyState">
+        <!-- CENTER: ticket content -->
+        <main class="tk-center">
+            <!-- HERO -->
+            <section class="tk-hero">
+                <div class="tk-hero__left">
+                    <div class="avatar">
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterEmpId + '.jpg'"
+                            (error)="onImgError($event)" />
+                    </div>
+                    <div>
+                        <div class="tk-hero__title">{{ t.subject }}</div>
+                        <div class="tk-hero__sub">
+                            <span class="muted">Ticket</span>
+                            <b class="mono">#{{ t.ticketNumber }}</b>
 
-            <div class="main-header" [style.--header-color]="ticket.requesterColor">
-                <div class="header-left">
-                    <button class="btn-back-mobile" (click)="clearSelection()" title="กลับหน้ารายการ">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <!-- <div class="avatar-large" [style.background-color]="ticket.requesterColor">
-                        {{ ticket.requesterInitials }}
-                    </div> -->
-                    <div class="header-title-group">
-                        <h2>{{ ticket.subject }}</h2>
-                        <div class="header-subtitle">
-                            <span class="badge badge-header">{{ ticket.ticketType }}</span>
-                            <span class="header-date"><i class="far fa-calendar-alt"></i> {{ ticket.createdDate |
-                                date:'longDate' }}</span>
-                            <span class="header-time"><i class="far fa-clock"></i> {{ ticket.createdDate |
-                                date:'shortTime' }}</span>
+                            <span class="sep">•</span>
+                            <span class="muted">
+                                <span class="header-date"><i class="far fa-calendar-alt"></i> {{ t.createdDate |
+                                    date:'longDate' }}</span>
+                                <span class="header-time"><i class="far fa-clock"></i> {{ t.createdDate |
+                                    date:'shortTime' }}</span>
+                            </span>
                         </div>
                     </div>
                 </div>
-                <div class="header-right">
-                    <div class="status-badge" [ngClass]="{
-                                'status-assigned': ticket.status === 'Assigned Tickets',
-                                'status-in-process': ticket.status === 'In Process Tickets',
-                                'status-closed': ticket.status === 'Closed Tickets',
-                                'status-overdue': ticket.status === 'Overdue Tickets'
-                    }">
-                        <i class="fas fa-check-circle"></i> {{ ticket.status }}
+
+                <div class="tk-hero__right">
+                    <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
+                        <span class="dot"></span>
+                        {{ statusLabel(t.status) }}
+                    </span>
+                </div>
+            </section>
+
+            <!-- DETAILS -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">
+                        รายละเอียด
                     </div>
                 </div>
-            </div>
 
-            <div class="content-sections">
-                <!-- Details Section -->
-                <section class="card-section">
-                    <div class="card-header">
-                        <h3><i class="fas fa-info-circle"></i> รายละเอียด</h3>
+                <div class="tk-card__body">
+                    <div class="tk-text">
+                        {{ t.description }}
                     </div>
-                    <div class="card-body">
-                        <p class="description-text">{{ ticket.description }}</p>
-                    </div>
-                </section>
-
-                <!-- Attachments Section -->
-                <section class="card-section">
-                    <div class="card-header">
-                        <h3><i class="fas fa-paperclip"></i> เอกสารแนบ</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="attachment-list" *ngIf="ticket.attachments.length > 0; else noAttachments">
-                            <li *ngFor="let file of ticket.attachments" class="attachment-item"
-                                (click)="viewFile(file)">
-                                <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-                                <span class="file-name">{{ file.fileName }}</span>
-                                <i class="fas fa-download download-small"></i>
-                            </li>
-                        </ul>
-                        <ng-template #noAttachments>
-                            <p class="text-muted">ไม่มีเอกสารแนบ</p>
-                        </ng-template>
-                    </div>
-                </section>
-
-                <!-- IT Notes Section -->
-                <section class="card-section">
-                    <div class="card-header">
-                        <h3><i class="fas fa-user-edit"></i> Note จาก IT ({{ ticket.assigneeName }})</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="it-notes-text">{{ ticket.itNotes }}</p>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Anchored Action Bar -->
-            <div class="action-footer-bar">
-                <div class="action-left-info">
-
                 </div>
-                <div class="action-buttons-group">
-                    <button class="btn btn-action btn-add-note">
-                        <i class="fas fa-sticky-note"></i> เพิ่ม Note
-                    </button>
-                    <button class="btn btn-action btn-forward">
-                        <i class="fas fa-history"></i> Reopen
-                    </button>
-                    <button class="btn btn-action btn-close-ticket" (click)="openRating()">
-                        <i class="fas fa-star"></i> Rate Us
+            </section>
+
+            <!-- ATTACHMENTS -->
+            <!-- Attachments Section -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">
+                        เอกสารแนบ
+                    </div>
+                </div>
+                <div class="tk-card__body">
+                    <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+                        <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
+                            <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                            <span class="file-name">{{ file.name }}</span>
+                            <i class="fas fa-download download-small"></i>
+                        </li>
+                    </ul>
+                    <ng-template #noAttachments>
+                        <p class="text-muted">ไม่มีเอกสารแนบ</p>
+                    </ng-template>
+                </div>
+            </section>
+
+            <!-- NOTES -->
+            <section class="tk-card">
+                <div class="tk-card__head">
+                    <div class="tk-card__title">Note</div>
+                    <button style="border-radius: 10px;" nz-button nzType="primary" (click)="openAddNote()">
+                        <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
+                        เพิ่ม Note
                     </button>
                 </div>
-            </div>
+
+                <div class="tk-card__body">
+                    <div class="note-list" *ngIf="t.itNotes.length; else noNote">
+                        <div class="note" *ngFor="let n of t.itNotes">
+                            <div class="note__top">
+                                <div class="note__who">
+                                    <div class="avatar">
+                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + n.employee.empCode + '.jpg'"
+                                            (error)="onImgError($event)" />
+                                    </div>
+                                    <div>
+                                        <b>{{ n.employee.name }}</b>
+                                        <div class="muted">{{ n.employee.role }}</div>
+                                    </div>
+                                </div>
+                                <div class="muted"> @if (isToday(n.createdDate)) {
+                                    {{ n.createdDate | date:'HH:mm' }}
+                                    } @else {
+                                    {{ n.createdDate | date:'EEE dd HH:mm':'':'en' }}
+                                    }
+                                </div>
+
+                            </div>
+                            <div class="note__msg">{{ n.message }}</div>
+                        </div>
+                    </div>
+
+                    <ng-template #noNote>
+                        <div class="tk-empty">ยังไม่มี Note</div>
+                    </ng-template>
+                </div>
+            </section>
+
+            <!-- bottom actions (optional, keep like original) -->
+            <section class="tk-actions">
+                <ng-container>
+                    <button class="btn btn-accept">
+                        <i class="fas fa-sticky-note" style="margin-right: 4px;"></i> เพิ่ม Note
+                    </button>
+                    <button class="btn btn-send">
+                        <i class="fas fa-history" style="margin-right: 4px;"></i> Reopen
+                    </button>
+                    <button class="btn btn-done" (click)="openRating()">
+                        <i class="fas fa-star" style="margin-right: 4px;"></i> Rate Us
+                    </button>
+                </ng-container>
+            </section>
         </main>
+        <!-- RIGHT: assignee/requester -->
+        <aside class="tk-right" *ngIf="selectedTicket() as t">
+            <div class="tk-right">
+                <section class="side-card requester">
+                    <div class="side-title">ผู้ขอใช้บริการ</div>
 
-        <!-- Right Panel (User & IT Info) -->
-        <aside class="info-sidebar">
-            <div class="info-card">
-                <div class="profile-section">
-                    <p class="info-card-label">ผู้รับผิดชอบ</p>
-                    <div class="profile-avatar">{{ ticket.assigneeAduser?.substring(0, 2)?.toUpperCase() }}</div>
-                    <h3 class="profile-email">{{ ticket.assigneeEmail }}</h3>
-
-                    <div class="ticket-ref-box">
-                        <span class="ref-label">Ticket number :</span>
-                        <span class="ref-value ticket-number">{{ ticket.ticketNumber }}</span>
-                        <button class="icon-btn btn-green"><i class="fas fa-copy"></i></button>
-                        <button class="icon-btn btn-green"><i class="fas fa-file-download"></i></button>
-                    </div>
-                </div>
-
-                <div class="user-details-form">
-                    <div class="form-group row">
-                        <label>Name :</label>
-                        <input type="text" [value]="ticket.assigneeName" readonly>
-                        <div class="arrow-toggle">
-                            <i class="fas fa-chevron-right"></i>
+                    <div class="side-profile" *ngIf="t.requesterName;">
+                        <div class="side-avatar">
+                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+                                (error)="onImgError($event)" />
+                        </div>
+                        <div class="side-detail">
+                            <div>{{t.requesterName}}</div>
+                            <div>{{t.requesterDept}}</div>
+                            <div>{{t.requesterCompanyName}}</div>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label>Email :</label>
-                        <input type="email" [value]="ticket.assigneeEmail" readonly>
-                        <i class="fas fa-copy copy-icon"></i>
+
+
+                    <div class="side-contact">
+                        <p>ช่องทางการติต่อ</p>
+                        <div>อีเมล: {{t.requesterEmail}}</div>
+                        <div>ติดต่อ: {{t.requesterPhone}}</div>
                     </div>
-                    <div class="form-group row">
-                        <label>Phone :</label>
-                        <input type="text" [value]="ticket.assigneePhone" readonly>
-                        <i class="fas fa-copy copy-icon"></i>
+
+
+                </section>
+
+                <section class="side-card">
+
+                    <div class="side-title">ผู้รับผิดชอบ</div>
+
+                    <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
+                        <div class="side-avatar" [style.background]="t.assignee.avatarBg">
+                            {{ t.assignee.avatar }}
+                        </div>
+                        <div class="side-name">{{ t.assignee.name }}</div>
+                        <div class="side-email">{{ t.assignee.email }}</div>
                     </div>
-                </div>
+
+                    <ng-template #noAssignee>
+                        <div class="side-profile no-assignee">
+                            <div class="side-avatar empty">?</div>
+                            <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
+                            <div class="side-email muted">กรุณากดรับเรื่อง</div>
+                        </div>
+                    </ng-template>
+
+                    <div class="side-fields" *ngIf="t.assigneeName">
+                        <div class="sf">
+                            <div class="sf__label">Ticket number</div>
+                            <div class="sf__value mono">
+                                #{{ t.ticketNo }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy('#'+t.ticketNo)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Name</div>
+                            <div class="sf__value">
+                                {{ t.requester.name }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.name)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Email</div>
+                            <div class="sf__value">
+                                {{ t.requester.email }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.email)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Phone</div>
+                            <div class="sf__value">
+                                {{ t.requester.phone }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.phone)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
             </div>
         </aside>
     </ng-container>
 
     <!-- Empty State Placeholder -->
-    <ng-template #noTicketSelected>
+    <ng-template #emptyState>
         <div class="empty-selection-placeholder hide-on-mobile">
             <div class="empty-content">
                 <div class="empty-icon-wrapper">
@@ -200,14 +292,19 @@
             </div>
         </div>
     </ng-template>
-
     @if (isPreviewModalOpen()) {
     <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
     </app-file-preview-modal>
     }
 
-    @if (isRatingModalOpen()) {
-    <app-rating-modal (onClose)="closeRating()" (onRate)="handleRate($event)">
-    </app-rating-modal>
-    }
 </div>
+
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
+}
+
+@if (isRatingModalOpen()) {
+<app-rating-modal (onClose)="closeRating()" (onRate)="handleRate($event)">
+</app-rating-modal>
+}

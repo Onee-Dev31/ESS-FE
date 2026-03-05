@@ -337,6 +337,55 @@ textarea.form-input {
     background: var(--bg-page);
     height: calc(100vh - 70px);
     align-items: stretch;
+
+
+    .empty-selection-placeholder {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--bg-card);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        grid-column: 2 / 4;
+
+        .empty-content {
+            text-align: center;
+            width: 400px;
+            padding: 40px;
+
+            .empty-icon-wrapper {
+                width: 100px;
+                height: 100px;
+                background-color: var(--bg-slate);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+
+                i {
+                    font-size: 3rem;
+                    color: var(--primary);
+                    opacity: 0.6;
+                }
+            }
+
+            h3 {
+                font-size: 1.5rem;
+                color: var(--text);
+                margin-bottom: 12px;
+                font-weight: 700;
+            }
+
+            p {
+                color: var(--text-muted);
+                font-size: 1rem;
+                line-height: 1.5;
+            }
+        }
+    }
+
 }
 
 .tk-left,
@@ -749,12 +798,13 @@ textarea.form-input {
 }
 
 .tk-hero__title {
-    font-size: 18px;
+    font-size: $font-size-body;
     font-weight: 900;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     max-width: 52vw;
+
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .tk-hero__sub {

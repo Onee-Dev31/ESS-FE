@@ -67,11 +67,9 @@
         </div>
     </aside>
 
-    <!-- CENTER: ticket content -->
-    <main class="tk-center">
-        <!-- <ng-container *ngIf="selectedTicket() as t; else emptyState"> -->
-        <ng-container *ngIf="selectedTicket() as t; else emptyState">
-
+    <ng-container *ngIf="selectedTicket() as t; else emptyState">
+        <!-- CENTER: ticket content -->
+        <main class="tk-center">
             <!-- HERO -->
             <section class="tk-hero">
                 <div class="tk-hero__left">
@@ -204,115 +202,118 @@
                     </button>
                 </ng-container>
             </section>
+        </main>
+        <!-- RIGHT: assignee/requester -->
+        <aside class="tk-right" *ngIf="selectedTicket() as t">
+            <div class="tk-right">
+                <section class="side-card requester">
+                    <div class="side-title">ผู้ขอใช้บริการ</div>
 
-        </ng-container>
+                    <div class="side-profile" *ngIf="t.requesterName;">
+                        <div class="side-avatar">
+                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+                                (error)="onImgError($event)" />
+                        </div>
+                        <div class="side-detail">
+                            <div>{{t.requesterName}}</div>
+                            <div>{{t.requesterDept}}</div>
+                            <div>{{t.requesterCompanyName}}</div>
+                        </div>
+                    </div>
 
-        <ng-template #emptyState>
-            <div class="tk-empty-center">
-                <div class="big">เลือก Ticket ทางซ้ายเพื่อดูรายละเอียด</div>
+
+                    <div class="side-contact">
+                        <p>ช่องทางการติต่อ</p>
+                        <div>อีเมล: {{t.requesterEmail}}</div>
+                        <div>ติดต่อ: {{t.requesterPhone}}</div>
+                    </div>
+
+
+                </section>
+
+                <section class="side-card">
+
+                    <div class="side-title">ผู้รับผิดชอบ</div>
+
+                    <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
+                        <div class="side-avatar" [style.background]="t.assignee.avatarBg">
+                            {{ t.assignee.avatar }}
+                        </div>
+                        <div class="side-name">{{ t.assignee.name }}</div>
+                        <div class="side-email">{{ t.assignee.email }}</div>
+                    </div>
+
+                    <ng-template #noAssignee>
+                        <div class="side-profile no-assignee">
+                            <div class="side-avatar empty">?</div>
+                            <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
+                            <div class="side-email muted">กรุณากดรับเรื่อง</div>
+                        </div>
+                    </ng-template>
+
+                    <div class="side-fields" *ngIf="t.assigneeName">
+                        <div class="sf">
+                            <div class="sf__label">Ticket number</div>
+                            <div class="sf__value mono">
+                                #{{ t.ticketNo }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy('#'+t.ticketNo)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Name</div>
+                            <div class="sf__value">
+                                {{ t.requester.name }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.name)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Email</div>
+                            <div class="sf__value">
+                                {{ t.requester.email }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.email)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sf">
+                            <div class="sf__label">Phone</div>
+                            <div class="sf__value">
+                                {{ t.requester.phone }}
+                                <button nz-button nzType="text" nzSize="small" class="copy"
+                                    (click)="copy(t.requester.phone)">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </div>
-        </ng-template>
-        <iframe *ngIf="safeUrl" [src]="safeUrl" width="100%" height="600">
-        </iframe>
-    </main>
+        </aside>
+    </ng-container>
 
-    <!-- RIGHT: assignee/requester -->
-    <aside class="tk-right" *ngIf="selectedTicket() as t">
-        <div class="tk-right">
-            <section class="side-card requester">
-                <div class="side-title">ผู้ขอใช้บริการ</div>
-
-                <div class="side-profile" *ngIf="t.requesterName;">
-                    <div class="side-avatar">
-                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
-                            (error)="onImgError($event)" />
-                    </div>
-                    <div class="side-detail">
-                        <div>{{t.requesterName}}</div>
-                        <div>{{t.requesterDept}}</div>
-                        <div>{{t.requesterCompanyName}}</div>
-                    </div>
+    <!-- Empty State Placeholder -->
+    <ng-template #emptyState>
+        <div class="empty-selection-placeholder hide-on-mobile">
+            <div class="empty-content">
+                <div class="empty-icon-wrapper">
+                    <i class="fas fa-ticket-alt"></i>
                 </div>
-
-
-                <div class="side-contact">
-                    <p>ช่องทางการติต่อ</p>
-                    <div>อีเมล: {{t.requesterEmail}}</div>
-                    <div>ติดต่อ: {{t.requesterPhone}}</div>
-                </div>
-
-
-            </section>
-
-            <section class="side-card">
-
-                <div class="side-title">ผู้รับผิดชอบ</div>
-
-                <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
-                    <div class="side-avatar" [style.background]="t.assignee.avatarBg">
-                        {{ t.assignee.avatar }}
-                    </div>
-                    <div class="side-name">{{ t.assignee.name }}</div>
-                    <div class="side-email">{{ t.assignee.email }}</div>
-                </div>
-
-                <ng-template #noAssignee>
-                    <div class="side-profile no-assignee">
-                        <div class="side-avatar empty">?</div>
-                        <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
-                        <div class="side-email muted">กรุณากดรับเรื่อง</div>
-                    </div>
-                </ng-template>
-
-                <div class="side-fields" *ngIf="t.assigneeName">
-                    <div class="sf">
-                        <div class="sf__label">Ticket number</div>
-                        <div class="sf__value mono">
-                            #{{ t.ticketNo }}
-                            <button nz-button nzType="text" nzSize="small" class="copy" (click)="copy('#'+t.ticketNo)">
-                                <span class="material-symbols-outlined">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sf">
-                        <div class="sf__label">Name</div>
-                        <div class="sf__value">
-                            {{ t.requester.name }}
-                            <button nz-button nzType="text" nzSize="small" class="copy"
-                                (click)="copy(t.requester.name)">
-                                <span class="material-symbols-outlined">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sf">
-                        <div class="sf__label">Email</div>
-                        <div class="sf__value">
-                            {{ t.requester.email }}
-                            <button nz-button nzType="text" nzSize="small" class="copy"
-                                (click)="copy(t.requester.email)">
-                                <span class="material-symbols-outlined">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sf">
-                        <div class="sf__label">Phone</div>
-                        <div class="sf__value">
-                            {{ t.requester.phone }}
-                            <button nz-button nzType="text" nzSize="small" class="copy"
-                                (click)="copy(t.requester.phone)">
-                                <span class="material-symbols-outlined">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
+                <h3>กรุณาเลือก Ticket</h3>
+                <p>โปรดเลือกรายการ Ticket จากทางด้านซ้ายเพื่อดูรายละเอียด</p>
+            </div>
         </div>
-    </aside>
-
+    </ng-template>
     @if (isPreviewModalOpen()) {
     <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
     </app-file-preview-modal>
