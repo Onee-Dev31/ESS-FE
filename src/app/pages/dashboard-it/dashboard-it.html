@@ -205,100 +205,170 @@
         </main>
         <!-- RIGHT: assignee/requester -->
         <aside class="tk-right" *ngIf="selectedTicket() as t">
-            <div class="tk-right">
-                <section class="side-card requester">
-                    <div class="side-title">ผู้ขอใช้บริการ</div>
 
-                    <div class="side-profile" *ngIf="t.requesterName;">
-                        <div class="side-avatar">
-                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
-                                (error)="onImgError($event)" />
+            <section class="side-card requester">
+                <div class="side-title">ผู้ขอใช้บริการ</div>
+
+                <div class="side-profile" *ngIf="t.requesterName;">
+                    <div class="side-avatar">
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+                            (error)="onImgError($event)" />
+                    </div>
+                    <div class="side-detail">
+                        <div>{{t.requesterName}}</div>
+                        <div>{{t.requesterDept}}</div>
+                        <div>{{t.requesterCompanyName}}</div>
+                    </div>
+                </div>
+
+
+                <div class="side-contact">
+                    <p>ช่องทางการติต่อ</p>
+                    <div>อีเมล: {{t.requesterEmail}}</div>
+                    <div>ติดต่อ: {{t.requesterPhone}}</div>
+                </div>
+
+
+            </section>
+            <section class="side-card assignee">
+
+                <div class="side-title">ผู้รับผิดชอบ</div>
+
+
+                <div class="timeline" *ngIf="t.assign.length > 0; else noAssignee">
+
+                    <div class="timeline-item"
+                        *ngFor="let step of t.assign.slice().reverse();let i = index; let first = first">
+
+                        <div class="timeline-icon" [ngClass]="{
+                                    'done': !first || t.assign.length === 1,
+                                    'active': first && t.assign.length !== 1
+                                }">
                         </div>
-                        <div class="side-detail">
-                            <div>{{t.requesterName}}</div>
-                            <div>{{t.requesterDept}}</div>
-                            <div>{{t.requesterCompanyName}}</div>
+
+                        <div class="timeline-content">
+
+                            <div class="timeline-title">
+                                <div>
+                                    Step {{step.step}} - {{step.title}}
+                                    <br>
+                                    <small>
+                                        by {{step.createBy.nickName}}
+                                        • @if (isToday(step.createdDate)) {
+                                        {{ step.createdDate | date:'HH:mm' }}
+                                        } @else {
+                                        {{ step.createdDate | date:'EEE dd - HH:mm':'':'en' }}
+                                        }
+                                    </small>
+
+                                </div>
+                            </div>
+
+                            <div class="timeline-assignee" *ngIf="step.Assignee?.length">
+
+                                <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
+
+                                    <div class="avatar">
+                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                                            (error)="onImgError($event)" />
+                                    </div>
+
+                                    <div class="name">
+                                        {{ a.nickName }}
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                            @if (isVisibleAssignee()) {
+                            <div class="assignee-modal-overlay" (click)="closeAssignee()">
+
+                                <div class="assignee-card" (click)="$event.stopPropagation()">
+
+                                    <button class="btn-close" (click)="closeAssignee()">✕</button>
+
+                                    @if (selectedAssignee()) {
+                                    <div class="assignee-profile">
+
+                                        <img class="avatar"
+                                            [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + selectedAssignee().empCode + '.jpg'"
+                                            (error)="onImgError($event)" />
+
+                                        <h3>{{selectedAssignee().nickName}}</h3>
+                                        <!-- <div>{{selectedAssignee().fullName}}</div> -->
+
+                                        <div class="side-contact">
+                                            <p>ช่องทางการติต่อ</p>
+                                            <div>อีเมล: {{selectedAssignee().email || '-'}}</div>
+                                            <div>ติดต่อ: {{selectedAssignee().phone || '-'}}</div>
+                                        </div>
+
+                                    </div>
+                                    }
+
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noAssignee>
+                    <div class="side-profile no-assignee">
+                        <div class="side-avatar empty">?</div>
+                        <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
+                        <div class="side-email muted">กรุณากดรับเรื่อง</div>
+                    </div>
+                </ng-template>
+
+                <div class="side-fields" *ngIf="t.assigneeName">
+                    <div class="sf">
+                        <div class="sf__label">Ticket number</div>
+                        <div class="sf__value mono">
+                            #{{ t.ticketNo }}
+                            <button nz-button nzType="text" nzSize="small" class="copy" (click)="copy('#'+t.ticketNo)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
                         </div>
                     </div>
 
-
-                    <div class="side-contact">
-                        <p>ช่องทางการติต่อ</p>
-                        <div>อีเมล: {{t.requesterEmail}}</div>
-                        <div>ติดต่อ: {{t.requesterPhone}}</div>
-                    </div>
-
-
-                </section>
-
-                <section class="side-card">
-
-                    <div class="side-title">ผู้รับผิดชอบ</div>
-
-                    <div class="side-profile" *ngIf="t.assigneeName; else noAssignee">
-                        <div class="side-avatar" [style.background]="t.assignee.avatarBg">
-                            {{ t.assignee.avatar }}
-                        </div>
-                        <div class="side-name">{{ t.assignee.name }}</div>
-                        <div class="side-email">{{ t.assignee.email }}</div>
-                    </div>
-
-                    <ng-template #noAssignee>
-                        <div class="side-profile no-assignee">
-                            <div class="side-avatar empty">?</div>
-                            <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
-                            <div class="side-email muted">กรุณากดรับเรื่อง</div>
-                        </div>
-                    </ng-template>
-
-                    <div class="side-fields" *ngIf="t.assigneeName">
-                        <div class="sf">
-                            <div class="sf__label">Ticket number</div>
-                            <div class="sf__value mono">
-                                #{{ t.ticketNo }}
-                                <button nz-button nzType="text" nzSize="small" class="copy"
-                                    (click)="copy('#'+t.ticketNo)">
-                                    <span class="material-symbols-outlined">content_copy</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="sf">
-                            <div class="sf__label">Name</div>
-                            <div class="sf__value">
-                                {{ t.requester.name }}
-                                <button nz-button nzType="text" nzSize="small" class="copy"
-                                    (click)="copy(t.requester.name)">
-                                    <span class="material-symbols-outlined">content_copy</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="sf">
-                            <div class="sf__label">Email</div>
-                            <div class="sf__value">
-                                {{ t.requester.email }}
-                                <button nz-button nzType="text" nzSize="small" class="copy"
-                                    (click)="copy(t.requester.email)">
-                                    <span class="material-symbols-outlined">content_copy</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="sf">
-                            <div class="sf__label">Phone</div>
-                            <div class="sf__value">
-                                {{ t.requester.phone }}
-                                <button nz-button nzType="text" nzSize="small" class="copy"
-                                    (click)="copy(t.requester.phone)">
-                                    <span class="material-symbols-outlined">content_copy</span>
-                                </button>
-                            </div>
+                    <div class="sf">
+                        <div class="sf__label">Name</div>
+                        <div class="sf__value">
+                            {{ t.requester.name }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.name)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
                         </div>
                     </div>
-                </section>
 
-            </div>
+                    <div class="sf">
+                        <div class="sf__label">Email</div>
+                        <div class="sf__value">
+                            {{ t.requester.email }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.email)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sf">
+                        <div class="sf__label">Phone</div>
+                        <div class="sf__value">
+                            {{ t.requester.phone }}
+                            <button nz-button nzType="text" nzSize="small" class="copy"
+                                (click)="copy(t.requester.phone)">
+                                <span class="material-symbols-outlined">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </aside>
     </ng-container>
 
