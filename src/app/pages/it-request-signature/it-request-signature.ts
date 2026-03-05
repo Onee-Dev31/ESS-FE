@@ -32,6 +32,10 @@ export interface MockRequestData {
 }
 
 // Mock data - replace with API call later
+// http://localhost:4200/it-request-signature?requestNo=REQ-SR-2603-0004
+// http://localhost:4200/it-request-signature?requestNo=REQ-RP-2603-0006
+// http://localhost:4200/it-request-signature // เป็นขแใช้บริการ
+
 const MOCK_REQUESTS: MockRequestData[] = [
   {
     requestNo: 'REQ-SR-2603-0004',
