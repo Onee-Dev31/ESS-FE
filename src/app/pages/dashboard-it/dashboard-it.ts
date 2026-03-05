@@ -266,6 +266,21 @@ export class DashboardIT implements OnInit {
         },
       ];
 
+      const mockitNotes: any = [
+        {
+          id: 1,
+          message: 'เสร็จยัง',
+          createdDate: new Date('2026-03-04T16:00:00').toISOString(),
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo',
+            role: 'it'
+          }
+        }
+      ]
+
 
       const objectData = {
         ticketId: ticket.id,
@@ -288,7 +303,7 @@ export class DashboardIT implements OnInit {
         // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
-        itNotes: [],
+        itNotes: ticket.requester_code === 'OTD01050' ? mockitNotes : [],
         assigneeName: '',
         assigneeAduser: '',
         assigneeEmail: '',
@@ -574,7 +589,8 @@ export class DashboardIT implements OnInit {
           ticketType: ticket.ticket_type_name_th,
           status: ticket.status,
           createdDate: new Date(ticket.created_at).toISOString(),
-          requesterEmpId: ticket.requester_codeempid,
+          requesterEmpId: ticket.requester_code,
+          // requesterEmpId: ticket.requester_codeempid,
           subject: ticket.subject
         })))
 

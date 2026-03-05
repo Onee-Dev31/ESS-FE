@@ -140,7 +140,9 @@
       </div>
 
       <div class="user-profile" (click)="$event.stopPropagation()">
-        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar" (click)="toggleProfile()" />
+        <img class="avatar" [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + userCodeEmp + '.jpg'"
+          (error)="onImgError($event)" (click)="toggleProfile()" />
+        <!-- <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar" (click)="toggleProfile()" /> -->
 
         <div class="profile-dropdown" *ngIf="isProfileOpen">
           <div class="dropdown-user-info">

@@ -20,10 +20,10 @@
         <div class="ticket-list">
             <div class="ticket-item" *ngFor="let ticket of Tickets()"
                 [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
-                <div class="avatar">
+                <!-- <div class="avatar">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
                         (error)="onImgError($event)" />
-                </div>
+                </div> -->
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
@@ -58,10 +58,10 @@
             <!-- HERO -->
             <section class="tk-hero">
                 <div class="tk-hero__left">
-                    <div class="avatar">
+                    <!-- <div class="avatar">
                         <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterEmpId + '.jpg'"
                             (error)="onImgError($event)" />
-                    </div>
+                    </div> -->
                     <div>
                         <div class="tk-hero__title">{{ t.subject }}</div>
                         <div class="tk-hero__sub">
@@ -184,7 +184,7 @@
         <!-- RIGHT: assignee/requester -->
         <aside class="tk-right" *ngIf="selectedTicket() as t">
             <div class="tk-right">
-                <section class="side-card requester">
+                <!-- <section class="side-card requester">
                     <div class="side-title">ผู้ขอใช้บริการ</div>
 
                     <div class="side-profile" *ngIf="t.requesterName;">
@@ -207,7 +207,7 @@
                     </div>
 
 
-                </section>
+                </section> -->
 
                 <section class="side-card">
 
@@ -225,7 +225,7 @@
                         <div class="side-profile no-assignee">
                             <div class="side-avatar empty">?</div>
                             <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
-                            <div class="side-email muted">กรุณากดรับเรื่อง</div>
+                            <!-- <div class="side-email muted">กรุณากดรับเรื่อง</div> -->
                         </div>
                     </ng-template>
 

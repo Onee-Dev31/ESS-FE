@@ -52,6 +52,7 @@ export class NavbarComponent {
   userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
 
+  userCodeEmp: any = ''
 
   searchQuery = signal('');
   isSearchFocused = signal(false);
@@ -84,6 +85,8 @@ export class NavbarComponent {
           }
         });
       });
+
+    this.userCodeEmp = this.authService.userData().CODEMPID
   }
 
 
@@ -216,5 +219,13 @@ export class NavbarComponent {
     this.isProfileOpen = false;
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
   }
 }

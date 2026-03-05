@@ -155,12 +155,12 @@
                             <div class="note__top">
                                 <div class="note__who">
                                     <div class="avatar">
-                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + n.employee.empCode + '.jpg'"
+                                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'"
                                             (error)="onImgError($event)" />
                                     </div>
                                     <div>
-                                        <b>{{ n.employee.name }}</b>
-                                        <div class="muted">{{ n.employee.role }}</div>
+                                        <b>{{ n.createBy.nickName }}</b>
+                                        <div class="muted">{{ n.createBy.role }}</div>
                                     </div>
                                 </div>
                                 <div class="muted"> @if (isToday(n.createdDate)) {
