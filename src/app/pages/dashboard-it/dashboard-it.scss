@@ -311,23 +311,23 @@ textarea.form-input {
     border-radius: 16px !important;
 }
 
-::ng-deep .ant-select {
-    width: 50% !important;
-}
+// ::ng-deep .ant-select {
+//     width: 50% !important;
+// }
 
-::ng-deep .ant-select-selector {
-    height: 25px !important;
-    border-radius: 10px !important;
-    border: 1px solid #d9d9d9 !important;
-    display: flex;
-    align-items: center;
-    padding: 0 12px !important;
-    transition: all 0.3s ease;
-}
+// ::ng-deep .ant-select-selector {
+//     height: 25px !important;
+//     border-radius: 10px !important;
+//     border: 1px solid #d9d9d9 !important;
+//     display: flex;
+//     align-items: center;
+//     padding: 0 12px !important;
+//     transition: all 0.3s ease;
+// }
 
-::ng-deep .ant-select-arrow {
-    margin-top: -4px;
-}
+// ::ng-deep .ant-select-arrow {
+//     margin-top: -4px;
+// }
 
 .tk-page {
     display: grid;

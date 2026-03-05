@@ -12,11 +12,12 @@ import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { AuthService } from '../../services/auth.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { finalize } from 'rxjs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-it-repair-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent, NzSelectModule],
   templateUrl: './it-repair-request.html',
   styleUrl: './it-repair-request.scss'
 })
@@ -54,11 +55,15 @@ export class ItRepairRequestComponent implements OnInit {
 
   phoneModel = '';
 
+  openForOptions = signal<any[]>([])
+  selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
+
   // MASTER
   deviceCategories: any[] = [];
 
   ngOnInit() {
     this.getDeviceCategory();
+    this.getOpenFor();
 
     const userData = this.authService.userData();
     if (userData?.USR_MOBILE) {
@@ -312,6 +317,17 @@ export class ItRepairRequestComponent implements OnInit {
         // console.log(res);
         this.deviceCategories = res.data
         this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+  getOpenFor() {
+    this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
+      next: (res) => {
+        console.log(res.data);
+        this.openForOptions.set(res.data)
       },
       error: (error) => {
         console.error('Error fetching data:', error);

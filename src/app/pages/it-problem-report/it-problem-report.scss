@@ -1318,6 +1318,12 @@ $table-label-bg: var(--border-toolbar);
         .field-input-col {
             display: flex;
             flex-direction: column;
+
+            &.select {
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                padding: 5px 10px 5px 10px;
+            }
         }
     }
 

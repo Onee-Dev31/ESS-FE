@@ -15,7 +15,8 @@
             </div>
         </div>
 
-        <div class="form-field-row">
+        <!-- Field: เปิดสิทธิ์ให้ -->
+        <div class="form-field-row" *ngIf="openBy === 'IT'">
             <div class="field-label-col">
                 <label class="field-label">
                     <i class="fa-solid fa-book-open-reader field-icon"></i>
@@ -23,7 +24,7 @@
                     <span class="required-badge">*</span>
                 </label>
             </div>
-            <div class="field-input-col">
+            <div class="field-input-col select">
                 <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
                     (ngModelChange)="selectedOpenFor.set($event)" name="openFor">
                     @for (opt of openForOptions(); track opt.value) {
@@ -32,21 +33,6 @@
                 </nz-select>
             </div>
         </div>
-        <!-- 
-         <div class="form-group">
-                <label class="form-label">
-                    <i class="fa-solid fa-book-open-reader"></i>
-                    เปิดสิทธิ์ให้ (Open For)
-                    <span class="required-badge">*</span></label>
-                <div class="input-pair-row">
-                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
-                        (ngModelChange)="selectedOpenFor.set($event)" name="openFor" class="form-control-select">
-                        @for (opt of openForOptions(); track opt.value) {
-                        <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
-                        }
-                    </nz-select>
-                </div>
-            </div> -->
 
         <!-- Field: หัวข้อ -->
         <div class="form-field-row">
