@@ -16,6 +16,25 @@
             </div>
         </div>
 
+        <!-- Field: เปิดสิทธิ์ให้ -->
+        <div class="form-field-row" *ngIf="openBy === 'IT'">
+            <div class="field-label-col">
+                <label class="field-label">
+                    <i class="fa-solid fa-book-open-reader field-icon"></i>
+                    เปิดสิทธิ์ให้ (Open For)
+                    <span class="required-badge">*</span>
+                </label>
+            </div>
+            <div class="field-input-col select">
+                <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
+                    (ngModelChange)="selectedOpenFor.set($event)" name="openFor">
+                    @for (opt of openForOptions(); track opt.value) {
+                    <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
+                    }
+                </nz-select>
+            </div>
+        </div>
+        
         <!-- Field: อุปกรณ์ -->
         <div class="form-field-row">
             <div class="field-label-col">
