@@ -26,55 +26,46 @@
         <!-- Left: Request Details -->
         <div class="request-details-panel">
 
-            <!-- Section 1: ข้อมูลผู้ขอสิทธิ์ -->
-            <div class="info-section">
-                <div class="section-header">
-                    <i class="fas fa-user-circle"></i>
-                    ข้อมูลผู้ขอสิทธิ์ <span class="sub">(Request For)</span>
-                </div>
-                <div class="section-content">
-                    <div class="info-row">
-                        <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
-                        <div class="info-value">{{ req.requestFor }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">เบอร์โทรติดต่อ</div>
-                        <div class="info-value">{{ req.phone }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">วันที่ขอ</div>
-                        <div class="info-value">{{ req.requestDate }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 2: บริการที่เลือก -->
+            @switch (req.ticketType) {
+            @case ('service') {
             <div class="info-section">
                 <div class="section-header">
                     <i class="fas fa-server"></i>
-                    บริการที่เลือก <span class="sub">(Selected Services)</span>
+                    รายละเอียดการขอใช้บริการ <span class="sub">(Service Request Details)</span>
                 </div>
                 <div class="section-content">
                     <div class="info-row">
-                        <div class="info-label">บริการ</div>
+                        <div class="info-label">เปิดสิทธิ์ให้</div>
+                        <div class="info-value highlight">{{ req.requestFor }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ประเภทบริการ</div>
                         <div class="info-value">
                             <span class="service-tag">
-                                <i class="fas fa-check-circle text-success"></i>
+                                <i class="fas fa-check-circle text-success mr-1"></i>
                                 {{ req.requestCategory }}
                             </span>
                         </div>
                     </div>
+                    <div class="info-row">
+                        <div class="info-label align-top">รายละเอียด</div>
+                        <div class="info-value">{{ req.detail || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">เบอร์โทรติดต่อ</div>
+                        <div class="info-value highlight">{{ req.phone }}</div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Section 3: ระบบที่เลือก -->
+            <!-- Section 3: ระบบที่เลือก (Moved from original service case) -->
+            @if (req.basicSystems && req.basicSystems.length || req.specificSystems && req.specificSystems.length) {
             <div class="info-section">
                 <div class="section-header">
                     <i class="fas fa-desktop"></i>
                     ระบบที่เลือก <span class="sub">(Selected Systems)</span>
                 </div>
                 <div class="section-content">
-                    @if (req.basicSystems.length) {
+                    @if (req.basicSystems && req.basicSystems.length) {
                     <div class="info-row">
                         <div class="info-label align-top">Basic Systems</div>
                         <div class="info-value">
@@ -86,7 +77,7 @@
                         </div>
                     </div>
                     }
-                    @if (req.specificSystems.length) {
+                    @if (req.specificSystems && req.specificSystems.length) {
                     <div class="info-row">
                         <div class="info-label align-top">Specific Systems</div>
                         <div class="info-value">
@@ -100,6 +91,52 @@
                     }
                 </div>
             </div>
+            }
+            }
+
+            @case ('repair') {
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-tools"></i>
+                    รายละเอียดการแจ้งซ่อม <span class="sub">(Repair Details)</span>
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">ชื่อขอผู้แจ้ง</div>
+                        <div class="info-value highlight">{{ req.requestFor }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ความประสงค์จะซ่อมอุปกรณ์</div>
+                        <div class="info-value">{{ req.device }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ยี่ห้อ / รุ่น</div>
+                        <div class="info-value">{{ req.brand || '-' }} / {{ req.model || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label align-top">ลักษณะอาการที่พบ</div>
+                        <div class="info-value">{{ req.symptom }}</div>
+                    </div>
+                    @if (req.attachments && req.attachments.length) {
+                    <div class="info-row">
+                        <div class="info-label align-top">ไฟล์แนบ</div>
+                        <div class="info-value">
+                            <ul class="attachment-list">
+                                @for (file of req.attachments; track file) {
+                                <li><i class="fas fa-paperclip"></i> {{ file }}</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    }
+                    <div class="info-row">
+                        <div class="info-label">เบอร์ติดต่อ</div>
+                        <div class="info-value highlight">{{ req.phone }}</div>
+                    </div>
+                </div>
+            </div>
+            }
+            }
 
         </div>
 
@@ -139,7 +176,7 @@
                     <i class="fas fa-eraser"></i> ล้างลายเซนต์
                 </button>
 
-                
+
 
                 <button class="btn-submit" (click)="submit()" [disabled]="!hasSignature() || isSubmitting()">
                     @if (isSubmitting()) {

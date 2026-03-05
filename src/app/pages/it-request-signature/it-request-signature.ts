@@ -8,36 +8,54 @@ import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
-interface MockRequestData {
+export type TicketType = 'repair' | 'service';
+
+export interface MockRequestData {
   requestNo: string;
   requestDate: string;
   requestFor: string;
   phone: string;
-  requestCategory: string;
-  basicSystems: string[];
-  specificSystems: string[];
+  ticketType: TicketType;
+  detail?: string;
+  attachments?: string[];
+
+  // Fields for 'service' (ขอใช้บริการ)
+  requestCategory?: string;
+  basicSystems?: string[];
+  specificSystems?: string[];
+
+  // Fields for 'repair' (แจ้งซ่อม)
+  device?: string;
+  brand?: string;
+  model?: string;
+  symptom?: string;
 }
 
 // Mock data - replace with API call later
 const MOCK_REQUESTS: MockRequestData[] = [
   {
-    requestNo: 'REQ-IT-2603-0004',
+    requestNo: 'REQ-SR-2603-0004',
     requestDate: '26/03/2025',
     requestFor: 'นาง สมบูรณ์ หูนสุข',
-    phone: '-',
+    phone: '081-000-0000',
+    ticketType: 'service',
     requestCategory: 'Account & Password (ขอรีเซ็ตรหัสผ่าน)',
+    detail: 'ขอรีเซ็ตรหัสผ่านเนื่องจากลืมรหัสผ่าน ไม่ได้เข้าใช้งานนาน',
     basicSystems: ['ห้องประชุม'],
     specificSystems: ['Oracle', 'BMS'],
   },
   {
-    requestNo: 'REQ-IT-2603-0005',
+    requestNo: 'REQ-RP-2603-0006',
     requestDate: '26/03/2025',
-    requestFor: 'นาย ทดสอบ ระบบ',
-    phone: '081-234-5678',
-    requestCategory: 'New Account (ขอสิทธิ์ระบบใหม่)',
-    basicSystems: ['Email', 'เครื่องพิมพ์'],
-    specificSystems: ['SAP'],
-  },
+    requestFor: 'น.ส. แจ้ง ซ่อม',
+    phone: '089-999-9999',
+    ticketType: 'repair',
+    device: 'Notebook',
+    brand: 'Dell',
+    model: 'Latitude 3420',
+    symptom: 'จอฟ้า เครื่องเปิดไม่ติด',
+    attachments: ['bsod.jpg']
+  }
 ];
 
 @Component({
