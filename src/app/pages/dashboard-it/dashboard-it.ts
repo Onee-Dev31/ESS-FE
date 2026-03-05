@@ -258,23 +258,45 @@ export class DashboardIT implements OnInit {
     }
   }
 
+  // toggleGroup(group: any) {
+  //   const allIn = group.members.every((m: string) => this.selectedAssigneeEmpCodes.includes(m));
+  //   if (allIn) {
+  //     // Remove all
+  //     this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => !group.members.includes(c));
+  //   } else {
+  //     // Add missing ones
+  //     group.members.forEach((m: string) => {
+  //       if (!this.selectedAssigneeEmpCodes.includes(m)) {
+  //         this.selectedAssigneeEmpCodes.push(m);
+  //       }
+  //     });
+  //   }
+  // }
+
   toggleGroup(group: any) {
-    const allIn = group.members.every((m: string) => this.selectedAssigneeEmpCodes.includes(m));
+
+    const memberIds = group.members.map((m: any) => m.id);
+
+    const allIn = memberIds.every((id: any) =>
+      this.selectedAssigneeEmpCodes.includes(id)
+    );
+
     if (allIn) {
-      // Remove all
-      this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => !group.members.includes(c));
+      // remove all members
+      this.selectedAssigneeEmpCodes =
+        this.selectedAssigneeEmpCodes.filter(id => !memberIds.includes(id));
     } else {
-      // Add missing ones
-      group.members.forEach((m: string) => {
-        if (!this.selectedAssigneeEmpCodes.includes(m)) {
-          this.selectedAssigneeEmpCodes.push(m);
+      // add missing members
+      memberIds.forEach((id: any) => {
+        if (!this.selectedAssigneeEmpCodes.includes(id)) {
+          this.selectedAssigneeEmpCodes.push(id);
         }
       });
     }
-  }
 
+  }
   isGroupSelected(group: any): boolean {
-    return group.members.every((m: string) => this.selectedAssigneeEmpCodes.includes(m));
+    return group.members.every((m: any) => this.selectedAssigneeEmpCodes.includes(m.id));
   }
 
   removeAssignee(empCode: string) {
@@ -287,6 +309,8 @@ export class DashboardIT implements OnInit {
       return;
     }
     const selectedNames = this.selectedAssigneeEmpCodes.join(', ');
+
+    console.log(selectedNames)
 
     // if (this.selectedTicket && this.selectedTicket.assignee) {
     //   this.selectedTicket.status = 'assigned'; // Update status

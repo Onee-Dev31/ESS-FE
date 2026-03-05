@@ -76,8 +76,6 @@ export class StatusColor_Reverse {
 
         const key = this.statusMap[status];
 
-        console.log(key)
-
         if (!key) {
             return {
                 background: 'rgba(158,158,158,0.2)',
