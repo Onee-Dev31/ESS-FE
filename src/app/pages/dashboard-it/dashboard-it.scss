@@ -1167,7 +1167,11 @@ textarea.form-input {
 
 /* ===== RIGHT ===== */
 .tk-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     gap: 10px;
+    min-height: 0;
 }
 
 .side-card {
@@ -1214,6 +1218,162 @@ textarea.form-input {
             font-weight: 600;
         }
     }
+
+    .timeline {
+        position: relative;
+        border-left: 3px solid #e4e6ef;
+        margin-left: 10px;
+        padding-left: 25px;
+        width: 95%;
+    }
+
+    /* item */
+    .timeline-item {
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+    /* icon */
+    .timeline-icon {
+        position: absolute;
+        left: -34px;
+        top: 6px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #cfcfcf;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #e4e6ef;
+    }
+
+    /* status */
+    .timeline-icon.done {
+        background: #22c55e;
+    }
+
+    .timeline-icon.active {
+        background: #f59e0b;
+    }
+
+    /* content card */
+    .timeline-content {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f1f1f1;
+    }
+
+
+    /* title */
+    .timeline-title {
+        font-weight: 600;
+        font-size: $font-size-label;
+    }
+
+    /* creator */
+    .timeline-title small {
+        font-size: 12px;
+        color: #8b8b8b;
+    }
+
+    /* assignee area */
+    .timeline-assignee {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    /* assignee item */
+    .assignee-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f7f9fc;
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid #e6e6e6;
+        transition: all 0.2s ease;
+
+        &:hover {
+            cursor: pointer;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    /* avatar */
+    .avatar img {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    /* name */
+    .name {
+        font-size: $font-size-hint;
+        font-weight: 500;
+    }
+
+    .assignee-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20000;
+    }
+
+    .assignee-card {
+        width: 280px;
+        background: var(--bg-card);
+        border-radius: 14px;
+        padding: 24px;
+        position: relative;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, .15);
+        text-align: center;
+    }
+
+    .assignee-profile .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 12px;
+    }
+
+    .assignee-profile h3 {
+        margin: 0;
+        font-size: 18px;
+        color: var(--text-header);
+    }
+
+    .emp-code {
+        font-size: 13px;
+        color: var(--text-sub);
+    }
+
+    .btn-close {
+        @include close-btn-style;
+        color: var(--text-muted);
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        flex-shrink: 0;
+
+        position: absolute;
+        top: 10px;
+        right: 12px;
+
+        &:hover {
+            background: var(--border-toolbar);
+            color: $danger;
+            transform: rotate(90deg);
+        }
+    }
 }
 
 .side-card.requester {
@@ -1223,7 +1383,21 @@ textarea.form-input {
     border: 1px solid rgba(15, 23, 42, .06);
     padding: 14px;
     height: fit-content;
+    flex-shrink: 0;
+}
 
+.side-card.assignee {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.side-card.assignee::-webkit-scrollbar {
+    display: none;
+    /* Chrome / Safari */
 }
 
 .side-title {
@@ -1260,8 +1434,6 @@ textarea.form-input {
     flex-direction: column;
     gap: 10px;
 }
-
-
 
 .sf {
     padding: 10px 10px;

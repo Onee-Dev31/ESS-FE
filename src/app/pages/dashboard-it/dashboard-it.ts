@@ -44,6 +44,9 @@ export class DashboardIT implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
+  isVisibleAssignee = signal<boolean>(false);
+  selectedAssignee = signal<any | undefined>(undefined);
+
   assigneeGroups: any[] = [];
   get filteredAssigneeGroups() {
     const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
@@ -116,25 +119,153 @@ export class DashboardIT implements OnInit {
         );
       }
 
-
-
       const ticket = res.ticket;
       const replies = res.replies;
       const services = res.services;
       const attachments = convertedFiles
-
-      // res.attachments.map((item: any) => ({
-      //   id: item.id,
-      //   ticketId: item.ticket_id,
-      //   fileName: item.file_name,
-      //   filePath: item.file_path,
-      //   fileType: item.file_type,
-      //   fileSize: item.file_size,
-      //   fileDescription: item.file_description,
-      //   uploadedByaAduser: item.uploaded_by_aduser,
-      //   created_date: item.created_at
-      // }));
       const assignGroups = res.assignGroups;
+
+      const mockAssignData_2: any = [
+        {
+          step: 1,
+          Assignee: [],
+          title: 'เปิดคำขอ',
+          description: 'เปิดคำขอ',
+          status: 'Open',
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo'
+          },
+          createdDate: new Date('2026-03-04T10:00:00').toISOString(),
+        },
+        {
+          step: 2,
+          title: 'ส่งต่อ',
+          description: 'ส่งต่อ',
+          status: 'Assigned',
+          Assignee: [
+            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
+            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
+          ],
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo'
+          },
+          createdDate: new Date('2026-03-04T10:10:00').toISOString(),
+        },
+        {
+          step: 3,
+          title: 'ส่งต่อ',
+          description: 'ส่งต่อ',
+          status: 'Assigned',
+          Assignee: [
+            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
+            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
+            { id: 3, fullName: 'ธนากร ดวงแก้ว', nickName: 'คอปเตอร์', empCode: 'OTD01125', adUser: 'thanakorndua', email: 'thanakorn.dua@onee.one', phone: '' },
+          ],
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo'
+          },
+          createdDate: new Date('2026-03-04T10:30:00').toISOString(),
+        },
+        {
+          step: 4,
+          title: 'กำลังดำเนินการ',
+          description: 'กำลังดำเนินการ',
+          status: 'In Progress',
+          Assignee: [],
+          createBy: {
+            fullName: 'ธนากร ดวงแก้ว',
+            nickName: 'คอปเตอร์',
+            empCode: 'OTD01125',
+            adUser: 'thanakorndua'
+          },
+          createdDate: new Date('2026-03-04T10:33:00').toISOString(),
+        },
+        {
+          step: 5,
+          title: 'ส่งต่อ',
+          description: 'ส่งต่อ',
+          status: 'Assigned',
+          Assignee: [
+            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
+            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
+            { id: 3, fullName: 'ธนากร ดวงแก้ว', nickName: 'คอปเตอร์', empCode: 'OTD01125', adUser: 'thanakorndua', email: 'thanakorn.dua@onee.one', phone: '' },
+            { id: 4, fullName: 'ธราดล แก้วอนันต์', nickName: 'ฟลุ๊ค', empCode: 'OTD01128', adUser: '"tharadolkae', email: 'tharadol.kae@onee.one', phone: '1237' },
+          ],
+          createBy: {
+            fullName: 'ธนากร ดวงแก้ว',
+            nickName: 'คอปเตอร์',
+            empCode: 'OTD01125',
+            adUser: 'thanakorndua'
+          },
+          createdDate: new Date('2026-03-04T10:48:00').toISOString(),
+        },
+        {
+          step: 6,
+          title: 'กำลังดำเนินการ',
+          description: 'กำลังดำเนินการ',
+          status: 'In Progress',
+          Assignee: [],
+          createBy: {
+            fullName: 'ธราดล แก้วอนันต์',
+            nickName: 'ฟลุ๊ค',
+            empCode: 'OTD01128',
+            adUser: '"tharadolkae'
+          },
+          createdDate: new Date('2026-03-04T10:50:00').toISOString(),
+        },
+        {
+          step: 7,
+          title: 'รอข้อมูลเพิ่มเติม',
+          description: 'รอข้อมูลเพิ่มเติม',
+          status: 'On Hold',
+          Assignee: [],
+          createBy: {
+            fullName: 'ธราดล แก้วอนันต์',
+            nickName: 'ฟลุ๊ค',
+            empCode: 'OTD01128',
+            adUser: '"tharadolkae'
+          },
+          createdDate: new Date('2026-03-04T12:00:00').toISOString(),
+        },
+        {
+          step: 8,
+          title: 'แก้ไขเสร็จสิ้น',
+          description: 'แก้ไขเสร็จสิ้น',
+          status: 'Resolved',
+          Assignee: [],
+          createBy: {
+            fullName: 'ธราดล แก้วอนันต์',
+            nickName: 'ฟลุ๊ค',
+            empCode: 'OTD01128',
+            adUser: '"tharadolkae'
+          },
+          createdDate: new Date('2026-03-05T17:05:32').toISOString(),
+        },
+        {
+          step: 9,
+          title: 'ปิดแล้ว',
+          description: 'ปิดแล้ว',
+          status: 'Closed',
+          Assignee: [],
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo'
+          },
+          createdDate: new Date('2026-03-05T17:30:03').toISOString(),
+        },
+      ];
+
 
       const objectData = {
         ticketId: ticket.id,
@@ -162,6 +293,7 @@ export class DashboardIT implements OnInit {
         assigneeAduser: '',
         assigneeEmail: '',
         assigneePhone: '',
+        assign: ticket.requester_code === 'OTD01050' ? mockAssignData_2 : []
       }
 
       console.log("selectedTicket:", objectData)
@@ -173,6 +305,15 @@ export class DashboardIT implements OnInit {
 
   }
 
+  selectAssignee(item: any) {
+    console.log(item)
+    this.isVisibleAssignee.set(true)
+    this.selectedAssignee.set(item)
+  }
+
+  closeAssignee() {
+    this.isVisibleAssignee.set(false)
+  }
   // filteredTickets(): TicketItem[] {
   //   const kw = (this.keyword ?? '').trim().toLowerCase();
 
