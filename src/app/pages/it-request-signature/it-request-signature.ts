@@ -117,7 +117,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       this.authService.initializeFromBackend().subscribe({
         next: (res) => {
           console.log('Magic login success:', res);
-
+          this.loadTicket(); 
           // ลบ magic param ออกจาก URL ให้สะอาด
           this.router.navigate([], {
             queryParams: { magic: null },
@@ -161,7 +161,42 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       attributeFilter: ['data-theme'],
     });
   }
+  private loadTicket() {
 
+    const ticket = this.authService.ticketDetail();
+
+    if (!ticket) {
+      this.isNotFound.set(true);
+      return;
+    }
+
+    this.requestNo.set(ticket.ticket_number);
+
+    const data: MockRequestData = {
+
+      requestNo: ticket.ticket_number,
+      requestDate: ticket.created_at,
+      requestFor: ticket.RequesterName,
+      phone: ticket.contact_phone,
+
+      ticketType: ticket.code === 'repair' ? 'repair' : 'service',
+
+      // repair
+      device: ticket.DeviceNameTH,
+      brand: ticket.brand,
+      model: ticket.model,
+      symptom: ticket.Tdescription,
+
+      // service
+      requestCategory: ticket.TicketTypeName,
+      basicSystems: ticket.basic,
+      specificSystems: ticket.specific,
+
+      attachments: ticket.attachments?.map((a: any) => a.file_name)
+    };
+
+    this.requestData.set(data);
+  }
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas || !this.ctx) return;
