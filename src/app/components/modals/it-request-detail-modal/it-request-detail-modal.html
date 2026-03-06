@@ -33,11 +33,13 @@
                 </div>
                 <div class="section-content">
                     <div class="info-row">
-                        <div class="info-label">บริการ</div>
+                        <div class="info-label">{{ requestTypeLabel }}</div>
                         <div class="info-value">
                             <span class="service-tag">
                                 <i class="fas fa-check-circle text-success mr-1"></i>
-                                {{ approvalItem.originalData?.requestCategory || approvalItem.requestType ||
+                                {{ approvalItem.originalData?.requestCategory ||
+                                approvalItem.originalData?.device?.name ||
+                                approvalItem.requestType ||
                                 'ขอใช้ระบบ' }}
                             </span>
                         </div>
@@ -45,8 +47,8 @@
                 </div>
             </div>
 
-            <!-- Section 3: ระบบที่เลือก (Selected Systems) -->
-            <div class="info-section">
+            <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
+            <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
                 <div class="section-header">
                     <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
                 </div>
@@ -71,6 +73,41 @@
                 </div>
             </div>
 
+            <!-- Section 4: รายละเอียดปัญหา (สำหรับแจ้งซ่อม/แจ้งปัญหา) -->
+            <div class="info-section" *ngIf="showAttachments">
+                <div class="section-header">
+                    <i class="fas fa-exclamation-circle"></i> รายละเอียดคำขอ
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">รายละเอียด</div>
+                        <div class="info-value">{{ approvalItem.originalData?.symptom ||
+                            approvalItem.originalData?.description || '-' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: ไฟล์แนบ (Attachments) -->
+            <div class="info-section" *ngIf="showAttachments && attachments.length > 0">
+                <div class="section-header">
+                    <i class="fas fa-paperclip"></i> ไฟล์แนบ (Attachments)
+                </div>
+                <div class="section-content">
+                    <div class="attachment-list">
+                        <div class="attachment-item" *ngFor="let file of attachments">
+                            <div class="file-info">
+                                <i class="fas" [ngClass]="getFileIcon(file.fileName)"></i>
+                                <span class="file-name">{{ file.fileName }}</span>
+                                <span class="file-size">({{ formatFileSize(file.fileSize) }})</span>
+                            </div>
+                            <button class="btn-view-file" (click)="viewFile(file)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="modal-footer">
@@ -80,3 +117,7 @@
 
     </div>
 </div>
+
+<!-- File Preview Modal Overlay -->
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>

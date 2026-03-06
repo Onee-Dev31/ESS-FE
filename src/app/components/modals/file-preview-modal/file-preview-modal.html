@@ -38,7 +38,8 @@
                         <ng-container [ngSwitch]="true">
                             <!-- Image View -->
                             <ng-container *ngSwitchCase="isImage(selectedFile)">
-                                <img [src]="selectedFile.url" class="preview-image" [alt]="selectedFile.fileName">
+                                <img [src]="selectedFile.url" class="preview-image" [alt]="selectedFile.fileName"
+                                    (error)="onPreviewError()">
                             </ng-container>
 
                             <!-- PDF View -->
@@ -50,10 +51,18 @@
                             <ng-container *ngSwitchDefault>
                                 <div class="mock-image">
                                     <i class="fas fa-file-alt fa-3x"></i>
-                                    <span>{{ selectedFile.fileName }}</span>
+                                    <p>{{ selectedFile.fileName }}</p>
+                                    <small class="text-sub">ไม่สามารถแสดงตัวอย่างไฟล์ประเภทนี้ได้</small>
                                 </div>
                             </ng-container>
                         </ng-container>
+
+                        <!-- Error Fallback -->
+                        <div class="mock-image error-fallback" *ngIf="hasError">
+                            <i class="fas fa-exclamation-triangle fa-3x text-warning"></i>
+                            <p>ไม่สามารถโหลดไฟล์ "{{ selectedFile.fileName }}" ได้</p>
+                            <small class="text-sub">ลิงก์ไฟล์อาจไม่ถูกต้องหรือไฟล์ถูกย้ายที่</small>
+                        </div>
                     </div>
                 </div>
             </div>
