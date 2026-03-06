@@ -308,7 +308,7 @@ export class DashboardIT implements OnInit {
         subject: ticket.subject,
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
-        status: ticket.status,
+        status: ticket.IT_Status,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
