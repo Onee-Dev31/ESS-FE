@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
 import { ChartMode, KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,41 +25,43 @@ type PieDatum = { name: string; value: number; key?: string };
   styleUrl: './it-dashboard-summary.scss',
 })
 export class ItDashboardSummary {
-  @Output() statusChange = new EventEmitter<StatusKey | null>();
+  @Output() statusChange = new EventEmitter<string | null>();
 
   // ===== KPI =====
-  activeStatus: StatusKey = 'all';
-  selectedStatus: StatusKey = 'all';
+  activeStatus: string = 'all';
+  selectedStatus: string = 'all';
   kpis: KpiCard[] = [
-    { key: 'open', title: 'Open tickets', value: 52, delta: 0, hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา', icon: 'inbox' },
-    { key: 'assigned', title: 'Assigned Tickets', value: 36, delta: 0, hint: 'Tickets ที่ได้รับมอบหมาย', icon: 'user' },
-    { key: 'inprocess', title: 'In Process Tickets', value: 41, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
-    { key: 'done', title: 'Closed Tickets', value: 45, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
-    { key: 'all', title: 'All Tickets', value: 174, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
+    { status: 'Open', title: 'Open tickets', value: 0, delta: 0, hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา', icon: 'inbox' },
+    { status: 'Assigned', title: 'Assigned Tickets', value: 0, delta: 0, hint: 'Tickets ที่ได้รับมอบหมาย', icon: 'user' },
+    { status: 'In Progress', title: 'In Process Tickets', value: 0, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
+    { status: 'Closed', title: 'Closed Tickets', value: 0, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
+    { status: 'All', title: 'All Tickets', value: 0, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
   ];
   showDeptBar = false;
   selectedCompany: string | null = null;
 
   deptBarOption: EChartsOption = {};
-  trackByKey = (_: number, x: KpiCard) => x.key;
-  // ===== ECharts Options =====
+  trackByStatus(index: number, item: KpiCard) {
+    return item.status;
+  }
   statusPieOption!: EChartsOption;
   servicePieOption!: EChartsOption;
   companyBarOption!: EChartsOption;
   private statusChart?: ECharts;
 
   // map key -> index ใน pie (ต้องตรงกับ data ที่ใส่ใน option)
-  private statusIndexMap: Record<StatusKey, number> = {
+  private statusIndexMap: Record<string, number> = {
     open: 0,
     assigned: 1,
-    inprocess: 2,
+    inprogress: 2,
     done: 3,
     all: -1
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
 
   constructor(
-    private itServiceService: ItServiceService
+    private itServiceService: ItServiceService,
+    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
@@ -74,7 +76,7 @@ export class ItDashboardSummary {
   private updateKpis(summary: any) {
     this.kpis = [
       {
-        key: 'open',
+        status: 'open',
         title: 'Open tickets',
         value: summary.open ?? 0,
         delta: 0,
@@ -82,7 +84,7 @@ export class ItDashboardSummary {
         icon: 'inbox'
       },
       {
-        key: 'assigned',
+        status: 'assigned',
         title: 'Assigned Tickets',
         value: summary.assigned ?? 0,
         delta: 0,
@@ -90,7 +92,7 @@ export class ItDashboardSummary {
         icon: 'user'
       },
       {
-        key: 'inprocess',
+        status: 'inprogress',
         title: 'In Process Tickets',
         value: summary.inProcess ?? 0,
         delta: 0,
@@ -98,7 +100,7 @@ export class ItDashboardSummary {
         icon: 'sync'
       },
       {
-        key: 'done',
+        status: 'done',
         title: 'Closed Tickets',
         value: summary.closed ?? 0,
         delta: 0,
@@ -106,7 +108,7 @@ export class ItDashboardSummary {
         icon: 'check-circle'
       },
       {
-        key: 'all',
+        status: 'all',
         title: 'All Tickets',
         value: summary.all ?? 0,
         delta: 0,
@@ -120,7 +122,7 @@ export class ItDashboardSummary {
     const data: PieDatum[] = [
       { name: 'Open', value: summary.open ?? 0, key: 'open' },
       { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
-      { name: 'In Process', value: summary.inProcess ?? 0, key: 'inprocess' },
+      { name: 'In Process', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' }
     ];
 
@@ -335,15 +337,14 @@ export class ItDashboardSummary {
     };
   }
   getAllTotal(): number {
-    return this.kpis.find(x => x.key === 'all')?.value ?? 0;
+    return this.kpis.find(x => x.status === 'all')?.value ?? 0;
   }
 
   getPercent(k: KpiCard): number {
     const total = this.getAllTotal();
-    if (!total || k.key === 'all') return 100;
-    return Math.round((k.value / total) * 100); // หรือ toFixed(1) ก็ได้
+    if (!total || k.status === 'all') return 100;
+    return Math.round((k.value / total) * 100);
   }
-
   onStatusChartInit(ec: any) {
     this.statusChart = ec;
 
@@ -356,7 +357,7 @@ export class ItDashboardSummary {
     if (key) this.selectStatus(key);
   }
 
-  selectStatus(k: StatusKey) {
+  selectStatus(k: string) {
     this.activeStatus = k;
     this.selectedStatus = k;
     this.statusChange.emit(k);
@@ -368,7 +369,7 @@ export class ItDashboardSummary {
     this.applyStatusCenter(k);
   }
 
-  private highlightStatusSlice(k: StatusKey) {
+  private highlightStatusSlice(k: string) {
     if (!this.statusChart) return;
 
     // ล้าง highlight ทุกอันก่อน
@@ -394,7 +395,7 @@ export class ItDashboardSummary {
     }
   }
 
-  private applyStatusCenter(k: StatusKey) {
+  private applyStatusCenter(k: string) {
     const data = (this.statusPieOption?.series as any)?.[0]?.data as any[] | undefined;
     if (!data?.length) return;
 
@@ -513,7 +514,7 @@ export class ItDashboardSummary {
         this.buildServicePie(res.serviceTypes);
         this.buildDeptTop5Map(res.topDepartments);
         this.buildCompanyBar(res.topCompanies);
-
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching data:', error);

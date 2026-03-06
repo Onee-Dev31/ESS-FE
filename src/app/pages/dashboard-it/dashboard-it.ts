@@ -65,7 +65,7 @@ export class DashboardIT implements OnInit {
   keyword = '';
   TicketStatus: any;
 
-  filterStatus: StatusKey | null = 'all';
+  filterStatus: string | null = 'all';
 
   selectedId = 1;
   isAssignModalVisible = false;
@@ -90,7 +90,7 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false)
   }
 
-  onStatusChange(status: StatusKey | null) {
+  onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
     // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
   }
@@ -475,7 +475,7 @@ export class DashboardIT implements OnInit {
       this.selectedAssigneeEmpCodes.some(e => e.id === m.id)
     );
   }
-  
+
   isSelected(empId: string): boolean {
     return this.selectedAssigneeEmpCodes.some(e => e.id === empId);
   }
