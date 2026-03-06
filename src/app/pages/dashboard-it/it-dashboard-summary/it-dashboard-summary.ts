@@ -33,7 +33,7 @@ export class ItDashboardSummary {
   kpis: KpiCard[] = [
     { status: 'Open', title: 'Open tickets', value: 0, delta: 0, hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา', icon: 'inbox' },
     { status: 'Assigned', title: 'Assigned Tickets', value: 0, delta: 0, hint: 'Tickets ที่ได้รับมอบหมาย', icon: 'user' },
-    { status: 'In Progress', title: 'In Process Tickets', value: 0, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
+    { status: 'In Progress', title: 'In Progress Tickets', value: 0, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
     { status: 'Closed', title: 'Closed Tickets', value: 0, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
     { status: 'All', title: 'All Tickets', value: 0, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
   ];
@@ -93,7 +93,7 @@ export class ItDashboardSummary {
       },
       {
         status: 'inprogress',
-        title: 'In Process Tickets',
+        title: 'In Progress Tickets',
         value: summary.inProcess ?? 0,
         delta: 0,
         hint: 'Tickets ที่กำลังดำเนินการ',
@@ -122,7 +122,7 @@ export class ItDashboardSummary {
     const data: PieDatum[] = [
       { name: 'Open', value: summary.open ?? 0, key: 'open' },
       { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
-      { name: 'In Process', value: summary.inProcess ?? 0, key: 'inprogress' },
+      { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' }
     ];
 

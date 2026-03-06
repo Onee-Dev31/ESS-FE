@@ -33,7 +33,7 @@
         </div>
 
         <div class="ticket-list">
-            <div class="ticket-item" *ngFor="let ticket of Tickets()"
+            <div class="ticket-item" *ngFor="let ticket of filteredTickets()"
                 [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
                 <div class="avatar">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
@@ -74,7 +74,7 @@
             <section class="tk-hero">
                 <div class="tk-hero__left">
                     <div class="avatar">
-                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterEmpId + '.jpg'"
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
                             (error)="onImgError($event)" />
                     </div>
                     <div>
@@ -187,7 +187,7 @@
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
                     deny
                 </button>
-                <ng-container *ngIf="!t.assigneeName">
+                <ng-container *ngIf="t.status !== 'Closed'">
                     <button class="btn btn-accept" (click)="acknowledgeTicket()" *ngIf="t.status !== 'In Progress'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง

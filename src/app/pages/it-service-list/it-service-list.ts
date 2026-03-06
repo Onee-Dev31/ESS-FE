@@ -83,7 +83,7 @@ export class ItService implements OnInit {
         subject: ticket.subject,
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
-        status: ticket.status,
+        status: ticket.IT_Status === null ? ticket.user_status : 'In Progress',
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -178,9 +178,10 @@ export class ItService implements OnInit {
     }
   }
 
-  statusLabel(s: StatusKey) {
+  statusLabel(s: any) {
+    console.log(s)
     switch (s) {
-      case 'inprocess': return 'In Process Tickets';
+      case 'inprocess': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';
@@ -273,7 +274,7 @@ export class ItService implements OnInit {
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
           ticketType: ticket.ticket_type_name_th,
-          status: ticket.status,
+          status: ticket.IT_Status === null ? ticket.user_status : 'In Progress',
           createdDate: new Date(ticket.created_at).toISOString()
         })))
       },

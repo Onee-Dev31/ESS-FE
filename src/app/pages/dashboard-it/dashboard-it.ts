@@ -97,7 +97,8 @@ export class DashboardIT implements OnInit {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
     console.log("filterStatus : ", this.filterStatus);
 
-    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+    this.filteredTickets();
+    // หรือเรียก filterStatus(status) ของคุณ
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -307,7 +308,7 @@ export class DashboardIT implements OnInit {
         subject: ticket.subject,
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
-        status: ticket.status,
+        status: ticket.IT_Status,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -349,21 +350,30 @@ export class DashboardIT implements OnInit {
     this.isVisibleAssignee.set(false)
   }
 
-  filteredTickets(): TicketItem[] {
+  filteredTickets(): any[] {
     const kw = (this.keyword ?? '').trim().toLowerCase();
 
+    const statusMap: any = {
+      open: 'Open',
+      assigned: 'Assigned',
+      inprogress: 'In Progress',
+      done: 'Closed'
+    };
+
+    const mappedStatus = statusMap[this.filterStatus ?? ''];
+
     return this.Tickets().filter((t: any) => {
-      const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
+      const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
       const matchKw = !kw
         ? true
-        : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
+        : (t.ticketNumber.toLowerCase().includes(kw) || t.subject.toLowerCase().includes(kw));
       return matchStatus && matchKw;
     });
   }
 
   statusLabel(s: string) {
     switch (s) {
-      case 'inprogress': return 'In Process Tickets';
+      case 'inprogress': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';
