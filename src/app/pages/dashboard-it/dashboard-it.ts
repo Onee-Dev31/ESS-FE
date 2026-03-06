@@ -97,7 +97,8 @@ export class DashboardIT implements OnInit {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
     console.log("filterStatus : ", this.filterStatus);
 
-    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+    this.filteredTickets();
+    // หรือเรียก filterStatus(status) ของคุณ
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -349,14 +350,24 @@ export class DashboardIT implements OnInit {
     this.isVisibleAssignee.set(false)
   }
 
-  filteredTickets(): TicketItem[] {
+  filteredTickets(): any[] {
     const kw = (this.keyword ?? '').trim().toLowerCase();
 
+    const statusMap: any = {
+      open: 'Open',
+      assigned: 'Assigned',
+      inprogress: 'In Progress',
+      done: 'Closed'
+    };
+
+    const mappedStatus = statusMap[this.filterStatus ?? ''];
+
+
     return this.Tickets().filter((t: any) => {
-      const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
+      const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
       const matchKw = !kw
         ? true
-        : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
+        : (t.ticketNumber.toLowerCase().includes(kw) || t.subject.toLowerCase().includes(kw));
       return matchStatus && matchKw;
     });
   }
