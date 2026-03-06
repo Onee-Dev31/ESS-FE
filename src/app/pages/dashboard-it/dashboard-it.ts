@@ -362,7 +362,6 @@ export class DashboardIT implements OnInit {
 
     const mappedStatus = statusMap[this.filterStatus ?? ''];
 
-
     return this.Tickets().filter((t: any) => {
       const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
       const matchKw = !kw

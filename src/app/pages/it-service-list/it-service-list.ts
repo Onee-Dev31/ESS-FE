@@ -273,7 +273,6 @@ export class ItService implements OnInit {
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
           ticketType: ticket.ticket_type_name_th,
-          status: ticket.status,
           createdDate: new Date(ticket.created_at).toISOString()
         })))
       },

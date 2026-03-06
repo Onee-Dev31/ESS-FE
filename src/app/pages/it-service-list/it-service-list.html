@@ -43,8 +43,9 @@
                     </div>
                     <div class="ticket-footer">
                         <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
-                        <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
-                            <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
+                        <span class="ticket-status-inline"
+                            [ngStyle]="StatusColor.getStyle( ticket.IT_Status === null ? ticket.user_status : 'In Progress')">
+                            <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status === null ? ticket.user_status : 'In Progress'}}
                         </span>
                     </div>
                 </div>
