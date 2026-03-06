@@ -7,6 +7,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { TicketService } from '../../services/ticket.service';
 
 export type TicketType = 'repair' | 'service';
 
@@ -81,54 +82,58 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   hasSignature = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
   signerName = signal<string>('');
+  signatureImage = signal<string | null>(null);
 
   private ctx!: CanvasRenderingContext2D;
   private isDrawing = false;
   private lastX = 0;
   private lastY = 0;
+  
+  private ticketService = inject(TicketService);
 
   private authService = inject(AuthService);
   private router = inject(Router);
 
   currentApprover = signal<string>('');
-
+  
   ngOnInit() {
-    const no = this.route.snapshot.queryParamMap.get('requestNo') ?? '';
+
+    const ticket = this.route.snapshot.queryParamMap.get('ticket');
     const magic = this.route.snapshot.queryParamMap.get('magic');
 
-    this.requestNo.set(no);
-
-    if (no) {
-      const found = MOCK_REQUESTS.find(r => r.requestNo === no);
-      if (found) {
-        this.requestData.set(found);
-      } else {
-        this.isNotFound.set(true);
-      }
-    } else {
-      this.requestData.set(MOCK_REQUESTS[0]);
-      this.requestNo.set(MOCK_REQUESTS[0].requestNo);
-    }
-
-    // ============================================
-    // 🔥 Magic Login ทำงานเฉพาะตอน ?magic=1 เท่านั้น
-    // ============================================
     if (magic === '1') {
+
       this.authService.initializeFromBackend().subscribe({
-        next: (res) => {
-          console.log('Magic login success:', res);
-          this.loadTicket(); 
-          // ลบ magic param ออกจาก URL ให้สะอาด
+        next: () => {
+
+          const user = this.authService.userData();
+
+          if (user) {
+            const fullName =
+              `${user.TITLETHAI ?? ''}${user.NAMFIRSTT ?? ''} ${user.NAMLASTT ?? ''}`;
+
+            this.signerName.set(fullName.trim());
+          }
+
+          if (ticket) {
+            this.loadTicket(ticket);
+          }
+
           this.router.navigate([], {
             queryParams: { magic: null },
             queryParamsHandling: 'merge'
           });
+
         },
         error: () => {
-          console.warn('Magic login failed');
           this.router.navigate(['/login']);
         }
       });
+
+      return;
+    }
+    if (ticket) {
+      this.loadTicket(ticket);
     }
   }
 
@@ -161,41 +166,53 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       attributeFilter: ['data-theme'],
     });
   }
-  private loadTicket() {
+  private loadTicket(ticketNumber: string) {
 
-    const ticket = this.authService.ticketDetail();
+    this.ticketService.getTicket(ticketNumber)
+      .subscribe({
+        next: (ticket) => {
 
-    if (!ticket) {
-      this.isNotFound.set(true);
-      return;
-    }
+          if (ticket.NameApprover) {
+            this.signerName.set(ticket.NameApprover);
+          }
 
-    this.requestNo.set(ticket.ticket_number);
+          if (ticket.APSignature) {
+            this.signatureImage.set(ticket.APSignature);
+            this.hasSignature.set(true);
+          }
 
-    const data: MockRequestData = {
+          this.requestNo.set(ticket.ticket_number);
 
-      requestNo: ticket.ticket_number,
-      requestDate: ticket.created_at,
-      requestFor: ticket.RequesterName,
-      phone: ticket.contact_phone,
+          const data: MockRequestData = {
 
-      ticketType: ticket.code === 'repair' ? 'repair' : 'service',
+            requestNo: ticket.ticket_number,
+            requestDate: ticket.created_at,
+            requestFor: ticket.RequesterName,
+            phone: ticket.contact_phone,
 
-      // repair
-      device: ticket.DeviceNameTH,
-      brand: ticket.brand,
-      model: ticket.model,
-      symptom: ticket.Tdescription,
+            ticketType: ticket.code === 'repair'
+              ? 'repair'
+              : 'service',
 
-      // service
-      requestCategory: ticket.TicketTypeName,
-      basicSystems: ticket.basic,
-      specificSystems: ticket.specific,
+            device: ticket.DeviceNameTH,
+            brand: ticket.brand,
+            model: ticket.model,
+            symptom: ticket.Tdescription,
 
-      attachments: ticket.attachments?.map((a: any) => a.file_name)
-    };
+            requestCategory: ticket.TicketTypeName,
+            basicSystems: ticket.basic,
+            specificSystems: ticket.specific,
 
-    this.requestData.set(data);
+            attachments: ticket.attachments?.map((a:any)=>a.file_name)
+          };
+
+          this.requestData.set(data);
+
+        },
+        error: () => {
+          this.isNotFound.set(true);
+        }
+      });
   }
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;

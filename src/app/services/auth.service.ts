@@ -41,14 +41,12 @@ export class AuthService {
     private _isLoggedIn = signal<boolean>(localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true');
     private _userData = signal<any | null>(this.getStoredUser());
 
-    private _ticketDetail = signal<any | null>(this.getStoredTicket());
 
 
     currentUser = this._currentUser.asReadonly();
     userRole = this._userRole.asReadonly();
     isLoggedIn = this._isLoggedIn.asReadonly();
     userData = this._userData.asReadonly();
-    ticketDetail = this._ticketDetail.asReadonly();
 
     readonly userPhone = computed(() => {
         const user = this._userData();
@@ -68,16 +66,6 @@ export class AuthService {
 
     private getStoredUser(): any | null {
         const data = localStorage.getItem(STORAGE_KEYS.USER_DATA);
-        if (!data) return null;
-
-        try {
-            return JSON.parse(data);
-        } catch {
-            return null;
-        }
-    }
-    private getStoredTicket(): any | null {
-        const data = localStorage.getItem(STORAGE_KEYS.TICKET_DETAIL);
         if (!data) return null;
 
         try {
@@ -122,13 +110,13 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEYS.ALL_DATA);
         localStorage.removeItem(STORAGE_KEYS.USER_DATA);
 
-        localStorage.removeItem(STORAGE_KEYS.TICKET_DETAIL)
+        // localStorage.removeItem(STORAGE_KEYS.TICKET_DETAIL)
 
         this._isLoggedIn.set(false);
         this._currentUser.set(null);
         this._userRole.set(null);
         this._userData.set(null);
-        this._ticketDetail.set(null);
+        // this._ticketDetail.set(null);
 
         this.refreshAllMockData();
     }
@@ -182,18 +170,11 @@ export class AuthService {
             localStorage.setItem(STORAGE_KEYS.CURRENT_USER, res.adUser || '');
             localStorage.setItem(STORAGE_KEYS.USER_ROLE, res.permission?.Role || '');
             localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(res.employee) || '');
-            if (res.ticketDetail) {
-                localStorage.setItem(
-                    STORAGE_KEYS.TICKET_DETAIL,
-                    JSON.stringify(res.ticketDetail)
-                );
-            }
 
             this._isLoggedIn.set(true);
             this._currentUser.set(res.adUser);
             this._userRole.set(res.permission?.Role);
             this._userData.set(res.employee);
-            this._ticketDetail?.set?.(res.ticketDetail);
             }),
             catchError(() => {
                 // ถ้า 401 ไม่ต้องทำอะไรเลย

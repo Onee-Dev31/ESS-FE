@@ -13,8 +13,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
             let errorMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์';
+            const isMagicLogin = window.location.search.includes('magic=1');
 
-            if (error.status === 401) {
+            if (error.status === 401 && !isMagicLogin) {
                 errorMessage = 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่';
                 authService.logout();
                 router.navigate(['/login']);

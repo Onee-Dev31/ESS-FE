@@ -148,6 +148,23 @@
             </div>
 
             <div class="canvas-wrapper" [class.has-signature]="hasSignature()">
+                <!-- @if (signatureImage()) {
+                    <div class="signature-preview">
+                        <img [src]="signatureImage()" />
+                    </div>
+                } @else {
+                    <canvas #signatureCanvas class="signature-canvas"(mousedown)="startDrawing($event)" (mousemove)="draw($event)" 
+                     (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()" (touchstart)="startDrawing($event)" 
+                     (touchmove)="draw($event)" (touchend)="stopDrawing()">
+                    </canvas>
+                    @if (!hasSignature()) {
+                        <div class="canvas-placeholder">
+                            <i class="fas fa-signature"></i>
+                            <span>เซนชื่อในพื้นที่นี้</span>
+                        </div>
+                    }
+                } -->
+                    
                 <canvas #signatureCanvas class="signature-canvas" (mousedown)="startDrawing($event)"
                     (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
                     (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()">
@@ -165,7 +182,7 @@
                 <div class="name-input-wrapper">
                     <i class="fas fa-user name-icon"></i>
                     <input type="text" class="signer-name-input" placeholder="ชื่อ - นามสกุลเต็ม" [value]="signerName()"
-                        (input)="signerName.set($any($event.target).value)" />
+                        (input)="signerName.set($any($event.target).value)" [readonly]="!!signatureImage()"/>
                 </div>
                 <div class="name-label">ชื่อ - นามสกุลผู้อนุมัติ</div>
             </div>
