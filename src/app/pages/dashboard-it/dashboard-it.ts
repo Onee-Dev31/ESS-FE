@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
-import { tickets } from '../../utils/it-dashboard-mock';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../../services/auth.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -18,6 +17,7 @@ import dayjs from 'dayjs';
 import { ItProblemReportComponent } from "../it-problem-report/it-problem-report";
 import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request";
 import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
+import { tickets } from '../../utils/it-dashboard-mock';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -92,7 +92,9 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+    console.log("filterStatus : ", this.filterStatus);
+
+    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -343,21 +345,22 @@ export class DashboardIT implements OnInit {
   closeAssignee() {
     this.isVisibleAssignee.set(false)
   }
-  // filteredTickets(): TicketItem[] {
-  //   const kw = (this.keyword ?? '').trim().toLowerCase();
 
-  //   return this.tickets.filter(t => {
-  //     const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
-  //     const matchKw = !kw
-  //       ? true
-  //       : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
-  //     return matchStatus && matchKw;
-  //   });
-  // }
+  filteredTickets(): TicketItem[] {
+    const kw = (this.keyword ?? '').trim().toLowerCase();
 
-  statusLabel(s: StatusKey) {
+    return this.Tickets().filter((t: any) => {
+      const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
+      const matchKw = !kw
+        ? true
+        : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
+      return matchStatus && matchKw;
+    });
+  }
+
+  statusLabel(s: string) {
     switch (s) {
-      case 'inprocess': return 'In Process Tickets';
+      case 'inprogress': return 'In Process Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';
