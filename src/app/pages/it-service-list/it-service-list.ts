@@ -83,7 +83,7 @@ export class ItService implements OnInit {
         subject: ticket.subject,
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
-        status: ticket.IT_Status === null ? ticket.user_status : 'In Progress',
+        status: ticket.IT_Status === null ? ticket.user_status : ticket.IT_Status === 'Closed' ? 'Closed' : 'In Progress',
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -274,7 +274,7 @@ export class ItService implements OnInit {
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
           ticketType: ticket.ticket_type_name_th,
-          status: ticket.IT_Status === null ? ticket.user_status : 'In Progress',
+          status: ticket.IT_Status === null ? ticket.user_status : ticket.IT_Status === 'Closed' ? 'Closed' : 'In Progress',
           createdDate: new Date(ticket.created_at).toISOString()
         })))
       },
