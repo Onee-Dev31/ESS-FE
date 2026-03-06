@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { ItProblemReportComponent } from "../it-problem-report/it-problem-report";
 import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request";
 import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
+import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
 
 @Component({
@@ -35,6 +36,9 @@ import { tickets } from '../../utils/it-dashboard-mock';
 export class DashboardIT implements OnInit {
 
   private itServiceService = inject(ItServiceService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
+
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
@@ -74,7 +78,6 @@ export class DashboardIT implements OnInit {
 
   constructor(
     private msg: NzMessageService,
-    private auth: AuthService,
     private sanitizer: DomSanitizer
   ) { }
 
@@ -401,7 +404,7 @@ export class DashboardIT implements OnInit {
   }
 
   acknowledgeTicket() {
-    const user = this.auth.userData();
+    const user = this.authService.userData();
     // console.log(user)
     this.IS_ACKNOWLEDGE_TICKET.set(true)
     // if (this.selectedTicket && user) {
@@ -433,7 +436,9 @@ export class DashboardIT implements OnInit {
   }
 
   toggleAssignee(emp: any) {
-    const idx = this.selectedAssigneeEmpCodes.indexOf(emp.id);
+    const idx = this.selectedAssigneeEmpCodes.findIndex(e => e.id === emp.id);
+
+    console.log(this.selectedAssigneeEmpCodes, idx);
     if (idx > -1) {
       this.selectedAssigneeEmpCodes.splice(idx, 1);
     } else {
@@ -497,7 +502,34 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    console.log(this.selectedAssigneeEmpCodes)
+    console.log(this.authService.userData())
+
+    const assignees = JSON.stringify(
+      this.selectedAssigneeEmpCodes.map(x => ({
+        aduser: x.adUser.toLowerCase()
+      }))
+    );
+
+    console.log(assignees, this.selectedTicket())
+
+
+    this.itServiceService.updateAssigneesTicket({
+      id: this.selectedTicket().ticketId,
+      listAssignee: assignees || [],
+      createby: (this.authService.userData().AD_USER).toLowerCase()
+    }).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (res.success) {
+          this.swalService.success(res.message)
+          this.selectTicket(res.ticketId)
+          this.getAllTickets();
+        }
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    })
 
     // if (this.selectedTicket && this.selectedTicket.assignee) {
     //   this.selectedTicket.status = 'assigned'; // Update status
@@ -663,7 +695,7 @@ export class DashboardIT implements OnInit {
             groupMap[r.group_id].members.push({
               id: r.id,
               name: r.display_name,
-
+              adUser: r.AD_USER
             });
           }
         });
