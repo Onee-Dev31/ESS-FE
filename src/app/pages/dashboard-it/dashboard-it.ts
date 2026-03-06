@@ -363,7 +363,7 @@ export class DashboardIT implements OnInit {
 
   statusLabel(s: string) {
     switch (s) {
-      case 'inprogress': return 'In Process Tickets';
+      case 'inprogress': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';

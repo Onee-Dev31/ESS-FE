@@ -180,7 +180,7 @@ export class ItService implements OnInit {
 
   statusLabel(s: StatusKey) {
     switch (s) {
-      case 'inprocess': return 'In Process Tickets';
+      case 'inprocess': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';

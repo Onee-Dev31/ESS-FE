@@ -7,7 +7,7 @@
             <div class="kpi-title">{{ k.title }}</div>
 
             <span class="kpi-pill" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
-                [class.pill-orange]="k.status==='inprocess'" [class.pill-green]="k.status==='done'"
+                [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
                 [class.pill-gray]="k.status==='all'">
                 <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
             </span>
@@ -17,7 +17,7 @@
             {{ k.value | number }}
             <span>
                 <div class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
-                    [class.pill-orange]="k.status==='inprocess'" [class.pill-green]="k.status==='done'"
+                    [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
                     [class.pill-gray]="k.status==='all'">
                     <span>{{ getPercent(k) }}%</span>
                 </div>
