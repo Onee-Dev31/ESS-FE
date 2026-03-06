@@ -184,7 +184,7 @@
 
         <div class="pagination-wrapper">
             <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-                [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
+                [totalItems]="totalItems()" (onPageChange)="goToPage($event)"
                 (onPageSizeChange)="setPageSize($event)">
             </app-pagination>
         </div>

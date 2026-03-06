@@ -55,9 +55,17 @@ export class ApprovalItRequestComponent implements OnInit {
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+  totalItems = signal<number>(0);
 
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
+
+  statusCounts = signal<any>({
+    Pending: 0,
+    Approved: 0,
+    Rejected: 0,
+    ReferredBack: 0
+  });
 
   pageTitle = signal<string>('IT Request Approvals');
   showExportMenu = signal<boolean>(false);
@@ -75,29 +83,33 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   refresh() {
+
     this.loadingService.start('approvals-it-list');
 
-    this.itService.getApprovalItRequests().subscribe({
-      next: (data: any[]) => {
-        // Map raw IT Request data to ApprovalItem interface
-        const mappedData: ApprovalItem[] = (data || []).map(item => this.mapToApprovalItem(item));
+    const page = this.listing.currentPage() + 1;
+    const pageSize = this.listing.pageSize();
+
+    this.itService.getApprovalItRequests({
+      page,
+      pageSize
+    })
+    .subscribe({
+      next: (res) => {
+
+        const mappedData =
+          (res.data || []).map((item:any) => this.mapToApprovalItem(item));
+
         this.approvals.set(mappedData);
+
+        this.totalItems.set(res.total);
+
+        if(res.statusSummary){
+          this.statusCounts.set(res.statusSummary);
+        }
+
         this.loadingService.stop('approvals-it-list');
-      },
-      error: (err) => {
-        this.errorService.handle(err, { component: 'ApprovalItRequest', action: 'fetch-data' });
-        this.loadingService.stop('approvals-it-list');
-        // Handle mock or empty state for now if API fails
-        this.approvals.set([]);
       }
     });
-
-    // Fallback stop in case of no response
-    setTimeout(() => {
-      if (this.loadingService.isLoading('approvals-it-list')) {
-        this.loadingService.stop('approvals-it-list');
-      }
-    }, 5000);
   }
 
   private mapToApprovalItem(item: any): ApprovalItem {
@@ -111,6 +123,7 @@ export class ApprovalItRequestComponent implements OnInit {
         department: item.requester?.department || item.requestBy?.department || '-',
         company: item.requester?.company || item.requestBy?.company || 'Onee',
         position: '-',
+        phone: item.requester?.phone || '-',
         profileImage: 'assets/images/user-placeholder.png'
       },
       requestType: 'IT Request',
@@ -128,13 +141,13 @@ export class ApprovalItRequestComponent implements OnInit {
     this.approvals,
     this.listing,
     (item, search, status) => {
+
       const matchStatus = !status || item.status === status;
+
       const matchSearch = !search ||
         item.requestNo.toLowerCase().includes(search.toLowerCase()) ||
-        item.requestBy.name.toLowerCase().includes(search.toLowerCase()) ||
-        (item.originalData?.requestFor || '').toLowerCase().includes(search.toLowerCase()) ||
-        (item.originalData?.requestCategory || '').toLowerCase().includes(search.toLowerCase()) ||
-        item.requestDetail.toLowerCase().includes(search.toLowerCase());
+        item.requestBy.name.toLowerCase().includes(search.toLowerCase());
+
       return matchStatus && matchSearch;
     }
   );
@@ -176,9 +189,8 @@ export class ApprovalItRequestComponent implements OnInit {
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
   }
-
   getTabCount(tab: string) {
-    return this.approvals().filter(item => item.status === tab).length;
+    return this.statusCounts()[tab] || 0;
   }
 
   onSearch(event: Event) {
@@ -190,6 +202,7 @@ export class ApprovalItRequestComponent implements OnInit {
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
+    this.refresh();
   }
 
   goToPage(page: number) {

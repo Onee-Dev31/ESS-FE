@@ -206,9 +206,23 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets`, formData);
   }
 
-  getApprovalItRequests(): Observable<any> {
-    // return this._http.get(`${this.baseUrl}/approval-it-request`);
-    return of(MOCK_IT_APPROVALS).pipe(delay(800));
+  getApprovalItRequests(params: {page?: number; pageSize?: number; status?: string;}): Observable<any> {
+    let httpParams = new HttpParams();
+    if (params.page) {
+      httpParams = httpParams.set('page', params.page);
+    }
+
+    if (params.pageSize) {
+      httpParams = httpParams.set('pageSize', params.pageSize);
+    }
+
+    if (params.status) {
+      httpParams = httpParams.set('status', params.status);
+    }
+
+    return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request`, {
+      params: httpParams
+    });
   }
 
   updateAssigneesTicket(assignData: {

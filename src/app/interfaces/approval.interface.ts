@@ -23,6 +23,7 @@ export interface ApprovalItem {
         department: string;
         company: string;
         position?: string;
+        phone?: string;
         profileImage?: string;
     };
     requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล' | 'IT Request';
