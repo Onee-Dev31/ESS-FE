@@ -221,6 +221,8 @@ export class ItProblemReportComponent implements OnInit {
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
+    formData.append('IsSelfRequestByIT', this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
+
     formData.append('ticketTypeId', '2');
 
     data.attachments.forEach((item: any) => {

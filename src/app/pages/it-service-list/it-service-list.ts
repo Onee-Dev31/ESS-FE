@@ -11,10 +11,11 @@ import { StatusColor, ticketTypyColor, StatusColor_Reverse } from '../../utils/s
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { StatusKey } from '../../interfaces/it-dashboard.interface';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 @Component({
   selector: 'app-it-service',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent, NzSelectModule, NzIconModule],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent, NzSelectModule, NzIconModule, NzButtonModule],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
@@ -36,6 +37,8 @@ export class ItService implements OnInit {
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+  IS_NOTE_TICKET = signal(false);
+  IS_REOPEN_TICKET = signal(false);
 
   filterStatus: StatusKey | null = 'all';
   keyword = '';
@@ -46,23 +49,32 @@ export class ItService implements OnInit {
 
   selectTicket(ticketId: string) {
     console.log(ticketId)
-    this.getTicketById(ticketId).subscribe((res: any) => {
+    this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
+
+      let convertedFiles: any[] = [];
+
+      if (res.attachments?.length) {
+        convertedFiles = await Promise.all(
+          res.attachments.map((f: any) =>
+            this.convertUrlToFile({
+              id: f.id,
+              fileName: f.file_name,
+              filePath: f.file_path,
+              fileType: f.file_type,
+              fileSize: f.file_size,
+              fileDescription: f.file_description,
+              uploadedByaAduser: f.uploaded_by_aduser,
+              created_date: f.created_at
+            })
+          )
+        );
+      }
 
       const ticket = res.ticket;
       const replies = res.replies;
       const services = res.services;
-      const attachments = res.attachments.map((item: any) => ({
-        id: item.id,
-        ticketId: item.ticket_id,
-        fileName: item.file_name,
-        filePath: item.file_path,
-        fileType: item.file_type,
-        fileSize: item.file_size,
-        fileDescription: item.file_description,
-        uploadedByaAduser: item.uploaded_by_aduser,
-        created_date: item.created_at
-      }));
+      const attachments = convertedFiles;
       const assignGroups = res.assignGroups;
 
       const objectData = {
@@ -136,9 +148,20 @@ export class ItService implements OnInit {
   // FUNCTION ACTION
 
   openAddNote() {
-    console.log('TODO: เปิด Modal เพิ่ม Note');
+    this.IS_NOTE_TICKET.set(true)
   }
 
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
+  }
+
+  openReOpen() {
+    this.IS_REOPEN_TICKET.set(true)
+  }
+
+  closeReOpenModal() {
+    this.IS_REOPEN_TICKET.set(false);
+  }
 
   copy(text: string) {
     if (!text) return;
@@ -183,6 +206,57 @@ export class ItService implements OnInit {
       date.getMonth() === now.getMonth() &&
       date.getFullYear() === now.getFullYear()
     );
+  }
+
+  private async convertUrlToFile(fileData: any) {
+
+    try {
+
+      const response = await fetch(fileData.filePath);
+
+      if (!response.ok) {
+        throw new Error('Fetch failed');
+      }
+
+      const blob = await response.blob();
+
+      const file = new File(
+        [blob],
+        fileData.fileName,
+        { type: fileData.fileType }
+      );
+
+      return {
+        fileId: fileData.id,
+        name: fileData.fileName,
+        file: file,
+        description: fileData.fileDescription || '',
+        uploadedByAduser: fileData.uploadedByaAduser,
+        createdDate: fileData.created_date,
+        filePath: fileData.filePath,
+        size: fileData.fileSize,
+        type: fileData.fileType,
+        isError: false
+      };
+
+    } catch (error) {
+
+      console.warn('File fetch failed:', fileData.fileName);
+
+      // 🔥 fallback return
+      return {
+        fileId: fileData.id,
+        name: fileData.fileName,
+        file: null,  // ไม่มี blob
+        description: fileData.fileDescription || '',
+        uploadedByAduser: fileData.uploadedByaAduser,
+        createdDate: fileData.created_date,
+        filePath: fileData.filePath,
+        size: fileData.fileSize,
+        type: fileData.fileType,
+        isError: true
+      };
+    }
   }
 
   // GET

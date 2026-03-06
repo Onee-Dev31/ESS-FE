@@ -59,6 +59,8 @@ export class DashboardIT implements OnInit {
 
   IS_OPEN_IT_SERVICE = signal(0);
   IS_DENY_TICKET = signal(false);
+  IS_ACKNOWLEDGE_TICKET = signal(false);
+  IS_NOTE_TICKET = signal(false);
 
   keyword = '';
   TicketStatus: any;
@@ -278,6 +280,18 @@ export class DashboardIT implements OnInit {
             adUser: 'praewnapaboo',
             role: 'it'
           }
+        },
+        {
+          id: 2,
+          message: 'เสร็จยัง ? ',
+          createdDate: new Date('2026-03-05T16:30:00').toISOString(),
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo',
+            role: 'it'
+          }
         }
       ]
 
@@ -358,7 +372,11 @@ export class DashboardIT implements OnInit {
   }
 
   openAddNote() {
-    this.msg.info('TODO: เปิด Modal เพิ่ม Note');
+    this.IS_NOTE_TICKET.set(true)
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
   }
 
   safeUrl!: SafeResourceUrl;
@@ -381,6 +399,8 @@ export class DashboardIT implements OnInit {
 
   acknowledgeTicket() {
     const user = this.auth.userData();
+    // console.log(user)
+    this.IS_ACKNOWLEDGE_TICKET.set(true)
     // if (this.selectedTicket && user) {
     //   this.selectedTicket.status = 'assigned';
     //   this.selectedTicket.assignee = {
@@ -395,6 +415,10 @@ export class DashboardIT implements OnInit {
     //   // Fallback or if not logged in
     //   this.forwardTicket();
     // }
+  }
+
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
   }
 
   closeTicket() {
