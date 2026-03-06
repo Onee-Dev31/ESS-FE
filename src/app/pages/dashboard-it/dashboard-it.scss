@@ -384,11 +384,24 @@
         font-weight: 400;
     }
 
-    &:focus {
+    &.note:focus {
         outline: none;
-        border-color: #a78bfa !important;
+        border-color: var(--status-open-text) !important;
         box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
+
+    &.deny:focus {
+        outline: none;
+        border-color: var(--status-cancel-text) !important;
+        box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+
+
+    // &:focus {
+    //     outline: none;
+    //     border-color: #a78bfa !important;
+    //     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    // }
 
     &.readonly,
     &.disabled,
@@ -1685,7 +1698,7 @@ textarea.form-input {
 
     &:focus-within {
         background: var(--bg-card);
-        border-color: var(--primary);
+        border-color: var(--status-warning-text);
         box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
     }
 }
