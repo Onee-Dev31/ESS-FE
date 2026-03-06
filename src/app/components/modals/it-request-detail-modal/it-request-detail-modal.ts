@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
@@ -11,7 +12,7 @@ import dayjs from 'dayjs';
 @Component({
   selector: 'app-it-request-detail-modal',
   standalone: true,
-  imports: [CommonModule, FilePreviewModalComponent],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
   animations: [modalAnimation, fadeIn],
   templateUrl: './it-request-detail-modal.html',
   styleUrl: './it-request-detail-modal.scss',
@@ -27,6 +28,9 @@ export class ItRequestDetailModal {
 
   isActionConfirm = signal<boolean>(false);
   actionType = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+
+  isRejectPanelOpen = signal<boolean>(false);
+  rejectReason = signal<string>('');
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
@@ -105,9 +109,23 @@ export class ItRequestDetailModal {
     this.updateStatus('Approved');
   }
 
-  // Handle Edit/Other action (User requested "แก้ไข" button)
+  // Open reject reason panel
   editRequest() {
-    this.toastService.info('ฟังก์ชันแก้ไขกำลังอยู่ในระหว่างพัฒนา');
+    this.rejectReason.set('');
+    this.isRejectPanelOpen.set(true);
+  }
+
+  cancelReject() {
+    this.isRejectPanelOpen.set(false);
+    this.rejectReason.set('');
+  }
+
+  confirmReject() {
+    if (!this.rejectReason().trim()) {
+      this.toastService.error('กรุณากรอกเหตุผลในการปฏิเสธ');
+      return;
+    }
+    this.updateStatus('Rejected', this.rejectReason().trim());
   }
 
   private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
@@ -123,6 +141,7 @@ export class ItRequestDetailModal {
 
     this.onStatusUpdated.emit();
     this.close();
-    this.toastService.success('ดำเนินการอนุมัติเรียบร้อยแล้ว');
+    const msg = newStatus === 'Rejected' ? 'ปฏิเสธคำขอเรียบร้อยแล้ว' : 'ดำเนินการอนุมัติเรียบร้อยแล้ว';
+    this.toastService.success(msg);
   }
 }

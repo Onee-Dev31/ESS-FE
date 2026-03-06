@@ -110,7 +110,26 @@
 
         </div>
 
-        <div class="modal-footer">
+        <!-- Reject Reason Panel -->
+        <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
+            <div class="reject-reason-header">
+                <i class="fas fa-times-circle"></i>
+                <span>ระบุเหตุผลในการปฏิเสธ</span>
+            </div>
+            <textarea class="reject-reason-textarea" [ngModel]="rejectReason()"
+                (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผลในการปฏิเสธ..." rows="4"
+                maxlength="500">
+            </textarea>
+            <div class="reject-char-count">{{ rejectReason().length }} / 500</div>
+            <div class="reject-reason-actions">
+                <button class="btn-outline" (click)="cancelReject()">ยกเลิก</button>
+                <button class="btn-danger" (click)="confirmReject()" [disabled]="!rejectReason().trim()">
+                    <i class="fas fa-times-circle"></i> ยืนยันการปฏิเสธ
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-footer" *ngIf="!isRejectPanelOpen()">
             <button class="btn-outline btn-reject" (click)="editRequest()">Reject</button>
             <button class="btn-primary" (click)="confirmApprove()">Approve</button>
         </div>
