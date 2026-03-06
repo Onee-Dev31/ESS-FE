@@ -271,7 +271,7 @@ export class ITServiceRequestComponent implements OnInit {
         formData.append('description', this.requestDetails());
         formData.append('requesterAduser', this.authService.currentUser() || '-');
         formData.append('contactPhone', this.phoneNumber());
-        formData.append('IsSelfRequestByIT', this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
+        formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
 
 
         selectedServices.forEach(service => {
