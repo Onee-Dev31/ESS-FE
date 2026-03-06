@@ -958,6 +958,10 @@ textarea.form-input {
     overflow: hidden;
     height: 30%;
 
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
     &:first-child {
         .card-body {
             min-height: 125px;
@@ -966,7 +970,6 @@ textarea.form-input {
 
     &:hover {
         transform: translateY(-4px);
-
     }
 
     .attachment-list {
@@ -1023,7 +1026,6 @@ textarea.form-input {
                 border-color: var(--primary);
                 transform: translateY(-2px);
 
-
                 .file-icon-box {
                     background-color: var(--primary);
                     color: #ffffff;
@@ -1053,6 +1055,7 @@ textarea.form-input {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid rgba(15, 23, 42, .06);
+    flex-shrink: 0;
 }
 
 .tk-card__title {
@@ -1062,8 +1065,9 @@ textarea.form-input {
 
 .tk-card__body {
     padding: 14px;
-    max-height: 140px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .tk-text {
@@ -1072,7 +1076,6 @@ textarea.form-input {
     font-size: 14px;
 }
 
-/* attachments */
 .att-list {
     display: flex;
     flex-direction: column;
@@ -1601,6 +1604,8 @@ textarea.form-input {
     .tk-right {
         display: none;
     }
+
+
 }
 
 @media (max-width: 860px) {
