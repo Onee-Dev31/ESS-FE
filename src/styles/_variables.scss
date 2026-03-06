@@ -46,9 +46,9 @@
     --status-new-bg: rgba(14, 165, 233, 0.15);
     --status-new-text: #0284c7;
     --status-open-bg: rgba(37, 99, 235, 0.15);
-    --status-open-text: #2563eb;
-    --status-process-bg: rgba(147, 51, 234, 0.15);
-    --status-process-text: #9333ea;
+    --status-open-text: #0046df; //0046df
+    --status-progress-bg: rgba(147, 51, 234, 0.15);
+    --status-progress-text: #6910b9;
     --status-resolved-bg: rgba(5, 150, 105, 0.15);
     --status-resolved-text: #059669;
     --status-closed-bg: rgba(75, 85, 99, 0.15);
@@ -143,13 +143,13 @@
     --status-new-bg: rgba(56, 189, 248, 0.30);
     --status-new-text: #22d3ee;
     --status-open-bg: rgba(59, 130, 246, 0.30);
-    --status-open-text: #3b82f6;
-    --status-process-bg: rgba(168, 85, 247, 0.30);
-    --status-process-text: #a855f7;
+    --status-open-text: #004ac3;
+    --status-progress-bg: rgba(168, 85, 247, 0.30);
+    --status-progress-text: #6600c7;
     --status-resolved-bg: rgba(34, 197, 94, 0.30);
     --status-resolved-text: #22c55e;
     --status-closed-bg: rgba(156, 163, 175, 0.28);
-    --status-closed-text: #e5e7eb;
+    --status-closed-text: #616161;
     --status-cancel-bg: rgba(239, 68, 68, 0.30);
     --status-cancel-text: #ef4444;
     --status-assigned-bg: rgba(245, 158, 11, 0.30);
