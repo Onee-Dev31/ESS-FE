@@ -8,6 +8,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NgxEchartsDirective, NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import type { ECharts } from 'echarts'; // ✅ ไม่ใช้ EChartsType
+import { ItServiceService } from '../../../services/it-service.service';
 type PieDatum = { name: string; value: number; key?: string };
 
 @Component({
@@ -39,8 +40,7 @@ export class ItDashboardSummary {
   showDeptBar = false;
   selectedCompany: string | null = null;
 
-  deptBarOption!: EChartsOption;
-
+  deptBarOption: EChartsOption = {};
   trackByKey = (_: number, x: KpiCard) => x.key;
   // ===== ECharts Options =====
   statusPieOption!: EChartsOption;
@@ -56,89 +56,90 @@ export class ItDashboardSummary {
     done: 3,
     all: -1
   };
+
+  constructor(
+    private itServiceService: ItServiceService
+  ) { }
+
   ngOnInit(): void {
     // ✅ init default filter
     this.selectStatus('all');
-
+    this.getAllTickets();
     // ✅ build charts
-    this.buildStatusPie();
-    this.buildServicePie();
-    this.buildCompanyBar();
+    // this.buildStatusPie();
+    // this.buildServicePie();
+    // this.buildCompanyBar();
   }
 
   // mock: top 5 dept ต่อ company (ต่อ API ทีหลังได้)
-  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {
-    ONEE: [
-      { label: 'บัญชวย', value: 100 },
-      { label: 'HR', value: 4 },
-      { label: 'management', value: 0 },
-      { label: 'Financial', value: 16 },
-      { label: 'Legal', value: 0 },
-    ],
-    GTV: [
-      { label: 'Operation', value: 80 },
-      { label: 'Content', value: 1 },
-      { label: 'Engineering', value: 2 },
-      { label: 'Studio', value: 1 },
-      { label: 'Admin', value: 1 },
-    ],
-    FLD: [
-      { label: 'Field Service', value: 30 },
-      { label: 'Warehouse', value: 10 },
-      { label: 'Dispatch', value: 10 },
-      { label: 'QA', value: 5 },
-      { label: 'Admin', value: 5 },
-    ],
-    ARTS: [
-      { label: 'Design', value: 2 },
-      { label: 'Creative', value: 1 },
-      { label: 'Motion', value: 1 },
-      { label: 'Production', value: 35 },
-      { label: 'Admin', value: 1 },
-    ],
-    O31: [
-      { label: 'DesignO31', value: 10 },
-      { label: 'CreativeO31', value: 4 },
-      { label: 'MotionO31', value: 3 },
-      { label: 'ProductionO31', value: 2 },
-      { label: 'AdminO31', value: 1 },
-    ],
-  };
+  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
   // ====== 1) Status Donut ======
-  private buildStatusPie() {
+  private buildStatusPie(summary: any) {
+
     const data: PieDatum[] = [
-      { name: 'Open', value: 52, key: 'open' },
-      { name: 'Assigned', value: 36, key: 'assigned' },
-      { name: 'In Process', value: 41, key: 'inprocess' },
-      { name: 'Closed', value: 45, key: 'done' }
+      { name: 'Open', value: summary.open ?? 0, key: 'open' },
+      { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
+      { name: 'In Process', value: summary.inProcess ?? 0, key: 'inprocess' },
+      { name: 'Closed', value: summary.closed ?? 0, key: 'done' }
     ];
+
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.statusPieOption = this.makeDonutOption('Status Distribution', data, total, 'Total');
+    this.statusPieOption = this.makeDonutOption(
+      'Status Distribution',
+      data,
+      total,
+      'Total'
+    );
   }
   // ====== 2) Service Donut ======
-  private buildServicePie() {
-    const data: PieDatum[] = [
-      { name: 'ขอใช้บริการ', value: 120 },
-      { name: 'แจ้งซ่อม', value: 80 },
-      { name: 'แจ้งปัญหา', value: 60 }
-    ];
+  private buildServicePie(res: any[]) {
+
+    const data: PieDatum[] = res.map(x => ({
+      name: x.name_th,
+      value: x.ticket_count
+    }));
+
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.servicePieOption = this.makeDonutOptionService('Service Type', data, total, 'Total');
+    this.servicePieOption = this.makeDonutOptionService(
+      'Service Type',
+      data,
+      total,
+      'Total'
+    );
   }
-
   // ====== 3) Top Companies Bar ======
-  private buildCompanyBar() {
-    const labels = ['ONEE', 'GTV', 'FLD', 'ARTS', 'O31'];
-    const values = [120, 85, 60, 40, 20];
+  private buildCompanyBar(res: any[]) {
 
-    // Create computed styles to get actual color values for ECharts which doesn't fully support CSS var() in all places
-    const textColor = getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
+    const chartData = res.map(x => ({
+      value: x.ticket_count,
+      code: x.COMPANY_CODE,
+      name: x.COMPANY_NAME
+    }));
+
+    const labels = chartData.map(x => x.code);
+
+    const textColor =
+      getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
 
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const item = params[0];
+          const data = item.data;
+
+          return `
+          <div style="font-weight:700">${data.name}</div>
+          <div>Tickets: ${data.value}</div>
+        `;
+        }
+      },
+
       xAxis: {
         type: 'category',
         data: labels,
@@ -146,34 +147,61 @@ export class ItDashboardSummary {
         axisLine: { show: false },
         axisLabel: { fontWeight: 700, color: textColor }
       },
+
       yAxis: {
         type: 'value',
         splitLine: { show: false },
         axisLine: { show: false },
         axisLabel: { show: false }
       },
+
       series: [
         {
           type: 'bar',
-          data: values,
+          data: chartData,
           barWidth: 46,
           itemStyle: { borderRadius: [12, 12, 12, 12] },
           emphasis: { focus: 'series' }
         }
       ]
     };
-    const firstCompany = labels[0];
-    this.selectedCompany = firstCompany;
-    this.showDeptBar = true;
-    this.buildDeptBar(firstCompany, this.deptTop5Map[firstCompany] ?? []);
 
+    const firstCompany = labels[0];
+    console.log("firstCompany : ", firstCompany);
+
+    this.selectedCompany = firstCompany;
+    this.showDeptBar = !!firstCompany;
+
+    if (firstCompany) {
+      this.buildDeptBar(firstCompany, this.deptTop5Map[firstCompany] ?? []);
+    }
+  }
+
+  private buildDeptTop5Map(rows: any[]) {
+    const map: Record<string, Array<{ label: string; value: number }>> = {};
+
+    for (const row of rows ?? []) {
+      const companyCode = row.COMPANY_CODE;
+      if (!companyCode) continue;
+
+      if (!map[companyCode]) {
+        map[companyCode] = [];
+      }
+
+      map[companyCode].push({
+        label: row.dept_display,
+        value: row.ticket_count
+      });
+    }
+
+    this.deptTop5Map = map;
   }
 
   // ===== Helper: donut option (ใช้ร่วมกัน 2 pie) =====
   private makeDonutOption(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
     return {
       legend: {
-        top: 8,
+        top: -5,
         left: 'center',
         orient: 'horizontal',
         itemWidth: 18,
@@ -221,7 +249,7 @@ export class ItDashboardSummary {
   private makeDonutOptionService(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
     return {
       legend: {
-        top: 8,
+        top: -5,
         left: 'center',
         orient: 'horizontal',
         itemWidth: 18,
@@ -353,8 +381,9 @@ export class ItDashboardSummary {
   }
 
   onCompanyBarClick(e: any) {
+    console.log("company : ", e);
     // e.name จะเป็น label ของ category เช่น 'ONEE'
-    const company = (e?.name ?? '').toString();
+    const company = (e?.data.code ?? '').toString();
     if (!company) return;
     console.log("company : ", company);
 
@@ -374,13 +403,19 @@ export class ItDashboardSummary {
   }
 
   private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
-    // sort มาก->น้อย เผื่อข้อมูลไม่เรียง
-    const data = [...rows].sort((a, b) => b.value - a.value).slice(0, 5);
+    const data = [...rows]
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5)
+      .map(x => ({
+        name: x.label,
+        value: x.value
+      }));
 
-    const labels = data.map(x => x.label);
-    const values = data.map(x => x.value);
+    const labels = data.map(x => x.name);
 
-    const textColor = getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
+    const textColor =
+      getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
+
     this.deptBarOption = {
       title: {
         text: `Top 5 Departments - ${company}`,
@@ -389,8 +424,26 @@ export class ItDashboardSummary {
         textStyle: { fontSize: 14, fontWeight: 800, color: textColor }
       },
       grid: { left: 10, right: 18, top: 36, bottom: 10, containLabel: true },
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      xAxis: { type: 'value', splitLine: { show: false }, axisLabel: { show: false }, axisLine: { show: false } },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params: any) => {
+          const item = params?.[0];
+          const row = item?.data;
+          if (!row) return '';
+
+          return `
+          <div style="font-weight:700">${row.name}</div>
+          <div>Tickets: ${row.value}</div>
+        `;
+        }
+      },
+      xAxis: {
+        type: 'value',
+        splitLine: { show: false },
+        axisLabel: { show: false },
+        axisLine: { show: false }
+      },
       yAxis: {
         type: 'category',
         data: labels,
@@ -401,12 +454,28 @@ export class ItDashboardSummary {
       series: [
         {
           type: 'bar',
-          data: values,
+          data: data,
           barWidth: 16,
           itemStyle: { borderRadius: [10, 10, 10, 10] },
           emphasis: { focus: 'series' }
         }
       ]
     };
+  }
+
+  getAllTickets() {
+    this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.buildStatusPie(res.summary)
+        this.buildServicePie(res.serviceTypes);
+        this.buildDeptTop5Map(res.topDepartments);
+        this.buildCompanyBar(res.topCompanies);
+
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
   }
 }
