@@ -407,7 +407,7 @@
             </div>
             <div class="amh-search">
                 <span class="material-symbols-outlined">search</span>
-                <input placeholder="ค้นหาชื่อคน" [(ngModel)]="assignSearchKeyword" />
+                <input placeholder="ค้นหาชื่อคน" class="assign" [(ngModel)]="assignSearchKeyword" />
             </div>
         </div>
 
@@ -512,7 +512,7 @@
                 </div> -->
             </header>
             <div class="content-card">
-                <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea>
+                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
             </div>
             <div class="form-actions-footer">
                 <button class="btn-back-custom" (click)="closeAddNoteModal()">
@@ -540,7 +540,7 @@
                 </div> -->
             </header>
             <div class="content-card">
-                <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea>
+                <textarea class="form-input deny" placeholder="อธิบายรายละเอียด..."></textarea>
             </div>
             <div class="form-actions-footer">
                 <button class="btn-back-custom" (click)="closeDenyTicket()">

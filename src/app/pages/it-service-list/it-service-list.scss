@@ -285,11 +285,24 @@
         font-weight: 400;
     }
 
-    &:focus {
+    &.note:focus {
         outline: none;
-        border-color: #a78bfa !important;
+        border-color: var(--status-open-text) !important;
         box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
+
+    &.reopen:focus {
+        outline: none;
+        border-color: var(--status-warning-text) !important;
+        box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+
+
+    // &:focus {
+    //     outline: none;
+    //     border-color: #a78bfa !important;
+    //     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    // }
 
     &.readonly,
     &.disabled,
