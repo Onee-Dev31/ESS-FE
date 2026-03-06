@@ -188,7 +188,7 @@
                     deny
                 </button>
                 <ng-container *ngIf="!t.assigneeName">
-                    <button class="btn btn-accept" (click)="acknowledgeTicket()">
+                    <button class="btn btn-accept" (click)="acknowledgeTicket()" *ngIf="t.status !== 'In Progress'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>

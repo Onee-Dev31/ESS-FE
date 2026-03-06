@@ -211,4 +211,18 @@ export class ItServiceService {
     return of(MOCK_IT_APPROVALS).pipe(delay(800));
   }
 
+  updateAssigneesTicket(assignData: {
+    id: any;
+    listAssignee: any;
+    createby: any;
+  }): Observable<any> {
+    // return of({ success: true }).pipe(delay(1500));
+
+    const params = {
+      assignToAdusersJson: assignData.listAssignee,
+      executedBy: assignData.createby,
+    }
+    return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
+  }
+
 }
