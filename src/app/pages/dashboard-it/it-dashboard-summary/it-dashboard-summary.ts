@@ -56,24 +56,65 @@ export class ItDashboardSummary {
     done: 3,
     all: -1
   };
+  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
 
   constructor(
     private itServiceService: ItServiceService
   ) { }
 
   ngOnInit(): void {
-    // ✅ init default filter
     this.selectStatus('all');
     this.getAllTickets();
-    // ✅ build charts
-    // this.buildStatusPie();
-    // this.buildServicePie();
-    // this.buildCompanyBar();
+
   }
 
   // mock: top 5 dept ต่อ company (ต่อ API ทีหลังได้)
-  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
   // ====== 1) Status Donut ======
+
+  private updateKpis(summary: any) {
+    this.kpis = [
+      {
+        key: 'open',
+        title: 'Open tickets',
+        value: summary.open ?? 0,
+        delta: 0,
+        hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+        icon: 'inbox'
+      },
+      {
+        key: 'assigned',
+        title: 'Assigned Tickets',
+        value: summary.assigned ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ได้รับมอบหมาย',
+        icon: 'user'
+      },
+      {
+        key: 'inprocess',
+        title: 'In Process Tickets',
+        value: summary.inProcess ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่กำลังดำเนินการ',
+        icon: 'sync'
+      },
+      {
+        key: 'done',
+        title: 'Closed Tickets',
+        value: summary.closed ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ปิดแล้ว',
+        icon: 'check-circle'
+      },
+      {
+        key: 'all',
+        title: 'All Tickets',
+        value: summary.all ?? 0,
+        delta: 0,
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'appstore'
+      }
+    ];
+  }
   private buildStatusPie(summary: any) {
 
     const data: PieDatum[] = [
@@ -467,6 +508,7 @@ export class ItDashboardSummary {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
       next: (res) => {
         console.log(res);
+        this.updateKpis(res.summary)
         this.buildStatusPie(res.summary)
         this.buildServicePie(res.serviceTypes);
         this.buildDeptTop5Map(res.topDepartments);
