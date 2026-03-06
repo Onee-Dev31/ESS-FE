@@ -414,11 +414,11 @@
         <div class="assign-modal-body">
             <!-- SELECTED CHIPS -->
             <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                <div class="chip" *ngFor="let empCode of selectedAssigneeEmpCodes">
-                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + empCode + '.jpg'"
+                <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
                         (error)="onImgError($event)" />
-                    <span>{{ empCode }}</span>
-                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(empCode)">close</span>
+                    <span>{{ emp.id }}</span>
+                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">close</span>
                 </div>
             </div>
 
@@ -431,14 +431,13 @@
                         </button>
                     </div>
 
-                    <div class="assign-item" *ngFor="let emp of g.members"
-                        [class.selected]="selectedAssigneeEmpCodes.includes(emp.id)" (click)="toggleAssignee(emp.id)">
+                    <div class="assign-item" *ngFor="let emp of g.members" [class.selected]="isSelected(emp.id)"
+                        (click)="toggleAssignee(emp)">
 
                         <div class="assign-chk">
+                            <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
                             <span class="material-symbols-outlined"
-                                *ngIf="selectedAssigneeEmpCodes.includes(emp.id)">check_box</span>
-                            <span class="material-symbols-outlined"
-                                *ngIf="!selectedAssigneeEmpCodes.includes(emp.id)">check_box_outline_blank</span>
+                                *ngIf="!isSelected(emp.id)">check_box_outline_blank</span>
                         </div>
 
                         <div class="assign-avatar">

@@ -70,7 +70,7 @@ export class DashboardIT implements OnInit {
   selectedId = 1;
   isAssignModalVisible = false;
   assignSearchKeyword = '';
-  selectedAssigneeEmpCodes: string[] = [];
+  selectedAssigneeEmpCodes: any[] = [];
 
   constructor(
     private msg: NzMessageService,
@@ -429,58 +429,63 @@ export class DashboardIT implements OnInit {
     this.isAssignModalVisible = false;
   }
 
-  toggleAssignee(empCode: string) {
-    const idx = this.selectedAssigneeEmpCodes.indexOf(empCode);
+  toggleAssignee(emp: any) {
+    const idx = this.selectedAssigneeEmpCodes.indexOf(emp.id);
     if (idx > -1) {
       this.selectedAssigneeEmpCodes.splice(idx, 1);
     } else {
-      this.selectedAssigneeEmpCodes.push(empCode);
+      this.selectedAssigneeEmpCodes.push(emp);
     }
-  }
 
-  // toggleGroup(group: any) {
-  //   const allIn = group.members.every((m: string) => this.selectedAssigneeEmpCodes.includes(m));
-  //   if (allIn) {
-  //     // Remove all
-  //     this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => !group.members.includes(c));
-  //   } else {
-  //     // Add missing ones
-  //     group.members.forEach((m: string) => {
-  //       if (!this.selectedAssigneeEmpCodes.includes(m)) {
-  //         this.selectedAssigneeEmpCodes.push(m);
-  //       }
-  //     });
-  //   }
-  // }
+    console.log(this.selectedAssigneeEmpCodes)
+
+  }
 
   toggleGroup(group: any) {
 
     const memberIds = group.members.map((m: any) => m.id);
 
     const allIn = memberIds.every((id: any) =>
-      this.selectedAssigneeEmpCodes.includes(id)
+      this.selectedAssigneeEmpCodes.some(e => e.id === id)
     );
 
     if (allIn) {
-      // remove all members
+
       this.selectedAssigneeEmpCodes =
-        this.selectedAssigneeEmpCodes.filter(id => !memberIds.includes(id));
+        this.selectedAssigneeEmpCodes.filter(e => !memberIds.includes(e.id));
+
     } else {
-      // add missing members
-      memberIds.forEach((id: any) => {
-        if (!this.selectedAssigneeEmpCodes.includes(id)) {
-          this.selectedAssigneeEmpCodes.push(id);
+
+      group.members.forEach((m: any) => {
+
+        const exists = this.selectedAssigneeEmpCodes.some(e => e.id === m.id);
+
+        if (!exists) {
+          this.selectedAssigneeEmpCodes.push(m);
         }
+
       });
+
     }
 
   }
+
   isGroupSelected(group: any): boolean {
-    return group.members.every((m: any) => this.selectedAssigneeEmpCodes.includes(m.id));
+    return group.members.every((m: any) =>
+      this.selectedAssigneeEmpCodes.some(e => e.id === m.id)
+    );
+  }
+  
+  isSelected(empId: string): boolean {
+    return this.selectedAssigneeEmpCodes.some(e => e.id === empId);
   }
 
-  removeAssignee(empCode: string) {
-    this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => c !== empCode);
+
+  removeAssignee(empId: string) {
+
+    this.selectedAssigneeEmpCodes =
+      this.selectedAssigneeEmpCodes.filter(e => e.id !== empId);
+
   }
 
   submitAssign() {
@@ -488,9 +493,8 @@ export class DashboardIT implements OnInit {
       this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
       return;
     }
-    const selectedNames = this.selectedAssigneeEmpCodes.join(', ');
 
-    console.log(selectedNames)
+    console.log(this.selectedAssigneeEmpCodes)
 
     // if (this.selectedTicket && this.selectedTicket.assignee) {
     //   this.selectedTicket.status = 'assigned'; // Update status
