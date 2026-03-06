@@ -33,7 +33,7 @@
         </div>
 
         <div class="ticket-list">
-            <div class="ticket-item" *ngFor="let ticket of Tickets()"
+            <div class="ticket-item" *ngFor="let ticket of filteredTickets()"
                 [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
                 <div class="avatar">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"

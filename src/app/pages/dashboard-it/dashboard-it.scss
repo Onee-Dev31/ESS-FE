@@ -865,7 +865,7 @@ textarea.form-input {
 
 /* hero */
 .tk-hero {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 55%);
+    background: linear-gradient(150deg, var(--primary) 50%, color-mix(in srgb, var(--primary) , var(--text-reverse) 20%));
     border-radius: 16px;
     padding: 16px;
     color: var(--text-reverse);

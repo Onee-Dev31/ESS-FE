@@ -36,7 +36,7 @@ export class StatusColor {
         New: 'new',
         Open: 'open',
         Assigned: 'assigned',
-        'In Process': 'process',
+        'In Progress': 'progress',
         Resolved: 'resolved',
         Closed: 'closed',
         Cancelled: 'cancel'
@@ -66,7 +66,7 @@ export class StatusColor_Reverse {
         New: 'new',
         Open: 'open',
         Assigned: 'assigned',
-        'In Process': 'process',
+        'In Progress': 'progress',
         Resolved: 'resolved',
         Closed: 'closed',
         Cancelled: 'cancel'
