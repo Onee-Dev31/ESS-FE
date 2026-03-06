@@ -21,7 +21,7 @@
             <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
                 <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
                 <nz-option nzValue="open" nzLabel="Open"></nz-option>
-                <nz-option nzValue="inprocess" nzLabel="In Process"></nz-option>
+                <nz-option nzValue="inprogress" nzLabel="In Process"></nz-option>
                 <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
                 <nz-option nzValue="done" nzLabel="Done"></nz-option>
             </nz-select>
@@ -151,7 +151,7 @@
 
                 <div class="tk-card__body">
                     <div class="note-list" *ngIf="t.itNotes.length; else noNote">
-                        <div class="note" *ngFor="let n of t.itNotes">
+                        <div class="note" *ngFor="let n of t.itNotes.slice().reverse()">
                             <div class="note__top">
                                 <div class="note__who">
                                     <div class="avatar">
@@ -188,7 +188,7 @@
                     deny
                 </button>
                 <ng-container *ngIf="!t.assigneeName">
-                    <button class="btn btn-accept" (click)="acknowledgeTicket()">
+                    <button class="btn btn-accept" (click)="acknowledgeTicket()" *ngIf="t.status !== 'In Progress'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>
@@ -407,18 +407,18 @@
             </div>
             <div class="amh-search">
                 <span class="material-symbols-outlined">search</span>
-                <input placeholder="ค้นหาชื่อคน" [(ngModel)]="assignSearchKeyword" />
+                <input placeholder="ค้นหาชื่อคน" class="assign" [(ngModel)]="assignSearchKeyword" />
             </div>
         </div>
 
         <div class="assign-modal-body">
             <!-- SELECTED CHIPS -->
             <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                <div class="chip" *ngFor="let empCode of selectedAssigneeEmpCodes">
-                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + empCode + '.jpg'"
+                <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
+                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
                         (error)="onImgError($event)" />
-                    <span>{{ empCode }}</span>
-                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(empCode)">close</span>
+                    <span>{{ emp.id }}</span>
+                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">close</span>
                 </div>
             </div>
 
@@ -431,14 +431,13 @@
                         </button>
                     </div>
 
-                    <div class="assign-item" *ngFor="let emp of g.members"
-                        [class.selected]="selectedAssigneeEmpCodes.includes(emp.id)" (click)="toggleAssignee(emp.id)">
+                    <div class="assign-item" *ngFor="let emp of g.members" [class.selected]="isSelected(emp.id)"
+                        (click)="toggleAssignee(emp)">
 
                         <div class="assign-chk">
+                            <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
                             <span class="material-symbols-outlined"
-                                *ngIf="selectedAssigneeEmpCodes.includes(emp.id)">check_box</span>
-                            <span class="material-symbols-outlined"
-                                *ngIf="!selectedAssigneeEmpCodes.includes(emp.id)">check_box_outline_blank</span>
+                                *ngIf="!isSelected(emp.id)">check_box_outline_blank</span>
                         </div>
 
                         <div class="assign-avatar">
@@ -500,21 +499,91 @@
 </div>
 }
 
+
+@if (IS_NOTE_TICKET()) {
+<div class="modal-overlay denyTicket">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>เพิ่ม Note</h2>
+                <!-- <div class="header-right-meta">
+                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
+                </div> -->
+            </header>
+            <div class="content-card">
+                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
+            </div>
+            <div class="form-actions-footer">
+                <button class="btn-back-custom" (click)="closeAddNoteModal()">
+                    <i class="fas fa-times"></i> ยกเลิก
+                </button>
+                <button class="btn-save-custom">
+                    <i class="fas fa-paper-plane"></i> ส่ง
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+}
+
 @if (IS_DENY_TICKET()) {
 <div class="modal-overlay denyTicket">
     <div class="modal-container">
         <div>
             <header class="top-header-strip">
                 <h2>เหตุผลในการยกเลิก</h2>
-                <div class="header-right-meta">
+                <!-- <div class="header-right-meta">
                     <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div>
+                </div> -->
             </header>
             <div class="content-card">
-                <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea>
+                <textarea class="form-input deny" placeholder="อธิบายรายละเอียด..."></textarea>
             </div>
             <div class="form-actions-footer">
-                <button class="btn-back-custom">
+                <button class="btn-back-custom" (click)="closeDenyTicket()">
+                    <i class="fas fa-times"></i> ยกเลิก
+                </button>
+                <button class="btn-save-custom">
+                    <i class="fas fa-paper-plane"></i> ยืนยีน
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+}
+
+@if (IS_ACKNOWLEDGE_TICKET()) {
+<div class="modal-overlay acknowledgeTicket">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>รับเรื่อง</h2>
+            </header>
+            <div class="content-card">
+                <div class="tag-group">
+                    <label class="tag">
+                        <input type="radio" name="tag" value="2">
+                        <span>แจ้งปัญหา</span>
+                    </label>
+
+                    <label class="tag">
+                        <input type="radio" name="tag" value="1">
+                        <span>แจ้งซ่อม</span>
+                    </label>
+
+                    <label class="tag">
+                        <input type="radio" name="tag" value="3">
+                        <span>ขอใช้บริการ</span>
+                    </label>
+                </div>
+                <!-- <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea> -->
+            </div>
+            <div class="form-actions-footer">
+                <button class="btn-back-custom" (click)="closeAcknowledgeModal()">
                     <i class="fas fa-times"></i> ยกเลิก
                 </button>
                 <button class="btn-save-custom">

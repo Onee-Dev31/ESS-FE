@@ -169,10 +169,10 @@
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions">
                 <ng-container>
-                    <button class="btn btn-accept">
+                    <!-- <button class="btn btn-accept">
                         <i class="fas fa-sticky-note" style="margin-right: 4px;"></i> เพิ่ม Note
-                    </button>
-                    <button class="btn btn-send">
+                    </button> -->
+                    <button class="btn btn-send" (click)="openReOpen()">
                         <i class="fas fa-history" style="margin-right: 4px;"></i> Reopen
                     </button>
                     <button class="btn btn-done" (click)="openRating()">
@@ -302,6 +302,62 @@
 @if (isPreviewModalOpen()) {
 <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>
+}
+
+@if (IS_NOTE_TICKET()) {
+<div class="modal-overlay denyTicket">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>เพิ่ม Note</h2>
+                <!-- <div class="header-right-meta">
+                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
+                </div> -->
+            </header>
+            <div class="content-card">
+                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
+            </div>
+            <div class="form-actions-footer">
+                <button class="btn-back-custom" (click)="closeAddNoteModal()">
+                    <i class="fas fa-times"></i> ยกเลิก
+                </button>
+                <button class="btn-save-custom">
+                    <i class="fas fa-paper-plane"></i> ส่ง
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+}
+
+@if (IS_REOPEN_TICKET()) {
+<div class="modal-overlay denyTicket">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>อธิบายเหตุผล</h2>
+                <!-- <div class="header-right-meta">
+                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
+                </div> -->
+            </header>
+            <div class="content-card">
+                <textarea class="form-input reopen" placeholder="อธิบายรายละเอียด..."></textarea>
+            </div>
+            <div class="form-actions-footer">
+                <button class="btn-back-custom" (click)="closeReOpenModal()">
+                    <i class="fas fa-times"></i> ยกเลิก
+                </button>
+                <button class="btn-save-custom">
+                    <i class="fas fa-paper-plane"></i> ส่ง
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 }
 
 @if (isRatingModalOpen()) {

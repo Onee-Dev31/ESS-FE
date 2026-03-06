@@ -26,33 +26,36 @@ $text-sub: var(--text-sub);
         border-radius: 12px;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         overflow: hidden;
+        border: 1px solid var(--border-toolbar);
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            padding: 16px 24px;
             border-bottom: 1px solid var(--border-toolbar);
-            background-color: #f9fafb;
+            background-color: var(--bg-slate);
             flex-shrink: 0;
 
             h3 {
                 margin: 0;
-                font-size: 18px;
+                font-size: 1.1rem;
+                font-weight: 600;
                 color: var(--text);
             }
 
             .btn-close {
                 background: none;
                 border: none;
-                font-size: 20px;
+                font-size: 1.25rem;
                 cursor: pointer;
                 color: var(--text-sub);
+                transition: color 0.2s;
 
                 &:hover {
-                    color: var(--text);
+                    color: var(--danger);
                 }
             }
         }
@@ -73,7 +76,7 @@ $text-sub: var(--text-sub);
                 flex-shrink: 0;
 
                 @media (min-width: 768px) {
-                    width: 300px;
+                    width: 320px;
                     height: auto;
                     flex-shrink: 0;
                     border-right: 1px solid var(--border-toolbar);
@@ -83,16 +86,17 @@ $text-sub: var(--text-sub);
                 border-bottom: 1px solid var(--border-toolbar);
                 background-color: var(--bg-slate);
                 overflow-y: auto;
-                padding: 10px;
+                padding: 12px;
 
                 .no-files {
                     text-align: center;
                     padding-top: 50px;
-                    color: var(--text-muted);
+                    color: var(--text-sub);
 
                     i {
-                        font-size: 32px;
-                        margin-bottom: 10px;
+                        font-size: 2rem;
+                        margin-bottom: 12px;
+                        opacity: 0.5;
                     }
                 }
 
@@ -104,22 +108,25 @@ $text-sub: var(--text-sub);
                     li {
                         display: flex;
                         align-items: center;
-                        padding: 12px;
+                        padding: 12px 16px;
                         cursor: pointer;
-                        border-radius: 6px;
-                        margin-bottom: 4px;
+                        border-radius: 8px;
+                        margin-bottom: 6px;
                         transition: all 0.2s;
+                        border: 1px solid transparent;
 
                         .file-icon {
-                            width: 36px;
-                            height: 36px;
-                            background-color: #e3f2fd;
+                            width: 40px;
+                            height: 40px;
+                            background-color: var(--bg-card);
                             color: var(--primary);
-                            border-radius: 4px;
+                            border-radius: 6px;
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            margin-right: 12px;
+                            margin-right: 14px;
+                            font-size: 1.25rem;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
                         }
 
                         .file-info {
@@ -128,28 +135,38 @@ $text-sub: var(--text-sub);
                             overflow: hidden;
 
                             .file-name {
-                                font-weight: 500;
+                                font-weight: 600;
+                                font-size: 0.9rem;
                                 color: var(--text);
                                 white-space: nowrap;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
+                                margin-bottom: 2px;
                             }
 
                             .file-date {
-                                font-size: 12px;
-                                color: var(--text-muted);
+                                font-size: 0.75rem;
+                                color: var(--text-sub);
                             }
                         }
 
                         &:hover {
-                            background-color: var(--border-color);
+                            background-color: var(--bg-card);
+                            border-color: var(--border-color);
                         }
 
                         &.active {
-                            background-color: #e8f0fe;
+                            background-color: var(--bg-card);
+                            border-color: var(--primary);
+                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
                             .file-name {
-                                color: #1967d2;
+                                color: var(--primary);
+                            }
+
+                            .file-icon {
+                                background-color: var(--primary);
+                                color: #fff;
                             }
                         }
                     }
@@ -158,15 +175,16 @@ $text-sub: var(--text-sub);
 
             .preview-panel {
                 flex: 1;
-                padding: 20px;
+                padding: 24px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background-color: #ffffff;
+                background-color: var(--bg-card);
 
                 .empty-state {
-                    color: #aaa;
+                    color: var(--text-sub);
                     text-align: center;
+                    opacity: 0.7;
                 }
 
                 .preview-content {
@@ -176,13 +194,14 @@ $text-sub: var(--text-sub);
                     flex-direction: column;
 
                     .preview-header {
-                        margin-bottom: 10px;
-                        padding-bottom: 10px;
+                        margin-bottom: 16px;
+                        padding-bottom: 12px;
                         border-bottom: 1px solid var(--border-toolbar);
 
                         h4 {
                             margin: 0;
-                            font-size: 16px;
+                            font-size: 1rem;
+                            font-weight: 600;
                             color: var(--text);
                         }
                     }
@@ -190,19 +209,19 @@ $text-sub: var(--text-sub);
                     .image-box {
                         flex: 1;
                         display: flex;
-                        background-color: #f3f3f3;
-                        border-radius: 8px;
+                        background-color: var(--bg-slate);
+                        border-radius: 12px;
                         border: 1px dashed var(--border-color);
                         align-items: center;
                         justify-content: center;
                         overflow: hidden;
+                        position: relative;
 
                         .preview-image {
-                            width: 100%;
-                            height: 100%;
+                            max-width: 100%;
+                            max-height: 100%;
                             object-fit: contain;
                             border-radius: 8px;
-                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                         }
 
                         .preview-pdf {
@@ -214,11 +233,17 @@ $text-sub: var(--text-sub);
                         .mock-image {
                             text-align: center;
                             color: var(--text-sub);
+                            padding: 40px;
 
                             i {
                                 display: block;
-                                margin-bottom: 10px;
-                                color: #aaa;
+                                margin-bottom: 16px;
+                                opacity: 0.4;
+                            }
+
+                            p {
+                                margin: 0;
+                                font-weight: 500;
                             }
                         }
                     }

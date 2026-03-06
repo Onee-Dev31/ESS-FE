@@ -23,15 +23,22 @@ export class FilePreviewModalComponent implements OnInit {
     @Output() onClose = new EventEmitter<void>();
 
     selectedFile: FilePreviewItem | null = null;
+    hasError: boolean = false;
 
     ngOnInit() {
         if (this.files.length > 0) {
             this.selectedFile = this.files[0];
+            this.hasError = false;
         }
     }
 
     selectFile(file: FilePreviewItem) {
         this.selectedFile = file;
+        this.hasError = false;
+    }
+
+    onPreviewError() {
+        this.hasError = true;
     }
 
     close() {

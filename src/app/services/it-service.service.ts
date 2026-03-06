@@ -6,6 +6,7 @@ import { delay, Observable, of } from 'rxjs';
 const MOCK_IT_APPROVALS = [
   {
     requestNo: 'REQ-IT-2603-0001',
+    ticketTypeId: 1, // แจ้งซ่อม
     createDate: '2026-03-02T10:00:00Z',
     requester: {
       name: 'นาย สมชาย มั่นคง',
@@ -15,10 +16,15 @@ const MOCK_IT_APPROVALS = [
     },
     requestFor: 'นาย สมชาย มั่นคง',
     requestCategory: 'Hardware (ขอเบิกอุปกรณ์)',
-    status: 'Pending'
+    status: 'Pending',
+    attachments: [
+      { fileName: 'broken-keyboard.jpg', fileSize: 1024 * 500 },
+      { fileName: 'form-repair.pdf', fileSize: 1024 * 200 }
+    ]
   },
   {
     requestNo: 'REQ-IT-2603-0002',
+    ticketTypeId: 3, // ขอใช้บริการ
     createDate: '2026-03-01T15:30:00Z',
     requester: {
       name: 'นางสาว สมหญิง ใจดี',
@@ -28,10 +34,12 @@ const MOCK_IT_APPROVALS = [
     },
     requestFor: 'นางสาว สมหญิง ใจดี',
     requestCategory: 'Software (ขอสิทธิ์เข้าถึงระบบ)',
-    status: 'Approved'
+    status: 'Approved',
+    attachments: []
   },
   {
     requestNo: 'REQ-IT-2603-0003',
+    ticketTypeId: 2, // แจ้งปัญหา
     createDate: '2026-02-28T09:15:00Z',
     requester: {
       name: 'นาย วีระ ทองคำ',
@@ -41,10 +49,14 @@ const MOCK_IT_APPROVALS = [
     },
     requestFor: 'นาย เด็กใหม่ เพิ่งมา',
     requestCategory: 'Network (แจ้งปัญหาเน็ตเวิร์ค)',
-    status: 'Rejected'
+    status: 'Rejected',
+    attachments: [
+      { fileName: 'error-screen.png', fileSize: 1024 * 150 }
+    ]
   },
   {
     requestNo: 'REQ-IT-2603-0004',
+    ticketTypeId: 3, // ขอใช้บริการ
     createDate: '2026-03-02T14:20:00Z',
     requester: {
       name: 'นาง สมบูรณ์ พูนสุข',
@@ -54,10 +66,12 @@ const MOCK_IT_APPROVALS = [
     },
     requestFor: 'นาง สมบูรณ์ พูนสุข',
     requestCategory: 'Account & Password (ขอรีเซ็ตรหัสผ่าน)',
-    status: 'Pending'
+    status: 'Pending',
+    attachments: []
   },
   {
     requestNo: 'REQ-IT-2603-0005',
+    ticketTypeId: 1, // แจ้งซ่อม
     createDate: '2026-03-02T14:20:00Z',
     requester: {
       name: 'นาย อติวิชญ์ แจ่มใส',
@@ -67,7 +81,10 @@ const MOCK_IT_APPROVALS = [
     },
     requestFor: 'นาย อติวิชญ์ แจ่มใส',
     requestCategory: 'Hardware (ซ่อมอุปกรณ์)',
-    status: 'Referred Back'
+    status: 'Referred Back',
+    attachments: [
+      { fileName: 'monitor-flicker.mp4', fileSize: 1024 * 1024 * 2 }
+    ]
   }
 ];
 
@@ -192,6 +209,20 @@ export class ItServiceService {
   getApprovalItRequests(): Observable<any> {
     // return this._http.get(`${this.baseUrl}/approval-it-request`);
     return of(MOCK_IT_APPROVALS).pipe(delay(800));
+  }
+
+  updateAssigneesTicket(assignData: {
+    id: any;
+    listAssignee: any;
+    createby: any;
+  }): Observable<any> {
+    // return of({ success: true }).pipe(delay(1500));
+
+    const params = {
+      assignToAdusersJson: assignData.listAssignee,
+      executedBy: assignData.createby,
+    }
+    return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
 }

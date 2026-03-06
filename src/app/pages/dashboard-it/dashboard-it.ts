@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
-import { tickets } from '../../utils/it-dashboard-mock';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../../services/auth.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -18,6 +17,8 @@ import dayjs from 'dayjs';
 import { ItProblemReportComponent } from "../it-problem-report/it-problem-report";
 import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request";
 import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
+import { SwalService } from '../../services/swal.service';
+import { tickets } from '../../utils/it-dashboard-mock';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -35,6 +36,9 @@ import { ITServiceRequestComponent } from "../it-service-request/it-service-requ
 export class DashboardIT implements OnInit {
 
   private itServiceService = inject(ItServiceService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
+
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
@@ -59,20 +63,21 @@ export class DashboardIT implements OnInit {
 
   IS_OPEN_IT_SERVICE = signal(0);
   IS_DENY_TICKET = signal(false);
+  IS_ACKNOWLEDGE_TICKET = signal(false);
+  IS_NOTE_TICKET = signal(false);
 
   keyword = '';
   TicketStatus: any;
 
-  filterStatus: StatusKey | null = 'all';
+  filterStatus: string | null = 'all';
 
   selectedId = 1;
   isAssignModalVisible = false;
   assignSearchKeyword = '';
-  selectedAssigneeEmpCodes: string[] = [];
+  selectedAssigneeEmpCodes: any[] = [];
 
   constructor(
     private msg: NzMessageService,
-    private auth: AuthService,
     private sanitizer: DomSanitizer
   ) { }
 
@@ -88,9 +93,11 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false)
   }
 
-  onStatusChange(status: StatusKey | null) {
+  onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    // this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
+    console.log("filterStatus : ", this.filterStatus);
+
+    this.filteredTickets(); // หรือเรียก filterStatus(status) ของคุณ
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -278,6 +285,18 @@ export class DashboardIT implements OnInit {
             adUser: 'praewnapaboo',
             role: 'it'
           }
+        },
+        {
+          id: 2,
+          message: 'เสร็จยัง ? ',
+          createdDate: new Date('2026-03-05T16:30:00').toISOString(),
+          createBy: {
+            fullName: 'แพรวนภา บุตรโคษา',
+            nickName: 'แพรว',
+            empCode: 'OTD01050',
+            adUser: 'praewnapaboo',
+            role: 'it'
+          }
         }
       ]
 
@@ -329,21 +348,22 @@ export class DashboardIT implements OnInit {
   closeAssignee() {
     this.isVisibleAssignee.set(false)
   }
-  // filteredTickets(): TicketItem[] {
-  //   const kw = (this.keyword ?? '').trim().toLowerCase();
 
-  //   return this.tickets.filter(t => {
-  //     const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
-  //     const matchKw = !kw
-  //       ? true
-  //       : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
-  //     return matchStatus && matchKw;
-  //   });
-  // }
+  filteredTickets(): TicketItem[] {
+    const kw = (this.keyword ?? '').trim().toLowerCase();
 
-  statusLabel(s: StatusKey) {
+    return this.Tickets().filter((t: any) => {
+      const matchStatus = this.filterStatus === 'all' ? true : t.status === this.filterStatus;
+      const matchKw = !kw
+        ? true
+        : (t.ticketNo.toLowerCase().includes(kw) || t.title.toLowerCase().includes(kw));
+      return matchStatus && matchKw;
+    });
+  }
+
+  statusLabel(s: string) {
     switch (s) {
-      case 'inprocess': return 'In Process Tickets';
+      case 'inprogress': return 'In Process Tickets';
       case 'assigned': return 'Assigned Tickets';
       case 'done': return 'Done';
       case 'open': return 'Open';
@@ -358,7 +378,11 @@ export class DashboardIT implements OnInit {
   }
 
   openAddNote() {
-    this.msg.info('TODO: เปิด Modal เพิ่ม Note');
+    this.IS_NOTE_TICKET.set(true)
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
   }
 
   safeUrl!: SafeResourceUrl;
@@ -380,7 +404,9 @@ export class DashboardIT implements OnInit {
   }
 
   acknowledgeTicket() {
-    const user = this.auth.userData();
+    const user = this.authService.userData();
+    // console.log(user)
+    this.IS_ACKNOWLEDGE_TICKET.set(true)
     // if (this.selectedTicket && user) {
     //   this.selectedTicket.status = 'assigned';
     //   this.selectedTicket.assignee = {
@@ -397,6 +423,10 @@ export class DashboardIT implements OnInit {
     // }
   }
 
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+  }
+
   closeTicket() {
     this.msg.success('TODO: ปิดงาน (confirm)');
   }
@@ -405,58 +435,65 @@ export class DashboardIT implements OnInit {
     this.isAssignModalVisible = false;
   }
 
-  toggleAssignee(empCode: string) {
-    const idx = this.selectedAssigneeEmpCodes.indexOf(empCode);
+  toggleAssignee(emp: any) {
+    const idx = this.selectedAssigneeEmpCodes.findIndex(e => e.id === emp.id);
+
+    console.log(this.selectedAssigneeEmpCodes, idx);
     if (idx > -1) {
       this.selectedAssigneeEmpCodes.splice(idx, 1);
     } else {
-      this.selectedAssigneeEmpCodes.push(empCode);
+      this.selectedAssigneeEmpCodes.push(emp);
     }
-  }
 
-  // toggleGroup(group: any) {
-  //   const allIn = group.members.every((m: string) => this.selectedAssigneeEmpCodes.includes(m));
-  //   if (allIn) {
-  //     // Remove all
-  //     this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => !group.members.includes(c));
-  //   } else {
-  //     // Add missing ones
-  //     group.members.forEach((m: string) => {
-  //       if (!this.selectedAssigneeEmpCodes.includes(m)) {
-  //         this.selectedAssigneeEmpCodes.push(m);
-  //       }
-  //     });
-  //   }
-  // }
+    console.log(this.selectedAssigneeEmpCodes)
+
+  }
 
   toggleGroup(group: any) {
 
     const memberIds = group.members.map((m: any) => m.id);
 
     const allIn = memberIds.every((id: any) =>
-      this.selectedAssigneeEmpCodes.includes(id)
+      this.selectedAssigneeEmpCodes.some(e => e.id === id)
     );
 
     if (allIn) {
-      // remove all members
+
       this.selectedAssigneeEmpCodes =
-        this.selectedAssigneeEmpCodes.filter(id => !memberIds.includes(id));
+        this.selectedAssigneeEmpCodes.filter(e => !memberIds.includes(e.id));
+
     } else {
-      // add missing members
-      memberIds.forEach((id: any) => {
-        if (!this.selectedAssigneeEmpCodes.includes(id)) {
-          this.selectedAssigneeEmpCodes.push(id);
+
+      group.members.forEach((m: any) => {
+
+        const exists = this.selectedAssigneeEmpCodes.some(e => e.id === m.id);
+
+        if (!exists) {
+          this.selectedAssigneeEmpCodes.push(m);
         }
+
       });
+
     }
 
   }
+
   isGroupSelected(group: any): boolean {
-    return group.members.every((m: any) => this.selectedAssigneeEmpCodes.includes(m.id));
+    return group.members.every((m: any) =>
+      this.selectedAssigneeEmpCodes.some(e => e.id === m.id)
+    );
   }
 
-  removeAssignee(empCode: string) {
-    this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(c => c !== empCode);
+  isSelected(empId: string): boolean {
+    return this.selectedAssigneeEmpCodes.some(e => e.id === empId);
+  }
+
+
+  removeAssignee(empId: string) {
+
+    this.selectedAssigneeEmpCodes =
+      this.selectedAssigneeEmpCodes.filter(e => e.id !== empId);
+
   }
 
   submitAssign() {
@@ -464,9 +501,35 @@ export class DashboardIT implements OnInit {
       this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
       return;
     }
-    const selectedNames = this.selectedAssigneeEmpCodes.join(', ');
 
-    console.log(selectedNames)
+    console.log(this.authService.userData())
+
+    const assignees = JSON.stringify(
+      this.selectedAssigneeEmpCodes.map(x => ({
+        aduser: x.adUser.toLowerCase()
+      }))
+    );
+
+    console.log(assignees, this.selectedTicket())
+
+
+    this.itServiceService.updateAssigneesTicket({
+      id: this.selectedTicket().ticketId,
+      listAssignee: assignees || [],
+      createby: (this.authService.userData().AD_USER).toLowerCase()
+    }).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (res.success) {
+          this.swalService.success(res.message)
+          this.selectTicket(res.ticketId)
+          this.getAllTickets();
+        }
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    })
 
     // if (this.selectedTicket && this.selectedTicket.assignee) {
     //   this.selectedTicket.status = 'assigned'; // Update status
@@ -632,7 +695,7 @@ export class DashboardIT implements OnInit {
             groupMap[r.group_id].members.push({
               id: r.id,
               name: r.display_name,
-
+              adUser: r.AD_USER
             });
           }
         });

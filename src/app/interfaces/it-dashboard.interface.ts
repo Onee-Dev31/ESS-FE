@@ -47,12 +47,12 @@ export type StatusKey = 'open' | 'assigned' | 'inprocess' | 'done' | 'all';
 export type ChartMode = 'line' | 'bar';
 
 export interface KpiCard {
-    key: StatusKey;
+    status: string;
     title: string;
     value: number;
-    delta: number; // +/- percent
+    delta: number;
     hint: string;
-    icon: string; // nzType
+    icon: string;
 }
 
 export interface PieSlice {

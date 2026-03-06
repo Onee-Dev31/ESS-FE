@@ -1,21 +1,24 @@
 <!-- KPI CARDS -->
 <section class="kpi-row">
-    <div class="kpi" *ngFor="let k of kpis; trackBy: trackByKey" [class.active]="activeStatus === k.key"
-        (click)="selectStatus(k.key)">
+    <div class="kpi" *ngFor="let k of kpis; trackBy: trackByStatus" [class.active]="activeStatus === k.status"
+        (click)="selectStatus(k.status)">
+
         <div class="kpi-top">
             <div class="kpi-title">{{ k.title }}</div>
 
-            <span class="kpi-pill" [class.pill-blue]="k.key==='open'" [class.pill-cyan]="k.key==='assigned'"
-                [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='done'"
-                [class.pill-gray]="k.key==='all'">
+            <span class="kpi-pill" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
+                [class.pill-orange]="k.status==='inprocess'" [class.pill-green]="k.status==='done'"
+                [class.pill-gray]="k.status==='all'">
                 <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
             </span>
         </div>
 
-        <div class="kpi-value">{{ k.value | number }} <span>
-                <div class="kpi-delta" [class.pill-blue]="k.key==='open'" [class.pill-cyan]="k.key==='assigned'"
-                    [class.pill-orange]="k.key==='inprocess'" [class.pill-green]="k.key==='done'"
-                    [class.pill-gray]="k.key==='all'">
+        <div class="kpi-value">
+            {{ k.value | number }}
+            <span>
+                <div class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
+                    [class.pill-orange]="k.status==='inprocess'" [class.pill-green]="k.status==='done'"
+                    [class.pill-gray]="k.status==='all'">
                     <span>{{ getPercent(k) }}%</span>
                 </div>
             </span>

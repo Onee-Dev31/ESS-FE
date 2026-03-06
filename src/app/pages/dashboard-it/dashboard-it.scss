@@ -268,6 +268,105 @@
     }
 }
 
+.modal-overlay.acknowledgeTicket {
+
+    .top-header-strip {
+        padding: 10px 20px;
+
+        h2 {
+            font-size: $font-size-body;
+        }
+
+        .header-right-meta {
+            .btn-close-modal {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+    }
+
+    .top-header-strip::after {
+        display: none;
+    }
+
+    .top-header-strip h2::before {
+        display: none;
+    }
+
+    .modal-container {
+        width: 50% !important;
+        max-width: 500px;
+    }
+
+    // ==========================================
+    // Footer Actions
+    // ==========================================
+    .form-actions-footer {
+        padding: 18px 26px;
+        border-top: 1px solid var(--border-toolbar);
+        background: var(--bg-card);
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+
+        .btn-back-custom {
+            @include btn-secondary;
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: $font-size-label;
+        }
+
+        .btn-save-custom {
+            @include btn-primary;
+            height: 40px;
+            padding: 0 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            font-size: $font-size-label;
+
+            &:hover {
+                box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            }
+        }
+    }
+
+    .tag-group {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .tag input {
+        display: none;
+    }
+
+    .tag {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .tag input:checked+span,
+    .tag input:checked {}
+
+    .tag input:checked+span {
+        color: white;
+    }
+
+    .tag:has(input:checked) {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+}
+
 .form-input {
     width: 100%;
     height: 48px !important;
@@ -285,11 +384,24 @@
         font-weight: 400;
     }
 
-    &:focus {
+    &.note:focus {
         outline: none;
-        border-color: #a78bfa !important;
+        border-color: var(--status-open-text) !important;
         box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
+
+    &.deny:focus {
+        outline: none;
+        border-color: var(--status-cancel-text) !important;
+        box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+
+
+    // &:focus {
+    //     outline: none;
+    //     border-color: #a78bfa !important;
+    //     box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    // }
 
     &.readonly,
     &.disabled,
@@ -846,6 +958,10 @@ textarea.form-input {
     overflow: hidden;
     height: 30%;
 
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
     &:first-child {
         .card-body {
             min-height: 125px;
@@ -854,7 +970,6 @@ textarea.form-input {
 
     &:hover {
         transform: translateY(-4px);
-
     }
 
     .attachment-list {
@@ -911,7 +1026,6 @@ textarea.form-input {
                 border-color: var(--primary);
                 transform: translateY(-2px);
 
-
                 .file-icon-box {
                     background-color: var(--primary);
                     color: #ffffff;
@@ -940,7 +1054,8 @@ textarea.form-input {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+    flex-shrink: 0;
 }
 
 .tk-card__title {
@@ -950,8 +1065,9 @@ textarea.form-input {
 
 .tk-card__body {
     padding: 14px;
-    max-height: 140px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .tk-text {
@@ -960,7 +1076,6 @@ textarea.form-input {
     font-size: 14px;
 }
 
-/* attachments */
 .att-list {
     display: flex;
     flex-direction: column;
@@ -1025,7 +1140,7 @@ textarea.form-input {
 }
 
 .note {
-    border: 1px solid rgba(15, 23, 42, .08);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 12px;
     background: var(--bg-card);
@@ -1148,8 +1263,8 @@ textarea.form-input {
 .tk-empty,
 .tk-empty-center {
     color: var(--text-table-head);
-    background: var(--bg-slate);
     border: 1px dashed rgba(100, 116, 139, .35);
+    background: var(--bg-slate);
     border-radius: 14px;
     padding: 14px;
     text-align: center;
@@ -1222,7 +1337,7 @@ textarea.form-input {
 
     .timeline {
         position: relative;
-        border-left: 3px solid #e4e6ef;
+        border-left: 3px solid var(--text-muted);
         margin-left: 10px;
         padding-left: 25px;
         width: 95%;
@@ -1258,11 +1373,11 @@ textarea.form-input {
 
     /* content card */
     .timeline-content {
-        background: #ffffff;
+        background: var(--bg-page);
         border-radius: 12px;
         padding: 12px 16px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border: 1px solid #f1f1f1;
+        border: 1px solid var(--border-color);
     }
 
 
@@ -1291,10 +1406,10 @@ textarea.form-input {
         display: flex;
         align-items: center;
         gap: 6px;
-        background: #f7f9fc;
+        background: var(--bg-slate);
         padding: 4px 10px;
         border-radius: 20px;
-        border: 1px solid #e6e6e6;
+        border: 1px solid var(--border);
         transition: all 0.2s ease;
 
         &:hover {
@@ -1414,7 +1529,7 @@ textarea.form-input {
     text-align: center;
     gap: 6px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    border-bottom: 1px solid #0f172a0f;
 }
 
 
@@ -1489,6 +1604,8 @@ textarea.form-input {
     .tk-right {
         display: none;
     }
+
+
 }
 
 @media (max-width: 860px) {
@@ -1586,7 +1703,7 @@ textarea.form-input {
 
     &:focus-within {
         background: var(--bg-card);
-        border-color: var(--primary);
+        border-color: var(--status-warning-text);
         box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
     }
 }
