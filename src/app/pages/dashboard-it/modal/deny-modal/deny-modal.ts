@@ -26,6 +26,8 @@ export class DenyModal {
     const payload = {
       reason: form.value.reason
     };
+
+    this.submitModal.emit(payload);
   }
 
 }

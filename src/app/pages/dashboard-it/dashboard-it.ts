@@ -64,6 +64,7 @@ export class DashboardIT implements OnInit {
 
   IS_OPEN_IT_SERVICE = signal(0);
   IS_DENY_TICKET = signal(false);
+  IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
   IS_ASSIGN_TICKET = signal(false);
@@ -103,7 +104,7 @@ export class DashboardIT implements OnInit {
   trackById = (_: number, item: TicketItem) => item.id;
 
   selectTicket(ticketId: string) {
-    console.log(ticketId)
+    // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
 
@@ -132,147 +133,6 @@ export class DashboardIT implements OnInit {
       const attachments = convertedFiles
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
-
-      const mockAssignData_2: any = [
-        {
-          step: 1,
-          Assignee: [],
-          title: 'เปิดคำขอ',
-          description: 'เปิดคำขอ',
-          status: 'Open',
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo'
-          },
-          createdDate: new Date('2026-03-04T10:00:00').toISOString(),
-        },
-        {
-          step: 2,
-          title: 'ส่งต่อ',
-          description: 'ส่งต่อ',
-          status: 'Assigned',
-          Assignee: [
-            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
-            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
-          ],
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo'
-          },
-          createdDate: new Date('2026-03-04T10:10:00').toISOString(),
-        },
-        {
-          step: 3,
-          title: 'ส่งต่อ',
-          description: 'ส่งต่อ',
-          status: 'Assigned',
-          Assignee: [
-            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
-            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
-            { id: 3, fullName: 'ธนากร ดวงแก้ว', nickName: 'คอปเตอร์', empCode: 'OTD01125', adUser: 'thanakorndua', email: 'thanakorn.dua@onee.one', phone: '' },
-          ],
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo'
-          },
-          createdDate: new Date('2026-03-04T10:30:00').toISOString(),
-        },
-        {
-          step: 4,
-          title: 'กำลังดำเนินการ',
-          description: 'กำลังดำเนินการ',
-          status: 'In Progress',
-          Assignee: [],
-          createBy: {
-            fullName: 'ธนากร ดวงแก้ว',
-            nickName: 'คอปเตอร์',
-            empCode: 'OTD01125',
-            adUser: 'thanakorndua'
-          },
-          createdDate: new Date('2026-03-04T10:33:00').toISOString(),
-        },
-        {
-          step: 5,
-          title: 'ส่งต่อ',
-          description: 'ส่งต่อ',
-          status: 'Assigned',
-          Assignee: [
-            { id: 1, fullName: 'แพรวนภา บุตรโคษา', nickName: 'แพรว', empCode: 'OTD01050', adUser: 'praewnapaboo', email: 'praewnapa.boo@onee.one', phone: '1234' },
-            { id: 2, fullName: 'นพพร เอี่ยมขำ', nickName: 'หนึ่ง', empCode: 'OTD01072', adUser: 'nopporneam', email: 'nopporn.eam@onee.one', phone: '1235' },
-            { id: 3, fullName: 'ธนากร ดวงแก้ว', nickName: 'คอปเตอร์', empCode: 'OTD01125', adUser: 'thanakorndua', email: 'thanakorn.dua@onee.one', phone: '' },
-            { id: 4, fullName: 'ธราดล แก้วอนันต์', nickName: 'ฟลุ๊ค', empCode: 'OTD01128', adUser: '"tharadolkae', email: 'tharadol.kae@onee.one', phone: '1237' },
-          ],
-          createBy: {
-            fullName: 'ธนากร ดวงแก้ว',
-            nickName: 'คอปเตอร์',
-            empCode: 'OTD01125',
-            adUser: 'thanakorndua'
-          },
-          createdDate: new Date('2026-03-04T10:48:00').toISOString(),
-        },
-        {
-          step: 6,
-          title: 'กำลังดำเนินการ',
-          description: 'กำลังดำเนินการ',
-          status: 'In Progress',
-          Assignee: [],
-          createBy: {
-            fullName: 'ธราดล แก้วอนันต์',
-            nickName: 'ฟลุ๊ค',
-            empCode: 'OTD01128',
-            adUser: '"tharadolkae'
-          },
-          createdDate: new Date('2026-03-04T10:50:00').toISOString(),
-        },
-        {
-          step: 7,
-          title: 'รอข้อมูลเพิ่มเติม',
-          description: 'รอข้อมูลเพิ่มเติม',
-          status: 'On Hold',
-          Assignee: [],
-          createBy: {
-            fullName: 'ธราดล แก้วอนันต์',
-            nickName: 'ฟลุ๊ค',
-            empCode: 'OTD01128',
-            adUser: '"tharadolkae'
-          },
-          createdDate: new Date('2026-03-04T12:00:00').toISOString(),
-        },
-        {
-          step: 8,
-          title: 'แก้ไขเสร็จสิ้น',
-          description: 'แก้ไขเสร็จสิ้น',
-          status: 'Resolved',
-          Assignee: [],
-          createBy: {
-            fullName: 'ธราดล แก้วอนันต์',
-            nickName: 'ฟลุ๊ค',
-            empCode: 'OTD01128',
-            adUser: '"tharadolkae'
-          },
-          createdDate: new Date('2026-03-05T17:05:32').toISOString(),
-        },
-        {
-          step: 9,
-          title: 'ปิดแล้ว',
-          description: 'ปิดแล้ว',
-          status: 'Closed',
-          Assignee: [],
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo'
-          },
-          createdDate: new Date('2026-03-05T17:30:03').toISOString(),
-        },
-      ];
 
       const mockitNotes: any = [
         {
@@ -303,12 +163,6 @@ export class DashboardIT implements OnInit {
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      // this.selectedAssigneeEmpCodes = assignments.map((assign: any) => ({
-      //   id: assign.codeempid,
-      //   adUser: assign.aduser,
-      //   name: assign.full_name
-      // }));
-
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
@@ -335,7 +189,7 @@ export class DashboardIT implements OnInit {
         assignTimeline: result
       }
 
-      console.log("selectedTicket:", objectData)
+      // console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
@@ -607,15 +461,20 @@ export class DashboardIT implements OnInit {
 
 
   // MODAL
+  //>>> function
+  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any) {
+    const payload = {
+      decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
+      executedBy: this.authService.userData().CODEMPID,
+      ...((command === 'resume') && { itResult: 'In Progress' }),
+      ...((command === 'onhold') && { itResult: 'Hold' }),
+      ...((command === 'close') && { itResult: 'Closed' }),
+      ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
+      ...((command === 'assign') && { assignJson: assignees }),
+      ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+    }
 
-  // function
-  updateAssigneesTicket(ticketId: any, assignees: any, acceptBy?: any, createBy?: any) {
-    return this.itServiceService.updateAssigneesTicket({
-      id: ticketId,
-      listAssignee: assignees,
-      acceptby: acceptBy,
-      createby: createBy
-    });
+    return this.itServiceService.updateTicket(ticketId, payload)
   }
 
   // -- acknowledge --
@@ -627,29 +486,181 @@ export class DashboardIT implements OnInit {
     this.IS_ACKNOWLEDGE_TICKET.set(false);
   }
 
-  submitAcknowledge(event: any) {
-    console.log(event, this.authService.userData())
-    this.swalService.loading("กำลังบันทึกข้อมูล...")
-    this.IS_ACKNOWLEDGE_TICKET.set(false)
-    const ticketId = this.selectedTicket().ticketId
-    const user = (this.authService.userData().AD_USER).toLowerCase()
+  submitAcknowledge(data: any) {
 
-    this.updateAssigneesTicket(ticketId, null, user, user).subscribe({
-      next: (res) => {
-        console.log(res)
-        if (res.success) {
-          this.swalService.success(res.message)
-          this.selectTicket(res.ticketId)
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning("ไม่พบ Ticket");
+      return;
+    }
+
+    if (!data?.ticketTypeId?.tag) {
+      this.swalService.warning("กรุณาเลือกประเภท Ticket");
+      return;
+    }
+
+    const tag = data.ticketTypeId.tag;
+
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+
+    this.updateTicket('acknowledge', ticketId, tag, null, null)
+      .subscribe({
+        next: (res) => {
+
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket(ticketId);
           this.getAllTickets();
+
+        },
+
+        error: (error) => {
+          console.error("Acknowledge Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
         }
-      }
-      , error: (error) => {
-        console.error('Error fetching data:', error);
-        this.swalService.warning("เกิดข้อผิดพลาด", error)
-      }
-    })
+      });
 
   }
+
+  // -- deny --
+
+  onHoldTicket() {
+    this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('onhold', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket(ticketId);
+              this.getAllTickets();
+
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
+  }
+  resumeTicket() {
+    this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('resume', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket(ticketId);
+              this.getAllTickets();
+
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
+  }
+
+  // closeDenyModal() {
+  //   this.IS_DENY_TICKET.set(false);
+  // }
+
+  // submitDeny(data: any) {
+  //   const ticket = this.selectedTicket();
+  //   const ticketId = ticket?.ticketId;
+
+  //   if (!ticketId) {
+  //     this.swalService.warning("ไม่พบ Ticket");
+  //     return;
+  //   }
+  //   this.swalService.loading("กำลังบันทึกข้อมูล...");
+  //   this.IS_DENY_TICKET.set(false);
+
+  //   this.updateTicket('deny', ticketId, '', null, data.reason)
+  //     .subscribe({
+  //       next: (res) => {
+  //         if (!res?.success) {
+  //           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+  //           return;
+  //         }
+
+  //         this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+  //         this.selectTicket(ticketId);
+  //         this.getAllTickets();
+
+  //       },
+
+  //       error: (error) => {
+  //         console.error("Acknowledge Ticket Error:", error);
+
+  //         this.swalService.warning(
+  //           "เกิดข้อผิดพลาด",
+  //           error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+  //         );
+  //       }
+  //     });
+
+  // }
+
 
   // -- deny --
   openDenyModal() {
@@ -660,7 +671,41 @@ export class DashboardIT implements OnInit {
     this.IS_DENY_TICKET.set(false);
   }
 
-  submitDeny() {
+  submitDeny(data: any) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning("ไม่พบ Ticket");
+      return;
+    }
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_DENY_TICKET.set(false);
+
+    this.updateTicket('deny', ticketId, '', null, data.reason)
+      .subscribe({
+        next: (res) => {
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket(ticketId);
+          this.getAllTickets();
+
+        },
+
+        error: (error) => {
+          console.error("Acknowledge Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
+        }
+      });
 
   }
 
@@ -676,51 +721,100 @@ export class DashboardIT implements OnInit {
     this.IS_ASSIGN_TICKET.set(false)
   }
 
-  submitAssign(selectedAssignees: any[]) {
-    this.swalService.loading("กำลังบันทึกข้อมูล...")
-    this.IS_ASSIGN_TICKET.set(false)
+  submitAssign(data: any) {
 
-    if (selectedAssignees.length === 0) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!data?.assignees || data.assignees.length === 0) {
       this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
       return;
     }
 
-    const assignees = JSON.stringify(
-      selectedAssignees.map(x => ({
-        aduser: x.adUser.toLowerCase()
-      }))
-    );
+    const assignees = data.assignees.map((x: any) => ({
+      codeempid: x?.id?.toLowerCase()
+    }));
 
-    const ticketId = this.selectedTicket().ticketId
-    const user = (this.authService.userData().AD_USER).toLowerCase()
+    const typeTicket = data?.ticketTypeId;
 
-    this.updateAssigneesTicket(ticketId, assignees || [], null, user).subscribe({
-      next: (res) => {
-        console.log(res)
-        if (res.success) {
-          this.swalService.success(res.message)
-          this.selectTicket(res.ticketId)
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_ASSIGN_TICKET.set(false);
+
+    this.updateTicket('assign', ticketId, typeTicket, assignees)
+      .subscribe({
+        next: (res) => {
+
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket(res.ticketId || ticketId);
           this.getAllTickets();
+
+        },
+
+        error: (error) => {
+          console.error("Assign Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
         }
-      }
-      , error: (error) => {
-        console.error('Error fetching data:', error);
-        this.swalService.warning("เกิดข้อผิดพลาด", error)
-      }
-    })
+      });
 
-
-    // this.itServiceService.updateAssigneesTicket({
-    //   id: this.selectedTicket().ticketId,
-    //   listAssignee: assignees || [],
-    //   createby: (this.authService.userData().AD_USER).toLowerCase()
-    // })
   }
 
   // -- close --
 
   closeTicket() {
-    this.msg.success('TODO: ปิดงาน (confirm)');
+    this.swalService.confirm('ยืนยันการปิดงาน')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('close', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket(ticketId);
+              this.getAllTickets();
+
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
   }
 }
 

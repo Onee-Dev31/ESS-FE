@@ -1119,6 +1119,12 @@
         transform: translateY(2px);
     }
 
+    &.btn-onhold {
+        color: var(--btn-onhold-text);
+        --btn-border: var(--btn-onhold-text);
+        --btn-bg: var(--btn-onhold-bg);
+    }
+
     &.btn-deny {
         --btn-border: var(--status-rejected-bg);
         --btn-bg: var(--status-rejected-text);
@@ -1415,7 +1421,6 @@
     padding-bottom: 12px;
     border-bottom: 1px solid #0f172a0f;
 }
-
 
 .side-name {
     font-weight: 900;

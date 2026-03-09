@@ -136,6 +136,9 @@ export class AssignModal {
 
   save() {
     // console.log(this.selectedAssigneeEmpCodes)
-    this.submitModal.emit(this.selectedAssigneeEmpCodes);
+    this.submitModal.emit({
+      assignees: this.selectedAssigneeEmpCodes,
+      ticketTypeId: this.selectedTag
+    });
   }
 }

@@ -24,8 +24,7 @@ export class AcknowledgeModal {
       return;
     }
 
-    const payload = form.value;
-    this.submitModal.emit(payload);
+    this.submitModal.emit({ ticketTypeId: form.value });
   }
 
 }

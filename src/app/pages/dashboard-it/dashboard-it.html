@@ -183,9 +183,17 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions" *ngIf="t.status !== 'Closed'">
+                <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
+                    <i class="fa-solid fa-play" style="margin-right: 4px;"></i>
+                    Resume
+                </button>
+                <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
+                    <i class="fa-solid fa-pause" style="margin-right: 4px;"></i>
+                    On Hold
+                </button>
                 <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()">
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
-                    deny
+                    Deny
                 </button>
                 <ng-container>
                     <button class="btn btn-accept" (click)="openAcknowledgeModal()"
@@ -505,7 +513,8 @@
 }
 
 @if (IS_DENY_TICKET()) {
-<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
+<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"
+    (submitModal)="submitDeny($event)"></app-deny-modal>
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {

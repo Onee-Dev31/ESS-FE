@@ -445,11 +445,11 @@ export class ItDashboardSummary {
   }
 
   onCompanyBarClick(e: any) {
-    console.log("company : ", e);
+    // console.log("company : ", e);
     // e.name จะเป็น label ของ category เช่น 'ONEE'
     const company = (e?.data.code ?? '').toString();
     if (!company) return;
-    console.log("company : ", company);
+    // console.log("company : ", company);
 
     // toggle: คลิกซ้ำ = ซ่อน
     // if (this.selectedCompany === company && this.showDeptBar) {
