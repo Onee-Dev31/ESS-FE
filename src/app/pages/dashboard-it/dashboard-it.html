@@ -182,13 +182,14 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
-            <section class="tk-actions">
+            <section class="tk-actions" *ngIf="t.status !== 'Closed'">
                 <button class="btn btn-deny" style="margin-right: auto;" (click)="handleDeny()">
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
                     deny
                 </button>
-                <ng-container *ngIf="t.status !== 'Closed'">
-                    <button class="btn btn-accept" (click)="acknowledgeTicket()" *ngIf="t.status !== 'In Progress'">
+                <ng-container>
+                    <button class="btn btn-accept" (click)="acknowledgeTicket()"
+                        *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>
@@ -235,14 +236,14 @@
                 <div class="side-title">ผู้รับผิดชอบ</div>
 
 
-                <div class="timeline" *ngIf="t.assign.length > 0; else noAssignee">
+                <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
 
                     <div class="timeline-item"
-                        *ngFor="let step of t.assign.slice().reverse();let i = index; let first = first">
+                        *ngFor="let step of t.assignTimeline.slice().reverse();let i = index; let first = first">
 
                         <div class="timeline-icon" [ngClass]="{
-                                    'done': !first || t.assign.length === 1,
-                                    'active': first && t.assign.length !== 1
+                                    'done': !first || t.assignTimeline.length === 1,
+                                    'active': first && t.assignTimeline.length !== 1
                                 }">
                         </div>
 
@@ -498,7 +499,6 @@
     </div>
 </div>
 }
-
 
 @if (IS_NOTE_TICKET()) {
 <div class="modal-overlay denyTicket">

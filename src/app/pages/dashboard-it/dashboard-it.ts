@@ -132,6 +132,7 @@ export class DashboardIT implements OnInit {
       const services = res.services;
       const attachments = convertedFiles
       const assignGroups = res.assignGroups;
+      const assignments = res.assignments;
 
       const mockAssignData_2: any = [
         {
@@ -301,6 +302,13 @@ export class DashboardIT implements OnInit {
         }
       ]
 
+      const result = this.buildTimeline(res.timeline, res.timelineAssignees);
+
+      // this.selectedAssigneeEmpCodes = assignments.map((assign: any) => ({
+      //   id: assign.codeempid,
+      //   adUser: assign.aduser,
+      //   name: assign.full_name
+      // }));
 
       const objectData = {
         ticketId: ticket.id,
@@ -324,20 +332,14 @@ export class DashboardIT implements OnInit {
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
         itNotes: ticket.requester_code === 'OTD01050' ? mockitNotes : [],
-        assigneeName: '',
-        assigneeAduser: '',
-        assigneeEmail: '',
-        assigneePhone: '',
-        assign: ticket.requester_code === 'OTD01050' ? mockAssignData_2 : []
+        assignments: assignments,
+        assignTimeline: result
       }
 
       console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
-
-
-
   }
 
   selectAssignee(item: any) {
@@ -541,16 +543,6 @@ export class DashboardIT implements OnInit {
       }
     })
 
-    // if (this.selectedTicket && this.selectedTicket.assignee) {
-    //   this.selectedTicket.status = 'assigned'; // Update status
-    //   const first = this.selectedAssigneeEmpCodes[0];
-    //   this.selectedTicket.assignee.name = selectedNames;
-    //   this.selectedTicket.assignee.email = `${first.toLowerCase()}@oneeclick.com`;
-    //   this.selectedTicket.assignee.avatar = first.substring(0, 2);
-    //   this.selectedTicket.assignee.avatarBg = 'var(--primary)';
-    // }
-
-    this.msg.success(`มอบหมายงานให้ ${this.selectedAssigneeEmpCodes.length} ท่าน เรียบร้อยแล้ว`);
     this.isAssignModalVisible = false;
   }
 
@@ -642,6 +634,45 @@ export class DashboardIT implements OnInit {
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
+  }
+
+  buildTimeline(timelines: any[], assignees: any[]) {
+
+    // console.log(timelines, assignees)
+
+    return timelines.map(t => {
+
+      const assigneeList = assignees
+        .filter(a => a.timeline_id === t.timeline_id)
+        .map(a => ({
+          id: a.id,
+          fullName: a.full_name,
+          nickName: a.nickname,
+          empCode: a.codeempid,
+          adUser: a.aduser,
+          email: a.email,
+          phone: a.phone
+        }));
+
+      return {
+        step: t.step,
+        title: t.title,
+        description: t.description,
+        status: t.status,
+        Assignee: assigneeList,
+
+        createBy: {
+          fullName: t.created_by_name,
+          nickName: t.created_by_nickname,
+          empCode: t.created_by_codeempid,
+          adUser: t.created_by_aduser
+        },
+
+        createdDate: new Date(t.created_at).toISOString()
+      };
+
+    });
+
   }
 
   // FUNCTION
