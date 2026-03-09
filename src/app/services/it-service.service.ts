@@ -225,6 +225,13 @@ export class ItServiceService {
     });
   }
 
+  approveTicket(ticketId: number, payload: any) {
+    return this._http.post<any>(
+      `${this.baseUrl}/tickets/${ticketId}/approve`,
+      payload
+    );
+  }
+
   updateAssigneesTicket(assignData: {
     id: any;
     listAssignee: any;

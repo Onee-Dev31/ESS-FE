@@ -20,7 +20,7 @@ import { ItServiceService } from '../../services/it-service.service';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
-import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+// import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
@@ -29,7 +29,8 @@ import { listAnimation } from '../../animations/animations';
 @Component({
   selector: 'app-approval-it-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, EmptyStateComponent],
+  // imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
   styleUrl: './approval-it-request.scss',
@@ -88,14 +89,15 @@ export class ApprovalItRequestComponent implements OnInit {
 
     const page = this.listing.currentPage() + 1;
     const pageSize = this.listing.pageSize();
+    const status = this.listing.filterStatus(); 
 
     this.itService.getApprovalItRequests({
       page,
-      pageSize
+      pageSize,
+      status 
     })
     .subscribe({
       next: (res) => {
-
         const mappedData =
           (res.data || []).map((item:any) => this.mapToApprovalItem(item));
 
@@ -114,8 +116,10 @@ export class ApprovalItRequestComponent implements OnInit {
 
   private mapToApprovalItem(item: any): ApprovalItem {
     // Modify Mapping according to the actual IT Request API response
+    // console.log(`mapToApprovalItem ${JSON.stringify(item)}`)
     return {
-      requestNo: item.id || item.requestNo || 'IT-XXX',
+      requestId: item.id,
+      requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',
       requestDate: item.createDate ? this.dateUtil.formatDateToThaiMonth(item.createDate) : '-',
       requestBy: {
         name: item.requester?.name || item.requestBy?.name || 'Unknown',
@@ -142,7 +146,8 @@ export class ApprovalItRequestComponent implements OnInit {
     this.listing,
     (item, search, status) => {
 
-      const matchStatus = !status || item.status === status;
+      // const matchStatus = !status || item.status === status;
+      const matchStatus = true;
 
       const matchSearch = !search ||
         item.requestNo.toLowerCase().includes(search.toLowerCase()) ||
@@ -161,11 +166,14 @@ export class ApprovalItRequestComponent implements OnInit {
     return list;
   });
 
-  paginatedRows = computed(() => {
-    const start = this.listing.currentPage() * this.listing.pageSize();
-    return this.sortedData().slice(start, start + this.listing.pageSize());
-  });
+  // paginatedRows = computed(() => {
+  //   const start = this.listing.currentPage() * this.listing.pageSize();
+  //   return this.sortedData().slice(start, start + this.listing.pageSize());
+  // });
 
+  paginatedRows = computed(() => {
+    return this.approvals();
+  });
   table = createAngularTable(() => ({
     data: this.paginatedRows(),
     columns: [
@@ -186,8 +194,11 @@ export class ApprovalItRequestComponent implements OnInit {
   }));
 
   setActiveTab(tab: string) {
+    if (this.listing.filterStatus() === tab) return;
+
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
+    this.refresh();
   }
   getTabCount(tab: string) {
     return this.statusCounts()[tab] || 0;
@@ -207,6 +218,7 @@ export class ApprovalItRequestComponent implements OnInit {
 
   goToPage(page: number) {
     this.listing.currentPage.set(page);
+    this.refresh();
   }
 
   toggleSort(columnId: string) {

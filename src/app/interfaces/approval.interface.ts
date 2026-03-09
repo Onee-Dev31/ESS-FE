@@ -15,6 +15,7 @@ export interface UnifiedItem {
 
 /** ข้อมูลหลักของรายการขออนุมัติ (สวัสดิการ, ค่าเดินทาง, ฯลฯ) */
 export interface ApprovalItem {
+    requestId: number,
     requestNo: string;
     requestDate: string;
     requestBy: {
