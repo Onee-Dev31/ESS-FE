@@ -985,7 +985,7 @@
     border: 1px solid var(--btn-border);
     background: var(--btn-bg);
     transition: .2s;
-    box-shadow: 5px 5px 11px 0px #d5d5d5;
+    box-shadow: 2px 4px 8px 0px #d5d5d5;
 
     &:hover {
         background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);
