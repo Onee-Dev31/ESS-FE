@@ -207,6 +207,45 @@
             }
         }
     }
+
+    .select-tag {
+        padding: 16px;
+        margin: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+    }
+
+    .tag-group {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .tag input {
+        display: none;
+    }
+
+    .tag {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+    .tag input:checked+span,
+    .tag input:checked {}
+
+    .tag input:checked+span {
+        color: white;
+    }
+
+    .tag:has(input:checked) {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
 }
 
 .form-field {
@@ -548,4 +587,8 @@
         opacity: 0.7;
 
     }
+}
+
+.required {
+    color: red;
 }

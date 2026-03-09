@@ -32,6 +32,7 @@ export class AssignModal {
   @Output() submitModal = new EventEmitter<any>();
 
   selectedAssigneeEmpCodes: any[] = [];
+  selectedTag: number | null = null;
   assignSearchKeyword = '';
 
   ngOnChanges(changes: SimpleChanges) {
