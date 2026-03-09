@@ -182,17 +182,18 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
-            <section class="tk-actions">
-                <button class="btn btn-deny" style="margin-right: auto;" (click)="handleDeny()">
+            <section class="tk-actions" *ngIf="t.status !== 'Closed'">
+                <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()">
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
                     deny
                 </button>
-                <ng-container *ngIf="t.status !== 'Closed'">
-                    <button class="btn btn-accept" (click)="acknowledgeTicket()" *ngIf="t.status !== 'In Progress'">
+                <ng-container>
+                    <button class="btn btn-accept" (click)="openAcknowledgeModal()"
+                        *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>
-                    <button class="btn btn-send" (click)="forwardTicket()">
+                    <button class="btn btn-send" (click)="openAssignModal()">
                         <i class="fa-solid fa-share" style="margin-right: 4px;"></i>
                         ส่งต่อ
                     </button>
@@ -232,17 +233,17 @@
             </section>
             <section class="side-card assignee">
 
-                <div class="side-title">ผู้รับผิดชอบ</div>
+                <div class="side-title">Progress</div>
 
 
-                <div class="timeline" *ngIf="t.assign.length > 0; else noAssignee">
+                <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
 
                     <div class="timeline-item"
-                        *ngFor="let step of t.assign.slice().reverse();let i = index; let first = first">
+                        *ngFor="let step of t.assignTimeline.slice().reverse();let i = index; let first = first">
 
                         <div class="timeline-icon" [ngClass]="{
-                                    'done': !first || t.assign.length === 1,
-                                    'active': first && t.assign.length !== 1
+                                    'done': !first || t.assignTimeline.length === 1,
+                                    'active': first && t.assignTimeline.length !== 1
                                 }">
                         </div>
 
@@ -392,7 +393,7 @@
 </div>
 
 <!-- ASSIGN TICKET MODAL -->
-<nz-modal [(nzVisible)]="isAssignModalVisible" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
+<!-- <nz-modal [(nzVisible)]="IS_ASSIGN_TICKET()" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
     nzWrapClassName="assign-modal-wrap" (nzOnCancel)="closeAssignModal()">
     <ng-container *nzModalContent>
         <div class="assign-modal-header">
@@ -412,7 +413,7 @@
         </div>
 
         <div class="assign-modal-body">
-            <!-- SELECTED CHIPS -->
+  
             <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
                 <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
@@ -467,7 +468,7 @@
             </div>
         </div>
     </ng-container>
-</nz-modal>
+</nz-modal> -->
 
 @if (IS_OPEN_IT_SERVICE()) {
 <div class="modal-overlay OPEN">
@@ -499,7 +500,6 @@
 </div>
 }
 
-
 @if (IS_NOTE_TICKET()) {
 <div class="modal-overlay denyTicket">
     <div class="modal-container">
@@ -529,70 +529,15 @@
 }
 
 @if (IS_DENY_TICKET()) {
-<div class="modal-overlay denyTicket">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>เหตุผลในการยกเลิก</h2>
-                <!-- <div class="header-right-meta">
-                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div> -->
-            </header>
-            <div class="content-card">
-                <textarea class="form-input deny" placeholder="อธิบายรายละเอียด..."></textarea>
-            </div>
-            <div class="form-actions-footer">
-                <button class="btn-back-custom" (click)="closeDenyTicket()">
-                    <i class="fas fa-times"></i> ยกเลิก
-                </button>
-                <button class="btn-save-custom">
-                    <i class="fas fa-paper-plane"></i> ยืนยีน
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {
-<div class="modal-overlay acknowledgeTicket">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>รับเรื่อง</h2>
-            </header>
-            <div class="content-card">
-                <div class="tag-group">
-                    <label class="tag">
-                        <input type="radio" name="tag" value="2">
-                        <span>แจ้งปัญหา</span>
-                    </label>
+<app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()"
+    (submitModal)="submitAcknowledge($event)"></app-acknowledge-modal>
+}
 
-                    <label class="tag">
-                        <input type="radio" name="tag" value="1">
-                        <span>แจ้งซ่อม</span>
-                    </label>
-
-                    <label class="tag">
-                        <input type="radio" name="tag" value="3">
-                        <span>ขอใช้บริการ</span>
-                    </label>
-                </div>
-                <!-- <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea> -->
-            </div>
-            <div class="form-actions-footer">
-                <button class="btn-back-custom" (click)="closeAcknowledgeModal()">
-                    <i class="fas fa-times"></i> ยกเลิก
-                </button>
-                <button class="btn-save-custom">
-                    <i class="fas fa-paper-plane"></i> ยืนยีน
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+@if(IS_ASSIGN_TICKET()){
+<app-assign-modal [assigneeGroups]="assigneeGroups" [ticket]="selectedTicket()" (closeModal)="closeAssignModal()"
+    (submitModal)="submitAssign($event)"></app-assign-modal>
 }

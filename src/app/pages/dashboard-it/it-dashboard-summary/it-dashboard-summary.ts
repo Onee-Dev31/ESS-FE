@@ -360,7 +360,7 @@ export class ItDashboardSummary {
   selectStatus(k: string) {
     this.activeStatus = k;
     this.selectedStatus = k;
-    this.statusChange.emit(k);
+    // this.statusChange.emit(k);
 
     // ✅ ทำ effect เหมือน hover/active
     this.highlightStatusSlice(k);

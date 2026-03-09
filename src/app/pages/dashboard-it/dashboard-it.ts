@@ -19,17 +19,23 @@ import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request
 import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
 import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
+import { AcknowledgeModal } from "./modal/acknowledge-modal/acknowledge-modal";
+import { DenyModal } from "./modal/deny-modal/deny-modal";
+import { AssignModal } from "./modal/assign-modal/assign-modal";
 
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     FormsModule,
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent],
+    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent, AcknowledgeModal, DenyModal,
+    AssignModal
+  ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
@@ -52,19 +58,12 @@ export class DashboardIT implements OnInit {
   selectedAssignee = signal<any | undefined>(undefined);
 
   assigneeGroups: any[] = [];
-  get filteredAssigneeGroups() {
-    const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
-    if (!kw) return this.assigneeGroups;
-    return this.assigneeGroups.map(g => ({
-      ...g,
-      members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw))
-    })).filter(g => g.members.length > 0);
-  }
 
   IS_OPEN_IT_SERVICE = signal(0);
   IS_DENY_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
+  IS_ASSIGN_TICKET = signal(false);
 
   keyword = '';
   TicketStatus: any;
@@ -72,7 +71,7 @@ export class DashboardIT implements OnInit {
   filterStatus: string | null = 'all';
 
   selectedId = 1;
-  isAssignModalVisible = false;
+  // isAssignModalVisible = false;
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: any[] = [];
 
@@ -88,9 +87,6 @@ export class DashboardIT implements OnInit {
 
   close() {
     this.IS_OPEN_IT_SERVICE.set(0)
-  }
-  closeDenyTicket() {
-    this.IS_DENY_TICKET.set(false)
   }
 
   onStatusChange(status: string | null) {
@@ -132,6 +128,7 @@ export class DashboardIT implements OnInit {
       const services = res.services;
       const attachments = convertedFiles
       const assignGroups = res.assignGroups;
+      const assignments = res.assignments;
 
       const mockAssignData_2: any = [
         {
@@ -301,6 +298,13 @@ export class DashboardIT implements OnInit {
         }
       ]
 
+      const result = this.buildTimeline(res.timeline, res.timelineAssignees);
+
+      // this.selectedAssigneeEmpCodes = assignments.map((assign: any) => ({
+      //   id: assign.codeempid,
+      //   adUser: assign.aduser,
+      //   name: assign.full_name
+      // }));
 
       const objectData = {
         ticketId: ticket.id,
@@ -324,20 +328,14 @@ export class DashboardIT implements OnInit {
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
         itNotes: ticket.requester_code === 'OTD01050' ? mockitNotes : [],
-        assigneeName: '',
-        assigneeAduser: '',
-        assigneeEmail: '',
-        assigneePhone: '',
-        assign: ticket.requester_code === 'OTD01050' ? mockAssignData_2 : []
+        assignments: assignments,
+        assignTimeline: result
       }
 
       console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
-
-
-
   }
 
   selectAssignee(item: any) {
@@ -407,153 +405,6 @@ export class DashboardIT implements OnInit {
     this.msg.info(`ดาวน์โหลด: ${f.name}`);
   }
 
-  forwardTicket() {
-    this.isAssignModalVisible = true;
-    this.selectedAssigneeEmpCodes = [];
-    this.assignSearchKeyword = '';
-  }
-
-  acknowledgeTicket() {
-    const user = this.authService.userData();
-    // console.log(user)
-    this.IS_ACKNOWLEDGE_TICKET.set(true)
-    // if (this.selectedTicket && user) {
-    //   this.selectedTicket.status = 'assigned';
-    //   this.selectedTicket.assignee = {
-    //     name: user.USR_NAME_TH || user.USR_NAME_EN || 'Me',
-    //     email: user.USR_EMAIL || '',
-    //     phone: user.USR_MOBILE || '-',
-    //     avatar: (user.USR_NAME_EN || 'ME').substring(0, 2),
-    //     avatarBg: 'var(--primary)'
-    //   };
-    //   this.msg.success('คุณได้รับเรื่องเรียบร้อยแล้ว');
-    // } else {
-    //   // Fallback or if not logged in
-    //   this.forwardTicket();
-    // }
-  }
-
-  closeAcknowledgeModal() {
-    this.IS_ACKNOWLEDGE_TICKET.set(false);
-  }
-
-  closeTicket() {
-    this.msg.success('TODO: ปิดงาน (confirm)');
-  }
-
-  closeAssignModal() {
-    this.isAssignModalVisible = false;
-  }
-
-  toggleAssignee(emp: any) {
-    const idx = this.selectedAssigneeEmpCodes.findIndex(e => e.id === emp.id);
-
-    console.log(this.selectedAssigneeEmpCodes, idx);
-    if (idx > -1) {
-      this.selectedAssigneeEmpCodes.splice(idx, 1);
-    } else {
-      this.selectedAssigneeEmpCodes.push(emp);
-    }
-
-    console.log(this.selectedAssigneeEmpCodes)
-
-  }
-
-  toggleGroup(group: any) {
-
-    const memberIds = group.members.map((m: any) => m.id);
-
-    const allIn = memberIds.every((id: any) =>
-      this.selectedAssigneeEmpCodes.some(e => e.id === id)
-    );
-
-    if (allIn) {
-
-      this.selectedAssigneeEmpCodes =
-        this.selectedAssigneeEmpCodes.filter(e => !memberIds.includes(e.id));
-
-    } else {
-
-      group.members.forEach((m: any) => {
-
-        const exists = this.selectedAssigneeEmpCodes.some(e => e.id === m.id);
-
-        if (!exists) {
-          this.selectedAssigneeEmpCodes.push(m);
-        }
-
-      });
-
-    }
-
-  }
-
-  isGroupSelected(group: any): boolean {
-    return group.members.every((m: any) =>
-      this.selectedAssigneeEmpCodes.some(e => e.id === m.id)
-    );
-  }
-
-  isSelected(empId: string): boolean {
-    return this.selectedAssigneeEmpCodes.some(e => e.id === empId);
-  }
-
-
-  removeAssignee(empId: string) {
-
-    this.selectedAssigneeEmpCodes =
-      this.selectedAssigneeEmpCodes.filter(e => e.id !== empId);
-
-  }
-
-  submitAssign() {
-    if (this.selectedAssigneeEmpCodes.length === 0) {
-      this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
-      return;
-    }
-
-    console.log(this.authService.userData())
-
-    const assignees = JSON.stringify(
-      this.selectedAssigneeEmpCodes.map(x => ({
-        aduser: x.adUser.toLowerCase()
-      }))
-    );
-
-    console.log(assignees, this.selectedTicket())
-
-
-    this.itServiceService.updateAssigneesTicket({
-      id: this.selectedTicket().ticketId,
-      listAssignee: assignees || [],
-      createby: (this.authService.userData().AD_USER).toLowerCase()
-    }).subscribe({
-      next: (res) => {
-        console.log(res)
-        if (res.success) {
-          this.swalService.success(res.message)
-          this.selectTicket(res.ticketId)
-          this.getAllTickets();
-        }
-      }
-      , error: (error) => {
-        console.error('Error fetching data:', error);
-      }
-    })
-
-    // if (this.selectedTicket && this.selectedTicket.assignee) {
-    //   this.selectedTicket.status = 'assigned'; // Update status
-    //   const first = this.selectedAssigneeEmpCodes[0];
-    //   this.selectedTicket.assignee.name = selectedNames;
-    //   this.selectedTicket.assignee.email = `${first.toLowerCase()}@oneeclick.com`;
-    //   this.selectedTicket.assignee.avatar = first.substring(0, 2);
-    //   this.selectedTicket.assignee.avatarBg = 'var(--primary)';
-    // }
-
-    this.msg.success(`มอบหมายงานให้ ${this.selectedAssigneeEmpCodes.length} ท่าน เรียบร้อยแล้ว`);
-    this.isAssignModalVisible = false;
-  }
-
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
     if (!img.src.includes('user.png')) {
@@ -561,9 +412,6 @@ export class DashboardIT implements OnInit {
     }
   }
 
-  openImage(empCode: string) {
-    console.log('Open image:', empCode);
-  }
   // FUNCTION
 
   isToday(dateValue: string | Date): boolean {
@@ -644,10 +492,43 @@ export class DashboardIT implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
-  // FUNCTION
-  handleDeny() {
-    console.log("DENY")
-    this.IS_DENY_TICKET.set(true)
+  buildTimeline(timelines: any[], assignees: any[]) {
+
+    // console.log(timelines, assignees)
+
+    return timelines.map(t => {
+
+      const assigneeList = assignees
+        .filter(a => a.timeline_id === t.timeline_id)
+        .map(a => ({
+          id: a.id,
+          fullName: a.full_name,
+          nickName: a.nickname,
+          empCode: a.codeempid,
+          adUser: a.aduser,
+          email: a.email,
+          phone: a.phone
+        }));
+
+      return {
+        step: t.step,
+        title: t.title,
+        description: t.description,
+        status: t.status,
+        Assignee: assigneeList,
+
+        createBy: {
+          fullName: t.created_by_name,
+          nickName: t.created_by_nickname,
+          empCode: t.created_by_codeempid,
+          adUser: t.created_by_aduser
+        },
+
+        createdDate: new Date(t.created_at).toISOString()
+      };
+
+    });
+
   }
 
   // GET MASTER
@@ -719,6 +600,124 @@ export class DashboardIT implements OnInit {
         console.error('Error fetching data:', error);
       }
     })
+  }
+
+
+  // MODAL
+
+  // function
+  updateAssigneesTicket(ticketId: any, assignees: any, acceptBy?: any, createBy?: any) {
+    return this.itServiceService.updateAssigneesTicket({
+      id: ticketId,
+      listAssignee: assignees,
+      acceptby: acceptBy,
+      createby: createBy
+    });
+  }
+
+  // -- acknowledge --
+  openAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(true)
+  }
+
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+  }
+
+  submitAcknowledge(event: any) {
+    console.log(event, this.authService.userData())
+    this.swalService.loading("กำลังบันทึกข้อมูล...")
+    this.IS_ACKNOWLEDGE_TICKET.set(false)
+    const ticketId = this.selectedTicket().ticketId
+    const user = (this.authService.userData().AD_USER).toLowerCase()
+
+    this.updateAssigneesTicket(ticketId, null, user, user).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (res.success) {
+          this.swalService.success(res.message)
+          this.selectTicket(res.ticketId)
+          this.getAllTickets();
+        }
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+        this.swalService.warning("เกิดข้อผิดพลาด", error)
+      }
+    })
+
+  }
+
+  // -- deny --
+  openDenyModal() {
+    this.IS_DENY_TICKET.set(true)
+  }
+
+  closeDenyModal() {
+    this.IS_DENY_TICKET.set(false);
+  }
+
+  submitDeny() {
+
+  }
+
+  // -- assign --
+  openAssignModal() {
+    this.IS_ASSIGN_TICKET.set(true)
+    console.log("open")
+    this.selectedAssigneeEmpCodes = [];
+    this.assignSearchKeyword = '';
+  }
+
+  closeAssignModal() {
+    this.IS_ASSIGN_TICKET.set(false)
+  }
+
+  submitAssign(selectedAssignees: any[]) {
+    this.swalService.loading("กำลังบันทึกข้อมูล...")
+    this.IS_ASSIGN_TICKET.set(false)
+
+    if (selectedAssignees.length === 0) {
+      this.msg.warning('กรุณาเลือกผู้รับผิดชอบ');
+      return;
+    }
+
+    const assignees = JSON.stringify(
+      selectedAssignees.map(x => ({
+        aduser: x.adUser.toLowerCase()
+      }))
+    );
+
+    const ticketId = this.selectedTicket().ticketId
+    const user = (this.authService.userData().AD_USER).toLowerCase()
+
+    this.updateAssigneesTicket(ticketId, assignees || [], null, user).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (res.success) {
+          this.swalService.success(res.message)
+          this.selectTicket(res.ticketId)
+          this.getAllTickets();
+        }
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+        this.swalService.warning("เกิดข้อผิดพลาด", error)
+      }
+    })
+
+
+    // this.itServiceService.updateAssigneesTicket({
+    //   id: this.selectedTicket().ticketId,
+    //   listAssignee: assignees || [],
+    //   createby: (this.authService.userData().AD_USER).toLowerCase()
+    // })
+  }
+
+  // -- close --
+
+  closeTicket() {
+    this.msg.success('TODO: ปิดงาน (confirm)');
   }
 }
 

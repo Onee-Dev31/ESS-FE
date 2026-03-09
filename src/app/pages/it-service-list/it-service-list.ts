@@ -179,7 +179,7 @@ export class ItService implements OnInit {
   }
 
   statusLabel(s: any) {
-    console.log(s)
+    // console.log(s)
     switch (s) {
       case 'inprocess': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
