@@ -24,23 +24,27 @@
     // Shadows
     --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
-    // Status Badge Backgrounds (Light mode)
-    --status-success-bg: #dcfce7;
-    --status-success-text: #16a34a;
-    --status-danger-bg: #fee2e2;
-    --status-danger-text: #dc2626;
-    --status-warning-bg: #fef3c7;
-    --status-warning-text: #d97706;
-    --status-verified-bg: #dcfce7;
-    --status-verified-text: #16a34a;
-    --status-pending-bg: #fef3c7;
-    --status-pending-text: #d97706;
-    --status-rejected-bg: #fee2e2;
-    --status-rejected-text: #dc2626;
-    --status-approved-bg: #dbeafe;
-    --status-approved-text: #2563eb;
-    --status-completed-bg: #d1fae5;
-    --status-completed-text: #059669;
+    // // Status Badge Backgrounds (Light mode)
+    // --status-success-bg: #dcfce7;
+    // --status-success-text: #16a34a;
+    // --status-danger-bg: #fee2e2;
+    // --status-danger-text: #dc2626;
+    // --status-warning-bg: #fef3c7;
+    // --status-warning-text: #d97706;
+    // --status-verified-bg: #dcfce7;
+    // --status-verified-text: #16a34a;
+    // --status-pending-bg: #fef3c7;
+    // --status-pending-text: #d97706;
+    // --status-rejected-bg: #fee2e2;
+    // --status-rejected-text: #dc2626;
+    // --status-approved-bg: #dbeafe;
+    // --status-approved-text: #2563eb;
+    // --status-completed-bg: #d1fae5;
+    // --status-completed-text: #059669;
+
+    // Order Color
+    --green: #059669;
+    --greenlight: #d1fae5;
 
     // Status Color
     --status-new-bg: rgba(14, 165, 233, 0.15);
@@ -127,23 +131,23 @@
     // Shadows
     --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
 
-    // Status Badge Backgrounds (Dark mode adjustments - reducing lightness of BG)
-    --status-success-bg: rgba(22, 163, 74, 0.2);
-    --status-success-text: #4ade80;
-    --status-danger-bg: rgba(220, 38, 38, 0.2);
-    --status-danger-text: #f87171;
-    --status-warning-bg: rgba(217, 119, 6, 0.2);
-    --status-warning-text: #fbbf24;
-    --status-verified-bg: rgba(22, 163, 74, 0.2);
-    --status-verified-text: #4ade80;
-    --status-pending-bg: rgba(217, 119, 6, 0.2);
-    --status-pending-text: #fbbf24;
-    --status-rejected-bg: rgba(220, 38, 38, 0.2);
-    --status-rejected-text: #f87171;
-    --status-approved-bg: rgba(37, 99, 235, 0.2);
-    --status-approved-text: #60a5fa;
-    --status-completed-bg: rgba(5, 150, 105, 0.2);
-    --status-completed-text: #34d399;
+    // // Status Badge Backgrounds (Dark mode adjustments - reducing lightness of BG)
+    // --status-success-bg: rgba(22, 163, 74, 0.2);
+    // --status-success-text: #4ade80;
+    // --status-danger-bg: rgba(220, 38, 38, 0.2);
+    // --status-danger-text: #f87171;
+    // --status-warning-bg: rgba(217, 119, 6, 0.2);
+    // --status-warning-text: #fbbf24;
+    // --status-verified-bg: rgba(22, 163, 74, 0.2);
+    // --status-verified-text: #4ade80;
+    // --status-pending-bg: rgba(217, 119, 6, 0.2);
+    // --status-pending-text: #fbbf24;
+    // --status-rejected-bg: rgba(220, 38, 38, 0.2);
+    // --status-rejected-text: #f87171;
+    // --status-approved-bg: rgba(37, 99, 235, 0.2);
+    // --status-approved-text: #60a5fa;
+    // --status-completed-bg: rgba(5, 150, 105, 0.2);
+    // --status-completed-text: #34d399;
 
     // Status Color
     --status-new-bg: rgba(14, 165, 233, 0.40);

@@ -509,9 +509,9 @@ $border: var(--border);
                 }
 
                 .btn-create {
-                    background-color: var(--status-verified-bg) !important;
-                    color: var(--status-verified-text) !important;
-                    border: 1px solid var(--status-verified-text) !important;
+                    background-color: var( --greenlight) !important;
+                    color: var(--green) !important;
+                    border: 1px solid var(--green) !important;
                     font-weight: 600;
                     padding: 8px 16px;
                     border-radius: 4px;
