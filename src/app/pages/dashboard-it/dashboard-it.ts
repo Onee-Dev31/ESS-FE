@@ -22,7 +22,7 @@ import { tickets } from '../../utils/it-dashboard-mock';
 import { AcknowledgeModal } from "./modal/acknowledge-modal/acknowledge-modal";
 import { DenyModal } from "./modal/deny-modal/deny-modal";
 import { AssignModal } from "./modal/assign-modal/assign-modal";
-
+import { NoteModal } from './modal/note-modal/note-modal';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -33,8 +33,11 @@ import { AssignModal } from "./modal/assign-modal/assign-modal";
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent, AcknowledgeModal, DenyModal,
-    AssignModal
+    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent,
+    AcknowledgeModal,
+    DenyModal,
+    AssignModal,
+    NoteModal
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',

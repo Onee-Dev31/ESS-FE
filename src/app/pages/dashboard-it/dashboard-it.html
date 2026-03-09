@@ -501,31 +501,7 @@
 }
 
 @if (IS_NOTE_TICKET()) {
-<div class="modal-overlay denyTicket">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>เพิ่ม Note</h2>
-                <!-- <div class="header-right-meta">
-                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div> -->
-            </header>
-            <div class="content-card">
-                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
-            </div>
-            <div class="form-actions-footer">
-                <button class="btn-back-custom" (click)="closeAddNoteModal()">
-                    <i class="fas fa-times"></i> ยกเลิก
-                </button>
-                <button class="btn-save-custom">
-                    <i class="fas fa-paper-plane"></i> ส่ง
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+<app-note-modal [ticket]="selectedTicket()" (closeModal)="closeAddNoteModal()"></app-note-modal>
 }
 
 @if (IS_DENY_TICKET()) {

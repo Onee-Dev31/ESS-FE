@@ -9,6 +9,9 @@ import { NgxEchartsDirective, NgxEchartsModule } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import type { ECharts } from 'echarts'; // ✅ ไม่ใช้ EChartsType
 import { ItServiceService } from '../../../services/it-service.service';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 type PieDatum = { name: string; value: number; key?: string };
 
 @Component({
@@ -20,7 +23,12 @@ type PieDatum = { name: string; value: number; key?: string };
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
-    NgxEchartsDirective, NgxEchartsModule],
+    NgxEchartsDirective,
+    NgxEchartsModule,
+    NzTableModule,
+    NzModalModule,
+    NzPaginationModule
+  ],
   templateUrl: './it-dashboard-summary.html',
   styleUrl: './it-dashboard-summary.scss',
 })
@@ -58,6 +66,13 @@ export class ItDashboardSummary {
     all: -1
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
+  isLogModalVisible = false;
+  currentStatus = '';
+  ticketLogs: any[] = [];
+
+  page = 1;
+  pageSize = 10;
+
 
   constructor(
     private itServiceService: ItServiceService,
@@ -358,8 +373,15 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string) {
+    console.log("K : ", k);
+    this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
+    console.log(this.currentStatus);
+    if (k !== 'all') {
+      this.openTicketLogs(this.currentStatus);
+    }
+
     // this.statusChange.emit(k);
 
     // ✅ ทำ effect เหมือน hover/active
@@ -520,5 +542,79 @@ export class ItDashboardSummary {
         console.error('Error fetching data:', error);
       }
     });
+  }
+
+  openTicketLogs(status: string): void {
+    this.currentStatus = status;
+    this.page = 1;
+    this.ticketLogs = [];
+    this.isLogModalVisible = true;
+    this.loadTickets(status);
+  }
+
+  loadTickets(status: string): void {
+    this.itServiceService.getTicketByStatus(status).subscribe({
+      next: (res: any) => {
+        console.log('API RES = ', res);
+        this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('loadTickets error:', err);
+        this.ticketLogs = [];
+      }
+    });
+  }
+
+  handleCancel(): void {
+    this.isLogModalVisible = false;
+    this.ticketLogs = [];
+    this.page = 1;
+  }
+
+  viewTicket(data: any): void {
+    window.open(`/it-dashboard/report-detail?id=${data.id}`, '_blank');
+  }
+
+  onPageIndexChange(page: number): void {
+    this.page = page;
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = +size;
+    this.page = 1;
+  }
+
+  get pagedTicketLogs(): any[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.ticketLogs.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.ticketLogs.length / this.pageSize));
+  }
+
+  getPriorityClass(priority: string): string {
+    switch ((priority || '').toLowerCase()) {
+      case 'high':
+        return 'priority-high';
+      case 'medium':
+        return 'priority-medium';
+      case 'low':
+        return 'priority-low';
+      default:
+        return 'priority-default';
+    }
+  }
+
+  statusLabel(status: string) {
+    switch (status) {
+      case 'open': return 'Open';
+      case 'assigned': return 'Assigned';
+      case 'inprogress': return 'In Progress';
+      case 'done': return 'Closed';
+      case 'all': return 'All';
+      default: return this.currentStatus;
+    }
   }
 }

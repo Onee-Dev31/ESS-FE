@@ -64,3 +64,90 @@
 
 
 </div>
+
+<!-- overlay -->
+<div class="log-overlay" *ngIf="isLogModalVisible" (click)="handleCancel()">
+    <div class="log-modal" (click)="$event.stopPropagation()">
+        <div class="log-modal-header">
+            <div class="log-modal-title">
+                <span>Ticket Logs - </span>
+
+                <span class="status-pill" [class.pill-blue]="currentStatus==='Open'"
+                    [class.pill-cyan]="currentStatus==='Assigned'" [class.pill-orange]="currentStatus==='In Progress'"
+                    [class.pill-green]="currentStatus==='Closed'">
+                    {{ currentStatus }}
+                </span>
+            </div>
+
+            <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button>
+        </div>
+
+        <div class="log-modal-body">
+            <div class="log-summary">
+                ทั้งหมด {{ ticketLogs.length }} รายการ
+            </div>
+
+            <div class="table-wrap">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Ticket No</th>
+                            <th>Subject</th>
+                            <th>Requester</th>
+                            <th>Department</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let data of pagedTicketLogs">
+                            <td>{{ data.id }}</td>
+                            <td>{{ data.subject }}</td>
+                            <td>{{ data.requester_name || '-' }}</td>
+                            <td>{{ data.requester_dept || '-' }}</td>
+                            <td>
+                                <span class="priority-badge" [ngClass]="getPriorityClass(data.priority)">
+                                    {{ data.priority || '-' }}
+                                </span>
+                            </td>
+                            <td>{{ data.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>{{ data.updated_at ? (data.updated_at | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                            <td>
+                                <button class="view-btn" type="button" (click)="viewTicket(data)"> <i
+                                        class="fas fa-info-circle"></i></button>
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="pagedTicketLogs.length === 0">
+                            <td colspan="8" class="empty-row">ไม่พบข้อมูล</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
+                <button class="page-btn" type="button" [disabled]="page === 1" (click)="onPageIndexChange(page - 1)">
+                    Prev
+                </button>
+
+                <span class="page-info">
+                    Page {{ page }} / {{ totalPages }}
+                </span>
+
+                <button class="page-btn" type="button" [disabled]="page === totalPages"
+                    (click)="onPageIndexChange(page + 1)">
+                    Next
+                </button>
+
+                <select class="page-size-select" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="20">20</option>
+                    <option [ngValue]="50">50</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

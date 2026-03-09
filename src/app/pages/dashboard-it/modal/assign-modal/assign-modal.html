@@ -10,6 +10,30 @@
         </header>
 
         <div class="content-card">
+            <div class="select-tag">
+                <div>
+                    <p>เลือกประเภทงาน<span class="required">*</span></p>
+                </div>
+
+                <div class="tag-group">
+
+                    <label class="tag">
+                        <input type="radio" name="tag" value="2" [(ngModel)]="selectedTag">
+                        <span>แจ้งปัญหา</span>
+                    </label>
+
+                    <label class="tag">
+                        <input type="radio" name="tag" value="1" [(ngModel)]="selectedTag">
+                        <span>แจ้งซ่อม</span>
+                    </label>
+
+                    <label class="tag">
+                        <input type="radio" name="tag" value="3" [(ngModel)]="selectedTag">
+                        <span>ขอใช้บริการ</span>
+                    </label>
+
+                </div>
+            </div>
             <div class="form-field search">
                 <input nz-input placeholder="ค้นหาชื่อคน" [(ngModel)]="assignSearchKeyword" name="assign"
                     class="form-input" />
@@ -72,27 +96,13 @@
 
                 </div>
 
-                <!-- <div class="assign-modal-footer">
-                    <button type="button" class="btn-back-custom" (click)="close()">
-                        <i class="fas fa-times"></i> ยกเลิก
-                    </button>
-                    <button nz-button class="assign-submit" [disabled]="selectedAssigneeEmpCodes.length === 0"
-                        (click)="save()">
-
-                        {{ selectedAssigneeEmpCodes.length > 0
-                        ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
-                        : 'Assign Ticket' }}
-
-                    </button>
-                </div> -->
-
                 <div class="form-actions-footer">
                     <button type="button" class="btn-back-custom" (click)="close()">
                         <i class="fas fa-times"></i> ยกเลิก
                     </button>
 
-                    <button nz-button class="btn-save-custom" [disabled]="selectedAssigneeEmpCodes.length === 0"
-                        (click)="save()">
+                    <button nz-button class="btn-save-custom"
+                        [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null" (click)="save()">
                         <i class="fas fa-paper-plane"></i>
                         {{ selectedAssigneeEmpCodes.length > 0
                         ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
