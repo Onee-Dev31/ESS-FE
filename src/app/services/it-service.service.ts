@@ -249,4 +249,8 @@ export class ItServiceService {
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
+   getTicketByStatus(status: string) {
+    return this._http.get(`${this.baseUrl}/tickets/ByStatus?status=${status}`);
+  }
+
 }
