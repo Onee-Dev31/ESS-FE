@@ -78,8 +78,9 @@ export class ApprovalsHelperService {
 
         const details = item.items.map((i) => i.description).join(', ') || defaultDetails[type];
         const totalAmount = item.items.reduce((sum, i) => sum + (i.amount || 0), 0) || 0;
-
+        const requestId = (item as any).id;
         return {
+            requestId: requestId,
             requestNo: item.id,
             requestDate: this.dateUtil.formatDateToThaiMonth(item.createDate),
             requestBy: {
@@ -112,8 +113,9 @@ export class ApprovalsHelperService {
             department: 'N/A',
             company: 'บริษัท OTD'
         };
-
+        const requestId = (req as any).id;
         return {
+            requestId: requestId,
             requestNo: req.id,
             requestDate: req.createDate,
             requestBy: req.requester || defaultUser,

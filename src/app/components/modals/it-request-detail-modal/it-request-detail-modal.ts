@@ -8,6 +8,9 @@ import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { modalAnimation, fadeIn } from '../../../animations/animations';
 import { FilePreviewModalComponent, FilePreviewItem } from '../file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { ItServiceService } from '../../../services/it-service.service';
+import { DialogService } from '../../../services/dialog';
+import { STORAGE_KEYS } from '../../../constants/storage.constants';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -34,6 +37,9 @@ export class ItRequestDetailModal {
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
+
+  private itService = inject(ItServiceService);
+  private dialogService = inject(DialogService);
 
   get showAttachments(): boolean {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
@@ -105,10 +111,15 @@ export class ItRequestDetailModal {
     this.onClose.emit();
   }
 
-  confirmApprove() {
+  async confirmApprove() {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการอนุมัติ',
+      message: 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?'
+    });
+    if (!confirmed) return;
     this.updateStatus('Approved');
   }
-
+  
   // Open reject reason panel
   editRequest() {
     this.rejectReason.set('');
@@ -120,28 +131,60 @@ export class ItRequestDetailModal {
     this.rejectReason.set('');
   }
 
-  confirmReject() {
+  async confirmReject() {
     if (!this.rejectReason().trim()) {
       this.toastService.error('กรุณากรอกเหตุผลในการปฏิเสธ');
       return;
     }
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการปฏิเสธ',
+      message: 'คุณต้องการปฏิเสธคำขอนี้ใช่หรือไม่ ?'
+    });
+
+    if (!confirmed) return;
     this.updateStatus('Rejected', this.rejectReason().trim());
   }
+  
 
   private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
-    if (!this.approvalItem?.type) return;
 
-    let statusCode = REQUEST_STATUS.WAITING_CHECK;
-    if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
-    else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
-    else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
+    const ticketId = this.approvalItem.requestId;
 
-    const service = this.approvalsHelper.getServiceByType(this.approvalItem.type);
-    service.updateStatus(this.approvalItem.requestNo, statusCode);
 
-    this.onStatusUpdated.emit();
-    this.close();
-    const msg = newStatus === 'Rejected' ? 'ปฏิเสธคำขอเรียบร้อยแล้ว' : 'ดำเนินการอนุมัติเรียบร้อยแล้ว';
-    this.toastService.success(msg);
+    if (!ticketId) return;
+
+    const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
+    const approver = userData.CODEMPID;
+
+    const payload:any = {
+      decision: newStatus,
+      actionDate: new Date().toISOString(),
+      approverCodeempid: approver
+    };
+
+    if(reason){
+      payload.comment = reason;
+    }
+
+    // console.log(`updateStatus Ticket ID:${ticketId}`)
+    // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
+    this.itService.approveTicket(ticketId, payload)
+    .subscribe({
+      next: () => {
+
+        this.onStatusUpdated.emit();
+        this.close();
+
+        const msg =
+          newStatus === 'Rejected'
+            ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
+            : 'อนุมัติคำขอเรียบร้อยแล้ว';
+
+        this.toastService.success(msg);
+      },
+      error: () => {
+        this.toastService.error('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+      }
+    });
   }
 }
