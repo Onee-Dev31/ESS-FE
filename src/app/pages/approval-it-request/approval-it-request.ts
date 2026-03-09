@@ -172,8 +172,9 @@ export class ApprovalItRequestComponent implements OnInit {
   // });
 
   paginatedRows = computed(() => {
-    return this.approvals();
+    return this.sortedData();
   });
+
   table = createAngularTable(() => ({
     data: this.paginatedRows(),
     columns: [
