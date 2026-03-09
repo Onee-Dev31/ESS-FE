@@ -268,105 +268,6 @@
     }
 }
 
-.modal-overlay.acknowledgeTicket {
-
-    .top-header-strip {
-        padding: 10px 20px;
-
-        h2 {
-            font-size: $font-size-body;
-        }
-
-        .header-right-meta {
-            .btn-close-modal {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            }
-        }
-    }
-
-    .top-header-strip::after {
-        display: none;
-    }
-
-    .top-header-strip h2::before {
-        display: none;
-    }
-
-    .modal-container {
-        width: 50% !important;
-        max-width: 500px;
-    }
-
-    // ==========================================
-    // Footer Actions
-    // ==========================================
-    .form-actions-footer {
-        padding: 18px 26px;
-        border-top: 1px solid var(--border-toolbar);
-        background: var(--bg-card);
-        display: flex;
-        justify-content: flex-end;
-        gap: 16px;
-
-        .btn-back-custom {
-            @include btn-secondary;
-            height: 40px;
-            padding: 0 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: $font-size-label;
-        }
-
-        .btn-save-custom {
-            @include btn-primary;
-            height: 40px;
-            padding: 0 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-            font-size: $font-size-label;
-
-            &:hover {
-                box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-            }
-        }
-    }
-
-    .tag-group {
-        margin-top: 10px;
-        display: flex;
-        gap: 10px;
-    }
-
-    .tag input {
-        display: none;
-    }
-
-    .tag {
-        padding: 6px 14px;
-        border-radius: 20px;
-        border: 1px solid #ccc;
-        cursor: pointer;
-        font-size: 14px;
-        transition: 0.2s;
-    }
-
-    .tag input:checked+span,
-    .tag input:checked {}
-
-    .tag input:checked+span {
-        color: white;
-    }
-
-    .tag:has(input:checked) {
-        background: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
-}
-
 .form-input {
     width: 100%;
     height: 48px !important;
@@ -865,7 +766,7 @@ textarea.form-input {
 
 /* hero */
 .tk-hero {
-    background: linear-gradient(150deg, var(--primary) 50%, color-mix(in srgb, var(--primary) , var(--text-reverse) 20%));
+    background: linear-gradient(150deg, var(--primary) 50%, color-mix(in srgb, var(--primary), var(--text-reverse) 20%));
     border-radius: 16px;
     padding: 16px;
     color: var(--text-reverse);

@@ -183,12 +183,12 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions" *ngIf="t.status !== 'Closed'">
-                <button class="btn btn-deny" style="margin-right: auto;" (click)="handleDeny()">
+                <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()">
                     <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
                     deny
                 </button>
                 <ng-container>
-                    <button class="btn btn-accept" (click)="acknowledgeTicket()"
+                    <button class="btn btn-accept" (click)="openAcknowledgeModal()"
                         *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
@@ -529,14 +529,12 @@
 }
 
 @if (IS_DENY_TICKET()) {
-<div class="modal-overlay denyTicket">
+    <app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
+<!-- <div class="modal-overlay denyTicket">
     <div class="modal-container">
         <div>
             <header class="top-header-strip">
                 <h2>เหตุผลในการยกเลิก</h2>
-                <!-- <div class="header-right-meta">
-                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div> -->
             </header>
             <div class="content-card">
                 <textarea class="form-input deny" placeholder="อธิบายรายละเอียด..."></textarea>
@@ -553,46 +551,9 @@
 
     </div>
 
-</div>
+</div> -->
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {
-<div class="modal-overlay acknowledgeTicket">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>รับเรื่อง</h2>
-            </header>
-            <div class="content-card">
-                <div class="tag-group">
-                    <label class="tag">
-                        <input type="radio" name="tag" value="2">
-                        <span>แจ้งปัญหา</span>
-                    </label>
-
-                    <label class="tag">
-                        <input type="radio" name="tag" value="1">
-                        <span>แจ้งซ่อม</span>
-                    </label>
-
-                    <label class="tag">
-                        <input type="radio" name="tag" value="3">
-                        <span>ขอใช้บริการ</span>
-                    </label>
-                </div>
-                <!-- <textarea class="form-input" placeholder="อธิบายรายละเอียด..."></textarea> -->
-            </div>
-            <div class="form-actions-footer">
-                <button class="btn-back-custom" (click)="closeAcknowledgeModal()">
-                    <i class="fas fa-times"></i> ยกเลิก
-                </button>
-                <button class="btn-save-custom">
-                    <i class="fas fa-paper-plane"></i> ยืนยีน
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+<app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()" (submitModal)="submitAcknowledge()"></app-acknowledge-modal>
 }

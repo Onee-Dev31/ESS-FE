@@ -19,6 +19,8 @@ import { ItRepairRequestComponent } from "../it-repair-request/it-repair-request
 import { ITServiceRequestComponent } from "../it-service-request/it-service-request";
 import { SwalService } from '../../services/swal.service';
 import { tickets } from '../../utils/it-dashboard-mock';
+import { AcknowledgeModal } from "./modal/acknowledge-modal/acknowledge-modal";
+import { DenyModal } from "./modal/deny-modal/deny-modal";
 
 @Component({
   selector: 'app-dashboard-it',
@@ -29,7 +31,7 @@ import { tickets } from '../../utils/it-dashboard-mock';
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent],
+    ItDashboardSummary, FilePreviewModalComponent, ItProblemReportComponent, ItRepairRequestComponent, ITServiceRequestComponent, AcknowledgeModal, DenyModal],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
@@ -88,9 +90,6 @@ export class DashboardIT implements OnInit {
 
   close() {
     this.IS_OPEN_IT_SERVICE.set(0)
-  }
-  closeDenyTicket() {
-    this.IS_DENY_TICKET.set(false)
   }
 
   onStatusChange(status: string | null) {
@@ -415,30 +414,6 @@ export class DashboardIT implements OnInit {
     this.assignSearchKeyword = '';
   }
 
-  acknowledgeTicket() {
-    const user = this.authService.userData();
-    // console.log(user)
-    this.IS_ACKNOWLEDGE_TICKET.set(true)
-    // if (this.selectedTicket && user) {
-    //   this.selectedTicket.status = 'assigned';
-    //   this.selectedTicket.assignee = {
-    //     name: user.USR_NAME_TH || user.USR_NAME_EN || 'Me',
-    //     email: user.USR_EMAIL || '',
-    //     phone: user.USR_MOBILE || '-',
-    //     avatar: (user.USR_NAME_EN || 'ME').substring(0, 2),
-    //     avatarBg: 'var(--primary)'
-    //   };
-    //   this.msg.success('คุณได้รับเรื่องเรียบร้อยแล้ว');
-    // } else {
-    //   // Fallback or if not logged in
-    //   this.forwardTicket();
-    // }
-  }
-
-  closeAcknowledgeModal() {
-    this.IS_ACKNOWLEDGE_TICKET.set(false);
-  }
-
   closeTicket() {
     this.msg.success('TODO: ปิดงาน (confirm)');
   }
@@ -675,12 +650,6 @@ export class DashboardIT implements OnInit {
 
   }
 
-  // FUNCTION
-  handleDeny() {
-    console.log("DENY")
-    this.IS_DENY_TICKET.set(true)
-  }
-
   // GET MASTER
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
@@ -750,6 +719,34 @@ export class DashboardIT implements OnInit {
         console.error('Error fetching data:', error);
       }
     })
+  }
+
+
+  // MODAL
+  // -- acknowledge --
+  openAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(true)
+  }
+
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+  }
+
+  submitAcknowledge() {
+
+  }
+
+  // -- deny --
+  openDenyModal() {
+    this.IS_DENY_TICKET.set(true)
+  }
+
+  closeDenyModal() {
+    this.IS_DENY_TICKET.set(false);
+  }
+
+  submitDeny() {
+
   }
 }
 
