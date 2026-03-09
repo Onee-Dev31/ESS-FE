@@ -40,6 +40,7 @@ export class ItRequestDetailModal {
 
   private itService = inject(ItServiceService);
   private dialogService = inject(DialogService);
+  currentAction = signal<'Rejected' | 'Referred Back' | null>(null);
 
   get showAttachments(): boolean {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
@@ -86,7 +87,10 @@ export class ItRequestDetailModal {
   }
 
   viewFile(file: any) {
-    // For mock data, we use placeholder images/files
+
+    const baseUrl = 'https://10.2.0.11:7081'; // API server
+    const url = baseUrl + file.filePath;
+
     const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file.fileName);
     const isPdf = /\.pdf$/i.test(file.fileName);
 
@@ -94,12 +98,17 @@ export class ItRequestDetailModal {
     if (isImage) type = 'image/jpeg';
     else if (isPdf) type = 'application/pdf';
 
-    this.previewFiles.set([{
-      fileName: file.fileName,
-      date: dayjs(this.approvalItem.originalData?.createDate || new Date()).format('DD/MM/YYYY HH:mm'),
-      url: isImage ? 'assets/images/placeholder-attachment.png' : 'assets/docs/placeholder.pdf',
-      type: type
-    }]);
+    this.previewFiles.set([
+      {
+        fileName: file.fileName,
+        date: dayjs(
+          this.approvalItem.originalData?.createDate || new Date()
+        ).format('DD/MM/YYYY HH:mm'),
+        url: url, // ใช้ไฟล์จริง
+        type: type
+      }
+    ]);
+
     this.isPreviewModalOpen.set(true);
   }
 
@@ -145,6 +154,21 @@ export class ItRequestDetailModal {
     this.updateStatus('Rejected', this.rejectReason().trim());
   }
   
+  openReasonPanel(action: 'Rejected' | 'Referred Back') {
+    this.currentAction.set(action);
+    this.isRejectPanelOpen.set(true);
+  }
+
+  submitReason() {
+    const reason = this.rejectReason().trim();
+    if (!reason) {
+      this.toastService.error('กรุณากรอกเหตุผล');
+      return;
+    }
+    const action = this.currentAction();
+    if (!action) return;
+    this.updateStatus(action, reason);
+  }
 
   private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
 

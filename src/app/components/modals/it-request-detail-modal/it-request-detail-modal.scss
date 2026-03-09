@@ -321,13 +321,22 @@
 
     .modal-footer {
         display: flex;
-        justify-content: flex-end;
+        // justify-content: flex-end;
+        justify-content: space-between; 
         align-items: center;
         gap: 12px;
         padding: 20px 30px;
         background-color: var(--bg-card);
         border-top: 1px solid var(--border-color);
+        .footer-left {
+            display: flex;
+            align-items: center;
+        }
 
+        .footer-right {
+            display: flex;
+            gap: 12px;
+        }
         .btn-outline {
             padding: 8px 24px;
             border: 1px solid var(--border-table-head);
@@ -367,6 +376,15 @@
             &:hover {
                 opacity: 0.88;
             }
+        }
+        .btn-referred{
+            border:1px solid #f59e0b;
+            color:#f59e0b;
+        }
+
+        .btn-referred:hover{
+            background:#f59e0b;
+            color:white;
         }
     }
 }

@@ -98,6 +98,7 @@ export class ApprovalItRequestComponent implements OnInit {
     })
     .subscribe({
       next: (res) => {
+        console.log(`refresh : ${JSON.stringify(res)}`)
         const mappedData =
           (res.data || []).map((item:any) => this.mapToApprovalItem(item));
 
@@ -120,7 +121,8 @@ export class ApprovalItRequestComponent implements OnInit {
     return {
       requestId: item.id,
       requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',
-      requestDate: item.createDate ? this.dateUtil.formatDateToThaiMonth(item.createDate) : '-',
+      // requestDate: item.createDate ? this.dateUtil.formatDateToThaiMonth(item.createDate) : '-',
+      requestDate: item.createDate || null,
       requestBy: {
         name: item.requester?.name || item.requestBy?.name || 'Unknown',
         employeeId: item.requester?.employeeId || item.requestBy?.employeeId || '-',

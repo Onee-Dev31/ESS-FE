@@ -136,7 +136,13 @@
                             (click)="viewRequestDetail(row.original)">
                             {{ row.original.requestNo }}
                         </td>
-                        <td class="text-center text-muted">{{ row.original.requestDate }}</td>
+                        <!-- <td class="text-center text-muted">{{ row.original.requestDate }}</td> -->
+                        <td class="text-center text-muted">
+                            <div>{{ row.original.requestDate | date:'d MMM yyyy':'':'th-TH' }}</div>
+                            <div class="time-text">
+                                {{ row.original.requestDate | date:'HH:mm' }} น.
+                            </div>
+                        </td>
                         <td>
                             <div class="requester-info">
                                 <div class="name">{{ row.original.requestBy.name }}</div>
@@ -152,9 +158,20 @@
                         <td>
                             <span class="highlight">{{ row.original.originalData?.requestCategory || '-' }}</span>
                         </td>
-                        <td class="text-center">
+                        <!-- <td class="text-center">
                             <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">{{
                                 row.original.status }}</span>
+                        </td> -->
+                        <td class="text-center">
+                        <div>
+                            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                            {{ row.original.status }}
+                            </span>
+                        </div>
+
+                        <div class="status-time" *ngIf="row.original.originalData?.ApprovalDate && row.original.status != 'Pending'">
+                            {{ row.original.originalData?.ApprovalDate | date:'HH:mm' }} น.
+                        </div>
                         </td>
                         <td>
                             <div class="action-cell justify-center">

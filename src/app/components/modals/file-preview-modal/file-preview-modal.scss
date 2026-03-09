@@ -231,20 +231,14 @@ $text-sub: var(--text-sub);
                         }
 
                         .mock-image {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
                             text-align: center;
                             color: var(--text-sub);
                             padding: 40px;
-
-                            i {
-                                display: block;
-                                margin-bottom: 16px;
-                                opacity: 0.4;
-                            }
-
-                            p {
-                                margin: 0;
-                                font-weight: 500;
-                            }
+                            height: 100%;
                         }
                     }
                 }
