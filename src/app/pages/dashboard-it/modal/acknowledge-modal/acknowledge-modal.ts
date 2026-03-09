@@ -25,6 +25,7 @@ export class AcknowledgeModal {
     }
 
     const payload = form.value;
+    this.submitModal.emit(payload);
   }
 
 }

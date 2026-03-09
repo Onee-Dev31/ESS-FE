@@ -534,7 +534,7 @@
 
 @if (IS_ACKNOWLEDGE_TICKET()) {
 <app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()"
-    (submitModal)="submitAcknowledge()"></app-acknowledge-modal>
+    (submitModal)="submitAcknowledge($event)"></app-acknowledge-modal>
 }
 
 @if(IS_ASSIGN_TICKET()){

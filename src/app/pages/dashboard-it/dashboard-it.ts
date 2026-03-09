@@ -604,6 +604,17 @@ export class DashboardIT implements OnInit {
 
 
   // MODAL
+
+  // function
+  updateAssigneesTicket(ticketId: any, assignees: any, acceptBy?: any, createBy?: any) {
+    return this.itServiceService.updateAssigneesTicket({
+      id: ticketId,
+      listAssignee: assignees,
+      acceptby: acceptBy,
+      createby: createBy
+    });
+  }
+
   // -- acknowledge --
   openAcknowledgeModal() {
     this.IS_ACKNOWLEDGE_TICKET.set(true)
@@ -613,7 +624,27 @@ export class DashboardIT implements OnInit {
     this.IS_ACKNOWLEDGE_TICKET.set(false);
   }
 
-  submitAcknowledge() {
+  submitAcknowledge(event: any) {
+    console.log(event, this.authService.userData())
+    this.swalService.loading("กำลังบันทึกข้อมูล...")
+    this.IS_ACKNOWLEDGE_TICKET.set(false)
+    const ticketId = this.selectedTicket().ticketId
+    const user = (this.authService.userData().AD_USER).toLowerCase()
+
+    this.updateAssigneesTicket(ticketId, null, user, user).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (res.success) {
+          this.swalService.success(res.message)
+          this.selectTicket(res.ticketId)
+          this.getAllTickets();
+        }
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+        this.swalService.warning("เกิดข้อผิดพลาด", error)
+      }
+    })
 
   }
 
@@ -657,14 +688,10 @@ export class DashboardIT implements OnInit {
       }))
     );
 
-    console.log(assignees, this.selectedTicket())
+    const ticketId = this.selectedTicket().ticketId
+    const user = (this.authService.userData().AD_USER).toLowerCase()
 
-
-    this.itServiceService.updateAssigneesTicket({
-      id: this.selectedTicket().ticketId,
-      listAssignee: assignees || [],
-      createby: (this.authService.userData().AD_USER).toLowerCase()
-    }).subscribe({
+    this.updateAssigneesTicket(ticketId, assignees || [], null, user).subscribe({
       next: (res) => {
         console.log(res)
         if (res.success) {
@@ -678,6 +705,13 @@ export class DashboardIT implements OnInit {
         this.swalService.warning("เกิดข้อผิดพลาด", error)
       }
     })
+
+
+    // this.itServiceService.updateAssigneesTicket({
+    //   id: this.selectedTicket().ticketId,
+    //   listAssignee: assignees || [],
+    //   createby: (this.authService.userData().AD_USER).toLowerCase()
+    // })
   }
 
   // -- close --

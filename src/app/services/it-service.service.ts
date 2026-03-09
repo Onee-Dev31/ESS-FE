@@ -206,7 +206,7 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets`, formData);
   }
 
-  getApprovalItRequests(params: {page?: number; pageSize?: number; status?: string;}): Observable<any> {
+  getApprovalItRequests(params: { page?: number; pageSize?: number; status?: string; }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.page) {
       httpParams = httpParams.set('page', params.page);
@@ -227,15 +227,18 @@ export class ItServiceService {
 
   updateAssigneesTicket(assignData: {
     id: any;
-    listAssignee: any;
+    listAssignee?: any;
+    acceptby?: any;
     createby: any;
   }): Observable<any> {
-    // return of({ success: true }).pipe(delay(1500));
 
     const params = {
-      assignToAdusersJson: assignData.listAssignee,
       executedBy: assignData.createby,
+      ...(assignData.acceptby && { acceptby: assignData.acceptby }),
+      ...(assignData.listAssignee && { assignToAdusersJson: assignData.listAssignee })
     }
+
+    // console.log(params)
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
