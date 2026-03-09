@@ -20,15 +20,11 @@ export class AcknowledgeModal {
   }
 
   save(form: NgForm) {
-    console.log("click")
-
     if (form.invalid) {
       return;
     }
 
     const payload = form.value;
-
-    console.log(payload);
   }
 
 }

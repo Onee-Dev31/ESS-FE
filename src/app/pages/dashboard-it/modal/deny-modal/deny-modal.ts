@@ -26,9 +26,6 @@ export class DenyModal {
     const payload = {
       reason: form.value.reason
     };
-
-    console.log(payload);
-
   }
 
 }

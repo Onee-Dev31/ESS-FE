@@ -193,7 +193,7 @@
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>
-                    <button class="btn btn-send" (click)="forwardTicket()">
+                    <button class="btn btn-send" (click)="openAssignModal()">
                         <i class="fa-solid fa-share" style="margin-right: 4px;"></i>
                         ส่งต่อ
                     </button>
@@ -233,7 +233,7 @@
             </section>
             <section class="side-card assignee">
 
-                <div class="side-title">ผู้รับผิดชอบ</div>
+                <div class="side-title">Progress</div>
 
 
                 <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
@@ -393,7 +393,7 @@
 </div>
 
 <!-- ASSIGN TICKET MODAL -->
-<nz-modal [(nzVisible)]="isAssignModalVisible" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
+<!-- <nz-modal [(nzVisible)]="IS_ASSIGN_TICKET()" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
     nzWrapClassName="assign-modal-wrap" (nzOnCancel)="closeAssignModal()">
     <ng-container *nzModalContent>
         <div class="assign-modal-header">
@@ -413,7 +413,7 @@
         </div>
 
         <div class="assign-modal-body">
-            <!-- SELECTED CHIPS -->
+  
             <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
                 <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
@@ -468,7 +468,7 @@
             </div>
         </div>
     </ng-container>
-</nz-modal>
+</nz-modal> -->
 
 @if (IS_OPEN_IT_SERVICE()) {
 <div class="modal-overlay OPEN">
@@ -529,31 +529,15 @@
 }
 
 @if (IS_DENY_TICKET()) {
-    <app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
-<!-- <div class="modal-overlay denyTicket">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>เหตุผลในการยกเลิก</h2>
-            </header>
-            <div class="content-card">
-                <textarea class="form-input deny" placeholder="อธิบายรายละเอียด..."></textarea>
-            </div>
-            <div class="form-actions-footer">
-                <button class="btn-back-custom" (click)="closeDenyTicket()">
-                    <i class="fas fa-times"></i> ยกเลิก
-                </button>
-                <button class="btn-save-custom">
-                    <i class="fas fa-paper-plane"></i> ยืนยีน
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-</div> -->
+<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {
-<app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()" (submitModal)="submitAcknowledge()"></app-acknowledge-modal>
+<app-acknowledge-modal [ticket]="selectedTicket()" (closeModal)="closeAcknowledgeModal()"
+    (submitModal)="submitAcknowledge()"></app-acknowledge-modal>
+}
+
+@if(IS_ASSIGN_TICKET()){
+<app-assign-modal [assigneeGroups]="assigneeGroups" [ticket]="selectedTicket()" (closeModal)="closeAssignModal()"
+    (submitModal)="submitAssign($event)"></app-assign-modal>
 }
