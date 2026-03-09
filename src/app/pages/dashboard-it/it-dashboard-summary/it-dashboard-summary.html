@@ -83,6 +83,40 @@
         </div>
 
         <div class="log-modal-body">
+            <div class="log-filter">
+
+                <input type="text" class="search-input" placeholder="Ticket No" [(ngModel)]="filter.ticketNo"
+                    (ngModelChange)="applyFilter()" />
+
+                <input type="text" class="search-input" placeholder="Subject" [(ngModel)]="filter.subject"
+                    (ngModelChange)="applyFilter()" />
+
+                <input type="text" class="search-input" placeholder="Requester" [(ngModel)]="filter.requester"
+                    (ngModelChange)="applyFilter()" />
+
+                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()">
+                    <option value="">All Department</option>
+                    <option *ngFor="let d of departmentList" [value]="d">
+                        {{ d }}
+                    </option>
+                </select>
+
+                <select class="search-select" [(ngModel)]="filter.company" (ngModelChange)="applyFilter()">
+                    <option value="">All Company</option>
+                    <option *ngFor="let c of companyList" [value]="c">
+                        {{ c }}
+                    </option>
+                </select>
+
+                <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()"
+                    nzPlaceHolder="['From Date','To Date']">
+                </nz-range-picker>
+
+                <button class="export-btn" (click)="exportData()">
+                    <i class="fas fa-file-excel"></i> Export
+                </button>
+
+            </div>
             <div class="log-summary">
                 ทั้งหมด {{ ticketLogs.length }} รายการ
             </div>
@@ -93,16 +127,16 @@
                         <tr>
                             <th style="width: 10%;">Ticket No</th>
                             <th>Subject</th>
-                            <th>Requester</th>
-                            <th>Department</th>
+                            <th style="width: 15%;">Requester</th>
+                            <th style="width: 15%;">Department</th>
                             <th>Company</th>
-                            <th>Updated</th>
+                            <th style="width: 12%;">Updated</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr *ngFor="let data of pagedTicketLogs">
+                        <tr *ngFor="let data of filteredTicketLogs">
                             <td>{{ data.ticket_number }}</td>
                             <td>{{ data.subject }}</td>
                             <td>{{ data.requester_name || '-' }}</td>

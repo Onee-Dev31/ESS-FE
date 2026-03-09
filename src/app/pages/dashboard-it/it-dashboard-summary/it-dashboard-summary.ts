@@ -12,6 +12,10 @@ import { ItServiceService } from '../../../services/it-service.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import * as XLSX from 'xlsx';
+import { DateUtilityService } from '../../../services/date-utility.service';
+import dayjs, { Dayjs } from 'dayjs';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 type PieDatum = { name: string; value: number; key?: string };
 
 @Component({
@@ -27,7 +31,8 @@ type PieDatum = { name: string; value: number; key?: string };
     NgxEchartsModule,
     NzTableModule,
     NzModalModule,
-    NzPaginationModule
+    NzPaginationModule,
+    NzDatePickerModule
   ],
   templateUrl: './it-dashboard-summary.html',
   styleUrl: './it-dashboard-summary.scss',
@@ -73,10 +78,22 @@ export class ItDashboardSummary {
   page = 1;
   pageSize = 10;
 
-
+  searchKeyword = '';
+  filter = {
+    ticketNo: '',
+    subject: '',
+    requester: '',
+    department: '',
+    company: '',
+    dateRange: null as [Dayjs, Dayjs] | null
+  };
+  departmentList: string[] = [];
+  companyList: string[] = [];
+  filteredTicketLogs: any[] = [];
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
+    private dateService: DateUtilityService
   ) { }
 
   ngOnInit(): void {
@@ -557,6 +574,9 @@ export class ItDashboardSummary {
       next: (res: any) => {
         console.log('API RES = ', res);
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
+        this.filteredTicketLogs = this.ticketLogs
+        this.departmentList = [...new Set(this.ticketLogs.map(x => x.deptName))];
+        this.companyList = [...new Set(this.ticketLogs.map(x => x.COMPANY_CODE))];
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -616,5 +636,81 @@ export class ItDashboardSummary {
       case 'all': return 'All';
       default: return this.currentStatus;
     }
+  }
+
+  applyFilter() {
+
+    // const [from, to] = this.filter.dateRange || [];
+    const range = this.filter.dateRange;
+    const [rawFrom, rawTo] = range ?? [];
+    const from = rawFrom ? dayjs(rawFrom) : null;
+    const to = rawTo ? dayjs(rawTo) : null;
+    console.log('dateRange:', range);
+    console.log('from:', from?.format?.('YYYY-MM-DD HH:mm:ss'));
+    console.log('to:', to?.format?.('YYYY-MM-DD HH:mm:ss'));
+
+    this.filteredTicketLogs = this.ticketLogs.filter(t => {
+
+      const ticketNoMatch =
+        !this.filter.ticketNo ||
+        t.ticket_number?.toLowerCase().includes(this.filter.ticketNo.toLowerCase());
+
+      const subjectMatch =
+        !this.filter.subject ||
+        t.subject?.toLowerCase().includes(this.filter.subject.toLowerCase());
+
+      const requesterMatch =
+        !this.filter.requester ||
+        t.requester_name?.toLowerCase().includes(this.filter.requester.toLowerCase());
+
+      const deptMatch =
+        !this.filter.department ||
+        t.deptName === this.filter.department;
+
+      const companyMatch =
+        !this.filter.company ||
+        t.COMPANY_CODE === this.filter.company;
+
+      const rawDate = t.updated_at || t.created_at;
+      const itemDate = dayjs(rawDate);
+
+      console.log('--------------------------------');
+      console.log('rawDate(API):', rawDate);
+      console.log('itemDate(dayjs):', itemDate.format('YYYY-MM-DD HH:mm:ss'));
+
+      let dateMatch = true;
+
+      if (from && to) {
+        console.log('from.startOf:', from.startOf('day').format('YYYY-MM-DD HH:mm:ss'));
+        console.log('to.endOf:', to.endOf('day').format('YYYY-MM-DD HH:mm:ss'));
+
+        dateMatch =
+          itemDate.isAfter(from.startOf('day')) &&
+          itemDate.isBefore(to.endOf('day'));
+      }
+
+      console.log('dateMatch:', dateMatch);
+      return ticketNoMatch &&
+        subjectMatch &&
+        requesterMatch &&
+        deptMatch &&
+        companyMatch &&
+        dateMatch;
+
+    });
+
+    this.page = 1;
+  }
+
+  exportData() {
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
+
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Tickets': worksheet },
+      SheetNames: ['Tickets']
+    };
+
+    XLSX.writeFile(workbook, 'TicketLogs.xlsx');
   }
 }
