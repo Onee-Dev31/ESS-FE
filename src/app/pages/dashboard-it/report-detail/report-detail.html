@@ -12,10 +12,7 @@
                     <div>
                         <div class="tk-hero__title">{{ t.subject }}</div>
                         <div class="tk-hero__sub">
-                            <span class="muted">Ticket</span>
-                            <b class="mono">#{{ t.ticketNumber }}</b>
 
-                            <span class="sep">•</span>
                             <span class="muted">
                                 <span class="header-date"><i class="far fa-calendar-alt"></i> {{ t.createdDate |
                                     date:'longDate' }}</span>
@@ -27,6 +24,8 @@
                 </div>
 
                 <div class="tk-hero__right">
+                    <b class="mono">
+                        #{{ t.ticketNumber }}</b>
                     <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
                         <span class="dot"></span>
                         {{ statusLabel(t.status) }}
@@ -58,7 +57,7 @@
                     </div>
                 </div>
                 <div class="tk-card__body">
-                    <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+                    <ul class="attachment-list" *ngIf="t.attachments?.length > 0; else noAttachments">
                         <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
                             <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
                             <span class="file-name">{{ file.name }}</span>
@@ -78,7 +77,7 @@
                 </div>
 
                 <div class="tk-card__body">
-                    <div class="note-list" *ngIf="t.itNotes.length; else noNote">
+                    <div class="note-list" *ngIf="t.itNotes?.length; else noNote">
                         <div class="note" *ngFor="let n of t.itNotes.slice().reverse()">
                             <div class="note__top">
                                 <div class="note__who">
@@ -142,7 +141,7 @@
                 <div class="side-title">Progress</div>
 
 
-                <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
+                <div class="timeline" *ngIf="t.assignTimeline?.length > 0; else noAssignee">
 
                     <div class="timeline-item"
                         *ngFor="let step of t.assignTimeline.slice().reverse();let i = index; let first = first">
@@ -234,4 +233,8 @@
             </section>
         </aside>
     </ng-container>
+    @if (isPreviewModalOpen()) {
+    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
+    }
 </div>

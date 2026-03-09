@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, signal } from '@angular/core';
 import { ItServiceService } from '../../../services/it-service.service';
 import { tickets } from '../../../utils/it-dashboard-mock';
-import { FilePreviewItem } from '../../../components/modals/file-preview-modal/file-preview-modal';
+import { FilePreviewItem, FilePreviewModalComponent } from '../../../components/modals/file-preview-modal/file-preview-modal';
 import { StatusColor, StatusColor_Reverse, ticketTypyColor } from '../../../utils/status.util';
 import dayjs from 'dayjs';
 import { CommonModule } from '@angular/common';
@@ -19,7 +19,8 @@ import { ActivatedRoute } from '@angular/router';
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
-    NzModalModule,],
+    NzModalModule,
+    FilePreviewModalComponent],
   templateUrl: './report-detail.html',
   styleUrl: './report-detail.scss',
 })
@@ -74,20 +75,14 @@ export class ReportDetail {
       }
 
       const ticket = res.ticket;
-      const replies = res.replies;
-      const services = res.services;
-      const attachments = convertedFiles
-      const assignGroups = res.assignGroups;
-      const assignments = res.assignments;
+      const attachments = convertedFiles ?? [];
+      const replies = res.replies ?? [];
+      const services = res.services ?? [];
+      const assignGroups = res.assignGroups ?? [];
+      const assignments = res.assignments ?? [];
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       console.log("result : ", result);
-
-      // this.selectedAssigneeEmpCodes = assignments.map((assign: any) => ({
-      //   id: assign.codeempid,
-      //   adUser: assign.aduser,
-      //   name: assign.full_name
-      // }));
 
       const objectData = {
         ticketId: ticket.id,
@@ -107,13 +102,12 @@ export class ReportDetail {
         requesterCompanyCode: ticket.requester_companyCode,
         requesterCompanyName: ticket.requester_companyName,
         requesterPhone: ticket.contact_phone,
-        // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
-        attachments: attachments,
+        attachments: attachments ?? [],
         itNotes: ticket.requester_code === 'OTD01050',
-        assignments: assignments,
-        assignTimeline: result
-      }
+        assignments: assignments ?? [],
+        assignTimeline: result ?? []
+      };
 
       console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);

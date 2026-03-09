@@ -1,7 +1,7 @@
 <!-- KPI CARDS -->
 <section class="kpi-row">
     <div class="kpi" *ngFor="let k of kpis; trackBy: trackByStatus" [class.active]="activeStatus === k.status"
-        (click)="selectStatus(k.status)">
+        (click)="selectStatus(k.status,true)">
 
         <div class="kpi-top">
             <div class="kpi-title">{{ k.title }}</div>
@@ -91,12 +91,11 @@
                 <table class="log-table">
                     <thead>
                         <tr>
-                            <th>Ticket No</th>
+                            <th style="width: 10%;">Ticket No</th>
                             <th>Subject</th>
                             <th>Requester</th>
                             <th>Department</th>
-                            <th>Priority</th>
-                            <th>Created</th>
+                            <th>Company</th>
                             <th>Updated</th>
                             <th>Action</th>
                         </tr>
@@ -104,17 +103,19 @@
 
                     <tbody>
                         <tr *ngFor="let data of pagedTicketLogs">
-                            <td>{{ data.id }}</td>
+                            <td>{{ data.ticket_number }}</td>
                             <td>{{ data.subject }}</td>
                             <td>{{ data.requester_name || '-' }}</td>
-                            <td>{{ data.requester_dept || '-' }}</td>
                             <td>
-                                <span class="priority-badge" [ngClass]="getPriorityClass(data.priority)">
-                                    {{ data.priority || '-' }}
-                                </span>
+                                <div>{{ data.coscent }}</div>
+                                <div class="dept-name">{{ data.deptName }}</div>
                             </td>
-                            <td>{{ data.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-                            <td>{{ data.updated_at ? (data.updated_at | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                            <td>
+                                {{ data.COMPANY_CODE }}
+                            </td>
+                            <td>
+                                {{ (data.updated_at || data.created_at) | date:'dd/MM/yyyy HH:mm' }}
+                            </td>
                             <td>
                                 <button class="view-btn" type="button" (click)="viewTicket(data)"> <i
                                         class="fas fa-info-circle"></i></button>

@@ -250,7 +250,7 @@ export class ItServiceService {
   }
 
   getTicketByStatus(status: string) {
-    return this._http.get(`${this.baseUrl}/tickets/ByStatus?status=${status}`);
+    return this._http.get(`${this.baseUrl}/tickets/by-status?status=${status}`);
   }
 
   updateTicket(id: string, payload: any): Observable<any> {

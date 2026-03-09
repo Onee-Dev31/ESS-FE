@@ -80,7 +80,7 @@ export class ItDashboardSummary {
   ) { }
 
   ngOnInit(): void {
-    this.selectStatus('all');
+    this.selectStatus('all', false);
     this.getAllTickets();
 
   }
@@ -372,13 +372,13 @@ export class ItDashboardSummary {
     if (key) this.selectStatus(key);
   }
 
-  selectStatus(k: string) {
+  selectStatus(k: string, isClick: boolean = true) {
     console.log("K : ", k);
     this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
     console.log(this.currentStatus);
-    if (k !== 'all') {
+    if (isClick) {
       this.openTicketLogs(this.currentStatus);
     }
 
