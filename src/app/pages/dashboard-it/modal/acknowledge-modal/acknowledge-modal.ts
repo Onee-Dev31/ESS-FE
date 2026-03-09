@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 
@@ -14,6 +14,18 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
+
+  ngOnChanges(changes: SimpleChanges) {
+
+    if (changes['ticket'] && this.ticket) {
+
+      console.log(this.ticket.ticketTypeId)
+
+      this.selectedTag = this.ticket.ticketTypeId;
+
+    }
+
+  }
 
   close() {
     this.closeModal.emit();
