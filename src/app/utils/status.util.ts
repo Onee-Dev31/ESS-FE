@@ -37,9 +37,9 @@ export class StatusColor {
         Open: 'open',
         Assigned: 'assigned',
         'In Progress': 'progress',
-        Resolved: 'resolved',
+        Hold: 'hold',
+        Denied: 'deny',
         Closed: 'closed',
-        Cancelled: 'cancel'
     };
 
     static getStyle(status: string) {
@@ -67,9 +67,9 @@ export class StatusColor_Reverse {
         Open: 'open',
         Assigned: 'assigned',
         'In Progress': 'progress',
-        Resolved: 'resolved',
+        Hold: 'hold',
+        Denied: 'deny',
         Closed: 'closed',
-        Cancelled: 'cancel'
     };
 
     static getStyle(status: string) {

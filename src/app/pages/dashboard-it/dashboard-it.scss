@@ -1120,29 +1120,29 @@
     }
 
     &.btn-onhold {
-        color: var(--btn-onhold-text);
-        --btn-border: var(--btn-onhold-text);
+        color: var(--text);
+        --btn-border: var(--btn-onhold-border);
         --btn-bg: var(--btn-onhold-bg);
     }
 
     &.btn-deny {
-        --btn-border: var(--status-rejected-bg);
-        --btn-bg: var(--status-rejected-text);
+        --btn-border: var(--btn-deny-border);
+        --btn-bg: var(--btn-deny-bg);
     }
 
     &.btn-accept {
-        --btn-border: var(--status-approved-bg);
-        --btn-bg: var(--status-approved-text);
+        --btn-border: var(--btn-acknowledge-border);
+        --btn-bg: var(--btn-acknowledge-bg);
     }
 
     &.btn-send {
-        --btn-border: var(--status-warning-bg);
-        --btn-bg: var(--status-warning-text);
+        --btn-border: var(--btn-assign-border);
+        --btn-bg: var(--btn-assign-bg);
     }
 
     &.btn-done {
-        --btn-border: var(--status-completed-bg);
-        --btn-bg: var(--status-completed-text);
+        --btn-border: var(--btn-close-border);
+        --btn-bg: var(--btn-close-bg);
     }
 
 }

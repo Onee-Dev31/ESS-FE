@@ -46,21 +46,29 @@
     --status-new-bg: rgba(14, 165, 233, 0.15);
     --status-new-text: #0284c7;
     --status-open-bg: rgba(37, 99, 235, 0.15);
-    --status-open-text: #0046df; //0046df
-    --status-progress-bg: rgba(147, 51, 234, 0.15);
-    --status-progress-text: #6910b9;
-    --status-resolved-bg: rgba(5, 150, 105, 0.15);
-    --status-resolved-text: #059669;
-    --status-closed-bg: rgba(75, 85, 99, 0.15);
-    --status-closed-text: #4b5563;
-    --status-cancel-bg: rgba(220, 38, 38, 0.15);
-    --status-cancel-text: #dc2626;
-    --status-assigned-bg: rgba(217, 119, 6, 0.15);
-    --status-assigned-text: #d97706;
+    --status-open-text: #2563eb;
+    --status-assigned-bg: rgba(37, 100, 235, 0.15);
+    --status-assigned-text: #0ea5e9;
+    --status-progress-bg: rgba(255, 152, 34, 0.15);
+    --status-progress-text: #d97706;
+    --status-closed-bg: rgba(5, 150, 105, 0.15);
+    --status-closed-text: #22c55e;
+    --status-hold-bg: rgba(141, 141, 141, 0.15);
+    --status-hold-text: #616161;
+    --status-deny-bg: rgba(220, 38, 38, 0.15);
+    --status-deny-text: #dc2626;
 
     // BUTTON Color
     --btn-onhold-bg: #a7a7a7;
-    --btn-onhold-border: #0000008a;
+    --btn-onhold-border: #dbdbdb;
+    --btn-deny-bg: #dc2626;
+    --btn-deny-border: #e4bebe;
+    --btn-acknowledge-bg: #2563eb;
+    --btn-acknowledge-border: #a6ccff;
+    --btn-assign-bg: #d97706;
+    --btn-assign-border: #ffe7cc;
+    --btn-close-bg: #059669;
+    --btn-close-border: #a5d8c8;
 
     // Layout values
     --bg-toolbar: #ffffff;
@@ -126,8 +134,6 @@
     --status-danger-text: #f87171;
     --status-warning-bg: rgba(217, 119, 6, 0.2);
     --status-warning-text: #fbbf24;
-    // --status-new-bg: rgba(2, 132, 199, 0.2);
-    // --status-new-text: #38bdf8;
     --status-verified-bg: rgba(22, 163, 74, 0.2);
     --status-verified-text: #4ade80;
     --status-pending-bg: rgba(217, 119, 6, 0.2);
@@ -136,28 +142,36 @@
     --status-rejected-text: #f87171;
     --status-approved-bg: rgba(37, 99, 235, 0.2);
     --status-approved-text: #60a5fa;
-    // --status-progress-bg: rgba(147, 51, 234, 0.2);
-    // --status-progress-text: #c084fc;
     --status-completed-bg: rgba(5, 150, 105, 0.2);
     --status-completed-text: #34d399;
-    // --status-cancelled-bg: rgba(100, 116, 139, 0.2);
-    // --status-cancelled-text: #94a3b8;
 
     // Status Color
-    --status-new-bg: rgba(56, 189, 248, 0.30);
-    --status-new-text: #22d3ee;
-    --status-open-bg: rgba(59, 130, 246, 0.30);
-    --status-open-text: #004ac3;
-    --status-progress-bg: rgba(168, 85, 247, 0.30);
-    --status-progress-text: #6600c7;
-    --status-resolved-bg: rgba(34, 197, 94, 0.30);
-    --status-resolved-text: #22c55e;
-    --status-closed-bg: rgba(156, 163, 175, 0.28);
-    --status-closed-text: #616161;
-    --status-cancel-bg: rgba(239, 68, 68, 0.30);
-    --status-cancel-text: #ef4444;
-    --status-assigned-bg: rgba(245, 158, 11, 0.30);
-    --status-assigned-text: #f59e0b;
+    --status-new-bg: rgba(14, 165, 233, 0.40);
+    --status-new-text: #38bdf8;
+    --status-open-bg: rgba(59, 130, 246, 0.40);
+    --status-open-text: #60a5fa;
+    --status-assigned-bg: rgba(14, 165, 233, 0.40);
+    --status-assigned-text: #7dd3fc;
+    --status-progress-bg: rgba(245, 158, 11, 0.50);
+    --status-progress-text: #fb9724;
+    --status-closed-bg: rgba(34, 197, 94, 0.40);
+    --status-closed-text: #4ade80;
+    --status-hold-bg: rgba(107, 114, 128, 0.40);
+    --status-hold-text: #d1d5db;
+    --status-deny-bg: rgba(239, 68, 68, 0.40);
+    --status-deny-text: #f87171;
+
+    // BUTTON Color
+    --btn-onhold-bg: #6b7280;
+    --btn-onhold-border: #cbced32b;
+    --btn-deny-bg: #ef4444;
+    --btn-deny-border: #7f1d1d;
+    --btn-acknowledge-bg: #3b82f6;
+    --btn-acknowledge-border: #1e3a8a;
+    --btn-assign-bg: #f59e0b;
+    --btn-assign-border: #78350f;
+    --btn-close-bg: #10b981;
+    --btn-close-border: #064e3b;
 
     // Layout values
     --bg-toolbar: #1e293b;
