@@ -292,7 +292,7 @@ export class ItService implements OnInit {
   }
 
 
-  Resubmit(ticketId: number) {
+  Resubmit(ticket: any) {
     Swal.fire({
       title: 'ยืนยันการ Re-Submit ?',
       text: 'คุณต้องการส่ง Ticket นี้ให้หัวหน้า Approve หรือไม่',
@@ -308,7 +308,7 @@ export class ItService implements OnInit {
         const requester = JSON.parse(localStorage.getItem("employee") || '{}');
         console.log("Re submit จ้า", requester.CODEMPID);
 
-        this.itServiceService.re_open(ticketId, requester.CODEMPID).subscribe({
+        this.itServiceService.re_open(ticket.ticketId, requester.CODEMPID, ticket.ticketNumber, ticket.attachments).subscribe({
           next: (res) => {
 
             Swal.fire({
@@ -319,7 +319,7 @@ export class ItService implements OnInit {
               showConfirmButton: false
             });
 
-            this.selectTicket(ticketId.toString());
+            this.selectTicket(ticket.ticketId.toString());
 
           },
           error: (error) => {

@@ -260,8 +260,13 @@ export class ItServiceService {
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, payload);
   }
 
-  re_open(id: number, requester: string): Observable<any> {
-    return this._http.put(`${this.baseUrl}/tickets/re-open?id=${id}&requester=${requester}`,{});
+  re_open(id: number, requester: string, ticketNumber: string, file: any): Observable<any> {
+    return this._http.put('/tickets/re-open', {
+      id: id,
+      requester: requester,
+      ticketNumber: ticketNumber,
+      fileDescriptions: file
+    });
   }
 
 }
