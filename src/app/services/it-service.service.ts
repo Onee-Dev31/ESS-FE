@@ -226,7 +226,7 @@ export class ItServiceService {
   }
 
   approveTicket(ticketId: number, payload: any) {
-    return this._http.post<any>(
+    return this._http.patch<any>(
       `${this.baseUrl}/tickets/${ticketId}/approve`,
       payload
     );
