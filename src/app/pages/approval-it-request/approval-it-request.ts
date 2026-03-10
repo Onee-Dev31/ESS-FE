@@ -89,30 +89,30 @@ export class ApprovalItRequestComponent implements OnInit {
 
     const page = this.listing.currentPage() + 1;
     const pageSize = this.listing.pageSize();
-    const status = this.listing.filterStatus(); 
+    const status = this.listing.filterStatus();
 
     this.itService.getApprovalItRequests({
       page,
       pageSize,
-      status 
+      status: 'New'
     })
-    .subscribe({
-      next: (res) => {
-        console.log(`refresh : ${JSON.stringify(res)}`)
-        const mappedData =
-          (res.data || []).map((item:any) => this.mapToApprovalItem(item));
+      .subscribe({
+        next: (res) => {
+          // console.log(`refresh : ${JSON.stringify(res)}`)
+          const mappedData =
+            (res.data || []).map((item: any) => this.mapToApprovalItem(item));
 
-        this.approvals.set(mappedData);
+          this.approvals.set(mappedData);
 
-        this.totalItems.set(res.total);
+          this.totalItems.set(res.total);
 
-        if(res.statusSummary){
-          this.statusCounts.set(res.statusSummary);
+          if (res.statusSummary) {
+            this.statusCounts.set(res.statusSummary);
+          }
+
+          this.loadingService.stop('approvals-it-list');
         }
-
-        this.loadingService.stop('approvals-it-list');
-      }
-    });
+      });
   }
 
   private mapToApprovalItem(item: any): ApprovalItem {
