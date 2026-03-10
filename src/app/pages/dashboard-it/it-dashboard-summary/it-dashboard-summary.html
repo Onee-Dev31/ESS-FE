@@ -1,7 +1,7 @@
 <!-- KPI CARDS -->
 <section class="kpi-row">
     <div class="kpi" *ngFor="let k of kpis; trackBy: trackByStatus" [class.active]="activeStatus === k.status"
-        (click)="selectStatus(k.status)">
+        (click)="selectStatus(k.status,true)">
 
         <div class="kpi-top">
             <div class="kpi-title">{{ k.title }}</div>
@@ -83,6 +83,39 @@
         </div>
 
         <div class="log-modal-body">
+            <div class="log-filter">
+
+                <input type="text" class="search-input" placeholder="Ticket No" [(ngModel)]="filter.ticketNo"
+                    (ngModelChange)="applyFilter()" />
+
+                <input type="text" class="search-input" placeholder="Subject" [(ngModel)]="filter.subject"
+                    (ngModelChange)="applyFilter()" />
+
+                <input type="text" class="search-input" placeholder="Requester" [(ngModel)]="filter.requester"
+                    (ngModelChange)="applyFilter()" />
+
+                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()">
+                    <option value="">All Department</option>
+                    <option *ngFor="let d of departmentList" [value]="d">
+                        {{ d }}
+                    </option>
+                </select>
+
+                <select class="search-select" [(ngModel)]="filter.company" (ngModelChange)="applyFilter()">
+                    <option value="">All Company</option>
+                    <option *ngFor="let c of companyList" [value]="c">
+                        {{ c }}
+                    </option>
+                </select>
+
+                <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()">
+                </nz-range-picker>
+
+                <button class="export-btn" (click)="exportData()">
+                    <i class="fas fa-file-excel"></i> Export
+                </button>
+
+            </div>
             <div class="log-summary">
                 ทั้งหมด {{ ticketLogs.length }} รายการ
             </div>
@@ -91,30 +124,31 @@
                 <table class="log-table">
                     <thead>
                         <tr>
-                            <th>Ticket No</th>
+                            <th style="width: 10%;">Ticket No</th>
                             <th>Subject</th>
-                            <th>Requester</th>
-                            <th>Department</th>
-                            <th>Priority</th>
-                            <th>Created</th>
-                            <th>Updated</th>
+                            <th style="width: 15%;">Requester</th>
+                            <th style="width: 15%;">Department</th>
+                            <th>Company</th>
+                            <th style="width: 12%;">Updated</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        <tr *ngFor="let data of pagedTicketLogs">
-                            <td>{{ data.id }}</td>
+                        <tr *ngFor="let data of filteredTicketLogs">
+                            <td>{{ data.ticket_number }}</td>
                             <td>{{ data.subject }}</td>
                             <td>{{ data.requester_name || '-' }}</td>
-                            <td>{{ data.requester_dept || '-' }}</td>
                             <td>
-                                <span class="priority-badge" [ngClass]="getPriorityClass(data.priority)">
-                                    {{ data.priority || '-' }}
-                                </span>
+                                <div>{{ data.coscent }}</div>
+                                <div class="dept-name">{{ data.deptName }}</div>
                             </td>
-                            <td>{{ data.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-                            <td>{{ data.updated_at ? (data.updated_at | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                            <td>
+                                {{ data.COMPANY_CODE }}
+                            </td>
+                            <td>
+                                {{ (data.updated_at || data.created_at) | date:'dd/MM/yyyy HH:mm' }}
+                            </td>
                             <td>
                                 <button class="view-btn" type="button" (click)="viewTicket(data)"> <i
                                         class="fas fa-info-circle"></i></button>

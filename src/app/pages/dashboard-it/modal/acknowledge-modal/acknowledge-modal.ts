@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 
@@ -15,6 +15,18 @@ export class AcknowledgeModal {
 
   selectedTag: number | null = null;
 
+  ngOnChanges(changes: SimpleChanges) {
+
+    if (changes['ticket'] && this.ticket) {
+
+      console.log(this.ticket.ticketTypeId)
+
+      this.selectedTag = this.ticket.ticketTypeId;
+
+    }
+
+  }
+
   close() {
     this.closeModal.emit();
   }
@@ -24,8 +36,7 @@ export class AcknowledgeModal {
       return;
     }
 
-    const payload = form.value;
-    this.submitModal.emit(payload);
+    this.submitModal.emit({ ticketTypeId: form.value });
   }
 
 }

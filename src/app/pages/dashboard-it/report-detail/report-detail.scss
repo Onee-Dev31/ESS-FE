@@ -5,11 +5,11 @@
 
 .tk-page {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: 16px;
     padding: 16px;
     background: var(--bg-page);
-     min-height: 100dvh;
+    min-height: 100dvh;
     align-items: stretch;
     overflow-y: auto;
 
@@ -306,6 +306,16 @@
 
 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    margin-right: 10px;
+    background-color: #FFF5EE;
+    color: #FF69B4;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .btn-soft-primary {
@@ -962,7 +972,7 @@
 /* responsive (เบื้องต้น) */
 @media (max-width: 1200px) {
     .tk-page {
-        grid-template-columns:minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr);
     }
 
 }

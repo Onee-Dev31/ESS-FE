@@ -167,11 +167,8 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
-            <section class="tk-actions">
+            <section class="tk-actions" *ngIf="t.status === 'Closed'">
                 <ng-container>
-                    <!-- <button class="btn btn-accept">
-                        <i class="fas fa-sticky-note" style="margin-right: 4px;"></i> เพิ่ม Note
-                    </button> -->
                     <button class="btn btn-send" (click)="openReOpen()">
                         <i class="fas fa-history" style="margin-right: 4px;"></i> Reopen
                     </button>
@@ -310,9 +307,6 @@
         <div>
             <header class="top-header-strip">
                 <h2>เพิ่ม Note</h2>
-                <!-- <div class="header-right-meta">
-                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div> -->
             </header>
             <div class="content-card">
                 <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
@@ -338,9 +332,6 @@
         <div>
             <header class="top-header-strip">
                 <h2>อธิบายเหตุผล</h2>
-                <!-- <div class="header-right-meta">
-                    <button class="btn-close-modal" (click)="closeDenyTicket()"><i class="fas fa-times"></i></button>
-                </div> -->
             </header>
             <div class="content-card">
                 <textarea class="form-input reopen" placeholder="อธิบายรายละเอียด..."></textarea>

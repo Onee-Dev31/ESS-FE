@@ -249,8 +249,14 @@ export class ItServiceService {
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
-   getTicketByStatus(status: string) {
-    return this._http.get(`${this.baseUrl}/tickets/ByStatus?status=${status}`);
+  getTicketByStatus(status: string) {
+    return this._http.get(`${this.baseUrl}/tickets/by-status?status=${status}`);
+  }
+
+  updateTicket(id: string, payload: any): Observable<any> {
+    console.log(id, payload)
+    // return of({ success: true }).pipe(delay(1500));
+    return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, payload);
   }
 
 }

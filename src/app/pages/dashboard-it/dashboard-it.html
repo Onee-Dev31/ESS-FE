@@ -118,7 +118,6 @@
             </section>
 
             <!-- ATTACHMENTS -->
-            <!-- Attachments Section -->
             <section class="tk-card">
                 <div class="tk-card__head">
                     <div class="tk-card__title">
@@ -182,12 +181,21 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
-            <section class="tk-actions" *ngIf="t.status !== 'Closed'">
-                <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()">
-                    <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
-                    deny
+            <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+                <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
+                    <i class="fa-solid fa-play" style="margin-right: 4px;"></i>
+                    Resume
                 </button>
-                <ng-container>
+                <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
+                    <i class="fa-solid fa-pause" style="margin-right: 4px;"></i>
+                    On Hold
+                </button>
+                <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()"
+                    *ngIf="t.status !== 'Hold'">
+                    <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
+                    Deny
+                </button>
+                <div *ngIf="t.status !== 'Hold'">
                     <button class="btn btn-accept" (click)="openAcknowledgeModal()"
                         *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
@@ -201,7 +209,8 @@
                         <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i>
                         ปิดงาน
                     </button>
-                </ng-container>
+                </div>
+
             </section>
         </main>
         <!-- RIGHT: assignee/requester -->
@@ -505,7 +514,8 @@
 }
 
 @if (IS_DENY_TICKET()) {
-<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"></app-deny-modal>
+<app-deny-modal [ticket]="selectedTicket()" (closeModal)="closeDenyModal()"
+    (submitModal)="submitDeny($event)"></app-deny-modal>
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {

@@ -388,3 +388,55 @@
     background: #e2e8f0;
     color: #475569;
 }
+
+.status-pill {
+    padding: 5px 10px;
+    border-radius: 999px;
+}
+
+
+.log-filter {
+    padding: 5px 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+
+.export-btn {
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.log-filter {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.search-input,
+.search-select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.search-input {
+    width: 190px;
+}
+
+.search-select {
+    width: 190px;
+}
+
+::ng-deep nz-range-picker {
+    width: 220px;
+    border-radius: 10px !important;
+}
