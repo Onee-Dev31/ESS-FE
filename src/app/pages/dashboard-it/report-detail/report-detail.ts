@@ -46,7 +46,9 @@ export class ReportDetail {
     this.route.queryParams.subscribe(params => {
       const encrypted = params['id'];
       if (encrypted) {
-        const id = decryptValue(encrypted);
+        const bytes = decryptValue(encrypted);
+        const id = bytes.toString();
+
         if (id) {
           this.selectedTicket.set(id)
         }
