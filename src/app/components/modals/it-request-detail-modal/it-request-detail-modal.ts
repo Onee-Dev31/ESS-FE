@@ -45,7 +45,7 @@ export class ItRequestDetailModal {
   get showAttachments(): boolean {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
     // 1: แจ้งซ่อม (Repair), 2: แจ้งปัญหา (Problem)
-    return ticketTypeId === 1 || ticketTypeId === 2;
+    return ticketTypeId === 1 || ticketTypeId === 2 || ticketTypeId === 3;
   }
 
   get requestTypeLabel(): string {
@@ -180,21 +180,22 @@ export class ItRequestDetailModal {
     const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
     const approver = userData.CODEMPID;
 
-    const payload:any = {
-      decision: newStatus,
-      actionDate: new Date().toISOString(),
-      approverCodeempid: approver
+    const payload: any = {
+      Decision: newStatus == 'Referred Back' ? 'Referred_Back' : newStatus,
+      ExecutedBy: approver,
+      ...(reason ? { Comment: reason } : {})
     };
-
-    if(reason){
-      payload.comment = reason;
-    }
 
     // console.log(`updateStatus Ticket ID:${ticketId}`)
     // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
     this.itService.approveTicket(ticketId, payload)
     .subscribe({
-      next: () => {
+      next: (res) => {
+
+        if (!res?.success) {
+          this.toastService.error(res.message);
+          return;
+        }
 
         this.onStatusUpdated.emit();
         this.close();
@@ -202,12 +203,18 @@ export class ItRequestDetailModal {
         const msg =
           newStatus === 'Rejected'
             ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
+            : newStatus === 'Referred Back'
+            ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
             : 'อนุมัติคำขอเรียบร้อยแล้ว';
 
         this.toastService.success(msg);
       },
-      error: () => {
-        this.toastService.error('เกิดข้อผิดพลาดในการอัปเดตสถานะ');
+      error: (err) => {
+        const message =
+          err?.error?.message ||
+          'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
+
+        this.toastService.error(message);
       }
     });
   }

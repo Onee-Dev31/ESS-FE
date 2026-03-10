@@ -170,7 +170,7 @@
                         </div>
 
                         <div class="status-time" *ngIf="row.original.originalData?.ApprovalDate && row.original.status != 'Pending'">
-                            {{ row.original.originalData?.ApprovalDate | date:'HH:mm' }} น.
+                            {{ row.original.requestDate | date:'d MMM yyyy':'':'th-TH' }} {{ row.original.originalData?.ApprovalDate | date:'HH:mm' }} น.
                         </div>
                         </td>
                         <td>

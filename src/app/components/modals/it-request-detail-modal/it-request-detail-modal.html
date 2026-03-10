@@ -16,12 +16,17 @@
                 <div class="section-content">
                     <div class="info-row">
                         <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
-                        <div class="info-value">{{ approvalItem.originalData?.requestFor ||
+                        <div class="info-value">{{ approvalItem.requestBy.name ||
                             approvalItem.requestBy.name || '-' }}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">เบอร์โทรติดต่อ</div>
                         <div class="info-value">{{ approvalItem.requestBy.phone || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ขอสิทธิ์ให้</div>
+                        <div class="info-value">{{ approvalItem.originalData?.requestFor ||
+                            approvalItem.requestBy.name || '-' }}</div>
                     </div>
                 </div>
             </div>
@@ -48,30 +53,6 @@
             </div>
 
             <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
-            <!-- <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
-                <div class="section-header">
-                    <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
-                </div>
-                <div class="section-content">
-                    <div class="info-row">
-                        <div class="info-label align-top">Basic Systems</div>
-                        <div class="info-value">
-                            <ul class="system-list">
-                                <li><i class="fas fa-check"></i> ห้องประชุม</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label align-top">Specific Systems</div>
-                        <div class="info-value">
-                            <ul class="system-list">
-                                <li><i class="fas fa-check"></i> Oracle</li>
-                                <li><i class="fas fa-check"></i> BMS</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
             <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
                 <div class="section-header">
                     <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
@@ -126,8 +107,7 @@
                 <div class="section-content">
                     <div class="info-row">
                         <div class="info-label">รายละเอียด</div>
-                        <div class="info-value">{{ approvalItem.originalData?.symptom ||
-                            approvalItem.originalData?.description || '-' }}</div>
+                        <div class="info-value">{{ approvalItem.originalData?.description || '-' }}</div>
                     </div>
                 </div>
             </div>
