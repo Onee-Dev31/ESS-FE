@@ -18,6 +18,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 type PieDatum = { name: string; value: number; key?: string };
 import { encryptValue } from '../../../utils/crypto.js ';
+import { MasterDataService } from '../../../services/master-data.service';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -88,22 +89,23 @@ export class ItDashboardSummary {
     company: '',
     dateRange: null as [Dayjs, Dayjs] | null
   };
-  departmentList: string[] = [];
-  companyList: string[] = [];
+  departmentList: any[] = [];
+  companyList: any[] = [];
   filteredTicketLogs: any[] = [];
+  filteredDepartmentList: any[] = [];
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
-    private dateService: DateUtilityService
+    private masterService: MasterDataService
   ) { }
 
   ngOnInit(): void {
     this.selectStatus('all', false);
     this.getAllTickets();
-
+    this.getCompanies();
+    this.getDepartments();
   }
 
-  // mock: top 5 dept ต่อ company (ต่อ API ทีหลังได้)
   // ====== 1) Status Donut ======
 
   private updateKpis(summary: any) {
@@ -273,7 +275,6 @@ export class ItDashboardSummary {
     this.deptTop5Map = map;
   }
 
-  // ===== Helper: donut option (ใช้ร่วมกัน 2 pie) =====
   private makeDonutOption(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
     return {
       legend: {
@@ -286,9 +287,9 @@ export class ItDashboardSummary {
         textStyle: {
           fontSize: 10,
           fontWeight: 400,
-          overflow: 'truncate'   // กันข้อความยาวเกิน
+          overflow: 'truncate'
         },
-        width: '100%',            // 👈 บังคับความกว้าง
+        width: '100%',
         type: 'plain',
       },
       tooltip: { trigger: 'item' },
@@ -334,13 +335,13 @@ export class ItDashboardSummary {
         textStyle: {
           fontSize: 10,
           fontWeight: 400,
-          overflow: 'truncate'   // กันข้อความยาวเกิน
+          overflow: 'truncate'
         },
-        width: '100%',            // 👈 บังคับความกว้าง
+        width: '100%',
         type: 'plain',
       },
       tooltip: { trigger: 'item' },
-      color: ['#3b82f6', '#f43f5e', '#f59e0b'], // 👈 ใส่ตรงนี้
+      color: ['#3b82f6', '#f43f5e', '#f59e0b'],
       series: [
         {
           type: 'pie',
@@ -380,8 +381,6 @@ export class ItDashboardSummary {
   }
   onStatusChartInit(ec: any) {
     this.statusChart = ec;
-
-    // ✅ ตอนเริ่มถ้าอยากให้ all (ไม่ highlight อะไร) ก็แค่ลงค่า center total
     this.applyStatusCenter('all');
   }
 
@@ -391,7 +390,6 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
-    console.log("K : ", k);
     this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
@@ -400,12 +398,8 @@ export class ItDashboardSummary {
       this.openTicketLogs(this.currentStatus);
     }
 
-    // this.statusChange.emit(k);
-
-    // ✅ ทำ effect เหมือน hover/active
     this.highlightStatusSlice(k);
 
-    // ✅ ปรับข้อความกลางวง (จะเอา total ตอน all, เอาค่าตาม slice ตอนเลือก)
     this.applyStatusCenter(k);
   }
 
@@ -423,14 +417,12 @@ export class ItDashboardSummary {
         dataIndex
       });
 
-      // optional: ให้ tooltip โผล่ด้วยเหมือน hover
       this.statusChart.dispatchAction({
         type: 'showTip',
         seriesIndex: 0,
         dataIndex
       });
     } else {
-      // all -> ซ่อน tooltip
       this.statusChart.dispatchAction({ type: 'hideTip' });
     }
   }
@@ -452,7 +444,6 @@ export class ItDashboardSummary {
       }
     }
 
-    // ✅ update graphic text แล้ว setOption แบบไม่กระพริบ
     const opt = this.statusPieOption as any;
     opt.graphic = [
       { type: 'text', left: 'center', top: '46%', style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' } },
@@ -463,23 +454,13 @@ export class ItDashboardSummary {
   }
 
   onCompanyBarClick(e: any) {
-    // console.log("company : ", e);
-    // e.name จะเป็น label ของ category เช่น 'ONEE'
+
     const company = (e?.data.code ?? '').toString();
     if (!company) return;
-    // console.log("company : ", company);
-
-    // toggle: คลิกซ้ำ = ซ่อน
-    // if (this.selectedCompany === company && this.showDeptBar) {
-    //   this.showDeptBar = false;
-    //   this.selectedCompany = null;
-    //   return;
-    // }
 
     this.selectedCompany = company;
     this.showDeptBar = true;
 
-    // สร้างกราฟ top 5 dept
     const depts = this.deptTop5Map[company] ?? [];
     this.buildDeptBar(company, depts);
   }
@@ -576,8 +557,7 @@ export class ItDashboardSummary {
         console.log('API RES = ', res);
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
         this.filteredTicketLogs = this.ticketLogs
-        this.departmentList = [...new Set(this.ticketLogs.map(x => x.deptName))];
-        this.companyList = [...new Set(this.ticketLogs.map(x => x.COMPANY_CODE))];
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -694,14 +674,57 @@ export class ItDashboardSummary {
   }
 
   exportData() {
-
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
 
     const workbook: XLSX.WorkBook = {
       Sheets: { 'Tickets': worksheet },
       SheetNames: ['Tickets']
     };
-
     XLSX.writeFile(workbook, 'TicketLogs.xlsx');
+  }
+
+  // GET MASTER
+  getCompanies() {
+    this.masterService.getCompanyMaster().subscribe({
+      next: (data) => {
+        // console.log(data);
+        this.companyList = data
+        console.log("this.companyList : ", this.companyList);
+
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+
+  getDepartments() {
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (data) => {
+        // console.log(data);
+        this.departmentList = data
+        console.log("this.departmentList : ", this.departmentList);
+
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+  }
+
+  onCompanyChange() {
+
+    this.filter.department = '';
+
+    if (!this.filter.company) {
+      this.filteredDepartmentList = [];
+      return;
+    }
+
+    this.filteredDepartmentList = this.departmentList.filter(
+      d => d.COMPANY_CODE === this.filter.company
+    );
+
+    this.applyFilter();
   }
 }
