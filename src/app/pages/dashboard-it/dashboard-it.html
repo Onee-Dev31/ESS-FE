@@ -118,7 +118,7 @@
             </section>
 
             <!-- ATTACHMENTS -->
-            <section class="tk-card">
+            <!-- <section class="tk-card">
                 <div class="tk-card__head">
                     <div class="tk-card__title">
                         เอกสารแนบ
@@ -136,10 +136,10 @@
                         <p class="text-muted">ไม่มีเอกสารแนบ</p>
                     </ng-template>
                 </div>
-            </section>
+            </section> -->
 
             <!-- NOTES -->
-            <section class="tk-card">
+            <section class="tk-card note">
                 <div class="tk-card__head">
                     <div class="tk-card__title">Note</div>
                     <button style="border-radius: 10px;" nz-button nzType="primary" (click)="openAddNote()">
@@ -171,6 +171,21 @@
 
                             </div>
                             <div class="note__msg">{{ n.message }}</div>
+                            <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+
+                                <li *ngFor="let file of n.attachments" class="attachment-item" (click)="viewFile(file)">
+
+                                    <div class="file-icon-box">
+                                        <i class="far fa-file-alt"></i>
+                                    </div>
+
+                                    <span class="file-name">{{ file.name }}</span>
+
+                                    <i class="fas fa-download download-small"></i>
+
+                                </li>
+
+                            </ul>
                         </div>
                     </div>
 

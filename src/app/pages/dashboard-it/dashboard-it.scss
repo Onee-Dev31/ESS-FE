@@ -813,6 +813,10 @@
     }
 }
 
+.tk-card.note {
+    height: 60%;
+}
+
 .tk-card__head {
     padding: 12px 14px;
     display: flex;
@@ -920,6 +924,11 @@
         font-size: $font-size-hint;
         align-self: flex-start;
     }
+
+    // &.reply {
+    //     text-align: right;
+    //     justify-content: end;
+    // }
 }
 
 .note__who {

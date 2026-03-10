@@ -137,8 +137,29 @@ export class DashboardIT implements OnInit {
       const mockitNotes: any = [
         {
           id: 1,
-          message: 'เสร็จยัง',
-          createdDate: new Date('2026-03-04T16:00:00').toISOString(),
+          message: '',
+          attachments: [{
+            id: 1,
+            ticket_id: 16,
+            file_name: "Background 1536x1024 V.2.jpg",
+            file_path: "/uploads/tickets/ffae207283bd49c1889ee4146f8a6061_Background 1536x1024 V.2.jpg",
+            file_type: "image/jpeg",
+            file_size: 378964,
+            file_description: null,
+            uploaded_by_aduser: "system",
+            created_at: "2026-03-10T11:43:59.607"
+          }, {
+            id: 2,
+            ticket_id: 16,
+            file_name: "Background 1536x1024 V.2.jpg",
+            file_path: "/uploads/tickets/ffae207283bd49c1889ee4146f8a6061_Background 1536x1024 V.2.jpg",
+            file_type: "image/jpeg",
+            file_size: 378964,
+            file_description: null,
+            uploaded_by_aduser: "system",
+            created_at: "2026-03-10T11:43:59.607"
+          }],
+          createdDate: new Date('2026-03-04T14:55:09').toISOString(),
           createBy: {
             fullName: 'แพรวนภา บุตรโคษา',
             nickName: 'แพรว',
@@ -149,8 +170,54 @@ export class DashboardIT implements OnInit {
         },
         {
           id: 2,
-          message: 'เสร็จยัง ? ',
-          createdDate: new Date('2026-03-05T16:30:00').toISOString(),
+          message: 'ขอเอกสารแนบเพิ่มเติมครับ',
+          attachments: [],
+          createdDate: new Date('2026-03-04T16:00:00').toISOString(),
+          createBy: {
+            fullName: 'ธราดล แก้วอนันต์',
+            nickName: 'ฟลุ๊ค',
+            empCode: 'OTD01128',
+            adUser: 'tharadolkae',
+            role: 'it'
+          }
+        },
+        {
+          id: 3,
+          message: '',
+          attachments: [{
+            id: 5,
+            ticket_id: 18,
+            file_name: "White and Green 3 page.pdf",
+            file_path: "/uploads/tickets/55ebb68b2e2d4f5083bf2cb0740b7940_White and Green 3 page.pdf",
+            file_type: "application/pdf",
+            file_size: 4115054,
+            file_description: null,
+            uploaded_by_aduser: "system",
+            created_at: "2026-03-10T11:57:47.35"
+          }, {
+            id: 6,
+            ticket_id: 18,
+            file_name: "bg-white.jpg",
+            file_path: "/uploads/tickets/ea99c87aad1349b5b6c277524b0d6f0d_bg-white.jpg",
+            file_type: "image/jpeg",
+            file_size: 16514,
+            file_description: null,
+            uploaded_by_aduser: "system",
+            created_at: "2026-03-10T11:57:47.35"
+          }, {
+            id: 7,
+            ticket_id: 18,
+            file_name: "Background 1536x1024 V.2.jpg",
+            file_path: "/uploads/tickets/3d9cac65dab44cd3bdb26b9c16c01c91_Background 1536x1024 V.2.jpg",
+            file_type: "image/jpeg",
+            file_size: 378964,
+            file_description: null,
+            uploaded_by_aduser: "system",
+            created_at: "2026-03-10T11:57:47.35"
+          }
+
+          ],
+          createdDate: new Date('2026-03-05T17:16:20').toISOString(),
           createBy: {
             fullName: 'แพรวนภา บุตรโคษา',
             nickName: 'แพรว',
@@ -158,8 +225,33 @@ export class DashboardIT implements OnInit {
             adUser: 'praewnapaboo',
             role: 'it'
           }
-        }
+        },
       ]
+
+      if (mockitNotes?.length) {
+        for (const note of mockitNotes) {
+
+          if (note.attachments?.length) {
+
+            note.attachments = await Promise.all(
+              note.attachments.map((f: any) =>
+                this.convertUrlToFile({
+                  id: f.id,
+                  fileName: f.file_name,
+                  filePath: f.file_path,
+                  fileType: f.file_type,
+                  fileSize: f.file_size,
+                  fileDescription: f.file_description,
+                  uploadedByaAduser: f.uploaded_by_aduser,
+                  created_date: f.created_at
+                })
+              )
+            );
+
+          }
+
+        }
+      }
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
@@ -190,7 +282,7 @@ export class DashboardIT implements OnInit {
         assignTimeline: result
       }
 
-      // console.log("selectedTicket:", objectData)
+      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
