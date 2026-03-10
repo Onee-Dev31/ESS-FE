@@ -575,7 +575,7 @@ export class ItDashboardSummary {
 
   viewTicket(data: any): void {
     const encryptedId = encryptValue(String(data.id));
-    window.open(`/it-dashboard/report-detail?id=${encryptedId}`, '_blank');
+    window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
   onPageIndexChange(page: number): void {
@@ -687,10 +687,7 @@ export class ItDashboardSummary {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         this.companyList = data
-        console.log("this.companyList : ", this.companyList);
-
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -701,10 +698,7 @@ export class ItDashboardSummary {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         this.departmentList = data
-        console.log("this.departmentList : ", this.departmentList);
-
       },
       error: (error) => {
         console.error('Error fetching data:', error);

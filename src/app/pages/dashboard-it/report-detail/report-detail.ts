@@ -36,7 +36,7 @@ export class ReportDetail {
 
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
-  queryId : string = '';
+  queryId: string = '';
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
@@ -47,7 +47,8 @@ export class ReportDetail {
     this.route.queryParams.subscribe(params => {
       const encrypted = params['id'];
       if (encrypted) {
-        const bytes = decryptValue(encrypted);
+        const decoded = decodeURIComponent(encrypted);
+        const bytes = decryptValue(decoded);
         const id = bytes.toString();
 
         if (id) {
