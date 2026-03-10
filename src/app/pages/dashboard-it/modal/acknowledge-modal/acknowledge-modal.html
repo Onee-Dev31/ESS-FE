@@ -10,33 +10,46 @@
 
                 <div class="content-card">
                     <div>
-                        <p>เลือกประเภทงาน<span class="required">*</span></p>
+
+                        <div>
+                            <p>เลือกประเภทงาน<span class="required">*</span></p>
+                        </div>
+
+                        <div class="tag-group">
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag">
+                                <span>แจ้งปัญหา</span>
+                            </label>
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag">
+                                <span>แจ้งซ่อม</span>
+                            </label>
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag">
+                                <span>ขอใช้บริการ</span>
+                            </label>
+
+                        </div>
+
+                        <!-- error message -->
+                        <div *ngIf="ackForm.submitted && ackForm.invalid" style="color:red;">
+                            กรุณาเลือกประเภทงาน
+                        </div>
                     </div>
+                    <div *ngIf="selectedTag === 1" style="margin: 10px;">
+                        <textarea name="message" class="form-input note" placeholder="อธิบายรายละเอียด..."
+                            [(ngModel)]="message"></textarea>
+                        <!-- Field: ไฟล์แนบ -->
+                        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
+                        <button type="button" class="attach-btn" (click)="fileInput.click()">
+                            <i class="fas fa-paperclip"></i>
+                            แนบไฟล์
 
-                    <div class="tag-group">
-
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag">
-                            <span>แจ้งปัญหา</span>
-                        </label>
-
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag">
-                            <span>แจ้งซ่อม</span>
-                        </label>
-
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag">
-                            <span>ขอใช้บริการ</span>
-                        </label>
-
+                        </button>
                     </div>
-
-                    <!-- error message -->
-                    <div *ngIf="ackForm.submitted && ackForm.invalid" style="color:red;">
-                        กรุณาเลือกประเภทงาน
-                    </div>
-
                 </div>
 
                 <div class="form-actions-footer">

@@ -14,6 +14,8 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
+  message: string = "";
+  attachments: any[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
 
@@ -39,4 +41,21 @@ export class AcknowledgeModal {
     this.submitModal.emit({ ticketTypeId: form.value });
   }
 
+  onFileSelected(event: any) {
+    const files: FileList = event.target.files;
+    this.addFiles(files);
+  }
+
+  private addFiles(files: FileList) {
+    const newFiles = Array.from(files).map(f => ({
+      name: f.name,
+      size: f.size,
+      file: f
+    }));
+
+    this.attachments = [
+      ...this.attachments,
+      ...newFiles
+    ];
+  }
 }
