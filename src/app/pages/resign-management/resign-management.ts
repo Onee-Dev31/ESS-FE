@@ -293,7 +293,7 @@ export class ResignManagement {
       effective.getDate()
     );
 
-    return lastOnly < effectiveOnly;
+    return lastOnly > effectiveOnly;
   });
 
   convertToFullDate(dateStr: string): Date | null {
@@ -362,8 +362,8 @@ export class ResignManagement {
   setPageSize(tableType: 'active' | 'resign', size: number) {
 
     if (tableType === 'active') {
-      console.log("size : ",size);
-      
+      console.log("size : ", size);
+
       this.activeListing.pageSize.set(size);
       this.activeListing.currentPage.set(0);
 
