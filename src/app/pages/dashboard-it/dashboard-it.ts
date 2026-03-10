@@ -95,7 +95,7 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    console.log("filterStatus : ", this.filterStatus);
+    // console.log("filterStatus : ", this.filterStatus);
 
     this.filteredTickets();
     // หรือเรียก filterStatus(status) ของคุณ
@@ -197,7 +197,6 @@ export class DashboardIT implements OnInit {
   }
 
   selectAssignee(item: any) {
-    console.log(item)
     this.isVisibleAssignee.set(true)
     this.selectedAssignee.set(item)
   }
@@ -243,20 +242,11 @@ export class DashboardIT implements OnInit {
     this.msg.success('คัดลอกแล้ว');
   }
 
-  openAddNote() {
-    this.IS_NOTE_TICKET.set(true)
-  }
-
-  closeAddNoteModal() {
-    this.IS_NOTE_TICKET.set(false);
-  }
-
   safeUrl!: SafeResourceUrl;
 
   previewFile(f: any) {
     this.msg.info(`ดูไฟล์: ${f.name}`);
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(f.file_path);
-    console.log(this.safeUrl)
   }
 
   downloadFile(f: Attachment) {
@@ -335,8 +325,6 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-
-    console.log("file", file)
     this.previewFiles.set([{
       fileName: file.fileName,
       date: dayjs().format('DD/MM/YYYY HH:mm'),
@@ -393,7 +381,7 @@ export class DashboardIT implements OnInit {
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log("getAllTickets() >>> res :", res);
         this.Tickets.set(res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
@@ -421,7 +409,7 @@ export class DashboardIT implements OnInit {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        console.log(res)
+        // console.log(res)
 
         const rows = res.data
 
@@ -620,50 +608,6 @@ export class DashboardIT implements OnInit {
       });
   }
 
-  // closeDenyModal() {
-  //   this.IS_DENY_TICKET.set(false);
-  // }
-
-  // submitDeny(data: any) {
-  //   const ticket = this.selectedTicket();
-  //   const ticketId = ticket?.ticketId;
-
-  //   if (!ticketId) {
-  //     this.swalService.warning("ไม่พบ Ticket");
-  //     return;
-  //   }
-  //   this.swalService.loading("กำลังบันทึกข้อมูล...");
-  //   this.IS_DENY_TICKET.set(false);
-
-  //   this.updateTicket('deny', ticketId, '', null, data.reason)
-  //     .subscribe({
-  //       next: (res) => {
-  //         if (!res?.success) {
-  //           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-  //           return;
-  //         }
-
-  //         this.swalService.success(res.message || "บันทึกสำเร็จ");
-
-  //         this.selectTicket(ticketId);
-  //         this.getAllTickets();
-
-  //       },
-
-  //       error: (error) => {
-  //         console.error("Acknowledge Ticket Error:", error);
-
-  //         this.swalService.warning(
-  //           "เกิดข้อผิดพลาด",
-  //           error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
-  //         );
-  //       }
-  //     });
-
-  // }
-
-
-  // -- deny --
   openDenyModal() {
     this.IS_DENY_TICKET.set(true)
   }
@@ -713,7 +657,6 @@ export class DashboardIT implements OnInit {
   // -- assign --
   openAssignModal() {
     this.IS_ASSIGN_TICKET.set(true)
-    console.log("open")
     this.selectedAssigneeEmpCodes = [];
     this.assignSearchKeyword = '';
   }
@@ -816,6 +759,15 @@ export class DashboardIT implements OnInit {
             }
           });
       });
+  }
+
+  // -- note --
+  openAddNote() {
+    this.IS_NOTE_TICKET.set(true)
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
   }
 }
 

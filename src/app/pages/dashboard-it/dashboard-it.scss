@@ -659,6 +659,10 @@
     }
 }
 
+.tk-hero__right {
+    flex-shrink: 0;
+}
+
 .tk-hero__avatar {
     width: 46px;
     height: 46px;
@@ -968,9 +972,16 @@
 /* bottom actions */
 .tk-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
     padding: 6px 2px 2px;
+    flex-wrap: wrap;
+
+    .btn-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
 }
 
 .tk-actions button {

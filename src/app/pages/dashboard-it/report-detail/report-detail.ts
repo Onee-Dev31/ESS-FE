@@ -12,6 +12,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ActivatedRoute } from '@angular/router';
 import { decryptValue } from '../../../utils/crypto.js ';
+import { SwalService } from '../../../services/swal.service';
+import { AuthService } from '../../../services/auth.service';
+import { NoteModal } from "../modal/note-modal/note-modal";
+import { DenyModal } from "../modal/deny-modal/deny-modal";
+import { AcknowledgeModal } from "../modal/acknowledge-modal/acknowledge-modal";
+import { AssignModal } from "../modal/assign-modal/assign-modal";
 
 @Component({
   selector: 'app-report-detail',
@@ -21,7 +27,7 @@ import { decryptValue } from '../../../utils/crypto.js ';
     NzButtonModule,
     NzIconModule,
     NzModalModule,
-    FilePreviewModalComponent],
+    FilePreviewModalComponent, NoteModal, DenyModal, AcknowledgeModal, AssignModal],
   templateUrl: './report-detail.html',
   styleUrl: './report-detail.scss',
 })
@@ -37,8 +43,22 @@ export class ReportDetail {
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
   queryId: string = '';
+
+  IS_DENY_TICKET = signal(false);
+  IS_ONHOLD_TICKET = signal(false);
+  IS_ACKNOWLEDGE_TICKET = signal(false);
+  IS_NOTE_TICKET = signal(false);
+  IS_ASSIGN_TICKET = signal(false);
+
+  assigneeGroups: any[] = [];
+  assignSearchKeyword = '';
+  selectedAssigneeEmpCodes: any[] = [];
+
+
   constructor(
     private itServiceService: ItServiceService,
+    private swalService: SwalService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute
   ) { }
@@ -46,10 +66,13 @@ export class ReportDetail {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const encrypted = params['id'];
+      console.log("encrypted", encrypted)
       if (encrypted) {
         const decoded = decodeURIComponent(encrypted);
         const bytes = decryptValue(decoded);
         const id = bytes.toString();
+        console.log("bytes", bytes)
+        console.log("id", id)
 
         if (id) {
           this.queryId = id;
@@ -58,6 +81,7 @@ export class ReportDetail {
     });
 
     this.selectTicket();
+    this.getAssignItDropdown();
   }
 
 
@@ -67,7 +91,6 @@ export class ReportDetail {
 
   selectTicket() {
     this.getTicketById(this.queryId).subscribe(async (res: any) => {
-      console.log(res)
 
       let convertedFiles: any[] = [];
 
@@ -274,4 +297,360 @@ export class ReportDetail {
     this.isVisibleAssignee.set(false)
   }
 
+  getAssignItDropdown() {
+    this.itServiceService.getAssignItDropdown().subscribe({
+      next: (res) => {
+        // console.log(res)
+
+        const rows = res.data
+
+        const groupMap: Record<any, any> = {};
+        const assigneeGroup: any = [];
+
+        // สร้าง group
+        rows.forEach((r: any) => {
+          if (r.type === 'GROUP') {
+            groupMap[r.id] = {
+              name: r.display_name,
+              members: []
+            };
+          }
+        });
+
+        // ใส่ employee
+        rows.forEach((r: any) => {
+          if (r.type === 'EMPLOYEE' && groupMap[r.group_id]) {
+            groupMap[r.group_id].members.push({
+              id: r.id,
+              name: r.display_name,
+              adUser: r.AD_USER
+            });
+          }
+        });
+        // แปลงเป็น array
+        Object.values(groupMap).forEach(g => assigneeGroup.push(g));
+
+        console.log(assigneeGroup);
+        this.assigneeGroups = assigneeGroup
+      }
+      , error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    })
+  }
+
+  // MODAL
+  //>>> function
+  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any) {
+    const payload = {
+      decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
+      executedBy: this.authService.userData().CODEMPID,
+      ...((command === 'resume') && { itResult: 'In Progress' }),
+      ...((command === 'onhold') && { itResult: 'Hold' }),
+      ...((command === 'close') && { itResult: 'Closed' }),
+      ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
+      ...((command === 'assign') && { assignJson: assignees }),
+      ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+    }
+
+    console.log(ticketId, payload)
+
+    return this.itServiceService.updateTicket(ticketId, payload)
+  }
+
+  // -- acknowledge --
+  openAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(true)
+  }
+
+  closeAcknowledgeModal() {
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+  }
+
+  submitAcknowledge(data: any) {
+
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning("ไม่พบ Ticket");
+      return;
+    }
+
+    if (!data?.ticketTypeId?.tag) {
+      this.swalService.warning("กรุณาเลือกประเภท Ticket");
+      return;
+    }
+
+    const tag = data.ticketTypeId.tag;
+
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_ACKNOWLEDGE_TICKET.set(false);
+
+    this.updateTicket('acknowledge', ticketId, tag, null, null)
+      .subscribe({
+        next: (res) => {
+
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket();
+        },
+
+        error: (error) => {
+          console.error("Acknowledge Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
+        }
+      });
+
+  }
+
+  // -- deny --
+
+  onHoldTicket() {
+    this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.swalService.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('onhold', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket();
+
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
+  }
+  resumeTicket() {
+    this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.swalService.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('resume', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket();
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
+  }
+
+  openDenyModal() {
+    this.IS_DENY_TICKET.set(true)
+  }
+
+  closeDenyModal() {
+    this.IS_DENY_TICKET.set(false);
+  }
+
+  submitDeny(data: any) {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning("ไม่พบ Ticket");
+      return;
+    }
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_DENY_TICKET.set(false);
+
+    this.updateTicket('deny', ticketId, '', null, data.reason)
+      .subscribe({
+        next: (res) => {
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket();
+
+        },
+
+        error: (error) => {
+          console.error("Acknowledge Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
+        }
+      });
+
+  }
+
+  // -- assign --
+  openAssignModal() {
+    this.IS_ASSIGN_TICKET.set(true)
+    this.selectedAssigneeEmpCodes = [];
+    this.assignSearchKeyword = '';
+  }
+
+  closeAssignModal() {
+    this.IS_ASSIGN_TICKET.set(false)
+  }
+
+  submitAssign(data: any) {
+
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.swalService.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!data?.assignees || data.assignees.length === 0) {
+      this.swalService.warning('กรุณาเลือกผู้รับผิดชอบ');
+      return;
+    }
+
+    const assignees = data.assignees.map((x: any) => ({
+      codeempid: x?.id?.toLowerCase()
+    }));
+
+    const typeTicket = data?.ticketTypeId;
+
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_ASSIGN_TICKET.set(false);
+
+    this.updateTicket('assign', ticketId, typeTicket, assignees)
+      .subscribe({
+        next: (res) => {
+
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          this.selectTicket();
+
+        },
+
+        error: (error) => {
+          console.error("Assign Ticket Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
+        }
+      });
+
+  }
+
+  // -- close --
+
+  closeTicket() {
+    this.swalService.confirm('ยืนยันการปิดงาน')
+      .then(result => {
+        if (!result.isConfirmed) return;
+
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
+
+        if (!ticketId) {
+          this.swalService.warning('ไม่พบ Ticket');
+          return;
+        }
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        this.updateTicket('close', ticketId, '', null, null)
+          .subscribe({
+            next: (res) => {
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+              this.selectTicket();
+
+            },
+
+            error: (error) => {
+              console.error("Acknowledge Ticket Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+            }
+          });
+      });
+  }
+
+  // -- note --
+  openAddNote() {
+    this.IS_NOTE_TICKET.set(true)
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
+  }
 }

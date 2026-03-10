@@ -9,7 +9,8 @@
     gap: 16px;
     padding: 16px;
     background: var(--bg-page);
-    min-height: 100dvh;
+    // min-height: 100dvh;
+    height: calc(100vh - 70px);
     align-items: stretch;
     overflow-y: auto;
 
@@ -582,9 +583,16 @@
 /* bottom actions */
 .tk-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
     padding: 6px 2px 2px;
+    flex-wrap: wrap;
+
+    .btn-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
 }
 
 .tk-actions button {
@@ -599,6 +607,7 @@
     border: 1px solid var(--btn-border);
     background: var(--btn-bg);
     transition: .2s;
+    box-shadow: 2px 4px 8px 0px #d5d5d5;
 
     &:hover {
         background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);
@@ -610,24 +619,30 @@
         transform: translateY(2px);
     }
 
+    &.btn-onhold {
+        color: var(--text);
+        --btn-border: var(--btn-onhold-border);
+        --btn-bg: var(--btn-onhold-bg);
+    }
+
     &.btn-deny {
-        --btn-border: var(--status-rejected-bg);
-        --btn-bg: var(--status-rejected-text);
+        --btn-border: var(--btn-deny-border);
+        --btn-bg: var(--btn-deny-bg);
     }
 
     &.btn-accept {
-        --btn-border: var(--status-approved-bg);
-        --btn-bg: var(--status-approved-text);
+        --btn-border: var(--btn-acknowledge-border);
+        --btn-bg: var(--btn-acknowledge-bg);
     }
 
     &.btn-send {
-        --btn-border: var(--status-warning-bg);
-        --btn-bg: var(--status-warning-text);
+        --btn-border: var(--btn-assign-border);
+        --btn-bg: var(--btn-assign-bg);
     }
 
     &.btn-done {
-        --btn-border: var(--status-completed-bg);
-        --btn-bg: var(--status-completed-text);
+        --btn-border: var(--btn-close-border);
+        --btn-bg: var(--btn-close-bg);
     }
 
 }

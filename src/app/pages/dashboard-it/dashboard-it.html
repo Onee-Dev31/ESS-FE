@@ -182,20 +182,22 @@
 
             <!-- bottom actions (optional, keep like original) -->
             <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
-                <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
-                    <i class="fa-solid fa-play" style="margin-right: 4px;"></i>
-                    Resume
-                </button>
-                <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
-                    <i class="fa-solid fa-pause" style="margin-right: 4px;"></i>
-                    On Hold
-                </button>
-                <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()"
-                    *ngIf="t.status !== 'Hold'">
-                    <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
-                    Deny
-                </button>
-                <div *ngIf="t.status !== 'Hold'">
+                <div class="btn-group">
+                    <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
+                        <i class="fa-solid fa-play" style="margin-right: 4px;"></i>
+                        Resume
+                    </button>
+                    <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
+                        <i class="fa-solid fa-pause" style="margin-right: 4px;"></i>
+                        On Hold
+                    </button>
+                    <button class="btn btn-deny" style="margin-right: auto;" (click)="openDenyModal()"
+                        *ngIf="t.status !== 'Hold'">
+                        <i class="fa-solid fa-ban" style="margin-right: 4px;"></i>
+                        Deny
+                    </button>
+                </div>
+                <div class="btn-group" *ngIf="t.status !== 'Hold'">
                     <button class="btn btn-accept" (click)="openAcknowledgeModal()"
                         *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
@@ -210,9 +212,9 @@
                         ปิดงาน
                     </button>
                 </div>
-
             </section>
         </main>
+
         <!-- RIGHT: assignee/requester -->
         <aside class="tk-right" *ngIf="selectedTicket() as t">
 
@@ -400,84 +402,6 @@
     }
 
 </div>
-
-<!-- ASSIGN TICKET MODAL -->
-<!-- <nz-modal [(nzVisible)]="IS_ASSIGN_TICKET()" [nzFooter]="null" [nzClosable]="false" nzWidth="480px"
-    nzWrapClassName="assign-modal-wrap" (nzOnCancel)="closeAssignModal()">
-    <ng-container *nzModalContent>
-        <div class="assign-modal-header">
-            <div class="amh-top">
-                <div class="amh-title-group">
-                    <span class="amh-title">Assign Ticket</span>
-                    <span class="amh-count" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                        {{ selectedAssigneeEmpCodes.length }} selected
-                    </span>
-                </div>
-                <span class="material-symbols-outlined amh-close" (click)="closeAssignModal()">close</span>
-            </div>
-            <div class="amh-search">
-                <span class="material-symbols-outlined">search</span>
-                <input placeholder="ค้นหาชื่อคน" class="assign" [(ngModel)]="assignSearchKeyword" />
-            </div>
-        </div>
-
-        <div class="assign-modal-body">
-  
-            <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
-                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
-                        (error)="onImgError($event)" />
-                    <span>{{ emp.id }}</span>
-                    <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">close</span>
-                </div>
-            </div>
-
-            <div class="assign-list-container">
-                <div class="assign-group" *ngFor="let g of filteredAssigneeGroups">
-                    <div class="assign-group-header">
-                        <div class="assign-group-label">{{ g.name }}</div>
-                        <button class="grp-toggle-btn" (click)="toggleGroup(g)">
-                            {{ isGroupSelected(g) ? 'Unselect All' : 'Select All' }}
-                        </button>
-                    </div>
-
-                    <div class="assign-item" *ngFor="let emp of g.members" [class.selected]="isSelected(emp.id)"
-                        (click)="toggleAssignee(emp)">
-
-                        <div class="assign-chk">
-                            <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
-                            <span class="material-symbols-outlined"
-                                *ngIf="!isSelected(emp.id)">check_box_outline_blank</span>
-                        </div>
-
-                        <div class="assign-avatar">
-                            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
-                                loading="lazy" decoding="async" (error)="onImgError($event)"
-                                (click)="openImage(emp.id); $event.stopPropagation()" />
-                        </div>
-
-                        <div class="assign-info">
-                            <div class="assign-name">{{ emp.name }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="no-results" *ngIf="filteredAssigneeGroups.length === 0">
-                    <span class="material-symbols-outlined">person_off</span>
-                    <div class="msg">ไม่พบรายชื่อพนักงาน</div>
-                </div>
-            </div>
-
-            <div class="assign-modal-footer">
-                <button nz-button class="assign-submit" [disabled]="selectedAssigneeEmpCodes.length === 0"
-                    (click)="submitAssign()">
-                    {{ selectedAssigneeEmpCodes.length > 0 ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People' :
-                    'Assign Ticket' }}
-                </button>
-            </div>
-        </div>
-    </ng-container>
-</nz-modal> -->
 
 @if (IS_OPEN_IT_SERVICE()) {
 <div class="modal-overlay OPEN">
