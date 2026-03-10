@@ -36,6 +36,7 @@ export class ReportDetail {
 
   isVisibleAssignee = signal<boolean>(false);
   selectedAssignee = signal<any | undefined>(undefined);
+  queryId : string = '';
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
@@ -50,7 +51,7 @@ export class ReportDetail {
         const id = bytes.toString();
 
         if (id) {
-          this.selectedTicket.set(id)
+          this.queryId = id;
         }
       }
     });
@@ -64,7 +65,7 @@ export class ReportDetail {
   }
 
   selectTicket() {
-    this.getTicketById(this.selectedTicket()).subscribe(async (res: any) => {
+    this.getTicketById(this.queryId).subscribe(async (res: any) => {
       console.log(res)
 
       let convertedFiles: any[] = [];
