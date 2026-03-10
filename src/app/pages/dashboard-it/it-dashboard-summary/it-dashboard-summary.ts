@@ -17,6 +17,7 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 type PieDatum = { name: string; value: number; key?: string };
+import { encryptValue } from '../../../utils/crypto.js ';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -593,7 +594,8 @@ export class ItDashboardSummary {
   }
 
   viewTicket(data: any): void {
-    window.open(`/it-dashboard/report-detail?id=${data.id}`, '_blank');
+    const encryptedId = encryptValue(String(data.id));
+    window.open(`/it-dashboard/report-detail?id=${encryptedId}`, '_blank');
   }
 
   onPageIndexChange(page: number): void {

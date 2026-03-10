@@ -11,6 +11,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ActivatedRoute } from '@angular/router';
+import { decryptValue } from '../../../utils/crypto.js ';
 
 @Component({
   selector: 'app-report-detail',
@@ -42,7 +43,16 @@ export class ReportDetail {
   ) { }
 
   ngOnInit(): void {
-    this.selectedTicket.set(this.route.snapshot.queryParamMap.get('id'))
+    this.route.queryParams.subscribe(params => {
+      const encrypted = params['id'];
+      if (encrypted) {
+        const id = decryptValue(encrypted);
+        if (id) {
+          this.selectedTicket.set(id)
+        }
+      }
+    });
+
     this.selectTicket();
   }
 
