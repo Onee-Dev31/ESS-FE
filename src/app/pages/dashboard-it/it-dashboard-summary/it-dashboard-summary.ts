@@ -640,14 +640,10 @@ export class ItDashboardSummary {
 
   applyFilter() {
 
-    // const [from, to] = this.filter.dateRange || [];
     const range = this.filter.dateRange;
     const [rawFrom, rawTo] = range ?? [];
     const from = rawFrom ? dayjs(rawFrom) : null;
     const to = rawTo ? dayjs(rawTo) : null;
-    console.log('dateRange:', range);
-    console.log('from:', from?.format?.('YYYY-MM-DD HH:mm:ss'));
-    console.log('to:', to?.format?.('YYYY-MM-DD HH:mm:ss'));
 
     this.filteredTicketLogs = this.ticketLogs.filter(t => {
 
@@ -674,22 +670,15 @@ export class ItDashboardSummary {
       const rawDate = t.updated_at || t.created_at;
       const itemDate = dayjs(rawDate);
 
-      console.log('--------------------------------');
-      console.log('rawDate(API):', rawDate);
-      console.log('itemDate(dayjs):', itemDate.format('YYYY-MM-DD HH:mm:ss'));
-
       let dateMatch = true;
 
       if (from && to) {
-        console.log('from.startOf:', from.startOf('day').format('YYYY-MM-DD HH:mm:ss'));
-        console.log('to.endOf:', to.endOf('day').format('YYYY-MM-DD HH:mm:ss'));
 
         dateMatch =
           itemDate.isAfter(from.startOf('day')) &&
           itemDate.isBefore(to.endOf('day'));
       }
 
-      console.log('dateMatch:', dateMatch);
       return ticketNoMatch &&
         subjectMatch &&
         requesterMatch &&

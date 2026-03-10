@@ -108,8 +108,7 @@
                     </option>
                 </select>
 
-                <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()"
-                    nzPlaceHolder="['From Date','To Date']">
+                <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()">
                 </nz-range-picker>
 
                 <button class="export-btn" (click)="exportData()">
