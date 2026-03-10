@@ -51,6 +51,7 @@ export class DashboardIT implements OnInit {
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
+  currentUserEmpCode = this.authService.userData().CODEMPID;
 
   Tickets = signal<any[]>(tickets)
   selectedTicket = signal<any | undefined>(undefined);
@@ -108,151 +109,14 @@ export class DashboardIT implements OnInit {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
 
-      let convertedFiles: any[] = [];
-
-      if (res.attachments?.length) {
-        convertedFiles = await Promise.all(
-          res.attachments.map((f: any) =>
-            this.convertUrlToFile({
-              id: f.id,
-              fileName: f.file_name,
-              filePath: f.file_path,
-              fileType: f.file_type,
-              fileSize: f.file_size,
-              fileDescription: f.file_description,
-              uploadedByaAduser: f.uploaded_by_aduser,
-              created_date: f.created_at
-            })
-          )
-        );
-      }
-
       const ticket = res.ticket;
       const replies = res.replies;
       const services = res.services;
-      const attachments = convertedFiles
+      const attachments = res.attachments
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
 
-      const mockitNotes: any = [
-        {
-          id: 1,
-          message: '',
-          attachments: [{
-            id: 1,
-            ticket_id: 16,
-            file_name: "Background 1536x1024 V.2.jpg",
-            file_path: "/uploads/tickets/ffae207283bd49c1889ee4146f8a6061_Background 1536x1024 V.2.jpg",
-            file_type: "image/jpeg",
-            file_size: 378964,
-            file_description: null,
-            uploaded_by_aduser: "system",
-            created_at: "2026-03-10T11:43:59.607"
-          }, {
-            id: 2,
-            ticket_id: 16,
-            file_name: "Background 1536x1024 V.2.jpg",
-            file_path: "/uploads/tickets/ffae207283bd49c1889ee4146f8a6061_Background 1536x1024 V.2.jpg",
-            file_type: "image/jpeg",
-            file_size: 378964,
-            file_description: null,
-            uploaded_by_aduser: "system",
-            created_at: "2026-03-10T11:43:59.607"
-          }],
-          createdDate: new Date('2026-03-04T14:55:09').toISOString(),
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo',
-            role: 'it'
-          }
-        },
-        {
-          id: 2,
-          message: 'ขอเอกสารแนบเพิ่มเติมครับ',
-          attachments: [],
-          createdDate: new Date('2026-03-04T16:00:00').toISOString(),
-          createBy: {
-            fullName: 'ธราดล แก้วอนันต์',
-            nickName: 'ฟลุ๊ค',
-            empCode: 'OTD01128',
-            adUser: 'tharadolkae',
-            role: 'it'
-          }
-        },
-        {
-          id: 3,
-          message: '',
-          attachments: [{
-            id: 5,
-            ticket_id: 18,
-            file_name: "White and Green 3 page.pdf",
-            file_path: "/uploads/tickets/55ebb68b2e2d4f5083bf2cb0740b7940_White and Green 3 page.pdf",
-            file_type: "application/pdf",
-            file_size: 4115054,
-            file_description: null,
-            uploaded_by_aduser: "system",
-            created_at: "2026-03-10T11:57:47.35"
-          }, {
-            id: 6,
-            ticket_id: 18,
-            file_name: "bg-white.jpg",
-            file_path: "/uploads/tickets/ea99c87aad1349b5b6c277524b0d6f0d_bg-white.jpg",
-            file_type: "image/jpeg",
-            file_size: 16514,
-            file_description: null,
-            uploaded_by_aduser: "system",
-            created_at: "2026-03-10T11:57:47.35"
-          }, {
-            id: 7,
-            ticket_id: 18,
-            file_name: "Background 1536x1024 V.2.jpg",
-            file_path: "/uploads/tickets/3d9cac65dab44cd3bdb26b9c16c01c91_Background 1536x1024 V.2.jpg",
-            file_type: "image/jpeg",
-            file_size: 378964,
-            file_description: null,
-            uploaded_by_aduser: "system",
-            created_at: "2026-03-10T11:57:47.35"
-          }
-
-          ],
-          createdDate: new Date('2026-03-05T17:16:20').toISOString(),
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo',
-            role: 'it'
-          }
-        },
-      ]
-
-      if (mockitNotes?.length) {
-        for (const note of mockitNotes) {
-
-          if (note.attachments?.length) {
-
-            note.attachments = await Promise.all(
-              note.attachments.map((f: any) =>
-                this.convertUrlToFile({
-                  id: f.id,
-                  fileName: f.file_name,
-                  filePath: f.file_path,
-                  fileType: f.file_type,
-                  fileSize: f.file_size,
-                  fileDescription: f.file_description,
-                  uploadedByaAduser: f.uploaded_by_aduser,
-                  created_date: f.created_at
-                })
-              )
-            );
-
-          }
-
-        }
-      }
-
+      const itNotes = await this.buildItNotes(replies, attachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
       const objectData = {
@@ -277,7 +141,7 @@ export class DashboardIT implements OnInit {
         // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
-        itNotes: ticket.requester_code === 'OTD01050' ? mockitNotes : [],
+        itNotes: itNotes,
         assignments: assignments,
         assignTimeline: result
       }
@@ -385,14 +249,14 @@ export class DashboardIT implements OnInit {
 
       return {
         fileId: fileData.id,
-        name: fileData.fileName,
+        name: fileData.file_name,
         file: file,
-        description: fileData.fileDescription || '',
+        description: fileData.file_description || '',
         uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_date,
-        filePath: fileData.filePath,
-        size: fileData.fileSize,
-        type: fileData.fileType,
+        createdDate: fileData.created_at,
+        filePath: fileData.file_path,
+        size: fileData.file_size,
+        type: fileData.file_type,
         isError: false
       };
 
@@ -416,6 +280,12 @@ export class DashboardIT implements OnInit {
     }
   }
 
+  private extractNickName(name: string) {
+
+    const match = name.match(/\((.*?)\)/);
+
+    return match ? match[1] : name;
+  }
   viewFile(file: any) {
     this.previewFiles.set([{
       fileName: file.fileName,
@@ -467,6 +337,41 @@ export class DashboardIT implements OnInit {
 
     });
 
+  }
+
+  async buildItNotes(replies: any[], attachments: any[]) {
+
+    const notes = await Promise.all(
+
+      replies.map(async (r) => {
+
+        // หาไฟล์ของ reply นี้
+        const files = attachments.filter(a => a.reply_id === r.id);
+
+        // convert file -> File object
+        const convertedFiles = await Promise.all(
+          files.map(f => this.convertUrlToFile(f))
+        );
+
+        return {
+          id: r.id,
+          message: r.message,
+          attachments: convertedFiles,
+          createdDate: r.created_at,
+          createBy: {
+            fullName: r.sender_name,
+            nickName: this.extractNickName(r.sender_name),
+            empCode: r.user_code,
+            adUser: r.user_aduser,
+            role: 'user'
+          }
+        };
+
+      })
+
+    );
+
+    return notes;
   }
 
   // GET MASTER
@@ -860,6 +765,49 @@ export class DashboardIT implements OnInit {
 
   closeAddNoteModal() {
     this.IS_NOTE_TICKET.set(false);
+  }
+
+  submitNote(data: any) {
+    const formData = new FormData();
+    formData.append('Message', data.message);
+    formData.append('ExecutedBy', this.authService.userData().CODEMPID);
+
+    data.attachments.forEach((item: any) => {
+      if (item?.file instanceof File) {
+        formData.append('Files', item.file);
+      }
+    });
+    console.log("formData", [...formData.entries()]);
+
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_NOTE_TICKET.set(false);
+    this.itServiceService.replyTicket(data.id, formData).subscribe({
+      next: (res) => {
+
+        console.log(res)
+
+        if (!res?.success) {
+          this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+          return;
+        }
+
+        this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+
+      },
+
+      error: (error) => {
+        console.error("Assign Ticket Error:", error);
+
+        this.swalService.warning(
+          "เกิดข้อผิดพลาด",
+          error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+        );
+      }
+    });
+
   }
 }
 

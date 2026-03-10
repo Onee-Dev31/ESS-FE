@@ -409,13 +409,13 @@ export class ResignManagement {
 
     this.fetchEmployeeByStatus('Active', pageA, sizeA)
       .subscribe(res => {
-        // console.log("Active >>", res)
+        console.log("Active >>", res)
         this.dataActiveFromApi(res);
       });
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        // console.log("Resigned >>", res)
+        console.log("Resigned >>", res)
         this.dataResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });

@@ -254,8 +254,8 @@ export class ItServiceService {
   }
 
   updateTicket(id: string, payload: any): Observable<any> {
-    console.log('ticketId type:', typeof id);
-    console.log(id, payload)
+    // console.log('ticketId type:', typeof id);
+    // console.log(id, payload)
     // return of({ success: true }).pipe(delay(1500));
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, payload);
   }
@@ -267,6 +267,11 @@ export class ItServiceService {
       ticketNumber: ticketNumber,
       fileDescriptions: file
     });
+  }
+  
+  replyTicket(id: string, formData: FormData): Observable<any> {
+    // return of({ success: true }).pipe(delay(1500));
+    return this._http.post(`${this.baseUrl}/tickets/${id}/replies`, formData);
   }
 
 }

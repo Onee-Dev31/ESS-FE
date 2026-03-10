@@ -142,7 +142,8 @@
             <section class="tk-card note">
                 <div class="tk-card__head">
                     <div class="tk-card__title">Note</div>
-                    <button style="border-radius: 10px;" nz-button nzType="primary" (click)="openAddNote()">
+                    <button style="border-radius: 10px;" nz-button nzType="primary" (click)="openAddNote()"
+                        *ngIf="t.status !== 'Closed'">
                         <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
                         เพิ่ม Note
                     </button>
@@ -150,19 +151,26 @@
 
                 <div class="tk-card__body">
                     <div class="note-list" *ngIf="t.itNotes.length; else noNote">
-                        <div class="note" *ngFor="let n of t.itNotes.slice().reverse()">
+
+                        <div class="note" *ngFor="let n of t.itNotes.slice().reverse()"
+                            [class.note--me]="n.createBy.empCode === currentUserEmpCode">
+
                             <div class="note__top">
+
                                 <div class="note__who">
                                     <div class="avatar">
                                         <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'"
                                             (error)="onImgError($event)" />
                                     </div>
+
                                     <div>
                                         <b>{{ n.createBy.nickName }}</b>
-                                        <div class="muted">{{ n.createBy.role }}</div>
+                                        <!-- <div class="muted">{{ n.createBy.role }}</div> -->
                                     </div>
                                 </div>
-                                <div class="muted"> @if (isToday(n.createdDate)) {
+
+                                <div class="muted">
+                                    @if (isToday(n.createdDate)) {
                                     {{ n.createdDate | date:'HH:mm' }}
                                     } @else {
                                     {{ n.createdDate | date:'EEE dd HH:mm':'':'en' }}
@@ -170,9 +178,10 @@
                                 </div>
 
                             </div>
-                            <div class="note__msg">{{ n.message }}</div>
-                            <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
 
+                            <div class="note__msg">{{ n.message }}</div>
+
+                            <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
                                 <li *ngFor="let file of n.attachments" class="attachment-item" (click)="viewFile(file)">
 
                                     <div class="file-icon-box">
@@ -184,9 +193,10 @@
                                     <i class="fas fa-download download-small"></i>
 
                                 </li>
-
                             </ul>
+
                         </div>
+
                     </div>
 
                     <ng-template #noNote>
@@ -449,7 +459,8 @@
 }
 
 @if (IS_NOTE_TICKET()) {
-<app-note-modal [ticket]="selectedTicket()" (closeModal)="closeAddNoteModal()"></app-note-modal>
+<app-note-modal [ticket]="selectedTicket()" (closeModal)="closeAddNoteModal()"
+    (submitModal)="submitNote($event)"></app-note-modal>
 }
 
 @if (IS_DENY_TICKET()) {

@@ -1,17 +1,54 @@
-<div class="modal-overlay denyTicket">
+<div class="modal-overlay noteTicket">
     <div class="modal-container">
         <div>
             <header class="top-header-strip">
                 <h2>เพิ่ม Note</h2>
             </header>
             <div class="content-card">
-                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."></textarea>
+                <textarea class="form-input note" placeholder="อธิบายรายละเอียด..."
+                    [(ngModel)]="noteForm.message"></textarea>
+                <!-- Field: ไฟล์แนบ -->
+                <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
+                <button type="button" class="attach-btn" (click)="fileInput.click()">
+                    <i class="fas fa-paperclip"></i>
+                    แนบไฟล์
+
+                </button>
+
+                @if (noteForm.attachments.length > 0) {
+
+                <div class="file-chips">
+
+                    @for (file of noteForm.attachments; track file.name; let i = $index) {
+
+                    <div class="file-chip" (click)="viewFile(file)">
+
+                        <i class="far fa-file"></i>
+
+                        <span class="file-name">
+                            {{ file.name }}
+                        </span>
+
+                        <button type="button" class="chip-remove"
+                            (click)="removeAttachment(i); $event.stopPropagation()">
+
+                            <i class="fas fa-times"></i>
+
+                        </button>
+
+                    </div>
+
+                    }
+
+                </div>
+
+                }
             </div>
             <div class="form-actions-footer">
                 <button class="btn-back-custom" (click)="close()">
                     <i class="fas fa-times"></i> ยกเลิก
                 </button>
-                <button class="btn-save-custom">
+                <button class="btn-save-custom" (click)="save()">
                     <i class="fas fa-paper-plane"></i> ส่ง
                 </button>
             </div>
@@ -20,3 +57,8 @@
     </div>
 
 </div>
+
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
+}
