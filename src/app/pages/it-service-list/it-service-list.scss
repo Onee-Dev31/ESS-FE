@@ -1144,13 +1144,13 @@ textarea.form-input {
     }
 
     &.btn-send {
-        --btn-border: var(--status-warning-bg);
-        --btn-bg: var(--status-warning-text);
+        --btn-border: var(--btn-assign-border);
+        --btn-bg: var(--btn-assign-bg);
     }
 
     &.btn-done {
-        --btn-border: var(--status-completed-bg);
-        --btn-bg: var(--status-completed-text);
+        --btn-border: var(--btn-close-border);
+        --btn-bg: var(--btn-close-bg);
     }
 
 }

@@ -167,6 +167,13 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
+            <section class="tk-actions" *ngIf="t.status_user === 'Pending'">
+                <ng-container>
+                    <button class="btn btn-send" (click)="Resubmit(t.ticketId)">
+                        <i class="fas fa-history" style="margin-right: 4px;"></i> Re Submit
+                    </button>
+                </ng-container>
+            </section>
             <section class="tk-actions" *ngIf="t.status === 'Closed'">
                 <ng-container>
                     <button class="btn btn-send" (click)="openReOpen()">

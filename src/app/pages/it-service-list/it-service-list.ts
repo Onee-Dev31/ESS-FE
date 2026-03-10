@@ -12,6 +12,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { StatusKey } from '../../interfaces/it-dashboard.interface';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -84,6 +86,7 @@ export class ItService implements OnInit {
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         status: ticket.IT_Status === null ? ticket.user_status : ticket.IT_Status === 'Closed' ? 'Closed' : 'In Progress',
+        status_user: ticket.user_status,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -287,4 +290,52 @@ export class ItService implements OnInit {
   getTicketById(ticketId: string) {
     return this.itServiceService.getTicketById(ticketId)
   }
+
+
+  Resubmit(ticketId: number) {
+    Swal.fire({
+      title: 'ยืนยันการ Re-Submit ?',
+      text: 'คุณต้องการส่ง Ticket นี้ให้หัวหน้า Approve หรือไม่',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#aaa'
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+        const requester = JSON.parse(localStorage.getItem("employee") || '{}');
+        console.log("Re submit จ้า", requester.CODEMPID);
+
+        this.itServiceService.re_open(ticketId, requester.CODEMPID).subscribe({
+          next: (res) => {
+
+            Swal.fire({
+              icon: 'success',
+              title: 'สำเร็จ',
+              text: 'Re-Submit Ticket สำเร็จ',
+              timer: 1500,
+              showConfirmButton: false
+            });
+
+            this.selectTicket(ticketId.toString());
+
+          },
+          error: (error) => {
+
+            console.error('Error Re-Open:', error);
+
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด',
+              text: 'ไม่สามารถ Re-Submit ได้'
+            });
+
+          }
+        });
+      }
+    });
+  }
+
 }
