@@ -378,3 +378,51 @@ textarea.form-input {
 .chip-remove:hover {
     color: #ef4444;
 }
+
+/* File list */
+.file-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bg-table-head);
+    border: 1px solid var(--border-table-head);
+    border-radius: 8px;
+
+    .file-icon {
+        color: var(--text-table-head);
+        font-size: $font-size-body;
+    }
+
+    .file-name {
+        flex: 1;
+        font-size: $font-size-label;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .file-remove {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: $font-size-label;
+        transition: color 0.2s, background 0.2s;
+
+        &:hover {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+    }
+}

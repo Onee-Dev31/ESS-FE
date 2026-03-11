@@ -1,4 +1,7 @@
+@use 'sass:color';
 @use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
 
 // Variables
 $primary: var(--primary);
@@ -46,16 +49,34 @@ $text-sub: var(--text-sub);
                 color: var(--text);
             }
 
+            // .btn-close {
+            //     background: none;
+            //     border: none;
+            //     font-size: 1.25rem;
+            //     cursor: pointer;
+            //     color: var(--text-sub);
+            //     transition: color 0.2s;
+
+            //     &:hover {
+            //         background: var(--border-toolbar);
+            //         color: $danger;
+            //         transform: rotate(90deg);
+            //     }
+            // }
+
             .btn-close {
-                background: none;
-                border: none;
-                font-size: 1.25rem;
-                cursor: pointer;
-                color: var(--text-sub);
-                transition: color 0.2s;
+                @include close-btn-style;
+                color: var(--text-muted);
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+                font-weight: 900;
+                flex-shrink: 0;
 
                 &:hover {
-                    color: var(--danger);
+                    background: color-mix(in srgb, var(--border-toolbar), black 10%);
+                    color: $danger;
+                    transform: rotate(90deg);
                 }
             }
         }

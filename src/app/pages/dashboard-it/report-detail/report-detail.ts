@@ -341,21 +341,65 @@ export class ReportDetail {
 
   // MODAL
   //>>> function
-  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any) {
-    const payload = {
-      decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
-      executedBy: this.authService.userData().CODEMPID,
-      ...((command === 'resume') && { itResult: 'In Progress' }),
-      ...((command === 'onhold') && { itResult: 'Hold' }),
-      ...((command === 'close') && { itResult: 'Closed' }),
-      ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
-      ...((command === 'assign') && { assignJson: assignees }),
-      ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any, attachments?: any[]) {
+    // const payload = {
+    //   decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
+    //   executedBy: this.authService.userData().CODEMPID,
+    //   ...((command === 'resume') && { itResult: 'In Progress' }),
+    //   ...((command === 'onhold') && { itResult: 'Hold' }),
+    //   ...((command === 'close') && { itResult: 'Closed' }),
+    //   ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
+    //   ...((command === 'assign') && { assignJson: assignees }),
+    //   ...((command === 'acknowledge') && { Files: attachment, comment: comment }),
+    //   ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+    // }
+
+    const formData = new FormData();
+
+    formData.append('decision', 'ITAnalyze');
+    formData.append('executedBy', this.authService.userData().CODEMPID);
+
+    if (command === 'resume') {
+      formData.append('itResult', 'In Progress');
     }
 
-    console.log(ticketId, payload)
+    if (command === 'onhold') {
+      formData.append('itResult', 'Hold');
+    }
 
-    return this.itServiceService.updateTicket(ticketId, payload)
+    if (command === 'close') {
+      formData.append('itResult', 'Closed');
+    }
+
+    if (command === 'deny') {
+      formData.append('itResult', 'Denied');
+      formData.append('comment', comment);
+    }
+
+    if (command === 'assign') {
+      formData.append('assignJson', JSON.stringify(assignees));
+    }
+
+    if (command === 'acknowledge') {
+      formData.append('comment', comment);
+    }
+
+    if (command === 'acknowledge' || command === 'assign') {
+      formData.append('itResult', 'In Progress');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+    }
+
+    if (attachments) {
+      attachments.forEach((item: any) => {
+        if (item?.file instanceof File) {
+          formData.append('Files', item.file);
+        }
+      });
+    }
+
+    console.log("formData", [...formData.entries()]);
+
+    return this.itServiceService.updateTicket(ticketId, formData)
   }
 
   // -- acknowledge --

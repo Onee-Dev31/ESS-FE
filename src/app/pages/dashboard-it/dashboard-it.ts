@@ -108,15 +108,27 @@ export class DashboardIT implements OnInit {
     // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
+      const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
+      const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
+
+      let convertedFiles: any[] = [];
+
+      if (ticketAttachments.length) {
+        convertedFiles = await Promise.all(
+          ticketAttachments.map((f: any) =>
+            this.convertUrlToFile(f)
+          )
+        );
+      }
 
       const ticket = res.ticket;
       const replies = res.replies;
       const services = res.services;
-      const attachments = res.attachments
+      const attachments = convertedFiles
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
 
-      const itNotes = await this.buildItNotes(replies, attachments);
+      const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
       const objectData = {
@@ -138,7 +150,6 @@ export class DashboardIT implements OnInit {
         requesterCompanyCode: ticket.requester_companyCode,
         requesterCompanyName: ticket.requester_companyName,
         requesterPhone: ticket.contact_phone,
-        // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
         itNotes: itNotes,
@@ -448,19 +459,65 @@ export class DashboardIT implements OnInit {
 
   // MODAL
   //>>> function
-  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any) {
-    const payload = {
-      decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
-      executedBy: this.authService.userData().CODEMPID,
-      ...((command === 'resume') && { itResult: 'In Progress' }),
-      ...((command === 'onhold') && { itResult: 'Hold' }),
-      ...((command === 'close') && { itResult: 'Closed' }),
-      ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
-      ...((command === 'assign') && { assignJson: assignees }),
-      ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any, attachments?: any[]) {
+    // const payload = {
+    //   decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
+    //   executedBy: this.authService.userData().CODEMPID,
+    //   ...((command === 'resume') && { itResult: 'In Progress' }),
+    //   ...((command === 'onhold') && { itResult: 'Hold' }),
+    //   ...((command === 'close') && { itResult: 'Closed' }),
+    //   ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
+    //   ...((command === 'assign') && { assignJson: assignees }),
+    //   ...((command === 'acknowledge') && { Files: attachment, comment: comment }),
+    //   ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+    // }
+
+    const formData = new FormData();
+
+    formData.append('decision', 'ITAnalyze');
+    formData.append('executedBy', this.authService.userData().CODEMPID);
+
+    if (command === 'resume') {
+      formData.append('itResult', 'In Progress');
     }
 
-    return this.itServiceService.updateTicket(ticketId, payload)
+    if (command === 'onhold') {
+      formData.append('itResult', 'Hold');
+    }
+
+    if (command === 'close') {
+      formData.append('itResult', 'Closed');
+    }
+
+    if (command === 'deny') {
+      formData.append('itResult', 'Denied');
+      formData.append('comment', comment);
+    }
+
+    if (command === 'assign') {
+      formData.append('assignJson', JSON.stringify(assignees));
+    }
+
+    if (command === 'acknowledge') {
+      formData.append('comment', comment);
+    }
+
+    if (command === 'acknowledge' || command === 'assign') {
+      formData.append('itResult', 'In Progress');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+    }
+
+    if (attachments) {
+      attachments.forEach((item: any) => {
+        if (item?.file instanceof File) {
+          formData.append('Files', item.file);
+        }
+      });
+    }
+
+    console.log("formData", [...formData.entries()]);
+
+    return this.itServiceService.updateTicket(ticketId, formData)
   }
 
   // -- acknowledge --
@@ -474,6 +531,8 @@ export class DashboardIT implements OnInit {
 
   submitAcknowledge(data: any) {
 
+    console.log(data)
+
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
 
@@ -482,17 +541,17 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    if (!data?.ticketTypeId?.tag) {
+    if (!data?.ticketTypeId) {
       this.swalService.warning("กรุณาเลือกประเภท Ticket");
       return;
     }
 
-    const tag = data.ticketTypeId.tag;
+    const tag = data.ticketTypeId;
 
     this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, null)
+    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments)
       .subscribe({
         next: (res) => {
 
@@ -678,7 +737,7 @@ export class DashboardIT implements OnInit {
     }
 
     const assignees = data.assignees.map((x: any) => ({
-      codeempid: x?.id?.toLowerCase()
+      codeempid: x?.id
     }));
 
     const typeTicket = data?.ticketTypeId;

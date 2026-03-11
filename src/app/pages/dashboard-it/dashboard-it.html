@@ -118,7 +118,7 @@
             </section>
 
             <!-- ATTACHMENTS -->
-            <!-- <section class="tk-card">
+            <section class="tk-card">
                 <div class="tk-card__head">
                     <div class="tk-card__title">
                         เอกสารแนบ
@@ -136,7 +136,7 @@
                         <p class="text-muted">ไม่มีเอกสารแนบ</p>
                     </ng-template>
                 </div>
-            </section> -->
+            </section>
 
             <!-- NOTES -->
             <section class="tk-card note">
@@ -173,7 +173,7 @@
                                     @if (isToday(n.createdDate)) {
                                     {{ n.createdDate | date:'HH:mm' }}
                                     } @else {
-                                    {{ n.createdDate | date:'EEE dd HH:mm':'':'en' }}
+                                    {{ n.createdDate | date:'EEE dd, HH:mm':'':'en' }}
                                     }
                                 </div>
 
