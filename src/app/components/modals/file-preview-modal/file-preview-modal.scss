@@ -49,21 +49,6 @@ $text-sub: var(--text-sub);
                 color: var(--text);
             }
 
-            // .btn-close {
-            //     background: none;
-            //     border: none;
-            //     font-size: 1.25rem;
-            //     cursor: pointer;
-            //     color: var(--text-sub);
-            //     transition: color 0.2s;
-
-            //     &:hover {
-            //         background: var(--border-toolbar);
-            //         color: $danger;
-            //         transform: rotate(90deg);
-            //     }
-            // }
-
             .btn-close {
                 @include close-btn-style;
                 color: var(--text-muted);

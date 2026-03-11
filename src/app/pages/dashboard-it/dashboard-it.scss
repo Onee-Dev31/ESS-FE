@@ -152,7 +152,6 @@
     }
 }
 
-
 .btn-command {
     padding: 18px 18px 0 0;
     display: flex;
@@ -630,9 +629,9 @@
         }
     }
 
-    &:hover {
-        transform: translateY(-4px);
-    }
+    // &:hover {
+    //     transform: translateY(-4px);
+    // }
 
     .attachment-list {
         display: grid;
@@ -922,7 +921,7 @@
     border: 1px solid var(--btn-border);
     background: var(--btn-bg);
     transition: .2s;
-    box-shadow: 2px 4px 8px 0px #d5d5d5;
+    box-shadow: 0.5px 0.5px 5px 0px #d5d5d5;
 
     &:hover {
         background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);

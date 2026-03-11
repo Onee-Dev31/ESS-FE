@@ -297,6 +297,7 @@ export class DashboardIT implements OnInit {
 
     return match ? match[1] : name;
   }
+
   viewFile(file: any) {
     this.previewFiles.set([{
       fileName: file.fileName,
@@ -622,6 +623,7 @@ export class DashboardIT implements OnInit {
           });
       });
   }
+
   resumeTicket() {
     this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)')
       .then(result => {

@@ -245,6 +245,12 @@
         font-weight: 400;
     }
 
+    &:focus {
+        outline: none;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+
     &.note:focus {
         outline: none;
         border-color: var(--status-progress-text) !important;
