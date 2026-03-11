@@ -74,7 +74,6 @@ export class SignalrService {
 
         for (const role of roles) {
             await this.hubConnection.invoke("JoinGroup", role);
-            console.log("Joined group:", role);
         }
     }
 

@@ -226,9 +226,19 @@ export class ItServiceService {
   }
 
   approveTicket(ticketId: number, payload: any) {
+
+    const formData = new FormData();
+
+    Object.keys(payload).forEach(key => {
+      const value = payload[key];
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    });
+
     return this._http.patch<any>(
       `${this.baseUrl}/tickets/${ticketId}/approve`,
-      payload
+      formData
     );
   }
 

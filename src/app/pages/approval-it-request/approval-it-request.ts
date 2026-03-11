@@ -98,7 +98,6 @@ export class ApprovalItRequestComponent implements OnInit {
     })
     .subscribe({
       next: (res) => {
-        console.log(`refresh : ${JSON.stringify(res)}`)
         const mappedData =
           (res.data || []).map((item:any) => this.mapToApprovalItem(item));
 
