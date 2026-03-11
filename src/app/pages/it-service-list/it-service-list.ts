@@ -93,6 +93,15 @@ export class ItService implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
+      console.log(ticket.IT_Status, ticket.user_status)
+      console.log(ticket.IT_Status === null ? ticket.user_status :
+        ticket.IT_Status === 'Closed' ? 'Closed' :
+          ticket.user_status === 'Pending' ? 'Waiting you' :
+            'In Progress')
+      // if (ticket.user_status === 'Pending'){
+
+      // }
+
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
@@ -100,7 +109,11 @@ export class ItService implements OnInit {
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
-        status: ticket.IT_Status === null ? ticket.user_status : ticket.IT_Status === 'Closed' ? 'Closed' : 'In Progress',
+        status: ticket.IT_Status === null ? ticket.user_status :
+          ticket.IT_Status === 'Closed' ? 'Closed' :
+            ticket.user_status === 'Pending' ? 'Waiting you' :
+              'In Progress',
+        title: ticket.title,
         status_user: ticket.user_status,
         priority: ticket.priority,
         source: ticket.source,
@@ -418,7 +431,10 @@ export class ItService implements OnInit {
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
           ticketType: ticket.ticket_type_name_th,
-          status: ticket.IT_Status === null ? ticket.user_status : ticket.IT_Status === 'Closed' ? 'Closed' : 'In Progress',
+          status: ticket.IT_Status === null ? ticket.user_status :
+            ticket.IT_Status === 'Closed' ? 'Closed' :
+              ticket.user_status === 'Pending' ? 'Waiting you' :
+                'In Progress',
           createdDate: new Date(ticket.created_at).toISOString()
         })))
       },

@@ -40,6 +40,7 @@ export class StatusColor {
         Hold: 'hold',
         Denied: 'deny',
         Closed: 'closed',
+        'Waiting you': 'waiting'
     };
 
     static getStyle(status: string) {
@@ -70,6 +71,7 @@ export class StatusColor_Reverse {
         Hold: 'hold',
         Denied: 'deny',
         Closed: 'closed',
+        'Waiting you': 'waiting'
     };
 
     static getStyle(status: string) {
