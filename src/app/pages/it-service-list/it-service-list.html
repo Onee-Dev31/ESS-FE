@@ -96,9 +96,12 @@
                 </div>
 
                 <div class="tk-card__body">
-                    <div class="tk-text">
+                    <div class="tk-text" *ngIf="t.status_user !== 'Pending'">
                         {{ t.description }}
                     </div>
+                    <textarea *ngIf="t.status_user === 'Pending'" [(ngModel)]="t.description"
+                       class="form-input">
+                    </textarea>
                 </div>
             </section>
 
@@ -109,6 +112,15 @@
                     <div class="tk-card__title">
                         เอกสารแนบ
                     </div>
+                    <div *ngIf="t.status_user === 'Pending'">
+                        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
+                        <button type="button" class="attach-btn" (click)="fileInput.click()">
+                            <i class="fas fa-paperclip"></i>
+                            แนบไฟล์ {{t.status_user}}
+
+                        </button>
+                    </div>
+
                 </div>
                 <div class="tk-card__body">
                     <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
@@ -116,6 +128,10 @@
                             <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
                             <span class="file-name">{{ file.name }}</span>
                             <i class="fas fa-download download-small"></i>
+                            <button *ngIf="t.status_user === 'Pending'" type="button" class="btn-delete"
+                                (click)="removeAttachment(file); $event.stopPropagation()">
+                                ลบ
+                            </button>
                         </li>
                     </ul>
                     <ng-template #noAttachments>

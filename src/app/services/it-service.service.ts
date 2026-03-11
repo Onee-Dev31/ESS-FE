@@ -260,13 +260,8 @@ export class ItServiceService {
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
   }
 
-  re_open(id: number, requester: string, ticketNumber: string, file: any): Observable<any> {
-    return this._http.put('/tickets/re-open', {
-      id: id,
-      requester: requester,
-      ticketNumber: ticketNumber,
-      fileDescriptions: file
-    });
+  re_open(formData: FormData): Observable<any> {
+    return this._http.put<any>(`${this.baseUrl}/tickets/re-open`, formData);
   }
 
   replyTicket(id: string, formData: FormData): Observable<any> {

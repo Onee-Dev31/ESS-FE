@@ -44,7 +44,11 @@ export class ItService implements OnInit {
 
   filterStatus: StatusKey | null = 'all';
   keyword = '';
-
+  convertedFiles: any[] = [];
+  attachments: any[] = [];
+  deletedAttachmentIds: number[] = [];
+  newFiles: any[] = [];
+  desNew: string = '';
   ngOnInit() {
     this.getMyTicket();
   }
@@ -54,10 +58,8 @@ export class ItService implements OnInit {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
 
-      let convertedFiles: any[] = [];
-
       if (res.attachments?.length) {
-        convertedFiles = await Promise.all(
+        this.convertedFiles = await Promise.all(
           res.attachments.map((f: any) =>
             this.convertUrlToFile({
               id: f.id,
@@ -76,9 +78,9 @@ export class ItService implements OnInit {
       const ticket = res.ticket;
       const replies = res.replies;
       const services = res.services;
-      const attachments = convertedFiles;
+      const attachments = this.convertedFiles;
       const assignGroups = res.assignGroups;
-
+      this.desNew = ticket.description;
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
@@ -99,8 +101,7 @@ export class ItService implements OnInit {
         assigneeName: '',
         assigneeAduser: '',
         assigneeEmail: '',
-        assigneePhone: ''
-
+        assigneePhone: '',
       }
 
       console.log(objectData)
@@ -291,6 +292,60 @@ export class ItService implements OnInit {
     return this.itServiceService.getTicketById(ticketId)
   }
 
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+
+    if (!files || files.length === 0) return;
+
+    this.addFiles(files);
+
+    // reset input เพื่อให้เลือกไฟล์ชื่อเดิมซ้ำได้
+    input.value = '';
+  }
+
+  private addFiles(files: FileList) {
+    const current = this.selectedTicket();
+    if (!current) return;
+
+    const newFiles: any[] = Array.from(files).map((f) => ({
+      id: null,
+      name: f.name,
+      size: f.size,
+      file: f,
+      isNew: true,
+      isDeleted: false
+    }));
+
+    this.selectedTicket.set({
+      ...current,
+      attachments: [...current.attachments, ...newFiles]
+    });
+  }
+
+  removeAttachment(file: any) {
+
+    const current = this.selectedTicket();
+    if (!current) return;
+
+    const attachments = current.attachments || [];
+
+    // ถ้าเป็นไฟล์เดิมจาก DB
+    if (file.fileId) {
+      this.deletedAttachmentIds.push(file.fileId);
+    }
+
+    // ลบออกจาก list
+    const updatedAttachments = attachments.filter((x: any) => x !== file);
+
+    this.selectedTicket.set({
+      ...current,
+      attachments: updatedAttachments
+    });
+
+    console.log("deletedAttachmentIds:", this.deletedAttachmentIds);
+    console.log("attachments:", updatedAttachments);
+  }
 
   Resubmit(ticket: any) {
     Swal.fire({
@@ -303,38 +358,63 @@ export class ItService implements OnInit {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#aaa'
     }).then((result) => {
+      if (!result.isConfirmed) return;
 
-      if (result.isConfirmed) {
-        const requester = JSON.parse(localStorage.getItem("employee") || '{}');
-        console.log("Re submit จ้า", requester.CODEMPID);
+      const requester = JSON.parse(localStorage.getItem('employee') || '{}');
+      const current = this.selectedTicket();
+      if (!current) return;
 
-        this.itServiceService.re_open(ticket.ticketId, requester.CODEMPID, ticket.ticketNumber, ticket.attachments).subscribe({
-          next: (res) => {
+      const formData = new FormData();
 
-            Swal.fire({
-              icon: 'success',
-              title: 'สำเร็จ',
-              text: 'Re-Submit Ticket สำเร็จ',
-              timer: 1500,
-              showConfirmButton: false
-            });
+      // -------------------------
+      // ข้อมูลทั่วไป
+      // -------------------------
 
-            this.selectTicket(ticket.ticketId.toString());
+      formData.append('TicketId', String(current.ticketId));
+      formData.append('Requester', requester.CODEMPID ?? '');
+      formData.append('TicketNumber', current.ticketNumber ?? '');
+      formData.append('Description', current.description ?? '');
 
-          },
-          error: (error) => {
+      const newFiles = (current.attachments || []).filter((x: any) => x.isNew && x.file);
+      newFiles.forEach((item: any) => {
+        formData.append('NewFiles', item.file, item.name);
+      });
 
-            console.error('Error Re-Open:', error);
+      (this.deletedAttachmentIds || []).forEach((id: number) => {
+        formData.append('DeletedAttachmentIds', String(id));
+      });
 
-            Swal.fire({
-              icon: 'error',
-              title: 'เกิดข้อผิดพลาด',
-              text: 'ไม่สามารถ Re-Submit ได้'
-            });
-
-          }
-        });
+      console.log('===== REOPEN FORM DATA =====');
+      for (const pair of (formData as any).entries()) {
+        console.log(pair[0], pair[1]);
       }
+      // ยิงจริง
+      this.itServiceService.re_open(formData).subscribe({
+        next: (res) => {
+          console.log('re_open success:', res);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ',
+            text: 'Re-Submit Ticket สำเร็จ',
+            timer: 1500,
+            showConfirmButton: false
+          });
+
+          this.deletedAttachmentIds = [];
+          this.getMyTicket();
+          this.selectTicket(current.ticketId.toString());
+        },
+        error: (error) => {
+          console.error('Error Re-Open:', error);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถ Re-Submit ได้'
+          });
+        }
+      });
     });
   }
 
