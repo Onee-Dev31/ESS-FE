@@ -263,10 +263,20 @@ export class ItServiceService {
     return this._http.get(`${this.baseUrl}/tickets/by-status?status=${status}`);
   }
 
-  updateTicket(id: string, payload: any): Observable<any> {
-    console.log(id, payload)
+  updateTicket(id: string, formData: FormData): Observable<any> {
+    // console.log('ticketId type:', typeof id);
+    // console.log(id, payload)
     // return of({ success: true }).pipe(delay(1500));
-    return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, payload);
+    return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
+  }
+
+  re_open(formData: FormData): Observable<any> {
+    return this._http.put<any>(`${this.baseUrl}/tickets/re-open`, formData);
+  }
+
+  replyTicket(id: string, formData: FormData): Observable<any> {
+    // return of({ success: true }).pipe(delay(1500));
+    return this._http.post(`${this.baseUrl}/tickets/${id}/replies`, formData);
   }
 
 }

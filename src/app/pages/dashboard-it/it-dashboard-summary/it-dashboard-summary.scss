@@ -421,7 +421,8 @@
 }
 
 .search-input,
-.search-select {
+.search-select,
+.search-select-company {
     padding: 6px 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -429,11 +430,15 @@
 }
 
 .search-input {
-    width: 190px;
+    width: 200px;
+}
+
+.search-select-company {
+    width: 120px;
 }
 
 .search-select {
-    width: 190px;
+    width: 230px;
 }
 
 ::ng-deep nz-range-picker {

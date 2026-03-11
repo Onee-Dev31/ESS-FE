@@ -6,37 +6,76 @@
                 <h2>รับเรื่อง</h2>
             </header>
 
-            <form #ackForm="ngForm" (ngSubmit)="save(ackForm)">
+            <form (ngSubmit)="save()">
 
                 <div class="content-card">
                     <div>
-                        <p>เลือกประเภทงาน<span class="required">*</span></p>
+
+                        <div>
+                            <p>เลือกประเภทงาน<span class="required">*</span></p>
+                        </div>
+
+                        <div class="tag-group">
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>แจ้งปัญหา</span>
+                            </label>
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>แจ้งซ่อม</span>
+                            </label>
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>ขอใช้บริการ</span>
+                            </label>
+                        </div>
                     </div>
+                    <div *ngIf="selectedTag === 1" style="margin: 10px; margin-top: 20px;">
+                        <textarea name="message" class="form-input note" placeholder="อธิบายรายละเอียด..."
+                            [(ngModel)]="message" *ngIf="attachments.length > 0"></textarea>
+                        <!-- Field: ไฟล์แนบ -->
+                        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
+                        <button type="button" class="attach-btn" (click)="fileInput.click()">
+                            <i class="fas fa-paperclip"></i>
+                            แนบไฟล์
+                        </button>
 
-                    <div class="tag-group">
+                        @if (attachments.length > 0) {
 
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag">
-                            <span>แจ้งปัญหา</span>
-                        </label>
+                        <div class="file-chips">
 
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag">
-                            <span>แจ้งซ่อม</span>
-                        </label>
+                            @for (file of attachments; track file.name; let i = $index) {
 
-                        <label class="tag">
-                            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag">
-                            <span>ขอใช้บริการ</span>
-                        </label>
+                            <div class="file-chip" (click)="viewFile(file)">
+
+                                <i class="far fa-file"></i>
+
+                                <span class="file-name">
+                                    {{ file.name }}
+                                </span>
+
+                                <button type="button" class="chip-remove"
+                                    (click)="removeAttachment(i); $event.stopPropagation()">
+
+                                    <i class="fas fa-times"></i>
+
+                                </button>
+
+                            </div>
+
+                            }
+
+                        </div>
+
+                        }
 
                     </div>
-
-                    <!-- error message -->
-                    <div *ngIf="ackForm.submitted && ackForm.invalid" style="color:red;">
-                        กรุณาเลือกประเภทงาน
-                    </div>
-
                 </div>
 
                 <div class="form-actions-footer">
@@ -44,7 +83,8 @@
                         <i class="fas fa-times"></i> ยกเลิก
                     </button>
 
-                    <button type="submit" class="btn-save-custom" [disabled]="ackForm.invalid">
+                    <button type="submit" class="btn-save-custom"
+                        [disabled]="!selectedTag || (selectedTag === 1 && attachments.length > 0 && !message?.trim())">
                         <i class="fas fa-paper-plane"></i> ยืนยัน
                     </button>
                 </div>
@@ -54,3 +94,8 @@
         </div>
     </div>
 </div>
+
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
+}

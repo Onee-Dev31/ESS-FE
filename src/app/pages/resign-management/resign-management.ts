@@ -293,7 +293,7 @@ export class ResignManagement {
       effective.getDate()
     );
 
-    return lastOnly < effectiveOnly;
+    return lastOnly > effectiveOnly;
   });
 
   convertToFullDate(dateStr: string): Date | null {
@@ -362,8 +362,8 @@ export class ResignManagement {
   setPageSize(tableType: 'active' | 'resign', size: number) {
 
     if (tableType === 'active') {
-      console.log("size : ",size);
-      
+      console.log("size : ", size);
+
       this.activeListing.pageSize.set(size);
       this.activeListing.currentPage.set(0);
 
@@ -409,13 +409,13 @@ export class ResignManagement {
 
     this.fetchEmployeeByStatus('Active', pageA, sizeA)
       .subscribe(res => {
-        // console.log("Active >>", res)
+        console.log("Active >>", res)
         this.dataActiveFromApi(res);
       });
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        // console.log("Resigned >>", res)
+        console.log("Resigned >>", res)
         this.dataResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });

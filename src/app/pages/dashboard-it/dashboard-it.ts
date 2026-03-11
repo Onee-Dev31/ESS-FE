@@ -51,6 +51,7 @@ export class DashboardIT implements OnInit {
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
+  currentUserEmpCode = this.authService.userData().CODEMPID;
 
   Tickets = signal<any[]>(tickets)
   selectedTicket = signal<any | undefined>(undefined);
@@ -95,7 +96,7 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    console.log("filterStatus : ", this.filterStatus);
+    // console.log("filterStatus : ", this.filterStatus);
 
     this.filteredTickets();
     // หรือเรียก filterStatus(status) ของคุณ
@@ -107,22 +108,15 @@ export class DashboardIT implements OnInit {
     // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res)
+      const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
+      const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
       let convertedFiles: any[] = [];
 
-      if (res.attachments?.length) {
+      if (ticketAttachments.length) {
         convertedFiles = await Promise.all(
-          res.attachments.map((f: any) =>
-            this.convertUrlToFile({
-              id: f.id,
-              fileName: f.file_name,
-              filePath: f.file_path,
-              fileType: f.file_type,
-              fileSize: f.file_size,
-              fileDescription: f.file_description,
-              uploadedByaAduser: f.uploaded_by_aduser,
-              created_date: f.created_at
-            })
+          ticketAttachments.map((f: any) =>
+            this.convertUrlToFile(f)
           )
         );
       }
@@ -134,33 +128,7 @@ export class DashboardIT implements OnInit {
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
 
-      const mockitNotes: any = [
-        {
-          id: 1,
-          message: 'เสร็จยัง',
-          createdDate: new Date('2026-03-04T16:00:00').toISOString(),
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo',
-            role: 'it'
-          }
-        },
-        {
-          id: 2,
-          message: 'เสร็จยัง ? ',
-          createdDate: new Date('2026-03-05T16:30:00').toISOString(),
-          createBy: {
-            fullName: 'แพรวนภา บุตรโคษา',
-            nickName: 'แพรว',
-            empCode: 'OTD01050',
-            adUser: 'praewnapaboo',
-            role: 'it'
-          }
-        }
-      ]
-
+      const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
       const objectData = {
@@ -182,22 +150,20 @@ export class DashboardIT implements OnInit {
         requesterCompanyCode: ticket.requester_companyCode,
         requesterCompanyName: ticket.requester_companyName,
         requesterPhone: ticket.contact_phone,
-        // requesterInitials: 'MP', //ชื่อย่อ
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
-        itNotes: ticket.requester_code === 'OTD01050' ? mockitNotes : [],
+        itNotes: itNotes,
         assignments: assignments,
         assignTimeline: result
       }
 
-      // console.log("selectedTicket:", objectData)
+      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
   }
 
   selectAssignee(item: any) {
-    console.log(item)
     this.isVisibleAssignee.set(true)
     this.selectedAssignee.set(item)
   }
@@ -243,20 +209,11 @@ export class DashboardIT implements OnInit {
     this.msg.success('คัดลอกแล้ว');
   }
 
-  openAddNote() {
-    this.IS_NOTE_TICKET.set(true)
-  }
-
-  closeAddNoteModal() {
-    this.IS_NOTE_TICKET.set(false);
-  }
-
   safeUrl!: SafeResourceUrl;
 
   previewFile(f: any) {
     this.msg.info(`ดูไฟล์: ${f.name}`);
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(f.file_path);
-    console.log(this.safeUrl)
   }
 
   downloadFile(f: Attachment) {
@@ -303,14 +260,14 @@ export class DashboardIT implements OnInit {
 
       return {
         fileId: fileData.id,
-        name: fileData.fileName,
+        name: fileData.file_name,
         file: file,
-        description: fileData.fileDescription || '',
+        description: fileData.file_description || '',
         uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_date,
-        filePath: fileData.filePath,
-        size: fileData.fileSize,
-        type: fileData.fileType,
+        createdDate: fileData.created_at,
+        filePath: fileData.file_path,
+        size: fileData.file_size,
+        type: fileData.file_type,
         isError: false
       };
 
@@ -334,9 +291,14 @@ export class DashboardIT implements OnInit {
     }
   }
 
-  viewFile(file: any) {
+  private extractNickName(name: string) {
 
-    console.log("file", file)
+    const match = name.match(/\((.*?)\)/);
+
+    return match ? match[1] : name;
+  }
+
+  viewFile(file: any) {
     this.previewFiles.set([{
       fileName: file.fileName,
       date: dayjs().format('DD/MM/YYYY HH:mm'),
@@ -389,11 +351,46 @@ export class DashboardIT implements OnInit {
 
   }
 
+  async buildItNotes(replies: any[], attachments: any[]) {
+
+    const notes = await Promise.all(
+
+      replies.map(async (r) => {
+
+        // หาไฟล์ของ reply นี้
+        const files = attachments.filter(a => a.reply_id === r.id);
+
+        // convert file -> File object
+        const convertedFiles = await Promise.all(
+          files.map(f => this.convertUrlToFile(f))
+        );
+
+        return {
+          id: r.id,
+          message: r.message,
+          attachments: convertedFiles,
+          createdDate: r.created_at,
+          createBy: {
+            fullName: r.sender_name,
+            nickName: this.extractNickName(r.sender_name),
+            empCode: r.user_code,
+            adUser: r.user_aduser,
+            role: 'user'
+          }
+        };
+
+      })
+
+    );
+
+    return notes;
+  }
+
   // GET MASTER
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log("getAllTickets() >>> res :", res);
         this.Tickets.set(res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
@@ -421,7 +418,7 @@ export class DashboardIT implements OnInit {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        console.log(res)
+        // console.log(res)
 
         const rows = res.data
 
@@ -463,19 +460,65 @@ export class DashboardIT implements OnInit {
 
   // MODAL
   //>>> function
-  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any) {
-    const payload = {
-      decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
-      executedBy: this.authService.userData().CODEMPID,
-      ...((command === 'resume') && { itResult: 'In Progress' }),
-      ...((command === 'onhold') && { itResult: 'Hold' }),
-      ...((command === 'close') && { itResult: 'Closed' }),
-      ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
-      ...((command === 'assign') && { assignJson: assignees }),
-      ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+  updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any, attachments?: any[]) {
+    // const payload = {
+    //   decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
+    //   executedBy: this.authService.userData().CODEMPID,
+    //   ...((command === 'resume') && { itResult: 'In Progress' }),
+    //   ...((command === 'onhold') && { itResult: 'Hold' }),
+    //   ...((command === 'close') && { itResult: 'Closed' }),
+    //   ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
+    //   ...((command === 'assign') && { assignJson: assignees }),
+    //   ...((command === 'acknowledge') && { Files: attachment, comment: comment }),
+    //   ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
+    // }
+
+    const formData = new FormData();
+
+    formData.append('decision', 'ITAnalyze');
+    formData.append('executedBy', this.authService.userData().CODEMPID);
+
+    if (command === 'resume') {
+      formData.append('itResult', 'In Progress');
     }
 
-    return this.itServiceService.updateTicket(ticketId, payload)
+    if (command === 'onhold') {
+      formData.append('itResult', 'Hold');
+    }
+
+    if (command === 'close') {
+      formData.append('itResult', 'Closed');
+    }
+
+    if (command === 'deny') {
+      formData.append('itResult', 'Denied');
+      formData.append('comment', comment);
+    }
+
+    if (command === 'assign') {
+      formData.append('assignJson', JSON.stringify(assignees));
+    }
+
+    if (command === 'acknowledge') {
+      formData.append('comment', comment);
+    }
+
+    if (command === 'acknowledge' || command === 'assign') {
+      formData.append('itResult', 'In Progress');
+      formData.append('newTicketTypeId', ticketTypeId || '2');
+    }
+
+    if (attachments) {
+      attachments.forEach((item: any) => {
+        if (item?.file instanceof File) {
+          formData.append('Files', item.file);
+        }
+      });
+    }
+
+    console.log("formData", [...formData.entries()]);
+
+    return this.itServiceService.updateTicket(ticketId, formData)
   }
 
   // -- acknowledge --
@@ -489,6 +532,8 @@ export class DashboardIT implements OnInit {
 
   submitAcknowledge(data: any) {
 
+    console.log(data)
+
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
 
@@ -497,17 +542,17 @@ export class DashboardIT implements OnInit {
       return;
     }
 
-    if (!data?.ticketTypeId?.tag) {
+    if (!data?.ticketTypeId) {
       this.swalService.warning("กรุณาเลือกประเภท Ticket");
       return;
     }
 
-    const tag = data.ticketTypeId.tag;
+    const tag = data.ticketTypeId;
 
     this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, null)
+    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments)
       .subscribe({
         next: (res) => {
 
@@ -578,6 +623,7 @@ export class DashboardIT implements OnInit {
           });
       });
   }
+
   resumeTicket() {
     this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)')
       .then(result => {
@@ -620,50 +666,6 @@ export class DashboardIT implements OnInit {
       });
   }
 
-  // closeDenyModal() {
-  //   this.IS_DENY_TICKET.set(false);
-  // }
-
-  // submitDeny(data: any) {
-  //   const ticket = this.selectedTicket();
-  //   const ticketId = ticket?.ticketId;
-
-  //   if (!ticketId) {
-  //     this.swalService.warning("ไม่พบ Ticket");
-  //     return;
-  //   }
-  //   this.swalService.loading("กำลังบันทึกข้อมูล...");
-  //   this.IS_DENY_TICKET.set(false);
-
-  //   this.updateTicket('deny', ticketId, '', null, data.reason)
-  //     .subscribe({
-  //       next: (res) => {
-  //         if (!res?.success) {
-  //           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-  //           return;
-  //         }
-
-  //         this.swalService.success(res.message || "บันทึกสำเร็จ");
-
-  //         this.selectTicket(ticketId);
-  //         this.getAllTickets();
-
-  //       },
-
-  //       error: (error) => {
-  //         console.error("Acknowledge Ticket Error:", error);
-
-  //         this.swalService.warning(
-  //           "เกิดข้อผิดพลาด",
-  //           error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
-  //         );
-  //       }
-  //     });
-
-  // }
-
-
-  // -- deny --
   openDenyModal() {
     this.IS_DENY_TICKET.set(true)
   }
@@ -713,7 +715,6 @@ export class DashboardIT implements OnInit {
   // -- assign --
   openAssignModal() {
     this.IS_ASSIGN_TICKET.set(true)
-    console.log("open")
     this.selectedAssigneeEmpCodes = [];
     this.assignSearchKeyword = '';
   }
@@ -738,7 +739,7 @@ export class DashboardIT implements OnInit {
     }
 
     const assignees = data.assignees.map((x: any) => ({
-      codeempid: x?.id?.toLowerCase()
+      codeempid: x?.id
     }));
 
     const typeTicket = data?.ticketTypeId;
@@ -816,6 +817,58 @@ export class DashboardIT implements OnInit {
             }
           });
       });
+  }
+
+  // -- note --
+  openAddNote() {
+    this.IS_NOTE_TICKET.set(true)
+  }
+
+  closeAddNoteModal() {
+    this.IS_NOTE_TICKET.set(false);
+  }
+
+  submitNote(data: any) {
+    const formData = new FormData();
+    formData.append('Message', data.message);
+    formData.append('ExecutedBy', this.authService.userData().CODEMPID);
+
+    data.attachments.forEach((item: any) => {
+      if (item?.file instanceof File) {
+        formData.append('Files', item.file);
+      }
+    });
+    console.log("formData", [...formData.entries()]);
+
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.IS_NOTE_TICKET.set(false);
+    this.itServiceService.replyTicket(data.id, formData).subscribe({
+      next: (res) => {
+
+        console.log(res)
+
+        if (!res?.success) {
+          this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+          return;
+        }
+
+        this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+
+      },
+
+      error: (error) => {
+        console.error("Assign Ticket Error:", error);
+
+        this.swalService.warning(
+          "เกิดข้อผิดพลาด",
+          error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+        );
+      }
+    });
+
   }
 }
 

@@ -94,19 +94,20 @@
                 <input type="text" class="search-input" placeholder="Requester" [(ngModel)]="filter.requester"
                     (ngModelChange)="applyFilter()" />
 
-                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()">
-                    <option value="">All Department</option>
-                    <option *ngFor="let d of departmentList" [value]="d">
-                        {{ d }}
+                <select class="search-select-company" [(ngModel)]="filter.company" (ngModelChange)="onCompanyChange()">
+                    <option value="">All Company</option>
+                    <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
+                        {{ c.COMPANY_CODE }}
                     </option>
                 </select>
 
-                <select class="search-select" [(ngModel)]="filter.company" (ngModelChange)="applyFilter()">
-                    <option value="">All Company</option>
-                    <option *ngFor="let c of companyList" [value]="c">
-                        {{ c }}
+                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()" [disabled]="!filter.company">
+                    <option value="">All Department</option>
+                    <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
+                        {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
                     </option>
                 </select>
+
 
                 <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()">
                 </nz-range-picker>
