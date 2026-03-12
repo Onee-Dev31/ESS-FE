@@ -11,6 +11,8 @@ import dayjs from 'dayjs';
 import { ItServiceService } from '../../../services/it-service.service';
 import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
+import { AuthService } from '../../../services/auth.service';
+import { SwalService } from '../../../services/swal.service';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -23,6 +25,8 @@ import { STORAGE_KEYS } from '../../../constants/storage.constants';
 export class ItRequestDetailModal {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -87,28 +91,12 @@ export class ItRequestDetailModal {
   }
 
   viewFile(file: any) {
-
-    const baseUrl = 'https://10.2.0.11:7081'; // API server
-    const url = baseUrl + file.filePath;
-
-    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file.fileName);
-    const isPdf = /\.pdf$/i.test(file.fileName);
-
-    let type = 'application/octet-stream';
-    if (isImage) type = 'image/jpeg';
-    else if (isPdf) type = 'application/pdf';
-
-    this.previewFiles.set([
-      {
-        fileName: file.fileName,
-        date: dayjs(
-          this.approvalItem.originalData?.createDate || new Date()
-        ).format('DD/MM/YYYY HH:mm'),
-        url: url, // ใช้ไฟล์จริง
-        type: type
-      }
-    ]);
-
+    this.previewFiles.set([{
+      fileName: file.fileName,
+      date: dayjs().format('DD/MM/YYYY HH:mm'),
+      url: file.filePath,
+      type: file.type || 'image/png'
+    }]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -121,14 +109,22 @@ export class ItRequestDetailModal {
   }
 
   async confirmApprove() {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการอนุมัติ',
-      message: 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?'
-    });
-    if (!confirmed) return;
-    this.updateStatus('Approved');
+    // const confirmed = await this.dialogService.confirm({
+    //   title: 'ยืนยันการอนุมัติ',
+    //   message: 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?'
+    // });
+    // if (!confirmed) return;
+    this.swalService.confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
+      .then(result => {
+        console.log(result)
+        if (!result.isConfirmed) return;
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+        this.updateStatus('Approved');
+
+      });
   }
-  
+
   // Open reject reason panel
   editRequest() {
     this.rejectReason.set('');
@@ -153,7 +149,7 @@ export class ItRequestDetailModal {
     if (!confirmed) return;
     this.updateStatus('Rejected', this.rejectReason().trim());
   }
-  
+
   openReasonPanel(action: 'Rejected' | 'Referred Back') {
     this.currentAction.set(action);
     this.isRejectPanelOpen.set(true);
@@ -172,50 +168,52 @@ export class ItRequestDetailModal {
 
   private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
 
-    const ticketId = this.approvalItem.requestId;
+    console.log(this.approvalItem.requestId, newStatus, reason, this.authService.userData().CODEMPID)
+
+    // const ticketId = this.approvalItem.requestId;
 
 
-    if (!ticketId) return;
+    // if (!ticketId) return;
 
-    const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
-    const approver = userData.CODEMPID;
+    // const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
+    // const approver = userData.CODEMPID;
 
-    const payload: any = {
-      Decision: newStatus == 'Referred Back' ? 'Referred_Back' : newStatus,
-      ExecutedBy: approver,
-      ...(reason ? { Comment: reason } : {})
-    };
+    // const payload: any = {
+    //   Decision: newStatus == 'Referred Back' ? 'Referred_Back' : newStatus,
+    //   ExecutedBy: approver,
+    //   ...(reason ? { Comment: reason } : {})
+    // };
 
-    // console.log(`updateStatus Ticket ID:${ticketId}`)
-    // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
-    this.itService.approveTicket(ticketId, payload)
-    .subscribe({
-      next: (res) => {
+    // // console.log(`updateStatus Ticket ID:${ticketId}`)
+    // // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
+    // this.itService.approveTicket(ticketId, payload)
+    //   .subscribe({
+    //     next: (res) => {
 
-        if (!res?.success) {
-          this.toastService.error(res.message);
-          return;
-        }
+    //       if (!res?.success) {
+    //         this.toastService.error(res.message);
+    //         return;
+    //       }
 
-        this.onStatusUpdated.emit();
-        this.close();
+    //       this.onStatusUpdated.emit();
+    //       this.close();
 
-        const msg =
-          newStatus === 'Rejected'
-            ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
-            : newStatus === 'Referred Back'
-            ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
-            : 'อนุมัติคำขอเรียบร้อยแล้ว';
+    //       const msg =
+    //         newStatus === 'Rejected'
+    //           ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
+    //           : newStatus === 'Referred Back'
+    //             ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
+    //             : 'อนุมัติคำขอเรียบร้อยแล้ว';
 
-        this.toastService.success(msg);
-      },
-      error: (err) => {
-        const message =
-          err?.error?.message ||
-          'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
+    //       this.toastService.success(msg);
+    //     },
+    //     error: (err) => {
+    //       const message =
+    //         err?.error?.message ||
+    //         'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
 
-        this.toastService.error(message);
-      }
-    });
+    //       this.toastService.error(message);
+    //     }
+    //   });
   }
 }

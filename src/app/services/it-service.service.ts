@@ -206,7 +206,7 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets`, formData);
   }
 
-  getApprovalItRequests(params: { page?: number; pageSize?: number; status?: string; }): Observable<any> {
+  getApprovalItRequests(params: { page?: number; pageSize?: number; status?: string; empno: string; }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.page) {
       httpParams = httpParams.set('page', params.page);
@@ -218,6 +218,10 @@ export class ItServiceService {
 
     if (params.status) {
       httpParams = httpParams.set('status', params.status);
+    }
+
+    if (params.empno) {
+      httpParams = httpParams.set('empno', params.empno);
     }
 
     return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request`, {

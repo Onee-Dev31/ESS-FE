@@ -24,12 +24,13 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
+import { SkeletonComponent } from "../../components/shared/skeleton/skeleton";
 
 /** หน้าจัดการรายการอนุมัติ (Approval IT Request) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approval-it-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, EmptyStateComponent, SkeletonComponent],
   // imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
@@ -38,14 +39,12 @@ import { listAnimation } from '../../animations/animations';
 })
 export class ApprovalItRequestComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
-  private dateUtil = inject(DateUtilityService);
+  dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
-  private dialogService = inject(DialogService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private itService = inject(ItServiceService);
-  private route = inject(ActivatedRoute);
 
   isLoading = this.loadingService.loading('approvals-it-list');
   isExporting = this.loadingService.loading('export');
@@ -67,6 +66,13 @@ export class ApprovalItRequestComponent implements OnInit {
     Rejected: 0,
     ReferredBack: 0
   });
+
+  STATUS_API_MAP: Record<string, string> = {
+    Pending: 'New',
+    Approved: 'Approved',
+    Rejected: 'Rejected',
+    ReferredBack: 'ReferredBack'
+  };
 
   pageTitle = signal<string>('IT Request Approvals');
   showExportMenu = signal<boolean>(false);
@@ -90,16 +96,18 @@ export class ApprovalItRequestComponent implements OnInit {
     const page = this.listing.currentPage() + 1;
     const pageSize = this.listing.pageSize();
     const status = this.listing.filterStatus();
+    const apiStatus = this.STATUS_API_MAP[status] || status;
 
     this.itService.getApprovalItRequests({
       page,
       pageSize,
-      status: 'New'
+      status: apiStatus,
+      empno: 'OTD01050'
     })
-    .subscribe({
-      next: (res) => {
-        const mappedData =
-          (res.data || []).map((item:any) => this.mapToApprovalItem(item));
+      .subscribe({
+        next: (res) => {
+          const mappedData =
+            (res.data || []).map((item: any) => this.mapToApprovalItem(item));
 
           this.approvals.set(mappedData);
 
@@ -167,11 +175,6 @@ export class ApprovalItRequestComponent implements OnInit {
     return list;
   });
 
-  // paginatedRows = computed(() => {
-  //   const start = this.listing.currentPage() * this.listing.pageSize();
-  //   return this.sortedData().slice(start, start + this.listing.pageSize());
-  // });
-
   paginatedRows = computed(() => {
     return this.sortedData();
   });
@@ -202,6 +205,7 @@ export class ApprovalItRequestComponent implements OnInit {
     this.listing.currentPage.set(0);
     this.refresh();
   }
+
   getTabCount(tab: string) {
     return this.statusCounts()[tab] || 0;
   }
@@ -232,6 +236,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   viewRequestDetail(item: ApprovalItem) {
+    console.log("ApprovalItem >>> ", item)
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);

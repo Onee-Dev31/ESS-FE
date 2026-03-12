@@ -2,8 +2,8 @@
     <div class="modal-container-large it-request-modal" (click)="$event.stopPropagation()" @modalAnimation>
 
         <div class="modal-header">
-            <h2 class="request-title">สรุปรายละเอียดคำขอ</h2>
-            <button class="btn-close-x" (click)="close()"><i class="fas fa-times"></i></button>
+            <h2 class="request-title">สรุปรายละเอียดคำขอ <span>(requestNo : {{approvalItem.requestNo}})</span></h2>
+            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
 
         <div class="modal-body">
@@ -62,42 +62,42 @@
 
                     <!-- Main Systems -->
                     <div class="info-row" *ngIf="approvalItem.originalData?.main?.length">
-                    <div class="info-label align-top">Main Systems</div>
-                    <div class="info-value">
-                        <ul class="system-list">
-                        <li *ngFor="let sys of approvalItem.originalData.main">
-                            <i class="fas fa-check"></i> {{ sys }}
-                        </li>
-                        </ul>
-                    </div>
+                        <div class="info-label align-top">Main Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.main">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Basic Systems -->
                     <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length">
-                    <div class="info-label align-top">Basic Systems</div>
-                    <div class="info-value">
-                        <ul class="system-list">
-                        <li *ngFor="let sys of approvalItem.originalData.basic">
-                            <i class="fas fa-check"></i> {{ sys }}
-                        </li>
-                        </ul>
-                    </div>
+                        <div class="info-label align-top">Basic Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.basic">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Specific Systems -->
                     <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length">
-                    <div class="info-label align-top">Specific Systems</div>
-                    <div class="info-value">
-                        <ul class="system-list">
-                        <li *ngFor="let sys of approvalItem.originalData.specific">
-                            <i class="fas fa-check"></i> {{ sys }}
-                        </li>
-                        </ul>
-                    </div>
+                        <div class="info-label align-top">Specific Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.specific">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
                 </div>
-                </div>
+            </div>
 
             <!-- Section 4: รายละเอียดปัญหา (สำหรับแจ้งซ่อม/แจ้งปัญหา) -->
             <div class="info-section" *ngIf="showAttachments">
@@ -135,8 +135,7 @@
                                 </span>
                             </div>
 
-                            <button class="btn-view-file"
-                                    (click)="viewFile(file)">
+                            <button class="btn-view-file" (click)="viewFile(file)">
                                 <i class="fas fa-eye"></i>
                             </button>
 
@@ -152,8 +151,7 @@
                     <span>ระบุเหตุผล</span>
                 </div>
                 <textarea class="reject-reason-textarea" [ngModel]="rejectReason()"
-                    (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.." rows="4"
-                    maxlength="500">
+                    (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.." rows="4" maxlength="500">
                 </textarea>
                 <div class="reject-char-count">{{ rejectReason().length }} / 500</div>
             </div>
@@ -161,7 +159,7 @@
         <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
             <div class="reject-reason-actions">
                 <button class="btn-outline" (click)="cancelReject()">ยกเลิก</button>
-                    <button class="btn-danger" (click)="submitReason()" [disabled]="!rejectReason().trim()">
+                <button class="btn-danger" (click)="submitReason()" [disabled]="!rejectReason().trim()">
                     <i class="fas fa-times-circle"></i>
                     ยืนยัน
                 </button>
@@ -170,7 +168,8 @@
 
         <div class="modal-footer" *ngIf="!isRejectPanelOpen()">
             <div class="footer-left">
-                <button class="btn-outline btn-referred" (click)="openReasonPanel('Referred Back')">Referred Back</button>
+                <button class="btn-outline btn-referred" (click)="openReasonPanel('Referred Back')">Referred
+                    Back</button>
             </div>
             <div class="footer-right">
                 <button class="btn-outline btn-reject" (click)="openReasonPanel('Rejected')">Reject</button>
