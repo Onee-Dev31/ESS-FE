@@ -116,7 +116,8 @@ export const routes: Routes = [
             },
             {
                 path: 'resign-management',
-                loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
+                // loadComponent: () => import('./pages/resign-management/resign-management').then(m => m.ResignManagement),
+                loadChildren: () => import('./pages/resign-management/resign-detail.route').then(m => m.default),
                 canActivate: [menuGuard],
                 data: { animation: 'Dashboard' }
             },
