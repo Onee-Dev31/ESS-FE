@@ -71,13 +71,15 @@
                 @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
                 <tbody [@listAnimation]>
                     <tr>
-                        <td class="col-requestNo detail"
-                            (click)="viewRequestDetail(row.original)">
+                        <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
                             {{ row.original.requestNo }}
                         </td>
-                        <td class="text-center text-muted">
+                        <td class="text-muted">
                             <div>
-                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB, HH:mm')}} น.
+                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB')}}
+                            </div>
+                            <div>
+                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm')}} น.
                             </div>
                         </td>
                         <td>

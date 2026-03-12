@@ -71,7 +71,7 @@ export class ApprovalItRequestComponent implements OnInit {
     Pending: 'New',
     Approved: 'Approved',
     Rejected: 'Rejected',
-    ReferredBack: 'ReferredBack'
+    'Referred Back': 'Referred_Back'
   };
 
   pageTitle = signal<string>('IT Request Approvals');
@@ -207,6 +207,9 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   getTabCount(tab: string) {
+    if(tab === 'Referred Back'){
+      tab = 'ReferredBack'
+    }
     return this.statusCounts()[tab] || 0;
   }
 
@@ -236,7 +239,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   viewRequestDetail(item: ApprovalItem) {
-    console.log("ApprovalItem >>> ", item)
+    // console.log("ApprovalItem >>> ", item)
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);

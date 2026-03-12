@@ -218,6 +218,57 @@ label {
   z-index: 20000 !important;
 }
 
+/* Popup */
+.swal2-popup {
+  border-radius: 30px !important;
+  background-color: var(--bg-page);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  color: var(--text) !important;
+}
+
+/* Title */
+.swal2-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Text */
+.swal2-html-container {
+  font-size: 18px;
+  color: var(--text-sub);
+}
+
+/* Confirm Button */
+.swal2-confirm {
+  background-color: var(--primary) !important;
+  border-radius: 8px !important;
+  padding: 8px 30px !important;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--primary), var(--text) 10%) !important;
+    transform: translateY(-0.5px);
+  }
+}
+
+/* Cancel Button */
+.swal2-cancel {
+  background-color: var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 8px 20px !important;
+  color: var(--text-header);
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--border-color), var(--text) 10%) !important;
+    transform: translateY(-0.5px);
+  }
+}
+
+/* Remove button focus outline */
+.swal2-styled:focus {
+  box-shadow: none !important;
+}
+
 // antd tooltip
 .ant-tooltip-inner {
   background: var(--bg-card) !important;

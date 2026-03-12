@@ -27,6 +27,7 @@ export class ItRequestDetailModal {
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
+  private itServiceService = inject(ItServiceService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -42,7 +43,6 @@ export class ItRequestDetailModal {
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
-  private itService = inject(ItServiceService);
   private dialogService = inject(DialogService);
   currentAction = signal<'Rejected' | 'Referred Back' | null>(null);
 
@@ -109,18 +109,13 @@ export class ItRequestDetailModal {
   }
 
   async confirmApprove() {
-    // const confirmed = await this.dialogService.confirm({
-    //   title: 'ยืนยันการอนุมัติ',
-    //   message: 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?'
-    // });
-    // if (!confirmed) return;
     this.swalService.confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
       .then(result => {
-        console.log(result)
+        // console.log(result)
         if (!result.isConfirmed) return;
 
         this.swalService.loading("กำลังบันทึกข้อมูล...");
-        this.updateStatus('Approved');
+        this.updateTicket('Approved');
 
       });
   }
@@ -147,7 +142,7 @@ export class ItRequestDetailModal {
     });
 
     if (!confirmed) return;
-    this.updateStatus('Rejected', this.rejectReason().trim());
+    this.updateTicket('Rejected', this.rejectReason().trim());
   }
 
   openReasonPanel(action: 'Rejected' | 'Referred Back') {
@@ -161,59 +156,119 @@ export class ItRequestDetailModal {
       this.toastService.error('กรุณากรอกเหตุผล');
       return;
     }
+
     const action = this.currentAction();
+
     if (!action) return;
-    this.updateStatus(action, reason);
+
+    this.swalService.confirm(`ยืนยันการ${action}`, `คุณต้องการ${action}คำขอนี้ใช่หรือไม่ ?`)
+      .then(result => {
+        // console.log(result)
+        if (!result.isConfirmed) return;
+
+        this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+        if (action === 'Referred Back') {
+          this.updateTicket('Referred_Back', reason);
+        } else {
+          this.updateTicket(action, reason);
+        }
+
+      });
+
   }
 
-  private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
+  // private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
 
-    console.log(this.approvalItem.requestId, newStatus, reason, this.authService.userData().CODEMPID)
+  //   console.log(this.approvalItem.requestId, newStatus, reason, this.authService.userData().CODEMPID)
 
-    // const ticketId = this.approvalItem.requestId;
+  //   // const ticketId = this.approvalItem.requestId;
 
 
-    // if (!ticketId) return;
+  //   // if (!ticketId) return;
 
-    // const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
-    // const approver = userData.CODEMPID;
+  //   // const userData = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_DATA) || '{}');
+  //   // const approver = userData.CODEMPID;
 
-    // const payload: any = {
-    //   Decision: newStatus == 'Referred Back' ? 'Referred_Back' : newStatus,
-    //   ExecutedBy: approver,
-    //   ...(reason ? { Comment: reason } : {})
-    // };
+  //   // const payload: any = {
+  //   //   Decision: newStatus == 'Referred Back' ? 'Referred_Back' : newStatus,
+  //   //   ExecutedBy: approver,
+  //   //   ...(reason ? { Comment: reason } : {})
+  //   // };
 
-    // // console.log(`updateStatus Ticket ID:${ticketId}`)
-    // // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
-    // this.itService.approveTicket(ticketId, payload)
-    //   .subscribe({
-    //     next: (res) => {
+  //   // // console.log(`updateStatus Ticket ID:${ticketId}`)
+  //   // // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
+  //   // this.itService.approveTicket(ticketId, payload)
+  //   //   .subscribe({
+  //   //     next: (res) => {
 
-    //       if (!res?.success) {
-    //         this.toastService.error(res.message);
-    //         return;
-    //       }
+  //   //       if (!res?.success) {
+  //   //         this.toastService.error(res.message);
+  //   //         return;
+  //   //       }
 
-    //       this.onStatusUpdated.emit();
-    //       this.close();
+  //   //       this.onStatusUpdated.emit();
+  //   //       this.close();
 
-    //       const msg =
-    //         newStatus === 'Rejected'
-    //           ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
-    //           : newStatus === 'Referred Back'
-    //             ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
-    //             : 'อนุมัติคำขอเรียบร้อยแล้ว';
+  //   //       const msg =
+  //   //         newStatus === 'Rejected'
+  //   //           ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
+  //   //           : newStatus === 'Referred Back'
+  //   //             ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
+  //   //             : 'อนุมัติคำขอเรียบร้อยแล้ว';
 
-    //       this.toastService.success(msg);
-    //     },
-    //     error: (err) => {
-    //       const message =
-    //         err?.error?.message ||
-    //         'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
+  //   //       this.toastService.success(msg);
+  //   //     },
+  //   //     error: (err) => {
+  //   //       const message =
+  //   //         err?.error?.message ||
+  //   //         'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
 
-    //       this.toastService.error(message);
-    //     }
-    //   });
+  //   //       this.toastService.error(message);
+  //   //     }
+  //   //   });
+  // }
+
+  updateTicket(command: 'Approved' | 'Rejected' | 'Referred_Back', reason?: string) {
+
+    const ticketId = this.approvalItem.requestId.toString();
+    // console.log(command, ticketId, reason)
+
+    const formData = new FormData();
+
+    formData.append('decision', command);
+    formData.append('executedBy', this.authService.userData().CODEMPID);
+
+    if (reason) {
+      formData.append('comment', reason);
+    }
+
+    console.log("formData", [...formData.entries()]);
+
+    this.itServiceService.updateTicket(ticketId, formData).subscribe({
+      next: (res) => {
+        // console.log(res)
+
+        if (res.success) {
+          const msg =
+            command === 'Rejected'
+              ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
+              : command === 'Referred_Back'
+                ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
+                : 'อนุมัติคำขอเรียบร้อยแล้ว';
+          this.swalService.success(res.message)
+        }
+
+        this.onStatusUpdated.emit();
+        this.close();
+
+      },
+      error: (err) => {
+        const message =
+          err?.error?.message ||
+          'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
+        this.swalService.warning(message)
+      }
+    });
   }
 }
