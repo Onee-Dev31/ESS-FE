@@ -195,11 +195,14 @@ $border: var(--border);
     // .col-requestCategory {}
 
     .col-requestNo {
-        text-align: center;
-        color: var(--primary) !important;
-        font-weight: 600;
 
-        &:hover {
+        &.detail {
+            text-align: center;
+            color: var(--primary) !important;
+            font-weight: 600;
+        }
+
+        &.detail:hover {
             cursor: pointer;
             transform: translateY(-1px);
             text-decoration: underline;

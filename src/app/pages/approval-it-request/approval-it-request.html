@@ -71,7 +71,7 @@
                 @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
                 <tbody [@listAnimation]>
                     <tr>
-                        <td class="col-requestNo"
+                        <td class="col-requestNo detail"
                             (click)="viewRequestDetail(row.original)">
                             {{ row.original.requestNo }}
                         </td>

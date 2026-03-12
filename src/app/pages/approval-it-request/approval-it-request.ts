@@ -236,6 +236,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   viewRequestDetail(item: ApprovalItem) {
+    console.log("ApprovalItem >>> ", item)
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
