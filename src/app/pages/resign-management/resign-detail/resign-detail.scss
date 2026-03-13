@@ -886,9 +886,30 @@ $border: var(--border);
     }
 
     .btn-ghost:hover {
-        background: #3941b6;
+        background: color-mix(in srgb, var(--primary), var(--text) 15%);
+        transform: translateY(-2px);
     }
 
+
+    .btn-approve {
+        gap: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid var(--border);
+        background: var(--green);
+        color: #ffffff;
+    }
+
+    .btn-approve:hover {
+        background: color-mix(in srgb, var(--green), var(--text) 15%);
+        transform: translateY(-2px);
+    }
 
     // Edit button
     .btn-icon-pencil {

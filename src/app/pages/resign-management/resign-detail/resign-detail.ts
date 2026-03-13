@@ -140,6 +140,15 @@ export class ResignDetail {
     this.IS_INFO.set(false)
   }
 
+  approve(emp: any) {
+    console.log("approve", emp)
+    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+      });
+  }
+
   async deleteEmployeeInResign(emp: any) {
     this.swalService.confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
       .then(result => {
