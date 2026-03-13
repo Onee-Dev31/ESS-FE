@@ -369,7 +369,15 @@ export class ResignManagement {
   }
 
   submitConfirm(data: any) {
-    console.log(data)
+    console.log("submitConfirm:", data)
+    this.swalService.confirm('ยืนยันรายละเอียดพนักงานลาออก')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.success("ทำการยืนยันพนักงานลาออกสำเร็จ (mock)")
+        this.resetActiveDates();
+        this.IS_CONFIRM_MODAL.set(false)
+      });
+
   }
 
   closeConfirmModal() {

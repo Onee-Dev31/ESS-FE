@@ -159,7 +159,7 @@
         padding: 10px 20px;
 
         h2 {
-            font-size: $font-size-body;
+            font-size: $font-size-header;
         }
 
         .header-right-meta {
@@ -181,7 +181,7 @@
 
     .modal-container {
         width: 80% !important;
-        max-width: 1000px;
+        max-width: 1200px;
     }
 
     // ==========================================
@@ -309,13 +309,18 @@ textarea.form-input {
 }
 
 .table-scroll {
-    overflow: auto;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
     max-height: 400px;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 .confirm-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 1100px;
 }
 
 .confirm-table th {
@@ -364,4 +369,16 @@ textarea.form-input {
     border: 1px solid var(--border);
     padding: 8px 16px;
     border-radius: 8px;
+}
+
+.col {
+    width: 200px;
+}
+
+.col-code {
+    width: 100px;
+}
+
+.col-date {
+    width: 200px;
 }

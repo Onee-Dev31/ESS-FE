@@ -159,6 +159,17 @@
     border-radius: 10% !important;
 }
 
+/* ลบ background ของ disabled date */
+.ant-picker-cell-disabled::before {
+    background: color-mix(in srgb, var(--text-muted), var(--text-reverse) 80%) !important;
+}
+
+/* สีตัวเลขของวันที่ disabled */
+.ant-picker-cell-disabled .ant-picker-cell-inner {
+    color: var(--text) !important;
+    opacity: 0.6;
+}
+
 /*
   ANTD : MODAL
 */

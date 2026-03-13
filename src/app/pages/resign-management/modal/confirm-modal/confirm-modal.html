@@ -2,25 +2,24 @@
     <div class="modal-container">
         <div>
             <header class="top-header-strip">
-                <h2>ตรวจสอบข้อมูลอีกครั้ง</h2>
-                <div class="header-right-meta">
+                <h2>โปรดตรวจสอบข้อมูลอีกครั้ง</h2>
+                <!-- <div class="header-right-meta">
                     <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
-                </div>
+                </div> -->
             </header>
             <div class="content-card">
 
                 <div class="table-scroll">
 
                     <table class="confirm-table">
-
                         <thead>
                             <tr>
-                                <th>รหัส</th>
-                                <th>ชื่อ</th>
-                                <th>ตำแหน่ง</th>
-                                <th>บริษัท</th>
-                                <th>Last Date</th>
-                                <th>Effective Date</th>
+                                <th class="col-code">รหัส</th>
+                                <th class="col">ชื่อ</th>
+                                <th class="col">ตำแหน่ง</th>
+                                <th class="col">บริษัท</th>
+                                <th class="col-date">Last Date</th>
+                                <th class="col-date">Effective Date</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -30,22 +29,19 @@
                             @for (emp of data; track emp.empCode) {
 
                             <tr>
-
                                 <td>{{emp.empCode}}</td>
-
                                 <td>{{emp.name}}</td>
-
                                 <td>{{emp.position}}</td>
-
                                 <td>{{emp.company}}</td>
-
-                                <td>
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.lastDate">
+                                <td class="col-date">
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.lastDate" class="form-input"
+                                        [nzDisabledDate]="disableLastDate(emp)">
                                     </nz-date-picker>
                                 </td>
 
-                                <td>
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.effectiveDate">
+                                <td class="col-date">
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.effectiveDate"
+                                        class="form-input" [nzDisabledDate]="disableEffectiveDate(emp)">
                                     </nz-date-picker>
                                 </td>
 
@@ -65,23 +61,24 @@
 
                 </div>
 
-                <div class="form-actions-footer">
 
-                    <div class="count">
-                        จำนวนพนักงาน {{data.length}} คน
-                    </div>
+            </div>
+            <div class="form-actions-footer">
 
-                    <div class="btn-group">
-                        <button class="btn-cancel" (click)="close()">
-                            ยกเลิก
-                        </button>
-
-                        <button class="btn-save-custom" (click)="submit()">
-                            ยืนยัน
-                        </button>
-                    </div>
-
+                <div class="count">
+                    จำนวนพนักงาน {{data.length}} คน
                 </div>
+
+                <div class="btn-group">
+                    <button class="btn-back-custom" (click)="close()">
+                        ยกเลิก
+                    </button>
+
+                    <button class="btn-save-custom" (click)="submit()">
+                        ยืนยัน
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
