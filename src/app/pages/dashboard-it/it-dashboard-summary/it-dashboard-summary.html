@@ -79,7 +79,8 @@
                 </span>
             </div>
 
-            <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button>
+            <!-- <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button> -->
+            <button class="log-close-btn" (click)="handleCancel()"><i class="fas fa-times"></i></button>
         </div>
 
         <div class="log-modal-body">
@@ -101,7 +102,8 @@
                     </option>
                 </select>
 
-                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()" [disabled]="!filter.company">
+                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()"
+                    [disabled]="!filter.company">
                     <option value="">All Department</option>
                     <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
                         {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}

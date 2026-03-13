@@ -20,7 +20,8 @@
         <div class="file-preview" *ngIf="tempFileName">
           <i class="fas fa-file-alt file-icon"></i>
           <span class="filename">{{ tempFileName }}</span>
-          <button class="btn-remove-file" (click)="removeFile()">✕</button>
+          <!-- <button class="btn-remove-file" (click)="removeFile()">✕</button> -->
+          <button class="btn-close" (click)="removeFile()"><i class="fas fa-times"></i></button>
         </div>
       </div>
     </div>

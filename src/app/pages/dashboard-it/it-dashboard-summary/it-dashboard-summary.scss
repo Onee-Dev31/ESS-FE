@@ -264,6 +264,12 @@
     font-size: 22px;
     cursor: pointer;
     color: #475569;
+
+    &:hover {
+        background: var(--border-toolbar);
+        color: var(--danger);
+        transform: rotate(90deg) !important;
+    }
 }
 
 .log-modal-body {

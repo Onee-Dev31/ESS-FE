@@ -133,7 +133,8 @@
                         <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
                             <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
                             <span class="file-name">{{ file.name }}</span>
-                            <i class="fas fa-download download-small"></i>
+                            <!-- <i class="fas fa-download download-small"
+                                (click)="downloadFile(file); $event.stopPropagation()"></i> -->
                         </li>
                     </ul>
                     <ng-template #noAttachments>
@@ -328,7 +329,8 @@
 
                                 <div class="assignee-card" (click)="$event.stopPropagation()">
 
-                                    <button class="btn-close" (click)="closeAssignee()">✕</button>
+                                    <button class="btn-close" (click)="closeAssignee()"><i
+                                            class="fas fa-times"></i></button>
 
                                     @if (selectedAssignee()) {
                                     <div class="assignee-profile">

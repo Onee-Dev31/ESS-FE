@@ -463,6 +463,8 @@ export class DashboardIT implements OnInit {
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
+  
+
 
   // MODAL
   //>>> function
