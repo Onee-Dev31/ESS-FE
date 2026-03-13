@@ -42,6 +42,15 @@
             <table class="modern-table">
                 <thead>
                     <tr>
+                        <th style="width:40px">
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isSomeSelected()"
+                                    (change)="toggleSelectAll($event)" />
+                                <span class="checkmark"></span>
+                            </label>
+                            <!-- <input type="checkbox" [checked]="isAllSelected()"
+                                (change)="toggleSelectAll($event)" /> -->
+                        </th>
                         <th class="">ชื่อ-นามสกุล</th>
                         <th class="">แผนก</th>
                         <th class="">บริษัท</th>
@@ -49,12 +58,23 @@
                         <th>Effective Date</th>
                         <th>Aduser</th>
                         <th>Expire Date</th>
-                        <th class="text-center actions-col"></th>
+                        <th class="text-center actions-col">
+                            <button class="btn-approve" (click)="approve()">
+                                <i class="fa-solid fa-user-check"></i>Approve
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 @for (emp of resignComps.paginatedData(); track emp.empCode) {
                 <tbody>
                     <tr>
+                        <td>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isChecked(emp.empCode)"
+                                    (change)="toggleSelect(emp, $any($event.target).checked)" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
                         <td class="col-name">
                             <div class="profile-name">
                                 <div class="profile">
@@ -88,9 +108,9 @@
                                 <button class="btn-ghost" (click)="onView(emp)">
                                     <i class="fa-solid fa-circle-info"></i>Info
                                 </button>
-                                <button class="btn-approve" (click)="approve(emp)">
+                                <!-- <button class="btn-approve" (click)="approve(emp)">
                                     <i class="fa-solid fa-user-check"></i>Approve
-                                </button>
+                                </button> -->
                             </div>
                         </td>
                     </tr>

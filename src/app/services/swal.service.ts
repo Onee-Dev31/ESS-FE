@@ -42,11 +42,12 @@ export class SwalService {
         });
     }
 
-    confirm(title: string, text?: string) {
+    confirm(title: string, text?: string, html?: string) {
         return Swal.fire({
             icon: 'question',
             title,
             text,
+            html,
             showCancelButton: true,
             confirmButtonText: 'ตกลง',
             cancelButtonText: 'ยกเลิก',

@@ -104,6 +104,8 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         overflow-y: auto;
         max-height: calc(100vh - 180px);
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
 
         .selection-placeholder {
             margin: 2.5rem 0;
@@ -362,18 +364,11 @@ section {
     width: 100%;
     overflow-x: auto;
     border-radius: 10px;
+    
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
 }
 
-/* scrollbar */
-
-.table-scroll::-webkit-scrollbar {
-    height: 6px;
-}
-
-.table-scroll::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
-    border-radius: 10px;
-}
 
 /* table */
 

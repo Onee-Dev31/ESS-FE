@@ -1129,3 +1129,59 @@ $border: var(--border);
     background: rgba(255, 255, 255, 0.18);
     transform: translateY(-2px);
 }
+
+.checkbox-custom {
+    position: relative;
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+
+    input {
+        display: none;
+    }
+
+    .checkmark {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        border: 2px solid #cbd5e1;
+        background: var(--bg-slate);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    &:hover .checkmark {
+        border-color: var(--primary);
+    }
+
+    input:checked+.checkmark {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    input:checked+.checkmark::after {
+        content: "";
+        width: 6px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        margin-top: -2px;
+    }
+
+    /* indeterminate */
+    input:indeterminate+.checkmark {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    input:indeterminate+.checkmark::after {
+        content: "";
+        width: 10px;
+        height: 2px;
+        background: white;
+        border-radius: 2px;
+    }
+}

@@ -64,6 +64,8 @@
     -webkit-overflow-scrolling: touch;
     padding-bottom: 30px !important;
     flex: initial !important;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
 }
 
 .hidden-input {

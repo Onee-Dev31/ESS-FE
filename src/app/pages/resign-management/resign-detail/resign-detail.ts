@@ -88,6 +88,7 @@ export class ResignDetail {
   searchText = signal<string>('');
 
   IS_INFO = signal<boolean>(false)
+  selectedEmployees = signal<Map<string, EmployeeFormData>>(new Map());
 
   MODE_EDIT: boolean = false;
 
@@ -140,14 +141,38 @@ export class ResignDetail {
     this.IS_INFO.set(false)
   }
 
-  approve(emp: any) {
-    // console.log("approve", emp)
-    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง')
+  approve() {
+
+    const selected = Array.from(this.selectedEmployees().values());
+
+    if (selected.length === 0) {
+      this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกพนักงานก่อนทำรายการ');
+      return;
+    }
+
+    const employeeList = `
+      <div style="max-height:200px;overflow:auto;text-align:center">
+      ${selected
+        .map(emp => `${emp.empCode} - ${emp.firstNameTh} ${emp.lastNameTh}`)
+        .join('<br>')}
+      </div>
+      `;
+
+    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
       .then(result => {
         if (!result.isConfirmed) return;
         this.swalService.success("ทำรายการสำเร็จ", "(mock)")
       });
   }
+
+  // approve(emp: any) {
+  //   // console.log("approve", emp)
+  //   this.swalService.confirm('ยืนยันการ Approve อีกครั้ง')
+  //     .then(result => {
+  //       if (!result.isConfirmed) return;
+  //       this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+  //     });
+  // }
 
   async deleteEmployeeInResign(emp: any) {
     this.swalService.confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
@@ -288,6 +313,59 @@ export class ResignDetail {
       await Swal.fire('ผิดพลาด', e?.message ?? 'เกิดข้อผิดพลาด', 'error');
       return;
     }
+  }
+
+  toggleSelect(emp: EmployeeFormData, checked: boolean) {
+    const map = new Map(this.selectedEmployees());
+
+    if (checked) {
+      map.set(emp.empCode, emp);
+    } else {
+      map.delete(emp.empCode);
+    }
+
+    this.selectedEmployees.set(map);
+  }
+
+  isChecked(empCode: string): boolean {
+    return this.selectedEmployees().has(empCode);
+  }
+
+
+  toggleSelectAll(event: Event) {
+
+    const checked = (event.target as HTMLInputElement).checked;
+    const map = new Map(this.selectedEmployees());
+    const pageData = this.resignComps.paginatedData();
+
+    if (checked) {
+      pageData.forEach(emp => map.set(emp.empCode, emp));
+    } else {
+      pageData.forEach(emp => map.delete(emp.empCode));
+    }
+
+    this.selectedEmployees.set(map);
+  }
+
+  isAllSelected() {
+
+    const pageData = this.resignComps.paginatedData();
+    const selected = this.selectedEmployees();
+
+    return pageData.length > 0 &&
+      pageData.every(emp => selected.has(emp.empCode));
+  }
+
+  isSomeSelected() {
+
+    const pageData = this.resignComps.paginatedData();
+    const selected = this.selectedEmployees();
+
+    const count = pageData.filter(emp =>
+      selected.has(emp.empCode)
+    ).length;
+
+    return count > 0 && count < pageData.length;
   }
 
   onImgError(event: Event) {
