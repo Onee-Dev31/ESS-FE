@@ -58,7 +58,7 @@ interface EmployeeFormData {
   styleUrl: './resign-detail.scss',
 })
 export class ResignDetail {
-  pageTitle = signal<string>('รายการพนักงาน');
+  pageTitle = signal<string>('รายการพนักงานลาออก');
 
   private loadingService = inject(LoadingService);
   private resignService = inject(ResignManagementService);

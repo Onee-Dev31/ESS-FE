@@ -49,5 +49,9 @@ export class ResignManagementService {
     return this._http.delete(`${this.baseUrl}/employee-resignations/${id}`);
   }
 
+  resignEmployees(payload: any): Observable<any> {
+    return this._http.post(`${this.baseUrl}/employee-resignations/bulk`, payload);
+  }
+
 
 }

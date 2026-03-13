@@ -21,6 +21,7 @@ import { finalize } from 'rxjs';
 import dayjs from 'dayjs';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { ConfirmModal } from "./modal/confirm-modal/confirm-modal";
+import { AuthService } from '../../services/auth.service';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -64,6 +65,7 @@ export class ResignManagement {
   private resignService = inject(ResignManagementService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
+  private authService = inject(AuthService);
 
   isLoading = this.loadingService.loading('resign-table');
 
@@ -94,6 +96,7 @@ export class ResignManagement {
   activeDates: {
     [empCode: string]: {
       empCode: string
+      adUser: string
       name: string
       position: string
       company: string
@@ -326,7 +329,8 @@ export class ResignManagement {
         empCode: emp.empCode,
         name: `${emp.firstNameTh} ${emp.lastNameTh}`,
         position: emp.position,
-        company: emp.company
+        company: emp.company,
+        adUser: emp.adUser
       };
 
     }
@@ -344,6 +348,7 @@ export class ResignManagement {
       .filter(v => v.lastDate && v.effectiveDate)
       .map(v => ({
         empCode: v.empCode,
+        adUser: v.adUser,
         name: v.name,
         position: v.position,
         company: v.company,
@@ -370,12 +375,42 @@ export class ResignManagement {
 
   submitConfirm(data: any) {
     console.log("submitConfirm:", data)
+
+    const resignDate = data.map((emp: any) => ({
+      employeeNo: emp.empCode,
+      adUser: emp.adUser,
+      lastDate: formatDate(emp.lastDate, 'yyyy-MM-dd', 'en-US'),
+      resignedDate: formatDate(emp.effectiveDate, 'yyyy-MM-dd', 'en-US'),
+    }))
+
+    const payload = {
+      createdBy: this.authService.userData().AD_USER,
+      employees: resignDate
+    }
+
+    console.log("payload: ", payload)
+
     this.swalService.confirm('ยืนยันรายละเอียดพนักงานลาออก')
       .then(result => {
         if (!result.isConfirmed) return;
-        this.swalService.success("ทำการยืนยันพนักงานลาออกสำเร็จ (mock)")
-        this.resetActiveDates();
-        this.IS_CONFIRM_MODAL.set(false)
+
+        this.resignService.resignEmployees(payload).subscribe({
+          next: (res) => {
+            console.log(res)
+
+            if (res.success) {
+              this.swalService.success(res.message)
+              this.resetActiveDates();
+              this.IS_CONFIRM_MODAL.set(false)
+              this.loadInitialData();
+            }
+          },
+          error: (error) => {
+            console.error('Error fetching data:', error);
+            this.IS_CONFIRM_MODAL.set(false)
+          }
+        })
+
       });
 
   }
