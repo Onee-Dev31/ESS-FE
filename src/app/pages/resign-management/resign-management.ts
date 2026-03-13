@@ -18,6 +18,9 @@ import { PaginationComponent } from "../../components/shared/pagination/paginati
 import { MasterDataService } from '../../services/master-data.service';
 import { NzSelectModule } from "ng-zorro-antd/select";
 import { finalize } from 'rxjs';
+import dayjs from 'dayjs';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { ConfirmModal } from "./modal/confirm-modal/confirm-modal";
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -47,7 +50,9 @@ interface EmployeeFormData {
     NzModalModule,
     EmptyStateComponent,
     PaginationComponent,
-    NzSelectModule
+    NzSelectModule,
+    ConfirmModal,
+    NzTooltipModule
   ],
   templateUrl: './resign-management.html',
   styleUrl: './resign-management.scss',
@@ -83,6 +88,19 @@ export class ResignManagement {
   appliedDepartment = signal<any>(null);
   appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
   searchText = signal<string>('');
+
+  IS_CONFIRM_MODAL = signal<boolean>(false)
+  confirm_data = signal<any>(null)
+  activeDates: {
+    [empCode: string]: {
+      empCode: string
+      name: string
+      position: string
+      company: string
+      lastDate?: Date
+      effectiveDate?: Date
+    }
+  } = {};
 
   MODE_EDIT: boolean = false;
 
@@ -271,6 +289,91 @@ export class ResignManagement {
       await Swal.fire('ผิดพลาด', e?.message ?? 'เกิดข้อผิดพลาด', 'error');
       return;
     }
+  }
+
+  disableLastDate(empCode: string) {
+    return (current: Date): boolean => {
+
+      const effective = this.activeDates[empCode]?.effectiveDate;
+
+      if (!effective) return false;
+
+      // disable ถ้า > effectiveDate
+      return dayjs(current).isAfter(dayjs(effective), 'day');
+
+    };
+  }
+
+  disableEffectiveDate(empCode: string) {
+    return (current: Date): boolean => {
+
+      const last = this.activeDates[empCode]?.lastDate;
+
+      if (!last) return false;
+
+      // disable ถ้า < lastDate
+      return dayjs(current).isBefore(dayjs(last), 'day');
+
+    };
+  }
+
+  setDate(emp: any, type: 'lastDate' | 'effectiveDate', value: Date) {
+
+    console.log(emp)
+
+    if (!this.activeDates[emp.empCode]) {
+      this.activeDates[emp.empCode] = {
+        empCode: emp.empCode,
+        name: `${emp.firstNameTh} ${emp.lastNameTh}`,
+        position: emp.position,
+        company: emp.company
+      };
+
+    }
+
+    this.activeDates[emp.empCode][type] = value;
+
+  }
+
+  resetActiveDates() {
+    this.activeDates = {};
+  }
+
+  confirm() {
+    const result = Object.values(this.activeDates)
+      .filter(v => v.lastDate && v.effectiveDate)
+      .map(v => ({
+        empCode: v.empCode,
+        name: v.name,
+        position: v.position,
+        company: v.company,
+        lastDate: v.lastDate,
+        effectiveDate: v.effectiveDate
+        // lastDate: formatDate(v.lastDate!, 'dd/MM/yyyy', 'en-US'),
+        // effectiveDate: formatDate(v.effectiveDate!, 'dd/MM/yyyy', 'en-US')
+      }));
+
+    if (!result.length) {
+      this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกวันที่ให้พนักงานอย่างน้อย 1 คน');
+      return;
+    }
+
+    console.log(result)
+    this.IS_CONFIRM_MODAL.set(true)
+
+    this.confirm_data.set(result)
+
+    // this.showConfirmPopup(result);
+
+
+  }
+
+  submitConfirm(data: any) {
+    console.log(data)
+  }
+
+  closeConfirmModal() {
+    this.IS_CONFIRM_MODAL.set(false)
   }
 
   onImgError(event: Event) {

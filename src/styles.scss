@@ -268,17 +268,3 @@ label {
 .swal2-styled:focus {
   box-shadow: none !important;
 }
-
-// antd tooltip
-.ant-tooltip-inner {
-  background: var(--bg-card) !important;
-  padding: 16px;
-  color: var(--text);
-  border-radius: 16px;
-  box-shadow: var(--shadow) !important;
-}
-
-.ant-tooltip-arrow::before,
-.ant-tooltip-arrow::after {
-  background-color: var(--bg-card) !important;
-}

@@ -44,11 +44,19 @@
                         <th class="sortable-header">ชื่อ-นามสกุล</th>
                         <th class="">แผนก</th>
                         <th class="sortable-header">บริษัท</th>
-                        <th class="text-center actions-col"></th>
+                        <th class=""></th>
+                        <th class="text-center col-action">
+                            <div class="action">
+                                <button class="btn-submit" (click)="confirm()">ยืนยัน</button>
+                                <div class="btn-reset" nz-tooltip nzTooltipTitle="Reset"
+                                    nzTooltipOverlayClassName="custom-tooltip" (click)="resetActiveDates()"><i
+                                        class="fa-solid fa-arrow-rotate-left"></i></div>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
-                @for (emp of activeComps.paginatedData(); track emp.empCode) {
                 <tbody>
+                    @for (emp of activeComps.paginatedData(); track emp.empCode) {
                     <tr>
                         <td class="col-name">
                             <div class="profile-name">
@@ -74,26 +82,47 @@
                         </td>
                         <td class="col-department">{{ emp.department }}</td>
                         <td class="col-company">{{ emp.company }}</td>
+                        <td class="col-date">
+                            <div class="input-date">
+                                <div class="form-field">
+                                    <label>lastDate</label>
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="lastDate" class="form-input"
+                                        [ngModel]="activeDates[emp.empCode]?.lastDate"
+                                        (ngModelChange)="setDate(emp,'lastDate',$event)"
+                                        [nzDisabledDate]="disableLastDate(emp.empCode)" required>
+                                    </nz-date-picker>
+                                </div>
+                                <div class="form-field">
+                                    <label>effectiveDate</label>
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="effectiveDate" class="form-input"
+                                        [ngModel]="activeDates[emp.empCode]?.effectiveDate"
+                                        (ngModelChange)="setDate(emp,'effectiveDate',$event)"
+                                        [nzDisabledDate]="disableEffectiveDate(emp.empCode)" required>
+                                    </nz-date-picker>
+                                </div>
+                            </div>
+                        </td>
                         <td class="col-action">
                             <button class="btn-ghost" (click)="onView(emp)">
                                 <i class="fa-solid fa-circle-info"></i>Info
                             </button>
                         </td>
                     </tr>
-                </tbody>
-                } @empty {
-                <tbody>
+
+                    } @empty {
+
                     <tr>
                         <td colspan="10" class="no-data-cell">
                             <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
                                 icon="fas fa-users-slash"></app-empty-state>
                         </td>
                     </tr>
+                    }
                 </tbody>
-                }
             </table>
             }
         </div>
+
         <div class="card-list-view">
             @if (isLoading()) {
             <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -130,6 +159,7 @@
             }
             }
         </div>
+
         <div class="pagination-wrapper">
             <app-pagination [currentPage]="activeListing.currentPage()" [pageSize]="activeListing.pageSize()"
                 [totalItems]="activeListing.totalItems()" (onPageChange)="goToPage('active',$event)"
@@ -144,13 +174,14 @@
             @if (isLoading()) {
             <app-skeleton type="table" [rows]="5"></app-skeleton>
             } @else {
-            <table class="modern-table">
+            <table class="modern-table resign">
                 <thead>
                     <tr>
                         <th class="">ชื่อ-นามสกุล</th>
                         <th class="">แผนก</th>
                         <th class="">บริษัท</th>
-                        <th class="text-center actions-col"></th>
+                        <th class="text-center actions-col">
+                        </th>
                     </tr>
                 </thead>
                 @for (emp of resignComps.paginatedData(); track emp.empCode) {
@@ -378,3 +409,8 @@
 
 
 </div>
+
+@if (IS_CONFIRM_MODAL()) {
+<app-confirm-modal [data]="confirm_data()" (closeModal)="closeConfirmModal()"
+    (submitModal)="submitConfirm($event)"></app-confirm-modal>
+}

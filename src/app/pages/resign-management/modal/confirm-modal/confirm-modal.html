@@ -1,0 +1,87 @@
+<div class="modal-overlay confirm">
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>ตรวจสอบข้อมูลอีกครั้ง</h2>
+                <div class="header-right-meta">
+                    <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
+                </div>
+            </header>
+            <div class="content-card">
+
+                <div class="table-scroll">
+
+                    <table class="confirm-table">
+
+                        <thead>
+                            <tr>
+                                <th>รหัส</th>
+                                <th>ชื่อ</th>
+                                <th>ตำแหน่ง</th>
+                                <th>บริษัท</th>
+                                <th>Last Date</th>
+                                <th>Effective Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @for (emp of data; track emp.empCode) {
+
+                            <tr>
+
+                                <td>{{emp.empCode}}</td>
+
+                                <td>{{emp.name}}</td>
+
+                                <td>{{emp.position}}</td>
+
+                                <td>{{emp.company}}</td>
+
+                                <td>
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.lastDate">
+                                    </nz-date-picker>
+                                </td>
+
+                                <td>
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.effectiveDate">
+                                    </nz-date-picker>
+                                </td>
+
+                                <td>
+                                    <button class="btn-delete" (click)="remove(emp.empCode)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+
+                            </tr>
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="form-actions-footer">
+
+                    <div class="count">
+                        จำนวนพนักงาน {{data.length}} คน
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-cancel" (click)="close()">
+                            ยกเลิก
+                        </button>
+
+                        <button class="btn-save-custom" (click)="submit()">
+                            ยืนยัน
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>

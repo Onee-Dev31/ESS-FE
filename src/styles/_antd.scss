@@ -87,6 +87,10 @@
     background-color: var(--input-bg);
 }
 
+.ant-picker-dropdown .ant-picker-panel {
+    background: var(--bg-card);
+}
+
 .ant-picker-cell-today .ant-picker-cell-inner::before {
     border: none !important;
     display: none !important;
@@ -200,4 +204,18 @@
 /* สีเครื่องหมายถูก */
 .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
     border-color: #94a3b8;
+}
+
+// antd tooltip
+.ant-tooltip-inner {
+    background: var(--bg-card) !important;
+    padding: 16px;
+    color: var(--text);
+    border-radius: 16px;
+    box-shadow: var(--shadow) !important;
+}
+
+.ant-tooltip-arrow::before,
+.ant-tooltip-arrow::after {
+    background-color: var(--bg-card) !important;
 }
