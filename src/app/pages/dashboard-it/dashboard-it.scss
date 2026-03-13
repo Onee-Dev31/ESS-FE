@@ -166,6 +166,11 @@
         color: var(--text);
     }
 
+    .approve-out {
+        --btn-border: var(--orange);
+        --btn-bg: var(--orange-light);
+    }
+
     .problem {
         --btn-border: var(--btn-problem-border);
         --btn-bg: var(--btn-problem-bg);

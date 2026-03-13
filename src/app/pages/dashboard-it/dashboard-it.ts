@@ -457,6 +457,12 @@ export class DashboardIT implements OnInit {
     })
   }
 
+  viewApproveResign() {
+    window.open(`/resign-management/detail`, '_blank');
+
+    //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
+  }
+
 
   // MODAL
   //>>> function

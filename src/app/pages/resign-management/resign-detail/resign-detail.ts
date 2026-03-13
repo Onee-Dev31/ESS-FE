@@ -18,6 +18,8 @@ import { Employee } from '../employeeData.interface';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
+import { DateUtilityService } from '../../../services/date-utility.service';
+import { InfoModal } from "../modal/info-modal/info-modal";
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -31,6 +33,9 @@ interface EmployeeFormData {
   type: string; // ? 
   adUser: string; //AD_USER
   position: string; //POST
+  lastDate: string;
+  effectiveDate: string;
+  expireDate: string;
 }
 
 
@@ -46,7 +51,8 @@ interface EmployeeFormData {
     NzModalModule,
     EmptyStateComponent,
     PaginationComponent,
-    NzSelectModule
+    NzSelectModule,
+    InfoModal
   ],
   templateUrl: './resign-detail.html',
   styleUrl: './resign-detail.scss',
@@ -58,6 +64,7 @@ export class ResignDetail {
   private resignService = inject(ResignManagementService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
+  dataUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('resign-table');
 
@@ -66,9 +73,6 @@ export class ResignDetail {
   departmentList = signal<any[]>([]);
 
   // TABLE
-  activeData = signal<EmployeeFormData[]>([]);
-  activeListing = createListingState();
-  activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
   resignData = signal<EmployeeFormData[]>([]);
   resignListing = createListingState();
   resignComps = createListingComputeds_v2(this.resignData, this.resignListing);
@@ -82,6 +86,8 @@ export class ResignDetail {
   appliedDepartment = signal<any>(null);
   appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
   searchText = signal<string>('');
+
+  IS_INFO = signal<boolean>(false)
 
   MODE_EDIT: boolean = false;
 
@@ -121,14 +127,16 @@ export class ResignDetail {
   }
 
   onView(emp: any) {
-    if (emp.empStatus === 'Resigned') {
-      this.MODE_EDIT = true
-    }
-    this.selected = emp;
-    // reset required fields ทุกครั้งที่เปิด
-    this.lastDate.set(emp.lastDate);
-    this.effectiveDate.set(emp.effectiveDate);
-    this.isViewOpen = true;
+    this.IS_INFO.set(true)
+  }
+
+  closeInfoModal() {
+    this.IS_INFO.set(false)
+  }
+
+  submitInfo(data: any) {
+    console.log(data)
+    this.IS_INFO.set(false)
   }
 
   async deleteEmployeeInResign(emp: any) {
@@ -328,61 +336,35 @@ export class ResignDetail {
       type: '',
       adUser: item.AD_USER,
       position: item.POST,
-      lastDate: item.LAST_DATE ? new Date(item.LAST_DATE) : null,
-      effectiveDate: item.RESIGNED_DATE ? new Date(item.RESIGNED_DATE) : null,
+      lastDate: item.LAST_DATE ? item.LAST_DATE : null,
+      effectiveDate: item.RESIGNED_DATE ? item.RESIGNED_DATE : null,
       empStatus: item.EMP_STATUS,
-      id: item.ID
+      id: item.ID,
+      expireDate: ''
     }));
   }
 
-  goToPage(tableType: 'active' | 'resign', page: number) {
+  goToPage(page: number) {
+    this.resignListing.currentPage.set(page);
 
-    if (tableType === 'active') {
-      this.activeListing.currentPage.set(page);
+    this.fetchEmployeeByStatus(
+      'Resigned',
+      page + 1,
+      this.resignListing.pageSize()
+    ).subscribe(res => this.dataResignFromApi(res));
 
-      this.fetchEmployeeByStatus(
-        'Active',
-        page + 1,
-        this.activeListing.pageSize()
-      ).subscribe(res => this.dataActiveFromApi(res));
-
-    } else {
-
-      this.resignListing.currentPage.set(page);
-
-      this.fetchEmployeeByStatus(
-        'Resigned',
-        page + 1,
-        this.resignListing.pageSize()
-      ).subscribe(res => this.dataResignFromApi(res));
-    }
   }
 
-  setPageSize(tableType: 'active' | 'resign', size: number) {
+  setPageSize(size: number) {
+    this.resignListing.pageSize.set(size);
+    this.resignListing.currentPage.set(0);
 
-    if (tableType === 'active') {
-      console.log("size : ", size);
+    this.fetchEmployeeByStatus(
+      'Resigned',
+      1,
+      size
+    ).subscribe(res => this.dataResignFromApi(res));
 
-      this.activeListing.pageSize.set(size);
-      this.activeListing.currentPage.set(0);
-
-      this.fetchEmployeeByStatus(
-        'Active',
-        1,
-        size
-      ).subscribe(res => this.dataActiveFromApi(res));
-
-    } else {
-
-      this.resignListing.pageSize.set(size);
-      this.resignListing.currentPage.set(0);
-
-      this.fetchEmployeeByStatus(
-        'Resigned',
-        1,
-        size
-      ).subscribe(res => this.dataResignFromApi(res));
-    }
   }
 
   onCompanyChange(company: any) {
@@ -391,7 +373,6 @@ export class ResignDetail {
   }
 
   applyFilter() {
-    this.activeListing.currentPage.set(0);
     this.resignListing.currentPage.set(0);
 
     this.loadInitialData();
@@ -399,18 +380,8 @@ export class ResignDetail {
 
   loadInitialData() {
     this.loadingService.start('freelance-list');
-
-    const pageA = this.activeListing.currentPage() + 1;
-    const sizeA = this.activeListing.pageSize();
-
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
-
-    this.fetchEmployeeByStatus('Active', pageA, sizeA)
-      .subscribe(res => {
-        console.log("Active >>", res)
-        this.dataActiveFromApi(res);
-      });
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
@@ -421,17 +392,6 @@ export class ResignDetail {
   }
 
   //GET
-  private dataActiveFromApi(res: any) {
-    // console.log("Active >>", res)
-    const items = res.data.items ?? []
-    console.log(items)
-    this.activeData.set(this.mapApiData(items));
-
-    this.activeListing.totalItems.set(res.data.total ?? 0);
-    this.activeListing.totalPages.set(res.data.totalPages ?? 1);
-    this.activeListing.currentPage.set((res.data.page ?? 1) - 1);
-  }
-
   private dataResignFromApi(res: any) {
     // console.log("Resigned >>", res)
     const items = res.data.items ?? []

@@ -45,6 +45,10 @@
                         <th class="">ชื่อ-นามสกุล</th>
                         <th class="">แผนก</th>
                         <th class="">บริษัท</th>
+                        <th>Last Date</th>
+                        <th>Effective Date</th>
+                        <th>Aduser</th>
+                        <th>Expire Date</th>
                         <th class="text-center actions-col"></th>
                     </tr>
                 </thead>
@@ -75,12 +79,15 @@
                         </td>
                         <td class="col-department">{{ emp.department }}</td>
                         <td class="col-company">{{ emp.company }}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/BBBB')}}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/BBBB') }}</td>
+                        <td class="col-company">{{ emp.adUser }}</td>
+                        <td class="col-company">{{ emp.expireDate }}</td>
                         <td class="col-action">
                             <div class="Info-delete">
                                 <button class="btn-ghost" (click)="onView(emp)">
                                     <i class="fa-solid fa-circle-info"></i>Info
                                 </button>
-                                <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
                             </div>
                         </td>
                     </tr>
@@ -98,6 +105,7 @@
             </table>
             }
         </div>
+
         <div class="card-list-view">
             @if (isLoading()) {
             <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -135,17 +143,18 @@
             }
             }
         </div>
+
         <div class="pagination-wrapper">
             <app-pagination [currentPage]="resignListing.currentPage()" [pageSize]="resignListing.pageSize()"
-                [totalItems]="resignListing.totalItems()" (onPageChange)="goToPage('resign',$event)"
-                (onPageSizeChange)="setPageSize('resign',$event)">
+                [totalItems]="resignListing.totalItems()" (onPageChange)="goToPage($event)"
+                (onPageSizeChange)="setPageSize($event)">
             </app-pagination>
         </div>
     </div>
 
     <!-- ===== View Modal ===== -->
 
-    <nz-modal [(nzVisible)]="isViewOpen" [nzFooter]="null" [nzClosable]="true" [nzCentered]="true" [nzWidth]="560"
+    <!-- <nz-modal [(nzVisible)]="isViewOpen" [nzFooter]="null" [nzClosable]="true" [nzCentered]="true" [nzWidth]="560"
         (nzOnCancel)="closeViewModal()" [nzMaskClosable]="false">
 
         <ng-container *nzModalContent>
@@ -154,7 +163,6 @@
                 <div class="card-scene">
                     <div class="card-flip" [class.is-flipped]="isFlipped">
 
-                        <!-- FRONT (ของเดิมคุณ) -->
                         <div class="credit-card face front">
                             <div class="card-top">
                                 <div class="profile-fullname">
@@ -198,10 +206,6 @@
                                 </div>
 
                                 <div>
-                                    <!-- <div class="label">Type</div>
-                                    <div class="value">
-                                        <div class="badge" [attr.data-type]="emp.type">{{ emp.type }}</div>
-                                    </div> -->
                                 </div>
                             </div>
 
@@ -224,7 +228,7 @@
                             </button>
                         </div>
 
-                        <!-- BACK -->
+                      
                         <div class="credit-card face back">
                             <div class="back-header">
                                 <div>
@@ -269,7 +273,11 @@
             </div>
         </ng-container>
 
-    </nz-modal>
+    </nz-modal> -->
 
 
 </div>
+
+@if (IS_INFO()) {
+<app-info-modal (closeModal)="closeInfoModal()" (submitModal)="submitInfo($event)"></app-info-modal>
+}
