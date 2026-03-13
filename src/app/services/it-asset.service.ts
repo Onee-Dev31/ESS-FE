@@ -13,7 +13,7 @@ export class ItAssetService {
 
     GetItAssetByAD(systemcode: string, username: string) {
         return this._http.get<any>(
-            `${this.baseUrl}/it/get-it-asset-by-AD?systemcode=${systemcode}&username=${username}}`
+            `${this.baseUrl}/it/get-it-asset-by-AD?systemcode=${systemcode}&username=${username}`
         );
     }
 }

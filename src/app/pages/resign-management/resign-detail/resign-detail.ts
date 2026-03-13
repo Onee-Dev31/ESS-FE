@@ -127,6 +127,7 @@ export class ResignDetail {
   }
 
   onView(emp: any) {
+    this.selected = emp;
     this.IS_INFO.set(true)
   }
 
