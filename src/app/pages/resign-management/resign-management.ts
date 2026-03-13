@@ -245,7 +245,7 @@ export class ResignManagement {
 
       const id_update = this.selected.id
 
-      console.log("payload :", payload, id_update)
+      // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
         this.resignService.updateEmployeeResign(id_update, payload).pipe(
@@ -322,7 +322,7 @@ export class ResignManagement {
 
   setDate(emp: any, type: 'lastDate' | 'effectiveDate', value: Date) {
 
-    console.log(emp)
+    // console.log(emp)
 
     if (!this.activeDates[emp.empCode]) {
       this.activeDates[emp.empCode] = {
@@ -363,7 +363,7 @@ export class ResignManagement {
       return;
     }
 
-    console.log(result)
+    // console.log(result)
     this.IS_CONFIRM_MODAL.set(true)
 
     this.confirm_data.set(result)
@@ -374,7 +374,7 @@ export class ResignManagement {
   }
 
   submitConfirm(data: any) {
-    console.log("submitConfirm:", data)
+    // console.log("submitConfirm:", data)
 
     const resignDate = data.map((emp: any) => ({
       employeeNo: emp.empCode,
@@ -388,7 +388,7 @@ export class ResignManagement {
       employees: resignDate
     }
 
-    console.log("payload: ", payload)
+    // console.log("payload: ", payload)
 
     this.swalService.confirm('ยืนยันรายละเอียดพนักงานลาออก')
       .then(result => {
@@ -396,8 +396,6 @@ export class ResignManagement {
 
         this.resignService.resignEmployees(payload).subscribe({
           next: (res) => {
-            console.log(res)
-
             if (res.success) {
               this.swalService.success(res.message)
               this.resetActiveDates();
@@ -508,7 +506,7 @@ export class ResignManagement {
   setPageSize(tableType: 'active' | 'resign', size: number) {
 
     if (tableType === 'active') {
-      console.log("size : ", size);
+      // console.log("size : ", size);
 
       this.activeListing.pageSize.set(size);
       this.activeListing.currentPage.set(0);
@@ -571,7 +569,7 @@ export class ResignManagement {
   private dataActiveFromApi(res: any) {
     // console.log("Active >>", res)
     const items = res.data.items ?? []
-    console.log(items)
+    // console.log(items)
     this.activeData.set(this.mapApiData(items));
 
     this.activeListing.totalItems.set(res.data.total ?? 0);

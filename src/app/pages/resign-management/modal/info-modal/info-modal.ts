@@ -22,10 +22,9 @@ export class InfoModal implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['emp'] && changes['emp'].currentValue) {
       this.loading = true;
-      console.log('emp changed:', changes['emp'].currentValue);
+      // console.log('emp changed:', changes['emp'].currentValue);
       this.getItAssetByAduser(this.emp.adUser).subscribe({
         next: (res) => {
-          console.log(res)
           this.emp_asset = res.data.rows
           this.userId_asset = res.userId_asset
           this.loading = false;

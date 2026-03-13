@@ -136,12 +136,12 @@ export class ResignDetail {
   }
 
   submitInfo(data: any) {
-    console.log(data)
+    // console.log(data)
     this.IS_INFO.set(false)
   }
 
   approve(emp: any) {
-    console.log("approve", emp)
+    // console.log("approve", emp)
     this.swalService.confirm('ยืนยันการ Approve อีกครั้ง')
       .then(result => {
         if (!result.isConfirmed) return;
@@ -241,7 +241,7 @@ export class ResignDetail {
 
       const id_update = this.selected.id
 
-      console.log("payload :", payload, id_update)
+      // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
         this.resignService.updateEmployeeResign(id_update, payload).pipe(

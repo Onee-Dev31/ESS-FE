@@ -22,7 +22,7 @@ export class ConfirmModal implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && changes['data'].currentValue) {
       // this.loading = true;
-      console.log('data', changes['data'].currentValue);
+      // console.log('data', changes['data'].currentValue);
     }
   }
 
