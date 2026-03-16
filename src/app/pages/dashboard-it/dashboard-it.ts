@@ -23,6 +23,7 @@ import { AcknowledgeModal } from "./modal/acknowledge-modal/acknowledge-modal";
 import { DenyModal } from "./modal/deny-modal/deny-modal";
 import { AssignModal } from "./modal/assign-modal/assign-modal";
 import { NoteModal } from './modal/note-modal/note-modal';
+import { DateUtilityService } from '../../services/date-utility.service';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -47,6 +48,7 @@ export class DashboardIT implements OnInit {
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
+  dateUtil = inject(DateUtilityService);
 
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
@@ -341,7 +343,8 @@ export class DashboardIT implements OnInit {
           fullName: t.created_by_name,
           nickName: t.created_by_nickname,
           empCode: t.created_by_codeempid,
-          adUser: t.created_by_aduser
+          adUser: t.created_by_aduser,
+          department: t.created_by_department
         },
 
         createdDate: new Date(t.created_at).toISOString()
@@ -463,7 +466,7 @@ export class DashboardIT implements OnInit {
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
-  
+
 
 
   // MODAL

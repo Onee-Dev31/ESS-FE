@@ -20,6 +20,8 @@ import { ResignManagementService } from '../../../services/resign-management.ser
 import { SwalService } from '../../../services/swal.service';
 import { createListingState, createListingComputeds_v2 } from '../../../utils/listing.util';
 import { Employee } from '../employeeData.interface';
+// import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -210,6 +212,155 @@ export class ResignReport {
             }
           )
       });
+  }
+
+  exportData() {
+
+    const data = this.resignData();
+
+    const header = [
+      [
+        'ลำดับ', 'รหัส', 'ชื่อ-นามสกุล', 'ชื่อ-นามสกุล (ภาษาอังกฤษ)', 'ชื่อเล่น',
+        'ตำแหน่ง', 'แผนก', 'บริษัท', 'Last Date', 'Effective Date',
+        'System AD Info', '', '',
+        'Actual AD Info', '', '',
+        'Compare'
+      ],
+      [
+        '', '', '', '', '', '', '', '', '', '',
+        'AD User', 'Status', 'Expiry Date',
+        'AD User', 'Status', 'Expiry Date',
+        ''
+      ]
+    ];
+
+    const rows = data.map((item: any, index: number) => [
+      index + 1,
+      item.empCode,
+      item.firstNameTh + " " + item.lastNameTh,
+      item.firstNameEn + " " + item.lastNameEn,
+      item.nickName,
+      item.position,
+      item.department,
+      item.company,
+      dayjs(item.lastDate).format('DD/MM/YYYY'),
+      dayjs(item.effectiveDate).format('DD/MM/YYYY'),
+      item.systemAdUser,
+      item.systemStatus,
+      item.systemExpireDate,
+      item.actualAdUser,
+      item.actualStatus,
+      item.actualExpireDate,
+      item.compare
+    ]);
+
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.aoa_to_sheet([...header, ...rows]);
+
+    // merge header
+    worksheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+      { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } },
+      { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } },
+      { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } },
+      { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } },
+      { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } },
+      { s: { r: 0, c: 6 }, e: { r: 1, c: 6 } },
+      { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } },
+      { s: { r: 0, c: 8 }, e: { r: 1, c: 8 } },
+      { s: { r: 0, c: 9 }, e: { r: 1, c: 9 } },
+
+      { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } },
+      { s: { r: 0, c: 13 }, e: { r: 0, c: 15 } },
+
+      { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } }
+    ];
+
+    // column width
+    worksheet['!cols'] = [
+      { wch: 6 }, //A
+      { wch: 10 }, //B
+      { wch: 25 }, //C
+      { wch: 25 }, //D
+      { wch: 12 }, //E
+      { wch: 35 }, //F
+      { wch: 25 }, //G
+      { wch: 45 }, //H
+      { wch: 12 }, //I
+      { wch: 12 }, //J
+      { wch: 18 }, //K
+      { wch: 10 }, //L
+      { wch: 14 }, //M
+      { wch: 18 }, //N
+      { wch: 10 }, //O
+      { wch: 14 }, //P
+      { wch: 10 } //Q
+    ];
+
+    // header (center + bold)
+    const range = XLSX.utils.decode_range(worksheet['!ref']!);
+
+    for (let C = range.s.c; C <= range.e.c; C++) {
+
+      const header1 = XLSX.utils.encode_cell({ r: 0, c: C });
+      const header2 = XLSX.utils.encode_cell({ r: 1, c: C });
+
+      if (worksheet[header1]) {
+        worksheet[header1].s = {
+          alignment: { horizontal: "center", vertical: "center" },
+          font: { bold: true }
+        };
+      }
+
+      if (worksheet[header2]) {
+        worksheet[header2].s = {
+          alignment: { horizontal: "center", vertical: "center" },
+          font: { bold: true }
+        };
+      }
+
+    }
+
+    // body [lastDate, effectiveDate] อยู่ตรงกลาง
+    for (let R = 2; R <= range.e.r; R++) {
+
+      const lastDateCell = XLSX.utils.encode_cell({ r: R, c: 8 });  // column I
+      const effectiveDateCell = XLSX.utils.encode_cell({ r: R, c: 9 }); // column J
+
+      if (worksheet[lastDateCell]) {
+        worksheet[lastDateCell].s = {
+          alignment: { horizontal: "center", vertical: "center" }
+        };
+      }
+
+      if (worksheet[effectiveDateCell]) {
+        worksheet[effectiveDateCell].s = {
+          alignment: { horizontal: "center", vertical: "center" }
+        };
+      }
+
+    }
+    // เปลี่ยน Font
+    for (let R = 2; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+
+        const cell = XLSX.utils.encode_cell({ r: R, c: C });
+
+        if (worksheet[cell]) {
+          worksheet[cell].s = {
+            font: { name: "Tahoma", sz: 10 }
+          };
+        }
+
+      }
+    }
+
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'ResignReport': worksheet },
+      SheetNames: ['ResignReport']
+    };
+
+    XLSX.writeFile(workbook, 'ResignReport.xlsx');
   }
 
   closeViewModal() {

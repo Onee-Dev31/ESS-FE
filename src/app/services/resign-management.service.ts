@@ -57,4 +57,7 @@ export class ResignManagementService {
     return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batch`, payload);
   }
 
+  getReportResignEmployees(page: number, pageSize: number): Observable<any> {
+    return this._http.get(`${this.baseUrl}/employees-with-ad?page=${page}&perPage=${pageSize}`);
+  }
 }

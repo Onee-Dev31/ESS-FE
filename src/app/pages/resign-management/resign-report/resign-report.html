@@ -3,6 +3,8 @@
     <div class="content-card resign">
         <div class="card-header-title">
             รายงานรายชื่อพนักงานลาออก
+            <button class="btn-export" (click)="exportData()"> <i
+                    class="fa-solid fa-arrow-up-from-bracket"></i>export</button>
         </div>
         <div class="table-responsive">
             @if (isLoading()) {
@@ -48,7 +50,7 @@
                         <td class="nickname-col">{{ emp.nickName }}</td>
                         <td class="position-col">{{ emp.position }}</td>
                         <!-- <td class="department-col">{{ emp.department }}</td> -->
-                        <td>{{ emp.department?.slice(0,5) }}</td>
+                        <td>{{ emp.department.slice(0,5) }}</td>
                         <!-- <td class="company-col">{{ emp.company}}</td> -->
                         <td class="company-col">{{ emp.company.match(/\[(.*?)\]/)?.[1] }}</td>
                         <td class="date-col">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>

@@ -89,8 +89,8 @@
 
                             <span class="sep">•</span>
                             <span class="muted">
-                                <span class="header-date"><i class="far fa-calendar-alt"></i> {{ t.createdDate |
-                                    date:'longDate' }}</span>
+                                <span class="header-date"><i class="far fa-calendar-alt"></i> {{
+                                    dateUtil.formatDateToBE(t.createdDate, 'DD MMMM YYYY') }}</span>
                                 <span class="header-time"><i class="far fa-clock"></i> {{ t.createdDate |
                                     date:'shortTime' }}</span>
                             </span>
@@ -265,7 +265,7 @@
 
 
                 <div class="side-contact">
-                    <p>ช่องทางการติต่อ</p>
+                    <p>ช่องทางการติดต่อ</p>
                     <div>อีเมล: {{t.requesterEmail}}</div>
                     <div>ติดต่อ: {{t.requesterPhone}}</div>
                 </div>
@@ -295,7 +295,7 @@
                                     Step {{step.step}} - {{step.title}}
                                     <br>
                                     <small>
-                                        by {{step.createBy.nickName}}
+                                        by {{step.createBy.nickName}} {{step.createBy.department.includes('10806') ? '(IT)' : ''}}
                                         • @if (isToday(step.createdDate)) {
                                         {{ step.createdDate | date:'HH:mm' }}
                                         } @else {

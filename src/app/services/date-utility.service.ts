@@ -20,9 +20,9 @@ export class DateUtilityService {
     }
 
     /** แปลงวันที่ ISO เป็นรูปแบบ พ.ศ. (DD/MM/BBBB) */
-    formatDateToBE(isoDate: string, format = 'DD/MM/BBBB'): string {
+    formatDateToBE(isoDate: string, format = 'DD/MM/BBBB', local = 'en'): string {
         if (!isoDate) return '';
-        return dayjs(isoDate).format(format);
+        return dayjs(isoDate).locale(local).format(format);
     }
 
     /** แปลงวันที่ พ.ศ. กลับเป็นรูปแบบ ISO (YYYY-MM-DD) สำหรับ API */
