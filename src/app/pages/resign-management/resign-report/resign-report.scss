@@ -117,14 +117,14 @@ $border: var(--border);
             padding: 0px 5px;
         }
 
-        .expireDate-system-col {
-            background-color: var(--table-header-blue)
-        }
+    }
 
-        .expireDate-actual-col {
-            background-color: var(--table-header-red)
-        }
+    .expireDate-system-col {
+        background-color: var(--table-header-blue)
+    }
 
+    .expireDate-actual-col {
+        background-color: var(--table-header-red)
     }
 
     // tbody {
