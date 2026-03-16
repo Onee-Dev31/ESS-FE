@@ -13,12 +13,11 @@
   </div>
 
   <div class="nav-right">
-    <div class="search-box desktop-search">
+    <!-- <div class="search-box desktop-search">
       <input type="text" placeholder="Search..." [value]="searchQuery()" (input)="onSearchInput($event)"
         (focus)="isSearchFocused.set(true)" />
       <i class="fas fa-search search-icon"></i>
 
-      <!-- Search Results Dropdown -->
       <div class="search-results-dropdown" *ngIf="isSearchFocused() && filteredSearchResults().length > 0">
         <div class="search-result-item" *ngFor="let result of filteredSearchResults()"
           (click)="navigateTo(result.path)">
@@ -32,7 +31,7 @@
           <i class="fas fa-chevron-right result-arrow"></i>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="nav-actions">
 

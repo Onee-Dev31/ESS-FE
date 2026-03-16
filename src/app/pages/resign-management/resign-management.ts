@@ -262,7 +262,7 @@ export class ResignManagement {
           error: (error) => {
             console.error('Error fetching data:', error);
             this.swalService.close();
-            this.swalService.warning('แจ้งเตือน', error.error)
+            this.swalService.warning('แจ้งเตือน', error.error.message)
           }
         });
       } else {
@@ -460,7 +460,7 @@ export class ResignManagement {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    console.log("items >> ", items)
+    // console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -553,13 +553,13 @@ export class ResignManagement {
 
     this.fetchEmployeeByStatus('Active', pageA, sizeA)
       .subscribe(res => {
-        console.log("Active >>", res)
+        // console.log("Active >>", res)
         this.dataActiveFromApi(res);
       });
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned >>", res)
+        // console.log("Resigned >>", res)
         this.dataResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });

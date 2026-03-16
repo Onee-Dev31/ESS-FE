@@ -111,7 +111,6 @@ export class ResignDetail {
     this.loadInitialData();
   }
 
-
   filteredDepartmentList = computed(() => {
     const company = this.filterCompany();
     const departments = this.departmentList();
@@ -121,7 +120,6 @@ export class ResignDetail {
       dep.COMPANY_CODE === company.COMPANY_CODE
     );
   });
-
 
   trackByEmpCode(_: number, item: Employee) {
     return item.empCode;
@@ -137,12 +135,10 @@ export class ResignDetail {
   }
 
   submitInfo(data: any) {
-    // console.log(data)
     this.IS_INFO.set(false)
   }
 
   approve() {
-
     const selected = Array.from(this.selectedEmployees().values());
 
     if (selected.length === 0) {
@@ -164,15 +160,6 @@ export class ResignDetail {
         this.swalService.success("ทำรายการสำเร็จ", "(mock)")
       });
   }
-
-  // approve(emp: any) {
-  //   // console.log("approve", emp)
-  //   this.swalService.confirm('ยืนยันการ Approve อีกครั้ง')
-  //     .then(result => {
-  //       if (!result.isConfirmed) return;
-  //       this.swalService.success("ทำรายการสำเร็จ", "(mock)")
-  //     });
-  // }
 
   async deleteEmployeeInResign(emp: any) {
     this.swalService.confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
@@ -331,9 +318,7 @@ export class ResignDetail {
     return this.selectedEmployees().has(empCode);
   }
 
-
   toggleSelectAll(event: Event) {
-
     const checked = (event.target as HTMLInputElement).checked;
     const map = new Map(this.selectedEmployees());
     const pageData = this.resignComps.paginatedData();
@@ -348,7 +333,6 @@ export class ResignDetail {
   }
 
   isAllSelected() {
-
     const pageData = this.resignComps.paginatedData();
     const selected = this.selectedEmployees();
 
@@ -357,7 +341,6 @@ export class ResignDetail {
   }
 
   isSomeSelected() {
-
     const pageData = this.resignComps.paginatedData();
     const selected = this.selectedEmployees();
 
@@ -428,7 +411,7 @@ export class ResignDetail {
       effectiveDate: item.RESIGNED_DATE ? item.RESIGNED_DATE : null,
       empStatus: item.EMP_STATUS,
       id: item.ID,
-      expireDate: ''
+      expireDate: item.LAST_DATE ? item.LAST_DATE : null,
     }));
   }
 

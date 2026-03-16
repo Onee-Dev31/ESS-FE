@@ -99,10 +99,10 @@
                         </td>
                         <td class="col-department">{{ emp.department }}</td>
                         <td class="col-company">{{ emp.company }}</td>
-                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/BBBB')}}</td>
-                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/BBBB') }}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
                         <td class="col-company">{{ emp.adUser }}</td>
-                        <td class="col-company">{{ emp.expireDate }}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}</td>
                         <td class="col-action">
                             <div class="Info-delete">
                                 <button class="btn-ghost" (click)="onView(emp)">

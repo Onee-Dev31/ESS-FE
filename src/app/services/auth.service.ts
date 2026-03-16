@@ -40,13 +40,13 @@ export class AuthService {
     private _userRole = signal<string | null>(localStorage.getItem(STORAGE_KEYS.USER_ROLE));
     private _isLoggedIn = signal<boolean>(localStorage.getItem(STORAGE_KEYS.IS_LOGGED_IN) === 'true');
     private _userData = signal<any | null>(this.getStoredUser());
-
-
+    private _allData = signal<any | null>(this.getAllData());
 
     currentUser = this._currentUser.asReadonly();
     userRole = this._userRole.asReadonly();
     isLoggedIn = this._isLoggedIn.asReadonly();
     userData = this._userData.asReadonly();
+    allData = this._allData.asReadonly();
 
     readonly userPhone = computed(() => {
         const user = this._userData();
@@ -66,6 +66,17 @@ export class AuthService {
 
     private getStoredUser(): any | null {
         const data = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+        if (!data) return null;
+
+        try {
+            return JSON.parse(data);
+        } catch {
+            return null;
+        }
+    }
+
+    private getAllData(): any | null {
+        const data = localStorage.getItem(STORAGE_KEYS.ALL_DATA);
         if (!data) return null;
 
         try {
@@ -159,22 +170,22 @@ export class AuthService {
             withCredentials: true
         });
     }
-    
+
     initializeFromBackend() {
         return this.getMagicUser().pipe(
             tap(res => {
-            if (!res?.success) return;
+                if (!res?.success) return;
 
-            localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(res));
-            localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
-            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, res.adUser || '');
-            localStorage.setItem(STORAGE_KEYS.USER_ROLE, res.permission?.Role || '');
-            localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(res.employee) || '');
+                localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(res));
+                localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+                localStorage.setItem(STORAGE_KEYS.CURRENT_USER, res.adUser || '');
+                localStorage.setItem(STORAGE_KEYS.USER_ROLE, res.permission?.Role || '');
+                localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(res.employee) || '');
 
-            this._isLoggedIn.set(true);
-            this._currentUser.set(res.adUser);
-            this._userRole.set(res.permission?.Role);
-            this._userData.set(res.employee);
+                this._isLoggedIn.set(true);
+                this._currentUser.set(res.adUser);
+                this._userRole.set(res.permission?.Role);
+                this._userData.set(res.employee);
             }),
             catchError(() => {
                 // ถ้า 401 ไม่ต้องทำอะไรเลย

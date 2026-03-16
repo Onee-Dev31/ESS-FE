@@ -349,6 +349,11 @@ section {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-header) !important;
+
+    span{
+        font-size: $font-size-hint;
+        color: var(--text-sub);
+    }
 }
 
 /* STATUS BADGE */
