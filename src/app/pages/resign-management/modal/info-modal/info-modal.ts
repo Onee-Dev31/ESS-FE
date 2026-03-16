@@ -47,7 +47,13 @@ export class InfoModal implements OnChanges {
           this.userId_asset = res.asset.userId_asset;
 
           // API 2
-          this.onee_user = res.onee;
+          const statusMap: any = {
+            Lock: 'Lock',
+            Expired: 'Expired'
+          };
+
+          const STATUS = statusMap[res.onee.IsLocked] || 'Active';
+          this.onee_user = { ...res.onee, STATUS: STATUS };
 
           this.loading = false;
           this.cdr.detectChanges();

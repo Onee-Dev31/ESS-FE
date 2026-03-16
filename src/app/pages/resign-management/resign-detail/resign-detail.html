@@ -34,7 +34,10 @@
     </div>
 
     <div class="content-card resign">
-        <div class="card-header-title">รายชื่อพนักงานประจำ (resign)</div>
+        <div class="card-header-title">
+            รายชื่อพนักงานประจำ (resign)
+            <button class="btn-export"> <i class="fa-solid fa-folder-open"></i>ดูรายงาน</button>
+        </div>
         <div class="table-responsive">
             @if (isLoading()) {
             <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -102,7 +105,9 @@
                         <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
                         <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
                         <td class="col-company">{{ emp.adUser }}</td>
-                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}</td>
+                        <td class="col-expire">
+                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}</div>
+                        </td>
                         <td class="col-action">
                             <div class="Info-delete">
                                 <button class="btn-ghost" (click)="onView(emp)">

@@ -350,7 +350,7 @@ section {
     font-weight: 500;
     color: var(--text-header) !important;
 
-    span{
+    span {
         font-size: $font-size-hint;
         color: var(--text-sub);
     }
@@ -363,13 +363,23 @@ section {
     font-weight: 600;
 }
 
+.status-lock {
+    color: #c52222 !important;
+    font-weight: 600;
+}
+
+.status-lock {
+    color: #e59f1d !important;
+    font-weight: 600;
+}
+
 /* TABLE */
 
 .table-scroll {
     width: 100%;
     overflow-x: auto;
     border-radius: 10px;
-    
+
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
 }

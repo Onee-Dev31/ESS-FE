@@ -424,6 +424,27 @@ $border: var(--border);
 
     .card-header-title {
         @include card-header-title(var(--text), #bb00ff);
+        display: flex;
+        justify-content: space-between;
+
+        .btn-export{
+            background: var(--blue);
+            color: white !important;
+            border: none;
+            border-radius: 30px;
+            font-size: $font-size-label;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+
+            &:hover{
+                background: color-mix(in srgb, var(--blue) , var(--text) 10%);
+                transform: translateY(-1px);
+            }
+        }
     }
 
     .table-responsive {
@@ -826,6 +847,14 @@ $border: var(--border);
 
     .col-company {
         width: 25%;
+    }
+
+    .col-expire {
+        .detail {
+            background-color: var(--red-light);
+            border-radius: 10px;
+            padding: 2px 5px;
+        }
     }
 
     .col-action {

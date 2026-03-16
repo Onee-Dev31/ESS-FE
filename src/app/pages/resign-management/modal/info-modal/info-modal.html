@@ -62,7 +62,10 @@
                         </div>
                         <div>
                             <span class="label">Status</span>
-                            <div class="value status-active">Active (mock)</div>
+                            <div class="value" [class.status-active]="onee_user.STATUS === 'Active'"
+                                [class.status-lock]="onee_user.STATUS === 'Lock'"
+                                [class.status-expired]="onee_user.STATUS === 'Expired'">
+                                {{onee_user.STATUS}}</div>
                         </div>
 
                         <div>

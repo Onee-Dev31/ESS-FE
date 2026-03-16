@@ -20,6 +20,8 @@ import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { InfoModal } from "../modal/info-modal/info-modal";
+import dayjs from 'dayjs';
+import { AuthService } from '../../../services/auth.service';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -64,6 +66,7 @@ export class ResignDetail {
   private resignService = inject(ResignManagementService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
+  private authService = inject(AuthService);
   dataUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('resign-table');
@@ -154,11 +157,38 @@ export class ResignDetail {
       </div>
       `;
 
-    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
-      .then(result => {
-        if (!result.isConfirmed) return;
-        this.swalService.success("ทำรายการสำเร็จ", "(mock)")
-      });
+    const requests = selected.map(emp => ({
+      samAccountName: emp.adUser,
+      expireDate: dayjs(emp.lastDate).format('YYYY-MM-DD')
+    }))
+
+    const payload = {
+      actionEmp: this.authService.userData().AD_USER.toLowerCase(),
+      requests: requests
+    }
+
+    console.log(payload)
+
+    // this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
+    //   .then(result => {
+    //     if (!result.isConfirmed) return;
+
+    //     this.resignService.updateADManagementResign(payload).subscribe(
+    //       {
+    //         next: (res) => {
+    //           console.log(res);
+    //           this.swalService.success('สำเร็จ', '')
+    //           this.loadInitialData();
+    //         },
+    //         error: (error) => {
+    //           console.error('Error fetching data:', error);
+    //           this.swalService.warning('แจ้งเตือน', error.error)
+    //         }
+    //       }
+    //     )
+
+    //     this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+    //   });
   }
 
   async deleteEmployeeInResign(emp: any) {
@@ -411,7 +441,7 @@ export class ResignDetail {
       effectiveDate: item.RESIGNED_DATE ? item.RESIGNED_DATE : null,
       empStatus: item.EMP_STATUS,
       id: item.ID,
-      expireDate: item.LAST_DATE ? item.LAST_DATE : null,
+      expireDate: item.AD_EXPIRED_DATE ? item.AD_EXPIRED_DATE : null,
     }));
   }
 
