@@ -1,27 +1,25 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, computed, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { SkeletonComponent } from '../../../components/shared/skeleton/skeleton';
 import { PageHeaderComponent } from '../../../components/shared/page-header/page-header';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { EmptyStateComponent } from '../../../components/shared/empty-state/empty-state';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { LoadingService } from '../../../services/loading';
-import { ResignManagementService } from '../../../services/resign-management.service';
-import { SwalService } from '../../../services/swal.service';
-import { MasterDataService } from '../../../services/master-data.service';
-import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
-import { Employee } from '../employeeData.interface';
-import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import dayjs from 'dayjs';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { DateUtilityService } from '../../../services/date-utility.service';
-import { InfoModal } from "../modal/info-modal/info-modal";
-import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
+import { DateUtilityService } from '../../../services/date-utility.service';
+import { LoadingService } from '../../../services/loading';
+import { MasterDataService } from '../../../services/master-data.service';
+import { ResignManagementService } from '../../../services/resign-management.service';
+import { SwalService } from '../../../services/swal.service';
+import { createListingState, createListingComputeds_v2 } from '../../../utils/listing.util';
+import { Employee } from '../employeeData.interface';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -40,9 +38,8 @@ interface EmployeeFormData {
   expireDate: string;
 }
 
-
 @Component({
-  selector: 'app-resign-detail',
+  selector: 'app-resign-report',
   imports: [
     CommonModule,
     FormsModule,
@@ -54,12 +51,11 @@ interface EmployeeFormData {
     EmptyStateComponent,
     PaginationComponent,
     NzSelectModule,
-    InfoModal
   ],
-  templateUrl: './resign-detail.html',
-  styleUrl: './resign-detail.scss',
+  templateUrl: './resign-report.html',
+  styleUrl: './resign-report.scss',
 })
-export class ResignDetail {
+export class ResignReport {
   pageTitle = signal<string>('รายการพนักงานลาออก');
 
   private loadingService = inject(LoadingService);
@@ -102,10 +98,7 @@ export class ResignDetail {
   effectiveDate = signal<Date | null>(null);
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private i18n: NzI18nService,
   ) {
-    this.i18n.setLocale(en_US);
   }
 
   ngOnInit() {
@@ -492,11 +485,6 @@ export class ResignDetail {
       });
   }
 
-  viewReportResign() {
-    window.open(`/resign-management/report`, '_blank');
-    //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
-  }
-
   //GET
   private dataResignFromApi(res: any) {
     // console.log("Resigned >>", res)
@@ -553,5 +541,4 @@ export class ResignDetail {
       }
     });
   }
-
 }

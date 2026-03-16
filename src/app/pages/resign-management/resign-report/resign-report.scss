@@ -275,26 +275,60 @@ $border: var(--border);
 
 // ============================================
 
+
+.modal-overlay {
+    @include modal-overlay-styles;
+
+    .top-header-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: var(--bg-card);
+        color: var(--text-header);
+        border-bottom: 1px solid var(--border-toolbar);
+        position: relative;
+        display: none;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            &::before {
+                content: '';
+                display: block;
+                width: 4px;
+                height: 24px;
+                background: $primary;
+                border-radius: 2px;
+            }
+        }
+
+
+    }
+}
+
 .page {
     padding: 20px;
-}
 
-.page-header {
-    margin-bottom: 12px;
-
-    .title {
-        margin: 0;
-        font-size: 22px;
-        font-weight: 700;
-    }
-
-    .subtitle {
-        margin-top: 4px;
-        font-size: 13px;
-        opacity: 0.75;
+    .top-header-strip {
+        display: none !important;
     }
 }
-
 
 .content-card {
     @include content-card;
@@ -423,11 +457,11 @@ $border: var(--border);
     margin-top: 0.8rem;
 
     .card-header-title {
-        @include card-header-title(var(--text), #bb00ff);
+        @include card-header-title(var(--text), var(--red));
         display: flex;
         justify-content: space-between;
 
-        .btn-export{
+        .btn-export {
             background: var(--blue);
             color: white !important;
             border: none;
@@ -440,16 +474,16 @@ $border: var(--border);
             gap: 5px;
             cursor: pointer;
 
-            &:hover{
-                background: color-mix(in srgb, var(--blue) , var(--text) 10%);
+            &:hover {
+                background: color-mix(in srgb, var(--blue), var(--text) 10%);
                 transform: translateY(-1px);
             }
         }
     }
 
     .table-responsive {
+        overflow-y: auto;
         .modern-table {
-
             .col-action {
                 .Info-delete {
                     display: flex;

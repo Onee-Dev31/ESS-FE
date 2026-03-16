@@ -36,7 +36,7 @@
     <div class="content-card resign">
         <div class="card-header-title">
             รายชื่อพนักงานประจำ (resign)
-            <button class="btn-export"> <i class="fa-solid fa-folder-open"></i>ดูรายงาน</button>
+            <button class="btn-export" (click)="viewReportResign()"> <i class="fa-solid fa-folder-open"></i>ดูรายงาน</button>
         </div>
         <div class="table-responsive">
             @if (isLoading()) {
