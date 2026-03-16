@@ -75,43 +75,93 @@ $border: var(--border);
             border-bottom: 2px solid $border;
             white-space: nowrap;
         }
+
+        // COL
+
+        .position-col {
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .fullnameTH-col,
+        .fullnameEN-col {
+            text-align: center;
+            min-width: 120px;
+        }
     }
 
     tbody {
-        transition: background 0.2s;
-
-        &:hover {
-            background: var(--border-toolbar);
-
-            tr {
-                background: transparent;
-            }
-
-            td {
-                background: transparent !important;
-            }
-        }
-
-        tr {
-            transition: background 0.2s;
-
-            &:not(:last-child) td:not(.merged-col) {
-                border-bottom: none;
-            }
-        }
-
         td {
-            padding: 16px;
-            font-size: 0.9rem;
-            color: $text;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
+            text-align: center;
         }
 
-        &:last-of-type tr:last-child td {
-            border-bottom: none;
+        tr:hover td:not(.expireDate-system-col):not(.expireDate-actual-col) {
+            background: var(--border-toolbar);
         }
+
+        tr:hover td.expireDate-system-col,
+        tr:hover td.expireDate-actual-col {
+            filter: brightness(0.92);
+        }
+
+        // COL
+        .number-col {
+            text-align: center;
+        }
+
+        .code-col {
+            min-width: 100px;
+        }
+
+        .position-col {
+            padding: 0px 5px;
+        }
+
+        .expireDate-system-col {
+            background-color: var(--table-header-blue)
+        }
+
+        .expireDate-actual-col {
+            background-color: var(--table-header-red)
+        }
+
     }
+
+    // tbody {
+    //     transition: background 0.2s;
+
+    //     &:hover {
+    //         // background: var(--border-toolbar);
+
+    //         tr {
+    //             background: transparent;
+    //         }
+
+    //         td {
+    //             background: transparent !important;
+    //         }
+    //     }
+
+    //     tr {
+    //         transition: background 0.2s;
+
+    //         &:not(:last-child) td:not(.merged-col) {
+    //             border-bottom: none;
+    //         }
+    //     }
+
+    //     td {
+    //         padding: 16px;
+    //         font-size: 0.9rem;
+    //         color: $text;
+    //         border-bottom: 1px solid var(--border);
+    //         vertical-align: middle;
+    //     }
+
+    //     &:last-of-type tr:last-child td {
+    //         border-bottom: none;
+    //     }
+    // }
 
     @include tablet {
         display: none;
@@ -483,6 +533,7 @@ $border: var(--border);
 
     .table-responsive {
         overflow-y: auto;
+
         .modern-table {
             .col-action {
                 .Info-delete {

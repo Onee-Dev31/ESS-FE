@@ -11,19 +11,21 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" class="">ลำดับ</th>
-                        <th rowspan="2" class="">รหัส</th>
-                        <th rowspan="2" class="">ชื่อ-นามสกุล</th>
-                        <th rowspan="2" class="">ชื่อ-นามสกุล (ภาษาอังกฤษ)</th>
-                        <th rowspan="2" class="">ชื่อเล่น</th>
-                        <th rowspan="2" class="">ตำแหน่ง</th>
-                        <th rowspan="2" class="">รหัสฝ่าย</th>
-                        <th rowspan="2" class="">บริษัท</th>
-                        <th rowspan="2" class="">Last Date</th>
-                        <th rowspan="2" class="">Effective Date</th>
-                        <th colspan="3" class="text-center" style="background-color: var(--green-light)">System AD
+                        <th rowspan="2" class="number-col">ลำดับ</th>
+                        <th rowspan="2" class="code-col">รหัส</th>
+                        <th rowspan="2" class="fullnameTH-col">ชื่อ-นามสกุล</th>
+                        <th rowspan="2" class="fullnameEN-col">ชื่อ-นามสกุล <br> (ภาษาอังกฤษ)</th>
+                        <th rowspan="2" class="nickname-col">ชื่อเล่น</th>
+                        <th rowspan="2" class="position-col">ตำแหน่ง</th>
+                        <th rowspan="2" class="department-col">แผนก</th>
+                        <th rowspan="2" class="company-col">บริษัท</th>
+                        <th rowspan="2" class="date-col">Last Date</th>
+                        <th rowspan="2" class="date-col">Effective Date</th>
+                        <th colspan="3" class="text-center expireDate-system-col">System
+                            AD
                             Info</th>
-                        <th colspan="3" class="text-center" style="background-color: var(--blue-light)">Actual AD Info
+                        <th colspan="3" class="text-center expireDate-actual-col">Actual AD
+                            Info
                         </th>
                         <th rowspan="2" class="">Compare</th>
                     </tr>
@@ -39,25 +41,27 @@
                 @for (emp of resignComps.paginatedData(); track emp.empCode; let i = $index) {
                 <tbody>
                     <tr>
-                        <td>{{i + 1}}</td>
-                        <td>{{ emp.empCode }}</td>
-                        <td>{{ emp.firstNameTh }} {{ emp.lastNameTh }}</td>
-                        <td>{{ emp.firstNameEn }} {{ emp.lastNameEn }}</td>
-                        <td>{{ emp.nickName }}</td>
-                        <td>{{ emp.position }}</td>
-                        <td>{{ emp.department }}</td>
-                        <td>{{ emp.company }}</td>
-                        <td>{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
-                        <td>{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
+                        <td class="number-col">{{i + 1}}</td>
+                        <td class="code-col">{{ emp.empCode }}</td>
+                        <td class="fullnameTH-col">{{ emp.firstNameTh }} <br>{{ emp.lastNameTh }}</td>
+                        <td class="fullnameEN-col">{{ emp.firstNameEn }} <br>{{ emp.lastNameEn }}</td>
+                        <td class="nickname-col">{{ emp.nickName }}</td>
+                        <td class="position-col">{{ emp.position }}</td>
+                        <!-- <td class="department-col">{{ emp.department }}</td> -->
+                        <td>{{ emp.department?.slice(0,5) }}</td>
+                        <!-- <td class="company-col">{{ emp.company}}</td> -->
+                        <td class="company-col">{{ emp.company.match(/\[(.*?)\]/)?.[1] }}</td>
+                        <td class="date-col">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
+                        <td class="date-col">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
                         <td>{{ emp.adUser }}</td>
                         <td>Active (mock)</td>
-                        <td>
+                        <td class="expireDate-system-col">
                             <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
                                 'DD/MM/YYYY') }}</div>
                         </td>
                         <td>{{ emp.adUser }}</td>
                         <td>Active (mock)</td>
-                        <td>
+                        <td class="expireDate-actual-col">
                             <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
                                 'DD/MM/YYYY') }}</div>
                         </td>

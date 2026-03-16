@@ -98,6 +98,10 @@
     --status-waiting-bg: rgba(178, 38, 220, 0.15);
     --status-waiting-text: #be26dc;
 
+    //table
+    --table-header-green: #b9e7cf;
+    --table-header-blue: #b4cff3;
+    --table-header-red: #e6bdbd;
 }
 
 [data-theme='dark'] {
@@ -194,6 +198,12 @@
     --status-deny-text: #f87171;
     --status-waiting-bg: rgba(201, 103, 231, 0.15);
     --status-waiting-text: #cf5fe6;
+
+
+    // table
+    --table-header-green: #1f5f46;
+    --table-header-blue: #1f3f73;
+    --table-header-red: #6a2f2f;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility

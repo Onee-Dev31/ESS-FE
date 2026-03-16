@@ -46,7 +46,6 @@ interface EmployeeFormData {
     NzButtonModule,
     NzDatePickerModule,
     SkeletonComponent,
-    PageHeaderComponent,
     NzModalModule,
     EmptyStateComponent,
     PaginationComponent,
