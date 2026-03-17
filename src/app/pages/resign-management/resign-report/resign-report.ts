@@ -591,7 +591,8 @@ export class ResignReport {
       adUser_actual: item.adUser,
       status_actual: item.isDisabled === 'Yes' ? 'Disable' :
         item.isDisabled === 'No' && item.adIsLocked ? item.adIsLocked : '',
-      expiryDate_actual: this.dataUtil.formatDateToBE(item.adPasswordExpirationDate, 'DD/MM/YYYY'),
+      expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
+      passwordLastSet_actual: this.dataUtil.formatDateToBE(item.adPwdLastSet, 'DD/MM/YYYY'),
     }));
   }
 

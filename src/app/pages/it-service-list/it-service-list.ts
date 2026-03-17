@@ -94,13 +94,13 @@ export class ItService implements OnInit {
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
       console.log(ticket.IT_Status, ticket.user_status)
-      console.log(ticket.IT_Status === null ? ticket.user_status :
-        ticket.IT_Status === 'Closed' ? 'Closed' :
-          ticket.user_status === 'Pending' ? 'Waiting you' :
-            'In Progress')
-      // if (ticket.user_status === 'Pending'){
+      // console.log(ticket.IT_Status === null ? ticket.user_status :
+      //   ticket.IT_Status === 'Closed' ? 'Closed' :
+      //     ticket.user_status === 'Pending' ? 'Waiting you' :
+      //       'In Progress')
 
-      // }
+      let status = this.getTicketStatus(ticket)
+
 
       const objectData = {
         ticketId: ticket.id,
@@ -109,10 +109,12 @@ export class ItService implements OnInit {
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
-        status: ticket.IT_Status === null ? ticket.user_status :
-          ticket.IT_Status === 'Closed' ? 'Closed' :
-            ticket.user_status === 'Pending' ? 'Waiting you' :
-              'In Progress',
+        status: status,
+
+        // ticket.IT_Status === null ? ticket.user_status :
+        //   ticket.IT_Status === 'Closed' ? 'Closed' :
+        //     ticket.user_status === 'Pending' ? 'Waiting you' :
+        //       'In Progress',
         title: ticket.title,
         status_user: ticket.user_status,
         priority: ticket.priority,
@@ -232,7 +234,6 @@ export class ItService implements OnInit {
   }
 
   // FUNCTION MAP
-
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
     if (!img.src.includes('user.png')) {
@@ -417,6 +418,23 @@ export class ItService implements OnInit {
     return notes;
   }
 
+  getTicketStatus(ticket: any) {
+    console.log(ticket)
+    if (ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") {
+      return "Waiting you";
+    }
+
+    else if (ticket.IT_Status !== 'Closed' && ticket.user_status !== 'Approved') {
+      return ticket.user_status;
+    }
+
+    else if (ticket.IT_Status === "Closed") {
+      return "Closed";
+    }
+
+    return "Unknown";
+  }
+
   // GET
   getMyTicket() {
 
@@ -425,16 +443,12 @@ export class ItService implements OnInit {
 
     this.itServiceService.getMyTickets({ requesterCodeempid: this.userData.CODEMPID }).subscribe({
       next: (res) => {
-        console.log(res);
         this.Tickets.set(res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
           ticketType: ticket.ticket_type_name_th,
-          status: ticket.IT_Status === null ? ticket.user_status :
-            ticket.IT_Status === 'Closed' ? 'Closed' :
-              ticket.user_status === 'Pending' ? 'Waiting you' :
-                'In Progress',
+          status: this.getTicketStatus(ticket),
           createdDate: new Date(ticket.created_at).toISOString()
         })))
       },
