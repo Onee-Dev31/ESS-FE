@@ -57,7 +57,26 @@ export class ResignManagementService {
     return this._http.post(`${this.baseUrl}/ADManagement/set-account-expire-batch`, payload);
   }
 
-  getReportResignEmployees(page: number, pageSize: number): Observable<any> {
-    return this._http.get(`${this.baseUrl}/employees-with-ad?page=${page}&perPage=${pageSize}`);
+  getReportResignEmployees(params: {
+    page?: number;
+    pageSize?: number;
+    searchText?: string;
+    companyCode?: any;
+    costCent?: any;
+    empStatus?: string;
+  }): Observable<any> {
+
+    const queryParams: any = {};
+
+    if (params.page) queryParams.page = params.page;
+    if (params.pageSize) queryParams.perPage = params.pageSize;
+    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.companyCode) queryParams.companyCode = params.companyCode;
+    if (params.costCent) queryParams.costCent = params.costCent;
+    if (params.empStatus) queryParams.empStatus = params.empStatus;
+
+    return this._http.get<any>(`${this.baseUrl}/employees-with-ad`, {
+      params: queryParams
+    });
   }
 }

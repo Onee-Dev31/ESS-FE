@@ -56,13 +56,14 @@
                         <td class="date-col">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
                         <td class="date-col">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
                         <td>{{ emp.adUser }}</td>
-                        <td>Active (mock)</td>
+                        <td>{{emp.AD_DISABLE_DATE ? 'Disable' : emp.AD_EXPIRED_DATE? 'Expire' : ''}}</td>
                         <td class="expireDate-system-col">
-                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
+                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.AD_EXPIRED_DATE,
                                 'DD/MM/YYYY') }}</div>
                         </td>
                         <td>{{ emp.adUser }}</td>
-                        <td>Active (mock)</td>
+                        <td>{{emp.IsDisabled === 'Yes' ? 'Disable' :
+                            emp.IsDisabled === 'No' && emp.AccountExpires ? 'Expire' : '' }}</td>
                         <td class="expireDate-actual-col">
                             <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
                                 'DD/MM/YYYY') }}</div>

@@ -23,22 +23,22 @@ import { Employee } from '../employeeData.interface';
 // import * as XLSX from 'xlsx';
 import * as XLSX from 'xlsx-js-style';
 
-interface EmployeeFormData {
-  empCode: string; //CODEMPID
-  firstNameTh: string; //NAMFIRSTT
-  lastNameTh: string; //NAMLASTT
-  firstNameEn: string; //NAMFIRSTE
-  lastNameEn: string; //NAMLASTE
-  nickName: string; //NICKNAME
-  department: string; //DEPARTMENT
-  company: string; //COMPANY_NAME [COMPANY_CODE]
-  type: string; // ? 
-  adUser: string; //AD_USER
-  position: string; //POST
-  lastDate: string;
-  effectiveDate: string;
-  expireDate: string;
-}
+// interface EmployeeFormData {
+//   empCode: string; //CODEMPID
+//   firstNameTh: string; //NAMFIRSTT
+//   lastNameTh: string; //NAMLASTT
+//   firstNameEn: string; //NAMFIRSTE
+//   lastNameEn: string; //NAMLASTE
+//   nickName: string; //NICKNAME
+//   department: string; //DEPARTMENT
+//   company: string; //COMPANY_NAME [COMPANY_CODE]
+//   type: string; // ? 
+//   adUser: string; //AD_USER
+//   position: string; //POST
+//   lastDate: string;
+//   effectiveDate: string;
+//   expireDate: string;
+// }
 
 @Component({
   selector: 'app-resign-report',
@@ -73,7 +73,7 @@ export class ResignReport {
   departmentList = signal<any[]>([]);
 
   // TABLE
-  resignData = signal<EmployeeFormData[]>([]);
+  resignData = signal<any[]>([]);
   resignListing = createListingState();
   resignComps = createListingComputeds_v2(this.resignData, this.resignListing);
 
@@ -88,7 +88,7 @@ export class ResignReport {
   searchText = signal<string>('');
 
   IS_INFO = signal<boolean>(false)
-  selectedEmployees = signal<Map<string, EmployeeFormData>>(new Map());
+  selectedEmployees = signal<Map<string, any>>(new Map());
 
   MODE_EDIT: boolean = false;
 
@@ -245,9 +245,9 @@ export class ResignReport {
       item.company,
       dayjs(item.lastDate).format('DD/MM/YYYY'),
       dayjs(item.effectiveDate).format('DD/MM/YYYY'),
-      item.systemAdUser,
-      item.systemStatus,
-      item.systemExpireDate,
+      item.AD_USER,
+      item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE? 'Expire' : '',
+      item.AD_EXPIRED_DATE,
       item.actualAdUser,
       item.actualStatus,
       item.actualExpireDate,
@@ -475,7 +475,7 @@ export class ResignReport {
     }
   }
 
-  toggleSelect(emp: EmployeeFormData, checked: boolean) {
+  toggleSelect(emp: any, checked: boolean) {
     const map = new Map(this.selectedEmployees());
 
     if (checked) {
@@ -566,7 +566,7 @@ export class ResignReport {
   }
 
   // Function
-  private mapApiData(items: any[]): EmployeeFormData[] {
+  private mapApiData(items: any[]): any[] {
     console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
@@ -585,6 +585,7 @@ export class ResignReport {
       empStatus: item.EMP_STATUS,
       id: item.ID,
       expireDate: item.AD_EXPIRED_DATE ? item.AD_EXPIRED_DATE : null,
+      ...item
     }));
   }
 
@@ -655,7 +656,7 @@ export class ResignReport {
     const company = this.filterCompany();
     const department = this.filterDepartment();
 
-    return this.resignService.getEmployee({
+    return this.resignService.getReportResignEmployees({
       page,
       pageSize,
       searchText: searchText || undefined,
@@ -663,6 +664,15 @@ export class ResignReport {
       costCent: department?.COSTCENT,
       empStatus: status
     });
+
+    // return this.resignService.getEmployee({
+    //   page,
+    //   pageSize,
+    //   searchText: searchText || undefined,
+    //   companyCode: company?.COMPANY_CODE,
+    //   costCent: department?.COSTCENT,
+    //   empStatus: status
+    // });
   }
 
   // GET MASTER
