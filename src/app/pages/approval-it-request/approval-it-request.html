@@ -76,7 +76,7 @@
                         </td>
                         <td class="text-muted">
                             <div>
-                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB')}}
+                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY')}}
                             </div>
                             <div>
                                 {{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm')}} น.
@@ -107,7 +107,8 @@
 
                             <div class="status-time"
                                 *ngIf="row.original.originalData?.ApprovalDate && row.original.status != 'Pending'">
-                                {{dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB, HH:mm')}} น.
+                                {{dateUtil.formatDateToBE(row.original.originalData?.ApprovalDate, 'DD MMMM YYYY, HH:mm')}} น.
+                                <!-- {{dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB, HH:mm')}} น. -->
                             </div>
                         </td>
 

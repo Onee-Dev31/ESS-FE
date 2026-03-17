@@ -325,9 +325,17 @@ export class ItService implements OnInit {
 
   private extractNickName(name: string) {
 
-    const match = name.match(/\((.*?)\)/);
+    //   const match = name.match(/\((.*?)\)/);
+    //   return match ? match[1] : name;
 
-    return match ? match[1] : name;
+    const nickMatch = name.match(/\((.*?)\)/);
+    const firstName = name.split(' ')[0];
+
+    if (nickMatch) {
+      return `${firstName} (${nickMatch[1]})`;
+    }
+
+    return firstName;
   }
 
   viewFile(file: any) {
@@ -408,7 +416,9 @@ export class ItService implements OnInit {
             empCode: r.user_code,
             adUser: r.user_aduser,
             role: 'user'
-          }
+          },
+          referred_title: r.Referred_Title,
+          isReferred: r.IsReferred
         };
 
       })
@@ -420,7 +430,7 @@ export class ItService implements OnInit {
 
   getTicketStatus(ticket: any) {
     console.log(ticket)
-    if ((ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") ||(ticket.user_status === 'Referred_Back')) {
+    if ((ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") || (ticket.user_status === 'Referred_Back')) {
       return "Waiting you";
     }
 

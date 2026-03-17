@@ -54,11 +54,11 @@
     --orange: #ff8d30;
     --orange-light: #ffd5b3;
     --green: #059669;
-    --green-light: #80b1a0;
+    --green-light: #b4e5d4;
     --blue: #473CE2;
     --blue-light: #a9bffd;
-    --red: #d32020;
-    --red-light: #e5baba;
+    --red: #e74c3c;
+    --red-light: #f0c7c7;
 
     // IT-SERVICE
     --btn-problem-bg: #ffedce;
@@ -102,6 +102,12 @@
     --table-header-green: #b9e7cf;
     --table-header-blue: #b4cff3;
     --table-header-red: #e6bdbd;
+
+    //TAG
+    --tag-color-red: #e74c3c;
+    --tag-color-green: #2ed47e;
+    --tag-bg-red: #e74c3c1a;
+    --tag-bg-green: #2ed47e1a;
 }
 
 [data-theme='dark'] {
@@ -204,6 +210,12 @@
     --table-header-green: #1f5f46;
     --table-header-blue: #1f3f73;
     --table-header-red: #6a2f2f;
+
+    //TAG
+    --tag-color-red: #e74c3c;
+    --tag-color-green: #2ed47e;
+    --tag-bg-red: #e74c3c1a;
+    --tag-bg-green: #2ed47e1a;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility
