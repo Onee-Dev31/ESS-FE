@@ -156,7 +156,9 @@ export class DashboardIT implements OnInit {
         attachments: attachments,
         itNotes: itNotes,
         assignments: assignments,
-        assignTimeline: result
+        assignTimeline: result,
+        it_satus: ticket.IT_Status,
+        approval_status: ticket.approval_status
       }
 
       console.log("selectedTicket:", objectData)
@@ -472,18 +474,6 @@ export class DashboardIT implements OnInit {
   // MODAL
   //>>> function
   updateTicket(command: string, ticketId: string, ticketTypeId?: string, assignees?: any, comment?: any, attachments?: any[]) {
-    // const payload = {
-    //   decision: 'ITAnalyze', // -- Approved / Rejected / Referred_Back / ITAnalyze
-    //   executedBy: this.authService.userData().CODEMPID,
-    //   ...((command === 'resume') && { itResult: 'In Progress' }),
-    //   ...((command === 'onhold') && { itResult: 'Hold' }),
-    //   ...((command === 'close') && { itResult: 'Closed' }),
-    //   ...((command === 'deny') && { itResult: 'Denied', comment: comment }),
-    //   ...((command === 'assign') && { assignJson: assignees }),
-    //   ...((command === 'acknowledge') && { Files: attachment, comment: comment }),
-    //   ...((command === 'acknowledge' || command === 'assign') && { itResult: 'In Progress', newTicketTypeId: ticketTypeId }),
-    // }
-
     const formData = new FormData();
 
     formData.append('decision', 'ITAnalyze');

@@ -13,10 +13,6 @@
         <div class="ticket-list">
             <div class="ticket-item" *ngFor="let ticket of Tickets()"
                 [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
-                <!-- <div class="avatar">
-                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
-                        (error)="onImgError($event)" />
-                </div> -->
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
@@ -50,10 +46,6 @@
             <!-- HERO -->
             <section class="tk-hero">
                 <div class="tk-hero__left">
-                    <!-- <div class="avatar">
-                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterEmpId + '.jpg'"
-                            (error)="onImgError($event)" />
-                    </div> -->
                     <div>
                         <div class="tk-hero__title">{{ t.subject }}</div>
                         <div class="tk-hero__sub">
@@ -215,12 +207,12 @@
             </section>
             <section class="tk-actions" *ngIf="t.status === 'Closed'">
                 <ng-container>
-                    <button class="btn btn-send" (click)="openReOpen()">
+                    <!-- <button class="btn btn-send" (click)="openReOpen()">
                         <i class="fas fa-history" style="margin-right: 4px;"></i> Reopen
                     </button>
                     <button class="btn btn-done" (click)="openRating()">
                         <i class="fas fa-star" style="margin-right: 4px;"></i> Rate Us
-                    </button>
+                    </button> -->
                 </ng-container>
             </section>
         </main>

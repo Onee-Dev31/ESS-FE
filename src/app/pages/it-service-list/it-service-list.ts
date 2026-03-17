@@ -424,12 +424,12 @@ export class ItService implements OnInit {
       return "Waiting you";
     }
 
-    else if (ticket.IT_Status !== 'Closed' && ticket.user_status !== 'Approved') {
-      return ticket.user_status;
+    else if (ticket.user_status === "Approved") {
+      return "In Progress";
     }
 
-    else if (ticket.IT_Status === "Closed") {
-      return "Closed";
+    else if (ticket.user_status !== 'Approved') {
+      return ticket.user_status;
     }
 
     return "Unknown";

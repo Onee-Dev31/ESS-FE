@@ -16,7 +16,9 @@
         แจ้งขอใช้บริการ
     </button>
 </div>
+
 <app-it-dashboard-summary (statusChange)="onStatusChange($event)"></app-it-dashboard-summary>
+
 <div class="tk-page">
     <!-- LEFT: ticket list -->
     <aside class="tk-left">
@@ -229,7 +231,7 @@
                 </div>
                 <div class="btn-group" *ngIf="t.status !== 'Hold'">
                     <button class="btn btn-accept" (click)="openAcknowledgeModal()"
-                        *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned'">
+                        *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned' && t.approval_status !== 'Approved'">
                         <i class="fa-solid fa-tag" style="margin-right: 4px;"></i>
                         รับเรื่อง
                     </button>

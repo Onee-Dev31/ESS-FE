@@ -169,26 +169,27 @@ export class ResignDetail {
 
     console.log(payload)
 
-    // this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
-    //   .then(result => {
-    //     if (!result.isConfirmed) return;
+    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
+      .then(result => {
+        if (!result.isConfirmed) return;
 
-    //     this.resignService.updateADManagementResign(payload).subscribe(
-    //       {
-    //         next: (res) => {
-    //           console.log(res);
-    //           this.swalService.success('สำเร็จ', '')
-    //           this.loadInitialData();
-    //         },
-    //         error: (error) => {
-    //           console.error('Error fetching data:', error);
-    //           this.swalService.warning('แจ้งเตือน', error.error)
-    //         }
-    //       }
-    //     )
+        this.resignService.updateADManagementResign(payload).subscribe(
+          {
+            next: (res) => {
+              console.log(res);
+              this.swalService.success('สำเร็จ', '')
+              this.loadInitialData();
+            },
+            error: (error) => {
+              console.error('Error fetching data:', error);
+              this.swalService.warning('แจ้งเตือน', error.error)
+            }
+          }
+        )
 
-    //     this.swalService.success("ทำรายการสำเร็จ", "(mock)")
-    //   });
+        this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+      });
+
   }
 
   async deleteEmployeeInResign(emp: any) {
