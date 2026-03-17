@@ -172,7 +172,11 @@
                             </div>
 
                             <div class="note__msg">
-                                <span *ngIf="n.referred_title" class="refer_tag" [class.last]="!n.isReferred">
+                                <span *ngIf="n.referred_title === '[REFERRED]'" class="refer_tag"
+                                    [class.last]="!n.isReferred">
+                                    {{n.referred_title}}</span>
+                                <span *ngIf="n.referred_title === '[REJECTED]'" class="refer_tag"
+                                    [class.last]="n.referred_title === '[REJECTED]'">
                                     {{n.referred_title}}</span>
                                 {{ n.message }}
                             </div>
