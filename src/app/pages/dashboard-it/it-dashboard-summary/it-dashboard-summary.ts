@@ -50,6 +50,8 @@ export class ItDashboardSummary {
     { status: 'Assigned', title: 'Assigned Tickets', value: 0, delta: 0, hint: 'Tickets ที่ได้รับมอบหมาย', icon: 'user' },
     { status: 'In Progress', title: 'In Progress Tickets', value: 0, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
     { status: 'Closed', title: 'Closed Tickets', value: 0, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
+    { status: 'Hold', title: 'Hold Tickets', value: 0, delta: 0, hint: 'Tickets ที่หยุดทำการ', icon: 'pause-circle' },
+    { status: 'Deny', title: 'Deny Tickets', value: 0, delta: 0, hint: 'Tickets ที่ถูกปฏิเสธ', icon: 'stop' },
     { status: 'All', title: 'All Tickets', value: 0, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
   ];
   showDeptBar = false;
@@ -143,13 +145,30 @@ export class ItDashboardSummary {
         icon: 'check-circle'
       },
       {
+        status: 'hold',
+        title: 'hold',
+        value: summary.hold ?? 0,
+        delta: 0,
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'pause-circle'
+      },
+      {
+        status: 'denied',
+        title: 'Deny',
+        value: summary.Deny ?? 0,
+        delta: 0,
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'stop'
+      },
+      {
         status: 'all',
         title: 'All Tickets',
         value: summary.all ?? 0,
         delta: 0,
         hint: 'Tickets ทั้งหมดทุกสถานะ',
         icon: 'appstore'
-      }
+      },
+
     ];
   }
   private buildStatusPie(summary: any) {
@@ -393,7 +412,7 @@ export class ItDashboardSummary {
     this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
-    console.log(this.currentStatus);
+    // console.log(this.currentStatus);
     if (isClick) {
       this.openTicketLogs(this.currentStatus);
     }
@@ -617,6 +636,8 @@ export class ItDashboardSummary {
       case 'assigned': return 'Assigned';
       case 'inprogress': return 'In Progress';
       case 'done': return 'Closed';
+      case 'denied': return 'Deny';
+      case 'hold': return 'Hold';
       case 'all': return 'All';
       default: return this.currentStatus;
     }

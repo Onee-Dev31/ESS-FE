@@ -251,7 +251,7 @@ export class ResignReport {
       item.adUser_actual,
       item.status_actual,
       item.expiryDate_actual,
-      item.compare
+      item.expiryDate_system === item.expiryDate_actual
     ]);
 
     const worksheet: XLSX.WorkSheet =

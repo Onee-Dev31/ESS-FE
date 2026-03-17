@@ -8,7 +8,10 @@ import {
     PaperClipOutline,
     CommentOutline,
     InboxOutline, UserOutline, SyncOutline, CheckCircleOutline, AppstoreOutline,
-    ArrowUpOutline, ArrowDownOutline, LineChartOutline, BarChartOutline
+    ArrowUpOutline, ArrowDownOutline, LineChartOutline, BarChartOutline,
+    PauseCircleOutline,
+    PauseOutline,
+    StopOutline
 } from '@ant-design/icons-angular/icons';
 
 export const provideAppNzIcons = () =>
@@ -21,5 +24,5 @@ export const provideAppNzIcons = () =>
         PaperClipOutline,
         CommentOutline,
         InboxOutline, UserOutline, SyncOutline, CheckCircleOutline, AppstoreOutline,
-        ArrowUpOutline, ArrowDownOutline, LineChartOutline, BarChartOutline
+        ArrowUpOutline, ArrowDownOutline, LineChartOutline, BarChartOutline, PauseCircleOutline, PauseOutline, StopOutline
     ]);

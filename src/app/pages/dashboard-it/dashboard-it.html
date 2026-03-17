@@ -29,6 +29,8 @@
                 <nz-option nzValue="open" nzLabel="Open"></nz-option>
                 <nz-option nzValue="inprogress" nzLabel="In Process"></nz-option>
                 <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+                <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
+                <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
                 <nz-option nzValue="done" nzLabel="Done"></nz-option>
             </nz-select>
         </div>
@@ -297,7 +299,8 @@
                                     Step {{step.step}} - {{step.title}}
                                     <br>
                                     <small>
-                                        by {{step.createBy.nickName}} {{step.createBy.department.includes('10806') ? '(IT)' : ''}}
+                                        by {{step.createBy.nickName}} {{step.createBy.department.includes('10806') ?
+                                        '(IT)' : ''}}
                                         • @if (isToday(step.createdDate)) {
                                         {{ step.createdDate | date:'HH:mm' }}
                                         } @else {
