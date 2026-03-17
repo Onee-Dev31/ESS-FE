@@ -398,6 +398,8 @@ export class ItDashboardSummary {
       this.openTicketLogs(this.currentStatus);
     }
 
+    this.statusChange.emit(k);
+
     this.highlightStatusSlice(k);
 
     this.applyStatusCenter(k);
