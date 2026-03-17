@@ -249,7 +249,6 @@ textarea.form-input {
     height: auto !important;
     padding: 16px 20px !important;
     resize: vertical;
-    min-height: 100px;
     line-height: 1.6;
     border-radius: 16px !important;
 }
@@ -879,8 +878,8 @@ textarea.form-input {
 .tk-card__body.detail {
     padding: 0 14px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    // justify-content: center;
+    // align-items: center;
 }
 
 .tk-card__body::-webkit-scrollbar {

@@ -1,6 +1,6 @@
 /** Service สำหรับจัดการการเข้าสู่ระบบ (Authentication), การจัดการ Token และสิทธิ์ของผู้ใช้ (Roles) */
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay, tap, finalize } from 'rxjs/operators';
 import { STORAGE_KEYS } from '../constants/storage.constants';
@@ -18,6 +18,7 @@ import { environment } from '../../environments/environment';
 import { PhoneUtil } from '../utils/phone.util';
 
 import { catchError } from 'rxjs/operators';
+import { SKIP_AUTH } from '../interceptors/auth.interceptor';
 
 
 @Injectable({
@@ -91,6 +92,8 @@ export class AuthService {
         return this._http.post<any>(`${this.baseUrl}/auth/login`, {
             username,
             password
+        }, {
+            context: new HttpContext().set(SKIP_AUTH, true)
         }).pipe(
             tap(response => {
                 if (response) {

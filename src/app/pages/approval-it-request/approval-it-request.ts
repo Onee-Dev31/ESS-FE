@@ -25,13 +25,13 @@ import { createListingState, createListingComputeds, TableSortHelper } from '../
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
 import { SkeletonComponent } from "../../components/shared/skeleton/skeleton";
+import { AuthService } from '../../services/auth.service';
 
 /** หน้าจัดการรายการอนุมัติ (Approval IT Request) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approval-it-request',
   standalone: true,
   imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, EmptyStateComponent, SkeletonComponent],
-  // imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
   styleUrl: './approval-it-request.scss',
@@ -79,6 +79,7 @@ export class ApprovalItRequestComponent implements OnInit {
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
+    private authService: AuthService
 
   ) {
     this.listing.filterStatus.set('Pending');
@@ -97,15 +98,17 @@ export class ApprovalItRequestComponent implements OnInit {
     const pageSize = this.listing.pageSize();
     const status = this.listing.filterStatus();
     const apiStatus = this.STATUS_API_MAP[status] || status;
+    const empNo = this.authService.userData().CODEMPID
 
     this.itService.getApprovalItRequests({
       page,
       pageSize,
       status: apiStatus,
-      empno: 'OTD01050'
+      empno: empNo
     })
       .subscribe({
         next: (res) => {
+          console.log("getApprovalItRequests: ", res)
           const mappedData =
             (res.data || []).map((item: any) => this.mapToApprovalItem(item));
 
@@ -207,7 +210,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   getTabCount(tab: string) {
-    if(tab === 'Referred Back'){
+    if (tab === 'Referred Back') {
       tab = 'ReferredBack'
     }
     return this.statusCounts()[tab] || 0;

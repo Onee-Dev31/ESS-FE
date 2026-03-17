@@ -16,9 +16,9 @@
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
-                        <div class="ticket-meta-right">
+                        <!-- <div class="ticket-meta-right">
                             <i class="fas fa-comment text-icon"></i>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="ticket-title-row">
                         <div class="ticket-title">{{ ticket.subject }}</div>
@@ -85,12 +85,12 @@
                     </div>
                 </div>
 
-                <div class="tk-card__body" *ngIf="t.status_user !== 'Pending'">
+                <div class="tk-card__body" *ngIf="t.status !== 'Waiting you'">
                     <div class="tk-text">
                         {{ t.description }}
                     </div>
                 </div>
-                <div class="tk-card__body detail" *ngIf="t.status_user === 'Pending'">
+                <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
                     <textarea [(ngModel)]="t.description" class="form-input">
                         </textarea>
                 </div>
@@ -103,7 +103,7 @@
                     <div class="tk-card__title">
                         เอกสารแนบ
                     </div>
-                    <div *ngIf="t.status_user === 'Pending'">
+                    <div *ngIf="t.status === 'Waiting you'">
                         <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
                         <button type="button" class="btn-attach" (click)="fileInput.click()">
                             <i class="fas fa-paperclip"></i>
@@ -198,7 +198,7 @@
             </section>
 
             <!-- bottom actions (optional, keep like original) -->
-            <section class="tk-actions" *ngIf="t.status_user === 'Pending'">
+            <section class="tk-actions" *ngIf="t.status === 'Waiting you'">
                 <ng-container>
                     <button class="btn btn-send" (click)="Resubmit(t)">
                         <i class="fas fa-history" style="margin-right: 4px;"></i> Re Submit

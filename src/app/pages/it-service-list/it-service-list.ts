@@ -420,7 +420,7 @@ export class ItService implements OnInit {
 
   getTicketStatus(ticket: any) {
     console.log(ticket)
-    if (ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") {
+    if ((ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") ||(ticket.user_status === 'Referred_Back')) {
       return "Waiting you";
     }
 
