@@ -55,18 +55,15 @@
                         <td class="company-col">{{ emp.company.match(/\[(.*?)\]/)?.[1] }}</td>
                         <td class="date-col">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
                         <td class="date-col">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
-                        <td>{{ emp.adUser }}</td>
-                        <td>{{emp.AD_DISABLE_DATE ? 'Disable' : emp.AD_EXPIRED_DATE? 'Expire' : ''}}</td>
+                        <td>{{ emp.adUser_syetem }}</td>
+                        <td>{{ emp.status_system }}</td>
                         <td class="expireDate-system-col">
-                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.AD_EXPIRED_DATE,
-                                'DD/MM/YYYY') }}</div>
+                            <div *ngIf="emp.expiryDate_system" class="detail">{{ emp.expiryDate_system }}</div>
                         </td>
-                        <td>{{ emp.adUser }}</td>
-                        <td>{{emp.IsDisabled === 'Yes' ? 'Disable' :
-                            emp.IsDisabled === 'No' && emp.AccountExpires ? 'Expire' : '' }}</td>
+                        <td>{{ emp.adUser_actual }}</td>
+                        <td>{{ emp.status_actual }}</td>
                         <td class="expireDate-actual-col">
-                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
-                                'DD/MM/YYYY') }}</div>
+                            <div *ngIf="emp.expiryDate_actual" class="detail">{{emp.expiryDate_actual }}</div>
                         </td>
                         <td>/</td>
 

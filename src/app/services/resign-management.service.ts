@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,9 @@ import { delay, Observable, of } from 'rxjs';
 export class ResignManagementService {
   private baseUrl = environment.api_url;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient,
+    private authservice: AuthService
+  ) { }
 
   getEmployee(params: {
     page?: number;
@@ -74,6 +77,11 @@ export class ResignManagementService {
     if (params.companyCode) queryParams.companyCode = params.companyCode;
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
+
+    // const headers = new HttpHeaders({
+    //   'Authorization': `Bearer ${this.authservice.allData().accessToken}`,
+    //   'Content-Type': 'application/json'
+    // });
 
     return this._http.get<any>(`${this.baseUrl}/employees-with-ad`, {
       params: queryParams

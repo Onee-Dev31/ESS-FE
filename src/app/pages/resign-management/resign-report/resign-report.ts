@@ -246,10 +246,11 @@ export class ResignReport {
       dayjs(item.lastDate).format('DD/MM/YYYY'),
       dayjs(item.effectiveDate).format('DD/MM/YYYY'),
       item.AD_USER,
-      item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE? 'Expire' : '',
+      item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '',
       item.AD_EXPIRED_DATE,
-      item.actualAdUser,
-      item.actualStatus,
+      item.AD_USER,
+      item.IsDisabled === 'Yes' ? 'Disable' :
+        item.IsDisabled === 'No' && item.AccountExpires ? 'Expire' : '',
       item.actualExpireDate,
       item.compare
     ]);
@@ -578,14 +579,20 @@ export class ResignReport {
       department: item.DEPARTMENT,
       company: item.COMPANY_NAME + ' [' + item.COMPANY_CODE + ']',
       type: '',
-      adUser: item.AD_USER,
       position: item.POST,
       lastDate: item.LAST_DATE ? item.LAST_DATE : null,
       effectiveDate: item.RESIGNED_DATE ? item.RESIGNED_DATE : null,
       empStatus: item.EMP_STATUS,
       id: item.ID,
-      expireDate: item.AD_EXPIRED_DATE ? item.AD_EXPIRED_DATE : null,
-      ...item
+
+      adUser_syetem: item.AD_USER,
+      status_system: item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '',
+      expiryDate_system: this.dataUtil.formatDateToBE(item.AD_EXPIRED_DATE, 'DD/MM/YYYY'),
+
+      adUser_actual: item.adUser,
+      status_actual: item.isDisabled === 'Yes' ? 'Disable' :
+        item.isDisabled === 'No' && item.adIsLocked ? item.adIsLocked : '',
+      expiryDate_actual: this.dataUtil.formatDateToBE(item.adPasswordExpirationDate, 'DD/MM/YYYY'),
     }));
   }
 
