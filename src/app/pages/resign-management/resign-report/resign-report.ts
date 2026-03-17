@@ -245,13 +245,12 @@ export class ResignReport {
       item.company,
       dayjs(item.lastDate).format('DD/MM/YYYY'),
       dayjs(item.effectiveDate).format('DD/MM/YYYY'),
-      item.AD_USER,
-      item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '',
-      item.AD_EXPIRED_DATE,
-      item.AD_USER,
-      item.IsDisabled === 'Yes' ? 'Disable' :
-        item.IsDisabled === 'No' && item.AccountExpires ? 'Expire' : '',
-      item.actualExpireDate,
+      item.adUser_syetem,
+      item.status_system,
+      item.expiryDate_system,
+      item.adUser_actual,
+      item.status_actual,
+      item.expiryDate_actual,
       item.compare
     ]);
 
