@@ -387,8 +387,17 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         event.target.showPicker();
     }
 
-    // MASTER
+    disabledResignDate = (current: Date): boolean => {
+        if (!this.formResignData.lastWorkingDate) return false;
+        return current < this.formResignData.lastWorkingDate;
+    };
 
+    disabledLastWorkingDate = (current: Date): boolean => {
+        if (!this.formResignData.resignDate) return false;
+        return current > this.formResignData.resignDate;
+    };
+
+    // MASTER
     getBanks() {
         this.masterService.getBankMaster().subscribe({
             next: (data) => {

@@ -195,6 +195,7 @@ export class ResignDetail {
     }))
 
     const payload = {
+      type: command === 'Employee' ? 'fulltime' : 'freelance',
       actionEmp: this.authService.userData().AD_USER.toLowerCase(),
       requests: requests
     }
@@ -203,23 +204,26 @@ export class ResignDetail {
 
     this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
       .then(result => {
+        
         if (!result.isConfirmed) return;
 
-        // this.resignService.updateADManagementResign(payload).subscribe(
-        //   {
-        //     next: (res) => {
-        //       console.log(res);
-        //       this.swalService.success('สำเร็จ', '')
-        //       this.loadInitialData();
-        //     },
-        //     error: (error) => {
-        //       console.error('Error fetching data:', error);
-        //       this.swalService.warning('แจ้งเตือน', error.error)
-        //     }
-        //   }
-        // )
+        this.swalService.loading('กำลังบันทึกข้อมูล...')
 
-        this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+        this.resignService.updateADManagementResign(payload).subscribe(
+          {
+            next: (res) => {
+              console.log(res);
+              this.swalService.success('สำเร็จ', '')
+              this.loadInitialData();
+            },
+            error: (error) => {
+              console.error('Error fetching data:', error);
+              this.swalService.warning('แจ้งเตือน', error.error)
+            }
+          }
+        )
+
+        // this.swalService.success("ทำรายการสำเร็จ", "(mock)")
       });
 
   }

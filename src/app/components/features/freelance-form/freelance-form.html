@@ -269,8 +269,8 @@
                         <div class="form-field">
                             <label>วันที่ลาออก</label>
                             <nz-date-picker [(ngModel)]="formResignData.resignDate" nzFormat="dd/MM/yyyy"
-                                name="resignDate" class="form-input" required #resignDate="ngModel"
-                                [class.input-error]="resignDate.invalid && resignDate.touched">
+                                name="resignDate" [nzDisabledDate]="disabledResignDate" class="form-input" required
+                                #resignDate="ngModel" [class.input-error]="resignDate.invalid && resignDate.touched">
                             </nz-date-picker>
                             <div class="error" *ngIf="resignDate.invalid && resignDate.touched">
                                 กรุณาเลือกวันที่ลาออก
@@ -280,7 +280,8 @@
                         <div class="form-field">
                             <label>วันสุดท้ายที่มาทำงาน</label>
                             <nz-date-picker [(ngModel)]="formResignData.lastWorkingDate" nzFormat="dd/MM/yyyy"
-                                name="lastWorkingDate" class="form-input" required #lastWorkingDate="ngModel"
+                                name="lastWorkingDate" [nzDisabledDate]="disabledLastWorkingDate" class="form-input"
+                                required #lastWorkingDate="ngModel"
                                 [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched">
                             </nz-date-picker>
                             <div class="error" *ngIf="lastWorkingDate.invalid && lastWorkingDate.touched">
