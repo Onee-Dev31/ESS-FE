@@ -302,8 +302,9 @@ export class ItDashboardSummary {
         top: -5,
         left: 'center',
         orient: 'horizontal',
-        itemWidth: 18,
-        itemHeight: 10,
+        itemWidth: 25,
+        itemHeight: 12,
+        itemGap: 10,
         icon: 'roundRect',
         textStyle: {
           fontSize: 10,
@@ -325,12 +326,13 @@ export class ItDashboardSummary {
       series: [
         {
           type: 'pie',
+          top: '16px',
           radius: ['55%', '82%'],
-          center: ['50%', '56%'],
+          center: ['50%', '53%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
-          emphasis: { scale: true, scaleSize: 8 },
+          emphasis: { scale: true, scaleSize: 6 },
           data
         }
       ],
@@ -364,7 +366,7 @@ export class ItDashboardSummary {
         left: 'center',
         orient: 'horizontal',
         itemWidth: 18,
-        itemHeight: 10,
+        itemHeight: 12,
         icon: 'roundRect',
         textStyle: {
           fontSize: 10,
@@ -375,16 +377,21 @@ export class ItDashboardSummary {
         type: 'plain',
       },
       tooltip: { trigger: 'item' },
-      color: ['#3b82f6', '#f43f5e', '#f59e0b'],
+      color: [
+        this.getCssVar('--btn-service-border'),
+        this.getCssVar('--btn-repair-border'),
+        this.getCssVar('--btn-problem-border'),
+      ],
       series: [
         {
           type: 'pie',
+          top: '16px',
           radius: ['55%', '82%'],
-          center: ['50%', '56%'],
+          center: ['50%', '53%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
-          emphasis: { scale: true, scaleSize: 8 },
+          emphasis: { scale: true, scaleSize: 6 },
           data
         }
       ],
@@ -652,7 +659,7 @@ export class ItDashboardSummary {
       case 'assigned': return 'Assigned';
       case 'inprogress': return 'In Progress';
       case 'done': return 'Closed';
-      case 'denied': return 'Deny';
+      case 'denied': return 'Denied';
       case 'hold': return 'Hold';
       case 'all': return 'All';
       default: return this.currentStatus;
