@@ -692,7 +692,7 @@ export class ResignDetail {
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
       empStatus: status,
-      hasAdUser: false,
+      hasAdUser: 'false',
     });
   }
 
