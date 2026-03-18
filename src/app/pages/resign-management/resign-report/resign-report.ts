@@ -22,6 +22,8 @@ import { createListingState, createListingComputeds_v2 } from '../../../utils/li
 import { Employee } from '../employeeData.interface';
 // import * as XLSX from 'xlsx';
 import * as XLSX from 'xlsx-js-style';
+import { ActivatedRoute } from '@angular/router';
+import { FreelanceService } from '../../../services/freelance-management.service';
 
 // interface EmployeeFormData {
 //   empCode: string; //CODEMPID
@@ -61,6 +63,7 @@ export class ResignReport {
 
   private loadingService = inject(LoadingService);
   private resignService = inject(ResignManagementService);
+  private freelanceService = inject(FreelanceService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
   private authService = inject(AuthService);
@@ -98,15 +101,22 @@ export class ResignReport {
   lastDate = signal<Date | null>(null);
   effectiveDate = signal<Date | null>(null);
 
-  constructor(
-  ) {
-  }
+  type: any = 'fulltime'
+
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+      this.type = params['type'];
+      console.log(this.type); // fulltime / freelance
+    });
+
     this.getCompanies();
     this.getDepartments();
     this.loadInitialData();
   }
+
 
   filteredDepartmentList = computed(() => {
     const company = this.filterCompany();
@@ -133,85 +143,6 @@ export class ResignReport {
 
   submitInfo(data: any) {
     this.IS_INFO.set(false)
-  }
-
-  approve() {
-    const selected = Array.from(this.selectedEmployees().values());
-
-    if (selected.length === 0) {
-      this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกพนักงานก่อนทำรายการ');
-      return;
-    }
-
-    const employeeList = `
-      <div style="max-height:200px;overflow:auto;text-align:center">
-      ${selected
-        .map(emp => `${emp.empCode} - ${emp.firstNameTh} ${emp.lastNameTh}`)
-        .join('<br>')}
-      </div>
-      `;
-
-    const requests = selected.map(emp => ({
-      samAccountName: emp.adUser,
-      expireDate: dayjs(emp.lastDate).format('YYYY-MM-DD')
-    }))
-
-    const payload = {
-      actionEmp: this.authService.userData().AD_USER.toLowerCase(),
-      requests: requests
-    }
-
-    console.log(payload)
-
-    // this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
-    //   .then(result => {
-    //     if (!result.isConfirmed) return;
-
-    //     this.resignService.updateADManagementResign(payload).subscribe(
-    //       {
-    //         next: (res) => {
-    //           console.log(res);
-    //           this.swalService.success('สำเร็จ', '')
-    //           this.loadInitialData();
-    //         },
-    //         error: (error) => {
-    //           console.error('Error fetching data:', error);
-    //           this.swalService.warning('แจ้งเตือน', error.error)
-    //         }
-    //       }
-    //     )
-
-    //     this.swalService.success("ทำรายการสำเร็จ", "(mock)")
-    //   });
-  }
-
-  async deleteEmployeeInResign(emp: any) {
-    this.swalService.confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
-      .then(result => {
-        if (!result.isConfirmed) return;
-        this.swalService.loading('กำลังบันทึก...')
-        this.resignService.deleteEmployeeResign(emp.id)
-          .pipe(
-            finalize(() => {
-              this.loadInitialData();
-            })
-          )
-          .subscribe(
-            {
-              next: (res) => {
-                // console.log(res);
-                this.swalService.close();
-                this.swalService.success('สำเร็จ', 'ลบพนักงานออกจากresign')
-                this.loadInitialData();
-              },
-              error: (error) => {
-                console.error('Error fetching data:', error);
-                this.swalService.close();
-                this.swalService.warning('แจ้งเตือน', error.error)
-              }
-            }
-          )
-      });
   }
 
   exportData() {
@@ -596,6 +527,38 @@ export class ResignReport {
     }));
   }
 
+  private mapApiData_Freelance(items: any[]): any[] {
+    console.log("[mapApiData_Freelance] items >> ", items)
+    return items.map((item: any) => ({
+      empCode: item.EMP_NO,
+      firstNameTh: item.FIRSTNAME_TH,
+      lastNameTh: item.LASTNAME_TH,
+      firstNameEn: item.FIRSTNAME_EN,
+      lastNameEn: item.LASTNAME_EN,
+      nickName: item.NICKNAME,
+      department: item.COSTCENT + ' ' + item.NAMECOSTCENT,
+      company: item.COMPANY_NAME + ' [' + item.COMPANY_CODE + ']',
+      type: '',
+      adUser: item.AD_USER || '-',
+      position: item.POSITION,
+      lastDate: item.LAST_DATE ? item.LAST_DATE : null,
+      effectiveDate: item.RESIGN_DATE ? item.RESIGN_DATE : null,
+      empStatus: item.EMP_STATUS,
+      id: item.ID,
+      expireDate: item.AD_EXPIRED_DATE ? item.AD_EXPIRED_DATE : null,
+
+      adUser_syetem: item.AD_USER,
+      status_system: item.AD_DISABLE_DATE ? 'Disable' : item.AD_EXPIRED_DATE ? 'Expire' : '',
+      expiryDate_system: this.dataUtil.formatDateToBE(item.AD_EXPIRED_DATE, 'DD/MM/YYYY'),
+
+      adUser_actual: item.adUser,
+      status_actual: item.isDisabled === 'Yes' ? 'Disable' :
+        item.isDisabled === 'No' && item.adIsLocked ? item.adIsLocked : '',
+      expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
+      passwordLastSet_actual: this.dataUtil.formatDateToBE(item.adPwdLastSet, 'DD/MM/YYYY'),
+    }));
+  }
+
   goToPage(page: number) {
     this.resignListing.currentPage.set(page);
 
@@ -635,23 +598,43 @@ export class ResignReport {
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
 
-    this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
-      .subscribe(res => {
-        console.log("Resigned >>", res)
-        this.dataResignFromApi(res);
-        this.loadingService.stop('freelance-list');
-      });
+    if (this.type === 'fulltime') {
+      this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
+        .subscribe(res => {
+          console.log("Resigned >>", res)
+          this.dataResignFromApi(res);
+          this.loadingService.stop('freelance-list');
+        });
+    } else {
+      this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
+        .subscribe(res => {
+          console.log("Resigned [FREE]>>", res)
+          this.dataResignFromApi(res);
+          this.loadingService.stop('freelance-list');
+        });
+    }
+
   }
 
   //GET
   private dataResignFromApi(res: any) {
     // console.log("Resigned >>", res)
-    const items = res.data.items ?? []
-    this.resignData.set(this.mapApiData(items));
 
-    this.resignListing.totalItems.set(res.data.total ?? 0);
-    this.resignListing.currentPage.set((res.data.page ?? 1) - 1);
-    this.resignListing.totalPages.set(res.data.totalPages ?? 1);
+    if (this.type === 'fulltime') {
+      const items = res.data.items ?? []
+      this.resignData.set(this.mapApiData(items));
+
+      this.resignListing.totalItems.set(res.data.total ?? 0);
+      this.resignListing.currentPage.set((res.data.page ?? 1) - 1);
+      this.resignListing.totalPages.set(res.data.totalPages ?? 1);
+    } else {
+      const items = res.items ?? []
+      this.resignData.set(this.mapApiData_Freelance(items));
+
+      this.resignListing.totalItems.set(res.total ?? 0);
+      this.resignListing.currentPage.set((res.page ?? 1) - 1);
+      this.resignListing.totalPages.set(res.totalPages ?? 1);
+    }
   }
 
   private fetchEmployeeByStatus(
@@ -682,6 +665,25 @@ export class ResignReport {
     // });
   }
 
+  private fetchFreelanceByStatus(
+    status: 'Active' | 'Resigned',
+    page: number,
+    pageSize: number
+  ) {
+    const searchText = this.searchText();
+    const company = this.filterCompany();
+    const department = this.filterDepartment();
+
+    return this.freelanceService.getFreelance({
+      page,
+      pageSize,
+      searchText: searchText || undefined,
+      companyCode: company?.COMPANY_CODE,
+      costCent: department?.COSTCENT,
+      empStatus: status,
+      hasAdUser: 'false',
+    });
+  }
   // GET MASTER
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({

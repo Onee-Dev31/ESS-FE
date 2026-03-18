@@ -2,7 +2,7 @@
 
     <div class="content-card resign">
         <div class="card-header-title">
-            รายงานรายชื่อพนักงานลาออก
+            รายงานรายชื่อพนักงาน{{type === 'fulltime' ? 'ประจำ' : 'ฟรีแลนซ์'}}ลาออก
             <button class="btn-export" (click)="exportData()"> <i
                     class="fa-solid fa-arrow-up-from-bracket"></i>export</button>
         </div>
@@ -96,7 +96,7 @@
                         <span class="ticket-no">{{ emp.firstNameTh }} {{ emp.lastNameTh }}</span>
                         <div class="text-muted small">{{ emp.empCode }}</div>
                     </div>
-                    <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
+
                 </div>
 
                 <div class="card-body">

@@ -204,7 +204,7 @@ export class ResignDetail {
 
     this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
       .then(result => {
-        
+
         if (!result.isConfirmed) return;
 
         this.swalService.loading('กำลังบันทึกข้อมูล...')
@@ -635,8 +635,9 @@ export class ResignDetail {
       });
   }
 
-  viewReportResign() {
-    window.open(`/resign-management/report`, '_blank');
+  viewReportResign(command: 'fulltime' | 'freelance') {
+    console.log(command)
+    window.open(`/resign-management/report?type=${command}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
