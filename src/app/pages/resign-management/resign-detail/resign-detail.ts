@@ -1,5 +1,5 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, computed, Inject, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, Inject, inject, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -22,8 +22,25 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import { InfoModal } from "../modal/info-modal/info-modal";
 import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
+import { FreelanceService } from '../../../services/freelance-management.service';
 
 interface EmployeeFormData {
+  empCode: string; //CODEMPID
+  firstNameTh: string; //NAMFIRSTT
+  lastNameTh: string; //NAMLASTT
+  firstNameEn: string; //NAMFIRSTE
+  lastNameEn: string; //NAMLASTE
+  nickName: string; //NICKNAME
+  department: string; //DEPARTMENT
+  company: string; //COMPANY_NAME [COMPANY_CODE]
+  type: string; // ? 
+  adUser: string; //AD_USER
+  position: string; //POST
+  lastDate: string;
+  effectiveDate: string;
+  expireDate: string;
+}
+interface FreelanceFormData {
   empCode: string; //CODEMPID
   firstNameTh: string; //NAMFIRSTT
   lastNameTh: string; //NAMLASTT
@@ -64,6 +81,7 @@ export class ResignDetail {
 
   private loadingService = inject(LoadingService);
   private resignService = inject(ResignManagementService);
+  private freelanceService = inject(FreelanceService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
   private authService = inject(AuthService);
@@ -80,6 +98,10 @@ export class ResignDetail {
   resignListing = createListingState();
   resignComps = createListingComputeds_v2(this.resignData, this.resignListing);
 
+  resignFreelanceData = signal<FreelanceFormData[]>([]);
+  resignFreelanceListing = createListingState();
+  resignFreelanceComps = createListingComputeds_v2(this.resignFreelanceData, this.resignFreelanceListing);
+
   // New Filters
   filterCompany = signal<any>(null);
   filterDepartment = signal<any>(null);
@@ -92,6 +114,7 @@ export class ResignDetail {
 
   IS_INFO = signal<boolean>(false)
   selectedEmployees = signal<Map<string, EmployeeFormData>>(new Map());
+  selectedFreelance = signal<Map<string, FreelanceFormData>>(new Map());
 
   MODE_EDIT: boolean = false;
 
@@ -141,8 +164,17 @@ export class ResignDetail {
     this.IS_INFO.set(false)
   }
 
-  approve() {
-    const selected = Array.from(this.selectedEmployees().values());
+  approve(command: 'Employee' | 'Freelance') {
+
+    let selected;
+
+    if (command === 'Employee') {
+      selected = Array.from(this.selectedEmployees().values());
+
+    } else {
+      selected = Array.from(this.selectedFreelance().values());
+    }
+
 
     if (selected.length === 0) {
       this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกพนักงานก่อนทำรายการ');
@@ -150,12 +182,12 @@ export class ResignDetail {
     }
 
     const employeeList = `
-      <div style="max-height:200px;overflow:auto;text-align:center">
-      ${selected
+            <div style="max-height:200px;overflow:auto;text-align:center">
+            ${selected
         .map(emp => `${emp.empCode} - ${emp.firstNameTh} ${emp.lastNameTh}`)
         .join('<br>')}
-      </div>
-      `;
+            </div>
+            `;
 
     const requests = selected.map(emp => ({
       samAccountName: emp.adUser,
@@ -173,19 +205,19 @@ export class ResignDetail {
       .then(result => {
         if (!result.isConfirmed) return;
 
-        this.resignService.updateADManagementResign(payload).subscribe(
-          {
-            next: (res) => {
-              console.log(res);
-              this.swalService.success('สำเร็จ', '')
-              this.loadInitialData();
-            },
-            error: (error) => {
-              console.error('Error fetching data:', error);
-              this.swalService.warning('แจ้งเตือน', error.error)
-            }
-          }
-        )
+        // this.resignService.updateADManagementResign(payload).subscribe(
+        //   {
+        //     next: (res) => {
+        //       console.log(res);
+        //       this.swalService.success('สำเร็จ', '')
+        //       this.loadInitialData();
+        //     },
+        //     error: (error) => {
+        //       console.error('Error fetching data:', error);
+        //       this.swalService.warning('แจ้งเตือน', error.error)
+        //     }
+        //   }
+        // )
 
         this.swalService.success("ทำรายการสำเร็จ", "(mock)")
       });
@@ -333,53 +365,109 @@ export class ResignDetail {
     }
   }
 
-  toggleSelect(emp: EmployeeFormData, checked: boolean) {
-    const map = new Map(this.selectedEmployees());
+  // CHECK BOX : employee-freelance
+  toggleSelectItem<T>(
+    item: T,
+    checked: boolean,
+    selectedMap: WritableSignal<Map<string, T>>,
+    keyFn: (x: T) => string
+  ) {
+    const map = new Map(selectedMap());
+    const key = keyFn(item);
 
     if (checked) {
-      map.set(emp.empCode, emp);
+      map.set(key, item);
     } else {
-      map.delete(emp.empCode);
+      map.delete(key);
     }
 
-    this.selectedEmployees.set(map);
+    selectedMap.set(map);
   }
 
-  isChecked(empCode: string): boolean {
-    return this.selectedEmployees().has(empCode);
+  // Usage for employee
+  toggleSelectEmployee(emp: EmployeeFormData, checked: boolean) {
+    this.toggleSelectItem(emp, checked, this.selectedEmployees, e => e.empCode);
   }
 
-  toggleSelectAll(event: Event) {
+  // Usage for freelance
+  toggleSelectFreelance(free: any, checked: boolean) {
+    this.toggleSelectItem(free, checked, this.selectedFreelance, f => f.empCode);
+  }
+
+  isCheckedItem<T>(
+    key: string,
+    selectedMap: Signal<Map<string, T>>
+  ) {
+    return selectedMap().has(key);
+  }
+
+  isCheckedEmployee(empCode: string) {
+    return this.isCheckedItem(empCode, this.selectedEmployees);
+  }
+
+  isCheckedFreelance(empCode: string) {
+    return this.isCheckedItem(empCode, this.selectedFreelance);
+  }
+
+  // Toggle all items (page)
+  toggleSelectAllItems<T>(
+    event: Event,
+    pageData: T[],
+    selectedMap: WritableSignal<Map<string, T>>,
+    keyFn: (x: T) => string
+  ) {
     const checked = (event.target as HTMLInputElement).checked;
-    const map = new Map(this.selectedEmployees());
-    const pageData = this.resignComps.paginatedData();
+    const map = new Map(selectedMap());
 
     if (checked) {
-      pageData.forEach(emp => map.set(emp.empCode, emp));
+      pageData.forEach(item => map.set(keyFn(item), item));
     } else {
-      pageData.forEach(emp => map.delete(emp.empCode));
+      pageData.forEach(item => map.delete(keyFn(item)));
     }
 
-    this.selectedEmployees.set(map);
+    selectedMap.set(map);
   }
 
-  isAllSelected() {
-    const pageData = this.resignComps.paginatedData();
-    const selected = this.selectedEmployees();
-
-    return pageData.length > 0 &&
-      pageData.every(emp => selected.has(emp.empCode));
+  // Helper for employee
+  toggleSelectAllEmployees(event: Event) {
+    const pageData = this.resignComps.paginatedData(); // your page data
+    this.toggleSelectAllItems(event, pageData, this.selectedEmployees, e => e.empCode);
   }
 
-  isSomeSelected() {
-    const pageData = this.resignComps.paginatedData();
-    const selected = this.selectedEmployees();
+  // Helper for freelance
+  toggleSelectAllFreelance(event: Event) {
+    const pageData = this.resignFreelanceComps.paginatedData();
+    this.toggleSelectAllItems(event, pageData, this.selectedFreelance, f => f.empCode);
+  }
 
-    const count = pageData.filter(emp =>
-      selected.has(emp.empCode)
-    ).length;
+  // Partial / all selected helpers
+  isAllSelected<T>(pageData: T[], selectedMap: Signal<Map<string, T>>, keyFn: (x: T) => string) {
+    return pageData.length > 0 && pageData.every(x => selectedMap().has(keyFn(x)));
+  }
 
+  isSomeSelected<T>(pageData: T[], selectedMap: Signal<Map<string, T>>, keyFn: (x: T) => string) {
+    const count = pageData.filter(x => selectedMap().has(keyFn(x))).length;
     return count > 0 && count < pageData.length;
+  }
+
+  isAllSelectedEmployee() {
+    const pageData = this.resignComps.paginatedData();
+    return this.isAllSelected(pageData, this.selectedEmployees, e => e.empCode);
+  }
+
+  isSomeSelectedEmployee() {
+    const pageData = this.resignComps.paginatedData();
+    return this.isSomeSelected(pageData, this.selectedEmployees, e => e.empCode);
+  }
+
+  isAllSelectedFreelance() {
+    const pageData = this.resignFreelanceComps.paginatedData();
+    return this.isAllSelected(pageData, this.selectedFreelance, e => e.empCode);
+  }
+
+  isSomeSelectedFreelance() {
+    const pageData = this.resignFreelanceComps.paginatedData();
+    return this.isSomeSelected(pageData, this.selectedFreelance, e => e.empCode);
   }
 
   onImgError(event: Event) {
@@ -425,7 +513,7 @@ export class ResignDetail {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    console.log("items >> ", items)
+    // console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -446,26 +534,68 @@ export class ResignDetail {
     }));
   }
 
-  goToPage(page: number) {
-    this.resignListing.currentPage.set(page);
-
-    this.fetchEmployeeByStatus(
-      'Resigned',
-      page + 1,
-      this.resignListing.pageSize()
-    ).subscribe(res => this.dataResignFromApi(res));
-
+  private mapApiData_Freelance(items: any[]): FreelanceFormData[] {
+    // console.log("[mapApiData_Freelance] items >> ", items)
+    return items.map((item: any) => ({
+      empCode: item.EMP_NO,
+      firstNameTh: item.FIRSTNAME_TH,
+      lastNameTh: item.LASTNAME_TH,
+      firstNameEn: item.FIRSTNAME_EN,
+      lastNameEn: item.LASTNAME_EN,
+      nickName: item.NICKNAME,
+      department: item.COSTCENT + ' ' + item.NAMECOSTCENT,
+      company: item.COMPANY_NAME + ' [' + item.COMPANY_CODE + ']',
+      type: '',
+      adUser: item.AD_USER || '-',
+      position: item.POST,
+      lastDate: item.LAST_DATE ? item.LAST_DATE : null,
+      effectiveDate: item.RESIGN_DATE ? item.RESIGN_DATE : null,
+      empStatus: item.EMP_STATUS,
+      id: item.ID,
+      expireDate: item.AD_EXPIRED_DATE ? item.AD_EXPIRED_DATE : null,
+    }));
   }
 
-  setPageSize(size: number) {
-    this.resignListing.pageSize.set(size);
-    this.resignListing.currentPage.set(0);
+  goToPage(page: number, command: 'Freelance' | 'Employee') {
 
-    this.fetchEmployeeByStatus(
-      'Resigned',
-      1,
-      size
-    ).subscribe(res => this.dataResignFromApi(res));
+    if (command === 'Employee') {
+      this.resignListing.currentPage.set(page);
+
+      this.fetchEmployeeByStatus(
+        'Resigned',
+        page + 1,
+        this.resignListing.pageSize()
+      ).subscribe(res => this.dataEmployeeResignFromApi(res));
+    } else {
+      this.resignFreelanceListing.currentPage.set(page);
+
+      this.fetchFreelanceByStatus(
+        'Resigned',
+        page + 1,
+        this.resignFreelanceListing.pageSize()
+      ).subscribe(res => this.dataFreelanceResignFromApi(res));
+    }
+  }
+
+  setPageSize(size: number, command: 'Freelance' | 'Employee') {
+
+    if (command === 'Employee') {
+      this.resignListing.pageSize.set(size);
+      this.resignListing.currentPage.set(0);
+      this.fetchEmployeeByStatus(
+        'Resigned',
+        1,
+        size
+      ).subscribe(res => this.dataEmployeeResignFromApi(res));
+    } else {
+      this.resignFreelanceListing.pageSize.set(size);
+      this.resignFreelanceListing.currentPage.set(0);
+      this.fetchFreelanceByStatus(
+        'Resigned',
+        1,
+        size
+      ).subscribe(res => this.dataFreelanceResignFromApi(res));
+    }
 
   }
 
@@ -481,14 +611,22 @@ export class ResignDetail {
   }
 
   loadInitialData() {
+    this.loadingService.start('employee-list');
     this.loadingService.start('freelance-list');
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned >>", res)
-        this.dataResignFromApi(res);
+        console.log("Resigned [EMP]>>", res)
+        this.dataEmployeeResignFromApi(res);
+        this.loadingService.stop('employee-list');
+      });
+
+    this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
+      .subscribe(res => {
+        console.log("Resigned [FREE]>>", res)
+        this.dataFreelanceResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });
   }
@@ -499,7 +637,7 @@ export class ResignDetail {
   }
 
   //GET
-  private dataResignFromApi(res: any) {
+  private dataEmployeeResignFromApi(res: any) {
     // console.log("Resigned >>", res)
     const items = res.data.items ?? []
     this.resignData.set(this.mapApiData(items));
@@ -507,6 +645,16 @@ export class ResignDetail {
     this.resignListing.totalItems.set(res.data.total ?? 0);
     this.resignListing.currentPage.set((res.data.page ?? 1) - 1);
     this.resignListing.totalPages.set(res.data.totalPages ?? 1);
+  }
+
+  private dataFreelanceResignFromApi(res: any) {
+    // console.log("Resigned >>", res)
+    const items = res.items ?? []
+    this.resignFreelanceData.set(this.mapApiData_Freelance(items));
+
+    this.resignFreelanceListing.totalItems.set(res.total ?? 0);
+    this.resignFreelanceListing.currentPage.set((res.page ?? 1) - 1);
+    this.resignFreelanceListing.totalPages.set(res.totalPages ?? 1);
   }
 
   private fetchEmployeeByStatus(
@@ -527,6 +675,27 @@ export class ResignDetail {
       empStatus: status
     });
   }
+
+  private fetchFreelanceByStatus(
+    status: 'Active' | 'Resigned',
+    page: number,
+    pageSize: number
+  ) {
+    const searchText = this.searchText();
+    const company = this.filterCompany();
+    const department = this.filterDepartment();
+
+    return this.freelanceService.getFreelance({
+      page,
+      pageSize,
+      searchText: searchText || undefined,
+      companyCode: company?.COMPANY_CODE,
+      costCent: department?.COSTCENT,
+      empStatus: status,
+      hasAdUser: false,
+    });
+  }
+
 
   // GET MASTER
   getCompanies() {
