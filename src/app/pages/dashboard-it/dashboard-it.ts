@@ -98,7 +98,7 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    // console.log("filterStatus : ", this.filterStatus);
+    console.log("filterStatus : ", this.filterStatus);
 
     this.filteredTickets();
     // หรือเรียก filterStatus(status) ของคุณ
@@ -183,7 +183,9 @@ export class DashboardIT implements OnInit {
       open: 'Open',
       assigned: 'Assigned',
       inprogress: 'In Progress',
-      done: 'Closed'
+      done: 'Closed',
+      hold: 'Hold',
+      denied: 'Denied'
     };
 
     const mappedStatus = statusMap[this.filterStatus ?? ''];

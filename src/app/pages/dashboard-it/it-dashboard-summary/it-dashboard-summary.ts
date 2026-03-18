@@ -146,18 +146,18 @@ export class ItDashboardSummary {
       },
       {
         status: 'hold',
-        title: 'hold',
+        title: 'Hold Tickets',
         value: summary.hold ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        hint: 'Tickets ที่หยุดทำการ',
         icon: 'pause-circle'
       },
       {
         status: 'denied',
-        title: 'Deny',
-        value: summary.Deny ?? 0,
+        title: 'Deny Tickets',
+        value: summary.denied ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        hint: 'Tickets ที่ถูกปฏิเสธ',
         icon: 'stop'
       },
       {
@@ -177,7 +177,9 @@ export class ItDashboardSummary {
       { name: 'Open', value: summary.open ?? 0, key: 'open' },
       { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
-      { name: 'Closed', value: summary.closed ?? 0, key: 'done' }
+      { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
+      { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
+      { name: 'Hold', value: summary.hold ?? 0, key: 'hold' }
     ];
 
     const total = data.reduce((s, x) => s + x.value, 0);
@@ -312,7 +314,14 @@ export class ItDashboardSummary {
         type: 'plain',
       },
       tooltip: { trigger: 'item' },
-      color: ['#2563eb', '#0ea5e9', '#f97316', '#22c55e'], // 👈 ใส่ตรงนี้
+      color: [
+        this.getCssVar('--status-open-text')
+        , this.getCssVar('--status-assigned-text')
+        , this.getCssVar('--status-progress-text')
+        , this.getCssVar('--status-closed-text')
+        , this.getCssVar('--status-deny-text')
+        , this.getCssVar('--status-hold-text')
+      ],
       series: [
         {
           type: 'pie',
@@ -340,6 +349,12 @@ export class ItDashboardSummary {
         }
       ]
     };
+  }
+
+  private getCssVar(name: string): string {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim();
   }
 
   private makeDonutOptionService(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
@@ -409,10 +424,11 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
+
     this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
-    // console.log(this.currentStatus);
+    console.log(this.currentStatus);
     if (isClick) {
       this.openTicketLogs(this.currentStatus);
     }
