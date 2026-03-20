@@ -7,20 +7,19 @@ export const SKIP_AUTH = new HttpContextToken(() => false);
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthService);
 
-    if (req.context.get(SKIP_AUTH)) {
+    const raw = localStorage.getItem('allData');
+    const allData = raw ? JSON.parse(raw) : null;
+    const token = allData?.accessToken || '';
+
+    if (!token) {
         return next(req);
     }
 
-    const token = authService.allData().accessToken || '';
-
-    if (token) {
-        const cloned = req.clone({
-            setHeaders: {
-                Authorization: `Bearer ${token}` || ''
-            }
-        });
-        return next(cloned);
-    }
+    const clonedReq = req.clone({
+        setHeaders: {
+            Authorization: `Bearer ${token}`
+        }
+    });
 
     return next(req);
 };
