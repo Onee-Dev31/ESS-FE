@@ -45,7 +45,7 @@ export class ITServiceRequestComponent implements OnInit {
     selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
 
     isSystemCategorySelected = signal(false);
-
+    IsOneeJob: boolean = false;
     isFormValid = computed(() => {
         const services = this.serviceOptions();
         const hasService = services.some(s => s.checked);
@@ -86,6 +86,8 @@ export class ITServiceRequestComponent implements OnInit {
             this.phoneModel = formatted;
             this.phoneNumber.set(formatted);
         }
+
+        this.IsOneeJob = (localStorage.getItem('systemCode') || '') === 'ONEEJOB';
     }
 
     onPhoneInput(event: Event) {

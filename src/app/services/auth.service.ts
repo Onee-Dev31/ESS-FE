@@ -124,7 +124,7 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEYS.ALL_DATA);
         localStorage.removeItem(STORAGE_KEYS.USER_DATA);
         localStorage.removeItem('landingPath');
-
+        localStorage.removeItem('systemCode');
         // localStorage.removeItem(STORAGE_KEYS.TICKET_DETAIL)
 
         this._isLoggedIn.set(false);
@@ -215,6 +215,7 @@ export class AuthService {
                     localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
                     localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.employee) || '');
                     localStorage.setItem("landingPath", response.landingPath);
+                    localStorage.setItem("systemCode", response.systmeCode);
                     this._isLoggedIn.set(true);
                     this._currentUser.set(response.adUser);
                     this._userRole.set(response.permission.Role);
