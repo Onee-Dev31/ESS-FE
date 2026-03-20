@@ -1,13 +1,15 @@
 import {
   Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, signal, inject
+  ViewChild, ElementRef, signal, inject,
+  ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { TicketService } from '../../services/ticket.service';
+import { filter } from 'rxjs';
 
 export type TicketType = 'repair' | 'service';
 
@@ -88,55 +90,40 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private isDrawing = false;
   private lastX = 0;
   private lastY = 0;
-  
-  private ticketService = inject(TicketService);
+
 
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  ticketNumber: string = "";
   currentApprover = signal<string>('');
-  
-  ngOnInit() {
+  constructor(
+    private ticketService: TicketService,
+    private cdr: ChangeDetectorRef,
+  ) {
 
-    const ticket = this.route.snapshot.queryParamMap.get('ticket');
-    const magic = this.route.snapshot.queryParamMap.get('magic');
-
-    if (magic === '1') {
-
-      this.authService.initializeFromBackend().subscribe({
-        next: () => {
-
-          const user = this.authService.userData();
-
-          if (user) {
-            const fullName =
-              `${user.TITLETHAI ?? ''}${user.NAMFIRSTT ?? ''} ${user.NAMLASTT ?? ''}`;
-
-            this.signerName.set(fullName.trim());
-          }
-
-          if (ticket) {
-            this.loadTicket(ticket);
-          }
-
-          this.router.navigate([], {
-            queryParams: { magic: null },
-            queryParamsHandling: 'merge'
-          });
-
-        },
-        error: () => {
-          this.router.navigate(['/login']);
-        }
-      });
-
-      return;
-    }
-    if (ticket) {
-      this.loadTicket(ticket);
-    }
   }
 
+  ngOnInit() {
+    const reloaded = sessionStorage.getItem('ticket-page-reloaded');
+
+    if (!reloaded) {
+      sessionStorage.setItem('ticket-page-reloaded', '1');
+      window.location.reload();
+      return;
+    }
+
+    sessionStorage.removeItem('ticket-page-reloaded');
+
+    this.route.queryParams.subscribe(params => {
+      this.ticketNumber = params['ticket'] || '';
+      console.log('ticketNumber:', this.ticketNumber);
+
+      if (!this.ticketNumber) return;
+
+      this.loadTicket(this.ticketNumber);
+    });
+  }
   ngAfterViewInit() {
     this.initCanvas();
     window.addEventListener('resize', this.onResize.bind(this));
@@ -166,11 +153,12 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       attributeFilter: ['data-theme'],
     });
   }
-  private loadTicket(ticketNumber: string) {
 
+  loadTicket(ticketNumber: string) {
     this.ticketService.getTicket(ticketNumber)
       .subscribe({
         next: (ticket) => {
+          console.log("ticket : ", ticket);
 
           if (ticket.NameApprover) {
             this.signerName.set(ticket.NameApprover);
@@ -203,7 +191,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
             basicSystems: ticket.basic,
             specificSystems: ticket.specific,
 
-            attachments: ticket.attachments?.map((a:any)=>a.file_name)
+            attachments: ticket.attachments?.map((a: any) => a.file_name)
           };
 
           this.requestData.set(data);
@@ -214,6 +202,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
+
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas || !this.ctx) return;

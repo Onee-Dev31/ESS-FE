@@ -4,10 +4,11 @@ import { LayoutComponent } from './components/layout/layout';
 import { authGuard } from './guards/auth-guard';
 import { menuGuard, roleGuard } from './guards/role-guard';
 import { USER_ROLES } from './constants/user-roles.constant';
+import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-login-sso';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
-
+    { path: 'validate/loginSSO', component: ValidateLoginSso },
     {
         path: '',
         component: LayoutComponent,

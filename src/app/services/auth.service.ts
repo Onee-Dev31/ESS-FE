@@ -123,6 +123,7 @@ export class AuthService {
         localStorage.removeItem(STORAGE_KEYS.EMPLOYEE_ID);
         localStorage.removeItem(STORAGE_KEYS.ALL_DATA);
         localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+        localStorage.removeItem('landingPath');
 
         // localStorage.removeItem(STORAGE_KEYS.TICKET_DETAIL)
 
@@ -178,6 +179,7 @@ export class AuthService {
         return this.getMagicUser().pipe(
             tap(res => {
                 if (!res?.success) return;
+                console.log("res : ", JSON.stringify(res));
 
                 localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(res));
                 localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
@@ -193,6 +195,34 @@ export class AuthService {
             catchError(() => {
                 // ถ้า 401 ไม่ต้องทำอะไรเลย
                 return of(null);
+            })
+        );
+    }
+
+    loginSSO(accessToken: string, systemCode: string): Observable<any> {
+        this.loadingService.show();
+        return this._http.post<any>(`${this.baseUrl}/auth/login/sso`, {
+            accessToken,
+            systemCode
+        }, {
+            context: new HttpContext().set(SKIP_AUTH, true)
+        }).pipe(
+            tap(response => {
+                if (response) {
+                    localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(response));
+                    localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
+                    localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
+                    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.employee) || '');
+                    localStorage.setItem("landingPath", response.landingPath);
+                    this._isLoggedIn.set(true);
+                    this._currentUser.set(response.adUser);
+                    this._userRole.set(response.permission.Role);
+                    this._userData.set(response.employee);
+                }
+            }),
+            finalize(() => {
+                this.loadingService.hide();
             })
         );
     }
