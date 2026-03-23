@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
@@ -11,6 +11,7 @@ import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { decryptValue } from '../../utils/crypto.js ';
 
 @Component({
     selector: 'app-it-service-request',
@@ -26,6 +27,7 @@ export class ITServiceRequestComponent implements OnInit {
     private userService = inject(UserService);
     private itServiceMock = inject(ItServiceMockService);
     private itServiceService = inject(ItServiceService);
+    private route = inject(ActivatedRoute);
     private authService = inject(AuthService);
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
@@ -46,6 +48,8 @@ export class ITServiceRequestComponent implements OnInit {
 
     isSystemCategorySelected = signal(false);
     IsOneeJob: boolean = false;
+    applicantId: string = '';
+    detailJobs: any = null;
     isFormValid = computed(() => {
         const services = this.serviceOptions();
         const hasService = services.some(s => s.checked);
@@ -87,7 +91,23 @@ export class ITServiceRequestComponent implements OnInit {
             this.phoneNumber.set(formatted);
         }
 
+        const reloaded = sessionStorage.getItem('itServiceRequest-page-reloaded');
+
+        if (!reloaded) {
+            sessionStorage.setItem('itServiceRequest-page-reloaded', '1');
+            window.location.reload();
+            return;
+        }
+
+        sessionStorage.removeItem('itServiceRequest-page-reloaded');
+
         this.IsOneeJob = (localStorage.getItem('systemCode') || '') === 'ONEEJOB';
+
+        this.route.queryParams.subscribe(params => {
+            this.applicantId = decryptValue(params['applicantId']) || '';
+            this.getDetailFromJobsByApplicantId(this.applicantId)
+            if (!this.applicantId) return;
+        });
     }
 
     onPhoneInput(event: Event) {
@@ -207,11 +227,6 @@ export class ITServiceRequestComponent implements OnInit {
 
         }
 
-        // if (this.selectedOpenFor() === 'other' && !this.otherOpenForName().trim()) {
-        //     this.swalService.warning('แจ้งเตือน', 'กรุณาระบุชื่อผู้ขอสิทธิ์ (Other)');
-        //     return;
-        // }
-
         if (!this.requestDetails().trim()) {
             this.swalService.warning('แจ้งเตือน', 'กรุณากรอกรายละเอียด (Details)');
             return;
@@ -270,7 +285,7 @@ export class ITServiceRequestComponent implements OnInit {
         formData.append('ticketTypeId', '3');
 
         formData.append('openForCodeempid', this.selectedOpenFor());
-        formData.append('description', this.requestDetails());
+        formData.append('description', this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails());
         formData.append('requesterAduser', this.authService.currentUser() || '-');
         formData.append('contactPhone', this.phoneNumber());
         formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
@@ -455,6 +470,26 @@ export class ITServiceRequestComponent implements OnInit {
             next: (res) => {
                 console.log(res.data);
                 this.openForOptions.set(res.data)
+            },
+            error: (error) => {
+                console.error('Error fetching data:', error);
+            }
+        });
+    }
+
+    getDetailFromJobsByApplicantId(id: string) {
+        this.itServiceService.getDetailFromJobsByApplicant(id).subscribe({
+            next: (res) => {
+                console.log("getDetailFromJobsByApplicantId", res);
+                this.detailJobs = res
+                const data = res[0];
+
+                this.requestDetails.set(
+                    `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai}\n` +
+                    `Email: ${data.Email}\n` +
+                    `ตำแหน่ง: ${data.JobTitle}\n` +
+                    `บริษัท: ${data.Location}`
+                );
             },
             error: (error) => {
                 console.error('Error fetching data:', error);

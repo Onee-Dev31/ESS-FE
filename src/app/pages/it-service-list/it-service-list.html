@@ -86,8 +86,8 @@
                 </div>
 
                 <div class="tk-card__body" *ngIf="t.status !== 'Waiting you'">
-                    <div class="tk-text">
-                        {{ t.description }}
+                    <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)">
+                        <!-- {{ t.description }} -->
                     </div>
                 </div>
                 <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">

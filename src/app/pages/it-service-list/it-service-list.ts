@@ -15,6 +15,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import Swal from 'sweetalert2';
 import { NoteModal } from "../dashboard-it/modal/note-modal/note-modal";
 import { SwalService } from '../../services/swal.service';
+import { formatText } from '../../utils/formatText';
 
 @Component({
   selector: 'app-it-service',
@@ -31,6 +32,7 @@ export class ItService implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private userData = this.authService.userData()
 
+  formatText = formatText;
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
@@ -597,5 +599,4 @@ export class ItService implements OnInit {
       });
     });
   }
-
 }

@@ -24,6 +24,7 @@ import { DenyModal } from "./modal/deny-modal/deny-modal";
 import { AssignModal } from "./modal/assign-modal/assign-modal";
 import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { formatText } from '../../utils/formatText';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -44,12 +45,14 @@ import { DateUtilityService } from '../../services/date-utility.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
+  [x: string]: any;
 
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   dateUtil = inject(DateUtilityService);
-
+  
+  formatText = formatText;
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
 
@@ -873,5 +876,7 @@ export class DashboardIT implements OnInit {
     });
 
   }
+
+
 }
 

@@ -119,8 +119,8 @@
                 </div>
 
                 <div class="tk-card__body">
-                    <div class="tk-text">
-                        {{ t.description }}
+                    <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)">
+                        <!-- {{ t.description }} -->
                     </div>
                 </div>
             </section>

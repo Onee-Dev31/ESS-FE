@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { delay, Observable, of } from 'rxjs';
+import { AuthService } from './auth.service';
 
 const MOCK_IT_APPROVALS = [
   {
@@ -93,8 +94,11 @@ const MOCK_IT_APPROVALS = [
 })
 export class ItServiceService {
   private baseUrl = environment.api_url;
+  private ONEEJOB_url = environment.api_ONEEJOB_url;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient,
+    private authservice: AuthService
+  ) { }
 
   getSubProblem(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/sub-categories`);
@@ -281,6 +285,18 @@ export class ItServiceService {
   replyTicket(id: string, formData: FormData): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
     return this._http.post(`${this.baseUrl}/tickets/${id}/replies`, formData);
+  }
+
+  getDetailFromJobsByApplicant(id: string): Observable<any> {
+    // return of({ success: true }).pipe(delay(1500));
+    const token = this.authservice.allData().accessToken
+    return this._http.get(`${this.ONEEJOB_url}/ApplicantNews/applicantByID?applicantId=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
   }
 
 }
