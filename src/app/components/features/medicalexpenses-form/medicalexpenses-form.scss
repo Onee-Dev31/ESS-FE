@@ -455,6 +455,12 @@
 
 .input-field-group {
     @include input-field-group;
+
+    .error {
+        color: red;
+        text-align: center;
+        font-size: $font-size-hint;
+    }
 }
 
 .search-input-wrapper {

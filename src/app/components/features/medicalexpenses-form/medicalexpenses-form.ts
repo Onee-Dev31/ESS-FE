@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
@@ -29,6 +29,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private medicalApiService = inject(MedicalApiService);
+  private cdr = inject(ChangeDetectorRef);
+
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -76,7 +78,11 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private diseaseSearchSub?: Subscription;
   startDate = signal<string>('');
   endDate = signal<string>('');
-  amount = signal<number>(0);
+  amount = signal<string>('');
+  amountError: string | null = null;
+  // amount = signal<number>(0);
+  // amount: number = 0;
+
   totalDays = computed(() => {
     if (!this.startDate() || !this.endDate()) return 0;
     const start = dayjs(this.startDate());
@@ -286,7 +292,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
             this.startDate.set(this.dateUtil.formatBEToISO(item.treatmentDateFrom));
             this.endDate.set(this.dateUtil.formatBEToISO(item.treatmentDateTo));
-            this.amount.set(item.requestedAmount);
+            this.amount.set(item.requestedAmount.toString());
+            // this.amount = item.requestedAmount
           }
         } else {
           this.isEditMode.set(false);
@@ -364,7 +371,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.hospital() || !this.disease() || this.amount() <= 0) {
+    if (!this.hospital() || !this.disease() || this.parseNumber(this.amount()) <= 0) {
       this.toastService.warning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0');
       return;
     }
@@ -383,7 +390,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           department: profile.department,
           company: profile.company
         },
-        totalRequestedAmount: this.amount(),
+        totalRequestedAmount: this.parseNumber(this.amount()),
         totalApprovedAmount: 0,
         items: [{
           requestDate: this.dateUtil.formatDateToBE(this.dateUtil.getCurrentDateISO()),
@@ -392,7 +399,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           hospital: this.hospital(),
           treatmentDateFrom: this.dateUtil.formatDateToBE(this.startDate()),
           treatmentDateTo: this.dateUtil.formatDateToBE(this.endDate()),
-          requestedAmount: this.amount(),
+          requestedAmount: this.parseNumber(this.amount()),
           approvedAmount: 0
         }]
       };
@@ -416,4 +423,50 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       }
     });
   }
+
+
+  // FUNCTION
+
+  parseNumber(value: string | number): number {
+    if (typeof value === 'number') return value; // already number
+    return Number(value.replace(/,/g, ""));
+  }
+  formatNumber(value: number): string {
+    return value.toLocaleString("en-US");
+  }
+
+  onAmountChange(value: string) {
+    const selectedId = this.selectedClaimType();
+    const claim = this.claimTypes.find(item => item.id === selectedId);
+    const maxAmount = this.parseNumber(claim?.amount || 0);
+    console.log(value, maxAmount, this.parseNumber(value) > maxAmount)
+
+    if (this.parseNumber(value) > maxAmount) {
+      this.amountError = `จำนวนเงินต้องไม่เกิน ${maxAmount.toLocaleString('en-US')} บาท`;
+    } else {
+      this.amountError = null; // ไม่มี error
+    }
+
+
+  }
+
+  // onAmountChange(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   console.log(input)
+
+  //   // แปลง string -> number (ลบ comma)
+  //   let valueAmount = Number(input.value.replace(/,/g, ''));
+
+  //   // หา maxAmount
+  //   const selectedId = this.selectedClaimType();
+  //   const claim = this.claimTypes.find(item => item.id === selectedId);
+  //   const maxAmount = this.parseNumber(claim?.amount || 0);
+
+  //   if (valueAmount >= maxAmount) {
+  //     valueAmount = maxAmount;
+  //   }
+
+  //   this.amount = valueAmount;
+  //   input.value = valueAmount.toLocaleString('en-US');
+  // }
 }

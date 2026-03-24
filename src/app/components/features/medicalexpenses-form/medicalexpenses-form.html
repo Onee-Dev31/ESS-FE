@@ -77,7 +77,7 @@
                     <label>ประเภทโรค</label>
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
-                            <input type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค / ICD-10"
+                            <input type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค"
                                 [ngModel]="disease()" (ngModelChange)="onDiseaseInput($event)"
                                 (focus)="onDiseaseFocus()" (blur)="onDiseaseBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
@@ -133,9 +133,13 @@
                 <div class="input-field-group">
                     <label>จำนวนเงินที่ขอเบิก</label>
                     <div class="amount-input-wrapper">
-                        <input type="number" class="custom-form-control text-right" placeholder="0.00"
-                            [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0">
+                        <input type="text" class="custom-form-control text-right" placeholder="0.00"
+                            [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0"
+                            (ngModelChange)="onAmountChange($event)">
                         <span class="currency-tag">บาท</span>
+                    </div>
+                    <div *ngIf="amountError" class="error">
+                        {{ amountError }}
                     </div>
                 </div>
 
