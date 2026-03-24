@@ -26,6 +26,42 @@ export interface HospitalSearchResponse {
     };
 }
 
+export interface BenefitPlan {
+    planId: number;
+    planNo: string;
+    jobClassLabel: string;
+    jobClassMin: number;
+    jobClassMax: number;
+    opdLimit: number;
+    ipdLimit: number;
+    dentalLimit: number;
+    visionLimit: number;
+    opdPerVisitCap: number;
+    opdOverCap: number;
+    ipdDailyCap: number;
+    ipdDailyOverCap: number;
+}
+
+export interface PolicyContent {
+    contentId: number;
+    sectionNo: string;
+    sectionTitle: string;
+    content: string;
+    contentType: 'section' | 'subsection' | 'item' | 'note' | 'warning';
+    parentId: number | null;
+    sortOrder: number;
+}
+
+export interface MedicalPolicy {
+    benefit_plans: BenefitPlan[];
+    policy_content: PolicyContent[];
+}
+
+export interface MedicalPolicyResponse {
+    success: boolean;
+    data: MedicalPolicy;
+}
+
 export interface DiseaseType {
     diseaseId: number;
     code: string;

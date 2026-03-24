@@ -103,6 +103,16 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
     }
 }
 
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 16px;
+    color: var(--text-muted);
+}
+
 .modal-body {
     padding: 32px 48px;
     overflow-y: auto;
@@ -131,6 +141,11 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
             font-weight: 700;
             color: var(--text-header);
             font-size: 1.15rem;
+        }
+
+        .clause-detail {
+            font-weight: 400;
+            font-size: 1rem;
         }
     }
 

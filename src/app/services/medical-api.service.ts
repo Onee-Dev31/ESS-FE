@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance } from '../interfaces/medical.interface';
-export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance };
+import { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse } from '../interfaces/medical.interface';
+export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse };
 
 @Injectable({ providedIn: 'root' })
 export class MedicalApiService {
@@ -38,6 +38,11 @@ export class MedicalApiService {
         if (expense_type_id != null) params = params.set('expense_type_id', expense_type_id);
         if (category?.trim())      params = params.set('category', category.trim());
         return this._http.get<DiseaseTypeSearchResponse>(`${this.baseUrl}/medical/disease-types`, { params });
+    }
+
+    /** ดึงนโยบายและสิทธิประโยชน์ค่ารักษาพยาบาล */
+    getPolicy(): Observable<MedicalPolicyResponse> {
+        return this._http.get<MedicalPolicyResponse>(`${this.baseUrl}/medical/policy`);
     }
 
     /**
