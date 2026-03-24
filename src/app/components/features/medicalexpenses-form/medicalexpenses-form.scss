@@ -159,6 +159,80 @@
         position: absolute;
         right: 12px;
         color: $text-sub;
+        pointer-events: none;
+    }
+}
+
+.section-with-dropdown {
+    z-index: 2;
+}
+
+.hospital-autocomplete {
+    position: relative;
+
+    .hospital-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 100%;
+        z-index: 9999;
+        min-width: 200px;
+        background: var(--bg-card);
+        border: 2px solid $primary;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+        max-height: 240px;
+        overflow-y: auto;
+
+        .hospital-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border-toolbar);
+
+            &:first-child {
+                border-radius: 6px 6px 0 0;
+            }
+
+            &:last-child {
+                border-bottom: none;
+                border-radius: 0 0 6px 6px;
+            }
+
+            &:hover {
+                background: rgba($primary, 0.08);
+            }
+
+            .hospital-name {
+                font-size: 0.9rem;
+                color: var(--text-header);
+                font-weight: 500;
+            }
+
+            .dropdown-loading-more {
+                padding: 10px 14px;
+                text-align: center;
+                font-size: 0.85rem;
+                color: var(--text-muted);
+
+                i { margin-right: 6px; }
+            }
+
+            .hospital-contracted {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--success, #22c55e);
+                white-space: nowrap;
+                flex-shrink: 0;
+
+                i {
+                    margin-right: 3px;
+                }
+            }
+        }
     }
 }
 
@@ -299,6 +373,8 @@
     min-width: 0;
     width: 100%;
     margin-bottom: 24px;
+    overflow: visible;
+    position: relative;
 
     .section-header-row {
         display: flex;
@@ -324,6 +400,7 @@
     width: 100%;
     margin-bottom: 24px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    overflow: visible;
 
     .input-field-group:nth-child(1),
     .input-field-group:nth-child(2) {
@@ -445,7 +522,7 @@
                 }
 
                 &:hover .file-text {
-                    color: color-mix(in srgb, $primary, black 10%);
+                    filter: brightness(0.85);
                 }
             }
         }

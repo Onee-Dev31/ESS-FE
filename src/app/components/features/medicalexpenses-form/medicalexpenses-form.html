@@ -1,7 +1,7 @@
 <div class="form-root">
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
-        <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+        <button class="btn-close-modal" type="button" title="ปิด" (click)="close()"><i class="fas fa-times"></i></button>
     </header>
 
     <main class="content-card">
@@ -43,15 +43,36 @@
             </div>
         </section>
 
-        <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
+        <section class="form-section-wrapper mt-4 animated-fade-in section-with-dropdown" *ngIf="selectedClaimType()">
             <h4 class="section-heading">2. กรอกรายละเอียด</h4>
             <div class="details-grid">
                 <div class="input-field-group">
                     <label>สถานพยาบาล</label>
-                    <div class="search-input-wrapper">
-                        <input type="text" class="custom-form-control" placeholder="ระบุชื่อโรงพยาบาล/คลินิก"
-                            [ngModel]="hospital()" (ngModelChange)="hospital.set($event)">
-                        <i class="fas fa-search search-icon"></i>
+                    <div class="hospital-autocomplete">
+                        <div class="search-input-wrapper">
+                            <input type="text" class="custom-form-control" placeholder="ค้นหาโรงพยาบาล/คลินิก"
+                                [ngModel]="hospital()"
+                                (ngModelChange)="onHospitalInput($event)"
+                                (focus)="onHospitalFocus()"
+                                (blur)="onHospitalBlur()">
+                            <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
+                            <i class="fas fa-search search-icon" *ngIf="!isHospitalLoading()"></i>
+                        </div>
+                        <div class="hospital-dropdown"
+                            #hospitalDropdownEl
+                            *ngIf="isHospitalDropdownOpen()"
+                            (scroll)="onDropdownScroll($event)">
+                            <div class="hospital-option" *ngFor="let h of hospitalDropdown()"
+                                (mousedown)="selectHospital(h)">
+                                <span class="hospital-name">{{ h.nameTh }}</span>
+                                <span class="hospital-contracted" *ngIf="h.isContracted">
+                                    <i class="fas fa-check-circle"></i> ในเครือ
+                                </span>
+                            </div>
+                            <div class="dropdown-loading-more" *ngIf="isHospitalLoadingMore()">
+                                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -67,7 +88,7 @@
                 <div class="input-field-group">
                     <label>วันที่รักษา ตั้งแต่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
-                        <input type="date" class="input-field" [ngModel]="startDate()"
+                        <input type="date" class="input-field" title="วันที่รักษา ตั้งแต่" [ngModel]="startDate()"
                             (ngModelChange)="startDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
@@ -78,7 +99,7 @@
                 <div class="input-field-group">
                     <label>ถึงวันที่ <span class="required">*</span></label>
                     <div class="custom-input-wrapper">
-                        <input type="date" class="input-field" [ngModel]="endDate()"
+                        <input type="date" class="input-field" title="ถึงวันที่" [ngModel]="endDate()"
                             (ngModelChange)="endDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
@@ -89,7 +110,7 @@
                 <div class="input-field-group">
                     <label>จำนวนวัน</label>
                     <div class="custom-input-wrapper">
-                        <input type="text" class="input-field text-center readonly-highlight" [value]="calculatedDays()"
+                        <input type="text" class="input-field text-center readonly-highlight" title="จำนวนวัน" [value]="calculatedDays()"
                             readonly>
                         <div class="icon-box">
                             <i class="fas fa-calculator"></i>
@@ -114,7 +135,7 @@
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
                     <i class="fas fa-file-upload"></i> Upload file
                 </button>
-                <input #fileInput type="file" class="hidden-input" (change)="onFileSelected($event)" multiple>
+                <input #fileInput type="file" class="hidden-input" title="เลือกไฟล์แนบ" (change)="onFileSelected($event)" multiple>
             </div>
             <div class="attachment-table-container">
                 <table class="excel-table">
@@ -136,7 +157,7 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
+                                <button class="btn-delete-row" type="button" title="ลบไฟล์แนบ" (click)="deleteAttachment(file.id)">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
                             </td>

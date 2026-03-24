@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
@@ -8,8 +8,11 @@ import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
+import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
 
 import { MasterDataService, ClaimType } from '../../../services/master-data.service';
+import { MedicalApiService } from '../../../services/medical-api.service';
+import { Hospital } from '../../../interfaces/medical.interface';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -18,12 +21,13 @@ import { MasterDataService, ClaimType } from '../../../services/master-data.serv
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',
 })
-export class MedicalexpensesForm implements OnInit {
+export class MedicalexpensesForm implements OnInit, OnDestroy {
   private medicalService = inject(MedicalexpensesService);
   private userService = inject(UserService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private masterDataService = inject(MasterDataService);
+  private medicalApiService = inject(MedicalApiService);
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -39,6 +43,21 @@ export class MedicalexpensesForm implements OnInit {
   selectedClaimType = signal<string>('');
 
   hospital = signal<string>('');
+  hospitalDropdown = signal<Hospital[]>([]);
+  isHospitalDropdownOpen = signal<boolean>(false);
+  isHospitalLoading = signal<boolean>(false);
+  isHospitalLoadingMore = signal<boolean>(false);
+
+  private currentKeyword = '';
+  private currentPage = 1;
+  private hasNextPage = false;
+  private readonly PAGE_SIZE = 20;
+
+  @ViewChild('hospitalDropdownEl') hospitalDropdownEl?: ElementRef<HTMLDivElement>;
+
+  private hospitalSearch$ = new Subject<string>();
+  private searchSub?: Subscription;
+
   disease = signal<string>('');
   startDate = signal<string>('');
   endDate = signal<string>('');
@@ -73,6 +92,74 @@ export class MedicalexpensesForm implements OnInit {
       this.claimTypes = types;
       this.loadRequestData();
     });
+
+    this.searchSub = this.hospitalSearch$.pipe(
+      debounceTime(300),
+      switchMap(keyword => {
+        // reset pagination เมื่อ keyword เปลี่ยน
+        this.currentKeyword = keyword;
+        this.currentPage = 1;
+        this.isHospitalLoading.set(true);
+        return this.medicalApiService.searchHospitals(keyword || undefined, 1, this.PAGE_SIZE).pipe(
+          catchError(() => {
+            this.isHospitalLoading.set(false);
+            return of({ success: false, data: [], pagination: undefined });
+          })
+        );
+      })
+    ).subscribe(res => {
+      this.hospitalDropdown.set(res.data);
+      this.hasNextPage = res.pagination?.hasNext ?? false;
+      this.isHospitalDropdownOpen.set(res.data.length > 0);
+      this.isHospitalLoading.set(false);
+    });
+  }
+
+  ngOnDestroy() {
+    this.searchSub?.unsubscribe();
+  }
+
+  onHospitalInput(value: string) {
+    this.hospital.set(value);
+    this.hospitalSearch$.next(value);
+  }
+
+  onHospitalFocus() {
+    if (this.hospitalDropdown().length > 0) {
+      this.isHospitalDropdownOpen.set(true);
+    } else {
+      this.hospitalSearch$.next(this.hospital());
+    }
+  }
+
+  onHospitalBlur() {
+    setTimeout(() => this.isHospitalDropdownOpen.set(false), 200);
+  }
+
+  onDropdownScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+    if (nearBottom && this.hasNextPage && !this.isHospitalLoadingMore()) {
+      this.loadMoreHospitals();
+    }
+  }
+
+  private loadMoreHospitals() {
+    this.isHospitalLoadingMore.set(true);
+    const nextPage = this.currentPage + 1;
+    this.medicalApiService.searchHospitals(this.currentKeyword || undefined, nextPage, this.PAGE_SIZE)
+      .pipe(catchError(() => of({ success: false, data: [], pagination: undefined })))
+      .subscribe(res => {
+        this.hospitalDropdown.update(current => [...current, ...res.data]);
+        this.hasNextPage = res.pagination?.hasNext ?? false;
+        this.currentPage = nextPage;
+        this.isHospitalLoadingMore.set(false);
+      });
+  }
+
+  selectHospital(h: Hospital) {
+    this.hospital.set(h.nameTh);
+    this.isHospitalDropdownOpen.set(false);
   }
 
   loadRequestData() {
