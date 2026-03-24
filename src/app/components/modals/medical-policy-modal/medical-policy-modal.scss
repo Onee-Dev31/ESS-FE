@@ -34,6 +34,7 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
     width: 100vw;
     height: 100vh;
     background: rgba(15, 23, 42, 0.7);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
@@ -192,10 +193,19 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
         border-radius: 12px;
         border-left: 5px solid #fab005;
         margin: 24px 0;
+        color: #1e293b !important;
+
+        p, span, div, strong, u, b {
+            color: #1e293b !important;
+        }
 
         .note-header {
             margin-bottom: 8px;
-            color: #854d0e;
+            color: #854d0e !important;
+
+            strong, u {
+                color: #854d0e !important;
+            }
         }
     }
 
@@ -216,11 +226,10 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
     }
 
     .square-bullets-verbatim {
-        list-style: none;
         padding-left: 2rem;
         margin: 1rem 0;
 
-        li {
+        .bullet-item {
             position: relative;
             margin-bottom: 12px;
 
@@ -261,14 +270,23 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
         border-radius: 12px;
         border: 1px solid #ffa8a8;
         margin: 24px 0;
+        color: #1e293b !important;
+
+        p, span, div, strong, b {
+            color: #1e293b !important;
+        }
 
         .warning-header {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #e03131;
+            color: #e03131 !important;
             margin-bottom: 12px;
             font-size: 1.1rem;
+
+            strong, i {
+                color: #e03131 !important;
+            }
         }
     }
 

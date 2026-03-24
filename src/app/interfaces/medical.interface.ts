@@ -47,7 +47,7 @@ export interface PolicyContent {
     sectionNo: string;
     sectionTitle: string;
     content: string;
-    contentType: 'section' | 'subsection' | 'item' | 'note' | 'warning';
+    contentType: 'section' | 'subsection' | 'item' | 'note' | 'warning' | 'meta';
     parentId: number | null;
     sortOrder: number;
 }

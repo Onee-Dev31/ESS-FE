@@ -18,15 +18,16 @@ export class MedicalPolicyModalComponent implements OnInit {
     isLoading = signal(true);
     benefitPlans = signal<BenefitPlan[]>([]);
     allContent = signal<PolicyContent[]>([]);
-
     rootSections = signal<PolicyContent[]>([]);
+    metaContent = signal<PolicyContent | null>(null);
 
     ngOnInit() {
         this.medicalApi.getPolicy().subscribe({
             next: (res) => {
                 this.benefitPlans.set(res.data.benefit_plans);
                 this.allContent.set(res.data.policy_content);
-                this.rootSections.set(res.data.policy_content.filter(c => c.parentId === null));
+                this.metaContent.set(res.data.policy_content.find(c => c.contentType === 'meta') ?? null);
+                this.rootSections.set(res.data.policy_content.filter(c => c.parentId === null && c.contentType !== 'meta'));
                 this.isLoading.set(false);
             },
             error: () => this.isLoading.set(false)

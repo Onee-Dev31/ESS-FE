@@ -4,8 +4,8 @@
             <div class="header-content">
                 <span class="header-icon"><i class="fas fa-file-alt"></i></span>
                 <div class="header-text">
-                    <h3>นโยบายสวัสดิการค่ารักษาพยาบาล</h3>
-                    <span class="header-subtitle">ระเบียบและสิทธิการเบิกจ่ายช่วยเหลือ</span>
+                    <h3>{{ metaContent()?.sectionTitle }}</h3>
+                    <span class="header-subtitle">{{ metaContent()?.content }}</span>
                 </div>
             </div>
             <button type="button" class="btn-close" title="ปิด" (click)="close()">
@@ -25,11 +25,9 @@
 
             <!-- ตาราง Benefit Plans -->
             <section class="policy-section">
-                <h4 class="section-title main-title">ค่ารักษาพยาบาล</h4>
+                <h4 class="section-title main-title">{{ rootSections()[0]?.sectionTitle }}</h4>
                 <div class="clause">
-                    <p>1. พนักงานประจำของบริษัทฯ ยกเว้นพนักงานที่สัญญาจ้างที่มีกำหนดระยะเวลาแน่นอน
-                        มีสิทธิขอรับเงินช่วยเหลือการรักษาพยาบาล ทั้งผู้ป่วยนอก (OPD) และผู้ป่วยใน (IPD) ตามระดับ ดังนี้
-                    </p>
+                    <p>{{ rootSections()[0]?.sectionNo }}. {{ rootSections()[0]?.content }}</p>
                 </div>
 
                 <div class="table-container">
@@ -113,12 +111,11 @@
                         <span class="sub-num">{{ child.sectionNo }}</span>
                         <h5>{{ child.sectionTitle }}</h5>
                     </div>
-                    <ul class="square-bullets-verbatim">
-                        <li>{{ child.content }}</li>
-                        @for (grandchild of getChildren(child.contentId); track grandchild.contentId) {
-                        <li>{{ grandchild.content }}</li>
+                    <div class="square-bullets-verbatim">
+                        @for (item of [child].concat(getChildren(child.contentId)); track item.contentId) {
+                        <div class="bullet-item">{{ item.content }}</div>
                         }
-                    </ul>
+                    </div>
                 </div>
                 }
 
