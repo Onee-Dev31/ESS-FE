@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
 import { UserService } from '../../../services/user.service';
-import { MedicalRequest, MedicalItem } from '../../../interfaces/medical.interface';
+import { AuthService } from '../../../services/auth.service';
+import { MedicalRequest, MedicalItem, MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
 import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
 
-import { MasterDataService, ClaimType } from '../../../services/master-data.service';
+import { ClaimType } from '../../../services/master-data.service';
 import { MedicalApiService } from '../../../services/medical-api.service';
 import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 
@@ -24,9 +25,9 @@ import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 export class MedicalexpensesForm implements OnInit, OnDestroy {
   private medicalService = inject(MedicalexpensesService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
-  private masterDataService = inject(MasterDataService);
   private medicalApiService = inject(MedicalApiService);
 
   @Input() requestId: string = '';
@@ -97,14 +98,39 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return end.diff(start, 'day') + 1;
   });
 
-  ngOnInit() {
-    this.userService.getUserProfile().subscribe(profile => {
-      this.employeeId.set(profile.employeeId);
-    });
+  private mapExpenseType(type: MedicalExpenseTypeWithBalance): ClaimType {
+    const iconMap: Record<string, string> = {
+      stethoscope: 'fas fa-stethoscope',
+      bed: 'fas fa-bed',
+      tooth: 'fas fa-tooth',
+      glasses: 'fas fa-glasses'
+    };
+    const colorMap: Record<string, string> = {
+      OPD: 'var(--danger)',
+      IPD: 'var(--success)',
+      DENTAL: 'var(--primary)',
+      VISION: 'var(--primary)'
+    };
+    return {
+      id: type.code.toLowerCase(),
+      label: type.nameTh,
+      amount: type.remainingAmount.toLocaleString('th-TH'),
+      icon: iconMap[type.icon ?? ''] ?? 'fas fa-medkit',
+      color: colorMap[type.code] ?? 'var(--primary)'
+    };
+  }
 
-    this.masterDataService.getMedicalClaimTypes().subscribe(types => {
-      this.claimTypes = types;
-      this.loadRequestData();
+  ngOnInit() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    this.employeeId.set(employeeCode);
+
+    const fiscalYear = dayjs().year();
+    this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
+      next: (res) => {
+        this.claimTypes = res.data.map(t => this.mapExpenseType(t));
+        this.loadRequestData();
+      },
+      error: () => this.loadRequestData()
     });
 
     this.searchSub = this.hospitalSearch$.pipe(
@@ -345,7 +371,6 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
 
     this.userService.getUserProfile().subscribe(profile => {
-      const titleName = profile.name.split(' ')[0];
       const request: MedicalRequest = {
         id: this.requestId,
         createDate: dayjs().toISOString(),
