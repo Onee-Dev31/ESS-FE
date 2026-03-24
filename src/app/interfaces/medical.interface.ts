@@ -26,6 +26,33 @@ export interface HospitalSearchResponse {
     };
 }
 
+export interface DiseaseType {
+    diseaseId: number;
+    code: string;
+    nameTh: string;
+    nameEn: string;
+    icd10Code: string | null;
+    category: string | null;
+    expenseTypeId: number | null;
+    isExcluded: boolean;
+    excludeReason: string | null;
+    sortOrder: number;
+    totalCount: number;
+}
+
+export interface DiseaseTypeSearchResponse {
+    success: boolean;
+    data: DiseaseType[];
+    pagination?: {
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrevious: boolean;
+    };
+}
+
 export interface MedicalExpenseTypeWithBalance {
     typeId: number;
     code: string;

@@ -78,10 +78,29 @@
 
                 <div class="input-field-group">
                     <label>ประเภทโรค</label>
-                    <div class="search-input-wrapper">
-                        <input type="text" class="custom-form-control" placeholder="ระบุประเภทโรค" [ngModel]="disease()"
-                            (ngModelChange)="disease.set($event)">
-                        <i class="fas fa-search search-icon"></i>
+                    <div class="hospital-autocomplete">
+                        <div class="search-input-wrapper">
+                            <input type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค / ICD-10"
+                                [ngModel]="disease()"
+                                (ngModelChange)="onDiseaseInput($event)"
+                                (focus)="onDiseaseFocus()"
+                                (blur)="onDiseaseBlur()">
+                            <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
+                            <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
+                        </div>
+                        <div class="hospital-dropdown"
+                            #diseaseDropdownEl
+                            *ngIf="isDiseaseDropdownOpen()"
+                            (scroll)="onDiseaseDropdownScroll($event)">
+                            <div class="hospital-option" *ngFor="let d of diseaseDropdown()"
+                                (mousedown)="selectDisease(d)">
+                                <span class="hospital-name">{{ d.nameTh }}</span>
+                                <span class="disease-code">{{ d.icd10Code }}</span>
+                            </div>
+                            <div class="dropdown-loading-more" *ngIf="isDiseaseLoadingMore()">
+                                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+                            </div>
+                        </div>
                     </div>
                 </div>
 

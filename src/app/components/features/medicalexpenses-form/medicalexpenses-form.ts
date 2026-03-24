@@ -12,7 +12,7 @@ import { Subject, Subscription, debounceTime, switchMap, catchError, of } from '
 
 import { MasterDataService, ClaimType } from '../../../services/master-data.service';
 import { MedicalApiService } from '../../../services/medical-api.service';
-import { Hospital } from '../../../interfaces/medical.interface';
+import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -58,7 +58,21 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private hospitalSearch$ = new Subject<string>();
   private searchSub?: Subscription;
 
+  // Disease autocomplete
   disease = signal<string>('');
+  diseaseDropdown = signal<DiseaseType[]>([]);
+  isDiseaseDropdownOpen = signal<boolean>(false);
+  isDiseaseLoading = signal<boolean>(false);
+  isDiseaseLoadingMore = signal<boolean>(false);
+
+  private diseaseKeyword = '';
+  private diseasePage = 1;
+  private diseaseHasNext = false;
+
+  @ViewChild('diseaseDropdownEl') diseaseDropdownEl?: ElementRef<HTMLDivElement>;
+
+  private diseaseSearch$ = new Subject<string>();
+  private diseaseSearchSub?: Subscription;
   startDate = signal<string>('');
   endDate = signal<string>('');
   amount = signal<number>(0);
@@ -113,10 +127,31 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       this.isHospitalDropdownOpen.set(res.data.length > 0);
       this.isHospitalLoading.set(false);
     });
+
+    this.diseaseSearchSub = this.diseaseSearch$.pipe(
+      debounceTime(300),
+      switchMap(keyword => {
+        this.diseaseKeyword = keyword;
+        this.diseasePage = 1;
+        this.isDiseaseLoading.set(true);
+        return this.medicalApiService.searchDiseaseTypes(keyword || undefined, undefined, undefined, 1, this.PAGE_SIZE).pipe(
+          catchError(() => {
+            this.isDiseaseLoading.set(false);
+            return of({ success: false, data: [], pagination: undefined });
+          })
+        );
+      })
+    ).subscribe(res => {
+      this.diseaseDropdown.set(res.data);
+      this.diseaseHasNext = res.pagination?.hasNext ?? false;
+      this.isDiseaseDropdownOpen.set(res.data.length > 0);
+      this.isDiseaseLoading.set(false);
+    });
   }
 
   ngOnDestroy() {
     this.searchSub?.unsubscribe();
+    this.diseaseSearchSub?.unsubscribe();
   }
 
   onHospitalInput(value: string) {
@@ -160,6 +195,49 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   selectHospital(h: Hospital) {
     this.hospital.set(h.nameTh);
     this.isHospitalDropdownOpen.set(false);
+  }
+
+  onDiseaseInput(value: string) {
+    this.disease.set(value);
+    this.diseaseSearch$.next(value);
+  }
+
+  onDiseaseFocus() {
+    if (this.diseaseDropdown().length > 0) {
+      this.isDiseaseDropdownOpen.set(true);
+    } else {
+      this.diseaseSearch$.next(this.disease());
+    }
+  }
+
+  onDiseaseBlur() {
+    setTimeout(() => this.isDiseaseDropdownOpen.set(false), 200);
+  }
+
+  onDiseaseDropdownScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+    if (nearBottom && this.diseaseHasNext && !this.isDiseaseLoadingMore()) {
+      this.loadMoreDiseases();
+    }
+  }
+
+  private loadMoreDiseases() {
+    this.isDiseaseLoadingMore.set(true);
+    const nextPage = this.diseasePage + 1;
+    this.medicalApiService.searchDiseaseTypes(this.diseaseKeyword || undefined, undefined, undefined, nextPage, this.PAGE_SIZE)
+      .pipe(catchError(() => of({ success: false, data: [], pagination: undefined })))
+      .subscribe(res => {
+        this.diseaseDropdown.update(current => [...current, ...res.data]);
+        this.diseaseHasNext = res.pagination?.hasNext ?? false;
+        this.diseasePage = nextPage;
+        this.isDiseaseLoadingMore.set(false);
+      });
+  }
+
+  selectDisease(d: DiseaseType) {
+    this.disease.set(d.nameTh);
+    this.isDiseaseDropdownOpen.set(false);
   }
 
   loadRequestData() {

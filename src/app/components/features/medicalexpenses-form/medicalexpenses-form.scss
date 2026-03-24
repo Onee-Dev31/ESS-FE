@@ -221,6 +221,15 @@
                 i { margin-right: 6px; }
             }
 
+            .disease-code {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--text-muted);
+                white-space: nowrap;
+                flex-shrink: 0;
+                font-family: monospace;
+            }
+
             .hospital-contracted {
                 font-size: 0.75rem;
                 font-weight: 600;
