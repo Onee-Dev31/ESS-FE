@@ -119,6 +119,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       color: colorMap[type.code] ?? 'var(--primary)'
     };
   }
+  remark = signal<string>('');
 
   ngOnInit() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';

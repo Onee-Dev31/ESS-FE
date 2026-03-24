@@ -218,7 +218,9 @@
                 font-size: 0.85rem;
                 color: var(--text-muted);
 
-                i { margin-right: 6px; }
+                i {
+                    margin-right: 6px;
+                }
             }
 
             .disease-code {
@@ -414,6 +416,10 @@
     .input-field-group:nth-child(1),
     .input-field-group:nth-child(2) {
         grid-column: span 2;
+    }
+
+    .input-field-group:nth-child(7) {
+        grid-column: span 4;
     }
 }
 

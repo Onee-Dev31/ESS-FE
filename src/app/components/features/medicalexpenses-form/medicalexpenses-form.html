@@ -1,7 +1,8 @@
 <div class="form-root">
     <header class="top-header-strip">
         <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
-        <button class="btn-close-modal" type="button" title="ปิด" (click)="close()"><i class="fas fa-times"></i></button>
+        <button class="btn-close-modal" type="button" title="ปิด" (click)="close()"><i
+                class="fas fa-times"></i></button>
     </header>
 
     <main class="content-card">
@@ -51,16 +52,12 @@
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
                             <input type="text" class="custom-form-control" placeholder="ค้นหาโรงพยาบาล/คลินิก"
-                                [ngModel]="hospital()"
-                                (ngModelChange)="onHospitalInput($event)"
-                                (focus)="onHospitalFocus()"
-                                (blur)="onHospitalBlur()">
+                                [ngModel]="hospital()" (ngModelChange)="onHospitalInput($event)"
+                                (focus)="onHospitalFocus()" (blur)="onHospitalBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
                             <i class="fas fa-search search-icon" *ngIf="!isHospitalLoading()"></i>
                         </div>
-                        <div class="hospital-dropdown"
-                            #hospitalDropdownEl
-                            *ngIf="isHospitalDropdownOpen()"
+                        <div class="hospital-dropdown" #hospitalDropdownEl *ngIf="isHospitalDropdownOpen()"
                             (scroll)="onDropdownScroll($event)">
                             <div class="hospital-option" *ngFor="let h of hospitalDropdown()"
                                 (mousedown)="selectHospital(h)">
@@ -81,16 +78,12 @@
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
                             <input type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค / ICD-10"
-                                [ngModel]="disease()"
-                                (ngModelChange)="onDiseaseInput($event)"
-                                (focus)="onDiseaseFocus()"
-                                (blur)="onDiseaseBlur()">
+                                [ngModel]="disease()" (ngModelChange)="onDiseaseInput($event)"
+                                (focus)="onDiseaseFocus()" (blur)="onDiseaseBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
                             <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
                         </div>
-                        <div class="hospital-dropdown"
-                            #diseaseDropdownEl
-                            *ngIf="isDiseaseDropdownOpen()"
+                        <div class="hospital-dropdown" #diseaseDropdownEl *ngIf="isDiseaseDropdownOpen()"
                             (scroll)="onDiseaseDropdownScroll($event)">
                             <div class="hospital-option" *ngFor="let d of diseaseDropdown()"
                                 (mousedown)="selectDisease(d)">
@@ -129,8 +122,8 @@
                 <div class="input-field-group">
                     <label>จำนวนวัน</label>
                     <div class="custom-input-wrapper">
-                        <input type="text" class="input-field text-center readonly-highlight" title="จำนวนวัน" [value]="calculatedDays()"
-                            readonly>
+                        <input type="text" class="input-field text-center readonly-highlight" title="จำนวนวัน"
+                            [value]="calculatedDays()" readonly>
                         <div class="icon-box">
                             <i class="fas fa-calculator"></i>
                         </div>
@@ -145,6 +138,12 @@
                         <span class="currency-tag">บาท</span>
                     </div>
                 </div>
+
+                <div class="input-field-group">
+                    <label>หมายเหตุ</label>
+                    <textarea type="text" class="custom-form-control" [ngModel]="remark()"
+                        (ngModelChange)="remark.set($event)"></textarea>
+                </div>
             </div>
         </section>
 
@@ -154,7 +153,8 @@
                 <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
                     <i class="fas fa-file-upload"></i> Upload file
                 </button>
-                <input #fileInput type="file" class="hidden-input" title="เลือกไฟล์แนบ" (change)="onFileSelected($event)" multiple>
+                <input #fileInput type="file" class="hidden-input" title="เลือกไฟล์แนบ"
+                    (change)="onFileSelected($event)" multiple>
             </div>
             <div class="attachment-table-container">
                 <table class="excel-table">
@@ -176,7 +176,8 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <button class="btn-delete-row" type="button" title="ลบไฟล์แนบ" (click)="deleteAttachment(file.id)">
+                                <button class="btn-delete-row" type="button" title="ลบไฟล์แนบ"
+                                    (click)="deleteAttachment(file.id)">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
                             </td>
