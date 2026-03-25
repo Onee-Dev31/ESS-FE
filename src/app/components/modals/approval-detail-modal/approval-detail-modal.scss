@@ -1026,3 +1026,117 @@ $primary-orange: $warning;
         transform: translateY(0);
     }
 }
+// ── Medical Claim Info Grid ───────────────────────────────
+.medical-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--bg-table-head);
+    border-radius: 12px;
+    border: 1px solid var(--border-toolbar);
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+
+    .med-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &.med-info-full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+
+            i { margin-right: 4px; opacity: 0.7; }
+        }
+
+        span {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+        }
+    }
+}
+
+// ── Attachment List ───────────────────────────────────────
+.content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 { margin: 0; }
+
+    .btn-view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border: 1px solid var(--border-toolbar);
+        border-radius: 8px;
+        background: none;
+        font-size: 13px;
+        color: var(--primary);
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover { background: var(--bg-table-head); }
+    }
+}
+
+.attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+
+    .attachment-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--bg-table-head);
+        border: 1px solid var(--border-toolbar);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        i:first-child {
+            font-size: 18px;
+            color: var(--primary);
+            opacity: 0.7;
+        }
+
+        .att-name {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .att-open {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+    }
+}
+
+// ── Summary card text-success ─────────────────────────────
+.s-value.text-success { color: var(--success) !important; }

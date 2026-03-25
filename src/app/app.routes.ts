@@ -77,7 +77,7 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/approvals/approvals').then(m => m.ApprovalsComponent),
                 canActivate: [menuGuard],
                 // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
-                data: { animation: 'ApprovalsMedical' }
+                data: { category: 'medical', animation: 'ApprovalsMedical' }
             },
             {
                 path: 'medicalexpenses',

@@ -18,7 +18,7 @@
                     <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
                     }
                 </div>
-                <button class="btn-close-x" (click)="close()"><i class="fas fa-times"></i></button>
+                <button type="button" class="btn-close-x" title="ปิด" (click)="close()"><i class="fas fa-times"></i></button>
             </div>
         </div>
 
@@ -60,15 +60,80 @@
                     </div>
                     <div class="summary-card">
                         <div class="s-data">
-                            <label>Main Amount</label>
-                            <div class="s-value">{{ approvalItem.amount | number }} THB</div>
+                            <label>ยอดขอเบิก</label>
+                            <div class="s-value">{{ approvalItem.amount | number:'1.2-2' }} ฿</div>
                         </div>
                     </div>
+                    @if (medicalClaim && medicalClaim.approvedAmount > 0) {
+                    <div class="summary-card">
+                        <div class="s-data">
+                            <label>อนุมัติ</label>
+                            <div class="s-value text-success">{{ medicalClaim.approvedAmount | number:'1.2-2' }} ฿</div>
+                        </div>
+                    </div>
+                    }
                 </div>
 
+                @if (medicalClaim) {
+                <div class="medical-info-grid">
+                    <div class="med-info-item">
+                        <label><i class="fas fa-tag"></i> ประเภทการเบิก</label>
+                        <span>{{ medicalClaim.expenseTypeName }}</span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="fas fa-hospital-alt"></i> สถานพยาบาล</label>
+                        <span>{{ medicalClaim.hospitalName }}</span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="fas fa-virus"></i> โรค / อาการ</label>
+                        <span>{{ medicalClaim.diseaseName }}
+                            @if (medicalClaim.icd10Code) {
+                            <span class="text-muted">({{ medicalClaim.icd10Code }})</span>
+                            }
+                        </span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
+                        <span>{{ medicalClaim.treatmentDateFrom }} – {{ medicalClaim.treatmentDateTo }}
+                            <span class="text-muted">({{ medicalClaim.treatmentDays }} วัน)</span>
+                        </span>
+                    </div>
+                    @if (medicalClaim.remark) {
+                    <div class="med-info-item med-info-full">
+                        <label><i class="fas fa-comment-alt"></i> หมายเหตุ</label>
+                        <span>{{ medicalClaim.remark }}</span>
+                    </div>
+                    }
+                    @if (medicalClaim.rejectionReason) {
+                    <div class="med-info-item med-info-full">
+                        <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
+                        <span class="text-danger">{{ medicalClaim.rejectionReason }}</span>
+                    </div>
+                    }
+                </div>
+
+                @if (medicalClaim.attachments.length) {
+                <div class="content-header">
+                    <h3>เอกสารแนบ ({{ medicalClaim.attachments.length }} ไฟล์)</h3>
+                    <button type="button" class="btn-view-all" (click)="openAllAttachments()">
+                        <i class="far fa-eye"></i> ดูทั้งหมด
+                    </button>
+                </div>
+                <div class="attachment-list">
+                    @for (att of medicalClaim.attachments; track att.fileName) {
+                    <div class="attachment-item" (click)="openPreview(att.fileUrl)">
+                        <i class="far fa-file-alt"></i>
+                        <span class="att-name">{{ att.fileName }}</span>
+                        <i class="fas fa-external-link-alt att-open"></i>
+                    </div>
+                    }
+                </div>
+                }
+                } @else {
                 <div class="content-header">
                     <h3>รายการเบิก (Items)</h3>
                 </div>
+                }
 
                 <div class="tab-view">
                     @if (selectedRequestDetails()) {
@@ -251,5 +316,7 @@
     </div>
 </div>
 
-<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>
+}

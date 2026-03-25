@@ -5,6 +5,7 @@ import { ToastService } from '../../../services/toast';
 import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
+import { MedicalClaim } from '../../../interfaces/medical.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
@@ -12,6 +13,7 @@ import { modalAnimation, fadeIn } from '../../../animations/animations';
 
 interface PreviewFile {
   fileName: string;
+  fileUrl?: string;
   date: string;
 }
 
@@ -98,18 +100,34 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
-  /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ (เช่น รายการย่อยในบิลรักษาพยาบาล) */
+  /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */
   loadDetails() {
     const item = this.approvalItem;
     if (!item?.type) return;
 
     this.currentDetailType.set(item.type);
-    const service = this.approvalsHelper.getServiceByType(item.type);
 
+    // ถ้าเป็น medical claim จาก API ใหม่ — ใช้ originalData โดยตรง
+    if (item.type === 'medical') {
+      const claim = item.originalData as MedicalClaim;
+      if (claim?.claimId != null) {
+        this.detailedStatus.set(claim.status);
+        const unifiedItems: UnifiedItem[] = [{
+          date: `${claim.treatmentDateFrom} – ${claim.treatmentDateTo}`,
+          description: `${claim.diseaseName} | ${claim.hospitalName}`,
+          amount: claim.requestedAmount,
+          attachedFile: claim.attachments?.[0]?.fileUrl ?? ''
+        }];
+        this.currentDetailItems.set(unifiedItems);
+        return;
+      }
+    }
+
+    // fallback: mock service (ใช้กับ non-medical หรือ medical ข้อมูลเก่า)
+    const service = this.approvalsHelper.getServiceByType(item.type);
     service.getRequestById(item.requestNo).subscribe(data => {
       if (!data) return;
       this.detailedStatus.set(data.status);
-
       if (item.type === 'medical') {
         const unifiedItems: UnifiedItem[] = (data.items || []).map((m: { treatmentDateFrom?: string; diseaseType?: string; hospital?: string; requestedAmount?: number; attachedFile?: string }) => ({
           date: m.treatmentDateFrom || data.createDate,
@@ -171,10 +189,22 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   close() { this.onClose.emit(); }
 
-  openPreview(fileName: string) {
-    if (!fileName) return;
-    this.previewFiles.set([{ fileName, date: '' }]);
+  openPreview(fileUrlOrName: string) {
+    if (!fileUrlOrName) return;
+    this.previewFiles.set([{ fileName: fileUrlOrName, fileUrl: fileUrlOrName, date: '' }]);
     this.isPreviewModalOpen.set(true);
+  }
+
+  openAllAttachments() {
+    const claim = this.approvalItem.originalData as MedicalClaim;
+    if (!claim?.attachments?.length) return;
+    this.previewFiles.set(claim.attachments.map(a => ({ fileName: a.fileName, fileUrl: a.fileUrl, date: '' })));
+    this.isPreviewModalOpen.set(true);
+  }
+
+  get medicalClaim(): MedicalClaim | null {
+    const claim = this.approvalItem?.originalData as MedicalClaim;
+    return claim?.claimId != null ? claim : null;
   }
 
   closePreview() { this.isPreviewModalOpen.set(false); }

@@ -1,25 +1,26 @@
-<div class="approvals-wrapper">
+<div class="approvals-wrapper" [class.medical-mode]="category === 'medical'">
   <app-page-header [title]="pageTitle()">
     <div class="utility-btns">
       <div class="export-dropdown">
-        <button class="btn-outline" (click)="toggleExportMenu()">
+        <button type="button" class="btn-outline" (click)="toggleExportMenu()">
           <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
           <i class="fas fa-chevron-down ml-1"></i>
         </button>
         <div class="dropdown-menu" [class.show]="showExportMenu()">
-          <button class="dropdown-item" (click)="exportPDF()">
+          <button type="button" class="dropdown-item" (click)="exportPDF()">
             <i class="fas fa-file-pdf text-danger"></i> Export PDF
           </button>
-          <button class="dropdown-item" (click)="exportExcel()">
+          <button type="button" class="dropdown-item" (click)="exportExcel()">
             <i class="fas fa-file-excel text-success"></i> Export Excel
           </button>
-          <button class="dropdown-item" (click)="print()">
+          <button type="button" class="dropdown-item" (click)="print()">
             <i class="fas fa-print text-secondary"></i> Print
           </button>
         </div>
       </div>
-      <button class="btn-outline" (click)="refresh()">
-        <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
+      <button type="button" class="btn-outline" (click)="refresh()" [disabled]="isRefreshing()">
+        <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin mr-1' : 'fas fa-sync-alt mr-1'"></i>
+        <span class="btn-text">Refresh</span>
       </button>
     </div>
   </app-page-header>
@@ -27,20 +28,127 @@
   <div class="card">
     <div class="table-controls">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="listing.searchText()"
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <input type="text" placeholder="ค้นหา Request No, รหัสพนักงาน..." [value]="listing.searchText()"
           (input)="onSearch($event)" />
       </div>
 
       <div class="tab-navigation">
-        @for (tab of tabs; track tab) {
-        <button class="tab-item" [class.active]="listing.filterStatus() === tab" (click)="setActiveTab(tab)">
+        @for (tab of (category === 'medical' ? medicalTabs : tabs); track tab) {
+        <button type="button" class="tab-item" [class.active]="listing.filterStatus() === tab"
+          (click)="setActiveTab(tab)">
           {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
         </button>
         }
       </div>
     </div>
 
+    @if (category === 'medical') {
+    <!-- ── Medical: 3-column claim-card grid ── -->
+    <div class="claim-cards-grid">
+      @if (isLoading()) {
+      <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
+      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+      @let claim = getMedicalClaim(req);
+      @if (claim) {
+      <div class="claim-card">
+        <div class="claim-card__header">
+          <div class="claim-card__type-badge">
+            <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
+          </div>
+          <div class="claim-card__actions">
+            @if (claim.attachments.length) {
+            <button type="button" class="btn-attach" (click)="openPreview(claim)" title="ดูเอกสาร">
+              <i class="far fa-paperclip"></i> {{ claim.attachments.length }}
+            </button>
+            }
+            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+              {{ req.rawStatus | statusLabel }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Employee info -->
+        <div class="claim-card__employee">
+          <div class="emp-avatar" [class.clickable]="claim.employeeImageUrl" (click)="openProfileImage(claim)" title="คลิกดูรูปขนาดใหญ่">
+            <img [src]="claim.employeeImageUrl" alt="{{ claim.employeeCode }}" (error)="onImgError($event)" />
+            <i class="fas fa-user-circle fallback-icon"></i>
+          </div>
+          <div class="emp-info">
+            <div class="emp-name">
+              {{ claim.employeeName ?? claim.employeeCode }}
+              @if (claim.employeeNickname) {
+              <span class="emp-nickname">({{ claim.employeeNickname }})</span>
+              }
+            </div>
+            <div class="emp-meta">
+              <span><i class="fas fa-id-badge"></i> {{ claim.employeeCode }}</span>
+              @if (claim.departmentName) {
+              <span><i class="fas fa-building"></i> {{ claim.departmentName }}</span>
+              }
+              @if (claim.companyName) {
+              <span><i class="fas fa-city"></i> {{ claim.companyName }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="claim-card__body">
+          <div class="claim-card__main">
+            <div class="claim-date">
+              <i class="far fa-calendar-alt"></i>
+              <span>{{ claim.treatmentDateFrom }} – {{ claim.treatmentDateTo }}</span>
+              <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
+            </div>
+            <div class="claim-hospital">
+              <i class="fas fa-hospital-alt"></i>
+              <span>{{ claim.hospitalName }}</span>
+            </div>
+            <div class="claim-disease">
+              <i class="fas fa-virus"></i>
+              <span>{{ claim.diseaseName }}</span>
+            </div>
+          </div>
+
+          <div class="claim-card__amount">
+            <span class="amount-label">ขอเบิก</span>
+            <span class="amount-value">฿{{ claim.requestedAmount | number:'1.0-0' }}</span>
+            @if (claim.approvedAmount > 0) {
+            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.0-0' }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="claim-card__footer">
+          <span class="claim-id">{{ req.requestNo }}</span>
+          <div class="claim-card__footer-actions">
+            <button type="button" class="act-btn act-view" title="ดูรายละเอียด" (click)="viewDetail(req)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button type="button" class="act-btn act-approve" title="อนุมัติ"
+              (click)="openActionModal(req, 'Approved')">
+              <i class="fas fa-check"></i>
+            </button>
+            <button type="button" class="act-btn act-reject" title="ไม่อนุมัติ"
+              (click)="openActionModal(req, 'Rejected')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+      }
+      @empty {
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+        icon="fas fa-inbox">
+      </app-empty-state>
+      }
+      }
+    </div>
+
+    } @else {
+    <!-- ── Non-medical: responsive cards (mobile) + table (desktop) ── -->
     <div class="card-list-view">
       @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
       <div class="mobile-card">
@@ -49,51 +157,42 @@
             <span class="label"><i class="fas fa-hashtag"></i> No.</span>
             <span class="value">{{ req.requestNo }}</span>
           </div>
-          <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-            {{ req.status }}
-          </span>
+          <span class="status-badge" [ngClass]="getStatusClass(req.status)">{{ req.status }}</span>
         </div>
         <div class="card-body">
           <div class="info-row">
-            <span class="label"><i class="far fa-clock"></i> Date Created:</span>
+            <span class="label"><i class="far fa-clock"></i> วันที่:</span>
             <span class="value">{{ req.requestDate }}</span>
           </div>
-
           <div class="requester-block">
             <div class="req-name"><i class="fas fa-user-circle"></i> {{ req.requestBy.name }}</div>
             <div class="req-details">
               <span><i class="fas fa-id-badge"></i> {{ req.requestBy.employeeId }}</span> &bull;
               <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span>
             </div>
-            <div class="req-company"><i class="fas fa-city"></i> {{ req.requestBy.company }}</div>
           </div>
-
           <div class="info-row mt-2">
             <span class="label"><i class="fas fa-tag"></i> Type:</span>
             <span class="value highlight">{{ req.requestType }}</span>
           </div>
-
-          <div class="description-block">
-            <div class="desc-label"><i class="fas fa-align-left"></i> Description:</div>
-            <div class="desc-content">{{ req.requestDetail }}</div>
-          </div>
-
           <div class="amount-row">
             <span class="label"><i class="fas fa-coins"></i> Amount</span>
             <span class="value amount">{{ req.amount | number }}</span>
           </div>
-
           <div class="card-actions">
-            <button class="act-btn v-btn" title="View" (click)="viewDetail(req)">
+            <button type="button" class="act-btn v-btn" title="View" (click)="viewDetail(req)">
               <i class="fas fa-eye"></i>
             </button>
-            <button class="act-btn a-btn" title="Approve" (click)="openActionModal(req, 'Approved')">
+            <button type="button" class="act-btn a-btn" title="Approve"
+              (click)="openActionModal(req, 'Approved')">
               <i class="fas fa-check"></i>
             </button>
-            <button class="act-btn r-btn" title="Reject" (click)="openActionModal(req, 'Rejected')">
+            <button type="button" class="act-btn r-btn" title="Reject"
+              (click)="openActionModal(req, 'Rejected')">
               <i class="fas fa-times"></i>
             </button>
-            <button class="act-btn b-btn" title="Refer Back" (click)="openActionModal(req, 'Referred Back')">
+            <button type="button" class="act-btn b-btn" title="Refer Back"
+              (click)="openActionModal(req, 'Referred Back')">
               <i class="fas fa-undo-alt"></i>
             </button>
           </div>
@@ -101,7 +200,8 @@
       </div>
       }
       @empty {
-      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+        icon="fas fa-inbox">
       </app-empty-state>
       }
     </div>
@@ -114,28 +214,25 @@
         <thead>
           <tr>
             <th class="sortable-header" (click)="toggleSort('requestNo')">
-              <i class="fas fa-hashtag mr-1"></i> เลขที่เอกสาร <i class="fas ml-1"
-                [ngClass]="getSortIcon('requestNo')"></i>
+              เลขที่เอกสาร <i class="fas ml-1" [ngClass]="getSortIcon('requestNo')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDate')">
-              <i class="far fa-clock mr-1"></i> วันที่สราง <i class="fas ml-1"
-                [ngClass]="getSortIcon('requestDate')"></i>
+              วันที่ <i class="fas ml-1" [ngClass]="getSortIcon('requestDate')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestBy')">
-              <i class="fas fa-user mr-1"></i> ผู้ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
+              ผู้ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestBy')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestType')">
-              <i class="fas fa-tag mr-1"></i> ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
+              ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('requestType')"></i>
             </th>
             <th class="sortable-header" (click)="toggleSort('requestDetail')">
-              <i class="fas fa-info-circle mr-1"></i> รายละเอียด <i class="fas ml-1"
-                [ngClass]="getSortIcon('requestDetail')"></i>
+              รายละเอียด <i class="fas ml-1" [ngClass]="getSortIcon('requestDetail')"></i>
             </th>
             <th class="sortable-header text-right" (click)="toggleSort('amount')">
-              <i class="fas fa-coins mr-1"></i> จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+              จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
             <th class="sortable-header text-center" (click)="toggleSort('status')">
-              <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+              สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
             <th class="text-center">จัดการ</th>
           </tr>
@@ -143,41 +240,43 @@
         @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
         <tbody [@listAnimation]>
           <tr>
-            <td class="text-center font-inter request-no-link text-primary-link" (click)="viewDetail(row.original)">
+            <td class="font-inter request-no-link text-primary-link" (click)="viewDetail(row.original)">
               {{ row.original.requestNo }}
             </td>
-            <td class="text-center text-muted">{{ row.original.requestDate }}</td>
+            <td class="text-muted">{{ row.original.requestDate }}</td>
             <td>
               <div class="requester-info">
                 <div class="name">{{ row.original.requestBy.name }}</div>
                 <div class="details-box">
                   <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
                   <div class="detail-item">{{ row.original.requestBy.department }}</div>
-                  <div class="detail-item">{{ row.original.requestBy.company }}</div>
                 </div>
               </div>
             </td>
-            <td class="text-center">{{ row.original.requestType }}</td>
-            <td class="text-left description-cell">
+            <td>{{ row.original.requestType }}</td>
+            <td class="description-cell">
               <div class="truncate-text">{{ row.original.requestDetail }}</div>
             </td>
             <td class="amount-cell">{{ row.original.amount | number }}</td>
             <td class="text-center">
-              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">{{
-                row.original.status }}</span>
+              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                {{ row.original.status | statusLabel }}
+              </span>
             </td>
             <td>
               <div class="action-cell">
-                <button class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
+                <button type="button" class="act-btn v-btn" title="View" (click)="viewDetail(row.original)">
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="act-btn a-btn" title="Approve" (click)="openActionModal(row.original, 'Approved')">
+                <button type="button" class="act-btn a-btn" title="Approve"
+                  (click)="openActionModal(row.original, 'Approved')">
                   <i class="fas fa-check"></i>
                 </button>
-                <button class="act-btn r-btn" title="Reject" (click)="openActionModal(row.original, 'Rejected')">
+                <button type="button" class="act-btn r-btn" title="Reject"
+                  (click)="openActionModal(row.original, 'Rejected')">
                   <i class="fas fa-times"></i>
                 </button>
-                <button class="act-btn b-btn" title="Refer Back"
+                <button type="button" class="act-btn b-btn" title="Refer Back"
                   (click)="openActionModal(row.original, 'Referred Back')">
                   <i class="fas fa-undo-alt"></i>
                 </button>
@@ -200,6 +299,7 @@
       </table>
       }
     </div>
+    }
 
     <div class="pagination-wrapper">
       <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
@@ -213,4 +313,24 @@
 <app-approval-detail-modal [approvalItem]="selectedItem()!" [initialAction]="initialAction()" (onClose)="closeModal()"
   (onStatusUpdated)="onStatusUpdated()">
 </app-approval-detail-modal>
+}
+
+@if (isPreviewModalOpen()) {
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
+}
+
+@if (profileLightbox()) {
+<div class="profile-lightbox-overlay" (click)="closeProfileLightbox()">
+  <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
+    <i class="fas fa-times"></i>
+  </button>
+  <img [src]="profileLightbox()!.url"
+       [alt]="profileLightbox()!.name"
+       [title]="profileLightbox()!.name"
+       [attr.aria-label]="profileLightbox()!.name"
+       role="img"
+       (click)="$event.stopPropagation()" />
+  <div class="lightbox-name">{{ profileLightbox()!.name }}</div>
+</div>
 }

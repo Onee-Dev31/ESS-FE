@@ -133,6 +133,13 @@ export interface MedicalClaim {
     claimId: number;
     voucherNo: string | null;
     employeeCode: string;
+    employeeName: string | null;
+    employeeNameEng: string | null;
+    employeeNickname: string | null;
+    departmentName: string | null;
+    companyCode: string | null;
+    companyName: string | null;
+    employeeImageUrl: string | null;
     expenseTypeId: number;
     expenseTypeName: string;
     hospitalId: number;

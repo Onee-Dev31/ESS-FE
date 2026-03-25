@@ -703,3 +703,390 @@ $status-danger-text: var(--status-danger-text);
         padding: 0 12px 12px;
     }
 }
+// ============================================================
+// Medical mode: 3-column claim-card grid
+// ============================================================
+.approvals-wrapper.medical-mode {
+    .card { overflow: visible; }
+}
+
+// empty state spans all columns
+app-empty-state { grid-column: 1 / -1; }
+
+.claim-cards-grid {
+    padding: 0 24px 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+
+    @include large-tablet {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mobile {
+        grid-template-columns: 1fr;
+        padding: 0 12px 8px;
+    }
+}
+
+.claim-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-toolbar);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border-left: 4px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--bg-table-head);
+        gap: 10px;
+    }
+
+    &__type-badge {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        i { font-size: 0.9rem; }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    &__body {
+        display: flex;
+        align-items: stretch;
+        flex: 1;
+    }
+
+    &__main {
+        flex: 1;
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    &__amount {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 14px 16px;
+        border-left: 1px solid var(--border-toolbar);
+        min-width: 100px;
+        gap: 4px;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px 8px 16px;
+        border-top: 1px solid var(--border-toolbar);
+        background: var(--bg-table-head);
+    }
+
+    &__footer-actions {
+        display: flex;
+        gap: 6px;
+    }
+}
+
+.claim-date,
+.claim-hospital,
+.claim-disease {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: var(--text-header);
+    min-width: 0;
+
+    i {
+        color: var(--text-muted);
+        width: 14px;
+        text-align: center;
+        flex-shrink: 0;
+        font-size: 0.8rem;
+    }
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.claim-hospital { font-weight: 600; }
+.claim-disease  { color: var(--text-table-head); }
+
+.claim-days {
+    font-size: 0.72rem;
+    background: var(--border-toolbar);
+    color: var(--text-muted);
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.claim-id {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.amount-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.amount-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+    white-space: nowrap;
+}
+
+.amount-approved {
+    font-size: 0.72rem;
+    color: var(--status-success-text);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.btn-attach {
+    background: var(--border-toolbar);
+    border: none;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    color: var(--text-table-head);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s;
+
+    &:hover { background: var(--border-color); }
+}
+
+// ============================================================
+// Employee info block inside claim card
+// ============================================================
+.claim-card__employee {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-toolbar);
+
+    .emp-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-table-head);
+        border: 2px solid var(--border-toolbar);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        i {
+            font-size: 28px;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+    }
+
+    .emp-info {
+        min-width: 0;
+        flex: 1;
+
+        .emp-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-header);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .emp-nickname {
+                font-weight: 500;
+                color: var(--text-muted);
+                font-size: 0.82rem;
+                margin-left: 4px;
+            }
+        }
+
+        .emp-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 3px;
+
+            span {
+                font-size: 0.75rem;
+                color: var(--text-table-head);
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                white-space: nowrap;
+
+                i {
+                    color: var(--text-muted);
+                    font-size: 0.7rem;
+                    opacity: 0.8;
+                }
+            }
+        }
+    }
+}
+
+// ============================================================
+// Action buttons — colored with hover
+// ============================================================
+.act-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+
+    &:active { transform: scale(0.92); }
+
+    &.act-view {
+        background: rgba(99, 102, 241, 0.12);
+        color: #6366f1;
+        &:hover {
+            background: #6366f1;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+        }
+    }
+
+    &.act-approve {
+        background: rgba(34, 197, 94, 0.12);
+        color: #16a34a;
+        &:hover {
+            background: #22c55e;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.35);
+        }
+    }
+
+    &.act-reject {
+        background: rgba(239, 68, 68, 0.12);
+        color: #dc2626;
+        &:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.35);
+        }
+    }
+}
+
+// fallback icon — hidden by default, shown when img fails
+.emp-avatar {
+    .fallback-icon { display: none; }
+    &.img-error img { display: none; }
+    &.img-error .fallback-icon { display: flex; }
+}
+
+// clickable avatar
+.emp-avatar.clickable {
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+
+    &:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    }
+}
+
+// ── Profile image lightbox ────────────────────────────────
+.profile-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+
+    img {
+        max-width: min(480px, 90vw);
+        max-height: 80vh;
+        border-radius: 16px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        object-fit: contain;
+        cursor: default;
+    }
+
+    .lightbox-name {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+
+        &:hover { background: rgba(255, 255, 255, 0.28); }
+    }
+}

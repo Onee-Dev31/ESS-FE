@@ -8,12 +8,15 @@ import {
   SortingState,
 } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
+import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
+import { MedicalClaim } from '../../interfaces/medical.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
+import { MedicalApiService } from '../../services/medical-api.service';
+import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
-import { DialogService } from '../../services/dialog';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
@@ -22,13 +25,16 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { listAnimation } from '../../animations/animations';
+import dayjs from 'dayjs';
+import { MONTHS_TH } from '../../constants/date.constant';
 
 /** หน้าจัดการรายการอนุมัติ (Approvals) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, FilePreviewModalComponent, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent, StatusLabelPipe],
   animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
@@ -36,23 +42,38 @@ import { listAnimation } from '../../animations/animations';
 })
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
+  private medicalApiService = inject(MedicalApiService);
+  private authService = inject(AuthService);
   private dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
-  private dialogService = inject(DialogService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private route = inject(ActivatedRoute);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
+  isRefreshing = signal<boolean>(false);
+  private initialized = false;
 
   listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
+  medicalTabs = APPROVAL_STATUS_TABS.filter(t => t !== 'Referred Back');
+  months = MONTHS_TH;
+
+  fromMonth = signal<number>(0);
+  fromYear = signal<string>((dayjs().year() - 1).toString());
+  toMonth = signal<number>(11);
+  toYear = signal<string>(dayjs().year().toString());
 
   isModalOpen = signal<boolean>(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
+
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<{ fileName: string; fileUrl: string; date: string }[]>([]);
+
+  profileLightbox = signal<{ url: string; name: string } | null>(null);
 
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
@@ -67,21 +88,94 @@ export class ApprovalsComponent implements OnInit {
 
   /** เริ่มต้นโหลดข้อมูลและจัดการ Route Parameter */
   ngOnInit() {
-
-    this.loadingService.start('approvals-list');
-    setTimeout(() => {
-      this.loadingService.stop('approvals-list');
-    }, 1500);
-
     this.route.data.subscribe(data => {
       this.category = data['category'] || 'all';
-      this.pageTitle.set(this.category === 'medical' ? 'Medical Expenses Approvals' : 'Pending Approvals');
-      this.refresh();
+      this.pageTitle.set(this.category === 'medical' ? 'อนุมัติค่ารักษาพยาบาล' : 'Pending Approvals');
+      if (this.category === 'medical') {
+        this.loadMedicalClaims();
+      } else {
+        this.loadingService.start('approvals-list');
+        setTimeout(() => { this.loadingService.stop('approvals-list'); }, 1500);
+        this.refresh();
+      }
     });
+  }
+
+  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
+  loadMedicalClaims() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    const fromYear = parseInt(this.fromYear());
+    const toYear = parseInt(this.toYear());
+    const status = this.listing.filterStatus() || undefined;
+    const keyword = this.listing.searchText().trim() || undefined;
+
+    if (!this.initialized) {
+      this.loadingService.start('approvals-list');
+    } else {
+      this.isRefreshing.set(true);
+    }
+
+    this.medicalApiService.getClaims({
+      employee_code: employeeCode,
+      from_month: this.fromMonth() + 1,
+      from_year: isNaN(fromYear) ? undefined : fromYear,
+      to_month: this.toMonth() + 1,
+      to_year: isNaN(toYear) ? undefined : toYear,
+      status,
+      keyword,
+    }).subscribe({
+      next: (res) => {
+        this.approvals.set(res.data.map(c => this.mapClaimToApproval(c)));
+        this.listing.currentPage.set(0);
+        this.loadingService.stop('approvals-list');
+        this.isRefreshing.set(false);
+        this.initialized = true;
+      },
+      error: (error) => {
+        this.loadingService.stop('approvals-list');
+        this.isRefreshing.set(false);
+        this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
+      }
+    });
+  }
+
+  private mapClaimToApproval(claim: MedicalClaim): ApprovalItem {
+    return {
+      requestId: claim.claimId,
+      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
+      requestDate: claim.claimDate,
+      requestBy: {
+        name: claim.employeeName ?? claim.employeeCode,
+        employeeId: claim.employeeCode,
+        department: claim.departmentName ?? '-',
+        company: claim.companyName ?? '-'
+      },
+      requestType: 'ค่ารักษาพยาบาล',
+      typeId: claim.expenseTypeId,
+      requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
+      amount: claim.requestedAmount,
+      status: this.mapClaimStatus(claim.status),
+      rawStatus: claim.status,
+      type: 'medical',
+      originalData: claim
+    };
+  }
+
+  private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch (status?.toUpperCase()) {
+      case 'APPROVED': return 'Approved';
+      case 'REJECTED': return 'Rejected';
+      case 'REFERRED_BACK': return 'Referred Back';
+      default: return 'Pending';
+    }
   }
 
   /** รีเฟรชข้อมูลรายการอนุมัติจาก Service */
   refresh() {
+    if (this.category === 'medical') {
+      this.loadMedicalClaims();
+      return;
+    }
     this.approvalsHelper.getApprovals(this.category).subscribe(allData => {
       this.approvals.set(allData);
     });
@@ -198,6 +292,32 @@ export class ApprovalsComponent implements OnInit {
     return this.approvalsHelper.getStatusClass(status);
   }
 
+  openPreview(claim: MedicalClaim) {
+    if (!claim.attachments?.length) return;
+    this.previewFiles.set(claim.attachments.map(a => ({ fileName: a.fileName, fileUrl: a.fileUrl ?? '', date: claim.claimDate })));
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() { this.isPreviewModalOpen.set(false); }
+
+  onImgError(event: Event) {
+    const avatar = (event.target as HTMLElement).closest('.emp-avatar') as HTMLElement;
+    if (avatar) avatar.classList.add('img-error');
+  }
+
+  openProfileImage(claim: MedicalClaim) {
+    if (!claim.employeeImageUrl) return;
+    this.profileLightbox.set({ url: claim.employeeImageUrl, name: claim.employeeName ?? claim.employeeCode });
+  }
+
+  closeProfileLightbox() { this.profileLightbox.set(null); }
+
+  getMedicalClaim(item: ApprovalItem): MedicalClaim | null {
+    return (item.originalData as MedicalClaim)?.claimId != null
+      ? item.originalData as MedicalClaim
+      : null;
+  }
+
   trackByRowId(index: number, itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     return `${item.requestNo}-${index}`;
@@ -241,16 +361,14 @@ export class ApprovalsComponent implements OnInit {
       const columns = [
         { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
         { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
-        { header: 'ผู้ขอเบิก', key: 'requestBy', width: 20 },
         { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
-        { header: 'แผนก', key: 'department', width: 20 },
         { header: 'ประเภท', key: 'requestType', width: 15 },
-        { header: 'รายละเอียด', key: 'requestDetail', width: 30 },
+        { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
         { header: 'จำนวนเงิน', key: 'amount', width: 15 },
         { header: 'สถานะ', key: 'status', width: 15 }
       ];
 
-      await this.exportService.exportToExcel(data, columns, 'approvals');
+      await this.exportService.exportToExcel(data, columns, 'approvals-medical');
       this.toastService.success('Export Excel สำเร็จ');
     } catch (error) {
       this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
