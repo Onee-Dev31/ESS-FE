@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse } from '../interfaces/medical.interface';
-export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse };
+import { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse, MedicalClaimsResponse, MedicalClaimResponse, MedicalStatusesResponse } from '../interfaces/medical.interface';
+export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse, MedicalClaimsResponse, MedicalClaimResponse, MedicalStatusesResponse };
 
 @Injectable({ providedIn: 'root' })
 export class MedicalApiService {
@@ -40,6 +40,11 @@ export class MedicalApiService {
         return this._http.get<DiseaseTypeSearchResponse>(`${this.baseUrl}/medical/disease-types`, { params });
     }
 
+    /** ดึงรายการสถานะการเบิก */
+    getStatuses(): Observable<MedicalStatusesResponse> {
+        return this._http.get<MedicalStatusesResponse>(`${this.baseUrl}/medical/statuses`);
+    }
+
     /** ดึงนโยบายและสิทธิประโยชน์ค่ารักษาพยาบาล */
     getPolicy(): Observable<MedicalPolicyResponse> {
         return this._http.get<MedicalPolicyResponse>(`${this.baseUrl}/medical/policy`);
@@ -59,6 +64,36 @@ export class MedicalApiService {
             `${this.baseUrl}/medical/expense-types`,
             { params }
         );
+    }
+
+    /**
+     * ดึงรายการเบิกค่ารักษาพยาบาลของพนักงาน
+     */
+    getClaims(params: {
+        employee_code: string;
+        from_month?: number;
+        from_year?: number;
+        to_month?: number;
+        to_year?: number;
+        status?: string;
+        keyword?: string;
+    }): Observable<MedicalClaimsResponse> {
+        let p = new HttpParams().set('employee_code', params.employee_code);
+        if (params.from_month != null) p = p.set('from_month', params.from_month);
+        if (params.from_year  != null) p = p.set('from_year',  params.from_year);
+        if (params.to_month   != null) p = p.set('to_month',   params.to_month);
+        if (params.to_year    != null) p = p.set('to_year',    params.to_year);
+        if (params.status?.trim())     p = p.set('status',     params.status);
+        if (params.keyword?.trim())    p = p.set('keyword',    params.keyword);
+        return this._http.get<MedicalClaimsResponse>(`${this.baseUrl}/medical/claims`, { params: p });
+    }
+
+    /**
+     * ดึงรายละเอียดการเบิกตาม ID
+     */
+    getClaimById(id: number, employee_code: string): Observable<MedicalClaimResponse> {
+        const p = new HttpParams().set('employee_code', employee_code);
+        return this._http.get<MedicalClaimResponse>(`${this.baseUrl}/medical/claims/${id}`, { params: p });
     }
 
     /**

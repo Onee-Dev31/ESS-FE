@@ -104,6 +104,72 @@ export interface MedicalExpenseTypeWithBalance {
     remainingAmount: number;
 }
 
+export interface MedicalStatus {
+    statusId: number;
+    statusCode: string;
+    statusName: string;
+    isActive: boolean;
+    sortOrder: number;
+}
+
+export interface MedicalStatusesResponse {
+    success: boolean;
+    data: MedicalStatus[];
+}
+
+export interface MedicalClaimAttachment {
+    claimId: number;
+    attachmentId: number;
+    fileName: string;
+    filePath: string;
+    fileUrl: string;
+    fileType: string;
+    fileSize: number;
+    remark: string | null;
+    uploadedAt: string;
+}
+
+export interface MedicalClaim {
+    claimId: number;
+    voucherNo: string | null;
+    employeeCode: string;
+    expenseTypeId: number;
+    expenseTypeName: string;
+    hospitalId: number;
+    hospitalName: string;
+    hospitalShortName: string | null;
+    diseaseId: number;
+    diseaseName: string;
+    icd10Code: string | null;
+    treatmentDateFrom: string;
+    treatmentDateTo: string;
+    treatmentDays: number;
+    requestedAmount: number;
+    approvedAmount: number;
+    remark: string | null;
+    claimDate: string;
+    status: string;
+    rejectionReason: string | null;
+    submittedAt: string;
+    reviewedBy: string | null;
+    reviewedAt: string | null;
+    approvedBy: string | null;
+    approvedAt: string | null;
+    modifiedAt: string | null;
+    createdAt: string;
+    attachments: MedicalClaimAttachment[];
+}
+
+export interface MedicalClaimsResponse {
+    success: boolean;
+    data: MedicalClaim[];
+}
+
+export interface MedicalClaimResponse {
+    success: boolean;
+    data: MedicalClaim;
+}
+
 export interface MedicalItem {
     id?: string;
     requestDate: string;
