@@ -78,6 +78,10 @@
         background: var(--bg-card);
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+        @media (max-width: 575.98px) {
+            padding: 12px 14px;
+        }
         overflow-y: auto;
         max-height: calc(100vh - 200px);
 
@@ -380,6 +384,10 @@
 .claim-groups-labels {
     display: flex;
     gap: 0.75rem;
+
+    @media (max-width: 640px) {
+        flex-wrap: wrap;
+    }
 }
 
 .claim-group-label-cell {
@@ -416,10 +424,19 @@
 .claim-cards-row {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap;
 
     .claim-type-card {
-        flex: 1;
+        flex: 1 1 160px;
         min-width: 0;
+    }
+
+    @media (max-width: 640px) {
+        gap: 0.5rem;
+
+        .claim-type-card {
+            flex: 1 1 calc(50% - 0.25rem);
+        }
     }
 }
 
@@ -573,13 +590,30 @@
 
 @include tablet {
     .details-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         padding: 1rem;
         gap: 1rem;
 
         .input-field-group {
             grid-column: span 1 !important;
             min-width: 0;
+        }
+
+        .input-field-group:nth-child(7) {
+            grid-column: span 2 !important;
+        }
+    }
+}
+
+@include mobile {
+    .details-grid {
+        grid-template-columns: 1fr !important;
+        padding: 0.75rem;
+        gap: 0.75rem;
+
+        .input-field-group,
+        .input-field-group:nth-child(7) {
+            grid-column: span 1 !important;
         }
     }
 }

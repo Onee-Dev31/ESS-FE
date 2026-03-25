@@ -170,6 +170,10 @@ $border: var(--border);
         gap: 12px;
         flex: 1;
         align-items: flex-end;
+
+        @include mobile {
+            gap: 8px;
+        }
     }
 
     .toolbar-actions {
@@ -189,6 +193,10 @@ $border: var(--border);
     font-size: 1.2rem;
     line-height: 44px;
     padding-bottom: 0;
+
+    @include mobile {
+        display: none;
+    }
 }
 
 .filter-group {
