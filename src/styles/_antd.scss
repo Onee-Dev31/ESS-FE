@@ -133,7 +133,7 @@
 
 /* ทำให้วันที่ที่เลือกเป็นวงกลม */
 .ant-picker-cell-selected .ant-picker-cell-inner {
-    background-color: #4e4e4e !important;
+    background-color: var(--primary) !important;
     color: #ffffff !important;
     border-radius: 50% !important;
     display: flex;

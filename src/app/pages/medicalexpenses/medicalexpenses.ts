@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalClaim } from '../../interfaces/medical.interface';
@@ -10,7 +10,6 @@ import { FilePreviewModalComponent } from '../../components/modals/file-preview-
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { StatusUtil } from '../../utils/status.util';
-import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -23,12 +22,25 @@ import {
 import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-
+import { DateUtilityService } from '../../services/date-utility.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 /** หน้าแสดงรายการเบิกค่ารักษาพยาบาล */
 @Component({
   selector: 'app-medicalexpenses',
   standalone: true,
-  imports: [CommonModule, FormsModule, MedicalexpensesForm, MedicalPolicyModalComponent, StatusLabelPipe, FilePreviewModalComponent, PaginationComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MedicalexpensesForm,
+    MedicalPolicyModalComponent,
+    StatusLabelPipe,
+    FilePreviewModalComponent,
+    PageHeaderComponent,
+    SkeletonComponent,
+    EmptyStateComponent,
+    NzDatePickerModule
+  ],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
 })
@@ -37,6 +49,7 @@ export class MedicalexpensesComponent implements OnInit {
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
+  dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('medical-list');
   isRefreshing = signal<boolean>(false);
@@ -44,10 +57,16 @@ export class MedicalexpensesComponent implements OnInit {
 
   listing = createListingState();
 
-  fromMonth = signal<number>(0);
-  fromYear = signal<string>((dayjs().year() - 1).toString());
-  toMonth = signal<number>(11);
-  toYear = signal<string>(dayjs().year().toString());
+  // fromMonth = signal<number>(0);
+  // fromYear = signal<string>((dayjs().year() - 1).toString());
+  // toMonth = signal<number>(11);
+  // toYear = signal<string>(dayjs().year().toString());
+  date: Date[] | null = null;
+
+
+  onChange(result: Date[]): void {
+    console.log('onChange: ', result);
+  }
 
   statusOptions = signal<{ value: string; label: string }[]>([]);
   months = MONTHS_TH;
@@ -83,24 +102,24 @@ export class MedicalexpensesComponent implements OnInit {
     return this.sortedClaims().slice(start, start + this.listing.pageSize());
   });
 
-  totalItems    = computed(() => this.allClaims().length);
-  totalAmount   = computed(() => this.allClaims().reduce((s, c) => s + c.requestedAmount, 0));
-  pendingCount  = computed(() => this.allClaims().filter(c => ['NEW', 'PENDING_APPROVAL', 'WAITING_CHECK'].includes(c.status)).length);
+  totalItems = computed(() => this.allClaims().length);
+  totalAmount = computed(() => this.allClaims().reduce((s, c) => s + c.requestedAmount, 0));
+  pendingCount = computed(() => this.allClaims().filter(c => ['NEW', 'PENDING_APPROVAL', 'WAITING_CHECK'].includes(c.status)).length);
   approvedCount = computed(() => this.allClaims().filter(c => c.status === 'APPROVED').length);
 
   table = createAngularTable(() => ({
     data: this.paginatedClaims(),
     columns: [
-      { accessorKey: 'claimId',          header: 'เลขที่เอกสาร' },
-      { accessorKey: 'claimDate',         header: 'วันที่ขอเบิก' },
-      { accessorKey: 'expenseTypeName',   header: 'ประเภทวงเงิน' },
-      { accessorKey: 'diseaseName',       header: 'ประเภทโรค' },
-      { accessorKey: 'hospitalName',      header: 'สถานพยาบาล' },
+      { accessorKey: 'claimId', header: 'เลขที่เอกสาร' },
+      { accessorKey: 'claimDate', header: 'วันที่ขอเบิก' },
+      { accessorKey: 'expenseTypeName', header: 'ประเภทวงเงิน' },
+      { accessorKey: 'diseaseName', header: 'ประเภทโรค' },
+      { accessorKey: 'hospitalName', header: 'สถานพยาบาล' },
       { accessorKey: 'treatmentDateFrom', header: 'ตั้งแต่' },
-      { accessorKey: 'treatmentDateTo',   header: 'ถึง' },
-      { accessorKey: 'requestedAmount',   header: 'จำนวนเงินที่ขอเบิก' },
-      { accessorKey: 'approvedAmount',    header: 'จำนวนเงินที่เบิกได้' },
-      { accessorKey: 'status',            header: 'สถานะ' },
+      { accessorKey: 'treatmentDateTo', header: 'ถึง' },
+      { accessorKey: 'requestedAmount', header: 'จำนวนเงินที่ขอเบิก' },
+      { accessorKey: 'approvedAmount', header: 'จำนวนเงินที่เบิกได้' },
+      { accessorKey: 'status', header: 'สถานะ' },
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
@@ -120,6 +139,13 @@ export class MedicalexpensesComponent implements OnInit {
     this.listing.currentPage.set(page);
   }
 
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private i18n: NzI18nService,
+  ) {
+    this.i18n.setLocale(en_US);
+  }
+
   ngOnInit() {
     this.medicalApiService.getStatuses().subscribe({
       next: (res) => {
@@ -133,10 +159,8 @@ export class MedicalexpensesComponent implements OnInit {
 
   loadData() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-    const fromYear  = parseInt(this.fromYear());
-    const toYear    = parseInt(this.toYear());
-    const status    = this.listing.filterStatus() || undefined;
-    const keyword   = this.listing.searchText().trim() || undefined;
+    const status = this.listing.filterStatus() || undefined;
+    const keyword = this.listing.searchText().trim() || undefined;
 
     if (!this.initialized) {
       this.loadingService.start('medical-list');
@@ -144,15 +168,29 @@ export class MedicalexpensesComponent implements OnInit {
       this.isRefreshing.set(true);
     }
 
-    this.medicalApiService.getClaims({
+    let datePayload = {};
+
+    if (this.date && this.date.length === 2) {
+      const [start, end] = this.date;
+
+      datePayload = {
+        from_month: start.getMonth() + 1,
+        from_year: start.getFullYear(),
+        to_month: end.getMonth() + 1,
+        to_year: end.getFullYear(),
+      };
+    }
+
+    const payload = {
       employee_code: employeeCode,
-      from_month: this.fromMonth() + 1,   // 0-based → 1-based
-      from_year:  isNaN(fromYear) ? undefined : fromYear,
-      to_month:   this.toMonth() + 1,
-      to_year:    isNaN(toYear)   ? undefined : toYear,
+      ...datePayload,
       status,
       keyword,
-    }).subscribe({
+    }
+
+    console.log(payload)
+
+    this.medicalApiService.getClaims(payload).subscribe({
       next: (res) => {
         this.allClaims.set(res.data);
         this.listing.currentPage.set(0);
@@ -179,10 +217,11 @@ export class MedicalexpensesComponent implements OnInit {
 
   clearFilters() {
     clearListingFiltersLocal(this.listing);
-    this.fromMonth.set(0);
-    this.fromYear.set((dayjs().year() - 1).toString());
-    this.toMonth.set(11);
-    this.toYear.set(dayjs().year().toString());
+    this.date = null
+    // this.fromMonth.set(0);
+    // this.fromYear.set((dayjs().year() - 1).toString());
+    // this.toMonth.set(11);
+    // this.toYear.set(dayjs().year().toString());
     this.loadData();
   }
 
@@ -204,8 +243,8 @@ export class MedicalexpensesComponent implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
-  getStatusClass(status: string): string {
-    return StatusUtil.getStatusBadgeClass(status);
+  getStatusClass(status: string) {
+    return StatusUtil.getStatusBadgeClaims(status);
   }
 
   trackById(_: number, claim: MedicalClaim): number {

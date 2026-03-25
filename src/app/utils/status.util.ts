@@ -14,6 +14,28 @@ export class StatusUtil {
             default: return '';
         }
     }
+
+    private static statusMap: Record<string, string> = {
+        pending: 'progress',
+        approved: 'closed',
+        rejected: 'rejected'
+    };
+
+    static getStatusBadgeClaims(status: string) {
+        const key = this.statusMap[status];
+
+        if (!key) {
+            return {
+                background: 'rgba(158,158,158,0.2)',
+                color: '#9E9E9E'
+            };
+        }
+
+        return {
+            background: `var(--status-${key}-bg)`,
+            color: `var(--status-${key}-text)`
+        };
+    }
 }
 
 export class ticketTypyColor {
@@ -61,7 +83,6 @@ export class StatusColor {
         };
     }
 }
-
 export class StatusColor_Reverse {
 
     private static statusMap: Record<string, string> = {

@@ -48,60 +48,12 @@
 
         <!-- Toolbar -->
         <div class="toolbar-container">
-            <div class="toolbar-bottom-row">
-                <div class="right-filters">
-                    <div class="filter-group">
-                        <span class="filter-label">ตั้งแต่เดือน</span>
-                        <div class="select-input-group">
-                            <select class="form-control" title="เลือกเดือนเริ่มต้น" [ngModel]="fromMonth()"
-                                (ngModelChange)="fromMonth.set($event)">
-                                @for (m of months; track m.value) {
-                                <option [value]="m.value">{{ m.label }}</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-group">
-                        <span class="filter-label">ปี</span>
-                        <div class="date-input-group">
-                            <input type="text" class="form-control" title="ปีเริ่มต้น" placeholder="เช่น 2025"
-                                [ngModel]="fromYear()" (ngModelChange)="fromYear.set($event)" />
-                        </div>
-                    </div>
-                    <div class="filter-sep">—</div>
-                    <div class="filter-group">
-                        <span class="filter-label">ถึงเดือน</span>
-                        <div class="select-input-group">
-                            <select class="form-control" title="เลือกเดือนสิ้นสุด" [ngModel]="toMonth()"
-                                (ngModelChange)="toMonth.set($event)">
-                                @for (m of months; track m.value) {
-                                <option [value]="m.value">{{ m.label }}</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-group">
-                        <span class="filter-label">ปี</span>
-                        <div class="date-input-group">
-                            <input type="text" class="form-control" title="ปีสิ้นสุด" placeholder="เช่น 2025"
-                                [ngModel]="toYear()" (ngModelChange)="toYear.set($event)" />
-                        </div>
-                    </div>
-                    <div class="filter-group">
-                        <span class="filter-label">สถานะ</span>
-                        <div class="select-input-group">
-                            <select class="form-control" title="เลือกสถานะ" [ngModel]="listing.filterStatus()"
-                                (ngModelChange)="listing.filterStatus.set($event)">
-                                <option value="">ทั้งหมด</option>
-                                @for (opt of statusOptions(); track opt.value) {
-                                <option [value]="opt.value">{{ opt.label }}</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                <div class="form-field">
+                    <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="date" class="form-input"
+                        (ngModelChange)="onChange($event)" />
                 </div>
-
-                <div class="toolbar-actions">
+                <div style="display: flex; flex-direction: row; gap: 10px;">
                     <div class="search-input-group">
                         <i class="fas fa-search search-icon-inner"></i>
                         <input type="text" class="form-control search-control" placeholder="ค้นหา..."
@@ -116,6 +68,7 @@
                     </button>
                 </div>
             </div>
+
         </div>
 
         <!-- Mobile card view -->
@@ -132,10 +85,10 @@
                     <div class="claim-card__actions">
                         @if (claim.attachments.length) {
                         <button type="button" class="btn-attach" (click)="openPreview(claim)" title="ดูเอกสาร">
-                            <i class="far fa-paperclip"></i> {{ claim.attachments.length }}
+                            <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
                         </button>
                         }
-                        <span class="status-badge" [ngClass]="getStatusClass(claim.status)">
+                        <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                             {{ claim.status | statusLabel }}
                         </span>
                     </div>
@@ -145,7 +98,8 @@
                     <div class="claim-card__main">
                         <div class="claim-date">
                             <i class="far fa-calendar-alt"></i>
-                            <span>{{ claim.treatmentDateFrom }} – {{ claim.treatmentDateTo }}</span>
+                            <span>{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
+                                {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY')}}</span>
                             <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
                         </div>
                         <div class="claim-hospital">
@@ -169,20 +123,20 @@
 
                 <div class="claim-card__footer">
                     <span class="claim-id">#{{ claim.voucherNo ?? claim.claimId }}</span>
-                    <span class="claim-date-created">{{ claim.claimDate }}</span>
+                    <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.claimDate, 'DD MMMM YYYY')
+                        }}</span>
                 </div>
             </div>
             }
             @empty {
-            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                icon="fas fa-inbox">
+            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
             </app-empty-state>
             }
             }
         </div>
 
         <!-- Desktop table view -->
-        <div class="table-responsive">
+        <!-- <div class="table-responsive">
             @if (isLoading()) {
             <app-skeleton type="table" [rows]="5"></app-skeleton>
             } @else {
@@ -272,14 +226,8 @@
                 </tbody>
             </table>
             }
-        </div>
+        </div> -->
 
-        <div class="pagination-wrapper">
-            <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-                [totalItems]="totalItems()" (onPageChange)="goToPage($event)"
-                (onPageSizeChange)="setPageSize($event)">
-            </app-pagination>
-        </div>
     </div>
 
     @if (isModalOpen()) {
