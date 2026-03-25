@@ -235,7 +235,12 @@ export class MedicalexpensesComponent implements OnInit {
 
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
-    this.previewFiles.set(claim.attachments.map(a => ({ fileName: a.fileName, fileUrl: a.fileUrl, date: claim.claimDate })));
+    this.previewFiles.set(claim.attachments.map(a => ({
+      fileName: a.fileName,
+      url: this.medicalApiService.getFileUrl(a.fileUrl),
+      date: claim.claimDate,
+      type: a.fileType
+    })));
     this.isPreviewModalOpen.set(true);
   }
 

@@ -118,7 +118,22 @@
         @include mobile {
             width: 100%;
         }
+
+        &:hover {
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+
+        &:disabled {
+            background: #cbd5e1;
+            border-color: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.8;
+        }
     }
+
+
 }
 
 .btn-upload-file {
@@ -286,9 +301,17 @@
 }
 
 @keyframes inputPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-    50%  { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
 }
 
 .input-highlight {
@@ -321,11 +344,26 @@
 // ==========================================
 
 @keyframes claimPulse {
-    0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); transform: translateY(0); }
-    20%  { transform: translateY(-4px); }
-    40%  { transform: translateY(0); }
-    60%  { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
+        transform: translateY(0);
+    }
+
+    20% {
+        transform: translateY(-4px);
+    }
+
+    40% {
+        transform: translateY(0);
+    }
+
+    60% {
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
 }
 
 .claim-type-groups {
@@ -360,7 +398,9 @@
     padding: 3px 10px;
     border-radius: 20px;
 
-    i { font-size: 0.65rem; }
+    i {
+        font-size: 0.65rem;
+    }
 
     &.outpatient {
         color: var(--danger);
@@ -408,6 +448,7 @@
             border-color: rgba($success, 0.45);
         }
     }
+
     border-radius: 12px;
     padding: 1.25rem;
     cursor: pointer;
@@ -744,4 +785,9 @@
         transform: scale(0.95);
         opacity: 0.5;
     }
+}
+
+
+.required {
+    color: $danger;
 }

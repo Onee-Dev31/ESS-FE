@@ -24,10 +24,13 @@
             <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
             <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
                 <div class="claim-groups-labels">
-                    <div class="claim-group-label-cell" [style.flex]="outpatientTypes.length" *ngIf="outpatientTypes.length">
-                        <span class="claim-group-label outpatient"><i class="fas fa-walking"></i> ผู้ป่วยนอก & ทั่วไป</span>
+                    <div class="claim-group-label-cell" [style.flex]="outpatientTypes.length"
+                        *ngIf="outpatientTypes.length">
+                        <span class="claim-group-label outpatient"><i class="fas fa-walking"></i> ผู้ป่วยนอก &
+                            ทั่วไป</span>
                     </div>
-                    <div class="claim-group-label-cell" [style.flex]="inpatientTypes.length" *ngIf="inpatientTypes.length">
+                    <div class="claim-group-label-cell" [style.flex]="inpatientTypes.length"
+                        *ngIf="inpatientTypes.length">
                         <span class="claim-group-label inpatient"><i class="fas fa-bed"></i> ผู้ป่วยใน</span>
                     </div>
                 </div>
@@ -66,11 +69,11 @@
             <h4 class="section-heading">2. กรอกรายละเอียด</h4>
             <div class="details-grid">
                 <div class="input-field-group">
-                    <label>สถานพยาบาล</label>
+                    <label>สถานพยาบาล <span class="required">*</span></label>
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
-                            <input #hospitalInput type="text" class="custom-form-control" placeholder="ค้นหาโรงพยาบาล/คลินิก"
-                                [class.input-highlight]="hospitalHighlight()"
+                            <input #hospitalInput type="text" class="custom-form-control"
+                                placeholder="ค้นหาโรงพยาบาล/คลินิก" [class.input-highlight]="hospitalHighlight()"
                                 [ngModel]="hospital()" (ngModelChange)="onHospitalInput($event)"
                                 (focus)="onHospitalFocus()" (blur)="onHospitalBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
@@ -93,13 +96,13 @@
                 </div>
 
                 <div class="input-field-group">
-                    <label>ประเภทโรค</label>
+                    <label>ประเภทโรค <span class="required">*</span></label>
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
                             <input #diseaseInput type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค"
-                                [class.input-highlight]="diseaseHighlight()"
-                                [ngModel]="disease()" (ngModelChange)="onDiseaseInput($event)"
-                                (focus)="onDiseaseFocus()" (blur)="onDiseaseBlur()">
+                                [class.input-highlight]="diseaseHighlight()" [ngModel]="disease()"
+                                (ngModelChange)="onDiseaseInput($event)" (focus)="onDiseaseFocus()"
+                                (blur)="onDiseaseBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
                             <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
                         </div>
@@ -151,12 +154,11 @@
                 </div>
 
                 <div class="input-field-group">
-                    <label>จำนวนเงินที่ขอเบิก</label>
+                    <label>จำนวนเงินที่ขอเบิก <span class="required">*</span></label>
                     <div class="amount-input-wrapper">
                         <input #amountInput type="text" class="custom-form-control text-right" placeholder="0.00"
-                            [class.input-highlight]="amountHighlight()"
-                            [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0"
-                            (ngModelChange)="onAmountChange($event)">
+                            [class.input-highlight]="amountHighlight()" [ngModel]="amount()"
+                            (ngModelChange)="amount.set($event)" min="0" (ngModelChange)="onAmountChange($event)">
                         <span class="currency-tag">บาท</span>
                     </div>
                     <div *ngIf="amountError" class="error">
@@ -231,7 +233,7 @@
         <button class="btn-back-custom" (click)="close()">
             <i class="fas fa-times"></i> ยกเลิก
         </button>
-        <button class="btn-save-custom" (click)="save()" [disabled]="isSaving()">
+        <button class="btn-save-custom" [class.disable]="!isValidSave()" (click)="save()" [disabled]="isSaving() || !isValidSave()">
             <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
             {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
         </button>

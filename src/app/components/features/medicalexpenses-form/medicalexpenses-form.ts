@@ -379,6 +379,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.isPreviewModalOpen.set(false);
   }
 
+  isValidSave() {
+    if (this.amountError) {
+      return false;
+    }
+
+    if (
+      !this.hospital().trim() ||
+      !this.disease().trim() ||
+      !this.startDate().trim() ||
+      !this.endDate().trim() ||
+      !this.amount().trim()
+    ) {
+      return false; // ยังกรอกไม่ครบ
+    }
+
+    return true; // ครบทุก field
+  }
+
   async save() {
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
