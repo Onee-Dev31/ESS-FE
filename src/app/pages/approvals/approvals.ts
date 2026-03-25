@@ -13,7 +13,6 @@ import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalClaim } from '../../interfaces/medical.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
 import { MedicalApiService } from '../../services/medical-api.service';
-import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -43,7 +42,6 @@ import { MONTHS_TH } from '../../constants/date.constant';
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private medicalApiService = inject(MedicalApiService);
-  private authService = inject(AuthService);
   private dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
@@ -103,7 +101,6 @@ export class ApprovalsComponent implements OnInit {
 
   /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
   loadMedicalClaims() {
-    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
     const fromYear = parseInt(this.fromYear());
     const toYear = parseInt(this.toYear());
     const status = this.listing.filterStatus() || undefined;
@@ -116,7 +113,6 @@ export class ApprovalsComponent implements OnInit {
     }
 
     this.medicalApiService.getClaims({
-      employee_code: employeeCode,
       from_month: this.fromMonth() + 1,
       from_year: isNaN(fromYear) ? undefined : fromYear,
       to_month: this.toMonth() + 1,

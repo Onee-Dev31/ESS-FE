@@ -70,7 +70,7 @@ export class MedicalApiService {
      * ดึงรายการเบิกค่ารักษาพยาบาลของพนักงาน
      */
     getClaims(params: {
-        employee_code: string;
+        employee_code?: string;
         from_month?: number;
         from_year?: number;
         to_month?: number;
@@ -78,7 +78,8 @@ export class MedicalApiService {
         status?: string;
         keyword?: string;
     }): Observable<MedicalClaimsResponse> {
-        let p = new HttpParams().set('employee_code', params.employee_code);
+        let p = new HttpParams();
+        if (params.employee_code?.trim()) p = p.set('employee_code', params.employee_code);
         if (params.from_month != null) p = p.set('from_month', params.from_month);
         if (params.from_year  != null) p = p.set('from_year',  params.from_year);
         if (params.to_month   != null) p = p.set('to_month',   params.to_month);
