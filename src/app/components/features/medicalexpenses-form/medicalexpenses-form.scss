@@ -328,74 +328,140 @@
     100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
-.claim-type-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
+.claim-type-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
     &.highlight-required .claim-type-card {
         border-color: var(--primary) !important;
         animation: claimPulse 0.7s ease forwards;
     }
+}
+
+.claim-groups-labels {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.claim-group-label-cell {
+    display: flex;
+    align-items: center;
+}
+
+.claim-group-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+
+    i { font-size: 0.65rem; }
+
+    &.outpatient {
+        color: var(--danger);
+        background: color-mix(in srgb, var(--danger) 10%, transparent);
+    }
+
+    &.inpatient {
+        color: var(--success);
+        background: color-mix(in srgb, var(--success) 10%, transparent);
+    }
+}
+
+.claim-cards-row {
+    display: flex;
+    gap: 0.75rem;
 
     .claim-type-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-toolbar);
-        border-radius: 12px;
-        padding: 1.25rem;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 0;
+    }
+}
 
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: var(--border);
+.claim-type-card {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-toolbar);
+
+    &.outpatient-card {
+        background: color-mix(in srgb, var(--danger) 5%, var(--bg-card));
+        border-color: rgba($danger, 0.3);
+
+        [data-theme='dark'] & {
+            background: color-mix(in srgb, var(--danger) 14%, var(--bg-card));
+            border-color: rgba($danger, 0.45);
         }
+    }
 
-        &.active {
-            border: 2px solid $primary;
-            background-color: var(--bg-slate);
+    &.inpatient-card {
+        background: color-mix(in srgb, var(--success) 5%, var(--bg-card));
+        border-color: rgba($success, 0.3);
+
+        [data-theme='dark'] & {
+            background: color-mix(in srgb, var(--success) 14%, var(--bg-card));
+            border-color: rgba($success, 0.45);
         }
+    }
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-        .card-content {
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-color: var(--border);
+    }
+
+    &.active {
+        border: 2px solid $primary;
+        background-color: var(--bg-slate);
+    }
+
+    .card-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .type-info {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 4px;
 
-            .type-info {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-
-                .type-label {
-                    font-weight: 700;
-                    font-size: 0.95rem;
-                    color: var(--text);
-                }
-
-                .balance-value {
-                    font-size: 1.3rem;
-                    font-weight: 800;
-                    margin: 4px 0;
-                }
-
-                .balance-label {
-                    font-size: 0.75rem;
-                    color: var(--text-muted);
-                    font-weight: 600;
-                }
+            .type-label {
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: var(--text);
             }
 
-            .type-icon-wrapper {
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.1rem;
+            .balance-value {
+                font-size: 1.3rem;
+                font-weight: 800;
+                margin: 4px 0;
             }
+
+            .balance-label {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                font-weight: 600;
+            }
+        }
+
+        .type-icon-wrapper {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
         }
     }
 }

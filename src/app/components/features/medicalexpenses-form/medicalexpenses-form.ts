@@ -125,13 +125,23 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       DENTAL: 'var(--primary)',
       VISION: 'var(--primary)'
     };
+    const inpatientCodes = ['IPD'];
     return {
       id: type.code.toLowerCase(),
       label: type.nameTh,
       amount: type.remainingAmount.toLocaleString('th-TH'),
       icon: iconMap[type.icon ?? ''] ?? 'fas fa-medkit',
-      color: colorMap[type.code] ?? 'var(--primary)'
+      color: colorMap[type.code] ?? 'var(--primary)',
+      group: inpatientCodes.includes(type.code.toUpperCase()) ? 'inpatient' : 'outpatient'
     };
+  }
+
+  get outpatientTypes(): ClaimType[] {
+    return this.claimTypes.filter(t => t.group === 'outpatient');
+  }
+
+  get inpatientTypes(): ClaimType[] {
+    return this.claimTypes.filter(t => t.group === 'inpatient');
   }
   remark = signal<string>('');
 

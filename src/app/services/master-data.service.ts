@@ -14,6 +14,7 @@ export interface ClaimType {
     amount: string;
     icon: string;
     color: string;
+    group: 'outpatient' | 'inpatient';
 }
 
 @Injectable({
@@ -44,10 +45,10 @@ export class MasterDataService {
     getMedicalClaimTypes(): Observable<ClaimType[]> {
         if (!this.claimTypesCache$) {
             const types: ClaimType[] = [
-                { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: 'var(--danger)' },
-                { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: 'var(--primary)' },
-                { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: 'var(--primary)' },
-                { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: 'var(--success)' },
+                { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: 'var(--danger)', group: 'outpatient' },
+                { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: 'var(--primary)', group: 'outpatient' },
+                { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: 'var(--primary)', group: 'outpatient' },
+                { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: 'var(--success)', group: 'inpatient' },
             ];
             this.claimTypesCache$ = of(types).pipe(
                 delay(500),

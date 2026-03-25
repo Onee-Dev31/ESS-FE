@@ -22,17 +22,40 @@
 
         <section class="form-section-wrapper" #claimTypeSection>
             <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
-            <div class="claim-type-grid" [class.highlight-required]="claimTypeHighlight()">
-                <div class="claim-type-card" *ngFor="let type of claimTypes"
-                    [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
-                    <div class="card-content">
-                        <div class="type-info">
-                            <span class="type-label">{{ type.label }}</span>
-                            <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
-                            <span class="balance-label">ยอดคงเหลือ</span>
+            <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
+                <div class="claim-groups-labels">
+                    <div class="claim-group-label-cell" [style.flex]="outpatientTypes.length" *ngIf="outpatientTypes.length">
+                        <span class="claim-group-label outpatient"><i class="fas fa-walking"></i> ผู้ป่วยนอก & ทั่วไป</span>
+                    </div>
+                    <div class="claim-group-label-cell" [style.flex]="inpatientTypes.length" *ngIf="inpatientTypes.length">
+                        <span class="claim-group-label inpatient"><i class="fas fa-bed"></i> ผู้ป่วยใน</span>
+                    </div>
+                </div>
+                <div class="claim-cards-row">
+                    <div class="claim-type-card outpatient-card" *ngFor="let type of outpatientTypes"
+                        [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
+                        <div class="card-content">
+                            <div class="type-info">
+                                <span class="type-label">{{ type.label }}</span>
+                                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
+                                <span class="balance-label">ยอดคงเหลือ</span>
+                            </div>
+                            <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
+                                <i [class]="type.icon" [style.color]="type.color"></i>
+                            </div>
                         </div>
-                        <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
-                            <i [class]="type.icon" [style.color]="type.color"></i>
+                    </div>
+                    <div class="claim-type-card inpatient-card" *ngFor="let type of inpatientTypes"
+                        [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
+                        <div class="card-content">
+                            <div class="type-info">
+                                <span class="type-label">{{ type.label }}</span>
+                                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
+                                <span class="balance-label">ยอดคงเหลือ</span>
+                            </div>
+                            <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
+                                <i [class]="type.icon" [style.color]="type.color"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
