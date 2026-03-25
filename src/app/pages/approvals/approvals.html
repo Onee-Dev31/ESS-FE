@@ -60,7 +60,7 @@
           <div class="claim-card__actions">
             @if (claim.attachments.length) {
             <button type="button" class="btn-attach" (click)="openPreview(claim)" title="ดูเอกสาร">
-              <i class="far fa-paperclip"></i> {{ claim.attachments.length }}
+              <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
             </button>
             }
             <span class="status-badge" [ngClass]="getStatusClass(req.status)">
