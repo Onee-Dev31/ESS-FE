@@ -52,6 +52,18 @@ $border: var(--border);
     &:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
+
+    @media screen and (max-width: 425px) {
+        flex-direction: column;
+        text-align: center;
+        padding: 8px 10px;
+    }
+
+    .stat-value {
+        @media screen and (max-width: 425px) {
+            font-size: $font-size-header;
+        }
+    }
 }
 
 .stat-icon {
@@ -177,6 +189,14 @@ $border: var(--border);
             flex: auto;
 
             input {
+                width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 425px) {
+            flex-direction: column;
+
+            button {
                 width: 100%;
             }
         }
@@ -390,6 +410,10 @@ app-empty-state {
         display: flex;
         align-items: stretch;
         gap: 0;
+
+        @media screen and (max-width: 455px) {
+            flex-direction: column;
+        }
     }
 
     &__main {
@@ -410,6 +434,11 @@ app-empty-state {
         border-left: 1px solid var(--border-toolbar);
         min-width: 110px;
         gap: 4px;
+
+        @media screen and (max-width: 425px) {
+            // align-items: flex-start;
+            padding: 4px 16px;
+        }
     }
 
     &__footer {
@@ -453,6 +482,12 @@ app-empty-state {
 
 .claim-disease {
     color: var(--text-table-head);
+}
+
+.claim-date {
+    @media screen and (max-width: 455px) {
+        flex-wrap: wrap;
+    }
 }
 
 .claim-days {
