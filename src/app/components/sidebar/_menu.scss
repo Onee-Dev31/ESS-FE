@@ -38,14 +38,14 @@
         }
 
         &.active {
-            background: var(--status-new-bg);
-            color: var(--primary) !important;
-            border-left-color: var(--primary);
+            background: var(--primary);
+            color: #fff !important;
+            border-left-color: transparent;
 
             .nav-icon,
             .link-text,
             .arrow-icon {
-                color: var(--primary) !important;
+                color: #fff !important;
             }
         }
 
