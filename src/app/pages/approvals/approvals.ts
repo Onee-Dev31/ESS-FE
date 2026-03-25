@@ -20,7 +20,6 @@ import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
-import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -34,7 +33,7 @@ import { StatusUtil } from '../../utils/status.util';
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, FilePreviewModalComponent, PageHeaderComponent, PaginationComponent, SkeletonComponent, EmptyStateComponent, StatusLabelPipe],
+  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, FilePreviewModalComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent, StatusLabelPipe],
   animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
@@ -104,7 +103,6 @@ export class ApprovalsComponent implements OnInit {
   loadMedicalClaims() {
     const fromYear = parseInt(this.fromYear());
     const toYear = parseInt(this.toYear());
-    const status = this.listing.filterStatus() || undefined;
     const keyword = this.listing.searchText().trim() || undefined;
 
     if (!this.initialized) {
@@ -118,7 +116,6 @@ export class ApprovalsComponent implements OnInit {
       from_year: isNaN(fromYear) ? undefined : fromYear,
       to_month: this.toMonth() + 1,
       to_year: isNaN(toYear) ? undefined : toYear,
-      status,
       keyword,
     }).subscribe({
       next: (res) => {
