@@ -285,6 +285,17 @@
     }
 }
 
+@keyframes inputPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+    50%  { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.input-highlight {
+    border-color: #ef4444 !important;
+    animation: inputPulse 0.7s ease forwards;
+}
+
 .amount-input-wrapper {
     position: relative;
     display: flex;
@@ -309,10 +320,23 @@
 // Claim Grid (from _claim-grid.scss)
 // ==========================================
 
+@keyframes claimPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); transform: translateY(0); }
+    20%  { transform: translateY(-4px); }
+    40%  { transform: translateY(0); }
+    60%  { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
 .claim-type-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.25rem;
+
+    &.highlight-required .claim-type-card {
+        border-color: var(--primary) !important;
+        animation: claimPulse 0.7s ease forwards;
+    }
 
     .claim-type-card {
         background: var(--bg-card);

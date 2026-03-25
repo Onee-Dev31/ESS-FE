@@ -44,6 +44,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private expenseTypesRaw: MedicalExpenseTypeWithBalance[] = [];
 
   selectedClaimType = signal<string>('');
+  claimTypeHighlight = signal<boolean>(false);
+  amountHighlight = signal<boolean>(false);
+  hospitalHighlight = signal<boolean>(false);
+  diseaseHighlight = signal<boolean>(false);
 
   hospital = signal<string>('');
   selectedHospitalObj = signal<Hospital | null>(null);
@@ -57,6 +61,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private hasNextPage = false;
   private readonly PAGE_SIZE = 20;
 
+  @ViewChild('claimTypeSection') claimTypeSectionEl?: ElementRef<HTMLElement>;
+  @ViewChild('amountInput') amountInputEl?: ElementRef<HTMLInputElement>;
+  @ViewChild('hospitalInput') hospitalInputEl?: ElementRef<HTMLInputElement>;
+  @ViewChild('diseaseInput') diseaseInputEl?: ElementRef<HTMLInputElement>;
   @ViewChild('hospitalDropdownEl') hospitalDropdownEl?: ElementRef<HTMLDivElement>;
 
   private hospitalSearch$ = new Subject<string>();
@@ -364,6 +372,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   async save() {
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
+      this.claimTypeSectionEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.claimTypeHighlight.set(true);
+      setTimeout(() => this.claimTypeHighlight.set(false), 800);
       return;
     }
 
@@ -379,6 +390,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     if (this.parseNumber(this.amount()) <= 0) {
       this.toastService.warning('จำนวนเงินที่เบิกต้องมากกว่า 0');
+      this.amountInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.amountInputEl?.nativeElement.focus();
+      this.amountHighlight.set(true);
+      setTimeout(() => this.amountHighlight.set(false), 800);
       return;
     }
 
@@ -391,12 +406,20 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const hosp = this.selectedHospitalObj();
     if (!hosp) {
       this.toastService.warning('กรุณาเลือกสถานพยาบาลจากรายการ');
+      this.hospitalInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.hospitalInputEl?.nativeElement.focus();
+      this.hospitalHighlight.set(true);
+      setTimeout(() => this.hospitalHighlight.set(false), 800);
       return;
     }
 
     const disease = this.selectedDiseaseObj();
     if (!disease) {
       this.toastService.warning('กรุณาเลือกประเภทโรคจากรายการ');
+      this.diseaseInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      this.diseaseInputEl?.nativeElement.focus();
+      this.diseaseHighlight.set(true);
+      setTimeout(() => this.diseaseHighlight.set(false), 800);
       return;
     }
 

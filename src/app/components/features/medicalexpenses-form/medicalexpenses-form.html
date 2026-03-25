@@ -20,9 +20,9 @@
             </div>
         </div>
 
-        <section class="form-section-wrapper">
+        <section class="form-section-wrapper" #claimTypeSection>
             <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
-            <div class="claim-type-grid">
+            <div class="claim-type-grid" [class.highlight-required]="claimTypeHighlight()">
                 <div class="claim-type-card" *ngFor="let type of claimTypes"
                     [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
                     <div class="card-content">
@@ -46,7 +46,8 @@
                     <label>สถานพยาบาล</label>
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
-                            <input type="text" class="custom-form-control" placeholder="ค้นหาโรงพยาบาล/คลินิก"
+                            <input #hospitalInput type="text" class="custom-form-control" placeholder="ค้นหาโรงพยาบาล/คลินิก"
+                                [class.input-highlight]="hospitalHighlight()"
                                 [ngModel]="hospital()" (ngModelChange)="onHospitalInput($event)"
                                 (focus)="onHospitalFocus()" (blur)="onHospitalBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
@@ -72,7 +73,8 @@
                     <label>ประเภทโรค</label>
                     <div class="hospital-autocomplete">
                         <div class="search-input-wrapper">
-                            <input type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค"
+                            <input #diseaseInput type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค"
+                                [class.input-highlight]="diseaseHighlight()"
                                 [ngModel]="disease()" (ngModelChange)="onDiseaseInput($event)"
                                 (focus)="onDiseaseFocus()" (blur)="onDiseaseBlur()">
                             <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
@@ -128,7 +130,8 @@
                 <div class="input-field-group">
                     <label>จำนวนเงินที่ขอเบิก</label>
                     <div class="amount-input-wrapper">
-                        <input type="text" class="custom-form-control text-right" placeholder="0.00"
+                        <input #amountInput type="text" class="custom-form-control text-right" placeholder="0.00"
+                            [class.input-highlight]="amountHighlight()"
                             [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0"
                             (ngModelChange)="onAmountChange($event)">
                         <span class="currency-tag">บาท</span>
