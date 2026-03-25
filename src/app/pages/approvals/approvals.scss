@@ -355,37 +355,6 @@ $status-danger-text: var(--status-danger-text);
         }
     }
 
-    // ==================== STATUS BADGES ====================
-    .status-badge {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
-
-        &.approved,
-        &.Approved {
-            background: $status-success-bg;
-            color: $status-success-text;
-        }
-
-        &.pending,
-        &.Pending {
-            background: $status-pending-bg;
-            color: $status-pending-text;
-        }
-
-        &.rejected,
-        &.Rejected {
-            background: $status-danger-bg;
-            color: $status-danger-text;
-        }
-
-        &.referred-back {
-            background: $status-new-bg;
-            color: $status-new-text;
-        }
-    }
-
     // ==================== DATA GRID / TABLE ====================
     .data-grid-container {
         padding: 0 24px 24px;
@@ -703,15 +672,20 @@ $status-danger-text: var(--status-danger-text);
         padding: 0 12px 12px;
     }
 }
+
 // ============================================================
 // Medical mode: 3-column claim-card grid
 // ============================================================
 .approvals-wrapper.medical-mode {
-    .card { overflow: visible; }
+    .card {
+        overflow: visible;
+    }
 }
 
 // empty state spans all columns
-app-empty-state { grid-column: 1 / -1; }
+app-empty-state {
+    grid-column: 1 / -1;
+}
 
 .claim-cards-grid {
     padding: 0 24px 8px;
@@ -764,7 +738,10 @@ app-empty-state { grid-column: 1 / -1; }
         display: flex;
         align-items: center;
         gap: 6px;
-        i { font-size: 0.9rem; }
+
+        i {
+            font-size: 0.9rem;
+        }
     }
 
     &__actions {
@@ -840,8 +817,13 @@ app-empty-state { grid-column: 1 / -1; }
     }
 }
 
-.claim-hospital { font-weight: 600; }
-.claim-disease  { color: var(--text-table-head); }
+.claim-hospital {
+    font-weight: 600;
+}
+
+.claim-disease {
+    color: var(--text-table-head);
+}
 
 .claim-days {
     font-size: 0.72rem;
@@ -893,7 +875,9 @@ app-empty-state { grid-column: 1 / -1; }
     gap: 4px;
     transition: background 0.15s;
 
-    &:hover { background: var(--border-color); }
+    &:hover {
+        background: var(--border-color);
+    }
 }
 
 // ============================================================
@@ -990,11 +974,14 @@ app-empty-state { grid-column: 1 / -1; }
     font-size: 13px;
     transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
 
-    &:active { transform: scale(0.92); }
+    &:active {
+        transform: scale(0.92);
+    }
 
     &.act-view {
         background: rgba(99, 102, 241, 0.12);
         color: #6366f1;
+
         &:hover {
             background: #6366f1;
             color: #fff;
@@ -1005,6 +992,7 @@ app-empty-state { grid-column: 1 / -1; }
     &.act-approve {
         background: rgba(34, 197, 94, 0.12);
         color: #16a34a;
+
         &:hover {
             background: #22c55e;
             color: #fff;
@@ -1015,6 +1003,7 @@ app-empty-state { grid-column: 1 / -1; }
     &.act-reject {
         background: rgba(239, 68, 68, 0.12);
         color: #dc2626;
+
         &:hover {
             background: #ef4444;
             color: #fff;
@@ -1025,9 +1014,17 @@ app-empty-state { grid-column: 1 / -1; }
 
 // fallback icon — hidden by default, shown when img fails
 .emp-avatar {
-    .fallback-icon { display: none; }
-    &.img-error img { display: none; }
-    &.img-error .fallback-icon { display: flex; }
+    .fallback-icon {
+        display: none;
+    }
+
+    &.img-error img {
+        display: none;
+    }
+
+    &.img-error .fallback-icon {
+        display: flex;
+    }
 }
 
 // clickable avatar
@@ -1087,7 +1084,9 @@ app-empty-state { grid-column: 1 / -1; }
         justify-content: center;
         transition: background 0.2s;
 
-        &:hover { background: rgba(255, 255, 255, 0.28); }
+        &:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
     }
 }
 
@@ -1138,5 +1137,30 @@ app-empty-state { grid-column: 1 / -1; }
         margin-top: 4px;
         font-size: 0.7rem;
         color: var(--text-muted);
+    }
+}
+
+
+// ============================================================
+// Status badge
+// ============================================================
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+
+    &::before {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
     }
 }

@@ -28,6 +28,7 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { listAnimation } from '../../animations/animations';
 import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
+import { StatusUtil } from '../../utils/status.util';
 
 /** หน้าจัดการรายการอนุมัติ (Approvals) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
@@ -284,10 +285,9 @@ export class ApprovalsComponent implements OnInit {
     return this.dateUtil.getTimeAgo(date);
   }
 
-  getStatusClass(status: string): string {
-    return this.approvalsHelper.getStatusClass(status);
+  getStatusClass(status: string) {
+    return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
-
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
     this.previewFiles.set(claim.attachments.map(a => ({

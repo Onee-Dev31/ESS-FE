@@ -63,7 +63,7 @@
               <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
             </button>
             }
-            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+            <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
               {{ req.rawStatus | statusLabel }}
             </span>
           </div>
@@ -129,8 +129,7 @@
             <span class="budget-remaining">คงเหลือ ฿{{ claim.typeRemainingAmount | number:'1.0-0' }}</span>
           </div>
           <div class="budget-bar">
-            <div class="budget-bar__used"
-              [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100">
+            <div class="budget-bar__used" [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100">
             </div>
           </div>
           <div class="budget-meta">
@@ -176,7 +175,7 @@
             <span class="label"><i class="fas fa-hashtag"></i> No.</span>
             <span class="value">{{ req.requestNo }}</span>
           </div>
-          <span class="status-badge" [ngClass]="getStatusClass(req.status)">{{ req.status }}</span>
+          <span class="status-badge" [ngStyle]="getStatusClass(req.status)">{{ req.status }}</span>
         </div>
         <div class="card-body">
           <div class="info-row">
@@ -275,7 +274,7 @@
             </td>
             <td class="amount-cell">{{ row.original.amount | number }}</td>
             <td class="text-center">
-              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+              <span class="status-badge" [ngStyle]="getStatusClass(row.original.status )">
                 {{ row.original.status | statusLabel }}
               </span>
             </td>
@@ -317,11 +316,6 @@
     </div>
     }
 
-    <div class="pagination-wrapper">
-      <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
-      </app-pagination>
-    </div>
   </div>
 </div>
 
