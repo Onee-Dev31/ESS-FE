@@ -156,6 +156,31 @@ $border: var(--border);
     border: 1px solid var(--border-toolbar);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     margin-bottom: 20px;
+
+    .filter {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+
+        @include tablet {
+            flex-direction: column;
+        }
+    }
+
+    .group-filter {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+
+        .search-input-group {
+            flex: auto;
+
+            input {
+                width: 100%;
+            }
+        }
+    }
 }
 
 .toolbar-bottom-row {
@@ -302,21 +327,20 @@ app-empty-state {
 }
 
 .card-list-view {
-    display: none;
+    // display: none;
     gap: 14px;
     padding: 4px 0 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
 
     @include large-tablet {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    @media (max-width: 1024px) {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    @include mobile {
-        grid-template-columns: 1fr;
+    @include tablet {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 

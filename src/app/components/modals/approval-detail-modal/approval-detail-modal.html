@@ -6,19 +6,18 @@
                     <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
                     <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
                             }}</span></div>
-                    <div class="requester-line">Requester: <span class="highlight">{{ approvalItem.requestBy.name
+                    <!-- <div class="requester-line">Requester: <span class="highlight">{{ approvalItem.requestBy.name
                             }}</span> ({{ approvalItem.requestBy.employeeId }}) | Department: <span class="highlight">{{
                             approvalItem.requestBy.department }}</span> | Company: <span class="highlight">{{
-                            approvalItem.requestBy.company }}</span></div>
+                            approvalItem.requestBy.company }}</span></div> -->
                 </div>
                 <div class="header-actions-group">
                     @if (!isActionConfirm()) {
                     <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
-                    <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
-                    <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
-                    }
+                    <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button> }
                 </div>
-                <button type="button" class="btn-close-x" title="ปิด" (click)="close()"><i class="fas fa-times"></i></button>
+                <button type="button" class="btn-close-x" title="ปิด" (click)="close()"><i
+                        class="fas fa-times"></i></button>
             </div>
         </div>
 
@@ -303,12 +302,9 @@
 
                 <div class="side-divider"></div>
 
-                <h3 class="side-title">Comments</h3>
-                <div class="comment-thread side-mode">
-                    <div class="comment-bubble">
-                        <div class="comment-top"><strong>Request Detail :</strong></div>
-                        <p>{{ approvalItem.requestDetail }}</p>
-                    </div>
+                <h3 class="side-title">Remark</h3>
+                <div class="comment-thred side-mode">
+                    <p>{{ approvalItem.remark }}</p>
                 </div>
             </div>
 

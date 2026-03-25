@@ -35,4 +35,5 @@ export interface ApprovalItem {
     rawStatus: string;
     type?: 'allowance' | 'taxi' | 'transport' | 'medical' | 'it-request';
     originalData?: AllowanceRequest | MedicalRequest | any;
+    remark?: string;
 }

@@ -48,12 +48,12 @@
 
         <!-- Toolbar -->
         <div class="toolbar-container">
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <div class="filter">
                 <div class="form-field">
                     <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="date" class="form-input"
                         (ngModelChange)="onChange($event)" />
                 </div>
-                <div style="display: flex; flex-direction: row; gap: 10px;">
+                <div class="group-filter">
                     <div class="search-input-group">
                         <i class="fas fa-search search-icon-inner"></i>
                         <input type="text" class="form-control search-control" placeholder="ค้นหา..."

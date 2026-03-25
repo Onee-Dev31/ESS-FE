@@ -10,6 +10,9 @@ import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
 import { modalAnimation, fadeIn } from '../../../animations/animations';
+import { ApprovalService } from '../../../services/approval.service';
+import { AuthService } from '../../../services/auth.service';
+import { SwalService } from '../../../services/swal.service';
 
 interface PreviewFile {
   fileName: string;
@@ -29,6 +32,9 @@ interface PreviewFile {
 export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
+  private approvelService = inject(ApprovalService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -49,10 +55,10 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   steps = [
     { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
-    { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
+    // { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
     { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
-    { label: 'ผู้บริหารอนุมัติ', id: 4, icon: 'fas fa-user-tie' },
-    { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
+    // { label: 'ผู้บริหารอนุมัติ', id: 4, icon: 'fas fa-user-tie' },
+    // { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
   ];
 
   currentStepIndex = computed(() => {
@@ -178,13 +184,41 @@ export class ApprovalDetailModalComponent implements OnInit {
     else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
     else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
 
-    const service = this.approvalsHelper.getServiceByType(item.type);
-    service.updateStatus(item.requestNo, statusCode);
+    console.log(item, newStatus, reason)
 
+    const payload = {
+      action: newStatus.toLowerCase(),
+      reviewedBy: this.authService.userData().CODEMPID,
+      ...(newStatus.toLowerCase() === 'rejected' && {
+        rejectionReason: reason?.trim() || ''
+      }),
+    }
+
+    console.log(item.requestId, payload)
+
+    this.approvelService.updateTypeClaims(item.requestId, payload)
+      .subscribe({
+        next: (res) => {
+
+          if (!res?.success) {
+            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+            return;
+          }
+
+          this.swalService.success(res.message || "บันทึกสำเร็จ");
+        },
+
+        error: (error) => {
+          console.error("Approved Claim Error:", error);
+
+          this.swalService.warning(
+            "เกิดข้อผิดพลาด",
+            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+          );
+        }
+      });
     this.onStatusUpdated.emit();
     this.onClose.emit();
-    const successMsg = newStatus === 'Approved' ? 'ดำเนินการอนุมัติเรียบร้อยแล้ว' : 'ดำเนินการส่งคืน/ปฏิเสธเรียบร้อยแล้ว';
-    this.toastService.success(successMsg);
   }
 
   close() { this.onClose.emit(); }

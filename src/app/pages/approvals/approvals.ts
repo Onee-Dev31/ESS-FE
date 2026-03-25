@@ -28,12 +28,23 @@ import { listAnimation } from '../../animations/animations';
 import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
 
 /** หน้าจัดการรายการอนุมัติ (Approvals) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approvals',
   standalone: true,
-  imports: [CommonModule, FormsModule, ApprovalDetailModalComponent, FilePreviewModalComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent, StatusLabelPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ApprovalDetailModalComponent,
+    FilePreviewModalComponent,
+    PageHeaderComponent,
+    SkeletonComponent,
+    EmptyStateComponent,
+    StatusLabelPipe,
+    PaginationComponent
+  ],
   animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
@@ -119,6 +130,7 @@ export class ApprovalsComponent implements OnInit {
       keyword,
     }).subscribe({
       next: (res) => {
+        console.log(res)
         this.approvals.set(res.data.map(c => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
@@ -147,11 +159,12 @@ export class ApprovalsComponent implements OnInit {
       requestType: 'ค่ารักษาพยาบาล',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
+      remark: claim.remark || '',
       amount: claim.requestedAmount,
       status: this.mapClaimStatus(claim.status),
       rawStatus: claim.status,
       type: 'medical',
-      originalData: claim
+      originalData: claim,
     };
   }
 
@@ -258,6 +271,7 @@ export class ApprovalsComponent implements OnInit {
   /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
+    console.log(item)
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }
@@ -272,6 +286,7 @@ export class ApprovalsComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
+    this.loadMedicalClaims()
   }
 
   onStatusUpdated() {
