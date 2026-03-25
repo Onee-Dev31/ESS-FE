@@ -145,7 +145,7 @@
 
                 <div class="input-field-group">
                     <label>หมายเหตุ</label>
-                    <textarea type="text" class="custom-form-control" [ngModel]="remark()"
+                    <textarea class="custom-form-control" placeholder="ระบุหมายเหตุ (ถ้ามี)" [ngModel]="remark()"
                         (ngModelChange)="remark.set($event)"></textarea>
                 </div>
             </div>
@@ -210,9 +210,9 @@
         <button class="btn-back-custom" (click)="close()">
             <i class="fas fa-times"></i> ยกเลิก
         </button>
-        <button class="btn-save-custom" (click)="save()">
-            <i [class]="isEditMode() ? 'fas fa-check' : 'fas fa-paper-plane'"></i>
-            {{ isEditMode() ? 'บันทึกการแก้ไข' : 'ส่งเรื่องเบิก' }}
+        <button class="btn-save-custom" (click)="save()" [disabled]="isSaving()">
+            <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
+            {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
         </button>
     </div>
 

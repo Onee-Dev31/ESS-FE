@@ -73,13 +73,13 @@
 .dialog-title {
     font-size: 1.5rem !important;
     font-weight: 700 !important;
-    color: #1d1d1f !important;
+    color: var(--text-primary) !important;
     margin: 0 0 12px 0 !important;
 }
 
 .dialog-message {
     font-size: 1rem !important;
-    color: #6e6e73 !important;
+    color: var(--text-secondary) !important;
     line-height: 1.5 !important;
     margin: 0 !important;
 }
@@ -111,10 +111,10 @@
 
 .btn-cancel {
     background: var(--bg-page) !important;
-    color: #1d1d1f !important;
+    color: var(--text-primary) !important;
 
     &:hover {
-        background: #e8e8ed !important;
+        background: var(--border-color) !important;
     }
 }
 

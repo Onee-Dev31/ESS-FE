@@ -1,12 +1,12 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
-import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
-import { MedicalRequest, MedicalItem, MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
+import { MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
 import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { DialogService } from '../../../services/dialog';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
@@ -24,12 +24,11 @@ import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 })
 export class MedicalexpensesForm implements OnInit, OnDestroy {
   private medicalService = inject(MedicalexpensesService);
-  private userService = inject(UserService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
   private medicalApiService = inject(MedicalApiService);
-  private cdr = inject(ChangeDetectorRef);
+  private dialogService = inject(DialogService);
 
 
   @Input() requestId: string = '';
@@ -42,10 +41,12 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   previewFiles = signal<FilePreviewItem[]>([]);
 
   claimTypes: ClaimType[] = [];
+  private expenseTypesRaw: MedicalExpenseTypeWithBalance[] = [];
 
   selectedClaimType = signal<string>('');
 
   hospital = signal<string>('');
+  selectedHospitalObj = signal<Hospital | null>(null);
   hospitalDropdown = signal<Hospital[]>([]);
   isHospitalDropdownOpen = signal<boolean>(false);
   isHospitalLoading = signal<boolean>(false);
@@ -63,6 +64,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   // Disease autocomplete
   disease = signal<string>('');
+  selectedDiseaseObj = signal<DiseaseType | null>(null);
   diseaseDropdown = signal<DiseaseType[]>([]);
   isDiseaseDropdownOpen = signal<boolean>(false);
   isDiseaseLoading = signal<boolean>(false);
@@ -91,10 +93,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return diff > 0 ? diff : 0;
   });
 
-  attachments = signal<{ id: number; name: string; description: string }[]>([
-    { id: 1, name: 'approval-list-page.005-87d92c90a8cb2e588a7032052d9d94ac.png', description: 'ใบเสร็จยา' },
-    { id: 2, name: 'original-aa87c620661b3eb94e5d85441b761387.png', description: 'ใบรับรองแพทย์' }
-  ]);
+  attachments = signal<{ id: number; name: string; description: string; file?: File }[]>([]);
+  isSaving = signal<boolean>(false);
 
   calculatedDays = computed(() => {
     if (!this.startDate() || !this.endDate()) return 0;
@@ -134,6 +134,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const fiscalYear = dayjs().year();
     this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
       next: (res) => {
+        this.expenseTypesRaw = res.data;
         this.claimTypes = res.data.map(t => this.mapExpenseType(t));
         this.loadRequestData();
       },
@@ -189,6 +190,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   onHospitalInput(value: string) {
     this.hospital.set(value);
+    this.selectedHospitalObj.set(null);
     this.hospitalSearch$.next(value);
   }
 
@@ -227,11 +229,13 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   selectHospital(h: Hospital) {
     this.hospital.set(h.nameTh);
+    this.selectedHospitalObj.set(h);
     this.isHospitalDropdownOpen.set(false);
   }
 
   onDiseaseInput(value: string) {
     this.disease.set(value);
+    this.selectedDiseaseObj.set(null);
     this.diseaseSearch$.next(value);
   }
 
@@ -270,6 +274,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   selectDisease(d: DiseaseType) {
     this.disease.set(d.nameTh);
+    this.selectedDiseaseObj.set(d);
     this.isDiseaseDropdownOpen.set(false);
   }
 
@@ -332,7 +337,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       const newAttachments = Array.from(input.files).map((file: File, index) => ({
         id: currentAttachments.length + index + 1,
         name: file.name,
-        description: ''
+        description: '',
+        file
       }));
       this.attachments.update(current => [...current, ...newAttachments]);
     }
@@ -355,7 +361,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.isPreviewModalOpen.set(false);
   }
 
-  save() {
+  async save() {
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
       return;
@@ -371,55 +377,65 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.hospital() || !this.disease() || this.parseNumber(this.amount()) <= 0) {
-      this.toastService.warning('กรุณากรอกข้อมูลให้ครบถ้วน และจำนวนเงินที่เบิกต้องมากกว่า 0');
+    if (this.parseNumber(this.amount()) <= 0) {
+      this.toastService.warning('จำนวนเงินที่เบิกต้องมากกว่า 0');
       return;
     }
 
-    const typeLabel = this.claimTypes.find(t => t.id === this.selectedClaimType())?.label || '';
+    const rawType = this.expenseTypesRaw.find(t => t.code.toLowerCase() === this.selectedClaimType());
+    if (!rawType) {
+      this.toastService.warning('ไม่พบข้อมูลประเภทการเบิก');
+      return;
+    }
 
-    this.userService.getUserProfile().subscribe(profile => {
-      const request: MedicalRequest = {
-        id: this.requestId,
-        createDate: dayjs().toISOString(),
-        status: this.isEditMode() ? 'VERIFIED' : 'NEW',
-        employeeId: profile.employeeId,
-        requester: {
-          employeeId: profile.employeeId,
-          name: profile.name,
-          department: profile.department,
-          company: profile.company
-        },
-        totalRequestedAmount: this.parseNumber(this.amount()),
-        totalApprovedAmount: 0,
-        items: [{
-          requestDate: this.dateUtil.formatDateToBE(this.dateUtil.getCurrentDateISO()),
-          limitType: typeLabel,
-          diseaseType: this.disease(),
-          hospital: this.hospital(),
-          treatmentDateFrom: this.dateUtil.formatDateToBE(this.startDate()),
-          treatmentDateTo: this.dateUtil.formatDateToBE(this.endDate()),
-          requestedAmount: this.parseNumber(this.amount()),
-          approvedAmount: 0
-        }]
-      };
+    const hosp = this.selectedHospitalObj();
+    if (!hosp) {
+      this.toastService.warning('กรุณาเลือกสถานพยาบาลจากรายการ');
+      return;
+    }
 
-      if (this.isEditMode()) {
-        this.medicalService.updateRequest(request).subscribe({
-          next: () => {
-            this.toastService.success('แก้ไขข้อมูลเรียบร้อยแล้ว');
-            this.close();
-          },
-          error: () => this.toastService.error('เกิดข้อผิดพลาดในการแก้ไขข้อมูล')
-        });
-      } else {
-        this.medicalService.addRequest(request).subscribe({
-          next: () => {
-            this.toastService.success('บันทึกข้อมูลเรียบร้อยแล้ว');
-            this.close();
-          },
-          error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
-        });
+    const disease = this.selectedDiseaseObj();
+    if (!disease) {
+      this.toastService.warning('กรุณาเลือกประเภทโรคจากรายการ');
+      return;
+    }
+
+    const attachmentList = this.attachments();
+    const files = attachmentList.map(a => a.file).filter((f): f is File => f != null);
+    const fileRemarks = attachmentList.map(a => a.description);
+
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการส่งเรื่องเบิก',
+      message: `ต้องการส่งเรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount()).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
+      confirmText: 'ส่งเรื่องเบิก',
+      cancelText: 'ยกเลิก',
+      type: 'info',
+    });
+
+    if (!confirmed) return;
+
+    this.isSaving.set(true);
+    this.medicalApiService.submitClaim({
+      employee_code: this.employeeId(),
+      expense_type_id: rawType.typeId,
+      hospital_id: hosp.hospitalId,
+      disease_id: disease.diseaseId,
+      treatment_date_from: this.startDate(),
+      treatment_date_to: this.endDate(),
+      treatment_days: this.calculatedDays(),
+      requested_amount: this.parseNumber(this.amount()),
+      remark: this.remark() || undefined,
+      files: files.length > 0 ? files : undefined,
+      file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
+    }).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
+        this.close();
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
       }
     });
   }
