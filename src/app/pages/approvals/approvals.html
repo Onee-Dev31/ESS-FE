@@ -71,7 +71,8 @@
 
         <!-- Employee info -->
         <div class="claim-card__employee">
-          <div class="emp-avatar" [class.clickable]="claim.employeeImageUrl" (click)="openProfileImage(claim)" title="คลิกดูรูปขนาดใหญ่">
+          <div class="emp-avatar" [class.clickable]="claim.employeeImageUrl" (click)="openProfileImage(claim)"
+            title="คลิกดูรูปขนาดใหญ่">
             <img [src]="claim.employeeImageUrl" alt="{{ claim.employeeCode }}" (error)="onImgError($event)" />
             <i class="fas fa-user-circle fallback-icon"></i>
           </div>
@@ -140,8 +141,7 @@
       }
       }
       @empty {
-      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-        icon="fas fa-inbox">
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
       </app-empty-state>
       }
       }
@@ -183,12 +183,10 @@
             <button type="button" class="act-btn v-btn" title="View" (click)="viewDetail(req)">
               <i class="fas fa-eye"></i>
             </button>
-            <button type="button" class="act-btn a-btn" title="Approve"
-              (click)="openActionModal(req, 'Approved')">
+            <button type="button" class="act-btn a-btn" title="Approve" (click)="openActionModal(req, 'Approved')">
               <i class="fas fa-check"></i>
             </button>
-            <button type="button" class="act-btn r-btn" title="Reject"
-              (click)="openActionModal(req, 'Rejected')">
+            <button type="button" class="act-btn r-btn" title="Reject" (click)="openActionModal(req, 'Rejected')">
               <i class="fas fa-times"></i>
             </button>
             <button type="button" class="act-btn b-btn" title="Refer Back"
@@ -200,8 +198,7 @@
       </div>
       }
       @empty {
-      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-        icon="fas fa-inbox">
+      <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
       </app-empty-state>
       }
     </div>
@@ -325,12 +322,9 @@
   <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
     <i class="fas fa-times"></i>
   </button>
-  <img [src]="profileLightbox()!.url"
-       [alt]="profileLightbox()!.name"
-       [title]="profileLightbox()!.name"
-       [attr.aria-label]="profileLightbox()!.name"
-       role="img"
-       (click)="$event.stopPropagation()" />
-  <div class="lightbox-name">{{ profileLightbox()!.name }}</div>
+  <img [src]="profileLightbox()?.url" alt="{{ profileLightbox()?.name || 'Profile image' }}"
+    title="{{ profileLightbox()?.name || 'Profile image' }}"
+    [attr.aria-label]="profileLightbox()?.name || 'Profile image'" role="img" (click)="$event.stopPropagation()" />
+  <div class="lightbox-name">{{ profileLightbox()?.name || 'Profile image' }}</div>
 </div>
 }
