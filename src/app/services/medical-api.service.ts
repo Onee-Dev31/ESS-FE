@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+const FILE_BASE = environment.file_base_url;
 import { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse, MedicalClaimsResponse, MedicalClaimResponse, MedicalStatusesResponse } from '../interfaces/medical.interface';
 export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchResponse, MedicalExpenseTypeWithBalance, MedicalPolicyResponse, MedicalClaimsResponse, MedicalClaimResponse, MedicalStatusesResponse };
 
@@ -9,6 +10,13 @@ export type { Hospital, HospitalSearchResponse, DiseaseType, DiseaseTypeSearchRe
 export class MedicalApiService {
     private readonly baseUrl = environment.api_url;
     private _http = inject(HttpClient);
+
+    /** แปลง relative path ของไฟล์ให้เป็น full URL */
+    getFileUrl(path: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${FILE_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+    }
 
     /**
      * ค้นหาโรงพยาบาล

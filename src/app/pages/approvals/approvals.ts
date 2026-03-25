@@ -290,7 +290,11 @@ export class ApprovalsComponent implements OnInit {
 
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
-    this.previewFiles.set(claim.attachments.map(a => ({ fileName: a.fileName, fileUrl: a.fileUrl ?? '', date: claim.claimDate })));
+    this.previewFiles.set(claim.attachments.map(a => ({
+      fileName: a.fileName,
+      fileUrl: this.medicalApiService.getFileUrl(a.fileUrl),
+      date: claim.claimDate
+    })));
     this.isPreviewModalOpen.set(true);
   }
 

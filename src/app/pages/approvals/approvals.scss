@@ -1090,3 +1090,53 @@ app-empty-state { grid-column: 1 / -1; }
         &:hover { background: rgba(255, 255, 255, 0.28); }
     }
 }
+
+// ── Budget bar ────────────────────────────────────────────
+.claim-card__budget {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border-toolbar);
+    background: var(--bg-table-head);
+
+    .budget-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .budget-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+    }
+
+    .budget-remaining {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--success);
+    }
+
+    .budget-bar {
+        height: 6px;
+        background: var(--border-toolbar);
+        border-radius: 999px;
+        overflow: hidden;
+
+        &__used {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+    }
+
+    .budget-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+    }
+}

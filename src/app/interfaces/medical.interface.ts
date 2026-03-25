@@ -126,7 +126,7 @@ export interface MedicalClaimAttachment {
     fileType: string;
     fileSize: number;
     remark: string | null;
-    uploadedAt: string;
+    createdAt: string;
 }
 
 export interface MedicalClaim {
@@ -141,6 +141,7 @@ export interface MedicalClaim {
     companyName: string | null;
     employeeImageUrl: string | null;
     expenseTypeId: number;
+    expenseTypeCode: string | null;
     expenseTypeName: string;
     hospitalId: number;
     hospitalName: string;
@@ -164,6 +165,9 @@ export interface MedicalClaim {
     approvedAt: string | null;
     modifiedAt: string | null;
     createdAt: string;
+    typeTotalLimit: number;
+    typeUsedAmount: number;
+    typeRemainingAmount: number;
     attachments: MedicalClaimAttachment[];
 }
 

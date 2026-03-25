@@ -121,6 +121,25 @@
           </div>
         </div>
 
+        <!-- Budget bar -->
+        @if (claim.typeTotalLimit > 0) {
+        <div class="claim-card__budget">
+          <div class="budget-row">
+            <span class="budget-label">วงเงิน {{ claim.expenseTypeCode }}</span>
+            <span class="budget-remaining">คงเหลือ ฿{{ claim.typeRemainingAmount | number:'1.0-0' }}</span>
+          </div>
+          <div class="budget-bar">
+            <div class="budget-bar__used"
+              [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100">
+            </div>
+          </div>
+          <div class="budget-meta">
+            <span>ใช้ไป ฿{{ claim.typeUsedAmount | number:'1.0-0' }}</span>
+            <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number:'1.0-0' }}</span>
+          </div>
+        </div>
+        }
+
         <div class="claim-card__footer">
           <span class="claim-id">{{ req.requestNo }}</span>
           <div class="claim-card__footer-actions">
