@@ -69,7 +69,7 @@ export class ApprovalsComponent implements OnInit {
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
   isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<{ fileName: string; fileUrl: string; date: string }[]>([]);
+  previewFiles = signal<{ fileName: string; url: string; date: string; type: string }[]>([]);
 
   profileLightbox = signal<{ url: string; name: string } | null>(null);
 
@@ -292,8 +292,9 @@ export class ApprovalsComponent implements OnInit {
     if (!claim.attachments?.length) return;
     this.previewFiles.set(claim.attachments.map(a => ({
       fileName: a.fileName,
-      fileUrl: this.medicalApiService.getFileUrl(a.fileUrl),
-      date: claim.claimDate
+      url: this.medicalApiService.getFileUrl(a.fileUrl),
+      date: claim.claimDate,
+      type: a.fileType
     })));
     this.isPreviewModalOpen.set(true);
   }
