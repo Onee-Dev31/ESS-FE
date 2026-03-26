@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
   private dialogService = inject(DialogService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
 
   constructor(
     private teamCalendarService: TeamCalendarService,
@@ -146,14 +146,13 @@ export class DashboardComponent implements OnInit {
   });
 
   profileList = computed<ProfileItem[]>(() => {
-    const profile = this.userProfile();
-    if (!profile) return [];
+    const user = this.authService.userData();
+    if (!user) return [];
     return [
-      { label: 'Email', value: profile.email, icon: 'fas fa-envelope', iconColor: '#ffffff' },
-      { label: 'เบอร์โทรศัพท์', value: profile.phone, icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
-      { label: 'ชั้น', value: profile.floor, icon: 'fas fa-layer-group', iconColor: '#ffffff' },
-      { label: 'แผนก', value: profile.department, icon: 'fas fa-sitemap', iconColor: '#ffffff' },
-      { label: 'บริษัท', value: profile.company, icon: 'fas fa-building', iconColor: '#ffffff' }
+      { label: 'Email', value: user.AD_USER || '-', icon: 'fas fa-envelope', iconColor: '#ffffff' },
+      { label: 'เบอร์โทรศัพท์', value: user.USR_MOBILE || '-', icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
+      { label: 'แผนก', value: user.DEPARTMENT || '-', icon: 'fas fa-sitemap', iconColor: '#ffffff' },
+      { label: 'บริษัท', value: user.COMPANY_NAME || '-', icon: 'fas fa-building', iconColor: '#ffffff' }
     ];
   });
 
@@ -455,6 +454,13 @@ export class DashboardComponent implements OnInit {
     const year = d.getFullYear() + 543;
 
     return `${day} ${month} ${year}`;
+  }
+
+  onAvatarError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
   }
 
   closeForm() {

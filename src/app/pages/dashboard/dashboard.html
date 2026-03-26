@@ -12,7 +12,8 @@
             <i class="fas fa-pen"></i>
           </button>
           <div class="avatar-frame">
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile Avatar" class="avatar-img" />
+            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + authService.userData()?.CODEMPID + '.jpg'"
+            (error)="onAvatarError($event)" alt="Profile Avatar" class="avatar-img" />
           </div>
         </div>
 
@@ -112,18 +113,20 @@
       </div>
       <div class="right-col-wrapper">
         <div class="card profile-card">
-          <button type="button" class="action-btn-outline top-right-pos">
+          <button type="button" class="action-btn-outline top-right-pos" title="แก้ไขโปรไฟล์">
             <i class="fas fa-pen"></i>
           </button>
 
           <div class="card-body profile-layout">
-            @if (userProfile(); as profile) {
+            @if (authService.userData(); as user) {
             <div class="profile-left-section">
-              <div class="user-id-badge">{{ profile.employeeId }}</div>
-              <div class="user-name">{{ profile.name }}</div>
-              <div class="user-role">{{ profile.position }}</div>
-              <div class="user-meta"><span>แผนก : {{ profile.department }}</span></div>
-              <div class="user-meta"><span>บริษัท : {{ profile.company }}</span></div>
+              <div class="user-id-badge">{{ user.CODEMPID }}</div>
+              <div class="user-name">{{ user.USR_FNAME }} {{ user.USR_LNAME }}
+                @if (user.NICKNAME) { <span class="user-nickname">({{ user.NICKNAME }})</span> }
+              </div>
+              <div class="user-role">{{ user.POST }}</div>
+              <div class="user-meta"><span>แผนก : {{ user.DEPARTMENT }}</span></div>
+              <div class="user-meta"><span>บริษัท : {{ user.COMPANY_NAME }}</span></div>
             </div>
             } @else {
             <div class="profile-left-section">
@@ -207,7 +210,7 @@
           }
 
           <div class="stats-action-area text-end card-footer">
-            <button type="button" class="action-btn-sm" (click)="navigateTo('/medicalexpenses')">
+            <button type="button" class="action-btn-sm" (click)="navigateTo('/medicalexpenses')" title="ดูรายการค่ารักษาพยาบาล">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -243,7 +246,7 @@
                     <span class="title-text">{{ stat.label }}</span>
                     @if (stat.tooltip) {
                     <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip(stat.tooltip); $event.stopPropagation()">
+                      <button class="btn-info-circle" (click)="openTooltip(stat.tooltip); $event.stopPropagation()" title="ข้อมูลเพิ่มเติม">
                         <i class="fa-solid fa-circle-info"></i>
                       </button>
                     </div>
@@ -327,21 +330,19 @@
             <div class="schedule-body">
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
-                <ul class="holiday-list" *ngIf="holidays.length; else noHoliday">
-                  @for (h of holidays; track h.id) {
-                  <li class="holiday-item">
+                @if (holidays.length) {
+                <ul class="holiday-list">
+                  <li class="holiday-item" *ngFor="let h of holidays">
                     <span class="status-dot dot-green"></span>
                     <div class="holiday-info">
                       <span class="h-date">{{ formatThaiDate(h.date) }}</span>
                       <span class="h-name">{{ h.name }}</span>
                     </div>
                   </li>
-                  }
                 </ul>
-
-                <ng-template #noHoliday>
-                  <div class="no-holiday">ไม่มีการประกาศวันหยุดประเพณี</div>
-                </ng-template>
+                } @else {
+                <div class="no-holiday">ไม่มีการประกาศวันหยุดประเพณี</div>
+                }
               </div>
 
               <div class="calendar-panel">

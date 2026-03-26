@@ -7,6 +7,8 @@ import { MedicalStat, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, S
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
+import { MedicalApiService } from './medical-api.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +16,8 @@ import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constant
 export class DashboardService {
     private loadingService = inject(LoadingService);
     private approvalsHelper = inject(ApprovalsHelperService);
+    private medicalApiService = inject(MedicalApiService);
+    private authService = inject(AuthService);
 
     private readonly PENDING_STATUSES = [
         APPROVAL_STATUS.NEW,
@@ -39,14 +43,33 @@ export class DashboardService {
         );
     }
 
+    private readonly CODE_TYPE_MAP: Record<string, MedicalStat['type']> = {
+        OPD: 'outpatient',
+        IPD: 'inpatient',
+        DENTAL: 'dental',
+        VISION: 'optical'
+    };
+
     getMedicalStats(): Observable<MedicalStat[]> {
-        const stats: MedicalStat[] = [
-            { label: 'ผู้ป่วยนอก', subLabel: '(15,000/ปี)', used: '3,000', balance: '12,000', percent: 20, type: 'outpatient' },
-            { label: 'ทันตกรรม', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', percent: 100, type: 'dental' },
-            { label: 'สายตา', subLabel: '(1,000/ปี)', used: '1,000', balance: '0', percent: 100, type: 'optical' },
-            { label: 'ผู้ป่วยใน', subLabel: '(40,000/ปี)', used: '3,000', balance: '37,000', percent: 7.5, type: 'inpatient' },
-        ];
-        return this.loadingService.wrap(of(stats).pipe(delay(1000)));
+        const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+        const fiscalYear = dayjs().year();
+
+        return this.loadingService.wrap(
+            this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).pipe(
+                map(res => res.data.map(t => {
+                    const fmt = (n: number) => n.toLocaleString('th-TH');
+                    const percent = t.totalLimit > 0 ? Math.round((t.usedAmount / t.totalLimit) * 100) : 0;
+                    return {
+                        label: t.nameTh,
+                        subLabel: `(${fmt(t.totalLimit)}/ปี)`,
+                        used: fmt(t.usedAmount),
+                        balance: fmt(t.remainingAmount),
+                        percent,
+                        type: this.CODE_TYPE_MAP[t.code.toUpperCase()] ?? 'outpatient'
+                    } as MedicalStat;
+                }))
+            )
+        );
     }
 
     getLeaveStats(): Observable<LeaveItem[]> {
