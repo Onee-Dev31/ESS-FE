@@ -18,7 +18,8 @@ export class StatusUtil {
     private static statusMap: Record<string, string> = {
         pending: 'progress',
         approved: 'closed',
-        rejected: 'rejected'
+        rejected: 'rejected',
+        new: 'new'
     };
 
     static getStatusBadgeClaims(status: string) {

@@ -50,7 +50,7 @@
         </div>
 
         <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+          <input type="text" class="form-control" placeholder="ค้นหารหัส/description" [ngModel]="listing.searchText()"
             (ngModelChange)="listing.searchText.set($event)">
           <button class="btn-search">
             <i class="fas fa-search"></i> ค้นหา
@@ -59,53 +59,43 @@
       </div>
     </div>
 
+    <!-- Mobile card view -->
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
-      <div class="mobile-card">
-        <div class="card-header">
-          <div class="header-content">
-            <span class="ticket-no">{{ row.original.id }}</span>
+      @for (claim of comps.paginatedData(); track claim.id) {
+      <div class="claim-card">
+        <div class="claim-card__header">
+          <div class="claim-card__type-badge">
+            <i class="fa-solid fa-car-side"></i>{{ claim.claimNo }}
           </div>
-          <div class="card-actions-top">
-            <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-              {{ row.original.status | statusLabel }}
+          <div class="claim-card__actions">
+            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+              {{ claim.status | statusLabel }}
             </span>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="info-row">
-            <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
-            <span class="value">{{ row.original.createDate | date : 'dd/MM/yyyy' }}</span>
+        <div class="claim-card__body">
+          <div class="claim-card__main">
+
+            <!-- {{claim.employeeCode}} -->
           </div>
 
-          <div class="nested-list">
-            @for (item of row.original.items; track $index) {
-            <div class="nested-item">
-              <div class="item-header">
-                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="item-amount">฿{{ item.amount | number : '1.2-2' }}</span>
-              </div>
-              <div class="item-detail">
-                <div class="detail-row">
-                  <i class="fas fa-info-circle"></i> {{ item.description }}
-                </div>
-              </div>
-            </div>
+          <div class="claim-card__amount">
+            <span class="amount-label">ขอเบิก</span>
+            <span class="amount-value">฿{{ claim.amount | number:'1.2-2' }}</span>
+            @if (claim.approvedAmount > 0) {
+            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
             }
           </div>
+        </div>
 
-          <div class="card-footer-actions">
-            <button class="btn-edit-sm" (click)="openModal(row.original.id)">
-              <i class="far fa-edit"></i> แก้ไข
-            </button>
-            <button class="btn-delete-sm" (click)="deleteRequest(row.original.id)">
-              <i class="far fa-trash-alt"></i> ลบ
-            </button>
-          </div>
+        <div class="claim-card__footer">
+          <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
+          <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
+            }}</span>
         </div>
       </div>
       }
@@ -116,6 +106,7 @@
       }
     </div>
 
+    <!-- Table view -->
     <div class="table-responsive">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -123,97 +114,55 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('id')">
+            <th class="">
               <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก
-              <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
             </th>
 
-            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('createDate')">
-              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ
-              <i class="fas ml-1" [ngClass]="getSortIcon('createDate')"></i>
-            </th>
-
-            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('date')">
+            <th class="">
               <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก
-              <i class="fas ml-1" [ngClass]="getSortIcon('date')"></i>
             </th>
 
-            <th class="w-auto sortable-header text-center" (click)="toggleSort('desc')">
-              <i class="fas fa-align-left mr-1"></i> รายละเอียด
-              <i class="fas ml-1" [ngClass]="getSortIcon('desc')"></i>
-            </th>
-
-            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('amount')">
+            <th class="">
               <i class="fas fa-coins mr-1"></i> จำนวนเงิน
-              <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
             </th>
 
-            <th class="w-px-150 sortable-header text-center" (click)="toggleSort('status')">
+            <th class="">
               <i class="fas fa-tasks mr-1"></i> สถานะ
-              <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
             </th>
 
-            <th class="w-px-120 text-center">Actions</th>
+            <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+        @for (claim of comps.paginatedData(); track claim.id) {
         <tbody>
-          @for (item of row.original.items; track $index) {
-          <tr [class.group-end]="$index === row.original.items.length - 1">
-            @if ($index === 0) {
-            <td [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
-              <span class="text-primary-link">{{ row.original.id }}</span>
-            </td>
-            <td [attr.rowspan]="row.original.items.length" class="merged-col top-align text-center">
-              {{ row.original.createDate | date : 'dd/MM/yyyy' }}
-            </td>
-            }
+          <tr>
+            <td class="">{{ claim.claimNo }}</td>
+            <td class="">{{ claim.createDate | date : 'dd/MM/yyyy' }}</td>
 
-            <td class="text-center">{{ item.date }}</td>
-
-            <td class="text-center">
-              <div class="desc-wrapper">
-                <i class="fas fa-car-side text-muted"></i>
-                {{ item.description }}
-              </div>
+            <td class="">
+              {{ claim.amount | number : '1.2-2' }}
             </td>
-
-            <td class="text-center font-semibold">
-              {{ item.amount | number : '1.2-2' }}
-            </td>
-
-            @if ($index === 0) {
-            <td [attr.rowspan]="row.original.items.length" class="merged-col text-center">
-              <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                {{ row.original.status | statusLabel }}
-              </span>
-            </td>
-
-            <td [attr.rowspan]="row.original.items.length" class="merged-col text-center">
+            <td class="">{{ claim.status }}</td>
+            <td class="col-actions">
               <div class="action-btns">
-                <button class="btn-icon edit" (click)="openModal(row.original.id)">
+                <button class="btn-icon edit" (click)="openModal(claim.id)">
                   <i class="far fa-edit"></i>
                 </button>
-                <button class="btn-icon delete" (click)="deleteRequest(row.original.id)">
+                <button class="btn-icon delete" (click)="deleteRequest(claim.id)">
                   <i class="far fa-trash-alt"></i>
                 </button>
               </div>
             </td>
-            }
           </tr>
-          }
         </tbody>
         }
         @empty {
-        <tbody>
-          <tr>
-            <td colspan="7" class="no-data-cell">
-              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                icon="fas fa-inbox">
-              </app-empty-state>
-            </td>
-          </tr>
-        </tbody>
+        <tr>
+          <td colspan="7" class="no-data-cell">
+            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
+            </app-empty-state>
+          </td>
+        </tr>
         }
       </table>
       }
