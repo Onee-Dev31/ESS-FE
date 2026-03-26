@@ -99,6 +99,12 @@
     --status-waiting-text: #be26dc;
     --status-rejected-bg: rgba(220, 38, 38, 0.15);
     --status-rejected-text: #dc2626;
+    --status-approved-bg: rgba(22, 163, 74, 0.15);
+    --status-approved-text: #16a34a;
+    --status-verified-bg: rgba(22, 163, 74, 0.15);
+    --status-verified-text: #16a34a;
+    --status-pending-bg: rgba(234, 88, 12, 0.15);
+    --status-pending-text: #ea580c;
 
     //table
     --table-header-green: #b9e7cf;
@@ -208,7 +214,12 @@
     --status-waiting-text: #cf5fe6;
     --status-rejected-bg: rgba(239, 68, 68, 0.40);
     --status-rejected-text: #f87171;
-
+    --status-approved-bg: rgba(22, 163, 74, 0.25);
+    --status-approved-text: #86efac;
+    --status-verified-bg: rgba(22, 163, 74, 0.25);
+    --status-verified-text: #86efac;
+    --status-pending-bg: rgba(234, 88, 12, 0.25);
+    --status-pending-text: #fdba74;
 
     // table
     --table-header-green: #1f5f46;
