@@ -10,6 +10,8 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 interface VehicleLogItem extends AttendanceLog {
   amount: number;
   rateId: string;
+  isDuplicate: boolean;
+  type: string;
 }
 
 import { MasterDataService } from '../../../services/master-data.service';
@@ -85,10 +87,12 @@ export class VehicleFormComponent implements OnInit, OnChanges {
               timeIn: item.actual_checkin,
               timeOut: item.actual_checkout,
               selected: false,
+              isDuplicate: false,
               description: '',
               shiftCode: item.shift_code,
               amount: item.rate_amount,
-              rateId: item.rate_id
+              rateId: item.rate_id,
+              type: item.condition_type
             } as VehicleLogItem;
           })
           this.cdr.detectChanges()
@@ -98,39 +102,32 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         }
       }
     )
-
-    // this.transportService.getMockAttendanceLogs(this.selectedMonthIndex, this.selectedYearBE).subscribe(rawLogs => {
-    //   console.log()
-    //   // this.logs = rawLogs.map((item: AttendanceLog) => {
-    //   //   const matchingItem = existingRequest?.items.find(reqItem => reqItem.date === item.date);
-
-    //   //   return {
-    //   //     ...item,
-    //   //     timeIn: item.timeIn ? String(item.timeIn) : '',
-    //   //     timeOut: item.timeOut ? String(item.timeOut) : '',
-    //   //     amount: matchingItem ? matchingItem.amount : 0,
-    //   //     selected: !!matchingItem,
-    //   //     description: matchingItem ? matchingItem.description : item.description,
-    //   //   } as VehicleLogItem;
-    //   // });
-
-    //   // this.updateTotal();
-    //   this.cdr.markForCheck();
-    // });
   }
 
   onInputChange(log: VehicleLogItem) {
     if (log.description && log.description.trim() !== '') {
       log.selected = true;
     }
+    this.updateDuplicateStatus();
   }
 
   onToggleCheck(log: VehicleLogItem) {
     if (log.selected) {
+      const hasSelectedSameDate = this.logs.some(item =>
+        item !== log &&
+        item.selected &&
+        dayjs(item.date).format('YYYY-MM-DD') === dayjs(log.date).format('YYYY-MM-DD')
+      );
+
+      if (hasSelectedSameDate) {
+        log.selected = false;
+        return;
+      }
     } else {
-      log.amount = 0;
-      this.updateTotal();
+      log.description = ''
     }
+
+    this.updateDuplicateStatus();
   }
 
   updateTotal() {
@@ -189,56 +186,79 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           });
 
       });
-
-    // const invalidLogs = selectedLogs.filter(log => {
-    //   const description = log.description ? String(log.description).trim() : '';
-    //   return description === '';
-    // });
-
-    // if (invalidLogs.length > 0) {
-    //   const invalidDates = invalidLogs.map(log => log.date).join(', ');
-    //   this.toastService.warning(`กรุณากรอกรายละเอียดการเบิกให้ครบถ้วนสำหรับวันที่: ${invalidDates}`);
-    //   return;
-    // }
-
-    // if (selectedLogs.length === 0 || this.totalAmount === 0) {
-    //   this.toastService.warning('ไม่พบรายการที่เข้าเงื่อนไขการเบิกค่ารถ (ก่อน 06:00 หรือ หลัง 22:00)');
-    //   return;
-    // }
-
-    // const requestItems: RequestItem[] = selectedLogs.map(log => ({
-    //   date: log.date,
-    //   description: log.description,
-    //   amount: log.amount
-    // }));
-
-    // this.transportService.getRequestById(this.requestId).subscribe(existingRequest => {
-    //   if (existingRequest) {
-    //     const updatedRequest: VehicleRequest = {
-    //       ...existingRequest,
-    //       items: requestItems
-    //     };
-    //     this.transportService.updateVehicleRequest(this.requestId, updatedRequest).subscribe(() => {
-    //       this.toastService.success(`บันทึกการแก้ไขข้อมูลเรียบร้อย`);
-    //       this.closeModal();
-    //     });
-    //   } else {
-    //     const newRequest: VehicleRequest = {
-    //       id: this.requestId,
-    //       typeId: WELFARE_TYPES.TRANSPORT,
-    //       createDate: this.dateUtil.getCurrentDateISO(),
-    //       status: 'รอตรวจสอบ',
-    //       items: requestItems
-    //     };
-    //     this.transportService.addRequest(newRequest).subscribe(() => {
-    //       this.toastService.success(`สร้างรายการเบิกเลขที่ ${this.requestId} สำเร็จ\nยอดรวมทั้งสิ้น: ${this.totalAmount} บาท`);
-    //       this.closeModal();
-    //     });
-    //   }
-    // });
   }
 
   closeModal() {
     this.onClose.emit();
   }
+
+  // updateDuplicateStatus() {
+  //   // reset ก่อน
+  //   this.logs.forEach(log => log.isDuplicate = false);
+
+  //   const grouped: { [key: string]: VehicleLogItem[] } = {};
+
+  //   // group ตามวันที่ (ทุกตัว ไม่ใช่เฉพาะ selected)
+  //   this.logs.forEach(log => {
+  //     const key = dayjs(log.date).format('YYYY-MM-DD');
+
+  //     if (!grouped[key]) {
+  //       grouped[key] = [];
+  //     }
+
+  //     grouped[key].push(log);
+  //   });
+
+  //   // loop แต่ละวัน
+  //   Object.keys(grouped).forEach(date => {
+  //     const logsInDate = grouped[date];
+
+  //     const selectedLogs = logsInDate.filter(l => l.selected);
+
+  //     // ถ้ามี selected มากกว่า 1
+  //     if (selectedLogs.length >= 1 && logsInDate.length > 1) {
+  //       logsInDate.forEach(log => {
+  //         if (!log.selected) {
+  //           log.isDuplicate = true; // block ตัวอื่น
+  //         } else {
+  //           log.isDuplicate = false; // ตัวที่เลือกไม่โดน
+  //         }
+  //       });
+  //     }
+  //   });
+
+  //   setTimeout(() => {
+  //     console.log(grouped, this.logs)
+
+  //   }, 1000);
+  // }
+
+  updateDuplicateStatus() {
+    this.logs.forEach(log => log.isDuplicate = false);
+
+    const grouped: { [key: string]: VehicleLogItem[] } = {};
+
+    this.logs.forEach(log => {
+      const key = dayjs(log.date).format('YYYY-MM-DD');
+
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+
+      grouped[key].push(log);
+    });
+
+    Object.keys(grouped).forEach(date => {
+      const logsInDate = grouped[date];
+      const selectedLogs = logsInDate.filter(l => l.selected);
+
+      // ✅ มีคนเลือกอย่างน้อย 1 และมีหลายรายการในวันเดียวกัน
+      if (selectedLogs.length >= 1 && logsInDate.length > 1) {
+        logsInDate.forEach(log => {
+          log.isDuplicate = !log.selected; // ตัวที่ไม่เลือก = true
+        });
+      }
+    });
+  }
+
 }

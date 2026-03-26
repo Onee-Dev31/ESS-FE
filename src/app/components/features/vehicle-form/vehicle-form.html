@@ -27,7 +27,7 @@
       </button>
 
       <div class="info-badges">
-        <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span>
+        <!-- <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span> -->
       </div>
     </div>
 
@@ -64,7 +64,7 @@
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
             </td>
-            <td class="text-center bg-gray">{{ log.date }}</td>
+            <td class="text-center bg-gray">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')}}</td>
             <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
               [class.regular-label]="log.dayType === 'W'">
               {{ log.dayType }}
@@ -97,7 +97,8 @@
       </table>
 
       <div class="mobile-cards-view mobile-only">
-        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
+        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected"
+          [class.disable]="log.isDuplicate">
           <div class="card-header">
             <div class="date-info">
               <span class="day-dot"
@@ -107,7 +108,8 @@
                 log.dayType
                 }})</span>
             </div>
-            <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox" />
+            <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
+              [disabled]="log.isDuplicate" />
           </div>
 
           <div class="card-grid">
@@ -120,6 +122,10 @@
               <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
             </div>
             <div class="grid-item">
+              <label>type</label>
+              <div class="val">{{ log.type }}</div>
+            </div>
+            <div class="grid-item">
               <label>ยอดรวม (บาท)</label>
               <div class="val highlight-green">{{ (log.amount || 0) | number }}.-</div>
             </div>
@@ -128,7 +134,8 @@
           <div class="card-input-section">
             <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
             <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-              [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
+              [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)"
+              [disabled]="log.isDuplicate" />
           </div>
         </div>
       </div>

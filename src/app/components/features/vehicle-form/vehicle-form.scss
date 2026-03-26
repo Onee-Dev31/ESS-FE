@@ -7,7 +7,7 @@
 // ==========================================
 
 $col-select: 50px;
-$col-date: 120px;
+$col-date: 160px;
 $col-day-type: 80px;
 $col-shift: 120px;
 $col-time: 70px;
@@ -54,6 +54,7 @@ $col-desc: auto;
             margin: 0;
             font-size: 1.25rem;
             font-weight: 700;
+            color: #ffffff !important;
         }
 
         .btn-close-modal {
@@ -329,9 +330,9 @@ $col-desc: auto;
 // ==========================================
 
 .mobile-cards-view {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
     padding: 4px;
 
     .log-card {
@@ -453,5 +454,9 @@ $col-desc: auto;
                 }
             }
         }
+    }
+
+    .log-card.disable {
+        opacity: 0.45;
     }
 }
