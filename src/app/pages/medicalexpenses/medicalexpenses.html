@@ -54,11 +54,12 @@
                         (ngModelChange)="onChange($event)" />
                 </div>
                 <div class="group-filter">
-                    <div class="search-input-group">
-                        <i class="fas fa-search search-icon-inner"></i>
-                        <input type="text" class="form-control search-control" placeholder="ค้นหา..."
-                            [ngModel]="listing.searchText()" (ngModelChange)="listing.searchText.set($event)"
-                            (keyup.enter)="loadData()">
+                    <div class="form-field">
+                        <nz-input-wrapper class="form-input">
+                            <nz-icon nzInputPrefix nzType="search" />
+                            <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+                                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
+                        </nz-input-wrapper>
                     </div>
                     <button type="button" class="btn-search" (click)="loadData()" [disabled]="isRefreshing()">
                         <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i> ค้นหา
@@ -134,99 +135,6 @@
             }
             }
         </div>
-
-        <!-- Desktop table view -->
-        <!-- <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th class="col-id sortable-header" (click)="toggleSort('claimId')">
-                            เลขที่ <i class="fas ml-1" [ngClass]="getSortIcon('claimId')"></i>
-                        </th>
-                        <th class="sortable-header" (click)="toggleSort('claimDate')">
-                            วันที่ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('claimDate')"></i>
-                        </th>
-                        <th class="sortable-header" (click)="toggleSort('expenseTypeName')">
-                            ประเภท <i class="fas ml-1" [ngClass]="getSortIcon('expenseTypeName')"></i>
-                        </th>
-                        <th class="sortable-header" (click)="toggleSort('diseaseName')">
-                            โรค / อาการ <i class="fas ml-1" [ngClass]="getSortIcon('diseaseName')"></i>
-                        </th>
-                        <th class="sortable-header" (click)="toggleSort('hospitalName')">
-                            สถานพยาบาล <i class="fas ml-1" [ngClass]="getSortIcon('hospitalName')"></i>
-                        </th>
-                        <th class="sortable-header text-center" (click)="toggleSort('treatmentDateFrom')">
-                            วันที่รักษา <i class="fas ml-1" [ngClass]="getSortIcon('treatmentDateFrom')"></i>
-                        </th>
-                        <th class="sortable-header text-right" (click)="toggleSort('requestedAmount')">
-                            ขอเบิก <i class="fas ml-1" [ngClass]="getSortIcon('requestedAmount')"></i>
-                        </th>
-                        <th class="sortable-header text-right" (click)="toggleSort('approvedAmount')">
-                            อนุมัติ <i class="fas ml-1" [ngClass]="getSortIcon('approvedAmount')"></i>
-                        </th>
-                        <th class="sortable-header text-center" (click)="toggleSort('status')">
-                            สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
-                        </th>
-                        <th class="text-center col-actions" title="เอกสารแนบ"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (claim of paginatedClaims(); track trackById($index, claim)) {
-                    <tr>
-                        <td class="col-id">
-                            <span class="voucher-no">{{ claim.voucherNo ?? '#' + claim.claimId }}</span>
-                        </td>
-                        <td class="text-muted-sm">{{ claim.claimDate }}</td>
-                        <td>
-                            <span class="type-chip">{{ claim.expenseTypeName }}</span>
-                        </td>
-                        <td class="col-ellipsis" [title]="claim.diseaseName">{{ claim.diseaseName }}</td>
-                        <td class="col-ellipsis" [title]="claim.hospitalName">
-                            <i class="fas fa-hospital-alt text-muted mr-1"></i>{{ claim.hospitalName }}
-                        </td>
-                        <td class="text-center text-muted-sm">
-                            {{ claim.treatmentDateFrom }}<br>
-                            <span class="to-date">– {{ claim.treatmentDateTo }}</span>
-                        </td>
-                        <td class="text-right amount-col">{{ claim.requestedAmount | number:'1.2-2' }}</td>
-                        <td class="text-right amount-col approved">
-                            @if (claim.approvedAmount > 0) {
-                            {{ claim.approvedAmount | number:'1.2-2' }}
-                            } @else {
-                            <span class="text-muted">—</span>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <span class="status-badge" [ngClass]="getStatusClass(claim.status)">
-                                {{ claim.status | statusLabel }}
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            @if (claim.attachments.length) {
-                            <button type="button" class="btn-icon view" (click)="openPreview(claim)"
-                                title="ดูเอกสาร">
-                                <i class="far fa-paperclip"></i>
-                            </button>
-                            }
-                        </td>
-                    </tr>
-                    }
-                    @empty {
-                    <tr>
-                        <td colspan="10" class="no-data-cell">
-                            <app-empty-state title="ไม่พบรายการ"
-                                description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-                            </app-empty-state>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-            }
-        </div> -->
 
     </div>
 

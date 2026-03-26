@@ -185,12 +185,8 @@ $border: var(--border);
         flex-direction: row;
         gap: 10px;
 
-        .search-input-group {
-            flex: auto;
-
-            input {
-                width: 100%;
-            }
+        input {
+            width: 100%;
         }
 
         @media screen and (max-width: 425px) {
@@ -199,6 +195,10 @@ $border: var(--border);
             button {
                 width: 100%;
             }
+        }
+
+        .form-field {
+            flex: 1;
         }
     }
 }
@@ -263,29 +263,29 @@ $border: var(--border);
     color: var(--text-muted);
 }
 
-.search-input-group {
-    position: relative;
+// .search-input-group {
+//     position: relative;
 
-    .search-icon-inner {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 0.85rem;
-        pointer-events: none;
-    }
+//     .search-icon-inner {
+//         position: absolute;
+//         left: 12px;
+//         top: 50%;
+//         transform: translateY(-50%);
+//         color: var(--text-muted);
+//         font-size: 0.85rem;
+//         pointer-events: none;
+//     }
 
-    .search-control {
-        padding-left: 34px;
-        min-width: 200px;
+//     .search-control {
+//         padding-left: 34px;
+//         min-width: 200px;
 
-        @include mobile {
-            min-width: 0;
-            width: 100%;
-        }
-    }
-}
+//         @include mobile {
+//             min-width: 0;
+//             width: 100%;
+//         }
+//     }
+// }
 
 // ============================================================
 // Status badge

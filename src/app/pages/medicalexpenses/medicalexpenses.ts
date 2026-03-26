@@ -25,6 +25,8 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 /** หน้าแสดงรายการเบิกค่ารักษาพยาบาล */
 @Component({
   selector: 'app-medicalexpenses',
@@ -39,7 +41,9 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
     PageHeaderComponent,
     SkeletonComponent,
     EmptyStateComponent,
-    NzDatePickerModule
+    NzDatePickerModule,
+    NzInputModule,
+    NzIconModule
   ],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
