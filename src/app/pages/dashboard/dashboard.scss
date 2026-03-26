@@ -671,7 +671,6 @@ $balance: $status-success-text;
     .stats-group-header {
         font-size: 16px;
         font-weight: 700;
-        margin-bottom: 20px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -682,10 +681,41 @@ $balance: $status-success-text;
         }
     }
 
+    .medical-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .btn-view-medical {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1.5px solid var(--primary);
+        background: transparent;
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+
+        i { font-size: 12px; }
+
+        &:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+    }
+
     .stat-items-grid {
-        margin-bottom: 20px;
+        margin-top: 16px;
         display: grid;
-        gap: 15px;
+        gap: 12px;
         grid-template-columns: repeat(2, 1fr);
 
         @media (min-width: 1441px) {
@@ -698,122 +728,126 @@ $balance: $status-success-text;
 
         @media (max-width: 480px) {
             grid-template-columns: 1fr;
-            gap: 12px;
-        }
-    }
-
-    .stats-action-area.card-footer {
-        background: var(--bg-slate);
-        border-radius: 0 0 $radius $radius;
-        padding: 12px 15px;
-        margin: 15px -15px -15px -15px;
-
-        @media (min-width: 768px) {
-            padding: 12px 24px;
-            margin: 24px -24px -24px -24px;
+            gap: 10px;
         }
     }
 }
 
 .stat-item {
-    padding: 15px;
-    border-radius: 8px;
+    padding: 14px 16px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
+    gap: 10px;
+    background: var(--bg-slate);
+    border-left: 4px solid #ccc;
     min-width: 0;
+    transition: box-shadow 0.2s;
 
-    .stat-header {
-        margin-bottom: 12px;
+    &:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+    &.type-outpatient { border-left-color: #ef4444; }
+    &.type-dental     { border-left-color: #3b82f6; }
+    &.type-optical    { border-left-color: #6366f1; }
+    &.type-inpatient  { border-left-color: #22c55e; }
+
+    .stat-top-row {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
         gap: 8px;
-
-        .stat-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: $dark;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-
-            @media (min-width: 768px) {
-                font-size: 15px;
-            }
-        }
-
-        .stat-limit {
-            font-size: 11px;
-            color: $muted;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 90px;
-
-            @media (min-width: 768px) {
-                font-size: 13px;
-                max-width: none;
-            }
-        }
     }
 
-    .stat-content-row {
+    .stat-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: $dark;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .stat-percent-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        color: #fff;
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        &.bg-red    { background: #ef4444; }
+        &.bg-blue   { background: #3b82f6; }
+        &.bg-indigo { background: #6366f1; }
+        &.bg-green  { background: #22c55e; }
+    }
+
+    .stat-limit-label {
+        font-size: 11px;
+        color: $muted;
+        margin-top: -6px;
+    }
+
+    .stat-values-row {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 8px;
+        align-items: stretch;
+        gap: 0;
+        background: var(--bg-card);
+        border-radius: 8px;
+        overflow: hidden;
 
-        @media (min-width: 1600px) {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .stat-data-group {
+        .stat-val-group {
+            flex: 1;
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px;
+            gap: 2px;
 
-            @media (min-width: 1600px) {
-                width: auto;
-                gap: 4px;
+            &.accent {
+                background: rgba(var(--primary-rgb, 70,80,221), 0.06);
             }
 
-            .inline-label {
-                font-size: 11px;
+            .val-label {
+                font-size: 10px;
                 color: $muted;
                 font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
             }
 
-            .inline-value {
-                font-size: 16px;
+            .val-num {
+                font-size: 15px;
                 font-weight: 700;
                 color: var(--text-header);
                 font-family: $font-main;
 
-                &.bold-value {
-                    font-size: 18px;
-                    color: $balance;
-                }
+                &.text-balance { color: #22c55e; }
             }
+        }
+
+        .stat-val-divider {
+            width: 1px;
+            background: var(--border-table-head);
+            flex-shrink: 0;
         }
     }
 
     .stat-progress {
-        height: 6px;
+        height: 5px;
         background: var(--border-table-head);
         border-radius: 10px;
         overflow: hidden;
-        width: 100%;
-        margin-top: auto;
 
         .progress-bar {
             height: 100%;
             border-radius: 10px;
-            transition: width 0.3s ease;
+            transition: width 0.4s ease;
+
+            &.bg-red    { background: #ef4444; }
+            &.bg-blue   { background: #3b82f6; }
+            &.bg-indigo { background: #6366f1; }
+            &.bg-green  { background: #22c55e; }
         }
     }
 }

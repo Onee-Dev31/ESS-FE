@@ -160,41 +160,45 @@
                 <i class="fa-solid fa-circle-info"></i>
               </button>
             </div>
-            @if (userRole() === 'Admin') {
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals-medicalexpenses')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                @if (medicalPendingCount(); as count) {
-                @if (count > 0) {
-                <span class="notification-badge">{{ count }}</span>
-                }
-                }
-              </div>
-              รายการรออนุมัติ
-            </button>
-            }
+            <div class="medical-header-actions">
+              <button type="button" class="btn-view-medical" (click)="navigateTo('/medicalexpenses')">
+                <i class="fas fa-list-alt"></i> ดูรายการ
+              </button>
+              @if (userRole() === 'Admin') {
+              <button class="btn-pending-approvals" (click)="navigateTo('/approvals-medicalexpenses')">
+                <div class="icon-shake">
+                  <i class="fas fa-bell"></i>
+                  @if (medicalPendingCount(); as count) {
+                  @if (count > 0) {
+                  <span class="notification-badge">{{ count }}</span>
+                  }
+                  }
+                </div>
+                รายการรออนุมัติ
+              </button>
+              }
+            </div>
           </div>
 
           @if (medicalStatsDisplay(); as stats) {
           <div class="stat-items-grid">
             @for (stat of stats; track stat.label) {
-            <div class="stat-item">
-              <div class="stat-header">
-                <div class="stat-title">{{ stat.label }}</div>
-                <div class="stat-limit">{{ stat.subLabel }}</div>
+            <div class="stat-item" [ngClass]="'type-' + stat.type">
+              <div class="stat-top-row">
+                <span class="stat-title">{{ stat.label }}</span>
+                <span class="stat-percent-badge" [ngClass]="stat.progressColor">{{ stat.percent }}%</span>
               </div>
+              <div class="stat-limit-label">วงเงิน {{ stat.subLabel }}</div>
 
-              <div class="stat-content-row">
-                <div class="stat-data-group">
-                  <span class="inline-label">ใช้ไป</span>
-                  <span class="inline-value">{{ stat.used }}</span>
+              <div class="stat-values-row">
+                <div class="stat-val-group">
+                  <span class="val-label">ใช้ไป</span>
+                  <span class="val-num">{{ stat.used }}</span>
                 </div>
-
-                <div class="stat-data-group text-end">
-                  <span class="inline-label">คงเหลือ</span>
-                  <span class="inline-value bold-value" [ngClass]="stat.balanceColor">
-                    {{ stat.balance }}
-                  </span>
+                <div class="stat-val-divider"></div>
+                <div class="stat-val-group accent">
+                  <span class="val-label">คงเหลือ</span>
+                  <span class="val-num" [ngClass]="stat.balanceColor">{{ stat.balance }}</span>
                 </div>
               </div>
 
@@ -209,12 +213,6 @@
             <app-skeleton type="card" [rows]="4"></app-skeleton>
           </div>
           }
-
-          <div class="stats-action-area text-end card-footer">
-            <button type="button" class="action-btn-sm" (click)="navigateTo('/medicalexpenses')" title="ดูรายการค่ารักษาพยาบาล">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
         </section>
 
         @defer (on viewport) {
