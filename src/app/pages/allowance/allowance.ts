@@ -58,6 +58,7 @@ export class AllowanceComponent implements OnInit {
   allRequests = signal<AllowanceRequest[]>([]);
   totalCount = signal<number>(0);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
+  private reloadTrigger = signal(0);
 
   listing = createListingState();
 
@@ -174,6 +175,7 @@ export class AllowanceComponent implements OnInit {
       endDate:   toObservable(this.listing.filterEndDate),
       page:      toObservable(this.listing.currentPage),
       pageSize:  toObservable(this.listing.pageSize),
+      _reload:   toObservable(this.reloadTrigger),
     }).pipe(
       switchMap(({ search, status, startDate, endDate, page, pageSize }) => {
         const userData = this.authService.userData();
@@ -201,8 +203,8 @@ export class AllowanceComponent implements OnInit {
   ngOnInit() {}
 
   loadData() {
-    // trigger reload by nudging the page signal
     this.listing.currentPage.set(0);
+    this.reloadTrigger.update(v => v + 1);
   }
 
   openModal() {
