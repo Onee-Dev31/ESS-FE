@@ -1,10 +1,11 @@
 /** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยง (Allowance) และคำนวณเบี้ยเลี้ยงตามชั่วโมงงาน */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
 import { AllowanceMock } from '../mocks/allowance.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
+import { AllowanceApiService } from './allowance-api.service';
 
 export type { AllowanceItem, AllowanceRequest };
 
@@ -13,6 +14,7 @@ export type { AllowanceItem, AllowanceRequest };
 })
 export class AllowanceService extends BaseRequestService<AllowanceRequest> {
     protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_ALLOWANCE_DATA;
+    private allowanceApi = inject(AllowanceApiService);
 
     constructor() {
         super();
@@ -78,15 +80,7 @@ export class AllowanceService extends BaseRequestService<AllowanceRequest> {
         const minutes = extraMinutes % 60;
         const displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
 
-        let amount = 0;
-        if (extraHoursDecimal >= 2) {
-            if (extraHoursDecimal <= 4) amount = 150;
-            else if (extraHoursDecimal <= 8) amount = 225;
-            else if (extraHoursDecimal <= 12) amount = 300;
-            else if (extraHoursDecimal <= 16) amount = 375;
-            else if (extraHoursDecimal <= 20) amount = 450;
-            else amount = 525;
-        }
+        const amount = this.allowanceApi.calculateAmount(extraHoursDecimal);
 
         return {
             ...log,

@@ -1,7 +1,7 @@
 <div class="allowance-form-page">
   <header class="top-header-strip">
     <h2>บันทึกข้อมูลเบี้ยเลี้ยง</h2>
-    <button class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+    <button class="btn-close-modal" (click)="closeModal()" title="ปิด"><i class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
@@ -9,10 +9,10 @@
       <div class="month-selector">
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
-          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
+          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control" title="เลือกเดือน">
             <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i">{{ m }}</option>
           </select>
-          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
+          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control" title="เลือกปี">
             <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
           </select>
           <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
@@ -26,17 +26,10 @@
       </span>
       <span class="note-desc">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</span>
       <span class="note-rates">
-        <span><strong>2-4 ชม. :</strong> 150 บาท</span>
-        <span class="divider">|</span>
-        <span><strong>5-8 ชม. :</strong> 225 บาท</span>
-        <span class="divider">|</span>
-        <span><strong>9-12 ชม. :</strong> 300 บาท</span>
-        <span class="divider">|</span>
-        <span><strong>13-16 ชม. :</strong> 375 บาท</span>
-        <span class="divider">|</span>
-        <span><strong>17-20 ชม. :</strong> 450 บาท</span>
-        <span class="divider">|</span>
-        <span><strong>21-24 ชม. :</strong> 525 บาท</span>
+        @for (rate of allowanceApi.rates(); track rate.rate_id) {
+          <span><strong>{{ rate.description }} :</strong> {{ rate.rate_amount | number }} บาท</span>
+          @if (!$last) { <span class="divider">|</span> }
+        }
       </span>
     </div>
 
@@ -44,35 +37,17 @@
       <div class="policy-popup-content" (click)="$event.stopPropagation()">
         <div class="policy-popup-header">
           <h3><i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณเบี้ยเลี้ยง</h3>
-          <button class="btn-close-popup" (click)="isPolicyPopupOpen.set(false)"><i class="fas fa-times"></i></button>
+          <button class="btn-close-popup" (click)="isPolicyPopupOpen.set(false)" title="ปิด"><i class="fas fa-times"></i></button>
         </div>
         <div class="policy-popup-body">
           <p class="policy-description">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</p>
           <div class="policy-rates-list">
-            <div class="rate-item">
-              <span class="rate-hours">2-4 ชม.</span>
-              <span class="rate-amount">150 บาท</span>
-            </div>
-            <div class="rate-item">
-              <span class="rate-hours">5-8 ชม.</span>
-              <span class="rate-amount">225 บาท</span>
-            </div>
-            <div class="rate-item">
-              <span class="rate-hours">9-12 ชม.</span>
-              <span class="rate-amount">300 บาท</span>
-            </div>
-            <div class="rate-item">
-              <span class="rate-hours">13-16 ชม.</span>
-              <span class="rate-amount">375 บาท</span>
-            </div>
-            <div class="rate-item">
-              <span class="rate-hours">17-20 ชม.</span>
-              <span class="rate-amount">450 บาท</span>
-            </div>
-            <div class="rate-item">
-              <span class="rate-hours">21-24 ชม.</span>
-              <span class="rate-amount">525 บาท</span>
-            </div>
+            @for (rate of allowanceApi.rates(); track rate.rate_id) {
+              <div class="rate-item">
+                <span class="rate-hours">{{ rate.description }}</span>
+                <span class="rate-amount">{{ rate.rate_amount | number }} บาท</span>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -122,9 +97,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let log of logs" [class.highlight-row]="log.selected">
+          <tr *ngFor="let log of logs" [class.highlight-row]="log.selected" [class.not-eligible-row]="!log.isEligible">
             <td class="text-center">
-              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
+              <label class="sr-only-label">
+                <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
+                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, descInput)" [disabled]="!log.isEligible" />
+              </label>
             </td>
             <td class="text-center bg-gray">{{ log.date }}</td>
             <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
@@ -135,16 +113,16 @@
               {{ log.shiftCode }}
             </td>
             <td class="p-0">
-              <input type="text" class="time-input" [ngModel]="log.timeIn" readonly />
+              <input type="text" class="time-input" [ngModel]="log.timeIn" readonly title="เวลาเข้างาน" />
             </td>
             <td class="p-0">
-              <input type="text" class="time-input" [ngModel]="log.timeOut" readonly />
+              <input type="text" class="time-input" [ngModel]="log.timeOut" readonly title="เวลาออกงาน" />
             </td>
             <td class="text-center font-bold">{{ log.displayHours }}</td>
             <td class="text-center font-bold">{{ log.amount | number }}</td>
             <td class="desc-cell">
               <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+                <input #descInput type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
                   [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
                 <small class="error-msg" *ngIf="log.selected && !log.description"></small>
               </div>
@@ -164,7 +142,7 @@
       </table>
 
       <div class="mobile-cards-view mobile-only">
-        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected">
+        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected" [class.not-eligible-card]="!log.isEligible">
           <div class="card-header">
             <div class="date-info">
               <span class="day-dot"
@@ -174,7 +152,10 @@
                 log.dayType
                 }})</span>
             </div>
-            <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox" />
+            <label class="sr-only-label">
+              <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
+              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, cardDescInput)" class="card-checkbox" [disabled]="!log.isEligible" />
+            </label>
           </div>
 
           <div class="card-grid">
@@ -198,7 +179,7 @@
 
           <div class="card-input-section">
             <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
-            <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+            <input #cardDescInput type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
               [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
           </div>
         </div>

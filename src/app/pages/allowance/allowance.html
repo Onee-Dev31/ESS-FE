@@ -19,7 +19,7 @@
           <div class="filter-group">
             <span class="filter-label">ตั้งแต่เดือน</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
+              <input type="date" class="form-control" title="ตั้งแต่วันที่" [ngModel]="listing.filterStartDate()"
                 (ngModelChange)="listing.filterStartDate.set($event)" />
             </div>
           </div>
@@ -27,7 +27,7 @@
           <div class="filter-group">
             <span class="filter-label">ถึง</span>
             <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
+              <input type="date" class="form-control" title="ถึงวันที่" [ngModel]="listing.filterEndDate()"
                 (ngModelChange)="listing.filterEndDate.set($event)" />
             </div>
           </div>
@@ -35,7 +35,7 @@
           <div class="filter-group">
             <span class="filter-label">สถานะ</span>
             <div class="select-input-group">
-              <select class="form-control select-status" [ngModel]="listing.filterStatus()"
+              <select class="form-control select-status" title="กรองตามสถานะ" [ngModel]="listing.filterStatus()"
                 (ngModelChange)="listing.filterStatus.set($event)">
                 <option value="">ทั้งหมด</option>
                 <option value="NEW">คำขอใหม่</option>
@@ -64,7 +64,7 @@
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      @for (req of comps.paginatedData(); track trackByReqId($index, req)) {
+      @for (req of processedData(); track trackByReqId($index, req)) {
       <div class="mobile-card">
         <div class="card-header">
           <div class="header-content">
@@ -147,7 +147,7 @@
             <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        @for (req of comps.paginatedData(); track trackByReqId($index, req)) {
+        @for (req of processedData(); track trackByReqId($index, req)) {
         <tbody>
           @for (item of req.items; track $index) {
           <tr>
@@ -206,7 +206,7 @@
 
     <div class="pagination-wrapper">
       <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+        [totalItems]="totalCount()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
       </app-pagination>
     </div>
   </div>

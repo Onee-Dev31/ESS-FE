@@ -2,6 +2,8 @@ import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
+import { AllowanceApiService } from '../../../services/allowance-api.service';
+import { AuthService } from '../../../services/auth.service';
 import { UserService } from '../../../services/user.service';
 import { ToastService } from '../../../services/toast';
 import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
@@ -20,6 +22,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private allowanceService = inject(AllowanceService);
+  protected allowanceApi = inject(AllowanceApiService);
+  private authService = inject(AuthService);
   private userService = inject(UserService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -27,10 +31,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadedRequest?: AllowanceRequest;
 
-  thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษาพยน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-  years = [2568, 2569, 2570];
-  selectedMonthIndex: number = 9;
-  selectedYearBE: number = 2568;
+  thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+  private readonly currentYearBE = new Date().getFullYear() + 543;
+  years = [this.currentYearBE - 1, this.currentYearBE, this.currentYearBE + 1];
+  selectedMonthIndex: number = new Date().getMonth();   // 0-based
+  selectedYearBE: number = this.currentYearBE;
   totalAmount: number = 0;
   totalHoursStr: string = '0.00';
   logs: AllowanceItem[] = [];
@@ -70,42 +75,53 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   generateCalendar() {
     const existingRequest = this.loadedRequest;
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    const yearCE = this.selectedYearBE - 543; // API รับปี ค.ศ.
+    const month = this.selectedMonthIndex + 1; // 0-based → 1-based
 
-    this.allowanceService.getMockAllowanceLogs(this.selectedMonthIndex, this.selectedYearBE)
-      .subscribe(rawLogs => {
-        this.logs = rawLogs.map(item => {
-          const matchingItem = existingRequest?.items.find(i => i.date === item.date);
+    this.allowanceApi.getEligibleDates(employeeCode, yearCE, month)
+      .subscribe({
+        next: (res) => {
+          this.logs = (res.data ?? []).map(item => {
+            const dateStr = item.work_date.split('T')[0]; // "2026-03-02"
+            const eligible = item.is_eligible === 1;
 
-          const log: AllowanceItem = {
-            date: item.date,
-            dayType: item.dayType,
-            timeIn: item.timeIn,
-            timeOut: item.timeOut,
-            displayHours: '0.00',
-            actualExtraHours: 0,
-            amount: 0,
-            selected: item.selected,
-            description: item.description,
-            shiftCode: item.shiftCode,
-            hours: 0
-          };
+            const log: AllowanceItem = {
+              date: dateStr,
+              dayType: item.day_type,
+              timeIn: item.actual_checkin,
+              timeOut: item.actual_checkout,
+              hours: item.rounded_hours,
+              amount: item.rate_amount ?? 0,
+              actualExtraHours: item.total_hours,
+              displayHours: item.total_hours_text,
+              selected: false,
+              description: '',
+              shiftCode: item.shift_code,
+              isEligible: eligible,
+              totalHoursText: item.total_hours_text,
+            };
 
-          if (matchingItem) {
-            log.timeIn = matchingItem.timeIn;
-            log.timeOut = matchingItem.timeOut;
-            log.amount = matchingItem.amount;
-            log.selected = matchingItem.selected;
-            log.description = matchingItem.description;
-            log.hours = matchingItem.hours;
-            log.displayHours = matchingItem.displayHours;
-            log.actualExtraHours = matchingItem.actualExtraHours;
-          }
+            // ถ้าเป็น request ที่บันทึกไว้แล้ว ให้ override ด้วยค่าที่บันทึก
+            const saved = existingRequest?.items.find(i => i.date === dateStr);
+            if (saved) {
+              log.selected = saved.selected;
+              log.description = saved.description;
+              log.amount = saved.amount;
+              log.hours = saved.hours;
+              log.displayHours = saved.displayHours;
+              log.actualExtraHours = saved.actualExtraHours;
+            }
 
-          this.autoCalculate(log);
-
-          return log;
-        });
-        this.cdr.markForCheck();
+            return log;
+          });
+          this.updateTotal();
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.toastService.warning('ไม่สามารถโหลดรายการวันที่มีสิทธิ์เบิกได้');
+          this.cdr.markForCheck();
+        }
       });
   }
 
@@ -118,12 +134,15 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onInputChange(log: AllowanceItem) {
     if (log.description && log.description.trim() !== '') {
       log.selected = true;
-      this.autoCalculate(log);
     }
+    this.updateTotal();
   }
 
-  onToggleCheck(log: AllowanceItem) {
-    this.autoCalculate(log);
+  onToggleCheck(log: AllowanceItem, descInput?: HTMLInputElement) {
+    this.updateTotal();
+    if (log.selected && descInput) {
+      setTimeout(() => descInput.focus(), 0);
+    }
   }
 
   updateTotal() {

@@ -7,6 +7,23 @@
 // ============================================
 
 
+// Visually hidden but accessible to screen readers
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sr-only-label {
+    display: contents;
+}
+
 // ==========================================
 // Layout Styles (from _layout.scss)
 // ==========================================
@@ -246,6 +263,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     z-index: 10000;
     display: flex;
@@ -437,7 +455,7 @@
             z-index: 10;
             text-align: center;
             color: #ffffff;
-            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+            border-top: 1px solid rgba(0, 0, 0, 0.15);
         }
 
         .sub-header th {
@@ -486,6 +504,10 @@
 
         .highlight-row td {
             background-color: rgba($warning, 0.05) !important;
+        }
+
+        .not-eligible-row td {
+            opacity: 0.45;
         }
 
         .time-input {
@@ -575,6 +597,10 @@
             border-color: $warning;
             background: rgba($warning, 0.05);
             box-shadow: 0 4px 15px rgba($warning, 0.1);
+        }
+
+        &.not-eligible-card {
+            opacity: 0.45;
         }
 
         .card-header {

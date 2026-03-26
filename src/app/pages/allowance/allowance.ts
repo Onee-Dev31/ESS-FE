@@ -1,23 +1,28 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
 import { AllowanceService } from '../../services/allowance.service';
-import { AllowanceRequest, AllowanceItem } from '../../interfaces/allowance.interface';
+import { AllowanceApiService } from '../../services/allowance-api.service';
+import { AuthService } from '../../services/auth.service';
+import { AllowanceRequest, AllowanceItem, MealAllowanceClaim } from '../../interfaces/allowance.interface';
 import { LoadingService } from '../../services/loading';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusUtil } from '../../utils/status.util';
-import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
+import { createListingState, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { combineLatest, debounce, timer, switchMap, catchError, of } from 'rxjs';
 import {
   createAngularTable,
   getCoreRowModel,
   SortingState,
 } from '@tanstack/angular-table';
+import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
 interface FlatAllowanceRow extends AllowanceItem {
   requestId: string;
@@ -27,8 +32,6 @@ interface FlatAllowanceRow extends AllowanceItem {
   groupLength: number;
 }
 
-import { StatusLabelPipe } from '../../pipes/status-label.pipe';
-
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยง (Allowance) พร้อมระบบตารางข้อมูลและตัวกรอง */
 @Component({
   selector: 'app-allowance',
@@ -36,10 +39,15 @@ import { StatusLabelPipe } from '../../pipes/status-label.pipe';
   imports: [CommonModule, FormsModule, AllowanceFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, MedicalPolicyModalComponent, EmptyStateComponent, SkeletonComponent],
   templateUrl: './allowance.html',
   styleUrl: './allowance.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AllowanceComponent implements OnInit {
+  private allowanceApiService = inject(AllowanceApiService);
   private allowanceService = inject(AllowanceService);
+  private authService = inject(AuthService);
   private dateUtil = inject(DateUtilityService);
+  private loadingService = inject(LoadingService);
+  private destroyRef = inject(DestroyRef);
 
   protected readonly Math = Math;
 
@@ -48,66 +56,73 @@ export class AllowanceComponent implements OnInit {
   selectedRequestId = '';
 
   allRequests = signal<AllowanceRequest[]>([]);
+  totalCount = signal<number>(0);
   sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
 
   listing = createListingState();
 
+  isLoading = this.loadingService.loading('allowance-list');
+
+  /** Map API claim → AllowanceRequest shape used by the template */
+  private mapClaim(claim: MealAllowanceClaim): AllowanceRequest {
+    return {
+      id: claim.VoucherNo,
+      typeId: 0,
+      createDate: claim.CreatedAt?.split('T')[0] ?? claim.ClaimDate,
+      status: claim.Status,
+      items: claim.Details.map(d => ({
+        date: d.WorkDate,
+        timeIn: '',
+        timeOut: '',
+        description: d.Description,
+        hours: d.WorkHours,
+        amount: d.AllowanceAmount,
+        selected: false,
+      })),
+    };
+  }
+
+  /** Client-side sort on the fetched page */
   processedData = computed(() => {
     const list = [...this.allRequests()];
-    const search = this.listing.searchText().toLowerCase();
-    const status = this.listing.filterStatus();
-    const start = this.listing.filterStartDate();
-    const end = this.listing.filterEndDate();
-
-    let filtered = list.filter(r => {
-      const matchSearch = !search || r.id.toLowerCase().includes(search) ||
-        r.items.some(item => item.description.toLowerCase().includes(search));
-      const matchStatus = !status || r.status === status;
-      const matchStart = !start || r.createDate >= start;
-      const matchEnd = !end || r.createDate <= end;
-      return matchSearch && matchStatus && matchStart && matchEnd;
-    });
-
     const sortState = this.sorting()[0];
-    if (sortState) {
-      const { id, desc } = sortState;
-      const direction = desc ? -1 : 1;
+    if (!sortState) return list;
 
-      filtered.sort((requestA, requestB) => {
-        let valueA: number | string, valueB: number | string;
-        switch (id) {
-          case 'requestId': return requestA.id.localeCompare(requestB.id) * direction;
-          case 'createDate': return requestA.createDate.localeCompare(requestB.createDate) * direction;
-          case 'status': return requestA.status.localeCompare(requestB.status) * direction;
-          case 'amount':
-            valueA = requestA.items.reduce((sum, i) => sum + i.amount, 0);
-            valueB = requestB.items.reduce((sum, i) => sum + i.amount, 0);
-            return (valueA - valueB) * direction;
-          case 'hours':
-            valueA = requestA.items.reduce((sum, i) => sum + i.hours, 0);
-            valueB = requestB.items.reduce((sum, i) => sum + i.hours, 0);
-            return (valueA - valueB) * direction;
-          case 'date':
-            valueA = requestA.items[0]?.date || '';
-            valueB = requestB.items[0]?.date || '';
-            return this.dateUtil.formatBEToISO(valueA).localeCompare(this.dateUtil.formatBEToISO(valueB)) * direction;
-          case 'description':
-            valueA = requestA.items[0]?.description || '';
-            valueB = requestB.items[0]?.description || '';
-            return valueA.localeCompare(valueB) * direction;
-          default: return 0;
-        }
-      });
-    }
-    return filtered;
+    const { id, desc } = sortState;
+    const direction = desc ? -1 : 1;
+
+    list.sort((a, b) => {
+      let va: number | string, vb: number | string;
+      switch (id) {
+        case 'requestId':  return a.id.localeCompare(b.id) * direction;
+        case 'createDate': return a.createDate.localeCompare(b.createDate) * direction;
+        case 'status':     return a.status.localeCompare(b.status) * direction;
+        case 'amount':
+          va = a.items.reduce((s, i) => s + i.amount, 0);
+          vb = b.items.reduce((s, i) => s + i.amount, 0);
+          return (va - vb) * direction;
+        case 'hours':
+          va = a.items.reduce((s, i) => s + i.hours, 0);
+          vb = b.items.reduce((s, i) => s + i.hours, 0);
+          return (va - vb) * direction;
+        case 'date':
+          va = a.items[0]?.date || '';
+          vb = b.items[0]?.date || '';
+          return this.dateUtil.formatBEToISO(va).localeCompare(this.dateUtil.formatBEToISO(vb)) * direction;
+        case 'description':
+          va = a.items[0]?.description || '';
+          vb = b.items[0]?.description || '';
+          return va.localeCompare(vb) * direction;
+        default: return 0;
+      }
+    });
+    return list;
   });
 
-  comps = createListingComputeds(this.processedData, this.listing);
-
-  /** แปลงข้อมูลจากรูปแบบ Request (ที่มีหลายรายการย่อย) เป็นแถวตารางแบบแบน (Flat Rows) */
+  /** แปลงข้อมูลจากรูปแบบ Request เป็นแถวตารางแบบแบน */
   displayedRows = computed(() => {
     const rows: FlatAllowanceRow[] = [];
-    this.comps.paginatedData().forEach((request: AllowanceRequest) => {
+    this.processedData().forEach((request: AllowanceRequest) => {
       request.items.forEach((item: AllowanceItem, index: number) => {
         rows.push({
           ...item,
@@ -142,19 +157,52 @@ export class AllowanceComponent implements OnInit {
     manualPagination: true,
   }));
 
-  ngOnInit() {
-    this.loadData();
-  }
+  constructor() {
+    // Seed from cache immediately so the page feels instant on re-visit
+    const cached = this.allowanceApiService.lastResponse();
+    if (cached) {
+      this.allRequests.set((cached.data ?? []).map(c => this.mapClaim(c)));
+      this.totalCount.set(cached.pagination?.totalCount ?? 0);
+    }
 
-  private loadingService = inject(LoadingService);
-  isLoading = this.loadingService.loading('allowance-list');
-
-  loadData() {
-    this.loadingService.start('allowance-list');
-    this.allowanceService.getAllowanceRequests().subscribe(data => {
-      this.allRequests.set(data);
+    // Convert signals to observables and combine
+    // Search text uses 400ms debounce, other filters fire immediately
+    combineLatest({
+      search:    toObservable(this.listing.searchText).pipe(debounce(v => timer(v ? 400 : 0))),
+      status:    toObservable(this.listing.filterStatus),
+      startDate: toObservable(this.listing.filterStartDate),
+      endDate:   toObservable(this.listing.filterEndDate),
+      page:      toObservable(this.listing.currentPage),
+      pageSize:  toObservable(this.listing.pageSize),
+    }).pipe(
+      switchMap(({ search, status, startDate, endDate, page, pageSize }) => {
+        const userData = this.authService.userData();
+        this.loadingService.start('allowance-list');
+        return this.allowanceApiService.getClaims({
+          employee_code: userData?.CODEMPID ?? '',
+          date_from: startDate || undefined,
+          date_to: endDate || undefined,
+          status: status || undefined,
+          search: search || undefined,
+          page_number: page + 1,
+          page_size: pageSize,
+        }).pipe(
+          catchError(() => of({ success: false, data: [], pagination: { totalCount: 0, pageNumber: 1, pageSize: 10 } }))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(res => {
+      this.allRequests.set((res.data ?? []).map(c => this.mapClaim(c)));
+      this.totalCount.set(res.pagination?.totalCount ?? 0);
       this.loadingService.stop('allowance-list');
     });
+  }
+
+  ngOnInit() {}
+
+  loadData() {
+    // trigger reload by nudging the page signal
+    this.listing.currentPage.set(0);
   }
 
   openModal() {
@@ -194,15 +242,15 @@ export class AllowanceComponent implements OnInit {
     return TableSortHelper.getSortIcon(this.table, columnId);
   }
 
-  trackByReqId(index: number, req: AllowanceRequest): string {
+  trackByReqId(_index: number, req: AllowanceRequest): string {
     return req.id;
   }
 
-  trackByRowId(index: number, itemOrRow: AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>): string {
+  trackByRowId(_index: number, itemOrRow: AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     const id = (item as FlatAllowanceRow).requestId || (item as AllowanceRequest).id || 'row';
     const date = (item as FlatAllowanceRow).date || '';
-    return `${id}-${date}-${index}`;
+    return `${id}-${date}-${_index}`;
   }
 
   getStatusClass(status: string): string {
@@ -217,5 +265,4 @@ export class AllowanceComponent implements OnInit {
   goToPage(page: number) {
     this.listing.currentPage.set(page);
   }
-
 }
