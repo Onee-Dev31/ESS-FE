@@ -14,6 +14,7 @@ import { Subject, Subscription, debounceTime, switchMap, catchError, of } from '
 import { ClaimType } from '../../../services/master-data.service';
 import { MedicalApiService } from '../../../services/medical-api.service';
 import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
+import { formatMoneyInput } from '../../../utils/formatText';
 
 @Component({
   selector: 'app-medicalexpenses-form',
@@ -88,7 +89,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private diseaseSearchSub?: Subscription;
   startDate = signal<string>('');
   endDate = signal<string>('');
-  amount = signal<string>('');
+  // amount = signal<string>('');
+  amount: string = '';
   amountError: string | null = null;
   // amount = signal<number>(0);
   // amount: number = 0;
@@ -315,7 +317,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
             this.startDate.set(this.dateUtil.formatBEToISO(item.treatmentDateFrom));
             this.endDate.set(this.dateUtil.formatBEToISO(item.treatmentDateTo));
-            this.amount.set(item.requestedAmount.toString());
+            this.amount = item.requestedAmount.toString();
+            // this.amount.set(item.requestedAmount.toString());
             // this.amount = item.requestedAmount
           }
         } else {
@@ -389,7 +392,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       !this.disease().trim() ||
       !this.startDate().trim() ||
       !this.endDate().trim() ||
-      !this.amount().trim()
+      !this.amount.trim()
     ) {
       return false; // ยังกรอกไม่ครบ
     }
@@ -416,7 +419,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.parseNumber(this.amount()) <= 0) {
+    if (this.parseNumber(this.amount) <= 0) {
       this.toastService.warning('จำนวนเงินที่เบิกต้องมากกว่า 0');
       this.amountInputEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       this.amountInputEl?.nativeElement.focus();
@@ -457,7 +460,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     const confirmed = await this.dialogService.confirm({
       title: 'ยืนยันการส่งเรื่องเบิก',
-      message: `ต้องการส่งเรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount()).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
+      message: `ต้องการส่งเรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
       confirmText: 'ส่งเรื่องเบิก',
       cancelText: 'ยกเลิก',
       type: 'info',
@@ -474,7 +477,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       treatment_date_from: this.startDate(),
       treatment_date_to: this.endDate(),
       treatment_days: this.calculatedDays(),
-      requested_amount: this.parseNumber(this.amount()),
+      requested_amount: this.parseNumber(this.amount),
       remark: this.remark() || undefined,
       files: files.length > 0 ? files : undefined,
       file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
@@ -502,38 +505,30 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return value.toLocaleString("en-US");
   }
 
-  onAmountChange(value: string) {
+  onAmountInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    // กรองให้เหลือแค่ 0-9 , .
+    let value = input.value.replace(/[^0-9\.,]/g, '');
+
+    // ปัดเศษ 2 ตำแหน่ง และใส่ comma
+    const money = formatMoneyInput(value);
+
+    this.amount = money;
+
+    // อัพเดต input จริง ๆ ให้แสดงค่า formatted
+    input.value = money;
+
+    // ตรวจสอบ max amount
     const selectedId = this.selectedClaimType();
     const claim = this.claimTypes.find(item => item.id === selectedId);
     const maxAmount = this.parseNumber(claim?.amount || 0);
-    console.log(value, maxAmount, this.parseNumber(value) > maxAmount)
+    const numericValue = this.parseNumber(money);
 
-    if (this.parseNumber(value) > maxAmount) {
-      this.amountError = `จำนวนเงินต้องไม่เกิน ${maxAmount.toLocaleString('en-US')} บาท`;
-    } else {
-      this.amountError = null; // ไม่มี error
-    }
-
-
+    this.amountError =
+      numericValue > maxAmount
+        ? `จำนวนเงินต้องไม่เกิน ${maxAmount.toLocaleString('en-US')} บาท`
+        : null;
   }
 
-  // onAmountChange(event: Event) {
-  //   const input = event.target as HTMLInputElement;
-  //   console.log(input)
-
-  //   // แปลง string -> number (ลบ comma)
-  //   let valueAmount = Number(input.value.replace(/,/g, ''));
-
-  //   // หา maxAmount
-  //   const selectedId = this.selectedClaimType();
-  //   const claim = this.claimTypes.find(item => item.id === selectedId);
-  //   const maxAmount = this.parseNumber(claim?.amount || 0);
-
-  //   if (valueAmount >= maxAmount) {
-  //     valueAmount = maxAmount;
-  //   }
-
-  //   this.amount = valueAmount;
-  //   input.value = valueAmount.toLocaleString('en-US');
-  // }
 }

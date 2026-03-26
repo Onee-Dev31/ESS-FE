@@ -157,8 +157,8 @@
                     <label>จำนวนเงินที่ขอเบิก <span class="required">*</span></label>
                     <div class="amount-input-wrapper">
                         <input #amountInput type="text" class="custom-form-control text-right" placeholder="0.00"
-                            [class.input-highlight]="amountHighlight()" [ngModel]="amount()"
-                            (ngModelChange)="amount.set($event)" min="0" (ngModelChange)="onAmountChange($event)">
+                            [class.input-highlight]="amountHighlight()" [ngModel]="amount"
+                            (input)="onAmountInput($event)" />
                         <span class="currency-tag">บาท</span>
                     </div>
                     <div *ngIf="amountError" class="error">
@@ -233,7 +233,8 @@
         <button class="btn-back-custom" (click)="close()">
             <i class="fas fa-times"></i> ยกเลิก
         </button>
-        <button class="btn-save-custom" [class.disable]="!isValidSave()" (click)="save()" [disabled]="isSaving() || !isValidSave()">
+        <button class="btn-save-custom" [class.disable]="!isValidSave()" (click)="save()"
+            [disabled]="isSaving() || !isValidSave()">
             <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
             {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
         </button>

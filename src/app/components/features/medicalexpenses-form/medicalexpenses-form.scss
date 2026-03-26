@@ -52,7 +52,7 @@
         align-items: center;
         padding: 16px 24px;
         background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
-        color: #ffffff ;
+        color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         h2 {
@@ -517,6 +517,13 @@
             font-size: 1.1rem;
         }
     }
+
+
+    @include tablet {
+        .card-content .type-info .balance-value{
+            font-size: $font-size-header;
+        }
+    }
 }
 
 // ==========================================
@@ -759,6 +766,26 @@
         .value {
             font-weight: 600;
             color: var(--text-header);
+        }
+    }
+
+    @include tablet {
+        gap: 10px;
+
+        .badge-item {
+            font-size: $font-size-label;
+            gap: 6px;
+            padding: 6px 10px;
+        }
+    }
+
+    @include mobile {
+        gap: 6px;
+
+        .badge-item {
+            font-size: $font-size-hint;
+            gap: 2px;
+            padding: 4px 8px;
         }
     }
 }

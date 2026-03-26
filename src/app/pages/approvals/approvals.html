@@ -114,9 +114,9 @@
 
           <div class="claim-card__amount">
             <span class="amount-label">ขอเบิก</span>
-            <span class="amount-value">฿{{ claim.requestedAmount | number:'1.0-0' }}</span>
+            <span class="amount-value">฿{{ claim.requestedAmount | number:'1.2-2' }}</span>
             @if (claim.approvedAmount > 0) {
-            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.0-0' }}</span>
+            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
             }
           </div>
         </div>
@@ -133,8 +133,8 @@
             </div>
           </div>
           <div class="budget-meta">
-            <span>ใช้ไป ฿{{ claim.typeUsedAmount | number:'1.0-0' }}</span>
-            <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number:'1.0-0' }}</span>
+            <span>ใช้ไป ฿{{ claim.typeUsedAmount | number:'1.2-2' }}</span>
+            <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number:'1.2-2' }}</span>
           </div>
         </div>
         }
