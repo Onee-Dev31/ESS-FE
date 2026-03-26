@@ -178,6 +178,18 @@ export class DashboardComponent implements OnInit {
   holidayColor: any;
   isFormOpen = signal(false);
   selectedDate = signal<string>('');
+  profileLightbox = signal<{ url: string; name: string } | null>(null);
+
+  openProfileLightbox() {
+    const user = this.authService.userData();
+    if (!user?.CODEMPID) return;
+    this.profileLightbox.set({
+      url: `https://empimg.oneeclick.co:8048/employeeimage/${user.CODEMPID}.jpg`,
+      name: `${user.USR_FNAME ?? ''} ${user.USR_LNAME ?? ''}`.trim()
+    });
+  }
+
+  closeProfileLightbox() { this.profileLightbox.set(null); }
   selectedRequestStatus = signal<string>('');
   welfareStats = computed(() => [
     { label: 'ค่าเบี้ยเลี้ยง', value: '10,500', icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
@@ -192,8 +204,8 @@ export class DashboardComponent implements OnInit {
   workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
 
   attendancePeriod = computed(() => {
-    const start = dayjs().startOf('month').format('DD/MM/YYYY');
-    const end = dayjs().endOf('month').format('DD/MM/YYYY');
+    const start = dayjs().startOf('year').format('DD/MM/YYYY');
+    const end = dayjs().endOf('year').format('DD/MM/YYYY');
     return `${start} - ${end}`;
   });
 
@@ -326,7 +338,6 @@ export class DashboardComponent implements OnInit {
 
 
   ngOnInit() {
-    this.attendanceList = this.dashboardService.getAttendanceList();
     this.performanceList = this.dashboardService.getPerformanceList();
     // this.specialDates = this.dashboardService.getSpecialDates();
     // console.log("specialDates  ; ", this.specialDates);
@@ -397,6 +408,25 @@ export class DashboardComponent implements OnInit {
       // ✅ สำคัญ: หลัง holiday โหลดเสร็จ ให้ sync list ซ้ายกับเดือนที่กำลังเปิดอยู่ "ทันที"
       const monthToUse = this.currentViewMonthStart ?? dayjs().startOf('month');
       this.applyHolidayListForMonth(monthToUse);
+
+      // ✅ My Time Attendance: นับการลาของ user ปัจจุบันในเดือนนี้
+      const currentEmpId = userData.CODEMPID;
+      const currentEmp = (team || []).find((emp: any) => emp.EmpId === currentEmpId);
+      const yearStart = dayjs().startOf('year').valueOf();
+      const yearEnd = dayjs().endOf('year').valueOf();
+
+      const leaveCounts: Record<string, number> = {};
+      (currentEmp?.Leaves || []).forEach((lv: any) => {
+        const leaveDate = dayjs(lv.LeaveDate).valueOf();
+        if (leaveDate >= yearStart && leaveDate <= yearEnd) {
+          const label = lv.LabelDescription || lv.Label || lv.LeaveType || 'ลา';
+          leaveCounts[label] = (leaveCounts[label] || 0) + 1;
+        }
+      });
+
+      this.attendanceList = Object.keys(leaveCounts).length > 0
+        ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
+        : [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];
 
       this.cdr.detectChanges();
     });

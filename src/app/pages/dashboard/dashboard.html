@@ -13,7 +13,8 @@
           </button>
           <div class="avatar-frame">
             <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + authService.userData()?.CODEMPID + '.jpg'"
-            (error)="onAvatarError($event)" alt="Profile Avatar" class="avatar-img" />
+            (error)="onAvatarError($event)" (click)="openProfileLightbox()"
+            alt="Profile Avatar" class="avatar-img avatar-clickable" title="คลิกเพื่อดูรูปขนาดใหญ่" />
           </div>
         </div>
 
@@ -383,6 +384,17 @@
   @if (isTimeOffModalOpen()) {
   <app-time-off-form [initialLeaveTypeId]="selectedLeaveTypeId()" (onClose)="closeTimeOffForm()">
   </app-time-off-form>
+  }
+
+  @if (profileLightbox()) {
+  <div class="profile-lightbox-overlay" (click)="closeProfileLightbox()">
+    <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="profileLightbox()?.url" alt="{{ profileLightbox()?.name }}"
+      title="{{ profileLightbox()?.name }}" role="img" (click)="$event.stopPropagation()" />
+    <div class="lightbox-name">{{ profileLightbox()?.name }}</div>
+  </div>
   }
 
   @if (isTooltipModalOpen()) {

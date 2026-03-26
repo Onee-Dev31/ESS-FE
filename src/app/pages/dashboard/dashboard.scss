@@ -1847,3 +1847,54 @@ $balance: $status-success-text;
 .modal-overlay {
     @include modal-overlay-styles;
 }
+// ── Profile image lightbox ─────────────────────────────────
+.avatar-clickable { cursor: pointer; transition: opacity 0.2s; &:hover { opacity: 0.85; } }
+
+.profile-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+
+    img {
+        max-width: min(480px, 90vw);
+        max-height: 80vh;
+        border-radius: 16px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        object-fit: contain;
+        cursor: default;
+    }
+
+    .lightbox-name {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+
+        &:hover { background: rgba(255, 255, 255, 0.28); }
+    }
+}
