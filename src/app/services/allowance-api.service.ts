@@ -1,8 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
+import { Observable, tap, catchError, of, retry } from 'rxjs';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 import { environment } from '../../environments/environment';
-import { MealAllowanceClaimsResponse, MealAllowanceRate, MealAllowanceRatesResponse, EligibleDatesResponse } from '../interfaces/allowance.interface';
+import { MealAllowanceClaimsResponse, MealAllowanceRate, MealAllowanceRatesResponse, EligibleDatesResponse, CreateClaimRequest, CreateClaimResponse } from '../interfaces/allowance.interface';
 export type { MealAllowanceClaimsResponse };
 
 @Injectable({ providedIn: 'root' })
@@ -17,15 +18,23 @@ export class AllowanceApiService {
     readonly rates = signal<MealAllowanceRate[]>([]);
 
     constructor() {
-        // โหลด rates ครั้งเดียวตอน service สร้าง (singleton)
-        this.getRates().subscribe(res => {
-            if (res.success) this.rates.set(res.data);
+        this.reloadRates();
+    }
+
+    /** โหลด rates ใหม่ (เรียกได้จากภายนอก) */
+    reloadRates(): void {
+        this.getRates().pipe(
+            retry(2),
+            catchError(() => of({ success: false, data: [] as MealAllowanceRate[] }))
+        ).subscribe(res => {
+            if (res.success && res.data.length) this.rates.set(res.data);
         });
     }
 
     /** GET api/meal-allowance/rates */
     getRates(): Observable<MealAllowanceRatesResponse> {
-        return this._http.get<MealAllowanceRatesResponse>(`${this.baseUrl}/meal-allowance/rates`);
+        const context = new HttpContext().set(SKIP_ERROR_TOAST, true);
+        return this._http.get<MealAllowanceRatesResponse>(`${this.baseUrl}/meal-allowance/rates`, { context });
     }
 
     /**
@@ -51,6 +60,14 @@ export class AllowanceApiService {
             .set('year', year)
             .set('month', month);
         return this._http.get<EligibleDatesResponse>(`${this.baseUrl}/meal-allowance/eligible-dates`, { params });
+    }
+
+    /**
+     * สร้างใบเบิกเบี้ยเลี้ยง
+     * POST api/meal-allowance/claim
+     */
+    createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
+        return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
     }
 
     /**

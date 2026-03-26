@@ -14,6 +14,7 @@ export interface AllowanceItem {
     actualExtraHours?: number;
     isEligible?: boolean;
     totalHoursText?: string;
+    rateId?: number | null;
 }
 
 export interface AllowanceRequest {
@@ -68,32 +69,71 @@ export interface MealAllowanceRatesResponse {
     data: MealAllowanceRate[];
 }
 
+// ─── Create Claim ─────────────────────────────────────────────────────────────
+
+export interface CreateClaimDetail {
+    work_date: string;       // "YYYY-MM-DD"
+    shift_code?: string;
+    day_type?: string;
+    actual_checkin?: string; // "HH:mm"
+    actual_checkout?: string;
+    extra_hours?: number;
+    rate_id?: number | null;
+    rate_amount: number;
+    description?: string;
+}
+
+export interface CreateClaimRequest {
+    employee_code: string;
+    details: CreateClaimDetail[];
+}
+
+export interface CreateClaimResult {
+    claimId: number;
+    voucherNo: string;
+    totalAmount: number;
+    status: string;
+    claimStatus: string;
+}
+
+export interface CreateClaimResponse {
+    success: boolean;
+    data: CreateClaimResult;
+}
+
 // ─── Meal Allowance API interfaces ───────────────────────────────────────────
 
 export interface MealAllowanceClaimDetail {
-    DetailId: number;
-    ClaimId: number;
-    WorkDate: string;
-    WorkHours: number;
-    AllowanceAmount: number;
-    Description: string;
+    detail_id: number;
+    work_date: string;
+    shift_code: string;
+    day_type: string;
+    actual_checkin: string;
+    actual_checkout: string;
+    extra_hours: number;
+    rate_id: number;
+    rate_amount: number;
+    description: string;
 }
 
 export interface MealAllowanceClaim {
-    ClaimId: number;
-    VoucherNo: string;
-    EmployeeCode: string;
-    TotalAmount: number;
-    ClaimDate: string;
-    Status: string;
-    CreatedAt: string;
-    Details: MealAllowanceClaimDetail[];
+    claimId: number;
+    voucherNo: string;
+    employeeCode: string;
+    totalAmount: number;
+    claimDate: string;
+    status: string;
+    createdAt: string;
+    details: MealAllowanceClaimDetail[];
 }
 
 export interface MealAllowancePagination {
-    totalCount: number;
-    pageNumber: number;
+    total: number;
+    page: number;
     pageSize: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
 }
 
 export interface MealAllowanceClaimsResponse {

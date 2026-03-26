@@ -1,13 +1,10 @@
-import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input, inject, ChangeDetectorRef, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AllowanceService, AllowanceRequest, AllowanceItem } from '../../../services/allowance.service';
+import { AllowanceService, AllowanceItem, AllowanceRequest } from '../../../services/allowance.service';
 import { AllowanceApiService } from '../../../services/allowance-api.service';
 import { AuthService } from '../../../services/auth.service';
-import { UserService } from '../../../services/user.service';
 import { ToastService } from '../../../services/toast';
-import { WELFARE_TYPES } from '../../../constants/welfare-types.constant';
-import { DateUtilityService } from '../../../services/date-utility.service';
 import { switchMap } from 'rxjs';
 
 @Component({
@@ -24,9 +21,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   private allowanceService = inject(AllowanceService);
   protected allowanceApi = inject(AllowanceApiService);
   private authService = inject(AuthService);
-  private userService = inject(UserService);
   private toastService = inject(ToastService);
-  private dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: AllowanceRequest;
@@ -41,8 +36,12 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   logs: AllowanceItem[] = [];
 
   isPolicyPopupOpen = signal(false);
+  protected readonly rates = computed(() => this.allowanceApi.rates());
 
   ngOnInit(): void {
+    if (!this.allowanceApi.rates().length) {
+      this.allowanceApi.reloadRates();
+    }
     this.loadData();
   }
 
@@ -100,6 +99,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
               shiftCode: item.shift_code,
               isEligible: eligible,
               totalHoursText: item.total_hours_text,
+              rateId: item.rate_id,
             };
 
             // ถ้าเป็น request ที่บันทึกไว้แล้ว ให้ override ด้วยค่าที่บันทึก
@@ -157,66 +157,42 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit() {
-    const invalid = this.logs.filter(l => l.selected && (!l.description || l.description.trim() === ''));
-    if (invalid.length > 0) {
-      this.toastService.warning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
-      return;
-    }
-    if (!this.totalAmount || this.totalAmount <= 0) {
-      this.toastService.warning('กรุณากรอกจำนวนเงินให้ถูกต้อง');
-      return;
-    }
+    const selectedLogs = this.logs.filter(l => l.selected);
 
-    const items: AllowanceItem[] = this.logs
-      .filter(log => log.selected)
-      .map(log => ({
-        date: log.date,
-        dayType: log.dayType,
-        timeIn: log.timeIn,
-        timeOut: log.timeOut,
-        description: log.description,
-        hours: parseFloat(log.displayHours || '0'),
-        amount: log.amount,
-        selected: true
-      }));
-
-    if (items.length === 0) {
+    if (selectedLogs.length === 0) {
       this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
       return;
     }
 
-    this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existingRequest => {
-      if (existingRequest) {
-        this.allowanceService.updateAllowanceRequest(this.requestId, {
-          ...existingRequest,
-          items: items
-        }).subscribe({
-          next: () => {
-            this.toastService.success('อัปเดตรายการเบิกเรียบร้อยแล้ว');
-            this.closeModal();
-          },
-        });
-      } else {
-        this.userService.getUserProfile().subscribe(profile => {
-          const newRequest: AllowanceRequest = {
-            id: this.requestId,
-            typeId: WELFARE_TYPES.ALLOWANCE,
-            createDate: this.dateUtil.getCurrentDateISO(),
-            status: 'WAITING_CHECK',
-            requester: {
-              employeeId: profile.employeeId,
-              name: profile.name,
-              department: profile.department,
-              company: profile.company
-            },
-            items: items
-          };
-          this.allowanceService.addAllowanceRequest(newRequest).subscribe(() => {
-            this.toastService.success('บันทึกสร้างรายการเบิกเรียบร้อยแล้ว');
-            this.closeModal();
-          });
-        });
-      }
+    const missingDesc = selectedLogs.filter(l => !l.description?.trim());
+    if (missingDesc.length > 0) {
+      this.toastService.warning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');
+      return;
+    }
+
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+
+    this.allowanceApi.createClaim({
+      employee_code: employeeCode,
+      details: selectedLogs.map(log => ({
+        work_date: log.date,
+        shift_code: log.shiftCode,
+        day_type: log.dayType,
+        actual_checkin: log.timeIn,
+        actual_checkout: log.timeOut,
+        extra_hours: log.actualExtraHours,
+        rate_id: log.rateId,
+        rate_amount: log.amount,
+        description: log.description,
+      })),
+    }).subscribe({
+      next: (res) => {
+        this.toastService.success(`บันทึกสำเร็จ เลขที่ใบเบิก: ${res.data.voucherNo}`);
+        this.closeModal();
+      },
+      error: () => {
+        this.toastService.warning('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+      },
     });
   }
 

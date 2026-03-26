@@ -66,17 +66,17 @@ export class AllowanceComponent implements OnInit {
   /** Map API claim → AllowanceRequest shape used by the template */
   private mapClaim(claim: MealAllowanceClaim): AllowanceRequest {
     return {
-      id: claim.VoucherNo,
+      id: claim.voucherNo,
       typeId: 0,
-      createDate: claim.CreatedAt?.split('T')[0] ?? claim.ClaimDate,
-      status: claim.Status,
-      items: claim.Details.map(d => ({
-        date: d.WorkDate,
-        timeIn: '',
-        timeOut: '',
-        description: d.Description,
-        hours: d.WorkHours,
-        amount: d.AllowanceAmount,
+      createDate: claim.createdAt?.split('T')[0] ?? claim.claimDate,
+      status: claim.status,
+      items: (claim.details ?? []).map(d => ({
+        date: d.work_date?.split('T')[0] ?? '',
+        timeIn: d.actual_checkin ?? '',
+        timeOut: d.actual_checkout ?? '',
+        description: d.description ?? '',
+        hours: d.extra_hours ?? 0,
+        amount: d.rate_amount ?? 0,
         selected: false,
       })),
     };
@@ -162,7 +162,7 @@ export class AllowanceComponent implements OnInit {
     const cached = this.allowanceApiService.lastResponse();
     if (cached) {
       this.allRequests.set((cached.data ?? []).map(c => this.mapClaim(c)));
-      this.totalCount.set(cached.pagination?.totalCount ?? 0);
+      this.totalCount.set(cached.pagination?.total ?? 0);
     }
 
     // Convert signals to observables and combine
@@ -187,13 +187,13 @@ export class AllowanceComponent implements OnInit {
           page_number: page + 1,
           page_size: pageSize,
         }).pipe(
-          catchError(() => of({ success: false, data: [], pagination: { totalCount: 0, pageNumber: 1, pageSize: 10 } }))
+          catchError(() => of({ success: false, data: [], pagination: { total: 0, page: 1, pageSize: 10, totalPages: 0, hasNext: false, hasPrevious: false } }))
         );
       }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(res => {
       this.allRequests.set((res.data ?? []).map(c => this.mapClaim(c)));
-      this.totalCount.set(res.pagination?.totalCount ?? 0);
+      this.totalCount.set(res.pagination?.total ?? 0);
       this.loadingService.stop('allowance-list');
     });
   }

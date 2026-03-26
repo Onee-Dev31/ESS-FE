@@ -1,4 +1,6 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpContextToken } from '@angular/common/http';
+
+export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
@@ -9,6 +11,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const toastService = inject(ToastService);
     const authService = inject(AuthService);
     const router = inject(Router);
+
+    const skipToast = req.context.get(SKIP_ERROR_TOAST);
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
@@ -27,7 +31,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 errorMessage = 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์ (Internal Server Error)';
             }
 
-            toastService.error(errorMessage);
+            if (!skipToast) {
+                toastService.error(errorMessage);
+            }
 
             return throwError(() => error);
         })
