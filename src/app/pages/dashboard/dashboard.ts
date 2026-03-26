@@ -10,6 +10,7 @@ import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { DialogService } from '../../services/dialog';
+import { AllowanceApiService } from '../../services/allowance-api.service';
 import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit {
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
   private dialogService = inject(DialogService);
+  private allowanceApiService = inject(AllowanceApiService);
   authService = inject(AuthService);
 
   constructor(
@@ -191,15 +193,21 @@ export class DashboardComponent implements OnInit {
 
   closeProfileLightbox() { this.profileLightbox.set(null); }
   selectedRequestStatus = signal<string>('');
-  welfareStats = computed(() => [
-    { label: 'ค่าเบี้ยเลี้ยง', value: '10,500', icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
+  allowanceTotalAmount = signal<number | null>(null);
+
+  welfareStats = computed(() => {
+    const allowanceAmt = this.allowanceTotalAmount();
+    const allowanceValue = allowanceAmt === null ? '...' : allowanceAmt.toLocaleString('th-TH');
+    return [
+    { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
     { label: 'ค่ารถ', value: '584', icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
     { label: 'ค่าแท็กซี่', value: '876', icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
     { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
     { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
     { label: 'ค่าฌาปนกิจ', value: '584', icon: 'fas fa-church', tooltip: 'funeral' },
     { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' }
-  ]);
+  ];});
+
 
   workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
 
@@ -339,10 +347,21 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    // this.specialDates = this.dashboardService.getSpecialDates();
-    // console.log("specialDates  ; ", this.specialDates);
     this.getTeamCalendar();
+    this.loadAllowanceSummary();
+  }
 
+  loadAllowanceSummary() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    if (!employeeCode) return;
+    this.allowanceApiService.getClaims({ employee_code: employeeCode, page_size: 200 }).subscribe({
+      next: (res) => {
+        const total = (res.data ?? []).reduce((sum, c) => sum + (c.totalAmount ?? 0), 0);
+        this.allowanceTotalAmount.set(total);
+        this.cdr.markForCheck();
+      },
+      error: () => this.allowanceTotalAmount.set(0),
+    });
   }
 
   getTeamCalendar() {
