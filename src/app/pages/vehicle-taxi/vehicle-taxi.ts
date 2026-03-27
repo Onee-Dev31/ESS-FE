@@ -1,8 +1,8 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaxiService, TaxiRequest, TaxiItem } from '../../services/taxi.service';
+import { TaxiService, TaxiRequest } from '../../services/taxi.service';
 import { LoadingService } from '../../services/loading';
 import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
@@ -14,21 +14,9 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
+import { createListingState, createListingComputeds_v2, clearListingFilters } from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
-import {
-  createAngularTable,
-  getCoreRowModel,
-  SortingState,
-} from '@tanstack/angular-table';
-
-interface FlatTaxiRow extends TaxiItem {
-  requestId: string;
-  createDate: string;
-  status: string;
-  isFirstInGroup: boolean;
-  groupLength: number;
-}
+import { AuthService } from '../../services/auth.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 
@@ -46,6 +34,7 @@ export class VehicleTaxiComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
+  private authService = inject(AuthService);
 
   isLoading = this.loadingService.loading('taxi-list');
 
@@ -58,84 +47,17 @@ export class VehicleTaxiComponent implements OnInit {
   previewFiles = signal<any[]>([]);
 
   allRequests = signal<TaxiRequest[]>([]);
-  sorting = signal<SortingState>([{ id: 'requestId', desc: true }]);
-
-  processedData = computed(() => {
-    let filtered = [...this.allRequests()];
-    const status = this.listing.filterStatus();
-    const start = this.listing.filterStartDate();
-    const end = this.listing.filterEndDate();
-    const search = this.listing.searchText().toLowerCase();
-
-    if (status) filtered = filtered.filter(r => r.status === status);
-    if (start) filtered = filtered.filter(r => r.createDate >= start);
-    if (end) filtered = filtered.filter(r => r.createDate <= end);
-    if (search) {
-      filtered = filtered.filter(r =>
-        r.id.toLowerCase().includes(search) ||
-        r.items.some(item =>
-          item.description.toLowerCase().includes(search) ||
-          item.destination.toLowerCase().includes(search)
-        )
-      );
-    }
-
-    const sortState = this.sorting()[0];
-    if (sortState) {
-      const { id, desc } = sortState;
-      filtered = TableSortHelper.sortVehicleLikeData(filtered, id, desc, {
-        id: 'requestId',
-        desc: 'description',
-        date: 'date',
-        destination: 'destination'
-      });
-    }
-
-    return filtered;
-  });
-
-  comps = createListingComputeds(this.processedData, this.listing);
-
-  displayedRows = computed(() => {
-    return this.comps.paginatedData().flatMap((request: TaxiRequest) =>
-      request.items.map((item: TaxiItem, index: number) => ({
-        ...item,
-        requestId: request.id,
-        createDate: request.createDate,
-        status: request.status,
-        isFirstInGroup: index === 0,
-        groupLength: request.items.length,
-      } as FlatTaxiRow))
-    );
-  });
-
-  table = createAngularTable(() => ({
-    data: this.displayedRows(),
-    columns: [
-      { accessorKey: 'requestId', header: 'เลขที่การเบิก' },
-      { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
-      { accessorKey: 'date', header: 'วันที่ขอเบิก' },
-      { accessorKey: 'description', header: 'รายละเอียด' },
-      { accessorKey: 'destination', header: 'สถานที่รับ-ส่ง' },
-      { accessorKey: 'amount', header: 'จำนวนเงิน' },
-      { accessorKey: 'status', header: 'สถานะ' },
-    ],
-    state: { sorting: this.sorting() },
-    onSortingChange: (updaterOrValue) => {
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
-      this.sorting.set(next);
-    },
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-  }));
+  comps = createListingComputeds_v2(this.allRequests, this.listing);
 
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
+    this.loadData();
   }
 
   goToPage(page: number) {
     this.listing.currentPage.set(page);
+    this.loadData();
   }
 
   ngOnInit() {
@@ -144,16 +66,49 @@ export class VehicleTaxiComponent implements OnInit {
 
   loadData() {
     this.loadingService.start('taxi-list');
-    this.taxiService.getTaxiRequests().subscribe({
-      next: (data) => {
-        this.allRequests.set(data);
+    const param = {
+      page: this.listing.currentPage() + 1 || 1,
+      pageSize: this.listing.pageSize(),
+      empCode: this.authService.userData().CODEMPID,
+      searchText: this.listing.searchText() || '',
+      claimStatus: this.listing.filterStatus(),
+      dateFrom: this.listing.filterStartDate(),
+      dateTo: this.listing.filterEndDate(),
+    };
+    this.taxiService.getTaxiClaims(param).subscribe({
+      next: (res: any) => {
         this.loadingService.stop('taxi-list');
+        const items = res.data ?? [];
+        this.allRequests.set(this.mapApiData(items));
+        this.listing.totalItems.set(res.pagination?.total ?? 0);
+        this.listing.totalPages.set(res.pagination?.totalPages ?? 1);
+        this.listing.currentPage.set((res.pagination?.page ?? 1) - 1);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.loadingService.stop('taxi-list');
         this.errorService.handle(error, { component: 'VehicleTaxi', action: 'load-data' });
       }
     });
+  }
+
+  private mapApiData(items: any[]): TaxiRequest[] {
+    return items.map((item: any) => ({
+      id: String(item.ClaimId ?? item.claimId ?? ''),
+      typeId: item.TypeId ?? item.typeId ?? 0,
+      createDate: item.ClaimDate ?? item.claimDate ?? '',
+      status: item.Status ?? item.status ?? '',
+      items: (item.Details ?? item.details ?? []).map((d: any) => ({
+        date: d.ClaimDate ?? d.claimDate ?? d.date ?? '',
+        description: d.Description ?? d.description ?? '',
+        destination: d.Destination ?? d.destination ?? '',
+        distance: d.Distance ?? d.distance ?? 0,
+        amount: d.Amount ?? d.amount ?? 0,
+        shiftCode: d.ShiftCode ?? d.shiftCode,
+        attachedFile: d.AttachedFile ?? d.attachedFile ?? null,
+      })),
+      voucherNo: item.VoucherNo ?? item.voucherNo,
+      totalAmount: item.TotalAmount ?? item.totalAmount,
+    } as TaxiRequest & { voucherNo?: string; totalAmount?: number }));
   }
 
   async deleteRequest(id: string) {
@@ -165,28 +120,14 @@ export class VehicleTaxiComponent implements OnInit {
     });
 
     if (confirmed) {
-      this.taxiService.deleteTaxiRequest(id).subscribe({
-        next: () => {
-          this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
-          this.loadData();
-        },
-        error: (error) => {
-          this.errorService.handle(error, { component: 'VehicleTaxi', action: 'delete-request' });
-        }
-      });
+      this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
+      this.loadData();
     }
   }
 
   openModal(id: string = '') {
-    if (!id) {
-      this.taxiService.generateNextTaxiId().subscribe(nid => {
-        this.selectedRequestId.set(nid);
-        this.isModalOpen.set(true);
-      });
-    } else {
-      this.selectedRequestId.set(id);
-      this.isModalOpen.set(true);
-    }
+    this.selectedRequestId.set(id);
+    this.isModalOpen.set(true);
   }
 
   closeModal() {
@@ -219,19 +160,8 @@ export class VehicleTaxiComponent implements OnInit {
     clearListingFilters(this.listing);
   }
 
-  toggleSort(columnId: string) {
-    TableSortHelper.toggleSort(this.table, columnId);
-  }
-
-  getSortIcon(columnId: string) {
-    return TableSortHelper.getSortIcon(this.table, columnId);
-  }
-
-  trackByRowId(index: number, itemOrRow: TaxiRequest | FlatTaxiRow | import('@tanstack/angular-table').Row<FlatTaxiRow>): string {
-    const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
-    const id = (item as FlatTaxiRow).requestId || (item as TaxiRequest).id || 'row';
-    const date = (item as FlatTaxiRow).date || '';
-    return `${id}-${date}-${index}`;
+  trackByRowId(index: number, req: TaxiRequest): string {
+    return `${req.id}-${index}`;
   }
 
   getStatusClass(status: string): string {
