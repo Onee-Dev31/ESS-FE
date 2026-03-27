@@ -11,6 +11,7 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { DialogService } from '../../services/dialog';
 import { AllowanceApiService } from '../../services/allowance-api.service';
+import { VehicleService } from '../../services/vehicle.service';
 import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
@@ -56,6 +57,7 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private dialogService = inject(DialogService);
   private allowanceApiService = inject(AllowanceApiService);
+  private vehicleService = inject(VehicleService);
   authService = inject(AuthService);
 
   constructor(
@@ -194,13 +196,16 @@ export class DashboardComponent implements OnInit {
   closeProfileLightbox() { this.profileLightbox.set(null); }
   selectedRequestStatus = signal<string>('');
   allowanceTotalAmount = signal<number | null>(null);
+  vehicleTotalAmount = signal<number | null>(null);
 
   welfareStats = computed(() => {
     const allowanceAmt = this.allowanceTotalAmount();
     const allowanceValue = allowanceAmt === null ? '...' : allowanceAmt.toLocaleString('th-TH');
+    const vehicleAmt = this.vehicleTotalAmount();
+    const vehicleValue = vehicleAmt === null ? '...' : vehicleAmt.toLocaleString('th-TH');
     return [
     { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
-    { label: 'ค่ารถ', value: '584', icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
+    { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
     { label: 'ค่าแท็กซี่', value: '876', icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
     { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
     { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
@@ -349,6 +354,7 @@ export class DashboardComponent implements OnInit {
     this.performanceList = this.dashboardService.getPerformanceList();
     this.getTeamCalendar();
     this.loadAllowanceSummary();
+    this.loadVehicleSummary();
   }
 
   loadAllowanceSummary() {
@@ -361,6 +367,20 @@ export class DashboardComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => this.allowanceTotalAmount.set(0),
+    });
+  }
+
+  loadVehicleSummary() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    if (!employeeCode) return;
+    this.vehicleService.getVehicleClaimByEmpcode({ empCode: employeeCode, pageSize: 200 }).subscribe({
+      next: (res) => {
+        const items = res.data ?? res ?? [];
+        const total = (Array.isArray(items) ? items : []).reduce((sum: number, c: any) => sum + (c.totalAmount ?? 0), 0);
+        this.vehicleTotalAmount.set(total);
+        this.cdr.markForCheck();
+      },
+      error: () => this.vehicleTotalAmount.set(0),
     });
   }
 
