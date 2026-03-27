@@ -265,7 +265,7 @@ tbody {
       border-color: rgba(0, 0, 0, 0.08);
 
       .card-header {
-        background: #f0f9ff;
+        background: var(--bg-table-head);
       }
 
       .card-header::after {
@@ -658,6 +658,17 @@ tbody {
       .col-actions {
         width: 150px;
       }
+    }
+  }
+
+  // ==================== VOUCHER LINK ====================
+  .text-primary-link {
+    color: var(--primary);
+    font-weight: 700;
+    cursor: default;
+
+    &:hover {
+      opacity: 0.8;
     }
   }
 

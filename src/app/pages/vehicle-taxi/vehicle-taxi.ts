@@ -92,23 +92,29 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): TaxiRequest[] {
-    return items.map((item: any) => ({
-      id: String(item.ClaimId ?? item.claimId ?? ''),
-      typeId: item.TypeId ?? item.typeId ?? 0,
-      createDate: item.ClaimDate ?? item.claimDate ?? '',
-      status: item.Status ?? item.status ?? '',
-      items: (item.Details ?? item.details ?? []).map((d: any) => ({
-        date: d.ClaimDate ?? d.claimDate ?? d.date ?? '',
-        description: d.Description ?? d.description ?? '',
-        destination: d.Destination ?? d.destination ?? '',
-        distance: d.Distance ?? d.distance ?? 0,
-        amount: d.Amount ?? d.amount ?? 0,
-        shiftCode: d.ShiftCode ?? d.shiftCode,
-        attachedFile: d.AttachedFile ?? d.attachedFile ?? null,
-      })),
-      voucherNo: item.VoucherNo ?? item.voucherNo,
-      totalAmount: item.TotalAmount ?? item.totalAmount,
-    } as TaxiRequest & { voucherNo?: string; totalAmount?: number }));
+    return items.map((item: any) => {
+      return {
+        id: String(item.claimId ?? ''),
+        typeId: 0,
+        createDate: item.claimDate ?? '',
+        status: item.status ?? '',
+        voucherNo: item.voucherNo ?? '',
+        totalAmount: item.totalAmount ?? 0,
+        items: (item.details ?? []).map((d: any) => {
+          const fromName: string   = d.other_from?.trim() || d.location_from_name || '';
+          const toName: string     = d.other_to?.trim()   || d.location_to_name   || '';
+          const attachments: any[] = d.attachments ?? [];
+          return {
+            date: d.work_date ?? '',
+            description: d.description ?? '',
+            destination: fromName && toName ? `${fromName} → ${toName}` : (fromName || toName),
+            distance: 0,
+            amount: d.rate_amount ?? 0,
+            attachedFile: attachments.length > 0 ? (attachments[0].file_url ?? null) : null,
+          };
+        }),
+      } as TaxiRequest;
+    });
   }
 
   async deleteRequest(id: string) {
@@ -125,8 +131,7 @@ export class VehicleTaxiComponent implements OnInit {
     }
   }
 
-  openModal(id: string = '') {
-    this.selectedRequestId.set(id);
+  openModal() {
     this.isModalOpen.set(true);
   }
 

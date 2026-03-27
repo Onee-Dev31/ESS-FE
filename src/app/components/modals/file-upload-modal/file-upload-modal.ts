@@ -12,18 +12,18 @@ import { ToastService } from '../../../services/toast';
 export class FileUploadModal implements OnChanges {
   private toastService = inject(ToastService);
 
-  @Input() currentFileName: string | null = null;
+  @Input() currentFile: File | null = null;
   @Input() dateLabel: string = '';
 
-  @Output() onSave = new EventEmitter<string | null>();
+  @Output() onSave = new EventEmitter<File | null>();
   @Output() onClose = new EventEmitter<void>();
 
-  tempFileName: string | null = null;
+  tempFile: File | null = null;
   isDeleted: boolean = false;
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentFileName']) {
-      this.tempFileName = this.currentFileName;
+    if (changes['currentFile']) {
+      this.tempFile = this.currentFile;
       this.isDeleted = false;
     }
   }
@@ -39,18 +39,18 @@ export class FileUploadModal implements OnChanges {
         return;
       }
 
-      this.tempFileName = file.name;
+      this.tempFile = file;
       this.isDeleted = false;
     }
   }
 
   removeFile() {
-    this.tempFileName = null;
+    this.tempFile = null;
     this.isDeleted = true;
   }
 
   confirm() {
-    this.onSave.emit(this.tempFileName);
+    this.onSave.emit(this.tempFile);
   }
 
   close() {

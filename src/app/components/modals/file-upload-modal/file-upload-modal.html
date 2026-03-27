@@ -2,7 +2,7 @@
   <div class="upload-modal-content">
     <div class="modal-header">
       <h3>แนบไฟล์เอกสาร</h3>
-      <button class="close-btn" (click)="close()"><i class="fas fa-times"></i></button>
+      <button class="close-btn" (click)="close()" title="ปิด" aria-label="ปิด"><i class="fas fa-times"></i></button>
     </div>
 
     <div class="modal-body">
@@ -11,24 +11,23 @@
       <div class="upload-box">
         <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
 
-        <label for="fileInput" class="upload-trigger" *ngIf="!tempFileName">
+        <label for="fileInput" class="upload-trigger" *ngIf="!tempFile">
           <i class="fas fa-cloud-upload-alt"></i>
           <span>คลิกเพื่อเลือกไฟล์</span>
           <small class="file-hint">(รองรับทุกประเภท, สูงสุด 4MB)</small>
         </label>
 
-        <div class="file-preview" *ngIf="tempFileName">
+        <div class="file-preview" *ngIf="tempFile">
           <i class="fas fa-file-alt file-icon"></i>
-          <span class="filename">{{ tempFileName }}</span>
-          <!-- <button class="btn-remove-file" (click)="removeFile()">✕</button> -->
-          <button class="btn-close" (click)="removeFile()"><i class="fas fa-times"></i></button>
+          <span class="filename">{{ tempFile.name }}</span>
+          <button class="btn-close" (click)="removeFile()" title="ลบไฟล์" aria-label="ลบไฟล์"><i class="fas fa-times"></i></button>
         </div>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="close()">ยกเลิก</button>
-      <button class="btn-confirm" (click)="confirm()" [disabled]="!tempFileName && !isDeleted">บันทึก</button>
+      <button class="btn-confirm" (click)="confirm()" [disabled]="!tempFile && !isDeleted">บันทึก</button>
     </div>
   </div>
 </div>
