@@ -19,7 +19,7 @@
             <span class="filter-label">ตั้งแต่เดือน</span>
             <div class="date-input-group">
               <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" />
+                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่" aria-label="ตั้งแต่วันที่" />
             </div>
           </div>
 
@@ -27,7 +27,7 @@
             <span class="filter-label">ถึง</span>
             <div class="date-input-group">
               <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
-                (ngModelChange)="listing.filterEndDate.set($event)" />
+                (ngModelChange)="listing.filterEndDate.set($event)" title="ถึงวันที่" aria-label="ถึงวันที่" />
             </div>
           </div>
 
@@ -35,7 +35,7 @@
             <span class="filter-label">สถานะ</span>
             <div class="select-input-group">
               <select class="form-control select-status" [ngModel]="listing.filterStatus()"
-                (ngModelChange)="listing.filterStatus.set($event)">
+                (ngModelChange)="listing.filterStatus.set($event)" title="กรองตามสถานะ" aria-label="กรองตามสถานะ">
                 <option value="">ทั้งหมด</option>
                 <option value="NEW">คำขอใหม่</option>
                 <option value="WAITING_CHECK">รอตรวจสอบ</option>
@@ -188,6 +188,7 @@
       <app-vehicle-form
         [requestId]="selectedRequestId"
         [claimId]="editClaimId"
+        [claimData]="editClaimData"
         (onClose)="closeModal()">
       </app-vehicle-form>
     </div>

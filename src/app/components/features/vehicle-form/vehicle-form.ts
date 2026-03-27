@@ -40,6 +40,7 @@ import { AuthService } from '../../../services/auth.service';
 export class VehicleFormComponent implements OnInit, OnChanges {
   @Input() requestId: string = '';
   @Input() claimId: number | null = null;
+  @Input() claimData: any = null;
 
   @Output() onClose = new EventEmitter<void>();
 
@@ -213,32 +214,22 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   // ─── Edit mode ───────────────────────────────────────────────
 
   loadExistingClaim() {
-    if (!this.claimId) return;
-    this.isLoadingEdit = true;
-    this.vehicleService.getVehicleClaimById(this.claimId).subscribe({
-      next: (res) => {
-        this.claimInfo = res.data;
-        this.existingDetails = (res.data?.details ?? []).map((d: any) => ({
-          detailId: d.detailId ?? d.detail_id,
-          workDate: d.workDate ?? d.work_date,
-          shiftCode: d.shiftCode ?? d.shift_code,
-          dayType: d.dayType ?? d.day_type,
-          actualCheckin: d.actualCheckin ?? d.actual_checkin,
-          actualCheckout: d.actualCheckout ?? d.actual_checkout,
-          rateAmount: d.rateAmount ?? d.rate_amount,
-          description: d.description ?? '',
-          selected: true,
-        } as EditDetailItem));
-        this.updateTotal();
-        this.isLoadingEdit = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.isLoadingEdit = false;
-        this.swalService.warning("ไม่สามารถโหลดข้อมูลรายการเบิกได้");
-        this.cdr.detectChanges();
-      }
-    });
+    if (!this.claimData) return;
+    this.claimInfo = this.claimData;
+    this.existingDetails = (this.claimData.details ?? []).map((d: any) => ({
+      detailId: d.detailId ?? d.detail_id,
+      workDate: d.workDate ?? d.work_date,
+      shiftCode: d.shiftCode ?? d.shift_code,
+      dayType: d.dayType ?? d.day_type,
+      actualCheckin: d.actualCheckin ?? d.actual_checkin,
+      actualCheckout: d.actualCheckout ?? d.actual_checkout,
+      rateAmount: d.rateAmount ?? d.rate_amount,
+      description: d.description ?? '',
+      selected: true,
+    } as EditDetailItem));
+    this.updateTotal();
+    this.isLoadingEdit = false;
+    this.cdr.detectChanges();
   }
 
   onToggleEditDetail(_detail: EditDetailItem) {

@@ -45,6 +45,7 @@ export class VehicleComponent implements OnInit {
   isModalOpen = false;
   selectedRequestId = '';
   editClaimId: number | null = null;
+  editClaimData: any = null;
 
   readonly EDITABLE_STATUSES = ['New', 'Returned'];
 
@@ -177,7 +178,9 @@ export class VehicleComponent implements OnInit {
   }
 
   openEditModal(claimId: number) {
+    const claim = this.allRequests().find((r: any) => r.claimId === claimId);
     this.editClaimId = claimId;
+    this.editClaimData = claim ?? null;
     this.selectedRequestId = '';
     this.isModalOpen = true;
   }
@@ -185,6 +188,7 @@ export class VehicleComponent implements OnInit {
   closeModal() {
     this.isModalOpen = false;
     this.editClaimId = null;
+    this.editClaimData = null;
     this.loadData();
   }
 

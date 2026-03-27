@@ -6,7 +6,7 @@
         <span class="voucher-chip">{{ claimInfo.voucherNo }}</span>
       }
     </div>
-    <button class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+    <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด" aria-label="ปิด"><i class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
@@ -20,19 +20,19 @@
         <div class="month-selector">
           <label>ประจำเดือน :</label>
           <div class="inputs-row">
-            <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
+            <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control" title="เลือกเดือน" aria-label="เลือกเดือน">
               <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i+1">{{ m }}</option>
             </select>
-            <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
+            <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control" title="เลือกปี" aria-label="เลือกปี">
               <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
             </select>
-            <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+            <button type="button" class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
           </div>
         </div>
       </section>
 
       <div class="action-bar">
-        <button class="btn-submit" (click)="onSubmit()">
+        <button type="button" class="btn-submit" (click)="onSubmit()">
           <i class="fas fa-check"></i> ยืนยันการเบิก
         </button>
         <div class="total-summary-inline">
@@ -72,7 +72,7 @@
           <tbody>
             <tr *ngFor="let log of logs" [class.highlight-row]="log.selected">
               <td class="text-center">
-                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
+                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" title="เลือกรายการ" aria-label="เลือกรายการ" />
               </td>
               <td class="text-center bg-gray">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')}}</td>
               <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
@@ -80,8 +80,8 @@
                 {{ log.dayType }}
               </td>
               <td class="text-center bg-gray shift-code">{{ log.shiftCode }}</td>
-              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeIn" readonly /></td>
-              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeOut" readonly /></td>
+              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeIn" readonly title="เวลาเข้า" aria-label="เวลาเข้า" /></td>
+              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeOut" readonly title="เวลาออก" aria-label="เวลาออก" /></td>
               <td class="text-center font-bold">{{ (log.amount || 0) | number }}</td>
               <td class="desc-cell">
                 <div class="input-container">
@@ -111,7 +111,7 @@
                 <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{ log.dayType }})</span>
               </div>
               <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
-                [disabled]="log.isDuplicate" />
+                [disabled]="log.isDuplicate" title="เลือกรายการ" aria-label="เลือกรายการ" />
             </div>
             <div class="card-grid">
               <div class="grid-item">
@@ -201,7 +201,7 @@
                 [class.edit-row-kept]="detail.selected"
                 [class.edit-row-removed]="!detail.selected">
                 <td class="text-center">
-                  <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" />
+                  <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" title="เลือกเก็บรายการ" aria-label="เลือกเก็บรายการ" />
                 </td>
                 <td class="text-center bg-gray">
                   {{ dateUtil.formatDateToBE(detail.workDate, 'ddd. DD/MM/YYYY') }}
@@ -244,7 +244,7 @@
                   <span class="date">{{ dateUtil.formatDateToBE(detail.workDate, 'ddd. DD/MM/YYYY') }}</span>
                   <span class="remove-label" *ngIf="!detail.selected">จะถูกลบ</span>
                 </div>
-                <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" class="card-checkbox" />
+                <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" class="card-checkbox" title="เลือกเก็บรายการ" aria-label="เลือกเก็บรายการ" />
               </div>
               <div class="card-grid">
                 <div class="grid-item">
@@ -278,10 +278,10 @@
 
         <!-- Edit action bar -->
         <div class="edit-action-bar">
-          <button class="btn-cancel-edit" (click)="closeModal()">
+          <button type="button" class="btn-cancel-edit" (click)="closeModal()">
             <i class="fas fa-times"></i> ยกเลิก
           </button>
-          <button class="btn-submit-edit" (click)="onSubmitEdit()">
+          <button type="button" class="btn-submit-edit" (click)="onSubmitEdit()">
             <i class="fas fa-save"></i> บันทึกการแก้ไข
           </button>
         </div>
