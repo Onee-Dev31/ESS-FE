@@ -65,7 +65,7 @@
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
       @for (claim of comps.paginatedData(); track claim.id) {
-      <div class="claim-card">
+      <div class="claim-card" (click)="openModal(claim.id)">
         <div class="claim-card__header">
           <div class="claim-card__type-badge">
             <i class="fa-solid fa-car-side"></i>{{ claim.claimNo }}
@@ -74,11 +74,11 @@
             <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
               {{ claim.status | statusLabel }}
             </span>
-            @if (isEditable(claim.status)) {
+            <!-- @if (isEditable(claim.status)) {
               <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
                 <i class="far fa-edit"></i>
               </button>
-            }
+            } -->
           </div>
         </div>
 
@@ -150,14 +150,14 @@
             <td class="">{{ claim.status }}</td>
             <td class="col-actions">
               <div class="action-btns">
-                @if (isEditable(claim.status)) {
+                <!-- @if (isEditable(claim.status)) {
                   <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
                     <i class="far fa-edit"></i>
                   </button>
                   <button type="button" class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
                     <i class="far fa-trash-alt"></i>
                   </button>
-                }
+                } -->
               </div>
             </td>
           </tr>
@@ -185,11 +185,7 @@
   @if (isModalOpen) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-vehicle-form
-        [requestId]="selectedRequestId"
-        [claimId]="editClaimId"
-        (onClose)="closeModal()">
-      </app-vehicle-form>
+      <app-vehicle-form (onClose)="closeModal()" [requests]="selectedRequest"></app-vehicle-form>
     </div>
   </div>
   }

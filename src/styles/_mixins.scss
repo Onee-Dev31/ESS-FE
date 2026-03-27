@@ -204,6 +204,15 @@
     &:active {
         transform: translateY(0);
     }
+
+    &:disabled {
+        background: #cbd5e1; // สีเทาเมื่อ disable
+        color: #94a3b8;
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+        opacity: 0.7;
+    }
 }
 
 @mixin btn-secondary {

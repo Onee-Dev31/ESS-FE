@@ -61,7 +61,7 @@ export class VehicleService {
         if (params.dateFrom) queryParams.date_from = params.dateFrom;
         if (params.dateTo) queryParams.date_to = params.dateTo;
 
-        console.log("params >>> ", queryParams)
+        // console.log("params >>> ", queryParams)
 
         return this._http.get(`${this.baseUrl}/transport-claim/claims`, {
             params: queryParams
@@ -73,17 +73,18 @@ export class VehicleService {
         return this._http.get(`${this.baseUrl}/transport-claim/eligible-dates?employee_code=${empCode}&year=${year}&month=${month}`);
     }
 
-    updateVehicleByEmpcode(payload: any): Observable<any> {
+    createVehicleByEmpcode(payload: any): Observable<any> {
         return this._http.post(`${this.baseUrl}/transport-claim`, payload);
     }
 
-    getVehicleClaimById(id: number): Observable<any> {
-        return this._http.get(`${this.baseUrl}/transport-claim/claims/${id}`);
-    }
-
-    patchVehicleClaim(id: number, payload: { claim_id: number; details: { detail_id: number; description: string }[] }): Observable<any> {
+    updateVehicleByClaimId(id: string, payload: any): Observable<any> {
         return this._http.patch(`${this.baseUrl}/transport-claim/${id}`, payload);
     }
+
+    deleteVehicleByEmpCode(id: string, empCode: string): Observable<any> {
+        return this._http.delete(`${this.baseUrl}/transport-claim/${id}?employee_code=${empCode}`);
+    }
+
 }
 
 

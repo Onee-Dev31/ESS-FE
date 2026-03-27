@@ -10,6 +10,7 @@ interface VehicleLogItem extends AttendanceLog {
   rateId: string;
   isDuplicate: boolean;
   type: string;
+  detail_id?: string;
 }
 
 interface EditDetailItem {
@@ -38,8 +39,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./vehicle-form.scss']
 })
 export class VehicleFormComponent implements OnInit, OnChanges {
-  @Input() requestId: string = '';
-  @Input() claimId: number | null = null;
+  // @Input() requestId: string = '';
+  @Input() requests: any = null;
 
   @Output() onClose = new EventEmitter<void>();
 
@@ -59,41 +60,25 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   selectedYearBE: number = new Date().getFullYear() + 543;
   logs: VehicleLogItem[] = [];
 
-  // Edit mode
-  isEditMode = false;
-  isLoadingEdit = false;
-  claimInfo: any = null;
-  existingDetails: EditDetailItem[] = [];
-
-  // Shared
-  totalAmount: number = 0;
-
-  get keptCount() { return this.existingDetails.filter(d => d.selected).length; }
-  get removedCount() { return this.existingDetails.filter(d => !d.selected).length; }
+  MODE_EDIT: boolean = false;
 
   ngOnInit(): void {
-    this.isEditMode = this.claimId != null;
     this.masterDataService.getDateConfig().subscribe(config => {
       this.thaiMonths = config.months;
       this.years = config.years;
-      if (this.isEditMode) {
-        this.loadExistingClaim();
-      } else {
+
+      if (!this.requests) {
         this.loadData();
       }
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['claimId'] && !changes['claimId'].firstChange) {
-      this.isEditMode = this.claimId != null;
-      if (this.isEditMode) {
-        this.loadExistingClaim();
-      }
-    } else if (changes['requestId'] && !changes['requestId'].firstChange) {
-      if (!this.isEditMode) {
-        this.loadData();
-      }
+    if (changes['requests'] && this.requests && this.requests !== '') {
+      // console.log('requests เข้ามาแล้ว:', this.requests);
+      this.MODE_EDIT = true;
+      this.mapData();
+      return;
     }
   }
 
@@ -103,29 +88,95 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     this.generateCalendar();
   }
 
+  mapData() {
+    this.logs = this.requests.details.map((item: any) => {
+      return {
+        date: item.work_date,
+        dayType: item.day_type,
+        timeIn: item.actual_checkin,
+        timeOut: item.actual_checkout,
+        selected: true,
+        isDuplicate: false,
+        description: item.description,
+        shiftCode: item.shift_code,
+        amount: item.rate_amount,
+        rateId: item.rate_id,
+        type: item.condition_label,
+        detail_id: item.detail_id
+      } as VehicleLogItem;
+    })
+  }
+
+  // hasInvalid(): boolean {
+  //   const selectedLogs = this.logs.filter(log => log.selected);
+
+  //   if (selectedLogs.length === 0) {
+  //     return true;
+  //   }
+  //   return selectedLogs.some(log => !log.description || log.description.trim() === '');
+  // }
+
+  isKeep(): number {
+    const selectedLogs = this.logs.filter(log => log.selected);
+    return selectedLogs.length
+  }
+
+  isDelete(): number {
+    const selectedLogs = this.logs.filter(log => !log.selected);
+    return selectedLogs.length
+  }
+
+  totolClaims(): string {
+    const selectedLogs = this.logs.filter(log => log.selected);
+    const total = selectedLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+    return total.toLocaleString('en-US') + '.-';
+  }
+
+  hasDelete(): boolean {
+    const selectedLogs = this.logs.filter(log => log.selected);
+    if (selectedLogs.length === 0) {
+      return true;
+    }
+    return false
+  }
+
+  hasInvalid(): boolean {
+    return this.logs.some(log =>
+      log.selected && (!log.description || log.description.trim() === '')
+    );
+  }
+
   generateCalendar() {
-    this.vehicleService.getVehicleByEmpcode(this.selectedYearBE.toString(), this.selectedMonthIndex.toString()).subscribe({
-      next: (res) => {
-        const rawData = res.data;
-        this.logs = rawData.map((item: any) => ({
-          date: item.work_date,
-          dayType: item.day_type,
-          timeIn: item.actual_checkin,
-          timeOut: item.actual_checkout,
-          selected: false,
-          isDuplicate: false,
-          description: '',
-          shiftCode: item.shift_code,
-          amount: item.rate_amount,
-          rateId: item.rate_id,
-          type: item.condition_type
-        } as VehicleLogItem));
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
+    // console.log(this.selectedYearBE.toString(), this.selectedMonthIndex.toString())
+
+    this.vehicleService.getVehicleByEmpcode(this.selectedYearBE.toString(), this.selectedMonthIndex.toString()).subscribe(
+      {
+        next: (res) => {
+          // console.log(res);
+          const rawData = res.data
+
+          this.logs = rawData.map((item: any) => {
+            return {
+              date: item.work_date,
+              dayType: item.day_type,
+              timeIn: item.actual_checkin,
+              timeOut: item.actual_checkout,
+              selected: false,
+              isDuplicate: false,
+              description: '',
+              shiftCode: item.shift_code,
+              amount: item.rate_amount,
+              rateId: item.rate_id,
+              type: item.condition_type
+            } as VehicleLogItem;
+          })
+          this.cdr.detectChanges()
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        }
       }
-    });
+    );
   }
 
   onInputChange(log: VehicleLogItem) {
@@ -147,7 +198,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         return;
       }
     } else {
-      log.description = '';
+      log.description = this.MODE_EDIT ? log.description : ''
     }
     this.updateDuplicateStatus();
   }
@@ -164,154 +215,166 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         rate_id: log.rateId,
         rate_amount: log.amount,
         description: log.description,
+        ...(log.detail_id && { detail_id: log.detail_id })
       }));
 
+    // DELETE
+    if (this.MODE_EDIT && selectedLogs.length === 0) {
+      this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด')
+        .then(result => {
+          if (!result.isConfirmed) return;
+          this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+          this.vehicleService.deleteVehicleByEmpCode(this.requests.id, this.authservice.userData().CODEMPID)
+            .subscribe({
+              next: (res) => {
+                // console.log(res)
+                if (!res?.success) {
+                  this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                  return;
+                }
+
+                this.swalService.success(res.message || "ลบรายการเบิกสำเร็จ");
+                this.closeModal();
+              },
+
+              error: (error) => {
+                console.error("Delete Vehicle Claim Error:", error);
+
+                this.swalService.warning(
+                  "เกิดข้อผิดพลาด",
+                  error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+                );
+              }
+            });
+
+        });
+      return;
+    }
+
+    // EDIT
+    if (this.MODE_EDIT) {
+      const payload = {
+        claim_id: this.requests.claimId,
+        details: selectedLogs
+      }
+      this.swalService.confirm('ยืนยันการแก้ไขการเบิก')
+        .then(result => {
+          if (!result.isConfirmed) return;
+          this.swalService.loading("กำลังบันทึกข้อมูล...");
+
+          this.vehicleService.updateVehicleByClaimId(this.requests.id, payload)
+            .subscribe({
+              next: (res) => {
+                // console.log(res)
+                if (!res?.success) {
+                  this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                  return;
+                }
+
+                this.swalService.success(res.message || "บันทึกการแก้ไขสำเร็จ");
+                this.closeModal();
+              },
+
+              error: (error) => {
+                console.error("Update Vehicle Claim Error:", error);
+
+                this.swalService.warning(
+                  "เกิดข้อผิดพลาด",
+                  error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+                );
+              }
+            });
+
+        });
+      return;
+    }
+
+    // CREATE
     const payload = {
       employee_code: this.authservice.userData().CODEMPID,
       details: selectedLogs
-    };
-
+    }
     this.swalService.confirm('ยืนยันการเบิก')
       .then(result => {
         if (!result.isConfirmed) return;
         this.swalService.loading("กำลังบันทึกข้อมูล...");
 
-        this.vehicleService.updateVehicleByEmpcode(payload).subscribe({
-          next: (res) => {
-            if (!res?.success) {
-              this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-              return;
-            }
-            this.swalService.success(res.message || "บันทึกสำเร็จ");
-            this.closeModal();
-          },
-          error: (error) => {
-            console.error("Vehicle claim Error:", error);
-            this.swalService.warning("เกิดข้อผิดพลาด", error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
-          }
-        });
+        this.vehicleService.createVehicleByEmpcode(payload)
+          .subscribe({
+            next: (res) => {
+              // console.log(res)
+              if (!res?.success) {
+                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                return;
+              }
+
+              this.swalService.success(res.message || "บันทึกสำเร็จ");
+              this.closeModal();
+            },
+
+            error: (error) => {
+              console.error("Vehicle claim Error:", error);
+
+              this.swalService.warning(
+                "เกิดข้อผิดพลาด",
+                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+              );
+              this.closeModal();
+            },
+          });
       });
+  }
+
+  // updateDuplicateStatus() {
+  //   this.logs.forEach(log => log.isDuplicate = false);
+  //   const grouped: { [key: string]: VehicleLogItem[] } = {};
+  //   this.logs.forEach(log => {
+  //     const key = dayjs(log.date).format('YYYY-MM-DD');
+  //     if (!grouped[key]) grouped[key] = [];
+  //     grouped[key].push(log);
+  //   });
+  //   Object.keys(grouped).forEach(date => {
+  //     const logsInDate = grouped[date];
+  //     const selectedLogs = logsInDate.filter(l => l.selected);
+  //     if (selectedLogs.length >= 1 && logsInDate.length > 1) {
+  //       logsInDate.forEach(log => { log.isDuplicate = !log.selected; });
+  //     }
+  //   });
+  // }
+
+  closeModal() {
+    this.MODE_EDIT = false;
+    this.requests = null;
+    this.onClose.emit();
   }
 
   updateDuplicateStatus() {
     this.logs.forEach(log => log.isDuplicate = false);
+
     const grouped: { [key: string]: VehicleLogItem[] } = {};
+
     this.logs.forEach(log => {
       const key = dayjs(log.date).format('YYYY-MM-DD');
-      if (!grouped[key]) grouped[key] = [];
+
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+
       grouped[key].push(log);
     });
+
     Object.keys(grouped).forEach(date => {
       const logsInDate = grouped[date];
       const selectedLogs = logsInDate.filter(l => l.selected);
+
+      // ✅ มีคนเลือกอย่างน้อย 1 และมีหลายรายการในวันเดียวกัน
       if (selectedLogs.length >= 1 && logsInDate.length > 1) {
-        logsInDate.forEach(log => { log.isDuplicate = !log.selected; });
+        logsInDate.forEach(log => {
+          log.isDuplicate = !log.selected; // ตัวที่ไม่เลือก = true
+        });
       }
     });
   }
 
-  // ─── Edit mode ───────────────────────────────────────────────
-
-  loadExistingClaim() {
-    if (!this.claimId) return;
-    this.isLoadingEdit = true;
-    this.vehicleService.getVehicleClaimById(this.claimId).subscribe({
-      next: (res) => {
-        this.claimInfo = res.data;
-        this.existingDetails = (res.data?.details ?? []).map((d: any) => ({
-          detailId: d.detailId ?? d.detail_id,
-          workDate: d.workDate ?? d.work_date,
-          shiftCode: d.shiftCode ?? d.shift_code,
-          dayType: d.dayType ?? d.day_type,
-          actualCheckin: d.actualCheckin ?? d.actual_checkin,
-          actualCheckout: d.actualCheckout ?? d.actual_checkout,
-          rateAmount: d.rateAmount ?? d.rate_amount,
-          description: d.description ?? '',
-          selected: true,
-        } as EditDetailItem));
-        this.updateTotal();
-        this.isLoadingEdit = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.isLoadingEdit = false;
-        this.swalService.warning("ไม่สามารถโหลดข้อมูลรายการเบิกได้");
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  onToggleEditDetail(_detail: EditDetailItem) {
-    this.updateTotal();
-  }
-
-  onEditDescChange(_detail: EditDetailItem) {
-    this.updateTotal();
-  }
-
-  updateTotal() {
-    if (this.isEditMode) {
-      this.totalAmount = this.existingDetails
-        .filter(d => d.selected)
-        .reduce((sum, d) => sum + (d.rateAmount ?? 0), 0);
-    } else {
-      this.totalAmount = this.logs
-        .filter(log => log.selected)
-        .reduce((sum, current) => sum + current.amount, 0);
-    }
-  }
-
-  onSubmitEdit() {
-    const keptDetails = this.existingDetails.filter(d => d.selected);
-
-    if (keptDetails.length === 0) {
-      this.swalService.warning("กรุณาเลือกรายการอย่างน้อย 1 รายการ");
-      return;
-    }
-
-    const invalidDesc = keptDetails.some(d => !d.description?.trim());
-    if (invalidDesc) {
-      this.swalService.warning("กรุณากรอกรายละเอียดให้ครบทุกรายการที่เลือก");
-      return;
-    }
-
-    const removedCount = this.existingDetails.filter(d => !d.selected).length;
-    const confirmMsg = removedCount > 0
-      ? `จะเก็บ ${keptDetails.length} รายการ และลบ ${removedCount} รายการถาวร`
-      : `บันทึกการแก้ไข ${keptDetails.length} รายการ`;
-
-    this.swalService.confirm(confirmMsg).then(result => {
-      if (!result.isConfirmed) return;
-      this.swalService.loading("กำลังบันทึก...");
-
-      const payload = {
-        claim_id: this.claimId!,
-        details: keptDetails.map(d => ({
-          detail_id: d.detailId,
-          description: d.description
-        }))
-      };
-
-      this.vehicleService.patchVehicleClaim(this.claimId!, payload).subscribe({
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning("ไม่สามารถบันทึกได้");
-            return;
-          }
-          this.swalService.success("บันทึกสำเร็จ");
-          this.closeModal();
-        },
-        error: (error) => {
-          console.error("Patch vehicle Error:", error);
-          this.swalService.warning("เกิดข้อผิดพลาด", error?.error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
-        }
-      });
-    });
-  }
-
-  // ─── Shared ──────────────────────────────────────────────────
-
-  closeModal() {
-    this.onClose.emit();
-  }
 }
