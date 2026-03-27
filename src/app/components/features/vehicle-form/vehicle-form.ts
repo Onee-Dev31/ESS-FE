@@ -167,7 +167,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
               shiftCode: item.shift_code,
               amount: item.rate_amount,
               rateId: item.rate_id,
-              type: item.condition_type
+              type: item.condition_label
             } as VehicleLogItem;
           })
           this.cdr.detectChanges()

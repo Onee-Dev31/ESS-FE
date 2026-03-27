@@ -233,7 +233,7 @@ $col-desc: auto;
                 .total {
                     color: color-mix(in srgb, var(--primary), white 20%) !important;
                     font-size: $font-size-body;
-                    font-weight:900;
+                    font-weight: 900;
                 }
             }
         }
@@ -421,7 +421,7 @@ $col-desc: auto;
 
 .mobile-cards-view {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 4px;
 
@@ -550,4 +550,13 @@ $col-desc: auto;
     .log-card.disable {
         opacity: 0.45;
     }
+
+    @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 800px) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
 }

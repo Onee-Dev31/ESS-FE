@@ -119,7 +119,6 @@ export class VehicleComponent implements OnInit {
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
-        console.log(res)
         this.dataFromApi(res)
         // this.loadingService.stop('vehicle-list');
       },
