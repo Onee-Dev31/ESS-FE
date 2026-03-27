@@ -212,13 +212,13 @@
 
 /* ===== Disabled + NOT checked (false) ===== */
 .ant-checkbox-disabled:not(.ant-checkbox-checked) .ant-checkbox-inner {
-    background-color: color-mix(in srgb, var(--primary), var(--bg-page) 90%);
+    background-color: rgba(99, 102, 241, 0.1);
     border-color: var(--status-approved-text);
 }
 
 /* ===== Disabled + checked (true) ===== */
 .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner {
-    background-color: color-mix(in srgb, var(--primary), var(--bg-page) 10%);
+    background-color: rgba(99, 102, 241, 0.9);
     border-color: var(--status-approved-text);
 }
 
@@ -239,4 +239,38 @@
 .ant-tooltip-arrow::before,
 .ant-tooltip-arrow::after {
     background-color: var(--bg-card) !important;
+}
+
+/*
+  ANTD : INPUT / INPUT-WRAPPER
+*/
+.ant-input-affix-wrapper {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+
+    &:hover {
+        border-color: var(--input-border-hover);
+    }
+
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+        background-color: var(--input-focus-bg);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    }
+
+    .ant-input-prefix {
+        color: var(--text-muted);
+    }
+}
+
+.ant-input-affix-wrapper .ant-input,
+.ant-input {
+    background-color: transparent;
+    color: var(--input-text);
+
+    &::placeholder {
+        color: var(--input-text-placeholder);
+    }
 }
