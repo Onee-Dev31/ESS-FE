@@ -2,7 +2,7 @@
   <app-page-header title="เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)"></app-page-header>
 
   <div class="content-card">
-    <div class="card-header-title">รายการเบิกของฉัน</div>
+    <!-- <div class="card-header-title">รายการเบิกของฉัน</div>
 
     <div class="toolbar-container">
       <div class="toolbar-top-row">
@@ -19,7 +19,8 @@
             <span class="filter-label">ตั้งแต่เดือน</span>
             <div class="date-input-group">
               <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่" aria-label="ตั้งแต่วันที่" />
+                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่"
+                aria-label="ตั้งแต่วันที่" />
             </div>
           </div>
 
@@ -37,7 +38,7 @@
               <select class="form-control select-status" [ngModel]="listing.filterStatus()"
                 (ngModelChange)="listing.filterStatus.set($event)" title="กรองตามสถานะ" aria-label="กรองตามสถานะ">
                 <option value="">ทั้งหมด</option>
-                <option value="NEW">คำขอใหม่</option>
+                <option value="New">คำขอใหม่</option>
                 <option value="WAITING_CHECK">รอตรวจสอบ</option>
                 <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
                 <option value="APPROVED">อนุมัติแล้ว</option>
@@ -52,11 +53,54 @@
         <div class="search-input-group">
           <input type="text" class="form-control" placeholder="ค้นหารหัส/description" [ngModel]="listing.searchText()"
             (ngModelChange)="listing.searchText.set($event)">
-          <button class="btn-search">
+          <button class="btn-search" (click)="loadData()">
             <i class="fas fa-search"></i> ค้นหา
           </button>
         </div>
       </div>
+    </div> -->
+
+    <div class="card-header-row">
+      <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
+      <button type="button" class="btn-create" (click)="openModal()">
+        <i class="fas fa-plus"></i> สร้างรายการเบิก
+      </button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar-container">
+      <div class="filter">
+        <div class="group-filter">
+          <div class="form-field">
+            <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
+            <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
+          </div>
+          <div class="form-field">
+            <nz-select nzShowSearch nzAllowClear class="form-input select-status" [ngModel]="listing.filterStatus()"
+              (ngModelChange)="listing.filterStatus.set($event)">
+              <nz-option nzLabel="ทั้งหมด" nzValue="" />
+              <nz-option nzLabel="คำขอใหม่" nzValue="New" />
+              <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
+            </nz-select>
+          </div>
+        </div>
+        <div class="group-filter">
+          <div class="form-field">
+            <nz-input-wrapper class="form-input">
+              <nz-icon nzInputPrefix nzType="search" />
+              <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
+            </nz-input-wrapper>
+          </div>
+          <button type="button" class="btn-search" (click)="loadData()">
+            <i class="fas fa-search"></i> ค้นหา
+          </button>
+          <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+      </div>
+
     </div>
 
     <!-- Mobile card view -->
@@ -112,7 +156,7 @@
     </div>
 
     <!-- Table view -->
-    <div class="table-responsive">
+    <!-- <div class="table-responsive">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
@@ -150,14 +194,12 @@
             <td class="">{{ claim.status }}</td>
             <td class="col-actions">
               <div class="action-btns">
-                <!-- @if (isEditable(claim.status)) {
-                  <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
-                    <i class="far fa-edit"></i>
-                  </button>
-                  <button type="button" class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
-                    <i class="far fa-trash-alt"></i>
-                  </button>
-                } -->
+                <button type="button" class="btn-icon edit" (click)="openModal(claim.claimId)" title="แก้ไข">
+                  <i class="far fa-edit"></i>
+                </button>
+                <button type="button" class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
+                  <i class="far fa-trash-alt"></i>
+                </button>
               </div>
             </td>
           </tr>
@@ -173,7 +215,7 @@
         }
       </table>
       }
-    </div>
+    </div> -->
 
     <div class="pagination-wrapper">
       <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"

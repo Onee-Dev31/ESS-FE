@@ -7,28 +7,41 @@ import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { StatusUtil } from '../../utils/status.util';
-import { createListingState, clearListingFilters, TableSortHelper, createListingComputeds_v2 } from '../../utils/listing.util';
+import { createListingState, clearListingFilters, createListingComputeds_v2 } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import {
-  createAngularTable,
-  getCoreRowModel,
-  SortingState,
-} from '@tanstack/angular-table';
-
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { VehicleService } from '../../services/vehicle.service';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import dayjs from 'dayjs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่ารถ (Vehicle Allowance) */
 @Component({
   selector: 'app-vehicle',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleFormComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, EmptyStateComponent, SkeletonComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    VehicleFormComponent,
+    StatusLabelPipe,
+    PaginationComponent,
+    PageHeaderComponent,
+    EmptyStateComponent,
+    SkeletonComponent,
+    NzInputModule,
+    NzIconModule,
+    NzDatePickerModule,
+    NzSelectModule 
+  ],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
 })
@@ -41,6 +54,8 @@ export class VehicleComponent implements OnInit {
   dateUtil = inject(DateUtilityService);
 
   private swalService = inject(SwalService);
+
+  dateRange: Date[] | null = null;
 
   isModalOpen = false;
   selectedRequestId = '';
@@ -61,53 +76,14 @@ export class VehicleComponent implements OnInit {
   emptyDescription = computed(() => this.hasActiveFilters() ? 'ลองเปลี่ยนเงื่อนไขการค้นหาหรือล้างตัวกรอง' : 'กดปุ่ม "สร้างรายการเบิก" เพื่อเริ่มต้นเบิกค่าพาหนะ');
   emptyIcon = computed(() => this.hasActiveFilters() ? 'fas fa-search' : 'fas fa-car');
 
-  // processedData = computed(() => {
-  //   const list = [...this.allRequests()];
-
-  //   const search = this.listing.searchText().toLowerCase();
-  //   const status = this.listing.filterStatus();
-  //   const start = this.listing.filterStartDate();
-  //   const end = this.listing.filterEndDate();
-
-  //   let filtered = list.filter(r => {
-  //     const matchSearch = !search || r.id.toLowerCase().includes(search);
-  //     const matchStatus = !status || r.status === status;
-  //     const matchStart = !start || r.createDate >= start;
-  //     const matchEnd = !end || r.createDate <= end;
-  //     return matchSearch && matchStatus && matchStart && matchEnd;
-  //   });
-
-  //   const sortState = this.sorting()[0];
-  //   if (sortState) {
-  //     const { id, desc } = sortState;
-  //     filtered = TableSortHelper.sortVehicleLikeData(filtered, id, desc, {
-  //       desc: 'desc',
-  //       date: 'date'
-  //     });
-  //   }
-  //   return filtered;
-  // });
-
-
-  // table = createAngularTable(() => ({
-  //   data: this.comps.paginatedData(),
-  //   columns: [
-  //     { accessorKey: 'id', header: 'เลขที่การเบิก' },
-  //     { accessorKey: 'createDate', header: 'วันที่สร้างรายการ' },
-  //     { accessorKey: 'date', header: 'วันที่ขอเบิก' },
-  //     { accessorKey: 'desc', header: 'รายละเอียด' },
-  //     { accessorKey: 'amount', header: 'จำนวนเงิน' },
-  //     { accessorKey: 'status', header: 'สถานะ' },
-  //   ],
-  //   onSortingChange: (updaterOrValue) => {
-  //     const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
-  //   },
-  //   getCoreRowModel: getCoreRowModel(),
-  //   manualPagination: true,
-  // }));
-
   ngOnInit() {
     this.loadData();
+  }
+
+  constructor(
+    private i18n: NzI18nService,
+  ) {
+    this.i18n.setLocale(en_US);
   }
 
   private loadingService = inject(LoadingService);
@@ -116,17 +92,23 @@ export class VehicleComponent implements OnInit {
   loadData() {
     // this.loadingService.start('vehicle-list');
 
+    let [start, end]: [any, any] = ['', ''];
+    if (this.dateRange && this.dateRange.length === 2) {
+      [start, end] = this.dateRange;
+      console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
+    }
+
     const param = {
       page: this.listing.currentPage() + 1 || 1,
       pageSize: this.listing.pageSize(),
       empCode: this.authservice.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
-      dateFrom: this.listing.filterStartDate(),
-      dateTo: this.listing.filterEndDate()
+      dateFrom: start ? dayjs(start).format("YYYY-MM-DD") : '',
+      dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
     }
 
-    // console.log(param)
+    console.log(param)
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
@@ -203,6 +185,8 @@ export class VehicleComponent implements OnInit {
 
   clearFilters() {
     clearListingFilters(this.listing);
+    this.dateRange = null;
+    this.loadData()
   }
 
   trackById(_: number, claim: any): number {
