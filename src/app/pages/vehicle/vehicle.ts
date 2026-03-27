@@ -50,6 +50,17 @@ export class VehicleComponent implements OnInit {
   listing = createListingState();
   comps = createListingComputeds_v2(this.allRequests, this.listing);
 
+  hasActiveFilters = computed(() =>
+    !!this.listing.searchText() ||
+    !!this.listing.filterStatus() ||
+    !!this.listing.filterStartDate() ||
+    !!this.listing.filterEndDate()
+  );
+
+  emptyTitle = computed(() => this.hasActiveFilters() ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการเบิก');
+  emptyDescription = computed(() => this.hasActiveFilters() ? 'ลองเปลี่ยนเงื่อนไขการค้นหาหรือล้างตัวกรอง' : 'กดปุ่ม "สร้างรายการเบิก" เพื่อเริ่มต้นเบิกค่าพาหนะ');
+  emptyIcon = computed(() => this.hasActiveFilters() ? 'fas fa-search' : 'fas fa-car');
+
   // processedData = computed(() => {
   //   const list = [...this.allRequests()];
 

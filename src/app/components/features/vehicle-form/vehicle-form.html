@@ -3,7 +3,7 @@
     <h2>{{ MODE_EDIT ? 'แก้ไขรายการเบิกค่ารถ' : 'เบิกค่ารถ (ก่อน 06:00 / หลัง 22:00)'}} <span class="request-id-badge"
         *ngIf="requests?.claimNo">เลขที่การเบิก : {{ requests?.claimNo }}</span>
     </h2>
-    <button class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
+    <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด" aria-label="ปิด"><i class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
@@ -12,10 +12,10 @@
       <div class="month-selector">
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
-          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
+          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control" title="เลือกเดือน" aria-label="เลือกเดือน">
             <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i+1">{{ m }}</option>
           </select>
-          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
+          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control" title="เลือกปี" aria-label="เลือกปี">
             <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
           </select>
           <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
@@ -53,7 +53,7 @@
               }})</span>
           </div>
           <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
-            [disabled]="log.isDuplicate" />
+            [disabled]="log.isDuplicate" title="เลือกรายการ" aria-label="เลือกรายการ" />
         </div>
 
         <div class="card-grid">
