@@ -164,6 +164,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     this.taxiService.getEligibleDates(empCode, this.selectedYear, month).subscribe({
       next: (res: any) => {
+        console.log(res)
         const rows: any[] = res.data ?? [];
         this.items = rows.map((row: any) => ({
           date: row.workDate ?? row.work_date,
@@ -205,39 +206,104 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   onFromLocationChange(item: TaxiLogItem, rowIndex: number) {
     item.selected = true;
-    if (!this.isOtherLocation(item.locationFromId)) item.otherFrom = '';
 
-    const oppositeLoc = this.locations.find(l => l.location_id !== item.locationFromId);
-    if (oppositeLoc) {
-      item.locationToId = oppositeLoc.location_id;
-      if (!this.isOtherLocation(item.locationToId)) item.otherTo = '';
+    // ถ้า from ไม่ใช่ other → เคลียร์
+    if (!this.isOtherLocation(item.locationFromId)) {
+      item.otherFrom = '';
     }
 
-    if (this.isOtherLocation(item.locationToId)) {
-      this.pendingFocusId = `other-to-${rowIndex}`;
-    } else if (this.isOtherLocation(item.locationFromId)) {
+    // 👉 ถ้าเลือก "อื่นๆ"
+    if (this.isOtherLocation(item.locationFromId)) {
+      // ต้อง force ให้ to เป็น office
+      const office = this.locations.find(l => l.is_office);
+      if (office) {
+        item.locationToId = office.location_id;
+        item.otherTo = '';
+      }
+
       this.pendingFocusId = `other-from-${rowIndex}`;
+      return;
     }
+
+    // 👉 ถ้า from เป็น office → to เป็น other
+    const other = this.locations.find(l => !l.is_office);
+    if (other) {
+      item.locationToId = other.location_id;
+    }
+
+    this.pendingFocusId = `other-to-${rowIndex}`;
   }
 
   onToLocationChange(item: TaxiLogItem, rowIndex: number) {
     item.selected = true;
-    if (!this.isOtherLocation(item.locationToId)) item.otherTo = '';
 
     if (!this.isOtherLocation(item.locationToId)) {
-      const otherLoc = this.locations.find(l => !l.is_office);
-      if (otherLoc) {
-        item.locationFromId = otherLoc.location_id;
+      item.otherTo = '';
+    }
+
+    // 👉 ถ้าเลือก "อื่นๆ"
+    if (this.isOtherLocation(item.locationToId)) {
+      // from ต้องเป็น office
+      const office = this.locations.find(l => l.is_office);
+      if (office) {
+        item.locationFromId = office.location_id;
         item.otherFrom = '';
       }
-      this.pendingFocusId = `other-from-${rowIndex}`;
+
+      this.pendingFocusId = `other-to-${rowIndex}`;
       return;
     }
-    this.pendingFocusId = `other-to-${rowIndex}`;
+
+    // 👉 ถ้า to เป็น office → from เป็น other
+    const other = this.locations.find(l => !l.is_office);
+    if (other) {
+      item.locationFromId = other.location_id;
+    }
+
+    this.pendingFocusId = `other-from-${rowIndex}`;
   }
 
   onInputChange(item: TaxiLogItem) {
     if (item.description?.trim() || item.locationFromId || item.locationToId || (item.amount && item.amount > 0)) {
+      item.selected = true;
+    }
+  }
+
+  parseNumber(value: string | number): number {
+    if (typeof value === 'number') return value;
+    return Number(value.replace(/,/g, ""));
+  }
+
+  formatNumber(value: number): string {
+    return value.toLocaleString("en-US");
+  }
+
+  onAmountInput(event: Event, item: TaxiLogItem) {
+    const input = event.target as HTMLInputElement;
+
+    // เอาเฉพาะตัวเลข
+    let value = input.value.replace(/[^0-9]/g, '');
+
+    const numericValue = Number(value || 0);
+
+    // 👉 max จาก remaining
+    const maxAmount = item.remainingAmount ?? 0;
+
+    // ❌ ถ้าเกิน
+    if (numericValue > maxAmount) {
+      item.amountError = `จำนวนเงินต้องไม่เกิน ${this.formatNumber(maxAmount)} บาท`;
+    } else {
+      item.amountError = null;
+    }
+
+    // set ค่า
+    item.amount = numericValue;
+
+    // format ใส่ comma
+    input.value = this.formatNumber(numericValue);
+
+    // auto select
+    if (numericValue > 0) {
       item.selected = true;
     }
   }
@@ -329,6 +395,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         detailIndexes.push(index);
       }
     });
+
+    console.log(this.originalClaimId, empCode, details, files, detailIndexes)
 
     if (this.isEditMode && this.originalClaimId) {
       // Update

@@ -58,7 +58,7 @@
     <div class="table-container">
 
       <!-- Desktop Table -->
-      <table class="excel-table desktop-only">
+      <!-- <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-select" />
           <col class="col-date" />
@@ -122,7 +122,7 @@
                 placeholder="ระบุรายละเอียดการเบิก..." title="รายละเอียดการเบิก" aria-label="รายละเอียดการเบิก" />
             </td>
 
-            <!-- จากที่ไหน -->
+     
             <td class="location-cell">
               <select class="table-select" [(ngModel)]="item.locationFromId" id="loc-from-{{i}}"
                 [class.is-invalid]="item.selected && !item.locationFromId"
@@ -136,7 +136,6 @@
                 placeholder="ระบุสถานที่ต้นทาง..." title="ระบุสถานที่ต้นทาง" />
             </td>
 
-            <!-- ไปที่ไหน -->
             <td class="location-cell">
               <select class="table-select" [(ngModel)]="item.locationToId" id="loc-to-{{i}}"
                 [class.is-invalid]="item.selected && !item.locationToId" (ngModelChange)="onToLocationChange(item, i)"
@@ -178,7 +177,7 @@
             <td colspan="2" class="bg-white"></td>
           </tr>
         </tfoot>
-      </table>
+      </table> -->
 
       <!-- ====================== MOBILE CARDS ====================== -->
       <div class="mobile-cards-view mobile-only">
@@ -252,12 +251,32 @@
                 placeholder="ระบุสถานที่ปลายทาง..." title="ระบุสถานที่ปลายทาง" />
             </div>
 
-            <div class="grid-item full-width">
+            <!-- <div class="grid-item full-width">
               <label for="mob-amount-{{i}}">จำนวนเงิน (บาท) <span *ngIf="item.selected"
                   class="required">*</span></label>
               <input type="number" id="mob-amount-{{i}}" class="card-input" [(ngModel)]="item.amount"
                 [class.is-invalid]="item.selected && (!item.amount || item.amount <= 0)"
                 (ngModelChange)="onInputChange(item)" [max]="item.remainingAmount ?? null" title="จำนวนเงิน" />
+      
+              <div class="error-text" *ngIf="item.selected && item.amount > item.remainingAmount">
+                จำนวนเงินเกินวงเงินคงเหลือ
+              </div>
+            </div> -->
+            <div class="grid-item full-width">
+              <label>
+                จำนวนเงิน (บาท)
+                <span *ngIf="item.selected" class="required">*</span>
+              </label>
+
+              <div class="amount-input-wrapper">
+                <input type="text" class="card-input text-right" placeholder="0.00"
+                  [value]="formatNumber(item.amount || 0)" (input)="onAmountInput($event, item)"
+                  [class.is-invalid]="item.amountError" />
+              </div>
+
+              <div *ngIf="item.amountError" class="error">
+                {{ item.amountError }}
+              </div>
             </div>
           </div>
         </div>

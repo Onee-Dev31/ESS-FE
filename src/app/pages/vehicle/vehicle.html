@@ -51,7 +51,7 @@
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
       @for (claim of comps.paginatedData(); track claim.id) {
-      <div class="claim-card" (click)="openModal(claim.id)">
+      <div class="claim-card" (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
         <div class="claim-card__header">
           <div class="claim-card__type-badge">
             <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ

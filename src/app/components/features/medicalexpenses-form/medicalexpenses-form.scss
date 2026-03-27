@@ -520,7 +520,7 @@
 
 
     @include tablet {
-        .card-content .type-info .balance-value{
+        .card-content .type-info .balance-value {
             font-size: $font-size-header;
         }
     }
@@ -624,7 +624,7 @@
     @include input-field-group;
 
     .error {
-        color: red;
+        color: var(--danger);
         text-align: center;
         font-size: $font-size-hint;
     }

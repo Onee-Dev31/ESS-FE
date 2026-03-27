@@ -35,7 +35,7 @@ export class TaxiMock {
         return this.generateRequestsByRole(count, 'Member');
     }
 
-    static getMockTaxiLogs(month: number, year: number): TaxiLogItem[] {
+    static getMockTaxiLogs(month: number, year: number): any[] {
         const days = MockHelper.generateDays(month, year);
         return days.map((date: Date) => {
             const dayOfWeek = date.getDay();

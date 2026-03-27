@@ -61,6 +61,15 @@ $col-file: 50px;
             margin: 0;
             font-size: 1.25rem;
             font-weight: 700;
+            color: #ffffff !important;
+
+            span {
+                font-size: $font-size-hint;
+                border: 1px solid #ffffff3f;
+                background: #ffffff17;
+                padding: 4px 6px;
+                border-radius: 100px;
+            }
         }
 
         .btn-close-modal {
@@ -69,7 +78,9 @@ $col-file: 50px;
             font-size: 1.25rem;
 
             &:hover {
+                // color: var(--danger);
                 background: rgba(255, 255, 255, 0.15);
+                transform: rotate(90deg);
             }
         }
     }
@@ -134,10 +145,14 @@ $col-file: 50px;
         color: var(--text-muted);
         font-size: 0.95rem;
 
-        i { font-size: 1.2rem; }
+        i {
+            font-size: 1.2rem;
+        }
     }
 
-    .col-remaining { width: 80px; }
+    .col-remaining {
+        width: 80px;
+    }
 
     .remaining-amount {
         font-size: 0.8rem;
@@ -187,255 +202,596 @@ $col-file: 50px;
     }
 }
 
+// // ==========================================
+// // Table Styles (from _table.scss)
+// // ==========================================
+
+
+// .table-container {
+//     width: 100% !important;
+//     display: block !important;
+//     flex: 1 1 100%;
+//     align-self: stretch;
+//     min-height: 0;
+//     overflow: auto;
+//     border: 1px solid $border;
+//     border-radius: 8px;
+
+//     @include large-tablet {
+//         border: none;
+//         background: transparent;
+//     }
+
+//     .excel-table {
+//         width: 100% !important;
+//         min-width: 100% !important;
+//         display: table;
+//         border-collapse: separate;
+//         border-spacing: 0;
+//         table-layout: fixed !important;
+//         margin: 0 !important;
+
+//         th,
+//         td {
+//             border-bottom: 1px solid $border;
+//             border-right: 1px solid $border;
+//             height: 40px;
+
+//             @media (min-width: 768px) {
+//                 height: 44px;
+//             }
+
+//             vertical-align: middle;
+//             box-sizing: border-box;
+//         }
+
+//         .col-select {
+//             width: $col-select;
+//         }
+
+//         .col-date {
+//             width: $col-date;
+//         }
+
+//         .col-day-type {
+//             width: $col-day-type;
+//         }
+
+//         .col-shift {
+//             width: $col-shift;
+//         }
+
+//         .col-time {
+//             width: $col-time;
+//         }
+
+//         .col-desc {
+//             width: $col-desc;
+//         }
+
+//         .col-dest {
+//             width: $col-dest;
+//         }
+
+//         .col-location {
+//             width: 160px;
+//         }
+
+//         .col-dist {
+//             width: $col-dist;
+//         }
+
+//         .col-amount {
+//             width: $col-amount;
+//         }
+
+//         .col-file {
+//             width: $col-file;
+//         }
+
+//         th {
+//             background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+//             position: sticky;
+//             top: 0;
+//             z-index: 10;
+//             text-align: center;
+//             color: #ffffff;
+//             border-top: 1px solid rgba(0, 0, 0, 0.15);
+
+//             .required {
+//                 color: rgba(var(--bg-card), 0.8);
+//                 margin-left: 2px;
+//             }
+//         }
+
+//         .sub-header th {
+//             top: 40px;
+
+//             @media (min-width: 768px) {
+//                 top: 44px;
+//             }
+
+//             font-size: 0.8rem;
+//             z-index: 9;
+//         }
+
+//         .text-center {
+//             text-align: center;
+
+//             input[type='checkbox'] {
+//                 cursor: pointer;
+//                 margin: 0 auto;
+//                 display: block;
+//             }
+//         }
+
+//         .bg-gray {
+//             background-color: $bg-slate;
+//         }
+
+//         .font-bold {
+//             font-weight: 700;
+//         }
+
+//         .holiday-label {
+//             color: $danger;
+//             font-weight: 700;
+//         }
+
+//         .regular-label {
+//             color: $text;
+//         }
+
+//         .shift-code {
+//             font-size: 12px;
+//             color: $text-sub;
+//         }
+
+//         .highlight-row td {
+//             background-color: rgba($warning, 0.05) !important;
+//         }
+
+//         .time-input {
+//             width: 100%;
+//             text-align: center;
+//             border: none;
+//             background: transparent;
+//             outline: none;
+//         }
+
+//         .desc-cell {
+//             padding: 0 8px;
+//             position: relative;
+
+//             .input-container {
+//                 display: flex;
+//                 align-items: center;
+//                 height: 100%;
+//             }
+
+//             .table-input {
+//                 width: 100%;
+//                 height: 32px;
+//                 border: 1px solid transparent;
+//                 border-radius: 4px;
+//                 padding: 0 8px;
+//                 background: transparent;
+
+//                 &.is-invalid {
+//                     border: 1px solid $danger !important;
+//                     background-color: rgba($danger, 0.05);
+//                 }
+
+//                 &:focus:not(:disabled) {
+//                     background: $bg-card;
+//                     border: 1px solid $primary;
+//                     outline: none;
+//                 }
+//             }
+
+//             .table-select {
+//                 width: 100%;
+//                 height: 32px;
+//                 border: 1px solid var(--border);
+//                 border-radius: 4px;
+//                 padding: 0 6px;
+//                 background: var(--bg-card);
+//                 color: var(--text);
+//                 font-size: 0.85rem;
+//                 cursor: pointer;
+
+//                 &.is-invalid {
+//                     border-color: $danger !important;
+//                     background-color: rgba($danger, 0.05);
+//                 }
+
+//                 &:focus {
+//                     border-color: $primary;
+//                     outline: none;
+//                 }
+//             }
+
+//             .location-cell {
+//                 padding: 6px 8px;
+//                 vertical-align: top;
+//             }
+
+//             .mt-1 {
+//                 margin-top: 4px;
+//             }
+//         }
+
+//         .btn-icon-folder {
+//             background: none;
+//             border: none;
+//             cursor: pointer;
+//             font-size: 1.1rem;
+//             color: #9575cd;
+//             transition: transform 0.2s;
+
+//             &:hover {
+//                 transform: scale(1.1);
+//             }
+
+//             &.has-file {
+//                 color: $success;
+//             }
+//         }
+
+//         tfoot {
+//             .total-val {
+//                 background: $status-success-bg !important;
+//                 color: $status-success-text;
+//                 font-weight: 700;
+//             }
+
+//             .total-label {
+//                 text-align: right;
+//                 padding-right: 20px;
+//                 font-weight: 600;
+//             }
+//         }
+//     }
+// }
+
+// // ==========================================
+// // Mobile Cards (from _mobile-cards.scss)
+// // ==========================================
+
+
+// .mobile-cards-view {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 16px;
+//     padding: 4px;
+
+//     .log-card {
+//         background: $bg-card;
+//         border: 1px solid $border;
+//         border-radius: 12px;
+//         padding: 16px;
+//         box-shadow: $shadow;
+//         transition: all 0.2s;
+
+//         &.highlight-card {
+//             border-color: $warning;
+//             background: rgba($warning, 0.05);
+//             box-shadow: 0 4px 15px rgba($warning, 0.1);
+//         }
+
+//         .card-header {
+//             display: flex;
+//             justify-content: space-between;
+//             align-items: center;
+//             margin-bottom: 12px;
+//             padding-bottom: 10px;
+//             border-bottom: 1px solid rgba($border, 0.5);
+
+//             .date-info {
+//                 display: flex;
+//                 align-items: center;
+//                 gap: 8px;
+
+//                 .day-dot {
+//                     width: 8px;
+//                     height: 8px;
+//                     border-radius: 50%;
+//                 }
+
+//                 .date {
+//                     font-weight: 700;
+//                     color: $text;
+//                     font-size: 0.95rem;
+//                 }
+
+//                 .day-type {
+//                     font-size: 0.8rem;
+//                     font-weight: 500;
+//                 }
+//             }
+
+//             .header-right {
+//                 display: flex;
+//                 align-items: center;
+//                 gap: 12px;
+
+//                 .btn-card-upload {
+//                     background: #f0ebf8;
+//                     color: #673ab7;
+//                     border: 1px solid #d1c4e9;
+//                     padding: 4px 10px;
+//                     border-radius: 8px;
+//                     font-size: 0.75rem;
+//                     font-weight: 600;
+//                     display: flex;
+//                     align-items: center;
+//                     gap: 5px;
+
+//                     &.has-file {
+//                         background: #e6f4ea;
+//                         color: $success;
+//                         border-color: #c4ebd0;
+//                     }
+//                 }
+
+//                 .card-checkbox {
+//                     width: 20px;
+//                     height: 20px;
+//                     accent-color: $primary;
+//                     cursor: pointer;
+//                 }
+//             }
+//         }
+
+//         .card-grid {
+//             display: grid;
+//             grid-template-columns: 1fr 1fr;
+//             gap: 12px;
+//             margin-bottom: 16px;
+
+//             .grid-item {
+//                 &.full-width {
+//                     grid-column: span 2;
+//                 }
+
+//                 label {
+//                     display: block;
+//                     font-size: 0.75rem;
+//                     color: $text-sub;
+//                     margin-bottom: 4px;
+//                 }
+
+//                 .val {
+//                     font-size: 0.9rem;
+//                     font-weight: 600;
+//                     color: $text;
+
+//                     &.highlight-green {
+//                         color: $success;
+//                         font-weight: 700;
+//                     }
+//                 }
+
+//                 .card-input {
+//                     width: 100%;
+//                     padding: 8px 10px;
+//                     border: 1.5px solid $border;
+//                     border-radius: 8px;
+//                     font-size: 0.9rem;
+//                     background: $bg-slate;
+
+//                     &:focus {
+//                         outline: none;
+//                         border-color: $primary;
+//                         background: $bg-card;
+//                         box-shadow: 0 0 0 3px rgba($primary, 0.1);
+//                     }
+
+//                     &.is-invalid {
+//                         border-color: $danger;
+//                     }
+//                 }
+
+//                 .card-select {
+//                     width: 100%;
+//                     padding: 8px 10px;
+//                     border: 1.5px solid $border;
+//                     border-radius: 8px;
+//                     font-size: 0.9rem;
+//                     background: $bg-slate;
+//                     color: var(--text);
+//                     cursor: pointer;
+
+//                     &:focus {
+//                         outline: none;
+//                         border-color: $primary;
+//                         background: $bg-card;
+//                     }
+
+//                     &.is-invalid {
+//                         border-color: $danger;
+//                     }
+//                 }
+
+//                 .mt-1 {
+//                     margin-top: 6px;
+//                 }
+//             }
+//         }
+//     }
+// }
+
 // ==========================================
 // Table Styles (from _table.scss)
 // ==========================================
 
-.vehicle-taxi-form-page {
-    .table-container {
-        width: 100% !important;
-        display: block !important;
-        flex: 1 1 100%;
-        align-self: stretch;
-        min-height: 0;
-        overflow: auto;
-        border: 1px solid $border;
-        border-radius: 8px;
+.table-container {
+    width: 100% !important;
+    display: block !important;
+    flex: 1 1 100%;
+    align-self: stretch;
+    overflow: auto;
+    border: 1px solid $border;
+    border-radius: 8px;
 
-        @include large-tablet {
-            border: none;
-            background: transparent;
+    @include tablet {
+        border: none;
+        background: transparent;
+    }
+
+    .excel-table {
+        width: 100% !important;
+        min-width: 100% !important;
+        display: table;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed !important;
+        margin: 0 !important;
+
+        th,
+        td {
+            border-bottom: 1px solid $border;
+            border-right: 1px solid $border;
+            height: 40px;
+
+            @media (min-width: 768px) {
+                height: 44px;
+            }
+
+            vertical-align: middle;
+            box-sizing: border-box;
         }
 
-        .excel-table {
-            width: 100% !important;
-            min-width: 100% !important;
-            display: table;
-            border-collapse: separate;
-            border-spacing: 0;
-            table-layout: fixed !important;
-            margin: 0 !important;
+        .col-select {
+            width: $col-select;
+        }
 
-            th,
-            td {
-                border-bottom: 1px solid $border;
-                border-right: 1px solid $border;
-                height: 40px;
+        .col-date {
+            width: $col-date;
+        }
 
-                @media (min-width: 768px) {
-                    height: 44px;
-                }
+        .col-day-type {
+            width: $col-day-type;
+        }
 
-                vertical-align: middle;
-                box-sizing: border-box;
-            }
+        .col-shift {
+            width: $col-shift;
+        }
 
-            .col-select {
-                width: $col-select;
-            }
+        .col-time {
+            width: $col-time;
+        }
 
-            .col-date {
-                width: $col-date;
-            }
+        .col-amount {
+            width: $col-amount;
+        }
 
-            .col-day-type {
-                width: $col-day-type;
-            }
+        .col-desc {
+            width: $col-desc;
+        }
 
-            .col-shift {
-                width: $col-shift;
-            }
+        th {
+            background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: center;
+            color: #ffffff;
+            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+        }
 
-            .col-time {
-                width: $col-time;
-            }
+        .sub-header th {
+            top: 44px;
+            font-size: 0.8rem;
+            z-index: 9;
+        }
 
-            .col-desc {
-                width: $col-desc;
-            }
+        .text-center {
+            text-align: center;
 
-            .col-dest {
-                width: $col-dest;
-            }
-
-            .col-location {
-                width: 160px;
-            }
-
-            .col-dist {
-                width: $col-dist;
-            }
-
-            .col-amount {
-                width: $col-amount;
-            }
-
-            .col-file {
-                width: $col-file;
-            }
-
-            th {
-                background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                text-align: center;
-                color: #ffffff;
-                border-top: 1px solid rgba(0, 0, 0, 0.15);
-
-                .required {
-                    color: rgba(var(--bg-card), 0.8);
-                    margin-left: 2px;
-                }
-            }
-
-            .sub-header th {
-                top: 40px;
-
-                @media (min-width: 768px) {
-                    top: 44px;
-                }
-
-                font-size: 0.8rem;
-                z-index: 9;
-            }
-
-            .text-center {
-                text-align: center;
-
-                input[type='checkbox'] {
-                    cursor: pointer;
-                    margin: 0 auto;
-                    display: block;
-                }
-            }
-
-            .bg-gray {
-                background-color: $bg-slate;
-            }
-
-            .font-bold {
-                font-weight: 700;
-            }
-
-            .holiday-label {
-                color: $danger;
-                font-weight: 700;
-            }
-
-            .regular-label {
-                color: $text;
-            }
-
-            .shift-code {
-                font-size: 12px;
-                color: $text-sub;
-            }
-
-            .highlight-row td {
-                background-color: rgba($warning, 0.05) !important;
-            }
-
-            .time-input {
-                width: 100%;
-                text-align: center;
-                border: none;
-                background: transparent;
-                outline: none;
-            }
-
-            .desc-cell {
-                padding: 0 8px;
-                position: relative;
-
-                .input-container {
-                    display: flex;
-                    align-items: center;
-                    height: 100%;
-                }
-
-                .table-input {
-                    width: 100%;
-                    height: 32px;
-                    border: 1px solid transparent;
-                    border-radius: 4px;
-                    padding: 0 8px;
-                    background: transparent;
-
-                    &.is-invalid {
-                        border: 1px solid $danger !important;
-                        background-color: rgba($danger, 0.05);
-                    }
-
-                    &:focus:not(:disabled) {
-                        background: $bg-card;
-                        border: 1px solid $primary;
-                        outline: none;
-                    }
-                }
-
-                .table-select {
-                    width: 100%;
-                    height: 32px;
-                    border: 1px solid var(--border);
-                    border-radius: 4px;
-                    padding: 0 6px;
-                    background: var(--bg-card);
-                    color: var(--text);
-                    font-size: 0.85rem;
-                    cursor: pointer;
-
-                    &.is-invalid {
-                        border-color: $danger !important;
-                        background-color: rgba($danger, 0.05);
-                    }
-
-                    &:focus {
-                        border-color: $primary;
-                        outline: none;
-                    }
-                }
-
-                .location-cell {
-                    padding: 6px 8px;
-                    vertical-align: top;
-                }
-
-                .mt-1 {
-                    margin-top: 4px;
-                }
-            }
-
-            .btn-icon-folder {
-                background: none;
-                border: none;
+            input[type='checkbox'] {
                 cursor: pointer;
-                font-size: 1.1rem;
-                color: #9575cd;
-                transition: transform 0.2s;
+                margin: 0 auto;
+                display: block;
+            }
+        }
 
-                &:hover {
-                    transform: scale(1.1);
-                }
+        .bg-gray {
+            background-color: $bg-slate;
+        }
 
-                &.has-file {
-                    color: $success;
-                }
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .holiday-label {
+            color: $danger;
+            font-weight: 700;
+        }
+
+        .regular-label {
+            color: $text;
+            font-weight: 700;
+        }
+
+        .shift-code {
+            font-size: 12px;
+            color: $text-sub;
+        }
+
+        .highlight-row td {
+            background-color: rgba($warning, 0.05) !important;
+        }
+
+        .time-input {
+            width: 100%;
+            text-align: center;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        .desc-cell {
+            padding: 0 8px;
+            position: relative;
+
+            .input-container {
+                display: flex;
+                align-items: center;
+                height: 100%;
+                position: relative;
             }
 
-            tfoot {
-                .total-val {
-                    background: $status-success-bg !important;
-                    color: $status-success-text;
-                    font-weight: 700;
+            .table-input {
+                width: 100%;
+                height: 32px;
+                border: 1px solid transparent;
+                border-radius: 8px;
+                padding: 0 8px;
+                background: transparent;
+
+                &.is-invalid {
+                    border: 1px solid $danger !important;
+                    background: rgba($danger, 0.05);
                 }
 
-                .total-label {
-                    text-align: right;
-                    padding-right: 20px;
-                    font-weight: 600;
+                &:focus:not(:disabled) {
+                    background: $bg-card;
+                    border: 1px solid $primary;
                 }
             }
+        }
+
+        .total-val {
+            background: $status-success-bg !important;
+            color: $status-success-text;
+            font-weight: 700;
+        }
+
+        .total-label {
+            text-align: right;
+            padding-right: 20px;
+            font-weight: 600;
         }
     }
 }
@@ -444,166 +800,291 @@ $col-file: 50px;
 // Mobile Cards (from _mobile-cards.scss)
 // ==========================================
 
-.vehicle-taxi-form-page {
-    .mobile-cards-view {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 4px;
+.mobile-cards-view {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 4px;
 
-        .log-card {
-            background: $bg-card;
-            border: 1px solid $border;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: $shadow;
-            transition: all 0.2s;
+    .log-card {
+        background: $bg-card;
+        border: 1px solid $border;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: $shadow;
+        transition: all 0.2s;
 
-            &.highlight-card {
-                border-color: $warning;
-                background: rgba($warning, 0.05);
-                box-shadow: 0 4px 15px rgba($warning, 0.1);
-            }
+        &.highlight-card {
+            // border-color: $warning;
+            // background: rgba($warning, 0.05);
+            // box-shadow: 0 4px 15px rgba($warning, 0.1);
+            border-left: 4px solid var(--primary);
+        }
 
-            .card-header {
+        // .card-header {
+        //     display: flex;
+        //     justify-content: space-between;
+        //     align-items: center;
+        //     margin-bottom: 12px;
+        //     padding-bottom: 10px;
+        //     border-bottom: 1px solid rgba($border, 0.5);
+
+        //     .date-info {
+        //         display: flex;
+        //         align-items: center;
+        //         gap: 8px;
+
+        //         .day-dot {
+        //             width: 8px;
+        //             height: 8px;
+        //             border-radius: 50%;
+        //         }
+
+        //         .date {
+        //             font-weight: 700;
+        //             color: $text;
+        //             font-size: 0.95rem;
+        //         }
+
+        //         .day-type {
+        //             font-size: 0.8rem;
+        //             font-weight: 500;
+        //         }
+        //     }
+
+        //     .card-checkbox {
+        //         width: 20px;
+        //         height: 20px;
+        //         accent-color: $primary;
+        //         cursor: pointer;
+        //     }
+        // }
+
+        // .card-grid {
+        //     display: grid;
+        //     grid-template-columns: 1fr 1fr;
+        //     gap: 12px;
+        //     margin-bottom: 16px;
+
+        //     .grid-item {
+        //         label {
+        //             display: block;
+        //             font-size: 0.75rem;
+        //             color: $text-sub;
+        //             margin-bottom: 4px;
+        //         }
+
+        //         .val {
+        //             font-size: 0.9rem;
+        //             font-weight: 600;
+        //             color: $text;
+
+        //             &.highlight-blue {
+        //                 color: $primary;
+        //             }
+
+        //             &.highlight-green {
+        //                 color: $success;
+        //                 font-weight: 700;
+        //             }
+        //         }
+        //     }
+        // }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba($border, 0.5);
+
+            .date-info {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                margin-bottom: 12px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid rgba($border, 0.5);
+                gap: 8px;
 
-                .date-info {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-
-                    .day-dot {
-                        width: 8px;
-                        height: 8px;
-                        border-radius: 50%;
-                    }
-
-                    .date {
-                        font-weight: 700;
-                        color: $text;
-                        font-size: 0.95rem;
-                    }
-
-                    .day-type {
-                        font-size: 0.8rem;
-                        font-weight: 500;
-                    }
+                .day-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
                 }
 
-                .header-right {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
+                .date {
+                    font-weight: 700;
+                    color: $text;
+                    font-size: 0.95rem;
+                }
 
-                    .btn-card-upload {
-                        background: #f0ebf8;
-                        color: #673ab7;
-                        border: 1px solid #d1c4e9;
-                        padding: 4px 10px;
-                        border-radius: 8px;
-                        font-size: 0.75rem;
-                        font-weight: 600;
-                        display: flex;
-                        align-items: center;
-                        gap: 5px;
-
-                        &.has-file {
-                            background: #e6f4ea;
-                            color: $success;
-                            border-color: #c4ebd0;
-                        }
-                    }
-
-                    .card-checkbox {
-                        width: 20px;
-                        height: 20px;
-                        accent-color: $primary;
-                        cursor: pointer;
-                    }
+                .day-type {
+                    font-size: 0.8rem;
+                    font-weight: 500;
                 }
             }
 
-            .card-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
+            .header-right {
+                display: flex;
+                align-items: center;
                 gap: 12px;
-                margin-bottom: 16px;
 
-                .grid-item {
-                    &.full-width {
-                        grid-column: span 2;
+                .btn-card-upload {
+                    background: #f0ebf8;
+                    color: var(--purple);
+                    border: 1px solid #d1c4e9;
+                    padding: 4px 10px;
+                    border-radius: 8px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    cursor: pointer;
+
+                    &:hover {}
+
+                    &.has-file {
+                        background: #e6f4ea;
+                        color: $success;
+                        border-color: #c4ebd0;
+                    }
+                }
+
+                .card-checkbox {
+                    width: 20px;
+                    height: 20px;
+                    accent-color: $primary;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .grid-item {
+                &.full-width {
+                    grid-column: span 2;
+                }
+
+                label {
+                    display: block;
+                    font-size: 0.75rem;
+                    color: $text-sub;
+                    margin-bottom: 4px;
+                }
+
+                .val {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    color: $text;
+
+                    &.highlight-green {
+                        color: $success;
+                        font-weight: 700;
+                    }
+                }
+
+                .card-input {
+                    width: 100%;
+                    padding: 8px 10px;
+                    border: 1.5px solid $border;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    background: $bg-slate;
+
+                    &:focus {
+                        outline: none;
+                        border-color: $primary;
+                        background: $bg-card;
+                        box-shadow: 0 0 0 3px rgba($primary, 0.1);
                     }
 
-                    label {
-                        display: block;
-                        font-size: 0.75rem;
-                        color: $text-sub;
-                        margin-bottom: 4px;
+                    &.is-invalid {
+                        border-color: $danger;
+                    }
+                }
+
+                .card-select {
+                    width: 100%;
+                    padding: 8px 10px;
+                    border: 1.5px solid $border;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    background: $bg-slate;
+                    color: var(--text);
+                    cursor: pointer;
+
+                    &:focus {
+                        outline: none;
+                        border-color: $primary;
+                        background: $bg-card;
                     }
 
-                    .val {
-                        font-size: 0.9rem;
-                        font-weight: 600;
-                        color: $text;
-
-                        &.highlight-green {
-                            color: $success;
-                            font-weight: 700;
-                        }
+                    &.is-invalid {
+                        border-color: $danger;
                     }
+                }
 
-                    .card-input {
-                        width: 100%;
-                        padding: 8px 10px;
-                        border: 1.5px solid $border;
-                        border-radius: 8px;
-                        font-size: 0.9rem;
-                        background: $bg-slate;
+                .mt-1 {
+                    margin-top: 6px;
+                }
 
-                        &:focus {
-                            outline: none;
-                            border-color: $primary;
-                            background: $bg-card;
-                            box-shadow: 0 0 0 3px rgba($primary, 0.1);
-                        }
+                .error {
+                    color: var(--danger);
+                    text-align: center;
+                    font-size: $font-size-hint;
+                }
+            }
+        }
 
-                        &.is-invalid {
-                            border-color: $danger;
-                        }
-                    }
+        .card-input-section {
+            label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 600;
+                color: $text-sub;
+                margin-bottom: 6px;
 
-                    .card-select {
-                        width: 100%;
-                        padding: 8px 10px;
-                        border: 1.5px solid $border;
-                        border-radius: 8px;
-                        font-size: 0.9rem;
-                        background: $bg-slate;
-                        color: var(--text);
-                        cursor: pointer;
+                .required {
+                    color: $danger;
+                }
+            }
 
-                        &:focus {
-                            outline: none;
-                            border-color: $primary;
-                            background: $bg-card;
-                        }
+            .card-input {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1.5px solid $border;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                background: $bg-slate;
+                transition: all 0.2s;
 
-                        &.is-invalid {
-                            border-color: $danger;
-                        }
-                    }
+                &:focus {
+                    outline: none;
+                    border-color: $primary;
+                    background: $bg-card;
+                    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+                }
 
-                    .mt-1 { margin-top: 6px; }
+                &.is-invalid {
+                    border-color: $danger;
+                    background: rgba($danger, 0.02);
                 }
             }
         }
     }
+
+    .log-card.disable {
+        opacity: 0.45;
+    }
+
+    @include tablet {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
 }
 
 // ==========================================

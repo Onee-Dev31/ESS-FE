@@ -15,13 +15,14 @@ export interface TaxiLogItem extends TaxiItem {
     checkIn?: string;
     checkOut?: string;
     dayType?: string;
-    remainingAmount?: number;
+    remainingAmount: number;
     usedAmount?: number;
     locationFromId?: number;
     locationToId?: number;
     otherFrom?: string;
     otherTo?: string;
     fileToUpload?: File | null;
+    amountError?: string | null;
 
     // ==================== เพิ่มสำหรับ Edit Mode ====================
     existingFileUrl?: string;      // URL ของไฟล์เก่า
