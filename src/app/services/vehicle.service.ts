@@ -76,6 +76,14 @@ export class VehicleService {
     updateVehicleByEmpcode(payload: any): Observable<any> {
         return this._http.post(`${this.baseUrl}/transport-claim`, payload);
     }
+
+    getVehicleClaimById(id: number): Observable<any> {
+        return this._http.get(`${this.baseUrl}/transport-claim/claims/${id}`);
+    }
+
+    patchVehicleClaim(id: number, payload: { claim_id: number; details: { detail_id: number; description: string }[] }): Observable<any> {
+        return this._http.patch(`${this.baseUrl}/transport-claim/${id}`, payload);
+    }
 }
 
 

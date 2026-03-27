@@ -1,145 +1,292 @@
 <div class="vehicle-form-page">
   <header class="top-header-strip">
-    <h2>เบิกค่ารถ (ก่อน 06:00 / หลัง 22:00)</h2>
+    <div class="header-left">
+      <h2>{{ isEditMode ? 'แก้ไขรายการเบิกค่ารถ' : 'เบิกค่ารถ (ก่อน 06:00 / หลัง 22:00)' }}</h2>
+      @if (isEditMode && claimInfo) {
+        <span class="voucher-chip">{{ claimInfo.voucherNo }}</span>
+      }
+    </div>
     <button class="btn-close-modal" (click)="closeModal()"><i class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
 
-    <section class="filter-controls">
-      <div class="month-selector">
-        <label>ประจำเดือน :</label>
-        <div class="inputs-row">
-          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
-            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i+1">{{ m }}</option>
-          </select>
-          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
-            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-          </select>
-          <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+    <!-- ══════════════════════════════════════════ -->
+    <!-- CREATE MODE                                -->
+    <!-- ══════════════════════════════════════════ -->
+    @if (!isEditMode) {
+
+      <section class="filter-controls">
+        <div class="month-selector">
+          <label>ประจำเดือน :</label>
+          <div class="inputs-row">
+            <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control">
+              <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i+1">{{ m }}</option>
+            </select>
+            <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control">
+              <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+            </select>
+            <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="action-bar">
+        <button class="btn-submit" (click)="onSubmit()">
+          <i class="fas fa-check"></i> ยืนยันการเบิก
+        </button>
+        <div class="total-summary-inline">
+          ยอดรวม:
+          <strong class="total-amount-inline">฿{{ (totalAmount || 0) | number:'1.0-0' }}</strong>
         </div>
       </div>
-    </section>
 
-    <div class="action-bar">
-      <button class="btn-submit" (click)="onSubmit()">
-        <i class="fas fa-check"></i> ยืนยันการเบิก
-      </button>
+      <div class="table-container">
 
-      <div class="info-badges">
-        <!-- <span class="request-id-badge" *ngIf="requestId">เลขที่การเบิก : {{ requestId }}</span> -->
-      </div>
-    </div>
+        <table class="excel-table desktop-only">
+          <colgroup>
+            <col class="col-select" />
+            <col class="col-date" />
+            <col class="col-day-type" />
+            <col class="col-shift" />
+            <col class="col-time" />
+            <col class="col-time" />
+            <col class="col-amount" />
+            <col class="col-desc" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th rowspan="2">เลือก</th>
+              <th rowspan="2">วันที่</th>
+              <th rowspan="2">ประเภทวัน</th>
+              <th rowspan="2">รหัสกะ</th>
+              <th colspan="2" class="col-time-header">เวลาทำงาน</th>
+              <th rowspan="2">จำนวนเงิน</th>
+              <th rowspan="2">รายละเอียดการเบิก</th>
+            </tr>
+            <tr class="sub-header">
+              <th class="col-time-header">เข้า</th>
+              <th class="col-time-header">ออก</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of logs" [class.highlight-row]="log.selected">
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
+              </td>
+              <td class="text-center bg-gray">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')}}</td>
+              <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
+                [class.regular-label]="log.dayType === 'W'">
+                {{ log.dayType }}
+              </td>
+              <td class="text-center bg-gray shift-code">{{ log.shiftCode }}</td>
+              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeIn" readonly /></td>
+              <td class="p-0"><input type="text" class="time-input" [ngModel]="log.timeOut" readonly /></td>
+              <td class="text-center font-bold">{{ (log.amount || 0) | number }}</td>
+              <td class="desc-cell">
+                <div class="input-container">
+                  <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+                    [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="footer-row">
+              <td colspan="6" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
+              <td class="total-val text-center">{{ (totalAmount || 0) | number }}</td>
+              <td class="bg-white"></td>
+            </tr>
+          </tfoot>
+        </table>
 
-    <div class="table-container">
-
-      <table class="excel-table desktop-only">
-        <colgroup>
-          <col class="col-select" />
-          <col class="col-date" />
-          <col class="col-day-type" />
-          <col class="col-shift" />
-          <col class="col-time" />
-          <col class="col-time" />
-          <col class="col-amount" />
-          <col class="col-desc" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th rowspan="2">เลือก</th>
-            <th rowspan="2">วันที่</th>
-            <th rowspan="2">ประเภทวัน</th>
-            <th rowspan="2">รหัสกะ</th>
-            <th colspan="2" class="col-time-header">เวลาทำงาน</th>
-            <th rowspan="2">จำนวนเงิน</th>
-            <th rowspan="2">รายละเอียดการเบิก</th>
-          </tr>
-          <tr class="sub-header">
-            <th class="col-time-header">เข้า</th>
-            <th class="col-time-header">ออก</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let log of logs" [class.highlight-row]="log.selected">
-            <td class="text-center">
-              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" />
-            </td>
-            <td class="text-center bg-gray">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')}}</td>
-            <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
-              [class.regular-label]="log.dayType === 'W'">
-              {{ log.dayType }}
-            </td>
-            <td class="text-center bg-gray shift-code">
-              {{ log.shiftCode }}
-            </td>
-            <td class="p-0">
-              <input type="text" class="time-input" [ngModel]="log.timeIn" readonly />
-            </td>
-            <td class="p-0">
-              <input type="text" class="time-input" [ngModel]="log.timeOut" readonly />
-            </td>
-            <td class="text-center font-bold">{{ (log.amount || 0) | number }}</td>
-            <td class="desc-cell">
-              <div class="input-container">
-                <input type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-                  [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
+        <div class="mobile-cards-view mobile-only">
+          <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected"
+            [class.disable]="log.isDuplicate">
+            <div class="card-header">
+              <div class="date-info">
+                <span class="day-dot"
+                  [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+                <span class="date">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY') }}</span>
+                <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{ log.dayType }})</span>
               </div>
-            </td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr class="footer-row">
-            <td colspan="6" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
-            <td class="total-val text-center">{{ (totalAmount || 0) | number }}</td>
-            <td class="bg-white"></td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <div class="mobile-cards-view mobile-only">
-        <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected"
-          [class.disable]="log.isDuplicate">
-          <div class="card-header">
-            <div class="date-info">
-              <span class="day-dot"
-                [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
-              <span class="date">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY') }}</span>
-              <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
-                log.dayType
-                }})</span>
+              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
+                [disabled]="log.isDuplicate" />
             </div>
-            <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
-              [disabled]="log.isDuplicate" />
-          </div>
-
-          <div class="card-grid">
-            <div class="grid-item">
-              <label>รหัสกะ</label>
-              <div class="val">{{ log.shiftCode || '-' }}</div>
+            <div class="card-grid">
+              <div class="grid-item">
+                <label>รหัสกะ</label>
+                <div class="val">{{ log.shiftCode || '-' }}</div>
+              </div>
+              <div class="grid-item">
+                <label>เวลา เข้า - ออก</label>
+                <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
+              </div>
+              <div class="grid-item">
+                <label>ประเภท</label>
+                <div class="val">{{ log.type }}</div>
+              </div>
+              <div class="grid-item">
+                <label>ยอดรวม (บาท)</label>
+                <div class="val highlight-green">{{ (log.amount || 0) | number }}.-</div>
+              </div>
             </div>
-            <div class="grid-item">
-              <label>เวลา เข้า - ออก</label>
-              <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
+            <div class="card-input-section">
+              <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
+              <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+                [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)"
+                [disabled]="log.isDuplicate" />
             </div>
-            <div class="grid-item">
-              <label>type</label>
-              <div class="val">{{ log.type }}</div>
-            </div>
-            <div class="grid-item">
-              <label>ยอดรวม (บาท)</label>
-              <div class="val highlight-green">{{ (log.amount || 0) | number }}.-</div>
-            </div>
-          </div>
-
-          <div class="card-input-section">
-            <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
-            <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-              [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)"
-              [disabled]="log.isDuplicate" />
           </div>
         </div>
+
       </div>
-    </div>
+    }
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- EDIT MODE                                  -->
+    <!-- ══════════════════════════════════════════ -->
+    @if (isEditMode) {
+
+      @if (isLoadingEdit) {
+        <div class="loading-edit">
+          <i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...
+        </div>
+      } @else {
+
+        <!-- Warning banner -->
+        @if (removedCount > 0) {
+          <div class="edit-warning-banner">
+            <i class="fas fa-exclamation-triangle"></i>
+            รายการที่ยกเลิกเลือก <strong>{{ removedCount }} รายการ</strong> จะถูกลบถาวรเมื่อกด "บันทึกการแก้ไข"
+          </div>
+        }
+
+        <!-- Summary bar -->
+        <div class="edit-summary-bar">
+          <div class="summary-stats">
+            <div class="stat-pill keep">
+              <i class="fas fa-check-circle"></i>
+              เก็บไว้ <strong>{{ keptCount }}</strong> รายการ
+            </div>
+            @if (removedCount > 0) {
+              <div class="stat-pill remove">
+                <i class="fas fa-times-circle"></i>
+                ลบ <strong>{{ removedCount }}</strong> รายการ
+              </div>
+            }
+          </div>
+          <div class="summary-total">
+            ยอดรวม: <strong class="total-amount-inline">฿{{ (totalAmount || 0) | number:'1.0-0' }}</strong>
+          </div>
+        </div>
+
+        <!-- Edit table (desktop) -->
+        <div class="table-container">
+          <table class="excel-table edit-table desktop-only">
+            <thead>
+              <tr>
+                <th class="col-select">เก็บ</th>
+                <th class="col-date">วันที่</th>
+                <th class="col-day-type">ประเภท</th>
+                <th class="col-shift">รหัสกะ</th>
+                <th class="col-time">เข้า</th>
+                <th class="col-time">ออก</th>
+                <th class="col-amount">จำนวนเงิน</th>
+                <th class="col-desc">รายละเอียด</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detail of existingDetails"
+                [class.edit-row-kept]="detail.selected"
+                [class.edit-row-removed]="!detail.selected">
+                <td class="text-center">
+                  <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" />
+                </td>
+                <td class="text-center bg-gray">
+                  {{ dateUtil.formatDateToBE(detail.workDate, 'ddd. DD/MM/YYYY') }}
+                </td>
+                <td class="text-center bg-gray" [class.holiday-label]="detail.dayType === 'H'" [class.regular-label]="detail.dayType === 'W'">
+                  {{ detail.dayType }}
+                </td>
+                <td class="text-center bg-gray shift-code">{{ detail.shiftCode }}</td>
+                <td class="text-center">{{ detail.actualCheckin }}</td>
+                <td class="text-center">{{ detail.actualCheckout }}</td>
+                <td class="text-center font-bold">{{ (detail.rateAmount || 0) | number }}</td>
+                <td class="desc-cell">
+                  <div class="input-container">
+                    <input type="text" class="table-input" [(ngModel)]="detail.description"
+                      placeholder="ระบุรายละเอียด..."
+                      [disabled]="!detail.selected"
+                      [class.is-invalid]="detail.selected && !detail.description"
+                      (ngModelChange)="onEditDescChange(detail)" />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="footer-row">
+                <td colspan="6" class="total-label">รวมยอดที่เก็บไว้</td>
+                <td class="total-val text-center">{{ (totalAmount || 0) | number }}</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- Edit cards (mobile) -->
+          <div class="mobile-cards-view mobile-only">
+            <div *ngFor="let detail of existingDetails" class="log-card"
+              [class.highlight-card]="detail.selected"
+              [class.edit-card-removed]="!detail.selected">
+              <div class="card-header">
+                <div class="date-info">
+                  <span class="day-dot" [style.background]="detail.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+                  <span class="date">{{ dateUtil.formatDateToBE(detail.workDate, 'ddd. DD/MM/YYYY') }}</span>
+                  <span class="remove-label" *ngIf="!detail.selected">จะถูกลบ</span>
+                </div>
+                <input type="checkbox" [(ngModel)]="detail.selected" (change)="onToggleEditDetail(detail)" class="card-checkbox" />
+              </div>
+              <div class="card-grid">
+                <div class="grid-item">
+                  <label>รหัสกะ</label>
+                  <div class="val">{{ detail.shiftCode || '-' }}</div>
+                </div>
+                <div class="grid-item">
+                  <label>เวลา เข้า - ออก</label>
+                  <div class="val">{{ detail.actualCheckin }} - {{ detail.actualCheckout }}</div>
+                </div>
+                <div class="grid-item">
+                  <label>ประเภทวัน</label>
+                  <div class="val">{{ detail.dayType }}</div>
+                </div>
+                <div class="grid-item">
+                  <label>ยอดเงิน</label>
+                  <div class="val highlight-green">฿{{ (detail.rateAmount || 0) | number }}.-</div>
+                </div>
+              </div>
+              <div class="card-input-section">
+                <label>รายละเอียด <span *ngIf="detail.selected" class="required">*</span></label>
+                <input type="text" class="card-input" [(ngModel)]="detail.description"
+                  placeholder="ระบุรายละเอียด..."
+                  [disabled]="!detail.selected"
+                  [class.is-invalid]="detail.selected && !detail.description"
+                  (ngModelChange)="onEditDescChange(detail)" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit action bar -->
+        <div class="edit-action-bar">
+          <button class="btn-cancel-edit" (click)="closeModal()">
+            <i class="fas fa-times"></i> ยกเลิก
+          </button>
+          <button class="btn-submit-edit" (click)="onSubmitEdit()">
+            <i class="fas fa-save"></i> บันทึกการแก้ไข
+          </button>
+        </div>
+      }
+    }
 
   </main>
 </div>

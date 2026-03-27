@@ -74,6 +74,11 @@
             <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
               {{ claim.status | statusLabel }}
             </span>
+            @if (isEditable(claim.status)) {
+              <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
+                <i class="far fa-edit"></i>
+              </button>
+            }
           </div>
         </div>
 
@@ -145,12 +150,14 @@
             <td class="">{{ claim.status }}</td>
             <td class="col-actions">
               <div class="action-btns">
-                <button class="btn-icon edit" (click)="openModal(claim.id)">
-                  <i class="far fa-edit"></i>
-                </button>
-                <button class="btn-icon delete" (click)="deleteRequest(claim.id)">
-                  <i class="far fa-trash-alt"></i>
-                </button>
+                @if (isEditable(claim.status)) {
+                  <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button type="button" class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
               </div>
             </td>
           </tr>
@@ -178,7 +185,11 @@
   @if (isModalOpen) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-vehicle-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-vehicle-form>
+      <app-vehicle-form
+        [requestId]="selectedRequestId"
+        [claimId]="editClaimId"
+        (onClose)="closeModal()">
+      </app-vehicle-form>
     </div>
   </div>
   }

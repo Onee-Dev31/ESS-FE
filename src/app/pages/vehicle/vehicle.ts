@@ -44,6 +44,9 @@ export class VehicleComponent implements OnInit {
 
   isModalOpen = false;
   selectedRequestId = '';
+  editClaimId: number | null = null;
+
+  readonly EDITABLE_STATUSES = ['New', 'Returned'];
 
   allRequests = signal<any[]>([]);
   listing = createListingState();
@@ -168,20 +171,25 @@ export class VehicleComponent implements OnInit {
   }
 
   openModal(id: string = '') {
-    if (id === '') {
-      this.transportService.generateNextId().subscribe(nid => {
-        this.selectedRequestId = nid;
-        this.isModalOpen = true;
-      });
-    } else {
-      this.selectedRequestId = id;
-      this.isModalOpen = true;
-    }
+    this.editClaimId = null;
+    this.selectedRequestId = id;
+    this.isModalOpen = true;
+  }
+
+  openEditModal(claimId: number) {
+    this.editClaimId = claimId;
+    this.selectedRequestId = '';
+    this.isModalOpen = true;
   }
 
   closeModal() {
     this.isModalOpen = false;
+    this.editClaimId = null;
     this.loadData();
+  }
+
+  isEditable(status: string): boolean {
+    return this.EDITABLE_STATUSES.includes(status);
   }
 
   clearFilters() {
