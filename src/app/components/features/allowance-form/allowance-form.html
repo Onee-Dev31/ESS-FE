@@ -1,7 +1,9 @@
 <div class="allowance-form-page">
   <header class="top-header-strip">
-    <h2>บันทึกข้อมูลเบี้ยเลี้ยง</h2>
-    <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด"><i class="fas fa-times"></i></button>
+    <h2>บันทึกข้อมูลเบี้ยเลี้ยง <span (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ"> <i
+          class="fas fa-info-circle"></i></span></h2>
+    <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด"><i
+        class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
@@ -9,14 +11,15 @@
       <div class="month-selector">
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
-          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control" title="เลือกเดือน">
+          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control"
+            title="เลือกเดือน">
             @for (m of thaiMonths; track $index) {
-              <option [ngValue]="$index">{{ m }}</option>
+            <option [ngValue]="$index">{{ m }}</option>
             }
           </select>
           <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control" title="เลือกปี">
             @for (y of years; track y) {
-              <option [ngValue]="y">{{ y }}</option>
+            <option [ngValue]="y">{{ y }}</option>
             }
           </select>
           <button type="button" class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
@@ -31,49 +34,38 @@
       <span class="note-desc">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</span>
       <span class="note-rates">
         @for (rate of rates(); track rate.rate_id) {
-          <span><strong>{{ rate.description }} :</strong> {{ rate.rate_amount | number }} บาท</span>
-          @if (!$last) { <span class="divider">|</span> }
+        <span><strong>{{ rate.description }} :</strong> {{ rate.rate_amount | number }} บาท</span>
+        @if (!$last) { <span class="divider">|</span> }
         } @empty {
-          <span class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
+        <span class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
         }
       </span>
     </div>
 
     @if (isPolicyPopupOpen()) {
-      <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
-        <div class="policy-popup-content" (click)="$event.stopPropagation()">
-          <div class="policy-popup-header">
-            <h3><i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณเบี้ยเลี้ยง</h3>
-            <button type="button" class="btn-close-popup" (click)="isPolicyPopupOpen.set(false)" title="ปิด"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="policy-popup-body">
-            <p class="policy-description">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</p>
-            <div class="policy-rates-list">
-              @for (rate of rates(); track rate.rate_id) {
-                <div class="rate-item">
-                  <span class="rate-hours">{{ rate.description }}</span>
-                  <span class="rate-amount">{{ rate.rate_amount | number }} บาท</span>
-                </div>
-              } @empty {
-                <p class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</p>
-              }
+    <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
+      <div class="policy-popup-content" (click)="$event.stopPropagation()">
+        <div class="policy-popup-header">
+          <h3><i class="fas fa-info-circle"></i> เงื่อนไขการคำนวณเบี้ยเลี้ยง</h3>
+          <button type="button" class="btn-close-popup" (click)="isPolicyPopupOpen.set(false)" title="ปิด"><i
+              class="fas fa-times"></i></button>
+        </div>
+        <div class="policy-popup-body">
+          <p class="policy-description">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</p>
+          <div class="policy-rates-list">
+            @for (rate of rates(); track rate.rate_id) {
+            <div class="rate-item">
+              <span class="rate-hours">{{ rate.description }}</span>
+              <span class="rate-amount">{{ rate.rate_amount | number }} บาท</span>
             </div>
+            } @empty {
+            <p class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</p>
+            }
           </div>
         </div>
       </div>
-    }
-
-    <div class="action-bar">
-      <div class="left-actions">
-        <button type="button" class="btn-submit" (click)="onSubmit()">
-          <i class="fas fa-check"></i> ยืนยันการเบิก
-        </button>
-        <button type="button" class="policy-icon-btn mobile-only" (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ">
-          <i class="fas fa-info-circle"></i>
-        </button>
-      </div>
-      <div class="info-badges"></div>
     </div>
+    }
 
     <div class="table-container">
       <table class="excel-table desktop-only">
@@ -106,36 +98,38 @@
         </thead>
         <tbody>
           @for (log of logs; track log.date) {
-            <tr [class.highlight-row]="log.selected" [class.not-eligible-row]="!log.isEligible">
-              <td class="text-center">
-                <label class="sr-only-label">
-                  <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
-                  <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, descInput)" [disabled]="!log.isEligible" />
-                </label>
-              </td>
-              <td class="text-center bg-gray">{{ log.date }}</td>
-              <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
-                [class.regular-label]="log.dayType === 'W'">
-                {{ log.dayType }}
-              </td>
-              <td class="text-center bg-gray shift-code">
-                {{ log.shiftCode }}
-              </td>
-              <td class="p-0">
-                <input type="text" class="time-input" [ngModel]="log.timeIn" readonly title="เวลาเข้างาน" />
-              </td>
-              <td class="p-0">
-                <input type="text" class="time-input" [ngModel]="log.timeOut" readonly title="เวลาออกงาน" />
-              </td>
-              <td class="text-center font-bold">{{ log.displayHours }}</td>
-              <td class="text-center font-bold">{{ log.amount | number }}</td>
-              <td class="desc-cell">
-                <div class="input-container">
-                  <input #descInput type="text" class="table-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-                    [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
-                </div>
-              </td>
-            </tr>
+          <tr [class.highlight-row]="log.selected" [class.not-eligible-row]="!log.isEligible">
+            <td class="text-center">
+              <label class="sr-only-label">
+                <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
+                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, descInput)"
+                  [disabled]="!log.isEligible" />
+              </label>
+            </td>
+            <td class="text-center bg-gray">{{ log.date }}</td>
+            <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
+              [class.regular-label]="log.dayType === 'W'">
+              {{ log.dayType }}
+            </td>
+            <td class="text-center bg-gray shift-code">
+              {{ log.shiftCode }}
+            </td>
+            <td class="p-0">
+              <input type="text" class="time-input" [ngModel]="log.timeIn" readonly title="เวลาเข้างาน" />
+            </td>
+            <td class="p-0">
+              <input type="text" class="time-input" [ngModel]="log.timeOut" readonly title="เวลาออกงาน" />
+            </td>
+            <td class="text-center font-bold">{{ log.displayHours }}</td>
+            <td class="text-center font-bold">{{ log.amount | number }}</td>
+            <td class="desc-cell">
+              <div class="input-container">
+                <input #descInput type="text" class="table-input" [(ngModel)]="log.description"
+                  placeholder="ระบุรายละเอียด..." [class.is-invalid]="log.selected && !log.description"
+                  (ngModelChange)="onInputChange(log)" />
+              </div>
+            </td>
+          </tr>
           }
         </tbody>
         <tfoot>
@@ -152,50 +146,58 @@
 
       <div class="mobile-cards-view mobile-only">
         @for (log of logs; track log.date) {
-          <div class="log-card" [class.highlight-card]="log.selected" [class.not-eligible-card]="!log.isEligible">
-            <div class="card-header">
-              <div class="date-info">
-                <span class="day-dot"
-                  [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
-                <span class="date">{{ log.date }}</span>
-                <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
-                  log.dayType
-                  }})</span>
-              </div>
-              <label class="sr-only-label">
-                <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
-                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, cardDescInput)" class="card-checkbox" [disabled]="!log.isEligible" />
-              </label>
+        <div class="log-card" [class.highlight-card]="log.selected" [class.not-eligible-card]="!log.isEligible">
+          <div class="card-header">
+            <div class="date-info">
+              <span class="day-dot"
+                [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+              <span class="date">{{ log.date }}</span>
+              <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
+                log.dayType
+                }})</span>
             </div>
+            <label class="sr-only-label">
+              <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
+              <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, cardDescInput)"
+                class="card-checkbox" [disabled]="!log.isEligible" />
+            </label>
+          </div>
 
-            <div class="card-grid">
-              <div class="grid-item">
-                <label>รหัสกะ</label>
-                <div class="val">{{ log.shiftCode || '-' }}</div>
-              </div>
-              <div class="grid-item">
-                <label>เวลา เข้า - ออก</label>
-                <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
-              </div>
-              <div class="grid-item">
-                <label>จำนวนชั่วโมง</label>
-                <div class="val highlight-blue">{{ log.displayHours }} ชม.</div>
-              </div>
-              <div class="grid-item">
-                <label>ยอดรวม (บาท)</label>
-                <div class="val highlight-green">{{ log.amount | number }}.-</div>
-              </div>
+          <div class="card-grid">
+            <div class="grid-item">
+              <label>รหัสกะ</label>
+              <div class="val">{{ log.shiftCode || '-' }}</div>
             </div>
-
-            <div class="card-input-section">
-              <label>รายละเอียดการเบิก @if (log.selected) { <span class="required">*</span> }</label>
-              <input #cardDescInput type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
-                [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)" />
+            <div class="grid-item">
+              <label>เวลา เข้า - ออก</label>
+              <div class="val">{{ log.timeIn }} - {{ log.timeOut }}</div>
+            </div>
+            <div class="grid-item">
+              <label>จำนวนชั่วโมง</label>
+              <div class="val highlight-blue">{{ log.displayHours }} ชม.</div>
+            </div>
+            <div class="grid-item">
+              <label>ยอดรวม (บาท)</label>
+              <div class="val highlight-green">{{ log.amount | number }}.-</div>
             </div>
           </div>
+
+          <div class="card-input-section">
+            <label>รายละเอียดการเบิก @if (log.selected) { <span class="required">*</span> }</label>
+            <input #cardDescInput type="text" class="card-input" [(ngModel)]="log.description"
+              placeholder="ระบุรายละเอียด..." [class.is-invalid]="log.selected && !log.description"
+              (ngModelChange)="onInputChange(log)" />
+          </div>
+        </div>
         }
       </div>
     </div>
 
   </main>
+
+  <div class="form-actions">
+    <button type="button" class="btn-submit" (click)="onSubmit()">
+      <i class="fas fa-check"></i> ยืนยันการเบิก
+    </button>
+  </div>
 </div>

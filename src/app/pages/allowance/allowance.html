@@ -3,104 +3,97 @@
   </app-page-header>
 
   <div class="content-card">
-    <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+    <div class="card-header-row">
+      <div class="card-header-title">รายการเบิกเบี้ยเลี้ยง</div>
+      <button type="button" class="btn-create" (click)="openModal()">
+        <i class="fas fa-plus"></i> สร้างรายการเบิก
+      </button>
+    </div>
 
+    <!-- Toolbar -->
     <div class="toolbar-container">
-      <div class="toolbar-top-row">
-        <div class="left-action">
-          <button class="btn-create" (click)="openModal()" title="สร้างรายการเบิก">
-            <i class="fas fa-plus"></i> สร้างรายการเบิก
-          </button>
+      <div class="filter">
+        <div class="group-filter">
+          <div class="form-field">
+            <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
+            <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
+          </div>
+          <div class="form-field">
+            <nz-select nzShowSearch nzAllowClear class="form-input select-status" [ngModel]="listing.filterStatus()"
+              (ngModelChange)="listing.filterStatus.set($event)">
+              <nz-option nzLabel="ทั้งหมด" nzValue="" />
+              <nz-option nzLabel="คำขอใหม่" nzValue="New" />
+              <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
+            </nz-select>
+          </div>
         </div>
-      </div>
-
-      <div class="toolbar-bottom-row">
-        <div class="right-filters">
-          <div class="filter-group">
-            <span class="filter-label">ตั้งแต่เดือน</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" title="ตั้งแต่วันที่" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" />
-            </div>
+        <div class="group-filter">
+          <div class="form-field">
+            <nz-input-wrapper class="form-input">
+              <nz-icon nzInputPrefix nzType="search" />
+              <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
+            </nz-input-wrapper>
           </div>
-
-          <div class="filter-group">
-            <span class="filter-label">ถึง</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" title="ถึงวันที่" [ngModel]="listing.filterEndDate()"
-                (ngModelChange)="listing.filterEndDate.set($event)" />
-            </div>
-          </div>
-
-          <div class="filter-group">
-            <span class="filter-label">สถานะ</span>
-            <div class="select-input-group">
-              <select class="form-control select-status" title="กรองตามสถานะ" [ngModel]="listing.filterStatus()"
-                (ngModelChange)="listing.filterStatus.set($event)">
-                <option value="">ทั้งหมด</option>
-                <option value="NEW">คำขอใหม่</option>
-                <option value="WAITING_CHECK">รอตรวจสอบ</option>
-                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-                <option value="APPROVED">อนุมัติแล้ว</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn-clear" (click)="clearFilters()">
-            <i class="fas fa-sync-alt"></i> คืนค่า
-          </button>
-        </div>
-
-        <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
-            (ngModelChange)="listing.searchText.set($event)">
-          <button class="btn-search">
+          <button type="button" class="btn-search" (click)="loadData()">
             <i class="fas fa-search"></i> ค้นหา
           </button>
+          <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
+            <i class="fas fa-sync-alt"></i>
+          </button>
         </div>
       </div>
+
     </div>
 
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      @for (req of processedData(); track trackByReqId($index, req)) {
-      <div class="mobile-card">
-        <div class="card-header">
-          <div class="header-content">
-            <span class="ticket-no">{{ req.id }}</span>
+      @for (claim of comps.paginatedData(); track claim.id) {
+      <div class="claim-card">
+        <div class="claim-card__header">
+          <div class="claim-card__type-badge">
+            <i class="fa-solid fa-money-bills"></i>เบิกเบี้ยเลี้ยง
           </div>
-          <div class="card-actions-top">
-            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-              {{ req.status | statusLabel }}
+          <div class="claim-card__actions">
+            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+              {{ claim.status | statusLabel }}
             </span>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="info-row">
-            <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
-            <span class="value">{{ req.createDate | date: 'dd/MM/yyyy' }}</span>
-          </div>
-
-          <div class="nested-list">
-            @for (item of req.items; track $index) {
+        <div class="claim-card__body">
+          <div class="claim-card__main">
+            @for (item of claim.items; track $index) {
             <div class="nested-item">
-              <div class="item-header">
-                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="item-amount">฿{{ item.amount | number: '1.2-2' }}</span>
+              <div class="claim-date">
+                <span class="item-title"><i class="far fa-calendar-alt"></i> {{dateUtil.formatDateToBE(item.date, 'DD MMMM YYYY')}}</span>
               </div>
               <div class="item-detail">
-                <div class="detail-row">
+                <div class="claim-time">
                   <i class="far fa-clock"></i> {{ item.hours }} ชม.
                 </div>
-                <div class="detail-row">
+                <div class="claim-date">
                   <i class="fas fa-info-circle"></i> {{ item.description }}
                 </div>
               </div>
             </div>
             }
           </div>
+
+          <div class="claim-card__amount">
+            <span class="amount-label">ขอเบิก</span>
+            <span class="amount-value">฿{{ claim.amount | number:'1.2-2' }}</span>
+            <!-- @if (claim.approvedAmount > 0) {
+            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
+            } -->
+          </div>
+        </div>
+        <div class="claim-card__footer">
+          <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
+          <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
+            }}</span>
         </div>
       </div>
       }
@@ -111,52 +104,47 @@
       }
     </div>
 
-    <div class="table-responsive">
+    <!-- <div class="table-responsive">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
       <table class="modern-table">
         <thead>
           <tr>
-            <th class="col-id sortable-header text-center" (click)="toggleSort('requestId')">
-              <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก <i class="fas ml-1"
-                [ngClass]="getSortIcon('requestId')"></i>
+            <th class="col-id sortable-header text-center">
+              <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก
             </th>
-            <th class="col-date sortable-header text-center" (click)="toggleSort('createDate')">
-              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ <i class="fas ml-1"
-                [ngClass]="getSortIcon('createDate')"></i>
+            <th class="col-date sortable-header text-center">
+              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ
             </th>
-            <th class="col-date sortable-header text-center" (click)="toggleSort('date')">
-              <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก <i class="fas ml-1"
-                [ngClass]="getSortIcon('date')"></i>
+            <th class="col-date sortable-header text-center">
+              <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก
             </th>
-            <th class="col-desc sortable-header text-center" (click)="toggleSort('description')">
-              <i class="fas fa-align-left mr-1"></i> รายละเอียด <i class="fas ml-1"
-                [ngClass]="getSortIcon('description')"></i>
+            <th class="col-desc sortable-header text-center">
+              <i class="fas fa-align-left mr-1"></i> รายละเอียด
             </th>
-            <th class="col-hours sortable-header text-center" (click)="toggleSort('hours')">
-              <i class="fas fa-hourglass-half mr-1"></i> จำนวนชั่วโมง <i class="fas ml-1"
-                [ngClass]="getSortIcon('hours')"></i>
+            <th class="col-hours sortable-header text-center">
+              <i class="fas fa-hourglass-half mr-1"></i> จำนวนชั่วโมง
             </th>
-            <th class="col-amount sortable-header text-center" (click)="toggleSort('amount')">
-              <i class="fas fa-coins mr-1"></i> จำนวนเงิน <i class="fas ml-1" [ngClass]="getSortIcon('amount')"></i>
+            <th class="col-amount sortable-header text-center">
+              <i class="fas fa-coins mr-1"></i> จำนวนเงิน
             </th>
-            <th class="col-status sortable-header text-center" (click)="toggleSort('status')">
-              <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+            <th class="col-status sortable-header text-center">
+              <i class="fas fa-tasks mr-1"></i> สถานะ
             </th>
             <th class="col-actions text-center">Actions</th>
           </tr>
         </thead>
-        @for (req of processedData(); track trackByReqId($index, req)) {
+        @for (claim of comps.paginatedData(); track claim.id) {
         <tbody>
-          @for (item of req.items; track $index) {
+          @for (item of claim.items; track $index) {
           <tr>
             @if ($index === 0) {
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
-              <span class="text-primary-link">{{ req.id }}</span>
+            <td [attr.rowspan]="claim.items.length" class="text-center top-align merged-col">
+              <span class="text-primary-link">{{ claim.id }}</span>
             </td>
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
-              {{ req.createDate | date: 'dd/MM/yyyy' }}
+            <td [attr.rowspan]="claim.items.length" class="text-center top-align merged-col">
+              {{ claim.createDate | date: 'dd/MM/yyyy' }}
             </td>
             }
 
@@ -168,18 +156,18 @@
             </td>
 
             @if ($index === 0) {
-            <td [attr.rowspan]="req.items.length" class="v-middle text-center merged-col">
-              <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                {{ req.status | statusLabel }}
+            <td [attr.rowspan]="claim.items.length" class="v-middle text-center merged-col">
+              <span class="status-badge" [ngClass]="getStatusClass(claim.status)">
+                {{ claim.status | statusLabel }}
               </span>
             </td>
 
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
+            <td [attr.rowspan]="claim.items.length" class="text-center top-align merged-col">
               <div class="action-btns">
-                <button class="btn-icon edit" (click)="editRequest(req.id)" title="แก้ไข">
+                <button class="btn-icon edit" (click)="editRequest(claim.id)" title="แก้ไข">
                   <i class="far fa-edit"></i>
                 </button>
-                <button class="btn-icon delete" (click)="deleteRequest(req.id)" title="ลบ">
+                <button class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
                   <i class="far fa-trash-alt"></i>
                 </button>
               </div>
@@ -202,11 +190,11 @@
         }
       </table>
       }
-    </div>
+    </div> -->
 
     <div class="pagination-wrapper">
       <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="totalCount()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
       </app-pagination>
     </div>
   </div>

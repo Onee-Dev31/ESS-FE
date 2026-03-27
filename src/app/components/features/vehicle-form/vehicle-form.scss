@@ -71,7 +71,9 @@ $col-desc: auto;
             font-size: 1.25rem;
 
             &:hover {
+                // color: var(--danger);
                 background: rgba(255, 255, 255, 0.15);
+                transform: rotate(90deg);
             }
         }
     }

@@ -41,8 +41,6 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    flex: 1;
-    min-height: 0;
     background: $bg-card;
     font-family: $font-main;
     overflow: hidden;
@@ -67,6 +65,20 @@
             margin: 0;
             font-size: 1.25rem;
             font-weight: 700;
+            color: #ffffff !important;
+
+            span {
+                font-size: $font-size-body;
+                border: 1px solid #ffffff3f;
+                background: #ffffff17;
+                padding: 4px 6px;
+                border-radius: 100px;
+                cursor: pointer;
+
+                &:hover {
+                    color: color-mix(in srgb, #ffffff, black 20%);
+                }
+            }
         }
 
         .btn-close-modal {
@@ -75,7 +87,9 @@
             font-size: 1.25rem;
 
             &:hover {
+                // color: var(--danger);
                 background: rgba(255, 255, 255, 0.15);
+                transform: rotate(90deg);
             }
         }
     }
@@ -97,6 +111,43 @@
         overflow: hidden;
     }
 
+    .form-actions {
+        padding: 10px 40px 10px;
+        gap: 16px;
+        background: transparent;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        @include mobile {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-submit {
+            @include btn-primary;
+            min-width: 160px;
+        }
+
+        button {
+            // flex: 1;
+            height: 48px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-search {
+            @include btn-primary;
+        }
+
+    }
+
     .action-bar {
         display: flex;
         justify-content: space-between;
@@ -107,17 +158,6 @@
         @include tablet {
             flex-direction: column-reverse;
             align-items: stretch;
-        }
-
-        .left-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-submit {
-            @include btn-primary;
-            min-width: 160px;
         }
     }
 
@@ -145,7 +185,7 @@
                 gap: 12px;
                 flex: 1;
 
-                @include tablet {
+                @include mobile {
                     flex-direction: column;
                 }
 
@@ -156,6 +196,79 @@
 
                 .btn-search {
                     @include btn-primary;
+                }
+            }
+        }
+
+        .alert-delete {
+            color: var(--danger);
+            font-size: $font-size-hint;
+            padding: 6px;
+            border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
+            background: color-mix(in srgb, var(--danger), transparent 90%);
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+
+            .fa-solid {
+                color: var(--danger) !important;
+            }
+        }
+
+        .display-order {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-top: 10px;
+            gap: 10px;
+            background: var(--bg-slate);
+            border-radius: 10px;
+
+            .left {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+
+                span {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 4px 10px;
+                    font-size: $font-size-hint;
+                    border-radius: 100px;
+                    font-weight: 500;
+                    color: var(--text);
+
+                    &.keep {
+                        border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
+                        background: color-mix(in srgb, var(--success), transparent 85%);
+
+                        i.fa-solid {
+                            color: color-mix(in srgb, var(--success), white 10%) !important;
+                        }
+                    }
+
+                    &.delete {
+                        border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+                        background: color-mix(in srgb, var(--danger), transparent 85%);
+
+                        i.fa-solid {
+                            color: color-mix(in srgb, var(--danger), white 10%) !important;
+                        }
+                    }
+                }
+            }
+
+            .right {
+                display: flex;
+                align-items: center;
+                font-weight: 500;
+                font-size: $font-size-hint;
+
+                .total {
+                    color: color-mix(in srgb, var(--primary), white 20%) !important;
+                    font-size: $font-size-body;
+                    font-weight: 900;
                 }
             }
         }
@@ -227,32 +340,6 @@
                 display: none;
             }
         }
-    }
-}
-
-.policy-icon-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: $primary;
-    color: #ffffff;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.75rem;
-    box-shadow: 0 2px 6px rgba($primary, 0.25);
-    transition: all 0.3s ease;
-
-    &:hover {
-        background: color-mix(in srgb, $primary, black 10%);
-        transform: scale(1.05);
-        box-shadow: 0 3px 10px rgba($primary, 0.35);
-    }
-
-    &:active {
-        transform: scale(0.95);
     }
 }
 
@@ -580,9 +667,9 @@
 // ==========================================
 
 .mobile-cards-view {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     padding: 4px;
 
     .log-card {
@@ -594,9 +681,10 @@
         transition: all 0.2s;
 
         &.highlight-card {
-            border-color: $warning;
-            background: rgba($warning, 0.05);
-            box-shadow: 0 4px 15px rgba($warning, 0.1);
+            // border-color: $warning;
+            // background: rgba($warning, 0.05);
+            // box-shadow: 0 4px 15px rgba($warning, 0.1);
+            border-left: 4px solid var(--primary);
         }
 
         &.not-eligible-card {
@@ -709,4 +797,17 @@
             }
         }
     }
+
+    .log-card.disable {
+        opacity: 0.45;
+    }
+
+    @include tablet {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 800px) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
 }

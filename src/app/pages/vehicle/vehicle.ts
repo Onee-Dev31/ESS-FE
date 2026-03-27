@@ -108,10 +108,11 @@ export class VehicleComponent implements OnInit {
       dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
     }
 
-    console.log(param)
+    // console.log(param)
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
+        console.log(res)
         this.dataFromApi(res)
         // this.loadingService.stop('vehicle-list');
       },

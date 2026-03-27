@@ -2,64 +2,6 @@
   <app-page-header title="เบิกค่าพาหนะ (ก่อน 06:00 น. / หลัง 22:00 น.)"></app-page-header>
 
   <div class="content-card">
-    <!-- <div class="card-header-title">รายการเบิกของฉัน</div>
-
-    <div class="toolbar-container">
-      <div class="toolbar-top-row">
-        <div class="left-action">
-          <button class="btn-create" (click)="openModal()">
-            <i class="fas fa-plus"></i> สร้างรายการเบิก
-          </button>
-        </div>
-      </div>
-
-      <div class="toolbar-bottom-row">
-        <div class="right-filters">
-          <div class="filter-group">
-            <span class="filter-label">ตั้งแต่เดือน</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่"
-                aria-label="ตั้งแต่วันที่" />
-            </div>
-          </div>
-
-          <div class="filter-group">
-            <span class="filter-label">ถึง</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
-                (ngModelChange)="listing.filterEndDate.set($event)" title="ถึงวันที่" aria-label="ถึงวันที่" />
-            </div>
-          </div>
-
-          <div class="filter-group">
-            <span class="filter-label">สถานะ</span>
-            <div class="select-input-group">
-              <select class="form-control select-status" [ngModel]="listing.filterStatus()"
-                (ngModelChange)="listing.filterStatus.set($event)" title="กรองตามสถานะ" aria-label="กรองตามสถานะ">
-                <option value="">ทั้งหมด</option>
-                <option value="New">คำขอใหม่</option>
-                <option value="WAITING_CHECK">รอตรวจสอบ</option>
-                <option value="PENDING_APPROVAL">อยู่ระหว่างการอนุมัติ</option>
-                <option value="APPROVED">อนุมัติแล้ว</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn-clear" (click)="clearFilters()">
-            <i class="fas fa-sync-alt"></i> คืนค่า
-          </button>
-        </div>
-
-        <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหารหัส/description" [ngModel]="listing.searchText()"
-            (ngModelChange)="listing.searchText.set($event)">
-          <button class="btn-search" (click)="loadData()">
-            <i class="fas fa-search"></i> ค้นหา
-          </button>
-        </div>
-      </div>
-    </div> -->
-
     <div class="card-header-row">
       <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
       <button type="button" class="btn-create" (click)="openModal()">
@@ -112,24 +54,19 @@
       <div class="claim-card" (click)="openModal(claim.id)">
         <div class="claim-card__header">
           <div class="claim-card__type-badge">
-            <i class="fa-solid fa-car-side"></i>{{ claim.claimNo }}
+            <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ
+            <!-- {{ claim.claimNo }} -->
           </div>
           <div class="claim-card__actions">
             <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
               {{ claim.status | statusLabel }}
             </span>
-            <!-- @if (isEditable(claim.status)) {
-              <button type="button" class="btn-icon edit" (click)="openEditModal(claim.claimId)" title="แก้ไข">
-                <i class="far fa-edit"></i>
-              </button>
-            } -->
           </div>
         </div>
 
         <div class="claim-card__body">
           <div class="claim-card__main">
-
-            <!-- {{claim.employeeCode}} -->
+            จำนวน {{claim.details.length}} วัน
           </div>
 
           <div class="claim-card__amount">
