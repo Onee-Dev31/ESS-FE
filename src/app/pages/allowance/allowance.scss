@@ -425,9 +425,7 @@ $status-cancelled-text: var(--text-table-head);
       gap: 8px;
       min-width: 0;
 
-      .nested-item {
-        .item-header {}
-      }
+      /* .nested-item styles intentionally removed to avoid empty ruleset */
     }
 
     &__amount {
