@@ -20,12 +20,31 @@ import { AuthService } from '../../services/auth.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { DateUtilityService } from '../../services/date-utility.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import dayjs from 'dayjs';
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
   selector: 'app-vehicle-taxi',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehicleTaxiFormComponent, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, PageHeaderComponent, SkeletonComponent, EmptyStateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    VehicleTaxiFormComponent,
+    FilePreviewModalComponent,
+    StatusLabelPipe,
+    PaginationComponent,
+    PageHeaderComponent,
+    SkeletonComponent,
+    EmptyStateComponent,
+    NzIconModule,
+    NzDatePickerModule,
+    NzSelectModule,
+    NzInputModule,
+  ],
   templateUrl: './vehicle-taxi.html',
   styleUrl: './vehicle-taxi.scss',
 })
@@ -53,6 +72,8 @@ export class VehicleTaxiComponent implements OnInit {
   allRequests = signal<any[]>([]);
   comps = createListingComputeds_v2(this.allRequests, this.listing);
 
+  dateRange: Date[] | null = null;
+
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
@@ -70,14 +91,21 @@ export class VehicleTaxiComponent implements OnInit {
 
   loadData() {
     this.loadingService.start('taxi-list');
+
+    let [start, end]: [any, any] = ['', ''];
+    if (this.dateRange && this.dateRange.length === 2) {
+      [start, end] = this.dateRange;
+      console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
+    }
+
     const param = {
       page: this.listing.currentPage() + 1 || 1,
       pageSize: this.listing.pageSize(),
       empCode: this.authService.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
-      dateFrom: this.listing.filterStartDate(),
-      dateTo: this.listing.filterEndDate(),
+      dateFrom: start ? dayjs(start).format("YYYY-MM-DD") : '',
+      dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
     };
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
@@ -185,6 +213,8 @@ export class VehicleTaxiComponent implements OnInit {
 
   clearFilters() {
     clearListingFilters(this.listing);
+    this.dateRange = null;
+    this.loadData()
   }
 
   trackByRowId(index: number, req: TaxiRequest): string {

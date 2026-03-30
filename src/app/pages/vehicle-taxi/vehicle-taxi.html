@@ -2,143 +2,53 @@
   <app-page-header title="เบิกค่าพาหนะ (Taxi)"></app-page-header>
 
   <div class="content-card">
-    <div class="card-header-title">รายการเบิกของฉัน</div>
-
-    <div class="toolbar-container">
-      <div class="toolbar-top-row">
-        <div class="left-action">
-          <button class="btn-create" (click)="openModal()">
-            <i class="fas fa-plus"></i>สร้างรายการเบิก
-          </button>
-        </div>
-      </div>
-
-      <div class="toolbar-bottom-row">
-        <div class="right-filters">
-          <div class="filter-group">
-            <span class="filter-label">ตั้งแต่วันที่</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่"
-                aria-label="ตั้งแต่วันที่" />
-            </div>
-          </div>
-          <div class="filter-group">
-            <span class="filter-label">ถึงวันที่</span>
-            <div class="date-input-group">
-              <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
-                (ngModelChange)="listing.filterEndDate.set($event)" title="ถึงวันที่" aria-label="ถึงวันที่" />
-            </div>
-          </div>
-          <div class="filter-group">
-            <span class="filter-label">สถานะ</span>
-            <div class="select-input-group">
-              <select class="form-control" [ngModel]="listing.filterStatus()"
-                (ngModelChange)="listing.filterStatus.set($event)" title="กรองตามสถานะ" aria-label="กรองตามสถานะ">
-                <option value="">ทั้งหมด</option>
-                @for (opt of statusOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-                }
-              </select>
-            </div>
-          </div>
-          <button class="btn-clear" (click)="clearFilters()">
-            <i class="fas fa-sync-alt"></i>คืนค่า
-          </button>
-        </div>
-
-        <div class="search-input-group">
-          <input type="text" class="form-control" placeholder="ค้นหาเบิก/เลขที่..." [ngModel]="listing.searchText()"
-            (ngModelChange)="listing.searchText.set($event)">
-          <button class="btn-search">
-            <i class="fas fa-search"></i>ค้นหา
-          </button>
-        </div>
-      </div>
+    <div class="card-header-row">
+      <div class="card-header-title">รายการเบิกค่าพาหนะ (Taxi)</div>
+      <button type="button" class="btn-create" (click)="openModal()">
+        <i class="fas fa-plus"></i> สร้างรายการเบิก
+      </button>
     </div>
 
-    <!-- <div class="table-responsive">
-      @if (isLoading()) {
-      <app-skeleton type="table" [rows]="5"></app-skeleton>
-      } @else {
-      <table class="modern-table taxi-table">
-        <thead>
-          <tr>
-            <th class="w-px-150 text-center">
-              <i class="fas fa-hashtag mr-1"></i> เลขที่การเบิก
-            </th>
-            <th class="w-px-150 text-center">
-              <i class="far fa-clock mr-1"></i> วันที่สร้างรายการ
-            </th>
-            <th class="w-px-150 text-center">
-              <i class="far fa-calendar-alt mr-1"></i> วันที่ขอเบิก
-            </th>
-            <th class="w-auto text-center">
-              <i class="fas fa-align-left mr-1"></i> รายละเอียด
-            </th>
-            <th class="w-20 text-center">
-              <i class="fas fa-map-marker-alt mr-1"></i> สถานที่รับ-ส่ง
-            </th>
-            <th class="w-px-150 text-center">
-              <i class="fas fa-coins mr-1"></i> จำนวนเงิน
-            </th>
-            <th class="w-px-150 text-center">
-              <i class="fas fa-tasks mr-1"></i> สถานะ
-            </th>
-            <th class="w-px-120 text-center">Actions</th>
-          </tr>
-        </thead>
-        @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-        <tbody>
-          @for (item of req.items; track $index) {
-          <tr>
-            @if ($index === 0) {
-            <td [attr.rowspan]="req.items.length" class="font-bold text-center top-align merged-col">
-              <span class="text-primary-link">{{ req.voucherNo || req.id }}</span>
-            </td>
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
-              {{ req.createDate }}
-            </td>
-            }
-            <td class="text-center top-align">{{ item.date }}</td>
-            <td class="text-center top-align">{{ item.description }}</td>
-            <td class="text-center top-align">{{ item.destination }}</td>
-            <td class="text-center font-bold top-align">{{ item.amount | number: '1.2-2' }}</td>
-            @if ($index === 0) {
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
-              <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                {{ req.status | statusLabel }}
-              </span>
-            </td>
-            <td [attr.rowspan]="req.items.length" class="text-center top-align merged-col">
-              <div class="action-btns">
-                <button class="btn-icon view" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
-                  <i class="far fa-folder-open"></i>
-                </button>
-                <button class="btn-icon delete" (click)="deleteRequest(req.id)" title="ลบ">
-                  <i class="far fa-trash-alt"></i>
-                </button>
-              </div>
-            </td>
-            }
-          </tr>
-          }
-        </tbody>
-        }
-        @empty {
-        <tbody>
-          <tr>
-            <td colspan="8" class="no-data-cell">
-              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                icon="fas fa-inbox">
-              </app-empty-state>
-            </td>
-          </tr>
-        </tbody>
-        }
-      </table>
-      }
-    </div> -->
+    <!-- Toolbar -->
+    <div class="toolbar-container">
+      <div class="filter">
+        <div class="group-filter">
+          <div class="form-field">
+            <label>วันที่เริ่มต้น-วันที่สุิ้นสุด</label>
+            <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
+            <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
+          </div>
+          <div class="form-field">
+            <label>สถานะ</label>
+            <nz-select nzShowSearch nzAllowClear class="form-input select-status" [ngModel]="listing.filterStatus()"
+              (ngModelChange)="listing.filterStatus.set($event)">
+              <nz-option nzLabel="ทั้งหมด" nzValue="" />
+              <nz-option nzLabel="คำขอใหม่" nzValue="New" />
+              <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
+            </nz-select>
+          </div>
+        </div>
+        <div class="group-filter">
+          <div class="form-field">
+            <label>ค้นหา</label>
+            <nz-input-wrapper class="form-input">
+              <nz-icon nzInputPrefix nzType="search" />
+              <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
+            </nz-input-wrapper>
+          </div>
+          <div style="display: flex; align-items: end; gap: 8px;">
+            <button type="button" class="btn-search" (click)="loadData()">
+              <i class="fas fa-search"></i> ค้นหา
+            </button>
+            <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <div class="card-list-view">
       @if (isLoading()) {
