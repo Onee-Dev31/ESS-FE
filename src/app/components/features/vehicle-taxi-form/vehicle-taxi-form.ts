@@ -8,6 +8,7 @@ import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { MasterDataService } from '../../../services/master-data.service';
 import { AuthService } from '../../../services/auth.service';
+import { FileConverterService } from '../../../services/file-converter';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -18,7 +19,8 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChecked {
 
-  @Input() requestId: string = '';
+  @Input() requests: any = null;
+
   @Input() claimId?: number;                 // สำหรับ Edit Mode
 
   @Output() onClose = new EventEmitter<void>();
@@ -29,6 +31,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   private cdr = inject(ChangeDetectorRef);
   private masterDataService = inject(MasterDataService);
   private authService = inject(AuthService);
+  private fileConvertService = inject(FileConverterService);
 
   items: TaxiLogItem[] = [];
   locations: TaxiLocation[] = [];
@@ -72,7 +75,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['claimId'] || changes['requestId']) {
+    if (changes['requests']) {
       this.checkAndLoadData();
     }
   }
@@ -94,10 +97,10 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   private checkAndLoadData() {
-    if (this.claimId && this.claimId > 0) {
+    if (this.requests) {
       this.isEditMode = true;
-      this.originalClaimId = this.claimId;
-      this.loadClaimForEdit(this.claimId);
+      this.originalClaimId = this.requests.claimId;
+      this.loadClaimForEdit(this.requests.claimId);
     } else {
       this.isEditMode = false;
       this.loadEligibleDates();
@@ -108,31 +111,60 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   private loadClaimForEdit(claimId: number) {
     this.isLoading = true;
     this.items = [];
+    const param = {
+      page: 1,
+      pageSize: 10,
+      empCode: this.authService.userData().CODEMPID,
+      claimId: claimId.toString() || '',
+    };
 
-    this.taxiService.getTaxiClaim(claimId).subscribe({
+    console.log("param", param)
+
+    this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
-        const claim = res.data || res;
+        const claim = res.data[0] || res;
 
-        this.items = (claim.details || claim.taxi_details || []).map((d: any) => ({
-          date: d.work_date || d.workDate,
-          description: d.description || '',
-          destination: '',                    // เพิ่มเพื่อให้ตรงกับ interface
-          distance: 0,                        // เพิ่มเพื่อให้ตรงกับ interface
-          locationFromId: d.location_from_id || d.locationFromId,
-          locationToId: d.location_to_id || d.locationToId,
-          otherFrom: d.other_from || d.otherFrom || '',
-          otherTo: d.other_to || d.otherTo || '',
-          amount: Number(d.rate_amount || d.amount || 0),
-          shiftCode: d.shift_code || d.shiftCode || '',
-          selected: true,
-          attachedFile: null,
-          fileToUpload: null,
-          checkIn: d.check_in || d.checkIn,
-          checkOut: d.check_out || d.checkOut,
-          dayType: d.day_type || d.dayType,
-          remainingAmount: 0,
-          attachedFiles: d.attachedFiles || (d.fileToUpload ? [d.fileToUpload] : [])
-        } as TaxiLogItem));
+        console.log(res)
+
+        const itemPromises = (claim.details || []).map(async (d: any) => {
+          const attachedFiles = d.attachments
+            ? await this.fileConvertService.convertUrlsToFiles(d.attachments)
+            : [];
+
+          return {
+            date: d.work_date || d.workDate,
+            description: d.description || '',
+            destination: '',
+            distance: 0,
+            locationFromId: d.location_from_id || d.locationFromId,
+            locationToId: d.location_to_id || d.locationToId,
+            otherFrom: d.other_from || d.otherFrom || '',
+            otherTo: d.other_to || d.otherTo || '',
+            amount: Number(d.rate_amount || d.amount || 0),
+            shiftCode: d.shift_code || d.shiftCode || '',
+            selected: true,
+            attachedFiles: attachedFiles,
+            fileToUpload: null,
+            checkIn: d.check_in || d.time_in,
+            checkOut: d.check_out || d.time_out,
+            dayType: d.day_type || d.dayType,
+            remainingAmount: d.remaining_amount,
+          };
+        });
+
+        // ใช้ Promise.all หลัง map เพื่อ resolve ทุก promise
+        Promise.all(itemPromises).then(items => {
+          this.items = items;
+
+          if (this.items.length > 0) {
+            const firstDate = new Date(this.items[0].date);
+            this.selectedMonthIndex = firstDate.getMonth();
+            this.selectedYear = firstDate.getFullYear() + 543;
+          }
+
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        });
 
         // ตั้งค่าเดือน-ปี จากข้อมูล claim
         if (this.items.length > 0) {
@@ -317,7 +349,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
-  openUploadModal(item: TaxiLogItem) {
+  openUploadModal(item: any) {
+    console.log(item)
     this.currentUploadItem = item;
     this.isShowUploadModal = true;
   }

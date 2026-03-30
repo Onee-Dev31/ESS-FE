@@ -33,6 +33,7 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
         claimStatus?: string;
         dateFrom?: string;
         dateTo?: string;
+        claimId?: string;
     }): Observable<any> {
         const queryParams: any = {
             employee_code: params.empCode,
@@ -43,14 +44,15 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
         if (params.claimStatus) queryParams.status = params.claimStatus;
         if (params.dateFrom) queryParams.date_from = params.dateFrom;
         if (params.dateTo) queryParams.date_to = params.dateTo;
+        if (params.claimId) queryParams.claim_id = params.claimId;
 
         return this._http.get(`${this.baseUrl}/taxi-claim/claims`, { params: queryParams });
     }
 
     // ==================== Get Single Claim for Edit ====================
-    getTaxiClaim(claimId: number): Observable<any> {
-        return this._http.get(`${this.baseUrl}/taxi-claim/${claimId}`);
-    }
+    // getTaxiClaim(claimId: number): Observable<any> {
+    //     return this._http.get(`${this.baseUrl}/taxi-claim/${claimId}`);
+    // }
 
     // ==================== Create Claim ====================
     createTaxiClaim(formData: FormData): Observable<any> {

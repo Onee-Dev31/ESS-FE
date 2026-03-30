@@ -19,6 +19,7 @@ import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import { AuthService } from '../../services/auth.service';
 
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
+import { DateUtilityService } from '../../services/date-utility.service';
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
@@ -35,6 +36,7 @@ export class VehicleTaxiComponent implements OnInit {
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
+  dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('taxi-list');
 
@@ -42,11 +44,13 @@ export class VehicleTaxiComponent implements OnInit {
   statusOptions = COMMON_STATUS_OPTIONS;
 
   isModalOpen = signal<boolean>(false);
-  selectedRequestId = signal<string>('');
+  // selectedRequestId = signal<string>('');
+  selectedRequestId = '';
+  selectedRequest: any = null;
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
-  allRequests = signal<TaxiRequest[]>([]);
+  allRequests = signal<any[]>([]);
   comps = createListingComputeds_v2(this.allRequests, this.listing);
 
   setPageSize(size: number) {
@@ -91,18 +95,18 @@ export class VehicleTaxiComponent implements OnInit {
     });
   }
 
-  private mapApiData(items: any[]): TaxiRequest[] {
+  private mapApiData(items: any[]): any[] {
     return items.map((item: any) => {
       return {
         id: String(item.claimId ?? ''),
         typeId: 0,
         createDate: item.claimDate ?? '',
         status: item.status ?? '',
-        voucherNo: item.voucherNo ?? '',
+        claimNo: item.voucherNo,
         totalAmount: item.totalAmount ?? 0,
         items: (item.details ?? []).map((d: any) => {
-          const fromName: string   = d.other_from?.trim() || d.location_from_name || '';
-          const toName: string     = d.other_to?.trim()   || d.location_to_name   || '';
+          const fromName: string = d.other_from?.trim() || d.location_from_name || '';
+          const toName: string = d.other_to?.trim() || d.location_to_name || '';
           const attachments: any[] = d.attachments ?? [];
           return {
             date: d.work_date ?? '',
@@ -113,6 +117,7 @@ export class VehicleTaxiComponent implements OnInit {
             attachedFile: attachments.length > 0 ? (attachments[0].file_url ?? null) : null,
           };
         }),
+        ...item
       } as TaxiRequest;
     });
   }
@@ -131,12 +136,31 @@ export class VehicleTaxiComponent implements OnInit {
     }
   }
 
-  openModal() {
-    this.isModalOpen.set(true);
+  // openModal() {
+  //   this.isModalOpen.set(true);
+  // }
+
+  openModal(id: string = '') {
+    if (id === '') {
+      this.selectedRequestId = '';
+      this.isModalOpen.set(true);
+    } else {
+      this.selectedRequestId = id;
+      this.isModalOpen.set(true);
+    }
+
+    if (!this.selectedRequestId) return;
+
+    const result = this.allRequests().find(item => item.id === this.selectedRequestId);
+
+    this.selectedRequest = result
+
+    console.log(result, this.allRequests())
   }
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.selectedRequest = '';
     this.loadData();
   }
 
@@ -144,8 +168,8 @@ export class VehicleTaxiComponent implements OnInit {
     const request = this.allRequests().find(r => r.id === requestId);
     if (request?.items) {
       const files = request.items
-        .filter(item => item.attachedFile)
-        .map(item => ({ fileName: item.attachedFile, date: item.date }));
+        .filter((item: any) => item.attachedFile)
+        .map((item: any) => ({ fileName: item.attachedFile, date: item.date }));
 
       if (files.length > 0) {
         this.previewFiles.set(files);
@@ -169,7 +193,7 @@ export class VehicleTaxiComponent implements OnInit {
     return `${req.id}-${index}`;
   }
 
-  getStatusClass(status: string): string {
-    return StatusUtil.getStatusBadgeClass(status);
+  getStatusClass(status: string) {
+    return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
 }

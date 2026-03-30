@@ -1,16 +1,19 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
+import { FilePreviewItem, FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
+import { FileConverterService } from '../../../services/file-converter';
 
 @Component({
   selector: 'app-file-upload-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FilePreviewModalComponent],
   templateUrl: './file-upload-modal.html',
   styleUrl: './file-upload-modal.scss',
 })
 export class FileUploadModal implements OnChanges {
   private toastService = inject(ToastService);
+  private fileConvertService = inject(FileConverterService);
 
   @Input() currentFiles: File[] = [];
   @Input() dateLabel: string = '';
@@ -18,8 +21,13 @@ export class FileUploadModal implements OnChanges {
   @Output() onSave = new EventEmitter<File[]>();
   @Output() onClose = new EventEmitter<void>();
 
+
+
   tempFiles: File[] = [];
   isDeleted: boolean = false;
+
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['currentFiles']) {
@@ -85,8 +93,14 @@ export class FileUploadModal implements OnChanges {
     });
   }
 
-  getFileIcon(file: File): string {
-    const type = file.type;
+  getFileIcon(file: any): string {
+    const actualFile = file instanceof File
+      ? file
+      : file?.file instanceof File
+        ? file.file
+        : null;
+
+    const type = actualFile.type;
 
     if (type.includes('image')) return 'fas fa-file-image text-blue';
     if (type.includes('pdf')) return 'fas fa-file-pdf text-red';
@@ -97,5 +111,18 @@ export class FileUploadModal implements OnChanges {
 
   formatFileSize(size: number): string {
     return (size / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+
+
+  viewFile(file: any) {
+    this.previewFiles.set([
+      this.fileConvertService.buildPreviewFile(file)
+    ]);
+
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 }

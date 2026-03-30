@@ -19,7 +19,8 @@
             <span class="filter-label">ตั้งแต่วันที่</span>
             <div class="date-input-group">
               <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่" aria-label="ตั้งแต่วันที่" />
+                (ngModelChange)="listing.filterStartDate.set($event)" title="ตั้งแต่วันที่"
+                aria-label="ตั้งแต่วันที่" />
             </div>
           </div>
           <div class="filter-group">
@@ -56,7 +57,7 @@
       </div>
     </div>
 
-    <div class="table-responsive">
+    <!-- <div class="table-responsive">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
@@ -137,35 +138,33 @@
         }
       </table>
       }
-    </div>
+    </div> -->
 
     <div class="card-list-view">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-      <div class="mobile-card">
-        <div class="card-header">
-          <div class="header-content">
-            <span class="ticket-no">{{ req.voucherNo || req.id }}</span>
+      @for (claim of comps.paginatedData(); track trackByRowId($index, claim)) {
+      <div class="claim-card" (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+        <div class="claim-card__header">
+          <div class="claim-card__type-badge">
+            <span class="ticket-no"><i class="fa-solid fa-car-side"></i> เบิกค่าพาหนะ Taxi</span>
           </div>
-          <div class="card-actions-top">
-            <button class="action-btn folder" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
-              <i class="far fa-folder-open"></i>
-            </button>
-            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-              {{ req.status | statusLabel }}
+          <div class="claim-card__actions">
+            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+              {{ claim.status | statusLabel }}
             </span>
           </div>
         </div>
-        <div class="card-body">
-          <div class="info-row">
+        <div class="claim-card__body">
+          <!-- <div class="info-row">
             <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
             <span class="value">{{ req.createDate }}</span>
-          </div>
+          </div> -->
 
-          <div class="nested-list">
-            @for (item of req.items; track $index) {
+          <div class="claim-card__main">
+            จำนวน {{claim.items.length}} รายการ
+            <!-- @for (item of req.items; track $index) {
             <div class="nested-item">
               <div class="item-header">
                 <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
@@ -176,13 +175,25 @@
                 <div class="detail-row"><i class="fas fa-map-marker-alt"></i> {{ item.destination }}</div>
               </div>
             </div>
-            }
+            } -->
           </div>
-          <div class="card-footer-actions">
+          <div class="claim-card__amount">
+            <span class="amount-label">ขอเบิก</span>
+            <span class="amount-value">฿{{ claim.totalAmount | number:'1.2-2' }}</span>
+            <!-- @if (req.approvedAmount > 0) {
+            <span class="amount-approved">อนุมัติ ฿{{ req.approvedAmount | number:'1.2-2' }}</span>
+            } -->
+          </div>
+          <!-- <div class="card-footer-actions">
             <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
               <i class="far fa-trash-alt"></i> ลบ
             </button>
-          </div>
+          </div> -->
+        </div>
+        <div class="claim-card__footer">
+          <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
+          <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
+            }}</span>
         </div>
       </div>
       }
@@ -195,8 +206,7 @@
 
     <div class="pagination-wrapper">
       <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
-        (onPageSizeChange)="setPageSize($event)">
+        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
       </app-pagination>
     </div>
   </div>
@@ -209,7 +219,7 @@
   @if (isModalOpen()) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+      <app-vehicle-taxi-form [requests]="selectedRequest" (onClose)="closeModal()">
       </app-vehicle-taxi-form>
     </div>
   </div>

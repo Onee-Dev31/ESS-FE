@@ -18,6 +18,7 @@ import { SwalService } from '../../services/swal.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MasterDataService } from '../../services/master-data.service';
 import { finalize, firstValueFrom } from 'rxjs';
+import { FileConverterService } from '../../services/file-converter';
 
 interface FreelanceMember {
     id: string;
@@ -87,6 +88,7 @@ export class FreelanceManagementComponent implements OnInit {
     private freelanceService = inject(FreelanceService);
     private swalService = inject(SwalService);
     private masterService = inject(MasterDataService);
+    private fileConvertService = inject(FileConverterService);
 
     isLoading = this.loadingService.loading('freelance-list');
     data = signal<FreelanceMember[]>([]);
@@ -330,11 +332,13 @@ export class FreelanceManagementComponent implements OnInit {
         let convertedFiles: any[] = [];
 
         if (file?.length) {
-            convertedFiles = await Promise.all(
-                file.map((f: any) =>
-                    this.convertUrlToFile(f)
-                )
-            );
+            // convertedFiles = await Promise.all(
+            //     file.map((f: any) =>
+            //         this.convertUrlToFile(f)
+            //     )
+            // );
+
+            convertedFiles = await this.fileConvertService.convertUrlsToFiles(file);
         }
 
         const formData = {
@@ -739,3 +743,4 @@ export class FreelanceManagementComponent implements OnInit {
         });
     }
 }
+
