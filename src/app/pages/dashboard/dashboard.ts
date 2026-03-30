@@ -12,6 +12,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { DialogService } from '../../services/dialog';
 import { AllowanceApiService } from '../../services/allowance-api.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { WelfareService, WelfareEventType } from '../../services/welfare.service';
 import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
@@ -58,6 +59,7 @@ export class DashboardComponent implements OnInit {
   private dialogService = inject(DialogService);
   private allowanceApiService = inject(AllowanceApiService);
   private vehicleService = inject(VehicleService);
+  private welfareService = inject(WelfareService);
   authService = inject(AuthService);
 
   constructor(
@@ -197,21 +199,39 @@ export class DashboardComponent implements OnInit {
   selectedRequestStatus = signal<string>('');
   allowanceTotalAmount = signal<number | null>(null);
   vehicleTotalAmount = signal<number | null>(null);
+  welfareEventTypes = signal<WelfareEventType[]>([]);
+
+  private readonly WELFARE_META: Record<string, { icon: string; colorClass?: string; tooltip?: string }> = {
+    MARRIAGE:         { icon: 'fas fa-heart',          tooltip: 'wedding' },
+    ORDINATION:       { icon: 'fas fa-hands-praying',   tooltip: 'ordination' },
+    FUNERAL_EMPLOYEE: { icon: 'fas fa-church',          tooltip: 'funeral' },
+    FUNERAL_FAMILY:   { icon: 'fas fa-church',          tooltip: 'funeral' },
+    WREATH_EMPLOYEE:  { icon: 'fas fa-spa',             tooltip: 'wreath' },
+    WREATH_FAMILY:    { icon: 'fas fa-spa',             tooltip: 'wreath' },
+  };
 
   welfareStats = computed(() => {
     const allowanceAmt = this.allowanceTotalAmount();
     const allowanceValue = allowanceAmt === null ? '...' : allowanceAmt.toLocaleString('th-TH');
     const vehicleAmt = this.vehicleTotalAmount();
     const vehicleValue = vehicleAmt === null ? '...' : vehicleAmt.toLocaleString('th-TH');
-    return [
-    { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
-    { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
-    { label: 'ค่าแท็กซี่', value: '876', icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
-    { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
-    { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
-    { label: 'ค่าฌาปนกิจ', value: '584', icon: 'fas fa-church', tooltip: 'funeral' },
-    { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' }
-  ];});
+
+    const fixed = [
+      { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
+      { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
+      { label: 'ค่าแท็กซี่', value: '...', icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
+    ];
+
+    const eventTypes = this.welfareEventTypes();
+    const welfare = eventTypes.map(t => ({
+      label: t.name_th,
+      value: t.max_amount.toLocaleString('th-TH'),
+      icon: this.WELFARE_META[t.code]?.icon ?? 'fas fa-gift',
+      tooltip: this.WELFARE_META[t.code]?.tooltip,
+    }));
+
+    return [...fixed, ...welfare];
+  });
 
 
   workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
@@ -355,6 +375,7 @@ export class DashboardComponent implements OnInit {
     this.getTeamCalendar();
     this.loadAllowanceSummary();
     this.loadVehicleSummary();
+    this.loadWelfareEventTypes();
   }
 
   loadAllowanceSummary() {
@@ -367,6 +388,18 @@ export class DashboardComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => this.allowanceTotalAmount.set(0),
+    });
+  }
+
+  loadWelfareEventTypes() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    if (!employeeCode) return;
+    this.welfareService.getEventTypes(employeeCode).subscribe({
+      next: (res) => {
+        this.welfareEventTypes.set(res.data ?? []);
+        this.cdr.markForCheck();
+      },
+      error: () => this.welfareEventTypes.set([]),
     });
   }
 
