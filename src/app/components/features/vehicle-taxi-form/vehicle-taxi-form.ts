@@ -9,6 +9,7 @@ import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { MasterDataService } from '../../../services/master-data.service';
 import { AuthService } from '../../../services/auth.service';
+import { DialogService } from '../../../services/dialog';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -26,6 +27,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   private taxiService = inject(TaxiService);
   private toastService = inject(ToastService);
+  private dialogService = inject(DialogService);
   dateUtil = inject(DateUtilityService);
   private cdr = inject(ChangeDetectorRef);
   private masterDataService = inject(MasterDataService);
@@ -124,17 +126,24 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           return;
         }
 
+        // shift/remaining fields are returned at claim level by the SP (joined on claim_date)
+        // use them as fallback; getEligibleDates merge below will override with per-date values
+        const claimShiftCode     = claim.shift_code     ?? claim.shiftCode     ?? '';
+        const claimCheckIn       = claim.time_in        ?? claim.timeIn;
+        const claimCheckOut      = claim.time_out       ?? claim.timeOut;
+        const claimDayType       = claim.day_type       ?? claim.dayType;
+        const claimRemaining     = claim.remaining_amount ?? claim.remainingAmount ?? 0;
+
         this.items = (claim.details || claim.Details || []).map((d: any) => ({
           date: d.work_date || d.workDate,
           description: d.description || '',
-          destination: '',                    // เพิ่มเพื่อให้ตรงกับ interface
-          distance: 0,                        // เพิ่มเพื่อให้ตรงกับ interface
+          destination: '',
+          distance: 0,
           locationFromId: d.location_from_id || d.locationFromId,
           locationToId: d.location_to_id || d.locationToId,
           otherFrom: d.other_from || d.otherFrom || '',
           otherTo: d.other_to || d.otherTo || '',
           amount: Number(d.rate_amount || d.amount || 0),
-          shiftCode: d.shift_code || d.shiftCode || '',
           selected: true,
           attachedFile: null,
           filesToUpload: [],
@@ -146,10 +155,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             fileType: a.file_type ?? a.fileType,
             fileSize: a.file_size ?? a.fileSize,
           })),
-          checkIn: d.check_in || d.checkIn,
-          checkOut: d.check_out || d.checkOut,
-          dayType: d.day_type || d.dayType,
-          remainingAmount: 0,
+          shiftCode:       d.shift_code      ?? d.shiftCode      ?? claimShiftCode,
+          checkIn:         d.time_in         ?? d.check_in       ?? d.checkIn   ?? claimCheckIn,
+          checkOut:        d.time_out        ?? d.check_out      ?? d.checkOut  ?? claimCheckOut,
+          dayType:         d.day_type        ?? d.dayType        ?? claimDayType,
+          remainingAmount: d.remaining_amount ?? d.remainingAmount ?? claimRemaining,
         } as TaxiLogItem));
 
         // ตั้งค่าเดือน-ปี จากข้อมูล claim
@@ -393,6 +403,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     const selectedItems = this.items.filter(item => item.selected);
 
     if (selectedItems.length === 0) {
+      if (this.isEditMode && this.originalClaimId) {
+        // Edit mode + ยกเลิกทั้งหมด → ลบ claim
+        this.confirmDeleteAllAndSave();
+        return;
+      }
       this.toastService.warning('กรุณาเลือกรายการที่ต้องการเบิก');
       return;
     }
@@ -463,11 +478,18 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       // Update
       this.taxiService.updateTaxiClaim(this.originalClaimId, empCode, details, files, detailIndexes, keptAttachments)
         .subscribe({
-          next: () => {
-            this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
+          next: (res: any) => {
+            if (res?.data?.status === 'deleted') {
+              this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
+            } else {
+              this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
+            }
             this.onClose.emit();
           },
-          error: () => this.toastService.error('ไม่สามารถแก้ไขข้อมูลได้')
+          error: (err: any) => {
+            const msg = err?.error?.message ?? 'ไม่สามารถแก้ไขข้อมูลได้';
+            this.toastService.error(msg);
+          }
         });
     } else {
       // Create
@@ -480,6 +502,30 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           error: () => this.toastService.error('ไม่สามารถบันทึกข้อมูลได้')
         });
     }
+  }
+
+  private async confirmDeleteAllAndSave() {
+    const confirmed = await this.dialogService.confirm({
+      title: 'ยืนยันการลบใบเบิก',
+      message: 'ไม่มีรายการที่เลือก ระบบจะลบใบเบิกนี้ทั้งหมด ต้องการดำเนินการต่อหรือไม่?',
+      type: 'danger',
+      confirmText: 'ลบใบเบิก'
+    });
+
+    if (!confirmed) return;
+
+    const empCode = this.authService.userData().CODEMPID;
+    this.taxiService.updateTaxiClaim(this.originalClaimId!, empCode, [], [], [], [])
+      .subscribe({
+        next: () => {
+          this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
+          this.onClose.emit();
+        },
+        error: (err: any) => {
+            const msg = err?.error?.message ?? 'ไม่สามารถลบข้อมูลได้';
+            this.toastService.error(msg);
+          }
+      });
   }
 
   private getInvalidFieldId(rowIndex: number, item: TaxiLogItem): string {
