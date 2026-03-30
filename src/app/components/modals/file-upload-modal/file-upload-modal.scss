@@ -40,6 +40,7 @@ $border: var(--border-toolbar);
   display: flex;
   justify-content: center;
   align-items: center;
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 
   .upload-modal-content {
@@ -105,6 +106,23 @@ $border: var(--border-toolbar);
           background: var(--bg-card);
         }
 
+        .file-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          width: 100%;
+          margin-bottom: 16px;
+
+          .file-section-label {
+            margin: 0 0 4px 0;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
         .upload-trigger {
           cursor: pointer;
           display: flex;
@@ -112,6 +130,25 @@ $border: var(--border-toolbar);
           align-items: center;
           color: $primary;
           gap: 12px;
+
+          &.compact {
+            flex-direction: row;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+
+            i {
+              font-size: 1rem;
+              opacity: 0.8;
+            }
+
+            span {
+              font-size: 0.9rem;
+              font-weight: 600;
+            }
+          }
 
           i {
             font-size: 2rem;
@@ -128,6 +165,10 @@ $border: var(--border-toolbar);
             margin-top: 4px;
             font-size: 0.8rem;
           }
+        }
+
+        .file-preview.existing .file-icon {
+          color: $primary !important;
         }
 
         .file-preview {

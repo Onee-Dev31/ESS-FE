@@ -10,6 +10,15 @@ export interface TaxiItem {
     attachedFile?: string | null;
 }
 
+export interface ExistingAttachment {
+    attachmentId?: number;
+    fileName: string;
+    fileUrl?: string;
+    filePath?: string;
+    fileType?: string;
+    fileSize?: number;
+}
+
 export interface TaxiLogItem extends TaxiItem {
     selected: boolean;
     checkIn?: string;
@@ -21,13 +30,12 @@ export interface TaxiLogItem extends TaxiItem {
     locationToId?: number;
     otherFrom?: string;
     otherTo?: string;
-    fileToUpload?: File | null;
+    filesToUpload: File[];
     amountError?: string | null;
 
-    // ==================== เพิ่มสำหรับ Edit Mode ====================
-    existingFileUrl?: string;      // URL ของไฟล์เก่า
-    existingFileName?: string;     // ชื่อไฟล์เก่า (ใช้แสดงสถานะ)
-    // ============================================================
+    // ==================== Edit Mode ====================
+    existingAttachments: ExistingAttachment[];
+    // ===================================================
 }
 
 export interface TaxiLocation {

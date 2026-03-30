@@ -9,25 +9,44 @@
       <p class="date-label">สำหรับวันที่: <strong>{{ dateLabel }}</strong></p>
 
       <div class="upload-box">
-        <input type="file" id="fileInput" (change)="onFileSelected($event)" hidden>
+        <input type="file" id="fileInput" (change)="onFileSelected($event)" multiple hidden>
 
-        <label for="fileInput" class="upload-trigger" *ngIf="!tempFile">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <span>คลิกเพื่อเลือกไฟล์</span>
-          <small class="file-hint">(รองรับทุกประเภท, สูงสุด 4MB)</small>
-        </label>
-
-        <div class="file-preview" *ngIf="tempFile">
-          <i class="fas fa-file-alt file-icon"></i>
-          <span class="filename">{{ tempFile.name }}</span>
-          <button class="btn-close" (click)="removeFile()" title="ลบไฟล์" aria-label="ลบไฟล์"><i class="fas fa-times"></i></button>
+        <!-- ไฟล์ที่มีอยู่แล้ว (Edit Mode) -->
+        <div class="file-list" *ngIf="keptAttachments.length > 0">
+          <p class="file-section-label">ไฟล์แนบเดิม</p>
+          <div class="file-preview existing" *ngFor="let a of keptAttachments; let i = index">
+            <i class="fas fa-file-alt file-icon"></i>
+            <span class="filename" [title]="a.fileName">{{ a.fileName }}</span>
+            <button class="btn-remove-file" (click)="removeExistingAttachment(i)" title="ลบไฟล์" aria-label="ลบไฟล์">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
+
+        <!-- ไฟล์ใหม่ที่เพิ่ม -->
+        <div class="file-list" *ngIf="tempFiles.length > 0">
+          <p class="file-section-label" *ngIf="keptAttachments.length > 0">ไฟล์ใหม่</p>
+          <div class="file-preview" *ngFor="let f of tempFiles; let i = index">
+            <i class="fas fa-file-alt file-icon"></i>
+            <span class="filename" [title]="f.name">{{ f.name }}</span>
+            <button class="btn-remove-file" (click)="removeNewFile(i)" title="ลบไฟล์" aria-label="ลบไฟล์">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload trigger -->
+        <label for="fileInput" class="upload-trigger" [class.compact]="totalCount > 0">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>{{ totalCount > 0 ? 'เพิ่มไฟล์' : 'คลิกเพื่อเลือกไฟล์' }}</span>
+          <small class="file-hint" *ngIf="totalCount === 0">(รองรับทุกประเภท, สูงสุด 4MB ต่อไฟล์)</small>
+        </label>
       </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="close()">ยกเลิก</button>
-      <button class="btn-confirm" (click)="confirm()" [disabled]="!tempFile && !isDeleted">บันทึก</button>
+      <button class="btn-confirm" (click)="confirm()">บันทึก</button>
     </div>
   </div>
 </div>

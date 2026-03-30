@@ -195,9 +195,9 @@
             </div>
             <div class="header-right">
               <button class="btn-card-upload" (click)="openUploadModal(item)"
-                [class.has-file]="item.attachedFile || !!item.existingFileName" title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
+                [class.has-file]="item.filesToUpload.length > 0 || item.existingAttachments.length > 0" title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
                 <i class="fas fa-file-upload"></i>
-                {{ item.attachedFile || item.existingFileName ? 'เปลี่ยนไฟล์' : 'แนบไฟล์' }}
+                {{ (item.filesToUpload.length + item.existingAttachments.length) > 0 ? (item.filesToUpload.length + item.existingAttachments.length) + ' ไฟล์' : 'แนบไฟล์' }}
               </button>
               <input type="checkbox" id="mob-select-{{i}}" [(ngModel)]="item.selected" class="card-checkbox"
                 title="เลือกรายการ" aria-label="เลือกรายการ" />
@@ -269,7 +269,7 @@
               </label>
 
               <div class="amount-input-wrapper">
-                <input type="text" class="card-input text-right" placeholder="0.00"
+                <input type="text" id="mob-amount-{{i}}" class="card-input text-right" placeholder="0.00"
                   [value]="formatNumber(item.amount || 0)" (input)="onAmountInput($event, item)"
                   [class.is-invalid]="item.amountError" />
               </div>
@@ -288,8 +288,12 @@
   </main>
 
   <!-- File Upload Modal -->
-  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFile]="currentUploadItem?.fileToUpload || null"
-    [dateLabel]="currentUploadItem?.date || ''" (onSave)="handleFileSave($event)" (onClose)="closeUploadModal()">
+  <app-file-upload-modal *ngIf="isShowUploadModal"
+    [currentFiles]="currentUploadItem?.filesToUpload || []"
+    [existingAttachments]="currentUploadItem?.existingAttachments || []"
+    [dateLabel]="currentUploadItem?.date || ''"
+    (onSave)="handleFileSave($event)"
+    (onClose)="closeUploadModal()">
   </app-file-upload-modal>
 
 </div>

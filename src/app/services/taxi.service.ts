@@ -48,8 +48,10 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
     }
 
     // ==================== Get Single Claim for Edit ====================
-    getTaxiClaim(claimId: number): Observable<any> {
-        return this._http.get(`${this.baseUrl}/taxi-claim/${claimId}`);
+    getTaxiClaim(claimId: number, empCode: string): Observable<any> {
+        return this._http.get(`${this.baseUrl}/taxi-claim/claims`, {
+            params: { employee_code: empCode, claim_id: claimId, page_size: 1 }
+        });
     }
 
     // ==================== Create Claim ====================
@@ -80,7 +82,8 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
         empCode: string,
         details: any[],
         files: File[] = [],
-        detailIndexes: number[] = []
+        detailIndexes: number[] = [],
+        keptAttachments: any[] = []
     ): Observable<any> {
         const formData = new FormData();
         formData.append('employee_code', empCode);
@@ -94,9 +97,11 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
             formData.append('detail_indexes', idx.toString());
         });
 
-        // ใช้ PUT (แนะนำ) หรือ PATCH ตาม Backend
-        return this._http.put(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
-        // return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData); // ใช้ถ้า Backend เป็น PATCH
+        if (keptAttachments.length > 0) {
+            formData.append('kept_attachments', JSON.stringify(keptAttachments));
+        }
+
+        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
     }
 
     // ==================== Other Methods ====================

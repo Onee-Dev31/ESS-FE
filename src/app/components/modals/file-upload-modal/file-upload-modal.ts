@@ -1,6 +1,12 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
+import { ExistingAttachment } from '../../../interfaces/taxi.interface';
+
+export interface FileSaveResult {
+  newFiles: File[];
+  keptAttachments: ExistingAttachment[];
+}
 
 @Component({
   selector: 'app-file-upload-modal',
@@ -12,45 +18,55 @@ import { ToastService } from '../../../services/toast';
 export class FileUploadModal implements OnChanges {
   private toastService = inject(ToastService);
 
-  @Input() currentFile: File | null = null;
+  @Input() currentFiles: File[] = [];
+  @Input() existingAttachments: ExistingAttachment[] = [];
   @Input() dateLabel: string = '';
 
-  @Output() onSave = new EventEmitter<File | null>();
+  @Output() onSave = new EventEmitter<FileSaveResult>();
   @Output() onClose = new EventEmitter<void>();
 
-  tempFile: File | null = null;
-  isDeleted: boolean = false;
+  tempFiles: File[] = [];
+  keptAttachments: ExistingAttachment[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentFile']) {
-      this.tempFile = this.currentFile;
-      this.isDeleted = false;
+    if (changes['currentFiles']) {
+      this.tempFiles = [...(this.currentFiles ?? [])];
+    }
+    if (changes['existingAttachments']) {
+      this.keptAttachments = [...(this.existingAttachments ?? [])];
     }
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      const maxSizeInBytes = 4 * 1024 * 1024;
-      if (file.size > maxSizeInBytes) {
-        this.toastService.warning('ขนาดไฟล์ต้องไม่เกิน 4MB (ไฟล์ที่เลือกมีขนาด ' + (file.size / (1024 * 1024)).toFixed(2) + 'MB)');
-        input.value = '';
-        return;
-      }
+    if (!input.files || input.files.length === 0) return;
 
-      this.tempFile = file;
-      this.isDeleted = false;
+    const maxSizeInBytes = 4 * 1024 * 1024;
+    for (const file of Array.from(input.files)) {
+      if (file.size > maxSizeInBytes) {
+        this.toastService.warning(`ไฟล์ "${file.name}" มีขนาดเกิน 4MB (${(file.size / (1024 * 1024)).toFixed(2)} MB)`);
+        continue;
+      }
+      this.tempFiles = [...this.tempFiles, file];
     }
+
+    input.value = '';
   }
 
-  removeFile() {
-    this.tempFile = null;
-    this.isDeleted = true;
+  removeNewFile(index: number) {
+    this.tempFiles = this.tempFiles.filter((_, i) => i !== index);
+  }
+
+  removeExistingAttachment(index: number) {
+    this.keptAttachments = this.keptAttachments.filter((_, i) => i !== index);
+  }
+
+  get totalCount(): number {
+    return this.tempFiles.length + this.keptAttachments.length;
   }
 
   confirm() {
-    this.onSave.emit(this.tempFile);
+    this.onSave.emit({ newFiles: this.tempFiles, keptAttachments: this.keptAttachments });
   }
 
   close() {

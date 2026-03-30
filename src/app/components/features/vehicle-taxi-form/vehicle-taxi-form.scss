@@ -697,7 +697,7 @@ $col-file: 50px;
             z-index: 10;
             text-align: center;
             color: #ffffff;
-            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+            border-top: 1px solid $primary;
         }
 
         .sub-header th {
@@ -939,8 +939,6 @@ $col-file: 50px;
                     align-items: center;
                     gap: 5px;
                     cursor: pointer;
-
-                    &:hover {}
 
                     &.has-file {
                         background: #e6f4ea;

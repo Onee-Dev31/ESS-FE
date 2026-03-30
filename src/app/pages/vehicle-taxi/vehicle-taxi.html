@@ -114,6 +114,11 @@
                 <button class="btn-icon view" (click)="openPreviewModalForRequest(req.id)" title="ดูไฟล์แนบ">
                   <i class="far fa-folder-open"></i>
                 </button>
+                @if (req.status === 'New') {
+                <button class="btn-icon edit" (click)="openEditModal(req.id)" title="แก้ไข">
+                  <i class="far fa-edit"></i>
+                </button>
+                }
                 <button class="btn-icon delete" (click)="deleteRequest(req.id)" title="ลบ">
                   <i class="far fa-trash-alt"></i>
                 </button>
@@ -179,6 +184,11 @@
             }
           </div>
           <div class="card-footer-actions">
+            @if (req.status === 'New') {
+            <button class="btn-edit-sm" (click)="openEditModal(req.id)">
+              <i class="far fa-edit"></i> แก้ไข
+            </button>
+            }
             <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
               <i class="far fa-trash-alt"></i> ลบ
             </button>
@@ -209,7 +219,10 @@
   @if (isModalOpen()) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-vehicle-taxi-form [requestId]="selectedRequestId()" (onClose)="closeModal()">
+      <app-vehicle-taxi-form
+        [requestId]="selectedRequestId()"
+        [claimId]="selectedClaimId()"
+        (onClose)="closeModal()">
       </app-vehicle-taxi-form>
     </div>
   </div>

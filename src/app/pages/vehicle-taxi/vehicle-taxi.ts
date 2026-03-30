@@ -43,6 +43,7 @@ export class VehicleTaxiComponent implements OnInit {
 
   isModalOpen = signal<boolean>(false);
   selectedRequestId = signal<string>('');
+  selectedClaimId = signal<number | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
@@ -132,11 +133,18 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   openModal() {
+    this.selectedClaimId.set(undefined);
+    this.isModalOpen.set(true);
+  }
+
+  openEditModal(claimId: string) {
+    this.selectedClaimId.set(Number(claimId));
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.selectedClaimId.set(undefined);
     this.loadData();
   }
 
