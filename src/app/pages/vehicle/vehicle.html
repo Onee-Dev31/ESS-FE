@@ -14,10 +14,12 @@
       <div class="filter">
         <div class="group-filter">
           <div class="form-field">
+            <label>วันที่เริ่มต้น-วันที่สุิ้นสุด</label>
             <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
             <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
           </div>
           <div class="form-field">
+            <label>สถานะ</label>
             <nz-select nzShowSearch nzAllowClear class="form-input select-status" [ngModel]="listing.filterStatus()"
               (ngModelChange)="listing.filterStatus.set($event)">
               <nz-option nzLabel="ทั้งหมด" nzValue="" />
@@ -28,18 +30,21 @@
         </div>
         <div class="group-filter">
           <div class="form-field">
+            <label>ค้นหา</label>
             <nz-input-wrapper class="form-input">
               <nz-icon nzInputPrefix nzType="search" />
               <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
                 (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
             </nz-input-wrapper>
           </div>
-          <button type="button" class="btn-search" (click)="loadData()">
-            <i class="fas fa-search"></i> ค้นหา
-          </button>
-          <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
-            <i class="fas fa-sync-alt"></i>
-          </button>
+          <div style="display: flex; align-items: end; gap: 8px;">
+            <button type="button" class="btn-search" (click)="loadData()">
+              <i class="fas fa-search"></i> ค้นหา
+            </button>
+            <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
         </div>
       </div>
 
