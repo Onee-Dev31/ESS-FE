@@ -228,6 +228,8 @@ export class DashboardComponent implements OnInit {
       value: t.max_amount.toLocaleString('th-TH'),
       icon: this.WELFARE_META[t.code]?.icon ?? 'fas fa-gift',
       tooltip: this.WELFARE_META[t.code]?.tooltip,
+      path: undefined as string | undefined,
+      colorClass: undefined as string | undefined,
     }));
 
     return [...fixed, ...welfare];
