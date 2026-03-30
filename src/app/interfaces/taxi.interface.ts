@@ -11,6 +11,7 @@ export interface TaxiItem {
 }
 
 export interface TaxiLogItem extends TaxiItem {
+    attachedFileNames: string[];
     selected: boolean;
     checkIn?: string;
     checkOut?: string;
@@ -25,9 +26,12 @@ export interface TaxiLogItem extends TaxiItem {
     amountError?: string | null;
 
     // ==================== เพิ่มสำหรับ Edit Mode ====================
-    existingFileUrl?: string;      // URL ของไฟล์เก่า
-    existingFileName?: string;     // ชื่อไฟล์เก่า (ใช้แสดงสถานะ)
+    // existingFileUrl?: string;      // URL ของไฟล์เก่า
+    // existingFileName?: string;     // ชื่อไฟล์เก่า (ใช้แสดงสถานะ)
     // ============================================================
+
+    attachedFiles?: File[];
+    existingFiles?: string[];
 }
 
 export interface TaxiLocation {

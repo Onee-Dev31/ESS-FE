@@ -30,11 +30,6 @@
     }
 
     <div class="action-bar">
-      <button class="btn-submit" (click)="save()" [disabled]="isLoading"
-        title="{{ isEditMode ? 'บันทึกการแก้ไข' : 'ยืนยันการเบิก' }}"
-        aria-label="{{ isEditMode ? 'บันทึกการแก้ไข' : 'ยืนยันการเบิก' }}">
-        <i class="fas fa-check"></i> {{ submitButtonText }}
-      </button>
       <div class="info-badges">
         <span class="info-text">
           เลือกแล้ว {{ getSelectedCount() }} รายการ · รวม {{ getTotalAmount() | number }} บาท
@@ -194,10 +189,22 @@
               </span>
             </div>
             <div class="header-right">
-              <button class="btn-card-upload" (click)="openUploadModal(item)"
+              <!-- <button class="btn-card-upload" (click)="openUploadModal(item)"
                 [class.has-file]="item.attachedFile || !!item.existingFileName" title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
                 <i class="fas fa-file-upload"></i>
                 {{ item.attachedFile || item.existingFileName ? 'เปลี่ยนไฟล์' : 'แนบไฟล์' }}
+              </button> -->
+              <button class="btn-card-upload" (click)="openUploadModal(item)"
+                [class.has-file]="(item.attachedFiles?.length || 0) > 0 || (item.existingFiles?.length || 0) > 0"
+                title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
+
+                <i class="fas fa-file-upload"></i>
+
+                {{
+                (item.attachedFiles?.length || 0) + (item.existingFiles?.length || 0) > 0
+                ? 'จัดการไฟล์'
+                : 'แนบไฟล์'
+                }}
               </button>
               <input type="checkbox" id="mob-select-{{i}}" [(ngModel)]="item.selected" class="card-checkbox"
                 title="เลือกรายการ" aria-label="เลือกรายการ" />
@@ -287,9 +294,15 @@
 
   </main>
 
+
+  <div class="form-actions">
+    <button type="button" class="btn-submit" (click)="save()" [disabled]="isLoading || !areAllItemsValid()">
+      <i class="fas fa-check"></i> ยืนยันการเบิก
+    </button>
+  </div>
+
   <!-- File Upload Modal -->
-  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFile]="currentUploadItem?.fileToUpload || null"
+  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFiles]="currentUploadItem?.attachedFiles || []"
     [dateLabel]="currentUploadItem?.date || ''" (onSave)="handleFileSave($event)" (onClose)="closeUploadModal()">
   </app-file-upload-modal>
-
 </div>

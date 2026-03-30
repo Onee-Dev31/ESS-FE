@@ -53,53 +53,15 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
     }
 
     // ==================== Create Claim ====================
-    createTaxiClaim(
-        empCode: string,
-        details: any[],
-        files: File[] = [],
-        detailIndexes: number[] = []
-    ): Observable<any> {
-        const formData = new FormData();
-        formData.append('employee_code', empCode);
-        formData.append('details', JSON.stringify(details));
-
-        files.forEach(file => {
-            formData.append('files', file, file.name);
-        });
-
-        detailIndexes.forEach(idx => {
-            formData.append('detail_indexes', idx.toString());
-        });
-
+    createTaxiClaim(formData: FormData): Observable<any> {
         return this._http.post(`${this.baseUrl}/taxi-claim`, formData);
     }
 
     // ==================== Update Claim (สำหรับ Edit) ====================
-    updateTaxiClaim(
-        claimId: number,
-        empCode: string,
-        details: any[],
-        files: File[] = [],
-        detailIndexes: number[] = []
-    ): Observable<any> {
-        const formData = new FormData();
-        formData.append('employee_code', empCode);
-        formData.append('details', JSON.stringify(details));
-
-        files.forEach(file => {
-            formData.append('files', file, file.name);
-        });
-
-        detailIndexes.forEach(idx => {
-            formData.append('detail_indexes', idx.toString());
-        });
-
-        // ใช้ PUT (แนะนำ) หรือ PATCH ตาม Backend
-        return this._http.put(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
-        // return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData); // ใช้ถ้า Backend เป็น PATCH
+    updateTaxiClaim(claimId: number, formData: FormData): Observable<any> {
+        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
     }
 
-    // ==================== Other Methods ====================
     getTaxiRequests(): Observable<TaxiRequest[]> {
         return this.getRequests();
     }

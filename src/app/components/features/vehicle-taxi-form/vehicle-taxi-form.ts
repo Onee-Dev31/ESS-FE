@@ -127,12 +127,11 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           selected: true,
           attachedFile: null,
           fileToUpload: null,
-          existingFileUrl: d.file_url || d.fileUrl,
-          existingFileName: d.file_name || d.fileName,
           checkIn: d.check_in || d.checkIn,
           checkOut: d.check_out || d.checkOut,
           dayType: d.day_type || d.dayType,
           remainingAmount: 0,
+          attachedFiles: d.attachedFiles || (d.fileToUpload ? [d.fileToUpload] : [])
         } as TaxiLogItem));
 
         // ตั้งค่าเดือน-ปี จากข้อมูล claim
@@ -328,13 +327,30 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     this.currentUploadItem = null;
   }
 
-  handleFileSave(file: File | null) {
+  handleFileSave(files: File[]) {
     if (this.currentUploadItem) {
-      this.currentUploadItem.fileToUpload = file;
-      this.currentUploadItem.attachedFile = file?.name ?? null;
-      if (file) this.currentUploadItem.selected = true;
+      // เก็บไฟล์จริง
+      this.currentUploadItem.attachedFiles = files;
+
+      // เก็บชื่อไฟล์ (กรณีต้องใช้แสดง / ส่ง API แยก)
+      this.currentUploadItem.attachedFileNames = files.map(f => f.name);
+
+      // auto select ถ้ามีไฟล์
+      if (files.length > 0) {
+        this.currentUploadItem.selected = true;
+      }
     }
+
     this.closeUploadModal();
+  }
+
+  onFilesSelected(event: Event, item: any) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const files = Array.from(input.files);
+
+    item.attachedFiles = [...(item.attachedFiles || []), ...files];
   }
 
   // ====================== SAVE ======================
@@ -352,7 +368,8 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       !item.locationToId ||
       (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()) ||
       (this.isOtherLocation(item.locationToId) && !item.otherTo?.trim()) ||
-      !item.amount || item.amount <= 0
+      !item.amount || item.amount <= 0 ||
+      item.amount > item.remainingAmount
     );
 
     if (invalidItem) {
@@ -378,29 +395,45 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     const empCode = this.authService.userData().CODEMPID;
     const details = selectedItems.map(item => ({
       work_date: item.date.split('T')[0],
-      description: item.description,
+      description: item.description ?? '',
       location_from_id: item.locationFromId ?? 0,
       location_to_id: item.locationToId ?? 0,
       other_from: item.otherFrom ?? '',
       other_to: item.otherTo ?? '',
-      rate_amount: Number(item.amount),
+      rate_amount: Number(item.amount) || 0,
     }));
 
     const files: File[] = [];
-    const detailIndexes: number[] = [];
+    const detail_indexes: number[] = [];
 
     selectedItems.forEach((item, index) => {
-      if (item.fileToUpload) {
-        files.push(item.fileToUpload);
-        detailIndexes.push(index);
+      if (item.attachedFiles?.length) {
+        item.attachedFiles.forEach(file => {
+          files.push(file);
+          detail_indexes.push(index);
+        });
       }
     });
 
-    console.log(this.originalClaimId, empCode, details, files, detailIndexes)
+    // สร้าง FormData
+    const formData = new FormData();
+
+    files.forEach((file, i) => {
+      formData.append('files', file);
+      formData.append('detail_indexes', detail_indexes[i].toString());
+    });
+    details.forEach((detail) => {
+      formData.append('details', JSON.stringify(detail));
+    });
+    formData.append('employee_code', empCode);
+
+    console.log("formData", [...formData.entries()]);
+
+    console.log(selectedItems, this.originalClaimId, empCode)
 
     if (this.isEditMode && this.originalClaimId) {
       // Update
-      this.taxiService.updateTaxiClaim(this.originalClaimId, empCode, details, files, detailIndexes)
+      this.taxiService.updateTaxiClaim(this.originalClaimId, formData)
         .subscribe({
           next: () => {
             this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
@@ -410,7 +443,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         });
     } else {
       // Create
-      this.taxiService.createTaxiClaim(empCode, details, files, detailIndexes)
+      this.taxiService.createTaxiClaim(formData)
         .subscribe({
           next: () => {
             this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
@@ -439,4 +472,29 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   cancel() {
     this.onClose.emit();
   }
+
+  // Validate
+  isItemValid(item: any): boolean {
+    if (!item.description?.trim()) return false;
+
+    if (!item.locationFromId || !item.locationToId) return false;
+
+    if (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()) return false;
+
+    if (this.isOtherLocation(item.locationToId) && !item.otherTo?.trim()) return false;
+
+    if (!item.amount || item.amount <= 0) return false;
+
+    if (item.amount > item.remainingAmount) return false;
+
+    return true;
+  }
+
+  areAllItemsValid(): boolean {
+    return this.items
+      .filter(item => item.selected)
+      .every(item => this.isItemValid(item));
+  }
+
+
 }

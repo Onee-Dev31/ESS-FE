@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
         <div class="page-size-selector">
           <span>จำนวนแถวต่อหน้า:</span>
           <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange.emit($event)">
-            <!-- <option [ngValue]="1">1</option> -->
+            <option [ngValue]="1">1</option>
             <option [ngValue]="5">5</option>
             <option [ngValue]="10">10</option>
             <option [ngValue]="20">20</option>
