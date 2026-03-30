@@ -9,7 +9,7 @@
 
   <main class="content-card">
 
-    <section class="filter-controls">
+    <section class="filter-controls" *ngIf="!isEditMode">
       <div class="month-selector">
         <label for="month-select">ประจำเดือน :</label>
         <div class="inputs-row">
@@ -25,15 +25,32 @@
         </div>
       </div>
     </section>
-    
+    <section class="filter-controls" *ngIf="isEditMode">
+      <div class="alert-delete" *ngIf="isDelete()">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        รายการที่ยกเลิก {{isDelete()}} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+      </div>
 
-    <div class="action-bar">
+      <div class="display-order">
+        <div class="left">
+          <span class="keep"><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep()}} รายการ</span>
+          <span class="delete"><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span>
+        </div>
+        <div class="right">
+          <span>ยอดรวม: <span class="total"> {{totalClaims()}}</span></span>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- <div class="action-bar">
       <div class="info-badges">
         <span class="info-text">
           เลือกแล้ว {{ getSelectedCount() }} รายการ · รวม {{ getTotalAmount() | number }} บาท
         </span>
       </div>
-    </div>
+    </div> -->
 
     @if (isLoading) {
     <div class="loading-row">
@@ -295,7 +312,8 @@
 
   <div class="form-actions">
     <button type="button" class="btn-submit" (click)="save()" [disabled]="isLoading || !areAllItemsValid()">
-      <i class="fas fa-check"></i> ยืนยันการเบิก
+      <i class="fas fa-check"></i> {{ !isEditMode ?'ยืนยันการเบิก' : hasDelete()? 'ลบรายการเบิกทั้งหมด'
+      :'ยืนยันการแก้ไขการเบิก' }}
     </button>
   </div>
 

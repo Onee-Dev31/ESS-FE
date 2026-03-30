@@ -154,8 +154,6 @@ export class VehicleTaxiComponent implements OnInit {
     const result = this.allRequests().find(item => item.id === this.selectedRequestId);
 
     this.selectedRequest = result
-
-    console.log(result, this.allRequests())
   }
 
   closeModal() {

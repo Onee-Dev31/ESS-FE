@@ -186,6 +186,45 @@ $col-file: 50px;
         white-space: nowrap;
     }
 
+    // .filter-controls {
+    //     margin-bottom: 24px;
+
+    //     .month-selector {
+    //         display: flex;
+    //         align-items: center;
+    //         gap: 16px;
+
+    //         @include tablet {
+    //             flex-direction: column;
+    //             align-items: stretch;
+    //         }
+
+    //         label {
+    //             font-weight: 600;
+    //             color: $text;
+    //             white-space: nowrap;
+    //         }
+
+    //         .inputs-row {
+    //             display: flex;
+    //             gap: 12px;
+    //             flex: 1;
+
+    //             @include mobile {
+    //                 flex-direction: column;
+    //             }
+
+    //             .form-control {
+    //                 @include select-dropdown;
+    //                 flex: 1;
+    //             }
+
+    //             .btn-search {
+    //                 @include btn-primary;
+    //             }
+    //         }
+    //     }
+    // }
     .filter-controls {
         margin-bottom: 24px;
 
@@ -221,6 +260,79 @@ $col-file: 50px;
 
                 .btn-search {
                     @include btn-primary;
+                }
+            }
+        }
+
+        .alert-delete {
+            color: var(--danger);
+            font-size: $font-size-hint;
+            padding: 6px;
+            border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
+            background: color-mix(in srgb, var(--danger), transparent 90%);
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+
+            .fa-solid {
+                color: var(--danger) !important;
+            }
+        }
+
+        .display-order {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-top: 10px;
+            gap: 10px;
+            background: var(--bg-slate);
+            border-radius: 10px;
+
+            .left {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+
+                span {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 4px 10px;
+                    font-size: $font-size-hint;
+                    border-radius: 100px;
+                    font-weight: 500;
+                    color: var(--text);
+
+                    &.keep {
+                        border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
+                        background: color-mix(in srgb, var(--success), transparent 85%);
+
+                        i.fa-solid {
+                            color: color-mix(in srgb, var(--success), white 10%) !important;
+                        }
+                    }
+
+                    &.delete {
+                        border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+                        background: color-mix(in srgb, var(--danger), transparent 85%);
+
+                        i.fa-solid {
+                            color: color-mix(in srgb, var(--danger), white 10%) !important;
+                        }
+                    }
+                }
+            }
+
+            .right {
+                display: flex;
+                align-items: center;
+                font-weight: 500;
+                font-size: $font-size-hint;
+
+                .total {
+                    color: color-mix(in srgb, var(--primary), white 20%) !important;
+                    font-size: $font-size-body;
+                    font-weight: 900;
                 }
             }
         }

@@ -107,15 +107,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     })
   }
 
-  // hasInvalid(): boolean {
-  //   const selectedLogs = this.logs.filter(log => log.selected);
-
-  //   if (selectedLogs.length === 0) {
-  //     return true;
-  //   }
-  //   return selectedLogs.some(log => !log.description || log.description.trim() === '');
-  // }
-
   isKeep(): number {
     const selectedLogs = this.logs.filter(log => log.selected);
     return selectedLogs.length
@@ -126,7 +117,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     return selectedLogs.length
   }
 
-  totolClaims(): string {
+  totalClaims(): string {
     const selectedLogs = this.logs.filter(log => log.selected);
     const total = selectedLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
     return total.toLocaleString('en-US') + '.-';
@@ -291,57 +282,45 @@ export class VehicleFormComponent implements OnInit, OnChanges {
     }
 
     // CREATE
-    const payload = {
-      employee_code: this.authservice.userData().CODEMPID,
-      details: selectedLogs
+    if (!this.MODE_EDIT && selectedLogs.length === 0) {
+      this.swalService.warning('กรุณาเลือกวันที่ต้องการดำเนินการเบิก')
     }
-    this.swalService.confirm('ยืนยันการเบิก')
-      .then(result => {
-        if (!result.isConfirmed) return;
-        this.swalService.loading("กำลังบันทึกข้อมูล...");
+    else {
+      const payload = {
+        employee_code: this.authservice.userData().CODEMPID,
+        details: selectedLogs
+      }
+      this.swalService.confirm('ยืนยันการเบิก')
+        .then(result => {
+          if (!result.isConfirmed) return;
+          this.swalService.loading("กำลังบันทึกข้อมูล...");
 
-        this.vehicleService.createVehicleByEmpcode(payload)
-          .subscribe({
-            next: (res) => {
-              // console.log(res)
-              if (!res?.success) {
-                this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-                return;
-              }
+          this.vehicleService.createVehicleByEmpcode(payload)
+            .subscribe({
+              next: (res) => {
+                // console.log(res)
+                if (!res?.success) {
+                  this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                  return;
+                }
 
-              this.swalService.success(res.message || "บันทึกสำเร็จ");
-              this.closeModal();
-            },
+                this.swalService.success(res.message || "บันทึกสำเร็จ");
+                this.closeModal();
+              },
 
-            error: (error) => {
-              console.error("Vehicle claim Error:", error);
+              error: (error) => {
+                console.error("Vehicle claim Error:", error);
 
-              this.swalService.warning(
-                "เกิดข้อผิดพลาด",
-                error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
-              );
-              this.closeModal();
-            },
-          });
-      });
+                this.swalService.warning(
+                  "เกิดข้อผิดพลาด",
+                  error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+                );
+                this.closeModal();
+              },
+            });
+        });
+    }
   }
-
-  // updateDuplicateStatus() {
-  //   this.logs.forEach(log => log.isDuplicate = false);
-  //   const grouped: { [key: string]: VehicleLogItem[] } = {};
-  //   this.logs.forEach(log => {
-  //     const key = dayjs(log.date).format('YYYY-MM-DD');
-  //     if (!grouped[key]) grouped[key] = [];
-  //     grouped[key].push(log);
-  //   });
-  //   Object.keys(grouped).forEach(date => {
-  //     const logsInDate = grouped[date];
-  //     const selectedLogs = logsInDate.filter(l => l.selected);
-  //     if (selectedLogs.length >= 1 && logsInDate.length > 1) {
-  //       logsInDate.forEach(log => { log.isDuplicate = !log.selected; });
-  //     }
-  //   });
-  // }
 
   closeModal() {
     this.MODE_EDIT = false;

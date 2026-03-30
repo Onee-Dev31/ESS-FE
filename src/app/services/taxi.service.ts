@@ -64,6 +64,10 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
         return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
     }
 
+    deleteTaxiClaim(id: string, empCode: string): Observable<any> {
+        return this._http.delete(`${this.baseUrl}/taxi-claim/${id}?employee_code=${empCode}`);
+    }
+
     getTaxiRequests(): Observable<TaxiRequest[]> {
         return this.getRequests();
     }

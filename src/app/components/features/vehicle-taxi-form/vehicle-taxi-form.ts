@@ -9,6 +9,7 @@ import { DateUtilityService } from '../../../services/date-utility.service';
 import { MasterDataService } from '../../../services/master-data.service';
 import { AuthService } from '../../../services/auth.service';
 import { FileConverterService } from '../../../services/file-converter';
+import { SwalService } from '../../../services/swal.service';
 
 @Component({
   selector: 'app-vehicle-taxi-form',
@@ -21,8 +22,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   @Input() requests: any = null;
 
-  @Input() claimId?: number;                 // สำหรับ Edit Mode
-
   @Output() onClose = new EventEmitter<void>();
 
   private taxiService = inject(TaxiService);
@@ -32,6 +31,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   private masterDataService = inject(MasterDataService);
   private authService = inject(AuthService);
   private fileConvertService = inject(FileConverterService);
+  private swalService = inject(SwalService);
 
   items: TaxiLogItem[] = [];
   locations: TaxiLocation[] = [];
@@ -118,13 +118,9 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       claimId: claimId.toString() || '',
     };
 
-    console.log("param", param)
-
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
         const claim = res.data[0] || res;
-
-        console.log(res)
 
         const itemPromises = (claim.details || []).map(async (d: any) => {
           const attachedFiles = d.attachments
@@ -162,19 +158,12 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             this.selectedYear = firstDate.getFullYear() + 543;
           }
 
-          this.isLoading = false;
-          this.cdr.markForCheck();
         });
 
-        // ตั้งค่าเดือน-ปี จากข้อมูล claim
-        if (this.items.length > 0) {
-          const firstDate = new Date(this.items[0].date);
-          this.selectedMonthIndex = firstDate.getMonth();
-          this.selectedYear = firstDate.getFullYear() + 543;
-        }
-
-        this.isLoading = false;
-        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        }, 300)
       },
       error: (err: any) => {
         console.error(err);
@@ -390,40 +379,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   save() {
     const selectedItems = this.items.filter(item => item.selected);
 
-    if (selectedItems.length === 0) {
-      this.toastService.warning('กรุณาเลือกรายการที่ต้องการเบิก');
-      return;
-    }
-
-    const invalidItem = selectedItems.find(item =>
-      !item.description?.trim() ||
-      !item.locationFromId ||
-      !item.locationToId ||
-      (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()) ||
-      (this.isOtherLocation(item.locationToId) && !item.otherTo?.trim()) ||
-      !item.amount || item.amount <= 0 ||
-      item.amount > item.remainingAmount
-    );
-
-    if (invalidItem) {
-      const rowIndex = this.items.indexOf(invalidItem);
-      const fieldId = this.getInvalidFieldId(rowIndex, invalidItem);
-
-      const row = document.getElementById(`taxi-row-${rowIndex}`) ?? document.getElementById(`taxi-card-${rowIndex}`);
-      row?.scrollIntoView({ behavior: 'instant', block: 'center' });
-
-      const el = document.getElementById(fieldId) as HTMLElement | null;
-      if (el) {
-        el.focus();
-        if (el instanceof HTMLInputElement) el.select();
-        if (el instanceof HTMLSelectElement) {
-          try { el.showPicker(); } catch { el.click(); }
-        }
-      }
-
-      this.toastService.warning(`กรุณากรอกข้อมูลให้ครบถ้วนในรายการวันที่ ${this.dateUtil.formatDateToBE(invalidItem.date, 'DD/MM/YYYY')}`);
-      return;
-    }
+    console.log(selectedItems)
 
     const empCode = this.authService.userData().CODEMPID;
     const details = selectedItems.map(item => ({
@@ -436,7 +392,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       rate_amount: Number(item.amount) || 0,
     }));
 
-    const files: File[] = [];
+    const files: any[] = [];
     const detail_indexes: number[] = [];
 
     selectedItems.forEach((item, index) => {
@@ -452,7 +408,9 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     const formData = new FormData();
 
     files.forEach((file, i) => {
-      formData.append('files', file);
+      const actualFile = file instanceof File ? file : file?.file;
+      if (!actualFile) return; // skip ถ้าไม่มีไฟล์จริง
+      formData.append('files', actualFile);
       formData.append('detail_indexes', detail_indexes[i].toString());
     });
     details.forEach((detail) => {
@@ -462,10 +420,42 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     console.log("formData", [...formData.entries()]);
 
-    console.log(selectedItems, this.originalClaimId, empCode)
+    // DELETE
+    if (this.isEditMode && selectedItems.length === 0) {
+      this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด')
+        .then(result => {
+          if (!result.isConfirmed) return;
+          this.swalService.loading("กำลังบันทึกข้อมูล...");
 
+          this.taxiService.deleteTaxiClaim(this.requests.id, empCode)
+            .subscribe({
+              next: (res) => {
+                // console.log(res)
+                if (!res?.success) {
+                  this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
+                  return;
+                }
+
+                this.swalService.success(res.message || "ลบรายการเบิกสำเร็จ");
+                this.onClose.emit();
+              },
+
+              error: (error) => {
+                console.error("Delete Taxi Claim Error:", error);
+
+                this.swalService.warning(
+                  "เกิดข้อผิดพลาด",
+                  error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+                );
+              }
+            });
+
+        });
+      return;
+    }
+
+    // EDIT
     if (this.isEditMode && this.originalClaimId) {
-      // Update
       this.taxiService.updateTaxiClaim(this.originalClaimId, formData)
         .subscribe({
           next: () => {
@@ -474,6 +464,12 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           },
           error: () => this.toastService.error('ไม่สามารถแก้ไขข้อมูลได้')
         });
+      return;
+    }
+
+    // CREATE
+    if (!this.isEditMode && selectedItems.length === 0) {
+      this.swalService.warning('กรุณาเลือกวันที่ต้องการดำเนินการเบิก')
     } else {
       // Create
       this.taxiService.createTaxiClaim(formData)
@@ -529,5 +525,28 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       .every(item => this.isItemValid(item));
   }
 
+  isKeep(): number {
+    const selectedLogs = this.items.filter(item => item.selected);
+    return selectedLogs.length
+  }
+
+  isDelete(): number {
+    const selectedLogs = this.items.filter(item => !item.selected);
+    return selectedLogs.length
+  }
+
+  totalClaims(): string {
+    const selectedLogs = this.items.filter(item => item.selected);
+    const total = selectedLogs.reduce((sum, item) => sum + (item.amount || 0), 0);
+    return total.toLocaleString('en-US') + '.-';
+  }
+
+  hasDelete(): boolean {
+    const selectedLogs = this.items.filter(item => item.selected);
+    if (selectedLogs.length === 0) {
+      return true;
+    }
+    return false
+  }
 
 }
