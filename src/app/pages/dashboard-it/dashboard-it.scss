@@ -262,6 +262,11 @@
         }
     }
 
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        gap: 8px;
+        padding: 10px;
+    }
+
 }
 
 .tk-left,
@@ -527,6 +532,10 @@
     gap: 12px;
     min-height: 0;
     // overflow: hidden;
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        gap: 6px;
+    }
 }
 
 /* hero */
@@ -605,6 +614,11 @@
 
         .sep {
             opacity: .55;
+        }
+
+
+        @media (min-width: 1024px) and (max-width: 1440px) {
+            padding: 6px 14px;
         }
     }
 }
@@ -714,6 +728,15 @@
             &:active {
                 transform: translateY(0);
             }
+
+            @media (min-width: 1024px) and (max-width: 1440px) {
+                padding: 4px 10px;
+                width: 80%;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1440px) {
+            margin-top: 0px;
         }
     }
 }
@@ -731,6 +754,10 @@
     justify-content: space-between;
     border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
     flex-shrink: 0;
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 6px 12px;
+    }
 }
 
 .tk-card__title {
@@ -747,6 +774,10 @@
     /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 6px 12px;
+    }
 }
 
 .tk-card__body::-webkit-scrollbar {
@@ -912,6 +943,10 @@
         display: flex;
         gap: 6px;
         flex-wrap: wrap;
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 0px 2px 2px;
     }
 }
 

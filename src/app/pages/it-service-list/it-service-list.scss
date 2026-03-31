@@ -390,6 +390,7 @@ textarea.form-input {
 
     @media (min-width: 1024px) and (max-width: 1440px) {
         gap: 8px;
+        padding: 10px;
     }
 
 }
@@ -1088,6 +1089,10 @@ textarea.form-input {
         display: flex;
         gap: 6px;
         flex-wrap: wrap;
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 0px 2px 2px;
     }
 }
 
