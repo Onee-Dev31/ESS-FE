@@ -268,7 +268,8 @@ $col-file: 50px;
             color: var(--danger);
             font-size: $font-size-hint;
             padding: 6px;
-            border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            background: rgba(220, 53, 69, 0.1);
             background: color-mix(in srgb, var(--danger), transparent 90%);
             border-radius: 6px;
             border-left: 4px solid var(--danger);
@@ -304,20 +305,20 @@ $col-file: 50px;
                     color: var(--text);
 
                     &.keep {
-                        border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
+                        border: 1px solid rgba(var(--success-rgb), 0.1);
                         background: color-mix(in srgb, var(--success), transparent 85%);
 
                         i.fa-solid {
-                            color: color-mix(in srgb, var(--success), white 10%) !important;
+                            color: rgba(var(--success-rgb), 0.9) !important;
                         }
                     }
 
                     &.delete {
-                        border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+                        border: 1px solid rgba(var(--danger-rgb), 0.1);
                         background: color-mix(in srgb, var(--danger), transparent 85%);
 
                         i.fa-solid {
-                            color: color-mix(in srgb, var(--danger), white 10%) !important;
+                            color: rgba(var(--danger-rgb), 0.9) !important;
                         }
                     }
                 }
@@ -330,7 +331,7 @@ $col-file: 50px;
                 font-size: $font-size-hint;
 
                 .total {
-                    color: color-mix(in srgb, var(--primary), white 20%) !important;
+                    color: rgba(var(--primary-rgb), 0.8) !important;
                     font-size: $font-size-body;
                     font-weight: 900;
                 }
@@ -415,7 +416,7 @@ $col-file: 50px;
             z-index: 10;
             text-align: center;
             color: #ffffff;
-            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+            border-top: 1px solid rgba(var(--primary-rgb), 0.9);
         }
 
         .sub-header th {
@@ -648,7 +649,7 @@ $col-file: 50px;
                 .btn-card-upload {
                     background: color-mix(in srgb, var(--purple), transparent 90%);
                     color: var(--purple);
-                    border: 1px solid color-mix(in srgb, var(--purple), transparent 10%);
+                    border: 1px solid rgba(var(--purple-rgb), 0.85);
                     padding: 4px 10px;
                     border-radius: 8px;
                     font-size: 0.75rem;
@@ -665,7 +666,7 @@ $col-file: 50px;
                     &.has-file {
                         background: color-mix(in srgb, var(--green), transparent 90%);
                         color: var(--green);
-                        border-color: 1px solid color-mix(in srgb, var(--green), transparent 10%);
+                        border-color: rgba(var(--green-rgb), 0.9);
                     }
                 }
 
