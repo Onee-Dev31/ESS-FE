@@ -53,7 +53,7 @@ $col-file: 50px;
         justify-content: space-between;
         align-items: center;
         padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color.mix($primary, white, 10%) 100%);
+        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
         color: #ffffff;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
@@ -268,8 +268,8 @@ $col-file: 50px;
             color: var(--danger);
             font-size: $font-size-hint;
             padding: 6px;
-            border: 1px solid rgba($danger, 0.2);
-            background: rgba($danger, 0.1);
+            border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
+            background: color-mix(in srgb, var(--danger), transparent 90%);
             border-radius: 6px;
             border-left: 4px solid var(--danger);
 
@@ -304,38 +304,20 @@ $col-file: 50px;
                     color: var(--text);
 
                     &.keep {
-                        /* Fallbacks for browsers that don't support CSS color-mix() */
-                        border: 1px solid rgba(0, 0, 0, 0.04);
-                        background: rgba(0, 0, 0, 0.02);
+                        border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
+                        background: color-mix(in srgb, var(--success), transparent 85%);
 
                         i.fa-solid {
-                            color: var(--success) !important;
-                        }
-
-                        /* Preferred when supported (compiled to a concrete color) */
-                        border: 1px solid color.mix($success, transparent, 10%);
-                        background: color.mix($success, transparent, 15%);
-
-                        i.fa-solid {
-                            color: color.mix($success, white, 90%) !important;
+                            color: color-mix(in srgb, var(--success), white 10%) !important;
                         }
                     }
 
                     &.delete {
-                        /* Fallbacks for browsers that don't support CSS color-mix() */
-                        border: 1px solid rgba(0, 0, 0, 0.04);
-                        background: rgba(0, 0, 0, 0.02);
+                        border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+                        background: color-mix(in srgb, var(--danger), transparent 85%);
 
                         i.fa-solid {
-                            color: var(--danger) !important;
-                        }
-
-                        /* Preferred when supported (compiled to a concrete color) */
-                        border: 1px solid color.mix($danger, transparent, 10%);
-                        background: color.mix($danger, transparent, 15%);
-
-                        i.fa-solid {
-                            color: color.mix($danger, white, 90%) !important;
+                            color: color-mix(in srgb, var(--danger), white 10%) !important;
                         }
                     }
                 }
@@ -348,7 +330,7 @@ $col-file: 50px;
                 font-size: $font-size-hint;
 
                 .total {
-                    color: color.mix($primary, white, 80%) !important;
+                    color: color-mix(in srgb, var(--primary), white 20%) !important;
                     font-size: $font-size-body;
                     font-weight: 900;
                 }
@@ -427,13 +409,13 @@ $col-file: 50px;
         }
 
         th {
-            background: linear-gradient(135deg, $primary 0%, color.mix($primary, white, 10%) 100%);
+            background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
             position: sticky;
             top: 0;
             z-index: 10;
             text-align: center;
             color: #ffffff;
-            border-top: 1px solid color.mix($primary, black, 90%);
+            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
         }
 
         .sub-header th {
@@ -664,9 +646,9 @@ $col-file: 50px;
                 gap: 12px;
 
                 .btn-card-upload {
-                    background: color.mix($purple, transparent, 10%);
+                    background: color-mix(in srgb, var(--purple), transparent 90%);
                     color: var(--purple);
-                    border: 1px solid color.mix($purple, transparent, 90%);
+                    border: 1px solid color-mix(in srgb, var(--purple), transparent 10%);
                     padding: 4px 10px;
                     border-radius: 8px;
                     font-size: 0.75rem;
@@ -681,9 +663,9 @@ $col-file: 50px;
                     }
 
                     &.has-file {
-                        background: color.mix($green, transparent, 10%);
+                        background: color-mix(in srgb, var(--green), transparent 90%);
                         color: var(--green);
-                        border-color: color.mix($green, transparent, 90%);
+                        border-color: 1px solid color-mix(in srgb, var(--green), transparent 10%);
                     }
                 }
 
