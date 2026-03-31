@@ -95,7 +95,7 @@ export class VehicleTaxiComponent implements OnInit {
     let [start, end]: [any, any] = ['', ''];
     if (this.dateRange && this.dateRange.length === 2) {
       [start, end] = this.dateRange;
-      console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
+      // console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
     }
 
     const param = {

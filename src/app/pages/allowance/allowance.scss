@@ -374,6 +374,7 @@ $status-cancelled-text: var(--text-table-head);
     border-left: 4px solid var(--primary);
 
     &:hover {
+      cursor: pointer;
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }

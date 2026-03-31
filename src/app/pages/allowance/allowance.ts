@@ -102,7 +102,7 @@ export class AllowanceComponent implements OnInit {
     let [start, end]: [any, any] = ['', ''];
     if (this.dateRange && this.dateRange.length === 2) {
       [start, end] = this.dateRange;
-      console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
+      // console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
     }
 
     const param = {
@@ -115,7 +115,7 @@ export class AllowanceComponent implements OnInit {
       page_size: this.listing.pageSize(),
     }
 
-    console.log(param)
+    // console.log(param)
 
     this.allowanceApiService.getClaims(param).subscribe({
       next: (res) => {
@@ -131,8 +131,7 @@ export class AllowanceComponent implements OnInit {
 
   private dataFromApi(res: any) {
     const items = res.data ?? []
-    console.log(res)
-    // console.log(items)
+    // console.log(res)
     this.allRequests.set(this.mapApiData(items));
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
@@ -141,7 +140,7 @@ export class AllowanceComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): any[] {
-    console.log("items >> ", items)
+    // console.log("items >> ", items)
     return items.map((claim: any) => ({
       id: claim.claimId,
       claimNo: claim.voucherNo,
@@ -166,7 +165,7 @@ export class AllowanceComponent implements OnInit {
     if (claimId) {
       const result = this.allRequests().find(item => item.id === claimId);
       this.selectedRequest = result
-      console.log("result: ", result)
+      // console.log("result: ", result)
     }
     this.isModalOpen = true;
   }

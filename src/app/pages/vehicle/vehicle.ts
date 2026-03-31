@@ -95,7 +95,7 @@ export class VehicleComponent implements OnInit {
     let [start, end]: [any, any] = ['', ''];
     if (this.dateRange && this.dateRange.length === 2) {
       [start, end] = this.dateRange;
-      console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
+      // console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
     }
 
     const param = {
@@ -112,7 +112,7 @@ export class VehicleComponent implements OnInit {
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
-        console.log(res)
+        // console.log(res)
         this.dataFromApi(res)
         // this.loadingService.stop('vehicle-list');
       },

@@ -67,11 +67,6 @@ export class MedicalexpensesComponent implements OnInit {
   // toYear = signal<string>(dayjs().year().toString());
   date: Date[] | null = null;
 
-
-  onChange(result: Date[]): void {
-    console.log('onChange: ', result);
-  }
-
   statusOptions = signal<{ value: string; label: string }[]>([]);
   months = MONTHS_TH;
 
@@ -192,7 +187,7 @@ export class MedicalexpensesComponent implements OnInit {
       keyword,
     }
 
-    console.log(payload)
+    // console.log(payload)
 
     this.medicalApiService.getClaims(payload).subscribe({
       next: (res) => {
