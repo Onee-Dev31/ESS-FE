@@ -86,6 +86,8 @@ export class DashboardComponent implements OnInit {
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
 
+  isLoading = true;
+
   // MASTER
   leavePolicyMaster = signal<any[]>([]);
   performanceData = signal<any>(null);
@@ -381,8 +383,13 @@ export class DashboardComponent implements OnInit {
         this.vehicleTaxiTotalAmount.set(taxiSummary ?? 0);
 
         this.loadAfterData();
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error loading initial data', err)
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error loading initial data', err)
+      }
     });
   }
 
@@ -591,7 +598,6 @@ export class DashboardComponent implements OnInit {
   }
 
   mapItStory() {
-    console.log(this.itAsset(), this.oneeUser())
     const assets = this.itAsset().data.rows || [];
     const user = this.oneeUser() || [];
     const map = [
