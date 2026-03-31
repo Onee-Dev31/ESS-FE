@@ -164,10 +164,6 @@ export class VehicleTaxiComponent implements OnInit {
     }
   }
 
-  // openModal() {
-  //   this.isModalOpen.set(true);
-  // }
-
   openModal(id: string = '') {
     if (id === '') {
       this.selectedRequestId = '';

@@ -462,7 +462,9 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
             this.onClose.emit();
           },
-          error: () => this.toastService.error('ไม่สามารถแก้ไขข้อมูลได้')
+          error: (error) => {
+            this.toastService.warning(error.error.message)
+          }
         });
       return;
     }
@@ -478,7 +480,10 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
             this.onClose.emit();
           },
-          error: () => this.toastService.error('ไม่สามารถบันทึกข้อมูลได้')
+          error: (error) => {
+            // this.swalService.warning(error.error.message)
+            this.toastService.warning(error.error.message)
+          }
         });
     }
   }

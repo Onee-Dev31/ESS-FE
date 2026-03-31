@@ -1,13 +1,14 @@
 /** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Taxi) */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 
 import { TaxiItem, TaxiRequest, TaxiLogItem, TaxiLocation } from '../interfaces/taxi.interface';
 import { TaxiMock } from '../mocks/taxi.mock';
 import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 import { environment } from '../../environments/environment';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
 export type { TaxiItem, TaxiRequest, TaxiLogItem, TaxiLocation };
 
@@ -56,12 +57,20 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
 
     // ==================== Create Claim ====================
     createTaxiClaim(formData: FormData): Observable<any> {
-        return this._http.post(`${this.baseUrl}/taxi-claim`, formData);
+        return this._http.post(`${this.baseUrl}/taxi-claim`, formData,
+            {
+                context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+            }
+        );
     }
 
     // ==================== Update Claim (สำหรับ Edit) ====================
     updateTaxiClaim(claimId: number, formData: FormData): Observable<any> {
-        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
+        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData,
+            {
+                context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+            }
+        );
     }
 
     deleteTaxiClaim(id: string, empCode: string): Observable<any> {

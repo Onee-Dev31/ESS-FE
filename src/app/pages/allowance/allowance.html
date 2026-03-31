@@ -15,7 +15,7 @@
       <div class="filter">
         <div class="group-filter">
           <div class="form-field">
-            <label>วันที่เริ่มต้น-วันที่สุิ้นสุด</label>
+            <label>วันที่เริ่มต้น-วันที่สิ้นสุด</label>
             <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
             <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
           </div>
@@ -34,7 +34,7 @@
             <label>ค้นหา</label>
             <nz-input-wrapper class="form-input">
               <nz-icon nzInputPrefix nzType="search" />
-              <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
+              <input nz-input class="" placeholder="Order No, Description" [ngModel]="listing.searchText()"
                 (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
             </nz-input-wrapper>
           </div>
@@ -86,7 +86,7 @@
             </div>
             }
           </div>
-
+          
           <div class="claim-card__amount">
             <span class="amount-label">ขอเบิก</span>
             <span class="amount-value">฿{{ claim.amount | number:'1.2-2' }}</span>
