@@ -64,11 +64,15 @@ export class ApprovalDetailModalComponent implements OnInit {
   currentStepIndex = computed(() => {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
     if (!status) return 0;
-    if (status === REQUEST_STATUS.WAITING_CHECK || status === REQUEST_STATUS.NEW) return 1;
-    if (status === REQUEST_STATUS.PENDING_APPROVAL) return 4;
-    if (status === REQUEST_STATUS.APPROVED) return 6;
-    if (status === REQUEST_STATUS.REJECTED || status === REQUEST_STATUS.REFERRED_BACK) return -1;
-    if (status === REQUEST_STATUS.VERIFIED) return 2;
+    if (status === 'pending') return 1;
+    if (status === 'rejected') return -1;
+    if (status === 'approved') return 6;
+
+    // if (status === REQUEST_STATUS.WAITING_CHECK || status === REQUEST_STATUS.NEW) return 1;
+    // if (status === REQUEST_STATUS.PENDING_APPROVAL) return 4;
+    // if (status === REQUEST_STATUS.APPROVED) return 6;
+    // if (status === REQUEST_STATUS.REJECTED || status === REQUEST_STATUS.REFERRED_BACK) return -1;
+    // if (status === REQUEST_STATUS.VERIFIED) return 2;
     return 1;
   });
 
@@ -127,6 +131,7 @@ export class ApprovalDetailModalComponent implements OnInit {
         this.currentDetailItems.set(unifiedItems);
         return;
       }
+
     }
 
     // fallback: mock service (ใช้กับ non-medical หรือ medical ข้อมูลเก่า)

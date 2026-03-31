@@ -6,12 +6,8 @@
                     <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
                     <div class="requester-line">Created on: <span class="highlight">{{ approvalItem.requestDate
                             }}</span></div>
-                    <!-- <div class="requester-line">Requester: <span class="highlight">{{ approvalItem.requestBy.name
-                            }}</span> ({{ approvalItem.requestBy.employeeId }}) | Department: <span class="highlight">{{
-                            approvalItem.requestBy.department }}</span> | Company: <span class="highlight">{{
-                            approvalItem.requestBy.company }}</span></div> -->
                 </div>
-                <div class="header-actions-group">
+                <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
                     @if (!isActionConfirm()) {
                     <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
                     <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button> }

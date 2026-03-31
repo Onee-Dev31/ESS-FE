@@ -44,7 +44,6 @@
     </div>
 
     @if (category === 'medical') {
-    <!-- ── Medical: 3-column claim-card grid ── -->
     <div class="claim-cards-grid">
       @if (isLoading()) {
       <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -145,11 +144,11 @@
             <button type="button" class="act-btn act-view" title="ดูรายละเอียด" (click)="viewDetail(req)">
               <i class="fas fa-eye"></i>
             </button>
-            <button type="button" class="act-btn act-approve" title="อนุมัติ"
+            <button type="button" class="act-btn act-approve" title="อนุมัติ" *ngIf="req.rawStatus === 'pending'"
               (click)="openActionModal(req, 'Approved')">
               <i class="fas fa-check"></i>
             </button>
-            <button type="button" class="act-btn act-reject" title="ไม่อนุมัติ"
+            <button type="button" class="act-btn act-reject" title="ไม่อนุมัติ" *ngIf="req.rawStatus === 'pending'"
               (click)="openActionModal(req, 'Rejected')">
               <i class="fas fa-times"></i>
             </button>
