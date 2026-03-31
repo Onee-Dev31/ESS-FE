@@ -7,11 +7,30 @@ export interface MedicalStat {
     type: 'outpatient' | 'dental' | 'optical' | 'inpatient';
 }
 
-export interface LeaveItem {
-    type: 'vacation' | 'business' | 'sick' | 'sterilization' | 'funeral';
-    label: string;
-    count: string;
-    balance: number;
+export interface LeaveSummaryItem {
+    leave_type_id: number;
+    leave_code: string;
+    leave_name_th: string;
+    leave_name_en: string;
+    quota_type: string;
+    icon_name: string;
+    color_hex: string;
+    is_paid: boolean;
+    paid_days_limit: number | null;
+    carry_forward: boolean;
+    advance_notice_days: number;
+    require_medical_cert: boolean;
+    medical_cert_after_days: number | null;
+    include_holiday: boolean;
+    min_service_years: number | null;
+    gender_restriction: string | null;
+    max_times_per_year: number | null;
+    quota_days: number | null;
+    used_days: number;
+    remaining_days: number | null;
+    once_career_used: number | null;
+    is_eligible: number;
+    service_year_eligible: number;
 }
 
 export interface HolidayItem {

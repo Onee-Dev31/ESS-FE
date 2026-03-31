@@ -13,7 +13,7 @@ import { DialogService } from '../../services/dialog';
 import { AllowanceApiService } from '../../services/allowance-api.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { WelfareService, WelfareEventType } from '../../services/welfare.service';
-import { MedicalStat, LeaveItem, HolidayItem, EmployeeServiceInfo } from '../../interfaces/dashboard.interface';
+import { MedicalStat, LeaveSummaryItem, HolidayItem, EmployeeServiceInfo } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit {
     { initialValue: null }
   );
 
-  leaveStats = toSignal(this.dashboardService.getLeaveStats());
+  leaveStats = toSignal(this.dashboardService.getLeaveSummaryDashboard(this._empCode, dayjs().year().toString()), { initialValue: null });
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
@@ -110,51 +110,39 @@ export class DashboardComponent implements OnInit {
     });
   });
 
-  /** ฟอร์แมตข้อมูลสถิติการลา (สี, ไอคอน, ธีม) ตามประเภทการลา */
+  private readonly LEAVE_ICON_MAP: Record<string, string> = {
+    ANNUAL:         'fas fa-plane-departure',
+    SICK:           'fas fa-stethoscope',
+    PERSONAL:       'fas fa-briefcase',
+    MATERNITY:      'fas fa-baby',
+    ORDINATION:     'fas fa-hands-praying',
+    MILITARY_TRAIN: 'fas fa-shield-alt',
+    MILITARY_DRAFT: 'fas fa-shield-alt',
+    MARRIAGE:       'fas fa-heart',
+    FUNERAL:        'fas fa-ribbon',
+    STERILIZE:      'fas fa-user-md',
+    TRAINING:       'fas fa-graduation-cap',
+  };
+
+  /** ฟอร์แมตข้อมูลสถิติการลาจาก API โดยใช้จำนวนวันลาจริงจาก My Time Attendance */
   leaveStatsDisplay = computed(() => {
-    const stats = this.leaveStats();
-    if (!stats) return null;
-    return stats.map(leave => {
-      let countColor = '#4650dd';
-      let iconClass = 'fas fa-file';
-      let iconColor = '#888';
-      let theme = 'theme-purple';
-
-      switch (leave.type) {
-        case 'vacation':
-          countColor = '#dc3545';
-          iconClass = 'fas fa-plane-departure';
-          iconColor = '#ef4444';
-          theme = 'theme-pink';
-          break;
-        case 'business':
-          countColor = '#0d6efd';
-          iconClass = 'fas fa-briefcase';
-          iconColor = '#3b82f6';
-          theme = 'theme-blue';
-          break;
-        case 'sick':
-          countColor = '#4650dd';
-          iconClass = 'fas fa-stethoscope';
-          iconColor = '#4049c7';
-          theme = 'theme-purple';
-          break;
-        case 'sterilization':
-          countColor = '#4650dd';
-          iconClass = 'fas fa-user-md';
-          iconColor = '#9333ea';
-          theme = 'theme-purple';
-          break;
-        case 'funeral':
-          countColor = '#35b653';
-          iconClass = 'fas fa-ribbon';
-          iconColor = '#35b653';
-          theme = 'theme-green';
-          break;
-      }
-
-      return { ...leave, countColor, iconClass, iconColor, theme };
-    });
+    const res = this.leaveStats();
+    if (!res) return null;
+    const counts = this.attendanceLeaveCounts();
+    return res.data
+      .filter(leave => leave.is_eligible === 1)
+      .map(leave => {
+        const usedDays = counts[leave.leave_name_th] ?? 0;
+        const remainingDays = leave.quota_days !== null ? leave.quota_days - usedDays : null;
+        return {
+          label:         leave.leave_name_th,
+          usedDays,
+          quotaDays:     leave.quota_days,
+          remainingDays,
+          iconClass:     this.LEAVE_ICON_MAP[leave.leave_code] ?? 'fas fa-file-alt',
+          color:         leave.color_hex,
+        };
+      });
   });
 
   profileList = computed<ProfileItem[]>(() => {
@@ -182,6 +170,7 @@ export class DashboardComponent implements OnInit {
   });
 
   attendanceList: AttendanceItem[] = [];
+  attendanceLeaveCounts = signal<Record<string, number>>({});
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
   allHolidays: Array<{ id: any; date: string; name: string }> = [];
   holidays: Array<{ id: any; date: string; name: string }> = [];
@@ -512,6 +501,7 @@ export class DashboardComponent implements OnInit {
         }
       });
 
+      this.attendanceLeaveCounts.set(leaveCounts);
       this.attendanceList = Object.keys(leaveCounts).length > 0
         ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
         : [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];

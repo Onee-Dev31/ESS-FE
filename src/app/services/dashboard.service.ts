@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
 import { LoadingService } from './loading';
 import { ApprovalsHelperService } from './approvals-helper.service';
-import { MedicalStat, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate, EmployeeServiceInfo } from '../interfaces/dashboard.interface';
+import { MedicalStat, LeaveSummaryItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate, EmployeeServiceInfo } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
@@ -75,15 +75,12 @@ export class DashboardService {
         );
     }
 
-    getLeaveStats(): Observable<LeaveItem[]> {
-        const leaves: LeaveItem[] = [
-            { label: 'ลาพักร้อน', count: '01/09', type: 'vacation', balance: 8 },
-            { label: 'ลากิจ', count: '03/06', type: 'business', balance: 3 },
-            { label: 'ลาป่วย', count: '10/30', type: 'sick', balance: 20 },
-            { label: 'ลาทำหมัน', count: '03/06', type: 'sterilization', balance: 3 },
-            { label: 'ลาเพื่อจัดการงานศพ', count: '03/06', type: 'funeral', balance: 3 },
-        ];
-        return this.loadingService.wrap(of(leaves).pipe(delay(1000)));
+    getLeaveSummaryDashboard(empCode: string, year?: string): Observable<{ success: boolean; data: LeaveSummaryItem[] }> {
+        const params: any = { employee_code: empCode };
+        if (year) params.year = year;
+        return this.http.get<{ success: boolean; data: LeaveSummaryItem[] }>(
+            `${this.baseUrl}/leave/summary-dashboard`, { params }
+        );
     }
 
     getHolidays(): Observable<HolidayItem[]> {

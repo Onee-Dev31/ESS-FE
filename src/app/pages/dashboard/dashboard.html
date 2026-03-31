@@ -290,18 +290,23 @@
           @if (leaveStatsDisplay(); as lstats) {
           <div class="leave-stats-grid">
             @for (leave of lstats; track leave.label) {
-            <div class="card leave-card" [ngClass]="leave.theme" (click)="navigateTo('/timeoff')">
+            <div class="card leave-card" (click)="navigateTo('/timeoff')"
+              [style.border-left-color]="leave.color">
               <div class="leave-body">
                 <div class="leave-header">
-                  <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.count }}</h3>
+                  <h3 class="leave-count" [style.color]="leave.color">{{ leave.usedDays }}</h3>
                   <div class="leave-icon">
-                    <i [class]="leave.iconClass" [style.color]="leave.iconColor || '#888'"></i>
+                    <i [class]="leave.iconClass" [style.color]="leave.color"></i>
                   </div>
                 </div>
                 <p class="leave-label">{{ leave.label }}</p>
               </div>
               <div class="leave-footer">
-                <span class="">คงเหลือ {{ leave.balance }} วัน</span>
+                @if (leave.remainingDays !== null) {
+                <span>คงเหลือ {{ leave.remainingDays }} วัน</span>
+                } @else {
+                <span>ตามใบรับรองแพทย์</span>
+                }
                 <i class="fas fa-chevron-right"></i>
               </div>
             </div>
