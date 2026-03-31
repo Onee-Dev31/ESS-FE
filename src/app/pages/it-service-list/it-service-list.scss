@@ -341,7 +341,6 @@ textarea.form-input {
     align-items: stretch;
     overflow: hidden;
 
-
     .empty-selection-placeholder {
         flex: 1;
         display: flex;
@@ -387,6 +386,10 @@ textarea.form-input {
                 line-height: 1.5;
             }
         }
+    }
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        gap: 8px;
     }
 
 }
@@ -652,7 +655,10 @@ textarea.form-input {
     flex-direction: column;
     gap: 12px;
     min-height: 0;
-    // overflow: hidden;
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        gap: 6px;
+    }
 }
 
 /* hero */
@@ -733,14 +739,16 @@ textarea.form-input {
             opacity: .55;
         }
     }
+
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 6px 14px;
+    }
 }
-
-
 
 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-
 
 /* card */
 .tk-card {
@@ -840,6 +848,15 @@ textarea.form-input {
             &:active {
                 transform: translateY(0);
             }
+
+            @media (min-width: 1024px) and (max-width: 1440px) {
+                padding: 4px 10px;
+                width: 80%;
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 1440px) {
+            margin-top: 0px;
         }
     }
 }
@@ -857,6 +874,10 @@ textarea.form-input {
     justify-content: space-between;
     border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
     flex-shrink: 0;
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 6px 12px;
+    }
 }
 
 .tk-card__title {
@@ -873,6 +894,11 @@ textarea.form-input {
     /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+
+
+    @media (min-width: 1024px) and (max-width: 1440px) {
+        padding: 6px 12px;
+    }
 }
 
 .tk-card__body.detail {

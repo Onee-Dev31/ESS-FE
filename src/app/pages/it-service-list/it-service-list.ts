@@ -1,4 +1,4 @@
-import { Component, signal, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, signal, inject, ChangeDetectorRef, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
@@ -25,6 +25,19 @@ import { formatText } from '../../utils/formatText';
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
+  isLaptop = false;
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreen();
+  }
+
+  checkScreen() {
+    const width = window.innerWidth;
+    this.isLaptop = width >= 1024 && width <= 1440;
+    console.log("isLabtop, " , width, ' > ', this.isLaptop)
+  }
+
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
@@ -61,6 +74,7 @@ export class ItService implements OnInit {
   desNew: string = '';
   ngOnInit() {
     this.getMyTicket();
+    this.checkScreen();
   }
 
   /**

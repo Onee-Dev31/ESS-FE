@@ -215,6 +215,8 @@ export class ItProblemReportComponent implements OnInit {
   confirmSubmission() {
     const data = this.problemFormData();
 
+    console.log(data, this.selectedOpenFor(), this.openBy)
+
     const formData = new FormData();
     formData.append('subject', data.topic);
     formData.append('description', data.detail);
@@ -222,7 +224,9 @@ export class ItProblemReportComponent implements OnInit {
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
     formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
-
+    if (this.openBy === 'IT') {
+      formData.append('openForCodeempid', this.selectedOpenFor())
+    }
     formData.append('ticketTypeId', '2');
 
     data.attachments.forEach((item: any) => {

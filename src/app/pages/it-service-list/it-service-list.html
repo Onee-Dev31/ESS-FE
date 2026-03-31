@@ -16,9 +16,6 @@
                 <div class="ticket-info">
                     <div class="ticket-header">
                         <span class="ticket-number">{{ ticket.ticketNumber }}</span>
-                        <!-- <div class="ticket-meta-right">
-                            <i class="fas fa-comment text-icon"></i>
-                        </div> -->
                     </div>
                     <div class="ticket-title-row">
                         <div class="ticket-title">{{ ticket.subject }}</div>
@@ -55,7 +52,7 @@
                             <span class="sep">•</span>
                             <span class="muted">
                                 <span class="header-date"><i class="far fa-calendar-alt"></i> {{ t.createdDate |
-                                    date:'longDate' }}</span>
+                                    date:(isLaptop ? 'shortDate' : 'longDate') }}</span>
                                 <span class="header-time"><i class="far fa-clock"></i> {{ t.createdDate |
                                     date:'shortTime' }}</span>
                             </span>

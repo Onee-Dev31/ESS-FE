@@ -90,7 +90,12 @@ export class ITServiceRequestComponent implements OnInit {
             this.phoneModel = formatted;
             this.phoneNumber.set(formatted);
         }
+        
+        const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
+        if (!hasQueryParams) {
+            return; // ❌ ไม่มี param → ไม่ต้องทำอะไรต่อ
+        }
         const reloaded = sessionStorage.getItem('itServiceRequest-page-reloaded');
 
         if (!reloaded) {
