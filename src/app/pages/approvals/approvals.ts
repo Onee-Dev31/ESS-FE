@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { NzInputModule } from 'ng-zorro-antd/input';
 
 /** หน้าจัดการรายการอนุมัติ (Approvals) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
@@ -43,7 +44,8 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
     SkeletonComponent,
     EmptyStateComponent,
     StatusLabelPipe,
-    PaginationComponent
+    PaginationComponent,
+    NzInputModule
   ],
   animations: [listAnimation],
   templateUrl: './approvals.html',

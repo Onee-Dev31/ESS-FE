@@ -19,6 +19,9 @@ import { Router } from '@angular/router';
     </div>
   `,
     styles: [`
+    @use '../../../../styles/variables' as *;
+    @use '../../../../styles/mixins' as *;
+
     .top-header-strip {
         display: flex;
         align-items: center;
@@ -60,14 +63,34 @@ import { Router } from '@angular/router';
         }
     }
 
-    @media (max-width: 640px) {
-        .top-header-strip {
+
+    @include tablet {
+         .top-header-strip {
             padding: 0.75rem 1rem;
             h2 {
-                font-size: 1.1rem;
+                font-size:$font-size-body;
             }
         }
     }
+
+    @include mobile {
+         .top-header-strip {
+            padding: 0.5rem 0.7rem;
+            h2 {
+                font-size: $font-size-label;
+            }
+        }
+    }
+
+    @media (max-width: 425px) {
+         .top-header-strip {
+            padding: 0.5rem 0.7rem;
+            h2 {
+                font-size: $font-size-hint;
+            }
+        }
+    }
+
   `]
 })
 export class PageHeaderComponent {
