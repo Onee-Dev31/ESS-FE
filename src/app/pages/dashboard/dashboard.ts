@@ -130,7 +130,6 @@ export class DashboardComponent implements OnInit {
     if (!res) return null;
     const counts = this.attendanceLeaveCounts();
     return res.data
-      .filter(leave => leave.is_eligible === 1)
       .map(leave => {
         const usedDays = counts[leave.leave_name_th] ?? 0;
         const remainingDays = leave.quota_days !== null ? leave.quota_days - usedDays : null;

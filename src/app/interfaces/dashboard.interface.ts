@@ -29,7 +29,6 @@ export interface LeaveSummaryItem {
     used_days: number;
     remaining_days: number | null;
     once_career_used: number | null;
-    is_eligible: number;
     service_year_eligible: number;
 }
 
