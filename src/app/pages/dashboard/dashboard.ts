@@ -23,12 +23,14 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import { BUSINESS_CONFIG } from '../../constants/business.constant';
 import { TeamCalendarService } from '../../services/team-calendar.service';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { NgZone } from '@angular/core';
 import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
 import Swal from 'sweetalert2';
 import { color } from 'echarts';
 import { TaxiService } from '../../services/taxi.service';
+import { DateUtilityService } from '../../services/date-utility.service';
+import { ItAssetService } from '../../services/it-asset.service';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
@@ -53,6 +55,7 @@ dayjs.locale('th');
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
+  [x: string]: any;
   private router = inject(Router);
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
@@ -60,7 +63,9 @@ export class DashboardComponent implements OnInit {
   private allowanceApiService = inject(AllowanceApiService);
   private vehicleService = inject(VehicleService);
   private taxiService = inject(TaxiService);
+  private itAssetService = inject(ItAssetService);
   authService = inject(AuthService);
+  dateUtil = inject(DateUtilityService);
 
   constructor(
     private teamCalendarService: TeamCalendarService,
@@ -81,7 +86,13 @@ export class DashboardComponent implements OnInit {
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
 
-  leaveStats = toSignal(this.dashboardService.getLeaveStats());
+  // MASTER
+  leavePolicyMaster = signal<any[]>([]);
+  performanceData = signal<any>(null);
+  itAsset = signal<any>(null);
+  oneeUser = signal<any>(null);
+  itStoryMap = signal<any>(null);
+  leaveStats = signal<any>([]);
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
   medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
 
@@ -108,7 +119,7 @@ export class DashboardComponent implements OnInit {
   leaveStatsDisplay = computed(() => {
     const stats = this.leaveStats();
     if (!stats) return null;
-    return stats.map(leave => {
+    return stats.map((leave: any) => {
       let countColor = '#4650dd';
       let iconClass = 'fas fa-file';
       let iconColor = '#888';
@@ -163,19 +174,19 @@ export class DashboardComponent implements OnInit {
   });
 
   /** อุปกรณ์ IT ที่พนักงานครอบครอง (MOCK DATA) */
-  itList = computed<ProfileItem[]>(() => {
-    const profile = this.userProfile();
-    if (!profile?.itAssets) return [];
-    return [
-      { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
-      { label: 'Account expire date', value: profile.itAssets.expireDate },
-      { label: 'Laptop', value: profile.itAssets.laptop },
-      { label: 'PC', value: profile.itAssets.pc },
-      { label: 'Monitor', value: profile.itAssets.monitor }
-    ];
-  });
+  // itList = computed<ProfileItem[]>(() => {
+  //   const profile = this.userProfile();
+  //   if (!profile?.itAssets) return [];
+  //   return [
+  //     { label: 'Account เข้าเครื่องคอม, Email, Wifi', value: profile.itAssets.account },
+  //     { label: 'Account expire date', value: profile.itAssets.expireDate },
+  //     { label: 'Laptop', value: profile.itAssets.laptop },
+  //     { label: 'PC', value: profile.itAssets.pc },
+  //     { label: 'Monitor', value: profile.itAssets.monitor }
+  //   ];
+  // });
 
-  attendanceList: AttendanceItem[] = [];
+  attendanceList: any[] = [];
   performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
   allHolidays: Array<{ id: any; date: string; name: string }> = [];
@@ -354,58 +365,93 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-
-
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.getTeamCalendar();
-    this.loadAllowanceSummary();
-    this.loadVehicleSummary();
-    this.loadVehicleTaxiSummary();
+    this.getTeamCalendar()
+
+    this.loadInitialData().subscribe({
+      next: ([leaveDashboard, performanceData, itAsset, oneeUser, allowanceSummary, vehicleSummary, taxiSummary]) => {
+        // console.log(itAsset, oneeUser)
+        this.leavePolicyMaster.set(leaveDashboard);
+        this.performanceData.set(performanceData);
+        this.itAsset.set(itAsset);
+        this.oneeUser.set(oneeUser);
+        this.allowanceTotalAmount.set(allowanceSummary ?? 0);
+        this.vehicleTotalAmount.set(vehicleSummary ?? 0);
+        this.vehicleTaxiTotalAmount.set(taxiSummary ?? 0);
+
+        this.loadAfterData();
+      },
+      error: (err) => console.error('Error loading initial data', err)
+    });
+  }
+
+  loadInitialData() {
+    const userAd = this.authService.userData().AD_USER.toLowerCase()
+    // 1
+    return forkJoin([
+      this.getLeaveDashboard(),
+      this.getPerformance(),
+      this.getItAssetByAduser(userAd),
+      this.getOneeuserByAduser(userAd),
+      this.loadAllowanceSummary(),
+      this.loadVehicleSummary(),
+      this.loadVehicleTaxiSummary()
+    ]);
+  }
+
+  loadAfterData() {
+    // 2
+    this.mapLeave();
+    this.mapItStory();
   }
 
   loadAllowanceSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-    if (!employeeCode) return;
-    this.allowanceApiService.getClaims({ employee_code: employeeCode, page_size: 200 }).subscribe({
-      next: (res) => {
-        const total = (res.data ?? []).reduce((sum, c) => sum + (c.totalAmount ?? 0), 0);
-        this.allowanceTotalAmount.set(total);
-        this.cdr.markForCheck();
-      },
-      error: () => this.allowanceTotalAmount.set(0),
-    });
+    if (!employeeCode) return of(0);
+    return this.allowanceApiService.getClaims({ employee_code: employeeCode, page_size: 200 }).pipe(
+      map((res: any) => {
+        const items = res.data ?? [];
+        const total = items.reduce((sum: any, c: { totalAmount: any; }) => sum + (c.totalAmount ?? 0), 0);
+        return total;
+      }),
+      catchError(() => of(0))
+    );
   }
 
   loadVehicleSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-    if (!employeeCode) return;
-    this.vehicleService.getVehicleClaimByEmpcode({ empCode: employeeCode, pageSize: 200 }).subscribe({
-      next: (res) => {
+    if (!employeeCode) return of(0);
+    return this.vehicleService.getVehicleClaimByEmpcode({ empCode: employeeCode, pageSize: 200 }).pipe(
+      map((res: any) => {
         const items = res.data ?? res ?? [];
-        const total = (Array.isArray(items) ? items : []).reduce((sum: number, c: any) => sum + (c.totalAmount ?? 0), 0);
-        this.vehicleTotalAmount.set(total);
-        this.cdr.markForCheck();
-      },
-      error: () => this.vehicleTotalAmount.set(0),
-    });
+        const total = (Array.isArray(items) ? items : []).reduce(
+          (sum: number, c: any) => sum + (c.totalAmount ?? 0),
+          0
+        );
+        return total;
+      }),
+      catchError(() => of(0))
+    );
   }
 
   loadVehicleTaxiSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-    if (!employeeCode) return;
-    this.taxiService.getTaxiClaims({ empCode: employeeCode, pageSize: 200 }).subscribe({
-      next: (res) => {
-        console.log(res)
-        const items = res.data ?? res ?? [];
-        const total = (Array.isArray(items) ? items : []).reduce((sum: number, c: any) => sum + (c.totalAmount ?? 0), 0);
-        console.log(total)
-        this.vehicleTaxiTotalAmount.set(total);
-        this.cdr.markForCheck();
-      },
-
-      error: () => this.vehicleTaxiTotalAmount.set(0),
-    });
+    if (!employeeCode) { return of(null); }
+    return this.taxiService.getTaxiClaims({ empCode: employeeCode, pageSize: 200 }).pipe(
+      map((res: any) => {
+        const items = res.data ?? [];
+        const total = (Array.isArray(items) ? items : []).reduce(
+          (sum, c) => sum + (c.totalAmount ?? 0),
+          0
+        );
+        return total;
+      }),
+      catchError(err => {
+        this.vehicleTaxiTotalAmount.set(0);
+        return of(null);
+      })
+    );
   }
 
   getTeamCalendar() {
@@ -488,11 +534,82 @@ export class DashboardComponent implements OnInit {
       });
 
       this.attendanceList = Object.keys(leaveCounts).length > 0
-        ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
+        ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: count }))
+        // ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
         : [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];
 
       this.cdr.detectChanges();
     });
+  }
+
+  getPerformance() {
+    const empCode = this.authService.userData().CODEMPID
+    return this.dashboardService.getPerformanceByEmpCode(empCode).pipe(
+      map((res: any) => {
+        return res.data
+      }),
+      catchError(err => {
+        console.error('Error loading performance dashboard', err);
+        return of(null);
+      })
+    );
+  }
+
+  getItAssetByAduser(adUser: string) {
+    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser)
+  }
+
+  getOneeuserByAduser(adUser: string) {
+    return this.itAssetService.getOneeuserByAd(adUser)
+  }
+
+  getLeaveDashboard() {
+    const empCode = this.authService.userData().CODEMPID
+    const yearCurrent = dayjs().format("YYYY-MM-DD")
+    return this.dashboardService.getLeaveSummaryDashboard({
+      empCode: empCode,
+      year: yearCurrent
+    }).pipe(
+      map((res: any) => {
+        return res.data
+      }),
+      catchError(err => {
+        console.error('Error loading leave dashboard', err);
+        return of(null);
+      })
+    );
+  }
+
+  mapLeave() {
+    const mapLeave = this.leavePolicyMaster().map((item: any) => {
+      return {
+        ...item,
+        used_days: (this.attendanceList.find((att: any) => att.label === item.leave_name_th) || {}).value || item.used_days
+      }
+    })
+    this.leaveStats.set(mapLeave)
+  }
+
+  mapItStory() {
+    console.log(this.itAsset(), this.oneeUser())
+    const assets = this.itAsset().data.rows || [];
+    const user = this.oneeUser() || [];
+    const map = [
+      {
+        label: 'Account เข้าเครื่องคอม, Email, Wifi',
+        value: user.SamAccountName
+      },
+      {
+        label: 'password expire date',
+        value: user.PasswordExpirationDate
+      },
+      ...assets.map((item: any) => ({
+        label: item.category.name,
+        value: item.model.name
+      }))
+    ]
+
+    this.itStoryMap.set(map)
   }
 
   openTimeOffForm(leaveLabel: string) {

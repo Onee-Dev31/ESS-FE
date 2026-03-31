@@ -704,7 +704,9 @@ $balance: $status-success-text;
         transition: all 0.2s ease;
         white-space: nowrap;
 
-        i { font-size: 12px; }
+        i {
+            font-size: 12px;
+        }
 
         &:hover {
             background: var(--primary);
@@ -744,12 +746,25 @@ $balance: $status-success-text;
     min-width: 0;
     transition: box-shadow 0.2s;
 
-    &:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    &:hover {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
 
-    &.type-outpatient { border-left-color: #ef4444; }
-    &.type-dental     { border-left-color: #3b82f6; }
-    &.type-optical    { border-left-color: #6366f1; }
-    &.type-inpatient  { border-left-color: #22c55e; }
+    &.type-outpatient {
+        border-left-color: #ef4444;
+    }
+
+    &.type-dental {
+        border-left-color: #3b82f6;
+    }
+
+    &.type-optical {
+        border-left-color: #6366f1;
+    }
+
+    &.type-inpatient {
+        border-left-color: #22c55e;
+    }
 
     .stat-top-row {
         display: flex;
@@ -776,10 +791,21 @@ $balance: $status-success-text;
         white-space: nowrap;
         flex-shrink: 0;
 
-        &.bg-red    { background: #ef4444; }
-        &.bg-blue   { background: #3b82f6; }
-        &.bg-indigo { background: #6366f1; }
-        &.bg-green  { background: #22c55e; }
+        &.bg-red {
+            background: #ef4444;
+        }
+
+        &.bg-blue {
+            background: #3b82f6;
+        }
+
+        &.bg-indigo {
+            background: #6366f1;
+        }
+
+        &.bg-green {
+            background: #22c55e;
+        }
     }
 
     .stat-limit-label {
@@ -805,7 +831,7 @@ $balance: $status-success-text;
             gap: 2px;
 
             &.accent {
-                background: rgba(var(--primary-rgb, 70,80,221), 0.06);
+                background: rgba(var(--primary-rgb, 70, 80, 221), 0.06);
             }
 
             .val-label {
@@ -822,7 +848,9 @@ $balance: $status-success-text;
                 color: var(--text-header);
                 font-family: $font-main;
 
-                &.text-balance { color: #22c55e; }
+                &.text-balance {
+                    color: #22c55e;
+                }
             }
         }
 
@@ -844,10 +872,21 @@ $balance: $status-success-text;
             border-radius: 10px;
             transition: width 0.4s ease;
 
-            &.bg-red    { background: #ef4444; }
-            &.bg-blue   { background: #3b82f6; }
-            &.bg-indigo { background: #6366f1; }
-            &.bg-green  { background: #22c55e; }
+            &.bg-red {
+                background: #ef4444;
+            }
+
+            &.bg-blue {
+                background: #3b82f6;
+            }
+
+            &.bg-indigo {
+                background: #6366f1;
+            }
+
+            &.bg-green {
+                background: #22c55e;
+            }
         }
     }
 }
@@ -1065,6 +1104,11 @@ $balance: $status-success-text;
                 margin: 0;
                 font-size: 20px;
                 font-weight: 700;
+
+                span {
+                    color: var(--text-muted);
+                    font-size: $font-size-body;
+                }
             }
 
             .leave-icon {
@@ -1711,6 +1755,7 @@ $balance: $status-success-text;
         .fc-daygrid-day {
             transition: background-color 0.2s;
             cursor: pointer;
+
             &:hover {
                 background-color: var(--bg-slate);
             }
@@ -1881,8 +1926,16 @@ $balance: $status-success-text;
 .modal-overlay {
     @include modal-overlay-styles;
 }
+
 // ── Profile image lightbox ─────────────────────────────────
-.avatar-clickable { cursor: pointer; transition: opacity 0.2s; &:hover { opacity: 0.85; } }
+.avatar-clickable {
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.85;
+    }
+}
 
 .profile-lightbox-overlay {
     position: fixed;
@@ -1929,6 +1982,8 @@ $balance: $status-success-text;
         justify-content: center;
         transition: background 0.2s;
 
-        &:hover { background: rgba(255, 255, 255, 0.28); }
+        &:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
     }
 }

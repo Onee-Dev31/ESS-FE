@@ -9,11 +9,14 @@ import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
 import { MedicalApiService } from './medical-api.service';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class DashboardService {
+    private baseUrl = environment.api_url;
+
     private loadingService = inject(LoadingService);
     private approvalsHelper = inject(ApprovalsHelperService);
     private medicalApiService = inject(MedicalApiService);
@@ -29,7 +32,9 @@ export class DashboardService {
         APPROVAL_LABELS.TH.PENDING
     ];
 
-    constructor() { }
+    constructor(private _http: HttpClient,
+        private authservice: AuthService
+    ) { }
 
     getGlobalPendingCount(): Observable<number> {
         return this.approvalsHelper.getAllCategoriesApprovals().pipe(
@@ -126,4 +131,26 @@ export class DashboardService {
         result['2026-01-20'] = { type: 'leave', note: 'ลาพักร้อน', code: 'VAC' };
         return result;
     }
+
+    // real
+
+    getPerformanceByEmpCode(empCode: string): Observable<any> {
+        return this._http.get<any>(`${this.baseUrl}/employee-service-info/${empCode}`);
+    }
+
+    getLeaveSummaryDashboard(params: {
+        empCode?: any;
+        year?: string;
+    }): Observable<any> {
+        const queryParams: any = {};
+
+        if (params.empCode) queryParams.employee_code = params.empCode;
+        if (params.year) queryParams.year = params.year;
+
+        return this._http.get<any>(`${this.baseUrl}/leave/summary-dashboard`, {
+            params: queryParams
+        });
+    }
+
+
 }
