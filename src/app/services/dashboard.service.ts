@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, delay } from 'rxjs';
 import { LoadingService } from './loading';
 import { ApprovalsHelperService } from './approvals-helper.service';
-import { MedicalStat, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate } from '../interfaces/dashboard.interface';
+import { MedicalStat, LeaveItem, HolidayItem, AttendanceStat, PerformanceItem, SpecialDate, EmployeeServiceInfo } from '../interfaces/dashboard.interface';
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
 import { MedicalApiService } from './medical-api.service';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +19,8 @@ export class DashboardService {
     private approvalsHelper = inject(ApprovalsHelperService);
     private medicalApiService = inject(MedicalApiService);
     private authService = inject(AuthService);
+    private http = inject(HttpClient);
+    private readonly baseUrl = environment.api_url;
 
     private readonly PENDING_STATUSES = [
         APPROVAL_STATUS.NEW,
@@ -110,6 +113,12 @@ export class DashboardService {
             { year: 'ปี 2022', grade: 'เกรด C+' },
             { year: 'ปี 2021', grade: 'เกรด C' }
         ];
+    }
+
+    getEmployeeServiceInfo(empCode: string): Observable<{ success: boolean; data: EmployeeServiceInfo }> {
+        return this.http.get<{ success: boolean; data: EmployeeServiceInfo }>(
+            `${this.baseUrl}/employee-service-info/${empCode}`
+        );
     }
 
     getSpecialDates(): Record<string, SpecialDate> {

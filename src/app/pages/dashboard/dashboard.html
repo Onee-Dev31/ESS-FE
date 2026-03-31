@@ -62,7 +62,7 @@
             <div class="work-meta-group">
               <div class="meta-row">
                 <span class="meta-label">วันที่เริ่มงาน</span>
-                <span class="meta-value">10 July 2021</span>
+                <span class="meta-value">{{ employeeServiceInfo()?.data?.service_info?.start_date_display ?? '...' }}</span>
               </div>
               <div class="meta-row">
                 <span class="meta-label">อายุงาน</span>
@@ -73,11 +73,13 @@
             <h6 class="perf-subtitle">ประวัติผลการประเมินการทำงาน</h6>
 
             <div class="performance-list">
-              @for (p of performanceList; track p.year) {
+              @for (p of performanceList(); track p.year) {
               <div class="perf-item">
                 <span class="perf-year">{{ p.year }}</span>
                 <span class="perf-grade">{{ p.grade }}</span>
               </div>
+              } @empty {
+              <div class="perf-empty">ยังไม่มีประวัติผลการประเมิน</div>
               }
             </div>
           </div>

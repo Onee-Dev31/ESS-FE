@@ -13,7 +13,7 @@ import { DialogService } from '../../services/dialog';
 import { AllowanceApiService } from '../../services/allowance-api.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { WelfareService, WelfareEventType } from '../../services/welfare.service';
-import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
+import { MedicalStat, LeaveItem, HolidayItem, EmployeeServiceInfo } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { TooltipModalComponent } from '../../components/modals/tooltip-modal/tooltip-modal';
 import { TimeOffForm } from '../../components/features/time-off-form/time-off-form';
@@ -80,6 +80,12 @@ export class DashboardComponent implements OnInit {
 
   userProfile = toSignal(this.userService.getUserProfile());
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
+
+  private readonly _empCode = this.authService.userData()?.CODEMPID ?? '';
+  employeeServiceInfo = toSignal(
+    this.dashboardService.getEmployeeServiceInfo(this._empCode),
+    { initialValue: null }
+  );
 
   leaveStats = toSignal(this.dashboardService.getLeaveStats());
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
@@ -176,7 +182,6 @@ export class DashboardComponent implements OnInit {
   });
 
   attendanceList: AttendanceItem[] = [];
-  performanceList: PerformanceItem[] = [];
   specialDates: Record<string, { type: string; note?: string; code?: string }> = {};
   allHolidays: Array<{ id: any; date: string; name: string }> = [];
   holidays: Array<{ id: any; date: string; name: string }> = [];
@@ -236,8 +241,6 @@ export class DashboardComponent implements OnInit {
   });
 
 
-  workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
-
   attendancePeriod = computed(() => {
     const start = dayjs().startOf('year').format('DD/MM/YYYY');
     const end = dayjs().endOf('year').format('DD/MM/YYYY');
@@ -245,8 +248,20 @@ export class DashboardComponent implements OnInit {
   });
 
   workDuration = computed(() => {
-    const years = dayjs().diff(dayjs(this.workStartDate), 'year');
-    return `${years} ปี`;
+    const info = this.employeeServiceInfo();
+    if (!info) return '...';
+    return `${info.data.service_info.service_years} ปี`;
+  });
+
+  performanceList = computed<PerformanceItem[]>(() => {
+    const info = this.employeeServiceInfo();
+    if (!info) return [];
+    return info.data.evaluations
+      .filter(e => e.has_data !== 0 && e.year !== null)
+      .map(e => ({
+        year: `ปี ${e.year}`,
+        grade: `เกรด ${e.hr_grade ?? '-'}`
+      }));
   });
 
   private currentViewMonthStart: dayjs.Dayjs | null = null;
@@ -373,7 +388,6 @@ export class DashboardComponent implements OnInit {
 
 
   ngOnInit() {
-    this.performanceList = this.dashboardService.getPerformanceList();
     this.getTeamCalendar();
     this.loadAllowanceSummary();
     this.loadVehicleSummary();

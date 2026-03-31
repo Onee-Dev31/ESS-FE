@@ -499,7 +499,10 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
             this.onClose.emit();
           },
-          error: () => this.toastService.error('ไม่สามารถบันทึกข้อมูลได้')
+          error: (err: any) => {
+            const msg = err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้';
+            this.toastService.error(msg);
+          }
         });
     }
   }

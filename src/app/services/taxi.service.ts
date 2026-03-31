@@ -1,7 +1,8 @@
 /** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Taxi) */
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
 import { TaxiItem, TaxiRequest, TaxiLogItem, TaxiLocation } from '../interfaces/taxi.interface';
 import { TaxiMock } from '../mocks/taxi.mock';
@@ -73,7 +74,9 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
             formData.append('detail_indexes', idx.toString());
         });
 
-        return this._http.post(`${this.baseUrl}/taxi-claim`, formData);
+        return this._http.post(`${this.baseUrl}/taxi-claim`, formData, {
+            context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+        });
     }
 
     // ==================== Update Claim (สำหรับ Edit) ====================
@@ -101,7 +104,9 @@ export class TaxiService extends BaseRequestService<TaxiRequest> {
             formData.append('kept_attachments', JSON.stringify(keptAttachments));
         }
 
-        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData);
+        return this._http.patch(`${this.baseUrl}/taxi-claim/${claimId}`, formData, {
+            context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+        });
     }
 
     // ==================== Other Methods ====================

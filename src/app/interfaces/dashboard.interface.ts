@@ -34,3 +34,25 @@ export interface SpecialDate {
     note: string;
     code: string;
 }
+
+export interface EmployeeServiceInfo {
+    service_info: {
+        start_date_display: string;
+        service_years: number;
+        start_date_ce: string;
+        start_date_raw: string;
+    };
+    evaluations: {
+        has_data?: number;
+        year: string | null;
+        position: string | null;
+        total_score: number | null;
+        total_grade: string | null;
+        hr_grade: string | null;
+        evaluator1_grade: string | null;
+        evaluator2_grade: string | null;
+        evaluator2_grade_override: string | null;
+        self_grade: string | null;
+        status: string;
+    }[];
+}
