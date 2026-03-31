@@ -28,6 +28,7 @@ import { NgZone } from '@angular/core';
 import type { DatesSetArg, EventClickArg } from '@fullcalendar/core';
 import Swal from 'sweetalert2';
 import { color } from 'echarts';
+import { TaxiService } from '../../services/taxi.service';
 
 interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
 interface AttendanceItem { label: string; value: string; }
@@ -58,6 +59,7 @@ export class DashboardComponent implements OnInit {
   private dialogService = inject(DialogService);
   private allowanceApiService = inject(AllowanceApiService);
   private vehicleService = inject(VehicleService);
+  private taxiService = inject(TaxiService);
   authService = inject(AuthService);
 
   constructor(
@@ -197,21 +199,25 @@ export class DashboardComponent implements OnInit {
   selectedRequestStatus = signal<string>('');
   allowanceTotalAmount = signal<number | null>(null);
   vehicleTotalAmount = signal<number | null>(null);
+  vehicleTaxiTotalAmount = signal<number | null>(null);
 
   welfareStats = computed(() => {
     const allowanceAmt = this.allowanceTotalAmount();
     const allowanceValue = allowanceAmt === null ? '...' : allowanceAmt.toLocaleString('th-TH');
     const vehicleAmt = this.vehicleTotalAmount();
     const vehicleValue = vehicleAmt === null ? '...' : vehicleAmt.toLocaleString('th-TH');
+    const vehicleTaxiAmt = this.vehicleTaxiTotalAmount();
+    const vehicleTaxiValue = vehicleTaxiAmt === null ? '...' : vehicleTaxiAmt.toLocaleString('th-TH');
     return [
-    { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
-    { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
-    { label: 'ค่าแท็กซี่', value: '876', icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
-    { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
-    { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
-    { label: 'ค่าฌาปนกิจ', value: '584', icon: 'fas fa-church', tooltip: 'funeral' },
-    { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' }
-  ];});
+      { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
+      { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
+      { label: 'ค่าแท็กซี่', value: vehicleTaxiValue, icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
+      { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
+      { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
+      { label: 'ค่าฌาปนกิจ', value: '584', icon: 'fas fa-church', tooltip: 'funeral' },
+      { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' }
+    ];
+  });
 
 
   workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
@@ -355,6 +361,7 @@ export class DashboardComponent implements OnInit {
     this.getTeamCalendar();
     this.loadAllowanceSummary();
     this.loadVehicleSummary();
+    this.loadVehicleTaxiSummary();
   }
 
   loadAllowanceSummary() {
@@ -381,6 +388,23 @@ export class DashboardComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => this.vehicleTotalAmount.set(0),
+    });
+  }
+
+  loadVehicleTaxiSummary() {
+    const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+    if (!employeeCode) return;
+    this.taxiService.getTaxiClaims({ empCode: employeeCode, pageSize: 200 }).subscribe({
+      next: (res) => {
+        console.log(res)
+        const items = res.data ?? res ?? [];
+        const total = (Array.isArray(items) ? items : []).reduce((sum: number, c: any) => sum + (c.totalAmount ?? 0), 0);
+        console.log(total)
+        this.vehicleTaxiTotalAmount.set(total);
+        this.cdr.markForCheck();
+      },
+
+      error: () => this.vehicleTaxiTotalAmount.set(0),
     });
   }
 
