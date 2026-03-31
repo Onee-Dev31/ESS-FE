@@ -67,7 +67,6 @@ export class AllowanceComponent implements OnInit {
   private authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
-  private destroyRef = inject(DestroyRef);
 
   dateRange: Date[] | null = null;
 
@@ -76,6 +75,7 @@ export class AllowanceComponent implements OnInit {
   isModalOpen = false;
   isPolicyModalOpen = signal<boolean>(false);
   selectedRequestId = '';
+  selectedRequest: any = null;
 
   allRequests = signal<any[]>([]);
   listing = createListingState();
@@ -160,15 +160,15 @@ export class AllowanceComponent implements OnInit {
       })),
       ...claim
     }));
-
-
   }
 
-  openModal() {
-    this.allowanceService.generateNextAllowanceId().subscribe(nid => {
-      this.selectedRequestId = nid;
-      this.isModalOpen = true;
-    });
+  openModal(claimId?: string) {
+    if (claimId) {
+      const result = this.allRequests().find(item => item.id === claimId);
+      this.selectedRequest = result
+      console.log("result: ", result)
+    }
+    this.isModalOpen = true;
   }
 
   editRequest(targetId: string) {
@@ -186,6 +186,7 @@ export class AllowanceComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    this.selectedRequest = '';
     this.loadData();
   }
 

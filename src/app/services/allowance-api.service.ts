@@ -67,6 +67,7 @@ export class AllowanceApiService {
      * POST api/meal-allowance/claim
      */
     createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
+        console.log(request)
         return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
     }
 

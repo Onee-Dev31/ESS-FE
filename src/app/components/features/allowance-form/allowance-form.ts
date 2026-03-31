@@ -6,6 +6,7 @@ import { AllowanceApiService } from '../../../services/allowance-api.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast';
 import { switchMap } from 'rxjs';
+import { SwalService } from '../../../services/swal.service';
 
 @Component({
   selector: 'app-allowance-form',
@@ -15,13 +16,15 @@ import { switchMap } from 'rxjs';
   styleUrls: ['./allowance-form.scss']
 })
 export class AllowanceFormComponent implements OnInit, OnChanges {
-  @Input() requestId: string = '';
+  // @Input() requestId: string = '';
+  @Input() requests: any = null;
   @Output() onClose = new EventEmitter<void>();
 
   private allowanceService = inject(AllowanceService);
   protected allowanceApi = inject(AllowanceApiService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private swalService = inject(SwalService);
   private cdr = inject(ChangeDetectorRef);
 
   loadedRequest?: AllowanceRequest;
@@ -35,6 +38,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   totalHoursStr: string = '0.00';
   logs: AllowanceItem[] = [];
 
+  MODE_EDIT: boolean = false;
+
   isPolicyPopupOpen = signal(false);
   protected readonly rates = computed(() => this.allowanceApi.rates());
 
@@ -42,34 +47,64 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     if (!this.allowanceApi.rates().length) {
       this.allowanceApi.reloadRates();
     }
-    this.loadData();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['requestId'] && !changes['requestId'].firstChange) {
+    if (!this.requests) {
       this.loadData();
     }
   }
 
-  loadData() {
-    if (!this.requestId) {
-      this.allowanceService.generateNextAllowanceId().pipe(
-        switchMap(id => {
-          this.requestId = id;
-          return this.allowanceService.getAllowanceRequestById(id);
-        })
-      ).subscribe(existing => {
-        this.loadedRequest = existing;
-        this.generateCalendar();
-        this.cdr.markForCheck();
-      });
-    } else {
-      this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
-        this.loadedRequest = existing;
-        this.generateCalendar();
-        this.cdr.markForCheck();
-      });
+  ngOnChanges(changes: SimpleChanges) {
+    // if (changes['requestId'] && !changes['requestId'].firstChange) {
+    //   this.loadData();
+    // }
+    if (changes['requests'] && this.requests && this.requests !== '') {
+      // console.log('requests เข้ามาแล้ว:', this.requests);
+      this.MODE_EDIT = true;
+      this.mapData();
+      return;
     }
+  }
+
+  loadData() {
+    this.generateCalendar()
+    // if (!this.requestId) {
+    //   this.allowanceService.generateNextAllowanceId().pipe(
+    //     switchMap(id => {
+    //       this.requestId = id;
+    //       return this.allowanceService.getAllowanceRequestById(id);
+    //     })
+    //   ).subscribe(existing => {
+    //     this.loadedRequest = existing;
+    //     this.generateCalendar();
+    //     this.cdr.markForCheck();
+    //   });
+    // } else {
+    //   this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
+    //     this.loadedRequest = existing;
+    //     this.generateCalendar();
+    //     this.cdr.markForCheck();
+    //   });
+    // }
+  }
+
+  mapData() {
+    this.logs = this.requests.details.map((item: any) => {
+      return {
+        date: item.work_date,
+        dayType: item.day_type,
+        timeIn: item.actual_checkin,
+        timeOut: item.actual_checkout,
+        hours: item.rounded_hours,
+        amount: item.rate_amount ?? 0,
+        actualExtraHours: item.total_hours,
+        displayHours: item.total_hours_text,
+        selected: true,
+        description: item.description,
+        shiftCode: item.shift_code,
+        isEligible: true,
+        totalHoursText: item.total_hours_text,
+        rateId: item.rate_id,
+      } as AllowanceItem;
+    })
   }
 
   generateCalendar() {
@@ -171,6 +206,12 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
 
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+
+    if (this.MODE_EDIT) {
+      this.swalService.info('MOCK')
+      this.closeModal();
+      return;
+    }
 
     this.allowanceApi.createClaim({
       employee_code: employeeCode,

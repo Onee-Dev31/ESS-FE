@@ -56,7 +56,7 @@
       <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
       @for (claim of comps.paginatedData(); track claim.id) {
-      <div class="claim-card">
+      <div class="claim-card" (click)="openModal(claim.id)">
         <div class="claim-card__header">
           <div class="claim-card__type-badge">
             <i class="fa-solid fa-money-bills"></i>เบิกเบี้ยเลี้ยง
@@ -70,7 +70,8 @@
 
         <div class="claim-card__body">
           <div class="claim-card__main">
-            @for (item of claim.items; track $index) {
+            จำนวน {{claim.items.length}} รายการ
+            <!-- @for (item of claim.items; track $index) {
             <div class="nested-item">
               <div class="claim-date">
                 <span class="item-title"><i class="far fa-calendar-alt"></i> {{dateUtil.formatDateToBE(item.date, 'DD MMMM YYYY')}}</span>
@@ -84,9 +85,9 @@
                 </div>
               </div>
             </div>
-            }
+            } -->
           </div>
-          
+
           <div class="claim-card__amount">
             <span class="amount-label">ขอเบิก</span>
             <span class="amount-value">฿{{ claim.amount | number:'1.2-2' }}</span>
@@ -207,7 +208,8 @@
   @if (isModalOpen) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-allowance-form [requestId]="selectedRequestId" (onClose)="closeModal()"></app-allowance-form>
+      <app-allowance-form [requests]="selectedRequest"
+        (onClose)="closeModal()"></app-allowance-form>
     </div>
   </div>
   }
