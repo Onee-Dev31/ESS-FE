@@ -333,28 +333,6 @@ export class ITServiceRequestComponent implements OnInit {
                 }
             });
 
-        // this.submittedRequests.update(reqs => [newRequest, ...reqs]);
-
-        // Mock shared state
-        // this.itServiceMock.addTicket({
-        //     subject: selectedServices.map(s => s.label).join(', '),
-        //     ticketType: 'ขอใช้บริการ',
-        //     description: this.requestDetails(),
-        //     status: 'Assigned Tickets',
-        //     requesterName: 'พนักงาน (Self)',
-        // });
-
-        // this.swalService.success('สำเร็จ', 'ส่งคำขอเรียบร้อยแล้ว');
-        // this.showSummaryModal.set(false);
-
-        // // Redirect to list page
-        // this.router.navigate(['/it-service-list']);
-
-        // this.serviceOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        // this.isSystemCategorySelected.set(false);
-        // this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        // this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        // this.phoneNumber.set('');
     }
 
     closeRepairModal() {

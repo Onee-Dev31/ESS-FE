@@ -1997,7 +1997,7 @@ $balance: $status-success-text;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #f9fafb;
+    background: var(--bg-card);
 }
 
 /* HTML: <div class="loader"></div> */
