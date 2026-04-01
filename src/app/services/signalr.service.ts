@@ -26,6 +26,7 @@ export class SignalrService {
         this.hubConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${this.baseUrl}/notificationHub`)
             .withAutomaticReconnect()
+            .configureLogging(signalR.LogLevel.None)
             .build();
 
         this.hubConnection.onreconnected(async () => {

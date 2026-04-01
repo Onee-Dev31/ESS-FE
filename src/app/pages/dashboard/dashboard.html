@@ -99,7 +99,7 @@
           </div>
           <div class="card-body">
             <div class="profile-info-list">
-              @for (item of itStoryMap(); track item.label) {
+              @for (item of itStoryMap(); track $index) {
               <div class="profile-display-group">
                 <label class="display-label">{{ item.label }}</label>
                 <div class="display-value">{{ item.value }}</div>
