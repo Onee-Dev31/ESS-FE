@@ -33,7 +33,7 @@
             <label>ค้นหา</label>
             <nz-input-wrapper class="form-input">
               <nz-icon nzInputPrefix nzType="search" />
-              <input nz-input class=""  placeholder="Order No, Description" [ngModel]="listing.searchText()"
+              <input nz-input class="" placeholder="Order No, Description" [ngModel]="listing.searchText()"
                 (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
             </nz-input-wrapper>
           </div>
@@ -94,6 +94,88 @@
       <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" [icon]="emptyIcon()">
       </app-empty-state>
       }
+      }
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>ประเภท</th>
+            <th>จำนวนวัน</th>
+            <th class="text-right">ยอดเงิน</th>
+            <th>สถานะ</th>
+            <th>วันที่สร้างรายการ</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (claim of comps.paginatedData(); track claim.id) {
+          <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+
+            <!-- ประเภท -->
+            <td>
+              <div class="type-badge">
+                <span class="type-name">เบิกค่าพาหนะ</span>
+              </div>
+
+              <div class="request-no">
+                <i class="fa-solid fa-tag"></i>
+                {{ claim.claimNo ?? claim.claimId }}
+              </div>
+            </td>
+
+            <!-- จำนวนวัน -->
+            <td>
+              <div class="claim-days">
+                {{ claim.details.length }} วัน
+              </div>
+            </td>
+
+            <!-- ยอดเงิน -->
+            <td class="text-right">
+              <div class="amount-cell">
+                <div class="amount-main">฿{{ claim.amount | number:'1.2-2' }}</div>
+                @if (claim.approvedAmount > 0) {
+                <div class="amount-approved">
+                  <i class="fas fa-check text-success"></i>
+                  ฿{{ claim.approvedAmount | number:'1.2-2' }}
+                </div>
+                }
+              </div>
+            </td>
+
+            <!-- สถานะ -->
+            <td style="text-align: center;">
+              <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                {{ claim.status | statusLabel }}
+              </span>
+            </td>
+
+            <!-- ข้อมูลเพิ่มเติม -->
+            <td style="text-align: center;">
+              <div class="sub-text">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}</div>
+            </td>
+
+          </tr>
+          }
+
+          @empty {
+          <tr>
+            <td colspan="5">
+              <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" [icon]="emptyIcon()">
+              </app-empty-state>
+            </td>
+          </tr>
+          }
+
+        </tbody>
+      </table>
+
       }
     </div>
 

@@ -49,83 +49,6 @@ $border-color: var(--border-color);
   }
 }
 
-@mixin modern-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: var(--bg-card);
-  border: 1px solid $border;
-  border-radius: 12px;
-  overflow: hidden;
-
-  thead {
-    tr {
-      background: $header-bg;
-    }
-
-    th {
-      padding: 14px 16px;
-      text-align: left;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: $text-header;
-      border-bottom: 2px solid $border;
-      white-space: nowrap;
-    }
-  }
-
-  tbody {
-    transition: background 0.2s;
-
-    &:hover {
-      background: var(--bg-table-head);
-
-      tr {
-        background: transparent;
-      }
-
-      td {
-        background: transparent !important;
-      }
-    }
-
-    tr {
-      transition: background 0.2s;
-
-      &:not(:last-child) td {
-        border-bottom: 1px solid var(--border-toolbar);
-      }
-
-      &:last-child td {
-        border-bottom: 1px solid #e9ecef;
-      }
-    }
-
-    &:last-child tr:last-child td {
-      border-bottom: none;
-    }
-
-    td {
-      padding: 16px;
-      font-size: 0.9rem;
-      color: $text;
-    }
-  }
-}
-
-// Content Card Mixin
-@mixin content-card {
-  background: var(--bg-card);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  padding: 24px;
-
-  @include tablet {
-    padding: 16px;
-    border-radius: 12px;
-  }
-}
-
 // Card Header Title Mixin
 .card-header-title {
   @include card-header-title;
@@ -185,7 +108,7 @@ $border-color: var(--border-color);
 
   // ==================== MOBILE CARD VIEW ====================
   .card-list-view {
-    // display: none;
+    display: none;
     gap: 14px;
     padding: 4px 0 8px;
 
@@ -193,8 +116,8 @@ $border-color: var(--border-color);
       grid-column: 1 / -1;
     }
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    // display: grid;
+    // grid-template-columns: repeat(4, 1fr);
 
     @include large-tablet {
       display: grid;
@@ -336,37 +259,36 @@ $border-color: var(--border-color);
   // ==================== TABLE STYLES ====================
   .modern-table {
     @include modern-table;
-    border: 1px solid var(--text-muted);
 
-    &.taxi-table {
-      .col-id {
-        width: 120px;
-      }
 
-      .col-date {
-        width: 150px;
-      }
-
-      .col-desc {
-        width: auto;
-      }
-
-      .col-dest {
-        width: 200px;
-      }
-
-      .col-amount {
-        width: 150px;
-      }
-
-      .col-status {
-        width: 200px;
-      }
-
-      .col-actions {
-        width: 150px;
+    tbody {
+      tr {
+        cursor: pointer;
       }
     }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: $font-size-label;
+
+      i {
+        font-size: $font-size-body;
+        opacity: 0.9;
+      }
+
+      .type-name {
+        white-space: nowrap;
+      }
+    }
+
+    .request-no {
+      font-size: $font-size-label;
+      color: $primary;
+    }
+
   }
 
   // ==================== VOUCHER LINK ====================

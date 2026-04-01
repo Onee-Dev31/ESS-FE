@@ -15,72 +15,72 @@
   }
 }
 
-// Modern Table Mixin
-@mixin modern-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: var(--bg-card);
-  border: 1px solid $border;
-  border-radius: 12px;
-  overflow: hidden;
+// // Modern Table Mixin
+// @mixin modern-table {
+//   width: 100%;
+//   border-collapse: separate;
+//   border-spacing: 0;
+//   background: var(--bg-card);
+//   border: 1px solid $border;
+//   border-radius: 12px;
+//   overflow: hidden;
 
-  thead {
-    tr {
-      background: var(--bg-table-head);
-    }
+//   thead {
+//     tr {
+//       background: var(--bg-table-head);
+//     }
 
-    th {
-      padding: 14px 16px;
-      text-align: left;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: $text-header;
-      border-bottom: 2px solid $border;
-      white-space: nowrap;
-    }
-  }
+//     th {
+//       padding: 14px 16px;
+//       text-align: left;
+//       font-size: 0.875rem;
+//       font-weight: 600;
+//       color: $text-header;
+//       border-bottom: 2px solid $border;
+//       white-space: nowrap;
+//     }
+//   }
 
-  tbody {
-    transition: background 0.2s;
+//   tbody {
+//     transition: background 0.2s;
 
-    &:hover {
-      background: var(--border-toolbar);
+//     &:hover {
+//       background: var(--border-toolbar);
 
-      tr {
-        background: transparent;
-      }
+//       tr {
+//         background: transparent;
+//       }
 
-      td {
-        background: transparent !important;
-      }
-    }
+//       td {
+//         background: transparent !important;
+//       }
+//     }
 
-    tr {
-      transition: background 0.2s;
+//     tr {
+//       transition: background 0.2s;
 
-      &:not(:last-child) td:not(.merged-col) {
-        border-bottom: none;
-      }
-    }
+//       &:not(:last-child) td:not(.merged-col) {
+//         border-bottom: none;
+//       }
+//     }
 
-    td {
-      padding: 16px;
-      font-size: 0.9rem;
-      color: $text;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
+//     td {
+//       padding: 16px;
+//       font-size: 0.9rem;
+//       color: $text;
+//       border-bottom: 1px solid var(--border);
+//       vertical-align: middle;
+//     }
 
-    &:last-of-type tr:last-child td {
-      border-bottom: none;
-    }
-  }
+//     &:last-of-type tr:last-child td {
+//       border-bottom: none;
+//     }
+//   }
 
-  @include tablet {
-    display: none;
-  }
-}
+//   @include tablet {
+//     display: none;
+//   }
+// }
 
 // Mobile Cards View Mixin
 @mixin mobile-cards-view {
@@ -263,7 +263,7 @@
 
   // ==================== MOBILE CARD VIEW ====================
   .card-list-view {
-    // display: none;
+    display: none;
     gap: 14px;
     padding: 4px 0 8px;
 
@@ -271,8 +271,8 @@
       grid-column: 1 / -1;
     }
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    // display: grid;
+    // grid-template-columns: repeat(4, 1fr);
 
     @include large-tablet {
       display: grid;
@@ -414,20 +414,33 @@
   // ==================== TABLE SECTION ====================
   .modern-table {
     @include modern-table;
-    border: 1px solid var(--text-muted); // Darker border for better visibility
 
-    td,
-    th {
-      &:nth-child(4) {
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    tbody {
+      tr {
+        cursor: pointer;
+      }
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: $font-size-label;
+
+      i {
+        font-size: $font-size-body;
+        opacity: 0.9;
+      }
+
+      .type-name {
         white-space: nowrap;
       }
     }
 
-    .col-actions {
-      width: 150px;
+    .request-no {
+      font-size: $font-size-label;
+      color: $primary;
     }
 
   }
