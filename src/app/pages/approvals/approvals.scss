@@ -355,6 +355,216 @@ $status-danger-text: var(--status-danger-text);
         }
     }
 
+    // ==================== TABLE SECTION ====================
+    .table-responsive {
+        @include modern-table;
+        display: block;
+        padding: 0 1.5rem 1.5rem 1.5rem;
+        overflow-x: auto;
+
+        @include large-tablet {
+            display: none !important;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-success {
+            color: #16a34a;
+        }
+
+        .small {
+            font-size: 0.75rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .budget-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+
+            &__used {
+                height: 100%;
+                background: #2563eb;
+            }
+        }
+
+        .amount-main {
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .amount-main.is-approved {
+            color: #16a34a;
+        }
+
+        .check-icon {
+            font-size: 0.8rem;
+        }
+    }
+
+    .modern-table {
+        @include modern-table;
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 330px;
+        }
+
+        // พนักงาน
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 180px;
+        }
+
+        // ประเภท
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 350px;
+        }
+
+        // วันที่
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 150px;
+        }
+
+        // โรงพยาบาล
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 180px;
+        }
+
+        // โรค
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 160px;
+        }
+
+        // จำนวนเงิน
+        th:nth-child(7),
+        td:nth-child(7) {
+            width: 100px;
+        }
+
+        // สถานะ
+        th:nth-child(8),
+        td:nth-child(8) {
+            width: 50px;
+        }
+
+        // เอกสาร
+        th:nth-child(9),
+        td:nth-child(9) {
+            width: 120px;
+        }
+
+        // action
+
+        .emp-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .emp-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .emp-meta {
+                font-size: $font-size-hint;
+                font-weight: 500;
+            }
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: $font-size-label;
+
+            i {
+                font-size: $font-size-body;
+                opacity: 0.9;
+            }
+
+            .type-name {
+                white-space: nowrap;
+            }
+        }
+
+        .request-no {
+            font-size: $font-size-label;
+            color: $primary;
+        }
+
+        .amount-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .amount-main {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .amount-approved {
+            font-size: 0.8rem;
+            color: #16a34a;
+        }
+
+        .budget-section {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .budget-bar {
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+
+            &__used {
+                height: 100%;
+                background: #2563eb;
+            }
+        }
+
+        .budget-text {
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        .sub-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            background: var(--bg-slate);
+            padding: 6px 8px;
+            border-radius: 10px;
+        }
+
+    }
+
     // ==================== DATA GRID / TABLE ====================
     .data-grid-container {
         padding: 0 24px 24px;
@@ -693,11 +903,12 @@ app-empty-state {
 
 .claim-cards-grid {
     padding: 0 24px 8px;
-    display: grid;
+    display: none;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
 
     @include large-tablet {
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
     }
 

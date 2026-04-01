@@ -52,76 +52,77 @@ $border: var(--border);
 }
 
 // Modern Table Mixin
-@mixin modern-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: var(--bg-card);
-    border: 1px solid $border;
-    border-radius: 12px;
-    overflow: hidden;
+// @mixin modern-table {
 
-    thead {
-        tr {
-            background: var(--bg-table-head);
-        }
+//     width: 100%;
+//     border-collapse: separate;
+//     border-spacing: 0;
+//     background: var(--bg-card);
+//     border: 1px solid $border;
+//     border-radius: 12px;
+//     overflow: hidden;
 
-        th {
-            padding: 14px 16px;
-            text-align: left;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: $text-header;
-            border-bottom: 2px solid $border;
-            white-space: nowrap;
-        }
-    }
+//     thead {
+//         tr {
+//             background: var(--bg-table-head);
+//         }
 
-    tbody {
-        transition: background 0.2s;
+//         th {
+//             padding: 14px 16px;
+//             text-align: left;
+//             font-size: 0.875rem;
+//             font-weight: 600;
+//             color: $text-header;
+//             border-bottom: 2px solid $border;
+//             white-space: nowrap;
+//         }
+//     }
 
-        // &:hover {
-        //     background: var(--border-toolbar);
+//     tbody {
+//         transition: background 0.2s;
 
-        //     tr {
-        //         background: transparent;
-        //     }
+//         // &:hover {
+//         //     background: var(--border-toolbar);
 
-        //     td {
-        //         background: transparent !important;
-        //     }
-        // }
+//         //     tr {
+//         //         background: transparent;
+//         //     }
 
-        tr {
-            transition: background 0.2s;
+//         //     td {
+//         //         background: transparent !important;
+//         //     }
+//         // }
 
-            &:not(:last-child) td:not(.merged-col) {
-                border-bottom: none;
-            }
+//         tr {
+//             transition: background 0.2s;
 
-            &:hover {
-                background: var(--border-toolbar);
-            }
+//             &:not(:last-child) td:not(.merged-col) {
+//                 border-bottom: none;
+//             }
 
-        }
+//             &:hover {
+//                 background: var(--border-toolbar);
+//             }
 
-        td {
-            padding: 16px;
-            font-size: 0.9rem;
-            color: $text;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
+//         }
 
-        &:last-of-type tr:last-child td {
-            border-bottom: none;
-        }
-    }
+//         td {
+//             padding: 16px;
+//             font-size: 0.9rem;
+//             color: $text;
+//             border-bottom: 1px solid var(--border);
+//             vertical-align: middle;
+//         }
 
-    @include tablet {
-        display: none;
-    }
-}
+//         &:last-of-type tr:last-child td {
+//             border-bottom: none;
+//         }
+//     }
+
+//     @include tablet {
+//         display: none;
+//     }
+// }
 
 // Mobile Cards View Mixin
 @mixin mobile-cards-view {
@@ -953,10 +954,6 @@ $border: var(--border);
             opacity: 1;
         }
     }
-
-
-
-
 
     // Edit button
     .btn-icon-pencil {

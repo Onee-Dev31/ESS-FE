@@ -27,11 +27,6 @@
 
   <div class="card">
     <div class="table-controls">
-      <!-- <div class="search-box">
-        <span class="search-icon"><i class="fas fa-search"></i></span>
-        <input type="text" placeholder="ค้นหา Request No, รหัสพนักงาน..." [value]="listing.searchText()"
-          (input)="onSearch($event)" />
-      </div> -->
       <div class="form-field">
         <nz-input-wrapper class="form-input">
           <nz-icon nzInputPrefix nzType="search" />
@@ -172,6 +167,166 @@
       }
     </div>
 
+    <div class="table-responsive">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ประเภท</th>
+            <th>วันที่รักษา</th>
+            <th>สถานพยาบาล</th>
+            <th>โรค</th>
+            <th class="text-right">ยอดเงิน</th>
+            <th>สถานะ</th>
+            <th>เอกสาร</th>
+            <th>จัดการ</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (isLoading()) {
+          <tr>
+            <td colspan="11">
+              <app-skeleton type="table" [rows]="5"></app-skeleton>
+            </td>
+          </tr>
+          } @else {
+
+          @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+          @let claim = getMedicalClaim(req);
+
+          @if (claim) {
+          <tr>
+
+            <!-- พนักงาน -->
+            <td>
+              <div class="emp-cell">
+                <img class="emp-avatar" [src]="claim.employeeImageUrl" (error)="onImgError($event)" />
+                <div>
+                  <div class="emp-name">
+                    {{ claim.employeeName ?? claim.employeeCode }}
+                  </div>
+                  <div class="emp-meta">
+                    {{ claim.employeeCode }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- ประเภท -->
+            <td>
+              <div class="type-badge">
+                <span class="type-name">{{ claim.expenseTypeName }}</span>
+              </div>
+
+              <div class="request-no">
+                <i class="fa-solid fa-tag"></i>
+                {{ req.requestNo }}
+              </div>
+            </td>
+
+            <!-- วันที่ -->
+            <td>
+              {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
+              {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
+              <span class="sub-text">{{ claim.treatmentDays }} วัน</span>
+            </td>
+
+            <!-- โรงพยาบาล -->
+            <td>{{ claim.hospitalName }}</td>
+
+            <!-- โรค -->
+            <td>{{ claim.diseaseName }}</td>
+
+            <td class="text-right">
+              <div class="amount-cell">
+
+                <!-- Requested -->
+                <div class="amount-main" [class.is-approved]="claim.approvedAmount > 0">
+
+                  @if (claim.approvedAmount > 0) {
+                  <i class="fas fa-check check-icon"></i>
+                  }
+
+                  ฿{{ claim.requestedAmount | number:'1.2-2' }}
+                </div>
+
+                <!-- Budget -->
+                @if (claim.typeTotalLimit > 0) {
+                <div class="budget-section">
+                  <div class="budget-bar">
+                    <div class="budget-bar__used" [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100">
+                    </div>
+                  </div>
+
+                  <div class="budget-text">
+                    {{ claim.typeUsedAmount | number:'1.0-0' }} /
+                    {{ claim.typeTotalLimit | number:'1.0-0' }}
+                  </div>
+                </div>
+                }
+
+              </div>
+            </td>
+            <!-- สถานะ -->
+            <td>
+              <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
+                {{ req.rawStatus | statusLabel }}
+              </span>
+            </td>
+
+            <!-- เอกสาร -->
+            <td class="text-center">
+              @if (claim.attachments.length) {
+              <button class="btn-attach" (click)="openPreview(claim)">
+                <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
+              </button>
+              } @else {
+              -
+              }
+            </td>
+
+            <!-- Action -->
+            <td>
+              <div class="table-actions">
+                <button class="act-btn act-view" (click)="viewDetail(req)">
+                  <i class="fas fa-eye"></i>
+                </button>
+
+                @if (req.rawStatus === 'pending') {
+                <button class="act-btn act-approve" (click)="openActionModal(req, 'Approved')">
+                  <i class="fas fa-check"></i>
+                </button>
+
+                <button class="act-btn act-reject" (click)="openActionModal(req, 'Rejected')">
+                  <i class="fas fa-times"></i>
+                </button>
+                }
+              </div>
+            </td>
+
+          </tr>
+          }
+          }
+
+          @empty {
+          <tr>
+            <td colspan="11">
+              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                icon="fas fa-inbox">
+              </app-empty-state>
+            </td>
+          </tr>
+          }
+
+          }
+        </tbody>
+      </table>
+      }
+    </div>
     } @else {
     <!-- ── Non-medical: responsive cards (mobile) + table (desktop) ── -->
     <div class="card-list-view">
