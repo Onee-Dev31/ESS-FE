@@ -27,7 +27,7 @@
       </div>
     </section>
 
-    <div class="allowance-policy-note desktop-only">
+    <!-- <div class="allowance-policy-note desktop-only">
       <span class="note-header">
         <i class="fas fa-info-circle"></i> <strong>เงื่อนไขการคำนวณเบี้ยเลี้ยง :</strong>
       </span>
@@ -40,7 +40,7 @@
         <span class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
         }
       </span>
-    </div>
+    </div> -->
 
     @if (isPolicyPopupOpen()) {
     <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
@@ -68,7 +68,7 @@
     }
 
     <div class="table-container">
-      <table class="excel-table desktop-only">
+      <!-- <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-50" />
           <col class="col-100" />
@@ -142,7 +142,7 @@
             <td class="bg-white"></td>
           </tr>
         </tfoot>
-      </table>
+      </table> -->
 
       <div class="mobile-cards-view mobile-only">
         @for (log of logs; track log.date) {
