@@ -110,6 +110,102 @@
       }
     </div>
 
+    <div class="table-responsive">
+      @if (isLoading()) {
+      <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>ประเภท</th>
+            <th>รายการ</th>
+            <th class="text-right">ยอดเงิน</th>
+            <th>สถานะ</th>
+            <th>ข้อมูล</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (claim of comps.paginatedData(); track claim.id) {
+          <tr (click)="openModal(claim.id)">
+
+            <!-- ประเภท -->
+            <td>
+              <div class="type-badge">
+                <span class="type-name">เบิกค่าเบี้ยเลี้ยง</span>
+              </div>
+
+              <div class="request-no">
+                <i class="fa-solid fa-tag"></i>
+                {{ claim.claimNo ?? claim.claimId }}
+              </div>
+            </td>
+
+            <!-- รายการ -->
+            <td>
+              <div class="nested-items">
+                จำนวน {{claim.items.length}} รายการ
+                <!-- @for (item of claim.items; track $index) {
+                <div class="nested-item">
+                  <div class="claim-date">
+                    <span class="item-title">
+                      <i class="far fa-calendar-alt"></i>
+                      {{ dateUtil.formatDateToBE(item.date, 'DD MMM YYYY') }}
+                    </span>
+                  </div>
+                  <div class="item-detail">
+                    <div class="claim-time">
+                      <i class="far fa-clock"></i> {{ item.hours }} ชม.
+                    </div>
+                    <div class="claim-desc">
+                      <i class="fas fa-info-circle"></i> {{ item.description }}
+                    </div>
+                  </div>
+                </div>
+                } -->
+              </div>
+            </td>
+
+            <!-- ยอดเงิน -->
+            <td class="text-right">
+              <div class="amount-cell">
+                <div class="amount-main">฿{{ claim.amount | number:'1.2-2' }}</div>
+              </div>
+            </td>
+
+            <!-- สถานะ -->
+            <td style="text-align: center;">
+              <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                {{ claim.status | statusLabel }}
+              </span>
+            </td>
+
+            <!-- ข้อมูลเพิ่มเติม -->
+            <td style="text-align: center;">
+              <div class="sub-text">
+                {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY') }}
+              </div>
+            </td>
+
+          </tr>
+          }
+
+          @empty {
+          <tr>
+            <td colspan="5">
+              <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                icon="fas fa-inbox">
+              </app-empty-state>
+            </td>
+          </tr>
+          }
+
+        </tbody>
+      </table>
+
+      }
+    </div>
     <!-- <div class="table-responsive">
       @if (isLoading()) {
       <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -208,8 +304,7 @@
   @if (isModalOpen) {
   <div class="modal-overlay">
     <div class="modal-container">
-      <app-allowance-form [requests]="selectedRequest"
-        (onClose)="closeModal()"></app-allowance-form>
+      <app-allowance-form [requests]="selectedRequest" (onClose)="closeModal()"></app-allowance-form>
     </div>
   </div>
   }

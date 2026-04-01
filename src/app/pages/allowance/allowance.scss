@@ -338,7 +338,7 @@ $status-cancelled-text: var(--text-table-head);
 
   // ==================== MOBILE CARD VIEW ====================
   .card-list-view {
-    // display: none;
+    display: none;
     gap: 14px;
     padding: 4px 0 8px;
 
@@ -346,8 +346,8 @@ $status-cancelled-text: var(--text-table-head);
       grid-column: 1 / -1;
     }
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    // display: grid;
+    // grid-template-columns: repeat(4, 1fr);
 
     @include large-tablet {
       display: grid;
@@ -526,22 +526,59 @@ $status-cancelled-text: var(--text-table-head);
   // ==================== TABLE SECTION ====================
   .modern-table {
     @include modern-table;
-    border: 1px solid var(--text-muted); // Darker border for better visibility
 
-    td,
-    th {
-      &:nth-child(4) {
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    tbody {
+      tr {
+        cursor: pointer;
+      }
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: $font-size-label;
+
+      i {
+        font-size: $font-size-body;
+        opacity: 0.9;
+      }
+
+      .type-name {
         white-space: nowrap;
       }
     }
 
-    .col-actions {
-      width: 150px;
+    .request-no {
+      font-size: $font-size-label;
+      color: $primary;
     }
 
+    .nested-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nested-item {
+      padding: 4px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .claim-time,
+    .claim-desc {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
   // ==================== MODAL ====================
