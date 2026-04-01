@@ -268,6 +268,7 @@ $balance: $status-success-text;
             display: flex;
             flex-direction: column;
             padding-left: 10px;
+            gap: 24px;
         }
 
         .banner-avatar-section,
@@ -1017,13 +1018,14 @@ $balance: $status-success-text;
     margin-bottom: 24px;
 
     .card-header {
-        background: linear-gradient(to right, var(--bg-card), var(--bg-table-head));
+        background: var(--bg-card);
         padding: 20px 24px;
         border-bottom: 1px solid var(--border-toolbar);
         display: flex;
         align-items: center;
         justify-content: space-between;
         border-left: 4px solid $primary;
+        border-radius: 6px 0px 0px 0px;
 
         .card-heading {
             color: $primary;
@@ -1377,6 +1379,9 @@ $balance: $status-success-text;
     .card-header {
         padding: 15px 20px;
         border-bottom: none;
+        border-radius: 16px 16px 0px 0px;
+        background: var(--bg-card);
+        border-left: 4px solid $primary;
 
         .card-heading {
             margin: 0;
@@ -1393,8 +1398,11 @@ $balance: $status-success-text;
     .card-footer {
         padding: 12px 15px;
         border-top: none;
-        background: var(--bg-slate);
+        background: var(--primary);
         border-radius: 0 0 $radius $radius;
+
+        display: flex;
+        justify-content: end;
     }
 
     @media (min-width: 768px) {
@@ -1445,20 +1453,12 @@ $balance: $status-success-text;
 
 // ==================== BUTTONS ====================
 .action-btn {
-    background: $primary;
-    color: #ffffff;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-    box-shadow: 0 2px 4px rgba($primary, 0.2);
-    white-space: nowrap;
+    @include btn-base;
+    background: var(--bg-slate);
+    color: var(--text);
 
     &:hover {
-        background: color-mix(in srgb, $primary, black 5%);
+        background: color-mix(in srgb, var(--bg-slate), var(--text) 10%);
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba($primary, 0.3);
     }
@@ -1485,21 +1485,21 @@ $balance: $status-success-text;
     }
 }
 
-.action-btn-sm {
-    @extend .action-btn;
-    width: 40px !important;
-    min-width: 40px !important;
-    max-width: 40px !important;
-    height: 40px !important;
-    padding: 0 !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 15px;
-    font-weight: 400;
-    flex: none !important;
-}
+// .action-btn-sm {
+//     @extend .action-btn;
+//     width: 40px !important;
+//     min-width: 40px !important;
+//     max-width: 40px !important;
+//     height: 40px !important;
+//     padding: 0 !important;
+//     display: inline-flex;
+//     align-items: center;
+//     justify-content: center;
+//     border-radius: 50%;
+//     font-size: 15px;
+//     font-weight: 400;
+//     flex: none !important;
+// }
 
 .btn-danger {
     background-color: $danger;
@@ -1568,8 +1568,10 @@ $balance: $status-success-text;
     margin-bottom: 24px;
 
     .card-header {
-        background: linear-gradient(to right, var(--bg-card), var(--bg-table-head));
+        background: var(--bg-card);
+        // background: linear-gradient(to right, var(--bg-card), var(--bg-table-head));
         padding: 20px 24px;
+        border-radius: 6px 0px 0px 0px;
         border-bottom: 1px solid var(--border-toolbar);
         border-left: 4px solid $primary;
 
@@ -1646,7 +1648,7 @@ $balance: $status-success-text;
 // ==================== IT STORY CARD ====================
 .it-story-card {
     .card-header {
-        background: var(--bg-slate);
+        background: var(--bg-card);
         border-radius: 12px 12px 0 0;
         padding: 15px 20px;
     }
@@ -1989,8 +1991,6 @@ $balance: $status-success-text;
 }
 
 
-// 
-
 .loading-overlay {
     height: 100vh;
     display: flex;
@@ -2002,34 +2002,46 @@ $balance: $status-success-text;
 
 /* HTML: <div class="loader"></div> */
 .loader {
-  width: 40px;
-  height: 30px;
-  border-radius: 3px;
-  --c:no-repeat linear-gradient(var(--primary) 0 0);
-  background:
-    var(--c) 0    100%/8px 30px,
-    var(--c) 50%  100%/8px 20px,
-    var(--c) 100% 100%/8px 10px;
-  position: relative;
-  clip-path: inset(-100% 0);
+    width: 40px;
+    height: 30px;
+    border-radius: 3px;
+    --c: no-repeat linear-gradient(var(--primary) 0 0);
+    background:
+        var(--c) 0 100%/8px 30px,
+        var(--c) 50% 100%/8px 20px,
+        var(--c) 100% 100%/8px 10px;
+    position: relative;
+    clip-path: inset(-100% 0);
 }
-.loader:before{
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-  left: -16px;
-  top: 0;
-  animation: 
-    l5-1 2s   linear infinite,
-    l5-2 0.5s cubic-bezier(0,200,.8,200) infinite;
+
+.loader:before {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    left: -16px;
+    top: 0;
+    animation:
+        l5-1 2s linear infinite,
+        l5-2 0.5s cubic-bezier(0, 200, .8, 200) infinite;
 }
+
 @keyframes l5-1 {
-  0%   {left:-16px;transform:translateY(-8px)}
-  100% {left:calc(100% + 8px);transform:translateY(22px)}
+    0% {
+        left: -16px;
+        transform: translateY(-8px)
+    }
+
+    100% {
+        left: calc(100% + 8px);
+        transform: translateY(22px)
+    }
 }
+
 @keyframes l5-2 {
-  100% {top:-0.1px}
+    100% {
+        top: -0.1px
+    }
 }

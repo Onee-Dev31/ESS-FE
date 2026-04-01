@@ -7,8 +7,14 @@
     </button>
   </header>
 
+  @if (isLoading) {
+  <div class="loading-row">
+    <div class="loading-overlay">
+      <div class="loader"></div>
+    </div>
+  </div>
+  }@else {
   <main class="content-card">
-
     <section class="filter-controls" *ngIf="!isEditMode">
       <div class="month-selector">
         <label for="month-select">ประจำเดือน :</label>
@@ -43,19 +49,8 @@
 
     </section>
 
-
-    <!-- <div class="action-bar">
-      <div class="info-badges">
-        <span class="info-text">
-          เลือกแล้ว {{ getSelectedCount() }} รายการ · รวม {{ getTotalAmount() | number }} บาท
-        </span>
-      </div>
-    </div> -->
-
     @if (isLoading) {
-    <div class="loading-row">
-      <i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...
-    </div>
+
     }
     @else if (items.length === 0) {
     <div class="empty-row">
@@ -308,7 +303,7 @@
     }
 
   </main>
-
+  }
 
   <div class="form-actions">
     <button type="button" class="btn-submit" (click)="save()" [disabled]="isLoading || !areAllItemsValid()">

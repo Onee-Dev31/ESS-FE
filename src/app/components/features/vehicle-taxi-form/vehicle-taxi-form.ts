@@ -163,7 +163,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         setTimeout(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        }, 300)
+        }, 500)
       },
       error: (err: any) => {
         console.error(err);
