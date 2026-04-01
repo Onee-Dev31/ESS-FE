@@ -21,7 +21,7 @@ export class ItAssetService {
 
     getOneeuserByAd(adUser: string): Observable<any> {
         const headers = new HttpHeaders({
-            Authorization: `Bearer ${this.authService.allData().accessToken}`
+            Authorization: `Bearer ${this.authService.allData()?.accessToken ?? ''}`
         });
         const url = `https://oneeuserapi.oneeclick.co/api/ActiveDirectory/GetUserInfo?samAccountName=${adUser}`
         return this._http.get(url, { headers });

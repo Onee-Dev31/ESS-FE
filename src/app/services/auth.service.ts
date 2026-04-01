@@ -3,6 +3,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay, tap, finalize } from 'rxjs/operators';
+import { STORAGE_KEYS } from '../constants/storage.constants';
 import { USER_ROLES } from '../constants/user-roles.constant';
 
 import { AllowanceService } from './allowance.service';
@@ -11,7 +12,6 @@ import { TaxiService } from './taxi.service';
 import { TransportService } from './transport.service';
 import { TimeOffService } from './time-off.service';
 import { LoadingService } from './loading';
-import { ToastService } from './toast';
 import { StorageService } from './storage.service';
 import { environment } from '../../environments/environment';
 import { PhoneUtil } from '../utils/phone.util';
@@ -28,7 +28,6 @@ export class AuthService {
 
     private _http = inject(HttpClient);
     private loadingService = inject(LoadingService);
-    private toastService = inject(ToastService);
     private storageService = inject(StorageService);
 
     private allowanceService = inject(AllowanceService);

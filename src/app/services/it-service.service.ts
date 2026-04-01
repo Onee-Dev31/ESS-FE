@@ -284,7 +284,7 @@ export class ItServiceService {
 
   getDetailFromJobsByApplicant(id: string): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
-    const token = this.authservice.allData().accessToken
+    const token = this.authservice.allData()?.accessToken ?? ''
     return this._http.get(`${this.ONEEJOB_url}/ApplicantNews/applicantByID?applicantId=${id}`,
       {
         headers: {
