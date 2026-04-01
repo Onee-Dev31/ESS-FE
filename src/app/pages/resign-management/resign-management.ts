@@ -167,7 +167,6 @@ export class ResignManagement {
           .subscribe(
             {
               next: (res) => {
-                // console.log(res);
                 this.swalService.close();
                 this.swalService.success('สำเร็จ', 'ลบพนักงานออกจากresign')
                 this.loadInitialData();
@@ -213,7 +212,6 @@ export class ResignManagement {
   }
 
   async onConfirmModal(): Promise<void> {
-    // console.log(this.selected)
     if (!this.selected) return;
 
     this.isViewOpen = false
@@ -245,7 +243,6 @@ export class ResignManagement {
 
       const id_update = this.selected.id
 
-      // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
         this.resignService.updateEmployeeResign(id_update, payload).pipe(
@@ -254,7 +251,6 @@ export class ResignManagement {
           })
         ).subscribe({
           next: (res) => {
-            // console.log(res);
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว')
 
@@ -272,7 +268,6 @@ export class ResignManagement {
           })
         ).subscribe({
           next: (res) => {
-            // console.log(res);
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
 
@@ -322,7 +317,6 @@ export class ResignManagement {
 
   setDate(emp: any, type: 'lastDate' | 'effectiveDate', value: Date) {
 
-    // console.log(emp)
 
     if (!this.activeDates[emp.empCode]) {
       this.activeDates[emp.empCode] = {
@@ -363,7 +357,6 @@ export class ResignManagement {
       return;
     }
 
-    // console.log(result)
     this.IS_CONFIRM_MODAL.set(true)
 
     this.confirm_data.set(result)
@@ -374,7 +367,6 @@ export class ResignManagement {
   }
 
   submitConfirm(data: any) {
-    // console.log("submitConfirm:", data)
 
     const resignDate = data.map((emp: any) => ({
       employeeNo: emp.empCode,
@@ -388,7 +380,6 @@ export class ResignManagement {
       employees: resignDate
     }
 
-    // console.log("payload: ", payload)
 
     this.swalService.confirm('ยืนยันรายละเอียดพนักงานลาออก')
       .then(result => {
@@ -460,7 +451,6 @@ export class ResignManagement {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    // console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -506,7 +496,6 @@ export class ResignManagement {
   setPageSize(tableType: 'active' | 'resign', size: number) {
 
     if (tableType === 'active') {
-      // console.log("size : ", size);
 
       this.activeListing.pageSize.set(size);
       this.activeListing.currentPage.set(0);
@@ -553,13 +542,11 @@ export class ResignManagement {
 
     this.fetchEmployeeByStatus('Active', pageA, sizeA)
       .subscribe(res => {
-        // console.log("Active >>", res)
         this.dataActiveFromApi(res);
       });
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        // console.log("Resigned >>", res)
         this.dataResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });
@@ -567,9 +554,7 @@ export class ResignManagement {
 
   //GET
   private dataActiveFromApi(res: any) {
-    // console.log("Active >>", res)
     const items = res.data.items ?? []
-    // console.log(items)
     this.activeData.set(this.mapApiData(items));
 
     this.activeListing.totalItems.set(res.data.total ?? 0);
@@ -578,7 +563,6 @@ export class ResignManagement {
   }
 
   private dataResignFromApi(res: any) {
-    // console.log("Resigned >>", res)
     const items = res.data.items ?? []
     this.resignData.set(this.mapApiData(items));
 
@@ -610,7 +594,6 @@ export class ResignManagement {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.companyList = data
         this.companyList.set(data);
       },
@@ -623,7 +606,6 @@ export class ResignManagement {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.departmentList = data
         this.departmentList.set(data);
       },

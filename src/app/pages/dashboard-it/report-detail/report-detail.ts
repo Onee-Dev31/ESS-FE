@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, signal, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ItServiceService } from '../../../services/it-service.service';
 import { tickets } from '../../../utils/it-dashboard-mock';
 import { FilePreviewItem, FilePreviewModalComponent } from '../../../components/modals/file-preview-modal/file-preview-modal';
@@ -53,7 +54,7 @@ export class ReportDetail {
   assigneeGroups: any[] = [];
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: any[] = [];
-
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private itServiceService: ItServiceService,
@@ -64,15 +65,12 @@ export class ReportDetail {
   ) { }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const encrypted = params['id'];
-      console.log("encrypted", encrypted)
       if (encrypted) {
         const decoded = decodeURIComponent(encrypted);
         const bytes = decryptValue(decoded);
         const id = bytes.toString();
-        console.log("bytes", bytes)
-        console.log("id", id)
 
         if (id) {
           this.queryId = id;
@@ -113,13 +111,9 @@ export class ReportDetail {
 
       const ticket = res.ticket;
       const attachments = convertedFiles ?? [];
-      const replies = res.replies ?? [];
-      const services = res.services ?? [];
-      const assignGroups = res.assignGroups ?? [];
       const assignments = res.assignments ?? [];
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
-      console.log("result : ", result);
 
       const objectData = {
         ticketId: ticket.id,
@@ -146,7 +140,6 @@ export class ReportDetail {
         assignTimeline: result ?? []
       };
 
-      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
       this.cdr.detectChanges();
     }
@@ -206,7 +199,6 @@ export class ReportDetail {
 
   viewFile(file: any) {
 
-    console.log("file", file)
     this.previewFiles.set([{
       fileName: file.fileName,
       date: dayjs().format('DD/MM/YYYY HH:mm'),
@@ -222,7 +214,6 @@ export class ReportDetail {
 
   buildTimeline(timelines: any[], assignees: any[]) {
 
-    // console.log(timelines, assignees)
 
     return timelines.map(t => {
 
@@ -288,7 +279,6 @@ export class ReportDetail {
   }
 
   selectAssignee(item: any) {
-    console.log(item)
     this.isVisibleAssignee.set(true)
     this.selectedAssignee.set(item)
   }
@@ -300,7 +290,6 @@ export class ReportDetail {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        // console.log(res)
 
         const rows = res.data
 
@@ -330,7 +319,6 @@ export class ReportDetail {
         // แปลงเป็น array
         Object.values(groupMap).forEach(g => assigneeGroup.push(g));
 
-        console.log(assigneeGroup);
         this.assigneeGroups = assigneeGroup
       }
       , error: (error) => {
@@ -397,7 +385,6 @@ export class ReportDetail {
       });
     }
 
-    console.log("formData", [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData)
   }

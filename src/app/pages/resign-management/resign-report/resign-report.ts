@@ -1,10 +1,10 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { SkeletonComponent } from '../../../components/shared/skeleton/skeleton';
-import { PageHeaderComponent } from '../../../components/shared/page-header/page-header';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { EmptyStateComponent } from '../../../components/shared/empty-state/empty-state';
@@ -12,7 +12,6 @@ import { PaginationComponent } from '../../../components/shared/pagination/pagin
 import dayjs from 'dayjs';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { AuthService } from '../../../services/auth.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { LoadingService } from '../../../services/loading';
 import { MasterDataService } from '../../../services/master-data.service';
@@ -66,7 +65,6 @@ export class ResignReport {
   private freelanceService = inject(FreelanceService);
   private swalService = inject(SwalService);
   private masterService = inject(MasterDataService);
-  private authService = inject(AuthService);
   dataUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('resign-table');
@@ -102,14 +100,14 @@ export class ResignReport {
   effectiveDate = signal<Date | null>(null);
 
   type: any = 'fulltime'
+  private destroyRef = inject(DestroyRef);
 
   constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.type = params['type'];
-      console.log(this.type); // fulltime / freelance
     });
 
     this.getCompanies();
@@ -141,7 +139,7 @@ export class ResignReport {
     this.IS_INFO.set(false)
   }
 
-  submitInfo(data: any) {
+  submitInfo(_data: any) {
     this.IS_INFO.set(false)
   }
 
@@ -325,7 +323,6 @@ export class ResignReport {
   }
 
   async onConfirmModal(): Promise<void> {
-    // console.log(this.selected)
     if (!this.selected) return;
 
     this.isViewOpen = false
@@ -357,7 +354,6 @@ export class ResignReport {
 
       const id_update = this.selected.id
 
-      // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
         this.resignService.updateEmployeeResign(id_update, payload).pipe(
@@ -365,8 +361,7 @@ export class ResignReport {
             this.loadInitialData();
           })
         ).subscribe({
-          next: (res) => {
-            // console.log(res);
+          next: () => {
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว')
 
@@ -383,8 +378,7 @@ export class ResignReport {
             this.loadInitialData();
           })
         ).subscribe({
-          next: (res) => {
-            // console.log(res);
+          next: () => {
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
 
@@ -498,7 +492,6 @@ export class ResignReport {
 
   // Function
   private mapApiData(items: any[]): any[] {
-    console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -528,7 +521,6 @@ export class ResignReport {
   }
 
   private mapApiData_Freelance(items: any[]): any[] {
-    console.log("[mapApiData_Freelance] items >> ", items)
     return items.map((item: any) => ({
       empCode: item.EMP_NO,
       firstNameTh: item.FIRSTNAME_TH,
@@ -601,14 +593,12 @@ export class ResignReport {
     if (this.type === 'fulltime') {
       this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
         .subscribe(res => {
-          console.log("Resigned >>", res)
           this.dataResignFromApi(res);
           this.loadingService.stop('freelance-list');
         });
     } else {
       this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
         .subscribe(res => {
-          console.log("Resigned [FREE]>>", res)
           this.dataResignFromApi(res);
           this.loadingService.stop('freelance-list');
         });
@@ -618,7 +608,6 @@ export class ResignReport {
 
   //GET
   private dataResignFromApi(res: any) {
-    // console.log("Resigned >>", res)
 
     if (this.type === 'fulltime') {
       const items = res.data.items ?? []
@@ -688,7 +677,6 @@ export class ResignReport {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.companyList = data
         this.companyList.set(data);
       },
@@ -701,7 +689,6 @@ export class ResignReport {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.departmentList = data
         this.departmentList.set(data);
       },

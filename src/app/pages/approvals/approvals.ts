@@ -1,4 +1,5 @@
-import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -61,6 +62,7 @@ export class ApprovalsComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -99,7 +101,7 @@ export class ApprovalsComponent implements OnInit {
 
   /** เริ่มต้นโหลดข้อมูลและจัดการ Route Parameter */
   ngOnInit() {
-    this.route.data.subscribe(data => {
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       this.category = data['category'] || 'all';
       this.pageTitle.set(this.category === 'medical' ? 'อนุมัติค่ารักษาพยาบาล' : 'Pending Approvals');
       if (this.category === 'medical') {
@@ -132,7 +134,6 @@ export class ApprovalsComponent implements OnInit {
       keyword,
     }).subscribe({
       next: (res) => {
-        console.log(res)
         this.approvals.set(res.data.map(c => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
@@ -273,7 +274,6 @@ export class ApprovalsComponent implements OnInit {
   /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
-    console.log(item)
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }

@@ -31,7 +31,6 @@ export class ResignManagementService {
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
 
-    // console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/employees`, {
       params: queryParams
@@ -39,12 +38,10 @@ export class ResignManagementService {
   }
 
   resignEmployee(payload: any): Observable<any> {
-    // console.log(payload)
     return this._http.post(`${this.baseUrl}/employee-resignations`, payload);
   }
 
   updateEmployeeResign(id: string, payload: any): Observable<any> {
-    // console.log(payload)
     return this._http.put(`${this.baseUrl}/employee-resignations/${id}`, payload);
   }
 

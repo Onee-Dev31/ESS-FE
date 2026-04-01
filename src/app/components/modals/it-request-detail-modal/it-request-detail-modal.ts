@@ -111,7 +111,6 @@ export class ItRequestDetailModal {
   async confirmApprove() {
     this.swalService.confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
       .then(result => {
-        // console.log(result)
         if (!result.isConfirmed) return;
 
         this.swalService.loading("กำลังบันทึกข้อมูล...");
@@ -163,7 +162,6 @@ export class ItRequestDetailModal {
 
     this.swalService.confirm(`ยืนยันการ${action}`, `คุณต้องการ${action}คำขอนี้ใช่หรือไม่ ?`)
       .then(result => {
-        // console.log(result)
         if (!result.isConfirmed) return;
 
         this.swalService.loading("กำลังบันทึกข้อมูล...");
@@ -180,7 +178,6 @@ export class ItRequestDetailModal {
 
   // private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
 
-  //   console.log(this.approvalItem.requestId, newStatus, reason, this.authService.userData().CODEMPID)
 
   //   // const ticketId = this.approvalItem.requestId;
 
@@ -196,8 +193,6 @@ export class ItRequestDetailModal {
   //   //   ...(reason ? { Comment: reason } : {})
   //   // };
 
-  //   // // console.log(`updateStatus Ticket ID:${ticketId}`)
-  //   // // console.log(`updateStatus payload: ${JSON.stringify(payload)}`)
   //   // this.itService.approveTicket(ticketId, payload)
   //   //   .subscribe({
   //   //     next: (res) => {
@@ -232,7 +227,6 @@ export class ItRequestDetailModal {
   updateTicket(command: 'Approved' | 'Rejected' | 'Referred_Back', reason?: string) {
 
     const ticketId = this.approvalItem.requestId.toString();
-    // console.log(command, ticketId, reason)
 
     const formData = new FormData();
 
@@ -243,11 +237,9 @@ export class ItRequestDetailModal {
       formData.append('comment', reason);
     }
 
-    console.log("formData", [...formData.entries()]);
 
     this.itServiceService.updateTicket(ticketId, formData).subscribe({
       next: (res) => {
-        // console.log(res)
 
         if (res.success) {
           const msg =

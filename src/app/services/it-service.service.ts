@@ -167,7 +167,6 @@ export class ItServiceService {
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
 
 
-    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/tickets`, {
       params: queryParams
@@ -193,7 +192,6 @@ export class ItServiceService {
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
 
-    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
       params: queryParams
@@ -263,7 +261,6 @@ export class ItServiceService {
       ...(assignData.listAssignee && { assignToAdusersJson: assignData.listAssignee })
     }
 
-    // console.log(params)
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
@@ -272,8 +269,6 @@ export class ItServiceService {
   }
 
   updateTicket(id: string, formData: FormData): Observable<any> {
-    console.log('ticketId type:', id);
-    // console.log(id, payload)
     // return of({ success: true }).pipe(delay(1500));
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
   }

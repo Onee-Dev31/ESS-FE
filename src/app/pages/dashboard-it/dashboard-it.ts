@@ -101,7 +101,6 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    console.log("filterStatus : ", this.filterStatus);
 
     this.filteredTickets();
     // หรือเรียก filterStatus(status) ของคุณ
@@ -110,9 +109,7 @@ export class DashboardIT implements OnInit {
   trackById = (_: number, item: TicketItem) => item.id;
 
   selectTicket(ticketId: string) {
-    // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res)
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -164,7 +161,6 @@ export class DashboardIT implements OnInit {
         approval_status: ticket.approval_status
       }
 
-      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
@@ -323,7 +319,6 @@ export class DashboardIT implements OnInit {
 
   buildTimeline(timelines: any[], assignees: any[]) {
 
-    // console.log(timelines, assignees)
 
     return timelines.map(t => {
 
@@ -400,7 +395,6 @@ export class DashboardIT implements OnInit {
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
       next: (res) => {
-        console.log("getAllTickets() >>> res :", res);
         this.Tickets.set(res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
@@ -413,7 +407,6 @@ export class DashboardIT implements OnInit {
           subject: ticket.subject
         })))
 
-        console.log(this.Tickets())
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -428,7 +421,6 @@ export class DashboardIT implements OnInit {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        // console.log(res)
 
         const rows = res.data
 
@@ -458,7 +450,6 @@ export class DashboardIT implements OnInit {
         // แปลงเป็น array
         Object.values(groupMap).forEach(g => assigneeGroup.push(g));
 
-        console.log(assigneeGroup);
         this.assigneeGroups = assigneeGroup
       }
       , error: (error) => {
@@ -522,7 +513,6 @@ export class DashboardIT implements OnInit {
       });
     }
 
-    console.log("formData", [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData)
   }
@@ -538,7 +528,6 @@ export class DashboardIT implements OnInit {
 
   submitAcknowledge(data: any) {
 
-    console.log(data)
 
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
@@ -844,14 +833,12 @@ export class DashboardIT implements OnInit {
         formData.append('Files', item.file);
       }
     });
-    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
 
-        console.log(res)
 
         if (!res?.success) {
           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");

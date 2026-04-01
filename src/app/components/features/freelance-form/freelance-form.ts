@@ -201,7 +201,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
         const validFiles: any[] = [];
 
         Array.from(input.files).forEach((file: File) => {
-            // console.log(file)
 
             const extension = file.name.split('.').pop()?.toLowerCase();
 
@@ -295,12 +294,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     }
 
     handleResign() {
-        // console.log('Open Resigned')
         this.showResignModal = true;
     }
 
     handleActive() {
-        // console.log('handleActive')
         this.swalService.confirm('ยืนยันการ Activate อีกครั้ง')
             .then(result => {
                 if (!result.isConfirmed) return;
@@ -326,7 +323,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     //     this.closeResignModal();
     // }
     confirmResign() {
-        // console.log(this.formResignData.resignDate, this.formResignData.lastWorkingDate)
         if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
 
         this.onSave.emit({
@@ -401,7 +397,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getBanks() {
         this.masterService.getBankMaster().subscribe({
             next: (data) => {
-                // console.log(data);
                 this.bankList = data
             },
             error: (error) => {
@@ -413,7 +408,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getCompanies() {
         this.masterService.getCompanyMaster().subscribe({
             next: (data) => {
-                // console.log(data);
                 this.companyList = data
             },
             error: (error) => {
@@ -425,7 +419,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     getDepartments() {
         this.masterService.getDepartmentMaster().subscribe({
             next: (data) => {
-                // console.log(data);
                 this.departmentList = data
             },
             error: (error) => {

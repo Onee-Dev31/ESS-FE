@@ -245,7 +245,6 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
           img.src = base64;
       },
       error: () => {
-        console.log('no signature');
       }
     });
   }

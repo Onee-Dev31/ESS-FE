@@ -187,7 +187,6 @@ export class MedicalexpensesComponent implements OnInit {
       keyword,
     }
 
-    // console.log(payload)
 
     this.medicalApiService.getClaims(payload).subscribe({
       next: (res) => {

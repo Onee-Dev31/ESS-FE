@@ -1,15 +1,12 @@
 import {
   Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, signal, inject,
-  ChangeDetectorRef
+  ViewChild, ElementRef, signal, inject, DestroyRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, NavigationEnd, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
 import { TicketService } from '../../services/ticket.service';
-import { filter } from 'rxjs';
 
 export type TicketType = 'repair' | 'service';
 
@@ -92,17 +89,13 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private lastY = 0;
 
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ticketNumber: string = "";
   currentApprover = signal<string>('');
   constructor(
     private ticketService: TicketService,
-    private cdr: ChangeDetectorRef,
-  ) {
-
-  }
+  ) {}
 
   ngOnInit() {
     const reloaded = sessionStorage.getItem('ticket-page-reloaded');
@@ -115,9 +108,8 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
     sessionStorage.removeItem('ticket-page-reloaded');
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.ticketNumber = params['ticket'] || '';
-      console.log('ticketNumber:', this.ticketNumber);
 
       if (!this.ticketNumber) return;
 
@@ -158,7 +150,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.ticketService.getTicket(ticketNumber)
       .subscribe({
         next: (ticket) => {
-          console.log("ticket : ", ticket);
 
           if (ticket.NameApprover) {
             this.signerName.set(ticket.NameApprover);
@@ -291,11 +282,9 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.isSubmitting.set(true);
-    const signatureBase64 = this.getSignatureBase64();
+    void this.getSignatureBase64();
 
     // TODO: Call API to submit approval + signature
-    console.log('[IT Signature] requestNo:', this.requestNo());
-    console.log('[IT Signature] signature (base64):', signatureBase64.substring(0, 60) + '...');
 
     setTimeout(() => {
       this.isSubmitting.set(false);

@@ -47,7 +47,6 @@ export class SettingService {
     if (params.roleName) queryParams.roleName = params.roleName;
     // if (params.empStatus) queryParams.empStatus = params.empStatus;
 
-    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/Master/employees`, {
       params: queryParams
@@ -55,7 +54,6 @@ export class SettingService {
   }
 
   settingUserRole(payload: any): Observable<any> {
-    console.log(payload)
     return this._http.post(`${this.baseUrl}/Master/user-roles`, payload);
   }
 

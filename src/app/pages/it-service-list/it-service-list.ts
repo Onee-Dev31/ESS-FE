@@ -35,7 +35,6 @@ export class ItService implements OnInit {
   checkScreen() {
     const width = window.innerWidth;
     this.isLaptop = width >= 1024 && width <= 1440;
-    console.log("isLabtop, " , width, ' > ', this.isLaptop)
   }
 
   private itServiceMock = inject(ItServiceMockService);
@@ -82,9 +81,7 @@ export class ItService implements OnInit {
    * NEW!!
    */
   selectTicket(ticketId: string) {
-    // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res)
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -109,8 +106,6 @@ export class ItService implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      console.log(ticket.IT_Status, ticket.user_status)
-      // console.log(ticket.IT_Status === null ? ticket.user_status :
       //   ticket.IT_Status === 'Closed' ? 'Closed' :
       //     ticket.user_status === 'Pending' ? 'Waiting you' :
       //       'In Progress')
@@ -151,7 +146,6 @@ export class ItService implements OnInit {
         assignTimeline: result
       }
 
-      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
@@ -179,7 +173,6 @@ export class ItService implements OnInit {
   }
 
   handleRate(event: { rating: number, comment: string }) {
-    console.log('Rating submitted:', event);
     // Here you would typically call a service to save the rating
     this.closeRating();
   }
@@ -203,14 +196,12 @@ export class ItService implements OnInit {
         formData.append('Files', item.file);
       }
     });
-    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
 
-        console.log(res)
 
         if (!res?.success) {
           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
@@ -246,7 +237,6 @@ export class ItService implements OnInit {
   copy(text: string) {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    console.log('คัดลอกแล้ว');
   }
 
   // FUNCTION MAP
@@ -258,7 +248,6 @@ export class ItService implements OnInit {
   }
 
   statusLabel(s: any) {
-    // console.log(s)
     switch (s) {
       case 'inprocess': return 'In Progress Tickets';
       case 'assigned': return 'Assigned Tickets';
@@ -370,7 +359,6 @@ export class ItService implements OnInit {
 
   buildTimeline(timelines: any[], assignees: any[]) {
 
-    // console.log(timelines, assignees)
 
     return timelines.map(t => {
 
@@ -445,7 +433,6 @@ export class ItService implements OnInit {
   }
 
   getTicketStatus(ticket: any) {
-    console.log(ticket)
     if ((ticket.IT_Status === "Assigned" && ticket.user_status === "Pending") || (ticket.user_status === 'Referred_Back')) {
       return "Waiting you";
     }
@@ -539,8 +526,6 @@ export class ItService implements OnInit {
       attachments: updatedAttachments
     });
 
-    console.log("deletedAttachmentIds:", this.deletedAttachmentIds);
-    console.log("attachments:", updatedAttachments);
   }
 
   Resubmit(ticket: any) {
@@ -580,14 +565,11 @@ export class ItService implements OnInit {
         formData.append('DeletedAttachmentIds', String(id));
       });
 
-      console.log('===== REOPEN FORM DATA =====');
       for (const pair of (formData as any).entries()) {
-        console.log(pair[0], pair[1]);
       }
       // ยิงจริง
       this.itServiceService.re_open(formData).subscribe({
         next: (res) => {
-          console.log('re_open success:', res);
 
           Swal.fire({
             icon: 'success',

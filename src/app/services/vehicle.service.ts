@@ -33,7 +33,6 @@ export class VehicleService {
         if (params.costCent) queryParams.costCent = params.costCent;
         if (params.empStatus) queryParams.empStatus = params.empStatus;
 
-        // console.log("params >>> ", queryParams)
 
         return this._http.get<any>(`${this.baseUrl}/employees`, {
             params: queryParams
@@ -61,7 +60,6 @@ export class VehicleService {
         if (params.dateFrom) queryParams.date_from = params.dateFrom;
         if (params.dateTo) queryParams.date_to = params.dateTo;
 
-        // console.log("params >>> ", queryParams)
 
         return this._http.get(`${this.baseUrl}/transport-claim/claims`, {
             params: queryParams

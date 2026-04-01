@@ -1,22 +1,22 @@
 import { inject } from '@angular/core';
 import { Observable, of, BehaviorSubject, delay, take } from 'rxjs';
 import { LoadingService } from './loading';
-import { STORAGE_KEYS } from '../constants/storage.constants';
+import { StorageService } from './storage.service';
 import { BUSINESS_CONFIG } from '../constants/business.constant';
 import { RequestBase } from '../interfaces/core.interface';
 
 /** คลาสพื้นฐาน (Abstract Class) สำหรับการจัดการบริการคำขอต่าง ๆ (CRUD) พร้อมระบบจัดเก็บข้อมูลใน LocalStorage */
 export abstract class BaseRequestService<T extends RequestBase> {
     protected loadingService = inject(LoadingService);
+    protected storageService = inject(StorageService);
     protected abstract readonly STORAGE_KEY: string;
     protected requestsSubject = new BehaviorSubject<T[]>([]);
 
     /** เริ่มต้นข้อมูลจาก LocalStorage หากไม่มีข้อมูลจะสร้างจาก Mock Generator */
     protected initializeData(mockGenerator: () => T[]) {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
+        const stored = this.storageService.get<T[]>(this.STORAGE_KEY);
         if (stored) {
-            const data = JSON.parse(stored);
-            this.updateSubject(data);
+            this.updateSubject(stored);
         } else {
             const masterData = mockGenerator();
             this.saveToStorage(masterData);
@@ -25,13 +25,13 @@ export abstract class BaseRequestService<T extends RequestBase> {
     }
 
     protected saveToStorage(data: T[]) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        this.storageService.set(this.STORAGE_KEY, data);
     }
 
     /** กรองและอัปเดตข้อมูลที่จะแสดงผลตามสิทธิ์ของผู้ใช้งาน (Admin/Member) */
     protected updateSubject(masterData: T[]) {
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE) || 'Member';
-        const employeeId = localStorage.getItem(STORAGE_KEYS.EMPLOYEE_ID);
+        const role = this.storageService.getUserRole() || 'Member';
+        const employeeId = this.storageService.getEmployeeId();
 
         let viewData = [...masterData];
         if (role !== 'Admin' && employeeId) {
@@ -43,8 +43,7 @@ export abstract class BaseRequestService<T extends RequestBase> {
     }
 
     protected getMasterData(): T[] {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
+        return this.storageService.get<T[]>(this.STORAGE_KEY) ?? [];
     }
 
     getRequests(): Observable<T[]> {

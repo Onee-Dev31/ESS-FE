@@ -48,23 +48,18 @@ export class LoginComponent {
 
     const { username, password } = this.loginForm.value;
 
-    // console.log('Login request:', { username, password });
 
     this.authService.login(username || '', password || '').pipe(
       take(1)
     ).subscribe({
       next: (res) => {
-        console.log('Login success:', res);
-        console.log('>>', res.menus)
         // const firstChildWithRoute = res.menus.find(
         //   (m: any) => m.ParentMenuID !== null && m.RoutePath
         // );
         // const routePath = firstChildWithRoute?.RoutePath || null;
-        // console.log(routePath)
         this.router.navigate(['/welcome']);
       },
       error: (err) => {
-        console.log('Login error:', err);
       }
     });
   }

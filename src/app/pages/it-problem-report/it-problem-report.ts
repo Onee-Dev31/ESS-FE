@@ -215,7 +215,6 @@ export class ItProblemReportComponent implements OnInit {
   confirmSubmission() {
     const data = this.problemFormData();
 
-    console.log(data, this.selectedOpenFor(), this.openBy)
 
     const formData = new FormData();
     formData.append('subject', data.topic);
@@ -236,7 +235,6 @@ export class ItProblemReportComponent implements OnInit {
       }
     });
 
-    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.createTicket(formData)
@@ -246,7 +244,6 @@ export class ItProblemReportComponent implements OnInit {
         })
       ).subscribe({
         next: (res) => {
-          console.log(res);
           if (res.success) {
             this.signalrService.sendTestRealtime()
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
@@ -284,7 +281,6 @@ export class ItProblemReportComponent implements OnInit {
   getSubProblem() {
     this.itServiceService.getSubProblem().subscribe({
       next: (res) => {
-        console.log(res);
         this.availableCategories = res.data
         this.cdr.detectChanges();
       },
@@ -297,7 +293,6 @@ export class ItProblemReportComponent implements OnInit {
   getOpenFor() {
     this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
       next: (res) => {
-        console.log(res.data);
         this.openForOptions.set(res.data)
       },
       error: (error) => {

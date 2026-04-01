@@ -1,13 +1,10 @@
 import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { STORAGE_KEYS } from '../constants/storage.constants';
 
 export const SKIP_AUTH = new HttpContextToken(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const authService = inject(AuthService);
-
-    const raw = localStorage.getItem('allData');
+    const raw = localStorage.getItem(STORAGE_KEYS.ALL_DATA);
     const allData = raw ? JSON.parse(raw) : null;
     const token = allData?.accessToken || '';
 
@@ -21,5 +18,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
     });
 
-    return next(req);
+    return next(clonedReq);
 };

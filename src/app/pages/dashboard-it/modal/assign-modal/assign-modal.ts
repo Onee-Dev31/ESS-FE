@@ -39,7 +39,6 @@ export class AssignModal {
 
     if (changes['ticket'] && this.ticket) {
 
-      console.log(this.ticket)
 
       this.selectedTag = this.ticket.ticketTypeId;
 
@@ -79,7 +78,6 @@ export class AssignModal {
   }
 
   openImage(empCode: string) {
-    console.log('Open image:', empCode);
   }
 
   toggleAssignee(emp: any) {
@@ -138,7 +136,6 @@ export class AssignModal {
   }
 
   save() {
-    // console.log(this.selectedAssigneeEmpCodes)
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
       ticketTypeId: this.selectedTag

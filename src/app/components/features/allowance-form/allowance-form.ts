@@ -57,7 +57,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     //   this.loadData();
     // }
     if (changes['requests'] && this.requests && this.requests !== '') {
-      // console.log('requests เข้ามาแล้ว:', this.requests);
       this.MODE_EDIT = true;
       this.mapData();
       return;

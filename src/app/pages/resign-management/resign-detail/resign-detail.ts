@@ -200,7 +200,6 @@ export class ResignDetail {
       requests: requests
     }
 
-    console.log(payload)
 
     this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
       .then(result => {
@@ -212,7 +211,6 @@ export class ResignDetail {
         this.resignService.updateADManagementResign(payload).subscribe(
           {
             next: (res) => {
-              console.log(res);
               this.swalService.success('สำเร็จ', '')
               this.loadInitialData();
             },
@@ -242,7 +240,6 @@ export class ResignDetail {
           .subscribe(
             {
               next: (res) => {
-                // console.log(res);
                 this.swalService.close();
                 this.swalService.success('สำเร็จ', 'ลบพนักงานออกจากresign')
                 this.loadInitialData();
@@ -288,7 +285,6 @@ export class ResignDetail {
   }
 
   async onConfirmModal(): Promise<void> {
-    // console.log(this.selected)
     if (!this.selected) return;
 
     this.isViewOpen = false
@@ -320,7 +316,6 @@ export class ResignDetail {
 
       const id_update = this.selected.id
 
-      // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
         this.resignService.updateEmployeeResign(id_update, payload).pipe(
@@ -329,7 +324,6 @@ export class ResignDetail {
           })
         ).subscribe({
           next: (res) => {
-            // console.log(res);
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว')
 
@@ -347,7 +341,6 @@ export class ResignDetail {
           })
         ).subscribe({
           next: (res) => {
-            // console.log(res);
             this.swalService.close();
             this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
 
@@ -517,7 +510,6 @@ export class ResignDetail {
 
   // Function
   private mapApiData(items: any[]): EmployeeFormData[] {
-    // console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -539,7 +531,6 @@ export class ResignDetail {
   }
 
   private mapApiData_Freelance(items: any[]): FreelanceFormData[] {
-    // console.log("[mapApiData_Freelance] items >> ", items)
     return items.map((item: any) => ({
       empCode: item.EMP_NO,
       firstNameTh: item.FIRSTNAME_TH,
@@ -622,28 +613,24 @@ export class ResignDetail {
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned [EMP]>>", res)
         this.dataEmployeeResignFromApi(res);
         this.loadingService.stop('employee-list');
       });
 
     this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned [FREE]>>", res)
         this.dataFreelanceResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });
   }
 
   viewReportResign(command: 'fulltime' | 'freelance') {
-    console.log(command)
     window.open(`/resign-management/report?type=${command}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
   //GET
   private dataEmployeeResignFromApi(res: any) {
-    // console.log("Resigned >>", res)
     const items = res.data.items ?? []
     this.resignData.set(this.mapApiData(items));
 
@@ -653,7 +640,6 @@ export class ResignDetail {
   }
 
   private dataFreelanceResignFromApi(res: any) {
-    // console.log("Resigned >>", res)
     const items = res.items ?? []
     this.resignFreelanceData.set(this.mapApiData_Freelance(items));
 
@@ -706,7 +692,6 @@ export class ResignDetail {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.companyList = data
         this.companyList.set(data);
       },
@@ -719,7 +704,6 @@ export class ResignDetail {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         // this.departmentList = data
         this.departmentList.set(data);
       },

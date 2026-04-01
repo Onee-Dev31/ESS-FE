@@ -95,7 +95,6 @@ export class VehicleComponent implements OnInit {
     let [start, end]: [any, any] = ['', ''];
     if (this.dateRange && this.dateRange.length === 2) {
       [start, end] = this.dateRange;
-      // console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
     }
 
     const param = {
@@ -108,11 +107,9 @@ export class VehicleComponent implements OnInit {
       dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
     }
 
-    // console.log(param)
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
-        // console.log(res)
         this.dataFromApi(res)
         // this.loadingService.stop('vehicle-list');
       },
@@ -125,7 +122,6 @@ export class VehicleComponent implements OnInit {
 
   private dataFromApi(res: any) {
     const items = res.data ?? []
-    // console.log(items)
     this.allRequests.set(this.mapApiData(items));
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
@@ -134,7 +130,6 @@ export class VehicleComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): any[] {
-    // console.log("items >> ", items)
     return items.map((item: any) => ({
       id: item.claimId,
       claimNo: item.voucherNo,

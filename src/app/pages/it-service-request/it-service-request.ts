@@ -1,4 +1,5 @@
-import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, Input, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,7 +7,6 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
-import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
@@ -25,12 +25,12 @@ export class ITServiceRequestComponent implements OnInit {
     // Inject Services
     private swalService = inject(SwalService);
     private userService = inject(UserService);
-    private itServiceMock = inject(ItServiceMockService);
     private itServiceService = inject(ItServiceService);
     private route = inject(ActivatedRoute);
     private authService = inject(AuthService);
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
+    private destroyRef = inject(DestroyRef);
 
     phoneModel = '';
     phoneNumber = signal('');
@@ -108,7 +108,7 @@ export class ITServiceRequestComponent implements OnInit {
 
         this.IsOneeJob = (localStorage.getItem('systemCode') || '') === 'ONEEJOB';
 
-        this.route.queryParams.subscribe(params => {
+        this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
             this.applicantId = decryptValue(params['applicantId']) || '';
             this.getDetailFromJobsByApplicantId(this.applicantId)
             if (!this.applicantId) return;
@@ -151,7 +151,6 @@ export class ITServiceRequestComponent implements OnInit {
     toggleSystemType(type: string) {
         this.selectedSystemTypes.update(types => {
 
-            console.log("types", types)
             if (types.includes(type)) {
                 return types.filter(t => t !== type);
             } else {
@@ -275,13 +274,7 @@ export class ITServiceRequestComponent implements OnInit {
     confirmSubmission() {
         const selectedServices = this.serviceOptions().filter(s => s.checked);
 
-        let openForDisplay = '';
-        const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
-        if (this.selectedOpenFor() === 'other') {
-            // openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
-        } else {
-            openForDisplay = selected ? selected.label : '';
-        }
+        this.openForOptions().find(o => o.value === this.selectedOpenFor());
 
         const userOptions = this.userSubOptions().filter(o => o.checked)
         const systemOptions = this.systemSubOptions().filter(o => o.checked)
@@ -308,7 +301,6 @@ export class ITServiceRequestComponent implements OnInit {
             formData.append('serviceTypeIds', service.id.toString());
         });
 
-        console.log("formData", [...formData.entries()]);
 
         this.swalService.loading('กำลังบันทึกข้อมูล...');
         this.itServiceService.createTicket(formData)
@@ -318,7 +310,6 @@ export class ITServiceRequestComponent implements OnInit {
                 })
             ).subscribe({
                 next: (res) => {
-                    // console.log(res);
                     if (res.success) {
                         // this.signalrService.sendTestRealtime()
                         this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
@@ -416,7 +407,6 @@ export class ITServiceRequestComponent implements OnInit {
     getServiceType() {
         this.itServiceService.getServiceType().subscribe({
             next: (res) => {
-                console.log(res.data);
                 const mappedServices_main = res.data.mainServices.map((item: any) => ({
                     ...item,
                     checked: false,
@@ -451,7 +441,6 @@ export class ITServiceRequestComponent implements OnInit {
     getOpenFor() {
         this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
             next: (res) => {
-                console.log(res.data);
                 this.openForOptions.set(res.data)
             },
             error: (error) => {
@@ -463,7 +452,6 @@ export class ITServiceRequestComponent implements OnInit {
     getDetailFromJobsByApplicantId(id: string) {
         this.itServiceService.getDetailFromJobsByApplicant(id).subscribe({
             next: (res) => {
-                console.log("getDetailFromJobsByApplicantId", res);
                 this.detailJobs = res
                 const data = res[0];
 

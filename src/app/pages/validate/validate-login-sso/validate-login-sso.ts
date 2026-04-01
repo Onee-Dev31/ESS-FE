@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { encryptValue } from '../../../utils/crypto.js ';
@@ -14,6 +15,7 @@ export class ValidateLoginSso {
   systemCode: string = "";
   ticketNumber: string = "";
   applicantId: string = "";
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private route: ActivatedRoute,
@@ -22,7 +24,7 @@ export class ValidateLoginSso {
   ) { }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const token = params.get('token') || '';
       this.systemCode = params.get('systemCode') || '';
       this.applicantId = params.get('applicantId') || '';
@@ -40,15 +42,12 @@ export class ValidateLoginSso {
         next: (res) => {
           if (res?.success) {
 
-            console.log("res", res);
             if (res.systmeCode == 'ESS-EMAIL-IT-Req') {
               const url = `${res.landingPath || '/'}?ticket=${encodeURIComponent(this.ticketNumber.trim())}`;
-              // console.log('go url:', url);
               this.router.navigateByUrl(url);
             }
             else {
               const url = `${res.landingPath || '/'}?applicantId=${encodeURIComponent(encryptValue(this.applicantId.trim()))}`;
-              // console.log('go url:', url);
               this.router.navigateByUrl(url || '/');
             }
           } else {

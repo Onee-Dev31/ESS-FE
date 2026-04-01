@@ -80,11 +80,9 @@ export class SettingMenu implements OnInit {
       createdBy: this.authService.currentUser()?.toLocaleLowerCase()
     }
 
-    console.log(payload)
 
     this.settingService.createMenu(payload).subscribe({
       next: (res) => {
-        // console.log(res)
         this.closeForm();
         this.getMenu();
       }
@@ -112,11 +110,9 @@ export class SettingMenu implements OnInit {
           CanApprove: item.CanApprove
         }));
 
-        console.log('payload:', newData[0].MenuID, payload);
 
         this.settingService.updateMenuRolePermission(newData[0].MenuID, payload).subscribe({
           next: (res) => {
-            // console.log(res)
 
             if (res?.success) {
               this.swalService.success(res.message)
@@ -150,11 +146,9 @@ export class SettingMenu implements OnInit {
           }))
         }
 
-        console.log("payload > ", payload)
 
         this.settingService.updateMenu(payload).subscribe({
           next: (res) => {
-            // console.log(res)
             if (res?.success) {
               this.swalService.success(res.message)
             }
@@ -219,7 +213,6 @@ export class SettingMenu implements OnInit {
 
   // เลือกเมนู
   selectMenu(menu: any) {
-    // console.log(this.menus, this.rolePermissionMap)
 
     // if (!menu.IsEnabled) return;
 
@@ -280,7 +273,6 @@ export class SettingMenu implements OnInit {
       .map(r => r.RoleName)                  // ค่อย map เป็นชื่อ
       .filter((value, index, self) => self.indexOf(value) === index); // unique
 
-    // console.log("summaryRoles >>> ", this.summaryRoles)
 
     // 2. group permission ตาม MenuID
     const permissionMap = this.rolePermissions.reduce((acc: any, item: any) => {
@@ -299,7 +291,6 @@ export class SettingMenu implements OnInit {
       return acc;
     }, {});
 
-    // console.log("permissionMap >>> ", permissionMap)
 
     // 3. flatten เมนู (เอาทั้ง parent + child)
     const flattenMenus = (menus: any[], level: number = 0): any[] => {
@@ -313,7 +304,6 @@ export class SettingMenu implements OnInit {
 
     const allMenus = flattenMenus(this.menus);
 
-    // console.log("allMenus >>> ", allMenus)
 
     // 4. สร้าง table
     this.summaryTable = allMenus.map(menu => ({
@@ -322,7 +312,6 @@ export class SettingMenu implements OnInit {
       permissions: permissionMap[menu.MenuID] || {}
     }));
 
-    // console.log("summaryTable >>> ", this.summaryTable)
     this.isViewSummaryOpen.set(true);
   }
 
@@ -343,7 +332,6 @@ export class SettingMenu implements OnInit {
   getMenu() {
     this.settingService.getMenu().subscribe({
       next: (res) => {
-        // console.log(res.data);
 
         const rawMenus = res.data.menus;
 

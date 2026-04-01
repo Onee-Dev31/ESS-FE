@@ -327,7 +327,6 @@ export class FreelanceManagementComponent implements OnInit {
 
         const info = res.info
         const file = res.files
-        // console.log(info, file)
 
         let convertedFiles: any[] = [];
 
@@ -372,7 +371,6 @@ export class FreelanceManagementComponent implements OnInit {
 
         this.original_formData_freelance = structuredClone(formData);
 
-        // console.log(formData);
 
         this.editingItem.set(formData);
         this.isFormOpen.set(true);
@@ -393,15 +391,11 @@ export class FreelanceManagementComponent implements OnInit {
         const is_resign = fData.btn_action === "RESIGN" ? true : false
         const is_Activate = fData.btn_action === "ACTIVATE" ? true : false
 
-        // console.log(is_update)
-        // console.log('Form data:', fData);
 
         let changedData: any = fData;
 
         if (is_update) {
-            // console.log('original Form data:', this.original_formData_freelance);
             const diff = this.getChangedFields(fData, this.original_formData_freelance);
-            // console.log('Changed fields:', diff);
             changedData = diff;
         }
 
@@ -529,11 +523,6 @@ export class FreelanceManagementComponent implements OnInit {
             obj[key] = value;
         });
 
-        console.log(obj);
-        console.log('replaceDescriptions:', formData.getAll('replaceDescriptions'));
-        console.log('replaceFiles:', formData.getAll('replaceFiles'));
-        console.log('newFileDescriptions:', formData.getAll('newFileDescriptions'));
-        console.log('Files:', formData.getAll('newFiles'));
 
         this.freelanceService.createFreelance(formData)
             .pipe(
@@ -545,13 +534,11 @@ export class FreelanceManagementComponent implements OnInit {
                 })
             ).subscribe({
                 next: (res) => {
-                    // console.log(res);
                     if (res.message.toLowerCase().includes('update')) {
                         this.swalService.success('อัพเดทพนักงานฟรีแลนซ์สำเร็จ')
                     } else if (res.message.toLowerCase().includes('create')) {
                         this.swalService.success('เพิ่มพนักงานฟรีแลนซ์สำเร็จ')
                     } else {
-                        console.log('ตกเงื่อนไข')
                         this.swalService.success(res.message)
                     }
                 },
@@ -565,7 +552,6 @@ export class FreelanceManagementComponent implements OnInit {
                     }
                 },
                 complete: () => {
-                    console.log("COMPLETE");
                 }
             });
     }
@@ -599,7 +585,6 @@ export class FreelanceManagementComponent implements OnInit {
             { type: fileData.FILE_TYPE }
         );
 
-        // console.log(file)
 
         return {
             name: fileData.FILE_NAME,
@@ -642,20 +627,17 @@ export class FreelanceManagementComponent implements OnInit {
 
         this.fetchFreelanceByStatus('Active', pageA, sizeA)
             .subscribe(res => {
-                // console.log("Active >>", res)
                 this.dataActiveFromApi(res);
             });
 
         this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
             .subscribe(res => {
-                // console.log("Resigned >>", res)
                 this.dataResignFromApi(res);
                 this.loadingService.stop('freelance-list');
             });
     }
 
     private dataActiveFromApi(res: any) {
-        // console.log("Active >>", res)
         const items = res.items ?? []
         this.activeData.set(this.mapApiData(items));
 
@@ -665,7 +647,6 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     private dataResignFromApi(res: any) {
-        // console.log("Resigned >>", res)
         const items = res.items ?? []
         this.resignData.set(this.mapApiData(items));
 
@@ -675,7 +656,6 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     private mapApiData(items: any[]): FreelanceMember[] {
-        // console.log("items >> ", items)
         return items.map((item: any) => ({
             id: item.ID,
             employeeId: item.EMP_NO,
@@ -722,7 +702,6 @@ export class FreelanceManagementComponent implements OnInit {
     getCompanies() {
         this.masterService.getCompanyMaster().subscribe({
             next: (data) => {
-                // console.log(data);
                 this.companyList = data
             },
             error: (error) => {
@@ -734,7 +713,6 @@ export class FreelanceManagementComponent implements OnInit {
     getDepartments() {
         this.masterService.getDepartmentMaster().subscribe({
             next: (data) => {
-                // console.log(data);
                 this.departmentList = data
             },
             error: (error) => {

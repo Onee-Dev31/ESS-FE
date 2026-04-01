@@ -34,7 +34,6 @@ export class NoteModal {
       attachments: this.noteForm.attachments
     }
 
-    console.log(payload)
     this.submitModal.emit(payload);
   }
 

@@ -189,7 +189,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
     else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
 
-    console.log(item, newStatus, reason)
 
     const payload = {
       action: newStatus.toLowerCase(),
@@ -199,7 +198,6 @@ export class ApprovalDetailModalComponent implements OnInit {
       }),
     }
 
-    console.log(item.requestId, payload)
 
     this.approvelService.updateTypeClaims(item.requestId, payload)
       .subscribe({

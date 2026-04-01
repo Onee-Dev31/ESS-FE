@@ -1,4 +1,5 @@
-import { Component, HostListener, ElementRef, inject, computed, signal, NgZone } from '@angular/core';
+import { Component, HostListener, ElementRef, inject, computed, signal, NgZone, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
@@ -44,6 +45,7 @@ export class NavbarComponent {
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
   themeService = inject(ThemeService);
+  private destroyRef = inject(DestroyRef);
   private notifyAudio = new Audio('/notification1.wav');
 
   isProfileOpen = false;
@@ -62,6 +64,7 @@ export class NavbarComponent {
     this.notifyAudio.volume = 0.7;
     this.signalrService
       .on('NewTicket', '/it-service-list')
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(data => {
 
         this.zone.run(() => {
@@ -141,7 +144,6 @@ export class NavbarComponent {
   //     .build();
 
   //   this.hubConnection.start()
-  //     .then(() => console.log('🔔 Navbar SignalR Connected'))
   //     .catch(err => console.error(err));
 
   //   this.hubConnection.on("NewTicket", (data) => {

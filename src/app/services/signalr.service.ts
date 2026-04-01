@@ -18,7 +18,6 @@ export class SignalrService {
     sendTestRealtime() {
         this.http.post(`${this.baseUrl}/notification/it-service`, {})
         .subscribe({
-        next: () => console.log('Test sent'),
         error: (err) => console.error(err)
         });
     }
@@ -30,13 +29,11 @@ export class SignalrService {
             .build();
 
         this.hubConnection.onreconnected(async () => {
-            console.log("Reconnected");
             await this.joinUserGroups();
         });
 
         try {
             await this.hubConnection.start();
-            console.log("SignalR Connected");
             await this.joinUserGroups();
 
         } catch (err) {

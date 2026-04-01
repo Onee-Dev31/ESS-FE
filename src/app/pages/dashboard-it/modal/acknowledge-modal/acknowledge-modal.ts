@@ -26,7 +26,6 @@ export class AcknowledgeModal {
 
     if (changes['ticket'] && this.ticket) {
 
-      console.log(this.ticket.ticketTypeId)
 
       this.selectedTag = this.ticket.ticketTypeId;
 
@@ -49,7 +48,6 @@ export class AcknowledgeModal {
       message: this.message,
       attachments: this.attachments
     }
-    console.log(payload);
     this.submitModal.emit(payload);
   }
 

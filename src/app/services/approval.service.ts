@@ -16,8 +16,6 @@ export class ApprovalService {
 
 
     //   updateTicket(id: string, formData: FormData): Observable<any> {
-    //     console.log('ticketId type:', id);
-    //     // console.log(id, payload)
     //     // return of({ success: true }).pipe(delay(1500));
     //     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
     //   }

@@ -129,7 +129,6 @@ export class ItRepairRequestComponent implements OnInit {
   });
 
   selectDevice(device: any, category: any) {
-    console.log(category)
     this.repairFormData.update(prev => ({
       ...prev, device: device, category: {
         categoryId: category.categoryId, group: category.group
@@ -251,7 +250,6 @@ export class ItRepairRequestComponent implements OnInit {
   confirmSubmission() {
     const data = this.repairFormData();
 
-    console.log(data)
 
     const formData = new FormData();
 
@@ -273,7 +271,6 @@ export class ItRepairRequestComponent implements OnInit {
       }
     });
 
-    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.createTicket(formData)
@@ -283,7 +280,6 @@ export class ItRepairRequestComponent implements OnInit {
         })
       ).subscribe({
         next: (res) => {
-          console.log(res);
           if (res.success) {
             this.swalService.success('ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว', res.ticketNumber).then(() => {
               this.clearForm();
@@ -316,7 +312,6 @@ export class ItRepairRequestComponent implements OnInit {
   getDeviceCategory() {
     this.itServiceService.getDeviceCategory().subscribe({
       next: (res) => {
-        // console.log(res);
         this.deviceCategories = res.data
         this.cdr.detectChanges();
       },
@@ -328,7 +323,6 @@ export class ItRepairRequestComponent implements OnInit {
   getOpenFor() {
     this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
       next: (res) => {
-        console.log(res.data);
         this.openForOptions.set(res.data)
       },
       error: (error) => {

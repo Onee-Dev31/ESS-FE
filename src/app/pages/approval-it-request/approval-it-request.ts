@@ -108,7 +108,6 @@ export class ApprovalItRequestComponent implements OnInit {
     })
       .subscribe({
         next: (res) => {
-          console.log("getApprovalItRequests: ", res)
           const mappedData =
             (res.data || []).map((item: any) => this.mapToApprovalItem(item));
 
@@ -127,7 +126,6 @@ export class ApprovalItRequestComponent implements OnInit {
 
   private mapToApprovalItem(item: any): ApprovalItem {
     // Modify Mapping according to the actual IT Request API response
-    // console.log(`mapToApprovalItem ${JSON.stringify(item)}`)
     return {
       requestId: item.id,
       requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',
@@ -242,7 +240,6 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   viewRequestDetail(item: ApprovalItem) {
-    // console.log("ApprovalItem >>> ", item)
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
