@@ -56,25 +56,37 @@ export class FileConverterService {
     }
 
     buildPreviewFile(file: any) {
-
-        let url = file.filePath || file.url;
+        let url = file.fileUrl || file.filePath || file.url;
 
         if (!url) {
-            const actualFile = file instanceof File
-                ? file
-                : file?.file instanceof File
-                    ? file.file
-                    : null;
+            const actualFile =
+                file instanceof File
+                    ? file
+                    : file?.file instanceof File
+                        ? file.file
+                        : null;
 
             if (actualFile) {
                 url = URL.createObjectURL(actualFile);
             }
         }
+
+        const date = file.createdDate
+            ? dayjs(file.createdDate).isValid()
+                ? dayjs(file.createdDate).format('DD/MM/YYYY HH:mm')
+                : ''
+            : '';
+
         return {
-            fileName: file.fileName || file.name,
-            date: dayjs(file.createdDate).format('DD/MM/YYYY HH:mm') || dayjs().format('DD/MM/YYYY HH:mm'),
-            url: url,
-            type: file.type || 'image/png'
+            fileName: file.fileName || file.name || 'unknown',
+            date: date,
+            url: url || '',
+            type: file.fileType ||file.type || file.file_type || ''
         };
+    }
+
+    buildPreviewFiles(files: any[]): any[] {
+        if (!files?.length) return [];
+        return files.map(f => this.buildPreviewFile(f));
     }
 }

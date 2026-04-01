@@ -27,6 +27,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { FileConverterService } from '../../services/file-converter';
 /** หน้าแสดงรายการเบิกค่ารักษาพยาบาล */
 @Component({
   selector: 'app-medicalexpenses',
@@ -53,6 +54,7 @@ export class MedicalexpensesComponent implements OnInit {
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
+  private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('medical-list');
@@ -234,12 +236,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
-    this.previewFiles.set(claim.attachments.map(a => ({
-      fileName: a.fileName,
-      url: this.medicalApiService.getFileUrl(a.fileUrl),
-      date: claim.claimDate,
-      type: a.fileType
-    })));
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(claim.attachments));
     this.isPreviewModalOpen.set(true);
   }
 

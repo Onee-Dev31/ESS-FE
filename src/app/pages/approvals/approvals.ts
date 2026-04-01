@@ -272,8 +272,8 @@ export class ApprovalsComponent implements OnInit {
 
   /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
-    this.selectedItem.set(item);
     console.log(item)
+    this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
   }
@@ -302,6 +302,7 @@ export class ApprovalsComponent implements OnInit {
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
+
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
     this.previewFiles.set(claim.attachments.map(a => ({

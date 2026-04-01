@@ -32,7 +32,7 @@
         <input type="text" placeholder="ค้นหา Request No, รหัสพนักงาน..." [value]="listing.searchText()"
           (input)="onSearch($event)" />
       </div> -->
-      <div class="form-field" >
+      <div class="form-field">
         <nz-input-wrapper class="form-input">
           <nz-icon nzInputPrefix nzType="search" />
           <input nz-input class="" placeholder="ค้นหา Request No, ชื่อ-นามสกุล" [value]="listing.searchText()"
@@ -331,9 +331,19 @@
 </div>
 
 @if (isModalOpen() && selectedItem()) {
-<app-approval-detail-modal [approvalItem]="selectedItem()!" [initialAction]="initialAction()" (onClose)="closeModal()"
-  (onStatusUpdated)="onStatusUpdated()">
-</app-approval-detail-modal>
+<div class="modal-overlay">
+  <div class="modal-container">
+    @defer {
+    <app-approval-detail-modal [approvalItem]="selectedItem()!" [initialAction]="initialAction()"
+      (onClose)="closeModal()" (onStatusUpdated)="onStatusUpdated()">
+    </app-approval-detail-modal>
+    } @loading {
+    <div class="p-4 text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+    </div>
+    }
+  </div>
+</div>
 }
 
 @if (isPreviewModalOpen()) {

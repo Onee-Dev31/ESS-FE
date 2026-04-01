@@ -13,6 +13,9 @@ import { modalAnimation, fadeIn } from '../../../animations/animations';
 import { ApprovalService } from '../../../services/approval.service';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
+import dayjs from 'dayjs';
+import { FileConverterService } from '../../../services/file-converter';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 interface PreviewFile {
   fileName: string;
@@ -35,6 +38,8 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvelService = inject(ApprovalService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
+  private fileConverter = inject(FileConverterService);
+  dateUtil = inject(DateUtilityService);
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
@@ -91,7 +96,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   isPreviewModalOpen = signal(false);
-  previewFiles = signal<PreviewFile[]>([]);
+  previewFiles = signal<any[]>([]);
 
   selectedRequestDetails = computed(() => ({
     type: this.currentDetailType(),
@@ -228,16 +233,17 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   close() { this.onClose.emit(); }
 
-  openPreview(fileUrlOrName: string) {
-    if (!fileUrlOrName) return;
-    this.previewFiles.set([{ fileName: fileUrlOrName, fileUrl: fileUrlOrName, date: '' }]);
+  openPreview(att: any) {
+    console.log(att, this.selectedRequestDetails())
+    if (!att) return;
+    this.previewFiles.set([this.fileConverter.buildPreviewFile(att)]);
     this.isPreviewModalOpen.set(true);
   }
 
   openAllAttachments() {
     const claim = this.approvalItem.originalData as MedicalClaim;
     if (!claim?.attachments?.length) return;
-    this.previewFiles.set(claim.attachments.map(a => ({ fileName: a.fileName, fileUrl: a.fileUrl, date: '' })));
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(claim.attachments));
     this.isPreviewModalOpen.set(true);
   }
 
@@ -246,5 +252,8 @@ export class ApprovalDetailModalComponent implements OnInit {
     return claim?.claimId != null ? claim : null;
   }
 
+  get isApproved(): boolean {
+    return (this.medicalClaim?.approvedAmount ?? 0) > 0;
+  }
   closePreview() { this.isPreviewModalOpen.set(false); }
 }

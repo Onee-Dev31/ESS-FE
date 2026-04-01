@@ -546,7 +546,7 @@ $status-danger-text: var(--status-danger-text);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
-        span{
+        span {
             margin-left: 8px;
         }
 
@@ -1257,4 +1257,8 @@ app-empty-state {
         border-radius: 50%;
         background: currentColor;
     }
+}
+
+.modal-overlay {
+    @include modal-overlay-styles;
 }

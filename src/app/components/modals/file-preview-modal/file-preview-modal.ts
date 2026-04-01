@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -24,6 +24,12 @@ export class FilePreviewModalComponent implements OnInit {
 
     selectedFile: FilePreviewItem | null = null;
     hasError: boolean = false;
+
+    // ngOnChanges(changes: SimpleChanges) {
+    //     if (changes['files']) {
+    //         console.log('files changed:', changes['files'].currentValue);
+    //     }
+    // }
 
     ngOnInit() {
         if (this.files.length > 0) {
