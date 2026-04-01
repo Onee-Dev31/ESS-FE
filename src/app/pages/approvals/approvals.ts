@@ -55,7 +55,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private medicalApiService = inject(MedicalApiService);
-  private dateUtil = inject(DateUtilityService);
+  dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);

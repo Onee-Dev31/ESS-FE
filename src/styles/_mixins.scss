@@ -170,8 +170,8 @@
     justify-content: center;
     gap: 8px;
     padding: 0 24px;
-    height: 48px;
-    font-size: 0.95rem;
+    height: 44px;
+    font-size: $font-size-label;
     font-weight: 600;
     border-radius: 10px;
     border: none;
@@ -186,6 +186,18 @@
 
     &:active {
         transform: translateY(1px);
+    }
+
+    @include tablet {
+        font-size: $font-size-label;
+        height: 42px;
+        padding: 0 12px;
+    }
+
+    @include mobile {
+        font-size: $font-size-hint;
+        height: 38px;
+        padding: 0 8px;
     }
 }
 
@@ -285,6 +297,16 @@
 
     &::placeholder {
         color: var(--text-muted);
+    }
+
+    @include tablet {
+        font-size: $font-size-label;
+        height: 42px;
+    }
+
+    @include mobile {
+        font-size: $font-size-hint;
+        height: 38px;
     }
 }
 
@@ -448,7 +470,6 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-header);
-    margin-bottom: 24px;
     position: relative;
     padding-left: 16px;
 
@@ -459,9 +480,17 @@
         top: 50%;
         transform: translateY(-50%);
         width: 4px;
-        height: 20px;
+        height: 18px;
         background: $primary;
         border-radius: 2px;
+    }
+
+    @include tablet {
+        font-size: $font-size-body;
+    }
+
+    @include mobile {
+        font-size: $font-size-label;
     }
 }
 

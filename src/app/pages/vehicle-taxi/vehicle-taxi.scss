@@ -127,25 +127,8 @@ $border-color: var(--border-color);
 }
 
 // Card Header Title Mixin
-@mixin card-header-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-header);
-  margin-bottom: 24px;
-  position: relative;
-  padding-left: 16px;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 20px;
-    background: $primary;
-    border-radius: 2px;
-  }
+.card-header-title {
+  @include card-header-title;
 }
 
 // Icon Button Sky Mixin
@@ -588,15 +571,7 @@ $border-color: var(--border-color);
   }
 
   .form-input {
-    height: 48px !important;
-    padding: 0 20px !important;
-    border: 1px solid var(--text-muted) !important;
-    border-radius: 10px !important;
-    font-size: 0.95rem !important;
-    color: var(--text) !important;
-    background: var(--bg-card) !important;
-    transition: all 0.2s;
-    font-family: $font-main;
+    @include input-field;
 
     &::placeholder {
       color: var(--text-muted);

@@ -140,23 +140,7 @@ $border: var(--border);
 }
 
 .card-header-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text-header);
-    position: relative;
-    padding-left: 14px;
-
-    &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 18px;
-        background: $primary;
-        border-radius: 2px;
-    }
+    @include card-header-title;
 }
 
 // ============================================================
@@ -714,17 +698,12 @@ app-empty-state {
 .btn-create {
     @include btn-primary;
     height: 40px;
-    padding: 0 20px;
     font-weight: 600;
     border-radius: 10px;
 }
 
 .btn-search {
     @include btn-primary;
-    height: 44px;
-    padding: 0 20px;
-    font-weight: 600;
-    border-radius: 10px;
 }
 
 .btn-icon-sky {
@@ -733,46 +712,6 @@ app-empty-state {
 
 .btn-clear {
     @include btn-outline;
-    height: 44px;
-    width: 44px;
-    padding: 0;
-    border-radius: 10px;
-    border-color: var(--border-table-head);
-    color: var(--text-table-head);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-        border-color: $primary;
-        color: $primary;
-    }
-}
-
-.form-control {
-    @include input-field;
-    height: 44px;
-    border-radius: 10px;
-    border-color: var(--border-table-head);
-    background: var(--bg-table-head);
-
-    &:focus {
-        background: var(--bg-card);
-        border-color: $primary;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-}
-
-select.form-control {
-    @include select-dropdown;
-    background-color: var(--bg-table-head);
-}
-
-.date-input-group,
-.select-input-group {
-    .form-control {
-        width: 100%;
-    }
 }
 
 // ============================================================
@@ -804,15 +743,7 @@ select.form-control {
     }
 
     .form-input {
-        height: 48px !important;
-        padding: 0 20px !important;
-        border: 1px solid var(--text-muted) !important;
-        border-radius: 10px !important;
-        font-size: 0.95rem !important;
-        color: var(--text) !important;
-        background: var(--bg-card) !important;
-        transition: all 0.2s;
-        font-family: $font-main;
+        @include input-field;
 
         &::placeholder {
             color: var(--text-muted);

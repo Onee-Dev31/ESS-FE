@@ -297,7 +297,7 @@
     overflow: hidden;
     transition: box-shadow 0.2s, transform 0.2s;
     border-left: 4px solid var(--primary);
-    
+
 
     &:hover {
       transform: translateY(-2px);
@@ -458,23 +458,7 @@
 }
 
 .card-header-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-header);
-  position: relative;
-  padding-left: 14px;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 18px;
-    background: $primary;
-    border-radius: 2px;
-  }
+  @include card-header-title;
 }
 
 // ============================================================
@@ -598,15 +582,7 @@
   }
 
   .form-input {
-    height: 48px !important;
-    padding: 0 20px !important;
-    border: 1px solid var(--text-muted) !important;
-    border-radius: 10px !important;
-    font-size: 0.95rem !important;
-    color: var(--text) !important;
-    background: var(--bg-card) !important;
-    transition: all 0.2s;
-    font-family: $font-main;
+    @include input-field;
 
     &::placeholder {
       color: var(--text-muted);
@@ -681,10 +657,6 @@
 
 .btn-clear {
   @include btn-outline;
-
-  @include tablet {
-    min-width: 100px;
-  }
 }
 
 .action-btns {

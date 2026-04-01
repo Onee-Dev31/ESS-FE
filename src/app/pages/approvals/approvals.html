@@ -105,7 +105,8 @@
           <div class="claim-card__main">
             <div class="claim-date">
               <i class="far fa-calendar-alt"></i>
-              <span>{{ claim.treatmentDateFrom }} – {{ claim.treatmentDateTo }}</span>
+              <span>{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} – {{
+                dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY')}}</span>
               <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
             </div>
             <div class="claim-hospital">
