@@ -139,6 +139,117 @@
             }
         </div>
 
+        <div class="table-responsive">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
+
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ประเภท</th>
+                        <th>วันที่รักษา</th>
+                        <th>สถานพยาบาล</th>
+                        <th>โรค</th>
+                        <th class="text-right">ยอดเงิน</th>
+                        <th>สถานะ</th>
+                        <th>เอกสาร</th>
+                        <th>สร้างวันที่</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (claim of paginatedClaims(); track trackById($index, claim)) {
+                    <tr>
+
+                        <!-- ประเภท -->
+                        <td>
+                            <div class="type-badge">
+                                <span class="type-name">{{ claim.expenseTypeName }}</span>
+                            </div>
+
+                            <div class="request-no">
+                                <i class="fa-solid fa-tag"></i>
+                                {{ claim.voucherNo ?? claim.claimId }}
+                            </div>
+                        </td>
+                        <!-- วันที่ -->
+                        <td>
+                            {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
+                            {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
+
+                            <span class="sub-text">
+                                {{ claim.treatmentDays }} วัน
+                            </span>
+                        </td>
+
+                        <!-- โรงพยาบาล -->
+                        <td>{{ claim.hospitalName }}</td>
+
+                        <!-- โรค -->
+                        <td>{{ claim.diseaseName }}</td>
+
+                        <!-- จำนวนเงิน -->
+                        <td class="text-right">
+                            <div class="amount-cell">
+
+                                <div class="amount-main">
+                                    ฿{{ claim.requestedAmount | number:'1.2-2' }}
+                                </div>
+
+                                @if (claim.approvedAmount > 0) {
+                                <div class="amount-approved">
+                                    <i class="fas fa-check text-success"></i>
+                                </div>
+                                }
+
+                            </div>
+                        </td>
+
+                        <!-- สถานะ -->
+                        <td>
+                            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                                {{ claim.status | statusLabel }}
+                            </span>
+                        </td>
+
+                        <!-- เอกสาร -->
+                        <td class="text-center">
+                            @if (claim.attachments.length) {
+                            <button type="button" class="btn-attach" (click)="openPreview(claim)">
+                                <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
+                            </button>
+                            } @else {
+                            -
+                            }
+                        </td>
+
+                        <!-- footer info -->
+                        <td>
+                            <div class="">
+                                {{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}
+                            </div>
+                        </td>
+
+                    </tr>
+                    }
+
+                    @empty {
+                    <tr>
+                        <td colspan="8">
+                            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                                icon="fas fa-inbox">
+                            </app-empty-state>
+                        </td>
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+
+            }
+        </div>
+
     </div>
 
     @if (isModalOpen()) {

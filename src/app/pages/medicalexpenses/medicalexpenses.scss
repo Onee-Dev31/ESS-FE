@@ -334,7 +334,7 @@ app-empty-state {
     // display: none;
     gap: 14px;
     padding: 4px 0 8px;
-    display: grid;
+    display: none;
     grid-template-columns: repeat(3, 1fr);
 
     @include large-tablet {
@@ -547,69 +547,37 @@ app-empty-state {
 }
 
 .modern-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
+    @include modern-table;
 
-    thead tr {
-        background: var(--bg-table-head);
-        border-bottom: 2px solid var(--border-table-head);
-    }
 
-    thead th {
-        padding: 12px 16px;
-        font-size: 0.72rem;
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-table-head);
-        white-space: nowrap;
-        cursor: default;
+        font-size: $font-size-label;
 
-        &.sortable-header {
-            cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
-
-            &:hover {
-                color: var(--text-header);
-            }
+        i {
+            font-size: $font-size-body;
+            opacity: 0.9;
         }
 
-        &.text-right {
-            text-align: right;
-        }
-
-        &.text-center {
-            text-align: center;
+        .type-name {
+            white-space: nowrap;
         }
     }
 
-    tbody tr {
-        border-bottom: 1px solid var(--border-toolbar);
-        transition: background 0.15s;
-
-        &:hover td {
-            background: var(--bg-table-head);
-        }
-
-        &:last-child {
-            border-bottom: none;
-        }
+    .request-no {
+        font-size: $font-size-label;
+        color: $primary;
     }
 
-    tbody td {
-        padding: 14px 16px;
-        color: var(--text-header);
-        vertical-align: middle;
-
-        &.text-right {
-            text-align: right;
-        }
-
-        &.text-center {
-            text-align: center;
-        }
+    .sub-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        background: var(--bg-slate);
+        padding: 6px 8px;
+        border-radius: 10px;
     }
 }
 
