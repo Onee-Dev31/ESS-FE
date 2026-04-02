@@ -290,7 +290,7 @@
           </div>
           @if (leaveStatsDisplay(); as lstats) {
           <div class="leave-stats-grid">
-            @for (leave of lstats; track leave.label) {
+            @for (leave of lstats; track leave.leave_type_id) {
             <div class="card leave-card" [ngClass]="leave.theme" (click)="navigateTo('/timeoff')">
               <div class="leave-body">
                 <div class="leave-header">

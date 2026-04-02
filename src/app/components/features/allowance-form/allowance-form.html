@@ -151,7 +151,7 @@
             <div class="date-info">
               <span class="day-dot"
                 [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
-              <span class="date">{{ log.date }}</span>
+              <span class="date">{{ dateUtil.formatDateToBE(log.date, "ddd. DD/MM/YYYY") }}</span>
               <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
                 log.dayType
                 }})</span>

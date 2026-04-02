@@ -71,9 +71,9 @@ export class FileConverterService {
             }
         }
 
-        const date = file.createdDate
-            ? dayjs(file.createdDate).isValid()
-                ? dayjs(file.createdDate).format('DD/MM/YYYY HH:mm')
+        const date = file.createdDate || file.createdAt
+            ? dayjs(file.createdDate || file.createdAt).isValid()
+                ? dayjs(file.createdDate || file.createdAt).format('DD/MM/YYYY HH:mm')
                 : ''
             : '';
 
@@ -81,7 +81,7 @@ export class FileConverterService {
             fileName: file.fileName || file.name || 'unknown',
             date: date,
             url: url || '',
-            type: file.fileType ||file.type || file.file_type || ''
+            type: file.fileType || file.type || file.file_type || ''
         };
     }
 

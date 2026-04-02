@@ -7,6 +7,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast';
 import { switchMap } from 'rxjs';
 import { SwalService } from '../../../services/swal.service';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 @Component({
   selector: 'app-allowance-form',
@@ -26,6 +27,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   private toastService = inject(ToastService);
   private swalService = inject(SwalService);
   private cdr = inject(ChangeDetectorRef);
+  dateUtil = inject(DateUtilityService)
 
   loadedRequest?: AllowanceRequest;
 
