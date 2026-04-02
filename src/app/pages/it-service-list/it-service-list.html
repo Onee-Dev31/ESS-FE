@@ -80,6 +80,26 @@
                     <div class="tk-card__title">
                         รายละเอียด
                     </div>
+                    <!-- <div class="services">
+                        @for (service of t.services; track service.service_type_id) {
+                        <span class="tag-service">
+                            {{ service.service_name_th }}
+                        </span>
+                        }
+                    </div> -->
+                    <div class="services">
+                        @for (service of t.services.slice(0, 3); track service.service_type_id) {
+                        <span class="tag-service">
+                            {{ service.service_name_th }}
+                        </span>
+                        }
+
+                        @if (t.services.length > 3) {
+                        <span class="tag-more" (click)="showAll(t.services)">
+                            +{{ t.services.length - 3 }}
+                        </span>
+                        }
+                    </div>
                 </div>
 
                 <div class="tk-card__body" *ngIf="t.status !== 'Waiting you'">
@@ -447,4 +467,26 @@
 @if (isRatingModalOpen()) {
 <app-rating-modal (onClose)="closeRating()" (onRate)="handleRate($event)">
 </app-rating-modal>
+}
+
+@if (showAllServices) {
+
+<app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()"></app-services-detail-modal>
+
+<!-- <div class="modal-backdrop" (click)="closeModal_showAll()"></div>
+
+<div class="modal">
+    <div class="modal-header">
+        <h3>บริการทั้งหมด</h3>
+        <button (click)="closeModal_showAll()">✕</button>
+    </div>
+
+    <div class="modal-body">
+        @for (service of selectedServices; track service.service_type_id) {
+        <span class="tag-service">
+            {{ service.service_name_th }}
+        </span>
+        }
+    </div>
+</div> -->
 }

@@ -127,7 +127,7 @@ export class ApprovalItRequestComponent implements OnInit {
 
   private mapToApprovalItem(item: any): ApprovalItem {
     // Modify Mapping according to the actual IT Request API response
-    // console.log(`mapToApprovalItem ${JSON.stringify(item)}`)
+    // console.log(`mapToApprovalItem` , item)
     return {
       requestId: item.id,
       requestNo: item.ticketNumber || item.requestNo || 'IT-XXX',

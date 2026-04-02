@@ -1,0 +1,37 @@
+<div class="modal-backdrop" (click)="close()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="header-content">
+                <span class="header-icon"><i class="fa-solid fa-desktop"></i></span>
+                <div class="header-text">
+                    <h3> Services</h3>
+                </div>
+            </div>
+            <button type="button" class="btn-close" title="ปิด" (click)="close()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            @for (group of groupedServices | keyvalue; track group.key) {
+
+            <div class="group-section">
+                <div class="group-title">
+                    {{ group.key }}
+                </div>
+
+                <div class="services-list">
+                    @for (service of group.value; track service.service_type_id) {
+                    <div class="service-item">
+                        {{ service.service_name_th }}
+                    </div>
+                    }
+                </div>
+            </div>
+
+            }
+
+        </div>
+    </div>
+</div>

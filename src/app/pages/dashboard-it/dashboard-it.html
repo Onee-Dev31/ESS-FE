@@ -116,6 +116,13 @@
                     <div class="tk-card__title">
                         รายละเอียด
                     </div>
+                    <div class="services">
+                        @for (service of t.services; track service.service_type_id) {
+                        <span class="tag-service">
+                            {{ service.service_name_th }}
+                        </span>
+                        }
+                    </div>
                 </div>
 
                 <div class="tk-card__body">

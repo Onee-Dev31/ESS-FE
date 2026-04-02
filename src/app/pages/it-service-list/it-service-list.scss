@@ -886,6 +886,29 @@ textarea.form-input {
     color: var(--text-header);
 }
 
+.services {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+
+.tag-service {
+    padding: 4px 10px;
+    border-radius: 50px;
+    background-color: var(--primary);
+    color: white;
+    font-size: $font-size-hint;
+    font-weight: 500;
+}
+
+.tag-more {
+    padding: 4px 10px;
+    border-radius: 50px;
+    background-color: #eee;
+    cursor: pointer;
+    font-size: 12px;
+}
+
 .tk-card__body {
     padding: 14px;
     overflow-y: auto;
@@ -1473,3 +1496,4 @@ textarea.form-input {
         order: 2;
     }
 }
+

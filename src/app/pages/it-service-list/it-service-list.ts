@@ -16,11 +16,12 @@ import Swal from 'sweetalert2';
 import { NoteModal } from "../dashboard-it/modal/note-modal/note-modal";
 import { SwalService } from '../../services/swal.service';
 import { formatText } from '../../utils/formatText';
+import { ServicesDetailModal } from "../../components/modals/services-detail-modal/services-detail-modal";
 
 @Component({
   selector: 'app-it-service',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent, NzSelectModule, NzIconModule, NzButtonModule, NoteModal],
+  imports: [CommonModule, FormsModule, FilePreviewModalComponent, RatingModalComponent, NzSelectModule, NzIconModule, NzButtonModule, NoteModal, ServicesDetailModal],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
 })
@@ -35,7 +36,7 @@ export class ItService implements OnInit {
   checkScreen() {
     const width = window.innerWidth;
     this.isLaptop = width >= 1024 && width <= 1440;
-    console.log("isLabtop, " , width, ' > ', this.isLaptop)
+    // console.log("isLabtop, ", width, ' > ', this.isLaptop)
   }
 
   private itServiceMock = inject(ItServiceMockService);
@@ -109,7 +110,7 @@ export class ItService implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      console.log(ticket.IT_Status, ticket.user_status)
+      // console.log(ticket.IT_Status, ticket.user_status)
       // console.log(ticket.IT_Status === null ? ticket.user_status :
       //   ticket.IT_Status === 'Closed' ? 'Closed' :
       //     ticket.user_status === 'Pending' ? 'Waiting you' :
@@ -148,13 +149,27 @@ export class ItService implements OnInit {
         attachments: attachments,
         itNotes: itNotes,
         assignments: assignments,
-        assignTimeline: result
+        assignTimeline: result,
+        services: services
       }
 
-      console.log("selectedTicket:", objectData)
+      // console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
+  }
+
+  showAllServices: boolean = false;
+  selectedServices: any[] = [];
+  showAll(services: any) {
+    // console.log(services)
+    this.showAllServices = true
+    this.selectedServices = services
+
+  }
+
+  closeModal_showAll() {
+    this.showAllServices = false;
   }
 
   selectAssignee(item: any) {
@@ -246,7 +261,7 @@ export class ItService implements OnInit {
   copy(text: string) {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    console.log('คัดลอกแล้ว');
+    // console.log('คัดลอกแล้ว');
   }
 
   // FUNCTION MAP

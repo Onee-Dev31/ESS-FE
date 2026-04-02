@@ -1,0 +1,251 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+
+// Variables
+$primary: var(--primary);
+$text: var(--text);
+$text-sub: var(--text-sub);
+$bg-card: var(--bg-card);
+$border: var(--border);
+$shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+
+@mixin close-btn-style {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: $text-sub;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--border-toolbar);
+        color: $danger;
+        transform: rotate(90deg);
+    }
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+
+    @include mobile {
+        display: block;
+    }
+}
+
+.modal-container {
+    background: var(--bg-card);
+    width: 70%;
+    max-width: 500px;
+    max-height: 500px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: modalFadeIn 0.3s ease-out;
+    overflow: hidden;
+
+    @include mobile {
+        width: 100%;
+        max-width: unset;
+        height: 100%;
+        max-height: unset;
+        border-radius: 0;
+    }
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border-toolbar);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .header-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .header-text {
+            h3 {
+                margin: 0;
+                font-size: 1.25rem;
+                color: var(--text-header);
+                font-weight: 700;
+            }
+
+            .header-subtitle {
+                font-size: 0.85rem;
+                color: var(--text-table-head);
+            }
+        }
+    }
+
+    .btn-close {
+        @include close-btn-style;
+    }
+
+    @include tablet {
+        .header-content>.header-text>h3 {
+            font-size: $font-size-header;
+        }
+
+        .header-content>.header-text>.header-subtitle {
+            font-size: $font-size-label;
+        }
+    }
+
+    @include mobile {
+        .header-content>.header-text>h3 {
+            font-size: $font-size-body;
+        }
+
+        .header-content>.header-text>.header-subtitle {
+            font-size: $font-size-hint;
+        }
+    }
+
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 16px;
+    color: var(--text-muted);
+}
+
+.modal-body {
+    padding: 32px 48px;
+    overflow-y: auto;
+    flex: 1;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-header);
+    font-family: $font-main;
+
+    .group-section {
+        margin-bottom: 16px;
+    }
+
+    .group-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--primary);
+        text-transform: capitalize;
+    }
+
+    .services-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .service-item {
+        padding: 6px 12px;
+        border-radius: 20px;
+        background-color: #f1f3f5;
+        font-size: 13px;
+    }
+
+    @include tablet {
+        padding: 20px 24px;
+        font-size: $font-size-label;
+    }
+
+    @include mobile {
+        font-size: $font-size-hint;
+    }
+}
+
+.modal-footer {
+    padding: 20px 32px;
+    background: var(--bg-table-head);
+    border-top: 1px solid var(--border-toolbar);
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-confirm {
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+        padding: 10px 40px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: var(--primary);
+        }
+
+        @include tablet {
+            font-size: $font-size-hint;
+            padding: 8px 30px;
+        }
+    }
+}
+
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--text-muted);
+        border-radius: 4px;
+
+        &:hover {
+            background: var(--text-muted);
+        }
+    }
+}
+
+u {
+    text-underline-offset: 4px;
+}
+
+b,
+strong {
+    color: var(--text-header);
+}

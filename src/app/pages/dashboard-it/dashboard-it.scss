@@ -765,6 +765,21 @@
     color: var(--text-header);
 }
 
+.services {
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+}
+
+.tag-service {
+    padding: 4px 10px;
+    border-radius: 50px;
+    background-color: var(--primary);
+    color: white;
+    font-size: $font-size-hint;
+    font-weight: 500;
+}
+
 .tk-card__body {
     padding: 14px;
     overflow-y: auto;

@@ -51,7 +51,7 @@ export class DashboardIT implements OnInit {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   dateUtil = inject(DateUtilityService);
-  
+
   formatText = formatText;
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
@@ -156,12 +156,12 @@ export class DashboardIT implements OnInit {
         requesterCompanyName: ticket.requester_companyName,
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
+        it_satus: ticket.IT_Status,
+        approval_status: ticket.approval_status,
         attachments: attachments,
         itNotes: itNotes,
-        assignments: assignments,
         assignTimeline: result,
-        it_satus: ticket.IT_Status,
-        approval_status: ticket.approval_status
+        services: services,
       }
 
       console.log("selectedTicket:", objectData)
