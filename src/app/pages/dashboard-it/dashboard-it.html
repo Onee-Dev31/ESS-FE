@@ -117,9 +117,15 @@
                         รายละเอียด
                     </div>
                     <div class="services">
-                        @for (service of t.services; track service.service_type_id) {
+                        @for (service of t.services.slice(0, 3); track service.service_type_id) {
                         <span class="tag-service">
                             {{ service.service_name_th }}
+                        </span>
+                        }
+
+                        @if (t.services.length > 3) {
+                        <span class="tag-more" (click)="showAll(t.services)">
+                            +{{ t.services.length - 3 }}
                         </span>
                         }
                     </div>
@@ -494,4 +500,8 @@
 @if(IS_ASSIGN_TICKET()){
 <app-assign-modal [assigneeGroups]="assigneeGroups" [ticket]="selectedTicket()" (closeModal)="closeAssignModal()"
     (submitModal)="submitAssign($event)"></app-assign-modal>
+}
+
+@if (showAllServices) {
+<app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()"></app-services-detail-modal>
 }

@@ -767,8 +767,8 @@
 
 .services {
     display: flex;
-    flex-direction: row;
     gap: 3px;
+    flex-wrap: wrap;
 }
 
 .tag-service {
@@ -779,6 +779,15 @@
     font-size: $font-size-hint;
     font-weight: 500;
 }
+
+.tag-more {
+    padding: 4px 10px;
+    border-radius: 50px;
+    background-color: #eee;
+    cursor: pointer;
+    font-size: 12px;
+}
+
 
 .tk-card__body {
     padding: 14px;
@@ -1385,6 +1394,6 @@
     }
 
     .tk-left {
-        order: 2;
+        // order: 1;
     }
 }

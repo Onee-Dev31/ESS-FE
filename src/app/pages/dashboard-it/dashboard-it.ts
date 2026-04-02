@@ -25,6 +25,7 @@ import { AssignModal } from "./modal/assign-modal/assign-modal";
 import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { formatText } from '../../utils/formatText';
+import { ServicesDetailModal } from "../../components/modals/services-detail-modal/services-detail-modal";
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -39,7 +40,8 @@ import { formatText } from '../../utils/formatText';
     AcknowledgeModal,
     DenyModal,
     AssignModal,
-    NoteModal
+    NoteModal,
+    ServicesDetailModal
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -169,6 +171,19 @@ export class DashboardIT implements OnInit {
     }
     );
   }
+
+  showAllServices: boolean = false;
+  selectedServices: any[] = [];
+  showAll(services: any) {
+    // console.log(services)
+    this.showAllServices = true
+    this.selectedServices = services
+  }
+
+  closeModal_showAll() {
+    this.showAllServices = false;
+  }
+
 
   selectAssignee(item: any) {
     this.isVisibleAssignee.set(true)

@@ -470,23 +470,5 @@
 }
 
 @if (showAllServices) {
-
 <app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()"></app-services-detail-modal>
-
-<!-- <div class="modal-backdrop" (click)="closeModal_showAll()"></div>
-
-<div class="modal">
-    <div class="modal-header">
-        <h3>บริการทั้งหมด</h3>
-        <button (click)="closeModal_showAll()">✕</button>
-    </div>
-
-    <div class="modal-body">
-        @for (service of selectedServices; track service.service_type_id) {
-        <span class="tag-service">
-            {{ service.service_name_th }}
-        </span>
-        }
-    </div>
-</div> -->
 }
