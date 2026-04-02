@@ -158,6 +158,7 @@
     justify-content: flex-end;
     align-items: end;
     gap: 12px;
+    flex-wrap: wrap;
 
     button {
         border-radius: 16px;
@@ -1090,7 +1091,13 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        ;
+        margin-top: 10px;
+    }
+
+    .side-detail.openFor {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
         margin-top: 10px;
     }
 
@@ -1383,6 +1390,11 @@
         overflow-y: visible;
         flex: unset;
         height: auto;
+
+
+        .empty-selection-placeholder {
+            grid-column: unset;
+        }
     }
 
     .tk-card {
@@ -1393,7 +1405,8 @@
         height: 300px;
     }
 
-    .tk-left {
-        // order: 1;
+    .empty-selection-placeholder {
+        grid-column: unset;
     }
+
 }

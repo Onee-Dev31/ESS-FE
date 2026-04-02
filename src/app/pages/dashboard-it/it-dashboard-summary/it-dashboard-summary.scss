@@ -1,3 +1,7 @@
+@use 'sass:color';
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
 :host {
     display: block;
 }
@@ -8,6 +12,30 @@
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 14px;
+
+    @include large-tablet {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @include tablet {
+        .kpi-top {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-value {
+            display: flex;
+            gap: 0;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .kpi-hint{
+            display: none;
+        }
+    }
 }
 
 .kpi {

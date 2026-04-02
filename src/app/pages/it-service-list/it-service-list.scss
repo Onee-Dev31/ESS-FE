@@ -1482,6 +1482,10 @@ textarea.form-input {
         overflow-y: visible;
         flex: unset;
         height: auto;
+
+        .empty-selection-placeholder {
+            grid-column: unset;
+        }
     }
 
     .tk-card {
@@ -1496,4 +1500,3 @@ textarea.form-input {
         order: 2;
     }
 }
-

@@ -8,20 +8,21 @@
 
             <span class="kpi-pill" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
                 [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
-                [class.pill-red]="k.status==='denied'" [class.pill-hold]="k.status==='hold'"  [class.pill-gray]="k.status==='all'">
+                [class.pill-red]="k.status==='denied'" [class.pill-hold]="k.status==='hold'"
+                [class.pill-gray]="k.status==='all'">
                 <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
             </span>
         </div>
 
         <div class="kpi-value">
             {{ k.value | number }}
-            <span>
-                <div class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
-                    [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
-                    [class.pill-gray]="k.status==='all'">
-                    <span>{{ getPercent(k) }}%</span>
-                </div>
+            <!-- <span> -->
+            <span class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
+                [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
+                [class.pill-gray]="k.status==='all'">
+                <span>{{ getPercent(k) }}%</span>
             </span>
+            <!-- </span> -->
         </div>
 
         <div class="kpi-hint">{{ k.hint }}</div>

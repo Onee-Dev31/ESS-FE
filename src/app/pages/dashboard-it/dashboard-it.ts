@@ -161,9 +161,12 @@ export class DashboardIT implements OnInit {
         it_satus: ticket.IT_Status,
         approval_status: ticket.approval_status,
         attachments: attachments,
+        assignments: assignments,
         itNotes: itNotes,
         assignTimeline: result,
         services: services,
+        requester: res.requester,
+        openFor: res.requestFor.emp_code ? res.requestFor : null
       }
 
       console.log("selectedTicket:", objectData)

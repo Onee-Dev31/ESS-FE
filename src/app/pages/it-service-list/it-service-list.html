@@ -244,7 +244,7 @@
         <!-- RIGHT: assignee/requester -->
         <aside class="tk-right" *ngIf="selectedTicket() as t">
 
-            <section class="side-card requester">
+            <!-- <section class="side-card requester">
                 <div class="side-title">ผู้ขอใช้บริการ</div>
 
                 <div class="side-profile" *ngIf="t.requesterName;">
@@ -267,6 +267,38 @@
                 </div>
 
 
+            </section> -->
+
+            <section class="side-card requester" *ngIf="t.requester as requester">
+                <div class="side-title">ผู้ขอใช้บริการ</div>
+
+                <div class="side-profile">
+                    <div class="side-avatar">
+                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+                            (error)="onImgError($event)" />
+                    </div>
+                    <div class="side-detail">
+                        <div>{{requester.fullname}} ({{requester.nickname}})</div>
+                        <div>{{requester.department_name}}</div>
+                        <div>{{requester.company_name}}</div>
+                    </div>
+                </div>
+
+                <div class="side-contact">
+                    <p>ช่องทางการติดต่อ</p>
+                    <div>อีเมล: {{requester.email}}</div>
+                    <div>ติดต่อ: {{requester.contact_phone}}</div>
+                </div>
+
+
+            </section>
+            <section class="side-card requester" *ngIf="t.openFor as openFor">
+                <div class="side-title">เปิดให้</div>
+                <div class="side-detail">
+                    <div>{{openFor.fullname}} <span *ngIf="openFor.nickname">({{openFor.nickname}})</span></div>
+                    <div>{{openFor.department_name}}</div>
+                    <div>{{openFor.company_name}}</div>
+                </div>
             </section>
             <section class="side-card assignee">
 

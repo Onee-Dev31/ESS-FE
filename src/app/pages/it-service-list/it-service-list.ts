@@ -147,10 +147,12 @@ export class ItService implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         attachments: attachments,
-        itNotes: itNotes,
         assignments: assignments,
+        itNotes: itNotes,
         assignTimeline: result,
-        services: services
+        services: services,
+        requester: res.requester,
+        openFor: res.requestFor.fullname  ? res.requestFor : null
       }
 
       // console.log("selectedTicket:", objectData)
