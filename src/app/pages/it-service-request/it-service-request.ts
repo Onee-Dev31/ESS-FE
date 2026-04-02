@@ -45,7 +45,7 @@ export class ITServiceRequestComponent implements OnInit {
     systemSubOptions = signal<any[]>([])
     openForOptions = signal<any[]>([])
     selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
-
+    openforOneejob: string = '';
     isSystemCategorySelected = signal(false);
     IsOneeJob: boolean = false;
     applicantId: string = '';
@@ -90,7 +90,7 @@ export class ITServiceRequestComponent implements OnInit {
             this.phoneModel = formatted;
             this.phoneNumber.set(formatted);
         }
-        
+
         const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
         if (!hasQueryParams) {
@@ -288,8 +288,10 @@ export class ITServiceRequestComponent implements OnInit {
 
         const formData = new FormData();
         formData.append('ticketTypeId', '3');
-
-        formData.append('openForCodeempid', this.selectedOpenFor());
+        if (this.IsOneeJob) {
+            formData.append('openForType', 'ONEEJOB');
+        }
+        formData.append('openForCodeempid', this.IsOneeJob ? this.openforOneejob : this.selectedOpenFor());
         formData.append('description', this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails());
         formData.append('requesterAduser', this.authService.currentUser() || '-');
         formData.append('contactPhone', this.phoneNumber());
@@ -466,9 +468,10 @@ export class ITServiceRequestComponent implements OnInit {
                 console.log("getDetailFromJobsByApplicantId", res);
                 this.detailJobs = res
                 const data = res[0];
-
+                console.log("data : ", data);
+                this.openforOneejob = data ? `${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)` : '';
                 this.requestDetails.set(
-                    `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai}\n` +
+                    `ชื่อ-นามสกุล: ${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)\n` +
                     `Email: ${data.Email}\n` +
                     `ตำแหน่ง: ${data.JobTitle}\n` +
                     `บริษัท: ${data.Location}`
