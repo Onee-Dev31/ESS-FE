@@ -79,7 +79,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private toastService = inject(ToastService);
 
   requestNo = signal<string>('');
-  requestData = signal<MockRequestData | null>(null);
+  requestData = signal<any | null>(null);
   isNotFound = signal<boolean>(false);
   hasSignature = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
@@ -165,18 +165,51 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
           }
 
           if (ticket.APSignature) {
-            this.signatureImage.set(ticket.APSignature);
-            this.hasSignature.set(true);
+            const img = new Image();
+
+            img.onload = () => {
+              const canvas = this.canvasRef.nativeElement;
+
+              if (!canvas) return;
+
+              // 🔥 FIX: ensure ctx มีค่า
+              if (!this.ctx) {
+                this.ctx = canvas.getContext('2d')!;
+              }
+
+              // 🔥 ต้อง set ขนาดก่อนทุกครั้ง
+              canvas.width = canvas.offsetWidth;
+              canvas.height = canvas.offsetHeight;
+
+              this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+              this.fillCanvasBg();
+
+              this.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+              this.signatureImage.set(ticket.APSignature);
+              this.hasSignature.set(true);
+              // this.isSaved.set(true);
+              // this.savedSignatureUrl.set(base64);
+            };
+
+
+            img.src = ticket.APSignature?.startsWith('data:')
+              ? ticket.APSignature
+              : `data:image/png;base64,${ticket.APSignature}`;
           }
 
           this.requestNo.set(ticket.ticket_number);
 
-          const data: MockRequestData = {
-
+          const data: any = {
             requestNo: ticket.ticket_number,
             requestDate: ticket.created_at,
-            requestFor: ticket.RequesterName,
+
+            requester: ticket.RequesterName,
             phone: ticket.contact_phone,
+
+            openFor: ticket.openFor,
+
+            detail: this.formatDetail(ticket.Tdescription),
 
             ticketType: ticket.code === 'repair'
               ? 'repair'
@@ -202,15 +235,20 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
+  
+  formatDetail(text: string) {
+    return text ? text.replace(/\n/g, '<br>') : '-';
+  }
 
   private resizeCanvas() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas || !this.ctx) return;
-    const imageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
+
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+
     this.setupCtxStyle();
-    this.ctx.putImageData(imageData, 0, 0);
+    this.fillCanvasBg();
   }
 
   private getStrokeColor(): string {
