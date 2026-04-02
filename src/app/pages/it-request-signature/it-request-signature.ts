@@ -86,14 +86,14 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   signerName = signal<string>('');
   signatureImage = signal<string | null>(null);
 
-  private ctx!: CanvasRenderingContext2D;
-  private isDrawing = false;
+  private ctx: CanvasRenderingContext2D | null = null; private isDrawing = false;
   private lastX = 0;
   private lastY = 0;
 
-
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private pendingSignature: string | null = null;
+  private canvasReady = false;
+  private ticketLoaded = false;
+  private resizeHandler = () => this.onResize();
 
   ticketNumber: string = "";
   currentApprover = signal<string>('');
@@ -105,28 +105,19 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    const reloaded = sessionStorage.getItem('ticket-page-reloaded');
-
-    if (!reloaded) {
-      sessionStorage.setItem('ticket-page-reloaded', '1');
-      window.location.reload();
-      return;
-    }
-
-    sessionStorage.removeItem('ticket-page-reloaded');
-
-    this.route.queryParams.subscribe(params => {
-      this.ticketNumber = params['ticket'] || '';
-      console.log('ticketNumber:', this.ticketNumber);
-
-      if (!this.ticketNumber) return;
-
-      this.loadTicket(this.ticketNumber);
-    });
+    this.ticketNumber = this.route.snapshot.queryParamMap.get('ticket') || '';
+    console.log('ticketNumber:', this.ticketNumber);
   }
+
   ngAfterViewInit() {
-    this.initCanvas();
-    window.addEventListener('resize', this.onResize.bind(this));
+    setTimeout(() => {
+      this.initCanvas();
+      window.addEventListener('resize', this.resizeHandler);
+
+      if (this.ticketNumber) {
+        this.loadTicket(this.ticketNumber);
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -137,17 +128,18 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private themeObserver?: MutationObserver;
 
   private initCanvas() {
-    const canvas = this.canvasRef?.nativeElement;
-    if (!canvas) return;
-    this.ctx = canvas.getContext('2d')!;
-    this.resizeCanvas();
-    this.fillCanvasBg();
-    this.setupCtxStyle();
+    const canvas = this.ensureCanvasContext();
+    if (!canvas) {
+      return;
+    }
 
-    // Watch for theme changes to update stroke color
+    this.resizeCanvas();
+
     this.themeObserver = new MutationObserver(() => {
       this.setupCtxStyle();
+      this.drawSignatureFromPending();
     });
+
     this.themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme'],
@@ -158,44 +150,10 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.ticketService.getTicket(ticketNumber)
       .subscribe({
         next: (ticket) => {
-          console.log("ticket : ", ticket);
+          console.log('ticket : ', ticket);
 
           if (ticket.NameApprover) {
             this.signerName.set(ticket.NameApprover);
-          }
-
-          if (ticket.APSignature) {
-            const img = new Image();
-
-            img.onload = () => {
-              const canvas = this.canvasRef.nativeElement;
-
-              if (!canvas) return;
-
-              // 🔥 FIX: ensure ctx มีค่า
-              if (!this.ctx) {
-                this.ctx = canvas.getContext('2d')!;
-              }
-
-              // 🔥 ต้อง set ขนาดก่อนทุกครั้ง
-              canvas.width = canvas.offsetWidth;
-              canvas.height = canvas.offsetHeight;
-
-              this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-              this.fillCanvasBg();
-
-              this.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-              this.signatureImage.set(ticket.APSignature);
-              this.hasSignature.set(true);
-              // this.isSaved.set(true);
-              // this.savedSignatureUrl.set(base64);
-            };
-
-
-            img.src = ticket.APSignature?.startsWith('data:')
-              ? ticket.APSignature
-              : `data:image/png;base64,${ticket.APSignature}`;
           }
 
           this.requestNo.set(ticket.ticket_number);
@@ -203,49 +161,53 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
           const data: any = {
             requestNo: ticket.ticket_number,
             requestDate: ticket.created_at,
-
             requester: ticket.RequesterName,
             phone: ticket.contact_phone,
-
             openFor: ticket.openFor,
-
             detail: this.formatDetail(ticket.Tdescription),
-
-            ticketType: ticket.code === 'repair'
-              ? 'repair'
-              : 'service',
-
+            ticketType: ticket.code === 'repair' ? 'repair' : 'service',
             device: ticket.DeviceNameTH,
             brand: ticket.brand,
             model: ticket.model,
             symptom: ticket.Tdescription,
-
             requestCategory: ticket.TicketTypeName,
             basicSystems: ticket.basic,
             specificSystems: ticket.specific,
-
             attachments: ticket.attachments?.map((a: any) => a.file_name)
           };
 
           this.requestData.set(data);
 
+          if (ticket.APSignature) {
+            this.pendingSignature = ticket.APSignature;
+            this.signatureImage.set(ticket.APSignature);
+
+            setTimeout(() => {
+              this.drawSignatureFromPending();
+            }, 0);
+          } else {
+            this.pendingSignature = null;
+            this.signatureImage.set(null);
+            this.hasSignature.set(false);
+            this.clearCanvasOnly();
+          }
         },
         error: () => {
           this.isNotFound.set(true);
         }
       });
   }
-  
+
   formatDetail(text: string) {
     return text ? text.replace(/\n/g, '<br>') : '-';
   }
 
   private resizeCanvas() {
-    const canvas = this.canvasRef?.nativeElement;
+    const canvas = this.ensureCanvasContext();
     if (!canvas || !this.ctx) return;
 
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    canvas.width = canvas.offsetWidth || 600;
+    canvas.height = canvas.offsetHeight || 200;
 
     this.setupCtxStyle();
     this.fillCanvasBg();
@@ -259,12 +221,15 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private fillCanvasBg() {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas || !this.ctx) return;
+
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     this.ctx.fillStyle = isDark ? '#1e293b' : '#ffffff';
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   private setupCtxStyle() {
+    if (!this.ctx) return;
+
     this.ctx.lineWidth = 2.5;
     this.ctx.lineCap = 'round';
     this.ctx.lineJoin = 'round';
@@ -288,6 +253,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   startDrawing(event: MouseEvent | TouchEvent) {
     event.preventDefault();
     this.isDrawing = true;
+    if (!this.ctx) return;
     // Re-read stroke color in case theme changed
     this.ctx.strokeStyle = this.getStrokeColor();
     const pos = this.getPosition(event);
@@ -299,6 +265,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   draw(event: MouseEvent | TouchEvent) {
     if (!this.isDrawing) return;
+    if (!this.ctx) return;
     event.preventDefault();
     const pos = this.getPosition(event);
     this.ctx.lineTo(pos.x, pos.y);
@@ -314,6 +281,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   clearSignature() {
     const canvas = this.canvasRef.nativeElement;
+    if (!this.ctx) return;
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     this.fillCanvasBg();
     this.hasSignature.set(false);
@@ -344,5 +312,108 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   editAction() {
     // TODO: Navigate back to edit the IT request
     this.toastService.info('ฟังก์ชันแก้ไขกำลังอยู่ในระหว่างพัฒนา');
+  }
+
+  private redrawSignature(retry = 0) {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas || !this.ctx || !this.pendingSignature) {
+      if (retry < 10) {
+        setTimeout(() => this.redrawSignature(retry + 1), 100);
+      }
+      return;
+    }
+
+    const width = canvas.offsetWidth || 600;
+    const height = canvas.offsetHeight || 200;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.fillCanvasBg();
+    this.setupCtxStyle();
+
+    const img = new Image();
+    img.onload = () => {
+      const currentCanvas = this.canvasRef?.nativeElement;
+      if (!currentCanvas || !this.ctx) return;
+
+      this.ctx.clearRect(0, 0, currentCanvas.width, currentCanvas.height);
+      this.fillCanvasBg();
+      this.ctx.drawImage(img, 0, 0, currentCanvas.width, currentCanvas.height);
+      this.hasSignature.set(true);
+    };
+
+    img.onerror = () => {
+      console.error('signature image load error');
+    };
+
+    img.src = this.pendingSignature.startsWith('data:')
+      ? this.pendingSignature
+      : `data:image/png;base64,${this.pendingSignature}`;
+  }
+
+  private clearCanvasOnly() {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas || !this.ctx) return;
+
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.fillCanvasBg();
+  }
+
+  private drawSignatureFromPending(retry = 0) {
+    const canvas = this.ensureCanvasContext();
+
+    if (!canvas || !this.ctx || !this.pendingSignature) {
+      console.log('draw skipped', {
+        hasCanvas: !!canvas,
+        hasCtx: !!this.ctx,
+        hasPending: !!this.pendingSignature
+      });
+
+      if (retry < 10) {
+        setTimeout(() => this.drawSignatureFromPending(retry + 1), 100);
+      }
+      return;
+    }
+
+    canvas.width = canvas.offsetWidth || 600;
+    canvas.height = canvas.offsetHeight || 200;
+
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.fillCanvasBg();
+    this.setupCtxStyle();
+
+    const img = new Image();
+    img.onload = () => {
+      const latestCanvas = this.ensureCanvasContext();
+      if (!latestCanvas || !this.ctx) return;
+
+      this.ctx.clearRect(0, 0, latestCanvas.width, latestCanvas.height);
+      this.fillCanvasBg();
+      this.ctx.drawImage(img, 0, 0, latestCanvas.width, latestCanvas.height);
+      this.hasSignature.set(true);
+
+      console.log('signature drawn OK');
+    };
+
+    img.onerror = () => {
+      console.error('signature image load error');
+    };
+
+    img.src = this.pendingSignature.startsWith('data:')
+      ? this.pendingSignature
+      : `data:image/png;base64,${this.pendingSignature}`;
+  }
+
+  private ensureCanvasContext(): HTMLCanvasElement | null {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return null;
+
+    if (!this.ctx) {
+      this.ctx = canvas.getContext('2d');
+    }
+
+    return this.ctx ? canvas : null;
   }
 }
