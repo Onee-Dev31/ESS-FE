@@ -1467,4 +1467,9 @@
             grid-template-columns: repeat(1, 1fr);
         }
     }
+
+    .side-card.assignee {
+        order: 2;
+    }
+
 }

@@ -403,6 +403,7 @@ textarea.form-input {
     flex-direction: column;
 }
 
+
 /* ===== LEFT ===== */
 .tk-left {
     background: var(--bg-card);
@@ -549,6 +550,10 @@ textarea.form-input {
             }
         }
     }
+}
+
+.replace-tk-right {
+    display: none;
 }
 
 .tk-left__top {
@@ -1498,6 +1503,18 @@ textarea.form-input {
         display: none;
     }
 
+
+    .replace-tk-right {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding: 16px;
+
+        &.has-open-for {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
 }
 
 @media (max-width: 860px) {
@@ -1518,6 +1535,24 @@ textarea.form-input {
 
     .tk-card.note {
         height: 300px;
+    }
+
+
+
+    .replace-tk-right {
+        font-size: $font-size-hint;
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 16px;
+        padding: 16px;
+
+        &.has-open-for {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+
+    .side-card.assignee {
+        order: 2;
     }
 
 }
