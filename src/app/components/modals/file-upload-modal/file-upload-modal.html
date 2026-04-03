@@ -6,7 +6,7 @@
     </div>
 
     <div class="modal-body">
-      <p class="date-label">สำหรับวันที่: <strong>{{ dateLabel }}</strong></p>
+      <p class="date-label">สำหรับวันที่: <strong>{{ dateUtil.formatDateToBE(dateLabel, 'DD/MM/YYYY') }}</strong></p>
 
       <div class="upload-box" (dragover)="$event.preventDefault()" (drop)="onDrop($event)">
         <input type="file" id="fileInput" multiple (change)="onFileSelected($event)" hidden>

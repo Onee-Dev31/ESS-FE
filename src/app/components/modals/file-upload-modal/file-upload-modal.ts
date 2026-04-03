@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../services/toast';
 import { FilePreviewItem, FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal';
 import { FileConverterService } from '../../../services/file-converter';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 @Component({
   selector: 'app-file-upload-modal',
@@ -14,6 +15,7 @@ import { FileConverterService } from '../../../services/file-converter';
 export class FileUploadModal implements OnChanges {
   private toastService = inject(ToastService);
   private fileConvertService = inject(FileConverterService);
+  dateUtil = inject(DateUtilityService)
 
   @Input() currentFiles: File[] = [];
   @Input() dateLabel: string = '';

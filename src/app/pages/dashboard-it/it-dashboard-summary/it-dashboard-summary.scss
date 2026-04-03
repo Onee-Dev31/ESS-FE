@@ -18,6 +18,10 @@
     }
 
     @include tablet {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+
+
         .kpi-top {
             display: flex;
             flex-direction: column;
@@ -32,7 +36,13 @@
             text-align: center;
         }
 
-        .kpi-hint{
+        .kpi-hint {
+            display: none;
+        }
+    }
+
+    @include mobile {
+        .kpi-pill {
             display: none;
         }
     }
@@ -201,18 +211,59 @@
 
 /* ===== CHART ===== */
 .chart-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
     padding: 16px;
+
+    @include large-tablet {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include tablet {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+    }
 }
 
+// .chart-card {
+//     flex: 1;
+//     background: var(--bg-card);
+//     border-radius: 16px;
+//     padding: 16px;
+//     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+//     text-align: center;
+
+// }
+
 .chart-card {
-    flex: 1;
+    min-width: 0; // สำคัญมาก ป้องกัน overflow ใน flex/grid
+    width: 100%;
     background: var(--bg-card);
     border-radius: 16px;
     padding: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    text-align: center;
+
+    .echart {
+        width: 100% !important;
+        height: 260px;
+    }
+
+    &.bar-card {
+        .echart.bar {
+            width: 100% !important;
+            height: 280px;
+        }
+    }
+}
+
+.dept-drill {
+    width: 100%;
+
+    .echart.dept {
+        width: 100% !important;
+        height: 280px;
+    }
 }
 
 .bar-card {
@@ -238,10 +289,6 @@
 
 /* responsive */
 @media (max-width: 1200px) {
-    .chart-row {
-        flex-direction: column;
-    }
-
     .bar-card {
         flex: 1;
     }
