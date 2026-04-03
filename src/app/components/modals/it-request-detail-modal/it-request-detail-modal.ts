@@ -13,6 +13,7 @@ import { DialogService } from '../../../services/dialog';
 import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
+import { formatText } from '../../../utils/formatText';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -28,6 +29,7 @@ export class ItRequestDetailModal {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private itServiceService = inject(ItServiceService);
+  formatText = formatText;
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;

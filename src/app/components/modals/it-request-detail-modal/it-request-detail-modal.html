@@ -107,7 +107,11 @@
                 <div class="section-content">
                     <div class="info-row">
                         <div class="info-label">รายละเอียด</div>
-                        <div class="info-value">{{ approvalItem.originalData?.description || '-' }}</div>
+                        <!-- <div class="info-value" >{{ approvalItem.originalData?.description || '-' }}</div> -->
+                        <div class="info-value"
+                            [innerHTML]="formatText.getFormatTextHTML( approvalItem.originalData?.description )">
+                            <!-- {{ approvalItem.originalData?.description || '-' }} -->
+                        </div>
                     </div>
                 </div>
             </div>
