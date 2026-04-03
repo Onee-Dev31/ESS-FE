@@ -10,41 +10,73 @@
       {{ loginMessage }}
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-      <div class="input-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" formControlName="username" placeholder="Enter your username" />
-      </div>
-
-      <div class="input-group password-group">
-        <label for="password">Password</label>
-        <div class="input-wrapper">
-          <input [type]="passwordFieldType" id="password" formControlName="password"
-            placeholder="Enter your password" />
-          <span class="password-toggle" (click)="togglePasswordVisibility()">
-            <i [class]="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
-          </span>
+    <!-- Username/Password Form -->
+    <ng-container *ngIf="!showQr">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" formControlName="username" placeholder="Enter your username" />
         </div>
+
+        <div class="input-group password-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input [type]="passwordFieldType" id="password" formControlName="password"
+              placeholder="Enter your password" />
+            <span class="password-toggle" (click)="togglePasswordVisibility()">
+              <i [class]="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="!loginForm.valid || isLoading">
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading" class="loader"></span>
+        </button>
+      </form>
+
+      <div class="qr-divider">
+        <span>หรือ</span>
       </div>
 
-      <!-- <div class="action-row">
-        <label class="remember-me">
-          <input type="checkbox" formControlName="rememberMe" />
-          <span>Remember Me</span>
-        </label>
-        <a href="#" class="forgot-password">Forgot Password?</a>
-      </div> -->
-
-      <button type="submit" class="login-button" [disabled]="!loginForm.valid || isLoading">
-        <span *ngIf="!isLoading">Login</span>
-        <span *ngIf="isLoading" class="loader"></span>
+      <button class="qr-toggle-button" (click)="switchToQr()">
+        <i class="fas fa-qrcode"></i>
+        Login ด้วย QR Code
       </button>
-    </form>
+    </ng-container>
 
-    <!-- <div class="signup-section">
-      <p>Don't have an account?</p>
-      <button class="signup-button">Sign up</button>
-    </div> -->
+    <!-- QR Code Section -->
+    <ng-container *ngIf="showQr">
+      <div class="qr-section">
+        <p class="qr-instruction">สแกน QR Code ด้วยกล้องบนมือถือเพื่อเข้าสู่ระบบ</p>
+
+        <div class="qr-image-wrapper">
+          <div *ngIf="qrLoading" class="qr-placeholder">
+            <span class="loader"></span>
+          </div>
+
+          <ng-container *ngIf="!qrLoading && !qrExpired && qrImage">
+            <img [src]="qrImage" alt="QR Code" class="qr-image" />
+          </ng-container>
+
+          <div *ngIf="qrExpired" class="qr-expired">
+            <i class="fas fa-clock"></i>
+            <p>QR หมดอายุแล้ว</p>
+            <button class="qr-refresh-button" (click)="loadQr()">รีเฟรช QR</button>
+          </div>
+        </div>
+
+        <p class="qr-waiting" *ngIf="!qrExpired && !qrLoading">
+          <span class="dot-pulse"></span>
+          รอการยืนยันจากมือถือ...
+        </p>
+
+        <button class="qr-back-button" (click)="switchToForm()">
+          <i class="fas fa-arrow-left"></i>
+          กลับไป Login แบบปกติ
+        </button>
+      </div>
+    </ng-container>
   </div>
 
   <div class="welcome-panel">

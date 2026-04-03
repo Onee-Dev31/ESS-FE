@@ -233,6 +233,7 @@ $bg-light-local: $bg-slate;
             gap: 6px;
             cursor: pointer;
             color: $text-muted;
+            -webkit-user-select: none;
             user-select: none;
 
             input {
@@ -343,13 +344,13 @@ $bg-light-local: $bg-slate;
     &.error-msg {
         background-color: var(--status-danger-bg);
         color: var(--status-danger-text);
-        border: 1px solid color-mix(in srgb, var(--status-danger-text), transparent 80%);
+        border: 1px solid var(--status-danger-border, var(--status-danger-bg));
     }
 
     &.success-msg {
         background-color: var(--status-success-bg);
         color: var(--status-success-text);
-        border: 1px solid color-mix(in srgb, var(--status-success-text), transparent 80%);
+        border: 1px solid var(--status-success-border, var(--status-success-bg));
     }
 }
 
@@ -361,6 +362,167 @@ $bg-light-local: $bg-slate;
     border-radius: 50%;
     display: inline-block;
     animation: rotation 1s linear infinite;
+}
+
+// ==================== QR LOGIN ====================
+.qr-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0 1rem;
+    color: $text-muted;
+    font-size: 0.85rem;
+    gap: 10px;
+
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+}
+
+.qr-toggle-button {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: $text-dark;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+
+    i {
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+        background: rgba(var(--primary-rgb, 27, 100, 200), 0.05);
+    }
+}
+
+.qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    .qr-instruction {
+        margin: 0;
+        font-size: 0.9rem;
+        color: $text-muted;
+        text-align: center;
+    }
+}
+
+.qr-image-wrapper {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+
+    .qr-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .qr-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .qr-expired {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: $text-muted;
+        font-size: 0.85rem;
+
+        i {
+            font-size: 2rem;
+            color: var(--status-warning-text, #d97706);
+        }
+
+        p {
+            margin: 0;
+        }
+    }
+}
+
+.qr-refresh-button {
+    padding: 6px 16px;
+    background: $primary-color;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover {
+        background: $primary-hover;
+    }
+}
+
+.qr-waiting {
+    margin: 0;
+    font-size: 0.85rem;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+.dot-pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $primary-color;
+    animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.qr-back-button {
+    background: transparent;
+    border: none;
+    color: $text-muted;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s;
+
+    &:hover {
+        color: $primary-color;
+    }
 }
 
 // ==================== RESPONSIVE STYLES ====================
@@ -383,7 +545,7 @@ $bg-light-local: $bg-slate;
         width: 100%;
         max-width: 440px;
         height: auto;
-        min-height: auto;
+        min-height: 0;
         max-height: 90vh;
         margin: 0 auto;
         border-radius: 20px;

@@ -9,6 +9,7 @@ import { ValidateLoginSso } from './pages/validate/validate-login-sso/validate-l
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'validate/loginSSO', component: ValidateLoginSso },
+    { path: 'qr-confirm', loadComponent: () => import('./pages/qr-confirm/qr-confirm').then(m => m.QrConfirmComponent) },
     {
         path: '',
         component: LayoutComponent,

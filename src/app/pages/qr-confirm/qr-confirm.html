@@ -1,0 +1,50 @@
+<div class="qr-confirm-host">
+  <div class="qr-confirm-card">
+    <div class="brand-header">
+      <img src="/02.png" alt="ESS Logo" class="logo" />
+      <h1>ESS</h1>
+    </div>
+
+    <!-- ยืนยัน -->
+    <ng-container *ngIf="state === 'confirming'">
+      <div class="icon-wrapper">
+        <i class="fas fa-desktop"></i>
+      </div>
+      <h2>ยืนยันการเข้าสู่ระบบ</h2>
+      <p class="description">มีคำขอเข้าสู่ระบบจากเบราว์เซอร์บนคอมพิวเตอร์<br />กดยืนยันเพื่ออนุญาตให้เข้าสู่ระบบ</p>
+      <button class="confirm-button" type="button" (click)="confirm()">
+        <i class="fas fa-check"></i>
+        ยืนยัน Login
+      </button>
+    </ng-container>
+
+    <!-- กำลังประมวลผล -->
+    <ng-container *ngIf="state === 'loading'">
+      <div class="icon-wrapper">
+        <span class="loader"></span>
+      </div>
+      <h2>กำลังยืนยัน...</h2>
+    </ng-container>
+
+    <!-- สำเร็จ -->
+    <ng-container *ngIf="state === 'success'">
+      <div class="icon-wrapper success">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2>ยืนยันสำเร็จ!</h2>
+      <p class="description">คอมพิวเตอร์ได้รับการเข้าสู่ระบบเรียบร้อยแล้ว</p>
+    </ng-container>
+
+    <!-- ผิดพลาด -->
+    <ng-container *ngIf="state === 'error'">
+      <div class="icon-wrapper error">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <h2>เกิดข้อผิดพลาด</h2>
+      <p class="description">{{ errorMessage }}</p>
+      <button class="confirm-button" type="button" (click)="state = 'confirming'">
+        ลองใหม่
+      </button>
+    </ng-container>
+  </div>
+</div>

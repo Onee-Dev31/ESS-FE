@@ -97,22 +97,42 @@ export class AuthService {
         }).pipe(
             tap(response => {
                 if (response) {
-                    localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(response));
-                    localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
-                    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
-                    localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
-                    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.employee) || '');
-
-                    this._isLoggedIn.set(true);
-                    this._currentUser.set(response.adUser);
-                    this._userRole.set(response.permission.Role);
-                    this._userData.set(response.employee);
+                    this.storeLoginResponse(response);
                 }
             }),
             finalize(() => {
                 this.loadingService.hide();
             })
         );
+    }
+
+    generateQr(): Observable<{ qrToken: string; qrImage: string; expiresAt: string }> {
+        return this._http.get<any>(`${this.baseUrl}/auth/qr/generate`, {
+            context: new HttpContext().set(SKIP_AUTH, true)
+        });
+    }
+
+    getQrStatus(qrToken: string): Observable<{ status: string;[key: string]: any }> {
+        return this._http.get<any>(`${this.baseUrl}/auth/qr/status/${qrToken}`, {
+            context: new HttpContext().set(SKIP_AUTH, true)
+        });
+    }
+
+    confirmQr(qrToken: string): Observable<any> {
+        return this._http.post<any>(`${this.baseUrl}/auth/qr/confirm`, { qrToken });
+    }
+
+    storeLoginResponse(response: any) {
+        localStorage.setItem(STORAGE_KEYS.ALL_DATA, JSON.stringify(response));
+        localStorage.setItem(STORAGE_KEYS.IS_LOGGED_IN, 'true');
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, response.adUser || '');
+        localStorage.setItem(STORAGE_KEYS.USER_ROLE, response.permission.Role || '');
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.employee) || '');
+
+        this._isLoggedIn.set(true);
+        this._currentUser.set(response.adUser);
+        this._userRole.set(response.permission.Role);
+        this._userData.set(response.employee);
     }
 
     /** ล้างข้อมูลการเข้าสู่ระบบ (Logout) และรีเซ็ตสถานะทั้งหมด */

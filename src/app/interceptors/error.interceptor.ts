@@ -19,10 +19,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             let errorMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์';
             const isMagicLogin = window.location.search.includes('magic=1');
 
-            if (error.status === 401 && !isMagicLogin) {
+            if (error.status === 401 && !isMagicLogin && !req.url.includes('/auth/login') && !req.url.includes('/auth/qr/confirm')) {
                 errorMessage = 'เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่';
                 authService.logout();
                 router.navigate(['/login']);
+            } else if (error.status === 401) {
+                errorMessage = error.error?.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
             } else if (error.status === 403) {
                 errorMessage = 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้';
             } else if (error.status === 404) {
