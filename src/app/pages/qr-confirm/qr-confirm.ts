@@ -56,7 +56,9 @@ export class QrConfirmComponent implements OnInit {
       error: (err) => {
         this.isConfirming = false;
         this.state = 'error';
-        this.errorMessage = err?.error?.message || 'ไม่สามารถยืนยันได้ กรุณาลองใหม่';
+        this.errorMessage = `${err?.error?.message}` || 'ไม่สามารถยืนยันได้ กรุณาลองใหม่';
+        const returnUrl = `/qr-confirm?token=${this.qrToken}`;
+        this.router.navigate(['/login'], { queryParams: { returnUrl } });
         this.cdr.detectChanges();
       }
     });
