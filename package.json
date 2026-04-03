@@ -9,8 +9,9 @@
     "build:prod": "ng build --configuration production --output-hashing=all --delete-output-path --verbose",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "e2e": "cypress run",
-    "cypress:open": "cypress open"
+    "e2e": "ng e2e",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "prettier": {
     "printWidth": 100,
