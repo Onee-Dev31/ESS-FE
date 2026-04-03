@@ -1234,8 +1234,32 @@ textarea.form-input {
         background: #22c55e;
     }
 
+
+    .timeline-icon.deny {
+        background: #c52a22;
+    }
+
+    .timeline-icon.hold {
+        background: #6a6a6a;
+    }
+
     .timeline-icon.active {
         background: #f59e0b;
+        animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+        }
     }
 
     /* content card */

@@ -310,9 +310,16 @@
                     <div class="timeline-item"
                         *ngFor="let step of t.assignTimeline.slice().reverse();let i = index; let first = first">
 
-                        <div class="timeline-icon" [ngClass]="{
+                        <!-- <div class="timeline-icon" [ngClass]="{
                                     'done': !first || t.assignTimeline.length === 1,
                                     'active': first && t.assignTimeline.length !== 1
+                                }">
+                        </div> -->
+                        <div class="timeline-icon" [ngClass]="{
+                                    'done': (!first || t.assignTimeline.length === 1 ) || step.title.includes('ปิด'),
+                                    'active': (first && t.assignTimeline.length !== 1) && !(step.title.includes('ปิด') || step.title.includes('Rejected') || step.title.includes('Hold') ),
+                                    'deny': step.title.includes('Rejected'),
+                                    'hold': step.title.includes('Hold'),
                                 }">
                         </div>
 
