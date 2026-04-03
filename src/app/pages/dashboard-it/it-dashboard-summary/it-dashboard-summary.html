@@ -19,6 +19,7 @@
             <!-- <span> -->
             <span class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
                 [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
+                [class.pill-red]="k.status==='denied'" [class.pill-hold]="k.status==='hold'"
                 [class.pill-gray]="k.status==='all'">
                 <span>{{ getPercent(k) }}%</span>
             </span>
