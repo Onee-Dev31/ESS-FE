@@ -1,6 +1,7 @@
 export class formatText {
 
-    static getFormatTextHTML(text: string): string {
+    static getFormatTextHTML(text: string | null): string {
+        if (!text) return '';
         return text.replace(/\r?\n/g, '<br>');
     }
 

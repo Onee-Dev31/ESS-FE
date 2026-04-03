@@ -263,6 +263,7 @@ export class ItRepairRequestComponent implements OnInit {
     formData.append('contactPhone', data.phoneNumber);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
+    formData.append('openForCodeempid', this.selectedOpenFor());
 
     formData.append('ticketTypeId', '1');
 
