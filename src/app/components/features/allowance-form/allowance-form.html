@@ -68,15 +68,15 @@
     }
 
     <div class="table-container">
-      <!-- <table class="excel-table desktop-only">
+      <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-50" />
           <col class="col-100" />
           <col class="col-80" />
+          <col class="col-80" />
+          <col class="col-60" />
+          <col class="col-60" />
           <col class="col-100" />
-          <col class="col-60" />
-          <col class="col-60" />
-          <col class="col-60" />
           <col class="col-100" />
           <col class="col-auto" />
         </colgroup>
@@ -101,12 +101,12 @@
           <tr [class.highlight-row]="log.selected" [class.not-eligible-row]="!log.isEligible">
             <td class="text-center">
               <label class="sr-only-label">
-                <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
-                <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, descInput)"
+                <span class="sr-only">เลือกวันที่ {{ dateUtil.formatDateToBE(log.date, 'DD/MM/YYYY') }}</span>
+                <input type="checkbox" class="card-checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log, descInput)"
                   [disabled]="!log.isEligible" />
               </label>
             </td>
-            <td class="text-center bg-gray">{{ log.date }}</td>
+            <td class="text-center bg-gray">{{ dateUtil.formatDateToBE(log.date, 'DD/MM/YYYY') }}</td>
             <td class="text-center bg-gray" [class.holiday-label]="log.dayType === 'H'"
               [class.regular-label]="log.dayType === 'W'">
               {{ log.dayType }}
@@ -142,7 +142,7 @@
             <td class="bg-white"></td>
           </tr>
         </tfoot>
-      </table> -->
+      </table>
 
       <div class="mobile-cards-view mobile-only">
         @for (log of logs; track log.date) {
