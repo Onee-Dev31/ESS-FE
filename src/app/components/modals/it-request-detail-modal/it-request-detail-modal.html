@@ -2,7 +2,10 @@
     <div class="modal-container-large it-request-modal" (click)="$event.stopPropagation()" @modalAnimation>
 
         <div class="modal-header">
-            <h2 class="request-title">สรุปรายละเอียดคำขอ <span>(requestNo : {{approvalItem.requestNo}})</span></h2>
+            <h2 class="request-title">
+                <div>สรุปรายละเอียดคำขอ</div>
+                <span>(requestNo : {{approvalItem.requestNo}})</span>
+            </h2>
             <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
 
@@ -149,7 +152,7 @@
                 </div>
             </div>
             <!-- Reject Reason Panel -->
-            <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
+            <!-- <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
                 <div class="reject-reason-header">
                     <i class="fas fa-times-circle"></i>
                     <span>ระบุเหตุผล</span>
@@ -158,19 +161,37 @@
                     (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.." rows="4" maxlength="500">
                 </textarea>
                 <div class="reject-char-count">{{ rejectReason().length }} / 500</div>
-            </div>
+            </div> -->
         </div>
+
         <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
-            <div class="reject-reason-actions">
+            <div class="" *ngIf="isRejectPanelOpen()" @fadeIn>
+                <div class="action-title">
+                    Confirm Action: <span class="action-name">{{currentAction()}}</span>
+                </div>
+                <div class="reason-section">
+                    <label for="reason">ระบุเหตุผล (Reason):</label>
+                    <textarea id="reason" class="reason-input" [ngModel]="rejectReason()"
+                        (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.."></textarea>
+                </div>
+            </div>
+            <div class="action-footer">
+                <button class="btn-confirm" (click)="submitReason()" [class.disabled]="!rejectReason().trim()"
+                    [disabled]="!rejectReason().trim()">ยืนยัน
+                    (Confirm)</button>
+                <button class="btn-cancel" (click)="cancelReject()">ยกเลิก (Cancel)</button>
+            </div>
+            <!-- <div class="reject-reason-actions">
                 <button class="btn-outline" (click)="cancelReject()">ยกเลิก</button>
                 <button class="btn-danger" (click)="submitReason()" [disabled]="!rejectReason().trim()">
                     <i class="fas fa-times-circle"></i>
                     ยืนยัน
                 </button>
-            </div>
+            </div> -->
         </div>
 
         <div class="modal-footer" *ngIf="!isRejectPanelOpen()">
+
             <div class="footer-left">
                 <button class="btn-outline btn-referred" (click)="openReasonPanel('Referred Back')">Referred
                     Back</button>
