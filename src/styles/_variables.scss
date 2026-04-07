@@ -276,8 +276,14 @@ $status-cancelled-bg: var(--status-cancelled-bg);
 $status-cancelled-text: var(--status-cancelled-text);
 
 // font-size
-$font-size-header: 18px;
-$font-size-body: 16px;
-$font-size-label: 14px;
-$font-size-hint: 12px;
-$font-size-mini: 10px;
+// $font-size-header: 18px;
+// $font-size-body: 16px;
+// $font-size-label: 14px;
+// $font-size-hint: 12px;
+// $font-size-mini: 10px;
+
+$font-size-header: clamp(16px, 2vw, 18px);
+$font-size-body: clamp(14px, 1.6vw, 16px);
+$font-size-label: clamp(12px, 1.4vw, 14px);
+$font-size-hint: clamp(11px, 1.2vw, 12px);
+$font-size-mini: clamp(9px, 1vw, 10px);

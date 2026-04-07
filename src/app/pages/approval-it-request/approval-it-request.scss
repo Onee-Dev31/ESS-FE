@@ -50,7 +50,7 @@ $border: var(--border);
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: $font-size-hint;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -68,38 +68,27 @@ $border: var(--border);
         background-color: currentColor;
     }
 
-    &.status-new,
-    &.status-waiting,
-    &.NEW,
-    &.WAITING_CHECK {
+    &.approved,
+    &.Approved {
+        background: var(--status-progress-bg);
+        color: var(--status-progress-text);
+    }
+
+    &.pending,
+    &.Pending {
         background: var(--status-new-bg);
-        color: var(--primary);
-        border-color: var(--primary);
+        color: var(--status-new-text);
     }
 
-    &.status-approved,
-    &.status-verified,
-    &.APPROVED,
-    &.VERIFIED {
-        background: var(--status-success-bg);
-        color: var(--status-success-text);
-        border-color: var(--status-success-text);
+    &.rejected,
+    &.Rejected {
+        background: var(--status-deny-bg);
+        color: var(--status-deny-text);
     }
 
-    &.status-rejected,
-    &.status-cancelled,
-    &.REJECTED,
-    &.CANCELLED {
-        background: var(--status-danger-bg);
-        color: var(--status-danger-text);
-        border-color: var(--status-danger-text);
-    }
-
-    &.status-pending,
-    &.PENDING_APPROVAL {
-        background: var(--status-warning-bg);
-        color: var(--status-warning-text);
-        border-color: var(--status-warning-text);
+    &.referred-back {
+        background: var(--status-hold-bg);
+        color: var(--status-hold-text);
     }
 }
 
@@ -108,7 +97,6 @@ $border: var(--border);
     font-size: 1.25rem;
     font-weight: 700;
     color: $color;
-    // color: var(--text-header);
     margin-bottom: 24px;
     position: relative;
     padding-left: 16px;
@@ -188,16 +176,10 @@ $border: var(--border);
         }
     }
 
-    // .col-requestNo
-    // .col-requestDate,
-    // .col-requestBy,
-    // .col-requestFor,
-    // .col-requestCategory {}
-
     .col-requestNo {
+        width: 150px;
 
         &.detail {
-            // text-align: center;
             color: var(--primary) !important;
             font-weight: 600;
         }
@@ -324,7 +306,7 @@ $border: var(--border);
                 display: flex;
                 justify-content: space-between;
                 margin-bottom: 14px;
-                font-size: 0.9rem;
+                font-size: $font-size-label;
 
                 .label {
                     color: var(--text-table-head);
@@ -343,6 +325,7 @@ $border: var(--border);
                 .value {
                     font-weight: 600;
                     color: var(--text-header);
+                    font-size: $font-size-label;
                 }
             }
 
@@ -421,6 +404,11 @@ $border: var(--border);
         @include tablet {
             flex-direction: column;
             align-items: stretch;
+            padding: 20px;
+        }
+
+        @include mobile {
+            padding: 16px 16px 0 16px;
         }
     }
 
@@ -441,7 +429,7 @@ $border: var(--border);
             border: 1px solid transparent;
             background: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: $font-size-label;
             font-weight: 500;
             color: $text-sub;
             display: flex;
@@ -550,7 +538,7 @@ $border: var(--border);
                     gap: 6px;
 
                     .label {
-                        font-size: 0.75rem;
+                        font-size: $font-size-hint;
                         color: $text-muted;
                         font-weight: 500;
 
@@ -564,8 +552,14 @@ $border: var(--border);
                     .value {
                         font-weight: 700 !important;
                         color: $primary !important;
-                        font-size: 0.95rem;
+                        font-size: $font-size-body;
                     }
+                }
+
+                @include mobile {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
                 }
             }
 
@@ -592,7 +586,8 @@ $border: var(--border);
 
                     .value {
                         font-weight: 600;
-                        color: $text;
+                        color: $text-sub;
+                        font-size: $font-size-label;
 
                         &.highlight {
                             color: $primary;
@@ -603,6 +598,16 @@ $border: var(--border);
                             font-weight: 800;
                             color: var(--text-header);
                         }
+
+                        @include mobile {
+                            padding: 12px;
+                            background: var(--header-bg);
+                            border-radius: 12px;
+                        }
+                    }
+
+                    @include mobile {
+                        flex-wrap: wrap;
                     }
                 }
 
@@ -615,7 +620,7 @@ $border: var(--border);
                     .req-name {
                         font-weight: 700;
                         color: $text;
-                        font-size: 0.95rem;
+                        font-size: $font-size-label;
                         margin-bottom: 4px;
 
                         i {
@@ -634,6 +639,10 @@ $border: var(--border);
                     .req-company {
                         font-size: 0.75rem;
                         color: $text-muted;
+                    }
+
+                    @include mobile {
+                        padding: 10px;
                     }
                 }
 
@@ -655,7 +664,7 @@ $border: var(--border);
                     }
 
                     .desc-content {
-                        font-size: 0.9rem;
+                        font-size: $font-size-label;
                         line-height: 1.5;
                         color: $text;
                         background: var(--border-toolbar);
@@ -691,6 +700,10 @@ $border: var(--border);
                             margin-right: 2px;
                         }
                     }
+                }
+
+                @include mobile {
+                    padding: 14px;
                 }
             }
         }
@@ -759,35 +772,35 @@ $border: var(--border);
     }
 
     // ==================== STATUS BADGES ====================
-    .status-badge {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    // .status-badge {
+    //     padding: 4px 10px;
+    //     border-radius: 6px;
+    //     font-size: 0.8rem;
+    //     font-weight: 600;
 
-        &.approved,
-        &.Approved {
-            background: var(--status-progress-bg);
-            color: var(--status-progress-text);
-        }
+    //     &.approved,
+    //     &.Approved {
+    //         background: var(--status-progress-bg);
+    //         color: var(--status-progress-text);
+    //     }
 
-        &.pending,
-        &.Pending {
-            background: var(--status-new-bg);
-            color: var(--status-new-text);
-        }
+    //     &.pending,
+    //     &.Pending {
+    //         background: var(--status-new-bg);
+    //         color: var(--status-new-text);
+    //     }
 
-        &.rejected,
-        &.Rejected {
-            background: var(--status-deny-bg);
-            color: var(--status-deny-text);
-        }
+    //     &.rejected,
+    //     &.Rejected {
+    //         background: var(--status-deny-bg);
+    //         color: var(--status-deny-text);
+    //     }
 
-        &.referred-back {
-            background: var(--status-hold-bg);
-            color: var(--status-hold-text);
-        }
-    }
+    //     &.referred-back {
+    //         background: var(--status-hold-bg);
+    //         color: var(--status-hold-text);
+    //     }
+    // }
 
     // ==================== ACTION BUTTONS ====================
     .action-cell,
@@ -885,10 +898,6 @@ $border: var(--border);
 
         i {
             font-size: 0.9rem;
-
-            &.mr-1 {
-                margin-right: 8px;
-            }
 
             &.ml-1 {
                 margin-left: 8px;
@@ -1007,5 +1016,92 @@ $border: var(--border);
 
     @include tablet {
         padding: 0 12px 12px;
+    }
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+
+    &.full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: var(--text) !important;
+        margin-left: 4px;
+    }
+
+    .form-input {
+        @include input-field;
+        max-width: 300px;
+
+        &::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: #a78bfa !important;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+        }
+
+        &.readonly,
+        &.disabled,
+        &:disabled {
+            background: var(--input-disabled-bg) !important;
+            color: var(--text-muted) !important;
+            border-color: var(--input-disabled-border) !important;
+            cursor: not-allowed;
+            opacity: 1;
+        }
+    }
+
+
+    @include tablet {
+        .form-input {
+            max-width: 100%;
+        }
+    }
+
+
+    textarea.form-input {
+        height: auto !important;
+        padding: 16px 20px !important;
+        resize: vertical;
+        min-height: 100px;
+        line-height: 1.6;
+        border-radius: 16px !important;
+    }
+
+    select.form-input {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 20px center;
+        background-size: 18px;
+        padding-right: 48px !important;
+    }
+
+    input[type="date"].form-input {
+        cursor: pointer;
+        position: relative;
+        padding-right: 16px !important;
+    }
+
+    .form-input.input-error {
+        border-color: #ff4d4f !important;
+        box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+    }
+
+    .error {
+        color: rgb(255, 166, 166);
+        text-align: center;
     }
 }

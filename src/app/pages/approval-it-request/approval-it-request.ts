@@ -26,12 +26,22 @@ import { EmptyStateComponent } from '../../components/shared/empty-state/empty-s
 import { listAnimation } from '../../animations/animations';
 import { SkeletonComponent } from "../../components/shared/skeleton/skeleton";
 import { AuthService } from '../../services/auth.service';
+import { NzInputModule } from 'ng-zorro-antd/input';
 
 /** หน้าจัดการรายการอนุมัติ (Approval IT Request) แสดงข้อมูลในรูปแบบตารางพร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-approval-it-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItRequestDetailModal, PageHeaderComponent, PaginationComponent, EmptyStateComponent, SkeletonComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ItRequestDetailModal, 
+    PageHeaderComponent, 
+    PaginationComponent, 
+    EmptyStateComponent, 
+    SkeletonComponent,
+    NzInputModule
+  ],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
   styleUrl: './approval-it-request.scss',

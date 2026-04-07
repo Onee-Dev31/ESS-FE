@@ -550,6 +550,11 @@ textarea.form-input {
             }
         }
     }
+
+    @include tablet {
+        height: 100vh;
+    }
+
 }
 
 .replace-tk-right {

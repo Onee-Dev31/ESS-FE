@@ -108,7 +108,7 @@ $status-danger-text: var(--status-danger-text);
             border: 1px solid transparent;
             background: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: $font-size-label;
             font-weight: 500;
             color: $text-sub;
             display: flex;
@@ -762,11 +762,7 @@ $status-danger-text: var(--status-danger-text);
 
         i {
             font-size: 0.9rem;
-
-            // &.mr-1 {
-            //     margin-right: 8px;
-            // }
-
+            
             &.ml-1 {
                 margin-left: 8px;
             }

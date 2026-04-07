@@ -26,10 +26,12 @@
 
     <div class="card">
         <div class="table-controls">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="ค้นหา Request No, ชื่อ..." [value]="listing.searchText()"
-                    (input)="onSearch($event)" />
+            <div class="form-field">
+                <nz-input-wrapper class="form-input">
+                    <nz-icon nzInputPrefix nzType="search" />
+                    <input nz-input class="" placeholder="ค้นหา Request No, ชื่อ..." [value]="listing.searchText()"
+                        (input)="onSearch($event)" />
+                </nz-input-wrapper>
             </div>
 
             <div class="tab-navigation">
@@ -107,9 +109,7 @@
 
                             <div class="status-time"
                                 *ngIf="row.original.originalData?.ApprovalDate && row.original.status != 'Pending'">
-                                {{dateUtil.formatDateToBE(row.original.originalData?.ApprovalDate, 'DD MMMM YYYY, HH:mm')}} น.
-                                <!-- {{dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM BBBB, HH:mm')}} น. -->
-                            </div>
+                                {{dateUtil.formatDateToBE(row.original.originalData?.ApprovalDate, 'DD MMMM YYYY, HH:mm')}} น.                            </div>
                         </td>
 
                     </tr>
@@ -143,16 +143,16 @@
                 <div class="card-body">
                     <div class="info-row">
                         <span class="label"><i class="far fa-clock"></i> Date Created:</span>
-                        <span class="value">{{ req.requestDate }}</span>
+                        <span class="value">{{ dateUtil.formatDateToBE(req.requestDate, 'DD MMM YYYY HH:mm')}} น.</span>
                     </div>
-
                     <div class="requester-block">
+                        <div style="color: rgb(172, 172, 172); margin: 0 0 10px 0; font-size: 12px;">Request by: </div>
                         <div class="req-name"><i class="fas fa-user-circle"></i> {{ req.requestBy.name }}</div>
                         <div class="req-details">
                             <span><i class="fas fa-id-badge"></i> {{ req.requestBy.employeeId }}</span> &bull;
-                            <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span>
+                            <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span> &bull;
+                            <span><i class="fas fa-city"></i> {{ req.requestBy.company }}</span>
                         </div>
-                        <div class="req-company"><i class="fas fa-city"></i> {{ req.requestBy.company }}</div>
                     </div>
 
                     <div class="info-row mt-2">
