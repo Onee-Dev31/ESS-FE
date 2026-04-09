@@ -48,6 +48,29 @@ export class FreelanceService {
 
     }
 
+    getFreelanceAll(params: {
+        searchText?: string;
+        companyCode?: string;
+        costCent?: string;
+        empStatus?: string;
+        hasAdUser?: string;
+    }): Observable<any> {
+
+        const queryParams: any = {};
+        if (params.searchText) queryParams.searchText = params.searchText;
+        if (params.companyCode) queryParams.companyCode = params.companyCode;
+        if (params.costCent) queryParams.costCent = params.costCent;
+        if (params.empStatus) queryParams.empStatus = params.empStatus;
+        if (params.hasAdUser === 'false') queryParams.hasAdUser = params.hasAdUser;
+
+        // console.log("params >>> ", queryParams)
+
+        return this._http.get<any>(`${this.baseUrl}/Freelance/all`, {
+            params: queryParams
+        });
+
+    }
+
     getFreelanceById(id: any): Observable<any> {
         return this._http.get(`${this.baseUrl}/Freelance/${id}`);
     }

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { createListingState, createListingComputeds_v2, TableSortHelper } from '../../utils/listing.util';
+import { createListingState, createListingComputeds_v2, TableSortHelper, createListingComputeds } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -119,8 +119,9 @@ export class FreelanceManagementComponent implements OnInit {
     activeListing = createListingState();
     resignListing = createListingState();
 
-    activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
-    resignComps = createListingComputeds_v2(this.resignData, this.resignListing);
+    activeComps = createListingComputeds(this.activeData, this.activeListing); //ดึงข้อมูลมาทีเดียว แล้วจัดการ pageSize ให้
+    // activeComps = createListingComputeds_v2(this.activeData, this.activeListing);
+    resignComps = createListingComputeds_v2(this.resignData, this.resignListing); //ค่อย ๆ ดึงข้อมูลมาตามที่กำหนด 
 
     activeSorting = signal<SortingState>([]);
     resignSorting = signal<SortingState>([]);
@@ -255,14 +256,15 @@ export class FreelanceManagementComponent implements OnInit {
         if (tableType === 'active') {
             this.activeListing.currentPage.set(page);
 
-            this.fetchFreelanceByStatus(
-                'Active',
-                page + 1,
-                this.activeListing.pageSize()
-            ).subscribe(res => this.dataActiveFromApi(res));
+            // this.fetchFreelanceByStatus(
+            //     'Active',
+            //     page + 1,
+            //     this.activeListing.pageSize()
+            // ).subscribe(res => this.dataActiveFromApi(res));
 
-        } else {
+        }
 
+        else {
             this.resignListing.currentPage.set(page);
 
             this.fetchFreelanceByStatus(
@@ -271,6 +273,8 @@ export class FreelanceManagementComponent implements OnInit {
                 this.resignListing.pageSize()
             ).subscribe(res => this.dataResignFromApi(res));
         }
+
+
     }
 
     setPageSize(tableType: 'active' | 'resign', size: number) {
@@ -279,11 +283,11 @@ export class FreelanceManagementComponent implements OnInit {
             this.activeListing.pageSize.set(size);
             this.activeListing.currentPage.set(0);
 
-            this.fetchFreelanceByStatus(
-                'Active',
-                1,
-                size
-            ).subscribe(res => this.dataActiveFromApi(res));
+            // this.fetchFreelanceByStatus(
+            //     'Active',
+            //     1,
+            //     size
+            // ).subscribe(res => this.dataActiveFromApi(res));
 
         } else {
 
@@ -298,23 +302,27 @@ export class FreelanceManagementComponent implements OnInit {
         }
     }
 
-
     toggleSelectAll(event: Event) {
         const checked = (event.target as HTMLInputElement).checked;
-        this.data.update(items => items.map(item => ({ ...item, selected: checked })));
+        this.activeData.update(items => items.map(item => ({ ...item, selected: checked })));
     }
 
     toggleItemSelection(item: FreelanceMember) {
-        this.data.update(items => items.map(i => i.id === item.id ? { ...i, selected: !i.selected } : i));
+        this.activeData.update(items => items.map(i => i.id === item.id ? { ...i, selected: !i.selected } : i));
     }
 
     isAllSelected(): boolean {
-        return this.data().length > 0 && this.data().every(item => item.selected);
+        return this.activeData().length > 0 && this.activeData().every(item => item.selected);
+    }
+
+    isSomeSelected(): boolean {
+        return this.activeData().length > 0 && this.activeData().some(item => item.selected) && !this.isAllSelected();
     }
 
     openCreateForm() {
-        this.editingItem.set(null);
-        this.isFormOpen.set(true);
+        console.log("ส่งข้อมูล")
+        // this.editingItem.set(null);
+        // this.isFormOpen.set(true);
     }
 
     original_formData_freelance: any;
@@ -704,14 +712,25 @@ export class FreelanceManagementComponent implements OnInit {
         const company = this.filterCompany();
         const department = this.filterDepartment();
 
-        return this.freelanceService.getFreelance({
-            page,
-            pageSize,
-            searchText: searchText || undefined,
-            companyCode: company?.COMPANY_CODE,
-            costCent: department?.COSTCENT,
-            empStatus: status
-        });
+        if (status === 'Active') {
+            return this.freelanceService.getFreelanceAll({
+                searchText: searchText || undefined,
+                companyCode: company?.COMPANY_CODE,
+                costCent: department?.COSTCENT,
+                empStatus: status
+            });
+        }
+
+        else {
+            return this.freelanceService.getFreelance({
+                page,
+                pageSize,
+                searchText: searchText || undefined,
+                companyCode: company?.COMPANY_CODE,
+                costCent: department?.COSTCENT,
+                empStatus: status
+            });
+        }
     }
 
     getFreelanceById(id: any) {

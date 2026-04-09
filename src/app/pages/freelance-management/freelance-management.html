@@ -32,8 +32,6 @@
         </form>
     </div>
 
-    <!-- <div class="section-divider"></div> -->
-
     <div class="content-card">
         <div class="card-header-title">รายชื่อฟรีแลนซ์</div>
 
@@ -64,7 +62,12 @@
                 <thead>
                     <tr>
                         <th class="text-center checkbox-col">
-                            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
+                            <!-- <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)"> -->
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isSomeSelected()"
+                                    (change)="toggleSelectAll($event)" />
+                                <span class="checkmark"></span>
+                            </label>
                         </th>
                         <th class="sortable-header">
                             พนักงาน <i class="fas ml-1"></i>
@@ -87,7 +90,11 @@
                 <tbody>
                     <tr>
                         <td class="text-center">
-                            <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)">
+                            <!-- <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)"> -->
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)" />
+                                <span class="checkmark"></span>
+                            </label>
                         </td>
                         <td>
                             <div class="employee-info">
@@ -190,25 +197,6 @@
     <div class="content-card resign">
         <div class="card-header-title">รายชื่อฟรีแลนซ์ (resign)</div>
 
-        <!-- <div class="action-toolbar">
-            <div class="toolbar-left">
-                <button class="btn-create" (click)="openCreateForm()">
-                    <i class="fas fa-plus"></i> เพิ่มพนักงาน
-                </button>
-            </div>
-            <div class="toolbar-right">
-                <nz-select class="form-control select-month" [ngModel]="filterMonth()"
-                    (ngModelChange)="filterMonth.set($event)">
-                    <nz-option nzLabel="-เลือกเดือน-" nzValue="" nzDisabled />
-                    <nz-option nzLabel="มกราคม" nzValue="01" />
-                    <nz-option nzLabel="กุมภาพันธ์" nzValue="02" />
-                </nz-select>
-                <button class="btn-send-data" (click)="openCreateForm()">
-                    <i class="fas fa-upload"></i> ส่งข้อมูล
-                </button>
-            </div>
-        </div> -->
-
         <div class="table-responsive">
             @if (isLoading()) {
             <app-skeleton type="table" [rows]="5"></app-skeleton>
@@ -216,9 +204,9 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th class="text-center checkbox-col">
+                        <!-- <th class="text-center checkbox-col">
                             <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
-                        </th>
+                        </th> -->
                         <th class="sortable-header">
                             พนักงาน <i class="fas ml-1"></i>
                         </th>
@@ -239,9 +227,9 @@
                 @for (item of resignComps.paginatedData(); track item.id) {
                 <tbody>
                     <tr>
-                        <td class="text-center">
+                        <!-- <td class="text-center">
                             <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)">
-                        </td>
+                        </td> -->
                         <td>
                             <div class="employee-info">
                                 <span class="employee-id">{{ item.employeeId }}</span>
