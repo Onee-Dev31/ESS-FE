@@ -19,6 +19,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MasterDataService } from '../../services/master-data.service';
 import { finalize, firstValueFrom } from 'rxjs';
 import { FileConverterService } from '../../services/file-converter';
+import * as XLSX from 'xlsx-js-style';
+import { saveAs } from 'file-saver';
 
 interface FreelanceMember {
     id: string;
@@ -321,8 +323,87 @@ export class FreelanceManagementComponent implements OnInit {
 
     openCreateForm() {
         console.log("ส่งข้อมูล")
-        // this.editingItem.set(null);
-        // this.isFormOpen.set(true);
+        const data = this.activeData().filter(item => item.selected);
+
+        if (data.length === 0) {
+            this.swalService.warning("กรุณาเลือกรายการก่อน export")
+            return;
+        }
+
+        console.log(data)
+
+        // แปลง field ให้เป็นชื่อ column ที่อ่านง่าย
+        const exportData = data.map(item => ({
+            'ชื่อ-นามสกุล': item.name,
+            'ชื่อเล่น': item.nickname,
+            'แผนก': item.department,
+            'บริษัท': item.company,
+            'วันที่เริ่มต้น': item.startDate,
+            'วันที่สิ้นสุด': item.endDate,
+            'เงินเดือน': item.salary,
+            'รายได้อื่น': item.otherIncome
+        }));
+
+        // สร้าง worksheet
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+
+        worksheet['!cols'] = [
+            { wch: 25 }, // ชื่อ-นามสกุล
+            { wch: 15 }, // ชื่อเล่น
+            { wch: 30 }, // แผนก
+            { wch: 20 }, // บริษัท
+            { wch: 18 }, // วันที่เริ่มต้น
+            { wch: 18 }, // วันที่สิ้นสุด
+            { wch: 15 }, // เงินเดือน
+            { wch: 15 }  // รายได้อื่น
+        ];
+
+        const range = XLSX.utils.decode_range(worksheet['!ref']!);
+        for (let row = range.s.r; row <= range.e.r; row++) {
+            for (let col = range.s.c; col <= range.e.c; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                if (!worksheet[cellAddress]) continue;
+
+                const isHeader = row === 0;
+
+                worksheet[cellAddress].s = {
+                    font: {
+                        name: 'Angsana New',
+                        sz: 12,
+                        bold: isHeader,
+                        color: { rgb: isHeader ? 'FFFFFF' : '000000' }
+                    },
+                    fill: isHeader ? { fgColor: { rgb: '4F81BD' } } : undefined, 
+                    alignment: {
+                        horizontal: isHeader ? 'center' : 'left',
+                        vertical: 'center'
+                    }
+                };
+            }
+        }
+
+        // สร้าง workbook
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Freelance': worksheet },
+            SheetNames: ['Freelance']
+        };
+
+        // export เป็น file
+        const excelBuffer: any = XLSX.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array',
+            cellStyles: true
+        });
+
+        this.saveExcelFile(excelBuffer, 'freelance_list');
+    }
+
+    saveExcelFile(buffer: any, fileName: string): void {
+        const data: Blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        saveAs(data, `${fileName}_${new Date().getTime()}.xlsx`);
     }
 
     original_formData_freelance: any;
