@@ -393,11 +393,12 @@ export class ResignManagement {
     this.swalService.confirm('ยืนยันรายละเอียดพนักงานลาออก')
       .then(result => {
         if (!result.isConfirmed) return;
-
+        this.swalService.loading('กำลังบันทึก...');
         this.resignService.resignEmployees(payload).subscribe({
           next: (res) => {
             if (res.success) {
-              this.swalService.success(res.message)
+              this.swalService.close();
+              this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
               this.resetActiveDates();
               this.IS_CONFIRM_MODAL.set(false)
               this.loadInitialData();
@@ -405,6 +406,8 @@ export class ResignManagement {
           },
           error: (error) => {
             console.error('Error fetching data:', error);
+            this.swalService.close();
+            this.swalService.warning('แจ้งเตือน', error.error)
             this.IS_CONFIRM_MODAL.set(false)
           }
         })
