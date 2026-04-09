@@ -21,6 +21,7 @@ export class ResignManagementService {
     companyCode?: any;
     costCent?: any;
     empStatus?: string;
+    adExpiredDate?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -30,8 +31,9 @@ export class ResignManagementService {
     if (params.companyCode) queryParams.companyCode = params.companyCode;
     if (params.costCent) queryParams.costCent = params.costCent;
     if (params.empStatus) queryParams.empStatus = params.empStatus;
+    if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
 
-    // console.log("params >>> ", queryParams)
+    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/employees`, {
       params: queryParams

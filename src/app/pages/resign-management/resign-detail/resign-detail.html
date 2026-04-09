@@ -33,6 +33,11 @@
         </form>
     </div>
 
+    <nz-tabs [nzSelectedIndex]="activeTabIndex" (nzSelectedIndexChange)="selectTab($event)">
+        <nz-tab *ngFor="let tab of tabs" [nzTitle]="tab.name">
+        </nz-tab>
+    </nz-tabs>
+
     <div class="content-card resign">
         <div class="card-header-title">
             รายชื่อพนักงานประจำลาออก
@@ -180,6 +185,7 @@
             </app-pagination>
         </div>
     </div>
+
     <div class="content-card freelance">
         <div class="card-header-title">
             รายชื่อพนักงานฟรีแลนซ์ลาออก

@@ -28,6 +28,7 @@ export class FreelanceService {
         costCent?: string;
         empStatus?: string;
         hasAdUser?: string;
+        adExpiredDate?: string;
     }): Observable<any> {
 
         const queryParams: any = {};
@@ -39,8 +40,9 @@ export class FreelanceService {
         if (params.costCent) queryParams.costCent = params.costCent;
         if (params.empStatus) queryParams.empStatus = params.empStatus;
         if (params.hasAdUser === 'false') queryParams.hasAdUser = params.hasAdUser;
+        if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
 
-        // console.log("params >>> ", queryParams)
+        console.log("params >>> ", queryParams)
 
         return this._http.get<any>(`${this.baseUrl}/Freelance`, {
             params: queryParams

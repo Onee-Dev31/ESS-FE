@@ -23,6 +23,7 @@ import { InfoModal } from "../modal/info-modal/info-modal";
 import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
 import { FreelanceService } from '../../../services/freelance-management.service';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -71,7 +72,8 @@ interface FreelanceFormData {
     EmptyStateComponent,
     PaginationComponent,
     NzSelectModule,
-    InfoModal
+    InfoModal,
+    NzTabsModule
   ],
   templateUrl: './resign-detail.html',
   styleUrl: './resign-detail.scss',
@@ -123,6 +125,19 @@ export class ResignDetail {
   isFlipped = false;
   lastDate = signal<Date | null>(null);
   effectiveDate = signal<Date | null>(null);
+
+  tabs = [
+    { name: 'Approved', key: 'approved' },
+    { name: 'Waiting', key: 'waiting' }
+  ];
+  activeTab: string = 'approved';
+  activeTabIndex: number = 0;
+
+  selectTab(index: number) {
+    this.activeTabIndex = index;
+    this.activeTab = this.tabs[index].key;
+    this.loadInitialData();
+  }
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -677,7 +692,8 @@ export class ResignDetail {
       searchText: searchText || undefined,
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
-      empStatus: status
+      empStatus: status,
+      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false'
     });
   }
 
@@ -698,6 +714,7 @@ export class ResignDetail {
       costCent: department?.COSTCENT,
       empStatus: status,
       hasAdUser: 'false',
+      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false'
     });
   }
 
