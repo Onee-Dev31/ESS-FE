@@ -86,18 +86,26 @@
                             <div class="input-date">
                                 <div class="form-field">
                                     <label>lastDate</label>
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="lastDate" class="form-input"
+                                    <!-- <nz-date-picker nzFormat="dd/MM/yyyy" name="lastDate" class="form-input"
                                         [ngModel]="activeDates[emp.empCode]?.lastDate"
                                         (ngModelChange)="setDate(emp,'lastDate',$event)"
                                         [nzDisabledDate]="disableLastDate(emp.empCode)" required>
+                                    </nz-date-picker> -->
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="lastDate" class="form-input"
+                                        [ngModel]="activeDates[emp.empCode]?.lastDate"
+                                        (ngModelChange)="setDate(emp,'lastDate',$event)" required>
                                     </nz-date-picker>
                                 </div>
                                 <div class="form-field">
                                     <label>effectiveDate</label>
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="effectiveDate" class="form-input"
+                                    <!-- <nz-date-picker nzFormat="dd/MM/yyyy" name="effectiveDate" class="form-input"
                                         [ngModel]="activeDates[emp.empCode]?.effectiveDate"
                                         (ngModelChange)="setDate(emp,'effectiveDate',$event)"
                                         [nzDisabledDate]="disableEffectiveDate(emp.empCode)" required>
+                                    </nz-date-picker> -->
+                                    <nz-date-picker nzFormat="dd/MM/yyyy" name="effectiveDate" class="form-input"
+                                        [ngModel]="activeDates[emp.empCode]?.effectiveDate"
+                                        (ngModelChange)="setDate(emp,'effectiveDate',$event)" required>
                                     </nz-date-picker>
                                 </div>
                             </div>

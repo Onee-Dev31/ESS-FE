@@ -266,7 +266,30 @@
             <div class="modal-content">
                 <form #resignForm="ngForm" class="resign-form">
                     <div class="form-row">
+
                         <div class="form-field">
+                            <label>lastDate</label>
+                            <nz-date-picker [(ngModel)]="formResignData.lastWorkingDate" nzFormat="dd/MM/yyyy"
+                                name="lastWorkingDate" class="form-input" required #lastWorkingDate="ngModel"
+                                [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched">
+                            </nz-date-picker>
+                            <div class="error" *ngIf="lastWorkingDate.invalid && lastWorkingDate.touched">
+                                กรุณาเลือกวันสุดท้ายที่มาทำงาน
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label>effectiveDate</label>
+                            <nz-date-picker [(ngModel)]="formResignData.resignDate" nzFormat="dd/MM/yyyy"
+                                name="resignDate" class="form-input" required #resignDate="ngModel"
+                                [class.input-error]="resignDate.invalid && resignDate.touched">
+                            </nz-date-picker>
+                            <div class="error" *ngIf="resignDate.invalid && resignDate.touched">
+                                กรุณาเลือกวันที่ลาออก
+                            </div>
+                        </div>
+
+
+                        <!-- <div class="form-field">
                             <label>วันที่ลาออก</label>
                             <nz-date-picker [(ngModel)]="formResignData.resignDate" nzFormat="dd/MM/yyyy"
                                 name="resignDate" [nzDisabledDate]="disabledResignDate" class="form-input" required
@@ -287,13 +310,13 @@
                             <div class="error" *ngIf="lastWorkingDate.invalid && lastWorkingDate.touched">
                                 กรุณาเลือกวันสุดท้ายที่มาทำงาน
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </form>
             </div>
             <div class="form-actions">
-                <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
                 <button type="button" class="btn-clear" (click)="closeResignModal()">ยกเลิก</button>
+                <button type="button" class="btn-confirm-resign" (click)="confirmResign()">ยืนยัน</button>
             </div>
         </div>
     </div>
