@@ -39,6 +39,7 @@ export class FilePreviewModalComponent implements OnInit {
     }
 
     selectFile(file: FilePreviewItem) {
+        console.log("preview", file)
         this.selectedFile = file;
         this.hasError = false;
     }
