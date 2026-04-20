@@ -177,6 +177,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
           };
 
           this.requestData.set(data);
+          this.cdr.detectChanges();
 
           if (ticket.APSignature) {
             this.pendingSignature = ticket.APSignature;
@@ -189,7 +190,9 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
             this.pendingSignature = null;
             this.signatureImage.set(null);
             this.hasSignature.set(false);
-            this.clearCanvasOnly();
+            setTimeout(() => {
+              this.initCanvas();
+            }, 0);
           }
         },
         error: () => {
@@ -351,14 +354,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     img.src = this.pendingSignature.startsWith('data:')
       ? this.pendingSignature
       : `data:image/png;base64,${this.pendingSignature}`;
-  }
-
-  private clearCanvasOnly() {
-    const canvas = this.canvasRef?.nativeElement;
-    if (!canvas || !this.ctx) return;
-
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-    this.fillCanvasBg();
   }
 
   private drawSignatureFromPending(retry = 0) {
