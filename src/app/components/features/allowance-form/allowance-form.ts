@@ -215,6 +215,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.allowanceApi.createClaim({
       employee_code: employeeCode,
       details: selectedLogs.map(log => ({
@@ -230,11 +231,13 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       })),
     }).subscribe({
       next: (res) => {
-        this.toastService.success(`บันทึกสำเร็จ เลขที่ใบเบิก: ${res.data.voucherNo}`);
+        // this.toastService.success(`บันทึกสำเร็จ เลขที่ใบเบิก: ${res.data.voucherNo}`);
+        this.swalService.success(`บันทึกสำเร็จ เลขที่ใบเบิก: ${res.data.voucherNo}`);
         this.closeModal();
       },
       error: () => {
-        this.toastService.warning('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+        // this.toastService.warning('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
+        this.swalService.success('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง');
       },
     });
   }

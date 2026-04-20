@@ -15,11 +15,18 @@ import { ClaimType } from '../../../services/master-data.service';
 import { MedicalApiService } from '../../../services/medical-api.service';
 import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 import { formatMoneyInput } from '../../../utils/formatText';
+import { SwalService } from '../../../services/swal.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FilePreviewModalComponent,
+    NzDatePickerModule
+  ],
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',
 })
@@ -30,6 +37,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private dateUtil = inject(DateUtilityService);
   private medicalApiService = inject(MedicalApiService);
   private dialogService = inject(DialogService);
+  private swalService = inject(SwalService);
 
 
   @Input() requestId: string = '';
@@ -390,8 +398,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     if (
       !this.hospital().trim() ||
       !this.disease().trim() ||
-      !this.startDate().trim() ||
-      !this.endDate().trim() ||
+      !this.startDate() ||
+      !this.endDate() ||
       !this.amount.trim()
     ) {
       return false; // ยังกรอกไม่ครบ
@@ -469,13 +477,14 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     if (!confirmed) return;
 
     this.isSaving.set(true);
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
     this.medicalApiService.submitClaim({
       employee_code: this.employeeId(),
       expense_type_id: rawType.typeId,
       hospital_id: hosp.hospitalId,
       disease_id: disease.diseaseId,
-      treatment_date_from: this.startDate(),
-      treatment_date_to: this.endDate(),
+      treatment_date_from: dayjs(this.startDate()).format('YYYY-MM-DD'),
+      treatment_date_to: dayjs(this.endDate()).format('YYYY-MM-DD'),
       treatment_days: this.calculatedDays(),
       requested_amount: this.parseNumber(this.amount),
       remark: this.remark() || undefined,
@@ -484,12 +493,14 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     }).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
+        this.swalService.success("ส่งเรื่องเบิกเรียบร้อยแล้ว")
+        // this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
         this.close();
       },
       error: () => {
         this.isSaving.set(false);
-        this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
+        this.swalService.warning("เกิดข้อผิดพลาดในการส่งเรื่อง")
+        // this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
       }
     });
   }
