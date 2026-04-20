@@ -17,6 +17,7 @@ import { NoteModal } from "../dashboard-it/modal/note-modal/note-modal";
 import { SwalService } from '../../services/swal.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from "../../components/modals/services-detail-modal/services-detail-modal";
+import { FileConverterService } from '../../services/file-converter';
 
 @Component({
   selector: 'app-it-service',
@@ -43,6 +44,7 @@ export class ItService implements OnInit {
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
+  private fileConverter = inject(FileConverterService);
   private cdr = inject(ChangeDetectorRef);
   private userData = this.authService.userData()
 
@@ -89,15 +91,17 @@ export class ItService implements OnInit {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
-      let convertedFiles: any[] = [];
+      // let convertedFiles: any[] = [];
 
-      if (ticketAttachments.length) {
-        convertedFiles = await Promise.all(
-          ticketAttachments.map((f: any) =>
-            this.convertUrlToFile(f)
-          )
-        );
-      }
+      // if (ticketAttachments.length) {
+      //   convertedFiles = await Promise.all(
+      //     ticketAttachments.map((f: any) =>
+      //       this.convertUrlToFile(f)
+      //     )
+      //   );
+      // }
+
+      const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -152,7 +156,7 @@ export class ItService implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.fullname  ? res.requestFor : null
+        openFor: res.requestFor.fullname ? res.requestFor : null
       }
 
       // console.log("selectedTicket:", objectData)
@@ -433,10 +437,11 @@ export class ItService implements OnInit {
         // หาไฟล์ของ reply นี้
         const files = attachments.filter(a => a.reply_id === r.id);
 
-        // convert file -> File object
-        const convertedFiles = await Promise.all(
-          files.map(f => this.convertUrlToFile(f))
-        );
+        // // convert file -> File object
+        // const convertedFiles = await Promise.all(
+        //   files.map(f => this.convertUrlToFile(f))
+        // );
+        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
 
         return {
           id: r.id,
