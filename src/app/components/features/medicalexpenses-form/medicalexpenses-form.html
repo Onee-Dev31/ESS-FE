@@ -122,24 +122,28 @@
 
                 <div class="input-field-group">
                     <label>วันที่รักษา ตั้งแต่ <span class="required">*</span></label>
-                    <div class="custom-input-wrapper">
+                    <!-- <div class="custom-input-wrapper">
                         <input type="date" class="input-field" title="วันที่รักษา ตั้งแต่" [ngModel]="startDate()"
                             (ngModelChange)="startDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
                         </div>
-                    </div>
+                    </div> -->
+                    <nz-date-picker class="input-field" nzFormat="dd/MM/yyyy" [ngModel]="startDate()"
+                        (ngModelChange)="startDate.set($event)" />
                 </div>
 
                 <div class="input-field-group">
                     <label>ถึงวันที่ <span class="required">*</span></label>
-                    <div class="custom-input-wrapper">
+                    <!-- <div class="custom-input-wrapper">
                         <input type="date" class="input-field" title="ถึงวันที่" [ngModel]="endDate()"
                             (ngModelChange)="endDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
                         </div>
-                    </div>
+                    </div> -->
+                    <nz-date-picker class="input-field" nzFormat="dd/MM/yyyy" [ngModel]="endDate()"
+                        (ngModelChange)="endDate.set($event)" />
                 </div>
 
                 <div class="input-field-group">
