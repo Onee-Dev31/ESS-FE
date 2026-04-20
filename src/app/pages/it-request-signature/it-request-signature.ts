@@ -1,15 +1,17 @@
 import {
   Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, signal, inject,
+  ViewChild, ElementRef, signal, inject, computed,
   ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, NavigationEnd, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
 import { TicketService } from '../../services/ticket.service';
-import { filter } from 'rxjs';
+import { ItServiceService } from '../../services/it-service.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { switchMap } from 'rxjs';
 
 export type TicketType = 'repair' | 'service';
 
@@ -77,6 +79,12 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
 
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+  private itServiceService = inject(ItServiceService);
+  private http = inject(HttpClient);
+  private baseUrl = environment.api_url;
+
+  loginUser = computed(() => this.authService.userData());
 
   requestNo = signal<string>('');
   requestData = signal<any | null>(null);
@@ -85,6 +93,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   isSubmitting = signal<boolean>(false);
   signerName = signal<string>('');
   signatureImage = signal<string | null>(null);
+  approvalStatus = signal<string>('');
 
   private ctx: CanvasRenderingContext2D | null = null; private isDrawing = false;
   private lastX = 0;
@@ -156,6 +165,7 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
             this.signerName.set(ticket.NameApprover);
           }
 
+          this.approvalStatus.set(ticket.approval_status ?? '');
           this.requestNo.set(ticket.ticket_number);
 
           const data: any = {
@@ -173,8 +183,10 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
             requestCategory: ticket.TicketTypeName,
             basicSystems: ticket.basic,
             specificSystems: ticket.specific,
-            attachments: ticket.attachments?.map((a: any) => a.file_name)
+            attachments: ticket.attachments?.map((a: any) => a.file_name),
+            ticketId: ticket.ticketID,
           };
+          console.log(data);
 
           this.requestData.set(data);
           this.cdr.detectChanges();
@@ -299,17 +311,38 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       this.toastService.warning('กรุณาเซนชื่อก่อนยืนยัน');
       return;
     }
+
+    const empId = this.loginUser()?.CODEMPID;
+    if (!empId) {
+      this.toastService.warning('ไม่พบข้อมูลผู้ใช้งาน');
+      return;
+    }
+
     this.isSubmitting.set(true);
-    const signatureBase64 = this.getSignatureBase64();
 
-    // TODO: Call API to submit approval + signature
-    console.log('[IT Signature] requestNo:', this.requestNo());
-    console.log('[IT Signature] signature (base64):', signatureBase64.substring(0, 60) + '...');
+    const formData = new FormData();
+    formData.append('decision', 'Approved');
+    formData.append('executedBy', empId);
 
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-      this.toastService.success('บันทึกลายเซนต์และอนุมัติเรียบร้อยแล้ว');
-    }, 800);
+    const base64 = this.getSignatureBase64();
+    const ticketId = this.requestData()?.ticketId;
+
+    this.itServiceService.updateTicket(ticketId, formData).pipe(
+      switchMap(() => this.http.post(`${this.baseUrl}/employee-signature`, {
+        codeEmpId: empId,
+        base64Signature: base64,
+        isActive: true
+      }))
+    ).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.toastService.success('บันทึกลายเซนต์และอนุมัติเรียบร้อยแล้ว');
+      },
+      error: () => {
+        this.isSubmitting.set(false);
+        this.toastService.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+      }
+    });
   }
 
   editAction() {

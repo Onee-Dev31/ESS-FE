@@ -176,12 +176,11 @@
             </div>
 
 
+            @if (approvalStatus() !== 'Approved') {
             <div class="signature-actions">
                 <button class="btn-clear" (click)="clearSignature()" [disabled]="!hasSignature()">
                     <i class="fas fa-eraser"></i> ล้างลายเซนต์
                 </button>
-
-
 
                 <button class="btn-submit" (click)="submit()" [disabled]="!hasSignature() || isSubmitting()">
                     @if (isSubmitting()) {
@@ -191,6 +190,7 @@
                     }
                 </button>
             </div>
+            }
 
             <p class="signature-note">
                 <i class="fas fa-info-circle"></i>
