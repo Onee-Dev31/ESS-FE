@@ -44,7 +44,10 @@ export class ITServiceRequestComponent implements OnInit {
     userSubOptions = signal<any[]>([])
     systemSubOptions = signal<any[]>([])
     openForOptions = signal<any[]>([])
-    selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
+    selectedOpenFor = signal<{ value: string; label: string }>({
+        value: this.authService.userData().CODEMPID,
+        label: ''
+    });
     openforOneejob: string = '';
     isSystemCategorySelected = signal(false);
     IsOneeJob: boolean = false;
@@ -112,6 +115,14 @@ export class ITServiceRequestComponent implements OnInit {
             this.applicantId = decryptValue(params['applicantId']) || '';
             this.getDetailFromJobsByApplicantId(this.applicantId)
             if (!this.applicantId) return;
+        });
+    }
+
+    onOpenForChange(value: string) {
+        const option = this.openForOptions().find(opt => opt.value === value);
+        this.selectedOpenFor.set({
+            value,
+            label: option?.label ?? ''
         });
     }
 
@@ -249,7 +260,7 @@ export class ITServiceRequestComponent implements OnInit {
         this.isSystemCategorySelected.set(false);
         this.userSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
         this.systemSubOptions.update(items => items.map(i => ({ ...i, checked: false })));
-        this.selectedOpenFor.set('self');
+        // this.selectedOpenFor.set('self');
         // this.otherOpenForName.set('');
         this.requestDetails.set('');
         this.selectedSystemTypes.set([]);
@@ -277,11 +288,8 @@ export class ITServiceRequestComponent implements OnInit {
 
         let openForDisplay = '';
         const selected = this.openForOptions().find(o => o.value === this.selectedOpenFor());
-        if (this.selectedOpenFor() === 'other') {
-            // openForDisplay = `อื่นๆ: ${this.otherOpenForName()}`;
-        } else {
-            openForDisplay = selected ? selected.label : '';
-        }
+        openForDisplay = selected ? selected.label : '';
+
 
         const userOptions = this.userSubOptions().filter(o => o.checked)
         const systemOptions = this.systemSubOptions().filter(o => o.checked)
@@ -291,7 +299,7 @@ export class ITServiceRequestComponent implements OnInit {
         if (this.IsOneeJob) {
             formData.append('openForType', 'ONEEJOB');
         }
-        formData.append('openForCodeempid', this.IsOneeJob ? this.openforOneejob : this.selectedOpenFor());
+        formData.append('openForCodeempid', this.IsOneeJob ? this.openforOneejob : this.selectedOpenFor().value);
         formData.append('description', this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails());
         formData.append('requesterAduser', this.authService.currentUser() || '-');
         formData.append('contactPhone', this.phoneNumber());
@@ -455,6 +463,15 @@ export class ITServiceRequestComponent implements OnInit {
             next: (res) => {
                 console.log(res.data);
                 this.openForOptions.set(res.data)
+                const defaultOption = this.openForOptions().find(
+                    opt => opt.value === this.authService.userData().CODEMPID
+                );
+                if (defaultOption) {
+                    this.selectedOpenFor.set({
+                        value: defaultOption.value,
+                        label: defaultOption.label
+                    });
+                }
             },
             error: (error) => {
                 console.error('Error fetching data:', error);

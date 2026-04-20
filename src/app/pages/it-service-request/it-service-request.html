@@ -81,8 +81,8 @@
                     เปิดสิทธิ์ให้ (Open For)
                     <span class="required-badge">*</span></label>
                 <div class="input-pair-row">
-                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
-                        (ngModelChange)="selectedOpenFor.set($event)" name="openFor" class="form-control-select">
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor().value"
+                        (ngModelChange)="onOpenForChange($event)" name="openFor" class="form-control-select">
                         @for (opt of openForOptions(); track opt.value) {
                         <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
                         }
@@ -314,7 +314,7 @@
                         <tr>
                             <th>ชื่อผู้ขอสิทธิ์</th>
                             <td>
-                                {{ selectedOpenFor() }}
+                                {{ selectedOpenFor().label }}
                             </td>
                         </tr>
                         @if (phoneNumber()) {
