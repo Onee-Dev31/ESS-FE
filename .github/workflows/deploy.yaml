@@ -1,0 +1,90 @@
+name: Build and Deploy Front to IIS
+
+on:
+  push:
+    branches:
+      - V2
+
+permissions: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    permissions: {}
+
+    env:
+      DEPLOY_PATH: 'C:\Projects\ESS\front\dist'
+      BACKUP_ROOT: 'C:\Projects\ESS\front\_backup'
+      APP_POOL_NAME: 'ESS-Front'
+      DIST_PATH: 'dist\my-angular-app\browser'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: Onee-Dev31/ESS-FE        
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Production
+        run: npm run build:prod
+
+      - name: Backup Current Deployment
+        shell: powershell
+        run: |
+          $backupRoot = "${{ env.BACKUP_ROOT }}"
+          $deployPath = "${{ env.DEPLOY_PATH }}"
+          $today = Get-Date -Format "yyyyMMdd"
+          if (!(Test-Path $backupRoot)) { New-Item -ItemType Directory -Path $backupRoot | Out-Null }
+          $backupFolder = $today
+          if (Test-Path "$backupRoot\$backupFolder") {
+            $counter = 1
+            while (Test-Path "$backupRoot\${backupFolder}_${counter}") { $counter++ }
+            $backupFolder = "${backupFolder}_${counter}"
+          }
+          $backupPath = "$backupRoot\$backupFolder"
+          New-Item -ItemType Directory -Path $backupPath | Out-Null
+          Get-ChildItem -Path $deployPath | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $backupPath -Recurse -Force
+          }
+          Write-Host "Backup done: $backupPath"
+
+      - name: Stop App Pool
+        shell: powershell
+        run: |
+          $result = & "C:\Windows\System32\inetsrv\appcmd.exe" stop apppool /apppool.name:"${{ env.APP_POOL_NAME }}" 2>&1
+          Write-Host $result
+          Start-Sleep -Seconds 3
+          exit 0
+
+      - name: Deploy Files
+        shell: powershell
+        run: |
+          $keepFolders = @("carousel", "employee", "files", "icon", "image", "img", "logo", "logo-backup070768")
+          
+          # ลบไฟล์ทั้งหมดใน root ยกเว้น web.config
+          $keepFiles = @("web.config")
+          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -File |
+            Where-Object { $keepFiles -notcontains $_.Name } |
+            Remove-Item -Force
+          
+          # ลบ folder ที่ไม่อยู่ใน whitelist
+          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -Directory | 
+            Where-Object { $keepFolders -notcontains $_.Name } |
+            Remove-Item -Recurse -Force
+          
+          # Copy ใหม่
+          Copy-Item -Path "${{ env.DIST_PATH }}\*" -Destination "${{ env.DEPLOY_PATH }}" -Recurse -Force
+
+      - name: Start App Pool
+        shell: powershell
+        run: |
+          & "C:\Windows\System32\inetsrv\appcmd.exe" start apppool /apppool.name:"${{ env.APP_POOL_NAME }}" 2>&1 | Out-Null
+          Write-Host "Deploy success"

@@ -637,14 +637,14 @@ export class ResignDetail {
 
     this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned [EMP]>>", res)
+        console.log("Resigned [EMP]>>", res.data.items)
         this.dataEmployeeResignFromApi(res);
         this.loadingService.stop('employee-list');
       });
 
     this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
       .subscribe(res => {
-        console.log("Resigned [FREE]>>", res)
+        console.log("Resigned [FREE]>>", res.items)
         this.dataFreelanceResignFromApi(res);
         this.loadingService.stop('freelance-list');
       });
