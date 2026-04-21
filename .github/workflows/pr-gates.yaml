@@ -5,6 +5,9 @@ on:
     branches: [master]
     types: [opened, synchronize, reopened, ready_for_review]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 concurrency:
   group: pr-gates-${{ github.event.pull_request.number }}
   cancel-in-progress: true
