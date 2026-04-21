@@ -7,6 +7,7 @@
     "dev": "ng serve --host 0.0.0.0 --configuration=dev",
     "build": "ng build",
     "build:prod": "ng build --configuration production --output-hashing=all --delete-output-path --verbose",
+    "build:uat": "ng build --configuration uat --output-hashing=all --delete-output-path --verbose",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "cypress run",
