@@ -148,7 +148,7 @@ export class ItDashboardSummary {
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
     private masterService: MasterDataService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.selectStatus('all', false);
@@ -686,9 +686,9 @@ export class ItDashboardSummary {
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
         this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
           ...t,
-          assignees: t.assignees_json ? JSON.parse(t.assignees_json) : []
+          assignees: t.assignees_json ? JSON.parse(t.assignees_json) : [],
         }));
-        console.log(this.filteredTicketLogs)
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },

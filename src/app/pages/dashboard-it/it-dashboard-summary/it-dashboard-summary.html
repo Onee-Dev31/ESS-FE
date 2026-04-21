@@ -1,14 +1,24 @@
 <!-- KPI CARDS -->
 <section class="kpi-row">
-  <div class="kpi" *ngFor="let k of kpis; trackBy: trackByStatus" [class.active]="activeStatus === k.status"
-    (click)="selectStatus(k.status, true)">
+  <div
+    class="kpi"
+    *ngFor="let k of kpis; trackBy: trackByStatus"
+    [class.active]="activeStatus === k.status"
+    (click)="selectStatus(k.status, true)"
+  >
     <div class="kpi-top">
       <div class="kpi-title">{{ k.title }}</div>
 
-      <span class="kpi-pill" [class.pill-blue]="k.status === 'open'" [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'" [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'" [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'">
+      <span
+        class="kpi-pill"
+        [class.pill-blue]="k.status === 'open'"
+        [class.pill-cyan]="k.status === 'assigned'"
+        [class.pill-orange]="k.status === 'inprogress'"
+        [class.pill-green]="k.status === 'done'"
+        [class.pill-red]="k.status === 'denied'"
+        [class.pill-hold]="k.status === 'hold'"
+        [class.pill-gray]="k.status === 'all'"
+      >
         <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
       </span>
     </div>
@@ -16,10 +26,16 @@
     <div class="kpi-value">
       {{ k.value | number }}
       <!-- <span> -->
-      <span class="kpi-delta" [class.pill-blue]="k.status === 'open'" [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'" [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'" [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'">
+      <span
+        class="kpi-delta"
+        [class.pill-blue]="k.status === 'open'"
+        [class.pill-cyan]="k.status === 'assigned'"
+        [class.pill-orange]="k.status === 'inprogress'"
+        [class.pill-green]="k.status === 'done'"
+        [class.pill-red]="k.status === 'denied'"
+        [class.pill-hold]="k.status === 'hold'"
+        [class.pill-gray]="k.status === 'all'"
+      >
         <span>{{ getPercent(k) }}%</span>
       </span>
       <!-- </span> -->
@@ -36,8 +52,13 @@
   <div class="chart-card">
     <div class="chart-title">Status Distribution</div>
 
-    <div echarts class="echart" [options]="statusPieOption" (chartInit)="onStatusChartInit($event)"
-      (chartClick)="onStatusPieClick($event)"></div>
+    <div
+      echarts
+      class="echart"
+      [options]="statusPieOption"
+      (chartInit)="onStatusChartInit($event)"
+      (chartClick)="onStatusPieClick($event)"
+    ></div>
   </div>
 
   <!-- Service Pie -->
@@ -50,7 +71,12 @@
   <!-- Company Bar -->
   <div class="chart-card bar-card">
     <div class="chart-title">Top 5 Companies</div>
-    <div echarts class="echart bar" [options]="companyBarOption" (chartClick)="onCompanyBarClick($event)"></div>
+    <div
+      echarts
+      class="echart bar"
+      [options]="companyBarOption"
+      (chartClick)="onCompanyBarClick($event)"
+    ></div>
   </div>
   <div class="chart-card bar-card">
     <div class="chart-title">Top 5 Deparment</div>
@@ -67,9 +93,13 @@
       <div class="log-modal-title">
         <span>Ticket Logs - </span>
 
-        <span class="status-pill" [class.pill-blue]="currentStatus === 'Open'"
-          [class.pill-cyan]="currentStatus === 'Assigned'" [class.pill-orange]="currentStatus === 'In Progress'"
-          [class.pill-green]="currentStatus === 'Closed'">
+        <span
+          class="status-pill"
+          [class.pill-blue]="currentStatus === 'Open'"
+          [class.pill-cyan]="currentStatus === 'Assigned'"
+          [class.pill-orange]="currentStatus === 'In Progress'"
+          [class.pill-green]="currentStatus === 'Closed'"
+        >
           {{ currentStatus }}
         </span>
       </div>
@@ -80,31 +110,58 @@
 
     <div class="log-modal-body">
       <div class="log-filter">
-        <input type="text" class="search-input" placeholder="Ticket No" [(ngModel)]="filter.ticketNo"
-          (ngModelChange)="applyFilter()" />
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Ticket No"
+          [(ngModel)]="filter.ticketNo"
+          (ngModelChange)="applyFilter()"
+        />
 
-        <input type="text" class="search-input" placeholder="Subject" [(ngModel)]="filter.subject"
-          (ngModelChange)="applyFilter()" />
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Subject"
+          [(ngModel)]="filter.subject"
+          (ngModelChange)="applyFilter()"
+        />
 
-        <input type="text" class="search-input" placeholder="Requester" [(ngModel)]="filter.requester"
-          (ngModelChange)="applyFilter()" />
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Requester"
+          [(ngModel)]="filter.requester"
+          (ngModelChange)="applyFilter()"
+        />
 
-        <select class="search-select-company" [(ngModel)]="filter.company" (ngModelChange)="onCompanyChange()">
+        <select
+          class="search-select-company"
+          [(ngModel)]="filter.company"
+          (ngModelChange)="onCompanyChange()"
+        >
           <option value="">All Company</option>
           <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
             {{ c.COMPANY_CODE }}
           </option>
         </select>
 
-        <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()"
-          [disabled]="!filter.company">
+        <select
+          class="search-select"
+          [(ngModel)]="filter.department"
+          (ngModelChange)="applyFilter()"
+          [disabled]="!filter.company"
+        >
           <option value="">All Department</option>
           <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
             {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
           </option>
         </select>
 
-        <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()">
+        <nz-range-picker
+          nzFormat="dd/MM/yyyy"
+          [(ngModel)]="filter.dateRange"
+          (ngModelChange)="applyFilter()"
+        >
         </nz-range-picker>
 
         <button class="export-btn" (click)="exportData()">
@@ -122,7 +179,7 @@
               <th style="width: 15%">Requester</th>
               <th style="width: 15%">Department</th>
               <th>Company</th>
-              <th *ngIf="currentStatus==='Assigned'">assign</th>
+              <th *ngIf="currentStatus === 'Assigned'">assign</th>
               <th style="width: 12%">Updated</th>
               <th>Action</th>
             </tr>
@@ -140,7 +197,7 @@
               <td>
                 {{ data.COMPANY_CODE }}
               </td>
-              <td *ngIf="currentStatus==='Assigned'">
+              <td *ngIf="currentStatus === 'Assigned'">
                 <div class="assignee-list">
                   <div class="assignee-item" *ngFor="let a of data.assignees">
                     <div class="assignee-info">
@@ -167,17 +224,31 @@
       </div>
 
       <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
-        <button class="page-btn" type="button" [disabled]="page === 1" (click)="onPageIndexChange(page - 1)">
+        <button
+          class="page-btn"
+          type="button"
+          [disabled]="page === 1"
+          (click)="onPageIndexChange(page - 1)"
+        >
           Prev
         </button>
 
         <span class="page-info"> Page {{ page }} / {{ totalPages }} </span>
 
-        <button class="page-btn" type="button" [disabled]="page === totalPages" (click)="onPageIndexChange(page + 1)">
+        <button
+          class="page-btn"
+          type="button"
+          [disabled]="page === totalPages"
+          (click)="onPageIndexChange(page + 1)"
+        >
           Next
         </button>
 
-        <select class="page-size-select" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+        <select
+          class="page-size-select"
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+        >
           <option [ngValue]="10">10</option>
           <option [ngValue]="20">20</option>
           <option [ngValue]="50">50</option>

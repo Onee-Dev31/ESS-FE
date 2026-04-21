@@ -51,7 +51,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
     AssignModal,
     NoteModal,
     ServicesDetailModal,
-    NzCheckboxModule
+    NzCheckboxModule,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -416,29 +416,35 @@ export class DashboardIT implements OnInit {
 
   // GET MASTER
   getAllTickets() {
-    this.itServiceService.getAllTickets({ page: 1, pageSize: 50, myTicket: this.myTicket ? this.authService.userData().AD_USER : null }).subscribe({
-      next: (res) => {
-        console.log('getAllTickets() >>> res :', res);
-        this.Tickets.set(
-          res.data.map((ticket: any) => ({
-            ...ticket,
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticket_number,
-            ticketType: ticket.ticket_type_name_th,
-            status: ticket.status,
-            createdDate: new Date(ticket.created_at).toISOString(),
-            requesterEmpId: ticket.requester_code,
-            // requesterEmpId: ticket.requester_codeempid,
-            subject: ticket.subject,
-          })),
-        );
+    this.itServiceService
+      .getAllTickets({
+        page: 1,
+        pageSize: 50,
+        myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
+      })
+      .subscribe({
+        next: (res) => {
+          console.log('getAllTickets() >>> res :', res);
+          this.Tickets.set(
+            res.data.map((ticket: any) => ({
+              ...ticket,
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              ticketType: ticket.ticket_type_name_th,
+              status: ticket.status,
+              createdDate: new Date(ticket.created_at).toISOString(),
+              requesterEmpId: ticket.requester_code,
+              // requesterEmpId: ticket.requester_codeempid,
+              subject: ticket.subject,
+            })),
+          );
 
-        console.log(this.Tickets());
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+          console.log(this.Tickets());
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getTicketById(ticketId: string) {
