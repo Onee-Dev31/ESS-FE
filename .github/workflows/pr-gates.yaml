@@ -21,7 +21,7 @@ jobs:
     name: Lint (Prettier)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: '22.x'
@@ -33,7 +33,7 @@ jobs:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: '22.x'
@@ -47,7 +47,7 @@ jobs:
     outputs:
       percent: ${{ steps.cov.outputs.percent }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: '22.x'
@@ -70,7 +70,7 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: '22.x'
@@ -84,8 +84,8 @@ jobs:
     needs: [lint, typecheck, test-coverage, security]
     if: always()
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/github-script@v7
+      - uses: actions/checkout@v5
+      - uses: actions/github-script@v8
         env:
           RESULT_LINT: ${{ needs.lint.result }}
           RESULT_TYPECHECK: ${{ needs.typecheck.result }}
