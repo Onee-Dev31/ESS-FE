@@ -1,0 +1,32 @@
+name: PR Auto Merge
+
+on:
+  workflow_run:
+    workflows: ["PR Gates"]
+    types: [completed]
+
+concurrency:
+  group: pr-auto-merge-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  MERGE_METHOD: MERGE
+
+jobs:
+  auto-merge:
+    name: Auto Merge PR
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        env:
+          MERGE_METHOD: ${{ env.MERGE_METHOD }}
+        with:
+          script: |
+            const script = require('./.github/scripts/auto-merge-pr.js')
+            await script({ github, context, core })

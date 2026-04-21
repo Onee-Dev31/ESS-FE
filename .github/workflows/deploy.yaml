@@ -2,31 +2,58 @@ name: Build and Deploy Front to IIS
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+  workflow_run:
+    workflows: ["PR Auto Merge"]
+    types: [completed]
 
-permissions: {}
+concurrency:
+  group: deploy-${{ github.sha || github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
+  resolve-deploy-source:
+    name: Resolve Deploy Source
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.resolve.outputs.should_deploy }}
+      deploy_ref:   ${{ steps.resolve.outputs.deploy_ref }}
+      pr_number:    ${{ steps.resolve.outputs.pr_number }}
+      pr_url:       ${{ steps.resolve.outputs.pr_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        id: resolve
+        with:
+          script: |
+            const script = require('./.github/scripts/resolve-deploy-source.js')
+            await script({ github, context, core })
+
   build-and-deploy:
+    name: Build and Deploy
+    needs: resolve-deploy-source
+    if: needs.resolve-deploy-source.outputs.should_deploy == 'true'
     runs-on: self-hosted
-    permissions: {}
 
     env:
-      DEPLOY_PATH: 'C:\Projects\ESS\front\dist'
-      BACKUP_ROOT: 'C:\Projects\ESS\front\_backup'
-      APP_POOL_NAME: 'ESS-Front'
-      DIST_PATH: 'dist\my-angular-app\browser'
+      DEPLOY_PATH:       'C:\Projects\ESS\front\dist'
+      BACKUP_ROOT:       'C:\Projects\ESS\front\_backup'
+      APP_POOL_NAME:     'ESS-Front'
+      DIST_PATH:         'dist\my-angular-app\browser'
+      BACKUP_RETENTION:  '5'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
-          repository: Onee-Dev31/ESS-FE        
+          ref:        ${{ needs.resolve-deploy-source.outputs.deploy_ref }}
+          token:      ${{ secrets.GH_PAT }}
+          repository: Onee-Dev31/ESS-FE
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22.x'
 
@@ -36,55 +63,92 @@ jobs:
       - name: Build Production
         run: npm run build:prod
 
-      - name: Backup Current Deployment
+      - name: Backup & Prune
         shell: powershell
         run: |
           $backupRoot = "${{ env.BACKUP_ROOT }}"
           $deployPath = "${{ env.DEPLOY_PATH }}"
-          $today = Get-Date -Format "yyyyMMdd"
+          $retention  = [int]"${{ env.BACKUP_RETENTION }}"
+          $timestamp  = Get-Date -Format "yyyyMMdd_HHmmss"
+
           if (!(Test-Path $backupRoot)) { New-Item -ItemType Directory -Path $backupRoot | Out-Null }
-          $backupFolder = $today
-          if (Test-Path "$backupRoot\$backupFolder") {
-            $counter = 1
-            while (Test-Path "$backupRoot\${backupFolder}_${counter}") { $counter++ }
-            $backupFolder = "${backupFolder}_${counter}"
-          }
-          $backupPath = "$backupRoot\$backupFolder"
+
+          $backupPath = "$backupRoot\$timestamp"
           New-Item -ItemType Directory -Path $backupPath | Out-Null
-          Get-ChildItem -Path $deployPath | ForEach-Object {
-            Copy-Item -Path $_.FullName -Destination $backupPath -Recurse -Force
+
+          if (Test-Path $deployPath) {
+            Get-ChildItem -Path $deployPath | ForEach-Object {
+              Copy-Item -Path $_.FullName -Destination $backupPath -Recurse -Force
+            }
           }
-          Write-Host "Backup done: $backupPath"
+
+          Write-Host "Backup: $backupPath"
+          "BACKUP_PATH=$backupPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+          # Prune old backups — keep latest $retention
+          $all = Get-ChildItem -Path $backupRoot | Sort-Object Name -Descending
+          if ($all.Count -gt $retention) {
+            $all | Select-Object -Skip $retention | ForEach-Object {
+              Remove-Item -Path $_.FullName -Recurse -Force
+              Write-Host "Pruned: $($_.FullName)"
+            }
+          }
 
       - name: Stop App Pool
         shell: powershell
         run: |
-          $result = & "C:\Windows\System32\inetsrv\appcmd.exe" stop apppool /apppool.name:"${{ env.APP_POOL_NAME }}" 2>&1
-          Write-Host $result
+          & "C:\Windows\System32\inetsrv\appcmd.exe" stop apppool /apppool.name:"${{ env.APP_POOL_NAME }}" 2>&1
           Start-Sleep -Seconds 3
           exit 0
 
       - name: Deploy Files
         shell: powershell
         run: |
-          $keepFolders = @("carousel", "employee", "files", "icon", "image", "img", "logo", "logo-backup070768")
-          
-          # ลบไฟล์ทั้งหมดใน root ยกเว้น web.config
-          $keepFiles = @("web.config")
+          $keepFolders = @("carousel","employee","files","icon","image","img","logo","logo-backup070768")
+          $keepFiles   = @("web.config")
+
           Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -File |
             Where-Object { $keepFiles -notcontains $_.Name } |
             Remove-Item -Force
-          
-          # ลบ folder ที่ไม่อยู่ใน whitelist
-          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -Directory | 
+
+          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -Directory |
             Where-Object { $keepFolders -notcontains $_.Name } |
             Remove-Item -Recurse -Force
-          
-          # Copy ใหม่
+
           Copy-Item -Path "${{ env.DIST_PATH }}\*" -Destination "${{ env.DEPLOY_PATH }}" -Recurse -Force
+          Write-Host "Files deployed"
+
+      - name: Rollback on Failure
+        if: failure()
+        shell: powershell
+        run: |
+          $backupPath = $env:BACKUP_PATH
+          if (-not $backupPath -or !(Test-Path $backupPath)) {
+            Write-Host "No backup available for rollback"
+            exit 0
+          }
+
+          Write-Host "Rolling back from: $backupPath"
+          $keepFolders = @("carousel","employee","files","icon","image","img","logo","logo-backup070768")
+          $keepFiles   = @("web.config")
+
+          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -File |
+            Where-Object { $keepFiles -notcontains $_.Name } |
+            Remove-Item -Force
+
+          Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -Directory |
+            Where-Object { $keepFolders -notcontains $_.Name } |
+            Remove-Item -Recurse -Force
+
+          Get-ChildItem -Path $backupPath | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination "${{ env.DEPLOY_PATH }}" -Recurse -Force
+          }
+
+          Write-Host "Rollback complete"
 
       - name: Start App Pool
+        if: always()
         shell: powershell
         run: |
           & "C:\Windows\System32\inetsrv\appcmd.exe" start apppool /apppool.name:"${{ env.APP_POOL_NAME }}" 2>&1 | Out-Null
-          Write-Host "Deploy success"
+          Write-Host "App Pool started"

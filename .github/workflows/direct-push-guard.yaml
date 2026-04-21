@@ -1,0 +1,30 @@
+name: Direct Push Guard
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: direct-push-guard-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  FAIL_IF_NOT_PR_BACKED: 'true'
+
+jobs:
+  check-pr-backed:
+    name: Check PR-Backed Commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        env:
+          FAIL_IF_NOT_PR_BACKED: ${{ env.FAIL_IF_NOT_PR_BACKED }}
+        with:
+          script: |
+            const script = require('./.github/scripts/check-pr-backed-push.js')
+            await script({ github, context, core })
