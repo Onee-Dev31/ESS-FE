@@ -179,6 +179,7 @@
               <th style="width: 15%">Requester</th>
               <th style="width: 15%">Department</th>
               <th>Company</th>
+              <th *ngIf="currentStatus === 'Assigned'">assign</th>
               <th style="width: 12%">Updated</th>
               <th>Action</th>
             </tr>
@@ -195,6 +196,15 @@
               </td>
               <td>
                 {{ data.COMPANY_CODE }}
+              </td>
+              <td *ngIf="currentStatus === 'Assigned'">
+                <div class="assignee-list">
+                  <div class="assignee-item" *ngFor="let a of data.assignees">
+                    <div class="assignee-info">
+                      <span class="assignee-name">{{ a.name }}</span>
+                    </div>
+                  </div>
+                </div>
               </td>
               <td>
                 {{ data.updated_at || data.created_at | date: 'dd/MM/yyyy HH:mm' }}

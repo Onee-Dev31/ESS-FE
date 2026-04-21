@@ -684,7 +684,11 @@ export class ItDashboardSummary {
       next: (res: any) => {
         console.log('API RES = ', res);
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
-        this.filteredTicketLogs = this.ticketLogs;
+        this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
+          ...t,
+          assignees: t.assignees_json ? JSON.parse(t.assignees_json) : [],
+        }));
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },

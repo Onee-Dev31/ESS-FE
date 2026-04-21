@@ -30,6 +30,7 @@ import { DateUtilityService } from '../../services/date-utility.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from '../../components/modals/services-detail-modal/services-detail-modal';
 import { FileConverterService } from '../../services/file-converter';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -50,6 +51,7 @@ import { FileConverterService } from '../../services/file-converter';
     AssignModal,
     NoteModal,
     ServicesDetailModal,
+    NzCheckboxModule,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -62,6 +64,8 @@ export class DashboardIT implements OnInit {
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
+
+  myTicket: boolean = false;
 
   formatText = formatText;
   StatusColor = StatusColor;
@@ -406,31 +410,41 @@ export class DashboardIT implements OnInit {
     return notes;
   }
 
+  onMyTicketChange() {
+    this.getAllTickets();
+  }
+
   // GET MASTER
   getAllTickets() {
-    this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
-      next: (res) => {
-        console.log('getAllTickets() >>> res :', res);
-        this.Tickets.set(
-          res.data.map((ticket: any) => ({
-            ...ticket,
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticket_number,
-            ticketType: ticket.ticket_type_name_th,
-            status: ticket.status,
-            createdDate: new Date(ticket.created_at).toISOString(),
-            requesterEmpId: ticket.requester_code,
-            // requesterEmpId: ticket.requester_codeempid,
-            subject: ticket.subject,
-          })),
-        );
+    this.itServiceService
+      .getAllTickets({
+        page: 1,
+        pageSize: 50,
+        myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
+      })
+      .subscribe({
+        next: (res) => {
+          console.log('getAllTickets() >>> res :', res);
+          this.Tickets.set(
+            res.data.map((ticket: any) => ({
+              ...ticket,
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              ticketType: ticket.ticket_type_name_th,
+              status: ticket.status,
+              createdDate: new Date(ticket.created_at).toISOString(),
+              requesterEmpId: ticket.requester_code,
+              // requesterEmpId: ticket.requester_codeempid,
+              subject: ticket.subject,
+            })),
+          );
 
-        console.log(this.Tickets());
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
+          console.log(this.Tickets());
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getTicketById(ticketId: string) {

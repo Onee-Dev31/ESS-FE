@@ -437,10 +437,47 @@
   color: var(--text-header);
 }
 
+::ng-deep .checkbox-my-ticket {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+
+  .ant-checkbox {
+    display: none;
+  }
+
+  &:hover {
+    border-color: #4f6ef7;
+    color: #4f6ef7;
+    background: #eef1ff;
+  }
+
+  // ตอน checked
+  &.ant-checkbox-wrapper-checked {
+    border-color: #4f6ef7;
+    background: #4f6ef7;
+    color: #fff;
+  }
+}
+
 .tk-left__select {
   border-radius: 10px;
   width: 130px;
   text-align: right;
+}
+
+::ng-deep .ant-select-arrow .anticon > svg {
+  color: var(--text);
 }
 
 .tk-left__search {
