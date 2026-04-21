@@ -6,6 +6,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  FAIL_IF_NOT_PR_BACKED: 'true'
 
 concurrency:
   group: direct-push-guard-${{ github.sha }}
@@ -14,9 +15,6 @@ concurrency:
 permissions:
   contents: read
   pull-requests: read
-
-env:
-  FAIL_IF_NOT_PR_BACKED: 'true'
 
 jobs:
   check-pr-backed:
