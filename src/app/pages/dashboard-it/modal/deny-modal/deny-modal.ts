@@ -18,16 +18,14 @@ export class DenyModal {
   }
 
   save(form: NgForm) {
-
     if (form.invalid) {
       return;
     }
 
     const payload = {
-      reason: form.value.reason
+      reason: form.value.reason,
     };
 
     this.submitModal.emit(payload);
   }
-
 }

@@ -11,7 +11,9 @@
         <i class="fas fa-desktop"></i>
       </div>
       <h2>ยืนยันการเข้าสู่ระบบ</h2>
-      <p class="description">มีคำขอเข้าสู่ระบบจากเบราว์เซอร์บนคอมพิวเตอร์<br />กดยืนยันเพื่ออนุญาตให้เข้าสู่ระบบ</p>
+      <p class="description">
+        มีคำขอเข้าสู่ระบบจากเบราว์เซอร์บนคอมพิวเตอร์<br />กดยืนยันเพื่ออนุญาตให้เข้าสู่ระบบ
+      </p>
       <button class="confirm-button" type="button" (click)="confirm()">
         <i class="fas fa-check"></i>
         ยืนยัน Login
@@ -42,9 +44,7 @@
       </div>
       <h2>เกิดข้อผิดพลาด</h2>
       <p class="description">{{ errorMessage }}</p>
-      <button class="confirm-button" type="button" (click)="state = 'confirming'">
-        ลองใหม่
-      </button>
+      <button class="confirm-button" type="button" (click)="state = 'confirming'">ลองใหม่</button>
     </ng-container>
   </div>
 </div>

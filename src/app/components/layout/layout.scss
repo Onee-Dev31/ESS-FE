@@ -18,7 +18,6 @@
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0;
       z-index: 1000;
-
     }
 
     .content-container {
@@ -35,15 +34,14 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-
       }
     }
   }
 
   &.collapsed {
     .sidebar-container {
-
-      @media (max-width: 1280px) {}
+      @media (max-width: 1280px) {
+      }
 
       @media (max-width: 600px) {
         width: 0;

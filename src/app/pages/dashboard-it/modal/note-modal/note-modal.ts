@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
-import { FilePreviewItem, FilePreviewModalComponent } from "../../../../components/modals/file-preview-modal/file-preview-modal";
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
 
@@ -19,7 +22,7 @@ export class NoteModal {
 
   noteForm = {
     message: '',
-    attachments: [] as any[]
+    attachments: [] as any[],
   };
 
   close() {
@@ -27,14 +30,13 @@ export class NoteModal {
   }
 
   save() {
-
     const payload = {
       id: this.ticket.ticketId,
       message: this.noteForm.message,
-      attachments: this.noteForm.attachments
-    }
+      attachments: this.noteForm.attachments,
+    };
 
-    console.log(payload)
+    console.log(payload);
     this.submitModal.emit(payload);
   }
 
@@ -55,16 +57,13 @@ export class NoteModal {
   }
 
   private addFiles(files: FileList) {
-    const newFiles = Array.from(files).map(f => ({
+    const newFiles = Array.from(files).map((f) => ({
       name: f.name,
       size: f.size,
-      file: f
+      file: f,
     }));
 
-    this.noteForm.attachments = [
-      ...this.noteForm.attachments,
-      ...newFiles
-    ];
+    this.noteForm.attachments = [...this.noteForm.attachments, ...newFiles];
   }
 
   removeAttachment(index: number) {
@@ -72,7 +71,6 @@ export class NoteModal {
   }
 
   viewFile(file: any) {
-
     let url = '';
 
     if (file.file) {
@@ -88,16 +86,14 @@ export class NoteModal {
         fileName: file.name || file.fileName,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
         url: url,
-        type: file.file?.type || file.type || 'application/octet-stream'
-      }
+        type: file.file?.type || file.type || 'application/octet-stream',
+      },
     ]);
 
     this.isPreviewModalOpen.set(true);
-
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
-
 }

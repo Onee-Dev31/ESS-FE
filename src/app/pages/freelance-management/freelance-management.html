@@ -1,335 +1,393 @@
 <div class="freelance-page">
-    <app-page-header title="Freelance Management" backUrl="/dashboard"></app-page-header>
+  <app-page-header title="Freelance Management" backUrl="/dashboard"></app-page-header>
 
-    <div class="search-section">
-        <div class="search-title">ค้นหา</div>
-        <form (ngSubmit)="applyFilter()">
-            <div class="filter-row">
-                <div class="filter-group-main">
-                    <input nz-input type="text" name="searchText" class="form-control"
-                        placeholder="ชื่อ, นามสกุล, ชื่อเล่น" [ngModel]="searchText()"
-                        (ngModelChange)="searchText.set($event)">
+  <div class="search-section">
+    <div class="search-title">ค้นหา</div>
+    <form (ngSubmit)="applyFilter()">
+      <div class="filter-row">
+        <div class="filter-group-main">
+          <input
+            nz-input
+            type="text"
+            name="searchText"
+            class="form-control"
+            placeholder="ชื่อ, นามสกุล, ชื่อเล่น"
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+          />
 
-                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [ngModel]="filterCompany()"
-                        (ngModelChange)="onCompanyChange($event)" name="company" class="form-control">
-                        <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
-                        <nz-option *ngFor="let company of companyList"
-                            [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'" [nzValue]="company" />
-                    </nz-select>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกบริษัท"
+            [ngModel]="filterCompany()"
+            (ngModelChange)="onCompanyChange($event)"
+            name="company"
+            class="form-control"
+          >
+            <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
+            <nz-option
+              *ngFor="let company of companyList"
+              [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+              [nzValue]="company"
+            />
+          </nz-select>
 
-                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก" [ngModel]="filterDepartment()"
-                        (ngModelChange)="filterDepartment.set($event)" name="department" class="form-control"
-                        [class.disabled]="!filterCompany()" [nzDisabled]="!filterCompany()">
-                        <!-- <nz-option nzLabel="เลือกแผนก" nzValue="" nzDisabled /> -->
-                        <nz-option *ngFor="let dept of filteredDepartmentList()"
-                            [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept" />
-                    </nz-select>
-                </div>
-                <button class="btn-search-purple" type="submit">
-                    <i class="fas fa-search"></i> ค้นหา
-                </button>
-            </div>
-        </form>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกแผนก"
+            [ngModel]="filterDepartment()"
+            (ngModelChange)="filterDepartment.set($event)"
+            name="department"
+            class="form-control"
+            [class.disabled]="!filterCompany()"
+            [nzDisabled]="!filterCompany()"
+          >
+            <!-- <nz-option nzLabel="เลือกแผนก" nzValue="" nzDisabled /> -->
+            <nz-option
+              *ngFor="let dept of filteredDepartmentList()"
+              [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT"
+              [nzValue]="dept"
+            />
+          </nz-select>
+        </div>
+        <button class="btn-search-purple" type="submit"><i class="fas fa-search"></i> ค้นหา</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-title">รายชื่อฟรีแลนซ์</div>
+
+    <div class="action-toolbar">
+      <div class="toolbar-left">
+        <button class="btn-create" (click)="openCreateForm()">
+          <i class="fas fa-plus"></i> เพิ่มพนักงาน
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <nz-select
+          class="form-control select-month"
+          [ngModel]="filterMonth()"
+          (ngModelChange)="filterMonth.set($event)"
+        >
+          <nz-option nzLabel="-เลือกเดือน-" nzValue="" nzDisabled />
+          <nz-option nzLabel="มกราคม" nzValue="01" />
+          <nz-option nzLabel="กุมภาพันธ์" nzValue="02" />
+        </nz-select>
+        <button class="btn-send-data" (click)="openViewForm()">
+          <i class="fas fa-upload"></i> ส่งข้อมูล
+        </button>
+      </div>
     </div>
 
-    <div class="content-card">
-        <div class="card-header-title">รายชื่อฟรีแลนซ์</div>
-
-        <div class="action-toolbar">
-            <div class="toolbar-left">
-                <button class="btn-create" (click)="openCreateForm()">
-                    <i class="fas fa-plus"></i> เพิ่มพนักงาน
-                </button>
-            </div>
-            <div class="toolbar-right">
-                <nz-select class="form-control select-month" [ngModel]="filterMonth()"
-                    (ngModelChange)="filterMonth.set($event)">
-                    <nz-option nzLabel="-เลือกเดือน-" nzValue="" nzDisabled />
-                    <nz-option nzLabel="มกราคม" nzValue="01" />
-                    <nz-option nzLabel="กุมภาพันธ์" nzValue="02" />
-                </nz-select>
-                <button class="btn-send-data" (click)="openViewForm()">
-                    <i class="fas fa-upload"></i> ส่งข้อมูล
-                </button>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th class="text-center checkbox-col">
-                            <!-- <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)"> -->
-                            <label class="checkbox-custom">
-                                <input type="checkbox" [checked]="isAllSelected()" [indeterminate]="isSomeSelected()"
-                                    (change)="toggleSelectAll($event)" />
-                                <span class="checkmark"></span>
-                            </label>
-                        </th>
-                        <th class="sortable-header">
-                            พนักงาน <i class="fas ml-1"></i>
-                        </th>
-                        <th class="text-center">เบอร์โทรศัพท์</th>
-                        <th class="sortable-header">
-                            บริษัท <i class="fas ml-1"></i>
-                        </th>
-                        <th class="sortable-header">
-                            แผนก <i class="fas ml-1"></i>
-                        </th>
-                        <th class="text-right">เงินเดือน</th>
-                        <th class="text-center">รายได้อื่น</th>
-                        <th class="text-center">วันที่เริ่มต้น</th>
-                        <th class="text-center">วันที่สิ้นสุด</th>
-                        <th class="text-center actions-col"></th>
-                    </tr>
-                </thead>
-                @for (item of activeComps.paginatedData(); track item.id) {
-                <tbody>
-                    <tr>
-                        <td class="text-center">
-                            <!-- <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)"> -->
-                            <label class="checkbox-custom">
-                                <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)" />
-                                <span class="checkmark"></span>
-                            </label>
-                        </td>
-                        <td>
-                            <div class="employee-info">
-                                <span class="employee-id">{{ item.employeeId }}</span>
-                                <span class="employee-name">{{ item.name }} ({{ item.nickname }})</span>
-                            </div>
-                        </td>
-                        <td class="text-center">{{ item.phone }}</td>
-                        <td class="text-center">{{ item.company }}</td>
-                        <td>{{ item.department }}</td>
-                        <td class="text-right">{{ item.salary | number }}</td>
-                        <td class="text-center">
-                            <div class="boxed-value">{{ item.otherIncome | number }}</div>
-                        </td>
-                        <td class="text-center">{{ item.startDate | date:'dd/MM/yyyy' }}</td>
-                        <td class="text-center">{{ item.endDate | date:'dd/MM/yyyy'}}</td>
-                        <td class="text-center">
-                            <button class="btn-icon-pencil" title="แก้ไข" (click)="openEditForm(item)">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-                } @empty {
-                <tbody>
-                    <tr>
-                        <td colspan="10" class="no-data-cell">
-                            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                                icon="fas fa-users-slash"></app-empty-state>
-                        </td>
-                    </tr>
-                </tbody>
-                }
-            </table>
-            }
-        </div>
-
-        <div class="card-list-view">
-            @if (isLoading()) {
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-            } @else {
-            @for (item of activeComps.paginatedData(); track item.id) {
-            <div class="mobile-card">
-                <div class="card-header">
-                    <div class="header-content">
-                        <span class="ticket-no">{{ item.name }}</span>
-                        <div class="text-muted small">{{ item.employeeId }}</div>
-                    </div>
-                    <div class="card-actions-top">
-                        <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)">
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์:</span>
-                        <span class="value">{{ item.phone }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-building"></i> บริษัท / แผนก:</span>
-                        <span class="value">{{ item.company }} / {{ item.department }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-money-bill-wave"></i> เงินเดือน:</span>
-                        <span class="value">{{ item.salary | number }} บาท</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-hand-holding-usd"></i> รายได้อื่น:</span>
-                        <span class="value">
-                            <div class="boxed-value">{{ item.otherIncome | number }}</div>
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="far fa-calendar-alt"></i> ระยะเวลาสัญญา:</span>
-                        <span class="value">{{ item.startDate }} - {{ item.endDate }}</span>
-                    </div>
-
-                    <div class="card-footer-actions" style="grid-template-columns: 1fr;">
-                        <button class="btn-edit-sm" title="แก้ไข" (click)="openEditForm(item)">
-                            <i class="fas fa-pencil-alt"></i> แก้ไข
-                        </button>
-                    </div>
-                </div>
-            </div>
-            } @empty {
-            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์" icon="fas fa-users-slash">
-            </app-empty-state>
-            }
-            }
-        </div>
-
-        <div class="pagination-wrapper">
-            <app-pagination [currentPage]="activeListing.currentPage()" [pageSize]="activeListing.pageSize()"
-                [totalItems]="activeListing.totalItems()" (onPageChange)="goToPage('active', $event)"
-                (onPageSizeChange)="setPageSize('active', $event)">
-            </app-pagination>
-        </div>
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="text-center checkbox-col">
+                <!-- <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)"> -->
+                <label class="checkbox-custom">
+                  <input
+                    type="checkbox"
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isSomeSelected()"
+                    (change)="toggleSelectAll($event)"
+                  />
+                  <span class="checkmark"></span>
+                </label>
+              </th>
+              <th class="sortable-header">พนักงาน <i class="fas ml-1"></i></th>
+              <th class="text-center">เบอร์โทรศัพท์</th>
+              <th class="sortable-header">บริษัท <i class="fas ml-1"></i></th>
+              <th class="sortable-header">แผนก <i class="fas ml-1"></i></th>
+              <th class="text-right">เงินเดือน</th>
+              <th class="text-center">รายได้อื่น</th>
+              <th class="text-center">วันที่เริ่มต้น</th>
+              <th class="text-center">วันที่สิ้นสุด</th>
+              <th class="text-center actions-col"></th>
+            </tr>
+          </thead>
+          @for (item of activeComps.paginatedData(); track item.id) {
+            <tbody>
+              <tr>
+                <td class="text-center">
+                  <!-- <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)"> -->
+                  <label class="checkbox-custom">
+                    <input
+                      type="checkbox"
+                      [checked]="item.selected"
+                      (change)="toggleItemSelection(item)"
+                    />
+                    <span class="checkmark"></span>
+                  </label>
+                </td>
+                <td>
+                  <div class="employee-info">
+                    <span class="employee-id">{{ item.employeeId }}</span>
+                    <span class="employee-name">{{ item.name }} ({{ item.nickname }})</span>
+                  </div>
+                </td>
+                <td class="text-center">{{ item.phone }}</td>
+                <td class="text-center">{{ item.company }}</td>
+                <td>{{ item.department }}</td>
+                <td class="text-right">{{ item.salary | number }}</td>
+                <td class="text-center">
+                  <div class="boxed-value">{{ item.otherIncome | number }}</div>
+                </td>
+                <td class="text-center">{{ item.startDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ item.endDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-center">
+                  <button class="btn-icon-pencil" title="แก้ไข" (click)="openEditForm(item)">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="10" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                    icon="fas fa-users-slash"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
     </div>
 
-    <div class="content-card resign">
-        <div class="card-header-title">รายชื่อฟรีแลนซ์ (resign)</div>
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
+        @for (item of activeComps.paginatedData(); track item.id) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="ticket-no">{{ item.name }}</span>
+                <div class="text-muted small">{{ item.employeeId }}</div>
+              </div>
+              <div class="card-actions-top">
+                <input
+                  type="checkbox"
+                  [checked]="item.selected"
+                  (change)="toggleItemSelection(item)"
+                />
+              </div>
+            </div>
 
-        <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <!-- <th class="text-center checkbox-col">
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์:</span>
+                <span class="value">{{ item.phone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-building"></i> บริษัท / แผนก:</span>
+                <span class="value">{{ item.company }} / {{ item.department }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-money-bill-wave"></i> เงินเดือน:</span>
+                <span class="value">{{ item.salary | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-hand-holding-usd"></i> รายได้อื่น:</span>
+                <span class="value">
+                  <div class="boxed-value">{{ item.otherIncome | number }}</div>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="far fa-calendar-alt"></i> ระยะเวลาสัญญา:</span>
+                <span class="value">{{ item.startDate }} - {{ item.endDate }}</span>
+              </div>
+
+              <div class="card-footer-actions" style="grid-template-columns: 1fr">
+                <button class="btn-edit-sm" title="แก้ไข" (click)="openEditForm(item)">
+                  <i class="fas fa-pencil-alt"></i> แก้ไข
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบข้อมูล"
+            description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+            icon="fas fa-users-slash"
+          >
+          </app-empty-state>
+        }
+      }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="activeListing.currentPage()"
+        [pageSize]="activeListing.pageSize()"
+        [totalItems]="activeListing.totalItems()"
+        (onPageChange)="goToPage('active', $event)"
+        (onPageSizeChange)="setPageSize('active', $event)"
+      >
+      </app-pagination>
+    </div>
+  </div>
+
+  <div class="content-card resign">
+    <div class="card-header-title">รายชื่อฟรีแลนซ์ (resign)</div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <!-- <th class="text-center checkbox-col">
                             <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)">
                         </th> -->
-                        <th class="sortable-header">
-                            พนักงาน <i class="fas ml-1"></i>
-                        </th>
-                        <th class="text-center">เบอร์โทรศัพท์</th>
-                        <th class="sortable-header">
-                            บริษัท <i class="fas ml-1"></i>
-                        </th>
-                        <th class="sortable-header">
-                            แผนก <i class="fas ml-1"></i>
-                        </th>
-                        <th class="text-right">เงินเดือน</th>
-                        <th class="text-center">รายได้อื่น</th>
-                        <th class="text-center">วันที่เริ่มต้น</th>
-                        <th class="text-center">วันที่สิ้นสุด</th>
-                        <th class="text-center actions-col"></th>
-                    </tr>
-                </thead>
-                @for (item of resignComps.paginatedData(); track item.id) {
-                <tbody>
-                    <tr>
-                        <!-- <td class="text-center">
+              <th class="sortable-header">พนักงาน <i class="fas ml-1"></i></th>
+              <th class="text-center">เบอร์โทรศัพท์</th>
+              <th class="sortable-header">บริษัท <i class="fas ml-1"></i></th>
+              <th class="sortable-header">แผนก <i class="fas ml-1"></i></th>
+              <th class="text-right">เงินเดือน</th>
+              <th class="text-center">รายได้อื่น</th>
+              <th class="text-center">วันที่เริ่มต้น</th>
+              <th class="text-center">วันที่สิ้นสุด</th>
+              <th class="text-center actions-col"></th>
+            </tr>
+          </thead>
+          @for (item of resignComps.paginatedData(); track item.id) {
+            <tbody>
+              <tr>
+                <!-- <td class="text-center">
                             <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)">
                         </td> -->
-                        <td>
-                            <div class="employee-info">
-                                <span class="employee-id">{{ item.employeeId }}</span>
-                                <span class="employee-name">{{ item.name }} ({{ item.nickname }})</span>
-                            </div>
-                        </td>
-                        <td class="text-center">{{ item.phone }}</td>
-                        <td class="text-center">{{ item.company }}</td>
-                        <td>{{ item.department }}</td>
-                        <td class="text-right">{{ item.salary | number }}</td>
-                        <td class="text-center">
-                            <div class="boxed-value">{{ item.otherIncome | number }}</div>
-                        </td>
-                        <td class="text-center">{{ item.startDate | date:'dd/MM/yyyy' }}</td>
-                        <td class="text-center">{{ item.endDate | date:'dd/MM/yyyy'}}</td>
-                        <td class="text-center">
-                            <button class="btn-icon-pencil" title="แก้ไข" (click)="openEditForm(item)">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-                } @empty {
-                <tbody>
-                    <tr>
-                        <td colspan="10" class="no-data-cell">
-                            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                                icon="fas fa-users-slash"></app-empty-state>
-                        </td>
-                    </tr>
-                </tbody>
-                }
-            </table>
-            }
-        </div>
-
-        <div class="card-list-view">
-            @if (isLoading()) {
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-            } @else {
-            @for (item of resignComps.paginatedData(); track item.id) {
-            <div class="mobile-card">
-                <div class="card-header">
-                    <div class="header-content">
-                        <span class="ticket-no">{{ item.name }}</span>
-                        <div class="text-muted small">{{ item.employeeId }}</div>
-                    </div>
-                    <div class="card-actions-top">
-                        <input type="checkbox" [checked]="item.selected" (change)="toggleItemSelection(item)">
-                    </div>
-                </div>
-
-                <div class="card-body">
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์:</span>
-                        <span class="value">{{ item.phone }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-building"></i> บริษัท / แผนก:</span>
-                        <span class="value">{{ item.company }} / {{ item.department }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-money-bill-wave"></i> เงินเดือน:</span>
-                        <span class="value">{{ item.salary | number }} บาท</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-hand-holding-usd"></i> รายได้อื่น:</span>
-                        <span class="value">
-                            <div class="boxed-value">{{ item.otherIncome | number }}</div>
-                        </span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="far fa-calendar-alt"></i> ระยะเวลาสัญญา:</span>
-                        <span class="value">{{ item.startDate }} - {{ item.endDate }}</span>
-                    </div>
-
-                    <div class="card-footer-actions" style="grid-template-columns: 1fr;">
-                        <button class="btn-edit-sm" title="แก้ไข" (click)="openEditForm(item)">
-                            <i class="fas fa-pencil-alt"></i> แก้ไข
-                        </button>
-                    </div>
-                </div>
-            </div>
-            } @empty {
-            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์" icon="fas fa-users-slash">
-            </app-empty-state>
-            }
-            }
-        </div>
-
-        <div class="pagination-wrapper">
-            <app-pagination [currentPage]="resignListing.currentPage()" [pageSize]="resignListing.pageSize()"
-                [totalItems]="resignListing.totalItems()" (onPageChange)="goToPage('resign', $event)"
-                (onPageSizeChange)="setPageSize('resign', $event)">
-            </app-pagination>
-        </div>
+                <td>
+                  <div class="employee-info">
+                    <span class="employee-id">{{ item.employeeId }}</span>
+                    <span class="employee-name">{{ item.name }} ({{ item.nickname }})</span>
+                  </div>
+                </td>
+                <td class="text-center">{{ item.phone }}</td>
+                <td class="text-center">{{ item.company }}</td>
+                <td>{{ item.department }}</td>
+                <td class="text-right">{{ item.salary | number }}</td>
+                <td class="text-center">
+                  <div class="boxed-value">{{ item.otherIncome | number }}</div>
+                </td>
+                <td class="text-center">{{ item.startDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-center">{{ item.endDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="text-center">
+                  <button class="btn-icon-pencil" title="แก้ไข" (click)="openEditForm(item)">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="10" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                    icon="fas fa-users-slash"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
     </div>
 
-    <!-- Freelance Form Modal -->
-    <app-freelance-form [isOpen]="isFormOpen()" [editData]="editingItem()" (onClose)="closeForm()"
-        (onSave)="handleFormSave($event)">
-    </app-freelance-form>
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
+        @for (item of resignComps.paginatedData(); track item.id) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="ticket-no">{{ item.name }}</span>
+                <div class="text-muted small">{{ item.employeeId }}</div>
+              </div>
+              <div class="card-actions-top">
+                <input
+                  type="checkbox"
+                  [checked]="item.selected"
+                  (change)="toggleItemSelection(item)"
+                />
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label"><i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์:</span>
+                <span class="value">{{ item.phone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-building"></i> บริษัท / แผนก:</span>
+                <span class="value">{{ item.company }} / {{ item.department }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-money-bill-wave"></i> เงินเดือน:</span>
+                <span class="value">{{ item.salary | number }} บาท</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-hand-holding-usd"></i> รายได้อื่น:</span>
+                <span class="value">
+                  <div class="boxed-value">{{ item.otherIncome | number }}</div>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="far fa-calendar-alt"></i> ระยะเวลาสัญญา:</span>
+                <span class="value">{{ item.startDate }} - {{ item.endDate }}</span>
+              </div>
+
+              <div class="card-footer-actions" style="grid-template-columns: 1fr">
+                <button class="btn-edit-sm" title="แก้ไข" (click)="openEditForm(item)">
+                  <i class="fas fa-pencil-alt"></i> แก้ไข
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบข้อมูล"
+            description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+            icon="fas fa-users-slash"
+          >
+          </app-empty-state>
+        }
+      }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="resignListing.currentPage()"
+        [pageSize]="resignListing.pageSize()"
+        [totalItems]="resignListing.totalItems()"
+        (onPageChange)="goToPage('resign', $event)"
+        (onPageSizeChange)="setPageSize('resign', $event)"
+      >
+      </app-pagination>
+    </div>
+  </div>
+
+  <!-- Freelance Form Modal -->
+  <app-freelance-form
+    [isOpen]="isFormOpen()"
+    [editData]="editingItem()"
+    (onClose)="closeForm()"
+    (onSave)="handleFormSave($event)"
+  >
+  </app-freelance-form>
 </div>

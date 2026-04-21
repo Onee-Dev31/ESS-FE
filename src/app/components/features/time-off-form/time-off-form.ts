@@ -1,4 +1,16 @@
-import { Component, Input, Output, EventEmitter, signal, computed, OnInit, inject, ChangeDetectorRef, SimpleChanges, NgZone } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  signal,
+  computed,
+  OnInit,
+  inject,
+  ChangeDetectorRef,
+  SimpleChanges,
+  NgZone,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
@@ -8,7 +20,10 @@ import { LeaveType } from '../../../interfaces/time-off.interface';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs from 'dayjs';
 
-import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
+import {
+  FilePreviewModalComponent,
+  FilePreviewItem,
+} from '../../modals/file-preview-modal/file-preview-modal';
 
 import { MasterDataService } from '../../../services/master-data.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -18,9 +33,8 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   standalone: true,
   imports: [CommonModule, FormsModule, FilePreviewModalComponent, NzDatePickerModule],
   templateUrl: './time-off-form.html',
-  styleUrl: './time-off-form.scss'
+  styleUrl: './time-off-form.scss',
 })
-
 export class TimeOffForm implements OnInit {
   private timeOffService = inject(TimeOffService);
   private userService = inject(UserService);
@@ -60,16 +74,15 @@ export class TimeOffForm implements OnInit {
   });
 
   isHalfDayDisabled = computed(() => {
-    const selectedType = this.leaveTypes.find(t => t.id === this.selectedLeaveType());
+    const selectedType = this.leaveTypes.find((t) => t.id === this.selectedLeaveType());
     return selectedType?.id === 'vacation' || selectedType?.id === 'funeral';
   });
   loadingTypes = signal(true);
   attachments = signal<{ id: number; name: string; description: string }[]>([]);
   constructor(
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
-  ) {
-  }
+    private zone: NgZone,
+  ) {}
 
   ngOnInit() {
     this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
@@ -82,21 +95,21 @@ export class TimeOffForm implements OnInit {
       this.resetDates();
     }
 
-    this.masterDataService.getLeaveTypes().subscribe(types => {
+    this.masterDataService.getLeaveTypes().subscribe((types) => {
       this.zone.run(() => {
-        this.leaveTypes = [...(types || [])]; 
+        this.leaveTypes = [...(types || [])];
         if (this.initialLeaveTypeId) {
           this.selectLeaveType(this.initialLeaveTypeId);
         }
 
-        this.cdr.markForCheck();  
+        this.cdr.markForCheck();
       });
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedDate']) {
-      this.setDatesBySelectedDate(); 
+      this.setDatesBySelectedDate();
     }
   }
 
@@ -120,7 +133,7 @@ export class TimeOffForm implements OnInit {
 
   private updateEndDate() {
     const start = this.startDate();
-    console.log("start : ", start);
+    console.log('start : ', start);
 
     if (!start) return;
 
@@ -128,8 +141,7 @@ export class TimeOffForm implements OnInit {
 
     if (period === 'morning' || period === 'afternoon') {
       this.endDate.set(start);
-    }
-    else if (period === 'full-day') {
+    } else if (period === 'full-day') {
       const end = this.endDate();
       if (!end || dayjs(end).isBefore(dayjs(start))) {
         this.endDate.set(start);
@@ -155,7 +167,7 @@ export class TimeOffForm implements OnInit {
   }
 
   deleteAttachment(id: number) {
-    this.attachments.update(current => current.filter(a => a.id !== id));
+    this.attachments.update((current) => current.filter((a) => a.id !== id));
   }
 
   triggerFileInput(input: HTMLInputElement) {
@@ -169,9 +181,9 @@ export class TimeOffForm implements OnInit {
       const newAttachments = Array.from(input.files).map((file: File, index) => ({
         id: currentAttachments.length + index + 1,
         name: file.name,
-        description: ''
+        description: '',
       }));
-      this.attachments.update(current => [...current, ...newAttachments]);
+      this.attachments.update((current) => [...current, ...newAttachments]);
     }
     input.value = '';
   }
@@ -184,10 +196,12 @@ export class TimeOffForm implements OnInit {
   }
 
   openPreview(file: { name: string }) {
-    this.previewFiles.set([{
-      fileName: file.name,
-      date: this.currentDate()
-    }]);
+    this.previewFiles.set([
+      {
+        fileName: file.name,
+        date: this.currentDate(),
+      },
+    ]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -216,9 +230,9 @@ export class TimeOffForm implements OnInit {
       return;
     }
 
-    const typeLabel = this.leaveTypes.find(t => t.id === this.selectedLeaveType())?.label || '';
+    const typeLabel = this.leaveTypes.find((t) => t.id === this.selectedLeaveType())?.label || '';
 
-    this.userService.getUserProfile().subscribe(profile => {
+    this.userService.getUserProfile().subscribe((profile) => {
       const request: TimeOffRequest = {
         id: 'NEW',
         createDate: dayjs().toISOString(),
@@ -228,17 +242,17 @@ export class TimeOffForm implements OnInit {
           employeeId: profile.employeeId,
           name: profile.name,
           department: profile.department,
-          company: profile.company
+          company: profile.company,
         },
         leaveType: typeLabel,
         startDate: this.startDate(),
         endDate: this.endDate(),
         reason: this.reason(),
-        attachments: this.attachments().map(a => ({ name: a.name })),
+        attachments: this.attachments().map((a) => ({ name: a.name })),
         days: this.calculatedDays(),
         leavePeriod: this.leavePeriod(),
         shiftStartTime: this.shiftStartTime() || '08:00',
-        shiftEndTime: this.shiftEndTime() || '17:00'
+        shiftEndTime: this.shiftEndTime() || '17:00',
       };
 
       this.timeOffService.addRequest(request).subscribe({
@@ -246,7 +260,7 @@ export class TimeOffForm implements OnInit {
           this.toastService.success('บันทึกคำขอลาเรียบร้อยแล้ว');
           this.close();
         },
-        error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
+        error: () => this.toastService.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล'),
       });
     });
   }

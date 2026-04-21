@@ -6,11 +6,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-confirm-modal',
-  imports: [
-    CommonModule,
-    FormsModule,
-    NzDatePickerModule
-  ],
+  imports: [CommonModule, FormsModule, NzDatePickerModule],
   templateUrl: './confirm-modal.html',
   styleUrl: './confirm-modal.scss',
 })
@@ -31,23 +27,17 @@ export class ConfirmModal implements OnChanges {
   }
 
   remove(empCode: string) {
-
-    this.data = this.data.filter(emp => emp.empCode !== empCode);
-
+    this.data = this.data.filter((emp) => emp.empCode !== empCode);
   }
 
   submit() {
-
-    const result = this.data
-      .filter(emp => emp.lastDate && emp.effectiveDate);
+    const result = this.data.filter((emp) => emp.lastDate && emp.effectiveDate);
 
     this.submitModal.emit(result);
-
   }
 
   disableLastDate(emp: any) {
     return (current: Date): boolean => {
-
       if (!emp?.effectiveDate || !current) return false;
 
       return dayjs(current).isAfter(dayjs(emp.effectiveDate), 'day');
@@ -56,7 +46,6 @@ export class ConfirmModal implements OnChanges {
 
   disableEffectiveDate(emp: any) {
     return (current: Date): boolean => {
-
       if (!emp?.lastDate || !current) return false;
 
       return dayjs(current).isBefore(dayjs(emp.lastDate), 'day');

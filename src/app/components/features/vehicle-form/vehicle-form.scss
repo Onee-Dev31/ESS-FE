@@ -19,227 +19,226 @@ $col-desc: auto;
 // ==========================================
 
 :host {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .vehicle-form-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: $bg-card;
+  font-family: $font-main;
+  overflow: hidden;
+
+  input,
+  button,
+  select,
+  textarea {
+    font-family: $font-main;
+  }
+
+  .top-header-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff !important;
+
+      span {
+        font-size: $font-size-hint;
+        border: 1px solid #ffffff3f;
+        background: #ffffff17;
+        padding: 4px 6px;
+        border-radius: 100px;
+      }
+    }
+
+    .btn-close-modal {
+      @include close-btn-style;
+      color: #ffffff;
+      font-size: 1.25rem;
+
+      &:hover {
+        // color: var(--danger);
+        background: rgba(255, 255, 255, 0.15);
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .content-card {
+    flex: 1;
+    padding: 15px 15px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: $shadow;
+
+    @include desktop {
+      padding: 20px 24px;
+    }
+
     display: flex;
     flex-direction: column;
-    height: 100%;
-    background: $bg-card;
-    font-family: $font-main;
+    align-items: stretch;
     overflow: hidden;
+  }
 
-    input,
-    button,
-    select,
-    textarea {
-        font-family: $font-main;
+  .form-actions {
+    padding: 10px 40px 10px;
+    gap: 16px;
+    background: transparent;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    @include mobile {
+      flex-direction: column;
+      align-items: stretch;
     }
 
-    .top-header-strip {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
-        color: #ffffff;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-
-        h2 {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #ffffff !important;
-
-            span {
-                font-size: $font-size-hint;
-                border: 1px solid #ffffff3f;
-                background: #ffffff17;
-                padding: 4px 6px;
-                border-radius: 100px;
-            }
-        }
-
-        .btn-close-modal {
-            @include close-btn-style;
-            color: #ffffff;
-            font-size: 1.25rem;
-
-            &:hover {
-                // color: var(--danger);
-                background: rgba(255, 255, 255, 0.15);
-                transform: rotate(90deg);
-            }
-        }
+    .btn-submit {
+      @include btn-primary;
+      min-width: 160px;
     }
 
-    .content-card {
-        flex: 1;
-        padding: 15px 15px;
-        background: var(--bg-card);
-        border-radius: 12px;
-        box-shadow: $shadow;
+    button {
+      // flex: 1;
+      height: 48px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 
-        @include desktop {
-            padding: 20px 24px;
-        }
+  .filter-controls {
+    margin-bottom: 24px;
 
-        display: flex;
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      @include tablet {
         flex-direction: column;
         align-items: stretch;
-        overflow: hidden;
-    }
+      }
 
-    .form-actions {
-        padding: 10px 40px 10px;
-        gap: 16px;
-        background: transparent;
+      label {
+        font-weight: 600;
+        color: $text;
+        white-space: nowrap;
+      }
 
+      .inputs-row {
         display: flex;
-        justify-content: flex-end;
-        align-items: center;
+        gap: 12px;
+        flex: 1;
 
         @include mobile {
-            flex-direction: column;
-            align-items: stretch;
+          flex-direction: column;
         }
 
-        .btn-submit {
-            @include btn-primary;
-            min-width: 160px;
+        .form-control {
+          @include select-dropdown;
+          flex: 1;
         }
 
-        button {
-            // flex: 1;
-            height: 48px;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .btn-search {
+          @include btn-primary;
         }
-
+      }
     }
 
-    .filter-controls {
-        margin-bottom: 24px;
+    .alert-delete {
+      color: var(--danger);
+      font-size: $font-size-hint;
+      padding: 6px;
+      border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
+      background: color-mix(in srgb, var(--danger), transparent 90%);
+      border-radius: 6px;
+      border-left: 4px solid var(--danger);
 
-        .month-selector {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-
-            @include tablet {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            label {
-                font-weight: 600;
-                color: $text;
-                white-space: nowrap;
-            }
-
-            .inputs-row {
-                display: flex;
-                gap: 12px;
-                flex: 1;
-
-                @include mobile {
-                    flex-direction: column;
-                }
-
-                .form-control {
-                    @include select-dropdown;
-                    flex: 1;
-                }
-
-                .btn-search {
-                    @include btn-primary;
-                }
-            }
-        }
-
-        .alert-delete {
-            color: var(--danger);
-            font-size: $font-size-hint;
-            padding: 6px;
-            border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
-            background: color-mix(in srgb, var(--danger), transparent 90%);
-            border-radius: 6px;
-            border-left: 4px solid var(--danger);
-
-            .fa-solid {
-                color: var(--danger) !important;
-            }
-        }
-
-        .display-order {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            margin-top: 10px;
-            gap: 10px;
-            background: var(--bg-slate);
-            border-radius: 10px;
-
-            .left {
-                display: flex;
-                gap: 10px;
-                align-items: center;
-
-                span {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 4px 10px;
-                    font-size: $font-size-hint;
-                    border-radius: 100px;
-                    font-weight: 500;
-                    color: var(--text);
-
-                    &.keep {
-                        border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
-                        background: color-mix(in srgb, var(--success), transparent 85%);
-
-                        i.fa-solid {
-                            color: color-mix(in srgb, var(--success), white 10%) !important;
-                        }
-                    }
-
-                    &.delete {
-                        border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
-                        background: color-mix(in srgb, var(--danger), transparent 85%);
-
-                        i.fa-solid {
-                            color: color-mix(in srgb, var(--danger), white 10%) !important;
-                        }
-                    }
-                }
-            }
-
-            .right {
-                display: flex;
-                align-items: center;
-                font-weight: 500;
-                font-size: $font-size-hint;
-
-                .total {
-                    color: color-mix(in srgb, var(--primary), white 20%) !important;
-                    font-size: $font-size-body;
-                    font-weight: 900;
-                }
-            }
-        }
+      .fa-solid {
+        color: var(--danger) !important;
+      }
     }
+
+    .display-order {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-top: 10px;
+      gap: 10px;
+      background: var(--bg-slate);
+      border-radius: 10px;
+
+      .left {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        span {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          font-size: $font-size-hint;
+          border-radius: 100px;
+          font-weight: 500;
+          color: var(--text);
+
+          &.keep {
+            border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
+            background: color-mix(in srgb, var(--success), transparent 85%);
+
+            i.fa-solid {
+              color: color-mix(in srgb, var(--success), white 10%) !important;
+            }
+          }
+
+          &.delete {
+            border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
+            background: color-mix(in srgb, var(--danger), transparent 85%);
+
+            i.fa-solid {
+              color: color-mix(in srgb, var(--danger), white 10%) !important;
+            }
+          }
+        }
+      }
+
+      .right {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: $font-size-hint;
+
+        .total {
+          color: color-mix(in srgb, var(--primary), white 20%) !important;
+          font-size: $font-size-body;
+          font-weight: 900;
+        }
+      }
+    }
+  }
 }
 
 // ==========================================
@@ -247,174 +246,178 @@ $col-desc: auto;
 // ==========================================
 
 .table-container {
+  width: 100% !important;
+  display: block !important;
+  flex: 1 1 100%;
+  align-self: stretch;
+  overflow: auto;
+  border: 1px solid $border;
+  border-radius: 8px;
+
+  @include tablet {
+    border: none;
+    background: transparent;
+  }
+
+  .excel-table {
     width: 100% !important;
-    display: block !important;
-    flex: 1 1 100%;
-    align-self: stretch;
-    overflow: auto;
-    border: 1px solid $border;
-    border-radius: 8px;
+    min-width: 100% !important;
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed !important;
+    margin: 0 !important;
 
-    @include tablet {
-        border: none;
+    th,
+    td {
+      border-bottom: 1px solid $border;
+      border-right: 1px solid $border;
+      height: 40px;
+
+      @media (min-width: 768px) {
+        height: 44px;
+      }
+
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+
+    .col-select {
+      width: $col-select;
+    }
+
+    .col-date {
+      width: $col-date;
+    }
+
+    .col-day-type {
+      width: $col-day-type;
+    }
+
+    .col-shift {
+      width: $col-shift;
+    }
+
+    .col-time {
+      width: $col-time;
+    }
+
+    .col-amount {
+      width: $col-amount;
+    }
+
+    .col-desc {
+      width: $col-desc;
+    }
+
+    th {
+      background: linear-gradient(
+        135deg,
+        $primary 0%,
+        color-mix(in srgb, $primary, white 10%) 100%
+      );
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      text-align: center;
+      color: #ffffff;
+      border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+    }
+
+    .sub-header th {
+      top: 44px;
+      font-size: 0.8rem;
+      z-index: 9;
+    }
+
+    .text-center {
+      text-align: center;
+
+      input[type='checkbox'] {
+        cursor: pointer;
+        margin: 0 auto;
+        display: block;
+      }
+    }
+
+    .bg-gray {
+      background-color: $bg-slate;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .holiday-label {
+      color: $danger;
+      font-weight: 700;
+    }
+
+    .regular-label {
+      color: $text;
+      font-weight: 700;
+    }
+
+    .shift-code {
+      font-size: 12px;
+      color: $text-sub;
+    }
+
+    .highlight-row td {
+      background-color: rgba($warning, 0.05) !important;
+    }
+
+    .time-input {
+      width: 100%;
+      text-align: center;
+      border: none;
+      background: transparent;
+      outline: none;
+    }
+
+    .desc-cell {
+      padding: 0 8px;
+      position: relative;
+
+      .input-container {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        position: relative;
+      }
+
+      .table-input {
+        width: 100%;
+        height: 32px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 0 8px;
         background: transparent;
+
+        &.is-invalid {
+          border: 1px solid $danger !important;
+          background: rgba($danger, 0.05);
+        }
+
+        &:focus:not(:disabled) {
+          background: $bg-card;
+          border: 1px solid $primary;
+        }
+      }
     }
 
-    .excel-table {
-        width: 100% !important;
-        min-width: 100% !important;
-        display: table;
-        border-collapse: separate;
-        border-spacing: 0;
-        table-layout: fixed !important;
-        margin: 0 !important;
-
-        th,
-        td {
-            border-bottom: 1px solid $border;
-            border-right: 1px solid $border;
-            height: 40px;
-
-            @media (min-width: 768px) {
-                height: 44px;
-            }
-
-            vertical-align: middle;
-            box-sizing: border-box;
-        }
-
-        .col-select {
-            width: $col-select;
-        }
-
-        .col-date {
-            width: $col-date;
-        }
-
-        .col-day-type {
-            width: $col-day-type;
-        }
-
-        .col-shift {
-            width: $col-shift;
-        }
-
-        .col-time {
-            width: $col-time;
-        }
-
-        .col-amount {
-            width: $col-amount;
-        }
-
-        .col-desc {
-            width: $col-desc;
-        }
-
-        th {
-            background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-align: center;
-            color: #ffffff;
-            border-top: 1px solid color-mix(in srgb, $primary, black 10%);
-        }
-
-        .sub-header th {
-            top: 44px;
-            font-size: 0.8rem;
-            z-index: 9;
-        }
-
-        .text-center {
-            text-align: center;
-
-            input[type='checkbox'] {
-                cursor: pointer;
-                margin: 0 auto;
-                display: block;
-            }
-        }
-
-        .bg-gray {
-            background-color: $bg-slate;
-        }
-
-        .font-bold {
-            font-weight: 700;
-        }
-
-        .holiday-label {
-            color: $danger;
-            font-weight: 700;
-        }
-
-        .regular-label {
-            color: $text;
-            font-weight: 700;
-        }
-
-        .shift-code {
-            font-size: 12px;
-            color: $text-sub;
-        }
-
-        .highlight-row td {
-            background-color: rgba($warning, 0.05) !important;
-        }
-
-        .time-input {
-            width: 100%;
-            text-align: center;
-            border: none;
-            background: transparent;
-            outline: none;
-        }
-
-        .desc-cell {
-            padding: 0 8px;
-            position: relative;
-
-            .input-container {
-                display: flex;
-                align-items: center;
-                height: 100%;
-                position: relative;
-            }
-
-            .table-input {
-                width: 100%;
-                height: 32px;
-                border: 1px solid transparent;
-                border-radius: 8px;
-                padding: 0 8px;
-                background: transparent;
-
-                &.is-invalid {
-                    border: 1px solid $danger !important;
-                    background: rgba($danger, 0.05);
-                }
-
-                &:focus:not(:disabled) {
-                    background: $bg-card;
-                    border: 1px solid $primary;
-                }
-            }
-        }
-
-        .total-val {
-            background: $status-success-bg !important;
-            color: $status-success-text;
-            font-weight: 700;
-        }
-
-        .total-label {
-            text-align: right;
-            padding-right: 20px;
-            font-weight: 600;
-        }
+    .total-val {
+      background: $status-success-bg !important;
+      color: $status-success-text;
+      font-weight: 700;
     }
+
+    .total-label {
+      text-align: right;
+      padding-right: 20px;
+      font-weight: 600;
+    }
+  }
 }
 
 // ==========================================
@@ -422,143 +425,142 @@ $col-desc: auto;
 // ==========================================
 
 .mobile-cards-view {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 4px;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 4px;
 
-    .log-card {
-        background: $bg-card;
-        border: 1px solid $border;
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: $shadow;
+  .log-card {
+    background: $bg-card;
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: $shadow;
+    transition: all 0.2s;
+
+    &.highlight-card {
+      // border-color: $warning;
+      // background: rgba($warning, 0.05);
+      // box-shadow: 0 4px 15px rgba($warning, 0.1);
+      border-left: 4px solid var(--primary);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba($border, 0.5);
+
+      .date-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .day-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+
+        .date {
+          font-weight: 700;
+          color: $text;
+          font-size: 0.95rem;
+        }
+
+        .day-type {
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+      }
+
+      .card-checkbox {
+        width: 20px;
+        height: 20px;
+        accent-color: $primary;
+        cursor: pointer;
+      }
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+
+      .grid-item {
+        label {
+          display: block;
+          font-size: 0.75rem;
+          color: $text-sub;
+          margin-bottom: 4px;
+        }
+
+        .val {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: $text;
+
+          &.highlight-blue {
+            color: $primary;
+          }
+
+          &.highlight-green {
+            color: $success;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .card-input-section {
+      label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $text-sub;
+        margin-bottom: 6px;
+
+        .required {
+          color: $danger;
+        }
+      }
+
+      .card-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid $border;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: $bg-slate;
         transition: all 0.2s;
 
-        &.highlight-card {
-            // border-color: $warning;
-            // background: rgba($warning, 0.05);
-            // box-shadow: 0 4px 15px rgba($warning, 0.1);
-            border-left: 4px solid var(--primary);
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          background: $bg-card;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba($border, 0.5);
-
-            .date-info {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-
-                .day-dot {
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                }
-
-                .date {
-                    font-weight: 700;
-                    color: $text;
-                    font-size: 0.95rem;
-                }
-
-                .day-type {
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                }
-            }
-
-            .card-checkbox {
-                width: 20px;
-                height: 20px;
-                accent-color: $primary;
-                cursor: pointer;
-            }
+        &.is-invalid {
+          border-color: $danger;
+          background: rgba($danger, 0.02);
         }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-
-            .grid-item {
-                label {
-                    display: block;
-                    font-size: 0.75rem;
-                    color: $text-sub;
-                    margin-bottom: 4px;
-                }
-
-                .val {
-                    font-size: 0.9rem;
-                    font-weight: 600;
-                    color: $text;
-
-                    &.highlight-blue {
-                        color: $primary;
-                    }
-
-                    &.highlight-green {
-                        color: $success;
-                        font-weight: 700;
-                    }
-                }
-            }
-        }
-
-        .card-input-section {
-            label {
-                display: block;
-                font-size: 0.8rem;
-                font-weight: 600;
-                color: $text-sub;
-                margin-bottom: 6px;
-
-                .required {
-                    color: $danger;
-                }
-            }
-
-            .card-input {
-                width: 100%;
-                padding: 10px 12px;
-                border: 1.5px solid $border;
-                border-radius: 8px;
-                font-size: 0.9rem;
-                background: $bg-slate;
-                transition: all 0.2s;
-
-                &:focus {
-                    outline: none;
-                    border-color: $primary;
-                    background: $bg-card;
-                    box-shadow: 0 0 0 3px rgba($primary, 0.1);
-                }
-
-                &.is-invalid {
-                    border-color: $danger;
-                    background: rgba($danger, 0.02);
-                }
-            }
-        }
+      }
     }
+  }
 
-    .log-card.disable {
-        opacity: 0.45;
-    }
+  .log-card.disable {
+    opacity: 0.45;
+  }
 
-    @include tablet {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-    @media (max-width: 800px) {
-        grid-template-columns: repeat(1, 1fr);
-    }
-
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }

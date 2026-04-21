@@ -20,8 +20,13 @@
           </div>
           <div class="form-field">
             <label>สถานะ</label>
-            <nz-select nzShowSearch nzAllowClear class="form-input select-status" [ngModel]="listing.filterStatus()"
-              (ngModelChange)="listing.filterStatus.set($event)">
+            <nz-select
+              nzShowSearch
+              nzAllowClear
+              class="form-input select-status"
+              [ngModel]="listing.filterStatus()"
+              (ngModelChange)="listing.filterStatus.set($event)"
+            >
               <nz-option nzLabel="ทั้งหมด" nzValue="" />
               <nz-option nzLabel="คำขอใหม่" nzValue="New" />
               <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
@@ -33,11 +38,17 @@
             <label>ค้นหา</label>
             <nz-input-wrapper class="form-input">
               <nz-icon nzInputPrefix nzType="search" />
-              <input nz-input class="" placeholder="Order No, Description" [ngModel]="listing.searchText()"
-                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
+              <input
+                nz-input
+                class=""
+                placeholder="Order No, Description"
+                [ngModel]="listing.searchText()"
+                (ngModelChange)="listing.searchText.set($event)"
+                (keyup.enter)="loadData()"
+              />
             </nz-input-wrapper>
           </div>
-          <div style="display: flex; align-items: end; gap: 8px;">
+          <div style="display: flex; align-items: end; gap: 8px">
             <button type="button" class="btn-search" (click)="loadData()">
               <i class="fas fa-search"></i> ค้นหา
             </button>
@@ -47,135 +58,136 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Mobile card view -->
     <div class="card-list-view">
       @if (isLoading()) {
-      <app-skeleton type="card" [rows]="3"></app-skeleton>
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
-      @for (claim of comps.paginatedData(); track claim.id) {
-      <div class="claim-card" (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
-        <div class="claim-card__header">
-          <div class="claim-card__type-badge">
-            <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ
-            <!-- {{ claim.claimNo }} -->
-          </div>
-          <div class="claim-card__actions">
-            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
-              {{ claim.status | statusLabel }}
-            </span>
-          </div>
-        </div>
+        @for (claim of comps.paginatedData(); track claim.id) {
+          <div class="claim-card" (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+            <div class="claim-card__header">
+              <div class="claim-card__type-badge">
+                <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ
+                <!-- {{ claim.claimNo }} -->
+              </div>
+              <div class="claim-card__actions">
+                <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                  {{ claim.status | statusLabel }}
+                </span>
+              </div>
+            </div>
 
-        <div class="claim-card__body">
-          <div class="claim-card__main">
-            จำนวน {{claim.details.length}} วัน
-          </div>
+            <div class="claim-card__body">
+              <div class="claim-card__main">จำนวน {{ claim.details.length }} วัน</div>
 
-          <div class="claim-card__amount">
-            <span class="amount-label">ขอเบิก</span>
-            <span class="amount-value">฿{{ claim.amount | number:'1.2-2' }}</span>
-            @if (claim.approvedAmount > 0) {
-            <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
-            }
-          </div>
-        </div>
+              <div class="claim-card__amount">
+                <span class="amount-label">ขอเบิก</span>
+                <span class="amount-value">฿{{ claim.amount | number: '1.2-2' }}</span>
+                @if (claim.approvedAmount > 0) {
+                  <span class="amount-approved"
+                    >อนุมัติ ฿{{ claim.approvedAmount | number: '1.2-2' }}</span
+                  >
+                }
+              </div>
+            </div>
 
-        <div class="claim-card__footer">
-          <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
-          <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
-            }}</span>
-        </div>
-      </div>
-      }
-      @empty {
-      <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" [icon]="emptyIcon()">
-      </app-empty-state>
-      }
+            <div class="claim-card__footer">
+              <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
+              <span class="claim-date-created">{{
+                dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY')
+              }}</span>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            [title]="emptyTitle()"
+            [description]="emptyDescription()"
+            [icon]="emptyIcon()"
+          >
+          </app-empty-state>
+        }
       }
     </div>
 
     <div class="table-responsive">
       @if (isLoading()) {
-      <app-skeleton type="table" [rows]="5"></app-skeleton>
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              <th>จำนวนวัน</th>
+              <th class="text-right">ยอดเงิน</th>
+              <th>สถานะ</th>
+              <th>วันที่สร้างรายการ</th>
+            </tr>
+          </thead>
 
-      <table class="modern-table">
-        <thead>
-          <tr>
-            <th>ประเภท</th>
-            <th>จำนวนวัน</th>
-            <th class="text-right">ยอดเงิน</th>
-            <th>สถานะ</th>
-            <th>วันที่สร้างรายการ</th>
-          </tr>
-        </thead>
+          <tbody>
+            @for (claim of comps.paginatedData(); track claim.id) {
+              <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+                <!-- ประเภท -->
+                <td>
+                  <div class="type-badge">
+                    <span class="type-name">เบิกค่าพาหนะ</span>
+                  </div>
 
-        <tbody>
-          @for (claim of comps.paginatedData(); track claim.id) {
-          <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
+                  <div class="request-no">
+                    <i class="fa-solid fa-tag"></i>
+                    {{ claim.claimNo ?? claim.claimId }}
+                  </div>
+                </td>
 
-            <!-- ประเภท -->
-            <td>
-              <div class="type-badge">
-                <span class="type-name">เบิกค่าพาหนะ</span>
-              </div>
+                <!-- จำนวนวัน -->
+                <td>
+                  <div class="claim-days">{{ claim.details.length }} วัน</div>
+                </td>
 
-              <div class="request-no">
-                <i class="fa-solid fa-tag"></i>
-                {{ claim.claimNo ?? claim.claimId }}
-              </div>
-            </td>
+                <!-- ยอดเงิน -->
+                <td class="text-right">
+                  <div class="amount-cell">
+                    <div class="amount-main">฿{{ claim.amount | number: '1.2-2' }}</div>
+                    @if (claim.approvedAmount > 0) {
+                      <div class="amount-approved">
+                        <i class="fas fa-check text-success"></i>
+                        ฿{{ claim.approvedAmount | number: '1.2-2' }}
+                      </div>
+                    }
+                  </div>
+                </td>
 
-            <!-- จำนวนวัน -->
-            <td>
-              <div class="claim-days">
-                {{ claim.details.length }} วัน
-              </div>
-            </td>
+                <!-- สถานะ -->
+                <td style="text-align: center">
+                  <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                    {{ claim.status | statusLabel }}
+                  </span>
+                </td>
 
-            <!-- ยอดเงิน -->
-            <td class="text-right">
-              <div class="amount-cell">
-                <div class="amount-main">฿{{ claim.amount | number:'1.2-2' }}</div>
-                @if (claim.approvedAmount > 0) {
-                <div class="amount-approved">
-                  <i class="fas fa-check text-success"></i>
-                  ฿{{ claim.approvedAmount | number:'1.2-2' }}
-                </div>
-                }
-              </div>
-            </td>
+                <!-- ข้อมูลเพิ่มเติม -->
+                <td style="text-align: center">
+                  <div class="sub-text">
+                    {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}
+                  </div>
+                </td>
+              </tr>
 
-            <!-- สถานะ -->
-            <td style="text-align: center;">
-              <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
-                {{ claim.status | statusLabel }}
-              </span>
-            </td>
-
-            <!-- ข้อมูลเพิ่มเติม -->
-            <td style="text-align: center;">
-              <div class="sub-text">{{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}</div>
-            </td>
-
-          </tr>
-          }
-
-          @empty {
-          <tr>
-            <td colspan="5">
-              <app-empty-state [title]="emptyTitle()" [description]="emptyDescription()" [icon]="emptyIcon()">
-              </app-empty-state>
-            </td>
-          </tr>
-          }
-
-        </tbody>
-      </table>
-
+            } @empty {
+              <tr>
+                <td colspan="5">
+                  <app-empty-state
+                    [title]="emptyTitle()"
+                    [description]="emptyDescription()"
+                    [icon]="emptyIcon()"
+                  >
+                  </app-empty-state>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       }
     </div>
 
@@ -242,17 +254,22 @@
     </div> -->
 
     <div class="pagination-wrapper">
-      <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-        [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
+      <app-pagination
+        [currentPage]="listing.currentPage()"
+        [pageSize]="listing.pageSize()"
+        [totalItems]="comps.totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      >
       </app-pagination>
     </div>
   </div>
 
   @if (isModalOpen) {
-  <div class="modal-overlay">
-    <div class="modal-container">
-      <app-vehicle-form (onClose)="closeModal()" [requests]="selectedRequest"></app-vehicle-form>
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <app-vehicle-form (onClose)="closeModal()" [requests]="selectedRequest"></app-vehicle-form>
+      </div>
     </div>
-  </div>
   }
 </div>

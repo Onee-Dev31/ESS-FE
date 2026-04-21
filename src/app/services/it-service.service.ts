@@ -13,15 +13,15 @@ const MOCK_IT_APPROVALS = [
       name: 'นาย สมชาย มั่นคง',
       employeeId: 'EMP-001',
       department: 'IT',
-      company: 'Onee'
+      company: 'Onee',
     },
     requestFor: 'นาย สมชาย มั่นคง',
     requestCategory: 'Hardware (ขอเบิกอุปกรณ์)',
     status: 'Pending',
     attachments: [
       { fileName: 'broken-keyboard.jpg', fileSize: 1024 * 500 },
-      { fileName: 'form-repair.pdf', fileSize: 1024 * 200 }
-    ]
+      { fileName: 'form-repair.pdf', fileSize: 1024 * 200 },
+    ],
   },
   {
     requestNo: 'REQ-IT-2603-0002',
@@ -31,12 +31,12 @@ const MOCK_IT_APPROVALS = [
       name: 'นางสาว สมหญิง ใจดี',
       employeeId: 'EMP-002',
       department: 'HR',
-      company: 'Onee'
+      company: 'Onee',
     },
     requestFor: 'นางสาว สมหญิง ใจดี',
     requestCategory: 'Software (ขอสิทธิ์เข้าถึงระบบ)',
     status: 'Approved',
-    attachments: []
+    attachments: [],
   },
   {
     requestNo: 'REQ-IT-2603-0003',
@@ -46,14 +46,12 @@ const MOCK_IT_APPROVALS = [
       name: 'นาย วีระ ทองคำ',
       employeeId: 'EMP-003',
       department: 'Account',
-      company: 'Onee'
+      company: 'Onee',
     },
     requestFor: 'นาย เด็กใหม่ เพิ่งมา',
     requestCategory: 'Network (แจ้งปัญหาเน็ตเวิร์ค)',
     status: 'Rejected',
-    attachments: [
-      { fileName: 'error-screen.png', fileSize: 1024 * 150 }
-    ]
+    attachments: [{ fileName: 'error-screen.png', fileSize: 1024 * 150 }],
   },
   {
     requestNo: 'REQ-IT-2603-0004',
@@ -63,12 +61,12 @@ const MOCK_IT_APPROVALS = [
       name: 'นาง สมบูรณ์ พูนสุข',
       employeeId: 'EMP-004',
       department: 'Marketing',
-      company: 'Onee'
+      company: 'Onee',
     },
     requestFor: 'นาง สมบูรณ์ พูนสุข',
     requestCategory: 'Account & Password (ขอรีเซ็ตรหัสผ่าน)',
     status: 'Pending',
-    attachments: []
+    attachments: [],
   },
   {
     requestNo: 'REQ-IT-2603-0005',
@@ -78,15 +76,13 @@ const MOCK_IT_APPROVALS = [
       name: 'นาย อติวิชญ์ แจ่มใส',
       employeeId: 'EMP-005',
       department: 'Sales',
-      company: 'Onee'
+      company: 'Onee',
     },
     requestFor: 'นาย อติวิชญ์ แจ่มใส',
     requestCategory: 'Hardware (ซ่อมอุปกรณ์)',
     status: 'Referred Back',
-    attachments: [
-      { fileName: 'monitor-flicker.mp4', fileSize: 1024 * 1024 * 2 }
-    ]
-  }
+    attachments: [{ fileName: 'monitor-flicker.mp4', fileSize: 1024 * 1024 * 2 }],
+  },
 ];
 
 @Injectable({
@@ -96,9 +92,10 @@ export class ItServiceService {
   private baseUrl = environment.api_url;
   private ONEEJOB_url = environment.api_ONEEJOB_url;
 
-  constructor(private _http: HttpClient,
-    private authservice: AuthService
-  ) { }
+  constructor(
+    private _http: HttpClient,
+    private authservice: AuthService,
+  ) {}
 
   getSubProblem(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/sub-categories`);
@@ -116,13 +113,15 @@ export class ItServiceService {
     return this._http.get(`${this.baseUrl}/Master/assign-dropdown?groupIds=1%2C2%2C3`);
   }
 
-  getOpenFor(
-    { currentEmpId, costCent, companyCode }: {
-      currentEmpId?: string;
-      costCent?: string;
-      companyCode?: string;
-    }): Observable<any> {
-
+  getOpenFor({
+    currentEmpId,
+    costCent,
+    companyCode,
+  }: {
+    currentEmpId?: string;
+    costCent?: string;
+    companyCode?: string;
+  }): Observable<any> {
     let params = new HttpParams();
 
     if (currentEmpId) {
@@ -152,7 +151,6 @@ export class ItServiceService {
     subCategoryId?: string;
     managerEmpNo?: string;
   }): Observable<any> {
-
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
@@ -166,13 +164,11 @@ export class ItServiceService {
     if (params.subCategoryId) queryParams.subCategoryId = params.subCategoryId;
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
 
-
-    console.log("params >>> ", queryParams)
+    console.log('params >>> ', queryParams);
 
     return this._http.get<any>(`${this.baseUrl}/tickets`, {
-      params: queryParams
+      params: queryParams,
     });
-
   }
 
   getMyTickets(params: {
@@ -183,7 +179,6 @@ export class ItServiceService {
     status?: string;
     priority?: string;
   }): Observable<any> {
-
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
@@ -193,12 +188,11 @@ export class ItServiceService {
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
 
-    console.log("params >>> ", queryParams)
+    console.log('params >>> ', queryParams);
 
     return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
-      params: queryParams
+      params: queryParams,
     });
-
   }
 
   getTicketById(ticketId: string) {
@@ -210,7 +204,12 @@ export class ItServiceService {
     return this._http.post(`${this.baseUrl}/tickets`, formData);
   }
 
-  getApprovalItRequests(params: { page?: number; pageSize?: number; status?: string; empno: string; }): Observable<any> {
+  getApprovalItRequests(params: {
+    page?: number;
+    pageSize?: number;
+    status?: string;
+    empno: string;
+  }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.page) {
       httpParams = httpParams.set('page', params.page);
@@ -229,25 +228,21 @@ export class ItServiceService {
     }
 
     return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request`, {
-      params: httpParams
+      params: httpParams,
     });
   }
 
   approveTicket(ticketId: number, payload: any) {
-
     const formData = new FormData();
 
-    Object.keys(payload).forEach(key => {
+    Object.keys(payload).forEach((key) => {
       const value = payload[key];
       if (value !== undefined && value !== null) {
         formData.append(key, value);
       }
     });
 
-    return this._http.patch<any>(
-      `${this.baseUrl}/tickets/${ticketId}/approve`,
-      formData
-    );
+    return this._http.patch<any>(`${this.baseUrl}/tickets/${ticketId}/approve`, formData);
   }
 
   updateAssigneesTicket(assignData: {
@@ -256,12 +251,11 @@ export class ItServiceService {
     acceptby?: any;
     createby: any;
   }): Observable<any> {
-
     const params = {
       executedBy: assignData.createby,
       ...(assignData.acceptby && { acceptby: assignData.acceptby }),
-      ...(assignData.listAssignee && { assignToAdusersJson: assignData.listAssignee })
-    }
+      ...(assignData.listAssignee && { assignToAdusersJson: assignData.listAssignee }),
+    };
 
     // console.log(params)
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
@@ -286,14 +280,11 @@ export class ItServiceService {
 
   getDetailFromJobsByApplicant(id: string): Observable<any> {
     // return of({ success: true }).pipe(delay(1500));
-    const token = this.authservice.allData().accessToken
-    return this._http.get(`${this.ONEEJOB_url}/ApplicantNews/applicantByID?applicantId=${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const token = this.authservice.allData().accessToken;
+    return this._http.get(`${this.ONEEJOB_url}/ApplicantNews/applicantByID?applicantId=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
-
 }

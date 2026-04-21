@@ -7,14 +7,13 @@ import { STORAGE_KEYS } from '../constants/storage.constants';
 import { BaseRequestService } from './base-request.service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class MedicalexpensesService extends BaseRequestService<MedicalRequest> {
-    protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_MEDICAL_DATA;
+  protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_MEDICAL_DATA;
 
-    constructor() {
-        super();
-        this.initializeData(() => MedicalMock.generateRequestsByRole(20, 'Admin'));
-    }
-
+  constructor() {
+    super();
+    this.initializeData(() => MedicalMock.generateRequestsByRole(20, 'Admin'));
+  }
 }

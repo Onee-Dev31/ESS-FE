@@ -10,7 +10,6 @@ import { CommonModule } from '@angular/common';
   templateUrl: './services-detail-modal.html',
   styleUrl: './services-detail-modal.scss',
 })
-
 export class ServicesDetailModal {
   @Output() onClose = new EventEmitter<void>();
   @Input() services: any[] = [];

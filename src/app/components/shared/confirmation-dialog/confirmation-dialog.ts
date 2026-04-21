@@ -8,7 +8,7 @@ import { DialogService } from '../../../services/dialog';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './confirmation-dialog.html',
-  styleUrl: './confirmation-dialog.scss'
+  styleUrl: './confirmation-dialog.scss',
 })
 export class ConfirmationDialogComponent {
   dialogService = inject(DialogService);
@@ -25,7 +25,7 @@ export class ConfirmationDialogComponent {
     const icons = {
       danger: 'fa-exclamation-triangle',
       warning: 'fa-exclamation-circle',
-      info: 'fa-info-circle'
+      info: 'fa-info-circle',
     };
     return icons[type as keyof typeof icons] || icons.info;
   }
@@ -34,7 +34,7 @@ export class ConfirmationDialogComponent {
     const colors = {
       danger: '#ff3b30',
       warning: '#ff9500',
-      info: '#0071e3'
+      info: '#0071e3',
     };
     return colors[type as keyof typeof colors] || colors.info;
   }

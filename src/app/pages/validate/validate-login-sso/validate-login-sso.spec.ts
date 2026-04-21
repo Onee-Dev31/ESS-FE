@@ -8,9 +8,8 @@ describe('ValidateLoginSso', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ValidateLoginSso]
-    })
-    .compileComponents();
+      imports: [ValidateLoginSso],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ValidateLoginSso);
     component = fixture.componentInstance;

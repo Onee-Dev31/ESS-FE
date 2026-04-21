@@ -6,34 +6,34 @@ import { delay } from 'rxjs/operators';
 import { UserMock } from '../mocks/auth-user.mock';
 
 export interface UserProfile {
-    name: string;
-    email: string;
-    employeeId: string;
-    department: string;
-    company: string;
-    position: string;
-    phone: string;
-    floor: string;
-    itAssets?: {
-        account: string;
-        expireDate: string;
-        laptop: string;
-        pc: string;
-        monitor: string;
-    };
+  name: string;
+  email: string;
+  employeeId: string;
+  department: string;
+  company: string;
+  position: string;
+  phone: string;
+  floor: string;
+  itAssets?: {
+    account: string;
+    expireDate: string;
+    laptop: string;
+    pc: string;
+    monitor: string;
+  };
 }
 
 import { STORAGE_KEYS } from '../constants/storage.constants';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-    private http = inject(HttpClient);
+  private http = inject(HttpClient);
 
-    getUserProfile(): Observable<UserProfile> {
-        const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
-        const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;
-        return of(profile).pipe(delay(100));
-    }
+  getUserProfile(): Observable<UserProfile> {
+    const role = localStorage.getItem(STORAGE_KEYS.USER_ROLE);
+    const profile = role === 'Admin' ? UserMock.ADMIN_PROFILE : UserMock.MEMBER_PROFILE;
+    return of(profile).pipe(delay(100));
+  }
 }

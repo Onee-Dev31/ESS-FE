@@ -2,7 +2,7 @@ name: PR Auto Merge
 
 on:
   workflow_run:
-    workflows: ["PR Gates"]
+    workflows: ['PR Gates']
     types: [completed]
 
 env:

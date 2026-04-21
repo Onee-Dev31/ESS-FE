@@ -5,25 +5,25 @@
 // UI Component Mixins
 
 @mixin section-heading {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: $primary;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $primary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 @mixin input-field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 @mixin custom-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
 }
 
 // ==========================================
@@ -31,721 +31,724 @@
 // ==========================================
 
 :host {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .form-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-card);
+  overflow: hidden;
+
+  .top-header-strip {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-card);
-    overflow: hidden;
-
-    .top-header-strip {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 24px;
-        background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
-        color: #ffffff;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        font-size: $font-size-label;
-
-        h2 {
-            margin: 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #ffffff !important;
-        }
-
-        .btn-close-modal {
-            @include close-btn-style;
-            color: #ffffff;
-            font-size: 1.25rem;
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.15);
-                transform: rotate(90deg);
-            }
-        }
-
-        .right {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header-actions-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: nowrap;
-            flex-shrink: 0;
-
-            button {
-                padding: 8px 20px;
-                border-radius: 8px;
-                border: none;
-                color: #ffffff;
-                font-weight: 600;
-                cursor: pointer;
-                font-size: 13px;
-                transition: transform 0.1s;
-                white-space: nowrap;
-
-                &:active {
-                    transform: translateY(1px);
-                }
-            }
-
-            .btn-action-green {
-                background: var(--green);
-
-                &:hover {
-                    background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
-                }
-            }
-
-            .btn-action-red {
-                background: var(--red);
-
-                &:hover {
-                    background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
-                }
-            }
-
-            .btn-action-orange {
-                background: var(--orange);
-            }
-
-            @include mobile {
-                display: none;
-            }
-        }
-
-
-        @include tablet {
-
-            font-size: $font-size-hint;
-
-            h2 {
-                font-size: $font-size-body;
-            }
-
-        }
-
-        @include mobile {
-
-            font-size: $font-size-mini;
-
-            h2 {
-                font-size: $font-size-label;
-            }
-
-        }
-
-    }
-
-    .content-card {
-        flex: 1;
-        background: var(--bg-card);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        overflow-y: auto;
-        max-height: calc(100vh - 200px);
-
-        @include mobile {
-            max-height: calc(100vh - 180px);
-        }
-
-        // Progress
-        .approval-progress-bar {
-            flex-shrink: 0;
-            padding: 1rem;
-            background: linear-gradient(135deg, $header-bg 0%, rgba($header-bg, 0.5) 100%);
-            border-bottom: 1px solid $border-color;
-
-            @media (max-width: 991px) {
-                padding: 1rem;
-            }
-
-            .progress-stepper {
-                max-width: 800px;
-                margin: 0 auto;
-
-                .stepper-points {
-                    position: relative;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-
-                    .progress-line-bg {
-                        position: absolute;
-                        top: 24px;
-                        left: 10%;
-                        right: 10%;
-                        height: 4px;
-                        background: $border-color;
-                        border-radius: 2px;
-                        z-index: 0;
-
-                        @media (max-width: 991px) {
-                            top: 18px;
-                        }
-                    }
-
-                    .progress-line-fill {
-                        position: absolute;
-                        top: 24px;
-                        left: 10%;
-                        height: 4px;
-                        background: linear-gradient(90deg, var(--green) 0%, color-mix(in srgb, var(--green), black 10%) 100%);
-                        border-radius: 2px;
-                        z-index: 1;
-                        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-                        box-shadow: 0 0 8px rgba(var(--green), 0.3);
-                        max-width: 80%;
-
-                        @media (max-width: 991px) {
-                            top: 18px;
-                        }
-                    }
-
-                    .progress-step {
-                        position: relative;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        flex: 1;
-                        z-index: 2;
-
-                        .step-icon-circle {
-                            width: 48px;
-                            height: 48px;
-                            border-radius: 50%;
-                            background: $bg-card;
-                            border: 3px solid $border;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 18px;
-                            color: $text-muted;
-                            margin-bottom: 12px;
-                            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-                            position: relative;
-
-                            @media (max-width: 991px) {
-                                width: 36px;
-                                height: 36px;
-                                font-size: 14px;
-                                margin-bottom: 8px;
-                            }
-
-                            i {
-                                transition: all 0.3s ease;
-                            }
-                        }
-
-                        .step-label {
-                            font-size: 12px;
-                            font-weight: 600;
-                            color: $text-sub;
-                            text-align: center;
-                            max-width: 110px;
-                            line-height: 1.4;
-                            transition: all 0.3s ease;
-
-                            @media (max-width: 991px) {
-                                font-size: 10px;
-                                max-width: 80px;
-                            }
-                        }
-
-                        &.completed {
-                            .step-icon-circle {
-                                background: linear-gradient(135deg, var(--green) 0%, color-mix(in srgb, var(--green), black 10%) 100%);
-                                border-color: color-mix(in srgb, var(--green), black 10%);
-                                color: #ffffff;
-                                box-shadow: 0 6px 16px rgba(var(--green), 0.35);
-                                transform: scale(1.05);
-                            }
-
-                            .step-label {
-                                color: $text;
-                                font-weight: 700;
-                            }
-                        }
-
-                        &.active {
-                            .step-icon-circle {
-                                background: $bg-card;
-                                border-color: var(--blue);
-                                border-width: 4px;
-                                color: var(--blue);
-                                transform: scale(1.2);
-                                box-shadow: 0 8px 24px rgba(var(--blue), 0.25),
-                                    0 0 0 8px rgba(var(--blue), 0.1);
-                                animation: pulse-active 2s ease-in-out infinite;
-
-                                i {
-                                    transform: scale(1.1);
-                                }
-                            }
-
-                            .step-label {
-                                color: var(--blue);
-                                font-weight: 800;
-                                transform: translateY(5px);
-                            }
-                        }
-
-                        &.rejected {
-                            .step-icon-circle {
-                                background: linear-gradient(135deg, var(--red) 0%, color-mix(in srgb, var(--red), black 10%) 100%);
-                                border-color: color-mix(in srgb, var(--red), black 10%);
-                                color: #ffffff;
-                                box-shadow: 0 6px 16px rgba(var(--red), 0.35);
-                            }
-
-                            .step-label {
-                                color: var(--red);
-                                font-weight: 700;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 280px;
-
-            @include tablet {
-                grid-template-columns: 1fr;
-                height: 100%;
-            }
-        }
-
-        // Main Panel
-        .main-panel {
-            padding: 1.5rem;
-            padding-bottom: 0px;
-
-            @media (min-width: 768px) {
-                padding: 1rem 1rem 0rem 1rem;
-            }
-
-            @media (min-width: 992px) {
-                flex: 1;
-                border-right: 1px solid $border-color;
-                position: relative;
-            }
-
-            .content-header {
-                border-bottom: 1px solid $border-color;
-                margin-bottom: 1.5rem;
-                padding-bottom: 10px;
-
-                h3 {
-                    margin: 0;
-                    font-size: 1.1rem;
-                    color: $text;
-                }
-            }
-
-            .panel-spacer {
-                min-height: 10px;
-                width: 100%;
-            }
-        }
-
-        // Summary 
-        .summary-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 1rem;
-
-            .summary-card {
-                background: $header-bg;
-                padding: 12px;
-                border-radius: 8px;
-                transition: all 0.3s ease;
-
-                &.status-card {
-                    &.pending {
-                        background: rgba($warning, 0.1);
-
-                        .s-value {
-                            color: color-mix(in srgb, $warning, black 10%);
-                        }
-
-                        label {
-                            color: rgba($warning, 0.6);
-                        }
-                    }
-
-                    &.approved {
-                        background: rgba($success, 0.1);
-
-                        .s-value {
-                            color: $success;
-                        }
-
-                        label {
-                            color: rgba($success, 0.6);
-                        }
-                    }
-
-                    &.rejected {
-                        background: rgba($danger, 0.1);
-
-                        .s-value {
-                            color: $danger;
-                        }
-
-                        label {
-                            color: rgba($danger, 0.6);
-                        }
-                    }
-
-                    &.referred-back {
-                        background: rgba(var(--orange), 0.1);
-
-                        .s-value {
-                            color: var(--orange);
-                        }
-
-                        label {
-                            color: rgba(var(--orange), 0.6);
-                        }
-                    }
-                }
-
-                label {
-                    display: block;
-                    font-size: $font-size-hint;
-                    color: $text-muted;
-                    margin-bottom: 2px;
-                }
-
-                .s-value {
-                    font-size: $font-size-label;
-                    font-weight: 700;
-                }
-
-                .s-value.amount {
-                    font-size: $font-size-body;
-                }
-
-                .s-value.text-success {
-                    color: var(--green);
-                }
-
-            }
-        }
-
-        // Medical Claim Info Grid
-        .medical-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-            padding: 16px;
-            background: var(--bg-table-head);
-            border-radius: 12px;
-            border: 1px solid var(--border-toolbar);
-
-            @media (max-width: 640px) {
-                grid-template-columns: 1fr;
-            }
-
-            .med-info-item {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-
-                &.med-info-full {
-                    grid-column: 1 / -1;
-                }
-
-                label {
-                    font-size: $font-size-hint;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    color: var(--text-muted);
-
-                    i {
-                        margin-right: 4px;
-                        opacity: 0.7;
-                    }
-                }
-
-                span {
-                    font-size: $font-size-label;
-                    color: var(--text);
-                    font-weight: 500;
-                }
-            }
-
-
-            .btn-view-all {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                background: none;
-                font-size: $font-size-hint;
-                color: var(--primary);
-                cursor: pointer;
-                transition: background 0.2s;
-
-                &:hover {
-                    color: color-mix(in srgb, var(--primary) 100%, var(--text) 20%)
-                }
-            }
-        }
-
-        // Info requester
-        .side-panel {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-
-            @media (min-width: 992px) {
-                width: 280px;
-                padding-bottom: 40px;
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                align-self: stretch;
-            }
-
-            padding: 1.5rem;
-            padding-bottom: 2rem;
-
-            @media (min-width: 768px) {
-                padding: 1.5rem;
-            }
-
-            background: transparent;
-
-            .side-title {
-                color: var(--blue);
-                margin-bottom: 1.5rem;
-                font-size: 1.1rem;
-                margin-top: 0;
-            }
-
-            .side-group {
-                margin-bottom: 1.2rem;
-
-                label {
-                    display: block;
-                    font-size: 11px;
-                    color: $text-muted;
-                    margin-bottom: 2px;
-                }
-
-                .side-val {
-                    font-size: 13px;
-                    color: $text-header;
-                    font-weight: 500;
-                }
-            }
-
-            .side-divider {
-                height: 1px;
-                background: $border-color;
-                margin: 1.5rem 0;
-                width: 100%;
-            }
-        }
-
-    }
-}
-
-.form-actions-footer {
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
     padding: 16px 24px;
-    background: var(--bg-table-head);
-    border-top: 1px solid var(--border-table-head);
-    animation: slideDown 0.3s ease-out;
-    border-radius: 12px;
+    background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+    color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: $font-size-label;
 
-    @include mobile {
-        flex-direction: column;
-        padding: 12px 16px;
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff !important;
     }
 
-    &.approved {
-        border-top: 5px solid var(--green);
+    .btn-close-modal {
+      @include close-btn-style;
+      color: #ffffff;
+      font-size: 1.25rem;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: rotate(90deg);
+      }
     }
 
-    &.rejected {
-        border-top: 4px solid var(--red);
-    }
-
-    &.referred-back {
-        border-left: 4px solid var(--orange);
-    }
-
-    .action-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: $text;
-        margin-bottom: 0.8rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        &::before {
-            content: '📝';
-            font-size: 1.2rem;
-        }
-
-        .action-name {
-            color: inherit;
-            text-decoration: underline;
-            font-weight: 800;
-        }
-    }
-
-    .reason-section {
-        margin-bottom: 1rem;
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            color: $text-sub;
-            font-size: 0.85rem;
-        }
-
-        .reason-input {
-            width: 100%;
-            box-sizing: border-box;
-            min-height: 60px;
-            padding: 0.6rem;
-            border: 1px solid $border;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.2s;
-
-            &:focus {
-                border-color: $primary;
-                box-shadow: 0 0 0 3px rgba($primary, 0.1);
-            }
-        }
-    }
-
-    .action-footer {
-        margin-top: 1rem;
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-
-        button {
-            padding: 0.5rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            font-size: 0.85rem;
-        }
-
-        .btn-confirm {
-            background: var(--blue);
-            color: #ffffff;
-            border: none;
-
-            &:hover {
-                background: color-mix(in srgb, var(--blue), black 10%);
-                transform: translateY(-1px);
-            }
-        }
-
-        .btn-cancel {
-            background: $bg-slate;
-            color: $text-sub;
-            border: 1px solid $border-color;
-
-            &:hover {
-                background: $border-color;
-                color: $text;
-            }
-        }
+    .right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
     }
 
     .header-actions-group {
-        display: none;
-        justify-content: flex-end;
-        gap: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
 
-        @include mobile {
-            display: flex;
-        }
-    }
-
-    .btn-action-green {
-        @include btn-outline;
-        min-width: 120px;
-
-        @include mobile {
-            width: 100%;
-        }
-
+      button {
+        padding: 8px 20px;
+        border-radius: 8px;
         border: none;
         color: #ffffff;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 13px;
+        transition: transform 0.1s;
+        white-space: nowrap;
 
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+
+      .btn-action-green {
         background: var(--green);
 
         &:hover {
-            background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
+          background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
         }
-    }
+      }
 
-    .btn-action-red {
-        @include btn-outline;
-        min-width: 120px;
-
-        @include mobile {
-            width: 100%;
-        }
-
-        border: none;
-        color: #ffffff;
-
+      .btn-action-red {
         background: var(--red);
 
         &:hover {
-            background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+          background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
         }
+      }
+
+      .btn-action-orange {
+        background: var(--orange);
+      }
+
+      @include mobile {
+        display: none;
+      }
     }
 
+    @include tablet {
+      font-size: $font-size-hint;
+
+      h2 {
+        font-size: $font-size-body;
+      }
+    }
+
+    @include mobile {
+      font-size: $font-size-mini;
+
+      h2 {
+        font-size: $font-size-label;
+      }
+    }
+  }
+
+  .content-card {
+    flex: 1;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+
+    @include mobile {
+      max-height: calc(100vh - 180px);
+    }
+
+    // Progress
+    .approval-progress-bar {
+      flex-shrink: 0;
+      padding: 1rem;
+      background: linear-gradient(135deg, $header-bg 0%, rgba($header-bg, 0.5) 100%);
+      border-bottom: 1px solid $border-color;
+
+      @media (max-width: 991px) {
+        padding: 1rem;
+      }
+
+      .progress-stepper {
+        max-width: 800px;
+        margin: 0 auto;
+
+        .stepper-points {
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+
+          .progress-line-bg {
+            position: absolute;
+            top: 24px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: $border-color;
+            border-radius: 2px;
+            z-index: 0;
+
+            @media (max-width: 991px) {
+              top: 18px;
+            }
+          }
+
+          .progress-line-fill {
+            position: absolute;
+            top: 24px;
+            left: 10%;
+            height: 4px;
+            background: linear-gradient(
+              90deg,
+              var(--green) 0%,
+              color-mix(in srgb, var(--green), black 10%) 100%
+            );
+            border-radius: 2px;
+            z-index: 1;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px rgba(var(--green), 0.3);
+            max-width: 80%;
+
+            @media (max-width: 991px) {
+              top: 18px;
+            }
+          }
+
+          .progress-step {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            z-index: 2;
+
+            .step-icon-circle {
+              width: 48px;
+              height: 48px;
+              border-radius: 50%;
+              background: $bg-card;
+              border: 3px solid $border;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 18px;
+              color: $text-muted;
+              margin-bottom: 12px;
+              transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+              position: relative;
+
+              @media (max-width: 991px) {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+                margin-bottom: 8px;
+              }
+
+              i {
+                transition: all 0.3s ease;
+              }
+            }
+
+            .step-label {
+              font-size: 12px;
+              font-weight: 600;
+              color: $text-sub;
+              text-align: center;
+              max-width: 110px;
+              line-height: 1.4;
+              transition: all 0.3s ease;
+
+              @media (max-width: 991px) {
+                font-size: 10px;
+                max-width: 80px;
+              }
+            }
+
+            &.completed {
+              .step-icon-circle {
+                background: linear-gradient(
+                  135deg,
+                  var(--green) 0%,
+                  color-mix(in srgb, var(--green), black 10%) 100%
+                );
+                border-color: color-mix(in srgb, var(--green), black 10%);
+                color: #ffffff;
+                box-shadow: 0 6px 16px rgba(var(--green), 0.35);
+                transform: scale(1.05);
+              }
+
+              .step-label {
+                color: $text;
+                font-weight: 700;
+              }
+            }
+
+            &.active {
+              .step-icon-circle {
+                background: $bg-card;
+                border-color: var(--blue);
+                border-width: 4px;
+                color: var(--blue);
+                transform: scale(1.2);
+                box-shadow:
+                  0 8px 24px rgba(var(--blue), 0.25),
+                  0 0 0 8px rgba(var(--blue), 0.1);
+                animation: pulse-active 2s ease-in-out infinite;
+
+                i {
+                  transform: scale(1.1);
+                }
+              }
+
+              .step-label {
+                color: var(--blue);
+                font-weight: 800;
+                transform: translateY(5px);
+              }
+            }
+
+            &.rejected {
+              .step-icon-circle {
+                background: linear-gradient(
+                  135deg,
+                  var(--red) 0%,
+                  color-mix(in srgb, var(--red), black 10%) 100%
+                );
+                border-color: color-mix(in srgb, var(--red), black 10%);
+                color: #ffffff;
+                box-shadow: 0 6px 16px rgba(var(--red), 0.35);
+              }
+
+              .step-label {
+                color: var(--red);
+                font-weight: 700;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+
+      @include tablet {
+        grid-template-columns: 1fr;
+        height: 100%;
+      }
+    }
+
+    // Main Panel
+    .main-panel {
+      padding: 1.5rem;
+      padding-bottom: 0px;
+
+      @media (min-width: 768px) {
+        padding: 1rem 1rem 0rem 1rem;
+      }
+
+      @media (min-width: 992px) {
+        flex: 1;
+        border-right: 1px solid $border-color;
+        position: relative;
+      }
+
+      .content-header {
+        border-bottom: 1px solid $border-color;
+        margin-bottom: 1.5rem;
+        padding-bottom: 10px;
+
+        h3 {
+          margin: 0;
+          font-size: 1.1rem;
+          color: $text;
+        }
+      }
+
+      .panel-spacer {
+        min-height: 10px;
+        width: 100%;
+      }
+    }
+
+    // Summary
+    .summary-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 1rem;
+
+      .summary-card {
+        background: $header-bg;
+        padding: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &.status-card {
+          &.pending {
+            background: rgba($warning, 0.1);
+
+            .s-value {
+              color: color-mix(in srgb, $warning, black 10%);
+            }
+
+            label {
+              color: rgba($warning, 0.6);
+            }
+          }
+
+          &.approved {
+            background: rgba($success, 0.1);
+
+            .s-value {
+              color: $success;
+            }
+
+            label {
+              color: rgba($success, 0.6);
+            }
+          }
+
+          &.rejected {
+            background: rgba($danger, 0.1);
+
+            .s-value {
+              color: $danger;
+            }
+
+            label {
+              color: rgba($danger, 0.6);
+            }
+          }
+
+          &.referred-back {
+            background: rgba(var(--orange), 0.1);
+
+            .s-value {
+              color: var(--orange);
+            }
+
+            label {
+              color: rgba(var(--orange), 0.6);
+            }
+          }
+        }
+
+        label {
+          display: block;
+          font-size: $font-size-hint;
+          color: $text-muted;
+          margin-bottom: 2px;
+        }
+
+        .s-value {
+          font-size: $font-size-label;
+          font-weight: 700;
+        }
+
+        .s-value.amount {
+          font-size: $font-size-body;
+        }
+
+        .s-value.text-success {
+          color: var(--green);
+        }
+      }
+    }
+
+    // Medical Claim Info Grid
+    .medical-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+      padding: 16px;
+      background: var(--bg-table-head);
+      border-radius: 12px;
+      border: 1px solid var(--border-toolbar);
+
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+      }
+
+      .med-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &.med-info-full {
+          grid-column: 1 / -1;
+        }
+
+        label {
+          font-size: $font-size-hint;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
+
+          i {
+            margin-right: 4px;
+            opacity: 0.7;
+          }
+        }
+
+        span {
+          font-size: $font-size-label;
+          color: var(--text);
+          font-weight: 500;
+        }
+      }
+
+      .btn-view-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: none;
+        font-size: $font-size-hint;
+        color: var(--primary);
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          color: color-mix(in srgb, var(--primary) 100%, var(--text) 20%);
+        }
+      }
+    }
+
+    // Info requester
+    .side-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      @media (min-width: 992px) {
+        width: 280px;
+        padding-bottom: 40px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+      }
+
+      padding: 1.5rem;
+      padding-bottom: 2rem;
+
+      @media (min-width: 768px) {
+        padding: 1.5rem;
+      }
+
+      background: transparent;
+
+      .side-title {
+        color: var(--blue);
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        margin-top: 0;
+      }
+
+      .side-group {
+        margin-bottom: 1.2rem;
+
+        label {
+          display: block;
+          font-size: 11px;
+          color: $text-muted;
+          margin-bottom: 2px;
+        }
+
+        .side-val {
+          font-size: 13px;
+          color: $text-header;
+          font-weight: 500;
+        }
+      }
+
+      .side-divider {
+        height: 1px;
+        background: $border-color;
+        margin: 1.5rem 0;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.form-actions-footer {
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--bg-table-head);
+  border-top: 1px solid var(--border-table-head);
+  animation: slideDown 0.3s ease-out;
+  border-radius: 12px;
+
+  @include mobile {
+    flex-direction: column;
+    padding: 12px 16px;
+  }
+
+  &.approved {
+    border-top: 5px solid var(--green);
+  }
+
+  &.rejected {
+    border-top: 4px solid var(--red);
+  }
+
+  &.referred-back {
+    border-left: 4px solid var(--orange);
+  }
+
+  .action-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '📝';
+      font-size: 1.2rem;
+    }
+
+    .action-name {
+      color: inherit;
+      text-decoration: underline;
+      font-weight: 800;
+    }
+  }
+
+  .reason-section {
+    margin-bottom: 1rem;
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: $text-sub;
+      font-size: 0.85rem;
+    }
+
+    .reason-input {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 60px;
+      padding: 0.6rem;
+      border: 1px solid $border;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      }
+    }
+  }
+
+  .action-footer {
+    margin-top: 1rem;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+
+    button {
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .btn-confirm {
+      background: var(--blue);
+      color: #ffffff;
+      border: none;
+
+      &:hover {
+        background: color-mix(in srgb, var(--blue), black 10%);
+        transform: translateY(-1px);
+      }
+    }
+
+    .btn-cancel {
+      background: $bg-slate;
+      color: $text-sub;
+      border: 1px solid $border-color;
+
+      &:hover {
+        background: $border-color;
+        color: $text;
+      }
+    }
+  }
+
+  .header-actions-group {
+    display: none;
+    justify-content: flex-end;
+    gap: 10px;
+
+    @include mobile {
+      display: flex;
+    }
+  }
+
+  .btn-action-green {
+    @include btn-outline;
+    min-width: 120px;
+
+    @include mobile {
+      width: 100%;
+    }
+
+    border: none;
+    color: #ffffff;
+
+    background: var(--green);
+
+    &:hover {
+      background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
+    }
+  }
+
+  .btn-action-red {
+    @include btn-outline;
+    min-width: 120px;
+
+    @include mobile {
+      width: 100%;
+    }
+
+    border: none;
+    color: #ffffff;
+
+    background: var(--red);
+
+    &:hover {
+      background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+    }
+  }
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

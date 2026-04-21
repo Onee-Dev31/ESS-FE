@@ -1,17 +1,19 @@
 module.exports = async ({ github, context, core }) => {
   const owner = context.repo.owner;
-  const repo  = context.repo.repo;
+  const repo = context.repo.repo;
 
   async function findMergedPr(sha) {
     const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-      owner, repo, commit_sha: sha,
+      owner,
+      repo,
+      commit_sha: sha,
     });
-    return prs.find(pr => pr.merged_at && pr.base.ref === 'master') ?? null;
+    return prs.find((pr) => pr.merged_at && pr.base.ref === 'master') ?? null;
   }
 
   if (context.eventName === 'push') {
     const sha = context.sha;
-    const pr  = await findMergedPr(sha);
+    const pr = await findMergedPr(sha);
 
     if (!pr) {
       core.warning(`Push commit ${sha.slice(0, 7)} is not PR-backed — skipping deploy`);
@@ -21,9 +23,9 @@ module.exports = async ({ github, context, core }) => {
 
     core.info(`Push backed by PR #${pr.number} — deploying`);
     core.setOutput('should_deploy', 'true');
-    core.setOutput('deploy_ref',    sha);
-    core.setOutput('pr_number',     String(pr.number));
-    core.setOutput('pr_url',        pr.html_url);
+    core.setOutput('deploy_ref', sha);
+    core.setOutput('pr_number', String(pr.number));
+    core.setOutput('pr_url', pr.html_url);
     return;
   }
 
@@ -37,7 +39,7 @@ module.exports = async ({ github, context, core }) => {
     }
 
     const sha = run.head_sha;
-    const pr  = await findMergedPr(sha);
+    const pr = await findMergedPr(sha);
 
     if (!pr) {
       core.warning(`No merged PR found for commit ${sha.slice(0, 7)} — skipping deploy`);
@@ -47,9 +49,9 @@ module.exports = async ({ github, context, core }) => {
 
     core.info(`workflow_run backed by PR #${pr.number} — deploying`);
     core.setOutput('should_deploy', 'true');
-    core.setOutput('deploy_ref',    sha);
-    core.setOutput('pr_number',     String(pr.number));
-    core.setOutput('pr_url',        pr.html_url);
+    core.setOutput('deploy_ref', sha);
+    core.setOutput('pr_number', String(pr.number));
+    core.setOutput('pr_url', pr.html_url);
     return;
   }
 

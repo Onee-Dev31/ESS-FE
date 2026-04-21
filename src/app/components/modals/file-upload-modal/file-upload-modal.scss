@@ -103,10 +103,9 @@ $border: var(--border-toolbar);
         color: var(--text) !important;
         transition: 0.2s;
 
-        .span{
+        .span {
           font-size: $font-size-label !important;
         }
-
 
         &:hover {
           color: var(--blue) !important;
