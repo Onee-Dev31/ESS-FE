@@ -28,8 +28,8 @@ jobs:
       pr_number: ${{ steps.resolve.outputs.pr_number }}
       pr_url: ${{ steps.resolve.outputs.pr_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/github-script@v7
+      - uses: actions/checkout@v5
+      - uses: actions/github-script@v8
         id: resolve
         with:
           script: |
