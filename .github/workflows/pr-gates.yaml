@@ -54,8 +54,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Run Tests + Coverage
-        run: |
-          npx vitest run --coverage --coverage.reporter=json-summary || npx vitest run
+        run: npx ng test --no-watch 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
       - name: Parse Coverage
         id: cov
         if: always()
