@@ -633,8 +633,8 @@ export class FreelanceManagementComponent implements OnInit {
                 finalize(() => {
                     this.swalService.close();
                     this.isSaving = false;
-                    this.loadInitialData();
-                    this.closeForm();
+                    // this.loadInitialData();
+                    // this.closeForm();
                 })
             ).subscribe({
                 next: (res) => {
@@ -647,13 +647,17 @@ export class FreelanceManagementComponent implements OnInit {
                         console.log('ตกเงื่อนไข')
                         this.swalService.success(res.message)
                     }
+                    this.loadInitialData();
+                    this.closeForm();
                 },
                 error: (error) => {
                     console.error('Error fetching data:', error.error.message);
                     const message = error?.error?.message || '';
-                    if (message.includes('duplicate key')) {
+                    console.log(message)
+                    if (message.includes('duplicate')) {
                         this.swalService.warning('ชื่อนามสกุลมีอยู่ในระบบแล้ว');
-                    } else {
+                    }
+                    else {
                         this.swalService.error('เกิดข้อผิดพลาด', message);
                     }
                 },
