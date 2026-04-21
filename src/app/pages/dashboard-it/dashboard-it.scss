@@ -476,7 +476,7 @@
   text-align: right;
 }
 
-::ng-deep .ant-select-arrow .anticon>svg {
+::ng-deep .ant-select-arrow .anticon > svg {
   color: var(--text);
 }
 
@@ -575,9 +575,11 @@
 
 /* hero */
 .tk-hero {
-  background: linear-gradient(150deg,
-      var(--primary) 50%,
-      color-mix(in srgb, var(--primary), var(--text-reverse) 20%));
+  background: linear-gradient(
+    150deg,
+    var(--primary) 50%,
+    color-mix(in srgb, var(--primary), var(--text-reverse) 20%)
+  );
   border-radius: 16px;
   padding: 16px;
   color: var(--text-reverse);

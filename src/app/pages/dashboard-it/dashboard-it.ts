@@ -103,7 +103,7 @@ export class DashboardIT implements OnInit {
   constructor(
     private msg: NzMessageService,
     private sanitizer: DomSanitizer,
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getAllTickets();
