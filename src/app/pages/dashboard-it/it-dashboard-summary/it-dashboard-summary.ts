@@ -12,7 +12,7 @@ import { ItServiceService } from '../../../services/it-service.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
