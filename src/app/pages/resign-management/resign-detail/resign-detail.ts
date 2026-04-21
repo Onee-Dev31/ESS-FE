@@ -215,8 +215,6 @@ export class ResignDetail {
       requests: requests
     }
 
-    console.log(payload)
-
     this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
       .then(result => {
 

@@ -27,14 +27,11 @@ export class NoteModal {
   }
 
   save() {
-
     const payload = {
       id: this.ticket.ticketId,
       message: this.noteForm.message,
       attachments: this.noteForm.attachments
     }
-
-    console.log(payload)
     this.submitModal.emit(payload);
   }
 

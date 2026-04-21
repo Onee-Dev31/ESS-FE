@@ -87,7 +87,6 @@ export class ItService implements OnInit {
   selectTicket(ticketId: string) {
     // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res)
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -103,15 +102,7 @@ export class ItService implements OnInit {
 
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
-
-      // console.log(ticket.IT_Status, ticket.user_status)
-      // console.log(ticket.IT_Status === null ? ticket.user_status :
-      //   ticket.IT_Status === 'Closed' ? 'Closed' :
-      //     ticket.user_status === 'Pending' ? 'Waiting you' :
-      //       'In Progress')
-
       let status = this.getTicketStatus(ticket)
-
 
       const objectData = {
         ticketId: ticket.id,
@@ -121,11 +112,6 @@ export class ItService implements OnInit {
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         status: status,
-
-        // ticket.IT_Status === null ? ticket.user_status :
-        //   ticket.IT_Status === 'Closed' ? 'Closed' :
-        //     ticket.user_status === 'Pending' ? 'Waiting you' :
-        //       'In Progress',
         title: ticket.title,
         status_user: ticket.user_status,
         priority: ticket.priority,
@@ -149,7 +135,7 @@ export class ItService implements OnInit {
         openFor: res.requestFor.fullname ? res.requestFor : null
       }
 
-      // console.log("selectedTicket:", objectData)
+      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );

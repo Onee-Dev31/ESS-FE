@@ -105,8 +105,6 @@ export class DashboardIT implements OnInit {
 
   onStatusChange(status: string | null) {
     this.filterStatus = status ?? 'all';  // ✅ ถ้า null → all
-    console.log("filterStatus : ", this.filterStatus);
-
     this.filteredTickets();
     // หรือเรียก filterStatus(status) ของคุณ
   }
@@ -114,24 +112,10 @@ export class DashboardIT implements OnInit {
   trackById = (_: number, item: TicketItem) => item.id;
 
   selectTicket(ticketId: string) {
-    // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res)
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
-
-      // let convertedFiles: any[] = [];
-
-      // if (ticketAttachments.length) {
-      //   convertedFiles = await Promise.all(
-      //     ticketAttachments.map((f: any) =>
-      //       this.convertUrlToFile(f)
-      //     )
-      //   );
-
-      // }
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
-
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -173,8 +157,6 @@ export class DashboardIT implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.emp_code ? res.requestFor : null
       }
-
-      console.log("selectedTicket:", objectData)
       this.selectedTicket.set(objectData);
     }
     );
@@ -183,7 +165,6 @@ export class DashboardIT implements OnInit {
   showAllServices: boolean = false;
   selectedServices: any[] = [];
   showAll(services: any) {
-    // console.log(services)
     this.showAllServices = true
     this.selectedServices = services
   }
@@ -410,7 +391,6 @@ export class DashboardIT implements OnInit {
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 50 }).subscribe({
       next: (res) => {
-        console.log("getAllTickets() >>> res :", res);
         this.Tickets.set(res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
@@ -422,8 +402,6 @@ export class DashboardIT implements OnInit {
           // requesterEmpId: ticket.requester_codeempid,
           subject: ticket.subject
         })))
-
-        console.log(this.Tickets())
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -438,10 +416,7 @@ export class DashboardIT implements OnInit {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        // console.log(res)
-
         const rows = res.data
-
         const groupMap: Record<any, any> = {};
         const assigneeGroup: any = [];
 
@@ -468,7 +443,6 @@ export class DashboardIT implements OnInit {
         // แปลงเป็น array
         Object.values(groupMap).forEach(g => assigneeGroup.push(g));
 
-        console.log(assigneeGroup);
         this.assigneeGroups = assigneeGroup
       }
       , error: (error) => {
@@ -547,9 +521,6 @@ export class DashboardIT implements OnInit {
   }
 
   submitAcknowledge(data: any) {
-
-    console.log(data)
-
     const ticket = this.selectedTicket();
     const ticketId = ticket?.ticketId;
 
@@ -860,9 +831,6 @@ export class DashboardIT implements OnInit {
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
-
-        console.log(res)
-
         if (!res?.success) {
           this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
           return;

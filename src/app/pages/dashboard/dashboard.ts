@@ -373,7 +373,6 @@ export class DashboardComponent implements OnInit {
 
     this.loadInitialData().subscribe({
       next: ([leaveDashboard, performanceData, itAsset, oneeUser, allowanceSummary, vehicleSummary, taxiSummary]) => {
-        // console.log(itAsset, oneeUser)
         this.leavePolicyMaster.set(leaveDashboard);
         this.performanceData.set(performanceData);
         this.itAsset.set(itAsset);
@@ -469,8 +468,6 @@ export class DashboardComponent implements OnInit {
       team: this.teamCalendarService.getTeamCalendar(userData.CODEMPID),
       color: this.teamCalendarService.getHolidayColor()
     }).subscribe(({ holidays, team, color }) => {
-      console.log("team : ", team);
-
       this.allHolidays = (holidays || []).map((h: any) => ({
         id: h.ID,
         date: dayjs(h.HOLIDAY_DATE).format('YYYY-MM-DD'),

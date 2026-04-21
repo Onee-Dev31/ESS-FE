@@ -159,8 +159,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     this.ticketService.getTicket(ticketNumber)
       .subscribe({
         next: (ticket) => {
-          console.log('ticket : ', ticket);
-
           if (ticket.NameApprover) {
             this.signerName.set(ticket.NameApprover);
           }
@@ -186,7 +184,6 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
             attachments: ticket.attachments?.map((a: any) => a.file_name),
             ticketId: ticket.ticketID,
           };
-          console.log(data);
 
           this.requestData.set(data);
           this.cdr.detectChanges();
@@ -393,11 +390,11 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     const canvas = this.ensureCanvasContext();
 
     if (!canvas || !this.ctx || !this.pendingSignature) {
-      console.log('draw skipped', {
-        hasCanvas: !!canvas,
-        hasCtx: !!this.ctx,
-        hasPending: !!this.pendingSignature
-      });
+      // console.log('draw skipped', {
+      //   hasCanvas: !!canvas,
+      //   hasCtx: !!this.ctx,
+      //   hasPending: !!this.pendingSignature
+      // });
 
       if (retry < 10) {
         setTimeout(() => this.drawSignatureFromPending(retry + 1), 100);

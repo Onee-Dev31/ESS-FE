@@ -112,9 +112,6 @@ export class Sidebar {
 
         const menusString = localStorage.getItem('allData');
         const menus = menusString ? JSON.parse(menusString).menus : null;
-
-        // console.log(menus, this.allMenuItems);
-
         const formattedMenus = menus
             .filter((menu: any) => menu.ParentMenuID === null) // หา parent
             .map((parent: any) => {

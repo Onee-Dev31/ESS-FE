@@ -132,7 +132,6 @@ export class ApprovalsComponent implements OnInit {
       keyword,
     }).subscribe({
       next: (res) => {
-        console.log(res)
         this.approvals.set(res.data.map(c => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
@@ -272,7 +271,6 @@ export class ApprovalsComponent implements OnInit {
 
   /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
-    console.log(item)
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);

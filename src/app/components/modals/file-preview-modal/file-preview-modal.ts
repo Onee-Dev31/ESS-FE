@@ -25,11 +25,11 @@ export class FilePreviewModalComponent implements OnInit {
     selectedFile: FilePreviewItem | null = null;
     hasError: boolean = false;
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['files']) {
-            console.log('files changed:', changes['files'].currentValue);
-        }
-    }
+    // ngOnChanges(changes: SimpleChanges) {
+    //     if (changes['files']) {
+    //         console.log('files changed:', changes['files'].currentValue);
+    //     }
+    // }
 
     ngOnInit() {
         if (this.files.length > 0) {

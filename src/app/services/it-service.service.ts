@@ -167,7 +167,7 @@ export class ItServiceService {
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
 
 
-    console.log("params >>> ", queryParams)
+    // console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/tickets`, {
       params: queryParams
@@ -193,7 +193,7 @@ export class ItServiceService {
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
 
-    console.log("params >>> ", queryParams)
+    // console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
       params: queryParams

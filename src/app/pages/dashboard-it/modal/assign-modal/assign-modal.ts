@@ -38,11 +38,7 @@ export class AssignModal {
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes['ticket'] && this.ticket) {
-
-      console.log(this.ticket)
-
       this.selectedTag = this.ticket.ticketTypeId;
-
       if (this.ticket.assignments) {
 
         this.selectedAssigneeEmpCodes = this.ticket.assignments
@@ -138,7 +134,6 @@ export class AssignModal {
   }
 
   save() {
-    // console.log(this.selectedAssigneeEmpCodes)
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
       ticketTypeId: this.selectedTag

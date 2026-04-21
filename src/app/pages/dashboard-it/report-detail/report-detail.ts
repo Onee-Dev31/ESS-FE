@@ -66,14 +66,10 @@ export class ReportDetail {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const encrypted = params['id'];
-      console.log("encrypted", encrypted)
       if (encrypted) {
         const decoded = decodeURIComponent(encrypted);
         const bytes = decryptValue(decoded);
         const id = bytes.toString();
-        console.log("bytes", bytes)
-        console.log("id", id)
-
         if (id) {
           this.queryId = id;
         }
@@ -119,7 +115,6 @@ export class ReportDetail {
       const assignments = res.assignments ?? [];
 
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
-      console.log("result : ", result);
 
       const objectData = {
         ticketId: ticket.id,
@@ -206,7 +201,6 @@ export class ReportDetail {
 
   viewFile(file: any) {
 
-    console.log("file", file)
     this.previewFiles.set([{
       fileName: file.fileName,
       date: dayjs().format('DD/MM/YYYY HH:mm'),
@@ -221,9 +215,6 @@ export class ReportDetail {
   }
 
   buildTimeline(timelines: any[], assignees: any[]) {
-
-    // console.log(timelines, assignees)
-
     return timelines.map(t => {
 
       const assigneeList = assignees
@@ -288,7 +279,6 @@ export class ReportDetail {
   }
 
   selectAssignee(item: any) {
-    console.log(item)
     this.isVisibleAssignee.set(true)
     this.selectedAssignee.set(item)
   }
@@ -300,8 +290,6 @@ export class ReportDetail {
   getAssignItDropdown() {
     this.itServiceService.getAssignItDropdown().subscribe({
       next: (res) => {
-        // console.log(res)
-
         const rows = res.data
 
         const groupMap: Record<any, any> = {};
@@ -329,8 +317,6 @@ export class ReportDetail {
         });
         // แปลงเป็น array
         Object.values(groupMap).forEach(g => assigneeGroup.push(g));
-
-        console.log(assigneeGroup);
         this.assigneeGroups = assigneeGroup
       }
       , error: (error) => {

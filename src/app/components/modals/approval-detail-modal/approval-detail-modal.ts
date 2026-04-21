@@ -194,8 +194,6 @@ export class ApprovalDetailModalComponent implements OnInit {
     else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
     else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
 
-    console.log(item, newStatus, reason)
-
     const payload = {
       action: newStatus.toLowerCase(),
       reviewedBy: this.authService.userData().CODEMPID,
@@ -203,8 +201,6 @@ export class ApprovalDetailModalComponent implements OnInit {
         rejectionReason: reason?.trim() || ''
       }),
     }
-
-    console.log(item.requestId, payload)
 
     this.approvelService.updateTypeClaims(item.requestId, payload)
       .subscribe({
@@ -234,7 +230,6 @@ export class ApprovalDetailModalComponent implements OnInit {
   close() { this.onClose.emit(); }
 
   openPreview(att: any) {
-    console.log(att, this.selectedRequestDetails())
     if (!att) return;
     this.previewFiles.set([this.fileConverter.buildPreviewFile(att)]);
     this.isPreviewModalOpen.set(true);

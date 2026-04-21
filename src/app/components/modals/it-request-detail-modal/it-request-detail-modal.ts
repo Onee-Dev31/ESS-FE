@@ -113,7 +113,6 @@ export class ItRequestDetailModal {
   async confirmApprove() {
     this.swalService.confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
       .then(result => {
-        // console.log(result)
         if (!result.isConfirmed) return;
 
         this.swalService.loading("กำลังบันทึกข้อมูล...");
@@ -165,7 +164,6 @@ export class ItRequestDetailModal {
 
     this.swalService.confirm(`ยืนยันการ${action}`, `คุณต้องการ${action}คำขอนี้ใช่หรือไม่ ?`)
       .then(result => {
-        // console.log(result)
         if (!result.isConfirmed) return;
 
         this.swalService.loading("กำลังบันทึกข้อมูล...");
@@ -234,8 +232,6 @@ export class ItRequestDetailModal {
   updateTicket(command: 'Approved' | 'Rejected' | 'Referred_Back', reason?: string) {
 
     const ticketId = this.approvalItem.requestId.toString();
-    // console.log(command, ticketId, reason)
-
     const formData = new FormData();
 
     formData.append('decision', command);

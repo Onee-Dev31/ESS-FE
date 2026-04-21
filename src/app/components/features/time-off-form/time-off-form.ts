@@ -102,8 +102,6 @@ export class TimeOffForm implements OnInit {
 
   private setDatesBySelectedDate() {
     const d = this.selectedDate?.trim();
-    console.log(d);
-
     if (d) {
       this.startDate.set(d);
       this.endDate.set(d);
@@ -120,8 +118,6 @@ export class TimeOffForm implements OnInit {
 
   private updateEndDate() {
     const start = this.startDate();
-    console.log("start : ", start);
-
     if (!start) return;
 
     const period = this.leavePeriod();

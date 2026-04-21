@@ -75,7 +75,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['requests'] && this.requests && this.requests !== '') {
-      // console.log('requests เข้ามาแล้ว:', this.requests);
       this.MODE_EDIT = true;
       this.mapData();
       return;
@@ -138,12 +137,10 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   }
 
   generateCalendar() {
-    // console.log(this.selectedYearBE.toString(), this.selectedMonthIndex.toString())
 
     this.vehicleService.getVehicleByEmpcode(this.selectedYearBE.toString(), this.selectedMonthIndex.toString()).subscribe(
       {
         next: (res) => {
-          // console.log(res);
           const rawData = res.data
 
           this.logs = rawData.map((item: any) => {
@@ -219,7 +216,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           this.vehicleService.deleteVehicleByEmpCode(this.requests.id, this.authservice.userData().CODEMPID)
             .subscribe({
               next: (res) => {
-                // console.log(res)
                 if (!res?.success) {
                   this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
                   return;
@@ -257,7 +253,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           this.vehicleService.updateVehicleByClaimId(this.requests.id, payload)
             .subscribe({
               next: (res) => {
-                // console.log(res)
                 if (!res?.success) {
                   this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
                   return;
@@ -298,7 +293,6 @@ export class VehicleFormComponent implements OnInit, OnChanges {
           this.vehicleService.createVehicleByEmpcode(payload)
             .subscribe({
               next: (res) => {
-                // console.log(res)
                 if (!res?.success) {
                   this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
                   return;

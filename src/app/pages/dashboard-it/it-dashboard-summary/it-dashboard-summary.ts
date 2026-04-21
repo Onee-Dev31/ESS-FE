@@ -266,8 +266,6 @@ export class ItDashboardSummary {
     };
 
     const firstCompany = labels[0];
-    console.log("firstCompany : ", firstCompany);
-
     this.selectedCompany = firstCompany;
     this.showDeptBar = !!firstCompany;
 
@@ -435,7 +433,6 @@ export class ItDashboardSummary {
     this.currentStatus = this.statusLabel(k)
     this.activeStatus = k;
     this.selectedStatus = k;
-    console.log(this.currentStatus);
     if (isClick) {
       this.openTicketLogs(this.currentStatus);
     }
@@ -573,7 +570,6 @@ export class ItDashboardSummary {
   getAllTickets() {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
       next: (res) => {
-        console.log(res);
         this.updateKpis(res.summary)
         this.buildStatusPie(res.summary)
         this.buildServicePie(res.serviceTypes);
@@ -598,7 +594,6 @@ export class ItDashboardSummary {
   loadTickets(status: string): void {
     this.itServiceService.getTicketByStatus(status).subscribe({
       next: (res: any) => {
-        console.log('API RES = ', res);
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
         this.filteredTicketLogs = this.ticketLogs
 

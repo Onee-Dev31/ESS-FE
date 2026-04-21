@@ -326,15 +326,12 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     openViewForm() {
-        console.log("ส่งข้อมูล")
         const data = this.activeData().filter(item => item.selected);
 
         if (data.length === 0) {
             this.swalService.warning("กรุณาเลือกรายการก่อน export")
             return;
         }
-
-        console.log(data)
 
         // แปลง field ให้เป็นชื่อ column ที่อ่านง่าย
         const exportData = data.map(item => ({
@@ -420,17 +417,9 @@ export class FreelanceManagementComponent implements OnInit {
 
         const info = res.info
         const file = res.files
-        // console.log(info, file)
-
         let convertedFiles: any[] = [];
 
         if (file?.length) {
-            // convertedFiles = await Promise.all(
-            //     file.map((f: any) =>
-            //         this.convertUrlToFile(f)
-            //     )
-            // );
-
             convertedFiles = await this.fileConvertService.convertUrlsToFiles(file);
         }
 
@@ -486,15 +475,10 @@ export class FreelanceManagementComponent implements OnInit {
         const is_resign = fData.btn_action === "RESIGN" ? true : false
         const is_Activate = fData.btn_action === "ACTIVATE" ? true : false
 
-        // console.log(is_update)
-        // console.log('Form data:', fData);
-
         let changedData: any = fData;
 
         if (is_update) {
-            // console.log('original Form data:', this.original_formData_freelance);
             const diff = this.getChangedFields(fData, this.original_formData_freelance);
-            // console.log('Changed fields:', diff);
             changedData = diff;
         }
 

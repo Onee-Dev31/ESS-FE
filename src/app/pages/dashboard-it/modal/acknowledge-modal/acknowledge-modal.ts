@@ -25,13 +25,8 @@ export class AcknowledgeModal {
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes['ticket'] && this.ticket) {
-
-      console.log(this.ticket.ticketTypeId)
-
       this.selectedTag = this.ticket.ticketTypeId;
-
     }
-
   }
 
   close() {
@@ -49,7 +44,6 @@ export class AcknowledgeModal {
       message: this.message,
       attachments: this.attachments
     }
-    console.log(payload);
     this.submitModal.emit(payload);
   }
 

@@ -18,7 +18,6 @@ export class ServicesDetailModal {
   groupedServices: Record<string, any[]> = {};
 
   ngOnChanges() {
-    // console.log('services:', this.services);
     this.groupServices();
   }
 

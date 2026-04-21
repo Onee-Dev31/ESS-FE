@@ -184,7 +184,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     this.taxiService.getEligibleDates(empCode, this.selectedYear, month).subscribe({
       next: (res: any) => {
-        // console.log(res)
         const rows: any[] = res.data ?? [];
         this.items = rows.map((row: any) => ({
           date: row.workDate ?? row.work_date,
@@ -339,7 +338,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   openUploadModal(item: any) {
-    // console.log(item)
     this.currentUploadItem = item;
     this.isShowUploadModal = true;
   }
@@ -378,9 +376,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   // ====================== SAVE ======================
   save() {
     const selectedItems = this.items.filter(item => item.selected);
-
-    // console.log(selectedItems)
-
     const empCode = this.authService.userData().CODEMPID;
     const details = selectedItems.map(item => ({
       work_date: item.date.split('T')[0],
@@ -430,7 +425,6 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
           this.taxiService.deleteTaxiClaim(this.requests.id, empCode)
             .subscribe({
               next: (res) => {
-                // console.log(res)
                 if (!res?.success) {
                   this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
                   return;

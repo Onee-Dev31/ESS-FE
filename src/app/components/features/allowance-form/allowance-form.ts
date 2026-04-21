@@ -55,11 +55,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // if (changes['requestId'] && !changes['requestId'].firstChange) {
-    //   this.loadData();
-    // }
     if (changes['requests'] && this.requests && this.requests !== '') {
-      // console.log('requests เข้ามาแล้ว:', this.requests);
       this.MODE_EDIT = true;
       this.mapData();
       return;
@@ -68,24 +64,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadData() {
     this.generateCalendar()
-    // if (!this.requestId) {
-    //   this.allowanceService.generateNextAllowanceId().pipe(
-    //     switchMap(id => {
-    //       this.requestId = id;
-    //       return this.allowanceService.getAllowanceRequestById(id);
-    //     })
-    //   ).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // } else {
-    //   this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // }
   }
 
   mapData() {
