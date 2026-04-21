@@ -86,6 +86,29 @@ export class NavbarComponent {
         });
       });
 
+    this.signalrService
+      .on('TicketAssigned', '/dashboard-it')
+      .subscribe(data => {
+        this.zone.run(() => {
+          const message = data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign แล้ว`;
+
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'มีการ Assign Ticket',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่'
+          };
+
+          this.notifications.update(list => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => { });
+          }
+        });
+      });
+
     this.userCodeEmp = this.authService.userData().CODEMPID
   }
 

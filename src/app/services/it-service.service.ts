@@ -297,4 +297,8 @@ export class ItServiceService {
     );
   }
 
+  assignNotify(ticketId: number): Observable<any> {
+    return this._http.post(`${this.baseUrl}/notification/it-assign-notify`, { ticketId });
+  }
+
 }
