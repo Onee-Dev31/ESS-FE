@@ -1,4 +1,13 @@
-import { Component, Input, Output, EventEmitter, signal, computed, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  signal,
+  computed,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast';
@@ -23,6 +32,24 @@ interface PreviewFile {
   date: string;
 }
 
+const DEFAULT_APPROVAL_ITEM = {
+  requestId: 0,
+  requestNo: '',
+  requestDate: '',
+  requestBy: {
+    name: '',
+    employeeId: '',
+    department: '',
+    company: '',
+  },
+  requestType: 'ค่ารักษาพยาบาล',
+  typeId: 0,
+  requestDetail: '',
+  amount: 0,
+  status: 'Pending',
+  rawStatus: '',
+} as ApprovalItem;
+
 /** Component แสดงรายละเอียดรายการขออนุมัติ และจัดการการอนุมัติ/ตีกลับ (Modal Detail) */
 @Component({
   selector: 'app-approval-detail-modal',
@@ -30,7 +57,7 @@ interface PreviewFile {
   imports: [CommonModule, FormsModule, FilePreviewModalComponent, StatusLabelPipe],
   animations: [modalAnimation, fadeIn],
   templateUrl: './approval-detail-modal.html',
-  styleUrl: './approval-detail-modal.scss'
+  styleUrl: './approval-detail-modal.scss',
 })
 export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
@@ -41,7 +68,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
 
-  @Input({ required: true }) approvalItem!: ApprovalItem;
+  @Input({ required: true }) approvalItem: ApprovalItem = DEFAULT_APPROVAL_ITEM;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
 
   @Output() onClose = new EventEmitter<void>();
@@ -87,7 +114,8 @@ export class ApprovalDetailModalComponent implements OnInit {
     if (!s) return 'รออนุมัติ';
     if (s === REQUEST_STATUS.REJECTED || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
     if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'รอแก้ไข';
-    if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย')) return 'อนุมัติแล้ว';
+    if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย'))
+      return 'อนุมัติแล้ว';
     return 'รออนุมัติ';
   }
 
@@ -100,19 +128,21 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   selectedRequestDetails = computed(() => ({
     type: this.currentDetailType(),
-    items: this.currentDetailItems()
+    items: this.currentDetailItems(),
   }));
 
   modalItemsTotal = computed(() =>
-    this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0)
+    this.currentDetailItems().reduce((sum, item) => sum + item.amount, 0),
   );
 
   ngOnInit() {
-    this.loadDetails();
-    if (this.initialAction) {
-      this.isActionConfirm.set(true);
-      this.actionType.set(this.initialAction);
-    }
+    queueMicrotask(() => {
+      this.loadDetails();
+      if (this.initialAction) {
+        this.isActionConfirm.set(true);
+        this.actionType.set(this.initialAction);
+      }
+    });
   }
 
   /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */
@@ -127,30 +157,39 @@ export class ApprovalDetailModalComponent implements OnInit {
       const claim = item.originalData as MedicalClaim;
       if (claim?.claimId != null) {
         this.detailedStatus.set(claim.status);
-        const unifiedItems: UnifiedItem[] = [{
-          date: `${claim.treatmentDateFrom} – ${claim.treatmentDateTo}`,
-          description: `${claim.diseaseName} | ${claim.hospitalName}`,
-          amount: claim.requestedAmount,
-          attachedFile: claim.attachments?.[0]?.fileUrl ?? ''
-        }];
+        const unifiedItems: UnifiedItem[] = [
+          {
+            date: `${claim.treatmentDateFrom} – ${claim.treatmentDateTo}`,
+            description: `${claim.diseaseName} | ${claim.hospitalName}`,
+            amount: claim.requestedAmount,
+            attachedFile: claim.attachments?.[0]?.fileUrl ?? '',
+          },
+        ];
         this.currentDetailItems.set(unifiedItems);
         return;
       }
-
     }
 
     // fallback: mock service (ใช้กับ non-medical หรือ medical ข้อมูลเก่า)
     const service = this.approvalsHelper.getServiceByType(item.type);
-    service.getRequestById(item.requestNo).subscribe(data => {
+    service.getRequestById(item.requestNo).subscribe((data) => {
       if (!data) return;
       this.detailedStatus.set(data.status);
       if (item.type === 'medical') {
-        const unifiedItems: UnifiedItem[] = (data.items || []).map((m: { treatmentDateFrom?: string; diseaseType?: string; hospital?: string; requestedAmount?: number; attachedFile?: string }) => ({
-          date: m.treatmentDateFrom || data.createDate,
-          description: `${m.diseaseType} (${m.hospital})` || '',
-          amount: m.requestedAmount || 0,
-          attachedFile: m.attachedFile || ''
-        }));
+        const unifiedItems: UnifiedItem[] = (data.items || []).map(
+          (m: {
+            treatmentDateFrom?: string;
+            diseaseType?: string;
+            hospital?: string;
+            requestedAmount?: number;
+            attachedFile?: string;
+          }) => ({
+            date: m.treatmentDateFrom || data.createDate,
+            description: `${m.diseaseType} (${m.hospital})` || '',
+            amount: m.requestedAmount || 0,
+            attachedFile: m.attachedFile || '',
+          }),
+        );
         this.currentDetailItems.set(unifiedItems);
       } else {
         this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
@@ -186,7 +225,11 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   /** อัปเดตสถานะไปยัง Service และแสดงข้อความตอบกลับไปยังผู้ใช้ */
-  private updateStatus(item: ApprovalItem, newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
+  private updateStatus(
+    item: ApprovalItem,
+    newStatus: 'Approved' | 'Rejected' | 'Referred Back',
+    reason?: string,
+  ) {
     if (!item.type) return;
 
     let statusCode = REQUEST_STATUS.WAITING_CHECK;
@@ -194,47 +237,47 @@ export class ApprovalDetailModalComponent implements OnInit {
     else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
     else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
 
-    console.log(item, newStatus, reason)
+    console.log(item, newStatus, reason);
 
     const payload = {
       action: newStatus.toLowerCase(),
       reviewedBy: this.authService.userData().CODEMPID,
       ...(newStatus.toLowerCase() === 'rejected' && {
-        rejectionReason: reason?.trim() || ''
+        rejectionReason: reason?.trim() || '',
       }),
-    }
+    };
 
-    console.log(item.requestId, payload)
+    console.log(item.requestId, payload);
 
-    this.approvelService.updateTypeClaims(item.requestId, payload)
-      .subscribe({
-        next: (res) => {
-
-          if (!res?.success) {
-            this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-            return;
-          }
-
-          this.swalService.success(res.message || "บันทึกสำเร็จ");
-        },
-
-        error: (error) => {
-          console.error("Approved Claim Error:", error);
-
-          this.swalService.warning(
-            "เกิดข้อผิดพลาด",
-            error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
-          );
+    this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
         }
-      });
+
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+      },
+
+      error: (error) => {
+        console.error('Approved Claim Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
     this.onStatusUpdated.emit();
     this.onClose.emit();
   }
 
-  close() { this.onClose.emit(); }
+  close() {
+    this.onClose.emit();
+  }
 
   openPreview(att: any) {
-    console.log(att, this.selectedRequestDetails())
+    console.log(att, this.selectedRequestDetails());
     if (!att) return;
     this.previewFiles.set([this.fileConverter.buildPreviewFile(att)]);
     this.isPreviewModalOpen.set(true);
@@ -255,5 +298,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   get isApproved(): boolean {
     return (this.medicalClaim?.approvedAmount ?? 0) > 0;
   }
-  closePreview() { this.isPreviewModalOpen.set(false); }
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
 }

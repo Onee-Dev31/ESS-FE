@@ -1,7 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
-
 export class SidebarService {
   isCollapsed = signal(true);
 
@@ -10,8 +9,7 @@ export class SidebarService {
   }
 
   toggle() {
-
-    this.isCollapsed.update(val => !val);
+    this.isCollapsed.update((val) => !val);
 
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));

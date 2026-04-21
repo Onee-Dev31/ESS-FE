@@ -1,339 +1,392 @@
-<div class="it-request-page"
-    [style]="openBy === 'IT' ? 'padding: 0; height: fit-content;' : 'padding: 40px; min-height: 100vh;'">
-    <app-page-header *ngIf="openBy !== 'IT'" title="IT Problem Report (แจ้งปัญหาการใช้งาน)"></app-page-header>
+<div
+  class="it-request-page"
+  [style]="
+    openBy === 'IT' ? 'padding: 0; height: fit-content;' : 'padding: 40px; min-height: 100vh;'
+  "
+>
+  <app-page-header
+    *ngIf="openBy !== 'IT'"
+    title="IT Problem Report (แจ้งปัญหาการใช้งาน)"
+  ></app-page-header>
 
-    <!-- Form Card -->
-    <div class="problem-form-card">
-        <!-- Card Header -->
-        <div class="problem-card-header">
-            <div class="header-icon-wrap">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div>
-                <h4 class="header-title">รายละเอียดการแจ้งปัญหา</h4>
-                <p class="header-subtitle">กรอกข้อมูลปัญหาที่พบให้ครบถ้วน เพื่อให้ทีม IT สามารถช่วยเหลือได้รวดเร็ว</p>
-            </div>
+  <!-- Form Card -->
+  <div class="problem-form-card">
+    <!-- Card Header -->
+    <div class="problem-card-header">
+      <div class="header-icon-wrap">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div>
+        <h4 class="header-title">รายละเอียดการแจ้งปัญหา</h4>
+        <p class="header-subtitle">
+          กรอกข้อมูลปัญหาที่พบให้ครบถ้วน เพื่อให้ทีม IT สามารถช่วยเหลือได้รวดเร็ว
+        </p>
+      </div>
+    </div>
+
+    <!-- Field: เปิดสิทธิ์ให้ -->
+    <div class="form-field-row" *ngIf="openBy === 'IT'">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fa-solid fa-book-open-reader field-icon"></i>
+          เปิดสิทธิ์ให้ (Open For)
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col select">
+        <nz-select
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder=""
+          [ngModel]="selectedOpenFor()"
+          (ngModelChange)="selectedOpenFor.set($event)"
+          name="openFor"
+        >
+          @for (opt of openForOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
+      </div>
+    </div>
+
+    <!-- Field: หัวข้อ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-heading field-icon"></i>
+          หัวข้อปัญหา
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <input
+          type="text"
+          [ngModel]="problemFormData().topic"
+          (ngModelChange)="problemFormData.set({ ...problemFormData(), topic: $event })"
+          class="styled-input"
+          placeholder="ระบุหัวข้อปัญหาสั้นๆ..."
+        />
+      </div>
+    </div>
+
+    <!-- Field: รายละเอียด -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-align-left field-icon"></i>
+          รายละเอียดปัญหา
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <!-- Selected category chips (appear inside box) -->
+        @if (problemFormData().categories.length > 0) {
+          <div class="selected-chips-bar">
+            @for (cat of problemFormData().categories; track cat.id) {
+              <span class="selected-chip">
+                <i class="fas fa-tag chip-icon"></i>
+                {{ cat.sub_category_name }}
+                <button type="button" class="chip-remove" (click)="toggleCategory(cat)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+            }
+          </div>
+        }
+        <textarea
+          [ngModel]="problemFormData().detail"
+          (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
+          class="styled-input styled-textarea"
+          [class.textarea-with-chips]="problemFormData().categories.length > 0"
+          rows="5"
+          placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Field: หมวดหมู่ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-tags field-icon"></i>
+          หมวดหมู่ปัญหา
+          <span class="required-badge">*</span>
+        </label>
+        <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p>
+      </div>
+      <div class="field-input-col">
+        <div class="category-tags">
+          @for (cat of availableCategories; track cat.id) {
+            <button
+              type="button"
+              class="cat-tag"
+              [class.cat-tag--active]="problemFormData().categories.includes(cat)"
+              (click)="toggleCategory(cat)"
+            >
+              <i class="fas fa-check-circle check-icon"></i>
+              {{ cat.sub_category_name }}
+            </button>
+          }
         </div>
+      </div>
+    </div>
 
-        <!-- Field: เปิดสิทธิ์ให้ -->
-        <div class="form-field-row" *ngIf="openBy === 'IT'">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fa-solid fa-book-open-reader field-icon"></i>
-                    เปิดสิทธิ์ให้ (Open For)
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col select">
-                <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
-                    (ngModelChange)="selectedOpenFor.set($event)" name="openFor">
-                    @for (opt of openForOptions(); track opt.value) {
-                    <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
-                    }
-                </nz-select>
-            </div>
+    <!-- Field: ไฟล์แนบ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-paperclip field-icon"></i>
+          ไฟล์แนบ
+        </label>
+        <p class="field-hint">รองรับไฟล์รูปภาพ, PDF, และเอกสารทั่วไป</p>
+      </div>
+      <div class="field-input-col">
+        <div
+          class="dropzone"
+          (click)="fileInput.click()"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event)"
+        >
+          <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+          <p class="dropzone-text">คลิกหรือลากไฟล์มาวางที่นี่</p>
+          <p class="dropzone-hint">รองรับหลายไฟล์พร้อมกัน</p>
+          <input
+            type="file"
+            #fileInput
+            style="display: none"
+            multiple
+            (change)="onFileSelected($event)"
+          />
         </div>
+        @if (problemFormData().attachments.length > 0) {
+          <div class="file-list">
+            @for (file of problemFormData().attachments; track file.name; let i = $index) {
+              <div class="file-item">
+                <i class="fas fa-file-alt file-icon"></i>
+                <span class="file-name">{{ file.name }}</span>
+                <button type="button" class="file-remove" (click)="removeAttachment(i)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
 
-        <!-- Field: หัวข้อ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-heading field-icon"></i>
-                    หัวข้อปัญหา
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col">
-                <input type="text" [ngModel]="problemFormData().topic"
-                    (ngModelChange)="problemFormData.set({...problemFormData(), topic: $event})" class="styled-input"
-                    placeholder="ระบุหัวข้อปัญหาสั้นๆ...">
-            </div>
+    <!-- Field: เบอร์โทรติดต่อ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-phone-alt field-icon"></i>
+          เบอร์โทรติดต่อ
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <input
+          type="text"
+          [value]="phoneModel"
+          (input)="onPhoneInput($event)"
+          class="styled-input"
+          placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
+        />
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions-row">
+      <button class="btn-secondary-action" (click)="clearForm()">
+        <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+      </button>
+      <button
+        class="btn-primary-action"
+        (click)="submit()"
+        [disabled]="!isFormValid()"
+        [class.disabled-btn]="!isFormValid()"
+      >
+        <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Modal -->
+  @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>
+            ยืนยันการแจ้งปัญหา
+            <!-- <span class="req-id">{{ nextRequestId }}</span> -->
+          </h2>
+          <button class="btn-close-modal" (click)="closeSummaryModal()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-
-
-        <!-- Field: รายละเอียด -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-align-left field-icon"></i>
-                    รายละเอียดปัญหา
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col">
-                <!-- Selected category chips (appear inside box) -->
-                @if (problemFormData().categories.length > 0) {
-                <div class="selected-chips-bar">
-                    @for (cat of problemFormData().categories; track cat.id) {
-                    <span class="selected-chip">
-                        <i class="fas fa-tag chip-icon"></i>
-                        {{ cat.sub_category_name }}
-                        <button type="button" class="chip-remove" (click)="toggleCategory(cat)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </span>
-                    }
-                </div>
-                }
-                <textarea [ngModel]="problemFormData().detail"
-                    (ngModelChange)="problemFormData.set({...problemFormData(), detail: $event})"
-                    class="styled-input styled-textarea"
-                    [class.textarea-with-chips]="problemFormData().categories.length > 0" rows="5"
-                    placeholder="อธิบายรายละเอียดปัญหาที่พบ..."></textarea>
-            </div>
-        </div>
-
-
-        <!-- Field: หมวดหมู่ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-tags field-icon"></i>
-                    หมวดหมู่ปัญหา
-                    <span class="required-badge">*</span>
-                </label>
-                <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p>
-            </div>
-            <div class="field-input-col">
-                <div class="category-tags">
-                    @for (cat of availableCategories; track cat.id) {
-                    <button type="button" class="cat-tag"
-                        [class.cat-tag--active]="problemFormData().categories.includes(cat)"
-                        (click)="toggleCategory(cat)">
-                        <i class="fas fa-check-circle check-icon"></i>
-                        {{ cat.sub_category_name }}
-                    </button>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Field: ไฟล์แนบ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-paperclip field-icon"></i>
-                    ไฟล์แนบ
-                </label>
-                <p class="field-hint">รองรับไฟล์รูปภาพ, PDF, และเอกสารทั่วไป</p>
-            </div>
-            <div class="field-input-col">
-                <div class="dropzone" (click)="fileInput.click()" (dragover)="onDragOver($event)"
-                    (drop)="onDrop($event)">
-                    <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
-                    <p class="dropzone-text">คลิกหรือลากไฟล์มาวางที่นี่</p>
-                    <p class="dropzone-hint">รองรับหลายไฟล์พร้อมกัน</p>
-                    <input type="file" #fileInput style="display:none" multiple (change)="onFileSelected($event)">
-                </div>
-                @if (problemFormData().attachments.length > 0) {
-                <div class="file-list">
-                    @for (file of problemFormData().attachments; track file.name; let i = $index) {
-                    <div class="file-item">
-                        <i class="fas fa-file-alt file-icon"></i>
-                        <span class="file-name">{{ file.name }}</span>
-                        <button type="button" class="file-remove" (click)="removeAttachment(i)">
-                            <i class="fas fa-times"></i>
-                        </button>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3>
+              <i class="fas fa-exclamation-triangle mr-2 text-primary"></i> รายละเอียดการแจ้งปัญหา
+            </h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>หัวข้อปัญหา</th>
+                <td>{{ problemFormData().topic }}</td>
+              </tr>
+              <tr>
+                <th>รายละเอียด</th>
+                <td>{{ problemFormData().detail }}</td>
+              </tr>
+              <tr>
+                <th>หมวดหมู่</th>
+                <td>
+                  @if (problemFormData().categories.length > 0) {
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (cat of problemFormData().categories; track cat.id) {
+                        <span class="badge badge-primary mr-1">{{ cat.sub_category_name }}</span>
+                      }
                     </div>
-                    }
-                </div>
-                }
-            </div>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+              @if (problemFormData().phoneNumber) {
+                <tr>
+                  <th>เบอร์โทรติดต่อ</th>
+                  <td class="text-primary font-weight-bold">{{ problemFormData().phoneNumber }}</td>
+                </tr>
+              }
+              <tr>
+                <th>ไฟล์แนบ</th>
+                <td>
+                  @if (problemFormData().attachments.length > 0) {
+                    <ul class="list-unstyled mb-0">
+                      @for (file of problemFormData().attachments; track file.name) {
+                        <li class="attachment-item mb-2">
+                          <div class="file-info">
+                            <i class="fas fa-paperclip"></i>
+                            <span>{{ file.name }}</span>
+                          </div>
+                          <button class="btn-view-file" (click)="viewFile(file)">
+                            <i class="fas fa-eye"></i> ดูไฟล์
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
-
-        <!-- Field: เบอร์โทรติดต่อ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-phone-alt field-icon"></i>
-                    เบอร์โทรติดต่อ
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col">
-                <input type="text" [value]="phoneModel" (input)="onPhoneInput($event)" class="styled-input"
-                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
-            </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
+          <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
         </div>
-
-        <!-- Actions -->
-        <div class="form-actions-row">
-            <button class="btn-secondary-action" (click)="clearForm()">
-                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
-            </button>
-            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
-                [class.disabled-btn]="!isFormValid()">
-                <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
-            </button>
-        </div>
+      </div>
     </div>
+  }
 
-    <!-- Summary Modal -->
-    @if (showSummaryModal()) {
+  <!-- Detail Modal -->
+  @if (showHistoryDetailModal() && selectedRequest()) {
     <div class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>ยืนยันการแจ้งปัญหา
-                    <!-- <span class="req-id">{{ nextRequestId }}</span> -->
-                </h2>
-                <button class="btn-close-modal" (click)="closeSummaryModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="summary-section">
-                    <h3><i class="fas fa-exclamation-triangle mr-2 text-primary"></i> รายละเอียดการแจ้งปัญหา</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>หัวข้อปัญหา</th>
-                            <td>{{ problemFormData().topic }}</td>
-                        </tr>
-                        <tr>
-                            <th>รายละเอียด</th>
-                            <td>{{ problemFormData().detail }}</td>
-                        </tr>
-                        <tr>
-                            <th>หมวดหมู่</th>
-                            <td>
-                                @if (problemFormData().categories.length > 0) {
-                                <div class="d-flex flex-wrap gap-1">
-                                    @for (cat of problemFormData().categories; track cat.id) {
-                                    <span class="badge badge-primary mr-1">{{ cat.sub_category_name }}</span>
-                                    }
-                                </div>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-                        @if (problemFormData().phoneNumber) {
-                        <tr>
-                            <th>เบอร์โทรติดต่อ</th>
-                            <td class="text-primary font-weight-bold">{{ problemFormData().phoneNumber }}</td>
-                        </tr>
-                        }
-                        <tr>
-                            <th>ไฟล์แนบ</th>
-                            <td>
-                                @if (problemFormData().attachments.length > 0) {
-                                <ul class="list-unstyled mb-0">
-                                    @for (file of problemFormData().attachments; track file.name) {
-                                    <li class="attachment-item mb-2">
-                                        <div class="file-info">
-                                            <i class="fas fa-paperclip"></i>
-                                            <span>{{ file.name }}</span>
-                                        </div>
-                                        <button class="btn-view-file" (click)="viewFile(file)">
-                                            <i class="fas fa-eye"></i> ดูไฟล์
-                                        </button>
-                                    </li>
-                                    }
-                                </ul>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
-                <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
-            </div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
+          </h3>
+          <button class="btn-close-modal" (click)="closeHistoryDetailModal()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-    </div>
-    }
-
-    <!-- Detail Modal -->
-    @if (showHistoryDetailModal() && selectedRequest()) {
-    <div class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3><i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}</h3>
-                <button class="btn-close-modal" (click)="closeHistoryDetailModal()"><i
-                        class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="summary-section">
-                    <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>วันที่แจ้ง</th>
-                            <td>{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</td>
-                        </tr>
-                        <tr>
-                            <th>สถานะ</th>
-                            <td>
-                                <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
-                                    {{ selectedRequest().status }}
-                                </span>
-                            </td>
-                        </tr>
-                        @if (selectedRequest().phoneNumber) {
-                        <tr>
-                            <th>เบอร์โทรติดต่อ</th>
-                            <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
-                        </tr>
-                        }
-                    </table>
-                </div>
-                <div class="summary-section">
-                    <h3><i class="fas fa-exclamation-triangle mr-2 text-primary"></i> ปัญหาที่แจ้ง</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>หัวข้อปัญหา</th>
-                            <td>{{ selectedRequest().topics }}</td>
-                        </tr>
-                        <tr>
-                            <th>รายละเอียด</th>
-                            <td>{{ selectedRequest().detail }}</td>
-                        </tr>
-                        <tr>
-                            <th>หมวดหมู่</th>
-                            <td>
-                                @if (selectedRequest().categories && selectedRequest().categories.length > 0) {
-                                <div class="d-flex flex-wrap gap-1">
-                                    @for (cat of selectedRequest().categories; track cat) {
-                                    <span class="badge badge-primary mr-1">{{ cat }}</span>
-                                    }
-                                </div>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>ไฟล์แนบ</th>
-                            <td>
-                                @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
-                                <ul class="list-unstyled mb-0">
-                                    @for (file of selectedRequest().attachments; track file.name) {
-                                    <li class="attachment-item mb-2">
-                                        <div class="file-info">
-                                            <i class="fas fa-paperclip"></i>
-                                            <span>{{ file.name }}</span>
-                                        </div>
-                                        <button class="btn-view-file" (click)="viewFile(file)">
-                                            <i class="fas fa-eye"></i> ดูไฟล์
-                                        </button>
-                                    </li>
-                                    }
-                                </ul>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
-            </div>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ</h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>วันที่แจ้ง</th>
+                <td>{{ selectedRequest().date | date: 'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+              <tr>
+                <th>สถานะ</th>
+                <td>
+                  <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
+                    {{ selectedRequest().status }}
+                  </span>
+                </td>
+              </tr>
+              @if (selectedRequest().phoneNumber) {
+                <tr>
+                  <th>เบอร์โทรติดต่อ</th>
+                  <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
+                </tr>
+              }
+            </table>
+          </div>
+          <div class="summary-section">
+            <h3><i class="fas fa-exclamation-triangle mr-2 text-primary"></i> ปัญหาที่แจ้ง</h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>หัวข้อปัญหา</th>
+                <td>{{ selectedRequest().topics }}</td>
+              </tr>
+              <tr>
+                <th>รายละเอียด</th>
+                <td>{{ selectedRequest().detail }}</td>
+              </tr>
+              <tr>
+                <th>หมวดหมู่</th>
+                <td>
+                  @if (selectedRequest().categories && selectedRequest().categories.length > 0) {
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (cat of selectedRequest().categories; track cat) {
+                        <span class="badge badge-primary mr-1">{{ cat }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <th>ไฟล์แนบ</th>
+                <td>
+                  @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
+                    <ul class="list-unstyled mb-0">
+                      @for (file of selectedRequest().attachments; track file.name) {
+                        <li class="attachment-item mb-2">
+                          <div class="file-info">
+                            <i class="fas fa-paperclip"></i>
+                            <span>{{ file.name }}</span>
+                          </div>
+                          <button class="btn-view-file" (click)="viewFile(file)">
+                            <i class="fas fa-eye"></i> ดูไฟล์
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
+        </div>
+      </div>
     </div>
-    }
+  }
 
-    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
-    </app-file-preview-modal>
+  <app-file-preview-modal
+    *ngIf="isPreviewModalOpen()"
+    [files]="previewFiles()"
+    (onClose)="closePreview()"
+  >
+  </app-file-preview-modal>
 </div>

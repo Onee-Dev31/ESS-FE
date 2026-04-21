@@ -1,4 +1,12 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -32,9 +40,20 @@ import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ItAssetService } from '../../services/it-asset.service';
 
-interface ProfileItem { label: string; value: string; icon?: string; iconColor?: string; }
-interface AttendanceItem { label: string; value: string; }
-interface PerformanceItem { year: string; grade: string; }
+interface ProfileItem {
+  label: string;
+  value: string;
+  icon?: string;
+  iconColor?: string;
+}
+interface AttendanceItem {
+  label: string;
+  value: string;
+}
+interface PerformanceItem {
+  year: string;
+  grade: string;
+}
 
 dayjs.locale('th');
 
@@ -48,11 +67,11 @@ dayjs.locale('th');
     FullCalendarModule,
     MedicalPolicyModalComponent,
     TooltipModalComponent,
-    TimeOffForm
+    TimeOffForm,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit {
   [x: string]: any;
@@ -71,9 +90,7 @@ export class DashboardComponent implements OnInit {
     private teamCalendarService: TeamCalendarService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-
-  ) {
-  }
+  ) {}
 
   userRole = this.authService.userRole;
 
@@ -96,21 +113,31 @@ export class DashboardComponent implements OnInit {
   itStoryMap = signal<any>(null);
   leaveStats = signal<any>([]);
   pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
-  medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), { initialValue: 0 });
+  medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), {
+    initialValue: 0,
+  });
 
   /** แปลงข้อมูลสถิติการเบิกค่ารักษาพยาบาลเพื่อใช้ในการแสดงผล (ProgressBar และสี) */
   medicalStatsDisplay = computed(() => {
     const stats = this.medicalStats();
     if (!stats) return null;
-    return stats.map(stat => {
+    return stats.map((stat) => {
       let balanceColor = 'text-balance';
       let progressColor = 'bg-primary';
 
       switch (stat.type) {
-        case 'outpatient': progressColor = 'bg-red'; break;
-        case 'dental': progressColor = 'bg-blue'; break;
-        case 'optical': progressColor = 'bg-indigo'; break;
-        case 'inpatient': progressColor = 'bg-green'; break;
+        case 'outpatient':
+          progressColor = 'bg-red';
+          break;
+        case 'dental':
+          progressColor = 'bg-blue';
+          break;
+        case 'optical':
+          progressColor = 'bg-indigo';
+          break;
+        case 'inpatient':
+          progressColor = 'bg-green';
+          break;
       }
 
       return { ...stat, balanceColor, progressColor };
@@ -169,9 +196,24 @@ export class DashboardComponent implements OnInit {
     if (!user) return [];
     return [
       { label: 'Email', value: user.AD_USER || '-', icon: 'fas fa-envelope', iconColor: '#ffffff' },
-      { label: 'เบอร์โทรศัพท์', value: user.USR_MOBILE || '-', icon: 'fas fa-phone-alt', iconColor: '#ffffff' },
-      { label: 'แผนก', value: user.DEPARTMENT || '-', icon: 'fas fa-sitemap', iconColor: '#ffffff' },
-      { label: 'บริษัท', value: user.COMPANY_NAME || '-', icon: 'fas fa-building', iconColor: '#ffffff' }
+      {
+        label: 'เบอร์โทรศัพท์',
+        value: user.USR_MOBILE || '-',
+        icon: 'fas fa-phone-alt',
+        iconColor: '#ffffff',
+      },
+      {
+        label: 'แผนก',
+        value: user.DEPARTMENT || '-',
+        icon: 'fas fa-sitemap',
+        iconColor: '#ffffff',
+      },
+      {
+        label: 'บริษัท',
+        value: user.COMPANY_NAME || '-',
+        icon: 'fas fa-building',
+        iconColor: '#ffffff',
+      },
     ];
   });
 
@@ -204,11 +246,13 @@ export class DashboardComponent implements OnInit {
     if (!user?.CODEMPID) return;
     this.profileLightbox.set({
       url: `https://empimg.oneeclick.co:8048/employeeimage/${user.CODEMPID}.jpg`,
-      name: `${user.USR_FNAME ?? ''} ${user.USR_LNAME ?? ''}`.trim()
+      name: `${user.USR_FNAME ?? ''} ${user.USR_LNAME ?? ''}`.trim(),
     });
   }
 
-  closeProfileLightbox() { this.profileLightbox.set(null); }
+  closeProfileLightbox() {
+    this.profileLightbox.set(null);
+  }
   selectedRequestStatus = signal<string>('');
   allowanceTotalAmount = signal<number | null>(null);
   vehicleTotalAmount = signal<number | null>(null);
@@ -220,18 +264,38 @@ export class DashboardComponent implements OnInit {
     const vehicleAmt = this.vehicleTotalAmount();
     const vehicleValue = vehicleAmt === null ? '...' : vehicleAmt.toLocaleString('th-TH');
     const vehicleTaxiAmt = this.vehicleTaxiTotalAmount();
-    const vehicleTaxiValue = vehicleTaxiAmt === null ? '...' : vehicleTaxiAmt.toLocaleString('th-TH');
+    const vehicleTaxiValue =
+      vehicleTaxiAmt === null ? '...' : vehicleTaxiAmt.toLocaleString('th-TH');
     return [
-      { label: 'ค่าเบี้ยเลี้ยง', value: allowanceValue, icon: 'fas fa-dollar-sign', colorClass: 'card-green', path: '/allowance' },
-      { label: 'ค่ารถ', value: vehicleValue, icon: 'fas fa-car', colorClass: 'card-blue', path: '/vehicle', tooltip: 'transport' },
-      { label: 'ค่าแท็กซี่', value: vehicleTaxiValue, icon: 'fas fa-taxi', colorClass: 'card-yellow', path: '/vehicle-taxi', tooltip: 'taxi' },
+      {
+        label: 'ค่าเบี้ยเลี้ยง',
+        value: allowanceValue,
+        icon: 'fas fa-dollar-sign',
+        colorClass: 'card-green',
+        path: '/allowance',
+      },
+      {
+        label: 'ค่ารถ',
+        value: vehicleValue,
+        icon: 'fas fa-car',
+        colorClass: 'card-blue',
+        path: '/vehicle',
+        tooltip: 'transport',
+      },
+      {
+        label: 'ค่าแท็กซี่',
+        value: vehicleTaxiValue,
+        icon: 'fas fa-taxi',
+        colorClass: 'card-yellow',
+        path: '/vehicle-taxi',
+        tooltip: 'taxi',
+      },
       { label: 'ค่าสมรส', value: '3,500', icon: 'fas fa-heart', tooltip: 'wedding' },
       { label: 'ค่าอุปสมบท', value: '10,500', icon: 'fas fa-hands-praying', tooltip: 'ordination' },
       { label: 'ค่าฌาปนกิจ', value: '584', icon: 'fas fa-church', tooltip: 'funeral' },
-      { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' }
+      { label: 'ค่าพวงหรีด', value: '876', icon: 'fas fa-spa', tooltip: 'wreath' },
     ];
   });
-
 
   workStartDate = BUSINESS_CONFIG.EMPLOYEE_START_DATE;
 
@@ -252,7 +316,7 @@ export class DashboardComponent implements OnInit {
     const start = monthStart.startOf('month');
     const end = start.endOf('month');
 
-    this.holidays = (this.allHolidays || []).filter(h => {
+    this.holidays = (this.allHolidays || []).filter((h) => {
       const t = dayjs(h.date).valueOf();
       return t >= start.valueOf() && t <= end.valueOf();
     });
@@ -288,7 +352,7 @@ export class DashboardComponent implements OnInit {
       </div>
     `,
       icon: 'info',
-      confirmButtonText: 'ปิด'
+      confirmButtonText: 'ปิด',
     });
   }
   onDateClick(arg: DateClickArg) {
@@ -302,7 +366,7 @@ export class DashboardComponent implements OnInit {
       // if (this.holidayMap?.[dateStr]) return;
 
       this.selectedDate.set(dateStr);
-      this.selectedRequestStatus.set('NEW');   // หรือค่า default ที่คุณใช้
+      this.selectedRequestStatus.set('NEW'); // หรือค่า default ที่คุณใช้
       this.isFormOpen.set(true);
 
       this.cdr.detectChanges();
@@ -362,17 +426,25 @@ export class DashboardComponent implements OnInit {
           <div class="date-code ${textClass}">${codeText}</div>
           ${noteText ? `<div class="date-note ${textClass}">${noteText}</div>` : ''}
         </div>
-      `
+      `,
       };
-    }
+    },
   };
 
   ngOnInit() {
     this.performanceList = this.dashboardService.getPerformanceList();
-    this.getTeamCalendar()
+    this.getTeamCalendar();
 
     this.loadInitialData().subscribe({
-      next: ([leaveDashboard, performanceData, itAsset, oneeUser, allowanceSummary, vehicleSummary, taxiSummary]) => {
+      next: ([
+        leaveDashboard,
+        performanceData,
+        itAsset,
+        oneeUser,
+        allowanceSummary,
+        vehicleSummary,
+        taxiSummary,
+      ]) => {
         // console.log(itAsset, oneeUser)
         this.leavePolicyMaster.set(leaveDashboard);
         this.performanceData.set(performanceData);
@@ -388,13 +460,13 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Error loading initial data', err)
-      }
+        console.error('Error loading initial data', err);
+      },
     });
   }
 
   loadInitialData() {
-    const userAd = this.authService.userData().AD_USER.toLowerCase()
+    const userAd = this.authService.userData().AD_USER.toLowerCase();
     // 1
     return forkJoin([
       this.getLeaveDashboard(),
@@ -403,7 +475,7 @@ export class DashboardComponent implements OnInit {
       this.getOneeuserByAduser(userAd),
       this.loadAllowanceSummary(),
       this.loadVehicleSummary(),
-      this.loadVehicleTaxiSummary()
+      this.loadVehicleTaxiSummary(),
     ]);
   }
 
@@ -419,45 +491,52 @@ export class DashboardComponent implements OnInit {
     return this.allowanceApiService.getClaims({ employee_code: employeeCode, page_size: 200 }).pipe(
       map((res: any) => {
         const items = res.data ?? [];
-        const total = items.reduce((sum: any, c: { totalAmount: any; }) => sum + (c.totalAmount ?? 0), 0);
+        const total = items.reduce(
+          (sum: any, c: { totalAmount: any }) => sum + (c.totalAmount ?? 0),
+          0,
+        );
         return total;
       }),
-      catchError(() => of(0))
+      catchError(() => of(0)),
     );
   }
 
   loadVehicleSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
     if (!employeeCode) return of(0);
-    return this.vehicleService.getVehicleClaimByEmpcode({ empCode: employeeCode, pageSize: 200 }).pipe(
-      map((res: any) => {
-        const items = res.data ?? res ?? [];
-        const total = (Array.isArray(items) ? items : []).reduce(
-          (sum: number, c: any) => sum + (c.totalAmount ?? 0),
-          0
-        );
-        return total;
-      }),
-      catchError(() => of(0))
-    );
+    return this.vehicleService
+      .getVehicleClaimByEmpcode({ empCode: employeeCode, pageSize: 200 })
+      .pipe(
+        map((res: any) => {
+          const items = res.data ?? res ?? [];
+          const total = (Array.isArray(items) ? items : []).reduce(
+            (sum: number, c: any) => sum + (c.totalAmount ?? 0),
+            0,
+          );
+          return total;
+        }),
+        catchError(() => of(0)),
+      );
   }
 
   loadVehicleTaxiSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-    if (!employeeCode) { return of(null); }
+    if (!employeeCode) {
+      return of(null);
+    }
     return this.taxiService.getTaxiClaims({ empCode: employeeCode, pageSize: 200 }).pipe(
       map((res: any) => {
         const items = res.data ?? [];
         const total = (Array.isArray(items) ? items : []).reduce(
           (sum, c) => sum + (c.totalAmount ?? 0),
-          0
+          0,
         );
         return total;
       }),
-      catchError(err => {
+      catchError((err) => {
         this.vehicleTaxiTotalAmount.set(0);
         return of(null);
-      })
+      }),
     );
   }
 
@@ -467,18 +546,18 @@ export class DashboardComponent implements OnInit {
     forkJoin({
       holidays: this.teamCalendarService.getHoliday(),
       team: this.teamCalendarService.getTeamCalendar(userData.CODEMPID),
-      color: this.teamCalendarService.getHolidayColor()
+      color: this.teamCalendarService.getHolidayColor(),
     }).subscribe(({ holidays, team, color }) => {
-      console.log("team : ", team);
+      console.log('team : ', team);
 
       this.allHolidays = (holidays || []).map((h: any) => ({
         id: h.ID,
         date: dayjs(h.HOLIDAY_DATE).format('YYYY-MM-DD'),
-        name: h.HOLIDAY_NAME
+        name: h.HOLIDAY_NAME,
       }));
 
       this.holidayMap = {};
-      this.allHolidays.forEach(h => {
+      this.allHolidays.forEach((h) => {
         this.holidayMap[h.date] = { id: h.id, name: h.name };
       });
       const colorMap: Record<string, string> = {};
@@ -513,7 +592,7 @@ export class DashboardComponent implements OnInit {
               reason: lv.Reason || lv.Remark || '',
               leaveDate: start,
               dept: lv.DepartmentName,
-            }
+            },
           });
         });
       });
@@ -540,61 +619,66 @@ export class DashboardComponent implements OnInit {
         }
       });
 
-      this.attendanceList = Object.keys(leaveCounts).length > 0
-        ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: count }))
-        // ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
-        : [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];
+      this.attendanceList =
+        Object.keys(leaveCounts).length > 0
+          ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: count }))
+          : // ? Object.entries(leaveCounts).map(([label, count]) => ({ label, value: `${count} วัน` }))
+            [{ label: 'ไม่มีรายการลาในปีนี้', value: '-' }];
 
       this.cdr.detectChanges();
     });
   }
 
   getPerformance() {
-    const empCode = this.authService.userData().CODEMPID
+    const empCode = this.authService.userData().CODEMPID;
     return this.dashboardService.getPerformanceByEmpCode(empCode).pipe(
       map((res: any) => {
-        return res.data
+        return res.data;
       }),
-      catchError(err => {
+      catchError((err) => {
         console.error('Error loading performance dashboard', err);
         return of(null);
-      })
+      }),
     );
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser)
+    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser);
   }
 
   getOneeuserByAduser(adUser: string) {
-    return this.itAssetService.getOneeuserByAd(adUser)
+    return this.itAssetService.getOneeuserByAd(adUser);
   }
 
   getLeaveDashboard() {
-    const empCode = this.authService.userData().CODEMPID
-    const yearCurrent = dayjs().format("YYYY-MM-DD")
-    return this.dashboardService.getLeaveSummaryDashboard({
-      empCode: empCode,
-      year: yearCurrent
-    }).pipe(
-      map((res: any) => {
-        return res.data
-      }),
-      catchError(err => {
-        console.error('Error loading leave dashboard', err);
-        return of(null);
+    const empCode = this.authService.userData().CODEMPID;
+    const yearCurrent = dayjs().format('YYYY-MM-DD');
+    return this.dashboardService
+      .getLeaveSummaryDashboard({
+        empCode: empCode,
+        year: yearCurrent,
       })
-    );
+      .pipe(
+        map((res: any) => {
+          return res.data;
+        }),
+        catchError((err) => {
+          console.error('Error loading leave dashboard', err);
+          return of(null);
+        }),
+      );
   }
 
   mapLeave() {
     const mapLeave = this.leavePolicyMaster().map((item: any) => {
       return {
         ...item,
-        used_days: (this.attendanceList.find((att: any) => att.label === item.leave_name_th) || {}).value || item.used_days
-      }
-    })
-    this.leaveStats.set(mapLeave)
+        used_days:
+          (this.attendanceList.find((att: any) => att.label === item.leave_name_th) || {}).value ||
+          item.used_days,
+      };
+    });
+    this.leaveStats.set(mapLeave);
   }
 
   mapItStory() {
@@ -603,19 +687,19 @@ export class DashboardComponent implements OnInit {
     const map = [
       {
         label: 'Account เข้าเครื่องคอม, Email, Wifi',
-        value: user.SamAccountName
+        value: user.SamAccountName,
       },
       {
         label: 'password expire date',
-        value: user.PasswordExpirationDate
+        value: user.PasswordExpirationDate,
       },
       ...assets.map((item: any) => ({
         label: item.category.name,
-        value: item.model.name
-      }))
-    ]
+        value: item.model.name,
+      })),
+    ];
 
-    this.itStoryMap.set(map)
+    this.itStoryMap.set(map);
   }
 
   openTimeOffForm(leaveLabel: string) {
@@ -653,7 +737,7 @@ export class DashboardComponent implements OnInit {
       title: 'ยืนยันการล้างข้อมูล',
       message: 'คุณต้องการล้างข้อมูลทั้งหมดเพื่อให้ระบบเริ่มใหม่หรือไม่?',
       type: 'danger',
-      confirmText: 'ล้างข้อมูล'
+      confirmText: 'ล้างข้อมูล',
     });
 
     if (confirmed) {

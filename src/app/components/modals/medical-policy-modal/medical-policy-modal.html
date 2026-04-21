@@ -1,144 +1,150 @@
 <div class="modal-backdrop" (click)="close()">
-    <div class="modal-container" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-            <div class="header-content">
-                <span class="header-icon"><i class="fas fa-file-alt"></i></span>
-                <div class="header-text">
-                    <h3>{{ metaContent()?.sectionTitle }}</h3>
-                    <span class="header-subtitle">{{ metaContent()?.content }}</span>
-                </div>
-            </div>
-            <button type="button" class="btn-close" title="ปิด" (click)="close()">
-                <i class="fas fa-times"></i>
-            </button>
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <span class="header-icon"><i class="fas fa-file-alt"></i></span>
+        <div class="header-text">
+          <h3>{{ metaContent()?.sectionTitle }}</h3>
+          <span class="header-subtitle">{{ metaContent()?.content }}</span>
         </div>
+      </div>
+      <button type="button" class="btn-close" title="ปิด" (click)="close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
 
-        <div class="modal-body custom-scrollbar">
+    <div class="modal-body custom-scrollbar">
+      <!-- Loading -->
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p>กำลังโหลด...</p>
+        </div>
+      } @else {
+        <!-- ตาราง Benefit Plans -->
+        <section class="policy-section">
+          <h4 class="section-title main-title">{{ rootSections()[0]?.sectionTitle }}</h4>
+          <div class="clause">
+            <p>{{ rootSections()[0]?.sectionNo }}. {{ rootSections()[0]?.content }}</p>
+          </div>
 
-            <!-- Loading -->
-            @if (isLoading()) {
-            <div class="loading-state">
-                <i class="fas fa-spinner fa-spin fa-2x"></i>
-                <p>กำลังโหลด...</p>
-            </div>
-            } @else {
-
-            <!-- ตาราง Benefit Plans -->
-            <section class="policy-section">
-                <h4 class="section-title main-title">{{ rootSections()[0]?.sectionTitle }}</h4>
-                <div class="clause">
-                    <p>{{ rootSections()[0]?.sectionNo }}. {{ rootSections()[0]?.content }}</p>
-                </div>
-
-                <div class="table-container">
-                    <table class="policy-table">
-                        <thead>
-                            <tr>
-                                <th>ระดับ</th>
-                                <th>แผน</th>
-                                <th>OPD (บาท/ปี)</th>
-                                <th>IPD (บาท/ปี)</th>
-                                <th>ทันตกรรม (บาท/ปี)</th>
-                                <th>สายตา (บาท/ปี)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (plan of benefitPlans(); track plan.planId) {
-                            <tr>
-                                <td class="jc-cell">{{ plan.jobClassLabel }}</td>
-                                <td>{{ plan.planNo }}</td>
-                                <td class="amount-cell">{{ plan.opdLimit | number }}</td>
-                                <td class="amount-cell">{{ plan.ipdLimit | number }}</td>
-                                <td class="amount-cell">{{ plan.dentalLimit | number }}</td>
-                                <td class="amount-cell">{{ plan.visionLimit | number }}</td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- notes ของ section 1 (parentId ของ section แรก) -->
-                @for (note of getChildren(rootSections()[0]?.contentId ?? 0); track note.contentId) {
-                <div class="clause-with-notes">
-                    <p class="note-header"><strong><u>{{ note.sectionTitle }}</u></strong></p>
-                    <div class="sub-clause-list">
-                        <div class="list-item">
-                            <span class="item-num">{{ note.sectionNo }}</span>
-                            <span class="item-text">{{ note.content }}</span>
-                        </div>
-                    </div>
-                </div>
+          <div class="table-container">
+            <table class="policy-table">
+              <thead>
+                <tr>
+                  <th>ระดับ</th>
+                  <th>แผน</th>
+                  <th>OPD (บาท/ปี)</th>
+                  <th>IPD (บาท/ปี)</th>
+                  <th>ทันตกรรม (บาท/ปี)</th>
+                  <th>สายตา (บาท/ปี)</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (plan of benefitPlans(); track plan.planId) {
+                  <tr>
+                    <td class="jc-cell">{{ plan.jobClassLabel }}</td>
+                    <td>{{ plan.planNo }}</td>
+                    <td class="amount-cell">{{ plan.opdLimit | number }}</td>
+                    <td class="amount-cell">{{ plan.ipdLimit | number }}</td>
+                    <td class="amount-cell">{{ plan.dentalLimit | number }}</td>
+                    <td class="amount-cell">{{ plan.visionLimit | number }}</td>
+                  </tr>
                 }
-            </section>
+              </tbody>
+            </table>
+          </div>
 
-            <!-- Policy Sections (ข้ามส่วนแรกที่แสดง benefit table แล้ว) -->
-            @for (section of rootSections(); track section.contentId; let i = $index) {
-            @if (i > 0) {
-            <section class="policy-section">
-                <div class="clause">
-                    <p>{{ section.sectionNo }}. {{ section.sectionTitle }}</p>
-                    @if (section.content !== section.sectionTitle) {
-                    <p class="clause-detail">{{ section.content }}</p>
-                    }
+          <!-- notes ของ section 1 (parentId ของ section แรก) -->
+          @for (note of getChildren(rootSections()[0]?.contentId ?? 0); track note.contentId) {
+            <div class="clause-with-notes">
+              <p class="note-header">
+                <strong
+                  ><u>{{ note.sectionTitle }}</u></strong
+                >
+              </p>
+              <div class="sub-clause-list">
+                <div class="list-item">
+                  <span class="item-num">{{ note.sectionNo }}</span>
+                  <span class="item-text">{{ note.content }}</span>
                 </div>
+              </div>
+            </div>
+          }
+        </section>
 
-                <!-- children ของแต่ละ section -->
-                @for (child of getChildren(section.contentId); track child.contentId) {
+        <!-- Policy Sections (ข้ามส่วนแรกที่แสดง benefit table แล้ว) -->
+        @for (section of rootSections(); track section.contentId; let i = $index) {
+          @if (i > 0) {
+            <section class="policy-section">
+              <div class="clause">
+                <p>{{ section.sectionNo }}. {{ section.sectionTitle }}</p>
+                @if (section.content !== section.sectionTitle) {
+                  <p class="clause-detail">{{ section.content }}</p>
+                }
+              </div>
 
+              <!-- children ของแต่ละ section -->
+              @for (child of getChildren(section.contentId); track child.contentId) {
                 <!-- warning -->
                 @if (child.contentType === 'warning') {
-                <div class="important-warning">
+                  <div class="important-warning">
                     <div class="warning-header">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>{{ child.sectionTitle }}</strong>
+                      <i class="fas fa-exclamation-triangle"></i>
+                      <strong>{{ child.sectionTitle }}</strong>
                     </div>
                     <p>{{ child.content }}</p>
-                </div>
+                  </div>
                 }
 
                 <!-- note -->
                 @else if (child.contentType === 'note') {
-                <div class="clause-with-notes">
-                    <p class="note-header"><strong><u>{{ child.sectionTitle }}</u></strong></p>
+                  <div class="clause-with-notes">
+                    <p class="note-header">
+                      <strong
+                        ><u>{{ child.sectionTitle }}</u></strong
+                      >
+                    </p>
                     <p>{{ child.content }}</p>
-                </div>
+                  </div>
                 }
 
                 <!-- subsection -->
                 @else if (child.contentType === 'subsection') {
-                <div class="sub-policy-v2">
+                  <div class="sub-policy-v2">
                     <div class="sub-header">
-                        <span class="sub-num">{{ child.sectionNo }}</span>
-                        <h5>{{ child.sectionTitle }}</h5>
+                      <span class="sub-num">{{ child.sectionNo }}</span>
+                      <h5>{{ child.sectionTitle }}</h5>
                     </div>
                     <div class="square-bullets-verbatim">
-                        @for (item of [child].concat(getChildren(child.contentId)); track item.contentId) {
+                      @for (
+                        item of [child].concat(getChildren(child.contentId));
+                        track item.contentId
+                      ) {
                         <div class="bullet-item">{{ item.content }}</div>
-                        }
+                      }
                     </div>
-                </div>
+                  </div>
                 }
 
                 <!-- item -->
                 @else {
-                <div class="verbatim-list">
+                  <div class="verbatim-list">
                     <div class="list-item">
-                        <span class="item-num">{{ child.sectionNo }}</span>
-                        <span class="item-text">{{ child.content }}</span>
+                      <span class="item-num">{{ child.sectionNo }}</span>
+                      <span class="item-text">{{ child.content }}</span>
                     </div>
-                </div>
+                  </div>
                 }
-
-                }
+              }
             </section>
-            }
-            }
-
-            }
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn-confirm" (click)="close()">รับทราบ</button>
-        </div>
+          }
+        }
+      }
     </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-confirm" (click)="close()">รับทราบ</button>
+    </div>
+  </div>
 </div>

@@ -8,9 +8,8 @@ describe('ItRequestSignature', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ItRequestSignature]
-    })
-    .compileComponents();
+      imports: [ItRequestSignature],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ItRequestSignature);
     component = fixture.componentInstance;

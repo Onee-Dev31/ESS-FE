@@ -12,7 +12,7 @@ import { ItServiceService } from '../../../services/it-service.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import dayjs, { Dayjs } from 'dayjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -34,7 +34,7 @@ import { MasterDataService } from '../../../services/master-data.service';
     NzTableModule,
     NzModalModule,
     NzPaginationModule,
-    NzDatePickerModule
+    NzDatePickerModule,
   ],
   templateUrl: './it-dashboard-summary.html',
   styleUrl: './it-dashboard-summary.scss',
@@ -46,13 +46,62 @@ export class ItDashboardSummary {
   activeStatus: string = 'all';
   selectedStatus: string = 'all';
   kpis: KpiCard[] = [
-    { status: 'Open', title: 'Open tickets', value: 0, delta: 0, hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา', icon: 'inbox' },
-    { status: 'Assigned', title: 'Assigned Tickets', value: 0, delta: 0, hint: 'Tickets ที่ได้รับมอบหมาย', icon: 'user' },
-    { status: 'In Progress', title: 'In Progress Tickets', value: 0, delta: 0, hint: 'Tickets ที่กำลังดำเนินการ', icon: 'sync' },
-    { status: 'Closed', title: 'Closed Tickets', value: 0, delta: 0, hint: 'Tickets ที่ปิดแล้ว', icon: 'check-circle' },
-    { status: 'Hold', title: 'Hold Tickets', value: 0, delta: 0, hint: 'Tickets ที่หยุดทำการ', icon: 'pause-circle' },
-    { status: 'Deny', title: 'Deny Tickets', value: 0, delta: 0, hint: 'Tickets ที่ถูกปฏิเสธ', icon: 'stop' },
-    { status: 'All', title: 'All Tickets', value: 0, delta: 0, hint: 'Tickets ทั้งหมดทุกสถานะ', icon: 'appstore' }
+    {
+      status: 'Open',
+      title: 'Open tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+      icon: 'inbox',
+    },
+    {
+      status: 'Assigned',
+      title: 'Assigned Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'user',
+    },
+    {
+      status: 'In Progress',
+      title: 'In Progress Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่กำลังดำเนินการ',
+      icon: 'sync',
+    },
+    {
+      status: 'Closed',
+      title: 'Closed Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่ปิดแล้ว',
+      icon: 'check-circle',
+    },
+    {
+      status: 'Hold',
+      title: 'Hold Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่หยุดทำการ',
+      icon: 'pause-circle',
+    },
+    {
+      status: 'Deny',
+      title: 'Deny Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่ถูกปฏิเสธ',
+      icon: 'stop',
+    },
+    {
+      status: 'All',
+      title: 'All Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'appstore',
+    },
   ];
   showDeptBar = false;
   selectedCompany: string | null = null;
@@ -72,7 +121,7 @@ export class ItDashboardSummary {
     assigned: 1,
     inprogress: 2,
     done: 3,
-    all: -1
+    all: -1,
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
   isLogModalVisible = false;
@@ -89,7 +138,7 @@ export class ItDashboardSummary {
     requester: '',
     department: '',
     company: '',
-    dateRange: null as [Dayjs, Dayjs] | null
+    dateRange: null as [Dayjs, Dayjs] | null,
   };
   departmentList: any[] = [];
   companyList: any[] = [];
@@ -98,8 +147,8 @@ export class ItDashboardSummary {
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
-    private masterService: MasterDataService
-  ) { }
+    private masterService: MasterDataService,
+  ) {}
 
   ngOnInit(): void {
     this.selectStatus('all', false);
@@ -118,7 +167,7 @@ export class ItDashboardSummary {
         value: summary.open ?? 0,
         delta: 0,
         hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-        icon: 'inbox'
+        icon: 'inbox',
       },
       {
         status: 'assigned',
@@ -126,7 +175,7 @@ export class ItDashboardSummary {
         value: summary.assigned ?? 0,
         delta: 0,
         hint: 'Tickets ที่ได้รับมอบหมาย',
-        icon: 'user'
+        icon: 'user',
       },
       {
         status: 'inprogress',
@@ -134,7 +183,7 @@ export class ItDashboardSummary {
         value: summary.inProcess ?? 0,
         delta: 0,
         hint: 'Tickets ที่กำลังดำเนินการ',
-        icon: 'sync'
+        icon: 'sync',
       },
       {
         status: 'done',
@@ -142,7 +191,7 @@ export class ItDashboardSummary {
         value: summary.closed ?? 0,
         delta: 0,
         hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle'
+        icon: 'check-circle',
       },
       {
         status: 'hold',
@@ -150,7 +199,7 @@ export class ItDashboardSummary {
         value: summary.hold ?? 0,
         delta: 0,
         hint: 'Tickets ที่หยุดทำการ',
-        icon: 'pause-circle'
+        icon: 'pause-circle',
       },
       {
         status: 'denied',
@@ -158,7 +207,7 @@ export class ItDashboardSummary {
         value: summary.denied ?? 0,
         delta: 0,
         hint: 'Tickets ที่ถูกปฏิเสธ',
-        icon: 'stop'
+        icon: 'stop',
       },
       {
         status: 'all',
@@ -166,58 +215,44 @@ export class ItDashboardSummary {
         value: summary.all ?? 0,
         delta: 0,
         hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore'
+        icon: 'appstore',
       },
-
     ];
   }
   private buildStatusPie(summary: any) {
-
     const data: PieDatum[] = [
       { name: 'Open', value: summary.open ?? 0, key: 'open' },
       { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
       { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
-      { name: 'Hold', value: summary.hold ?? 0, key: 'hold' }
+      { name: 'Hold', value: summary.hold ?? 0, key: 'hold' },
     ];
 
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.statusPieOption = this.makeDonutOption(
-      'Status Distribution',
-      data,
-      total,
-      'Total'
-    );
+    this.statusPieOption = this.makeDonutOption('Status Distribution', data, total, 'Total');
   }
   // ====== 2) Service Donut ======
   private buildServicePie(res: any[]) {
-
-    const data: PieDatum[] = res.map(x => ({
+    const data: PieDatum[] = res.map((x) => ({
       name: x.name_th,
-      value: x.ticket_count
+      value: x.ticket_count,
     }));
 
     const total = data.reduce((s, x) => s + x.value, 0);
 
-    this.servicePieOption = this.makeDonutOptionService(
-      'Service Type',
-      data,
-      total,
-      'Total'
-    );
+    this.servicePieOption = this.makeDonutOptionService('Service Type', data, total, 'Total');
   }
   // ====== 3) Top Companies Bar ======
   private buildCompanyBar(res: any[]) {
-
-    const chartData = res.map(x => ({
+    const chartData = res.map((x) => ({
       value: x.ticket_count,
       code: x.COMPANY_CODE,
-      name: x.COMPANY_NAME
+      name: x.COMPANY_NAME,
     }));
 
-    const labels = chartData.map(x => x.code);
+    const labels = chartData.map((x) => x.code);
 
     const textColor =
       getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
@@ -236,7 +271,7 @@ export class ItDashboardSummary {
           <div style="font-weight:700">${data.name}</div>
           <div>Tickets: ${data.value}</div>
         `;
-        }
+        },
       },
 
       xAxis: {
@@ -244,14 +279,14 @@ export class ItDashboardSummary {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700, color: textColor }
+        axisLabel: { fontWeight: 700, color: textColor },
       },
 
       yAxis: {
         type: 'value',
         splitLine: { show: false },
         axisLine: { show: false },
-        axisLabel: { show: false }
+        axisLabel: { show: false },
       },
 
       series: [
@@ -260,13 +295,13 @@ export class ItDashboardSummary {
           data: chartData,
           barWidth: 46,
           itemStyle: { borderRadius: [12, 12, 12, 12] },
-          emphasis: { focus: 'series' }
-        }
-      ]
+          emphasis: { focus: 'series' },
+        },
+      ],
     };
 
     const firstCompany = labels[0];
-    console.log("firstCompany : ", firstCompany);
+    console.log('firstCompany : ', firstCompany);
 
     this.selectedCompany = firstCompany;
     this.showDeptBar = !!firstCompany;
@@ -289,14 +324,19 @@ export class ItDashboardSummary {
 
       map[companyCode].push({
         label: row.dept_display,
-        value: row.ticket_count
+        value: row.ticket_count,
       });
     }
 
     this.deptTop5Map = map;
   }
 
-  private makeDonutOption(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
+  private makeDonutOption(
+    title: string,
+    data: PieDatum[],
+    centerValue: number,
+    centerLabel: string,
+  ): EChartsOption {
     return {
       legend: {
         top: -5,
@@ -309,19 +349,19 @@ export class ItDashboardSummary {
         textStyle: {
           fontSize: 10,
           fontWeight: 400,
-          overflow: 'truncate'
+          overflow: 'truncate',
         },
         width: '100%',
         type: 'plain',
       },
       tooltip: { trigger: 'item' },
       color: [
-        this.getCssVar('--status-open-text')
-        , this.getCssVar('--status-assigned-text')
-        , this.getCssVar('--status-progress-text')
-        , this.getCssVar('--status-closed-text')
-        , this.getCssVar('--status-deny-text')
-        , this.getCssVar('--status-hold-text')
+        this.getCssVar('--status-open-text'),
+        this.getCssVar('--status-assigned-text'),
+        this.getCssVar('--status-progress-text'),
+        this.getCssVar('--status-closed-text'),
+        this.getCssVar('--status-deny-text'),
+        this.getCssVar('--status-hold-text'),
       ],
       series: [
         {
@@ -333,33 +373,47 @@ export class ItDashboardSummary {
           labelLine: { show: false },
           avoidLabelOverlap: true,
           emphasis: { scale: true, scaleSize: 6 },
-          data
-        }
+          data,
+        },
       ],
       graphic: [
         {
           type: 'text',
           left: 'center',
           top: '46%',
-          style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' }
+          style: {
+            text: String(centerValue),
+            fontSize: 28,
+            fontWeight: 800,
+            fill:
+              getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a',
+          },
         },
         {
           type: 'text',
           left: 'center',
           top: '58%',
-          style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' }
-        }
-      ]
+          style: {
+            text: centerLabel,
+            fontSize: 12,
+            fill:
+              getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b',
+          },
+        },
+      ],
     };
   }
 
   private getCssVar(name: string): string {
-    return getComputedStyle(document.documentElement)
-      .getPropertyValue(name)
-      .trim();
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
-  private makeDonutOptionService(title: string, data: PieDatum[], centerValue: number, centerLabel: string): EChartsOption {
+  private makeDonutOptionService(
+    title: string,
+    data: PieDatum[],
+    centerValue: number,
+    centerLabel: string,
+  ): EChartsOption {
     return {
       legend: {
         top: -5,
@@ -371,7 +425,7 @@ export class ItDashboardSummary {
         textStyle: {
           fontSize: 10,
           fontWeight: 400,
-          overflow: 'truncate'
+          overflow: 'truncate',
         },
         width: '100%',
         type: 'plain',
@@ -392,27 +446,38 @@ export class ItDashboardSummary {
           labelLine: { show: false },
           avoidLabelOverlap: true,
           emphasis: { scale: true, scaleSize: 6 },
-          data
-        }
+          data,
+        },
       ],
       graphic: [
         {
           type: 'text',
           left: 'center',
           top: '46%',
-          style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' }
+          style: {
+            text: String(centerValue),
+            fontSize: 28,
+            fontWeight: 800,
+            fill:
+              getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a',
+          },
         },
         {
           type: 'text',
           left: 'center',
           top: '58%',
-          style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' }
-        }
-      ]
+          style: {
+            text: centerLabel,
+            fontSize: 12,
+            fill:
+              getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b',
+          },
+        },
+      ],
     };
   }
   getAllTotal(): number {
-    return this.kpis.find(x => x.status === 'all')?.value ?? 0;
+    return this.kpis.find((x) => x.status === 'all')?.value ?? 0;
   }
 
   getPercent(k: KpiCard): number {
@@ -431,8 +496,7 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
-
-    this.currentStatus = this.statusLabel(k)
+    this.currentStatus = this.statusLabel(k);
     this.activeStatus = k;
     this.selectedStatus = k;
     console.log(this.currentStatus);
@@ -458,13 +522,13 @@ export class ItDashboardSummary {
       this.statusChart.dispatchAction({
         type: 'highlight',
         seriesIndex: 0,
-        dataIndex
+        dataIndex,
       });
 
       this.statusChart.dispatchAction({
         type: 'showTip',
         seriesIndex: 0,
-        dataIndex
+        dataIndex,
       });
     } else {
       this.statusChart.dispatchAction({ type: 'hideTip' });
@@ -490,15 +554,35 @@ export class ItDashboardSummary {
 
     const opt = this.statusPieOption as any;
     opt.graphic = [
-      { type: 'text', left: 'center', top: '46%', style: { text: String(centerValue), fontSize: 28, fontWeight: 800, fill: getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a' } },
-      { type: 'text', left: 'center', top: '58%', style: { text: centerLabel, fontSize: 12, fill: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b' } }
+      {
+        type: 'text',
+        left: 'center',
+        top: '46%',
+        style: {
+          text: String(centerValue),
+          fontSize: 28,
+          fontWeight: 800,
+          fill:
+            getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a',
+        },
+      },
+      {
+        type: 'text',
+        left: 'center',
+        top: '58%',
+        style: {
+          text: centerLabel,
+          fontSize: 12,
+          fill:
+            getComputedStyle(document.body).getPropertyValue('--text-muted').trim() || '#64748b',
+        },
+      },
     ];
 
     this.statusChart?.setOption(opt, { notMerge: false, lazyUpdate: true });
   }
 
   onCompanyBarClick(e: any) {
-
     const company = (e?.data.code ?? '').toString();
     if (!company) return;
 
@@ -513,12 +597,12 @@ export class ItDashboardSummary {
     const data = [...rows]
       .sort((a, b) => b.value - a.value)
       .slice(0, 5)
-      .map(x => ({
+      .map((x) => ({
         name: x.label,
-        value: x.value
+        value: x.value,
       }));
 
-    const labels = data.map(x => x.name);
+    const labels = data.map((x) => x.name);
 
     const textColor =
       getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
@@ -528,7 +612,7 @@ export class ItDashboardSummary {
         text: `Top 5 Departments - ${company}`,
         left: 'left',
         top: 0,
-        textStyle: { fontSize: 14, fontWeight: 800, color: textColor }
+        textStyle: { fontSize: 14, fontWeight: 800, color: textColor },
       },
       grid: { left: 10, right: 18, top: 36, bottom: 10, containLabel: true },
       tooltip: {
@@ -543,20 +627,20 @@ export class ItDashboardSummary {
           <div style="font-weight:700">${row.name}</div>
           <div>Tickets: ${row.value}</div>
         `;
-        }
+        },
       },
       xAxis: {
         type: 'value',
         splitLine: { show: false },
         axisLabel: { show: false },
-        axisLine: { show: false }
+        axisLine: { show: false },
       },
       yAxis: {
         type: 'category',
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700, color: textColor }
+        axisLabel: { fontWeight: 700, color: textColor },
       },
       series: [
         {
@@ -564,9 +648,9 @@ export class ItDashboardSummary {
           data: data,
           barWidth: 16,
           itemStyle: { borderRadius: [10, 10, 10, 10] },
-          emphasis: { focus: 'series' }
-        }
-      ]
+          emphasis: { focus: 'series' },
+        },
+      ],
     };
   }
 
@@ -574,8 +658,8 @@ export class ItDashboardSummary {
     this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
       next: (res) => {
         console.log(res);
-        this.updateKpis(res.summary)
-        this.buildStatusPie(res.summary)
+        this.updateKpis(res.summary);
+        this.buildStatusPie(res.summary);
         this.buildServicePie(res.serviceTypes);
         this.buildDeptTop5Map(res.topDepartments);
         this.buildCompanyBar(res.topCompanies);
@@ -583,7 +667,7 @@ export class ItDashboardSummary {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
@@ -600,14 +684,14 @@ export class ItDashboardSummary {
       next: (res: any) => {
         console.log('API RES = ', res);
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
-        this.filteredTicketLogs = this.ticketLogs
+        this.filteredTicketLogs = this.ticketLogs;
 
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('loadTickets error:', err);
         this.ticketLogs = [];
-      }
+      },
     });
   }
 
@@ -655,26 +739,32 @@ export class ItDashboardSummary {
 
   statusLabel(status: string) {
     switch (status) {
-      case 'open': return 'Open';
-      case 'assigned': return 'Assigned';
-      case 'inprogress': return 'In Progress';
-      case 'done': return 'Closed';
-      case 'denied': return 'Denied';
-      case 'hold': return 'Hold';
-      case 'all': return 'All';
-      default: return this.currentStatus;
+      case 'open':
+        return 'Open';
+      case 'assigned':
+        return 'Assigned';
+      case 'inprogress':
+        return 'In Progress';
+      case 'done':
+        return 'Closed';
+      case 'denied':
+        return 'Denied';
+      case 'hold':
+        return 'Hold';
+      case 'all':
+        return 'All';
+      default:
+        return this.currentStatus;
     }
   }
 
   applyFilter() {
-
     const range = this.filter.dateRange;
     const [rawFrom, rawTo] = range ?? [];
     const from = rawFrom ? dayjs(rawFrom) : null;
     const to = rawTo ? dayjs(rawTo) : null;
 
-    this.filteredTicketLogs = this.ticketLogs.filter(t => {
-
+    this.filteredTicketLogs = this.ticketLogs.filter((t) => {
       const ticketNoMatch =
         !this.filter.ticketNo ||
         t.ticket_number?.toLowerCase().includes(this.filter.ticketNo.toLowerCase());
@@ -687,13 +777,9 @@ export class ItDashboardSummary {
         !this.filter.requester ||
         t.requester_name?.toLowerCase().includes(this.filter.requester.toLowerCase());
 
-      const deptMatch =
-        !this.filter.department ||
-        t.deptName === this.filter.department;
+      const deptMatch = !this.filter.department || t.deptName === this.filter.department;
 
-      const companyMatch =
-        !this.filter.company ||
-        t.COMPANY_CODE === this.filter.company;
+      const companyMatch = !this.filter.company || t.COMPANY_CODE === this.filter.company;
 
       const rawDate = t.updated_at || t.created_at;
       const itemDate = dayjs(rawDate);
@@ -701,19 +787,12 @@ export class ItDashboardSummary {
       let dateMatch = true;
 
       if (from && to) {
-
-        dateMatch =
-          itemDate.isAfter(from.startOf('day')) &&
-          itemDate.isBefore(to.endOf('day'));
+        dateMatch = itemDate.isAfter(from.startOf('day')) && itemDate.isBefore(to.endOf('day'));
       }
 
-      return ticketNoMatch &&
-        subjectMatch &&
-        requesterMatch &&
-        deptMatch &&
-        companyMatch &&
-        dateMatch;
-
+      return (
+        ticketNoMatch && subjectMatch && requesterMatch && deptMatch && companyMatch && dateMatch
+      );
     });
 
     this.page = 1;
@@ -723,8 +802,8 @@ export class ItDashboardSummary {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
 
     const workbook: XLSX.WorkBook = {
-      Sheets: { 'Tickets': worksheet },
-      SheetNames: ['Tickets']
+      Sheets: { Tickets: worksheet },
+      SheetNames: ['Tickets'],
     };
     XLSX.writeFile(workbook, 'TicketLogs.xlsx');
   }
@@ -733,27 +812,26 @@ export class ItDashboardSummary {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        this.companyList = data
+        this.companyList = data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        this.departmentList = data
+        this.departmentList = data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
   onCompanyChange() {
-
     this.filter.department = '';
 
     if (!this.filter.company) {
@@ -762,7 +840,7 @@ export class ItDashboardSummary {
     }
 
     this.filteredDepartmentList = this.departmentList.filter(
-      d => d.COMPANY_CODE === this.filter.company
+      (d) => d.COMPANY_CODE === this.filter.company,
     );
 
     this.applyFilter();

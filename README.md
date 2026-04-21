@@ -11,6 +11,7 @@
 ## 🇹🇭 สรุปภาพรวมโครงการ (Project Summary)
 
 โปรเจกต์นี้เป็นการปรับโฉมระบบบริการตนเองของพนักงาน (ESS) ให้มีความเป็น **Premium Dashboard** มากยิ่งขึ้น โดยมีการปรับปรุงหลักดังนี้:
+
 - **Modern UI/UX**: ปรับปรุงหน้าจอ Dashboard, รายการลา, และการเบิกสวัสดิการต่างๆ ให้มีความสะอาดตาและใช้งานง่าย
 - **Quick Navigation**: ระบบค้นหาเมนูทางลัดที่ช่วยให้เข้าถึงหน้างานที่ต้องการได้ภายในไม่กี่วินาที
 - **Standardized Tables**: ระบบตารางข้อมูลที่รองรับการเรียงลำดับ การกรอง และการแสดงผลที่เป็นมาตรฐานเดียวกันทุกหน้า
@@ -23,24 +24,33 @@
 หากต้องการเพิ่มระบบเบิกใหม่ (เช่น "เบิกอุปกรณ์ไอที") แนะนำให้ใช้ "Copy Logic" จากหน้า `Vehicle` หรือ `Allowance` ตามขั้นตอนดังนี้:
 
 ### 1. **Create Service** (ต่อยอดจาก `BaseRequestService`)
+
 สร้าง Service ใหม่โดย `extends BaseRequestService<T>`. ระบบจะจัดการเรื่อง Loading, Mock Data และ CRUD สิทธิการเข้าถึงให้โดยอัตโนมัติ
 
 ### 2. **Setup Component** (ใช้ `listing.util.ts`)
+
 ในตัว Component ให้ใช้ `createListingState()` และ `createListingComputeds()` เพื่อจัดการ Pagination และ Search โดยไม่ต้องเขียน Logic ซ้ำ
 
 ### 3. **Standardized HTML Table** (โครงสร้างตารางมาตรฐาน)
+
 เพื่อให้ Hover และสไตล์ตารางออกมาเนี๊ยบเหมือนหน้าอื่นๆ ให้ใช้โครงสร้างที่มี `<tbody>` แยกตามรายแถว (per row) ดังนี้:
+
 ```html
 <table class="modern-table">
-  <thead>...</thead>
+  <thead>
+    ...
+  </thead>
   <!-- หัวใจสำคัญคือการใช้ *ngFor ที่ tbody เพื่อให้ Hover ติดทั้งกลุ่มข้อมูล -->
   <tbody *ngFor="let item of data">
-    <tr>...</tr>
+    <tr>
+      ...
+    </tr>
   </tbody>
 </table>
 ```
 
 ### 4. **Register for Quick-Search**
+
 อย่าลืมนำลิงก์ใหม่ไปเพิ่มใน `NavbarComponent` (ส่วน `allMenuItems`) เพื่อให้สามารถค้นหาหน้าใหม่นี้เจอผ่านระบบ Quick-Search
 
 ---
@@ -48,13 +58,17 @@
 ## �🚀 Recent Enhancements (การอัปเดตล่าสุด)
 
 ### 1. **Navbar Quick-Search Menu**
+
 ระบบค้นหาอัจฉริยะที่มุมขวาบนของ Navbar:
+
 - รองรับการค้นหาเมนูด้วยคีย์เวิร์ด (เช่น "เบิก", "ลา", "Approval")
 - แสดงผลลัพธ์เป็น Dropdown พร้อมไอคอนและหมวดหมู่
 - กรองผลลัพธ์ตามสิทธิ์การเข้าถึง (Role-Based)
 
 ### 2. **UI Standardization Polish**
+
 ปรับปรุงพื้นฐาน UI ให้มีความสม่ำเสมอทั่วทั้งระบบ:
+
 - **Request ID Styling**: ใช้ตัวหนาสีน้ำเงิน (#1a73e8) สำหรับเลขที่เอกสารทุกหน้า
 - **Standard Table Actions**: เพิ่มปุ่ม Edit/Delete ในตาราง Medical Expenses และ Allowance ให้เป็นมาตรฐานเดียวกัน
 - **Pagination**: ปรับปรุงการวางตำแหน่งและ Style ของ Pagination ให้ตรงกันทุกหน้า
@@ -95,15 +109,18 @@ src/app/
 ## 🛠️ Getting Started
 
 ### Prerequisites
+
 - Node.js (v18+)
 - npm (v10+), This project uses `npm@11.7.0`
 
 ### Installation
+
 ```bash
 npm install
 ```
 
 ### Execution
+
 ```bash
 # Development server
 npm start # runs `ng serve`
@@ -119,5 +136,3 @@ npm start # runs `ng serve`
 4. **Kebab-Case**: ชื่อไฟล์ต้องเป็น kebab-case เสมอ เพื่อความสอดคล้องกับ Angular conventions
 
 ---
-
-

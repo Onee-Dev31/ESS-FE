@@ -1,113 +1,121 @@
 <div class="save-sig-wrapper">
+  <!-- Page Header -->
+  <div class="sig-page-header">
+    <div class="header-left">
+      <div class="page-icon"><i class="fas fa-signature"></i></div>
+      <div>
+        <h1 class="page-title">บันทึกลายเซนต์</h1>
+        <p class="page-subtitle">Save Signature</p>
+      </div>
+    </div>
+  </div>
 
-    <!-- Page Header -->
-    <div class="sig-page-header">
-        <div class="header-left">
-            <div class="page-icon"><i class="fas fa-signature"></i></div>
-            <div>
-                <h1 class="page-title">บันทึกลายเซนต์</h1>
-                <p class="page-subtitle">Save Signature</p>
+  <div class="content-layout">
+    <!-- Left: Signer Info -->
+    <div class="info-panel" #infoPanel>
+      <!-- Login User Card -->
+      @if (loginUser()) {
+        <div class="info-section">
+          <div class="section-header">
+            <i class="fas fa-id-card"></i>
+            ข้อมูลผู้ใช้งาน
+          </div>
+          <div class="section-content">
+            <div class="login-user-card">
+              <div class="login-avatar">
+                <i class="fas fa-user-circle"></i>
+              </div>
+              <div class="login-meta">
+                <div class="login-name-th">{{ loginNameTH() }}</div>
+                <div class="login-name-en">{{ loginNameEN() }}</div>
+                <div class="login-ad">
+                  <i class="fas fa-at"></i> {{ loginUser()?.AD_USER || '-' }}
+                </div>
+              </div>
             </div>
+            <div class="login-details">
+              <div class="info-row">
+                <div class="info-label"><i class="fas fa-briefcase"></i> ตำแหน่ง</div>
+                <div class="info-value text-value">{{ loginUser()?.POST || '-' }}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label"><i class="fas fa-building"></i> แผนก</div>
+                <div class="info-value text-value">{{ loginUser()?.DEPARTMENT || '-' }}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label"><i class="fas fa-city"></i> บริษัท</div>
+                <div class="info-value text-value">{{ loginUser()?.COMPANY_NAME || '-' }}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label"><i class="fas fa-id-badge"></i> รหัสพนักงาน</div>
+                <div class="info-value text-value">{{ loginUser()?.CODEMPID || '-' }}</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label"><i class="fas fa-phone"></i> เบอร์โทร</div>
+                <div class="info-value text-value">{{ loginUser()?.USR_MOBILE || '-' }}</div>
+              </div>
+            </div>
+          </div>
         </div>
+      }
     </div>
 
-    <div class="content-layout">
+    <!-- Right: Signature Pad -->
+    <div class="signature-panel" #signaturePanel>
+      <div class="section-header">
+        <i class="fas fa-pen-nib"></i>
+        ลายเซนต์ <span class="sub">(Signature Pad)</span>
+      </div>
 
-        <!-- Left: Signer Info -->
-        <div class="info-panel" #infoPanel>
+      <div
+        class="canvas-wrapper"
+        [class.has-signature]="hasSignature()"
+        [class.is-saved]="isSaved()"
+      >
+        <canvas
+          #signatureCanvas
+          class="signature-canvas"
+          (mousedown)="startDrawing($event)"
+          (mousemove)="draw($event)"
+          (mouseup)="stopDrawing()"
+          (mouseleave)="stopDrawing()"
+          (touchstart)="startDrawing($event)"
+          (touchmove)="draw($event)"
+          (touchend)="stopDrawing()"
+        >
+        </canvas>
 
-            <!-- Login User Card -->
-            @if (loginUser()) {
-            <div class="info-section">
-                <div class="section-header">
-                    <i class="fas fa-id-card"></i>
-                    ข้อมูลผู้ใช้งาน
-                </div>
-                <div class="section-content">
-                    <div class="login-user-card">
-                        <div class="login-avatar">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="login-meta">
-                            <div class="login-name-th">{{ loginNameTH() }}</div>
-                            <div class="login-name-en">{{ loginNameEN() }}</div>
-                            <div class="login-ad"><i class="fas fa-at"></i> {{ loginUser()?.AD_USER || '-' }}</div>
-                        </div>
-                    </div>
-                    <div class="login-details">
-                        <div class="info-row">
-                            <div class="info-label"><i class="fas fa-briefcase"></i> ตำแหน่ง</div>
-                            <div class="info-value text-value">{{ loginUser()?.POST || '-' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label"><i class="fas fa-building"></i> แผนก</div>
-                            <div class="info-value text-value">{{ loginUser()?.DEPARTMENT || '-' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label"><i class="fas fa-city"></i> บริษัท</div>
-                            <div class="info-value text-value">{{ loginUser()?.COMPANY_NAME || '-' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label"><i class="fas fa-id-badge"></i> รหัสพนักงาน</div>
-                            <div class="info-value text-value">{{ loginUser()?.CODEMPID || '-' }}</div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-label"><i class="fas fa-phone"></i> เบอร์โทร</div>
-                            <div class="info-value text-value">{{ loginUser()?.USR_MOBILE || '-' }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
-        </div>
+        @if (!hasSignature()) {
+          <div class="canvas-placeholder">
+            <i class="fas fa-signature"></i>
+            <span>เซนชื่อในพื้นที่นี้</span>
+          </div>
+        }
+      </div>
 
-        <!-- Right: Signature Pad -->
-        <div class="signature-panel" #signaturePanel>
-            <div class="section-header">
-                <i class="fas fa-pen-nib"></i>
-                ลายเซนต์ <span class="sub">(Signature Pad)</span>
-            </div>
+      <div class="signature-actions">
+        <button class="btn-clear" (click)="clearSignature()" [disabled]="!hasSignature()">
+          <i class="fas fa-eraser"></i> ล้าง
+        </button>
 
-            <div class="canvas-wrapper" [class.has-signature]="hasSignature()" [class.is-saved]="isSaved()">
-                <canvas #signatureCanvas class="signature-canvas" (mousedown)="startDrawing($event)"
-                    (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
-                    (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()">
-                </canvas>
+        <button class="btn-edit" (click)="editAction()"><i class="fas fa-pen"></i> แก้ไข</button>
 
-                @if (!hasSignature()) {
-                <div class="canvas-placeholder">
-                    <i class="fas fa-signature"></i>
-                    <span>เซนชื่อในพื้นที่นี้</span>
-                </div>
-                }
-            </div>
+        <button class="btn-save" (click)="saveSignature()">
+          <!-- [disabled]="!hasSignature() || isSaving() || isSaved()"> -->
+          @if (isSaving()) {
+            <i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...
+          } @else if (isSaved()) {
+            <i class="fas fa-check"></i> บันทึกแล้ว
+          } @else {
+            <i class="fas fa-save"></i> บันทึก Signature
+          }
+        </button>
+      </div>
 
-            <div class="signature-actions">
-                <button class="btn-clear" (click)="clearSignature()" [disabled]="!hasSignature()">
-                    <i class="fas fa-eraser"></i> ล้าง
-                </button>
-
-                <button class="btn-edit" (click)="editAction()">
-                    <i class="fas fa-pen"></i> แก้ไข
-                </button>
-
-                <button class="btn-save" (click)="saveSignature()">
-                    <!-- [disabled]="!hasSignature() || isSaving() || isSaved()"> -->
-                    @if (isSaving()) {
-                    <i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...
-                    } @else if (isSaved()) {
-                    <i class="fas fa-check"></i> บันทึกแล้ว
-                    } @else {
-                    <i class="fas fa-save"></i> บันทึก Signature
-                    }
-                </button>
-            </div>
-
-            <p class="signature-note">
-                <i class="fas fa-info-circle"></i>
-                ลายเซนต์จะถูกบันทึกเป็นรูปภาพ PNG
-            </p>
-        </div>
-
+      <p class="signature-note">
+        <i class="fas fa-info-circle"></i>
+        ลายเซนต์จะถูกบันทึกเป็นรูปภาพ PNG
+      </p>
     </div>
+  </div>
 </div>

@@ -1,14 +1,14 @@
 module.exports = async ({ github, context, core }) => {
-  const sha        = context.sha;
+  const sha = context.sha;
   const shouldFail = process.env.FAIL_IF_NOT_PR_BACKED !== 'false';
 
   const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-    owner:      context.repo.owner,
-    repo:       context.repo.repo,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     commit_sha: sha,
   });
 
-  const mergedPr = prs.find(pr => pr.merged_at && pr.base.ref === 'master');
+  const mergedPr = prs.find((pr) => pr.merged_at && pr.base.ref === 'master');
 
   if (!mergedPr) {
     const msg =

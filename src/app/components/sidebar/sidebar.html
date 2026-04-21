@@ -1,20 +1,21 @@
 <aside class="sidebar" [class.collapsed]="sidebarService.isCollapsed()">
   <div class="sidebar-scroll">
-
     <div class="menu-section">
       <h3 class="section-title">Main</h3>
 
       <ul class="nav-list">
         <li class="nav-item" *ngFor="let item of menuItems()" [class.open]="openMenu === item.name">
-
           <div class="nav-link" (click)="toggleMenu(item)" [class.active]="openMenu === item.name">
             <div class="link-content">
               <!-- <i [class]="'fas ' + item.icon + ' nav-icon'"></i> -->
-              <i *ngIf="item.iconType === 'fa'" [class]="'fas ' + item.icon + ' nav-icon'">
-              </i>
+              <i *ngIf="item.iconType === 'fa'" [class]="'fas ' + item.icon + ' nav-icon'"> </i>
 
               <!-- Material -->
-              <mat-icon *ngIf="item.iconType === 'material'" class="nav-icon" style="font-size: 1.6rem;">
+              <mat-icon
+                *ngIf="item.iconType === 'material'"
+                class="nav-icon"
+                style="font-size: 1.6rem"
+              >
                 {{ item.icon }}
               </mat-icon>
               <span class="link-text">{{ item.name }}</span>
@@ -23,12 +24,15 @@
           </div>
 
           <ul class="sub-menu" [class.expanded]="openMenu === item.name">
-            <li class="sub-item" *ngFor="let sub of item.subItems" [routerLink]="sub.path"
-              [class.active]="isSubMenuActive(sub.path)">
+            <li
+              class="sub-item"
+              *ngFor="let sub of item.subItems"
+              [routerLink]="sub.path"
+              [class.active]="isSubMenuActive(sub.path)"
+            >
               {{ sub.label }}
             </li>
           </ul>
-
         </li>
       </ul>
     </div>
@@ -46,6 +50,5 @@
         </li>
       </ul>
     </div>
-
   </div>
 </aside>

@@ -2,108 +2,108 @@
 $primary: var(--primary);
 
 .pagination-container {
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
     align-items: center;
+    text-align: center;
+    padding-bottom: 0.5rem;
+  }
+
+  .pagination-info {
+    font-size: 0.9rem;
+    color: var(--text-table-head);
+    font-weight: 500;
+
+    strong {
+      color: var(--text-header);
+      font-weight: 600;
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
     flex-wrap: wrap;
-    gap: 1rem;
+    justify-content: center;
 
-    @media (max-width: 768px) {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding-bottom: 0.5rem;
-    }
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #718096;
 
-    .pagination-info {
+      select {
+        padding: 0.5rem 0.5rem;
+        border: 1px solid var(--border-table-head);
+        border-radius: 8px;
+        outline: none;
+        background-color: var(--bg-card);
+        color: var(--text-sub);
         font-size: 0.9rem;
-        color: var(--text-table-head);
         font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
 
-        strong {
-            color: var(--text-header);
-            font-weight: 600;
+        &:hover,
+        &:focus {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
         }
+      }
     }
 
-    .pagination-controls {
+    .page-buttons {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .page-btn {
+        width: 36px;
+        height: 36px;
         display: flex;
         align-items: center;
-        gap: 1.5rem;
-        flex-wrap: wrap;
         justify-content: center;
+        border: 1px solid var(--border-table-head);
+        background: var(--bg-card);
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-table-head);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 500;
 
-        .page-size-selector {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: #718096;
-
-            select {
-                padding: 0.5rem 0.5rem;
-                border: 1px solid var(--border-table-head);
-                border-radius: 8px;
-                outline: none;
-                background-color: var(--bg-card);
-                color: var(--text-sub);
-                font-size: 0.9rem;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s ease;
-
-                &:hover,
-                &:focus {
-                    border-color: $primary;
-                    box-shadow: 0 0 0 3px rgba($primary, 0.1);
-                }
-            }
+        &:hover:not(:disabled) {
+          border-color: $primary;
+          color: $primary;
+          background: var(--status-new-bg);
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba($primary, 0.1);
         }
 
-        .page-buttons {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-
-            .page-btn {
-                width: 36px;
-                height: 36px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid var(--border-table-head);
-                background: var(--bg-card);
-                border-radius: 8px;
-                cursor: pointer;
-                color: var(--text-table-head);
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                font-weight: 500;
-
-                &:hover:not(:disabled) {
-                    border-color: $primary;
-                    color: $primary;
-                    background: var(--status-new-bg);
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 4px rgba($primary, 0.1);
-                }
-
-                &:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                    background: var(--bg-table-head);
-                }
-
-                i {
-                    font-size: 0.9rem;
-                }
-            }
-
-            strong {
-                font-size: 0.9rem;
-                color: var(--text-header);
-                margin: 0 0.5rem;
-            }
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background: var(--bg-table-head);
         }
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+
+      strong {
+        font-size: 0.9rem;
+        color: var(--text-header);
+        margin: 0 0.5rem;
+      }
     }
+  }
 }

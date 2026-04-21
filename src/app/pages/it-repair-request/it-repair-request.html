@@ -1,339 +1,404 @@
-<div class="it-request-page"
-    [style]="openBy === 'IT' ? 'padding: 0; height: fit-content;  background-color: transparent;' : 'padding: 40px; min-height: 100vh;'">
-    <app-page-header *ngIf="openBy !== 'IT'" title="IT Repair Request (แจ้งซ่อมอุปกรณ์)"></app-page-header>
+<div
+  class="it-request-page"
+  [style]="
+    openBy === 'IT'
+      ? 'padding: 0; height: fit-content;  background-color: transparent;'
+      : 'padding: 40px; min-height: 100vh;'
+  "
+>
+  <app-page-header
+    *ngIf="openBy !== 'IT'"
+    title="IT Repair Request (แจ้งซ่อมอุปกรณ์)"
+  ></app-page-header>
 
-    <!-- Form Card -->
-    <div class="repair-form-card">
-        <!-- Card Header -->
-        <div class="repair-card-header">
-            <div class="header-icon-wrap">
-                <i class="fas fa-tools"></i>
-            </div>
-            <div>
-                <h4 class="header-title">รายละเอียดการแจ้งซ่อม</h4>
-                <p class="header-subtitle">กรอกข้อมูลอุปกรณ์ที่ต้องการซ่อมให้ครบถ้วน เพื่อให้ทีม IT
-                    สามารถดำเนินการได้ทันที</p>
-            </div>
-        </div>
+  <!-- Form Card -->
+  <div class="repair-form-card">
+    <!-- Card Header -->
+    <div class="repair-card-header">
+      <div class="header-icon-wrap">
+        <i class="fas fa-tools"></i>
+      </div>
+      <div>
+        <h4 class="header-title">รายละเอียดการแจ้งซ่อม</h4>
+        <p class="header-subtitle">
+          กรอกข้อมูลอุปกรณ์ที่ต้องการซ่อมให้ครบถ้วน เพื่อให้ทีม IT สามารถดำเนินการได้ทันที
+        </p>
+      </div>
+    </div>
 
-        <!-- Field: เปิดสิทธิ์ให้ -->
-        <div class="form-field-row" *ngIf="openBy === 'IT'">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fa-solid fa-book-open-reader field-icon"></i>
-                    เปิดสิทธิ์ให้ (Open For)
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col select">
-                <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor()"
-                    (ngModelChange)="selectedOpenFor.set($event)" name="openFor">
-                    @for (opt of openForOptions(); track opt.value) {
-                    <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
-                    }
-                </nz-select>
-            </div>
-        </div>
-        
-        <!-- Field: อุปกรณ์ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-laptop field-icon"></i>
-                    ความประสงค์จะซ่อมอุปกรณ์
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col">
-                <div class="searchable-dropdown-wrapper" #dropdownWrapper>
-                    <div class="input-with-icon">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" [ngModel]="searchTerm()" (input)="onDeviceInput($event)"
-                            (focus)="isDropdownOpen.set(true)" class="styled-input dropdown-input"
-                            placeholder="ค้นหาหรือพิมพ์ชื่ออุปกรณ์ที่ต้องการซ่อม...">
+    <!-- Field: เปิดสิทธิ์ให้ -->
+    <div class="form-field-row" *ngIf="openBy === 'IT'">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fa-solid fa-book-open-reader field-icon"></i>
+          เปิดสิทธิ์ให้ (Open For)
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col select">
+        <nz-select
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder=""
+          [ngModel]="selectedOpenFor()"
+          (ngModelChange)="selectedOpenFor.set($event)"
+          name="openFor"
+        >
+          @for (opt of openForOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
+      </div>
+    </div>
 
-                        @if (searchTerm()) {
-                        <button class="btn-clear-input" (click)="clearDevice($event)" title="ล้างค่า">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        }
+    <!-- Field: อุปกรณ์ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-laptop field-icon"></i>
+          ความประสงค์จะซ่อมอุปกรณ์
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <div class="searchable-dropdown-wrapper" #dropdownWrapper>
+          <div class="input-with-icon">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              [ngModel]="searchTerm()"
+              (input)="onDeviceInput($event)"
+              (focus)="isDropdownOpen.set(true)"
+              class="styled-input dropdown-input"
+              placeholder="ค้นหาหรือพิมพ์ชื่ออุปกรณ์ที่ต้องการซ่อม..."
+            />
 
-                        <button class="dropdown-toggle" (click)="toggleDropdown()">
-                            <i class="fas" [class.fa-chevron-down]="!isDropdownOpen()"
-                                [class.fa-chevron-up]="isDropdownOpen()"></i>
-                        </button>
-                    </div>
+            @if (searchTerm()) {
+              <button class="btn-clear-input" (click)="clearDevice($event)" title="ล้างค่า">
+                <i class="fas fa-times"></i>
+              </button>
+            }
 
-                    @if (isDropdownOpen()) {
-                    <div class="dropdown-menu-container">
-                        @for (cat of filteredCategories(); track cat.group) {
-                        <div class="category-group">
-                            <div class="category-header">{{ cat.group }}</div>
-                            @for (item of cat.items; track item) {
-                            <div class="dropdown-item" (click)="selectDevice(item, cat)">
-                                {{ item.name }}
-                            </div>
-                            }
-                        </div>
-                        }
-                        @if (filteredCategories().length === 0) {
-                        <div class="no-results">คลิกเพื่อใช้ค่าที่พิมพ์: "{{ searchTerm() }}"</div>
-                        }
-                    </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Field: ยี่ห้อ + รุ่น (2 คอลัมน์) -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-tag field-icon"></i>
-                    ยี่ห้อ / รุ่น
-                </label>
-            </div>
-            <div class="field-input-col">
-                <div class="inline-pair">
-                    <input type="text" [ngModel]="repairFormData().brand"
-                        (ngModelChange)="repairFormData.set({...repairFormData(), brand: $event})" class="styled-input"
-                        placeholder="ยี่ห้อ (Brand)...">
-                    <input type="text" [ngModel]="repairFormData().model"
-                        (ngModelChange)="repairFormData.set({...repairFormData(), model: $event})" class="styled-input"
-                        placeholder="รุ่น (Model)...">
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Field: อาการ + ไฟล์แนบ -->
-        <div class="form-field-row">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-exclamation-circle field-icon"></i>
-                    ลักษณะอาการที่พบ
-                    <span class="required-badge">*</span>
-                </label>
-                <div class="mt-1 text-muted font-weight-normal" style="font-size: 0.75rem; padding-left: 22px;">
-                    <i class="fas fa-paperclip mr-1"></i> แนบรูปภาพประกอบ (ถ้ามี)
-                </div>
-            </div>
-            <div class="field-input-col">
-                <div class="unified-input-group">
-                    <textarea [ngModel]="repairFormData().symptom"
-                        (ngModelChange)="repairFormData.set({...repairFormData(), symptom: $event})"
-                        class="styled-input styled-textarea" rows="4"
-                        placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."></textarea>
-
-                    <div class="file-upload-section">
-                        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*"
-                            capture="environment" multiple style="display: none;">
-                        <div class="upload-trigger-row">
-                            <button class="btn-mini-upload" (click)="fileInput.click()">
-                                <i class="fas fa-camera mr-1"></i> เพิ่มรูปภาพ/ไฟล์แนบ
-                            </button>
-                            @if (repairFormData().attachments.length > 0) {
-                            <span class="attachment-count">
-                                <i class="fas fa-file-alt mr-1"></i> แนบแล้ว {{ repairFormData().attachments.length }}
-                                ไฟล์
-                            </span>
-                            }
-                        </div>
-
-                        @if (repairFormData().attachments.length > 0) {
-                        <div class="file-tag-container mt-2">
-                            @for (file of repairFormData().attachments; track $index) {
-                            <div class="file-tag">
-                                <span class="cursor-pointer" (click)="viewFile(file)" title="คลิกเพื่อดูตัวอย่าง">{{
-                                    file.name }}</span>
-                                <button class="remove-btn" (click)="removeAttachment($index)"><i
-                                        class="fas fa-times"></i></button>
-                            </div>
-                            }
-                        </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Field: เบอร์โทรติดต่อ -->
-        <div class="form-field-row ">
-            <div class="field-label-col">
-                <label class="field-label">
-                    <i class="fas fa-phone-alt field-icon"></i>
-                    เบอร์โทรติดต่อ
-                    <span class="required-badge">*</span>
-                </label>
-            </div>
-            <div class="field-input-col">
-                <input type="text" [value]="phoneModel" (input)="onPhoneInput($event)" class="styled-input"
-                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="form-actions-row">
-            <button class="btn-secondary-action" (click)="clearForm()">
-                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+            <button class="dropdown-toggle" (click)="toggleDropdown()">
+              <i
+                class="fas"
+                [class.fa-chevron-down]="!isDropdownOpen()"
+                [class.fa-chevron-up]="isDropdownOpen()"
+              ></i>
             </button>
-            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
-                [class.disabled-btn]="!isFormValid()">
-                <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
-            </button>
+          </div>
+
+          @if (isDropdownOpen()) {
+            <div class="dropdown-menu-container">
+              @for (cat of filteredCategories(); track cat.group) {
+                <div class="category-group">
+                  <div class="category-header">{{ cat.group }}</div>
+                  @for (item of cat.items; track item) {
+                    <div class="dropdown-item" (click)="selectDevice(item, cat)">
+                      {{ item.name }}
+                    </div>
+                  }
+                </div>
+              }
+              @if (filteredCategories().length === 0) {
+                <div class="no-results">คลิกเพื่อใช้ค่าที่พิมพ์: "{{ searchTerm() }}"</div>
+              }
+            </div>
+          }
         </div>
+      </div>
     </div>
 
-    <!-- Summary Modal -->
-    @if (showSummaryModal()) {
-    <div class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>ยืนยันการแจ้งซ่อม
-                    <!-- <span class="req-id">{{ nextRequestId }}</span> -->
-                </h2>
-                <button class="btn-close-modal" (click)="closeSummaryModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="summary-section">
-                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>อุปกรณ์</th>
-                            <td>{{ repairFormData().device.name }}</td>
-                        </tr>
-                        <tr>
-                            <th>ยี่ห้อ</th>
-                            <td>{{ repairFormData().brand }}</td>
-                        </tr>
-                        <tr>
-                            <th>รุ่น</th>
-                            <td>{{ repairFormData().model }}</td>
-                        </tr>
-                        <tr>
-                            <th>อาการ</th>
-                            <td>{{ repairFormData().symptom }}</td>
-                        </tr>
-                        @if (repairFormData().phoneNumber) {
-                        <tr>
-                            <th>เบอร์โทรติดต่อ</th>
-                            <td class="text-primary font-weight-bold">{{ repairFormData().phoneNumber }}</td>
-                        </tr>
-                        }
-                        <tr>
-                            <th>ไฟล์แนบ</th>
-                            <td>
-                                @if (repairFormData().attachments.length > 0) {
-                                <ul class="list-unstyled mb-0">
-                                    @for (file of repairFormData().attachments; track file.name) {
-                                    <li class="attachment-item mb-2">
-                                        <div class="file-info">
-                                            <i class="fas fa-paperclip"></i>
-                                            <span>{{ file.name }}</span>
-                                        </div>
-                                        <button class="btn-view-file" (click)="viewFile(file)">
-                                            <i class="fas fa-eye"></i> ดูไฟล์
-                                        </button>
-                                    </li>
-                                    }
-                                </ul>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
-                <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
-            </div>
+    <!-- Field: ยี่ห้อ + รุ่น (2 คอลัมน์) -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-tag field-icon"></i>
+          ยี่ห้อ / รุ่น
+        </label>
+      </div>
+      <div class="field-input-col">
+        <div class="inline-pair">
+          <input
+            type="text"
+            [ngModel]="repairFormData().brand"
+            (ngModelChange)="repairFormData.set({ ...repairFormData(), brand: $event })"
+            class="styled-input"
+            placeholder="ยี่ห้อ (Brand)..."
+          />
+          <input
+            type="text"
+            [ngModel]="repairFormData().model"
+            (ngModelChange)="repairFormData.set({ ...repairFormData(), model: $event })"
+            class="styled-input"
+            placeholder="รุ่น (Model)..."
+          />
         </div>
+      </div>
     </div>
-    }
 
-    <!-- Detail Modal -->
-    @if (showHistoryDetailModal() && selectedRequest()) {
-    <div class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3><i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}</h3>
-                <button class="btn-close-modal" (click)="closeHistoryDetailModal()"><i
-                        class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <div class="summary-section">
-                    <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>วันที่แจ้ง</th>
-                            <td>{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</td>
-                        </tr>
-                        <tr>
-                            <th>สถานะ</th>
-                            <td>
-                                <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
-                                    {{ selectedRequest().status }}
-                                </span>
-                            </td>
-                        </tr>
-                        @if (selectedRequest().phoneNumber) {
-                        <tr>
-                            <th>เบอร์โทรติดต่อ</th>
-                            <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
-                        </tr>
-                        }
-                    </table>
-                </div>
-                <div class="summary-section">
-                    <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
-                    <table class="info-table vertical-table">
-                        <tr>
-                            <th>อุปกรณ์</th>
-                            <td>{{ selectedRequest().device }}</td>
-                        </tr>
-                        <tr>
-                            <th>ยี่ห้อ / รุ่น</th>
-                            <td>{{ selectedRequest().brand }} / {{ selectedRequest().model }}</td>
-                        </tr>
-                        <tr>
-                            <th>อาการ</th>
-                            <td>{{ selectedRequest().symptom }}</td>
-                        </tr>
-                        <tr>
-                            <th>ไฟล์แนบ</th>
-                            <td>
-                                @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
-                                <ul class="list-unstyled mb-0">
-                                    @for (file of selectedRequest().attachments; track file.name) {
-                                    <li class="attachment-item mb-2">
-                                        <div class="file-info">
-                                            <i class="fas fa-paperclip"></i>
-                                            <span>{{ file.name }}</span>
-                                        </div>
-                                        <button class="btn-view-file" (click)="viewFile(file)">
-                                            <i class="fas fa-eye"></i> ดูไฟล์
-                                        </button>
-                                    </li>
-                                    }
-                                </ul>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
-            </div>
+    <!-- Field: อาการ + ไฟล์แนบ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-exclamation-circle field-icon"></i>
+          ลักษณะอาการที่พบ
+          <span class="required-badge">*</span>
+        </label>
+        <div
+          class="mt-1 text-muted font-weight-normal"
+          style="font-size: 0.75rem; padding-left: 22px"
+        >
+          <i class="fas fa-paperclip mr-1"></i> แนบรูปภาพประกอบ (ถ้ามี)
         </div>
+      </div>
+      <div class="field-input-col">
+        <div class="unified-input-group">
+          <textarea
+            [ngModel]="repairFormData().symptom"
+            (ngModelChange)="repairFormData.set({ ...repairFormData(), symptom: $event })"
+            class="styled-input styled-textarea"
+            rows="4"
+            placeholder="อธิบายอาการเสียหรือปัญหาที่พบ..."
+          ></textarea>
+
+          <div class="file-upload-section">
+            <input
+              type="file"
+              #fileInput
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              capture="environment"
+              multiple
+              style="display: none"
+            />
+            <div class="upload-trigger-row">
+              <button class="btn-mini-upload" (click)="fileInput.click()">
+                <i class="fas fa-camera mr-1"></i> เพิ่มรูปภาพ/ไฟล์แนบ
+              </button>
+              @if (repairFormData().attachments.length > 0) {
+                <span class="attachment-count">
+                  <i class="fas fa-file-alt mr-1"></i> แนบแล้ว
+                  {{ repairFormData().attachments.length }}
+                  ไฟล์
+                </span>
+              }
+            </div>
+
+            @if (repairFormData().attachments.length > 0) {
+              <div class="file-tag-container mt-2">
+                @for (file of repairFormData().attachments; track $index) {
+                  <div class="file-tag">
+                    <span
+                      class="cursor-pointer"
+                      (click)="viewFile(file)"
+                      title="คลิกเพื่อดูตัวอย่าง"
+                      >{{ file.name }}</span
+                    >
+                    <button class="remove-btn" (click)="removeAttachment($index)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </div>
-    }
-    @if (isPreviewModalOpen()) {
+
+    <!-- Field: เบอร์โทรติดต่อ -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-phone-alt field-icon"></i>
+          เบอร์โทรติดต่อ
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <input
+          type="text"
+          [value]="phoneModel"
+          (input)="onPhoneInput($event)"
+          class="styled-input"
+          placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
+        />
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions-row">
+      <button class="btn-secondary-action" (click)="clearForm()">
+        <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+      </button>
+      <button
+        class="btn-primary-action"
+        (click)="submit()"
+        [disabled]="!isFormValid()"
+        [class.disabled-btn]="!isFormValid()"
+      >
+        <i class="fas fa-paper-plane mr-2"></i> ส่งคำร้อง
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Modal -->
+  @if (showSummaryModal()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>
+            ยืนยันการแจ้งซ่อม
+            <!-- <span class="req-id">{{ nextRequestId }}</span> -->
+          </h2>
+          <button class="btn-close-modal" (click)="closeSummaryModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>อุปกรณ์</th>
+                <td>{{ repairFormData().device.name }}</td>
+              </tr>
+              <tr>
+                <th>ยี่ห้อ</th>
+                <td>{{ repairFormData().brand }}</td>
+              </tr>
+              <tr>
+                <th>รุ่น</th>
+                <td>{{ repairFormData().model }}</td>
+              </tr>
+              <tr>
+                <th>อาการ</th>
+                <td>{{ repairFormData().symptom }}</td>
+              </tr>
+              @if (repairFormData().phoneNumber) {
+                <tr>
+                  <th>เบอร์โทรติดต่อ</th>
+                  <td class="text-primary font-weight-bold">{{ repairFormData().phoneNumber }}</td>
+                </tr>
+              }
+              <tr>
+                <th>ไฟล์แนบ</th>
+                <td>
+                  @if (repairFormData().attachments.length > 0) {
+                    <ul class="list-unstyled mb-0">
+                      @for (file of repairFormData().attachments; track file.name) {
+                        <li class="attachment-item mb-2">
+                          <div class="file-info">
+                            <i class="fas fa-paperclip"></i>
+                            <span>{{ file.name }}</span>
+                          </div>
+                          <button class="btn-view-file" (click)="viewFile(file)">
+                            <i class="fas fa-eye"></i> ดูไฟล์
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
+          <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Detail Modal -->
+  @if (showHistoryDetailModal() && selectedRequest()) {
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
+          </h3>
+          <button class="btn-close-modal" (click)="closeHistoryDetailModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="summary-section">
+            <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ</h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>วันที่แจ้ง</th>
+                <td>{{ selectedRequest().date | date: 'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+              <tr>
+                <th>สถานะ</th>
+                <td>
+                  <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
+                    {{ selectedRequest().status }}
+                  </span>
+                </td>
+              </tr>
+              @if (selectedRequest().phoneNumber) {
+                <tr>
+                  <th>เบอร์โทรติดต่อ</th>
+                  <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
+                </tr>
+              }
+            </table>
+          </div>
+          <div class="summary-section">
+            <h3><i class="fas fa-tools mr-2 text-primary"></i> รายละเอียดการแจ้งซ่อม</h3>
+            <table class="info-table vertical-table">
+              <tr>
+                <th>อุปกรณ์</th>
+                <td>{{ selectedRequest().device }}</td>
+              </tr>
+              <tr>
+                <th>ยี่ห้อ / รุ่น</th>
+                <td>{{ selectedRequest().brand }} / {{ selectedRequest().model }}</td>
+              </tr>
+              <tr>
+                <th>อาการ</th>
+                <td>{{ selectedRequest().symptom }}</td>
+              </tr>
+              <tr>
+                <th>ไฟล์แนบ</th>
+                <td>
+                  @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
+                    <ul class="list-unstyled mb-0">
+                      @for (file of selectedRequest().attachments; track file.name) {
+                        <li class="attachment-item mb-2">
+                          <div class="file-info">
+                            <i class="fas fa-paperclip"></i>
+                            <span>{{ file.name }}</span>
+                          </div>
+                          <button class="btn-view-file" (click)="viewFile(file)">
+                            <i class="fas fa-eye"></i> ดูไฟล์
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
+        </div>
+      </div>
+    </div>
+  }
+  @if (isPreviewModalOpen()) {
     <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
     </app-file-preview-modal>
-    }
+  }
 </div>

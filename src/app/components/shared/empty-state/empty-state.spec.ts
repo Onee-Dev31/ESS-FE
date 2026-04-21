@@ -8,9 +8,8 @@ describe('EmptyStateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EmptyStateComponent]
-    })
-      .compileComponents();
+      imports: [EmptyStateComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EmptyStateComponent);
     component = fixture.componentInstance;

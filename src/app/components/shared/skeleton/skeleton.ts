@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './skeleton.html',
-  styleUrl: './skeleton.scss'
+  styleUrl: './skeleton.scss',
 })
 export class SkeletonComponent {
   @Input() type: 'table' | 'card' | 'text' = 'table';

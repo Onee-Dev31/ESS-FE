@@ -8,13 +8,12 @@ describe('ItDashboardSummary', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ItDashboardSummary]
-    })
-    .compileComponents();
+      imports: [ItDashboardSummary],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ItDashboardSummary);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {

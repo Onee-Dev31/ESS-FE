@@ -1,139 +1,186 @@
 <div class="modal-overlay" *ngIf="isOpen">
-    <form class="modal-container" (click)="$event.stopPropagation()">
-        <div class="form-header">
-            <h2>แก้ไขเมนู</h2>
-            <button type="button" class="btn-close" (click)="handleClose()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+  <form class="modal-container" (click)="$event.stopPropagation()">
+    <div class="form-header">
+      <h2>แก้ไขเมนู</h2>
+      <button type="button" class="btn-close" (click)="handleClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
 
-        <div class="modal-content">
+    <div class="modal-content">
+      <ul
+        cdkDropList
+        [cdkDropListData]="menusInternal"
+        class="parent-list"
+        (cdkDropListDropped)="dropParent($event)"
+      >
+        <li *ngFor="let menu of menusInternal" cdkDrag>
+          <div class="menu-parent">
+            <span class="drag-handle parent-handle" cdkDragHandle>
+              <i class="fa-solid fa-bars"></i>
+            </span>
+            <div class="menu-row">
+              <div class="input-group">
+                <div class="form-field">
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-tag input-icon"></i>
+                    <input
+                      id="label-{{ menu.MenuID }}"
+                      nz-input
+                      [(ngModel)]="menu.Label"
+                      name="label-{{ menu.MenuID }}"
+                      class="form-input"
+                    />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-icons input-icon"></i>
+                    <input
+                      id="icon-{{ menu.MenuID }}"
+                      nz-input
+                      [(ngModel)]="menu.Icon"
+                      name="icon-{{ menu.MenuID }}"
+                      class="form-input"
+                      placeholder="fa-solid fa-home"
+                    />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-link input-icon"></i>
+                    <input
+                      id="route-{{ menu.MenuID }}"
+                      nz-input
+                      [(ngModel)]="menu.RoutePath"
+                      name="route-{{ menu.MenuID }}"
+                      class="form-input"
+                      placeholder=""
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-field toggle visible">
+                <label>Visible</label>
 
-            <ul cdkDropList [cdkDropListData]="menusInternal" class="parent-list"
-                (cdkDropListDropped)="dropParent($event)">
+                <nz-switch
+                  [(ngModel)]="menu.IsVisible"
+                  nzCheckedChildren="ON"
+                  nzUnCheckedChildren="OFF"
+                  name="IsVisible-{{ menu.MenuID }}"
+                >
+                </nz-switch>
+              </div>
+              <div class="form-field toggle enabled">
+                <label>Enabled</label>
 
-                <li *ngFor="let menu of menusInternal" cdkDrag>
+                <nz-switch
+                  [(ngModel)]="menu.IsEnabled"
+                  nzCheckedChildren="ON"
+                  nzUnCheckedChildren="OFF"
+                  name="isEnabled-{{ menu.MenuID }}"
+                >
+                </nz-switch>
+              </div>
+            </div>
+            <span class="toggle-btn" (click)="toggleMenu(menu); $event.stopPropagation()">
+              <i *ngIf="menu.isExpanded" class="fa-solid fa-caret-down"></i>
 
-                    <div class="menu-parent">
-                        <span class="drag-handle parent-handle" cdkDragHandle>
-                            <i class="fa-solid fa-bars"></i>
-                        </span>
-                        <div class="menu-row">
-                            <div class="input-group">
-                                <div class="form-field">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-tag input-icon"></i>
-                                        <input id="label-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Label"
-                                            name="label-{{menu.MenuID}}" class="form-input" />
-                                    </div>
-                                </div>
-                                <div class="form-field">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-icons input-icon"></i>
-                                        <input id="icon-{{menu.MenuID}}" nz-input [(ngModel)]="menu.Icon"
-                                            name="icon-{{menu.MenuID}}" class="form-input"
-                                            placeholder="fa-solid fa-home" />
+              <i *ngIf="!menu.isExpanded" class="fa-solid fa-caret-left"></i>
+            </span>
+          </div>
 
-                                    </div>
-                                </div>
-                                <div class="form-field">
-                                    <div class="input-with-icon">
-                                        <i class="fa-solid fa-link input-icon"></i>
-                                        <input id="route-{{menu.MenuID}}" nz-input [(ngModel)]="menu.RoutePath"
-                                            name="route-{{menu.MenuID}}" class="form-input" placeholder="" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-field toggle visible">
-                                <label>Visible</label>
-
-                                <nz-switch [(ngModel)]="menu.IsVisible" nzCheckedChildren="ON" nzUnCheckedChildren="OFF"
-                                    name="IsVisible-{{menu.MenuID}}">
-                                </nz-switch>
-                            </div>
-                            <div class="form-field toggle enabled">
-                                <label>Enabled</label>
-
-                                <nz-switch [(ngModel)]="menu.IsEnabled" nzCheckedChildren="ON" nzUnCheckedChildren="OFF"
-                                    name="isEnabled-{{menu.MenuID}}">
-                                </nz-switch>
-                            </div>
-                        </div>
-                        <span class="toggle-btn" (click)="toggleMenu(menu); $event.stopPropagation()">
-                            <i *ngIf="menu.isExpanded" class="fa-solid fa-caret-down"></i>
-
-                            <i *ngIf="!menu.isExpanded" class="fa-solid fa-caret-left"></i>
-                        </span>
+          <!-- CHILD LIST -->
+          <ul
+            cdkDropList
+            [id]="'child-' + menu.MenuID"
+            [cdkDropListData]="menu.children"
+            class="child-list"
+            (cdkDropListDropped)="dropChild($event, menu)"
+            [cdkDropListConnectedTo]="childDropLists"
+            [class.collapsed]="!menu.isExpanded"
+          >
+            <li *ngFor="let child of menu.children" cdkDrag>
+              <div class="menu-parent">
+                <span class="drag-handle child-handle" cdkDragHandle>
+                  <i class="fa-solid fa-grip-lines"></i>
+                </span>
+                <div class="menu-row">
+                  <div class="input-group">
+                    <div class="form-field">
+                      <div class="input-with-icon">
+                        <i class="fa-solid fa-tag input-icon"></i>
+                        <input
+                          id="label-{{ child.MenuID }}"
+                          nz-input
+                          [(ngModel)]="child.Label"
+                          name="label-{{ child.MenuID }}"
+                          class="form-input"
+                        />
+                      </div>
                     </div>
+                    <div class="form-field">
+                      <div class="input-with-icon">
+                        <i class="fa-solid fa-icons input-icon"></i>
+                        <input
+                          id="icon-{{ child.MenuID }}"
+                          nz-input
+                          [(ngModel)]="child.Icon"
+                          name="icon-{{ child.MenuID }}"
+                          class="form-input"
+                          placeholder="fa-solid fa-home"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="input-with-icon">
+                        <i class="fa-solid fa-link input-icon"></i>
+                        <input
+                          id="route-{{ child }}"
+                          nz-input
+                          [(ngModel)]="child.RoutePath"
+                          name="route-{{ child.MenuID }}"
+                          class="form-input"
+                          placeholder=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-field toggle visible">
+                    <label>Visible</label>
+                    <nz-switch
+                      [(ngModel)]="child.IsVisible"
+                      nzCheckedChildren="ON"
+                      nzUnCheckedChildren="OFF"
+                      name="IsVisible-{{ child.MenuID }}"
+                    >
+                    </nz-switch>
+                  </div>
+                  <div class="form-field toggle enabled">
+                    <label>Enabled</label>
 
-                    <!-- CHILD LIST -->
-                    <ul cdkDropList [id]="'child-' + menu.MenuID" [cdkDropListData]="menu.children" class="child-list"
-                        (cdkDropListDropped)="dropChild($event, menu)" [cdkDropListConnectedTo]="childDropLists"
-                        [class.collapsed]="!menu.isExpanded">
+                    <nz-switch
+                      [(ngModel)]="child.IsEnabled"
+                      nzCheckedChildren="ON"
+                      nzUnCheckedChildren="OFF"
+                      name="isEnabled-{{ child.MenuID }}"
+                    >
+                    </nz-switch>
+                  </div>
+                </div>
+              </div>
+            </li>
 
+            <li *ngIf="menu.children.length === 0" class="empty-child-placeholder">
+              วางเมนูที่นี่
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
 
-                        <li *ngFor="let child of menu.children" cdkDrag>
-                            <div class="menu-parent">
-                                <span class="drag-handle child-handle" cdkDragHandle>
-                                    <i class="fa-solid fa-grip-lines"></i>
-                                </span>
-                                <div class="menu-row">
-                                    <div class="input-group">
-                                        <div class="form-field">
-                                            <div class="input-with-icon">
-                                                <i class="fa-solid fa-tag input-icon"></i>
-                                                <input id="label-{{child.MenuID}}" nz-input [(ngModel)]="child.Label"
-                                                    name="label-{{child.MenuID}}" class="form-input" />
-                                            </div>
-                                        </div>
-                                        <div class="form-field">
-                                            <div class="input-with-icon">
-                                                <i class="fa-solid fa-icons input-icon"></i>
-                                                <input id="icon-{{child.MenuID}}" nz-input [(ngModel)]="child.Icon"
-                                                    name="icon-{{child.MenuID}}" class="form-input"
-                                                    placeholder="fa-solid fa-home" />
-
-                                            </div>
-                                        </div>
-                                        <div class="form-field">
-                                            <div class="input-with-icon">
-                                                <i class="fa-solid fa-link input-icon"></i>
-                                                <input id="route-{{child}}" nz-input [(ngModel)]="child.RoutePath"
-                                                    name="route-{{child.MenuID}}" class="form-input" placeholder="" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-field toggle visible">
-                                        <label>Visible</label>
-                                        <nz-switch [(ngModel)]="child.IsVisible" nzCheckedChildren="ON"
-                                            nzUnCheckedChildren="OFF" name="IsVisible-{{child.MenuID}}">
-                                        </nz-switch>
-                                    </div>
-                                    <div class="form-field toggle enabled">
-                                        <label>Enabled</label>
-
-                                        <nz-switch [(ngModel)]="child.IsEnabled" nzCheckedChildren="ON"
-                                            nzUnCheckedChildren="OFF" name="isEnabled-{{child.MenuID}}">
-                                        </nz-switch>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li *ngIf="menu.children.length === 0" class="empty-child-placeholder">
-                            วางเมนูที่นี่
-                        </li>
-
-                    </ul>
-
-                </li>
-            </ul>
-
-        </div>
-
-        <div class="form-actions">
-            <button type="button" class="btn-save" (click)="handleSubmit()">Save</button>
-        </div>
-    </form>
-
+    <div class="form-actions">
+      <button type="button" class="btn-save" (click)="handleSubmit()">Save</button>
+    </div>
+  </form>
 </div>

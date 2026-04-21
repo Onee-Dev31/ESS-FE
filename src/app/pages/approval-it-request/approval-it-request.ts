@@ -1,12 +1,16 @@
-import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  createAngularTable,
-  getCoreRowModel,
-  SortingState,
-} from '@tanstack/angular-table';
+import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 import { ItRequestDetailModal } from '../../components/modals/it-request-detail-modal/it-request-detail-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { ApprovalsHelperService } from '../../services/approvals-helper.service';
@@ -21,10 +25,14 @@ import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 // import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
+import {
+  createListingState,
+  createListingComputeds,
+  TableSortHelper,
+} from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { listAnimation } from '../../animations/animations';
-import { SkeletonComponent } from "../../components/shared/skeleton/skeleton";
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { AuthService } from '../../services/auth.service';
 import { NzInputModule } from 'ng-zorro-antd/input';
 
@@ -33,19 +41,19 @@ import { NzInputModule } from 'ng-zorro-antd/input';
   selector: 'app-approval-it-request',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    ItRequestDetailModal, 
-    PageHeaderComponent, 
-    PaginationComponent, 
-    EmptyStateComponent, 
+    CommonModule,
+    FormsModule,
+    ItRequestDetailModal,
+    PageHeaderComponent,
+    PaginationComponent,
+    EmptyStateComponent,
     SkeletonComponent,
-    NzInputModule
+    NzInputModule,
   ],
   animations: [listAnimation],
   templateUrl: './approval-it-request.html',
   styleUrl: './approval-it-request.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApprovalItRequestComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
@@ -74,14 +82,14 @@ export class ApprovalItRequestComponent implements OnInit {
     Pending: 0,
     Approved: 0,
     Rejected: 0,
-    ReferredBack: 0
+    ReferredBack: 0,
   });
 
   STATUS_API_MAP: Record<string, string> = {
     Pending: 'New',
     Approved: 'Approved',
     Rejected: 'Rejected',
-    'Referred Back': 'Referred_Back'
+    'Referred Back': 'Referred_Back',
   };
 
   pageTitle = signal<string>('IT Request Approvals');
@@ -89,38 +97,35 @@ export class ApprovalItRequestComponent implements OnInit {
   constructor(
     private itServiceService: ItServiceService,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService
-
+    private authService: AuthService,
   ) {
     this.listing.filterStatus.set('Pending');
   }
-
 
   ngOnInit() {
     this.refresh();
   }
 
   refresh() {
-
     this.loadingService.start('approvals-it-list');
 
     const page = this.listing.currentPage() + 1;
     const pageSize = this.listing.pageSize();
     const status = this.listing.filterStatus();
     const apiStatus = this.STATUS_API_MAP[status] || status;
-    const empNo = this.authService.userData().CODEMPID
+    const empNo = this.authService.userData().CODEMPID;
 
-    this.itService.getApprovalItRequests({
-      page,
-      pageSize,
-      status: apiStatus,
-      empno: empNo
-    })
+    this.itService
+      .getApprovalItRequests({
+        page,
+        pageSize,
+        status: apiStatus,
+        empno: empNo,
+      })
       .subscribe({
         next: (res) => {
-          console.log("getApprovalItRequests: ", res)
-          const mappedData =
-            (res.data || []).map((item: any) => this.mapToApprovalItem(item));
+          console.log('getApprovalItRequests: ', res);
+          const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
 
           this.approvals.set(mappedData);
 
@@ -131,7 +136,7 @@ export class ApprovalItRequestComponent implements OnInit {
           }
 
           this.loadingService.stop('approvals-it-list');
-        }
+        },
       });
   }
 
@@ -150,7 +155,7 @@ export class ApprovalItRequestComponent implements OnInit {
         company: item.requester?.company || item.requestBy?.company || 'Onee',
         position: '-',
         phone: item.requester?.phone || '-',
-        profileImage: 'assets/images/user-placeholder.png'
+        profileImage: 'assets/images/user-placeholder.png',
       },
       requestType: 'IT Request',
       typeId: 99,
@@ -159,25 +164,21 @@ export class ApprovalItRequestComponent implements OnInit {
       status: this.approvalsHelper.mapStatus(item.status),
       rawStatus: item.status || 'Pending',
       type: 'it-request',
-      originalData: item
+      originalData: item,
     };
   }
 
-  comps = createListingComputeds(
-    this.approvals,
-    this.listing,
-    (item, search, status) => {
+  comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
+    // const matchStatus = !status || item.status === status;
+    const matchStatus = true;
 
-      // const matchStatus = !status || item.status === status;
-      const matchStatus = true;
+    const matchSearch =
+      !search ||
+      item.requestNo.toLowerCase().includes(search.toLowerCase()) ||
+      item.requestBy.name.toLowerCase().includes(search.toLowerCase());
 
-      const matchSearch = !search ||
-        item.requestNo.toLowerCase().includes(search.toLowerCase()) ||
-        item.requestBy.name.toLowerCase().includes(search.toLowerCase());
-
-      return matchStatus && matchSearch;
-    }
-  );
+    return matchStatus && matchSearch;
+  });
 
   sortedData = computed(() => {
     let list = [...this.comps.filteredData()];
@@ -204,7 +205,8 @@ export class ApprovalItRequestComponent implements OnInit {
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      const next =
+        typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
@@ -221,7 +223,7 @@ export class ApprovalItRequestComponent implements OnInit {
 
   getTabCount(tab: string) {
     if (tab === 'Referred Back') {
-      tab = 'ReferredBack'
+      tab = 'ReferredBack';
     }
     return this.statusCounts()[tab] || 0;
   }
@@ -282,7 +284,10 @@ export class ApprovalItRequestComponent implements OnInit {
     return this.approvalsHelper.getStatusClass(status);
   }
 
-  trackByRowId(index: number, itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>): string {
+  trackByRowId(
+    index: number,
+    itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>,
+  ): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     return `${item.requestNo}-${index}`;
   }
@@ -308,13 +313,13 @@ export class ApprovalItRequestComponent implements OnInit {
     this.showExportMenu.set(false);
     this.loadingService.start('export');
     try {
-      const data = this.table.getRowModel().rows.map(row => ({
+      const data = this.table.getRowModel().rows.map((row) => ({
         requestNo: row.original.requestNo,
         requestDate: row.original.requestDate,
         requestBy: row.original.requestBy.name,
         requestFor: row.original.originalData?.requestFor || '-',
         requestCategory: row.original.originalData?.requestCategory || '-',
-        status: row.original.status
+        status: row.original.status,
       }));
 
       const columns = [
@@ -323,7 +328,7 @@ export class ApprovalItRequestComponent implements OnInit {
         { header: 'Request By', key: 'requestBy', width: 20 },
         { header: 'Request For', key: 'requestFor', width: 20 },
         { header: 'Request Category', key: 'requestCategory', width: 30 },
-        { header: 'Status', key: 'status', width: 15 }
+        { header: 'Status', key: 'status', width: 15 },
       ];
 
       await this.exportService.exportToExcel(data, columns, 'approvals-it-request');

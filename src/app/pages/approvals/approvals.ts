@@ -1,12 +1,15 @@
-import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  inject,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  createAngularTable,
-  getCoreRowModel,
-  SortingState,
-} from '@tanstack/angular-table';
+import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
@@ -21,7 +24,11 @@ import { ErrorService } from '../../services/error';
 import { APPROVAL_STATUS_TABS } from '../../config/constants';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { createListingState, createListingComputeds, TableSortHelper } from '../../utils/listing.util';
+import {
+  createListingState,
+  createListingComputeds,
+  TableSortHelper,
+} from '../../utils/listing.util';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { listAnimation } from '../../animations/animations';
@@ -45,12 +52,12 @@ import { NzInputModule } from 'ng-zorro-antd/input';
     EmptyStateComponent,
     StatusLabelPipe,
     PaginationComponent,
-    NzInputModule
+    NzInputModule,
   ],
   animations: [listAnimation],
   templateUrl: './approvals.html',
   styleUrl: './approvals.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApprovalsComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
@@ -69,7 +76,7 @@ export class ApprovalsComponent implements OnInit {
 
   listing = createListingState();
   tabs = APPROVAL_STATUS_TABS;
-  medicalTabs = APPROVAL_STATUS_TABS.filter(t => t !== 'Referred Back');
+  medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
   months = MONTHS_TH;
 
   fromMonth = signal<number>(0);
@@ -99,14 +106,18 @@ export class ApprovalsComponent implements OnInit {
 
   /** เริ่มต้นโหลดข้อมูลและจัดการ Route Parameter */
   ngOnInit() {
-    this.route.data.subscribe(data => {
+    this.route.data.subscribe((data) => {
       this.category = data['category'] || 'all';
-      this.pageTitle.set(this.category === 'medical' ? 'อนุมัติค่ารักษาพยาบาล' : 'Pending Approvals');
+      this.pageTitle.set(
+        this.category === 'medical' ? 'อนุมัติค่ารักษาพยาบาล' : 'Pending Approvals',
+      );
       if (this.category === 'medical') {
         this.loadMedicalClaims();
       } else {
         this.loadingService.start('approvals-list');
-        setTimeout(() => { this.loadingService.stop('approvals-list'); }, 1500);
+        setTimeout(() => {
+          this.loadingService.stop('approvals-list');
+        }, 1500);
         this.refresh();
       }
     });
@@ -124,27 +135,29 @@ export class ApprovalsComponent implements OnInit {
       this.isRefreshing.set(true);
     }
 
-    this.medicalApiService.getClaims({
-      from_month: this.fromMonth() + 1,
-      from_year: isNaN(fromYear) ? undefined : fromYear,
-      to_month: this.toMonth() + 1,
-      to_year: isNaN(toYear) ? undefined : toYear,
-      keyword,
-    }).subscribe({
-      next: (res) => {
-        console.log(res)
-        this.approvals.set(res.data.map(c => this.mapClaimToApproval(c)));
-        this.listing.currentPage.set(0);
-        this.loadingService.stop('approvals-list');
-        this.isRefreshing.set(false);
-        this.initialized = true;
-      },
-      error: (error) => {
-        this.loadingService.stop('approvals-list');
-        this.isRefreshing.set(false);
-        this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
-      }
-    });
+    this.medicalApiService
+      .getClaims({
+        from_month: this.fromMonth() + 1,
+        from_year: isNaN(fromYear) ? undefined : fromYear,
+        to_month: this.toMonth() + 1,
+        to_year: isNaN(toYear) ? undefined : toYear,
+        keyword,
+      })
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          this.approvals.set(res.data.map((c) => this.mapClaimToApproval(c)));
+          this.listing.currentPage.set(0);
+          this.loadingService.stop('approvals-list');
+          this.isRefreshing.set(false);
+          this.initialized = true;
+        },
+        error: (error) => {
+          this.loadingService.stop('approvals-list');
+          this.isRefreshing.set(false);
+          this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
+        },
+      });
   }
 
   private mapClaimToApproval(claim: MedicalClaim): ApprovalItem {
@@ -156,7 +169,7 @@ export class ApprovalsComponent implements OnInit {
         name: claim.employeeName ?? claim.employeeCode,
         employeeId: claim.employeeCode,
         department: claim.departmentName ?? '-',
-        company: claim.companyName ?? '-'
+        company: claim.companyName ?? '-',
       },
       requestType: 'ค่ารักษาพยาบาล',
       typeId: claim.expenseTypeId,
@@ -172,10 +185,14 @@ export class ApprovalsComponent implements OnInit {
 
   private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
     switch (status?.toUpperCase()) {
-      case 'APPROVED': return 'Approved';
-      case 'REJECTED': return 'Rejected';
-      case 'REFERRED_BACK': return 'Referred Back';
-      default: return 'Pending';
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED':
+        return 'Rejected';
+      case 'REFERRED_BACK':
+        return 'Referred Back';
+      default:
+        return 'Pending';
     }
   }
 
@@ -185,24 +202,21 @@ export class ApprovalsComponent implements OnInit {
       this.loadMedicalClaims();
       return;
     }
-    this.approvalsHelper.getApprovals(this.category).subscribe(allData => {
+    this.approvalsHelper.getApprovals(this.category).subscribe((allData) => {
       this.approvals.set(allData);
     });
   }
 
   /** จัดการการคำนวณ Filter ข้อมูล (ค้นหาและสถานะ) */
-  comps = createListingComputeds(
-    this.approvals,
-    this.listing,
-    (item, search, status) => {
-      const matchStatus = !status || item.status === status;
-      const matchSearch = !search ||
-        item.requestNo.toLowerCase().includes(search) ||
-        item.requestBy.name.toLowerCase().includes(search) ||
-        item.requestDetail.toLowerCase().includes(search);
-      return matchStatus && matchSearch;
-    }
-  );
+  comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
+    const matchStatus = !status || item.status === status;
+    const matchSearch =
+      !search ||
+      item.requestNo.toLowerCase().includes(search) ||
+      item.requestBy.name.toLowerCase().includes(search) ||
+      item.requestDetail.toLowerCase().includes(search);
+    return matchStatus && matchSearch;
+  });
 
   sortedData = computed(() => {
     let list = [...this.comps.filteredData()];
@@ -231,7 +245,8 @@ export class ApprovalsComponent implements OnInit {
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      const next =
+        typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
@@ -244,7 +259,7 @@ export class ApprovalsComponent implements OnInit {
   }
 
   getTabCount(tab: string) {
-    return this.approvals().filter(item => item.status === tab).length;
+    return this.approvals().filter((item) => item.status === tab).length;
   }
 
   onSearch(event: Event) {
@@ -272,7 +287,7 @@ export class ApprovalsComponent implements OnInit {
 
   /** แสดงรายละเอียดรายการที่เลือกใน Modal */
   viewDetail(item: ApprovalItem) {
-    console.log(item)
+    console.log(item);
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
@@ -288,7 +303,7 @@ export class ApprovalsComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
-    this.loadMedicalClaims()
+    this.loadMedicalClaims();
   }
 
   onStatusUpdated() {
@@ -305,16 +320,20 @@ export class ApprovalsComponent implements OnInit {
 
   openPreview(claim: MedicalClaim) {
     if (!claim.attachments?.length) return;
-    this.previewFiles.set(claim.attachments.map(a => ({
-      fileName: a.fileName,
-      url: this.medicalApiService.getFileUrl(a.fileUrl),
-      date: claim.claimDate,
-      type: a.fileType
-    })));
+    this.previewFiles.set(
+      claim.attachments.map((a) => ({
+        fileName: a.fileName,
+        url: this.medicalApiService.getFileUrl(a.fileUrl),
+        date: claim.claimDate,
+        type: a.fileType,
+      })),
+    );
     this.isPreviewModalOpen.set(true);
   }
 
-  closePreview() { this.isPreviewModalOpen.set(false); }
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+  }
 
   onImgError(event: Event) {
     const avatar = (event.target as HTMLElement).closest('.emp-avatar') as HTMLElement;
@@ -323,18 +342,26 @@ export class ApprovalsComponent implements OnInit {
 
   openProfileImage(claim: MedicalClaim) {
     if (!claim.employeeImageUrl) return;
-    this.profileLightbox.set({ url: claim.employeeImageUrl, name: claim.employeeName ?? claim.employeeCode });
+    this.profileLightbox.set({
+      url: claim.employeeImageUrl,
+      name: claim.employeeName ?? claim.employeeCode,
+    });
   }
 
-  closeProfileLightbox() { this.profileLightbox.set(null); }
+  closeProfileLightbox() {
+    this.profileLightbox.set(null);
+  }
 
   getMedicalClaim(item: ApprovalItem): MedicalClaim | null {
     return (item.originalData as MedicalClaim)?.claimId != null
-      ? item.originalData as MedicalClaim
+      ? (item.originalData as MedicalClaim)
       : null;
   }
 
-  trackByRowId(index: number, itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>): string {
+  trackByRowId(
+    index: number,
+    itemOrRow: ApprovalItem | import('@tanstack/angular-table').Row<ApprovalItem>,
+  ): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     return `${item.requestNo}-${index}`;
   }
@@ -362,7 +389,7 @@ export class ApprovalsComponent implements OnInit {
     this.showExportMenu.set(false);
     this.loadingService.start('export');
     try {
-      const data = this.table.getRowModel().rows.map(row => ({
+      const data = this.table.getRowModel().rows.map((row) => ({
         requestNo: row.original.requestNo,
         requestDate: row.original.requestDate,
         requestBy: row.original.requestBy.name,
@@ -371,7 +398,7 @@ export class ApprovalsComponent implements OnInit {
         requestType: row.original.requestType,
         requestDetail: row.original.requestDetail,
         amount: row.original.amount,
-        status: row.original.status
+        status: row.original.status,
       }));
 
       const columns = [
@@ -381,7 +408,7 @@ export class ApprovalsComponent implements OnInit {
         { header: 'ประเภท', key: 'requestType', width: 15 },
         { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
         { header: 'จำนวนเงิน', key: 'amount', width: 15 },
-        { header: 'สถานะ', key: 'status', width: 15 }
+        { header: 'สถานะ', key: 'status', width: 15 },
       ];
 
       await this.exportService.exportToExcel(data, columns, 'approvals-medical');

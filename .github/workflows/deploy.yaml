@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
   workflow_run:
-    workflows: ["PR Auto Merge"]
+    workflows: ['PR Auto Merge']
     types: [completed]
 
 env:
@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_deploy: ${{ steps.resolve.outputs.should_deploy }}
-      deploy_ref:   ${{ steps.resolve.outputs.deploy_ref }}
-      pr_number:    ${{ steps.resolve.outputs.pr_number }}
-      pr_url:       ${{ steps.resolve.outputs.pr_url }}
+      deploy_ref: ${{ steps.resolve.outputs.deploy_ref }}
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      pr_url: ${{ steps.resolve.outputs.pr_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/github-script@v7
@@ -43,17 +43,17 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DEPLOY_PATH:       'C:\Projects\ESS\front\dist'
-      BACKUP_ROOT:       'C:\Projects\ESS\front\_backup'
-      APP_POOL_NAME:     'ESS-Front'
-      DIST_PATH:         'dist\my-angular-app\browser'
-      BACKUP_RETENTION:  '5'
+      DEPLOY_PATH: 'C:\Projects\ESS\front\dist'
+      BACKUP_ROOT: 'C:\Projects\ESS\front\_backup'
+      APP_POOL_NAME: 'ESS-Front'
+      DIST_PATH: 'dist\my-angular-app\browser'
+      BACKUP_RETENTION: '5'
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref:        ${{ needs.resolve-deploy-source.outputs.deploy_ref }}
-          token:      ${{ secrets.GH_PAT }}
+          ref: ${{ needs.resolve-deploy-source.outputs.deploy_ref }}
+          token: ${{ secrets.GH_PAT }}
           repository: Onee-Dev31/ESS-FE
 
       - uses: actions/setup-node@v4

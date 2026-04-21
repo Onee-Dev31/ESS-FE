@@ -12,107 +12,107 @@ $border-color: var(--border-color);
 $radius: 16px;
 
 .empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background-color: transparent;
+
+  animation: fadeIn 0.4s ease-out;
+
+  .empty-icon-wrapper {
+    width: 64px;
+    height: 64px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 1.5rem;
-    text-align: center;
+    margin-bottom: 1.25rem;
+
+    background: rgba($primary, 0.05);
+    border-radius: 50%;
+
+    i {
+      font-size: 2rem;
+      color: $text-muted;
+      opacity: 0.7;
+    }
+  }
+
+  .empty-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: $text;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .empty-description {
+    font-size: 0.925rem;
+    color: $text-muted;
+    max-width: 320px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.2rem;
     background-color: transparent;
+    border: 1px solid $border-color;
+    color: $primary;
+    border-radius: $radius;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 
-    animation: fadeIn 0.4s ease-out;
-
-    .empty-icon-wrapper {
-        width: 64px;
-        height: 64px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.25rem;
-
-        background: rgba($primary, 0.05);
-        border-radius: 50%;
-
-        i {
-            font-size: 2rem;
-            color: $text-muted;
-            opacity: 0.7;
-        }
+    &:hover {
+      background-color: rgba($primary, 0.05);
+      border-color: rgba($primary, 0.3);
+      transform: translateY(-1px);
     }
 
-    .empty-title {
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: $text;
-        margin: 0 0 0.5rem 0;
+    &:active {
+      transform: translateY(0);
     }
 
-    .empty-description {
-        font-size: 0.925rem;
-        color: $text-muted;
-        max-width: 320px;
-        margin: 0 auto;
-        line-height: 1.5;
+    i {
+      font-size: 0.85rem;
     }
-
-    .btn-action {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-        padding: 0.6rem 1.2rem;
-        background-color: transparent;
-        border: 1px solid $border-color;
-        color: $primary;
-        border-radius: $radius;
-        font-size: 0.9rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-            background-color: rgba($primary, 0.05);
-            border-color: rgba($primary, 0.3);
-            transform: translateY(-1px);
-        }
-
-        &:active {
-            transform: translateY(0);
-        }
-
-        i {
-            font-size: 0.85rem;
-        }
-    }
+  }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
-    .empty-state-container {
-        padding: 2.5rem 1rem;
+  .empty-state-container {
+    padding: 2.5rem 1rem;
 
-        .empty-icon-wrapper {
-            width: 56px;
-            height: 56px;
+    .empty-icon-wrapper {
+      width: 56px;
+      height: 56px;
 
-            i {
-                font-size: 1.75rem;
-            }
-        }
-
-        .empty-title {
-            font-size: 1.1rem;
-        }
+      i {
+        font-size: 1.75rem;
+      }
     }
+
+    .empty-title {
+      font-size: 1.1rem;
+    }
+  }
 }

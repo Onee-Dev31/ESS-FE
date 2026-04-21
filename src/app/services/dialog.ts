@@ -15,7 +15,7 @@ export interface DialogData extends DialogConfig {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DialogService {
   activeDialog = signal<DialogData | null>(null);
@@ -30,7 +30,7 @@ export class DialogService {
         confirmText: config.confirmText || 'ยืนยัน',
         cancelText: config.cancelText || 'ยกเลิก',
         type: config.type || 'info',
-        resolve
+        resolve,
       };
 
       this.activeDialog.set(dialogData);

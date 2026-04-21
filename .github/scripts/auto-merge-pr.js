@@ -4,10 +4,10 @@ module.exports = async ({ github, context, core }) => {
 
   const { data: prs } = await github.rest.pulls.list({
     owner: context.repo.owner,
-    repo:  context.repo.repo,
+    repo: context.repo.repo,
     state: 'open',
-    base:  'master',
-    head:  `${context.repo.owner}:${run.head_branch}`,
+    base: 'master',
+    head: `${context.repo.owner}:${run.head_branch}`,
   });
 
   if (prs.length === 0) {
@@ -35,9 +35,9 @@ module.exports = async ({ github, context, core }) => {
   core.info(`Merging PR #${pr.number}: ${pr.title}`);
 
   await github.rest.pulls.merge({
-    owner:        context.repo.owner,
-    repo:         context.repo.repo,
-    pull_number:  pr.number,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: pr.number,
     merge_method: mergeMethod,
   });
 

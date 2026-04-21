@@ -1,12 +1,12 @@
 <div class="empty-state-container">
-    <div class="empty-icon-wrapper">
-        <i [class]="icon"></i>
-    </div>
-    <h3 class="empty-title">{{ title }}</h3>
-    <p class="empty-description">{{ description }}</p>
+  <div class="empty-icon-wrapper">
+    <i [class]="icon"></i>
+  </div>
+  <h3 class="empty-title">{{ title }}</h3>
+  <p class="empty-description">{{ description }}</p>
 
-    <button *ngIf="actionLabel" class="btn-action" (click)="onAction()">
-        <i *ngIf="actionIcon" [class]="actionIcon"></i>
-        <span>{{ actionLabel }}</span>
-    </button>
+  <button *ngIf="actionLabel" class="btn-action" (click)="onAction()">
+    <i *ngIf="actionIcon" [class]="actionIcon"></i>
+    <span>{{ actionLabel }}</span>
+  </button>
 </div>

@@ -1,4 +1,13 @@
-import { Component, signal, inject, OnInit, computed, ChangeDetectorRef, effect, Input } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  computed,
+  ChangeDetectorRef,
+  effect,
+  Input,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,7 +15,10 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
-import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
+import {
+  FilePreviewModalComponent,
+  FilePreviewItem,
+} from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
@@ -18,9 +30,15 @@ import { SignalrService } from '../../services/signalr.service';
 @Component({
   selector: 'app-it-problem-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent, NzSelectModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    FilePreviewModalComponent,
+    NzSelectModule,
+  ],
   templateUrl: './it-problem-report.html',
-  styleUrl: './it-problem-report.scss'
+  styleUrl: './it-problem-report.scss',
 })
 export class ItProblemReportComponent implements OnInit {
   private swalService = inject(SwalService);
@@ -38,13 +56,13 @@ export class ItProblemReportComponent implements OnInit {
     detail: '',
     phoneNumber: '',
     categories: [] as any[],
-    attachments: [] as { name: string, size?: number, file: File }[]
+    attachments: [] as { name: string; size?: number; file: File }[],
   });
   phoneModel = '';
 
   // MASTER
   availableCategories: any[] = [];
-  openForOptions = signal<any[]>([])
+  openForOptions = signal<any[]>([]);
   selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
 
   // CONDITION
@@ -57,9 +75,8 @@ export class ItProblemReportComponent implements OnInit {
     if (userData?.USR_MOBILE) {
       const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
       this.phoneModel = formatted;
-      this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
+      this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
     }
-
   }
 
   onPhoneInput(event: Event) {
@@ -69,17 +86,22 @@ export class ItProblemReportComponent implements OnInit {
     const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
     input.value = formatted;
     this.phoneModel = formatted;
-    this.problemFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
+    this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
   }
 
   onPhoneNumberChange(value: string) {
     const formatted = PhoneUtil.formatPhoneNumber(value);
-    this.problemFormData.update(data => ({ ...data, phoneNumber: formatted }));
+    this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
   }
 
   isFormValid = computed(() => {
     const { topic, detail, categories, phoneNumber } = this.problemFormData();
-    return topic.trim().length > 0 && detail.trim().length > 0 && categories.length > 0 && phoneNumber !== '';
+    return (
+      topic.trim().length > 0 &&
+      detail.trim().length > 0 &&
+      categories.length > 0 &&
+      phoneNumber !== ''
+    );
   });
 
   isPreviewModalOpen = signal<boolean>(false);
@@ -91,7 +113,7 @@ export class ItProblemReportComponent implements OnInit {
 
     this.problemFormData.set({
       ...current,
-      categories: isSelected ? [] : [cat]
+      categories: isSelected ? [] : [cat],
     });
   }
 
@@ -114,17 +136,17 @@ export class ItProblemReportComponent implements OnInit {
 
   private addFiles(files: FileList) {
     if (files && files.length > 0) {
-      const newAttachments = Array.from(files).map(f => ({
+      const newAttachments = Array.from(files).map((f) => ({
         name: f.name,
         size: f.size,
-        file: f
+        file: f,
       }));
 
       const currentAttachments = this.problemFormData().attachments;
 
       this.problemFormData.set({
         ...this.problemFormData(),
-        attachments: [...currentAttachments, ...newAttachments]
+        attachments: [...currentAttachments, ...newAttachments],
       });
     }
   }
@@ -132,12 +154,14 @@ export class ItProblemReportComponent implements OnInit {
   viewFile(fileObj: any) {
     if (fileObj.file) {
       const url = URL.createObjectURL(fileObj.file);
-      this.previewFiles.set([{
-        fileName: fileObj.name,
-        date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: url,
-        type: fileObj.file.type
-      }]);
+      this.previewFiles.set([
+        {
+          fileName: fileObj.name,
+          date: dayjs().format('DD/MM/YYYY HH:mm'),
+          url: url,
+          type: fileObj.file.type,
+        },
+      ]);
       this.isPreviewModalOpen.set(true);
     } else {
       // For dummy data which doesn't have a real File object
@@ -154,7 +178,7 @@ export class ItProblemReportComponent implements OnInit {
     currentAttachments.splice(index, 1);
     this.problemFormData.set({
       ...this.problemFormData(),
-      attachments: currentAttachments
+      attachments: currentAttachments,
     });
   }
 
@@ -170,8 +194,8 @@ export class ItProblemReportComponent implements OnInit {
       phoneNumber: '081-234-5678',
       categories: ['Onee App', 'Software โปรแกรมต่างๆ'],
       attachments: [{ name: 'error-screenshot.png' }],
-      status: 'Pending'
-    }
+      status: 'Pending',
+    },
   ]);
 
   get nextRequestId() {
@@ -185,7 +209,7 @@ export class ItProblemReportComponent implements OnInit {
       this.swalService.warning('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบทุกช่อง');
       return;
     }
-    this.problemFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
+    this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
     this.showSummaryModal.set(true);
   }
 
@@ -200,7 +224,7 @@ export class ItProblemReportComponent implements OnInit {
       detail: '',
       phoneNumber: '',
       categories: [],
-      attachments: []
+      attachments: [],
     });
   }
 
@@ -215,7 +239,7 @@ export class ItProblemReportComponent implements OnInit {
   confirmSubmission() {
     const data = this.problemFormData();
 
-    console.log(data, this.selectedOpenFor(), this.openBy)
+    console.log(data, this.selectedOpenFor(), this.openBy);
 
     const formData = new FormData();
     formData.append('subject', data.topic);
@@ -223,9 +247,16 @@ export class ItProblemReportComponent implements OnInit {
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('subCategoryId', data.categories[0].id);
     formData.append('contactPhone', data.phoneNumber);
-    formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
+    formData.append(
+      'IsSelfRequestByIT',
+      this.openBy
+        ? 'false'
+        : this.authService.userData().DEPARTMENT === '10806 IT Department'
+          ? 'true'
+          : 'false',
+    ); //it เปิดให้ตัวเอง ?
     if (this.openBy === 'IT') {
-      formData.append('openForCodeempid', this.selectedOpenFor())
+      formData.append('openForCodeempid', this.selectedOpenFor());
     }
     formData.append('ticketTypeId', '2');
 
@@ -236,19 +267,21 @@ export class ItProblemReportComponent implements OnInit {
       }
     });
 
-    console.log("formData", [...formData.entries()]);
+    console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.itServiceService.createTicket(formData)
+    this.itServiceService
+      .createTicket(formData)
       .pipe(
         finalize(() => {
           this.closeSummaryModal();
-        })
-      ).subscribe({
+        }),
+      )
+      .subscribe({
         next: (res) => {
           console.log(res);
           if (res.success) {
-            this.signalrService.sendTestRealtime()
+            this.signalrService.sendTestRealtime();
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
@@ -262,7 +295,7 @@ export class ItProblemReportComponent implements OnInit {
             this.router.navigate(['/it-service-list']);
           });
           // const message = error?.error?.message || '';
-        }
+        },
       });
   }
 
@@ -279,30 +312,31 @@ export class ItProblemReportComponent implements OnInit {
     this.selectedRequest.set(null);
   }
 
-
   // GET MASTER
   getSubProblem() {
     this.itServiceService.getSubProblem().subscribe({
       next: (res) => {
         console.log(res);
-        this.availableCategories = res.data
+        this.availableCategories = res.data;
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
   getOpenFor() {
-    this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
-      next: (res) => {
-        console.log(res.data);
-        this.openForOptions.set(res.data)
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      }
-    });
+    this.itServiceService
+      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
+      .subscribe({
+        next: (res) => {
+          console.log(res.data);
+          this.openForOptions.set(res.data);
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 }

@@ -4,7 +4,7 @@ import type { Row, Cell, Column as ExcelColumn } from 'exceljs';
 import { DialogService } from './dialog';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExportService {
   private dialog = inject(DialogService);
@@ -18,21 +18,20 @@ export class ExportService {
         return;
       }
 
-
       const html2canvas = (await import('html2canvas')).default;
       const jsPDF = (await import('jspdf')).default;
 
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        logging: false
+        logging: false,
       });
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
       });
 
       const imgWidth = 297;
@@ -50,7 +49,7 @@ export class ExportService {
   async exportToExcel<T>(
     data: T[],
     columns: { header: string; key: string; width?: number }[],
-    filename: string = 'export'
+    filename: string = 'export',
   ): Promise<void> {
     try {
       const ExcelJS = await import('exceljs');
@@ -59,23 +58,23 @@ export class ExportService {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-      worksheet.columns = columns.map(col => ({
+      worksheet.columns = columns.map((col) => ({
         header: col.header,
         key: col.key,
-        width: col.width || 15
+        width: col.width || 15,
       }));
 
       worksheet.getRow(1).font = { bold: true, size: 12 };
       worksheet.getRow(1).fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF0071E3' }
+        fgColor: { argb: 'FF0071E3' },
       };
       worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
       worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
       worksheet.getRow(1).height = 25;
 
-      data.forEach(item => {
+      data.forEach((item) => {
         worksheet.addRow(item as any);
       });
 
@@ -85,14 +84,14 @@ export class ExportService {
             top: { style: 'thin' },
             left: { style: 'thin' },
             bottom: { style: 'thin' },
-            right: { style: 'thin' }
+            right: { style: 'thin' },
           };
         });
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       saveAs(blob, `${filename}.xlsx`);
     } catch (error) {
@@ -117,10 +116,10 @@ export class ExportService {
       }
 
       const styles = Array.from(document.styleSheets)
-        .map(styleSheet => {
+        .map((styleSheet) => {
           try {
             return Array.from(styleSheet.cssRules)
-              .map(rule => rule.cssText)
+              .map((rule) => rule.cssText)
               .join('\n');
           } catch (e) {
             return '';
@@ -168,32 +167,34 @@ export class ExportService {
         return;
       }
 
-
       const ExcelJS = await import('exceljs');
       const { saveAs } = await import('file-saver');
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-
       const headerRow = table.querySelector('thead tr');
       if (headerRow) {
-        const headers = Array.from(headerRow.querySelectorAll('th')).map(th => th.textContent?.trim() || '');
+        const headers = Array.from(headerRow.querySelectorAll('th')).map(
+          (th) => th.textContent?.trim() || '',
+        );
         worksheet.addRow(headers);
 
         worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
         worksheet.getRow(1).fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FF0071E3' }
+          fgColor: { argb: 'FF0071E3' },
         };
         worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
         worksheet.getRow(1).height = 25;
       }
 
       const dataRows = table.querySelectorAll('tbody tr');
-      dataRows.forEach(tr => {
-        const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent?.trim() || '');
+      dataRows.forEach((tr) => {
+        const cells = Array.from(tr.querySelectorAll('td')).map(
+          (td) => td.textContent?.trim() || '',
+        );
         worksheet.addRow(cells);
       });
 
@@ -207,14 +208,14 @@ export class ExportService {
             top: { style: 'thin' },
             left: { style: 'thin' },
             bottom: { style: 'thin' },
-            right: { style: 'thin' }
+            right: { style: 'thin' },
           };
         });
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       saveAs(blob, `${filename}.xlsx`);
     } catch (error) {
