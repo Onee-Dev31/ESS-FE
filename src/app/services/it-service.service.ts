@@ -151,6 +151,7 @@ export class ItServiceService {
     categoryId?: string;
     subCategoryId?: string;
     managerEmpNo?: string;
+    myTicket?: string | null;
   }): Observable<any> {
 
     const queryParams: any = {};
@@ -165,7 +166,7 @@ export class ItServiceService {
     if (params.categoryId) queryParams.categoryId = params.categoryId;
     if (params.subCategoryId) queryParams.subCategoryId = params.subCategoryId;
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
-
+    if (params.myTicket) queryParams.myTicket = params.myTicket;
 
     // console.log("params >>> ", queryParams)
 

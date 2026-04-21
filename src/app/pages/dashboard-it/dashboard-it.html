@@ -24,15 +24,19 @@
     <aside class="tk-left">
         <div class="tk-left__top">
             <div class="tk-left__title">Tickets</div>
-            <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
-                <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
-                <nz-option nzValue="open" nzLabel="Open"></nz-option>
-                <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
-                <nz-option nzValue="inprogress" nzLabel="In Progress"></nz-option>
-                <nz-option nzValue="done" nzLabel="Closed"></nz-option>
-                <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
-                <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
-            </nz-select>
+            <div style="display: flex; flex-direction: column; align-items: end; gap: 10px;">
+                <nz-select class="tk-left__select" [(ngModel)]="filterStatus" nzBorderless nzSize="small">
+                    <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
+                    <nz-option nzValue="open" nzLabel="Open"></nz-option>
+                    <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+                    <nz-option nzValue="inprogress" nzLabel="In Progress"></nz-option>
+                    <nz-option nzValue="done" nzLabel="Closed"></nz-option>
+                    <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
+                    <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
+                </nz-select>
+                <label nz-checkbox class="checkbox-my-ticket" [(ngModel)]="myTicket"
+                    (ngModelChange)="onMyTicketChange()">My Ticket</label>
+            </div>
         </div>
 
         <div class="tk-left__search">
