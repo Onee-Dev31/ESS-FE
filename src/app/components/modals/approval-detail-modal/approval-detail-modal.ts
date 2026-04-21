@@ -32,6 +32,24 @@ interface PreviewFile {
   date: string;
 }
 
+const DEFAULT_APPROVAL_ITEM = {
+  requestId: 0,
+  requestNo: '',
+  requestDate: '',
+  requestBy: {
+    name: '',
+    employeeId: '',
+    department: '',
+    company: '',
+  },
+  requestType: 'ค่ารักษาพยาบาล',
+  typeId: 0,
+  requestDetail: '',
+  amount: 0,
+  status: 'Pending',
+  rawStatus: '',
+} as ApprovalItem;
+
 /** Component แสดงรายละเอียดรายการขออนุมัติ และจัดการการอนุมัติ/ตีกลับ (Modal Detail) */
 @Component({
   selector: 'app-approval-detail-modal',
@@ -50,7 +68,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
 
-  @Input({ required: true }) approvalItem!: ApprovalItem;
+  @Input({ required: true }) approvalItem: ApprovalItem = DEFAULT_APPROVAL_ITEM;
   @Input() initialAction: 'Approved' | 'Rejected' | 'Referred Back' | null = null;
 
   @Output() onClose = new EventEmitter<void>();
@@ -118,11 +136,13 @@ export class ApprovalDetailModalComponent implements OnInit {
   );
 
   ngOnInit() {
-    this.loadDetails();
-    if (this.initialAction) {
-      this.isActionConfirm.set(true);
-      this.actionType.set(this.initialAction);
-    }
+    queueMicrotask(() => {
+      this.loadDetails();
+      if (this.initialAction) {
+        this.isActionConfirm.set(true);
+        this.actionType.set(this.initialAction);
+      }
+    });
   }
 
   /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */

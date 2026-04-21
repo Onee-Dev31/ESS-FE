@@ -13,7 +13,7 @@ describe('ItDashboardSummary', () => {
 
     fixture = TestBed.createComponent(ItDashboardSummary);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {

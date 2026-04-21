@@ -101,6 +101,12 @@
                 }
               ]
             },
+            "test": {
+              "polyfills": ["@angular/compiler"],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -134,6 +140,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
+            "buildTarget": "my-angular-app:build:test",
             "tsConfig": "tsconfig.spec.json",
             "setupFiles": ["src/test-setup.ts"],
             "providersFile": "src/test-providers.ts"

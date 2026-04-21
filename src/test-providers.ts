@@ -1,8 +1,7 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { EMPTY } from 'rxjs';
 import { NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { SignalrService } from './app/services/signalr.service';
-import { EMPTY } from 'rxjs';
 
 const mockSignalrService = {
   startConnection: () => Promise.resolve(),
@@ -10,9 +9,23 @@ const mockSignalrService = {
   sendTestRealtime: () => {},
 };
 
+const mockEchartsInstance = {
+  setOption: () => {},
+  resize: () => {},
+  showLoading: () => {},
+  hideLoading: () => {},
+  on: () => {},
+  off: () => {},
+  dispose: () => {},
+  isDisposed: () => false,
+};
+
+const mockEcharts = {
+  init: () => mockEchartsInstance,
+};
+
 export default [
   provideHttpClientTesting(),
-  provideRouter([]),
-  { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: () => import('echarts') } },
+  { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: async () => mockEcharts } },
   { provide: SignalrService, useValue: mockSignalrService },
 ];

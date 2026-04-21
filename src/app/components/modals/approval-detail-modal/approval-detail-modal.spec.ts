@@ -17,7 +17,7 @@ describe('ApprovalDetailModalComponent', () => {
     fixture = TestBed.createComponent(ApprovalDetailModalComponent);
     component = fixture.componentInstance;
 
-    component.approvalItem = {
+    fixture.componentRef.setInput('approvalItem', {
       requestNo: 'REQ-001',
       requestDate: '2024-01-01',
       requestBy: {
@@ -31,7 +31,7 @@ describe('ApprovalDetailModalComponent', () => {
       amount: 1000,
       status: 'Pending',
       rawStatus: 'Waiting Check',
-    } as any;
+    });
 
     await fixture.whenStable();
     fixture.detectChanges();
