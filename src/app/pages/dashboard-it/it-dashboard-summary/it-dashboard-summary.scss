@@ -539,3 +539,52 @@
   width: 220px;
   border-radius: 10px !important;
 }
+
+
+.assignee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assignee-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eef1ff;
+  color: #4f6ef7;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.assignee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.assignee-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.assignee-role {
+  font-size: 11px;
+  color: #94a3b8;
+
+  &.primary {
+    color: #4f6ef7;
+    font-weight: 600;
+  }
+}
