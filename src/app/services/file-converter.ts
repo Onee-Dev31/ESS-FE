@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import dayjs from 'dayjs';
+import { environment } from '../../environments/environment';
 
 export interface ConvertedFile {
     name: string;
@@ -25,6 +26,9 @@ export interface ConvertedFile {
 })
 export class FileConverterService {
 
+    private readonly FILE_URL = environment.file_url;
+
+
     constructor() { }
 
     // แปลงไฟล์เดียว
@@ -35,6 +39,7 @@ export class FileConverterService {
         const blob = await response.blob();
         const file = new File([blob], (fileData.FILE_NAME || fileData.file_name), { type: (fileData.FILE_TYPE || fileData.file_type) });
 
+        console.log("fileData", fileData)
         return {
             fieldId: fileData.FileID || fileData.attachment_id,
             name: fileData.FILE_NAME || fileData.file_name,
@@ -56,6 +61,7 @@ export class FileConverterService {
     }
 
     buildPreviewFile(file: any) {
+        console.log(file)
         let url = file.fileUrl || file.filePath || file.url;
 
         if (!url) {
@@ -69,6 +75,11 @@ export class FileConverterService {
             if (actualFile) {
                 url = URL.createObjectURL(actualFile);
             }
+        }
+
+        console.log(url)
+        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+            url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
         }
 
         const date = file.createdDate || file.createdAt

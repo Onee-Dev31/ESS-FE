@@ -91,16 +91,6 @@ export class ItService implements OnInit {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
-      // let convertedFiles: any[] = [];
-
-      // if (ticketAttachments.length) {
-      //   convertedFiles = await Promise.all(
-      //     ticketAttachments.map((f: any) =>
-      //       this.convertUrlToFile(f)
-      //     )
-      //   );
-      // }
-
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
 
       const ticket = res.ticket;
@@ -376,12 +366,7 @@ export class ItService implements OnInit {
   }
 
   viewFile(file: any) {
-    this.previewFiles.set([{
-      fileName: file.fileName,
-      date: dayjs().format('DD/MM/YYYY HH:mm'),
-      url: file.filePath,
-      type: file.type || 'image/png'
-    }]);
+    this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -390,9 +375,6 @@ export class ItService implements OnInit {
   }
 
   buildTimeline(timelines: any[], assignees: any[]) {
-
-    // console.log(timelines, assignees)
-
     return timelines.map(t => {
 
       const assigneeList = assignees
@@ -434,15 +416,8 @@ export class ItService implements OnInit {
 
       replies.map(async (r) => {
 
-        // หาไฟล์ของ reply นี้
         const files = attachments.filter(a => a.reply_id === r.id);
-
-        // // convert file -> File object
-        // const convertedFiles = await Promise.all(
-        //   files.map(f => this.convertUrlToFile(f))
-        // );
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
-
         return {
           id: r.id,
           message: r.message,

@@ -193,6 +193,7 @@ export class MedicalexpensesComponent implements OnInit {
 
     this.medicalApiService.getClaims(payload).subscribe({
       next: (res) => {
+        console.log(res.data)
         this.allClaims.set(res.data);
         this.listing.currentPage.set(0);
         this.loadingService.stop('medical-list');
