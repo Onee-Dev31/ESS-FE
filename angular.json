@@ -116,6 +116,10 @@
               "buildTarget": "my-angular-app:build:production",
               "proxyConfig": "proxy.conf.json"
             },
+              "uat": {
+                "buildTarget": "my-angular-app:build:uat",
+                "proxyConfig": "proxy.conf.json"
+              },
             "dev": {
               "buildTarget": "my-angular-app:build:dev",
               "proxyConfig": "proxy.conf.json"
