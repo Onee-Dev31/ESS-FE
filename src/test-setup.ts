@@ -1,7 +1,3 @@
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-
 localStorage.setItem(
   'employee',
   JSON.stringify({
@@ -18,10 +14,3 @@ localStorage.setItem(
 localStorage.setItem('isLoggedIn', 'true');
 localStorage.setItem('currentUser', 'testuser');
 localStorage.setItem('userRole', 'User');
-
-const _configure = TestBed.configureTestingModule.bind(TestBed);
-(TestBed as any).configureTestingModule = (moduleDef: any) =>
-  _configure({
-    ...moduleDef,
-    providers: [...(moduleDef.providers ?? []), provideHttpClientTesting(), provideRouter([])],
-  });
