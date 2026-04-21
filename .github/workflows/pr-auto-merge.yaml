@@ -5,6 +5,10 @@ on:
     workflows: ["PR Gates"]
     types: [completed]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  MERGE_METHOD: MERGE
+
 concurrency:
   group: pr-auto-merge-${{ github.event.workflow_run.id }}
   cancel-in-progress: false
@@ -12,9 +16,6 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
-
-env:
-  MERGE_METHOD: MERGE
 
 jobs:
   auto-merge:

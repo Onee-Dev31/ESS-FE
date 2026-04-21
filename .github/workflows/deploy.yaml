@@ -7,6 +7,9 @@ on:
     workflows: ["PR Auto Merge"]
     types: [completed]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 concurrency:
   group: deploy-${{ github.sha || github.event.workflow_run.head_sha }}
   cancel-in-progress: false
