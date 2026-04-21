@@ -38,11 +38,15 @@ module.exports = async ({ github, context, core }) => {
       return;
     }
 
-    const sha = run.head_sha;
+    // For workflow_run events, GitHub exposes the current default-branch SHA as context.sha.
+    // That is the merged commit we want to deploy after PR Auto Merge completes.
+    const sha = context.sha || run.head_sha;
     const pr = await findMergedPr(sha);
 
     if (!pr) {
-      core.warning(`No merged PR found for commit ${sha.slice(0, 7)} — skipping deploy`);
+      core.warning(
+        `No merged PR found for commit ${sha.slice(0, 7)} (upstream head ${run.head_sha.slice(0, 7)}) — skipping deploy`,
+      );
       core.setOutput('should_deploy', 'false');
       return;
     }
