@@ -322,6 +322,10 @@ export class FreelanceManagementComponent implements OnInit {
     }
 
     openCreateForm() {
+        this.isFormOpen.set(true);
+    }
+
+    openViewForm() {
         console.log("ส่งข้อมูล")
         const data = this.activeData().filter(item => item.selected);
 
@@ -373,7 +377,7 @@ export class FreelanceManagementComponent implements OnInit {
                         bold: isHeader,
                         color: { rgb: isHeader ? 'FFFFFF' : '000000' }
                     },
-                    fill: isHeader ? { fgColor: { rgb: '4F81BD' } } : undefined, 
+                    fill: isHeader ? { fgColor: { rgb: '4F81BD' } } : undefined,
                     alignment: {
                         horizontal: isHeader ? 'center' : 'left',
                         vertical: 'center'
