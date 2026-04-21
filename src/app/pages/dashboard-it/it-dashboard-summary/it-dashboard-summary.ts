@@ -595,7 +595,11 @@ export class ItDashboardSummary {
     this.itServiceService.getTicketByStatus(status).subscribe({
       next: (res: any) => {
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
-        this.filteredTicketLogs = this.ticketLogs
+        this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
+          ...t,
+          assignees: t.assignees_json ? JSON.parse(t.assignees_json) : [] 
+        }));
+        console.log(this.filteredTicketLogs)
 
         this.cdr.detectChanges();
       },
