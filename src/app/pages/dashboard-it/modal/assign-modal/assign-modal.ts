@@ -34,17 +34,18 @@ export class AssignModal {
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
   assignSearchKeyword = '';
+  ticketId: number | null = null;
 
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes['ticket'] && this.ticket) {
 
-      console.log(this.ticket)
+      console.log(`IT Assgin: =>  ${JSON.stringify(this.ticket)}`)
 
       this.selectedTag = this.ticket.ticketTypeId;
 
       if (this.ticket.assignments) {
-
+        this.ticketId = this.ticket.ticketId
         this.selectedAssigneeEmpCodes = this.ticket.assignments
           .map((a: any) => ({
             id: a.codeempid,
@@ -138,10 +139,11 @@ export class AssignModal {
   }
 
   save() {
-    // console.log(this.selectedAssigneeEmpCodes)
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
-      ticketTypeId: this.selectedTag
+      ticketTypeId: this.selectedTag,
+      ticketId: this.ticketId
     });
+
   }
 }

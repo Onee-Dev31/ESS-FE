@@ -18,6 +18,7 @@ import { NoteModal } from "../modal/note-modal/note-modal";
 import { DenyModal } from "../modal/deny-modal/deny-modal";
 import { AcknowledgeModal } from "../modal/acknowledge-modal/acknowledge-modal";
 import { AssignModal } from "../modal/assign-modal/assign-modal";
+import { SignalrService } from '../../../services/signalr.service';
 
 @Component({
   selector: 'app-report-detail',
@@ -60,7 +61,8 @@ export class ReportDetail {
     private swalService: SwalService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private signalrService: SignalrService
   ) { }
 
   ngOnInit(): void {
@@ -622,6 +624,7 @@ export class ReportDetail {
     this.updateTicket('assign', ticketId, typeTicket, assignees)
       .subscribe({
         next: (res) => {
+          console.log('[submitAssign] next res:', res);
 
           if (!res?.success) {
             this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
@@ -629,6 +632,12 @@ export class ReportDetail {
           }
 
           this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          const adUsers = data.assignees
+            .map((x: any) => x.adUser)
+            .filter((ad: any) => !!ad);
+          console.log('[submitAssign] adUsers:', adUsers);
+          setTimeout(() => this.signalrService.assignNotify(ticketId, adUsers), 500);
 
           this.selectTicket();
 

@@ -23,6 +23,14 @@ export class SignalrService {
         });
     }
 
+    assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
+        this.http.post(`${this.baseUrl}/notification/it-assign-notify`, { ticketId, assigneeAdUsers })
+        .subscribe({
+            next: () => console.log('AssignNotify sent', ticketId),
+            error: (err) => console.error('AssignNotify error', err)
+        });
+    }
+
     async startConnection() {
         this.hubConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${this.baseUrl}/notificationHub`)
@@ -74,6 +82,11 @@ export class SignalrService {
 
         for (const role of roles) {
             await this.hubConnection.invoke("JoinGroup", role);
+        }
+
+        const adUser = this.authService.currentUser();
+        if (adUser) {
+            await this.hubConnection.invoke("JoinGroup", `user:${adUser}`);
         }
     }
 

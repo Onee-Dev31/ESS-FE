@@ -27,6 +27,7 @@ import { DateUtilityService } from '../../services/date-utility.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from "../../components/modals/services-detail-modal/services-detail-modal";
 import { FileConverterService } from '../../services/file-converter';
+import { SignalrService } from '../../services/signalr.service';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -54,6 +55,7 @@ export class DashboardIT implements OnInit {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
+  private signalrService = inject(SignalrService);
   dateUtil = inject(DateUtilityService);
 
   formatText = formatText;
@@ -773,6 +775,11 @@ export class DashboardIT implements OnInit {
           }
 
           this.swalService.success(res.message || "บันทึกสำเร็จ");
+
+          const adUsers = data.assignees
+            .map((x: any) => x.adUser)
+            .filter((ad: any) => !!ad);
+          setTimeout(() => this.signalrService.assignNotify(ticketId, adUsers), 500);
 
           this.selectTicket(res.ticketId || ticketId);
           this.getAllTickets();
