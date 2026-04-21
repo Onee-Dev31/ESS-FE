@@ -26,6 +26,7 @@ import { NoteModal } from './modal/note-modal/note-modal';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from "../../components/modals/services-detail-modal/services-detail-modal";
+import { FileConverterService } from '../../services/file-converter';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -52,6 +53,7 @@ export class DashboardIT implements OnInit {
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
+  private fileConverter = inject(FileConverterService);
   dateUtil = inject(DateUtilityService);
 
   formatText = formatText;
@@ -118,15 +120,18 @@ export class DashboardIT implements OnInit {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
-      let convertedFiles: any[] = [];
+      // let convertedFiles: any[] = [];
 
-      if (ticketAttachments.length) {
-        convertedFiles = await Promise.all(
-          ticketAttachments.map((f: any) =>
-            this.convertUrlToFile(f)
-          )
-        );
-      }
+      // if (ticketAttachments.length) {
+      //   convertedFiles = await Promise.all(
+      //     ticketAttachments.map((f: any) =>
+      //       this.convertUrlToFile(f)
+      //     )
+      //   );
+
+      // }
+      const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
+
 
       const ticket = res.ticket;
       const replies = res.replies;
@@ -267,56 +272,56 @@ export class DashboardIT implements OnInit {
     );
   }
 
-  private async convertUrlToFile(fileData: any) {
+  // private async convertUrlToFile(fileData: any) {
 
-    try {
+  //   try {
 
-      const response = await fetch(fileData.filePath);
+  //     const response = await fetch(fileData.filePath);
 
-      if (!response.ok) {
-        throw new Error('Fetch failed');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Fetch failed');
+  //     }
 
-      const blob = await response.blob();
+  //     const blob = await response.blob();
 
-      const file = new File(
-        [blob],
-        fileData.fileName,
-        { type: fileData.fileType }
-      );
+  //     const file = new File(
+  //       [blob],
+  //       fileData.fileName,
+  //       { type: fileData.fileType }
+  //     );
 
-      return {
-        fileId: fileData.id,
-        name: fileData.file_name,
-        file: file,
-        description: fileData.file_description || '',
-        uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_at,
-        filePath: fileData.file_path,
-        size: fileData.file_size,
-        type: fileData.file_type,
-        isError: false
-      };
+  //     return {
+  //       fileId: fileData.id,
+  //       name: fileData.file_name,
+  //       file: file,
+  //       description: fileData.file_description || '',
+  //       uploadedByAduser: fileData.uploadedByaAduser,
+  //       createdDate: fileData.created_at,
+  //       filePath: fileData.file_path,
+  //       size: fileData.file_size,
+  //       type: fileData.file_type,
+  //       isError: false
+  //     };
 
-    } catch (error) {
+  //   } catch (error) {
 
-      console.warn('File fetch failed:', fileData.fileName);
+  //     console.warn('File fetch failed:', fileData.fileName);
 
-      // 🔥 fallback return
-      return {
-        fileId: fileData.id,
-        name: fileData.fileName,
-        file: null,  // ไม่มี blob
-        description: fileData.fileDescription || '',
-        uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_date,
-        filePath: fileData.filePath,
-        size: fileData.fileSize,
-        type: fileData.fileType,
-        isError: true
-      };
-    }
-  }
+  //     // 🔥 fallback return
+  //     return {
+  //       fileId: fileData.id,
+  //       name: fileData.fileName,
+  //       file: null,  // ไม่มี blob
+  //       description: fileData.fileDescription || '',
+  //       uploadedByAduser: fileData.uploadedByaAduser,
+  //       createdDate: fileData.created_date,
+  //       filePath: fileData.filePath,
+  //       size: fileData.fileSize,
+  //       type: fileData.fileType,
+  //       isError: true
+  //     };
+  //   }
+  // }
 
   private extractNickName(name: string) {
 
@@ -326,12 +331,7 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    this.previewFiles.set([{
-      fileName: file.fileName,
-      date: dayjs().format('DD/MM/YYYY HH:mm'),
-      url: file.filePath,
-      type: file.type || 'image/png'
-    }]);
+    this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -340,9 +340,6 @@ export class DashboardIT implements OnInit {
   }
 
   buildTimeline(timelines: any[], assignees: any[]) {
-
-    // console.log(timelines, assignees)
-
     return timelines.map(t => {
 
       const assigneeList = assignees
@@ -385,13 +382,8 @@ export class DashboardIT implements OnInit {
 
       replies.map(async (r) => {
 
-        // หาไฟล์ของ reply นี้
         const files = attachments.filter(a => a.reply_id === r.id);
-
-        // convert file -> File object
-        const convertedFiles = await Promise.all(
-          files.map(f => this.convertUrlToFile(f))
-        );
+        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
 
         return {
           id: r.id,
