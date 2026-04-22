@@ -17,7 +17,10 @@
   </button>
 </div>
 
-<app-it-dashboard-summary [externalStatus]="filterStatus" (statusChange)="onStatusChange($event)"></app-it-dashboard-summary>
+<app-it-dashboard-summary
+  [externalStatus]="filterStatus"
+  (statusChange)="onStatusChange($event)"
+></app-it-dashboard-summary>
 
 <div class="tk-page">
   <!-- LEFT: ticket list -->
@@ -25,7 +28,13 @@
     <div class="tk-left__top">
       <div class="tk-left__title">Tickets</div>
       <div style="display: flex; flex-direction: column; align-items: end; gap: 10px">
-        <nz-select class="tk-left__select" [(ngModel)]="filterStatus" (ngModelChange)="onFilterStatusChange($event)" nzBorderless nzSize="small">
+        <nz-select
+          class="tk-left__select"
+          [(ngModel)]="filterStatus"
+          (ngModelChange)="onFilterStatusChange($event)"
+          nzBorderless
+          nzSize="small"
+        >
           <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
           <nz-option nzValue="open" nzLabel="Open"></nz-option>
           <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
