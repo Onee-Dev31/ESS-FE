@@ -1,112 +1,101 @@
 <div class="modal-overlay acknowledgeTicket">
-  <div class="modal-container">
-    <div>
-      <header class="top-header-strip">
-        <h2>รับเรื่อง</h2>
-      </header>
+    <div class="modal-container">
+        <div>
 
-      <form (ngSubmit)="save()">
-        <div class="content-card">
-          <div>
-            <div>
-              <p>เลือกประเภทงาน<span class="required">*</span></p>
-            </div>
+            <header class="top-header-strip">
+                <h2>รับเรื่อง</h2>
+            </header>
 
-            <div class="tag-group">
-              <label class="tag">
-                <input
-                  type="radio"
-                  name="tag"
-                  [value]="2"
-                  [(ngModel)]="selectedTag"
-                  (ngModelChange)="onTagChange($event)"
-                />
-                <span>แจ้งปัญหา</span>
-              </label>
+            <form (ngSubmit)="save()">
 
-              <label class="tag">
-                <input
-                  type="radio"
-                  name="tag"
-                  [value]="1"
-                  [(ngModel)]="selectedTag"
-                  (ngModelChange)="onTagChange($event)"
-                />
-                <span>แจ้งซ่อม</span>
-              </label>
+                <div class="content-card">
+                    <div>
 
-              <label class="tag">
-                <input
-                  type="radio"
-                  name="tag"
-                  [value]="3"
-                  [(ngModel)]="selectedTag"
-                  (ngModelChange)="onTagChange($event)"
-                />
-                <span>ขอใช้บริการ</span>
-              </label>
-            </div>
-          </div>
-          <div *ngIf="selectedTag === 1" style="margin: 10px; margin-top: 20px">
-            <textarea
-              name="message"
-              class="form-input note"
-              placeholder="อธิบายรายละเอียด..."
-              [(ngModel)]="message"
-              *ngIf="attachments.length > 0"
-            ></textarea>
-            <!-- Field: ไฟล์แนบ -->
-            <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
-            <button type="button" class="attach-btn" (click)="fileInput.click()">
-              <i class="fas fa-paperclip"></i>
-              แนบไฟล์
-            </button>
+                        <div>
+                            <p>เลือกประเภทงาน<span class="required">*</span></p>
+                        </div>
 
-            @if (attachments.length > 0) {
-              <div class="file-chips">
-                @for (file of attachments; track file.name; let i = $index) {
-                  <div class="file-chip" (click)="viewFile(file)">
-                    <i class="far fa-file"></i>
+                        <div class="tag-group">
 
-                    <span class="file-name">
-                      {{ file.name }}
-                    </span>
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>แจ้งปัญหา</span>
+                            </label>
 
-                    <button
-                      type="button"
-                      class="chip-remove"
-                      (click)="removeAttachment(i); $event.stopPropagation()"
-                    >
-                      <i class="fas fa-times"></i>
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>แจ้งซ่อม</span>
+                            </label>
+
+                            <label class="tag">
+                                <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag"
+                                    (ngModelChange)="onTagChange($event)">
+                                <span>ขอใช้บริการ</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedTag === 1" style="margin: 10px; margin-top: 20px;">
+                        <textarea name="message" class="form-input note" placeholder="อธิบายรายละเอียด..."
+                            [(ngModel)]="message" *ngIf="attachments.length > 0"></textarea>
+                        <!-- Field: ไฟล์แนบ -->
+                        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)">
+                        <button type="button" class="attach-btn" (click)="fileInput.click()">
+                            <i class="fas fa-paperclip"></i>
+                            แนบไฟล์
+                        </button>
+
+                        @if (attachments.length > 0) {
+
+                        <div class="file-chips">
+
+                            @for (file of attachments; track file.name; let i = $index) {
+
+                            <div class="file-chip" (click)="viewFile(file)">
+
+                                <i class="far fa-file"></i>
+
+                                <span class="file-name">
+                                    {{ file.name }}
+                                </span>
+
+                                <button type="button" class="chip-remove"
+                                    (click)="removeAttachment(i); $event.stopPropagation()">
+
+                                    <i class="fas fa-times"></i>
+
+                                </button>
+
+                            </div>
+
+                            }
+
+                        </div>
+
+                        }
+
+                    </div>
+                </div>
+
+                <div class="form-actions-footer">
+                    <button type="button" class="btn-back-custom" (click)="close()">
+                        <i class="fas fa-times"></i> ยกเลิก
                     </button>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
 
-        <div class="form-actions-footer">
-          <button type="button" class="btn-back-custom" (click)="close()">
-            <i class="fas fa-times"></i> ยกเลิก
-          </button>
+                    <button type="submit" class="btn-save-custom"
+                        [disabled]="!selectedTag || (selectedTag === 1 && attachments.length > 0 && !message.trim())">
+                        <i class="fas fa-paper-plane"></i> ยืนยัน
+                    </button>
+                </div>
 
-          <button
-            type="submit"
-            class="btn-save-custom"
-            [disabled]="
-              !selectedTag || (selectedTag === 1 && attachments.length > 0 && !message.trim())
-            "
-          >
-            <i class="fas fa-paper-plane"></i> ยืนยัน
-          </button>
+            </form>
+
         </div>
-      </form>
     </div>
-  </div>
 </div>
 
 @if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-  </app-file-preview-modal>
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
 }

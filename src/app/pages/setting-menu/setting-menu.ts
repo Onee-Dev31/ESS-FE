@@ -1,26 +1,18 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  inject,
-  OnInit,
-  signal,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { FormsModule } from '@angular/forms';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import { PageHeaderComponent } from "../../components/shared/page-header/page-header";
 import { MatIconModule } from '@angular/material/icon';
 import { LoadingService } from '../../services/loading';
 import { SettingService } from '../../services/setting.service';
 import { SwalService } from '../../services/swal.service';
 import { MasterDataService } from '../../services/master-data.service';
-import { MenuForm } from '../../components/features/menu-form/menu-form';
+import { MenuForm } from "../../components/features/menu-form/menu-form";
 import { AuthService } from '../../services/auth.service';
-import { MenuAllForm } from '../../components/features/menu-all-form/menu-all-form';
+import { MenuAllForm } from "../../components/features/menu-all-form/menu-all-form";
 import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @Component({
@@ -36,12 +28,13 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
     MatIconModule,
     MenuForm,
     MenuAllForm,
-    NzModalModule,
+    NzModalModule
   ],
   templateUrl: './setting-menu.html',
   styleUrl: './setting-menu.scss',
 })
 export class SettingMenu implements OnInit {
+
   private loadingService = inject(LoadingService);
   private settingService = inject(SettingService);
   private swalService = inject(SwalService);
@@ -70,7 +63,7 @@ export class SettingMenu implements OnInit {
   IS_EDIT_MODE = false;
 
   ngOnInit() {
-    this.getMenu();
+    this.getMenu()
   }
 
   handleMenuSubmit(data: any) {
@@ -84,17 +77,17 @@ export class SettingMenu implements OnInit {
       isVisible: data.isVisible === 0 ? false : true,
       isEnabled: data.isEnabled === 0 ? false : true,
       remark: '',
-      createdBy: this.authService.currentUser()?.toLocaleLowerCase(),
-    };
+      createdBy: this.authService.currentUser()?.toLocaleLowerCase()
+    }
 
-    console.log(payload);
+    console.log(payload)
 
     this.settingService.createMenu(payload).subscribe({
       next: (res) => {
         // console.log(res)
         this.closeForm();
         this.getMenu();
-      },
+      }
     });
   }
 
@@ -103,77 +96,82 @@ export class SettingMenu implements OnInit {
   }
 
   handleSave() {
-    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์').then((result) => {
-      if (!result.isConfirmed) return;
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      const newData = this.selectedMenuPermissions;
+        const newData = this.selectedMenuPermissions
 
-      const payload = this.selectedMenuPermissions.map((item) => ({
-        RoleID: item.RoleID,
-        View: item.CanView,
-        CanCreate: item.CanCreate,
-        CanUpdate: item.CanUpdate,
-        CanDelete: item.CanDelete,
-        CanApprove: item.CanApprove,
-      }));
+        const payload = this.selectedMenuPermissions.map(item => ({
+          RoleID: item.RoleID,
+          View: item.CanView,
+          CanCreate: item.CanCreate,
+          CanUpdate: item.CanUpdate,
+          CanDelete: item.CanDelete,
+          CanApprove: item.CanApprove
+        }));
 
-      console.log('payload:', newData[0].MenuID, payload);
+        console.log('payload:', newData[0].MenuID, payload);
 
-      this.settingService.updateMenuRolePermission(newData[0].MenuID, payload).subscribe({
-        next: (res) => {
-          // console.log(res)
+        this.settingService.updateMenuRolePermission(newData[0].MenuID, payload).subscribe({
+          next: (res) => {
+            // console.log(res)
 
-          if (res?.success) {
-            this.swalService.success(res.message);
+            if (res?.success) {
+              this.swalService.success(res.message)
+            }
+            this.getMenu();
           }
-          this.getMenu();
-        },
+        });
+        this.IS_EDIT_MODE = false;
       });
-      this.IS_EDIT_MODE = false;
-    });
   }
 
   handleCancel() {
     // revert กลับค่าเดิม
-    this.selectedMenuPermissions = JSON.parse(JSON.stringify(this.originalPermissions));
+    this.selectedMenuPermissions = JSON.parse(
+      JSON.stringify(this.originalPermissions)
+    );
 
     this.IS_EDIT_MODE = false;
   }
 
   handleAllMenuSubmit(data: any) {
-    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์').then((result) => {
-      if (!result.isConfirmed) return;
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.swalService.confirm('ยืนยันการบันทึกสิทธิ์')
+      .then(result => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      const payload = {
-        menus: data.map((menu: any) => ({
-          ...menu,
-          modifiedBy: this.authService.currentUser(),
-        })),
-      };
+        const payload = {
+          menus: data.map((menu: any) => ({
+            ...menu,
+            modifiedBy: this.authService.currentUser()
+          }))
+        }
 
-      console.log('payload > ', payload);
+        console.log("payload > ", payload)
 
-      this.settingService.updateMenu(payload).subscribe({
-        next: (res) => {
-          // console.log(res)
-          if (res?.success) {
-            this.swalService.success(res.message);
+        this.settingService.updateMenu(payload).subscribe({
+          next: (res) => {
+            // console.log(res)
+            if (res?.success) {
+              this.swalService.success(res.message)
+            }
+            this.getMenu();
+            this.selectedMenu = null
+            this.closeAllMenuForm();
           }
-          this.getMenu();
-          this.selectedMenu = null;
-          this.closeAllMenuForm();
-        },
+        });
       });
-    });
+
   }
 
   //FUNCTION
   private buildPermissionMap() {
     this.rolePermissionMap.clear();
 
-    this.rolePermissions.forEach((p) => {
+    this.rolePermissions.forEach(p => {
       if (!this.rolePermissionMap.has(p.MenuID)) {
         this.rolePermissionMap.set(p.MenuID, []);
       }
@@ -188,19 +186,19 @@ export class SettingMenu implements OnInit {
     data
       // .filter(m => m.IsVisible)
       .sort((a, b) => a.OrderNo - b.OrderNo)
-      .forEach((m) => {
+      .forEach(m => {
         const iconType = this.getIconType(m.Icon);
 
         map.set(m.MenuID, {
           ...m,
           iconType,
-          children: [],
+          children: []
         });
       });
 
     const tree: any[] = [];
 
-    map.forEach((menu) => {
+    map.forEach(menu => {
       if (menu.ParentMenuID) {
         map.get(menu.ParentMenuID)?.children.push(menu);
       } else {
@@ -227,9 +225,9 @@ export class SettingMenu implements OnInit {
 
     this.selectedMenu = menu;
 
-    const perms = (this.rolePermissionMap.get(menu.MenuID) || []).sort(
-      (a, b) => a.RoleID - b.RoleID,
-    );
+    const perms =
+      (this.rolePermissionMap.get(menu.MenuID) || [])
+        .sort((a, b) => a.RoleID - b.RoleID);
 
     // clone สำหรับแก้ไข
     this.selectedMenuPermissions = JSON.parse(JSON.stringify(perms));
@@ -240,9 +238,10 @@ export class SettingMenu implements OnInit {
     setTimeout(() => {
       this.header?.nativeElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'start',
+        block: 'start'
       });
     });
+
 
     this.IS_EDIT_MODE = false;
   }
@@ -277,8 +276,8 @@ export class SettingMenu implements OnInit {
   summaryMenu() {
     // 1. ดึง Role ไม่ซ้ำ
     this.summaryRoles = this.rolePermissions
-      .sort((a, b) => a.RoleId - b.RoleId) // sort ตาม RoleId ก่อน
-      .map((r) => r.RoleName) // ค่อย map เป็นชื่อ
+      .sort((a, b) => a.RoleId - b.RoleId)   // sort ตาม RoleId ก่อน
+      .map(r => r.RoleName)                  // ค่อย map เป็นชื่อ
       .filter((value, index, self) => self.indexOf(value) === index); // unique
 
     // console.log("summaryRoles >>> ", this.summaryRoles)
@@ -294,7 +293,7 @@ export class SettingMenu implements OnInit {
         R: item.CanView,
         U: item.CanUpdate,
         D: item.CanDelete,
-        A: item.CanApprove,
+        A: item.CanApprove
       };
 
       return acc;
@@ -304,9 +303,11 @@ export class SettingMenu implements OnInit {
 
     // 3. flatten เมนู (เอาทั้ง parent + child)
     const flattenMenus = (menus: any[], level: number = 0): any[] => {
-      return menus.flatMap((m) => [
+      return menus.flatMap(m => [
         { ...m, level },
-        ...(m.children?.length ? flattenMenus(m.children, level + 1) : []),
+        ...(m.children?.length
+          ? flattenMenus(m.children, level + 1)
+          : [])
       ]);
     };
 
@@ -315,10 +316,10 @@ export class SettingMenu implements OnInit {
     // console.log("allMenus >>> ", allMenus)
 
     // 4. สร้าง table
-    this.summaryTable = allMenus.map((menu) => ({
+    this.summaryTable = allMenus.map(menu => ({
       label: menu.Label,
       level: menu.level,
-      permissions: permissionMap[menu.MenuID] || {},
+      permissions: permissionMap[menu.MenuID] || {}
     }));
 
     // console.log("summaryTable >>> ", this.summaryTable)
@@ -346,9 +347,12 @@ export class SettingMenu implements OnInit {
 
         const rawMenus = res.data.menus;
 
-        this.menusParent = rawMenus.filter((m: any) => m.ParentMenuID == null);
+        this.menusParent = rawMenus
+          .filter((m: any) => m.ParentMenuID == null);
 
-        this.ORDER_NO = rawMenus.length ? Math.max(...rawMenus.map((m: any) => m.OrderNo || 0)) : 0;
+        this.ORDER_NO = rawMenus.length
+          ? Math.max(...rawMenus.map((m: any) => m.OrderNo || 0))
+          : 0;
 
         this.menus = this.buildMenuTree(rawMenus);
 
@@ -359,7 +363,8 @@ export class SettingMenu implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      },
+      }
     });
   }
+
 }

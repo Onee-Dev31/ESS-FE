@@ -1,33 +1,33 @@
 @if (type === 'table') {
-  <div class="skeleton-table">
+<div class="skeleton-table">
     @for (row of rowsArray; track $index) {
-      <div class="skeleton-row">
+    <div class="skeleton-row">
         <div class="skeleton-cell"></div>
         <div class="skeleton-cell"></div>
         <div class="skeleton-cell"></div>
         <div class="skeleton-cell"></div>
         <div class="skeleton-cell"></div>
-      </div>
+    </div>
     }
-  </div>
+</div>
 }
 
 @if (type === 'card') {
-  <div class="skeleton-card">
+<div class="skeleton-card">
     @for (row of rowsArray; track $index) {
-      <div class="skeleton-card-item">
+    <div class="skeleton-card-item">
         <div class="skeleton-avatar"></div>
         <div class="skeleton-content">
-          <div class="skeleton-line" [style.height]="height"></div>
-          <div class="skeleton-line" [style.height]="height" style="width: 80%"></div>
+            <div class="skeleton-line" [style.height]="height"></div>
+            <div class="skeleton-line" [style.height]="height" style="width: 80%;"></div>
         </div>
-      </div>
+    </div>
     }
-  </div>
+</div>
 }
 
 @if (type === 'text') {
-  @for (row of rowsArray; track $index) {
-    <div class="skeleton-line" [style.height]="height"></div>
-  }
+@for (row of rowsArray; track $index) {
+<div class="skeleton-line" [style.height]="height"></div>
+}
 }

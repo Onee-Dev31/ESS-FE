@@ -10,23 +10,24 @@ import { encryptValue } from '../../../utils/crypto.js ';
   styleUrl: './validate-login-sso.scss',
 })
 export class ValidateLoginSso {
-  token: string = '';
-  systemCode: string = '';
-  ticketNumber: string = '';
-  applicantId: string = '';
+  token: string = "";
+  systemCode: string = "";
+  ticketNumber: string = "";
+  applicantId: string = "";
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService,
-  ) {}
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
+    this.route.queryParamMap.subscribe(params => {
       const token = params.get('token') || '';
       this.systemCode = params.get('systemCode') || '';
       this.applicantId = params.get('applicantId') || '';
-      this.ticketNumber = this.systemCode === 'ESS-EMAIL-IT-Req' ? params.get('ticket') || '' : '';
+      this.ticketNumber = this.systemCode === 'ESS-EMAIL-IT-Req'
+        ? params.get('ticket') || '' : '';
 
       this.token = token;
 
@@ -38,12 +39,14 @@ export class ValidateLoginSso {
       this.authService.loginSSO(this.token, this.systemCode).subscribe({
         next: (res) => {
           if (res?.success) {
-            console.log('res', res);
+
+            console.log("res", res);
             if (res.systmeCode == 'ESS-EMAIL-IT-Req') {
               const url = `${res.landingPath || '/'}?ticket=${encodeURIComponent(this.ticketNumber.trim())}`;
               // console.log('go url:', url);
               this.router.navigateByUrl(url);
-            } else {
+            }
+            else {
               const url = `${res.landingPath || '/'}?applicantId=${encodeURIComponent(encryptValue(this.applicantId.trim()))}`;
               // console.log('go url:', url);
               this.router.navigateByUrl(url || '/');
@@ -54,7 +57,7 @@ export class ValidateLoginSso {
         },
         error: () => {
           this.router.navigateByUrl('/login');
-        },
+        }
       });
     });
   }

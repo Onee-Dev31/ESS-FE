@@ -8,7 +8,7 @@ import { ToastService } from '../../../services/toast';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './toast.html',
-  styleUrl: './toast.scss',
+  styleUrl: './toast.scss'
 })
 export class ToastComponent {
   toastService = inject(ToastService);
@@ -18,7 +18,7 @@ export class ToastComponent {
       success: 'fa-check-circle',
       error: 'fa-exclamation-circle',
       warning: 'fa-exclamation-triangle',
-      info: 'fa-info-circle',
+      info: 'fa-info-circle'
     };
     return icons[type as keyof typeof icons] || icons.info;
   }

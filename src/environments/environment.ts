@@ -6,3 +6,4 @@ export const environment = {
   file_base_url: 'http://10.88.0.31:5258',
   file_url: 'http://10.31.1.85:5259',
 };
+

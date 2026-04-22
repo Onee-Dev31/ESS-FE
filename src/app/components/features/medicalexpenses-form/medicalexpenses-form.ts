@@ -1,16 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  signal,
-  OnInit,
-  OnDestroy,
-  inject,
-  computed,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnDestroy, inject, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
@@ -19,10 +7,7 @@ import { MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.inter
 import { ToastService } from '../../../services/toast';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { DialogService } from '../../../services/dialog';
-import {
-  FilePreviewModalComponent,
-  FilePreviewItem,
-} from '../../modals/file-preview-modal/file-preview-modal';
+import { FilePreviewModalComponent, FilePreviewItem } from '../../modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
 
@@ -36,7 +21,12 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, NzDatePickerModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FilePreviewModalComponent,
+    NzDatePickerModule
+  ],
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',
 })
@@ -48,6 +38,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private medicalApiService = inject(MedicalApiService);
   private dialogService = inject(DialogService);
   private swalService = inject(SwalService);
+
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
@@ -136,13 +127,13 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       stethoscope: 'fas fa-stethoscope',
       bed: 'fas fa-bed',
       tooth: 'fas fa-tooth',
-      glasses: 'fas fa-glasses',
+      glasses: 'fas fa-glasses'
     };
     const colorMap: Record<string, string> = {
       OPD: 'var(--danger)',
       IPD: 'var(--success)',
       DENTAL: 'var(--primary)',
-      VISION: 'var(--primary)',
+      VISION: 'var(--primary)'
     };
     const inpatientCodes = ['IPD'];
     return {
@@ -151,16 +142,16 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       amount: type.remainingAmount.toLocaleString('th-TH'),
       icon: iconMap[type.icon ?? ''] ?? 'fas fa-medkit',
       color: colorMap[type.code] ?? 'var(--primary)',
-      group: inpatientCodes.includes(type.code.toUpperCase()) ? 'inpatient' : 'outpatient',
+      group: inpatientCodes.includes(type.code.toUpperCase()) ? 'inpatient' : 'outpatient'
     };
   }
 
   get outpatientTypes(): ClaimType[] {
-    return this.claimTypes.filter((t) => t.group === 'outpatient');
+    return this.claimTypes.filter(t => t.group === 'outpatient');
   }
 
   get inpatientTypes(): ClaimType[] {
-    return this.claimTypes.filter((t) => t.group === 'inpatient');
+    return this.claimTypes.filter(t => t.group === 'inpatient');
   }
   remark = signal<string>('');
 
@@ -172,60 +163,52 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
       next: (res) => {
         this.expenseTypesRaw = res.data;
-        this.claimTypes = res.data.map((t) => this.mapExpenseType(t));
+        this.claimTypes = res.data.map(t => this.mapExpenseType(t));
         this.loadRequestData();
       },
-      error: () => this.loadRequestData(),
+      error: () => this.loadRequestData()
     });
 
-    this.searchSub = this.hospitalSearch$
-      .pipe(
-        debounceTime(300),
-        switchMap((keyword) => {
-          // reset pagination เมื่อ keyword เปลี่ยน
-          this.currentKeyword = keyword;
-          this.currentPage = 1;
-          this.isHospitalLoading.set(true);
-          return this.medicalApiService
-            .searchHospitals(keyword || undefined, 1, this.PAGE_SIZE)
-            .pipe(
-              catchError(() => {
-                this.isHospitalLoading.set(false);
-                return of({ success: false, data: [], pagination: undefined });
-              }),
-            );
-        }),
-      )
-      .subscribe((res) => {
-        this.hospitalDropdown.set(res.data);
-        this.hasNextPage = res.pagination?.hasNext ?? false;
-        this.isHospitalDropdownOpen.set(res.data.length > 0);
-        this.isHospitalLoading.set(false);
-      });
+    this.searchSub = this.hospitalSearch$.pipe(
+      debounceTime(300),
+      switchMap(keyword => {
+        // reset pagination เมื่อ keyword เปลี่ยน
+        this.currentKeyword = keyword;
+        this.currentPage = 1;
+        this.isHospitalLoading.set(true);
+        return this.medicalApiService.searchHospitals(keyword || undefined, 1, this.PAGE_SIZE).pipe(
+          catchError(() => {
+            this.isHospitalLoading.set(false);
+            return of({ success: false, data: [], pagination: undefined });
+          })
+        );
+      })
+    ).subscribe(res => {
+      this.hospitalDropdown.set(res.data);
+      this.hasNextPage = res.pagination?.hasNext ?? false;
+      this.isHospitalDropdownOpen.set(res.data.length > 0);
+      this.isHospitalLoading.set(false);
+    });
 
-    this.diseaseSearchSub = this.diseaseSearch$
-      .pipe(
-        debounceTime(300),
-        switchMap((keyword) => {
-          this.diseaseKeyword = keyword;
-          this.diseasePage = 1;
-          this.isDiseaseLoading.set(true);
-          return this.medicalApiService
-            .searchDiseaseTypes(keyword || undefined, undefined, undefined, 1, this.PAGE_SIZE)
-            .pipe(
-              catchError(() => {
-                this.isDiseaseLoading.set(false);
-                return of({ success: false, data: [], pagination: undefined });
-              }),
-            );
-        }),
-      )
-      .subscribe((res) => {
-        this.diseaseDropdown.set(res.data);
-        this.diseaseHasNext = res.pagination?.hasNext ?? false;
-        this.isDiseaseDropdownOpen.set(res.data.length > 0);
-        this.isDiseaseLoading.set(false);
-      });
+    this.diseaseSearchSub = this.diseaseSearch$.pipe(
+      debounceTime(300),
+      switchMap(keyword => {
+        this.diseaseKeyword = keyword;
+        this.diseasePage = 1;
+        this.isDiseaseLoading.set(true);
+        return this.medicalApiService.searchDiseaseTypes(keyword || undefined, undefined, undefined, 1, this.PAGE_SIZE).pipe(
+          catchError(() => {
+            this.isDiseaseLoading.set(false);
+            return of({ success: false, data: [], pagination: undefined });
+          })
+        );
+      })
+    ).subscribe(res => {
+      this.diseaseDropdown.set(res.data);
+      this.diseaseHasNext = res.pagination?.hasNext ?? false;
+      this.isDiseaseDropdownOpen.set(res.data.length > 0);
+      this.isDiseaseLoading.set(false);
+    });
   }
 
   ngOnDestroy() {
@@ -262,11 +245,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private loadMoreHospitals() {
     this.isHospitalLoadingMore.set(true);
     const nextPage = this.currentPage + 1;
-    this.medicalApiService
-      .searchHospitals(this.currentKeyword || undefined, nextPage, this.PAGE_SIZE)
+    this.medicalApiService.searchHospitals(this.currentKeyword || undefined, nextPage, this.PAGE_SIZE)
       .pipe(catchError(() => of({ success: false, data: [], pagination: undefined })))
-      .subscribe((res) => {
-        this.hospitalDropdown.update((current) => [...current, ...res.data]);
+      .subscribe(res => {
+        this.hospitalDropdown.update(current => [...current, ...res.data]);
         this.hasNextPage = res.pagination?.hasNext ?? false;
         this.currentPage = nextPage;
         this.isHospitalLoadingMore.set(false);
@@ -308,17 +290,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private loadMoreDiseases() {
     this.isDiseaseLoadingMore.set(true);
     const nextPage = this.diseasePage + 1;
-    this.medicalApiService
-      .searchDiseaseTypes(
-        this.diseaseKeyword || undefined,
-        undefined,
-        undefined,
-        nextPage,
-        this.PAGE_SIZE,
-      )
+    this.medicalApiService.searchDiseaseTypes(this.diseaseKeyword || undefined, undefined, undefined, nextPage, this.PAGE_SIZE)
       .pipe(catchError(() => of({ success: false, data: [], pagination: undefined })))
-      .subscribe((res) => {
-        this.diseaseDropdown.update((current) => [...current, ...res.data]);
+      .subscribe(res => {
+        this.diseaseDropdown.update(current => [...current, ...res.data]);
         this.diseaseHasNext = res.pagination?.hasNext ?? false;
         this.diseasePage = nextPage;
         this.isDiseaseLoadingMore.set(false);
@@ -333,7 +308,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   loadRequestData() {
     if (this.requestId) {
-      this.medicalService.getRequestById(this.requestId).subscribe((req) => {
+      this.medicalService.getRequestById(this.requestId).subscribe(req => {
         if (req) {
           this.isEditMode.set(true);
           this.currentDate.set(this.dateUtil.formatDateToThaiMonth(req.createDate));
@@ -343,7 +318,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
             this.hospital.set(item.hospital);
             this.disease.set(item.diseaseType);
 
-            const typeMatch = this.claimTypes.find((t) => t.label === item.limitType);
+            const typeMatch = this.claimTypes.find(t => t.label === item.limitType);
             if (typeMatch) {
               this.selectedClaimType.set(typeMatch.id);
             }
@@ -377,7 +352,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   deleteAttachment(id: number) {
-    this.attachments.update((current) => current.filter((a) => a.id !== id));
+    this.attachments.update(current => current.filter(a => a.id !== id));
   }
 
   triggerFileInput(input: HTMLInputElement) {
@@ -392,9 +367,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         id: currentAttachments.length + index + 1,
         name: file.name,
         description: '',
-        file,
+        file
       }));
-      this.attachments.update((current) => [...current, ...newAttachments]);
+      this.attachments.update(current => [...current, ...newAttachments]);
     }
     input.value = '';
   }
@@ -404,12 +379,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   openPreview(file: { name: string }) {
-    this.previewFiles.set([
-      {
-        fileName: file.name,
-        date: this.currentDate(),
-      },
-    ]);
+    this.previewFiles.set([{
+      fileName: file.name,
+      date: this.currentDate()
+    }]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -438,10 +411,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   async save() {
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
-      this.claimTypeSectionEl?.nativeElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      this.claimTypeSectionEl?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       this.claimTypeHighlight.set(true);
       setTimeout(() => this.claimTypeHighlight.set(false), 800);
       return;
@@ -466,9 +436,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       return;
     }
 
-    const rawType = this.expenseTypesRaw.find(
-      (t) => t.code.toLowerCase() === this.selectedClaimType(),
-    );
+    const rawType = this.expenseTypesRaw.find(t => t.code.toLowerCase() === this.selectedClaimType());
     if (!rawType) {
       this.toastService.warning('ไม่พบข้อมูลประเภทการเบิก');
       return;
@@ -495,8 +463,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     }
 
     const attachmentList = this.attachments();
-    const files = attachmentList.map((a) => a.file).filter((f): f is File => f != null);
-    const fileRemarks = attachmentList.map((a) => a.description);
+    const files = attachmentList.map(a => a.file).filter((f): f is File => f != null);
+    const fileRemarks = attachmentList.map(a => a.description);
 
     const confirmed = await this.dialogService.confirm({
       title: 'ยืนยันการส่งเรื่องเบิก',
@@ -509,44 +477,43 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     if (!confirmed) return;
 
     this.isSaving.set(true);
-    this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.medicalApiService
-      .submitClaim({
-        employee_code: this.employeeId(),
-        expense_type_id: rawType.typeId,
-        hospital_id: hosp.hospitalId,
-        disease_id: disease.diseaseId,
-        treatment_date_from: dayjs(this.startDate()).format('YYYY-MM-DD'),
-        treatment_date_to: dayjs(this.endDate()).format('YYYY-MM-DD'),
-        treatment_days: this.calculatedDays(),
-        requested_amount: this.parseNumber(this.amount),
-        remark: this.remark() || undefined,
-        files: files.length > 0 ? files : undefined,
-        file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.swalService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
-          // this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
-          this.close();
-        },
-        error: () => {
-          this.isSaving.set(false);
-          this.swalService.warning('เกิดข้อผิดพลาดในการส่งเรื่อง');
-          // this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
-        },
-      });
+    this.swalService.loading("กำลังบันทึกข้อมูล...");
+    this.medicalApiService.submitClaim({
+      employee_code: this.employeeId(),
+      expense_type_id: rawType.typeId,
+      hospital_id: hosp.hospitalId,
+      disease_id: disease.diseaseId,
+      treatment_date_from: dayjs(this.startDate()).format('YYYY-MM-DD'),
+      treatment_date_to: dayjs(this.endDate()).format('YYYY-MM-DD'),
+      treatment_days: this.calculatedDays(),
+      requested_amount: this.parseNumber(this.amount),
+      remark: this.remark() || undefined,
+      files: files.length > 0 ? files : undefined,
+      file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
+    }).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.swalService.success("ส่งเรื่องเบิกเรียบร้อยแล้ว")
+        // this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
+        this.close();
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.swalService.warning("เกิดข้อผิดพลาดในการส่งเรื่อง")
+        // this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
+      }
+    });
   }
+
 
   // FUNCTION
 
   parseNumber(value: string | number): number {
     if (typeof value === 'number') return value; // already number
-    return Number(value.replace(/,/g, ''));
+    return Number(value.replace(/,/g, ""));
   }
   formatNumber(value: number): string {
-    return value.toLocaleString('en-US');
+    return value.toLocaleString("en-US");
   }
 
   onAmountInput(event: Event) {
@@ -565,7 +532,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     // ตรวจสอบ max amount
     const selectedId = this.selectedClaimType();
-    const claim = this.claimTypes.find((item) => item.id === selectedId);
+    const claim = this.claimTypes.find(item => item.id === selectedId);
     const maxAmount = this.parseNumber(claim?.amount || 0);
     const numericValue = this.parseNumber(money);
 
@@ -574,4 +541,5 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         ? `จำนวนเงินต้องไม่เกิน ${maxAmount.toLocaleString('en-US')} บาท`
         : null;
   }
+
 }

@@ -1,495 +1,411 @@
-<div
-  class="it-request-page"
-  [style]="
-    openBy === 'IT'
-      ? 'padding: 0; height: fit-content; background-color: transparent;'
-      : 'padding: 40px; min-height: 100vh;'
-  "
->
-  <app-page-header
-    *ngIf="openBy !== 'IT'"
-    title="IT Service Request (ขอรับบริการ IT)"
-  ></app-page-header>
+<div class="it-request-page"
+    [style]="openBy === 'IT' ? 'padding: 0; height: fit-content; background-color: transparent;' : 'padding: 40px; min-height: 100vh;'">
+    <app-page-header *ngIf="openBy !== 'IT'" title="IT Service Request (ขอรับบริการ IT)"></app-page-header>
 
-  <div class="service-form-card">
-    <!-- Card Header -->
-    <div class="service-card-header">
-      <div class="header-icon-wrap">
-        <i class="fas fa-concierge-bell"></i>
-      </div>
-      <div>
-        <h4 class="header-title">แบบฟอร์มขอรับบริการ IT</h4>
-        <p class="header-subtitle">
-          เลือกประเภทบริการ ระบุผู้ขอสิทธิ์ และรายละเอียดความต้องการของคุณ
-        </p>
-      </div>
-    </div>
+    <div class="service-form-card">
+        <!-- Card Header -->
+        <div class="service-card-header">
+            <div class="header-icon-wrap">
+                <i class="fas fa-concierge-bell"></i>
+            </div>
+            <div>
+                <h4 class="header-title">แบบฟอร์มขอรับบริการ IT</h4>
+                <p class="header-subtitle">เลือกประเภทบริการ ระบุผู้ขอสิทธิ์ และรายละเอียดความต้องการของคุณ</p>
+            </div>
+        </div>
 
-    <div class="form-section">
-      <h3 class="section-title">
-        ประเภทบริการ (Service Type) <span class="required-badge">*</span>
-        <i class="fas fa-laptop-medical ml-2 text-muted"></i>
-      </h3>
-      <div class="checkbox-grid">
-        @for (service of serviceOptions(); track service.value; let i = $index) {
-          <label
-            class="checkbox-item"
-            [class.checked]="service.checked"
-            [class.disabled]="service.disabled"
-          >
-            <input
-              type="checkbox"
-              [checked]="service.checked"
-              [disabled]="service.disabled"
-              (change)="toggleService(i)"
-            />
-            <span class="checkmark"></span>
-            <span class="label-text">{{ service.label }}</span>
-          </label>
-        }
-      </div>
-
-      @if (isSystemCategorySelected()) {
-        <div class="sub-options-section">
-          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
-
-          <div class="type-selector mb-4">
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('user')"
-              (click)="toggleSystemType('user')"
-            >
-              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
-            </button>
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('system')"
-              (click)="toggleSystemType('system')"
-            >
-              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
-            </button>
-          </div>
-
-          @if (selectedSystemTypes().includes('system')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleSystemSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
+        <div class="form-section">
+            <h3 class="section-title">
+                ประเภทบริการ (Service Type) <span class="required-badge">*</span>
+                <i class="fas fa-laptop-medical ml-2 text-muted"></i>
+            </h3>
+            <div class="checkbox-grid">
+                @for (service of serviceOptions(); track service.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="service.checked" [class.disabled]="service.disabled">
+                    <input type="checkbox" [checked]="service.checked" [disabled]="service.disabled"
+                        (change)="toggleService(i)">
+                    <span class="checkmark"></span>
+                    <span class="label-text">{{ service.label }}</span>
                 </label>
-              }
-            </div>
-          }
-
-          @if (selectedSystemTypes().includes('user')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of userSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleUserSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-        </div>
-      }
-    </div>
-
-    <div class="form-section" *ngIf="!IsOneeJob">
-      <!-- Open For Dropdown -->
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fa-solid fa-book-open-reader"></i>
-          เปิดสิทธิ์ให้ (Open For)
-          <span class="required-badge">*</span></label
-        >
-        <div class="input-pair-row">
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder=""
-            [ngModel]="selectedOpenFor().value"
-            (ngModelChange)="onOpenForChange($event)"
-            name="openFor"
-            class="form-control-select"
-          >
-            @for (opt of openForOptions(); track opt.value) {
-              <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
-            }
-          </nz-select>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="form-group mb-4">
-        <label class="form-label">
-          <i class="fas fa-align-left"></i>
-          รายละเอียด (Details)
-          <span class="required-badge">*</span>
-        </label>
-        <textarea
-          class="form-control"
-          rows="4"
-          placeholder="กรอกรายละเอียดความต้องการ..."
-          [ngModel]="requestDetails()"
-          (ngModelChange)="requestDetails.set($event)"
-        ></textarea>
-      </div>
-
-      <div class="form-group mb-4 mt-3">
-        <label class="form-label">
-          <i class="fas fa-phone-alt field-icon"></i>
-          เบอร์โทรติดต่อ (Phone Number)
-          <span class="required-badge">*</span>
-        </label>
-        <input
-          type="text"
-          class="form-control"
-          [value]="phoneModel"
-          (input)="onPhoneInput($event)"
-          placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
-        />
-      </div>
-    </div>
-
-    <div class="form-section">
-      <h3 class="section-title">
-        ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
-      </h3>
-    </div>
-
-    <!-- Actions Footer -->
-    <div class="form-actions-row">
-      <span class="actions-hint"
-        ><i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลให้ครบถ้วนก่อนส่ง</span
-      >
-      <button class="btn-secondary-action" (click)="clearForm()">
-        <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
-      </button>
-      <button
-        class="btn-primary-action"
-        (click)="submit()"
-        [disabled]="!isFormValid()"
-        [class.disabled-btn]="!isFormValid()"
-      >
-        <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
-      </button>
-    </div>
-  </div>
-
-  <!-- History Detail Modal -->
-  @if (showHistoryDetailModal() && selectedRequest()) {
-    <div class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h3>
-            <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
-          </h3>
-          <button
-            class="btn-close-modal"
-            (click)="closeHistoryDetailModal()"
-            title="ปิด"
-            aria-label="Close details modal"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-            <!-- <span class="sr-only">ปิด</span> -->
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- 1. Open For -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>ชื่อผู้ขอสิทธิ์</th>
-                <td>{{ selectedRequest().openFor }}</td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 2. Status & Date -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ (Status & Date)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>วันที่ขอรับบริการ</th>
-                <td>{{ selectedRequest().date | date: 'dd/MM/yyyy HH:mm' }}</td>
-              </tr>
-              <tr>
-                <th>สถานะ</th>
-                <td>
-                  <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
-                    <i
-                      class="fas"
-                      [class.fa-check-circle]="selectedRequest().status === 'Approved'"
-                      [class.fa-clock]="selectedRequest().status === 'Pending'"
-                    ></i>
-                    {{ selectedRequest().status }}
-                  </span>
-                </td>
-              </tr>
-              @if (selectedRequest().phoneNumber) {
-                <tr>
-                  <th>เบอร์โทรติดต่อ</th>
-                  <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
-                </tr>
-              }
-            </table>
-          </div>
-
-          <!-- 3. Selected Service -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected
-              Services)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>บริการ</th>
-                <td>
-                  <div class="summary-list">
-                    @for (service of selectedRequest().services; track service) {
-                      <div class="summary-item">
-                        @if (selectedRequest().status === 'Pending') {
-                          <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
-                        } @else {
-                          <i class="fas fa-check-circle text-success"></i>
-                        }
-                        <span>{{ service }}</span>
-                      </div>
-                    }
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 4. Selected System (if applicable) -->
-          @if (
-            selectedRequest().systemData && selectedRequest().systemData.selectedTypes.length > 0
-          ) {
-            <div class="summary-section">
-              <h3>
-                <i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)
-              </h3>
-              <table class="info-table vertical-table">
-                @if (selectedRequest().systemData.selectedTypes.includes('user')) {
-                  <tr>
-                    <th>Basic Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of selectedRequest().systemData.userOptions; track opt) {
-                          <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                          </div>
-                        }
-                      </div>
-                    </td>
-                  </tr>
                 }
-                @if (selectedRequest().systemData.selectedTypes.includes('system')) {
-                  <tr>
-                    <th>Specific Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of selectedRequest().systemData.systemOptions; track opt) {
-                          <div class="summary-item sub-item">
-                            <i class="fas fa-check text-primary"></i>
-                            <span>{{ opt }}</span>
-                          </div>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </table>
             </div>
-          }
 
-          <!-- 6. Account Credentials (if applicable) -->
-          @if (selectedRequest().emailAccount) {
-            <div class="summary-section">
-              <h3>ข้อมูลบัญชีผู้ใช้งาน (Account Credentials)</h3>
-              <div class="credentials-card">
-                <div class="credential-item">
-                  <i class="fas fa-envelope"></i>
-                  <div class="cred-info">
-                    <span class="cred-label">Email:</span>
-                    <span class="cred-value">{{ selectedRequest().emailAccount.email }}</span>
-                  </div>
+            @if (isSystemCategorySelected()) {
+            <div class="sub-options-section">
+                <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
+
+                <div class="type-selector mb-4">
+                    <button class="type-btn" [class.active]="selectedSystemTypes().includes('user')"
+                        (click)="toggleSystemType('user')">
+                        <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
+                    </button>
+                    <button class="type-btn" [class.active]="selectedSystemTypes().includes('system')"
+                        (click)="toggleSystemType('system')">
+                        <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
+                    </button>
                 </div>
-                <div class="credential-item">
-                  <i class="fas fa-key"></i>
-                  <div class="cred-info">
-                    <span class="cred-label">Password:</span>
-                    <span class="cred-value">{{ selectedRequest().emailAccount.password }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="security-note">
-                <i class="fas fa-shield-alt"></i>
-                <span>กรุณาเปลี่ยนรหัสผ่านทันทีหลังจากการเข้าใช้งานครั้งแรก</span>
-              </div>
-            </div>
-          }
 
-          <!-- 7. Request Details -->
-          @if (selectedRequest().details) {
-            <div class="summary-section">
-              <h3>รายละเอียด (Details)</h3>
-              <div class="detail-text p-3 bg-light rounded text-muted">
-                {{ selectedRequest().details }}
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (showSummaryModal()) {
-    <div class="modal-overlay">
-      <div class="modal-container">
-        <div class="modal-header">
-          <h2>สรุปรายละเอียดคำขอ</h2>
-          <button
-            class="btn-close-modal"
-            (click)="closeSummaryModal()"
-            title="ปิด"
-            aria-label="Close summary modal"
-          >
-            <i class="fas fa-times" aria-hidden="true"></i>
-            <!-- <span class="sr-only">ปิด</span> -->
-          </button>
-        </div>
-        <div class="modal-body">
-          <!-- 1. Open For -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>ชื่อผู้ขอสิทธิ์</th>
-                <td>
-                  {{ selectedOpenFor().label }}
-                </td>
-              </tr>
-              @if (phoneNumber()) {
-                <tr>
-                  <th>เบอร์โทรติดต่อ</th>
-                  <td class="text-primary font-weight-bold">{{ phoneNumber() }}</td>
-                </tr>
-              }
-            </table>
-          </div>
-
-          <!-- 2. Selected Service -->
-          <div class="summary-section">
-            <h3>
-              <i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected
-              Services)
-            </h3>
-            <table class="info-table vertical-table">
-              <tr>
-                <th>บริการ</th>
-                <td>
-                  <div class="summary-list">
-                    @for (service of serviceOptions(); track service.value) {
-                      @if (service.checked) {
-                        <div class="summary-item">
-                          <i class="fas fa-check-circle text-success"></i>
-                          <span>{{ service.label }}</span>
-                        </div>
-                      }
-                    }
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- 3. Selected System (if applicable) -->
-          @if (isSystemCategorySelected()) {
-            <div class="summary-section">
-              <h3>
-                <i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)
-              </h3>
-              <table class="info-table vertical-table">
-                @if (selectedSystemTypes().includes('user')) {
-                  <tr>
-                    <th>Basic Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of userSubOptions(); track opt.value) {
-                          @if (opt.checked) {
-                            <div class="summary-item sub-item">
-                              <i class="fas fa-check text-primary"></i>
-                              <span>{{ opt.label }}</span>
-                            </div>
-                          }
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
                 @if (selectedSystemTypes().includes('system')) {
-                  <tr>
-                    <th>Specific Systems</th>
-                    <td>
-                      <div class="summary-list">
-                        @for (opt of systemSubOptions(); track opt.value) {
-                          @if (opt.checked) {
-                            <div class="summary-item sub-item">
-                              <i class="fas fa-check text-primary"></i>
-                              <span>{{ opt.label }}</span>
-                            </div>
-                          }
-                        }
-                      </div>
-                    </td>
-                  </tr>
+                <div class="checkbox-grid slide-down">
+                    @for (opt of systemSubOptions(); track opt.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="opt.checked">
+                        <input type="checkbox" [checked]="opt.checked" (change)="toggleSystemSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ opt.label }}</span>
+                    </label>
+                    }
+                </div>
                 }
-              </table>
-            </div>
-          }
 
-          <!-- 4. Request Details -->
-          @if (requestDetails()) {
-            <div class="summary-section">
-              <h3>รายละเอียด (Details)</h3>
-              <div class="detail-text p-3 bg-light rounded text-muted">
-                {{ requestDetails() }}
-              </div>
+                @if (selectedSystemTypes().includes('user')) {
+                <div class="checkbox-grid slide-down">
+                    @for (opt of userSubOptions(); track opt.value; let i = $index) {
+                    <label class="checkbox-item" [class.checked]="opt.checked">
+                        <input type="checkbox" [checked]="opt.checked" (change)="toggleUserSubOption(i)">
+                        <span class="checkmark"></span>
+                        <span class="label-text">{{ opt.label }}</span>
+                    </label>
+                    }
+                </div>
+                }
             </div>
-          }
+            }
+
         </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
-          <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+
+        <div class="form-section" *ngIf="!IsOneeJob">
+            <!-- Open For Dropdown -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    เปิดสิทธิ์ให้ (Open For)
+                    <span class="required-badge">*</span></label>
+                <div class="input-pair-row">
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="" [ngModel]="selectedOpenFor().value"
+                        (ngModelChange)="onOpenForChange($event)" name="openFor" class="form-control-select">
+                        @for (opt of openForOptions(); track opt.value) {
+                        <nz-option [nzLabel]=" opt.label" [nzValue]="opt.value" />
+                        }
+                    </nz-select>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="form-section">
+            <div class="form-group mb-4">
+                <label class="form-label">
+                    <i class="fas fa-align-left"></i>
+                    รายละเอียด (Details)
+                    <span class="required-badge">*</span>
+                </label>
+                <textarea class="form-control" rows="4" placeholder="กรอกรายละเอียดความต้องการ..."
+                    [ngModel]="requestDetails()" (ngModelChange)="requestDetails.set($event)"></textarea>
+            </div>
+
+            <div class="form-group mb-4 mt-3">
+                <label class="form-label">
+                    <i class="fas fa-phone-alt field-icon"></i>
+                    เบอร์โทรติดต่อ (Phone Number)
+                    <span class="required-badge">*</span>
+                </label>
+                <input type="text" class="form-control" [value]="phoneModel" (input)="onPhoneInput($event)"
+                    placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้...">
+            </div>
+        </div>
+
+
+        <div class="form-section">
+            <h3 class="section-title">
+                ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
+            </h3>
+        </div>
+
+        <!-- Actions Footer -->
+        <div class="form-actions-row">
+            <span class="actions-hint"><i class="fas fa-info-circle"></i> ตรวจสอบข้อมูลให้ครบถ้วนก่อนส่ง</span>
+            <button class="btn-secondary-action" (click)="clearForm()">
+                <i class="fas fa-eraser mr-2"></i> ล้างข้อมูล
+            </button>
+            <button class="btn-primary-action" (click)="submit()" [disabled]="!isFormValid()"
+                [class.disabled-btn]="!isFormValid()">
+                <i class="fas fa-paper-plane mr-2"></i> ส่งคำขอ
+            </button>
+        </div>
     </div>
-  }
+
+    <!-- History Detail Modal -->
+    @if (showHistoryDetailModal() && selectedRequest()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}</h3>
+                <button class="btn-close-modal" (click)="closeHistoryDetailModal()" title="ปิด"
+                    aria-label="Close details modal">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                    <!-- <span class="sr-only">ปิด</span> -->
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 1. Open For -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>ชื่อผู้ขอสิทธิ์</th>
+                            <td>{{ selectedRequest().openFor }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 2. Status & Date -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-calendar-alt mr-2 text-primary"></i> วันที่และสถานะ (Status & Date)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>วันที่ขอรับบริการ</th>
+                            <td>{{ selectedRequest().date | date:'dd/MM/yyyy HH:mm' }}</td>
+                        </tr>
+                        <tr>
+                            <th>สถานะ</th>
+                            <td>
+                                <span class="status-badge" [class]="selectedRequest().status.toLowerCase()">
+                                    <i class="fas" [class.fa-check-circle]="selectedRequest().status === 'Approved'"
+                                        [class.fa-clock]="selectedRequest().status === 'Pending'"></i>
+                                    {{ selectedRequest().status }}
+                                </span>
+                            </td>
+                        </tr>
+                        @if (selectedRequest().phoneNumber) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ selectedRequest().phoneNumber }}</td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+
+                <!-- 3. Selected Service -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected Services)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>บริการ</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (service of selectedRequest().services; track service) {
+                                    <div class="summary-item">
+                                        @if (selectedRequest().status === 'Pending') {
+                                        <i class="fas fa-hourglass-half text-yellow fa-spin"></i>
+                                        } @else {
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        }
+                                        <span>{{ service }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 4. Selected System (if applicable) -->
+                @if (selectedRequest().systemData && selectedRequest().systemData.selectedTypes.length > 0) {
+                <div class="summary-section">
+                    <h3><i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)</h3>
+                    <table class="info-table vertical-table">
+                        @if (selectedRequest().systemData.selectedTypes.includes('user')) {
+                        <tr>
+                            <th>Basic Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of selectedRequest().systemData.userOptions; track opt) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        @if (selectedRequest().systemData.selectedTypes.includes('system')) {
+                        <tr>
+                            <th>Specific Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of selectedRequest().systemData.systemOptions; track opt) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt }}</span>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+                }
+
+
+
+                <!-- 6. Account Credentials (if applicable) -->
+                @if (selectedRequest().emailAccount) {
+                <div class="summary-section">
+                    <h3>ข้อมูลบัญชีผู้ใช้งาน (Account Credentials)</h3>
+                    <div class="credentials-card">
+                        <div class="credential-item">
+                            <i class="fas fa-envelope"></i>
+                            <div class="cred-info">
+                                <span class="cred-label">Email:</span>
+                                <span class="cred-value">{{ selectedRequest().emailAccount.email }}</span>
+                            </div>
+                        </div>
+                        <div class="credential-item">
+                            <i class="fas fa-key"></i>
+                            <div class="cred-info">
+                                <span class="cred-label">Password:</span>
+                                <span class="cred-value">{{ selectedRequest().emailAccount.password }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-note">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>กรุณาเปลี่ยนรหัสผ่านทันทีหลังจากการเข้าใช้งานครั้งแรก</span>
+                    </div>
+                </div>
+                }
+
+                <!-- 7. Request Details -->
+                @if (selectedRequest().details) {
+                <div class="summary-section">
+                    <h3>รายละเอียด (Details)</h3>
+                    <div class="detail-text p-3 bg-light rounded text-muted">
+                        {{ selectedRequest().details }}
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-primary" (click)="closeHistoryDetailModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (showSummaryModal()) {
+    <div class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>สรุปรายละเอียดคำขอ</h2>
+                <button class="btn-close-modal" (click)="closeSummaryModal()" title="ปิด"
+                    aria-label="Close summary modal">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                    <!-- <span class="sr-only">ปิด</span> -->
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 1. Open For -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-user-circle mr-2 text-primary"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>ชื่อผู้ขอสิทธิ์</th>
+                            <td>
+                                {{ selectedOpenFor().label }}
+                            </td>
+                        </tr>
+                        @if (phoneNumber()) {
+                        <tr>
+                            <th>เบอร์โทรติดต่อ</th>
+                            <td class="text-primary font-weight-bold">{{ phoneNumber() }}</td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+
+                <!-- 2. Selected Service -->
+                <div class="summary-section">
+                    <h3><i class="fas fa-concierge-bell mr-2 text-primary"></i> บริการที่เลือก (Selected Services)</h3>
+                    <table class="info-table vertical-table">
+                        <tr>
+                            <th>บริการ</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (service of serviceOptions(); track service.value) {
+                                    @if (service.checked) {
+                                    <div class="summary-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>{{ service.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 3. Selected System (if applicable) -->
+                @if (isSystemCategorySelected()) {
+                <div class="summary-section">
+                    <h3><i class="fas fa-desktop mr-2 text-primary"></i> ระบบที่เลือก (Selected Systems)</h3>
+                    <table class="info-table vertical-table">
+                        @if (selectedSystemTypes().includes('user')) {
+                        <tr>
+                            <th>Basic Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of userSubOptions(); track opt.value) {
+                                    @if (opt.checked) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        @if (selectedSystemTypes().includes('system')) {
+                        <tr>
+                            <th>Specific Systems</th>
+                            <td>
+                                <div class="summary-list">
+                                    @for (opt of systemSubOptions(); track opt.value) {
+                                    @if (opt.checked) {
+                                    <div class="summary-item sub-item">
+                                        <i class="fas fa-check text-primary"></i>
+                                        <span>{{ opt.label }}</span>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+                }
+
+                <!-- 4. Request Details -->
+                @if (requestDetails()) {
+                <div class="summary-section">
+                    <h3>รายละเอียด (Details)</h3>
+                    <div class="detail-text p-3 bg-light rounded text-muted">
+                        {{ requestDetails() }}
+                    </div>
+                </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeSummaryModal()">แก้ไข</button>
+                <button class="btn-confirm" (click)="confirmSubmission()">ยืนยันการส่ง</button>
+            </div>
+        </div>
+    </div>
+    }
 </div>

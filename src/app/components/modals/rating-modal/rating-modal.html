@@ -1,46 +1,29 @@
 <div class="rating-modal-overlay" (click)="close()">
-  <div class="rating-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>ประเมินความพึงพอใจ</h3>
-      <button class="btn-close" (click)="close()">
-        <i class="fas fa-times"></i>
-      </button>
+    <div class="rating-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>ประเมินความพึงพอใจ</h3>
+            <button class="btn-close" (click)="close()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="rating-stars">
+                <i *ngFor="let s of [1,2,3,4,5]" class="fa-star" [class.fas]="s <= (hoverRating() || rating())"
+                    [class.far]="s > (hoverRating() || rating())" (click)="setRating(s)" (mouseenter)="setHover(s)"
+                    (mouseleave)="setHover(0)">
+                </i>
+            </div>
+            <p class="rating-label">
+                {{ rating() === 5 ? 'ยอดเยี่ยม' : rating() === 4 ? 'ดีมาก' : rating() === 3 ? 'ดี' : rating() === 2 ?
+                'พอใช้' : rating() === 1 ? 'ควรปรับปรุง' : 'ให้คะแนนความพึงพอใจ' }}
+            </p>
+            <div class="comment-box">
+                <textarea placeholder="คำแนะนำเพิ่มเติม..." [(ngModel)]="comment"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="close()">ยกเลิก</button>
+            <button class="btn-submit" [disabled]="rating() === 0" (click)="submit()">ส่งประเมิน</button>
+        </div>
     </div>
-    <div class="modal-body">
-      <div class="rating-stars">
-        <i
-          *ngFor="let s of [1, 2, 3, 4, 5]"
-          class="fa-star"
-          [class.fas]="s <= (hoverRating() || rating())"
-          [class.far]="s > (hoverRating() || rating())"
-          (click)="setRating(s)"
-          (mouseenter)="setHover(s)"
-          (mouseleave)="setHover(0)"
-        >
-        </i>
-      </div>
-      <p class="rating-label">
-        {{
-          rating() === 5
-            ? 'ยอดเยี่ยม'
-            : rating() === 4
-              ? 'ดีมาก'
-              : rating() === 3
-                ? 'ดี'
-                : rating() === 2
-                  ? 'พอใช้'
-                  : rating() === 1
-                    ? 'ควรปรับปรุง'
-                    : 'ให้คะแนนความพึงพอใจ'
-        }}
-      </p>
-      <div class="comment-box">
-        <textarea placeholder="คำแนะนำเพิ่มเติม..." [(ngModel)]="comment"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" (click)="close()">ยกเลิก</button>
-      <button class="btn-submit" [disabled]="rating() === 0" (click)="submit()">ส่งประเมิน</button>
-    </div>
-  </div>
 </div>

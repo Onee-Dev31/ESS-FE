@@ -9,11 +9,19 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-assign-modal',
-  imports: [CommonModule, FormsModule, NzSelectModule, NzButtonModule, NzIconModule, NzModalModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzSelectModule,
+    NzButtonModule,
+    NzIconModule,
+    NzModalModule,
+  ],
   templateUrl: './assign-modal.html',
   styleUrl: './assign-modal.scss',
 })
 export class AssignModal {
+
   private swalService = inject(SwalService);
 
   @Input() ticket: any;
@@ -26,36 +34,38 @@ export class AssignModal {
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
   assignSearchKeyword = '';
+  ticketId: number | null = null;
 
   ngOnChanges(changes: SimpleChanges) {
+
     if (changes['ticket'] && this.ticket) {
-      console.log(this.ticket);
-
       this.selectedTag = this.ticket.ticketTypeId;
-
       if (this.ticket.assignments) {
-        this.selectedAssigneeEmpCodes = this.ticket.assignments.map((a: any) => ({
-          id: a.codeempid,
-          name: a.full_name,
-          adUser: a.aduser,
-        }));
+        this.ticketId = this.ticket.ticketId
+        this.selectedAssigneeEmpCodes = this.ticket.assignments
+          .map((a: any) => ({
+            id: a.codeempid,
+            name: a.full_name,
+            adUser: a.aduser
+          }));
+
       }
     }
+
   }
 
   close() {
     this.closeModal.emit();
   }
 
+
   get filteredAssigneeGroups() {
     const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
     if (!kw) return this.assigneeGroups;
-    return this.assigneeGroups
-      .map((g) => ({
-        ...g,
-        members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw)),
-      }))
-      .filter((g) => g.members.length > 0);
+    return this.assigneeGroups.map(g => ({
+      ...g,
+      members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw))
+    })).filter(g => g.members.length > 0);
   }
 
   onImgError(event: Event) {
@@ -70,7 +80,7 @@ export class AssignModal {
   }
 
   toggleAssignee(emp: any) {
-    const idx = this.selectedAssigneeEmpCodes.findIndex((e) => e.id === emp.id);
+    const idx = this.selectedAssigneeEmpCodes.findIndex(e => e.id === emp.id);
 
     if (idx > -1) {
       this.selectedAssigneeEmpCodes.splice(idx, 1);
@@ -79,46 +89,57 @@ export class AssignModal {
     }
   }
   toggleGroup(group: any) {
+
     const memberIds = group.members.map((m: any) => m.id);
 
     const allIn = memberIds.every((id: any) =>
-      this.selectedAssigneeEmpCodes.some((e) => e.id === id),
+      this.selectedAssigneeEmpCodes.some(e => e.id === id)
     );
 
     if (allIn) {
-      this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter(
-        (e) => !memberIds.includes(e.id),
-      );
+
+      this.selectedAssigneeEmpCodes =
+        this.selectedAssigneeEmpCodes.filter(e => !memberIds.includes(e.id));
+
     } else {
+
       group.members.forEach((m: any) => {
-        const exists = this.selectedAssigneeEmpCodes.some((e) => e.id === m.id);
+
+        const exists = this.selectedAssigneeEmpCodes.some(e => e.id === m.id);
 
         if (!exists) {
           this.selectedAssigneeEmpCodes.push(m);
         }
+
       });
+
     }
+
   }
 
   isGroupSelected(group: any): boolean {
     return group.members.every((m: any) =>
-      this.selectedAssigneeEmpCodes.some((e) => e.id === m.id),
+      this.selectedAssigneeEmpCodes.some(e => e.id === m.id)
     );
   }
 
   isSelected(empId: string): boolean {
-    return this.selectedAssigneeEmpCodes.some((e) => e.id === empId);
+    return this.selectedAssigneeEmpCodes.some(e => e.id === empId);
   }
 
   removeAssignee(empId: string) {
-    this.selectedAssigneeEmpCodes = this.selectedAssigneeEmpCodes.filter((e) => e.id !== empId);
+
+    this.selectedAssigneeEmpCodes =
+      this.selectedAssigneeEmpCodes.filter(e => e.id !== empId);
+
   }
 
   save() {
-    // console.log(this.selectedAssigneeEmpCodes)
     this.submitModal.emit({
       assignees: this.selectedAssigneeEmpCodes,
       ticketTypeId: this.selectedTag,
+      ticketId: this.ticketId
     });
+
   }
 }

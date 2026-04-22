@@ -1,20 +1,13 @@
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  AfterViewInit,
-  ViewChild,
-  ElementRef,
-  signal,
-  inject,
-  computed,
+  Component, OnInit, OnDestroy, AfterViewInit,
+  ViewChild, ElementRef, signal, inject, computed
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, } from '@angular/common/http';
 
 @Component({
   selector: 'app-save-signature',
@@ -141,10 +134,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
       const touch = event.touches[0];
       return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
     }
-    return {
-      x: (event as MouseEvent).clientX - rect.left,
-      y: (event as MouseEvent).clientY - rect.top,
-    };
+    return { x: (event as MouseEvent).clientX - rect.left, y: (event as MouseEvent).clientY - rect.top };
   }
 
   startDrawing(event: MouseEvent | TouchEvent) {
@@ -211,7 +201,7 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
     const payload = {
       codeEmpId: this.loginUser()?.CODEMPID,
       base64Signature: base64,
-      isActive: true,
+      isActive: true
     };
 
     this.http.post(`${this.baseUrl}/employee-signature`, payload).subscribe({
@@ -224,38 +214,39 @@ export class SaveSignature implements OnInit, AfterViewInit, OnDestroy {
       error: () => {
         this.isSaving.set(false);
         this.toastService.error('บันทึกลายเซนต์ไม่สำเร็จ');
-      },
+      }
     });
   }
   loadSignature() {
     const empId = this.loginUser()?.CODEMPID;
     if (!empId) return;
 
-    this.http.get<any>(`${this.baseUrl}/employee-signature/${empId}`).subscribe({
-      next: (res) => {
-        const base64 = res?.data?.Base64Signature;
-        if (!base64) return;
+    this.http.get<any>(`${this.baseUrl}/employee-signature/${empId}`)
+      .subscribe({
+        next: (res) => {
+          const base64 = res?.data?.Base64Signature;
+          if (!base64) return;
 
-        const img = new Image();
+          const img = new Image();
 
-        img.onload = () => {
-          const canvas = this.canvasRef.nativeElement;
+          img.onload = () => {
+            const canvas = this.canvasRef.nativeElement;
 
-          this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-          this.fillCanvasBg();
+            this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            this.fillCanvasBg();
 
-          this.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            this.ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          this.hasSignature.set(true);
-          this.isSaved.set(true);
-          this.savedSignatureUrl.set(base64);
-        };
+            this.hasSignature.set(true);
+            this.isSaved.set(true);
+            this.savedSignatureUrl.set(base64);
+          };
 
-        img.src = base64;
+          img.src = base64;
       },
       error: () => {
         console.log('no signature');
-      },
+      }
     });
   }
 }

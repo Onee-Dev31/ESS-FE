@@ -8,8 +8,9 @@ describe('ItRepairRequestComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ItRepairRequestComponent],
-    }).compileComponents();
+      imports: [ItRepairRequestComponent]
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ItRepairRequestComponent);
     component = fixture.componentInstance;

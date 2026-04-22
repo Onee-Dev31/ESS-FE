@@ -9,115 +9,87 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 export interface ClaimType {
-  id: string;
-  label: string;
-  amount: string;
-  icon: string;
-  color: string;
-  group: 'outpatient' | 'inpatient';
+    id: string;
+    label: string;
+    amount: string;
+    icon: string;
+    color: string;
+    group: 'outpatient' | 'inpatient';
 }
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root'
 })
 export class MasterDataService {
-  private baseUrl = environment.api_url;
 
-  private leaveTypesCache$: Observable<LeaveType[]> | null = null;
-  private claimTypesCache$: Observable<ClaimType[]> | null = null;
-  private dateConfigCache$: Observable<DateConfig> | null = null;
+    private baseUrl = environment.api_url;
 
-  constructor(private _http: HttpClient) {}
+    private leaveTypesCache$: Observable<LeaveType[]> | null = null;
+    private claimTypesCache$: Observable<ClaimType[]> | null = null;
+    private dateConfigCache$: Observable<DateConfig> | null = null;
 
-  /** ดึงรายการประเภทการลาทั้งหมด (รองรับการทำ Cache) */
-  getLeaveTypes(): Observable<LeaveType[]> {
-    if (!this.leaveTypesCache$) {
-      this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(delay(500), shareReplay(1));
+    constructor(private _http: HttpClient) { }
+
+    /** ดึงรายการประเภทการลาทั้งหมด (รองรับการทำ Cache) */
+    getLeaveTypes(): Observable<LeaveType[]> {
+        if (!this.leaveTypesCache$) {
+            this.leaveTypesCache$ = of(LEAVE_TYPES).pipe(
+                delay(500),
+                shareReplay(1)
+            );
+        }
+        return this.leaveTypesCache$;
     }
-    return this.leaveTypesCache$;
-  }
 
-  /** ดึงรายการประเภทการเบิกค่ารักษาพยาบาล */
-  getMedicalClaimTypes(): Observable<ClaimType[]> {
-    if (!this.claimTypesCache$) {
-      const types: ClaimType[] = [
-        {
-          id: 'opd',
-          label: 'ผู้ป่วยนอก (OPD)',
-          amount: '10,500',
-          icon: 'fas fa-stethoscope',
-          color: 'var(--danger)',
-          group: 'outpatient',
-        },
-        {
-          id: 'dental',
-          label: 'ทันตกรรม',
-          amount: '584',
-          icon: 'fas fa-tooth',
-          color: 'var(--primary)',
-          group: 'outpatient',
-        },
-        {
-          id: 'vision',
-          label: 'สายตา',
-          amount: '876',
-          icon: 'fas fa-glasses',
-          color: 'var(--primary)',
-          group: 'outpatient',
-        },
-        {
-          id: 'ipd',
-          label: 'ผู้ป่วยใน',
-          amount: '3,500',
-          icon: 'fas fa-user-md',
-          color: 'var(--success)',
-          group: 'inpatient',
-        },
-      ];
-      this.claimTypesCache$ = of(types).pipe(delay(500), shareReplay(1));
+    /** ดึงรายการประเภทการเบิกค่ารักษาพยาบาล */
+    getMedicalClaimTypes(): Observable<ClaimType[]> {
+        if (!this.claimTypesCache$) {
+            const types: ClaimType[] = [
+                { id: 'opd', label: 'ผู้ป่วยนอก (OPD)', amount: '10,500', icon: 'fas fa-stethoscope', color: 'var(--danger)', group: 'outpatient' },
+                { id: 'dental', label: 'ทันตกรรม', amount: '584', icon: 'fas fa-tooth', color: 'var(--primary)', group: 'outpatient' },
+                { id: 'vision', label: 'สายตา', amount: '876', icon: 'fas fa-glasses', color: 'var(--primary)', group: 'outpatient' },
+                { id: 'ipd', label: 'ผู้ป่วยใน', amount: '3,500', icon: 'fas fa-user-md', color: 'var(--success)', group: 'inpatient' },
+            ];
+            this.claimTypesCache$ = of(types).pipe(
+                delay(500),
+                shareReplay(1)
+            );
+        }
+        return this.claimTypesCache$;
     }
-    return this.claimTypesCache$;
-  }
 
-  getDateConfig(): Observable<DateConfig> {
-    if (!this.dateConfigCache$) {
-      const config = {
-        months: [
-          'มกราคม',
-          'กุมภาพันธ์',
-          'มีนาคม',
-          'เมษายน',
-          'พฤษภาคม',
-          'มิถุนายน',
-          'กรกฎาคม',
-          'สิงหาคม',
-          'กันยายน',
-          'ตุลาคม',
-          'พฤศจิกายน',
-          'ธันวาคม',
-        ],
-        years: [2568, 2569, 2570],
-      };
-      this.dateConfigCache$ = of(config).pipe(delay(300), shareReplay(1));
+    getDateConfig(): Observable<DateConfig> {
+        if (!this.dateConfigCache$) {
+            const config = {
+                months: [
+                    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+                ],
+                years: [2568, 2569, 2570]
+            };
+            this.dateConfigCache$ = of(config).pipe(
+                delay(300),
+                shareReplay(1)
+            );
+        }
+        return this.dateConfigCache$;
     }
-    return this.dateConfigCache$;
-  }
 
-  /* MASTER API*/
+    /* MASTER API*/
 
-  getBankMaster(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/Master/banks`);
-  }
+    getBankMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/banks`);
+    }
 
-  getCompanyMaster(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/Master/companies`);
-  }
+    getCompanyMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/companies`);
+    }
 
-  getDepartmentMaster(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/Master/company-costcent`);
-  }
+    getDepartmentMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/company-costcent`);
+    }
 
-  getRoleMaster(): Observable<any> {
-    return this._http.get(`${this.baseUrl}/Master/roles/active`);
-  }
+    getRoleMaster(): Observable<any> {
+        return this._http.get(`${this.baseUrl}/Master/roles/active`);
+    }
 }

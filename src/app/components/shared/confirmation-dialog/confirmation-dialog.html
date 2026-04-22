@@ -1,28 +1,24 @@
 @if (dialogService.activeDialog(); as dialog) {
-  <div class="dialog-overlay" (click)="cancel()">
+<div class="dialog-overlay" (click)="cancel()">
     <div class="dialog-container" (click)="$event.stopPropagation()">
-      <div class="dialog-icon" [style.color]="getIconColor(dialog.type || 'info')">
-        <i class="fas {{ getIcon(dialog.type || 'info') }}"></i>
-      </div>
+        <div class="dialog-icon" [style.color]="getIconColor(dialog.type || 'info')">
+            <i class="fas {{ getIcon(dialog.type || 'info') }}"></i>
+        </div>
 
-      <div class="dialog-content">
-        <h3 class="dialog-title">{{ dialog.title }}</h3>
-        <p class="dialog-message" [innerHTML]="dialog.message"></p>
-      </div>
+        <div class="dialog-content">
+            <h3 class="dialog-title">{{ dialog.title }}</h3>
+            <p class="dialog-message" [innerHTML]="dialog.message"></p>
+        </div>
 
-      <div class="dialog-actions">
-        <button class="btn-cancel" (click)="cancel()">
-          {{ dialog.cancelText }}
-        </button>
-        <button
-          class="btn-confirm"
-          [class.btn-danger]="dialog.type === 'danger'"
-          [class.btn-warning]="dialog.type === 'warning'"
-          (click)="confirm()"
-        >
-          {{ dialog.confirmText }}
-        </button>
-      </div>
+        <div class="dialog-actions">
+            <button class="btn-cancel" (click)="cancel()">
+                {{ dialog.cancelText }}
+            </button>
+            <button class="btn-confirm" [class.btn-danger]="dialog.type === 'danger'"
+                [class.btn-warning]="dialog.type === 'warning'" (click)="confirm()">
+                {{ dialog.confirmText }}
+            </button>
+        </div>
     </div>
-  </div>
+</div>
 }

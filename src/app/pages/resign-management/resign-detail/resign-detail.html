@@ -1,420 +1,337 @@
 <div class="page">
-  <app-page-header [title]="pageTitle()" [backUrl]="'/resign-management'"> </app-page-header>
+    <app-page-header [title]="pageTitle()" [backUrl]="'/resign-management'">
+    </app-page-header>
 
-  <div class="search-section">
-    <div class="search-title">ค้นหา</div>
-    <form (ngSubmit)="applyFilter()">
-      <div class="filter-row">
-        <div class="filter-group-main">
-          <input
-            nz-input
-            type="text"
-            name="searchText"
-            class="form-control"
-            placeholder="ชื่อ, นามสกุล, ชื่อเล่น"
-            [ngModel]="searchText()"
-            (ngModelChange)="searchText.set($event)"
-          />
+    <div class="search-section">
+        <div class="search-title">ค้นหา</div>
+        <form (ngSubmit)="applyFilter()">
+            <div class="filter-row">
+                <div class="filter-group-main">
+                    <input nz-input type="text" name="searchText" class="form-control"
+                        placeholder="ชื่อ, นามสกุล, ชื่อเล่น" [ngModel]="searchText()"
+                        (ngModelChange)="searchText.set($event)">
 
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder="เลือกบริษัท"
-            [ngModel]="filterCompany()"
-            (ngModelChange)="onCompanyChange($event)"
-            name="company"
-            class="form-control"
-          >
-            <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
-            <nz-option
-              *ngFor="let company of companyList()"
-              [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
-              [nzValue]="company"
-            />
-          </nz-select>
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท" [ngModel]="filterCompany()"
+                        (ngModelChange)="onCompanyChange($event)" name="company" class="form-control">
+                        <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
+                        <nz-option *ngFor="let company of companyList()"
+                            [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'" [nzValue]="company" />
+                    </nz-select>
 
-          <nz-select
-            nzShowSearch
-            nzAllowClear
-            nzPlaceHolder="เลือกแผนก"
-            [ngModel]="filterDepartment()"
-            (ngModelChange)="filterDepartment.set($event)"
-            name="department"
-            class="form-control"
-            [class.disabled]="!filterCompany()"
-            [nzDisabled]="!filterCompany()"
-          >
-            <!-- <nz-option nzLabel="เลือกแผนก" nzValue="" nzDisabled /> -->
-            <nz-option
-              *ngFor="let dept of filteredDepartmentList()"
-              [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT"
-              [nzValue]="dept"
-            />
-          </nz-select>
-        </div>
-        <button class="btn-search-purple" type="submit"><i class="fas fa-search"></i> ค้นหา</button>
-      </div>
-    </form>
-  </div>
-
-  <nz-tabs [nzSelectedIndex]="activeTabIndex" (nzSelectedIndexChange)="selectTab($event)">
-    <nz-tab *ngFor="let tab of tabs" [nzTitle]="tab.name"> </nz-tab>
-  </nz-tabs>
-
-  <div class="content-card resign">
-    <div class="card-header-title">
-      รายชื่อพนักงานประจำลาออก
-      <button class="btn-export" (click)="viewReportResign('fulltime')">
-        <i class="fa-solid fa-folder-open"></i>ดูรายงาน
-      </button>
-    </div>
-    <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5"></app-skeleton>
-      } @else {
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th style="width: 40px">
-                <label class="checkbox-custom">
-                  <input
-                    type="checkbox"
-                    [checked]="isAllSelectedEmployee()"
-                    [indeterminate]="isSomeSelectedEmployee()"
-                    (change)="toggleSelectAllEmployees($event)"
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              </th>
-              <th class="">ชื่อ-นามสกุล</th>
-              <th class="">แผนก</th>
-              <th class="">บริษัท</th>
-              <th>Last Date</th>
-              <th>Effective Date</th>
-              <th>Aduser</th>
-              <th>Expire Date</th>
-              <th class="text-center actions-col">
-                <button class="btn-approve" (click)="approve('Employee')">
-                  <i class="fa-solid fa-user-check"></i>Approve
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก" [ngModel]="filterDepartment()"
+                        (ngModelChange)="filterDepartment.set($event)" name="department" class="form-control"
+                        [class.disabled]="!filterCompany()" [nzDisabled]="!filterCompany()">
+                        <!-- <nz-option nzLabel="เลือกแผนก" nzValue="" nzDisabled /> -->
+                        <nz-option *ngFor="let dept of filteredDepartmentList()"
+                            [nzLabel]="dept.COSTCENT + ' - ' + dept.NAMECOSTCENT" [nzValue]="dept" />
+                    </nz-select>
+                </div>
+                <button class="btn-search-purple" type="submit">
+                    <i class="fas fa-search"></i> ค้นหา
                 </button>
-              </th>
-            </tr>
-          </thead>
-          @for (emp of resignComps.paginatedData(); track emp.empCode) {
-            <tbody>
-              <tr>
-                <td>
-                  <label class="checkbox-custom">
-                    <input
-                      type="checkbox"
-                      [checked]="isCheckedEmployee(emp.empCode)"
-                      (change)="toggleSelectEmployee(emp, $any($event.target).checked)"
-                    />
-                    <span class="checkmark"></span>
-                  </label>
-                </td>
-                <td class="col-name">
-                  <div class="profile-name">
-                    <div class="profile">
-                      <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode + '.jpg'
-                        "
-                        (error)="onImgError($event)"
-                      />
-                    </div>
-                    <div class="name-block">
-                      <div class="fullname">
-                        {{ emp.firstNameTh }} {{ emp.lastNameTh }}
+            </div>
+        </form>
+    </div>
 
-                        <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
-                      </div>
+    <nz-tabs [nzSelectedIndex]="activeTabIndex" (nzSelectedIndexChange)="selectTab($event)">
+        <nz-tab *ngFor="let tab of tabs" [nzTitle]="tab.name">
+        </nz-tab>
+    </nz-tabs>
 
-                      <div class="code">
-                        {{ emp.empCode }}
-                      </div>
+    <div class="content-card resign">
+        <div class="card-header-title">
+            รายชื่อพนักงานประจำลาออก
+            <button class="btn-export" (click)="viewReportResign('fulltime')"> <i
+                    class="fa-solid fa-folder-open"></i>ดูรายงาน</button>
+        </div>
+        <div class="table-responsive">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px">
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isAllSelectedEmployee()"
+                                    [indeterminate]="isSomeSelectedEmployee()"
+                                    (change)="toggleSelectAllEmployees($event)" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </th>
+                        <th class="">ชื่อ-นามสกุล</th>
+                        <th class="">แผนก</th>
+                        <th class="">บริษัท</th>
+                        <th>Last Date</th>
+                        <th>Effective Date</th>
+                        <th>Aduser</th>
+                        <th>Expire Date</th>
+                        <th class="text-center actions-col">
+                            <button class="btn-approve" (click)="approve('Employee')">
+                                <i class="fa-solid fa-user-check"></i>Approve
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                @for (emp of resignComps.paginatedData(); track emp.empCode) {
+                <tbody>
+                    <tr>
+                        <td>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isCheckedEmployee(emp.empCode)"
+                                    (change)="toggleSelectEmployee(emp, $any($event.target).checked)" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+                        <td class="col-name">
+                            <div class="profile-name">
+                                <div class="profile">
+                                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode + '.jpg'"
+                                        (error)="onImgError($event)" />
+                                </div>
+                                <div class="name-block">
+                                    <div class="fullname">{{ emp.firstNameTh }} {{ emp.lastNameTh }}
 
-                      <div class="position">
-                        {{ emp.position }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="col-department">{{ emp.department }}</td>
-                <td class="col-company">{{ emp.company }}</td>
-                <td class="col-company">
-                  {{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY') }}
-                </td>
-                <td class="col-company">
-                  {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
-                </td>
-                <td class="col-company">{{ emp.adUser }}</td>
-                <td class="col-expire">
-                  <div *ngIf="emp.expireDate" class="detail">
-                    {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
-                  </div>
-                </td>
-                <td class="col-action">
-                  <div class="Info-delete">
-                    <button class="btn-ghost" (click)="onView(emp)">
-                      <i class="fa-solid fa-circle-info"></i>Info
-                    </button>
-                    <!-- <button class="btn-approve" (click)="approve(emp)">
+                                        <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                    </div>
+
+                                    <div class="code">
+                                        {{ emp.empCode }}
+                                    </div>
+
+                                    <div class="position">
+                                        {{ emp.position }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-department">{{ emp.department }}</td>
+                        <td class="col-company">{{ emp.company }}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
+                        <td class="col-company">{{ emp.adUser }}</td>
+                        <td class="col-expire">
+                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
+                                'DD/MM/YYYY') }}</div>
+                        </td>
+                        <td class="col-action">
+                            <div class="Info-delete">
+                                <button class="btn-ghost" (click)="onView(emp)">
+                                    <i class="fa-solid fa-circle-info"></i>Info
+                                </button>
+                                <!-- <button class="btn-approve" (click)="approve(emp)">
                                     <i class="fa-solid fa-user-check"></i>Approve
                                 </button> -->
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          } @empty {
-            <tbody>
-              <tr>
-                <td colspan="10" class="no-data-cell">
-                  <app-empty-state
-                    title="ไม่พบข้อมูล"
-                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                    icon="fas fa-users-slash"
-                  ></app-empty-state>
-                </td>
-              </tr>
-            </tbody>
-          }
-        </table>
-      }
-    </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                } @empty {
+                <tbody>
+                    <tr>
+                        <td colspan="10" class="no-data-cell">
+                            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                                icon="fas fa-users-slash"></app-empty-state>
+                        </td>
+                    </tr>
+                </tbody>
+                }
+            </table>
+            }
+        </div>
 
-    <div class="card-list-view">
-      @if (isLoading()) {
-        <app-skeleton type="card" [rows]="3"></app-skeleton>
-      } @else {
-        @for (emp of resignComps.paginatedData(); track emp.empCode) {
-          <div class="mobile-card">
-            <div class="card-header">
-              <div class="header-content">
-                <span class="ticket-no">{{ emp.firstNameTh }} {{ emp.lastNameTh }}</span>
-                <div class="text-muted small">{{ emp.empCode }}</div>
-              </div>
-              <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
-            </div>
-
-            <div class="card-body">
-              <div class="info-row">
-                <span class="label"><i class="fa-solid fa-users-between-lines"></i> แผนก:</span>
-                <span class="value">{{ emp.department }}</span>
-              </div>
-              <div class="info-row">
-                <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
-                <span class="value">{{ emp.company }} </span>
-              </div>
-
-              <div class="card-footer-actions" style="grid-template-columns: 1fr">
-                <button class="btn-edit-sm" title="Info" (click)="onView(emp)">
-                  <i class="fa-solid fa-circle-info"></i>Info
-                </button>
-              </div>
-            </div>
-          </div>
-        } @empty {
-          <app-empty-state
-            title="ไม่พบข้อมูล"
-            description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-            icon="fas fa-users-slash"
-          >
-          </app-empty-state>
-        }
-      }
-    </div>
-
-    <div class="pagination-wrapper">
-      <app-pagination
-        [currentPage]="resignListing.currentPage()"
-        [pageSize]="resignListing.pageSize()"
-        [totalItems]="resignListing.totalItems()"
-        (onPageChange)="goToPage($event, 'Employee')"
-        (onPageSizeChange)="setPageSize($event, 'Employee')"
-      >
-      </app-pagination>
-    </div>
-  </div>
-
-  <div class="content-card freelance">
-    <div class="card-header-title">
-      รายชื่อพนักงานฟรีแลนซ์ลาออก
-      <button class="btn-export" (click)="viewReportResign('freelance')">
-        <i class="fa-solid fa-folder-open"></i>ดูรายงาน
-      </button>
-    </div>
-    <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5"></app-skeleton>
-      } @else {
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th style="width: 40px">
-                <label class="checkbox-custom">
-                  <input
-                    type="checkbox"
-                    [checked]="isAllSelectedFreelance()"
-                    [indeterminate]="isSomeSelectedFreelance()"
-                    (change)="toggleSelectAllFreelance($event)"
-                  />
-                  <span class="checkmark"></span>
-                </label>
-              </th>
-              <th class="">ชื่อ-นามสกุล</th>
-              <th class="">แผนก</th>
-              <th class="">บริษัท</th>
-              <th>Last Date</th>
-              <th>Effective Date</th>
-              <th>Aduser</th>
-              <th>Expire Date</th>
-              <th class="text-center actions-col">
-                <button class="btn-approve" (click)="approve('Freelance')">
-                  <i class="fa-solid fa-user-check"></i>Approve
-                </button>
-              </th>
-            </tr>
-          </thead>
-          @for (emp of resignFreelanceComps.paginatedData(); track emp.empCode) {
-            <tbody>
-              <tr>
-                <td>
-                  <label class="checkbox-custom">
-                    <input
-                      type="checkbox"
-                      [checked]="isCheckedFreelance(emp.empCode)"
-                      (change)="toggleSelectFreelance(emp, $any($event.target).checked)"
-                    />
-                    <span class="checkmark"></span>
-                  </label>
-                </td>
-                <td class="col-name">
-                  <div class="profile-name">
-                    <div class="profile">
-                      <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode + '.jpg'
-                        "
-                        (error)="onImgError($event)"
-                      />
+        <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
+            @for (emp of resignComps.paginatedData(); track emp.empCode) {
+            <div class="mobile-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <span class="ticket-no">{{ emp.firstNameTh }} {{ emp.lastNameTh }}</span>
+                        <div class="text-muted small">{{ emp.empCode }}</div>
                     </div>
-                    <div class="name-block">
-                      <div class="fullname">
-                        {{ emp.firstNameTh }} {{ emp.lastNameTh }}
+                    <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
+                </div>
 
-                        <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
-                      </div>
-
-                      <div class="code">
-                        {{ emp.empCode }}
-                      </div>
-
-                      <div class="position">
-                        {{ emp.position }}
-                      </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label"><i class="fa-solid fa-users-between-lines"></i> แผนก:</span>
+                        <span class="value">{{ emp.department }}</span>
                     </div>
-                  </div>
-                </td>
-                <td class="col-department">{{ emp.department }}</td>
-                <td class="col-company">{{ emp.company }}</td>
-                <td class="col-company">
-                  {{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY') }}
-                </td>
-                <td class="col-company">
-                  {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
-                </td>
-                <td class="col-company">{{ emp.adUser }}</td>
-                <td class="col-expire">
-                  <div *ngIf="emp.expireDate" class="detail">
-                    {{ dataUtil.formatDateToBE(emp.expireDate, 'DD/MM/YYYY') }}
-                  </div>
-                </td>
-                <td class="col-action">
-                  <div class="Info-delete">
-                    <button class="btn-ghost" (click)="onView(emp)">
-                      <i class="fa-solid fa-circle-info"></i>Info
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          } @empty {
-            <tbody>
-              <tr>
-                <td colspan="10" class="no-data-cell">
-                  <app-empty-state
-                    title="ไม่พบข้อมูล"
-                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                    icon="fas fa-users-slash"
-                  ></app-empty-state>
-                </td>
-              </tr>
-            </tbody>
-          }
-        </table>
-      }
-    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
+                        <span class="value">{{ emp.company }} </span>
+                    </div>
 
-    <div class="card-list-view">
-      @if (isLoading()) {
-        <app-skeleton type="card" [rows]="3"></app-skeleton>
-      } @else {
-        @for (emp of resignFreelanceComps.paginatedData(); track emp.empCode) {
-          <div class="mobile-card">
-            <div class="card-header">
-              <div class="header-content">
-                <span class="ticket-no">{{ emp.firstNameTh }} {{ emp.lastNameTh }}</span>
-                <div class="text-muted small">{{ emp.empCode }}</div>
-              </div>
-              <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
+                    <div class="card-footer-actions" style="grid-template-columns: 1fr;">
+                        <button class="btn-edit-sm" title="Info" (click)="onView(emp)">
+                            <i class="fa-solid fa-circle-info"></i>Info
+                        </button>
+                    </div>
+                </div>
             </div>
+            } @empty {
+            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์" icon="fas fa-users-slash">
+            </app-empty-state>
+            }
+            }
+        </div>
 
-            <div class="card-body">
-              <div class="info-row">
-                <span class="label"><i class="fa-solid fa-users-between-lines"></i> แผนก:</span>
-                <span class="value">{{ emp.department }}</span>
-              </div>
-              <div class="info-row">
-                <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
-                <span class="value">{{ emp.company }} </span>
-              </div>
+        <div class="pagination-wrapper">
+            <app-pagination [currentPage]="resignListing.currentPage()" [pageSize]="resignListing.pageSize()"
+                [totalItems]="resignListing.totalItems()" (onPageChange)="goToPage($event, 'Employee')"
+                (onPageSizeChange)="setPageSize($event, 'Employee')">
+            </app-pagination>
+        </div>
+    </div>
 
-              <div class="card-footer-actions" style="grid-template-columns: 1fr">
-                <button class="btn-edit-sm" title="Info" (click)="onView(emp)">
-                  <i class="fa-solid fa-circle-info"></i>Info
-                </button>
-              </div>
+    <div class="content-card freelance">
+        <div class="card-header-title">
+            รายชื่อพนักงานฟรีแลนซ์ลาออก
+            <button class="btn-export" (click)="viewReportResign('freelance')"> <i
+                    class="fa-solid fa-folder-open"></i>ดูรายงาน</button>
+        </div>
+        <div class="table-responsive">
+            @if (isLoading()) {
+            <app-skeleton type="table" [rows]="5"></app-skeleton>
+            } @else {
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px">
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isAllSelectedFreelance()"
+                                    [indeterminate]="isSomeSelectedFreelance()"
+                                    (change)="toggleSelectAllFreelance($event)" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </th>
+                        <th class="">ชื่อ-นามสกุล</th>
+                        <th class="">แผนก</th>
+                        <th class="">บริษัท</th>
+                        <th>Last Date</th>
+                        <th>Effective Date</th>
+                        <th>Aduser</th>
+                        <th>Expire Date</th>
+                        <th class="text-center actions-col">
+                            <button class="btn-approve" (click)="approve('Freelance')">
+                                <i class="fa-solid fa-user-check"></i>Approve
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                @for (emp of resignFreelanceComps.paginatedData(); track emp.empCode) {
+                <tbody>
+                    <tr>
+                        <td>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" [checked]="isCheckedFreelance(emp.empCode)"
+                                    (change)="toggleSelectFreelance(emp, $any($event.target).checked)" />
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+                        <td class="col-name">
+                            <div class="profile-name">
+                                <div class="profile">
+                                    <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode + '.jpg'"
+                                        (error)="onImgError($event)" />
+                                </div>
+                                <div class="name-block">
+                                    <div class="fullname">{{ emp.firstNameTh }} {{ emp.lastNameTh }}
+
+                                        <span *ngIf="emp.nickName"> ({{ emp.nickName }})</span>
+                                    </div>
+
+                                    <div class="code">
+                                        {{ emp.empCode }}
+                                    </div>
+
+                                    <div class="position">
+                                        {{ emp.position }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-department">{{ emp.department }}</td>
+                        <td class="col-company">{{ emp.company }}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</td>
+                        <td class="col-company">{{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}</td>
+                        <td class="col-company">{{ emp.adUser }}</td>
+                        <td class="col-expire">
+                            <div *ngIf="emp.expireDate" class="detail">{{ dataUtil.formatDateToBE(emp.expireDate,
+                                'DD/MM/YYYY') }}</div>
+                        </td>
+                        <td class="col-action">
+                            <div class="Info-delete">
+                                <button class="btn-ghost" (click)="onView(emp)">
+                                    <i class="fa-solid fa-circle-info"></i>Info
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                } @empty {
+                <tbody>
+                    <tr>
+                        <td colspan="10" class="no-data-cell">
+                            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                                icon="fas fa-users-slash"></app-empty-state>
+                        </td>
+                    </tr>
+                </tbody>
+                }
+            </table>
+            }
+        </div>
+
+        <div class="card-list-view">
+            @if (isLoading()) {
+            <app-skeleton type="card" [rows]="3"></app-skeleton>
+            } @else {
+            @for (emp of resignFreelanceComps.paginatedData(); track emp.empCode) {
+            <div class="mobile-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <span class="ticket-no">{{ emp.firstNameTh }} {{ emp.lastNameTh }}</span>
+                        <div class="text-muted small">{{ emp.empCode }}</div>
+                    </div>
+                    <i class="fa-solid fa-minus" title="ลบ" (click)="deleteEmployeeInResign(emp)"></i>
+                </div>
+
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="label"><i class="fa-solid fa-users-between-lines"></i> แผนก:</span>
+                        <span class="value">{{ emp.department }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
+                        <span class="value">{{ emp.company }} </span>
+                    </div>
+
+                    <div class="card-footer-actions" style="grid-template-columns: 1fr;">
+                        <button class="btn-edit-sm" title="Info" (click)="onView(emp)">
+                            <i class="fa-solid fa-circle-info"></i>Info
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
-        } @empty {
-          <app-empty-state
-            title="ไม่พบข้อมูล"
-            description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-            icon="fas fa-users-slash"
-          >
-          </app-empty-state>
-        }
-      }
-    </div>
+            } @empty {
+            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์" icon="fas fa-users-slash">
+            </app-empty-state>
+            }
+            }
+        </div>
 
-    <div class="pagination-wrapper">
-      <app-pagination
-        [currentPage]="resignFreelanceListing.currentPage()"
-        [pageSize]="resignFreelanceListing.pageSize()"
-        [totalItems]="resignFreelanceListing.totalItems()"
-        (onPageChange)="goToPage($event, 'Freelance')"
-        (onPageSizeChange)="setPageSize($event, 'Freelance')"
-      >
-      </app-pagination>
+        <div class="pagination-wrapper">
+            <app-pagination [currentPage]="resignFreelanceListing.currentPage()"
+                [pageSize]="resignFreelanceListing.pageSize()" [totalItems]="resignFreelanceListing.totalItems()"
+                (onPageChange)="goToPage($event, 'Freelance')" (onPageSizeChange)="setPageSize($event, 'Freelance')">
+            </app-pagination>
+        </div>
     </div>
-  </div>
 </div>
 
 @if (IS_INFO()) {
-  <app-info-modal
-    [emp]="selected"
-    (closeModal)="closeInfoModal()"
-    (submitModal)="submitInfo($event)"
-  ></app-info-modal>
+<app-info-modal [emp]="selected" (closeModal)="closeInfoModal()" (submitModal)="submitInfo($event)"></app-info-modal>
 }

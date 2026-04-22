@@ -316,15 +316,12 @@ export class FreelanceManagementComponent implements OnInit {
   }
 
   openViewForm() {
-    console.log('ส่งข้อมูล');
     const data = this.activeData().filter((item) => item.selected);
 
     if (data.length === 0) {
       this.swalService.warning('กรุณาเลือกรายการก่อน export');
       return;
     }
-
-    console.log(data);
 
     // แปลง field ให้เป็นชื่อ column ที่อ่านง่าย
     const exportData = data.map((item) => ({
@@ -407,17 +404,9 @@ export class FreelanceManagementComponent implements OnInit {
 
     const info = res.info;
     const file = res.files;
-    // console.log(info, file)
-
     let convertedFiles: any[] = [];
 
     if (file?.length) {
-      // convertedFiles = await Promise.all(
-      //     file.map((f: any) =>
-      //         this.convertUrlToFile(f)
-      //     )
-      // );
-
       convertedFiles = await this.fileConvertService.convertUrlsToFiles(file);
     }
 
@@ -473,15 +462,10 @@ export class FreelanceManagementComponent implements OnInit {
     const is_resign = fData.btn_action === 'RESIGN' ? true : false;
     const is_Activate = fData.btn_action === 'ACTIVATE' ? true : false;
 
-    // console.log(is_update)
-    // console.log('Form data:', fData);
-
     let changedData: any = fData;
 
     if (is_update) {
-      // console.log('original Form data:', this.original_formData_freelance);
       const diff = this.getChangedFields(fData, this.original_formData_freelance);
-      // console.log('Changed fields:', diff);
       changedData = diff;
     }
 
@@ -548,7 +532,7 @@ export class FreelanceManagementComponent implements OnInit {
     if (Array.isArray(fData.attachments)) {
       // 1️⃣ new files
       fData.attachments.forEach((item: any) => {
-        if (item?.file instanceof File && !item.fileId) {
+        if (item?.file instanceof File && !item.fieldId) {
           formData.append('newFiles', item.file);
           formData.append('newFileDescriptions', item.description || '');
         }
@@ -556,41 +540,48 @@ export class FreelanceManagementComponent implements OnInit {
 
       if (is_update) {
         const originalFiles = this.original_formData_freelance.attachments || [];
+        console.log(fData.attachments, originalFiles);
 
         // 2️⃣ deleted
         const deletedFiles = originalFiles.filter(
           (oldFile: any) =>
             !fData.attachments.some(
-              (newFile: any) => Number(newFile.fileId) === Number(oldFile.fileId),
+              (newFile: any) => Number(newFile.fieldId) === Number(oldFile.fieldId),
             ),
         );
 
         if (deletedFiles.length > 0) {
-          const deleteIds = deletedFiles.map((file: any) => file.fileId).join(',');
+          const deleteIds = deletedFiles.map((file: any) => file.fieldId).join(',');
 
           formData.append('deleteFileIds', deleteIds);
         }
 
         // 3️⃣ description changed only
         const updatedDescriptions = fData.attachments.filter((item: any) => {
-          if (!item.fileId || item.file instanceof File) return false;
+          console.log(item);
+          if (!item.fieldId) return false;
+          // if (!item.fieldId || item.file instanceof File) return false;
 
-          const oldFile = originalFiles.find((f: any) => f.fileId === item.fileId);
+          const oldFile = originalFiles.find((f: any) => f.fieldId === item.fieldId);
 
           return oldFile && (oldFile.description || '') !== (item.description || '');
         });
 
+        console.log(updatedDescriptions);
+
         updatedDescriptions.forEach((file: any) => {
-          formData.append('fileIdForDesc', file.fileId.toString());
+          formData.append('fileIdForDesc', file.fieldId.toString());
           formData.append('newFileDescription', file.description || '');
         });
 
         // 4️⃣ replaced files
         const replacedFiles = fData.attachments.filter((item: any) => {
-          if (!item.fileId) return false;
+          if (!item.fieldId) return false;
           if (!(item.file instanceof File)) return false;
 
-          const oldFile = originalFiles.find((f: any) => Number(f.fileId) === Number(item.fileId));
+          const oldFile = originalFiles.find(
+            (f: any) => Number(f.fieldId) === Number(item.fieldId),
+          );
 
           if (!oldFile) return false;
 
@@ -599,13 +590,13 @@ export class FreelanceManagementComponent implements OnInit {
         });
 
         replacedFiles.forEach((file: any) => {
-          // formData.append('replaceFileIds', file.fileId.toString());
+          formData.append('replaceFileIds', file.fieldId.toString());
           formData.append('replaceFiles', file.file);
           formData.append('replaceDescriptions', file.description || '');
         });
 
         if (replacedFiles.length > 0) {
-          const replaceIds = replacedFiles.map((file: any) => file.fileId).join(',');
+          const replaceIds = replacedFiles.map((file: any) => file.fieldId).join(',');
 
           formData.append('replaceFileIds', replaceIds);
         }

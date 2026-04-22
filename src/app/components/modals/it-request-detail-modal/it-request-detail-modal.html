@@ -1,154 +1,158 @@
 <div class="modal-overlay approval-detail-overlay" (click)="close()" @fadeIn>
-  <div
-    class="modal-container-large it-request-modal"
-    (click)="$event.stopPropagation()"
-    @modalAnimation
-  >
-    <div class="modal-header">
-      <h2 class="request-title">
-        <div>สรุปรายละเอียดคำขอ</div>
-        <span>(requestNo : {{ approvalItem.requestNo }})</span>
-      </h2>
-      <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
-    </div>
+    <div class="modal-container-large it-request-modal" (click)="$event.stopPropagation()" @modalAnimation>
 
-    <div class="modal-body">
-      <!-- Section 1: ข้อมูลผู้ขอสิทธิ์ (Request For) -->
-      <div class="info-section">
-        <div class="section-header">
-          <i class="fas fa-user-circle"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
-        </div>
-        <div class="section-content">
-          <div class="info-row">
-            <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
-            <div class="info-value">
-              {{ approvalItem.requestBy.name || approvalItem.requestBy.name || '-' }}
-            </div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">เบอร์โทรติดต่อ</div>
-            <div class="info-value">{{ approvalItem.requestBy.phone || '-' }}</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">ขอสิทธิ์ให้</div>
-            <div class="info-value">
-              {{ approvalItem.originalData?.requestFor || approvalItem.requestBy.name || '-' }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 2: บริการที่เลือก (Selected Services) -->
-      <div class="info-section">
-        <div class="section-header">
-          <i class="fas fa-server"></i> บริการที่เลือก (Selected Services)
-        </div>
-        <div class="section-content">
-          <div class="info-row">
-            <div class="info-label">{{ requestTypeLabel }}</div>
-            <div class="info-value">
-              <span class="service-tag">
-                <i class="fas fa-check-circle text-success mr-1"></i>
-                {{
-                  approvalItem.originalData?.requestCategory ||
-                    approvalItem.originalData?.device?.name ||
-                    approvalItem.requestType ||
-                    'ขอใช้ระบบ'
-                }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
-      <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
-        <div class="section-header">
-          <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
+        <div class="modal-header">
+            <h2 class="request-title">
+                <div>สรุปรายละเอียดคำขอ</div>
+                <span>(requestNo : {{approvalItem.requestNo}})</span>
+            </h2>
+            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
         </div>
 
-        <div class="section-content">
-          <!-- Main Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.main?.length">
-            <div class="info-label align-top">Main Systems</div>
-            <div class="info-value">
-              <ul class="system-list">
-                <li *ngFor="let sys of approvalItem.originalData.main">
-                  <i class="fas fa-check"></i> {{ sys }}
-                </li>
-              </ul>
+        <div class="modal-body">
+
+            <!-- Section 1: ข้อมูลผู้ขอสิทธิ์ (Request For) -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-user-circle"></i> ข้อมูลผู้ขอสิทธิ์ (Request For)
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">ชื่อผู้ขอสิทธิ์</div>
+                        <div class="info-value">{{ approvalItem.requestBy.name ||
+                            approvalItem.requestBy.name || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">เบอร์โทรติดต่อ</div>
+                        <div class="info-value">{{ approvalItem.requestBy.phone || '-' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">ขอสิทธิ์ให้</div>
+                        <div class="info-value">{{ approvalItem.originalData?.requestFor ||
+                            approvalItem.requestBy.name || '-' }}</div>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <!-- Basic Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length">
-            <div class="info-label align-top">Basic Systems</div>
-            <div class="info-value">
-              <ul class="system-list">
-                <li *ngFor="let sys of approvalItem.originalData.basic">
-                  <i class="fas fa-check"></i> {{ sys }}
-                </li>
-              </ul>
+            <!-- Section 2: บริการที่เลือก (Selected Services) -->
+            <div class="info-section">
+                <div class="section-header">
+                    <i class="fas fa-server"></i> บริการที่เลือก (Selected Services)
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">{{ requestTypeLabel }}</div>
+                        <div class="info-value">
+                            <span class="service-tag">
+                                <i class="fas fa-check-circle text-success mr-1"></i>
+                                {{ approvalItem.originalData?.requestCategory ||
+                                approvalItem.originalData?.device?.name ||
+                                approvalItem.requestType ||
+                                'ขอใช้ระบบ' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <!-- Specific Systems -->
-          <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length">
-            <div class="info-label align-top">Specific Systems</div>
-            <div class="info-value">
-              <ul class="system-list">
-                <li *ngFor="let sys of approvalItem.originalData.specific">
-                  <i class="fas fa-check"></i> {{ sys }}
-                </li>
-              </ul>
+            <!-- Section 3: ระบบที่เลือก (Selected Systems) ถ้าเป็น "ขอใช้ระบบ" -->
+            <div class="info-section" *ngIf="approvalItem.originalData?.ticketTypeId === 3">
+                <div class="section-header">
+                    <i class="fas fa-desktop"></i> ระบบที่เลือก (Selected Systems)
+                </div>
+
+                <div class="section-content">
+
+                    <!-- Main Systems -->
+                    <div class="info-row" *ngIf="approvalItem.originalData?.main?.length">
+                        <div class="info-label align-top">Main Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.main">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Basic Systems -->
+                    <div class="info-row" *ngIf="approvalItem.originalData?.basic?.length">
+                        <div class="info-label align-top">Basic Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.basic">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Specific Systems -->
+                    <div class="info-row" *ngIf="approvalItem.originalData?.specific?.length">
+                        <div class="info-label align-top">Specific Systems</div>
+                        <div class="info-value">
+                            <ul class="system-list">
+                                <li *ngFor="let sys of approvalItem.originalData.specific">
+                                    <i class="fas fa-check"></i> {{ sys }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Section 4: รายละเอียดปัญหา (สำหรับแจ้งซ่อม/แจ้งปัญหา) -->
-      <div class="info-section" *ngIf="showAttachments">
-        <div class="section-header"><i class="fas fa-exclamation-circle"></i> รายละเอียดคำขอ</div>
-        <div class="section-content">
-          <div class="info-row">
-            <div class="info-label">รายละเอียด</div>
-            <!-- <div class="info-value" >{{ approvalItem.originalData?.description || '-' }}</div> -->
-            <div
-              class="info-value"
-              [innerHTML]="formatText.getFormatTextHTML(approvalItem.originalData?.description)"
-            >
-              <!-- {{ approvalItem.originalData?.description || '-' }} -->
+            <!-- Section 4: รายละเอียดปัญหา (สำหรับแจ้งซ่อม/แจ้งปัญหา) -->
+            <div class="info-section" *ngIf="showAttachments">
+                <div class="section-header">
+                    <i class="fas fa-exclamation-circle"></i> รายละเอียดคำขอ
+                </div>
+                <div class="section-content">
+                    <div class="info-row">
+                        <div class="info-label">รายละเอียด</div>
+                        <!-- <div class="info-value" >{{ approvalItem.originalData?.description || '-' }}</div> -->
+                        <div class="info-value"
+                            [innerHTML]="formatText.getFormatTextHTML( approvalItem.originalData?.description )">
+                            <!-- {{ approvalItem.originalData?.description || '-' }} -->
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Section 5: ไฟล์แนบ (Attachments) -->
-      <div class="info-section" *ngIf="showAttachments && attachments.length > 0">
-        <div class="section-header"><i class="fas fa-paperclip"></i> ไฟล์แนบ (Attachments)</div>
+            <!-- Section 5: ไฟล์แนบ (Attachments) -->
+            <div class="info-section" *ngIf="showAttachments && attachments.length > 0">
+                <div class="section-header">
+                    <i class="fas fa-paperclip"></i> ไฟล์แนบ (Attachments)
+                </div>
 
-        <div class="section-content">
-          <div class="attachment-list">
-            <div class="attachment-item" *ngFor="let file of attachments" (click)="viewFile(file)">
-              <div class="file-info">
-                <i class="fas" [ngClass]="getFileIcon(file.fileName)"></i>
+                <div class="section-content">
+                    <div class="attachment-list">
 
-                <span class="file-name">
-                  {{ file.fileName }}
-                </span>
+                        <div class="attachment-item" *ngFor="let file of attachments" (click)="viewFile(file)">
 
-                <span class="file-size"> ({{ formatFileSize(file.file_size) }}) </span>
-              </div>
+                            <div class="file-info">
+                                <i class="fas" [ngClass]="getFileIcon(file.fileName)"></i>
 
-              <!-- <button class="btn-view-file" (click)="viewFile(file)">
+                                <span class="file-name">
+                                    {{ file.fileName }}
+                                </span>
+
+                                <span class="file-size">
+                                    ({{ formatFileSize(file.file_size) }})
+                                </span>
+                            </div>
+
+                            <!-- <button class="btn-view-file" (click)="viewFile(file)">
                                 <i class="fas fa-eye"></i>
                             </button> -->
+
+                        </div>
+
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- Reject Reason Panel -->
-      <!-- <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
+            <!-- Reject Reason Panel -->
+            <!-- <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
                 <div class="reject-reason-header">
                     <i class="fas fa-times-circle"></i>
                     <span>ระบุเหตุผล</span>
@@ -158,62 +162,50 @@
                 </textarea>
                 <div class="reject-char-count">{{ rejectReason().length }} / 500</div>
             </div> -->
-    </div>
+        </div>
 
-    <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
-      <div class="" *ngIf="isRejectPanelOpen()" @fadeIn>
-        <div class="action-title">
-          Confirm Action: <span class="action-name">{{ currentAction() }}</span>
-        </div>
-        <div class="reason-section">
-          <label for="reason">ระบุเหตุผล (Reason):</label>
-          <textarea
-            id="reason"
-            class="reason-input"
-            [ngModel]="rejectReason()"
-            (ngModelChange)="rejectReason.set($event)"
-            placeholder="กรุณาระบุเหตุผล.."
-          ></textarea>
-        </div>
-      </div>
-      <div class="action-footer">
-        <button
-          class="btn-confirm"
-          (click)="submitReason()"
-          [class.disabled]="!rejectReason().trim()"
-          [disabled]="!rejectReason().trim()"
-        >
-          ยืนยัน (Confirm)
-        </button>
-        <button class="btn-cancel" (click)="cancelReject()">ยกเลิก (Cancel)</button>
-      </div>
-      <!-- <div class="reject-reason-actions">
+        <div class="reject-reason-panel" *ngIf="isRejectPanelOpen()" @fadeIn>
+            <div class="" *ngIf="isRejectPanelOpen()" @fadeIn>
+                <div class="action-title">
+                    Confirm Action: <span class="action-name">{{currentAction()}}</span>
+                </div>
+                <div class="reason-section">
+                    <label for="reason">ระบุเหตุผล (Reason):</label>
+                    <textarea id="reason" class="reason-input" [ngModel]="rejectReason()"
+                        (ngModelChange)="rejectReason.set($event)" placeholder="กรุณาระบุเหตุผล.."></textarea>
+                </div>
+            </div>
+            <div class="action-footer">
+                <button class="btn-confirm" (click)="submitReason()" [class.disabled]="!rejectReason().trim()"
+                    [disabled]="!rejectReason().trim()">ยืนยัน
+                    (Confirm)</button>
+                <button class="btn-cancel" (click)="cancelReject()">ยกเลิก (Cancel)</button>
+            </div>
+            <!-- <div class="reject-reason-actions">
                 <button class="btn-outline" (click)="cancelReject()">ยกเลิก</button>
                 <button class="btn-danger" (click)="submitReason()" [disabled]="!rejectReason().trim()">
                     <i class="fas fa-times-circle"></i>
                     ยืนยัน
                 </button>
             </div> -->
-    </div>
+        </div>
 
-    <div class="modal-footer" *ngIf="!isRejectPanelOpen()">
-      <div class="footer-left">
-        <button class="btn-outline btn-referred" (click)="openReasonPanel('Referred Back')">
-          Referred Back
-        </button>
-      </div>
-      <div class="footer-right">
-        <button class="btn-outline btn-reject" (click)="openReasonPanel('Rejected')">Reject</button>
-        <button class="btn-primary" (click)="confirmApprove()">Approve</button>
-      </div>
+        <div class="modal-footer" *ngIf="!isRejectPanelOpen()">
+
+            <div class="footer-left">
+                <button class="btn-outline btn-referred" (click)="openReasonPanel('Referred Back')">Referred
+                    Back</button>
+            </div>
+            <div class="footer-right">
+                <button class="btn-outline btn-reject" (click)="openReasonPanel('Rejected')">Reject</button>
+                <button class="btn-primary" (click)="confirmApprove()">Approve</button>
+            </div>
+
+        </div>
+
     </div>
-  </div>
 </div>
 
 <!-- File Preview Modal Overlay -->
-<app-file-preview-modal
-  *ngIf="isPreviewModalOpen()"
-  [files]="previewFiles()"
-  (onClose)="closePreview()"
->
+<app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
 </app-file-preview-modal>

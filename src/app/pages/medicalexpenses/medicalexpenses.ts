@@ -14,7 +14,11 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { createListingState, TableSortHelper } from '../../utils/listing.util';
-import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
+import {
+  createAngularTable,
+  getCoreRowModel,
+  SortingState,
+} from '@tanstack/angular-table';
 import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
@@ -40,7 +44,7 @@ import { FileConverterService } from '../../services/file-converter';
     EmptyStateComponent,
     NzDatePickerModule,
     NzInputModule,
-    NzIconModule,
+    NzIconModule
   ],
   templateUrl: './medicalexpenses.html',
   styleUrl: './medicalexpenses.scss',
@@ -88,9 +92,7 @@ export class MedicalexpensesComponent implements OnInit {
         if (typeof valA === 'string' && typeof valB === 'string') {
           return valA.localeCompare(valB) * direction;
         }
-        return (
-          (((valA as unknown as number) || 0) - ((valB as unknown as number) || 0)) * direction
-        );
+        return (((valA as unknown as number) || 0) - ((valB as unknown as number) || 0)) * direction;
       });
     }
     return rows;
@@ -103,13 +105,8 @@ export class MedicalexpensesComponent implements OnInit {
 
   totalItems = computed(() => this.allClaims().length);
   totalAmount = computed(() => this.allClaims().reduce((s, c) => s + c.requestedAmount, 0));
-  pendingCount = computed(
-    () =>
-      this.allClaims().filter((c) =>
-        ['NEW', 'PENDING_APPROVAL', 'WAITING_CHECK'].includes(c.status),
-      ).length,
-  );
-  approvedCount = computed(() => this.allClaims().filter((c) => c.status === 'APPROVED').length);
+  pendingCount = computed(() => this.allClaims().filter(c => ['NEW', 'PENDING_APPROVAL', 'WAITING_CHECK'].includes(c.status)).length);
+  approvedCount = computed(() => this.allClaims().filter(c => c.status === 'APPROVED').length);
 
   table = createAngularTable(() => ({
     data: this.paginatedClaims(),
@@ -127,8 +124,7 @@ export class MedicalexpensesComponent implements OnInit {
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
-      const next =
-        typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
@@ -155,11 +151,9 @@ export class MedicalexpensesComponent implements OnInit {
     this.medicalApiService.getStatuses().subscribe({
       next: (res) => {
         this.statusOptions.set(
-          res.data
-            .filter((s) => s.isActive)
-            .map((s) => ({ value: s.statusCode, label: s.statusName })),
+          res.data.filter(s => s.isActive).map(s => ({ value: s.statusCode, label: s.statusName }))
         );
-      },
+      }
     });
     this.loadData();
   }
@@ -193,13 +187,13 @@ export class MedicalexpensesComponent implements OnInit {
       ...datePayload,
       status,
       keyword,
-    };
+    }
 
     // console.log(payload)
 
     this.medicalApiService.getClaims(payload).subscribe({
       next: (res) => {
-        console.log(res.data);
+        console.log(res.data)
         this.allClaims.set(res.data);
         this.listing.currentPage.set(0);
         this.loadingService.stop('medical-list');
@@ -210,7 +204,7 @@ export class MedicalexpensesComponent implements OnInit {
         this.loadingService.stop('medical-list');
         this.isRefreshing.set(false);
         this.errorService.handle(error, { component: 'MedicalExpenses', action: 'load-data' });
-      },
+      }
     });
   }
 
@@ -225,7 +219,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   clearFilters() {
     clearListingFiltersLocal(this.listing);
-    this.date = null;
+    this.date = null
     // this.fromMonth.set(0);
     // this.fromYear.set((dayjs().year() - 1).toString());
     // this.toMonth.set(11);

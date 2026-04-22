@@ -1,40 +1,39 @@
 :host {
-  display: block;
-  height: 100%;
+    display: block;
+    height: 100%;
 }
 
 .sidebar {
-  width: 230px;
-  min-width: 230px;
-  height: 100%;
-  background: var(--bg-card);
-  transition:
-    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    padding 0.7s ease,
-    border-right-color 0.7s ease;
+    width: 230px;
+    min-width: 230px;
+    height: 100%;
+    background: var(--bg-card);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.7s ease,
+        border-right-color 0.7s ease;
 
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border-toolbar);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
-  position: relative;
-  z-index: 10;
-  overflow-x: hidden;
-
-  .sidebar-scroll {
-    flex: 1;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-toolbar);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02);
+    position: relative;
+    z-index: 10;
     overflow-x: hidden;
-    padding: 2px 0;
 
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
+    .sidebar-scroll {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 2px 0;
 
-    &::-webkit-scrollbar-thumb {
-      background: var(--border-table-head);
-      border-radius: 10px;
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--border-table-head);
+            border-radius: 10px;
+        }
     }
-  }
 }

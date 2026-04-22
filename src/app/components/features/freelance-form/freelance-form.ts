@@ -9,6 +9,7 @@ import {
   ViewEncapsulation,
   inject,
   ChangeDetectorRef,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +19,11 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SwalService } from '../../../services/swal.service';
+import {
+  FilePreviewItem,
+  FilePreviewModalComponent,
+} from '../../modals/file-preview-modal/file-preview-modal';
+import dayjs from 'dayjs';
 
 interface FreelanceFormData {
   id?: string;
@@ -60,6 +66,7 @@ interface FreelanceFormData {
     NzSelectModule,
     MatIconModule,
     MatTooltipModule,
+    FilePreviewModalComponent,
   ],
   templateUrl: './freelance-form.html',
   styleUrls: ['./freelance-form.scss'],
@@ -116,7 +123,8 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     file: File;
     description: string;
     url?: string;
-    fileId?: number;
+    fieldId?: number;
+    date?: string;
   }[] = [];
 
   private readonly MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -227,8 +235,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     const validFiles: any[] = [];
 
     Array.from(input.files).forEach((file: File) => {
-      // console.log(file)
-
       const extension = file.name.split('.').pop()?.toLowerCase();
 
       // ❌ ประเภทไฟล์ไม่ถูกต้อง
@@ -304,7 +310,13 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
       ...this.uploadedFiles[index],
       file: newFile,
       name: newFile.name,
+      date: dayjs().format('DD/MM/YYYY HH:mm A'),
+      //   url: previewUrl,
+      description: this.uploadedFiles[index].description,
+      fieldId: this.uploadedFiles[index].fieldId,
     };
+
+    console.log(this.uploadedFiles);
 
     input.value = '';
   }
@@ -315,12 +327,10 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   }
 
   handleResign() {
-    // console.log('Open Resigned')
     this.showResignModal = true;
   }
 
   handleActive() {
-    // console.log('handleActive')
     this.swalService.confirm('ยืนยันการ Activate อีกครั้ง').then((result) => {
       if (!result.isConfirmed) return;
 
@@ -331,21 +341,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     });
   }
 
-  // confirmResign() {
-  //     if (!this.resignDate || !this.lastWorkingDate) {
-  //         return;
-  //     }
-  //     this.onSave.emit({
-  //         ...this.formData,
-  //         id: 'RESIGN',
-  //         endDate: this.resignDate,
-  //         lastWorkingDate: this.lastWorkingDate
-  //     });
-
-  //     this.closeResignModal();
-  // }
   confirmResign() {
-    // console.log(this.formResignData.resignDate, this.formResignData.lastWorkingDate)
     if (!this.formResignData.resignDate || !this.formResignData.lastWorkingDate) return;
 
     this.onSave.emit({
@@ -419,7 +415,6 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   getBanks() {
     this.masterService.getBankMaster().subscribe({
       next: (data) => {
-        // console.log(data);
         this.bankList = data;
       },
       error: (error) => {
@@ -555,5 +550,37 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  isPreviewModalOpen = signal<boolean>(false);
+  previewFiles = signal<FilePreviewItem[]>([]);
+
+  openPreview(file: any) {
+    let url = '';
+
+    if (file.file instanceof File) {
+      // ไฟล์ใหม่/replaced → ใช้ object URL
+      url = URL.createObjectURL(file.file);
+    } else {
+      // ไฟล์เก่า → ใช้ URL จาก server
+      url = file.FileUrlFull || '';
+    }
+
+    this.previewFiles.set([
+      {
+        fileName: file.name,
+        date: file.UPLOADED_DATE
+          ? dayjs(file.UPLOADED_DATE).format('DD/MM/YYYY HH:mm A')
+          : dayjs().format('DD/MM/YYYY HH:mm A'),
+        url: url,
+        type: file.file instanceof File ? file.file.type : file.FILE_TYPE,
+      },
+    ]);
+
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
   }
 }

@@ -11,8 +11,9 @@ describe('ApprovalsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ApprovalsComponent],
-      providers: [provideRouter([])],
-    }).compileComponents();
+      providers: [provideRouter([])]
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ApprovalsComponent);
     component = fixture.componentInstance;

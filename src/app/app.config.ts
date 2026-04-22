@@ -38,9 +38,9 @@ const customTh: NzI18nInterface = {
     ...th_TH.DatePicker,
     lang: {
       ...th_TH.DatePicker.lang,
-      rangeQuarterPlaceholder: ['เลือกไตรมาสเริ่มต้น', 'เลือกไตรมาสสิ้นสุด'],
-    },
-  },
+      rangeQuarterPlaceholder: ['เลือกไตรมาสเริ่มต้น', 'เลือกไตรมาสสิ้นสุด']
+    }
+  }
 };
 
 export const appConfig: ApplicationConfig = {
@@ -49,19 +49,22 @@ export const appConfig: ApplicationConfig = {
     provideEchartsCore({ echarts }),
     provideBrowserGlobalErrorListeners(),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, errorInterceptor])
+    ),
     provideRouter(routes),
 
     { provide: LOCALE_ID, useValue: 'th' },
-    provideNzI18n(customTh),
-    provideIcons({
+    provideNzI18n(customTh)
+
+    , provideIcons({
       heroCurrencyDollarSolid,
       tablerCar,
       bootstrapTaxiFrontFill,
       tablerFriends,
       matSelfImprovement,
       tablerGrave2,
-      tablerFlower,
+      tablerFlower
     }),
     provideAppNzIcons(),
     // {
@@ -70,5 +73,5 @@ export const appConfig: ApplicationConfig = {
     //   deps: [AuthService],
     //   multi: true
     // },
-  ],
+  ]
 };

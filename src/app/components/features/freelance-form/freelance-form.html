@@ -353,6 +353,16 @@
                 <!-- <i class="fas fa-file-pdf"></i> -->
                 <span>{{ file.name }}</span>
 
+                <!-- ปุ่มดูไฟล์ -->
+                <mat-icon
+                  class="view-icon"
+                  (click)="openPreview(file)"
+                  matTooltip="ดูไฟล์"
+                  matTooltipPosition="above"
+                >
+                  visibility
+                </mat-icon>
+
                 <!-- ปุ่มเปลี่ยนไฟล์ -->
                 <mat-icon
                   class="change-icon"
@@ -504,4 +514,11 @@
       </div>
     </div>
   </div>
+
+  <app-file-preview-modal
+    *ngIf="isPreviewModalOpen()"
+    [files]="previewFiles()"
+    (onClose)="closePreview()"
+  >
+  </app-file-preview-modal>
 </div>

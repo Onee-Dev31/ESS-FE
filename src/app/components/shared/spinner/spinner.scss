@@ -1,60 +1,60 @@
 .spinner-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9998;
-  animation: fadeIn 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
+    from {
+        opacity: 0;
+    }
 
-  to {
-    opacity: 1;
-  }
+    to {
+        opacity: 1;
+    }
 }
 
 .spinner {
-  border: 3px solid rgba(0, 113, 227, 0.1);
-  border-radius: 50%;
-  border-top: 3px solid var(--primary);
-  animation: spin 0.6s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+    border: 3px solid rgba(0, 113, 227, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid var(--primary);
+    animation: spin 0.6s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
 
-  &-small {
-    width: 20px;
-    height: 20px;
-    border-width: 2px;
-  }
+    &-small {
+        width: 20px;
+        height: 20px;
+        border-width: 2px;
+    }
 
-  &-medium {
-    width: 40px;
-    height: 40px;
-    border-width: 3px;
-  }
+    &-medium {
+        width: 40px;
+        height: 40px;
+        border-width: 3px;
+    }
 
-  &-large {
-    width: 64px;
-    height: 64px;
-    border-width: 4px;
-  }
+    &-large {
+        width: 64px;
+        height: 64px;
+        border-width: 4px;
+    }
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(360deg);
-  }
+    100% {
+        transform: rotate(360deg);
+    }
 }

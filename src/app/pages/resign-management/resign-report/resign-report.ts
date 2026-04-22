@@ -34,7 +34,7 @@ import { FreelanceService } from '../../../services/freelance-management.service
 //   nickName: string; //NICKNAME
 //   department: string; //DEPARTMENT
 //   company: string; //COMPANY_NAME [COMPANY_CODE]
-//   type: string; // ?
+//   type: string; // ? 
 //   adUser: string; //AD_USER
 //   position: string; //POST
 //   lastDate: string;
@@ -90,7 +90,7 @@ export class ResignReport {
   appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
   searchText = signal<string>('');
 
-  IS_INFO = signal<boolean>(false);
+  IS_INFO = signal<boolean>(false)
   selectedEmployees = signal<Map<string, any>>(new Map());
 
   MODE_EDIT: boolean = false;
@@ -101,12 +101,13 @@ export class ResignReport {
   lastDate = signal<Date | null>(null);
   effectiveDate = signal<Date | null>(null);
 
-  type: any = 'fulltime';
+  type: any = 'fulltime'
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
+
+    this.route.queryParams.subscribe(params => {
       this.type = params['type'];
       console.log(this.type); // fulltime / freelance
     });
@@ -116,12 +117,15 @@ export class ResignReport {
     this.loadInitialData();
   }
 
+
   filteredDepartmentList = computed(() => {
     const company = this.filterCompany();
     const departments = this.departmentList();
     if (!company) return [];
 
-    return departments.filter((dep) => dep.COMPANY_CODE === company.COMPANY_CODE);
+    return departments.filter(dep =>
+      dep.COMPANY_CODE === company.COMPANY_CODE
+    );
   });
 
   trackByEmpCode(_: number, item: Employee) {
@@ -130,66 +134,42 @@ export class ResignReport {
 
   onView(emp: any) {
     this.selected = emp;
-    this.IS_INFO.set(true);
+    this.IS_INFO.set(true)
   }
 
   closeInfoModal() {
-    this.IS_INFO.set(false);
+    this.IS_INFO.set(false)
   }
 
   submitInfo(data: any) {
-    this.IS_INFO.set(false);
+    this.IS_INFO.set(false)
   }
 
   exportData() {
+
     const data = this.resignData();
 
     const header = [
       [
-        'ลำดับ',
-        'รหัส',
-        'ชื่อ-นามสกุล',
-        'ชื่อ-นามสกุล (ภาษาอังกฤษ)',
-        'ชื่อเล่น',
-        'ตำแหน่ง',
-        'แผนก',
-        'บริษัท',
-        'Last Date',
-        'Effective Date',
-        'System AD Info',
-        '',
-        '',
-        'Actual AD Info',
-        '',
-        '',
-        'Compare',
+        'ลำดับ', 'รหัส', 'ชื่อ-นามสกุล', 'ชื่อ-นามสกุล (ภาษาอังกฤษ)', 'ชื่อเล่น',
+        'ตำแหน่ง', 'แผนก', 'บริษัท', 'Last Date', 'Effective Date',
+        'System AD Info', '', '',
+        'Actual AD Info', '', '',
+        'Compare'
       ],
       [
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        'AD User',
-        'Status',
-        'Expiry Date',
-        'AD User',
-        'Status',
-        'Expiry Date',
-        '',
-      ],
+        '', '', '', '', '', '', '', '', '', '',
+        'AD User', 'Status', 'Expiry Date',
+        'AD User', 'Status', 'Expiry Date',
+        ''
+      ]
     ];
 
     const rows = data.map((item: any, index: number) => [
       index + 1,
       item.empCode,
-      item.firstNameTh + ' ' + item.lastNameTh,
-      item.firstNameEn + ' ' + item.lastNameEn,
+      item.firstNameTh + " " + item.lastNameTh,
+      item.firstNameEn + " " + item.lastNameEn,
       item.nickName,
       item.position,
       item.department,
@@ -202,10 +182,11 @@ export class ResignReport {
       item.adUser_actual,
       item.status_actual,
       item.expiryDate_actual,
-      item.expiryDate_system === item.expiryDate_actual,
+      item.expiryDate_system === item.expiryDate_actual
     ]);
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([...header, ...rows]);
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.aoa_to_sheet([...header, ...rows]);
 
     // merge header
     worksheet['!merges'] = [
@@ -223,7 +204,7 @@ export class ResignReport {
       { s: { r: 0, c: 10 }, e: { r: 0, c: 12 } },
       { s: { r: 0, c: 13 }, e: { r: 0, c: 15 } },
 
-      { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } },
+      { s: { r: 0, c: 16 }, e: { r: 1, c: 16 } }
     ];
 
     // column width
@@ -244,64 +225,70 @@ export class ResignReport {
       { wch: 18 }, //N
       { wch: 10 }, //O
       { wch: 14 }, //P
-      { wch: 10 }, //Q
+      { wch: 10 } //Q
     ];
 
     // header (center + bold)
     const range = XLSX.utils.decode_range(worksheet['!ref']!);
 
     for (let C = range.s.c; C <= range.e.c; C++) {
+
       const header1 = XLSX.utils.encode_cell({ r: 0, c: C });
       const header2 = XLSX.utils.encode_cell({ r: 1, c: C });
 
       if (worksheet[header1]) {
         worksheet[header1].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-          font: { bold: true },
+          alignment: { horizontal: "center", vertical: "center" },
+          font: { bold: true }
         };
       }
 
       if (worksheet[header2]) {
         worksheet[header2].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
-          font: { bold: true },
+          alignment: { horizontal: "center", vertical: "center" },
+          font: { bold: true }
         };
       }
+
     }
 
     // body [lastDate, effectiveDate] อยู่ตรงกลาง
     for (let R = 2; R <= range.e.r; R++) {
-      const lastDateCell = XLSX.utils.encode_cell({ r: R, c: 8 }); // column I
+
+      const lastDateCell = XLSX.utils.encode_cell({ r: R, c: 8 });  // column I
       const effectiveDateCell = XLSX.utils.encode_cell({ r: R, c: 9 }); // column J
 
       if (worksheet[lastDateCell]) {
         worksheet[lastDateCell].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
+          alignment: { horizontal: "center", vertical: "center" }
         };
       }
 
       if (worksheet[effectiveDateCell]) {
         worksheet[effectiveDateCell].s = {
-          alignment: { horizontal: 'center', vertical: 'center' },
+          alignment: { horizontal: "center", vertical: "center" }
         };
       }
+
     }
     // เปลี่ยน Font
     for (let R = 2; R <= range.e.r; R++) {
       for (let C = range.s.c; C <= range.e.c; C++) {
+
         const cell = XLSX.utils.encode_cell({ r: R, c: C });
 
         if (worksheet[cell]) {
           worksheet[cell].s = {
-            font: { name: 'Tahoma', sz: 10 },
+            font: { name: "Tahoma", sz: 10 }
           };
         }
+
       }
     }
 
     const workbook: XLSX.WorkBook = {
-      Sheets: { ResignReport: worksheet },
-      SheetNames: ['ResignReport'],
+      Sheets: { 'ResignReport': worksheet },
+      SheetNames: ['ResignReport']
     };
 
     XLSX.writeFile(workbook, 'ResignReport.xlsx');
@@ -314,27 +301,34 @@ export class ResignReport {
   }
 
   cancel() {
-    this.isFlipped = false;
+    this.isFlipped = false
 
     setTimeout(() => {
       if (!this.selected) {
         this.lastDate.set(null);
         this.effectiveDate.set(null);
       } else {
-        this.lastDate.set(this.selected.lastDate ? new Date(this.selected.lastDate) : null);
+        this.lastDate.set(
+          this.selected.lastDate
+            ? new Date(this.selected.lastDate)
+            : null
+        );
 
         this.effectiveDate.set(
-          this.selected.effectiveDate ? new Date(this.selected.effectiveDate) : null,
+          this.selected.effectiveDate
+            ? new Date(this.selected.effectiveDate)
+            : null
         );
       }
-    }, 100);
+    }, 100)
+
   }
 
   async onConfirmModal(): Promise<void> {
     // console.log(this.selected)
     if (!this.selected) return;
 
-    this.isViewOpen = false;
+    this.isViewOpen = false
 
     const result = await Swal.fire({
       title: 'ยืนยันการทำรายการใช่หรือไม่?',
@@ -345,8 +339,9 @@ export class ResignReport {
       cancelButtonText: 'ยกเลิก',
     });
 
+
     if (!result.isConfirmed) {
-      this.isViewOpen = true;
+      this.isViewOpen = true
       return;
     }
 
@@ -357,53 +352,49 @@ export class ResignReport {
         employeeNo: this.selected.empCode,
         adUser: this.selected.adUser,
         lastDate: formatDate(this.lastDate()!, 'yyyy-MM-dd', 'en-US'),
-        resignedDate: formatDate(this.effectiveDate()!, 'yyyy-MM-dd', 'en-US'),
+        resignedDate: formatDate(this.effectiveDate()!, 'yyyy-MM-dd', 'en-US')
       };
 
-      const id_update = this.selected.id;
+      const id_update = this.selected.id
 
       // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
-        this.resignService
-          .updateEmployeeResign(id_update, payload)
-          .pipe(
-            finalize(() => {
-              this.loadInitialData();
-            }),
-          )
-          .subscribe({
-            next: (res) => {
-              // console.log(res);
-              this.swalService.close();
-              this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว');
-            },
-            error: (error) => {
-              console.error('Error fetching data:', error);
-              this.swalService.close();
-              this.swalService.warning('แจ้งเตือน', error.error);
-            },
-          });
+        this.resignService.updateEmployeeResign(id_update, payload).pipe(
+          finalize(() => {
+            this.loadInitialData();
+          })
+        ).subscribe({
+          next: (res) => {
+            // console.log(res);
+            this.swalService.close();
+            this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว')
+
+          },
+          error: (error) => {
+            console.error('Error fetching data:', error);
+            this.swalService.close();
+            this.swalService.warning('แจ้งเตือน', error.error)
+          }
+        });
       } else {
-        this.resignService
-          .resignEmployee(payload)
-          .pipe(
-            finalize(() => {
-              this.loadInitialData();
-            }),
-          )
-          .subscribe({
-            next: (res) => {
-              // console.log(res);
-              this.swalService.close();
-              this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว');
-            },
-            error: (error) => {
-              console.error('Error fetching data:', error);
-              this.swalService.close();
-              this.swalService.warning('แจ้งเตือน', error.error);
-            },
-          });
+        this.resignService.resignEmployee(payload).pipe(
+          finalize(() => {
+            this.loadInitialData();
+          })
+        ).subscribe({
+          next: (res) => {
+            // console.log(res);
+            this.swalService.close();
+            this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
+
+          },
+          error: (error) => {
+            console.error('Error fetching data:', error);
+            this.swalService.close();
+            this.swalService.warning('แจ้งเตือน', error.error)
+          }
+        });
       }
       this.closeViewModal();
       this.MODE_EDIT = false;
@@ -437,9 +428,9 @@ export class ResignReport {
     const pageData = this.resignComps.paginatedData();
 
     if (checked) {
-      pageData.forEach((emp) => map.set(emp.empCode, emp));
+      pageData.forEach(emp => map.set(emp.empCode, emp));
     } else {
-      pageData.forEach((emp) => map.delete(emp.empCode));
+      pageData.forEach(emp => map.delete(emp.empCode));
     }
 
     this.selectedEmployees.set(map);
@@ -449,14 +440,17 @@ export class ResignReport {
     const pageData = this.resignComps.paginatedData();
     const selected = this.selectedEmployees();
 
-    return pageData.length > 0 && pageData.every((emp) => selected.has(emp.empCode));
+    return pageData.length > 0 &&
+      pageData.every(emp => selected.has(emp.empCode));
   }
 
   isSomeSelected() {
     const pageData = this.resignComps.paginatedData();
     const selected = this.selectedEmployees();
 
-    const count = pageData.filter((emp) => selected.has(emp.empCode)).length;
+    const count = pageData.filter(emp =>
+      selected.has(emp.empCode)
+    ).length;
 
     return count > 0 && count < pageData.length;
   }
@@ -478,7 +472,7 @@ export class ResignReport {
     const effectiveOnly = new Date(
       effective.getFullYear(),
       effective.getMonth(),
-      effective.getDate(),
+      effective.getDate()
     );
 
     return lastOnly > effectiveOnly;
@@ -492,12 +486,19 @@ export class ResignReport {
     // ใส่เวลาปัจจุบัน
     const now = new Date();
 
-    return new Date(+year, +month - 1, +day, now.getHours(), now.getMinutes(), now.getSeconds());
+    return new Date(
+      +year,
+      +month - 1,
+      +day,
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds()
+    );
   }
 
   // Function
   private mapApiData(items: any[]): any[] {
-    console.log('items >> ', items);
+    console.log("items >> ", items)
     return items.map((item: any) => ({
       empCode: item.CODEMPID,
       firstNameTh: item.NAMFIRSTT,
@@ -519,19 +520,15 @@ export class ResignReport {
       expiryDate_system: this.dataUtil.formatDateToBE(item.AD_EXPIRED_DATE, 'DD/MM/YYYY'),
 
       adUser_actual: item.adUser,
-      status_actual:
-        item.isDisabled === 'Yes'
-          ? 'Disable'
-          : item.isDisabled === 'No' && item.adIsLocked
-            ? item.adIsLocked
-            : '',
+      status_actual: item.isDisabled === 'Yes' ? 'Disable' :
+        item.isDisabled === 'No' && item.adIsLocked ? item.adIsLocked : '',
       expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
       passwordLastSet_actual: this.dataUtil.formatDateToBE(item.adPwdLastSet, 'DD/MM/YYYY'),
     }));
   }
 
   private mapApiData_Freelance(items: any[]): any[] {
-    console.log('[mapApiData_Freelance] items >> ', items);
+    console.log("[mapApiData_Freelance] items >> ", items)
     return items.map((item: any) => ({
       empCode: item.EMP_NO,
       firstNameTh: item.FIRSTNAME_TH,
@@ -555,12 +552,8 @@ export class ResignReport {
       expiryDate_system: this.dataUtil.formatDateToBE(item.AD_EXPIRED_DATE, 'DD/MM/YYYY'),
 
       adUser_actual: item.adUser,
-      status_actual:
-        item.isDisabled === 'Yes'
-          ? 'Disable'
-          : item.isDisabled === 'No' && item.adIsLocked
-            ? item.adIsLocked
-            : '',
+      status_actual: item.isDisabled === 'Yes' ? 'Disable' :
+        item.isDisabled === 'No' && item.adIsLocked ? item.adIsLocked : '',
       expiryDate_actual: this.dataUtil.formatDateToBE(item.accountExpires, 'DD/MM/YYYY'),
       passwordLastSet_actual: this.dataUtil.formatDateToBE(item.adPwdLastSet, 'DD/MM/YYYY'),
     }));
@@ -569,16 +562,24 @@ export class ResignReport {
   goToPage(page: number) {
     this.resignListing.currentPage.set(page);
 
-    this.fetchEmployeeByStatus('Resigned', page + 1, this.resignListing.pageSize()).subscribe(
-      (res) => this.dataResignFromApi(res),
-    );
+    this.fetchEmployeeByStatus(
+      'Resigned',
+      page + 1,
+      this.resignListing.pageSize()
+    ).subscribe(res => this.dataResignFromApi(res));
+
   }
 
   setPageSize(size: number) {
     this.resignListing.pageSize.set(size);
     this.resignListing.currentPage.set(0);
 
-    this.fetchEmployeeByStatus('Resigned', 1, size).subscribe((res) => this.dataResignFromApi(res));
+    this.fetchEmployeeByStatus(
+      'Resigned',
+      1,
+      size
+    ).subscribe(res => this.dataResignFromApi(res));
+
   }
 
   onCompanyChange(company: any) {
@@ -598,18 +599,21 @@ export class ResignReport {
     const sizeR = this.resignListing.pageSize();
 
     if (this.type === 'fulltime') {
-      this.fetchEmployeeByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-        console.log('Resigned >>', res);
-        this.dataResignFromApi(res);
-        this.loadingService.stop('freelance-list');
-      });
+      this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
+        .subscribe(res => {
+          console.log("Resigned >>", res)
+          this.dataResignFromApi(res);
+          this.loadingService.stop('freelance-list');
+        });
     } else {
-      this.fetchFreelanceByStatus('Resigned', pageR, sizeR).subscribe((res) => {
-        console.log('Resigned [FREE]>>', res);
-        this.dataResignFromApi(res);
-        this.loadingService.stop('freelance-list');
-      });
+      this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
+        .subscribe(res => {
+          console.log("Resigned [FREE]>>", res)
+          this.dataResignFromApi(res);
+          this.loadingService.stop('freelance-list');
+        });
     }
+
   }
 
   //GET
@@ -617,14 +621,14 @@ export class ResignReport {
     // console.log("Resigned >>", res)
 
     if (this.type === 'fulltime') {
-      const items = res.data.items ?? [];
+      const items = res.data.items ?? []
       this.resignData.set(this.mapApiData(items));
 
       this.resignListing.totalItems.set(res.data.total ?? 0);
       this.resignListing.currentPage.set((res.data.page ?? 1) - 1);
       this.resignListing.totalPages.set(res.data.totalPages ?? 1);
     } else {
-      const items = res.items ?? [];
+      const items = res.items ?? []
       this.resignData.set(this.mapApiData_Freelance(items));
 
       this.resignListing.totalItems.set(res.total ?? 0);
@@ -636,7 +640,7 @@ export class ResignReport {
   private fetchEmployeeByStatus(
     status: 'Active' | 'Resigned',
     page: number = 1,
-    pageSize: number = 10,
+    pageSize: number = 10
   ) {
     const searchText = this.searchText();
     const company = this.filterCompany();
@@ -648,7 +652,7 @@ export class ResignReport {
       searchText: searchText || undefined,
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
-      empStatus: status,
+      empStatus: status
     });
 
     // return this.resignService.getEmployee({
@@ -661,7 +665,11 @@ export class ResignReport {
     // });
   }
 
-  private fetchFreelanceByStatus(status: 'Active' | 'Resigned', page: number, pageSize: number) {
+  private fetchFreelanceByStatus(
+    status: 'Active' | 'Resigned',
+    page: number,
+    pageSize: number
+  ) {
     const searchText = this.searchText();
     const company = this.filterCompany();
     const department = this.filterDepartment();
@@ -686,7 +694,7 @@ export class ResignReport {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      },
+      }
     });
   }
 
@@ -699,7 +707,7 @@ export class ResignReport {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      },
+      }
     });
   }
 }

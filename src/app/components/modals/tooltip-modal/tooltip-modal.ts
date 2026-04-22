@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './tooltip-modal.html',
   styleUrl: './tooltip-modal.scss',
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class TooltipModalComponent {
   @Input() content: string = '';

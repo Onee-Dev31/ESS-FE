@@ -1,12 +1,5 @@
-import {
-  Component,
-  HostListener,
-  ElementRef,
-  inject,
-  computed,
-  signal,
-  NgZone,
-} from '@angular/core';
+import { Component, HostListener, ElementRef, inject, computed, signal, NgZone, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
@@ -22,6 +15,8 @@ interface NotificationItem {
   message: string;
   status: 'pending' | 'approved' | 'rejected';
   time: string;
+  route?: string;
+  ticketNumber?: string;
 }
 
 interface SearchMenuItem {
@@ -40,6 +35,7 @@ interface SearchMenuItem {
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
+
 export class NavbarComponent {
   private sidebarService = inject(SidebarService);
   private authService = inject(AuthService);
@@ -50,6 +46,7 @@ export class NavbarComponent {
   private zone = inject(NgZone);
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
   themeService = inject(ThemeService);
   private notifyAudio = new Audio('/notification1.wav');
 
@@ -59,7 +56,7 @@ export class NavbarComponent {
   userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
 
-  userCodeEmp: any = '';
+  userCodeEmp: any = ''
 
   searchQuery = signal('');
   isSearchFocused = signal(false);
@@ -67,62 +64,73 @@ export class NavbarComponent {
 
   ngOnInit() {
     this.notifyAudio.volume = 0.7;
-    this.signalrService.on('NewTicket', '/it-service-list').subscribe((data) => {
-      this.zone.run(() => {
-        const message = data.message || 'มี Ticket ใหม่เข้ามา';
+    this.signalrService
+      .on('NewTicket', '/it-service-list')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
 
-        const newNoti: NotificationItem = {
-          id: Date.now(),
-          title: 'แจ้งเตือนใหม่',
-          message,
-          status: 'pending',
-          time: 'เมื่อสักครู่',
-        };
+        this.zone.run(() => {
 
-        this.notifications.update((list) => [newNoti, ...list]);
-        if (!document.hidden) {
-          this.toastService.info(message);
+          const message = data.message || 'มี Ticket ใหม่เข้ามา';
 
-          this.notifyAudio.currentTime = 0;
-          this.notifyAudio.play().catch(() => {});
-        }
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'แจ้งเตือนใหม่',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่',
+            route: '/it-dashboard'
+          };
+
+          this.notifications.update(list => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => { });
+          }
+        });
       });
-    });
 
-    this.userCodeEmp = this.authService.userData().CODEMPID;
+    this.signalrService
+      .on('TicketAssigned', '/dashboard-it')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
+        this.zone.run(() => {
+          const message = data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign แล้ว`;
+
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'มีการ Assign Ticket',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่',
+            route: '/dashboard-it',
+            ticketNumber: data.ticket_number ?? undefined
+          };
+
+          this.notifications.update(list => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => { });
+          }
+        });
+      });
+
+    this.userCodeEmp = this.authService.userData().CODEMPID
   }
+
 
   private allSearchMenus: SearchMenuItem[] = [
     { label: 'แดชบอร์ด', path: '/dashboard', category: 'Main', icon: 'fa-home' },
-    {
-      label: 'ค่ารักษาพยาบาล (เบิก)',
-      path: '/medicalexpenses',
-      category: 'สวัสดิการ',
-      icon: 'fa-heartbeat',
-    },
-    {
-      label: 'เบี้ยเลี้ยง (เบิก)',
-      path: '/allowance',
-      category: 'สวัสดิการ',
-      icon: 'fa-money-bill-wave',
-    },
+    { label: 'ค่ารักษาพยาบาล (เบิก)', path: '/medicalexpenses', category: 'สวัสดิการ', icon: 'fa-heartbeat' },
+    { label: 'เบี้ยเลี้ยง (เบิก)', path: '/allowance', category: 'สวัสดิการ', icon: 'fa-money-bill-wave' },
     { label: 'ค่ารถ (เบิก)', path: '/vehicle', category: 'สวัสดิการ', icon: 'fa-car' },
     { label: 'ค่าแท็กซี่ (เบิก)', path: '/vehicle-taxi', category: 'สวัสดิการ', icon: 'fa-taxi' },
     { label: 'รายการลา / คำขอลา', path: '/timeoff', category: 'การลา', icon: 'fa-calendar-alt' },
-    {
-      label: 'อนุมัติสวัสดิการ',
-      path: '/approvals',
-      category: 'อนุมัติ',
-      icon: 'fa-check-circle',
-      role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR],
-    },
-    {
-      label: 'อนุมัติค่ารักษาพยาบาล',
-      path: '/approvals-medicalexpenses',
-      category: 'อนุมัติ',
-      icon: 'fa-stethoscope',
-      role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR],
-    },
+    { label: 'อนุมัติสวัสดิการ', path: '/approvals', category: 'อนุมัติ', icon: 'fa-check-circle', role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR] },
+    { label: 'อนุมัติค่ารักษาพยาบาล', path: '/approvals-medicalexpenses', category: 'อนุมัติ', icon: 'fa-stethoscope', role: [USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR] },
   ];
 
   /** คำนวณรายการค้นหาที่กรองตามตัวอักษรและสิทธิ์ (Role) */
@@ -132,31 +140,24 @@ export class NavbarComponent {
 
     const currentUserRole = this.authService.userRole();
 
-    return this.allSearchMenus
-      .filter((item) => {
-        if (item.role) {
-          if (Array.isArray(item.role)) {
-            if (!item.role.includes(currentUserRole || '')) return false;
-          } else {
-            if (item.role !== currentUserRole) return false;
-          }
-        }
+    return this.allSearchMenus.filter(item => {
 
-        return (
-          item.label.toLowerCase().includes(query) || item.category.toLowerCase().includes(query)
-        );
-      })
-      .slice(0, 5);
+      if (item.role) {
+        if (Array.isArray(item.role)) {
+          if (!item.role.includes(currentUserRole || '')) return false;
+        } else {
+          if (item.role !== currentUserRole) return false;
+        }
+      }
+
+
+      return item.label.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query);
+    }).slice(0, 5);
   });
 
   notifications = signal<NotificationItem[]>([
-    {
-      id: 1,
-      title: 'รายการรออนุมัติ',
-      message: 'รายการ #REQ-2024-001 รอการอนุมัติ',
-      status: 'pending',
-      time: 'เมื่อสักครู่',
-    },
+    
   ]);
 
   // startSignalR() {
@@ -191,6 +192,17 @@ export class NavbarComponent {
   //   });
   // }
 
+  onNotificationClick(item: NotificationItem) {
+    this.isNotificationOpen = false;
+    if (item.route) {
+      if (item.ticketNumber) {
+        this.signalrService.pendingTicketNumbers.update(s => new Set([...s, item.ticketNumber!]));
+      }
+      this.signalrService.refreshTrigger.update(n => n + 1);
+      this.navigateTo(item.route);
+    }
+  }
+
   toggleSidebar() {
     this.sidebarService.toggle();
   }
@@ -207,7 +219,7 @@ export class NavbarComponent {
 
   /** เปิด/ปิด การค้นหาบนหน้าจอมือถือ */
   toggleMobileSearch() {
-    this.isMobileSearchOpen.update((v) => !v);
+    this.isMobileSearchOpen.update(v => !v);
     if (!this.isMobileSearchOpen()) {
       this.clearSearch();
     }
@@ -245,6 +257,7 @@ export class NavbarComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
 
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;

@@ -9,7 +9,7 @@ export interface Toast {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class ToastService {
   toasts = signal<Toast[]>([]);
@@ -19,7 +19,7 @@ export class ToastService {
     const id = `toast-${++this.idCounter}`;
     const toast: Toast = { id, type, message, duration };
 
-    this.toasts.update((toasts) => [...toasts, toast]);
+    this.toasts.update(toasts => [...toasts, toast]);
 
     if (duration > 0) {
       setTimeout(() => this.remove(id), duration);
@@ -43,7 +43,7 @@ export class ToastService {
   }
 
   remove(id: string) {
-    this.toasts.update((toasts) => toasts.filter((t) => t.id !== id));
+    this.toasts.update(toasts => toasts.filter(t => t.id !== id));
   }
 
   clear() {

@@ -1,4 +1,5 @@
 <div class="vehicle-taxi-form-page" [class.edit-mode]="isEditMode">
+
   <header class="top-header-strip">
     <h2>{{ pageTitle }}</h2>
     <button class="btn-close-modal" (click)="cancel()" title="ปิดหน้าต่าง" aria-label="ปิด">
@@ -7,76 +8,62 @@
   </header>
 
   @if (isLoading) {
-    <div class="loading-row">
-      <div class="loading-overlay">
-        <div class="loader"></div>
-      </div>
+  <div class="loading-row">
+    <div class="loading-overlay">
+      <div class="loader"></div>
     </div>
-  } @else {
-    <main class="content-card">
-      <section class="filter-controls" *ngIf="!isEditMode">
-        <div class="month-selector">
-          <label for="month-select">ประจำเดือน :</label>
-          <div class="inputs-row">
-            <select
-              id="month-select"
-              class="form-control"
-              [(ngModel)]="selectedMonthIndex"
-              (change)="loadEligibleDates()"
-              title="เลือกเดือน"
-              aria-label="เลือกเดือน"
-            >
-              <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i">{{ m }}</option>
-            </select>
-            <select
-              id="year-select"
-              class="form-control"
-              [(ngModel)]="selectedYear"
-              (change)="loadEligibleDates()"
-              title="เลือกปี"
-              aria-label="เลือกปี"
-            >
-              <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-            </select>
-            <button class="btn-search" (click)="loadEligibleDates()" title="ค้นหาข้อมูล">
-              ค้นหาข้อมูล
-            </button>
-          </div>
+  </div>
+  }@else {
+  <main class="content-card">
+    <section class="filter-controls" *ngIf="!isEditMode">
+      <div class="month-selector">
+        <label for="month-select">ประจำเดือน :</label>
+        <div class="inputs-row">
+          <select id="month-select" class="form-control" [(ngModel)]="selectedMonthIndex" (change)="loadEligibleDates()"
+            title="เลือกเดือน" aria-label="เลือกเดือน">
+            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i">{{ m }}</option>
+          </select>
+          <select id="year-select" class="form-control" [(ngModel)]="selectedYear" (change)="loadEligibleDates()"
+            title="เลือกปี" aria-label="เลือกปี">
+            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+          </select>
+          <button class="btn-search" (click)="loadEligibleDates()" title="ค้นหาข้อมูล">ค้นหาข้อมูล</button>
         </div>
-      </section>
-      <section class="filter-controls" *ngIf="isEditMode">
-        <div class="alert-delete" *ngIf="isDelete()">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
-        </div>
+      </div>
+    </section>
+    <section class="filter-controls" *ngIf="isEditMode">
+      <div class="alert-delete" *ngIf="isDelete()">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        รายการที่ยกเลิก {{isDelete()}} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+      </div>
 
-        <div class="display-order">
-          <div class="left">
-            <span class="keep"
-              ><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep() }} รายการ</span
-            >
-            <span class="delete"
-              ><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span
-            >
-          </div>
-          <div class="right">
-            <span
-              >ยอดรวม: <span class="total"> {{ totalClaims() }}</span></span
-            >
-          </div>
+      <div class="display-order">
+        <div class="left">
+          <span class="keep"><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep()}} รายการ</span>
+          <span class="delete"><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span>
         </div>
-      </section>
+        <div class="right">
+          <span>ยอดรวม: <span class="total"> {{totalClaims()}}</span></span>
+        </div>
+      </div>
 
-      @if (isLoading) {
-      } @else if (items.length === 0) {
-        <div class="empty-row">
-          <i class="fas fa-calendar-times"></i>
-          {{ isEditMode ? 'ไม่พบข้อมูลการเบิกนี้' : 'ไม่พบวันที่มีสิทธิ์เบิกในเดือนนี้' }}
-        </div>
-      } @else {
-        <div class="table-container">
-          <!-- Desktop Table -->
-          <!-- <table class="excel-table desktop-only">
+    </section>
+
+    @if (isLoading) {
+
+    }
+    @else if (items.length === 0) {
+    <div class="empty-row">
+      <i class="fas fa-calendar-times"></i>
+      {{ isEditMode ? 'ไม่พบข้อมูลการเบิกนี้' : 'ไม่พบวันที่มีสิทธิ์เบิกในเดือนนี้' }}
+    </div>
+    }
+    @else {
+
+    <div class="table-container">
+
+      <!-- Desktop Table -->
+      <!-- <table class="excel-table desktop-only">
         <colgroup>
           <col class="col-select" />
           <col class="col-date" />
@@ -197,162 +184,91 @@
         </tfoot>
       </table> -->
 
-          <!-- ====================== MOBILE CARDS ====================== -->
-          <div class="mobile-cards-view mobile-only">
-            <div
-              *ngFor="let item of items; let i = index"
-              [id]="'taxi-card-' + i"
-              class="log-card"
-              [class.highlight-card]="item.selected"
-            >
-              <div class="card-header">
-                <div class="date-info">
-                  <span
-                    class="day-dot"
-                    [style.background]="item.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"
-                  ></span>
-                  <span class="date">{{
-                    dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY')
-                  }}</span>
-                  <span
-                    class="day-type"
-                    [style.color]="item.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
-                  >
-                    ({{ item.dayType }})
-                  </span>
-                </div>
-                <div class="header-right">
-                  <!-- <button class="btn-card-upload" (click)="openUploadModal(item)"
+      <!-- ====================== MOBILE CARDS ====================== -->
+      <div class="mobile-cards-view mobile-only">
+        <div *ngFor="let item of items; let i = index" [id]="'taxi-card-' + i" class="log-card"
+          [class.highlight-card]="item.selected">
+
+          <div class="card-header">
+            <div class="date-info">
+              <span class="day-dot"
+                [style.background]="item.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
+              <span class="date">{{ dateUtil.formatDateToBE(item.date, 'ddd. DD/MM/YYYY') }}</span>
+              <span class="day-type" [style.color]="item.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">
+                ({{ item.dayType }})
+              </span>
+            </div>
+            <div class="header-right">
+              <!-- <button class="btn-card-upload" (click)="openUploadModal(item)"
                 [class.has-file]="item.attachedFile || !!item.existingFileName" title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
                 <i class="fas fa-file-upload"></i>
                 {{ item.attachedFile || item.existingFileName ? 'เปลี่ยนไฟล์' : 'แนบไฟล์' }}
               </button> -->
-                  <button
-                    class="btn-card-upload"
-                    (click)="openUploadModal(item)"
-                    [class.has-file]="
-                      (item.attachedFiles?.length || 0) > 0 || (item.existingFiles?.length || 0) > 0
-                    "
-                    title="แนบหรือเปลี่ยนไฟล์หลักฐาน"
-                  >
-                    <i class="fas fa-file-upload"></i>
+              <button class="btn-card-upload" (click)="openUploadModal(item)"
+                [class.has-file]="(item.attachedFiles?.length || 0) > 0 || (item.existingFiles?.length || 0) > 0"
+                title="แนบหรือเปลี่ยนไฟล์หลักฐาน">
 
-                    {{
-                      (item.attachedFiles?.length || 0) + (item.existingFiles?.length || 0) > 0
-                        ? 'จัดการไฟล์'
-                        : 'แนบไฟล์'
-                    }}
-                  </button>
-                  <input
-                    type="checkbox"
-                    id="mob-select-{{ i }}"
-                    [(ngModel)]="item.selected"
-                    class="card-checkbox"
-                    title="เลือกรายการ"
-                    aria-label="เลือกรายการ"
-                  />
-                </div>
-              </div>
+                <i class="fas fa-file-upload"></i>
 
-              <div class="card-grid">
-                <div class="grid-item">
-                  <label for="mob-shift-{{ i }}">รหัสกะ / เวลา</label>
-                  <div class="val" id="mob-shift-{{ i }}">
-                    {{ item.shiftCode }} ({{ item.checkIn || '-' }} - {{ item.checkOut || '-' }})
-                  </div>
-                </div>
-                <div class="grid-item">
-                  <label for="mob-remaining-{{ i }}">วงเงินคงเหลือ</label>
-                  <div class="val highlight-green" id="mob-remaining-{{ i }}">
-                    {{ item.remainingAmount | number }} บาท
-                  </div>
-                </div>
+                {{
+                (item.attachedFiles?.length || 0) + (item.existingFiles?.length || 0) > 0
+                ? 'จัดการไฟล์'
+                : 'แนบไฟล์'
+                }}
+              </button>
+              <input type="checkbox" id="mob-select-{{i}}" [(ngModel)]="item.selected" class="card-checkbox"
+                title="เลือกรายการ" aria-label="เลือกรายการ" />
+            </div>
+          </div>
 
-                <div class="grid-item full-width">
-                  <label for="mob-desc-{{ i }}"
-                    >รายละเอียดการเบิก <span *ngIf="item.selected" class="required">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="mob-desc-{{ i }}"
-                    class="card-input"
-                    [(ngModel)]="item.description"
-                    placeholder="ระบุรายละเอียดการเบิก..."
-                    [class.is-invalid]="item.selected && !item.description.trim()"
-                    (ngModelChange)="onInputChange(item)"
-                    title="รายละเอียดการเบิก"
-                  />
-                </div>
+          <div class="card-grid">
+            <div class="grid-item">
+              <label for="mob-shift-{{i}}">รหัสกะ / เวลา</label>
+              <div class="val" id="mob-shift-{{i}}">{{ item.shiftCode }} ({{ item.checkIn || '-' }} - {{ item.checkOut
+                || '-' }})</div>
+            </div>
+            <div class="grid-item">
+              <label for="mob-remaining-{{i}}">วงเงินคงเหลือ</label>
+              <div class="val highlight-green" id="mob-remaining-{{i}}">{{ item.remainingAmount | number }} บาท</div>
+            </div>
 
-                <div class="grid-item">
-                  <label for="mob-loc-from-{{ i }}"
-                    >จากที่ไหน <span *ngIf="item.selected" class="required">*</span></label
-                  >
-                  <select
-                    class="card-select"
-                    id="mob-loc-from-{{ i }}"
-                    [(ngModel)]="item.locationFromId"
-                    [class.is-invalid]="item.selected && !item.locationFromId"
-                    (ngModelChange)="onFromLocationChange(item, i)"
-                    title="เลือกสถานที่ต้นทาง"
-                  >
-                    <option [ngValue]="undefined" [hidden]="item.locationFromId !== undefined">
-                      -- เลือก --
-                    </option>
-                    <option *ngFor="let loc of locations" [ngValue]="loc.location_id">
-                      {{ loc.location_name }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="isOtherLocation(item.locationFromId)"
-                    type="text"
-                    class="card-input mt-1"
-                    id="mob-other-from-{{ i }}"
-                    [(ngModel)]="item.otherFrom"
-                    [class.is-invalid]="
-                      item.selected &&
-                      isOtherLocation(item.locationFromId) &&
-                      !item.otherFrom?.trim()
-                    "
-                    placeholder="ระบุสถานที่ต้นทาง..."
-                    title="ระบุสถานที่ต้นทาง"
-                  />
-                </div>
+            <div class="grid-item full-width">
+              <label for="mob-desc-{{i}}">รายละเอียดการเบิก <span *ngIf="item.selected"
+                  class="required">*</span></label>
+              <input type="text" id="mob-desc-{{i}}" class="card-input" [(ngModel)]="item.description"
+                placeholder="ระบุรายละเอียดการเบิก..." [class.is-invalid]="item.selected && !item.description.trim()"
+                (ngModelChange)="onInputChange(item)" title="รายละเอียดการเบิก" />
+            </div>
 
-                <div class="grid-item">
-                  <label for="mob-loc-to-{{ i }}"
-                    >ไปที่ไหน <span *ngIf="item.selected" class="required">*</span></label
-                  >
-                  <select
-                    class="card-select"
-                    id="mob-loc-to-{{ i }}"
-                    [(ngModel)]="item.locationToId"
-                    [class.is-invalid]="item.selected && !item.locationToId"
-                    (ngModelChange)="onToLocationChange(item, i)"
-                    title="เลือกสถานที่ปลายทาง"
-                  >
-                    <option [ngValue]="undefined" [hidden]="item.locationToId !== undefined">
-                      -- เลือก --
-                    </option>
-                    <option *ngFor="let loc of locations" [ngValue]="loc.location_id">
-                      {{ loc.location_name }}
-                    </option>
-                  </select>
-                  <input
-                    *ngIf="isOtherLocation(item.locationToId)"
-                    type="text"
-                    class="card-input mt-1"
-                    id="mob-other-to-{{ i }}"
-                    [(ngModel)]="item.otherTo"
-                    [class.is-invalid]="
-                      item.selected && isOtherLocation(item.locationToId) && !item.otherTo?.trim()
-                    "
-                    placeholder="ระบุสถานที่ปลายทาง..."
-                    title="ระบุสถานที่ปลายทาง"
-                  />
-                </div>
+            <div class="grid-item">
+              <label for="mob-loc-from-{{i}}">จากที่ไหน <span *ngIf="item.selected" class="required">*</span></label>
+              <select class="card-select" id="mob-loc-from-{{i}}" [(ngModel)]="item.locationFromId"
+                [class.is-invalid]="item.selected && !item.locationFromId"
+                (ngModelChange)="onFromLocationChange(item, i)" title="เลือกสถานที่ต้นทาง">
+                <option [ngValue]="undefined" [hidden]="item.locationFromId !== undefined">-- เลือก --</option>
+                <option *ngFor="let loc of locations" [ngValue]="loc.location_id">{{ loc.location_name }}</option>
+              </select>
+              <input *ngIf="isOtherLocation(item.locationFromId)" type="text" class="card-input mt-1"
+                id="mob-other-from-{{i}}" [(ngModel)]="item.otherFrom"
+                [class.is-invalid]="item.selected && isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()"
+                placeholder="ระบุสถานที่ต้นทาง..." title="ระบุสถานที่ต้นทาง" />
+            </div>
 
-                <!-- <div class="grid-item full-width">
+            <div class="grid-item">
+              <label for="mob-loc-to-{{i}}">ไปที่ไหน <span *ngIf="item.selected" class="required">*</span></label>
+              <select class="card-select" id="mob-loc-to-{{i}}" [(ngModel)]="item.locationToId"
+                [class.is-invalid]="item.selected && !item.locationToId" (ngModelChange)="onToLocationChange(item, i)"
+                title="เลือกสถานที่ปลายทาง">
+                <option [ngValue]="undefined" [hidden]="item.locationToId !== undefined">-- เลือก --</option>
+                <option *ngFor="let loc of locations" [ngValue]="loc.location_id">{{ loc.location_name }}</option>
+              </select>
+              <input *ngIf="isOtherLocation(item.locationToId)" type="text" class="card-input mt-1"
+                id="mob-other-to-{{i}}" [(ngModel)]="item.otherTo"
+                [class.is-invalid]="item.selected && isOtherLocation(item.locationToId) && !item.otherTo?.trim()"
+                placeholder="ระบุสถานที่ปลายทาง..." title="ระบุสถานที่ปลายทาง" />
+            </div>
+
+            <!-- <div class="grid-item full-width">
               <label for="mob-amount-{{i}}">จำนวนเงิน (บาท) <span *ngIf="item.selected"
                   class="required">*</span></label>
               <input type="number" id="mob-amount-{{i}}" class="card-input" [(ngModel)]="item.amount"
@@ -363,60 +279,41 @@
                 จำนวนเงินเกินวงเงินคงเหลือ
               </div>
             </div> -->
-                <div class="grid-item full-width">
-                  <label>
-                    จำนวนเงิน (บาท)
-                    <span *ngIf="item.selected" class="required">*</span>
-                  </label>
+            <div class="grid-item full-width">
+              <label>
+                จำนวนเงิน (บาท)
+                <span *ngIf="item.selected" class="required">*</span>
+              </label>
 
-                  <div class="amount-input-wrapper">
-                    <input
-                      type="text"
-                      class="card-input text-right"
-                      placeholder="0.00"
-                      [value]="formatNumber(item.amount || 0)"
-                      (input)="onAmountInput($event, item)"
-                      [class.is-invalid]="item.amountError"
-                    />
-                  </div>
+              <div class="amount-input-wrapper">
+                <input type="text" class="card-input text-right" placeholder="0.00"
+                  [value]="formatNumber(item.amount || 0)" (input)="onAmountInput($event, item)"
+                  [class.is-invalid]="item.amountError" />
+              </div>
 
-                  <div *ngIf="item.amountError" class="error">
-                    {{ item.amountError }}
-                  </div>
-                </div>
+              <div *ngIf="item.amountError" class="error">
+                {{ item.amountError }}
               </div>
             </div>
           </div>
         </div>
-      }
-    </main>
+      </div>
+
+    </div>
+    }
+
+  </main>
   }
 
   <div class="form-actions">
-    <button
-      type="button"
-      class="btn-submit"
-      (click)="save()"
-      [disabled]="isLoading || !areAllItemsValid()"
-    >
-      <i class="fas fa-check"></i>
-      {{
-        !isEditMode
-          ? 'ยืนยันการเบิก'
-          : hasDelete()
-            ? 'ลบรายการเบิกทั้งหมด'
-            : 'ยืนยันการแก้ไขการเบิก'
-      }}
+    <button type="button" class="btn-submit" (click)="save()" [disabled]="isLoading || !areAllItemsValid()">
+      <i class="fas fa-check"></i> {{ !isEditMode ?'ยืนยันการเบิก' : hasDelete()? 'ลบรายการเบิกทั้งหมด'
+      :'ยืนยันการแก้ไขการเบิก' }}
     </button>
   </div>
 
   <!-- File Upload Modal -->
-  <app-file-upload-modal
-    *ngIf="isShowUploadModal"
-    [currentFiles]="currentUploadItem?.attachedFiles || []"
-    [dateLabel]="currentUploadItem?.date || ''"
-    (onSave)="handleFileSave($event)"
-    (onClose)="closeUploadModal()"
-  >
+  <app-file-upload-modal *ngIf="isShowUploadModal" [currentFiles]="currentUploadItem?.attachedFiles || []"
+    [dateLabel]="currentUploadItem?.date || ''" (onSave)="handleFileSave($event)" (onClose)="closeUploadModal()">
   </app-file-upload-modal>
 </div>

@@ -1,35 +1,36 @@
 <div class="modal-overlay denyTicket">
-  <div class="modal-container">
-    <div>
-      <header class="top-header-strip">
-        <h2>เหตุผลในการยกเลิก</h2>
-      </header>
+    <div class="modal-container">
+        <div>
 
-      <form #denyForm="ngForm" (ngSubmit)="save(denyForm)">
-        <div class="content-card">
-          <textarea
-            class="form-input deny"
-            name="reason"
-            ngModel
-            required
-            placeholder="อธิบายรายละเอียด..."
-          ></textarea>
+            <header class="top-header-strip">
+                <h2>เหตุผลในการยกเลิก</h2>
+            </header>
 
-          <div *ngIf="denyForm.submitted && denyForm.invalid" style="color: red; margin-top: 6px">
-            กรุณากรอกเหตุผลในการยกเลิก
-          </div>
+            <form #denyForm="ngForm" (ngSubmit)="save(denyForm)">
+
+                <div class="content-card">
+
+                    <textarea class="form-input deny" name="reason" ngModel required
+                        placeholder="อธิบายรายละเอียด..."></textarea>
+
+                    <div *ngIf="denyForm.submitted && denyForm.invalid" style="color:red; margin-top:6px;">
+                        กรุณากรอกเหตุผลในการยกเลิก
+                    </div>
+
+                </div>
+
+                <div class="form-actions-footer">
+                    <button type="button" class="btn-back-custom" (click)="close()">
+                        <i class="fas fa-times"></i> ยกเลิก
+                    </button>
+
+                    <button type="submit" class="btn-save-custom" [disabled]="denyForm.invalid">
+                        <i class="fas fa-paper-plane"></i> ยืนยัน
+                    </button>
+                </div>
+
+            </form>
+
         </div>
-
-        <div class="form-actions-footer">
-          <button type="button" class="btn-back-custom" (click)="close()">
-            <i class="fas fa-times"></i> ยกเลิก
-          </button>
-
-          <button type="submit" class="btn-save-custom" [disabled]="denyForm.invalid">
-            <i class="fas fa-paper-plane"></i> ยืนยัน
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>

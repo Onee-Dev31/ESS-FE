@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './services-detail-modal.html',
   styleUrl: './services-detail-modal.scss',
 })
+
 export class ServicesDetailModal {
   @Output() onClose = new EventEmitter<void>();
   @Input() services: any[] = [];
@@ -17,7 +18,6 @@ export class ServicesDetailModal {
   groupedServices: Record<string, any[]> = {};
 
   ngOnChanges() {
-    // console.log('services:', this.services);
     this.groupServices();
   }
 

@@ -43,25 +43,25 @@ $status-cancelled-text: var(--text-table-head);
 // No local modal-overlay-styles mixin here, using global one.
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
+    from {
+        opacity: 0;
+    }
 
-  to {
-    opacity: 1;
-  }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 // toolbar-container mixin is used from global _mixins.scss
@@ -75,416 +75,413 @@ $status-cancelled-text: var(--text-table-head);
 // modern-table mixin is used from global _mixins.scss
 
 @mixin mobile-cards-view {
-  display: none;
+    display: none;
 
-  @include large-tablet {
-    display: flex !important;
-    flex-direction: column;
-    gap: 16px;
-    padding: 10px 0;
-  }
-
-  .mobile-card {
-    background: var(--bg-card);
-    border-radius: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      border-color: rgba(0, 0, 0, 0.08);
-
-      .card-header {
-        background: var(--status-new-bg);
-      }
-
-      .card-header::after {
-        opacity: 1;
-      }
+    @include large-tablet {
+        display: flex !important;
+        flex-direction: column;
+        gap: 16px;
+        padding: 10px 0;
     }
 
-    .card-header {
-      background: var(--bg-card);
-      border-bottom: 1px solid var(--border-toolbar);
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      transition: background 0.3s ease;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      .header-content {
-        .ticket-no {
-          font-weight: 700;
-          color: $primary;
-          font-size: 1.05rem;
-        }
-      }
-
-      .card-actions-top {
+    .mobile-card {
+        background: var(--bg-card);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
         display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+        flex-direction: column;
+
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.08);
+
+            .card-header {
+                background: var(--status-new-bg);
+            }
+
+            .card-header::after {
+                opacity: 1;
+            }
+        }
+
+        .card-header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-toolbar);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: background 0.3s ease;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, $primary, color-mix(in srgb, $primary, white 20%));
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .header-content {
+                .ticket-no {
+                    font-weight: 700;
+                    color: $primary;
+                    font-size: 1.05rem;
+                }
+            }
+
+            .card-actions-top {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .info-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 14px;
+                font-size: 0.9rem;
+
+                .label {
+                    color: var(--text-table-head);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .value {
+                    font-weight: 600;
+                    color: var(--text-header);
+                }
+            }
+
+            .card-footer-actions {
+                margin-top: auto;
+                padding-top: 16px;
+                border-top: 1px solid var(--border-toolbar);
+                display: flex;
+                gap: 12px;
+
+                button {
+                    flex: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 9px 16px;
+                    border-radius: 12px;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: none;
+
+                    i {
+                        font-size: 1rem;
+                    }
+
+                    &:active {
+                        transform: scale(0.98);
+                    }
+                }
+
+                .btn-edit-sm {
+                    background: var(--status-new-bg);
+                    color: var(--status-new-text);
+
+                    &:hover {
+                        background: var(--status-progress-bg);
+                        color: var(--primary);
+                    }
+                }
+
+                .btn-delete-sm {
+                    background: var(--status-danger-bg);
+                    color: var(--status-danger-text);
+
+                    &:hover {
+                        background: var(--status-rejected-bg);
+                        color: var(--danger);
+                    }
+                }
+
+                .btn-view-sm {
+                    background: var(--border-toolbar);
+                    color: var(--text-sub);
+
+                    &:hover {
+                        background: var(--border-table-head);
+                        color: var(--text-header);
+                    }
+                }
+            }
+        }
     }
-
-    .card-body {
-      padding: 20px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-
-      .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 14px;
-        font-size: 0.9rem;
-
-        .label {
-          color: var(--text-table-head);
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .value {
-          font-weight: 600;
-          color: var(--text-header);
-        }
-      }
-
-      .card-footer-actions {
-        margin-top: auto;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-toolbar);
-        display: flex;
-        gap: 12px;
-
-        button {
-          flex: 1;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          padding: 9px 16px;
-          border-radius: 12px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: none;
-
-          i {
-            font-size: 1rem;
-          }
-
-          &:active {
-            transform: scale(0.98);
-          }
-        }
-
-        .btn-edit-sm {
-          background: var(--status-new-bg);
-          color: var(--status-new-text);
-
-          &:hover {
-            background: var(--status-progress-bg);
-            color: var(--primary);
-          }
-        }
-
-        .btn-delete-sm {
-          background: var(--status-danger-bg);
-          color: var(--status-danger-text);
-
-          &:hover {
-            background: var(--status-rejected-bg);
-            color: var(--danger);
-          }
-        }
-
-        .btn-view-sm {
-          background: var(--border-toolbar);
-          color: var(--text-sub);
-
-          &:hover {
-            background: var(--border-table-head);
-            color: var(--text-header);
-          }
-        }
-      }
-    }
-  }
 }
 
 // Status Badges
 .status-badge {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  line-height: 1;
-  white-space: nowrap;
-  border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+    white-space: nowrap;
+    border: 1px solid transparent;
 
-  &::before {
-    content: '';
-    display: block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: currentColor;
-  }
+    &::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
 
-  &.status-new,
-  &.status-waiting,
-  &.NEW,
-  &.WAITING_CHECK {
-    background: var(--status-new-bg);
-    color: var(--status-new-text);
-    border-color: var(--border);
-  }
+    &.status-new,
+    &.status-waiting,
+    &.NEW,
+    &.WAITING_CHECK {
+        background: var(--status-new-bg);
+        color: var(--status-new-text);
+        border-color: var(--border);
+    }
 
-  &.status-approved,
-  &.status-verified,
-  &.APPROVED,
-  &.VERIFIED {
-    background: var(--status-success-bg);
-    color: var(--status-success-text);
-    border-color: var(--border);
-  }
+    &.status-approved,
+    &.status-verified,
+    &.APPROVED,
+    &.VERIFIED {
+        background: var(--status-success-bg);
+        color: var(--status-success-text);
+        border-color: var(--border);
+    }
 
-  &.status-rejected,
-  &.status-cancelled,
-  &.REJECTED,
-  &.CANCELLED {
-    background: var(--status-danger-bg);
-    color: var(--status-danger-text);
-    border-color: var(--border);
-  }
+    &.status-rejected,
+    &.status-cancelled,
+    &.REJECTED,
+    &.CANCELLED {
+        background: var(--status-danger-bg);
+        color: var(--status-danger-text);
+        border-color: var(--border);
+    }
 
-  &.status-pending,
-  &.PENDING_APPROVAL {
-    background: var(--status-pending-bg);
-    color: var(--status-pending-text);
-    border-color: var(--border);
-  }
+    &.status-pending,
+    &.PENDING_APPROVAL {
+        background: var(--status-pending-bg);
+        color: var(--status-pending-text);
+        border-color: var(--border);
+    }
 }
 
 @mixin content-card {
-  background: var(--bg-card);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  padding: 24px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
 
-  @include tablet {
-    padding: 16px;
-    border-radius: 12px;
-  }
+    @include tablet {
+        padding: 16px;
+        border-radius: 12px;
+    }
 }
 
 @mixin card-header-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-header);
-  margin-bottom: 24px;
-  position: relative;
-  padding-left: 16px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-header);
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 16px;
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 20px;
-    background: $primary;
-    border-radius: 2px;
-  }
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 20px;
+        background: $primary;
+        border-radius: 2px;
+    }
 }
 
 @mixin icon-btn-sky {
-  background: var(--status-new-bg);
-  color: var(--status-new-text);
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+    background: var(--status-new-bg);
+    color: var(--status-new-text);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
 
-  &:hover {
-    background: var(--status-progress-bg);
-    transform: scale(1.05);
-  }
+    &:hover {
+        background: var(--status-progress-bg);
+        transform: scale(1.05);
+    }
 }
 
+
 .timeoff-page {
-  position: relative;
+    position: relative;
 
-  // ==================== LOADING OVERLAY ====================
-  .loading-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    backdrop-filter: blur(2px);
-    border-radius: inherit;
-
-    .spinner {
-      font-size: 2rem;
-      color: $primary;
-    }
-
-    p {
-      color: $text;
-      font-weight: 500;
-      margin: 0;
-    }
-  }
-
-  // ==================== LAYOUT ====================
-  padding: 24px;
-  padding-bottom: 24px;
-  background-color: $bg-page;
-  min-height: 100vh;
-
-  @include large-tablet {
-    padding: 12px;
-    padding-bottom: 5px;
-  }
-
-  .content-card {
-    @include content-card;
-    margin-top: 16px;
-  }
-
-  .card-header-title {
-    @include card-header-title;
-  }
-
-  .toolbar-container {
-    @include toolbar-container;
-
-    .toolbar-bottom-row .right-filters {
-      @include tablet {
+    // ==================== LOADING OVERLAY ====================
+    .loading-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-    }
-  }
-
-  .table-responsive {
-    @include large-tablet {
-      display: none;
-    }
-  }
-
-  // ==================== TABLE STYLES ====================
-  .modern-table {
-    @include modern-table;
-
-    // Column widths are now handled by utility classes in HTML (e.g., .w-px-120, .w-auto)
-
-    .leave-type-cell {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      i {
-        color: $primary;
-        font-size: 1rem;
-      }
-
-      &.centered {
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-      }
+        gap: 1rem;
+        backdrop-filter: blur(2px);
+        border-radius: inherit;
+
+        .spinner {
+            font-size: 2rem;
+            color: $primary;
+        }
+
+        p {
+            color: $text;
+            font-weight: 500;
+            margin: 0;
+        }
     }
 
-    .days-badge {
-      background: var(--border-toolbar);
-      color: var(--text-sub);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.9rem;
+    // ==================== LAYOUT ====================
+    padding: 24px;
+    padding-bottom: 24px;
+    background-color: $bg-page;
+    min-height: 100vh;
+
+    @include large-tablet {
+        padding: 12px;
+        padding-bottom: 5px;
     }
 
-    .period-text {
-      font-size: 0.85rem;
-      color: var(--text-table-head);
-      font-weight: 600;
+    .content-card {
+        @include content-card;
+        margin-top: 16px;
     }
 
-    .reason-cell {
-      max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  // ==================== MOBILE CARD VIEW ====================
-  .card-list-view {
-    @include mobile-cards-view;
-
-    .reason-box {
-      margin-top: 12px;
-      padding: 10px;
-      background: var(--bg-table-head);
-      border-radius: 8px;
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      border: 1px solid var(--border-toolbar);
-
-      strong {
-        color: var(--text-header);
-        display: block;
-        margin-bottom: 4px;
-      }
+    .card-header-title {
+        @include card-header-title;
     }
 
-    .action-btn.folder {
-      @include icon-btn-sky;
+    .toolbar-container {
+        @include toolbar-container;
 
-      &:hover {
-        transform: scale(1.05);
-      }
+        .toolbar-bottom-row .right-filters {
+            @include tablet {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+        }
     }
-  }
+
+    .table-responsive {
+        @include large-tablet {
+            display: none;
+        }
+    }
+
+    // ==================== TABLE STYLES ====================
+    .modern-table {
+        @include modern-table;
+
+        // Column widths are now handled by utility classes in HTML (e.g., .w-px-120, .w-auto)
+
+        .leave-type-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            i {
+                color: $primary;
+                font-size: 1rem;
+            }
+
+            &.centered {
+                justify-content: center;
+            }
+        }
+
+        .days-badge {
+            background: var(--border-toolbar);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .period-text {
+            font-size: 0.85rem;
+            color: var(--text-table-head);
+            font-weight: 600;
+        }
+
+        .reason-cell {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    // ==================== MOBILE CARD VIEW ====================
+    .card-list-view {
+        @include mobile-cards-view;
+
+        .reason-box {
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--bg-table-head);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            border: 1px solid var(--border-toolbar);
+
+            strong {
+                color: var(--text-header);
+                display: block;
+                margin-bottom: 4px;
+            }
+        }
+
+        .action-btn.folder {
+            @include icon-btn-sky;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+    }
 }
 
 // Import button and input styles
@@ -494,128 +491,129 @@ $status-cancelled-text: var(--text-table-head);
 
 // Main action buttons
 .btn-create {
-  @include btn-primary;
+    @include btn-primary;
 }
 
 .btn-search {
-  @include btn-primary;
+    @include btn-primary;
 }
 
 .btn-clear {
-  @include btn-outline;
+    @include btn-outline;
 
-  @include tablet {
-    flex: 1 0 45%;
-    min-width: 100px;
-  }
+    @include tablet {
+        flex: 1 0 45%;
+        min-width: 100px;
+    }
 }
 
 .action-btns {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-icon {
-  &.view {
-    @include icon-btn-ghost(var(--text-table-head)); // Slate
-  }
+    &.view {
+        @include icon-btn-ghost(var(--text-table-head)); // Slate
+    }
 
-  &.edit {
-    @include icon-btn-ghost(#0ea5e9); // Sky
-  }
+    &.edit {
+        @include icon-btn-ghost(#0ea5e9); // Sky
+    }
 
-  &.delete {
-    @include icon-btn-ghost(var(--danger)); // Red
-  }
+    &.delete {
+        @include icon-btn-ghost(var(--danger)); // Red
+    }
 }
 
 // Keep legacy classes for backward compatibility if needed, but override styling
 
-.btn-delete-sm {
-  @include btn-outline;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
-  color: var(--danger);
-  border-color: var(--danger);
 
-  &:hover {
-    background: rgba(239, 68, 68, 0.05);
-    border-color: #dc2626;
-  }
+.btn-delete-sm {
+    @include btn-outline;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    height: 36px;
+    color: var(--danger);
+    border-color: var(--danger);
+
+    &:hover {
+        background: rgba(239, 68, 68, 0.05);
+        border-color: #dc2626;
+    }
 }
 
 // Input fields
 .form-control {
-  @include input-field;
+    @include input-field;
 }
 
 .select-status,
 select.form-control {
-  @include select-dropdown;
+    @include select-dropdown;
 }
 
 // Search input group
 .search-input-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-
-  input.form-control {
-    min-width: 200px;
-  }
-
-  @include tablet {
-    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 
     input.form-control {
-      flex: 1;
-      min-width: 0;
+        min-width: 200px;
     }
 
-    button {
-      flex: none;
-      width: auto;
-      padding: 0 20px;
+    @include tablet {
+        width: 100%;
+
+        input.form-control {
+            flex: 1;
+            min-width: 0;
+        }
+
+        button {
+            flex: none;
+            width: auto;
+            padding: 0 20px;
+        }
     }
-  }
 }
 
 // Filter groups styling
 .filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 
-  .filter-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .date-input-group,
-  .select-input-group {
-    width: 100%;
-    max-width: 100%;
-
-    .form-control {
-      width: 100%;
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text);
     }
-  }
 
-  @include tablet {
-    flex: 1 1 120px;
-    min-width: 120px;
-  }
+    .date-input-group,
+    .select-input-group {
+        width: 100%;
+        max-width: 100%;
+
+        .form-control {
+            width: 100%;
+        }
+    }
+
+    @include tablet {
+        flex: 1 1 120px;
+        min-width: 120px;
+    }
 }
 
 // Modal Styling
 .modal-overlay {
-  @include modal-overlay-styles;
+    @include modal-overlay-styles;
 }
 
 // Pagination wrapper spacing
 .pagination-wrapper {
-  margin-top: 24px;
+    margin-top: 24px;
 }

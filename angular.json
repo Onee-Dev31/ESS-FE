@@ -101,12 +101,6 @@
                 }
               ]
             },
-            "test": {
-              "polyfills": ["@angular/compiler"],
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
-            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -140,10 +134,18 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "buildTarget": "my-angular-app:build:test",
             "tsConfig": "tsconfig.spec.json",
-            "setupFiles": ["src/test-setup.ts"],
-            "providersFile": "src/test-providers.ts"
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "src/styles.scss"
+            ]
           }
         }
       }

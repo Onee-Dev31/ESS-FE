@@ -1,13 +1,13 @@
 <div class="toast-container" aria-live="polite" aria-atomic="true">
-  @for (toast of toastService.toasts(); track toast.id) {
+    @for (toast of toastService.toasts(); track toast.id) {
     <div class="toast toast-{{ toast.type }}" role="alert">
-      <div class="toast-content">
-        <i class="fas {{ getIcon(toast.type) }} toast-icon"></i>
-        <span class="toast-message">{{ toast.message }}</span>
-      </div>
-      <button class="toast-close" (click)="close(toast.id)" aria-label="ปิด">
-        <i class="fas fa-times"></i>
-      </button>
+        <div class="toast-content">
+            <i class="fas {{ getIcon(toast.type) }} toast-icon"></i>
+            <span class="toast-message">{{ toast.message }}</span>
+        </div>
+        <button class="toast-close" (click)="close(toast.id)" aria-label="ปิด">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
-  }
+    }
 </div>

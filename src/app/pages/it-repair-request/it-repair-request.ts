@@ -1,16 +1,4 @@
-import {
-  Component,
-  signal,
-  inject,
-  computed,
-  HostListener,
-  ElementRef,
-  ViewChild,
-  OnInit,
-  effect,
-  ChangeDetectorRef,
-  Input,
-} from '@angular/core';
+import { Component, signal, inject, computed, HostListener, ElementRef, ViewChild, OnInit, effect, ChangeDetectorRef, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,10 +6,7 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SwalService } from '../../services/swal.service';
 import { UserService, UserProfile } from '../../services/user.service';
 import { PhoneUtil } from '../../utils/phone.util';
-import {
-  FilePreviewModalComponent,
-  FilePreviewItem,
-} from '../../components/modals/file-preview-modal/file-preview-modal';
+import { FilePreviewModalComponent, FilePreviewItem } from '../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { ItServiceMockService } from '../../services/it-service-mock.service';
 import { AuthService } from '../../services/auth.service';
@@ -32,15 +17,9 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 @Component({
   selector: 'app-it-repair-request',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    PageHeaderComponent,
-    FilePreviewModalComponent,
-    NzSelectModule,
-  ],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, FilePreviewModalComponent, NzSelectModule],
   templateUrl: './it-repair-request.html',
-  styleUrl: './it-repair-request.scss',
+  styleUrl: './it-repair-request.scss'
 })
 export class ItRepairRequestComponent implements OnInit {
   private swalService = inject(SwalService);
@@ -54,15 +33,12 @@ export class ItRepairRequestComponent implements OnInit {
   // CONDITION
   @Input() openBy!: string;
 
+
   @ViewChild('dropdownWrapper') dropdownWrapper!: ElementRef;
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (
-      this.isDropdownOpen() &&
-      this.dropdownWrapper &&
-      !this.dropdownWrapper.nativeElement.contains(event.target)
-    ) {
+    if (this.isDropdownOpen() && this.dropdownWrapper && !this.dropdownWrapper.nativeElement.contains(event.target)) {
       this.isDropdownOpen.set(false);
     }
   }
@@ -74,12 +50,12 @@ export class ItRepairRequestComponent implements OnInit {
     model: '',
     symptom: '',
     phoneNumber: '',
-    attachments: [] as { name: string; size?: number; file: File }[],
+    attachments: [] as { name: string, size?: number, file: File }[]
   });
 
   phoneModel = '';
 
-  openForOptions = signal<any[]>([]);
+  openForOptions = signal<any[]>([])
   selectedOpenFor = signal<string>(this.authService.userData().CODEMPID);
 
   // MASTER
@@ -93,7 +69,7 @@ export class ItRepairRequestComponent implements OnInit {
     if (userData?.USR_MOBILE) {
       const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
       this.phoneModel = formatted;
-      this.repairFormData.update((data) => ({ ...data, phoneNumber: formatted }));
+      this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
     }
   }
 
@@ -104,12 +80,12 @@ export class ItRepairRequestComponent implements OnInit {
     const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
     input.value = formatted;
     this.phoneModel = formatted;
-    this.repairFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
+    this.repairFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
   }
 
   onPhoneNumberChange(value: string) {
     const formatted = PhoneUtil.formatPhoneNumber(value);
-    this.repairFormData.update((data) => ({ ...data, phoneNumber: formatted }));
+    this.repairFormData.update(data => ({ ...data, phoneNumber: formatted }));
   }
 
   isPreviewModalOpen = signal<boolean>(false);
@@ -146,23 +122,17 @@ export class ItRepairRequestComponent implements OnInit {
     const term = this.searchTerm().toLowerCase().trim();
     if (!term) return this.deviceCategories;
 
-    return this.deviceCategories
-      .map((cat) => ({
-        ...cat,
-        items: cat.items.filter((item: any) => item.name.toLowerCase().includes(term)),
-      }))
-      .filter((cat) => cat.items.length > 0);
+    return this.deviceCategories.map(cat => ({
+      ...cat,
+      items: cat.items.filter((item: any) => item.name.toLowerCase().includes(term))
+    })).filter(cat => cat.items.length > 0);
   });
 
   selectDevice(device: any, category: any) {
-    console.log(category);
-    this.repairFormData.update((prev) => ({
-      ...prev,
-      device: device,
-      category: {
-        categoryId: category.categoryId,
-        group: category.group,
-      },
+    this.repairFormData.update(prev => ({
+      ...prev, device: device, category: {
+        categoryId: category.categoryId, group: category.group
+      }
     }));
     this.searchTerm.set(device.name);
     this.isDropdownOpen.set(false);
@@ -171,31 +141,26 @@ export class ItRepairRequestComponent implements OnInit {
   onDeviceInput(event: any) {
     const value = event.target.value;
     this.searchTerm.set(value);
-    this.repairFormData.update((prev) => ({ ...prev, device: value }));
+    this.repairFormData.update(prev => ({ ...prev, device: value }));
     this.isDropdownOpen.set(true);
   }
 
   toggleDropdown() {
-    this.isDropdownOpen.update((v) => !v);
+    this.isDropdownOpen.update(v => !v);
   }
 
   clearDevice(event?: Event) {
     if (event) {
       event.stopPropagation();
     }
-    this.repairFormData.update((prev) => ({ ...prev, device: { typeId: '', name: '' } }));
+    this.repairFormData.update(prev => ({ ...prev, device: { typeId: '', name: '' } }));
     this.searchTerm.set('');
     this.isDropdownOpen.set(false);
   }
 
   isFormValid = computed(() => {
     const { device, symptom, attachments, phoneNumber } = this.repairFormData();
-    return (
-      device.typeId !== '' &&
-      device.name !== '' &&
-      (symptom.trim().length > 0 || attachments.length > 0) &&
-      phoneNumber != ''
-    );
+    return (device.typeId !== '' && device.name !== '') && (symptom.trim().length > 0 || attachments.length > 0) && phoneNumber != '';
   });
 
   showSummaryModal = signal(false);
@@ -203,15 +168,15 @@ export class ItRepairRequestComponent implements OnInit {
   onFileSelected(event: any) {
     const files: FileList = event.target.files;
     if (files && files.length > 0) {
-      const newAttachments = Array.from(files).map((f) => ({
+      const newAttachments = Array.from(files).map(f => ({
         name: f.name,
         size: f.size,
-        file: f,
+        file: f
       }));
       const currentAttachments = this.repairFormData().attachments;
       this.repairFormData.set({
         ...this.repairFormData(),
-        attachments: [...currentAttachments, ...newAttachments],
+        attachments: [...currentAttachments, ...newAttachments]
       });
     }
   }
@@ -221,21 +186,19 @@ export class ItRepairRequestComponent implements OnInit {
     currentAttachments.splice(index, 1);
     this.repairFormData.set({
       ...this.repairFormData(),
-      attachments: currentAttachments,
+      attachments: currentAttachments
     });
   }
 
   viewFile(fileObj: any) {
     if (fileObj.file) {
       const url = URL.createObjectURL(fileObj.file);
-      this.previewFiles.set([
-        {
-          fileName: fileObj.name,
-          date: dayjs().format('DD/MM/YYYY HH:mm'),
-          url: url,
-          type: fileObj.file.type,
-        },
-      ]);
+      this.previewFiles.set([{
+        fileName: fileObj.name,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: url,
+        type: fileObj.file.type
+      }]);
       this.isPreviewModalOpen.set(true);
     } else {
       this.swalService.info('แจ้งเตือน', 'ไฟล์นี้เป็นข้อมูลตัวอย่าง ไม่สามารถเปิดดูได้จริง');
@@ -248,14 +211,11 @@ export class ItRepairRequestComponent implements OnInit {
 
   submit() {
     if (!this.isFormValid()) {
-      this.swalService.warning(
-        'แจ้งเตือน',
-        'กรุณาระบุอุปกรณ์ และรายละเอียดอาการหรือแนบรูปภาพให้ครบถ้วน',
-      );
+      this.swalService.warning('แจ้งเตือน', 'กรุณาระบุอุปกรณ์ และรายละเอียดอาการหรือแนบรูปภาพให้ครบถ้วน');
       return;
     }
 
-    this.repairFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
+    this.repairFormData.update(data => ({ ...data, phoneNumber: this.phoneModel }));
 
     this.showSummaryModal.set(true);
   }
@@ -273,7 +233,7 @@ export class ItRepairRequestComponent implements OnInit {
       model: '',
       symptom: '',
       phoneNumber: '',
-      attachments: [],
+      attachments: []
     });
     this.searchTerm.set('');
     this.isDropdownOpen.set(false);
@@ -289,9 +249,6 @@ export class ItRepairRequestComponent implements OnInit {
 
   confirmSubmission() {
     const data = this.repairFormData();
-
-    console.log(data);
-
     const formData = new FormData();
 
     formData.append('deviceTypeId', data.device.typeId);
@@ -301,14 +258,7 @@ export class ItRepairRequestComponent implements OnInit {
     formData.append('symptom', data.symptom);
     formData.append('contactPhone', data.phoneNumber);
     formData.append('requesterAduser', this.authService.currentUser() || '-');
-    formData.append(
-      'IsSelfRequestByIT',
-      this.openBy
-        ? 'false'
-        : this.authService.userData().DEPARTMENT === '10806 IT Department'
-          ? 'true'
-          : 'false',
-    ); //it เปิดให้ตัวเอง ?
+    formData.append('IsSelfRequestByIT', this.openBy ? 'false' : this.authService.userData().DEPARTMENT === '10806 IT Department' ? 'true' : 'false'); //it เปิดให้ตัวเอง ?
     formData.append('openForCodeempid', this.selectedOpenFor());
 
     formData.append('ticketTypeId', '1');
@@ -320,19 +270,16 @@ export class ItRepairRequestComponent implements OnInit {
       }
     });
 
-    console.log('formData', [...formData.entries()]);
+    console.log("formData", [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.itServiceService
-      .createTicket(formData)
+    this.itServiceService.createTicket(formData)
       .pipe(
         finalize(() => {
           this.closeSummaryModal();
-        }),
-      )
-      .subscribe({
+        })
+      ).subscribe({
         next: (res) => {
-          console.log(res);
           if (res.success) {
             this.swalService.success('ส่งคำขอแจ้งซ่อมเรียบร้อยแล้ว', res.ticketNumber).then(() => {
               this.clearForm();
@@ -343,8 +290,9 @@ export class ItRepairRequestComponent implements OnInit {
         error: (error) => {
           console.error('Error fetching data:', error.error.message);
           // const message = error?.error?.message || '';
-        },
+        }
       });
+
   }
 
   showHistoryDetailModal = signal(false);
@@ -364,26 +312,22 @@ export class ItRepairRequestComponent implements OnInit {
   getDeviceCategory() {
     this.itServiceService.getDeviceCategory().subscribe({
       next: (res) => {
-        // console.log(res);
-        this.deviceCategories = res.data;
+        this.deviceCategories = res.data
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      },
+      }
     });
   }
   getOpenFor() {
-    this.itServiceService
-      .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
-      .subscribe({
-        next: (res) => {
-          console.log(res.data);
-          this.openForOptions.set(res.data);
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        },
-      });
+    this.itServiceService.getOpenFor({ currentEmpId: this.authService.userData().CODEMPID }).subscribe({
+      next: (res) => {
+        this.openForOptions.set(res.data)
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
   }
 }
