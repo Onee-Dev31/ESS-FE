@@ -1,0 +1,98 @@
+name: PR Gates
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+concurrency:
+  group: pr-gates-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Lint (Prettier)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - run: npx prettier --check .
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  test-coverage:
+    name: Test + Coverage
+    runs-on: ubuntu-latest
+    outputs:
+      percent: ${{ steps.cov.outputs.percent }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - name: Run Tests + Coverage
+        run: npx ng test --no-watch 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
+      - name: Parse Coverage
+        id: cov
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            PERCENT=$(node -e "const s=require('./coverage/coverage-summary.json');console.log(s.total.lines.pct)")
+          else
+            PERCENT="N/A"
+          fi
+          echo "percent=$PERCENT" >> $GITHUB_OUTPUT
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=critical
+
+  summary:
+    name: PR Gates Summary
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test-coverage, security]
+    if: always()
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/github-script@v8
+        env:
+          RESULT_LINT: ${{ needs.lint.result }}
+          RESULT_TYPECHECK: ${{ needs.typecheck.result }}
+          RESULT_TEST: ${{ needs.test-coverage.result }}
+          RESULT_SECURITY: ${{ needs.security.result }}
+          COVERAGE_PERCENT: ${{ needs.test-coverage.outputs.percent }}
+        with:
+          script: |
+            const script = require('./.github/scripts/pr-gates-summary.js')
+            await script({ github, context, core })
