@@ -2,19 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
-import { MatIconModule  } from "@angular/material/icon";
+import { MatIconModule } from '@angular/material/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'app-menu-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    NzTooltipModule,
-    MatIconModule ,
-    NzSelectModule
-  ],
+  imports: [CommonModule, FormsModule, NzTooltipModule, MatIconModule, NzSelectModule],
   templateUrl: './menu-form.html',
   styleUrl: './menu-form.scss',
 })
@@ -35,12 +29,12 @@ export class MenuForm implements OnChanges {
     isVisible: 1,
     isEnabled: 1,
     remark: '',
-    createdBy: ''
-  }
+    createdBy: '',
+  };
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
-      this.formData.orderNo = this.ORDER_NO + 1
+      this.formData.orderNo = this.ORDER_NO + 1;
     }
   }
 
@@ -51,5 +45,4 @@ export class MenuForm implements OnChanges {
   handleSubmit() {
     this.onSubmit.emit(this.formData);
   }
-
 }

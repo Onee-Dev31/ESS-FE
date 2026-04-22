@@ -222,7 +222,12 @@
                 <td class="text-center" (click)="$event.stopPropagation()">
                   @if (claim.status === 'New') {
                     <div class="action-btns">
-                      <button class="btn-icon edit" style="margin-right: 10px;" (click)="editRequest(claim.id)" title="แก้ไข">
+                      <button
+                        class="btn-icon edit"
+                        style="margin-right: 10px"
+                        (click)="editRequest(claim.id)"
+                        title="แก้ไข"
+                      >
                         <i class="far fa-edit"></i>
                       </button>
                       <button class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">

@@ -3,7 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoadingService {
   private loadingStates = signal<Map<string, boolean>>(new Map());
@@ -32,7 +32,7 @@ export class LoadingService {
   }
 
   isAnyLoading(): boolean {
-    return Array.from(this.loadingStates().values()).some(v => v);
+    return Array.from(this.loadingStates().values()).some((v) => v);
   }
 
   clearAll(): void {

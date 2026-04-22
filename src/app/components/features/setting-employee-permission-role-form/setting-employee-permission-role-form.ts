@@ -1,6 +1,20 @@
-import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {
+  DragDropModule,
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -21,7 +35,7 @@ import { SettingService } from '../../../services/setting.service';
     NzSelectModule,
     DragDropModule,
     NzInputModule,
-    NzSwitchModule
+    NzSwitchModule,
   ],
   templateUrl: './setting-employee-permission-role-form.html',
   styleUrl: './setting-employee-permission-role-form.scss',
@@ -35,11 +49,11 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
   private masterService = inject(MasterDataService);
 
   //MASTER
-  roleList: any[] = []
+  roleList: any[] = [];
 
   emp: any;
-  permissionRoleByEmployee: any[] = []
-  originalPermissionRoleByEmployee: any[] = []
+  permissionRoleByEmployee: any[] = [];
+  originalPermissionRoleByEmployee: any[] = [];
 
   ngOnInit() {
     this.getRoleMaster();
@@ -47,16 +61,15 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isOpen'] && this.isOpen) {
-      this.emp = this.selected.emp
+      this.emp = this.selected.emp;
       const userRoleIds = new Set(this.selected.roles.map((r: any) => r.RoleID));
 
       this.permissionRoleByEmployee = this.roleList
         .sort((a, b) => a.RoleID - b.RoleID)
-        .map(role => ({
+        .map((role) => ({
           ...role,
-          checked: userRoleIds.has(role.RoleID)
+          checked: userRoleIds.has(role.RoleID),
         }));
-
     }
   }
 
@@ -66,15 +79,14 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
 
   handleSubmit() {
     const batchRoles = this.permissionRoleByEmployee
-      .filter(r => r.checked)
-      .map(r => ({
+      .filter((r) => r.checked)
+      .map((r) => ({
         RoleID: r.RoleID,
-        IsActive: r.checked ? 1 : 0
+        IsActive: r.checked ? 1 : 0,
       }));
 
     this.onSubmit.emit(batchRoles);
   }
-
 
   // FUNCTION
 
@@ -82,14 +94,11 @@ export class SettingEmployeePermissionRoleForm implements OnInit, OnChanges {
   getRoleMaster() {
     this.masterService.getRoleMaster().subscribe({
       next: (res) => {
-        this.roleList = res.data
+        this.roleList = res.data;
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
-
-
-
 }

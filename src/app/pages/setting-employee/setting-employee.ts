@@ -17,7 +17,7 @@ import { SwalService } from '../../services/swal.service';
 import { createListingState, createListingComputeds_v2 } from '../../utils/listing.util';
 import { Employee } from '../resign-management/employeeData.interface';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
-import { SettingEmployeePermissionRoleForm } from "../../components/features/setting-employee-permission-role-form/setting-employee-permission-role-form";
+import { SettingEmployeePermissionRoleForm } from '../../components/features/setting-employee-permission-role-form/setting-employee-permission-role-form';
 import { SettingService } from '../../services/setting.service';
 @Component({
   selector: 'app-setting-employee',
@@ -31,12 +31,11 @@ import { SettingService } from '../../services/setting.service';
     EmptyStateComponent,
     PaginationComponent,
     NzSelectModule,
-    SettingEmployeePermissionRoleForm
+    SettingEmployeePermissionRoleForm,
   ],
   templateUrl: './setting-employee.html',
   styleUrl: './setting-employee.scss',
 })
-
 export class SettingEmployee {
   pageTitle = signal<string>('กำหนดสิทธิ์พนักงาน');
 
@@ -91,28 +90,24 @@ export class SettingEmployee {
     const departments = this.departmentList();
     if (!company) return [];
 
-    return departments.filter(dep =>
-      dep.COMPANY_CODE === company.COMPANY_CODE
-    );
+    return departments.filter((dep) => dep.COMPANY_CODE === company.COMPANY_CODE);
   });
 
   openRoleModal(emp: any) {
     // console.log(emp)
 
     if (!emp.adUser) {
-      this.swalService.warning('ไม่มี Aduser')
+      this.swalService.warning('ไม่มี Aduser');
       return;
     }
 
-    this.settingPermissionRolesByAdUser(emp).subscribe(res => {
+    this.settingPermissionRolesByAdUser(emp).subscribe((res) => {
       this.selected = {
         emp: emp,
-        roles: res.data
-      }
+        roles: res.data,
+      };
       this.isFormOpen.set(true);
     });
-
-
   }
 
   closeForm() {
@@ -137,14 +132,13 @@ export class SettingEmployee {
       return;
     }
 
-    this.settingPermissionRolesByAdUser(this.selected.emp, data).subscribe(res => {
+    this.settingPermissionRolesByAdUser(this.selected.emp, data).subscribe((res) => {
       // console.log(res)
       if (res.success) {
-        this.swalService.success(res.message)
+        this.swalService.success(res.message);
       }
       this.closeForm();
     });
-
   }
 
   onImgError(event: Event) {
@@ -183,62 +177,48 @@ export class SettingEmployee {
   }
 
   goToPage(page: number) {
-
     this.activeListing.currentPage.set(page);
 
-    this.fetchEmployee(
-      page + 1,
-      this.activeListing.pageSize()
-    ).subscribe(res => this.setEmployeeFromApi(res));
-  }
-
-  setPageSize(size: number) {
-
-    this.activeListing.pageSize.set(size);
-    this.activeListing.currentPage.set(0);
-
-    this.fetchEmployee(1, size)
-      .subscribe(res => this.setEmployeeFromApi(res));
-  }
-
-  applyFilter() {
-
-    this.activeListing.currentPage.set(0);
-
-    this.fetchEmployee(
-      1,
-      this.activeListing.pageSize()
-    ).subscribe(res => {
-      // console.log(res)
-      this.setEmployeeFromApi(res)
-    }
+    this.fetchEmployee(page + 1, this.activeListing.pageSize()).subscribe((res) =>
+      this.setEmployeeFromApi(res),
     );
   }
 
-  private loadInitialData() {
+  setPageSize(size: number) {
+    this.activeListing.pageSize.set(size);
+    this.activeListing.currentPage.set(0);
 
+    this.fetchEmployee(1, size).subscribe((res) => this.setEmployeeFromApi(res));
+  }
+
+  applyFilter() {
+    this.activeListing.currentPage.set(0);
+
+    this.fetchEmployee(1, this.activeListing.pageSize()).subscribe((res) => {
+      // console.log(res)
+      this.setEmployeeFromApi(res);
+    });
+  }
+
+  private loadInitialData() {
     this.loadingService.start('employee-table');
 
     const page = this.activeListing.currentPage() + 1;
     const size = this.activeListing.pageSize();
 
-    this.fetchEmployee(page, size)
-      .subscribe({
-        next: (res) => {
-          // console.log(res)
-          this.setEmployeeFromApi(res);
-          this.loadingService.stop('employee-table');
-        },
-        error: () => {
-          this.loadingService.stop('employee-table');
-        }
-      });
+    this.fetchEmployee(page, size).subscribe({
+      next: (res) => {
+        // console.log(res)
+        this.setEmployeeFromApi(res);
+        this.loadingService.stop('employee-table');
+      },
+      error: () => {
+        this.loadingService.stop('employee-table');
+      },
+    });
   }
 
-  private fetchEmployee(
-    page: number = 1,
-    pageSize: number = 10
-  ) {
+  private fetchEmployee(page: number = 1, pageSize: number = 10) {
     const searchText = this.searchText();
     const company = this.filterCompany();
     const department = this.filterDepartment();
@@ -250,7 +230,7 @@ export class SettingEmployee {
       searchText: searchText || undefined,
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
-      roleName: role?.RoleName
+      roleName: role?.RoleName,
     });
   }
 
@@ -266,12 +246,12 @@ export class SettingEmployee {
   settingPermissionRolesByAdUser(emp: any, roles?: any[]) {
     const payload: any = {
       userID: emp.adUser,
-      ...(roles !== undefined ? { batchRoles: roles } : {})
+      ...(roles !== undefined ? { batchRoles: roles } : {}),
     };
 
-    console.log("payload", payload)
+    console.log('payload', payload);
 
-    return this.settingService.settingUserRole(payload)
+    return this.settingService.settingUserRole(payload);
   }
 
   // GET MASTER
@@ -282,7 +262,7 @@ export class SettingEmployee {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
@@ -293,7 +273,7 @@ export class SettingEmployee {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
@@ -305,7 +285,7 @@ export class SettingEmployee {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 }

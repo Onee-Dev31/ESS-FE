@@ -1,4 +1,15 @@
-import { Component, EventEmitter, OnInit, OnChanges, AfterViewChecked, Output, Input, inject, ChangeDetectorRef, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  AfterViewChecked,
+  Output,
+  Input,
+  inject,
+  ChangeDetectorRef,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -16,10 +27,9 @@ import { SwalService } from '../../../services/swal.service';
   standalone: true,
   imports: [CommonModule, FormsModule, FileUploadModal],
   templateUrl: './vehicle-taxi-form.html',
-  styleUrl: './vehicle-taxi-form.scss'
+  styleUrl: './vehicle-taxi-form.scss',
 })
 export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChecked {
-
   @Input() requests: any = null;
 
   @Output() onClose = new EventEmitter<void>();
@@ -60,7 +70,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   ngOnInit() {
-    this.masterDataService.getDateConfig().subscribe(config => {
+    this.masterDataService.getDateConfig().subscribe((config) => {
       this.thaiMonths = config.months;
       this.years = config.years;
     });
@@ -70,7 +80,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         this.locations = res.data ?? [];
         this.checkAndLoadData();
       },
-      error: () => this.toastService.error('ไม่สามารถโหลดข้อมูลสถานที่ได้')
+      error: () => this.toastService.error('ไม่สามารถโหลดข้อมูลสถานที่ได้'),
     });
   }
 
@@ -149,7 +159,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         });
 
         // ใช้ Promise.all หลัง map เพื่อ resolve ทุก promise
-        Promise.all(itemPromises).then(items => {
+        Promise.all(itemPromises).then((items) => {
           this.items = items;
 
           if (this.items.length > 0) {
@@ -157,20 +167,19 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
             this.selectedMonthIndex = firstDate.getMonth();
             this.selectedYear = firstDate.getFullYear() + 543;
           }
-
         });
 
         setTimeout(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-        }, 500)
+        }, 500);
       },
       error: (err: any) => {
         console.error(err);
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลการเบิกเพื่อแก้ไขได้');
         this.onClose.emit();
-      }
+      },
     });
   }
 
@@ -185,25 +194,28 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     this.taxiService.getEligibleDates(empCode, this.selectedYear, month).subscribe({
       next: (res: any) => {
         const rows: any[] = res.data ?? [];
-        this.items = rows.map((row: any) => ({
-          date: row.workDate ?? row.work_date,
-          description: '',
-          destination: '',
-          distance: 0,
-          amount: 0,
-          shiftCode: row.shiftCode ?? row.shift_code,
-          selected: false,
-          attachedFile: null,
-          fileToUpload: null,
-          checkIn: row.timeIn ?? row.time_in,
-          checkOut: row.timeOut ?? row.time_out,
-          dayType: row.dayType ?? row.day_type,
-          remainingAmount: row.remainingAmount ?? row.remaining_amount ?? 500,
-          locationFromId: undefined,
-          locationToId: undefined,
-          otherFrom: '',
-          otherTo: '',
-        } as TaxiLogItem));
+        this.items = rows.map(
+          (row: any) =>
+            ({
+              date: row.workDate ?? row.work_date,
+              description: '',
+              destination: '',
+              distance: 0,
+              amount: 0,
+              shiftCode: row.shiftCode ?? row.shift_code,
+              selected: false,
+              attachedFile: null,
+              fileToUpload: null,
+              checkIn: row.timeIn ?? row.time_in,
+              checkOut: row.timeOut ?? row.time_out,
+              dayType: row.dayType ?? row.day_type,
+              remainingAmount: row.remainingAmount ?? row.remaining_amount ?? 500,
+              locationFromId: undefined,
+              locationToId: undefined,
+              otherFrom: '',
+              otherTo: '',
+            }) as TaxiLogItem,
+        );
 
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -212,14 +224,14 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
         this.isLoading = false;
         this.toastService.error('ไม่สามารถโหลดข้อมูลวันที่ได้');
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
   // ====================== Helper Methods ======================
   isOtherLocation(locationId: number | undefined): boolean {
     if (!locationId) return false;
-    const loc = this.locations.find(l => l.location_id === locationId);
+    const loc = this.locations.find((l) => l.location_id === locationId);
     return loc ? !loc.is_office : false;
   }
 
@@ -234,7 +246,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     // 👉 ถ้าเลือก "อื่นๆ"
     if (this.isOtherLocation(item.locationFromId)) {
       // ต้อง force ให้ to เป็น office
-      const office = this.locations.find(l => l.is_office);
+      const office = this.locations.find((l) => l.is_office);
       if (office) {
         item.locationToId = office.location_id;
         item.otherTo = '';
@@ -245,7 +257,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     }
 
     // 👉 ถ้า from เป็น office → to เป็น other
-    const other = this.locations.find(l => !l.is_office);
+    const other = this.locations.find((l) => !l.is_office);
     if (other) {
       item.locationToId = other.location_id;
     }
@@ -263,7 +275,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     // 👉 ถ้าเลือก "อื่นๆ"
     if (this.isOtherLocation(item.locationToId)) {
       // from ต้องเป็น office
-      const office = this.locations.find(l => l.is_office);
+      const office = this.locations.find((l) => l.is_office);
       if (office) {
         item.locationFromId = office.location_id;
         item.otherFrom = '';
@@ -274,7 +286,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
     }
 
     // 👉 ถ้า to เป็น office → from เป็น other
-    const other = this.locations.find(l => !l.is_office);
+    const other = this.locations.find((l) => !l.is_office);
     if (other) {
       item.locationFromId = other.location_id;
     }
@@ -283,18 +295,23 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   onInputChange(item: TaxiLogItem) {
-    if (item.description?.trim() || item.locationFromId || item.locationToId || (item.amount && item.amount > 0)) {
+    if (
+      item.description?.trim() ||
+      item.locationFromId ||
+      item.locationToId ||
+      (item.amount && item.amount > 0)
+    ) {
       item.selected = true;
     }
   }
 
   parseNumber(value: string | number): number {
     if (typeof value === 'number') return value;
-    return Number(value.replace(/,/g, ""));
+    return Number(value.replace(/,/g, ''));
   }
 
   formatNumber(value: number): string {
-    return value.toLocaleString("en-US");
+    return value.toLocaleString('en-US');
   }
 
   onAmountInput(event: Event, item: TaxiLogItem) {
@@ -328,12 +345,12 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   getSelectedCount(): number {
-    return this.items.filter(item => item.selected).length;
+    return this.items.filter((item) => item.selected).length;
   }
 
   getTotalAmount(): number {
     return this.items
-      .filter(item => item.selected)
+      .filter((item) => item.selected)
       .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   }
 
@@ -353,7 +370,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
       this.currentUploadItem.attachedFiles = files;
 
       // เก็บชื่อไฟล์ (กรณีต้องใช้แสดง / ส่ง API แยก)
-      this.currentUploadItem.attachedFileNames = files.map(f => f.name);
+      this.currentUploadItem.attachedFileNames = files.map((f) => f.name);
 
       // auto select ถ้ามีไฟล์
       if (files.length > 0) {
@@ -375,9 +392,9 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
   // ====================== SAVE ======================
   save() {
-    const selectedItems = this.items.filter(item => item.selected);
+    const selectedItems = this.items.filter((item) => item.selected);
     const empCode = this.authService.userData().CODEMPID;
-    const details = selectedItems.map(item => ({
+    const details = selectedItems.map((item) => ({
       work_date: item.date.split('T')[0],
       description: item.description ?? '',
       location_from_id: item.locationFromId ?? 0,
@@ -392,7 +409,7 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     selectedItems.forEach((item, index) => {
       if (item.attachedFiles?.length) {
-        item.attachedFiles.forEach(file => {
+        item.attachedFiles.forEach((file) => {
           files.push(file);
           detail_indexes.push(index);
         });
@@ -417,82 +434,79 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
 
     // DELETE
     if (this.isEditMode && selectedItems.length === 0) {
-      this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด')
-        .then(result => {
-          if (!result.isConfirmed) return;
-          this.swalService.loading("กำลังบันทึกข้อมูล...");
+      this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-          this.taxiService.deleteTaxiClaim(this.requests.id, empCode)
-            .subscribe({
-              next: (res) => {
-                if (!res?.success) {
-                  this.swalService.warning("ไม่สามารถบันทึกข้อมูลได้");
-                  return;
-                }
+        this.taxiService.deleteTaxiClaim(this.requests.id, empCode).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
 
-                this.swalService.success(res.message || "ลบรายการเบิกสำเร็จ");
-                this.onClose.emit();
-              },
+            this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
+            this.onClose.emit();
+          },
 
-              error: (error) => {
-                console.error("Delete Taxi Claim Error:", error);
+          error: (error) => {
+            console.error('Delete Taxi Claim Error:', error);
 
-                this.swalService.warning(
-                  "เกิดข้อผิดพลาด",
-                  error?.message || "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
-                );
-              }
-            });
-
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
         });
+      });
       return;
     }
 
     // EDIT
     if (this.isEditMode && this.originalClaimId) {
-      this.taxiService.updateTaxiClaim(this.originalClaimId, formData)
-        .subscribe({
-          next: () => {
-            this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
-            this.onClose.emit();
-          },
-          error: (error) => {
-            this.toastService.warning(error.error.message)
-          }
-        });
+      this.taxiService.updateTaxiClaim(this.originalClaimId, formData).subscribe({
+        next: () => {
+          this.toastService.success('แก้ไขรายการเบิกเรียบร้อยแล้ว');
+          this.onClose.emit();
+        },
+        error: (error) => {
+          this.toastService.warning(error.error.message);
+        },
+      });
       return;
     }
 
     // CREATE
     if (!this.isEditMode && selectedItems.length === 0) {
-      this.swalService.warning('กรุณาเลือกวันที่ต้องการดำเนินการเบิก')
+      this.swalService.warning('กรุณาเลือกวันที่ต้องการดำเนินการเบิก');
     } else {
       // Create
-      this.taxiService.createTaxiClaim(formData)
-        .subscribe({
-          next: () => {
-            this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
-            this.onClose.emit();
-          },
-          error: (error) => {
-            // this.swalService.warning(error.error.message)
-            this.toastService.warning(error.error.message)
-          }
-        });
+      this.taxiService.createTaxiClaim(formData).subscribe({
+        next: () => {
+          this.toastService.success('สร้างรายการเบิกเรียบร้อยแล้ว');
+          this.onClose.emit();
+        },
+        error: (error) => {
+          // this.swalService.warning(error.error.message)
+          this.toastService.warning(error.error.message);
+        },
+      });
     }
   }
 
   private getInvalidFieldId(rowIndex: number, item: TaxiLogItem): string {
     const pick = (desktopId: string, mobileId: string) => {
       const desktop = document.getElementById(desktopId);
-      return (desktop && desktop.offsetParent !== null) ? desktopId : mobileId;
+      return desktop && desktop.offsetParent !== null ? desktopId : mobileId;
     };
 
     if (!item.description?.trim()) return pick(`desc-${rowIndex}`, `mob-desc-${rowIndex}`);
     if (!item.locationFromId) return pick(`loc-from-${rowIndex}`, `mob-loc-from-${rowIndex}`);
     if (!item.locationToId) return pick(`loc-to-${rowIndex}`, `mob-loc-to-${rowIndex}`);
-    if (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim()) return pick(`other-from-${rowIndex}`, `mob-other-from-${rowIndex}`);
-    if (this.isOtherLocation(item.locationToId) && !item.otherTo?.trim()) return pick(`other-to-${rowIndex}`, `mob-other-to-${rowIndex}`);
+    if (this.isOtherLocation(item.locationFromId) && !item.otherFrom?.trim())
+      return pick(`other-from-${rowIndex}`, `mob-other-from-${rowIndex}`);
+    if (this.isOtherLocation(item.locationToId) && !item.otherTo?.trim())
+      return pick(`other-to-${rowIndex}`, `mob-other-to-${rowIndex}`);
 
     return pick(`amount-${rowIndex}`, `mob-amount-${rowIndex}`);
   }
@@ -519,33 +533,30 @@ export class VehicleTaxiFormComponent implements OnInit, OnChanges, AfterViewChe
   }
 
   areAllItemsValid(): boolean {
-    return this.items
-      .filter(item => item.selected)
-      .every(item => this.isItemValid(item));
+    return this.items.filter((item) => item.selected).every((item) => this.isItemValid(item));
   }
 
   isKeep(): number {
-    const selectedLogs = this.items.filter(item => item.selected);
-    return selectedLogs.length
+    const selectedLogs = this.items.filter((item) => item.selected);
+    return selectedLogs.length;
   }
 
   isDelete(): number {
-    const selectedLogs = this.items.filter(item => !item.selected);
-    return selectedLogs.length
+    const selectedLogs = this.items.filter((item) => !item.selected);
+    return selectedLogs.length;
   }
 
   totalClaims(): string {
-    const selectedLogs = this.items.filter(item => item.selected);
+    const selectedLogs = this.items.filter((item) => item.selected);
     const total = selectedLogs.reduce((sum, item) => sum + (item.amount || 0), 0);
     return total.toLocaleString('en-US') + '.-';
   }
 
   hasDelete(): boolean {
-    const selectedLogs = this.items.filter(item => item.selected);
+    const selectedLogs = this.items.filter((item) => item.selected);
     if (selectedLogs.length === 0) {
       return true;
     }
-    return false
+    return false;
   }
-
 }

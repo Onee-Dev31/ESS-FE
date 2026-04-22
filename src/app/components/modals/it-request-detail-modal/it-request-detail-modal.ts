@@ -6,7 +6,10 @@ import { ApprovalsHelperService } from '../../../services/approvals-helper.servi
 import { ApprovalItem } from '../../../interfaces/approval.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { modalAnimation, fadeIn } from '../../../animations/animations';
-import { FilePreviewModalComponent, FilePreviewItem } from '../file-preview-modal/file-preview-modal';
+import {
+  FilePreviewModalComponent,
+  FilePreviewItem,
+} from '../file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { ItServiceService } from '../../../services/it-service.service';
 import { DialogService } from '../../../services/dialog';
@@ -57,10 +60,14 @@ export class ItRequestDetailModal {
   get requestTypeLabel(): string {
     const ticketTypeId = this.approvalItem.originalData?.ticketTypeId;
     switch (ticketTypeId) {
-      case 1: return 'แจ้งซ่อม';
-      case 2: return 'แจ้งปัญหา';
-      case 3: return 'ขอใช้บริการ';
-      default: return 'บริการ';
+      case 1:
+        return 'แจ้งซ่อม';
+      case 2:
+        return 'แจ้งปัญหา';
+      case 3:
+        return 'ขอใช้บริการ';
+      default:
+        return 'บริการ';
     }
   }
 
@@ -79,26 +86,33 @@ export class ItRequestDetailModal {
   getFileIcon(fileName: string): string {
     const ext = fileName.split('.').pop()?.toLowerCase();
     switch (ext) {
-      case 'pdf': return 'fa-file-pdf text-danger';
+      case 'pdf':
+        return 'fa-file-pdf text-danger';
       case 'doc':
-      case 'docx': return 'fa-file-word text-primary';
+      case 'docx':
+        return 'fa-file-word text-primary';
       case 'xls':
-      case 'xlsx': return 'fa-file-excel text-success';
+      case 'xlsx':
+        return 'fa-file-excel text-success';
       case 'jpg':
       case 'jpeg':
       case 'png':
-      case 'gif': return 'fa-file-image text-warning';
-      default: return 'fa-file-alt text-muted';
+      case 'gif':
+        return 'fa-file-image text-warning';
+      default:
+        return 'fa-file-alt text-muted';
     }
   }
 
   viewFile(file: any) {
-    this.previewFiles.set([{
-      fileName: file.fileName,
-      date: dayjs().format('DD/MM/YYYY HH:mm'),
-      url: file.filePath,
-      type: file.type || 'image/png'
-    }]);
+    this.previewFiles.set([
+      {
+        fileName: file.fileName,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: file.filePath,
+        type: file.type || 'image/png',
+      },
+    ]);
     this.isPreviewModalOpen.set(true);
   }
 
@@ -111,13 +125,13 @@ export class ItRequestDetailModal {
   }
 
   async confirmApprove() {
-    this.swalService.confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
-      .then(result => {
+    this.swalService
+      .confirm('ยืนยันการอนุมัติ', 'คุณต้องการอนุมัติคำขอนี้ใช่หรือไม่ ?')
+      .then((result) => {
         if (!result.isConfirmed) return;
 
-        this.swalService.loading("กำลังบันทึกข้อมูล...");
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
         this.updateTicket('Approved');
-
       });
   }
 
@@ -139,7 +153,7 @@ export class ItRequestDetailModal {
     }
     const confirmed = await this.dialogService.confirm({
       title: 'ยืนยันการปฏิเสธ',
-      message: 'คุณต้องการปฏิเสธคำขอนี้ใช่หรือไม่ ?'
+      message: 'คุณต้องการปฏิเสธคำขอนี้ใช่หรือไม่ ?',
     });
 
     if (!confirmed) return;
@@ -162,20 +176,19 @@ export class ItRequestDetailModal {
 
     if (!action) return;
 
-    this.swalService.confirm(`ยืนยันการ${action}`, `คุณต้องการ${action}คำขอนี้ใช่หรือไม่ ?`)
-      .then(result => {
+    this.swalService
+      .confirm(`ยืนยันการ${action}`, `คุณต้องการ${action}คำขอนี้ใช่หรือไม่ ?`)
+      .then((result) => {
         if (!result.isConfirmed) return;
 
-        this.swalService.loading("กำลังบันทึกข้อมูล...");
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
         if (action === 'Referred Back') {
           this.updateTicket('Referred_Back', reason);
         } else {
           this.updateTicket(action, reason);
         }
-
       });
-
   }
 
   // private updateStatus(newStatus: 'Approved' | 'Rejected' | 'Referred Back', reason?: string) {
@@ -183,7 +196,6 @@ export class ItRequestDetailModal {
   //   console.log(this.approvalItem.requestId, newStatus, reason, this.authService.userData().CODEMPID)
 
   //   // const ticketId = this.approvalItem.requestId;
-
 
   //   // if (!ticketId) return;
 
@@ -230,7 +242,6 @@ export class ItRequestDetailModal {
   // }
 
   updateTicket(command: 'Approved' | 'Rejected' | 'Referred_Back', reason?: string) {
-
     const ticketId = this.approvalItem.requestId.toString();
     const formData = new FormData();
 
@@ -241,7 +252,7 @@ export class ItRequestDetailModal {
       formData.append('comment', reason);
     }
 
-    console.log("formData", [...formData.entries()]);
+    console.log('formData', [...formData.entries()]);
 
     this.itServiceService.updateTicket(ticketId, formData).subscribe({
       next: (res) => {
@@ -254,19 +265,16 @@ export class ItRequestDetailModal {
               : command === 'Referred_Back'
                 ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
                 : 'อนุมัติคำขอเรียบร้อยแล้ว';
-          this.swalService.success(res.message)
+          this.swalService.success(res.message);
         }
 
         this.onStatusUpdated.emit();
         this.close();
-
       },
       error: (err) => {
-        const message =
-          err?.error?.message ||
-          'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
-        this.swalService.warning(message)
-      }
+        const message = err?.error?.message || 'เกิดข้อผิดพลาดในการอัปเดตสถานะ';
+        this.swalService.warning(message);
+      },
     });
   }
 }

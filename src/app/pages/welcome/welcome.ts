@@ -7,11 +7,10 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './welcome.html',
-  styleUrl: './welcome.scss'
+  styleUrl: './welcome.scss',
 })
 export class WelcomeComponent {
-
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
   navigateToDashboard() {
     this.router.navigate(['/dashboard']);

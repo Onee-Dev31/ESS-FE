@@ -11,9 +11,8 @@ describe('ApprovalDetailModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ApprovalDetailModalComponent],
-      providers: [provideNoopAnimations()]
-    })
-      .compileComponents();
+      providers: [provideNoopAnimations()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ApprovalDetailModalComponent);
     component = fixture.componentInstance;
@@ -25,13 +24,13 @@ describe('ApprovalDetailModalComponent', () => {
         name: 'Test User',
         employeeId: 'EMP001',
         department: 'Test Dept',
-        company: 'Test Co'
+        company: 'Test Co',
       },
       requestType: 'ค่ารักษาพยาบาล' as any,
       requestDetail: 'Test detail',
       amount: 1000,
       status: 'Pending',
-      rawStatus: 'Waiting Check'
+      rawStatus: 'Waiting Check',
     } as any;
 
     await fixture.whenStable();

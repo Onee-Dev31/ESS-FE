@@ -1,199 +1,229 @@
 <div class="approvals-wrapper">
-    <app-page-header [title]="pageTitle()">
-        <div class="utility-btns">
-            <div class="export-dropdown">
-                <button class="btn-outline" (click)="toggleExportMenu()">
-                    <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
-                    <i class="fas fa-chevron-down ml-1"></i>
-                </button>
-                <div class="dropdown-menu" [class.show]="showExportMenu()">
-                    <button class="dropdown-item" (click)="exportPDF()">
-                        <i class="fas fa-file-pdf text-danger"></i> Export PDF
-                    </button>
-                    <button class="dropdown-item" (click)="exportExcel()">
-                        <i class="fas fa-file-excel text-success"></i> Export Excel
-                    </button>
-                    <button class="dropdown-item" (click)="print()">
-                        <i class="fas fa-print text-secondary"></i> Print
-                    </button>
-                </div>
-            </div>
-            <button class="btn-outline" (click)="refresh()">
-                <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
-            </button>
+  <app-page-header [title]="pageTitle()">
+    <div class="utility-btns">
+      <div class="export-dropdown">
+        <button class="btn-outline" (click)="toggleExportMenu()">
+          <i class="fas fa-download mr-1"></i> <span class="btn-text">Export</span>
+          <i class="fas fa-chevron-down ml-1"></i>
+        </button>
+        <div class="dropdown-menu" [class.show]="showExportMenu()">
+          <button class="dropdown-item" (click)="exportPDF()">
+            <i class="fas fa-file-pdf text-danger"></i> Export PDF
+          </button>
+          <button class="dropdown-item" (click)="exportExcel()">
+            <i class="fas fa-file-excel text-success"></i> Export Excel
+          </button>
+          <button class="dropdown-item" (click)="print()">
+            <i class="fas fa-print text-secondary"></i> Print
+          </button>
         </div>
-    </app-page-header>
-
-    <div class="card">
-        <div class="table-controls">
-            <div class="form-field">
-                <nz-input-wrapper class="form-input">
-                    <nz-icon nzInputPrefix nzType="search" />
-                    <input nz-input class="" placeholder="ค้นหา Request No, ชื่อ..." [value]="listing.searchText()"
-                        (input)="onSearch($event)" />
-                </nz-input-wrapper>
-            </div>
-
-            <div class="tab-navigation">
-                @for (tab of tabs; track tab) {
-                <button class="tab-item" [class.active]="listing.filterStatus() === tab" (click)="setActiveTab(tab)">
-                    {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
-                </button>
-                }
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th class="col-requestNo">
-                            <i class="fas fa-hashtag mr-1"></i> Request No.
-                        </th>
-                        <th class="col-requestDate">
-                            <i class="far fa-clock mr-1"></i> Request Date
-                        </th>
-                        <th class="col-requestBy">
-                            <i class="fas fa-user-edit mr-1"></i> Request By
-                        </th>
-                        <th class="col-requestFor">
-                            <i class="fas fa-user mr-1"></i> Request For
-                        </th>
-                        <th class="col-requestCategory">
-                            <i class="fas fa-list-alt mr-1"></i> Request Category
-                        </th>
-                        <th class="col-status">
-                            <i class="fas fa-tasks mr-1"></i> Status
-                        </th>
-                    </tr>
-                </thead>
-                @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
-                <tbody [@listAnimation]>
-                    <tr>
-                        <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
-                            {{ row.original.requestNo }}
-                        </td>
-                        <td class="text-muted">
-                            <div>
-                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY')}}
-                            </div>
-                            <div>
-                                {{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm')}} น.
-                            </div>
-                        </td>
-                        <td>
-                            <div class="col-requestBy">
-                                <div class="name">{{ row.original.requestBy.name }}</div>
-                                <div class="details-box">
-                                    <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
-                                    <div class="detail-item">{{ row.original.requestBy.department }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="name">{{ row.original.originalData?.requestFor || '-' }}</div>
-                        </td>
-                        <td>
-                            <span class="highlight">{{ row.original.originalData?.requestCategory || '-' }}</span>
-                        </td>
-
-                        <td class="text-center">
-                            <div>
-                                <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
-                                    {{ row.original.status }}
-                                </span>
-                            </div>
-
-                            <div class="status-time"
-                                *ngIf="row.original.originalData?.ApprovalDate && row.original.status != 'Pending'">
-                                {{dateUtil.formatDateToBE(row.original.originalData?.ApprovalDate, 'DD MMMM YYYY, HH:mm')}} น.                            </div>
-                        </td>
-
-                    </tr>
-                </tbody>
-                } @empty {
-                <tbody>
-                    <tr>
-                        <td colspan="10" class="no-data-cell">
-                            <app-empty-state title="ไม่พบข้อมูล" description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
-                                icon="fas fa-users-slash"></app-empty-state>
-                        </td>
-                    </tr>
-                </tbody>
-                }
-            </table>
-            }
-        </div>
-
-        <div class="card-list-view">
-            @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-            <div class="mobile-card">
-                <div class="card-header">
-                    <div class="request-id">
-                        <span class="label"><i class="fas fa-hashtag"></i> No.</span>
-                        <span class="value">{{ req.requestNo }}</span>
-                    </div>
-                    <span class="status-badge" [ngClass]="getStatusClass(req.status)">
-                        {{ req.status }}
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="info-row">
-                        <span class="label"><i class="far fa-clock"></i> Date Created:</span>
-                        <span class="value">{{ dateUtil.formatDateToBE(req.requestDate, 'DD MMM YYYY HH:mm')}} น.</span>
-                    </div>
-                    <div class="requester-block">
-                        <div style="color: rgb(172, 172, 172); margin: 0 0 10px 0; font-size: 12px;">Request by: </div>
-                        <div class="req-name"><i class="fas fa-user-circle"></i> {{ req.requestBy.name }}</div>
-                        <div class="req-details">
-                            <span><i class="fas fa-id-badge"></i> {{ req.requestBy.employeeId }}</span> &bull;
-                            <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span> &bull;
-                            <span><i class="fas fa-city"></i> {{ req.requestBy.company }}</span>
-                        </div>
-                    </div>
-
-                    <div class="info-row mt-2">
-                        <span class="label"><i class="fas fa-user"></i> Request For:</span>
-                        <span class="value highlight">{{ req.originalData?.requestFor || '-' }}</span>
-                    </div>
-
-                    <div class="description-block">
-                        <div class="desc-label"><i class="fas fa-list-alt"></i> Category:</div>
-                        <div class="desc-content">{{ req.originalData?.requestCategory || '-' }}</div>
-                    </div>
-
-                    <div class="amount-row" *ngIf="req.amount">
-                        <span class="label"><i class="fas fa-coins"></i> Amount</span>
-                        <span class="value amount">{{ req.amount | number }}</span>
-                    </div>
-
-                    <div class="card-actions justify-end">
-                        <button class="btn-icon-view" title="View Details" (click)="viewRequestDetail(req)">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            }
-            @empty {
-            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-            </app-empty-state>
-            }
-        </div>
-
-        <div class="pagination-wrapper">
-            <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-                [totalItems]="totalItems()" (onPageChange)="goToPage($event)" (onPageSizeChange)="setPageSize($event)">
-            </app-pagination>
-        </div>
+      </div>
+      <button class="btn-outline" (click)="refresh()">
+        <i class="fas fa-sync-alt mr-1"></i> <span class="btn-text">Refresh</span>
+      </button>
     </div>
+  </app-page-header>
+
+  <div class="card">
+    <div class="table-controls">
+      <div class="form-field">
+        <nz-input-wrapper class="form-input">
+          <nz-icon nzInputPrefix nzType="search" />
+          <input
+            nz-input
+            class=""
+            placeholder="ค้นหา Request No, ชื่อ..."
+            [value]="listing.searchText()"
+            (input)="onSearch($event)"
+          />
+        </nz-input-wrapper>
+      </div>
+
+      <div class="tab-navigation">
+        @for (tab of tabs; track tab) {
+          <button
+            class="tab-item"
+            [class.active]="listing.filterStatus() === tab"
+            (click)="setActiveTab(tab)"
+          >
+            {{ tab }} <span class="badge">{{ getTabCount(tab) }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="col-requestNo"><i class="fas fa-hashtag mr-1"></i> Request No.</th>
+              <th class="col-requestDate"><i class="far fa-clock mr-1"></i> Request Date</th>
+              <th class="col-requestBy"><i class="fas fa-user-edit mr-1"></i> Request By</th>
+              <th class="col-requestFor"><i class="fas fa-user mr-1"></i> Request For</th>
+              <th class="col-requestCategory">
+                <i class="fas fa-list-alt mr-1"></i> Request Category
+              </th>
+              <th class="col-status"><i class="fas fa-tasks mr-1"></i> Status</th>
+            </tr>
+          </thead>
+          @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
+            <tbody [@listAnimation]>
+              <tr>
+                <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
+                  {{ row.original.requestNo }}
+                </td>
+                <td class="text-muted">
+                  <div>
+                    {{ dateUtil.formatDateToBE(row.original.requestDate, 'DD MMMM YYYY') }}
+                  </div>
+                  <div>{{ dateUtil.formatDateToBE(row.original.requestDate, 'HH:mm') }} น.</div>
+                </td>
+                <td>
+                  <div class="col-requestBy">
+                    <div class="name">{{ row.original.requestBy.name }}</div>
+                    <div class="details-box">
+                      <div class="detail-item">{{ row.original.requestBy.employeeId }}</div>
+                      <div class="detail-item">{{ row.original.requestBy.department }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="name">{{ row.original.originalData?.requestFor || '-' }}</div>
+                </td>
+                <td>
+                  <span class="highlight">{{
+                    row.original.originalData?.requestCategory || '-'
+                  }}</span>
+                </td>
+
+                <td class="text-center">
+                  <div>
+                    <span class="status-badge" [ngClass]="getStatusClass(row.original.status)">
+                      {{ row.original.status }}
+                    </span>
+                  </div>
+
+                  <div
+                    class="status-time"
+                    *ngIf="
+                      row.original.originalData?.ApprovalDate && row.original.status != 'Pending'
+                    "
+                  >
+                    {{
+                      dateUtil.formatDateToBE(
+                        row.original.originalData?.ApprovalDate,
+                        'DD MMMM YYYY, HH:mm'
+                      )
+                    }}
+                    น.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="10" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบรายชื่อพนักงานฟรีแลนซ์"
+                    icon="fas fa-users-slash"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
+    </div>
+
+    <div class="card-list-view">
+      @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
+        <div class="mobile-card">
+          <div class="card-header">
+            <div class="request-id">
+              <span class="label"><i class="fas fa-hashtag"></i> No.</span>
+              <span class="value">{{ req.requestNo }}</span>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+              {{ req.status }}
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <span class="label"><i class="far fa-clock"></i> Date Created:</span>
+              <span class="value"
+                >{{ dateUtil.formatDateToBE(req.requestDate, 'DD MMM YYYY HH:mm') }} น.</span
+              >
+            </div>
+            <div class="requester-block">
+              <div style="color: rgb(172, 172, 172); margin: 0 0 10px 0; font-size: 12px">
+                Request by:
+              </div>
+              <div class="req-name">
+                <i class="fas fa-user-circle"></i> {{ req.requestBy.name }}
+              </div>
+              <div class="req-details">
+                <span><i class="fas fa-id-badge"></i> {{ req.requestBy.employeeId }}</span> &bull;
+                <span><i class="fas fa-building"></i> {{ req.requestBy.department }}</span> &bull;
+                <span><i class="fas fa-city"></i> {{ req.requestBy.company }}</span>
+              </div>
+            </div>
+
+            <div class="info-row mt-2">
+              <span class="label"><i class="fas fa-user"></i> Request For:</span>
+              <span class="value highlight">{{ req.originalData?.requestFor || '-' }}</span>
+            </div>
+
+            <div class="description-block">
+              <div class="desc-label"><i class="fas fa-list-alt"></i> Category:</div>
+              <div class="desc-content">{{ req.originalData?.requestCategory || '-' }}</div>
+            </div>
+
+            <div class="amount-row" *ngIf="req.amount">
+              <span class="label"><i class="fas fa-coins"></i> Amount</span>
+              <span class="value amount">{{ req.amount | number }}</span>
+            </div>
+
+            <div class="card-actions justify-end">
+              <button class="btn-icon-view" title="View Details" (click)="viewRequestDetail(req)">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <app-empty-state
+          title="ไม่พบรายการ"
+          description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+          icon="fas fa-inbox"
+        >
+        </app-empty-state>
+      }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="listing.currentPage()"
+        [pageSize]="listing.pageSize()"
+        [totalItems]="totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      >
+      </app-pagination>
+    </div>
+  </div>
 </div>
 
 @if (isModalOpen() && selectedItem()) {
-<app-it-request-detail-modal [approvalItem]="selectedItem()!" [initialAction]="initialAction()" (onClose)="closeModal()"
-    (onStatusUpdated)="onStatusUpdated()">
-</app-it-request-detail-modal>
+  <app-it-request-detail-modal
+    [approvalItem]="selectedItem()!"
+    [initialAction]="initialAction()"
+    (onClose)="closeModal()"
+    (onStatusUpdated)="onStatusUpdated()"
+  >
+  </app-it-request-detail-modal>
 }

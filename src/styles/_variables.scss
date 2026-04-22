@@ -1,236 +1,236 @@
 // CSS Custom Properties (Variables)
 :root {
-    // Brand & Semantic
-    --primary: #1a73e8;
-    --success: #16a34a;
-    --danger: #dc2626;
-    --warning: #f59e0b;
+  // Brand & Semantic
+  --primary: #1a73e8;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #f59e0b;
 
-    // Text Colors
-    --text: #202124;
-    --text-sub: #5f6368;
-    --text-header: #475569;
-    --text-muted: #94a3b8;
-    --text-reverse: #ffffff;
+  // Text Colors
+  --text: #202124;
+  --text-sub: #5f6368;
+  --text-header: #475569;
+  --text-muted: #94a3b8;
+  --text-reverse: #ffffff;
 
-    // Backgrounds & Borders
-    --bg-page: #f8f9fa;
-    --bg-card: #ffffff;
-    --bg-slate: #f4f7f9;
-    --header-bg: #f8fafc;
-    --border: #dee2e6;
-    --border-color: #e9ecef;
+  // Backgrounds & Borders
+  --bg-page: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-slate: #f4f7f9;
+  --header-bg: #f8fafc;
+  --border: #dee2e6;
+  --border-color: #e9ecef;
 
-    // Shadows
-    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  // Shadows
+  --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
-    // Layout values
-    --bg-toolbar: #ffffff;
-    --border-toolbar: #f1f5f9;
-    --bg-table-head: #f8fafc;
-    --text-table-head: #64748b;
-    --bg-table-hover: #f8fafc;
-    --border-table: #f1f5f9;
-    --border-table-head: #e2e8f0;
-    --input-bg: #ffffff;
-    --input-bg-hover: #eeeeee;
-    --input-bg-active: #e1e1e1;
-    --input-border: #e2e8f0;
-    --input-border-hover: #94a3b8;
-    --input-text: #1f2937;
-    --input-text-placeholder: #94a3b8;
-    --input-focus-bg: #ffffff;
+  // Layout values
+  --bg-toolbar: #ffffff;
+  --border-toolbar: #f1f5f9;
+  --bg-table-head: #f8fafc;
+  --text-table-head: #64748b;
+  --bg-table-hover: #f8fafc;
+  --border-table: #f1f5f9;
+  --border-table-head: #e2e8f0;
+  --input-bg: #ffffff;
+  --input-bg-hover: #eeeeee;
+  --input-bg-active: #e1e1e1;
+  --input-border: #e2e8f0;
+  --input-border-hover: #94a3b8;
+  --input-text: #1f2937;
+  --input-text-placeholder: #94a3b8;
+  --input-focus-bg: #ffffff;
 
-    --input-disabled-bg: #f5f5f5;
-    --input-disabled-border: #d1d5db;
-    --input-hover-bg: #f1f5f9;
-    --input-active-bg: #e2e8f0;
+  --input-disabled-bg: #f5f5f5;
+  --input-disabled-border: #d1d5db;
+  --input-hover-bg: #f1f5f9;
+  --input-active-bg: #e2e8f0;
 
-    //Color
-    --orange: #ff8d30;
-    --orange-light: #ffd5b3;
-    --green: #059669;
-    --green-light: #b4e5d4;
-    --blue: #473CE2;
-    --blue-light: #a9bffd;
-    --red: #e74c3c;
-    --red-light: #f0c7c7;
-    --purple: #673ab7;
-    --purple-light: #d1c4e9;
+  //Color
+  --orange: #ff8d30;
+  --orange-light: #ffd5b3;
+  --green: #059669;
+  --green-light: #b4e5d4;
+  --blue: #473ce2;
+  --blue-light: #a9bffd;
+  --red: #e74c3c;
+  --red-light: #f0c7c7;
+  --purple: #673ab7;
+  --purple-light: #d1c4e9;
 
-    // IT-SERVICE
-    --btn-problem-bg: #ffedce;
-    --btn-problem-border: #f59e0b;
-    --btn-repair-bg: #ffd0d8;
-    --btn-repair-border: #f43f5e;
-    --btn-service-bg: #d2e3ff;
-    --btn-service-border: #3b82f6;
+  // IT-SERVICE
+  --btn-problem-bg: #ffedce;
+  --btn-problem-border: #f59e0b;
+  --btn-repair-bg: #ffd0d8;
+  --btn-repair-border: #f43f5e;
+  --btn-service-bg: #d2e3ff;
+  --btn-service-border: #3b82f6;
 
-    // BUTTON-Status
-    --btn-onhold-bg: #a7a7a7;
-    --btn-onhold-border: #dbdbdb;
-    --btn-deny-bg: #dc2626;
-    --btn-deny-border: #e4bebe;
-    --btn-acknowledge-bg: #2563eb;
-    --btn-acknowledge-border: #a6ccff;
-    --btn-assign-bg: #d97706;
-    --btn-assign-border: #ffe7cc;
-    --btn-close-bg: #059669;
-    --btn-close-border: #a5d8c8;
+  // BUTTON-Status
+  --btn-onhold-bg: #a7a7a7;
+  --btn-onhold-border: #dbdbdb;
+  --btn-deny-bg: #dc2626;
+  --btn-deny-border: #e4bebe;
+  --btn-acknowledge-bg: #2563eb;
+  --btn-acknowledge-border: #a6ccff;
+  --btn-assign-bg: #d97706;
+  --btn-assign-border: #ffe7cc;
+  --btn-close-bg: #059669;
+  --btn-close-border: #a5d8c8;
 
-    // Status Color
-    --status-new-bg: rgba(14, 165, 233, 0.15);
-    --status-new-text: #0284c7;
-    --status-open-bg: rgba(37, 99, 235, 0.15);
-    --status-open-text: #2563eb;
-    --status-assigned-bg: rgba(37, 100, 235, 0.15);
-    --status-assigned-text: #0ea5e9;
-    --status-progress-bg: rgba(255, 152, 34, 0.15);
-    --status-progress-text: #d97706;
-    --status-closed-bg: rgba(47, 185, 142, 0.149);
-    --status-closed-text: #229b4f;
-    --status-hold-bg: rgba(141, 141, 141, 0.15);
-    --status-hold-text: #616161;
-    --status-deny-bg: rgba(220, 38, 38, 0.15);
-    --status-deny-text: #dc2626;
-    --status-waiting-bg: rgba(178, 38, 220, 0.15);
-    --status-waiting-text: #be26dc;
-    --status-rejected-bg: rgba(220, 38, 38, 0.15);
-    --status-rejected-text: #dc2626;
-    --status-approved-bg: rgba(22, 163, 74, 0.15);
-    --status-approved-text: #16a34a;
-    --status-verified-bg: rgba(22, 163, 74, 0.15);
-    --status-verified-text: #16a34a;
-    --status-pending-bg: rgba(234, 88, 12, 0.15);
-    --status-pending-text: #ea580c;
+  // Status Color
+  --status-new-bg: rgba(14, 165, 233, 0.15);
+  --status-new-text: #0284c7;
+  --status-open-bg: rgba(37, 99, 235, 0.15);
+  --status-open-text: #2563eb;
+  --status-assigned-bg: rgba(37, 100, 235, 0.15);
+  --status-assigned-text: #0ea5e9;
+  --status-progress-bg: rgba(255, 152, 34, 0.15);
+  --status-progress-text: #d97706;
+  --status-closed-bg: rgba(47, 185, 142, 0.149);
+  --status-closed-text: #229b4f;
+  --status-hold-bg: rgba(141, 141, 141, 0.15);
+  --status-hold-text: #616161;
+  --status-deny-bg: rgba(220, 38, 38, 0.15);
+  --status-deny-text: #dc2626;
+  --status-waiting-bg: rgba(178, 38, 220, 0.15);
+  --status-waiting-text: #be26dc;
+  --status-rejected-bg: rgba(220, 38, 38, 0.15);
+  --status-rejected-text: #dc2626;
+  --status-approved-bg: rgba(22, 163, 74, 0.15);
+  --status-approved-text: #16a34a;
+  --status-verified-bg: rgba(22, 163, 74, 0.15);
+  --status-verified-text: #16a34a;
+  --status-pending-bg: rgba(234, 88, 12, 0.15);
+  --status-pending-text: #ea580c;
 
-    //table
-    --table-header-green: #b9e7cf;
-    --table-header-blue: #b4cff3;
-    --table-header-red: #e6bdbd;
+  //table
+  --table-header-green: #b9e7cf;
+  --table-header-blue: #b4cff3;
+  --table-header-red: #e6bdbd;
 
-    //TAG
-    --tag-color-red: #e74c3c;
-    --tag-color-green: #2ed47e;
-    --tag-bg-red: #e74c3c1a;
-    --tag-bg-green: #2ed47e1a;
+  //TAG
+  --tag-color-red: #e74c3c;
+  --tag-color-green: #2ed47e;
+  --tag-bg-red: #e74c3c1a;
+  --tag-bg-green: #2ed47e1a;
 }
 
 [data-theme='dark'] {
-    // Brand & Semantic
-    --primary: #6366f1; // #8ab4f8
-    --success: #4ade80;
-    --danger: #f87171;
-    --warning: #fbbf24;
+  // Brand & Semantic
+  --primary: #6366f1; // #8ab4f8
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
 
-    // Text Colors
-    --text: #e2e8f0;
-    --text-sub: #94a3b8;
-    --text-header: #f8fafc;
-    --text-muted: #64748b;
-    --text-reverse: #000000;
+  // Text Colors
+  --text: #e2e8f0;
+  --text-sub: #94a3b8;
+  --text-header: #f8fafc;
+  --text-muted: #64748b;
+  --text-reverse: #000000;
 
-    // Backgrounds & Borders
-    --bg-page: #0f172a;
-    --bg-card: #1e293b;
-    --bg-slate: #0f172a;
-    --header-bg: #1e293b;
-    --border: #334155;
-    --border-color: #334155;
+  // Backgrounds & Borders
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-slate: #0f172a;
+  --header-bg: #1e293b;
+  --border: #334155;
+  --border-color: #334155;
 
-    // Shadows
-    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+  // Shadows
+  --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
 
-    // Layout values
-    --bg-toolbar: #1e293b;
-    --border-toolbar: #334155;
-    --bg-table-head: #0f172a;
-    --text-table-head: #94a3b8;
-    --bg-table-hover: #334155;
-    --border-table: #334155;
-    --border-table-head: #475569;
-    --input-bg: #0f172a;
-    --input-bg-hover: #334155;
-    --input-bg-active: #475569;
-    --input-border: #334155;
-    --input-border-hover: #475569;
-    --input-text: #e2e8f0;
-    --input-text-placeholder: #64748b;
-    --input-focus-bg: #1e293b;
+  // Layout values
+  --bg-toolbar: #1e293b;
+  --border-toolbar: #334155;
+  --bg-table-head: #0f172a;
+  --text-table-head: #94a3b8;
+  --bg-table-hover: #334155;
+  --border-table: #334155;
+  --border-table-head: #475569;
+  --input-bg: #0f172a;
+  --input-bg-hover: #334155;
+  --input-bg-active: #475569;
+  --input-border: #334155;
+  --input-border-hover: #475569;
+  --input-text: #e2e8f0;
+  --input-text-placeholder: #64748b;
+  --input-focus-bg: #1e293b;
 
-    --input-disabled-bg: #313a48;
-    --input-disabled-border: #8b95a5;
-    --input-hover-bg: #f1f5f9;
-    --input-active-bg: #e2e8f0;
+  --input-disabled-bg: #313a48;
+  --input-disabled-border: #8b95a5;
+  --input-hover-bg: #f1f5f9;
+  --input-active-bg: #e2e8f0;
 
-    //Color
-    --orange: #ff9743;
-    --orange-light: #412e20;
-    --green: #379c4c;
-    --green-light: #305538;
-    --blue: #746ce4;
-    --blue-light: #292f41;
-    --red: #ac5353;
-    --red-light: #573e3e;
-    --purple: #a26eff;
-    --purple-light: #d1c4e9;
+  //Color
+  --orange: #ff9743;
+  --orange-light: #412e20;
+  --green: #379c4c;
+  --green-light: #305538;
+  --blue: #746ce4;
+  --blue-light: #292f41;
+  --red: #ac5353;
+  --red-light: #573e3e;
+  --purple: #a26eff;
+  --purple-light: #d1c4e9;
 
-    // IT-SERVICE
-    --btn-problem-bg: #3a2e1f;
-    --btn-problem-border: #f59e0b;
-    --btn-repair-bg: #3a1f26;
-    --btn-repair-border: #f43f5e;
-    --btn-service-bg: #1f2e3a;
-    --btn-service-border: #3b82f6;
+  // IT-SERVICE
+  --btn-problem-bg: #3a2e1f;
+  --btn-problem-border: #f59e0b;
+  --btn-repair-bg: #3a1f26;
+  --btn-repair-border: #f43f5e;
+  --btn-service-bg: #1f2e3a;
+  --btn-service-border: #3b82f6;
 
-    // BUTTON-Status
-    --btn-onhold-bg: #6b7280;
-    --btn-onhold-border: #cbced32b;
-    --btn-deny-bg: #ef4444;
-    --btn-deny-border: #7f1d1d;
-    --btn-acknowledge-bg: #3b82f6;
-    --btn-acknowledge-border: #1e3a8a;
-    --btn-assign-bg: #f59e0b;
-    --btn-assign-border: #78350f;
-    --btn-close-bg: #10b981;
-    --btn-close-border: #064e3b;
+  // BUTTON-Status
+  --btn-onhold-bg: #6b7280;
+  --btn-onhold-border: #cbced32b;
+  --btn-deny-bg: #ef4444;
+  --btn-deny-border: #7f1d1d;
+  --btn-acknowledge-bg: #3b82f6;
+  --btn-acknowledge-border: #1e3a8a;
+  --btn-assign-bg: #f59e0b;
+  --btn-assign-border: #78350f;
+  --btn-close-bg: #10b981;
+  --btn-close-border: #064e3b;
 
-    // Status Color
-    --status-new-bg: rgba(14, 165, 233, 0.40);
-    --status-new-text: #38bdf8;
-    --status-open-bg: rgba(59, 130, 246, 0.40);
-    --status-open-text: #60a5fa;
-    --status-assigned-bg: rgba(14, 165, 233, 0.40);
-    --status-assigned-text: #7dd3fc;
-    --status-progress-bg: rgba(245, 158, 11, 0.50);
-    --status-progress-text: #fb9724;
-    --status-closed-bg: rgba(34, 197, 94, 0.40);
-    --status-closed-text: #4ade80;
-    --status-hold-bg: rgba(107, 114, 128, 0.40);
-    --status-hold-text: #d1d5db;
-    --status-deny-bg: rgba(239, 68, 68, 0.40);
-    --status-deny-text: #f87171;
-    --status-waiting-bg: rgba(201, 103, 231, 0.15);
-    --status-waiting-text: #cf5fe6;
-    --status-rejected-bg: rgba(239, 68, 68, 0.40);
-    --status-rejected-text: #f87171;
-    --status-approved-bg: rgba(22, 163, 74, 0.25);
-    --status-approved-text: #86efac;
-    --status-verified-bg: rgba(22, 163, 74, 0.25);
-    --status-verified-text: #86efac;
-    --status-pending-bg: rgba(234, 88, 12, 0.25);
-    --status-pending-text: #fdba74;
+  // Status Color
+  --status-new-bg: rgba(14, 165, 233, 0.4);
+  --status-new-text: #38bdf8;
+  --status-open-bg: rgba(59, 130, 246, 0.4);
+  --status-open-text: #60a5fa;
+  --status-assigned-bg: rgba(14, 165, 233, 0.4);
+  --status-assigned-text: #7dd3fc;
+  --status-progress-bg: rgba(245, 158, 11, 0.5);
+  --status-progress-text: #fb9724;
+  --status-closed-bg: rgba(34, 197, 94, 0.4);
+  --status-closed-text: #4ade80;
+  --status-hold-bg: rgba(107, 114, 128, 0.4);
+  --status-hold-text: #d1d5db;
+  --status-deny-bg: rgba(239, 68, 68, 0.4);
+  --status-deny-text: #f87171;
+  --status-waiting-bg: rgba(201, 103, 231, 0.15);
+  --status-waiting-text: #cf5fe6;
+  --status-rejected-bg: rgba(239, 68, 68, 0.4);
+  --status-rejected-text: #f87171;
+  --status-approved-bg: rgba(22, 163, 74, 0.25);
+  --status-approved-text: #86efac;
+  --status-verified-bg: rgba(22, 163, 74, 0.25);
+  --status-verified-text: #86efac;
+  --status-pending-bg: rgba(234, 88, 12, 0.25);
+  --status-pending-text: #fdba74;
 
-    // table
-    --table-header-green: #1f5f46;
-    --table-header-blue: #1f3f73;
-    --table-header-red: #6a2f2f;
+  // table
+  --table-header-green: #1f5f46;
+  --table-header-blue: #1f3f73;
+  --table-header-red: #6a2f2f;
 
-    //TAG
-    --tag-color-red: #e74c3c;
-    --tag-color-green: #2ed47e;
-    --tag-bg-red: #e74c3c1a;
-    --tag-bg-green: #2ed47e1a;
+  //TAG
+  --tag-color-red: #e74c3c;
+  --tag-color-green: #2ed47e;
+  --tag-bg-red: #e74c3c1a;
+  --tag-bg-green: #2ed47e1a;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility

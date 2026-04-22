@@ -1,281 +1,301 @@
 <div class="medical-page">
-    <app-page-header title="ค่ารักษาพยาบาล">
-        <button type="button" class="btn-icon-sky" (click)="isPolicyModalOpen.set(true)"
-            title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
-            <i class="fas fa-info-circle"></i>
-        </button>
-    </app-page-header>
+  <app-page-header title="ค่ารักษาพยาบาล">
+    <button
+      type="button"
+      class="btn-icon-sky"
+      (click)="isPolicyModalOpen.set(true)"
+      title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ"
+    >
+      <i class="fas fa-info-circle"></i>
+    </button>
+  </app-page-header>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--blue"><i class="fas fa-file-medical"></i></div>
-            <div class="stat-info">
-                <span class="stat-value">{{ totalItems() }}</span>
-                <span class="stat-label">รายการทั้งหมด</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--orange"><i class="fas fa-clock"></i></div>
-            <div class="stat-info">
-                <span class="stat-value">{{ pendingCount() }}</span>
-                <span class="stat-label">รอดำเนินการ</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--green"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-info">
-                <span class="stat-value">{{ approvedCount() }}</span>
-                <span class="stat-label">อนุมัติแล้ว</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--purple"><i class="fas fa-coins"></i></div>
-            <div class="stat-info">
-                <span class="stat-value">฿{{ totalAmount() | number:'1.0-0' }}</span>
-                <span class="stat-label">ยอดรวมที่ขอเบิก</span>
-            </div>
-        </div>
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--blue"><i class="fas fa-file-medical"></i></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalItems() }}</span>
+        <span class="stat-label">รายการทั้งหมด</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><i class="fas fa-clock"></i></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ pendingCount() }}</span>
+        <span class="stat-label">รอดำเนินการ</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--green"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info">
+        <span class="stat-value">{{ approvedCount() }}</span>
+        <span class="stat-label">อนุมัติแล้ว</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--purple"><i class="fas fa-coins"></i></div>
+      <div class="stat-info">
+        <span class="stat-value">฿{{ totalAmount() | number: '1.0-0' }}</span>
+        <span class="stat-label">ยอดรวมที่ขอเบิก</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-row">
+      <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
+      <button type="button" class="btn-create" (click)="openModal()">
+        <i class="fas fa-plus"></i> สร้างรายการเบิก
+      </button>
     </div>
 
-    <div class="content-card">
-        <div class="card-header-row">
-            <div class="card-header-title">รายการเบิกค่ารักษาพยาบาล</div>
-            <button type="button" class="btn-create" (click)="openModal()">
-                <i class="fas fa-plus"></i> สร้างรายการเบิก
+    <!-- Toolbar -->
+    <div class="toolbar-container">
+      <div class="filter">
+        <div class="form-field">
+          <label>เดือนเริ่มต้น-เดือนสิ้นสุด</label>
+          <nz-range-picker
+            nzMode="month"
+            nzFormat="MM/yyyy"
+            [(ngModel)]="date"
+            class="form-input"
+          />
+        </div>
+        <div class="group-filter">
+          <div class="form-field">
+            <label>ค้นหา</label>
+            <nz-input-wrapper class="form-input">
+              <nz-icon nzInputPrefix nzType="search" />
+              <input
+                nz-input
+                class=""
+                placeholder="ค้นหา..."
+                [ngModel]="listing.searchText()"
+                (ngModelChange)="listing.searchText.set($event)"
+                (keyup.enter)="loadData()"
+              />
+            </nz-input-wrapper>
+          </div>
+          <div style="display: flex; align-items: end; gap: 8px">
+            <button
+              type="button"
+              class="btn-search"
+              (click)="loadData()"
+              [disabled]="isRefreshing()"
+            >
+              <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i> ค้นหา
             </button>
+            <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Toolbar -->
-        <div class="toolbar-container">
-            <div class="filter">
-                <div class="form-field">
-                    <label>เดือนเริ่มต้น-เดือนสิ้นสุด</label>
-                    <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="date" class="form-input" />
-                </div>
-                <div class="group-filter">
-                    <div class="form-field">
-                        <label>ค้นหา</label>
-                        <nz-input-wrapper class="form-input">
-                            <nz-icon nzInputPrefix nzType="search" />
-                            <input nz-input class="" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
-                                (ngModelChange)="listing.searchText.set($event)" (keyup.enter)="loadData()" />
-                        </nz-input-wrapper>
-                    </div>
-                    <div style="display: flex; align-items: end; gap: 8px;">
-                        <button type="button" class="btn-search" (click)="loadData()" [disabled]="isRefreshing()">
-                            <i [class]="isRefreshing() ? 'fas fa-spinner fa-spin' : 'fas fa-search'"></i> ค้นหา
-                        </button>
-                        <button type="button" class="btn-clear" title="คืนค่าตัวกรอง" (click)="clearFilters()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
+    <!-- Mobile card view -->
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
+        @for (claim of paginatedClaims(); track trackById($index, claim)) {
+          <div class="claim-card" [attr.data-type]="claim.expenseTypeName">
+            <div class="claim-card__header">
+              <div class="claim-card__type-badge">
+                <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
+              </div>
+              <div class="claim-card__actions">
+                @if (claim.attachments.length) {
+                  <button
+                    type="button"
+                    class="btn-attach"
+                    (click)="openPreview(claim)"
+                    title="ดูเอกสาร"
+                  >
+                    <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
+                  </button>
+                }
+                <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                  {{ claim.status | statusLabel }}
+                </span>
+              </div>
             </div>
 
-        </div>
+            <div class="claim-card__body">
+              <div class="claim-card__main">
+                <div class="claim-date">
+                  <i class="far fa-calendar-alt"></i>
+                  <span
+                    >{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
+                    {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}</span
+                  >
+                  <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
+                </div>
+                <div class="claim-hospital">
+                  <i class="fas fa-hospital-alt"></i>
+                  <span>{{ claim.hospitalName }}</span>
+                </div>
+                <div class="claim-disease">
+                  <i class="fas fa-virus"></i>
+                  <span>{{ claim.diseaseName }}</span>
+                </div>
+              </div>
 
-        <!-- Mobile card view -->
-        <div class="card-list-view">
-            @if (isLoading()) {
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-            } @else {
+              <div class="claim-card__amount">
+                <span class="amount-label">ขอเบิก</span>
+                <span class="amount-value">฿{{ claim.requestedAmount | number: '1.2-2' }}</span>
+                @if (claim.approvedAmount > 0) {
+                  <span class="amount-approved"
+                    >อนุมัติ ฿{{ claim.approvedAmount | number: '1.2-2' }}</span
+                  >
+                }
+              </div>
+            </div>
+
+            <div class="claim-card__footer">
+              <span class="claim-id">#{{ claim.voucherNo ?? claim.claimId }}</span>
+              <span class="claim-date-created">{{
+                dateUtil.formatDateToBE(claim.claimDate, 'DD MMMM YYYY')
+              }}</span>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบรายการ"
+            description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+            icon="fas fa-inbox"
+          >
+          </app-empty-state>
+        }
+      }
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              <th>วันที่รักษา</th>
+              <th>สถานพยาบาล</th>
+              <th>โรค</th>
+              <th class="text-right">ยอดเงิน</th>
+              <th>สถานะ</th>
+              <th>เอกสาร</th>
+              <th>วันที่สร้างรายการ</th>
+            </tr>
+          </thead>
+
+          <tbody>
             @for (claim of paginatedClaims(); track trackById($index, claim)) {
-            <div class="claim-card" [attr.data-type]="claim.expenseTypeName">
-                <div class="claim-card__header">
-                    <div class="claim-card__type-badge">
-                        <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
-                    </div>
-                    <div class="claim-card__actions">
-                        @if (claim.attachments.length) {
-                        <button type="button" class="btn-attach" (click)="openPreview(claim)" title="ดูเอกสาร">
-                            <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
-                        </button>
-                        }
-                        <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
-                            {{ claim.status | statusLabel }}
-                        </span>
-                    </div>
-                </div>
+              <tr>
+                <!-- ประเภท -->
+                <td>
+                  <div class="type-badge">
+                    <span class="type-name">{{ claim.expenseTypeName }}</span>
+                  </div>
 
-                <div class="claim-card__body">
-                    <div class="claim-card__main">
-                        <div class="claim-date">
-                            <i class="far fa-calendar-alt"></i>
-                            <span>{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                                {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY')}}</span>
-                            <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
-                        </div>
-                        <div class="claim-hospital">
-                            <i class="fas fa-hospital-alt"></i>
-                            <span>{{ claim.hospitalName }}</span>
-                        </div>
-                        <div class="claim-disease">
-                            <i class="fas fa-virus"></i>
-                            <span>{{ claim.diseaseName }}</span>
-                        </div>
-                    </div>
+                  <div class="request-no">
+                    <i class="fa-solid fa-tag"></i>
+                    {{ claim.voucherNo ?? claim.claimId }}
+                  </div>
+                </td>
+                <!-- วันที่ -->
+                <td>
+                  {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
+                  {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
 
-                    <div class="claim-card__amount">
-                        <span class="amount-label">ขอเบิก</span>
-                        <span class="amount-value">฿{{ claim.requestedAmount | number:'1.2-2' }}</span>
-                        @if (claim.approvedAmount > 0) {
-                        <span class="amount-approved">อนุมัติ ฿{{ claim.approvedAmount | number:'1.2-2' }}</span>
-                        }
-                    </div>
-                </div>
+                  <span class="sub-text"> {{ claim.treatmentDays }} วัน </span>
+                </td>
 
-                <div class="claim-card__footer">
-                    <span class="claim-id">#{{ claim.voucherNo ?? claim.claimId }}</span>
-                    <span class="claim-date-created">{{ dateUtil.formatDateToBE(claim.claimDate, 'DD MMMM YYYY')
-                        }}</span>
-                </div>
-            </div>
-            }
-            @empty {
-            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-            </app-empty-state>
-            }
-            }
-        </div>
+                <!-- โรงพยาบาล -->
+                <td>{{ claim.hospitalName }}</td>
 
-        <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
+                <!-- โรค -->
+                <td>{{ claim.diseaseName }}</td>
 
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th>ประเภท</th>
-                        <th>วันที่รักษา</th>
-                        <th>สถานพยาบาล</th>
-                        <th>โรค</th>
-                        <th class="text-right">ยอดเงิน</th>
-                        <th>สถานะ</th>
-                        <th>เอกสาร</th>
-                        <th>วันที่สร้างรายการ</th>
-                    </tr>
-                </thead>
+                <!-- จำนวนเงิน -->
+                <td class="text-right">
+                  <div class="amount-cell">
+                    <div class="amount-main">฿{{ claim.requestedAmount | number: '1.2-2' }}</div>
 
-                <tbody>
-                    @for (claim of paginatedClaims(); track trackById($index, claim)) {
-                    <tr>
-
-                        <!-- ประเภท -->
-                        <td>
-                            <div class="type-badge">
-                                <span class="type-name">{{ claim.expenseTypeName }}</span>
-                            </div>
-
-                            <div class="request-no">
-                                <i class="fa-solid fa-tag"></i>
-                                {{ claim.voucherNo ?? claim.claimId }}
-                            </div>
-                        </td>
-                        <!-- วันที่ -->
-                        <td>
-                            {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                            {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
-
-                            <span class="sub-text">
-                                {{ claim.treatmentDays }} วัน
-                            </span>
-                        </td>
-
-                        <!-- โรงพยาบาล -->
-                        <td>{{ claim.hospitalName }}</td>
-
-                        <!-- โรค -->
-                        <td>{{ claim.diseaseName }}</td>
-
-                        <!-- จำนวนเงิน -->
-                        <td class="text-right">
-                            <div class="amount-cell">
-
-                                <div class="amount-main">
-                                    ฿{{ claim.requestedAmount | number:'1.2-2' }}
-                                </div>
-
-                                @if (claim.approvedAmount > 0) {
-                                <div class="amount-approved">
-                                    <i class="fas fa-check text-success"></i>
-                                </div>
-                                }
-
-                            </div>
-                        </td>
-
-                        <!-- สถานะ -->
-                        <td>
-                            <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
-                                {{ claim.status | statusLabel }}
-                            </span>
-                        </td>
-
-                        <!-- เอกสาร -->
-                        <td class="text-center">
-                            @if (claim.attachments.length) {
-                            <button type="button" class="btn-attach" (click)="openPreview(claim)">
-                                <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
-                            </button>
-                            } @else {
-                            -
-                            }
-                        </td>
-
-                        <!-- footer info -->
-                        <td>
-                            <div class="">
-                                {{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}
-                            </div>
-                        </td>
-
-                    </tr>
+                    @if (claim.approvedAmount > 0) {
+                      <div class="amount-approved">
+                        <i class="fas fa-check text-success"></i>
+                      </div>
                     }
+                  </div>
+                </td>
 
-                    @empty {
-                    <tr>
-                        <td colspan="8">
-                            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                                icon="fas fa-inbox">
-                            </app-empty-state>
-                        </td>
-                    </tr>
-                    }
+                <!-- สถานะ -->
+                <td>
+                  <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
+                    {{ claim.status | statusLabel }}
+                  </span>
+                </td>
 
-                </tbody>
-            </table>
+                <!-- เอกสาร -->
+                <td class="text-center">
+                  @if (claim.attachments.length) {
+                    <button type="button" class="btn-attach" (click)="openPreview(claim)">
+                      <i class="fa-solid fa-file"></i> {{ claim.attachments.length }}
+                    </button>
+                  } @else {
+                    -
+                  }
+                </td>
 
+                <!-- footer info -->
+                <td>
+                  <div class="">
+                    {{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}
+                  </div>
+                </td>
+              </tr>
+
+            } @empty {
+              <tr>
+                <td colspan="8">
+                  <app-empty-state
+                    title="ไม่พบรายการ"
+                    description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                    icon="fas fa-inbox"
+                  >
+                  </app-empty-state>
+                </td>
+              </tr>
             }
-        </div>
-
+          </tbody>
+        </table>
+      }
     </div>
+  </div>
 
-    @if (isModalOpen()) {
+  @if (isModalOpen()) {
     <div class="modal-overlay">
-        <div class="modal-container">
-            @defer {
-            <app-medicalexpenses-form (onClose)="closeModal()">
-            </app-medicalexpenses-form>
-            } @loading {
-            <div class="p-4 text-center">
-                <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
-            </div>
-            }
-        </div>
+      <div class="modal-container">
+        @defer {
+          <app-medicalexpenses-form (onClose)="closeModal()"> </app-medicalexpenses-form>
+        } @loading {
+          <div class="p-4 text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+          </div>
+        }
+      </div>
     </div>
-    }
+  }
 
-    @if (isPreviewModalOpen()) {
+  @if (isPreviewModalOpen()) {
     @defer {
-    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-    </app-file-preview-modal>
+      <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+      </app-file-preview-modal>
     }
-    }
+  }
 
-    @if (isPolicyModalOpen()) {
-    <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)">
-    </app-medical-policy-modal>
-    }
+  @if (isPolicyModalOpen()) {
+    <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)"> </app-medical-policy-modal>
+  }
 </div>

@@ -8,9 +8,8 @@ describe('SaveSignature', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SaveSignature]
-    })
-    .compileComponents();
+      imports: [SaveSignature],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SaveSignature);
     component = fixture.componentInstance;

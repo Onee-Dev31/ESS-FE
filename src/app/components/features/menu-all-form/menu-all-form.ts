@@ -6,7 +6,12 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-menu-all-form',
@@ -18,7 +23,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
     NzSelectModule,
     DragDropModule,
     NzInputModule,
-    NzSwitchModule
+    NzSwitchModule,
   ],
   templateUrl: './menu-all-form.html',
   styleUrl: './menu-all-form.scss',
@@ -40,7 +45,7 @@ export class MenuAllForm {
         ...menu,
         isExpanded: false,
         // isExpanded: true,
-        children: menu.children ?? []
+        children: menu.children ?? [],
       }));
       this.generateDropListIds();
     }
@@ -52,7 +57,7 @@ export class MenuAllForm {
   }
 
   handleSubmit() {
-    const formData = this.flattenMenus(this.menusInternal)
+    const formData = this.flattenMenus(this.menusInternal);
     this.onSubmit.emit(formData);
   }
 
@@ -61,12 +66,7 @@ export class MenuAllForm {
   }
 
   dropParent(event: CdkDragDrop<any[]>) {
-
-    moveItemInArray(
-      this.menusInternal,
-      event.previousIndex,
-      event.currentIndex
-    );
+    moveItemInArray(this.menusInternal, event.previousIndex, event.currentIndex);
 
     this.menusInternal.forEach((menu: any, index: any) => {
       menu.OrderNo = index + 1;
@@ -76,26 +76,18 @@ export class MenuAllForm {
   childDropLists: string[] = [];
 
   generateDropListIds() {
-    this.childDropLists = this.menusInternal.map((m: { MenuID: string; }) => 'child-' + m.MenuID);
+    this.childDropLists = this.menusInternal.map((m: { MenuID: string }) => 'child-' + m.MenuID);
   }
 
   dropChild(event: CdkDragDrop<any[]>, parentMenu: any) {
-
     if (event.previousContainer === event.container) {
-
-      moveItemInArray(
-        parentMenu.children,
-        event.previousIndex,
-        event.currentIndex
-      );
-
+      moveItemInArray(parentMenu.children, event.previousIndex, event.currentIndex);
     } else {
-
       transferArrayItem(
         event.previousContainer.data,
         parentMenu.children,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
 
       const movedItem = parentMenu.children[event.currentIndex];
@@ -112,8 +104,7 @@ export class MenuAllForm {
     const result: any[] = [];
     let runningOrder = 1;
 
-    tree.forEach(parent => {
-
+    tree.forEach((parent) => {
       // push parent
       result.push({
         menuID: parent.MenuID,
@@ -126,7 +117,7 @@ export class MenuAllForm {
         parentMenuID: null,
         orderNo: runningOrder++,
         remark: parent.Remark,
-        modifiedBy: parent.ModifiedBy
+        modifiedBy: parent.ModifiedBy,
       });
 
       // push children
@@ -142,14 +133,11 @@ export class MenuAllForm {
           parentMenuID: parent.MenuID,
           orderNo: runningOrder++,
           remark: child.Remark,
-          modifiedBy: child.ModifiedBy
+          modifiedBy: child.ModifiedBy,
         });
       });
-
     });
 
     return result;
   }
-
-
 }

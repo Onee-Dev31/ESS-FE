@@ -1,5 +1,14 @@
 import { CommonModule, formatDate } from '@angular/common';
-import { Component, computed, Inject, inject, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  Inject,
+  inject,
+  PLATFORM_ID,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -19,7 +28,7 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { DateUtilityService } from '../../../services/date-utility.service';
-import { InfoModal } from "../modal/info-modal/info-modal";
+import { InfoModal } from '../modal/info-modal/info-modal';
 import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
 import { FreelanceService } from '../../../services/freelance-management.service';
@@ -34,7 +43,7 @@ interface EmployeeFormData {
   nickName: string; //NICKNAME
   department: string; //DEPARTMENT
   company: string; //COMPANY_NAME [COMPANY_CODE]
-  type: string; // ? 
+  type: string; // ?
   adUser: string; //AD_USER
   position: string; //POST
   lastDate: string;
@@ -50,14 +59,13 @@ interface FreelanceFormData {
   nickName: string; //NICKNAME
   department: string; //DEPARTMENT
   company: string; //COMPANY_NAME [COMPANY_CODE]
-  type: string; // ? 
+  type: string; // ?
   adUser: string; //AD_USER
   position: string; //POST
   lastDate: string;
   effectiveDate: string;
   expireDate: string;
 }
-
 
 @Component({
   selector: 'app-resign-detail',
@@ -73,7 +81,7 @@ interface FreelanceFormData {
     PaginationComponent,
     NzSelectModule,
     InfoModal,
-    NzTabsModule
+    NzTabsModule,
   ],
   templateUrl: './resign-detail.html',
   styleUrl: './resign-detail.scss',
@@ -102,7 +110,10 @@ export class ResignDetail {
 
   resignFreelanceData = signal<FreelanceFormData[]>([]);
   resignFreelanceListing = createListingState();
-  resignFreelanceComps = createListingComputeds_v2(this.resignFreelanceData, this.resignFreelanceListing);
+  resignFreelanceComps = createListingComputeds_v2(
+    this.resignFreelanceData,
+    this.resignFreelanceListing,
+  );
 
   // New Filters
   filterCompany = signal<any>(null);
@@ -114,7 +125,7 @@ export class ResignDetail {
   appliedSearch = signal<string>(''); // ค่าที่กดค้นหาแล้ว
   searchText = signal<string>('');
 
-  IS_INFO = signal<boolean>(false)
+  IS_INFO = signal<boolean>(false);
   selectedEmployees = signal<Map<string, EmployeeFormData>>(new Map());
   selectedFreelance = signal<Map<string, FreelanceFormData>>(new Map());
 
@@ -128,7 +139,7 @@ export class ResignDetail {
 
   tabs = [
     { name: 'Approved', key: 'approved' },
-    { name: 'Waiting', key: 'waiting' }
+    { name: 'Waiting', key: 'waiting' },
   ];
   activeTab: string = 'approved';
   activeTabIndex: number = 0;
@@ -157,9 +168,7 @@ export class ResignDetail {
     const departments = this.departmentList();
     if (!company) return [];
 
-    return departments.filter(dep =>
-      dep.COMPANY_CODE === company.COMPANY_CODE
-    );
+    return departments.filter((dep) => dep.COMPANY_CODE === company.COMPANY_CODE);
   });
 
   trackByEmpCode(_: number, item: Employee) {
@@ -168,28 +177,25 @@ export class ResignDetail {
 
   onView(emp: any) {
     this.selected = emp;
-    this.IS_INFO.set(true)
+    this.IS_INFO.set(true);
   }
 
   closeInfoModal() {
-    this.IS_INFO.set(false)
+    this.IS_INFO.set(false);
   }
 
   submitInfo(data: any) {
-    this.IS_INFO.set(false)
+    this.IS_INFO.set(false);
   }
 
   approve(command: 'Employee' | 'Freelance') {
-
     let selected;
 
     if (command === 'Employee') {
       selected = Array.from(this.selectedEmployees().values());
-
     } else {
       selected = Array.from(this.selectedFreelance().values());
     }
-
 
     if (selected.length === 0) {
       this.swalService.warning('แจ้งเตือน', 'กรุณาเลือกพนักงานก่อนทำรายการ');
@@ -199,74 +205,69 @@ export class ResignDetail {
     const employeeList = `
             <div style="max-height:200px;overflow:auto;text-align:center">
             ${selected
-        .map(emp => `${emp.empCode} - ${emp.firstNameTh} ${emp.lastNameTh}`)
-        .join('<br>')}
+              .map((emp) => `${emp.empCode} - ${emp.firstNameTh} ${emp.lastNameTh}`)
+              .join('<br>')}
             </div>
             `;
 
-    const requests = selected.map(emp => ({
+    const requests = selected.map((emp) => ({
       samAccountName: emp.adUser,
-      expireDate: dayjs(emp.lastDate).format('YYYY-MM-DD')
-    }))
+      expireDate: dayjs(emp.lastDate).format('YYYY-MM-DD'),
+    }));
 
     const payload = {
       type: command === 'Employee' ? 'fulltime' : 'freelance',
       actionEmp: this.authService.userData().AD_USER.toLowerCase(),
-      requests: requests
-    }
+      requests: requests,
+    };
 
-    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', "", employeeList)
-      .then(result => {
+    this.swalService.confirm('ยืนยันการ Approve อีกครั้ง', '', employeeList).then((result) => {
+      if (!result.isConfirmed) return;
 
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+      this.resignService.updateADManagementResign(payload).subscribe({
+        next: (res) => {
+          console.log(res);
+          this.swalService.success('สำเร็จ', '');
+          this.loadInitialData();
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+          this.swalService.warning('แจ้งเตือน', error.error);
+        },
+      });
+
+      // this.swalService.success("ทำรายการสำเร็จ", "(mock)")
+    });
+  }
+
+  async deleteEmployeeInResign(emp: any) {
+    this.swalService
+      .confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
+      .then((result) => {
         if (!result.isConfirmed) return;
-
-        this.swalService.loading('กำลังบันทึกข้อมูล...')
-
-        this.resignService.updateADManagementResign(payload).subscribe(
-          {
+        this.swalService.loading('กำลังบันทึก...');
+        this.resignService
+          .deleteEmployeeResign(emp.id)
+          .pipe(
+            finalize(() => {
+              this.loadInitialData();
+            }),
+          )
+          .subscribe({
             next: (res) => {
-              console.log(res);
-              this.swalService.success('สำเร็จ', '')
+              // console.log(res);
+              this.swalService.close();
+              this.swalService.success('สำเร็จ', 'ลบพนักงานออกจากresign');
               this.loadInitialData();
             },
             error: (error) => {
               console.error('Error fetching data:', error);
-              this.swalService.warning('แจ้งเตือน', error.error)
-            }
-          }
-        )
-
-        // this.swalService.success("ทำรายการสำเร็จ", "(mock)")
-      });
-
-  }
-
-  async deleteEmployeeInResign(emp: any) {
-    this.swalService.confirm('ยืนยันการลบ', emp.empCode + ' ' + emp.firstNameTh + ' ' + emp.lastNameTh)
-      .then(result => {
-        if (!result.isConfirmed) return;
-        this.swalService.loading('กำลังบันทึก...')
-        this.resignService.deleteEmployeeResign(emp.id)
-          .pipe(
-            finalize(() => {
-              this.loadInitialData();
-            })
-          )
-          .subscribe(
-            {
-              next: (res) => {
-                // console.log(res);
-                this.swalService.close();
-                this.swalService.success('สำเร็จ', 'ลบพนักงานออกจากresign')
-                this.loadInitialData();
-              },
-              error: (error) => {
-                console.error('Error fetching data:', error);
-                this.swalService.close();
-                this.swalService.warning('แจ้งเตือน', error.error)
-              }
-            }
-          )
+              this.swalService.close();
+              this.swalService.warning('แจ้งเตือน', error.error);
+            },
+          });
       });
   }
 
@@ -277,34 +278,27 @@ export class ResignDetail {
   }
 
   cancel() {
-    this.isFlipped = false
+    this.isFlipped = false;
 
     setTimeout(() => {
       if (!this.selected) {
         this.lastDate.set(null);
         this.effectiveDate.set(null);
       } else {
-        this.lastDate.set(
-          this.selected.lastDate
-            ? new Date(this.selected.lastDate)
-            : null
-        );
+        this.lastDate.set(this.selected.lastDate ? new Date(this.selected.lastDate) : null);
 
         this.effectiveDate.set(
-          this.selected.effectiveDate
-            ? new Date(this.selected.effectiveDate)
-            : null
+          this.selected.effectiveDate ? new Date(this.selected.effectiveDate) : null,
         );
       }
-    }, 100)
-
+    }, 100);
   }
 
   async onConfirmModal(): Promise<void> {
     // console.log(this.selected)
     if (!this.selected) return;
 
-    this.isViewOpen = false
+    this.isViewOpen = false;
 
     const result = await Swal.fire({
       title: 'ยืนยันการทำรายการใช่หรือไม่?',
@@ -315,9 +309,8 @@ export class ResignDetail {
       cancelButtonText: 'ยกเลิก',
     });
 
-
     if (!result.isConfirmed) {
-      this.isViewOpen = true
+      this.isViewOpen = true;
       return;
     }
 
@@ -328,49 +321,53 @@ export class ResignDetail {
         employeeNo: this.selected.empCode,
         adUser: this.selected.adUser,
         lastDate: formatDate(this.lastDate()!, 'yyyy-MM-dd', 'en-US'),
-        resignedDate: formatDate(this.effectiveDate()!, 'yyyy-MM-dd', 'en-US')
+        resignedDate: formatDate(this.effectiveDate()!, 'yyyy-MM-dd', 'en-US'),
       };
 
-      const id_update = this.selected.id
+      const id_update = this.selected.id;
 
       // console.log("payload :", payload, id_update)
 
       if (this.MODE_EDIT && id_update) {
-        this.resignService.updateEmployeeResign(id_update, payload).pipe(
-          finalize(() => {
-            this.loadInitialData();
-          })
-        ).subscribe({
-          next: (res) => {
-            // console.log(res);
-            this.swalService.close();
-            this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว')
-
-          },
-          error: (error) => {
-            console.error('Error fetching data:', error);
-            this.swalService.close();
-            this.swalService.warning('แจ้งเตือน', error.error)
-          }
-        });
+        this.resignService
+          .updateEmployeeResign(id_update, payload)
+          .pipe(
+            finalize(() => {
+              this.loadInitialData();
+            }),
+          )
+          .subscribe({
+            next: (res) => {
+              // console.log(res);
+              this.swalService.close();
+              this.swalService.success('สำเร็จ', 'อัพเดทข้อมูลเรียบร้อยแล้ว');
+            },
+            error: (error) => {
+              console.error('Error fetching data:', error);
+              this.swalService.close();
+              this.swalService.warning('แจ้งเตือน', error.error);
+            },
+          });
       } else {
-        this.resignService.resignEmployee(payload).pipe(
-          finalize(() => {
-            this.loadInitialData();
-          })
-        ).subscribe({
-          next: (res) => {
-            // console.log(res);
-            this.swalService.close();
-            this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว')
-
-          },
-          error: (error) => {
-            console.error('Error fetching data:', error);
-            this.swalService.close();
-            this.swalService.warning('แจ้งเตือน', error.error)
-          }
-        });
+        this.resignService
+          .resignEmployee(payload)
+          .pipe(
+            finalize(() => {
+              this.loadInitialData();
+            }),
+          )
+          .subscribe({
+            next: (res) => {
+              // console.log(res);
+              this.swalService.close();
+              this.swalService.success('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว');
+            },
+            error: (error) => {
+              console.error('Error fetching data:', error);
+              this.swalService.close();
+              this.swalService.warning('แจ้งเตือน', error.error);
+            },
+          });
       }
       this.closeViewModal();
       this.MODE_EDIT = false;
@@ -387,7 +384,7 @@ export class ResignDetail {
     item: T,
     checked: boolean,
     selectedMap: WritableSignal<Map<string, T>>,
-    keyFn: (x: T) => string
+    keyFn: (x: T) => string,
   ) {
     const map = new Map(selectedMap());
     const key = keyFn(item);
@@ -403,18 +400,15 @@ export class ResignDetail {
 
   // Usage for employee
   toggleSelectEmployee(emp: EmployeeFormData, checked: boolean) {
-    this.toggleSelectItem(emp, checked, this.selectedEmployees, e => e.empCode);
+    this.toggleSelectItem(emp, checked, this.selectedEmployees, (e) => e.empCode);
   }
 
   // Usage for freelance
   toggleSelectFreelance(free: any, checked: boolean) {
-    this.toggleSelectItem(free, checked, this.selectedFreelance, f => f.empCode);
+    this.toggleSelectItem(free, checked, this.selectedFreelance, (f) => f.empCode);
   }
 
-  isCheckedItem<T>(
-    key: string,
-    selectedMap: Signal<Map<string, T>>
-  ) {
+  isCheckedItem<T>(key: string, selectedMap: Signal<Map<string, T>>) {
     return selectedMap().has(key);
   }
 
@@ -431,15 +425,15 @@ export class ResignDetail {
     event: Event,
     pageData: T[],
     selectedMap: WritableSignal<Map<string, T>>,
-    keyFn: (x: T) => string
+    keyFn: (x: T) => string,
   ) {
     const checked = (event.target as HTMLInputElement).checked;
     const map = new Map(selectedMap());
 
     if (checked) {
-      pageData.forEach(item => map.set(keyFn(item), item));
+      pageData.forEach((item) => map.set(keyFn(item), item));
     } else {
-      pageData.forEach(item => map.delete(keyFn(item)));
+      pageData.forEach((item) => map.delete(keyFn(item)));
     }
 
     selectedMap.set(map);
@@ -448,43 +442,43 @@ export class ResignDetail {
   // Helper for employee
   toggleSelectAllEmployees(event: Event) {
     const pageData = this.resignComps.paginatedData(); // your page data
-    this.toggleSelectAllItems(event, pageData, this.selectedEmployees, e => e.empCode);
+    this.toggleSelectAllItems(event, pageData, this.selectedEmployees, (e) => e.empCode);
   }
 
   // Helper for freelance
   toggleSelectAllFreelance(event: Event) {
     const pageData = this.resignFreelanceComps.paginatedData();
-    this.toggleSelectAllItems(event, pageData, this.selectedFreelance, f => f.empCode);
+    this.toggleSelectAllItems(event, pageData, this.selectedFreelance, (f) => f.empCode);
   }
 
   // Partial / all selected helpers
   isAllSelected<T>(pageData: T[], selectedMap: Signal<Map<string, T>>, keyFn: (x: T) => string) {
-    return pageData.length > 0 && pageData.every(x => selectedMap().has(keyFn(x)));
+    return pageData.length > 0 && pageData.every((x) => selectedMap().has(keyFn(x)));
   }
 
   isSomeSelected<T>(pageData: T[], selectedMap: Signal<Map<string, T>>, keyFn: (x: T) => string) {
-    const count = pageData.filter(x => selectedMap().has(keyFn(x))).length;
+    const count = pageData.filter((x) => selectedMap().has(keyFn(x))).length;
     return count > 0 && count < pageData.length;
   }
 
   isAllSelectedEmployee() {
     const pageData = this.resignComps.paginatedData();
-    return this.isAllSelected(pageData, this.selectedEmployees, e => e.empCode);
+    return this.isAllSelected(pageData, this.selectedEmployees, (e) => e.empCode);
   }
 
   isSomeSelectedEmployee() {
     const pageData = this.resignComps.paginatedData();
-    return this.isSomeSelected(pageData, this.selectedEmployees, e => e.empCode);
+    return this.isSomeSelected(pageData, this.selectedEmployees, (e) => e.empCode);
   }
 
   isAllSelectedFreelance() {
     const pageData = this.resignFreelanceComps.paginatedData();
-    return this.isAllSelected(pageData, this.selectedFreelance, e => e.empCode);
+    return this.isAllSelected(pageData, this.selectedFreelance, (e) => e.empCode);
   }
 
   isSomeSelectedFreelance() {
     const pageData = this.resignFreelanceComps.paginatedData();
-    return this.isSomeSelected(pageData, this.selectedFreelance, e => e.empCode);
+    return this.isSomeSelected(pageData, this.selectedFreelance, (e) => e.empCode);
   }
 
   onImgError(event: Event) {
@@ -504,7 +498,7 @@ export class ResignDetail {
     const effectiveOnly = new Date(
       effective.getFullYear(),
       effective.getMonth(),
-      effective.getDate()
+      effective.getDate(),
     );
 
     return lastOnly > effectiveOnly;
@@ -518,14 +512,7 @@ export class ResignDetail {
     // ใส่เวลาปัจจุบัน
     const now = new Date();
 
-    return new Date(
-      +year,
-      +month - 1,
-      +day,
-      now.getHours(),
-      now.getMinutes(),
-      now.getSeconds()
-    );
+    return new Date(+year, +month - 1, +day, now.getHours(), now.getMinutes(), now.getSeconds());
   }
 
   // Function
@@ -574,46 +561,37 @@ export class ResignDetail {
   }
 
   goToPage(page: number, command: 'Freelance' | 'Employee') {
-
     if (command === 'Employee') {
       this.resignListing.currentPage.set(page);
 
-      this.fetchEmployeeByStatus(
-        'Resigned',
-        page + 1,
-        this.resignListing.pageSize()
-      ).subscribe(res => this.dataEmployeeResignFromApi(res));
+      this.fetchEmployeeByStatus('Resigned', page + 1, this.resignListing.pageSize()).subscribe(
+        (res) => this.dataEmployeeResignFromApi(res),
+      );
     } else {
       this.resignFreelanceListing.currentPage.set(page);
 
       this.fetchFreelanceByStatus(
         'Resigned',
         page + 1,
-        this.resignFreelanceListing.pageSize()
-      ).subscribe(res => this.dataFreelanceResignFromApi(res));
+        this.resignFreelanceListing.pageSize(),
+      ).subscribe((res) => this.dataFreelanceResignFromApi(res));
     }
   }
 
   setPageSize(size: number, command: 'Freelance' | 'Employee') {
-
     if (command === 'Employee') {
       this.resignListing.pageSize.set(size);
       this.resignListing.currentPage.set(0);
-      this.fetchEmployeeByStatus(
-        'Resigned',
-        1,
-        size
-      ).subscribe(res => this.dataEmployeeResignFromApi(res));
+      this.fetchEmployeeByStatus('Resigned', 1, size).subscribe((res) =>
+        this.dataEmployeeResignFromApi(res),
+      );
     } else {
       this.resignFreelanceListing.pageSize.set(size);
       this.resignFreelanceListing.currentPage.set(0);
-      this.fetchFreelanceByStatus(
-        'Resigned',
-        1,
-        size
-      ).subscribe(res => this.dataFreelanceResignFromApi(res));
+      this.fetchFreelanceByStatus('Resigned', 1, size).subscribe((res) =>
+        this.dataFreelanceResignFromApi(res),
+      );
     }
-
   }
 
   onCompanyChange(company: any) {
@@ -633,23 +611,21 @@ export class ResignDetail {
     const pageR = this.resignListing.currentPage() + 1;
     const sizeR = this.resignListing.pageSize();
 
-    this.fetchEmployeeByStatus('Resigned', pageR, sizeR)
-      .subscribe(res => {
-        console.log("Resigned [EMP]>>", res.data.items)
-        this.dataEmployeeResignFromApi(res);
-        this.loadingService.stop('employee-list');
-      });
+    this.fetchEmployeeByStatus('Resigned', pageR, sizeR).subscribe((res) => {
+      console.log('Resigned [EMP]>>', res.data.items);
+      this.dataEmployeeResignFromApi(res);
+      this.loadingService.stop('employee-list');
+    });
 
-    this.fetchFreelanceByStatus('Resigned', pageR, sizeR)
-      .subscribe(res => {
-        console.log("Resigned [FREE]>>", res.items)
-        this.dataFreelanceResignFromApi(res);
-        this.loadingService.stop('freelance-list');
-      });
+    this.fetchFreelanceByStatus('Resigned', pageR, sizeR).subscribe((res) => {
+      console.log('Resigned [FREE]>>', res.items);
+      this.dataFreelanceResignFromApi(res);
+      this.loadingService.stop('freelance-list');
+    });
   }
 
   viewReportResign(command: 'fulltime' | 'freelance') {
-    console.log(command)
+    console.log(command);
     window.open(`/resign-management/report?type=${command}`, '_blank');
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
@@ -657,7 +633,7 @@ export class ResignDetail {
   //GET
   private dataEmployeeResignFromApi(res: any) {
     // console.log("Resigned >>", res)
-    const items = res.data.items ?? []
+    const items = res.data.items ?? [];
     this.resignData.set(this.mapApiData(items));
 
     this.resignListing.totalItems.set(res.data.total ?? 0);
@@ -667,7 +643,7 @@ export class ResignDetail {
 
   private dataFreelanceResignFromApi(res: any) {
     // console.log("Resigned >>", res)
-    const items = res.items ?? []
+    const items = res.items ?? [];
     this.resignFreelanceData.set(this.mapApiData_Freelance(items));
 
     this.resignFreelanceListing.totalItems.set(res.total ?? 0);
@@ -678,7 +654,7 @@ export class ResignDetail {
   private fetchEmployeeByStatus(
     status: 'Active' | 'Resigned',
     page: number = 1,
-    pageSize: number = 10
+    pageSize: number = 10,
   ) {
     const searchText = this.searchText();
     const company = this.filterCompany();
@@ -691,15 +667,11 @@ export class ResignDetail {
       companyCode: company?.COMPANY_CODE,
       costCent: department?.COSTCENT,
       empStatus: status,
-      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false'
+      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false',
     });
   }
 
-  private fetchFreelanceByStatus(
-    status: 'Active' | 'Resigned',
-    page: number,
-    pageSize: number
-  ) {
+  private fetchFreelanceByStatus(status: 'Active' | 'Resigned', page: number, pageSize: number) {
     const searchText = this.searchText();
     const company = this.filterCompany();
     const department = this.filterDepartment();
@@ -712,10 +684,9 @@ export class ResignDetail {
       costCent: department?.COSTCENT,
       empStatus: status,
       hasAdUser: 'false',
-      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false'
+      adExpiredDate: this.activeTab === 'approved' ? 'true' : 'false',
     });
   }
-
 
   // GET MASTER
   getCompanies() {
@@ -727,7 +698,7 @@ export class ResignDetail {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
 
@@ -740,8 +711,7 @@ export class ResignDetail {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
-
 }

@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
-          repository: Onee-Dev31/ESS-FE        
+          repository: Onee-Dev31/ESS-FE
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,18 +83,18 @@ jobs:
         shell: powershell
         run: |
           $keepFolders = @("carousel", "employee", "files", "icon", "image", "img", "logo", "logo-backup070768")
-          
+
           # ลบไฟล์ทั้งหมดใน root ยกเว้น web.config
           $keepFiles = @("web.config")
           Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -File |
             Where-Object { $keepFiles -notcontains $_.Name } |
             Remove-Item -Force
-          
+
           # ลบ folder ที่ไม่อยู่ใน whitelist
           Get-ChildItem -Path "${{ env.DEPLOY_PATH }}" -Directory | 
             Where-Object { $keepFolders -notcontains $_.Name } |
             Remove-Item -Recurse -Force
-          
+
           # Copy ใหม่
           Copy-Item -Path "${{ env.DIST_PATH }}\*" -Destination "${{ env.DEPLOY_PATH }}" -Recurse -Force
 

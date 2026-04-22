@@ -1,62 +1,63 @@
 <div class="modal-overlay" *ngIf="isOpen">
-    <form class="modal-container" (click)="$event.stopPropagation()">
-        <div class="form-header">
-            <h2>กำหนดสิทธิ์</h2>
-            <button type="button" class="btn-close" (click)="handleClose()">
-                <i class="fas fa-times"></i>
-            </button>
+  <form class="modal-container" (click)="$event.stopPropagation()">
+    <div class="form-header">
+      <h2>กำหนดสิทธิ์</h2>
+      <button type="button" class="btn-close" (click)="handleClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-content">
+      <div class="employee-main">
+        <div class="employee-name">
+          {{ emp.fullNameTh }}
         </div>
 
-        <div class="modal-content">
+        <div class="employee-tags">
+          <span class="tag emp-code">{{ emp.empCode }}</span>
+          <span class="tag ad-user">{{ emp.adUser }}</span>
+        </div>
+      </div>
 
-            <div class="employee-main">
-                <div class="employee-name">
-                    {{emp.fullNameTh}}
-                </div>
+      <div class="employee-divider"></div>
 
-                <div class="employee-tags">
-                    <span class="tag emp-code">{{ emp.empCode }}</span>
-                    <span class="tag ad-user">{{ emp.adUser }}</span>
-                </div>
-            </div>
-
-            <div class="employee-divider"></div>
-
-            <div class="employee-info">
-                <!-- <div class="info-item">
+      <div class="employee-info">
+        <!-- <div class="info-item">
                     <div class="label">ตำแหน่ง</div>
                     <div class="value">{{ emp.position }}</div>
                 </div> -->
 
-                <div class="info-item">
-                    <div class="label">แผนก</div>
-                    <div class="value">{{ emp.department }}</div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">บริษัท</div>
-                    <div class="value">{{ emp.company }}</div>
-                </div>
-            </div>
-
-            <div class="role-section">
-                <div class="info-item">
-                    <div class="label">สิทธิ์การใช้งาน (Roles)</div>
-                    <form class="role-form">
-                        <div class="role-grid">
-                            <label class="role-item" *ngFor="let role of permissionRoleByEmployee"
-                                [class.active]="role.checked">
-                                <input type="checkbox" [(ngModel)]="role.checked" [name]="'role_' + role.RoleID">
-                                <span>{{ role.RoleName }}</span>
-                            </label>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="info-item">
+          <div class="label">แผนก</div>
+          <div class="value">{{ emp.department }}</div>
         </div>
-        <div class="form-actions">
-            <button type="button" class="btn-save" (click)="handleSubmit()">บันทึก</button>
-        </div>
-    </form>
 
+        <div class="info-item">
+          <div class="label">บริษัท</div>
+          <div class="value">{{ emp.company }}</div>
+        </div>
+      </div>
+
+      <div class="role-section">
+        <div class="info-item">
+          <div class="label">สิทธิ์การใช้งาน (Roles)</div>
+          <form class="role-form">
+            <div class="role-grid">
+              <label
+                class="role-item"
+                *ngFor="let role of permissionRoleByEmployee"
+                [class.active]="role.checked"
+              >
+                <input type="checkbox" [(ngModel)]="role.checked" [name]="'role_' + role.RoleID" />
+                <span>{{ role.RoleName }}</span>
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn-save" (click)="handleSubmit()">บันทึก</button>
+    </div>
+  </form>
 </div>
