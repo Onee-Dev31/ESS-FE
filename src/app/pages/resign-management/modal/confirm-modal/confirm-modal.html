@@ -1,84 +1,74 @@
 <div class="modal-overlay confirm">
-    <div class="modal-container">
-        <div>
-            <header class="top-header-strip">
-                <h2>โปรดตรวจสอบข้อมูลอีกครั้ง</h2>
-                <!-- <div class="header-right-meta">
+  <div class="modal-container">
+    <div>
+      <header class="top-header-strip">
+        <h2>โปรดตรวจสอบข้อมูลอีกครั้ง</h2>
+        <!-- <div class="header-right-meta">
                     <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
                 </div> -->
-            </header>
-            <div class="content-card">
+      </header>
+      <div class="content-card">
+        <div class="table-scroll">
+          <table class="confirm-table">
+            <thead>
+              <tr>
+                <th class="col-code">รหัส</th>
+                <th class="col">ชื่อ</th>
+                <th class="col">ตำแหน่ง</th>
+                <th class="col">บริษัท</th>
+                <th class="col-date">Last Date</th>
+                <th class="col-date">Effective Date</th>
+                <th></th>
+              </tr>
+            </thead>
 
-                <div class="table-scroll">
+            <tbody>
+              @for (emp of data; track emp.empCode) {
+                <tr>
+                  <td>{{ emp.empCode }}</td>
+                  <td>{{ emp.name }}</td>
+                  <td>{{ emp.position }}</td>
+                  <td>{{ emp.company }}</td>
+                  <td class="col-date">
+                    <nz-date-picker
+                      nzFormat="dd/MM/yyyy"
+                      [(ngModel)]="emp.lastDate"
+                      class="form-input"
+                      [nzDisabledDate]="disableLastDate(emp)"
+                    >
+                    </nz-date-picker>
+                  </td>
 
-                    <table class="confirm-table">
-                        <thead>
-                            <tr>
-                                <th class="col-code">รหัส</th>
-                                <th class="col">ชื่อ</th>
-                                <th class="col">ตำแหน่ง</th>
-                                <th class="col">บริษัท</th>
-                                <th class="col-date">Last Date</th>
-                                <th class="col-date">Effective Date</th>
-                                <th></th>
-                            </tr>
-                        </thead>
+                  <td class="col-date">
+                    <nz-date-picker
+                      nzFormat="dd/MM/yyyy"
+                      [(ngModel)]="emp.effectiveDate"
+                      class="form-input"
+                      [nzDisabledDate]="disableEffectiveDate(emp)"
+                    >
+                    </nz-date-picker>
+                  </td>
 
-                        <tbody>
-
-                            @for (emp of data; track emp.empCode) {
-
-                            <tr>
-                                <td>{{emp.empCode}}</td>
-                                <td>{{emp.name}}</td>
-                                <td>{{emp.position}}</td>
-                                <td>{{emp.company}}</td>
-                                <td class="col-date">
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.lastDate" class="form-input"
-                                        [nzDisabledDate]="disableLastDate(emp)">
-                                    </nz-date-picker>
-                                </td>
-
-                                <td class="col-date">
-                                    <nz-date-picker nzFormat="dd/MM/yyyy" [(ngModel)]="emp.effectiveDate"
-                                        class="form-input" [nzDisabledDate]="disableEffectiveDate(emp)">
-                                    </nz-date-picker>
-                                </td>
-
-                                <td>
-                                    <button class="btn-delete" (click)="remove(emp.empCode)">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-
-                            </tr>
-
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-            </div>
-            <div class="form-actions-footer">
-
-                <div class="count">
-                    จำนวนพนักงาน {{data.length}} คน
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn-back-custom" (click)="close()">
-                        ยกเลิก
+                  <td>
+                    <button class="btn-delete" (click)="remove(emp.empCode)">
+                      <i class="fa-solid fa-trash"></i>
                     </button>
-
-                    <button class="btn-save-custom" (click)="submit()">
-                        ยืนยัน
-                    </button>
-                </div>
-
-            </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
+      </div>
+      <div class="form-actions-footer">
+        <div class="count">จำนวนพนักงาน {{ data.length }} คน</div>
+
+        <div class="btn-group">
+          <button class="btn-back-custom" (click)="close()">ยกเลิก</button>
+
+          <button class="btn-save-custom" (click)="submit()">ยืนยัน</button>
+        </div>
+      </div>
     </div>
+  </div>
+</div>

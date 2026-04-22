@@ -10,7 +10,8 @@
     "build:uat": "ng build --configuration uat --output-hashing=all --delete-output-path --verbose",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "e2e": "cypress run",
+    "e2e": "cypress run --headed",
+    "e2e:ci": "cypress run",
     "cypress:open": "cypress open"
   },
   "prettier": {

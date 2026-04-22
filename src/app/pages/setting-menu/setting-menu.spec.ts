@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Setting } from './setting';
+import { SettingMenu } from './setting-menu';
 
-describe('Setting', () => {
-  let component: Setting;
-  let fixture: ComponentFixture<Setting>;
+describe('SettingMenu', () => {
+  let component: SettingMenu;
+  let fixture: ComponentFixture<SettingMenu>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Setting]
-    })
-    .compileComponents();
+      imports: [SettingMenu],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Setting);
+    fixture = TestBed.createComponent(SettingMenu);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

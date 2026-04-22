@@ -8,9 +8,8 @@ describe('MenuAllForm', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MenuAllForm]
-    })
-    .compileComponents();
+      imports: [MenuAllForm],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MenuAllForm);
     component = fixture.componentInstance;

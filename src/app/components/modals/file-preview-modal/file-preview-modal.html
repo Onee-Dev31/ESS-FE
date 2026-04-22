@@ -1,71 +1,84 @@
 <div class="file-preview-modal-overlay">
-    <div class="preview-card">
-        <header class="modal-header">
-            <h3>รายการไฟล์แนบ</h3>
-            <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
-        </header>
+  <div class="preview-card">
+    <header class="modal-header">
+      <h3>รายการไฟล์แนบ</h3>
+      <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
+    </header>
 
-        <div class="modal-body">
-            <div class="file-list-panel">
-                <div *ngIf="files.length === 0" class="no-files">
-                    <i class="fas fa-file-excel text-muted"></i>
-                    <p>ไม่มีไฟล์แนบในรายการนี้</p>
-                </div>
-
-                <ul class="file-list" *ngIf="files.length > 0">
-                    <li *ngFor="let file of files" (click)="selectFile(file)" [class.active]="selectedFile === file">
-                        <div class="file-icon">
-                            <i class="fas fa-file-image"></i>
-                        </div>
-                        <div class="file-info">
-                            <span class="file-name">{{ file.fileName }}</span>
-                            <span class="file-date">วันที่: {{ file.date }}</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="preview-panel">
-                <div *ngIf="!selectedFile" class="empty-state">
-                    <p>เลือกไฟล์เพื่อดูตัวอย่าง</p>
-                </div>
-
-                <div *ngIf="selectedFile" class="preview-content">
-                    <div class="preview-header">
-                        <h4>{{ selectedFile.fileName }}</h4>
-                    </div>
-                    <div class="image-box">
-                        <ng-container [ngSwitch]="true">
-                            <!-- Image View -->
-                            <ng-container *ngSwitchCase="isImage(selectedFile)">
-                                <img *ngIf="!hasError" [src]="selectedFile.url" class="preview-image"
-                                    [alt]="selectedFile.fileName" (error)="onPreviewError()">
-                            </ng-container>
-
-                            <!-- PDF View -->
-                            <ng-container *ngSwitchCase="isPdf(selectedFile)">
-                                <embed [src]="getSafeUrl(selectedFile.url)" type="application/pdf" class="preview-pdf">
-                            </ng-container>
-
-                            <!-- Other Files -->
-                            <ng-container *ngSwitchDefault>
-                                <div class="mock-image">
-                                    <i class="fas fa-file-alt fa-3x"></i>
-                                    <p>{{ selectedFile.fileName }}</p>
-                                    <small class="text-sub">ไม่สามารถแสดงตัวอย่างไฟล์ประเภทนี้ได้</small>
-                                </div>
-                            </ng-container>
-                        </ng-container>
-
-                        <!-- Error Fallback -->
-                        <div class="mock-image error-fallback" *ngIf="hasError && selectedFile">
-                            <i class="fas fa-exclamation-triangle fa-6x text-warning mb-4"></i>
-                            <p>ไม่สามารถโหลดไฟล์ "{{ selectedFile.fileName }}" ได้</p>
-                            <small class="text-sub">ลิงก์ไฟล์อาจไม่ถูกต้องหรือไฟล์ถูกย้ายที่</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="modal-body">
+      <div class="file-list-panel">
+        <div *ngIf="files.length === 0" class="no-files">
+          <i class="fas fa-file-excel text-muted"></i>
+          <p>ไม่มีไฟล์แนบในรายการนี้</p>
         </div>
+
+        <ul class="file-list" *ngIf="files.length > 0">
+          <li
+            *ngFor="let file of files"
+            (click)="selectFile(file)"
+            [class.active]="selectedFile === file"
+          >
+            <div class="file-icon">
+              <i class="fas fa-file-image"></i>
+            </div>
+            <div class="file-info">
+              <span class="file-name">{{ file.fileName }}</span>
+              <span class="file-date">วันที่: {{ file.date }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="preview-panel">
+        <div *ngIf="!selectedFile" class="empty-state">
+          <p>เลือกไฟล์เพื่อดูตัวอย่าง</p>
+        </div>
+
+        <div *ngIf="selectedFile" class="preview-content">
+          <div class="preview-header">
+            <h4>{{ selectedFile.fileName }}</h4>
+          </div>
+          <div class="image-box">
+            <ng-container [ngSwitch]="true">
+              <!-- Image View -->
+              <ng-container *ngSwitchCase="isImage(selectedFile)">
+                <img
+                  *ngIf="!hasError"
+                  [src]="selectedFile.url"
+                  class="preview-image"
+                  [alt]="selectedFile.fileName"
+                  (error)="onPreviewError()"
+                />
+              </ng-container>
+
+              <!-- PDF View -->
+              <ng-container *ngSwitchCase="isPdf(selectedFile)">
+                <embed
+                  [src]="getSafeUrl(selectedFile.url)"
+                  type="application/pdf"
+                  class="preview-pdf"
+                />
+              </ng-container>
+
+              <!-- Other Files -->
+              <ng-container *ngSwitchDefault>
+                <div class="mock-image">
+                  <i class="fas fa-file-alt fa-3x"></i>
+                  <p>{{ selectedFile.fileName }}</p>
+                  <small class="text-sub">ไม่สามารถแสดงตัวอย่างไฟล์ประเภทนี้ได้</small>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <!-- Error Fallback -->
+            <div class="mock-image error-fallback" *ngIf="hasError && selectedFile">
+              <i class="fas fa-exclamation-triangle fa-6x text-warning mb-4"></i>
+              <p>ไม่สามารถโหลดไฟล์ "{{ selectedFile.fileName }}" ได้</p>
+              <small class="text-sub">ลิงก์ไฟล์อาจไม่ถูกต้องหรือไฟล์ถูกย้ายที่</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

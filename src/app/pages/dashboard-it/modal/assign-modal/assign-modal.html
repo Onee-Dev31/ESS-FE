@@ -1,117 +1,127 @@
 <div class="modal-overlay assign">
-    <div class="modal-container">
+  <div class="modal-container">
+    <header class="top-header-strip">
+      <h2>
+        Assign Ticket
+        <span class="amh-count" *ngIf="selectedAssigneeEmpCodes.length > 0">
+          {{ selectedAssigneeEmpCodes.length }} selected
+        </span>
+      </h2>
+    </header>
 
-        <header class="top-header-strip">
-            <h2>Assign Ticket
-                <span class="amh-count" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                    {{ selectedAssigneeEmpCodes.length }} selected
-                </span>
-            </h2>
-        </header>
-
-        <div class="content-card">
-            <div class="select-tag">
-                <div>
-                    <p>เลือกประเภทงาน<span class="required">*</span></p>
-                </div>
-
-                <div class="tag-group">
-
-                    <label class="tag">
-                        <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag">
-                        <span>แจ้งปัญหา</span>
-                    </label>
-
-                    <label class="tag">
-                        <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag">
-                        <span>แจ้งซ่อม</span>
-                    </label>
-
-                    <label class="tag">
-                        <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag">
-                        <span>ขอใช้บริการ</span>
-                    </label>
-
-                </div>
-            </div>
-            <div class="form-field search">
-                <input nz-input placeholder="ค้นหาชื่อคน" [(ngModel)]="assignSearchKeyword" name="assign"
-                    class="form-input" />
-            </div>
-
-            <div class="assign-modal-body">
-
-                <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
-                    <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
-                        <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
-                            (error)="onImgError($event)" />
-
-                        <span>{{ emp.id }}</span>
-
-                        <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">
-                            close
-                        </span>
-                    </div>
-                </div>
-
-                <div class="assign-list-container">
-
-                    <div class="assign-group" *ngFor="let g of filteredAssigneeGroups">
-
-                        <div class="assign-group-header">
-                            <div class="assign-group-label">{{ g.name }}</div>
-
-                            <button class="grp-toggle-btn" (click)="toggleGroup(g)">
-                                {{ isGroupSelected(g) ? 'Unselect All' : 'Select All' }}
-                            </button>
-                        </div>
-
-                        <div class="assign-item" *ngFor="let emp of g.members" [class.selected]="isSelected(emp.id)"
-                            (click)="toggleAssignee(emp)">
-
-                            <div class="assign-chk">
-                                <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
-                                <span class="material-symbols-outlined"
-                                    *ngIf="!isSelected(emp.id)">check_box_outline_blank</span>
-                            </div>
-
-                            <div class="assign-avatar">
-                                <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
-                                    loading="lazy" (error)="onImgError($event)"
-                                    (click)="openImage(emp.id); $event.stopPropagation()" />
-                            </div>
-
-                            <div class="assign-info">
-                                <div class="assign-name">{{ emp.name }}</div>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="no-results" *ngIf="filteredAssigneeGroups.length === 0">
-                        <span class="material-symbols-outlined">person_off</span>
-                        <div class="msg">ไม่พบรายชื่อพนักงาน</div>
-                    </div>
-
-                </div>
-
-                <div class="form-actions-footer">
-                    <button type="button" class="btn-back-custom" (click)="close()">
-                        <i class="fas fa-times"></i> ยกเลิก
-                    </button>
-
-                    <button nz-button class="btn-save-custom"
-                        [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null" (click)="save()">
-                        <i class="fas fa-paper-plane"></i>
-                        {{ selectedAssigneeEmpCodes.length > 0
-                        ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
-                        : 'Assign Ticket' }}
-
-                    </button>
-                </div>
-
-            </div>
+    <div class="content-card">
+      <div class="select-tag">
+        <div>
+          <p>เลือกประเภทงาน<span class="required">*</span></p>
         </div>
+
+        <div class="tag-group">
+          <label class="tag">
+            <input type="radio" name="tag" [value]="2" [(ngModel)]="selectedTag" />
+            <span>แจ้งปัญหา</span>
+          </label>
+
+          <label class="tag">
+            <input type="radio" name="tag" [value]="1" [(ngModel)]="selectedTag" />
+            <span>แจ้งซ่อม</span>
+          </label>
+
+          <label class="tag">
+            <input type="radio" name="tag" [value]="3" [(ngModel)]="selectedTag" />
+            <span>ขอใช้บริการ</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-field search">
+        <input
+          nz-input
+          placeholder="ค้นหาชื่อคน"
+          [(ngModel)]="assignSearchKeyword"
+          name="assign"
+          class="form-input"
+        />
+      </div>
+
+      <div class="assign-modal-body">
+        <div class="selected-chips" *ngIf="selectedAssigneeEmpCodes.length > 0">
+          <div class="chip" *ngFor="let emp of selectedAssigneeEmpCodes">
+            <img
+              [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
+              (error)="onImgError($event)"
+            />
+
+            <span>{{ emp.id }}</span>
+
+            <span class="material-symbols-outlined close-ic" (click)="removeAssignee(emp.id)">
+              close
+            </span>
+          </div>
+        </div>
+
+        <div class="assign-list-container">
+          <div class="assign-group" *ngFor="let g of filteredAssigneeGroups">
+            <div class="assign-group-header">
+              <div class="assign-group-label">{{ g.name }}</div>
+
+              <button class="grp-toggle-btn" (click)="toggleGroup(g)">
+                {{ isGroupSelected(g) ? 'Unselect All' : 'Select All' }}
+              </button>
+            </div>
+
+            <div
+              class="assign-item"
+              *ngFor="let emp of g.members"
+              [class.selected]="isSelected(emp.id)"
+              (click)="toggleAssignee(emp)"
+            >
+              <div class="assign-chk">
+                <span class="material-symbols-outlined" *ngIf="isSelected(emp.id)">check_box</span>
+                <span class="material-symbols-outlined" *ngIf="!isSelected(emp.id)"
+                  >check_box_outline_blank</span
+                >
+              </div>
+
+              <div class="assign-avatar">
+                <img
+                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + emp.id + '.jpg'"
+                  loading="lazy"
+                  (error)="onImgError($event)"
+                  (click)="openImage(emp.id); $event.stopPropagation()"
+                />
+              </div>
+
+              <div class="assign-info">
+                <div class="assign-name">{{ emp.name }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="no-results" *ngIf="filteredAssigneeGroups.length === 0">
+            <span class="material-symbols-outlined">person_off</span>
+            <div class="msg">ไม่พบรายชื่อพนักงาน</div>
+          </div>
+        </div>
+
+        <div class="form-actions-footer">
+          <button type="button" class="btn-back-custom" (click)="close()">
+            <i class="fas fa-times"></i> ยกเลิก
+          </button>
+
+          <button
+            nz-button
+            class="btn-save-custom"
+            [disabled]="selectedAssigneeEmpCodes.length === 0 || selectedTag === null"
+            (click)="save()"
+          >
+            <i class="fas fa-paper-plane"></i>
+            {{
+              selectedAssigneeEmpCodes.length > 0
+                ? 'Assign ' + selectedAssigneeEmpCodes.length + ' People'
+                : 'Assign Ticket'
+            }}
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

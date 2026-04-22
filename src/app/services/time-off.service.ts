@@ -8,13 +8,13 @@ import { BaseRequestService } from './base-request.service';
 export type { TimeOffRequest };
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class TimeOffService extends BaseRequestService<TimeOffRequest> {
-    protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_TIMEOFF_DATA;
+  protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_TIMEOFF_DATA;
 
-    constructor() {
-        super();
-        this.initializeData(() => TimeOffMock.generateRequestsByRole(20, 'Admin'));
-    }
+  constructor() {
+    super();
+    this.initializeData(() => TimeOffMock.generateRequestsByRole(20, 'Admin'));
+  }
 }

@@ -13,22 +13,33 @@ import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { StatusUtil } from '../../utils/status.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
-import { createListingState, createListingComputeds, clearListingFilters, TableSortHelper } from '../../utils/listing.util';
+import {
+  createListingState,
+  createListingComputeds,
+  clearListingFilters,
+  TableSortHelper,
+} from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import {
-  createAngularTable,
-  getCoreRowModel,
-  SortingState,
-} from '@tanstack/angular-table';
+import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
 
 /** หน้าแสดงรายการคำขอลา (Time Off Request List) พร้อมระบบกรองและค้นหา */
 @Component({
   selector: 'app-timeoff',
   standalone: true,
-  imports: [CommonModule, FormsModule, TimeOffForm, FilePreviewModalComponent, StatusLabelPipe, PaginationComponent, SkeletonComponent, EmptyStateComponent, PageHeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TimeOffForm,
+    FilePreviewModalComponent,
+    StatusLabelPipe,
+    PaginationComponent,
+    SkeletonComponent,
+    EmptyStateComponent,
+    PageHeaderComponent,
+  ],
   templateUrl: './timeoff.html',
   styleUrl: './timeoff.scss',
 })
@@ -60,8 +71,9 @@ export class TimeoffComponent implements OnInit {
     const end = this.listing.filterEndDate();
 
     if (search || status || start || end) {
-      filtered = filtered.filter(req => {
-        const matchSearch = !search ||
+      filtered = filtered.filter((req) => {
+        const matchSearch =
+          !search ||
           req.id.toLowerCase().includes(search) ||
           req.reason.toLowerCase().includes(search) ||
           req.leaveType.toLowerCase().includes(search);
@@ -120,7 +132,8 @@ export class TimeoffComponent implements OnInit {
     ],
     state: { sorting: this.sorting() },
     onSortingChange: (updaterOrValue) => {
-      const next = typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
+      const next =
+        typeof updaterOrValue === 'function' ? updaterOrValue(this.sorting()) : updaterOrValue;
       this.sorting.set(next);
     },
     getCoreRowModel: getCoreRowModel(),
@@ -147,7 +160,7 @@ export class TimeoffComponent implements OnInit {
       error: (error) => {
         this.loadingService.stop('timeoff-list');
         this.errorService.handle(error, { component: 'TimeOff', action: 'load-requests' });
-      }
+      },
     });
   }
 
@@ -157,11 +170,11 @@ export class TimeoffComponent implements OnInit {
       title: 'ยืนยันการลบ',
       message: `คุณต้องการลบรายการลา "${request.leaveType}" รหัส ${request.id} หรอไม่?`,
       type: 'danger',
-      confirmText: 'ลบรายการ'
+      confirmText: 'ลบรายการ',
     });
 
     if (confirmed) {
-      this.requests.set(this.requests().filter(r => r.id !== request.id));
+      this.requests.set(this.requests().filter((r) => r.id !== request.id));
       this.toastService.success('ลบรายการสำเร็จ');
     }
   }
@@ -179,7 +192,6 @@ export class TimeoffComponent implements OnInit {
   openForm(status: string = 'NEW') {
     this.selectedRequestStatus.set(status);
     this.isFormOpen.set(true);
-
   }
 
   closeForm() {
@@ -189,9 +201,9 @@ export class TimeoffComponent implements OnInit {
 
   openPreview(attachments: { name: string }[]) {
     if (!attachments || attachments.length === 0) return;
-    const previewItems = attachments.map(att => ({
+    const previewItems = attachments.map((att) => ({
       fileName: att.name || 'Attachment',
-      date: ''
+      date: '',
     }));
     this.previewFiles.set(previewItems);
     this.isPreviewModalOpen.set(true);
@@ -219,11 +231,11 @@ export class TimeoffComponent implements OnInit {
 
   getLeaveTypeIcon(leaveType: string): string {
     const iconMap: { [key: string]: string } = {
-      'ลาพักร้อน': 'fas fa-plane-departure',
-      'ลากิจ': 'fas fa-briefcase',
-      'ลาป่วย': 'fas fa-stethoscope',
-      'ลาทำหมัน': 'fas fa-user-md',
-      'ลาเพื่อจัดการงานศพ': 'fas fa-ribbon'
+      ลาพักร้อน: 'fas fa-plane-departure',
+      ลากิจ: 'fas fa-briefcase',
+      ลาป่วย: 'fas fa-stethoscope',
+      ลาทำหมัน: 'fas fa-user-md',
+      ลาเพื่อจัดการงานศพ: 'fas fa-ribbon',
     };
     return iconMap[leaveType] || 'fas fa-calendar';
   }
@@ -232,8 +244,8 @@ export class TimeoffComponent implements OnInit {
     if (!period) return '';
     const periodMap: { [key: string]: string } = {
       'full-day': 'เต็มวัน',
-      'morning': 'ครึ่งวันเช้า',
-      'afternoon': 'ครึ่งวันบ่าย'
+      morning: 'ครึ่งวันเช้า',
+      afternoon: 'ครึ่งวันบ่าย',
     };
     return periodMap[period] || period;
   }

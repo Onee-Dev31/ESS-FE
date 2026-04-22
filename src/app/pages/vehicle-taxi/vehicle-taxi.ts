@@ -14,7 +14,11 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { createListingState, createListingComputeds_v2, clearListingFilters } from '../../utils/listing.util';
+import {
+  createListingState,
+  createListingComputeds_v2,
+  clearListingFilters,
+} from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import { AuthService } from '../../services/auth.service';
 
@@ -104,8 +108,8 @@ export class VehicleTaxiComponent implements OnInit {
       empCode: this.authService.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
-      dateFrom: start ? dayjs(start).format("YYYY-MM-DD") : '',
-      dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
+      dateFrom: start ? dayjs(start).format('YYYY-MM-DD') : '',
+      dateTo: end ? dayjs(end).format('YYYY-MM-DD') : '',
     };
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
@@ -119,7 +123,7 @@ export class VehicleTaxiComponent implements OnInit {
       error: (error: any) => {
         this.loadingService.stop('taxi-list');
         this.errorService.handle(error, { component: 'VehicleTaxi', action: 'load-data' });
-      }
+      },
     });
   }
 
@@ -139,13 +143,13 @@ export class VehicleTaxiComponent implements OnInit {
           return {
             date: d.work_date ?? '',
             description: d.description ?? '',
-            destination: fromName && toName ? `${fromName} → ${toName}` : (fromName || toName),
+            destination: fromName && toName ? `${fromName} → ${toName}` : fromName || toName,
             distance: 0,
             amount: d.rate_amount ?? 0,
             attachedFile: attachments.length > 0 ? (attachments[0].file_url ?? null) : null,
           };
         }),
-        ...item
+        ...item,
       } as TaxiRequest;
     });
   }
@@ -155,7 +159,7 @@ export class VehicleTaxiComponent implements OnInit {
       title: 'ยืนยันการลบ',
       message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
       type: 'danger',
-      confirmText: 'ลบรายการ'
+      confirmText: 'ลบรายการ',
     });
 
     if (confirmed) {
@@ -175,9 +179,9 @@ export class VehicleTaxiComponent implements OnInit {
 
     if (!this.selectedRequestId) return;
 
-    const result = this.allRequests().find(item => item.id === this.selectedRequestId);
+    const result = this.allRequests().find((item) => item.id === this.selectedRequestId);
 
-    this.selectedRequest = result
+    this.selectedRequest = result;
   }
 
   closeModal() {
@@ -187,7 +191,7 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   openPreviewModalForRequest(requestId: string) {
-    const request = this.allRequests().find(r => r.id === requestId);
+    const request = this.allRequests().find((r) => r.id === requestId);
     if (request?.items) {
       const files = request.items
         .filter((item: any) => item.attachedFile)
@@ -210,7 +214,7 @@ export class VehicleTaxiComponent implements OnInit {
   clearFilters() {
     clearListingFilters(this.listing);
     this.dateRange = null;
-    this.loadData()
+    this.loadData();
   }
 
   trackByRowId(index: number, req: TaxiRequest): string {

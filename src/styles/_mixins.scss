@@ -5,522 +5,530 @@
 // RESPONSIVE MIXINS
 // ============================================
 @mixin mobile {
-    @media (max-width: 575.98px) {
-        @content;
-    }
+  @media (max-width: 575.98px) {
+    @content;
+  }
 }
 
 @mixin tablet {
-    @media (max-width: 1024px) {
-        @content;
-    }
+  @media (max-width: 1024px) {
+    @content;
+  }
 }
 
 @mixin large-tablet {
-    @media (max-width: 1600px) {
-        @content;
-    }
+  @media (max-width: 1600px) {
+    @content;
+  }
 }
 
 @mixin desktop {
-    @media (min-width: 1025px) {
-        @content;
-    }
+  @media (min-width: 1025px) {
+    @content;
+  }
 }
 
 // 0. Base Components
 @mixin close-btn-style {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: $text-sub;
-    cursor: pointer;
-    transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: $text-sub;
+  cursor: pointer;
+  transition: all 0.2s;
 
-    &:hover {
-        background: rgba(0, 0, 0, 0.05);
-        color: $text;
-    }
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: $text;
+  }
 }
 
 // 1. Toolbar / Filter Bar
 @mixin toolbar-container {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-toolbar);
+
+  @include tablet {
+    padding: 20px 16px;
+    border-radius: 12px;
+    gap: 16px;
+  }
+
+  .toolbar-top-row {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid var(--border-toolbar);
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-toolbar);
 
     @include tablet {
-        padding: 20px 16px;
-        border-radius: 12px;
-        gap: 16px;
+      width: 100%;
+      padding-bottom: 12px;
     }
+  }
 
-    .toolbar-top-row {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 12px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border-toolbar);
+  .toolbar-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
 
-        @include tablet {
-            width: 100%;
-            padding-bottom: 12px;
-        }
+    @include tablet {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
     }
+  }
 
-    .toolbar-bottom-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        gap: 24px;
-        flex-wrap: wrap;
+  .right-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    flex: 1;
 
-        @include tablet {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 16px;
-        }
+    @include tablet {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 12px;
+      align-items: flex-end;
     }
-
-    .right-filters {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        flex: 1;
-
-        @include tablet {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px 12px;
-            align-items: flex-end;
-        }
-    }
+  }
 }
 
 // 2. Modern Table
 @mixin modern-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: var(--bg-card);
-    border-radius: 12px;
-    overflow: hidden;
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 
-    thead {
-        tr {
-            background: var(--bg-table-head);
-        }
-
-        th {
-            padding: 16px 24px;
-            font-size: $font-size-hint;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-table-head);
-            border-bottom: 1px solid var(--border-table-head);
-            font-weight: 600;
-            white-space: nowrap;
-        }
+  thead {
+    tr {
+      background: var(--bg-table-head);
     }
 
-    tbody {
-        tr {
-            transition: background 0.2s;
-
-            &:hover td {
-                background: var(--bg-table-head);
-            }
-        }
-
-        td {
-            padding: 20px 24px;
-            font-size: $font-size-label;
-            color: var(--text-header);
-            border-bottom: 1px solid var(--border-toolbar);
-            vertical-align: middle;
-        }
-
-        // Remove border from last row
-        tr:last-child td {
-            border-bottom: none;
-        }
+    th {
+      padding: 16px 24px;
+      font-size: $font-size-hint;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-table-head);
+      border-bottom: 1px solid var(--border-table-head);
+      font-weight: 600;
+      white-space: nowrap;
     }
+  }
+
+  tbody {
+    tr {
+      transition: background 0.2s;
+
+      &:hover td {
+        background: var(--bg-table-head);
+      }
+    }
+
+    td {
+      padding: 20px 24px;
+      font-size: $font-size-label;
+      color: var(--text-header);
+      border-bottom: 1px solid var(--border-toolbar);
+      vertical-align: middle;
+    }
+
+    // Remove border from last row
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
 }
 
 // 3. Buttons
 @mixin btn-base {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 24px;
-    height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 24px;
+  height: 44px;
+  font-size: $font-size-label;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  @include tablet {
     font-size: $font-size-label;
-    font-weight: 600;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
+    height: 42px;
+    padding: 0 12px;
+  }
 
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    &:active {
-        transform: translateY(1px);
-    }
-
-    @include tablet {
-        font-size: $font-size-label;
-        height: 42px;
-        padding: 0 12px;
-    }
-
-    @include mobile {
-        font-size: $font-size-hint;
-        height: 38px;
-        padding: 0 8px;
-    }
+  @include mobile {
+    font-size: $font-size-hint;
+    height: 38px;
+    padding: 0 8px;
+  }
 }
 
 @mixin btn-primary {
-    @include btn-base;
+  @include btn-base;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
+  color: #ffffff;
+  box-shadow:
+    0 4px 6px -1px rgba(37, 99, 235, 0.1),
+    0 2px 4px -1px rgba(37, 99, 235, 0.06);
+
+  &:hover {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1), 0 2px 4px -1px rgba(37, 99, 235, 0.06);
+    box-shadow:
+      0 6px 10px -2px rgba(37, 99, 235, 0.2),
+      0 4px 6px -2px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+  }
 
-    &:hover {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
-        box-shadow: 0 6px 10px -2px rgba(37, 99, 235, 0.2), 0 4px 6px -2px rgba(37, 99, 235, 0.1);
-        transform: translateY(-1px);
-    }
+  &:active {
+    transform: translateY(0);
+  }
 
-    &:active {
-        transform: translateY(0);
-    }
-
-    &:disabled {
-        background: #cbd5e1; // สีเทาเมื่อ disable
-        color: #94a3b8;
-        box-shadow: none;
-        cursor: not-allowed;
-        transform: none;
-        opacity: 0.7;
-    }
+  &:disabled {
+    background: #cbd5e1; // สีเทาเมื่อ disable
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+  }
 }
 
 @mixin btn-secondary {
-    @include btn-base;
-    background: var(--bg-card);
-    color: var(--text-sub);
-    border: 1px solid var(--border-table-head);
+  @include btn-base;
+  background: var(--bg-card);
+  color: var(--text-sub);
+  border: 1px solid var(--border-table-head);
 
-    &:hover {
-        background: var(--bg-table-head);
-        border-color: $primary;
-        color: $primary;
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: var(--bg-table-head);
+    border-color: $primary;
+    color: $primary;
+    transform: translateY(-1px);
+  }
 }
 
 @mixin btn-outline {
-    @include btn-base;
-    background: transparent;
-    color: $primary;
-    border: 1.5px solid $primary;
-    box-shadow: none;
+  @include btn-base;
+  background: transparent;
+  color: $primary;
+  border: 1.5px solid $primary;
+  box-shadow: none;
 
-    &:hover {
-        background: rgba(59, 130, 246, 0.05);
-        border-color: var(--primary);
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
 }
 
 @mixin icon-btn-sky {
-    background: #e0f2fe;
-    color: #0284c7;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
+  background: #e0f2fe;
+  color: #0284c7;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
 
-    &:hover {
-        background: #bae6fd;
-        transform: scale(1.05);
-    }
+  &:hover {
+    background: #bae6fd;
+    transform: scale(1.05);
+  }
 }
 
 // 4. Inputs
 @mixin input-field {
-    height: 44px;
-    padding: 8px 16px;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--bg-table-head);
-    border: 1.5px solid var(--border-table-head);
-    border-radius: 10px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none;
-    min-width: 0; // Prevent overflow in flex/grid containers
+  height: 44px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg-table-head);
+  border: 1.5px solid var(--border-table-head);
+  border-radius: 10px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+  min-width: 0; // Prevent overflow in flex/grid containers
 
-    &:hover {
-        border-color: var(--text-muted);
-    }
+  &:hover {
+    border-color: var(--text-muted);
+  }
 
-    &:focus {
-        outline: none;
-        background: var(--bg-card);
-        border-color: $primary;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+  &:focus {
+    outline: none;
+    background: var(--bg-card);
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
 
-    &::placeholder {
-        color: var(--text-muted);
-    }
+  &::placeholder {
+    color: var(--text-muted);
+  }
 
-    @include tablet {
-        font-size: $font-size-label;
-        height: 42px;
-    }
+  @include tablet {
+    font-size: $font-size-label;
+    height: 42px;
+  }
 
-    @include mobile {
-        font-size: $font-size-hint;
-        height: 38px;
-    }
+  @include mobile {
+    font-size: $font-size-hint;
+    height: 38px;
+  }
 }
 
 @mixin select-dropdown {
-    @include input-field;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 36px;
+  @include input-field;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
 }
 
 // 5. Mobile Cards
 @mixin mobile-cards-view {
-    display: none;
+  display: none;
 
-    @include large-tablet {
-        display: flex !important;
-        flex-direction: column;
-        gap: 20px;
-        padding: 10px 0;
+  @include large-tablet {
+    display: flex !important;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 0;
+  }
+
+  .mobile-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.05),
+      0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: none;
+    overflow: hidden;
+
+    .card-header {
+      background: var(--bg-card);
+      padding: 20px;
+      border-bottom: 1px solid var(--border-toolbar);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .header-content {
+        .ticket-no {
+          font-weight: 700;
+          color: $primary;
+          font-size: 1.1rem;
+        }
+      }
+
+      .card-actions-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
     }
 
-    .mobile-card {
-        background: var(--bg-card);
-        border-radius: 20px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-        border: none;
-        overflow: hidden;
+    .card-body {
+      padding: 20px;
 
-        .card-header {
-            background: var(--bg-card);
-            padding: 20px;
-            border-bottom: 1px solid var(--border-toolbar);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        align-items: flex-start;
 
-            .header-content {
-                .ticket-no {
-                    font-weight: 700;
-                    color: $primary;
-                    font-size: 1.1rem;
-                }
-            }
-
-            .card-actions-top {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+        .label {
+          color: var(--text-muted);
+          font-size: 0.85rem;
+          width: 40%;
         }
 
-        .card-body {
-            padding: 20px;
-
-            .info-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 16px;
-                align-items: flex-start;
-
-                .label {
-                    color: var(--text-muted);
-                    font-size: 0.85rem;
-                    width: 40%;
-                }
-
-                .value {
-                    font-weight: 500;
-                    color: var(--text-header);
-                    font-size: 1rem;
-                    width: 60%;
-                    text-align: right;
-                }
-            }
+        .value {
+          font-weight: 500;
+          color: var(--text-header);
+          font-size: 1rem;
+          width: 60%;
+          text-align: right;
         }
+      }
     }
+  }
 }
 
 // 6. Modal Overlay
 @mixin modal-overlay-styles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+
+  @include mobile {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .modal-container {
+    background: var(--bg-card);
+    width: 95%;
+    max-width: 1600px;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    padding: 20px;
+    flex-direction: column;
     overflow: hidden;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
+    position: relative;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     @include mobile {
-        padding: 0;
-        align-items: flex-start;
+      width: 100%;
+      height: 100dvh;
+      max-height: 100dvh;
+      border-radius: 0;
+      margin: 0;
     }
 
-    .modal-container {
-        background: var(--bg-card);
-        width: 95%;
-        max-width: 1600px;
-        max-height: 90vh;
-        border-radius: 12px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
-        @include mobile {
-            width: 100%;
-            height: 100dvh;
-            max-height: 100dvh;
-            border-radius: 0;
-            margin: 0;
-        }
-
-        &>* {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            width: 100%;
-            min-height: 0;
-        }
+    & > * {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      min-height: 0;
     }
+  }
 }
 
 @keyframes popIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 // 7. Content Card
 @mixin content-card {
-    background: var(--bg-card);
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    padding: 24px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px;
 
-    @include tablet {
-        padding: 16px;
-        border-radius: 12px;
-    }
+  @include tablet {
+    padding: 16px;
+    border-radius: 12px;
+  }
 }
 
 @mixin card-header-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-header);
-    position: relative;
-    padding-left: 16px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-header);
+  position: relative;
+  padding-left: 16px;
 
-    &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 18px;
-        background: $primary;
-        border-radius: 2px;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 18px;
+    background: $primary;
+    border-radius: 2px;
+  }
 
-    @include tablet {
-        font-size: $font-size-body;
-    }
+  @include tablet {
+    font-size: $font-size-body;
+  }
 
-    @include mobile {
-        font-size: $font-size-label;
-    }
+  @include mobile {
+    font-size: $font-size-label;
+  }
 }
 
 // 8. Ghost Icon Button
 @mixin icon-btn-ghost($color-theme) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    border: 1px solid transparent;
-    background: rgba($color-theme, 0.1); // Visible by default
-    color: $color-theme; // Visible by default
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  border: 1px solid transparent;
+  background: rgba($color-theme, 0.1); // Visible by default
+  color: $color-theme; // Visible by default
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 
-    &:hover {
-        background: rgba($color-theme, 0.2); // Darker on hover
-        // color: $color-theme; // Already set
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: rgba($color-theme, 0.2); // Darker on hover
+    // color: $color-theme; // Already set
+    transform: translateY(-1px);
+  }
 
-    &:active {
-        transform: scale(0.95);
-    }
+  &:active {
+    transform: scale(0.95);
+  }
 
-    i {
-        font-size: 1rem;
-        pointer-events: none;
-    }
+  i {
+    font-size: 1rem;
+    pointer-events: none;
+  }
 }

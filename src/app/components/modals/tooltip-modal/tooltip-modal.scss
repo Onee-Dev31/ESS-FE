@@ -9,216 +9,216 @@ $shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
 // Responsive Mixins
 @mixin mobile {
-    @media (max-width: 575.98px) {
-        @content;
-    }
+  @media (max-width: 575.98px) {
+    @content;
+  }
 }
 
 // UI Mixins
 // No local modal-overlay-styles mixin here, using global one.
 
 @mixin close-btn-style {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: $text;
-    cursor: pointer;
-    transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: $text;
+  cursor: pointer;
+  transition: all 0.2s;
 
-    &:hover {
-        background: rgba(0, 0, 0, 0.05);
-    }
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
 }
 
 .tooltip-overlay {
-    @include modal-overlay-styles;
+  @include modal-overlay-styles;
 }
 
 .modal-overlay {
-    z-index: 1000;
+  z-index: 1000;
+
+  @media (max-width: 767px) {
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .modal-container.info-modal {
+    width: 90%;
+    max-width: 350px !important;
+    min-height: auto;
+    height: auto;
+    background: var(--bg-card);
+    border-radius: $radius;
+    box-shadow: $shadow;
 
     @media (max-width: 767px) {
-        align-items: center !important;
-        justify-content: center !important;
+      width: 90% !important;
+      height: auto !important;
+      max-height: 80vh !important;
+      border-radius: $radius !important;
     }
 
-    .modal-container.info-modal {
-        width: 90%;
-        max-width: 350px !important;
-        min-height: auto;
-        height: auto;
-        background: var(--bg-card);
-        border-radius: $radius;
-        box-shadow: $shadow;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
 
-        @media (max-width: 767px) {
-            width: 90% !important;
-            height: auto !important;
-            max-height: 80vh !important;
-            border-radius: $radius !important;
-        }
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-table-head);
+      display: flex;
+      flex-direction: row !important;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to right, var(--bg-card), #f0f9ff);
+      width: 100%;
+      min-height: auto !important;
 
-        overflow: hidden;
-        animation: slideUp 0.3s ease-out;
+      h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-header);
+        margin: 0;
+        letter-spacing: -0.5px;
+      }
 
-        .modal-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border-table-head);
-            display: flex;
-            flex-direction: row !important;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(to right, var(--bg-card), #f0f9ff);
-            width: 100%;
-            min-height: auto !important;
-
-            h3 {
-                font-size: 18px;
-                font-weight: 700;
-                color: var(--text-header);
-                margin: 0;
-                letter-spacing: -0.5px;
-            }
-
-            .close-btn {
-                @include close-btn-style;
-                margin-left: 10px;
-            }
-        }
-
-        .modal-body {
-            padding: 24px;
-            color: var(--text-header);
-            font-size: 15px;
-            line-height: 1.5;
-            max-height: 60vh;
-            overflow-y: auto;
-
-            p {
-                margin-bottom: 0.5em;
-
-                &:last-child {
-                    margin-bottom: 0;
-                }
-            }
-
-            ::ng-deep {
-                strong {
-                    display: block;
-                    text-align: center;
-                    margin-bottom: 8px;
-                    color: var(--text-header);
-                }
-
-                .list-unstyled {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                }
-
-                .text-center {
-                    text-align: center !important;
-                }
-
-                .text-left {
-                    text-align: left !important;
-                }
-
-                .d-flex {
-                    display: flex;
-                }
-
-                .align-items-start {
-                    align-items: flex-start;
-                }
-
-                .mt-2 {
-                    margin-top: 0.5rem;
-                }
-
-                .mb-2 {
-                    margin-bottom: 0.5rem;
-                }
-
-                .mb-3 {
-                    margin-bottom: 1rem;
-                }
-
-                .me-2 {
-                    margin-right: 0.5rem;
-                }
-
-                .mx-auto {
-                    margin-left: auto;
-                    margin-right: auto;
-                }
-
-                .fa-2x {
-                    font-size: 2em;
-                }
-
-                .text-blue-500 {
-                    color: var(--primary);
-                }
-
-                .text-yellow-600 {
-                    color: #ca8a04;
-                }
-
-                .text-pink-500 {
-                    color: #ec4899;
-                }
-
-                .text-orange-500 {
-                    color: var(--warning);
-                }
-
-                .text-purple-500 {
-                    color: #a855f7;
-                }
-
-                .text-gray-600 {
-                    color: var(--text-sub);
-                }
-
-                .text-green-500 {
-                    color: var(--success);
-                }
-
-                .tooltip-condition-item {
-                    display: flex;
-                    align-items: flex-start;
-                    margin-bottom: 6px;
-                    text-align: left;
-
-                    i {
-                        flex-shrink: 0;
-                        margin-top: 4px;
-                        margin-right: 8px;
-                    }
-
-                    span {
-                        flex: 1;
-                    }
-                }
-            }
-        }
+      .close-btn {
+        @include close-btn-style;
+        margin-left: 10px;
+      }
     }
+
+    .modal-body {
+      padding: 24px;
+      color: var(--text-header);
+      font-size: 15px;
+      line-height: 1.5;
+      max-height: 60vh;
+      overflow-y: auto;
+
+      p {
+        margin-bottom: 0.5em;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      ::ng-deep {
+        strong {
+          display: block;
+          text-align: center;
+          margin-bottom: 8px;
+          color: var(--text-header);
+        }
+
+        .list-unstyled {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .text-center {
+          text-align: center !important;
+        }
+
+        .text-left {
+          text-align: left !important;
+        }
+
+        .d-flex {
+          display: flex;
+        }
+
+        .align-items-start {
+          align-items: flex-start;
+        }
+
+        .mt-2 {
+          margin-top: 0.5rem;
+        }
+
+        .mb-2 {
+          margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+          margin-bottom: 1rem;
+        }
+
+        .me-2 {
+          margin-right: 0.5rem;
+        }
+
+        .mx-auto {
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .fa-2x {
+          font-size: 2em;
+        }
+
+        .text-blue-500 {
+          color: var(--primary);
+        }
+
+        .text-yellow-600 {
+          color: #ca8a04;
+        }
+
+        .text-pink-500 {
+          color: #ec4899;
+        }
+
+        .text-orange-500 {
+          color: var(--warning);
+        }
+
+        .text-purple-500 {
+          color: #a855f7;
+        }
+
+        .text-gray-600 {
+          color: var(--text-sub);
+        }
+
+        .text-green-500 {
+          color: var(--success);
+        }
+
+        .tooltip-condition-item {
+          display: flex;
+          align-items: flex-start;
+          margin-bottom: 6px;
+          text-align: left;
+
+          i {
+            flex-shrink: 0;
+            margin-top: 4px;
+            margin-right: 8px;
+          }
+
+          span {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
