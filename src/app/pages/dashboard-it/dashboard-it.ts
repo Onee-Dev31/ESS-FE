@@ -119,7 +119,11 @@ export class DashboardIT implements OnInit {
     console.log('filterStatus : ', this.filterStatus);
 
     this.filteredTickets();
-    // หรือเรียก filterStatus(status) ของคุณ
+  }
+
+  onFilterStatusChange(status: string) {
+    this.filterStatus = status;
+    this.filteredTickets();
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
