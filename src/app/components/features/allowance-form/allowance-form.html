@@ -2,9 +2,12 @@
   <header class="top-header-strip">
     <h2>
       บันทึกข้อมูลเบี้ยเลี้ยง
-      <span (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ">
+      <span class="info-icon" (click)="isPolicyPopupOpen.set(true)" title="ดูเงื่อนไขการคำนวณ">
         <i class="fas fa-info-circle"></i
       ></span>
+      <span class="request-id-badge" *ngIf="requests?.claimNo"
+        >เลขที่การเบิก : {{ requests?.claimNo }}</span
+      >
     </h2>
     <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด">
       <i class="fas fa-times"></i>
