@@ -16,7 +16,7 @@ export class FreelanceService {
     constructor(private _http: HttpClient) { }
 
     createFreelance(formData: FormData): Observable<any> {
-        console.log(formData)
+        // console.log(formData)
         return this._http.post(`${this.baseUrl}/Freelance/operation`, formData);
     }
 
@@ -42,7 +42,7 @@ export class FreelanceService {
         if (params.hasAdUser === 'false') queryParams.hasAdUser = params.hasAdUser;
         if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
 
-        console.log("params >>> ", queryParams)
+        // console.log("params >>> ", queryParams)
 
         return this._http.get<any>(`${this.baseUrl}/Freelance`, {
             params: queryParams
