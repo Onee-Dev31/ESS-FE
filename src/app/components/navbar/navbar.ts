@@ -17,6 +17,7 @@ import { USER_ROLES } from '../../constants/user-roles.constant';
 import { ToastService } from '../../services/toast';
 import { SignalrService } from '../../services/signalr.service';
 import { ThemeService } from '../../services/theme.service';
+import { ItServiceService } from '../../services/it-service.service';
 
 interface NotificationItem {
   id: number;
@@ -55,11 +56,14 @@ export class NavbarComponent {
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
   private destroyRef = inject(DestroyRef);
+  private itService = inject(ItServiceService);
   themeService = inject(ThemeService);
   private notifyAudio = new Audio('/notification1.wav');
 
   isProfileOpen = false;
   isNotificationOpen = false;
+
+  unreadTicketCount = signal(0);
 
   userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
@@ -125,6 +129,26 @@ export class NavbarComponent {
       });
 
     this.userCodeEmp = this.authService.userData().CODEMPID;
+    this.fetchUnreadCount();
+
+    this.signalrService
+      .on('NewTicket')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.zone.run(() => this.fetchUnreadCount()));
+
+    this.signalrService
+      .on('TicketAssigned')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.zone.run(() => this.fetchUnreadCount()));
+  }
+
+  fetchUnreadCount() {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    if (!codeempid) return;
+    this.itService.getUnreadCount(codeempid).subscribe({
+      next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
+      error: () => this.unreadTicketCount.set(0),
+    });
   }
 
   private allSearchMenus: SearchMenuItem[] = [

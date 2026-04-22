@@ -161,7 +161,9 @@
       <div class="notification-dropdown" (click)="$event.stopPropagation()">
         <button class="icon-btn" (click)="toggleNotification()">
           <i class="fas fa-bell"></i>
-          <span class="badge">{{ notifications().length }}</span>
+          @if (unreadTicketCount() > 0) {
+            <span class="badge">{{ unreadTicketCount() }}</span>
+          }
         </button>
 
         <div class="dropdown-menu" *ngIf="isNotificationOpen">
