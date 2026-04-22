@@ -60,8 +60,23 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
+
+      - name: Cache Angular build
+        uses: actions/cache@v4
+        with:
+          path: .angular/cache
+          key: angular-cache-${{ github.sha }}
+          restore-keys: angular-cache-
 
       - name: Build Production
         run: npm run build:prod
