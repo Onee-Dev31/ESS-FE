@@ -10,6 +10,7 @@ import {
   EligibleDatesResponse,
   CreateClaimRequest,
   CreateClaimResponse,
+  MealAllowanceClaimDetail,
 } from '../interfaces/allowance.interface';
 export type { MealAllowanceClaimsResponse };
 
@@ -77,6 +78,22 @@ export class AllowanceApiService {
     return this._http.get<EligibleDatesResponse>(`${this.baseUrl}/meal-allowance/eligible-dates`, {
       params,
     });
+  }
+
+  /**
+   * แก้ไขใบเบิกเบี้ยเลี้ยง
+   * PUT api/meal-allowance/claim/:id
+   */
+  updateClaim(claimId: number, body: { details: MealAllowanceClaimDetail[] }): Observable<any> {
+    return this._http.put(`${this.baseUrl}/meal-allowance/claim/${claimId}`, body);
+  }
+
+  /**
+   * ลบใบเบิกเบี้ยเลี้ยง
+   * DELETE api/meal-allowance/claim/:id
+   */
+  deleteClaim(claimId: number): Observable<any> {
+    return this._http.delete(`${this.baseUrl}/meal-allowance/claim/${claimId}`);
   }
 
   /**

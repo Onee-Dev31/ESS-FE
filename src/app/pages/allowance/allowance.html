@@ -48,7 +48,7 @@
               />
             </nz-input-wrapper>
           </div>
-          <div style="display: flex; align-items: end; gap: 8px">
+          <div class="filter-actions">
             <button type="button" class="btn-search" (click)="loadData()">
               <i class="fas fa-search"></i> ค้นหา
             </button>
@@ -195,19 +195,19 @@
                 </td>
 
                 <!-- สถานะ -->
-                <td style="text-align: center">
+                <td class="text-center">
                   <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                     {{ claim.status | statusLabel }}
                   </span>
                 </td>
 
                 <!-- ข้อมูลเพิ่มเติม -->
-                <td style="text-align: center">
+                <td class="text-center">
                   <div class="sub-text">
                     {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY') }}
                   </div>
                 </td>
-                <td style="text-align: center" (click)="$event.stopPropagation()">
+                <td class="text-center" (click)="$event.stopPropagation()">
                   @if (claim.status === 'New') {
                     <div class="action-btns">
                       <button class="btn-icon edit" (click)="editRequest(claim.id)" title="แก้ไข">
