@@ -53,7 +53,7 @@ $col-file: 50px;
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
     color: #ffffff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
@@ -73,7 +73,7 @@ $col-file: 50px;
         margin-right: 8px;
 
         &:hover {
-          color: color-mix(in srgb, #ffffff, black 20%);
+          color: color.mix(black, #ffffff, 20%);
         }
       }
 
@@ -282,7 +282,7 @@ $col-file: 50px;
       padding: 6px;
       border: 1px solid rgba(220, 53, 69, 0.2);
       background: rgba(220, 53, 69, 0.1);
-      background: color-mix(in srgb, var(--danger), transparent 90%);
+      background: rgba(var(--danger-rgb), 0.1);
       border-radius: 6px;
       border-left: 4px solid var(--danger);
 
@@ -318,7 +318,7 @@ $col-file: 50px;
 
           &.keep {
             border: 1px solid rgba(var(--success-rgb), 0.1);
-            background: color-mix(in srgb, var(--success), transparent 85%);
+            background: rgba(var(--success-rgb), 0.15);
 
             i.fa-solid {
               color: rgba(var(--success-rgb), 0.9) !important;
@@ -327,7 +327,7 @@ $col-file: 50px;
 
           &.delete {
             border: 1px solid rgba(var(--danger-rgb), 0.1);
-            background: color-mix(in srgb, var(--danger), transparent 85%);
+            background: rgba(var(--danger-rgb), 0.15);
 
             i.fa-solid {
               color: rgba(var(--danger-rgb), 0.9) !important;
@@ -422,11 +422,7 @@ $col-file: 50px;
     }
 
     th {
-      background: linear-gradient(
-        135deg,
-        $primary 0%,
-        color-mix(in srgb, $primary, white 10%) 100%
-      );
+      background: linear-gradient(135deg, $primary 0%, var(--primary) 100%);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -663,7 +659,7 @@ $col-file: 50px;
         gap: 12px;
 
         .btn-card-upload {
-          background: color-mix(in srgb, var(--purple), transparent 90%);
+          background: rgba(var(--purple-rgb), 0.1);
           color: var(--purple);
           border: 1px solid rgba(var(--purple-rgb), 0.85);
           padding: 4px 10px;
@@ -680,7 +676,7 @@ $col-file: 50px;
           }
 
           &.has-file {
-            background: color-mix(in srgb, var(--green), transparent 90%);
+            background: rgba(var(--green-rgb), 0.1);
             color: var(--green);
             border-color: rgba(var(--green-rgb), 0.9);
           }
