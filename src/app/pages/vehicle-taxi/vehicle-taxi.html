@@ -74,41 +74,30 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+                @if (claim.status === 'New') {
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); openModal(claim.id)"
+                    title="แก้ไข"
+                  >
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim)"
+                    title="ลบ"
+                  >
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
               </div>
             </div>
             <div class="claim-card__body">
-              <!-- <div class="info-row">
-            <span class="label"><i class="far fa-clock"></i> วันที่สร้างรายการ:</span>
-            <span class="value">{{ req.createDate }}</span>
-          </div> -->
-
-              <div class="claim-card__main">
-                จำนวน {{ claim.items.length }} รายการ
-                <!-- @for (item of req.items; track $index) {
-            <div class="nested-item">
-              <div class="item-header">
-                <span class="item-title"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <span class="item-amount">฿{{ item.amount | number:'1.2-2' }}</span>
-              </div>
-              <div class="item-detail">
-                <div class="detail-row"><i class="fas fa-info-circle"></i> {{ item.description }}</div>
-                <div class="detail-row"><i class="fas fa-map-marker-alt"></i> {{ item.destination }}</div>
-              </div>
-            </div>
-            } -->
-              </div>
+              <div class="claim-card__main">จำนวน {{ claim.items.length }} รายการ</div>
               <div class="claim-card__amount">
                 <span class="amount-label">ขอเบิก</span>
                 <span class="amount-value">฿{{ claim.totalAmount | number: '1.2-2' }}</span>
-                <!-- @if (req.approvedAmount > 0) {
-            <span class="amount-approved">อนุมัติ ฿{{ req.approvedAmount | number:'1.2-2' }}</span>
-            } -->
               </div>
-              <!-- <div class="card-footer-actions">
-            <button class="btn-delete-sm" (click)="deleteRequest(req.id)">
-              <i class="far fa-trash-alt"></i> ลบ
-            </button>
-          </div> -->
             </div>
             <div class="claim-card__footer">
               <span class="claim-id">#{{ claim.claimNo ?? claim.claimId }}</span>
@@ -135,7 +124,7 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th>ประเภท</th>
+              <!-- <th>ประเภท</th> -->
               <th>จำนวนรายการ</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
@@ -147,19 +136,23 @@
             @for (claim of comps.paginatedData(); track trackByRowId($index, claim)) {
               <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
                 <!-- ประเภท -->
-                <td>
-                  <div class="type-badge">
-                    <span class="type-name">เบิกค่าพาหนะ Taxi</span>
-                  </div>
+                <!-- <td>
+              <div class="type-badge">
+                <span class="type-name">เบิกค่าพาหนะ Taxi</span>
+              </div>
 
+              <div class="request-no">
+                <i class="fa-solid fa-tag"></i>
+                {{ claim.claimNo ?? claim.claimId }}
+              </div>
+            </td> -->
+
+                <!-- จำนวนรายการ -->
+                <td>
                   <div class="request-no">
                     <i class="fa-solid fa-tag"></i>
                     {{ claim.claimNo ?? claim.claimId }}
                   </div>
-                </td>
-
-                <!-- จำนวนรายการ -->
-                <td>
                   <div class="claim-items-count">{{ claim.items.length }} รายการ</div>
                 </td>
 

@@ -152,6 +152,11 @@ export class DashboardIT implements OnInit {
     // หรือเรียก filterStatus(status) ของคุณ
   }
 
+  onFilterStatusChange(status: string) {
+    this.filterStatus = status;
+    this.filteredTickets();
+  }
+
   trackById = (_: number, item: TicketItem) => item.id;
 
   selectTicket(ticketId: string) {

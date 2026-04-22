@@ -70,12 +70,27 @@
             <div class="claim-card__header">
               <div class="claim-card__type-badge">
                 <i class="fa-solid fa-car-side"></i>เบิกค่าพาหนะ
-                <!-- {{ claim.claimNo }} -->
               </div>
               <div class="claim-card__actions">
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+                @if (claim.status === 'New') {
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); openModal(claim.id)"
+                    title="แก้ไข"
+                  >
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim)"
+                    title="ลบ"
+                  >
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
               </div>
             </div>
 
@@ -118,11 +133,12 @@
         <table class="modern-table">
           <thead>
             <tr>
-              <th>ประเภท</th>
+              <th>รายการ</th>
               <th>จำนวนวัน</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
               <th>วันที่สร้างรายการ</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -131,9 +147,9 @@
               <tr (click)="openModal(claim.id)" title="คลิกเพื่อดูรายละเอียด">
                 <!-- ประเภท -->
                 <td>
-                  <div class="type-badge">
-                    <span class="type-name">เบิกค่าพาหนะ</span>
-                  </div>
+                  <!-- <div class="type-badge">
+                <span class="type-name">เบิกค่าพาหนะ</span>
+              </div> -->
 
                   <div class="request-no">
                     <i class="fa-solid fa-tag"></i>
@@ -171,6 +187,18 @@
                   <div class="sub-text">
                     {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}
                   </div>
+                </td>
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  @if (claim.status === 'New') {
+                    <div class="action-btns">
+                      <button class="btn-icon edit" (click)="openModal(claim.id)" title="แก้ไข">
+                        <i class="far fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  }
                 </td>
               </tr>
             } @empty {

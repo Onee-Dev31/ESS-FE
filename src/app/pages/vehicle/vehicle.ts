@@ -153,20 +153,35 @@ export class VehicleComponent implements OnInit {
     }));
   }
 
-  async deleteRequest(id: string) {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการลบ',
-      message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
-      type: 'danger',
-      confirmText: 'ลบรายการ',
-    });
+  async deleteRequest(claim: any) {
+    console.log(claim);
+    this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
+      if (!result.isConfirmed) return;
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-    if (confirmed) {
-      this.transportService.deleteRequest(id).subscribe(() => {
-        this.toastService.success('ลบรายการเรียบร้อยแล้ว');
-        this.loadData();
-      });
-    }
+      this.vehicleService
+        .deleteVehicleByEmpCode(claim.id, this.authservice.userData().CODEMPID)
+        .subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
+
+            this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
+            this.closeModal();
+          },
+
+          error: (error) => {
+            console.error('Delete Vehicle Claim Error:', error);
+
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
+    });
   }
 
   openModal(id: string = '') {

@@ -29,6 +29,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
+import { SwalService } from '../../services/swal.service';
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
@@ -58,7 +59,8 @@ export class VehicleTaxiComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-  private authService = inject(AuthService);
+  private authservice = inject(AuthService);
+  private swalService = inject(SwalService);
   dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('taxi-list');
@@ -105,7 +107,7 @@ export class VehicleTaxiComponent implements OnInit {
     const param = {
       page: this.listing.currentPage() + 1 || 1,
       pageSize: this.listing.pageSize(),
-      empCode: this.authService.userData().CODEMPID,
+      empCode: this.authservice.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
       dateFrom: start ? dayjs(start).format('YYYY-MM-DD') : '',
@@ -154,18 +156,48 @@ export class VehicleTaxiComponent implements OnInit {
     });
   }
 
-  async deleteRequest(id: string) {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการลบ',
-      message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
-      type: 'danger',
-      confirmText: 'ลบรายการ',
-    });
+  async deleteRequest(claim: any) {
+    console.log(claim);
+    this.swalService
+      .confirm(
+        'ยืนยันการลบรายการเบิกทั้งหมด?',
+        undefined,
+        `
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">เลขที่การเบิก</span>
+                <span style="font-size:16px; font-weight:700; color:#4f6ef7">${claim.claimNo}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">จำนวนรายการ</span>
+                <span style="font-size:16px; font-weight:700; color:#ef4444">${claim.details.length} รายการ</span>
+            </div>
+        `,
+      )
+      .then((result) => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-    if (confirmed) {
-      this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
-      this.loadData();
-    }
+        this.taxiService.deleteTaxiClaim(claim.id, this.authservice.userData().CODEMPID).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
+
+            this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
+            this.closeModal();
+          },
+
+          error: (error) => {
+            console.error('Delete Taxi Claim Error:', error);
+
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
+      });
   }
 
   openModal(id: string = '') {

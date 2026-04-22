@@ -15,73 +15,6 @@
   }
 }
 
-// // Modern Table Mixin
-// @mixin modern-table {
-//   width: 100%;
-//   border-collapse: separate;
-//   border-spacing: 0;
-//   background: var(--bg-card);
-//   border: 1px solid $border;
-//   border-radius: 12px;
-//   overflow: hidden;
-
-//   thead {
-//     tr {
-//       background: var(--bg-table-head);
-//     }
-
-//     th {
-//       padding: 14px 16px;
-//       text-align: left;
-//       font-size: 0.875rem;
-//       font-weight: 600;
-//       color: $text-header;
-//       border-bottom: 2px solid $border;
-//       white-space: nowrap;
-//     }
-//   }
-
-//   tbody {
-//     transition: background 0.2s;
-
-//     &:hover {
-//       background: var(--border-toolbar);
-
-//       tr {
-//         background: transparent;
-//       }
-
-//       td {
-//         background: transparent !important;
-//       }
-//     }
-
-//     tr {
-//       transition: background 0.2s;
-
-//       &:not(:last-child) td:not(.merged-col) {
-//         border-bottom: none;
-//       }
-//     }
-
-//     td {
-//       padding: 16px;
-//       font-size: 0.9rem;
-//       color: $text;
-//       border-bottom: 1px solid var(--border);
-//       vertical-align: middle;
-//     }
-
-//     &:last-of-type tr:last-child td {
-//       border-bottom: none;
-//     }
-//   }
-
-//   @include tablet {
-//     display: none;
-//   }
-// }
-
 // Mobile Cards View Mixin
 @mixin mobile-cards-view {
   display: none;
@@ -676,34 +609,16 @@
   @include btn-outline;
 }
 
-.action-btns {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-
-.btn-icon {
-  &.view {
-    @include icon-btn-ghost(var(--text-table-head));
-  }
-
-  &.edit {
-    @include icon-btn-ghost(#0ea5e9);
-  }
-
-  &.delete {
-    @include icon-btn-ghost(var(--danger));
-  }
-}
-
-.btn-edit-sm {
+.btn-edit-sm,
+.btn-icon.edit {
   @include btn-secondary;
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
 }
 
-.btn-delete-sm {
+.btn-delete-sm,
+.btn-icon.delete {
   @include btn-outline;
   padding: 8px 12px;
   font-size: 0.875rem;

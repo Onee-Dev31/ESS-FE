@@ -174,12 +174,12 @@
         <table class="log-table">
           <thead>
             <tr>
-              <th style="width: 10%">Ticket No</th>
+              <th style="width: 150px">Ticket No</th>
               <th>Subject</th>
               <th style="width: 15%">Requester</th>
               <th style="width: 15%">Department</th>
               <th>Company</th>
-              <th *ngIf="currentStatus === 'Assigned'">assign</th>
+              <th style="width: 250px" *ngIf="currentStatus === 'Assigned'">assign</th>
               <th style="width: 12%">Updated</th>
               <th>Action</th>
             </tr>
@@ -198,12 +198,35 @@
                 {{ data.COMPANY_CODE }}
               </td>
               <td *ngIf="currentStatus === 'Assigned'">
-                <div class="assignee-list">
-                  <div class="assignee-item" *ngFor="let a of data.assignees">
-                    <div class="assignee-info">
-                      <span class="assignee-name">{{ a.name }}</span>
+                <div class="groups-container">
+                  <ng-container *ngFor="let group of data.assignees">
+                    <!-- assigned_count = total_members → แสดงแค่ชื่อกลุ่ม + tooltip -->
+                    <div
+                      class="group-tag full"
+                      *ngIf="
+                        group.assigned_count === group.total_members && group.assigned_count > 0
+                      "
+                      [title]="getAssignedNames(group.members_json)"
+                    >
+                      <i class="fas fa-users"></i>
+                      <span>{{ group.group_name }}</span>
+                      <span class="tag-count">{{ group.total_members }}</span>
                     </div>
-                  </div>
+
+                    <!-- assigned_count < total_members → แสดงชื่อคนที่ assigned -->
+                    <ng-container
+                      *ngIf="group.assigned_count > 0 && group.assigned_count < group.total_members"
+                    >
+                      <div
+                        class="member-item"
+                        *ngFor="let m of getAssignedMembers(group.members_json)"
+                      >
+                        <div class="member-info">
+                          <span class="member-name">{{ m.assigned_name }}</span>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </ng-container>
                 </div>
               </td>
               <td>

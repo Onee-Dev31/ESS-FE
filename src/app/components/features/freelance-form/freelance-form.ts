@@ -125,6 +125,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
     url?: string;
     fieldId?: number;
     date?: string;
+    FileUrlFull?: string;
   }[] = [];
 
   private readonly MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -311,7 +312,7 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
       file: newFile,
       name: newFile.name,
       date: dayjs().format('DD/MM/YYYY HH:mm A'),
-      //   url: previewUrl,
+      FileUrlFull: '',
       description: this.uploadedFiles[index].description,
       fieldId: this.uploadedFiles[index].fieldId,
     };
@@ -556,15 +557,17 @@ export class FreelanceFormComponent implements OnInit, OnChanges {
   previewFiles = signal<FilePreviewItem[]>([]);
 
   openPreview(file: any) {
+    console.log(file);
+
     let url = '';
 
-    if (file.file instanceof File) {
-      // ไฟล์ใหม่/replaced → ใช้ object URL
+    if (!file.FileUrlFull) {
       url = URL.createObjectURL(file.file);
     } else {
-      // ไฟล์เก่า → ใช้ URL จาก server
       url = file.FileUrlFull || '';
     }
+
+    console.log(url);
 
     this.previewFiles.set([
       {
