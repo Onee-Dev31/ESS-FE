@@ -181,8 +181,7 @@ export class AllowanceComponent implements OnInit {
   }
 
   editRequest(targetId: string) {
-    this.selectedRequestId = targetId;
-    this.isModalOpen = true;
+    this.openModal(targetId);
   }
 
   deleteRequest(targetId: string) {
