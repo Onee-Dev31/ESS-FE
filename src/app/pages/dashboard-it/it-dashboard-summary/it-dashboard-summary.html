@@ -163,113 +163,119 @@
           (ngModelChange)="applyFilter()"
         >
         </nz-range-picker>
-        <div class="table-wrap">
-          <table class="log-table">
-            <thead>
-              <tr>
-                <th style="width: 10%">Ticket No</th>
-                <th>Subject</th>
-                <th style="width: 15%">Requester</th>
-                <th style="width: 15%">Department</th>
-                <th>Company</th>
-                <th *ngIf="currentStatus === 'Assigned'">assign</th>
-                <th style="width: 12%">Updated</th>
-                <th>Action</th>
-              </tr>
-            </thead>
 
-            <button class="export-btn" (click)="exportData()">
-              <i class="fas fa-file-excel"></i> Export
-            </button>
+        <button class="export-btn" (click)="exportData()">
+          <i class="fas fa-file-excel"></i> Export
+        </button>
+      </div>
+      <div class="log-summary">ทั้งหมด {{ ticketLogs.length }} รายการ</div>
 
-            <div class="log-summary">ทั้งหมด {{ ticketLogs.length }} รายการ</div>
+      <div class="table-wrap">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th style="width: 150px">Ticket No</th>
+              <th>Subject</th>
+              <th style="width: 15%">Requester</th>
+              <th style="width: 14%">Department</th>
+              <th>Company</th>
+              <th style="width: 250px" *ngIf="currentStatus === 'Assigned'">assign</th>
+              <th>Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-            <div class="table-wrap">
-              <table class="log-table">
-                <thead>
-                  <tr>
-                    <th style="width: 10%">Ticket No</th>
-                    <th>Subject</th>
-                    <th style="width: 15%">Requester</th>
-                    <th style="width: 15%">Department</th>
-                    <th>Company</th>
-                    <th *ngIf="currentStatus === 'Assigned'">assign</th>
-                    <th style="width: 12%">Updated</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+          <tbody>
+            <tr *ngFor="let data of filteredTicketLogs">
+              <td>{{ data.ticket_number }}</td>
+              <td>{{ data.subject }}</td>
+              <td>{{ data.requester_name || '-' }}</td>
+              <td>
+                <div>{{ data.coscent }}</div>
+                <div class="dept-name">{{ data.deptName }}</div>
+              </td>
+              <td>
+                {{ data.COMPANY_CODE }}
+              </td>
+              <td *ngIf="currentStatus === 'Assigned'">
+                <div class="groups-container">
+                  <ng-container *ngFor="let group of data.assignees">
+                    <!-- assigned_count = total_members → แสดงแค่ชื่อกลุ่ม + tooltip -->
+                    <div
+                      class="group-tag full"
+                      *ngIf="
+                        group.assigned_count === group.total_members && group.assigned_count > 0
+                      "
+                      [title]="getAssignedNames(group.members_json)"
+                    >
+                      <i class="fas fa-users"></i>
+                      <span>{{ group.group_name }}</span>
+                      <span class="tag-count">{{ group.total_members }}</span>
+                    </div>
 
-                <tbody>
-                  <tr *ngFor="let data of filteredTicketLogs">
-                    <td>{{ data.ticket_number }}</td>
-                    <td>{{ data.subject }}</td>
-                    <td>{{ data.requester_name || '-' }}</td>
-                    <td>
-                      <div>{{ data.coscent }}</div>
-                      <div class="dept-name">{{ data.deptName }}</div>
-                    </td>
-                    <td>
-                      {{ data.COMPANY_CODE }}
-                    </td>
-                    <td *ngIf="currentStatus === 'Assigned'">
-                      <div class="assignee-list">
-                        <div class="assignee-item" *ngFor="let a of data.assignees">
-                          <div class="assignee-info">
-                            <span class="assignee-name">{{ a.name }}</span>
-                          </div>
+                    <!-- assigned_count < total_members → แสดงชื่อคนที่ assigned -->
+                    <ng-container
+                      *ngIf="group.assigned_count > 0 && group.assigned_count < group.total_members"
+                    >
+                      <div
+                        class="member-item"
+                        *ngFor="let m of getAssignedMembers(group.members_json)"
+                      >
+                        <div class="member-info">
+                          <span class="member-name">{{ m.assigned_name }}</span>
                         </div>
                       </div>
-                    </td>
-                    <td>
-                      {{ data.updated_at || data.created_at | date: 'dd/MM/yyyy HH:mm' }}
-                    </td>
-                    <td>
-                      <button class="view-btn" type="button" (click)="viewTicket(data)">
-                        <i class="fas fa-info-circle"></i>
-                      </button>
-                    </td>
-                  </tr>
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </td>
+              <td>
+                {{ data.updated_at || data.created_at | date: 'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td>
+                <button class="view-btn" type="button" (click)="viewTicket(data)">
+                  <i class="fas fa-info-circle"></i>
+                </button>
+              </td>
+            </tr>
 
-                  <tr *ngIf="pagedTicketLogs.length === 0">
-                    <td colspan="8" class="empty-row">ไม่พบข้อมูล</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <tr *ngIf="pagedTicketLogs.length === 0">
+              <td colspan="8" class="empty-row">ไม่พบข้อมูล</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-            <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
-              <button
-                class="page-btn"
-                type="button"
-                [disabled]="page === 1"
-                (click)="onPageIndexChange(page - 1)"
-              >
-                Prev
-              </button>
+      <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
+        <button
+          class="page-btn"
+          type="button"
+          [disabled]="page === 1"
+          (click)="onPageIndexChange(page - 1)"
+        >
+          Prev
+        </button>
 
-              <span class="page-info"> Page {{ page }} / {{ totalPages }} </span>
+        <span class="page-info"> Page {{ page }} / {{ totalPages }} </span>
 
-              <button
-                class="page-btn"
-                type="button"
-                [disabled]="page === totalPages"
-                (click)="onPageIndexChange(page + 1)"
-              >
-                Next
-              </button>
+        <button
+          class="page-btn"
+          type="button"
+          [disabled]="page === totalPages"
+          (click)="onPageIndexChange(page + 1)"
+        >
+          Next
+        </button>
 
-              <select
-                class="page-size-select"
-                [ngModel]="pageSize"
-                (ngModelChange)="onPageSizeChange($event)"
-              >
-                <option [ngValue]="10">10</option>
-                <option [ngValue]="20">20</option>
-                <option [ngValue]="50">50</option>
-              </select>
-            </div>
-          </table>
-        </div>
+        <select
+          class="page-size-select"
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+        >
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+        </select>
       </div>
     </div>
   </div>
