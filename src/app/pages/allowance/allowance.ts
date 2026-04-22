@@ -3,8 +3,8 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
-import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceApiService } from '../../services/allowance-api.service';
+import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { AllowanceRequest, AllowanceItem, MealAllowanceClaim } from '../../interfaces/allowance.interface';
 import { LoadingService } from '../../services/loading';
@@ -63,7 +63,7 @@ interface FlatAllowanceRow extends AllowanceItem {
 })
 export class AllowanceComponent implements OnInit {
   private allowanceApiService = inject(AllowanceApiService);
-  private allowanceService = inject(AllowanceService);
+  private swalService = inject(SwalService);
   private authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
@@ -159,16 +159,21 @@ export class AllowanceComponent implements OnInit {
   }
 
   editRequest(targetId: string) {
-    this.selectedRequestId = targetId;
-    this.isModalOpen = true;
+    this.openModal(targetId);
   }
 
   deleteRequest(targetId: string) {
-    if (confirm('ยืนยันการลบรายการเบิกเบี้ยเลี้ยงนี้?')) {
-      this.allowanceService.deleteRequest(targetId).subscribe(() => {
-        this.loadData();
-      });
-    }
+    this.swalService.confirm('ยืนยันการลบ', 'ต้องการลบรายการเบิกเบี้ยเลี้ยงนี้?').then((result) => {
+      if (result.isConfirmed) {
+        this.allowanceApiService.deleteClaim(Number(targetId)).subscribe({
+          next: () => {
+            this.swalService.success('ลบรายการสำเร็จ');
+            this.loadData();
+          },
+          error: () => this.swalService.error('เกิดข้อผิดพลาดในการลบรายการ'),
+        });
+      }
+    });
   }
 
   closeModal() {

@@ -75,7 +75,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         timeOut: item.actual_checkout,
         hours: item.rounded_hours,
         amount: item.rate_amount ?? 0,
-        actualExtraHours: item.total_hours,
+        actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
         displayHours: item.total_hours_text,
         selected: true,
         description: item.description,
@@ -188,8 +188,28 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
 
     if (this.MODE_EDIT) {
-      this.swalService.info('MOCK')
-      this.closeModal();
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
+      this.allowanceApi
+        .updateClaim(this.requests.claimId, {
+          details: selectedLogs.map((log) => ({
+            work_date: log.date,
+            shift_code: log.shiftCode,
+            day_type: log.dayType,
+            actual_checkin: log.timeIn,
+            actual_checkout: log.timeOut,
+            extra_hours: log.actualExtraHours ?? 0,
+            rate_id: log.rateId,
+            rate_amount: log.amount,
+            description: log.description,
+          })) as any,
+        })
+        .subscribe({
+          next: () => {
+            this.swalService.success('แก้ไขใบเบิกสำเร็จ');
+            this.closeModal();
+          },
+          error: () => this.swalService.error('เกิดข้อผิดพลาดในการแก้ไข'),
+        });
       return;
     }
 
