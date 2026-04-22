@@ -138,6 +138,36 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     });
   }
 
+  isKeep(): number {
+    const selectedLogs = this.logs.filter((log) => log.selected);
+    return selectedLogs.length;
+  }
+
+  isDelete(): number {
+    const selectedLogs = this.logs.filter((log) => !log.selected);
+    return selectedLogs.length;
+  }
+
+  totalClaims(): string {
+    const selectedLogs = this.logs.filter((log) => log.selected);
+    const total = selectedLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+    return total.toLocaleString('en-US') + '.-';
+  }
+
+  hasDelete(): boolean {
+    const selectedLogs = this.logs.filter((log) => log.selected);
+    if (selectedLogs.length === 0) {
+      return true;
+    }
+    return false;
+  }
+
+  hasInvalid(): boolean {
+    return this.logs.some(
+      (log) => log.selected && (!log.description || log.description.trim() === ''),
+    );
+  }
+
   generateCalendar() {
     const existingRequest = this.loadedRequest;
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
@@ -227,8 +257,24 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const selectedLogs = this.logs.filter((l) => l.selected);
 
-    if (selectedLogs.length === 0) {
-      this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
+    // if (selectedLogs.length === 0) {
+    //   this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
+    //   return;
+    // }
+
+    if (this.MODE_EDIT && selectedLogs.length === 0) {
+      this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
+        console.log(this.requests);
+        this.allowanceApi.deleteClaim(this.requests.id).subscribe({
+          next: () => {
+            this.swalService.success('ลบรายการสำเร็จ');
+            this.loadData();
+          },
+          error: () => this.swalService.error('เกิดข้อผิดพลาดในการลบรายการ'),
+        });
+      });
       return;
     }
 
