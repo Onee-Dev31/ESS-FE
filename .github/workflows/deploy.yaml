@@ -48,6 +48,10 @@ jobs:
           key: angular-cache-${{ github.sha }}
           restore-keys: angular-cache-
 
+      - name: Setup Environment
+        shell: powershell
+        run: Copy-Item "src\environments\environment.prod.ts" "src\environments\environment.ts"
+
       - name: Build Production
         run: npm run build:prod
 
