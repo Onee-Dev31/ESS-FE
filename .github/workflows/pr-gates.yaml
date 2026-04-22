@@ -39,6 +39,7 @@ jobs:
           node-version: '22.x'
           cache: npm
       - run: npm install
+      - run: cp src/environments/environment.example.ts src/environments/environment.ts
       - run: npx tsc --noEmit
 
   test-coverage:
@@ -53,6 +54,7 @@ jobs:
           node-version: '22.x'
           cache: npm
       - run: npm install
+      - run: cp src/environments/environment.example.ts src/environments/environment.ts
       - name: Run Tests + Coverage
         run: npx ng test --no-watch 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
       - name: Parse Coverage
