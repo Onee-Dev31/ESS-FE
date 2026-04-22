@@ -66,17 +66,26 @@
       font-weight: 700;
       color: #ffffff !important;
 
-      span {
+      .info-icon {
         font-size: $font-size-body;
         border: 1px solid #ffffff3f;
         background: #ffffff17;
         padding: 4px 6px;
         border-radius: 100px;
         cursor: pointer;
+        margin-right: 8px;
 
         &:hover {
           color: color-mix(in srgb, #ffffff, black 20%);
         }
+      }
+
+      .request-id-badge {
+        font-size: $font-size-hint;
+        border: 1px solid #ffffff3f;
+        background: #ffffff17;
+        padding: 4px 6px;
+        border-radius: 100px;
       }
     }
 

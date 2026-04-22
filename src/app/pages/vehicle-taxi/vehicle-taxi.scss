@@ -720,3 +720,9 @@ select.form-control {
     border-color: var(--status-danger-text);
   }
 }
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}

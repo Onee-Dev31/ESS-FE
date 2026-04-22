@@ -129,6 +129,7 @@
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
               <th>วันที่สร้างรายการ</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -181,6 +182,19 @@
                   <div class="sub-text">
                     {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMMM YYYY') }}
                   </div>
+                </td>
+
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  @if (claim.status === 'New') {
+                    <div class="action-btns">
+                      <button class="btn-icon edit" (click)="openModal(claim.id)" title="แก้ไข">
+                        <i class="far fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" (click)="deleteRequest(claim)" title="ลบ">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  }
                 </td>
               </tr>
             } @empty {

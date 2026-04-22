@@ -184,18 +184,34 @@ export class AllowanceComponent implements OnInit {
     this.openModal(targetId);
   }
 
-  deleteRequest(targetId: string) {
-    this.swalService.confirm('ยืนยันการลบ', 'ต้องการลบรายการเบิกเบี้ยเลี้ยงนี้?').then((result) => {
-      if (result.isConfirmed) {
-        this.allowanceApiService.deleteClaim(Number(targetId)).subscribe({
-          next: () => {
-            this.swalService.success('ลบรายการสำเร็จ');
-            this.loadData();
-          },
-          error: () => this.swalService.error('เกิดข้อผิดพลาดในการลบรายการ'),
-        });
-      }
-    });
+  deleteRequest(claim: any) {
+    console.log(claim);
+    this.swalService
+      .confirm(
+        'ยืนยันการลบรายการเบิกทั้งหมด?',
+        undefined,
+        `
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">เลขที่การเบิก</span>
+                <span style="font-size:16px; font-weight:700; color:#4f6ef7">${claim.claimNo}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">จำนวนรายการ</span>
+                <span style="font-size:16px; font-weight:700; color:#ef4444">${claim.details.length} รายการ</span>
+            </div>
+        `,
+      )
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.allowanceApiService.deleteClaim(Number(claim.id)).subscribe({
+            next: () => {
+              this.swalService.success('ลบรายการสำเร็จ');
+              this.loadData();
+            },
+            error: () => this.swalService.error('เกิดข้อผิดพลาดในการลบรายการ'),
+          });
+        }
+      });
   }
 
   closeModal() {

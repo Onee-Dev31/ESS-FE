@@ -84,7 +84,7 @@
                   </button>
                   <button
                     class="btn-icon delete"
-                    (click)="$event.stopPropagation(); deleteRequest(claim.id)"
+                    (click)="$event.stopPropagation(); deleteRequest(claim)"
                     title="ลบ"
                   >
                     <i class="far fa-trash-alt"></i>
@@ -230,7 +230,7 @@
                       >
                         <i class="far fa-edit"></i>
                       </button>
-                      <button class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
+                      <button class="btn-icon delete" (click)="deleteRequest(claim)" title="ลบ">
                         <i class="far fa-trash-alt"></i>
                       </button>
                     </div>
