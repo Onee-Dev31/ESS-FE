@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ChartMode, KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +41,11 @@ import { MasterDataService } from '../../../services/master-data.service';
 })
 export class ItDashboardSummary {
   @Output() statusChange = new EventEmitter<string | null>();
+  @Input() set externalStatus(status: string | null) {
+    if (status && status !== this.activeStatus) {
+      this.selectStatus(status, false);
+    }
+  }
 
   // ===== KPI =====
   activeStatus: string = 'all';
