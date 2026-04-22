@@ -11,9 +11,10 @@ import { AuthService } from './services/auth.service';
   standalone: true,
   imports: [RouterOutlet, LoaderComponent, ToastComponent, ConfirmationDialogComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrl: './app.scss'
 })
 export class App implements OnInit {
+
   protected readonly title = signal('my-angular-app');
   private signalrService = inject(SignalrService);
 

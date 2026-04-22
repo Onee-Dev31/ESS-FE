@@ -67,9 +67,7 @@ $status-cancelled-text: var(--text-table-head);
     background: var(--bg-card);
     border-radius: 20px;
     border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -78,9 +76,7 @@ $status-cancelled-text: var(--text-table-head);
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow:
-        0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       border-color: rgba(0, 0, 0, 0.08);
 
       .card-header {
@@ -374,9 +370,7 @@ $status-cancelled-text: var(--text-table-head);
     border: 1px solid var(--border-toolbar);
     border-radius: 16px;
     overflow: hidden;
-    transition:
-      box-shadow 0.2s,
-      transform 0.2s;
+    transition: box-shadow 0.2s, transform 0.2s;
     border-left: 4px solid var(--primary);
 
     &:hover {
@@ -460,6 +454,8 @@ $status-cancelled-text: var(--text-table-head);
       background: var(--bg-table-head);
     }
   }
+
+
 
   .claim-time,
   .claim-date {
@@ -778,7 +774,7 @@ $status-cancelled-text: var(--text-table-head);
     padding-right: 48px !important;
   }
 
-  input[type='date'].form-input {
+  input[type="date"].form-input {
     cursor: pointer;
     position: relative;
     padding-right: 16px !important;
@@ -808,6 +804,7 @@ $status-cancelled-text: var(--text-table-head);
 .btn-search {
   @include btn-primary;
 }
+
 
 .btn-clear {
   @include btn-outline;
@@ -839,6 +836,8 @@ $status-cancelled-text: var(--text-table-head);
     background: rgba(239, 68, 68, 0.1);
   }
 }
+
+
 
 // Pagination wrapper spacing
 .pagination-wrapper {

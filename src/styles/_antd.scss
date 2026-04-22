@@ -5,74 +5,75 @@
 */
 // input
 .ant-select {
-  color: var(--input-text);
+    color: var(--input-text);
 }
 
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  position: relative;
-  background-color: transparent;
-  border: 1px solid #cfcfcf00;
+    position: relative;
+    background-color: transparent;
+    border: 1px solid #cfcfcf00;
 }
 
 .ant-select-selection-placeholder {
-  color: var(--input-text-placeholder);
+    color: var(--input-text-placeholder);
 }
 
 .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  color: var(--text-muted);
+    color: var(--text-muted);
 }
 
 //input > diable
 .ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
-  border-color: #40a9ff00;
-  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+    border-color: #40a9ff00;
+    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
 }
 
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-  border-color: #40a9ff00;
-  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+    border-color: #40a9ff00;
+    box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
 }
 
 .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-  position: relative;
-  background-color: var(--input-disabled-bg);
-  border: 1px solid #cfcfcf00;
+    position: relative;
+    background-color: var(--input-disabled-bg);
+    border: 1px solid #cfcfcf00;
 }
 
 // >
-.ant-select-arrow .anticon > svg {
-  color: rgba(255, 255, 255, 0);
+.ant-select-arrow .anticon>svg {
+    color: rgba(255, 255, 255, 0);
 }
 
 // x
 .ant-select-clear,
 .ant-select-clear:hover {
-  background-color: transparent;
-  color: var(--input-text) !important;
-  font-size: 15px;
+    background-color: transparent;
+    color: var(--input-text) !important;
+    font-size: 15px;
 }
 
 // option
 .ant-select-dropdown {
-  background-color: var(--bg-page);
+    background-color: var(--bg-page);
 }
 
 .ant-select-item {
-  color: var(--input-text);
+    color: var(--input-text);
 }
 
 .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background-color: var(--input-bg-hover);
+    background-color: var(--input-bg-hover);
 }
 
 .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  background-color: var(--input-bg-active);
+    background-color: var(--input-bg-active);
 }
 
 //empty
 .ant-empty-small {
-  color: var(--input-text);
+    color: var(--input-text)
 }
+
 
 /*
   ANTD : PICKER
@@ -81,128 +82,129 @@
 //antd picker
 
 .ant-picker {
-  border: 1px solid var(--border-table-head);
-  color: var(--input-text);
-  background-color: var(--input-bg);
+    border: 1px solid var(--border-table-head);
+    color: var(--input-text);
+    background-color: var(--input-bg);
 }
 
 .ant-picker-dropdown .ant-picker-panel {
-  background: var(--bg-card);
+    background: var(--bg-card);
 }
 
 .ant-picker-cell-today .ant-picker-cell-inner::before {
-  border: none !important;
-  display: none !important;
+    border: none !important;
+    display: none !important;
 }
 
-.ant-picker-input > input {
-  color: var(--text);
+.ant-picker-input>input {
+    color: var(--text)
 }
 
 .ant-picker-clear {
-  background-color: transparent;
-  color: var(--input-text) !important;
+    background-color: transparent;
+    color: var(--input-text) !important;
 }
 
 .ant-picker-suffix {
-  color: var(--text);
+    color: var(--text)
 }
 
-.ant-picker:hover input:not(:placeholder-shown) ~ .ant-picker-suffix {
-  opacity: 0;
+.ant-picker:hover input:not(:placeholder-shown)~.ant-picker-suffix {
+    opacity: 0;
 }
 
 /* fix ขนาดแต่ละช่องให้ตายตัว */
 .ant-picker-cell {
-  width: 30px !important;
-  height: 35px !important;
-  padding: 0 !important;
+    width: 30px !important;
+    height: 35px !important;
+    padding: 0 !important;
 }
 
 /* fix inner ให้เต็ม cell และเป็นวงกลม */
 .ant-picker-cell-inner {
-  width: 100% !important;
-  height: 100% !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50% !important;
-  transition: background-color 0.2s ease;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    transition: background-color 0.2s ease;
 }
 
 /* ทำให้วันที่ที่เลือกเป็นวงกลม */
 .ant-picker-cell-selected .ant-picker-cell-inner {
-  background-color: var(--primary) !important;
-  color: #ffffff !important;
-  border-radius: 50% !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* hover ตอนชี้เมาส์ */
 .ant-picker-cell-inner:hover {
-  background-color: #b3b3b3 !important;
-  border-radius: 50% !important;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background-color: #b3b3b3 !important;
+    border-radius: 50% !important;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* month & year mode */
 .ant-picker-month-panel .ant-picker-cell-inner,
 .ant-picker-year-panel .ant-picker-cell-inner,
 .ant-picker-decade-panel .ant-picker-cell-inner {
-  border-radius: 10% !important;
+    border-radius: 10% !important;
 }
 
 /* ลบ background ของ disabled date */
 .ant-picker-cell-disabled::before {
-  background: color-mix(in srgb, var(--text-muted), var(--text-reverse) 80%) !important;
+    background: color-mix(in srgb, var(--text-muted), var(--text-reverse) 80%) !important;
 }
 
 /* สีตัวเลขของวันที่ disabled */
 .ant-picker-cell-disabled .ant-picker-cell-inner {
-  color: var(--text) !important;
-  opacity: 0.6;
+    color: var(--text) !important;
+    opacity: 0.6;
 }
 
 /* ตอนเป็น range เลื่อนซ้าย-ขวาได้*/
 .ant-picker-dropdown,
 .ant-picker-panel-container {
-  z-index: 1150 !important;
-  position: fixed !important;
-  max-width: calc(100vw - 24px) !important;
-  box-sizing: border-box;
-  overflow-x: auto;
+    z-index: 1150 !important;
+    position: fixed !important;
+    max-width: calc(100vw - 24px) !important;
+    box-sizing: border-box;
+    overflow-x: auto;
 }
 
 /*
   ANTD : MODAL
 */
 .ant-modal-body {
-  background-color: var(--bg-card);
-  border-radius: 17px;
+    background-color: var(--bg-card);
+    border-radius: 17px;
 }
 
 .ant-modal-close-x {
-  color: var(--text);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
 }
 
 .ant-modal-close-x:hover {
-  background: rgba(202, 202, 202, 0.5);
-  transform: scale(1);
-  border-radius: 10px;
-  transition: all 0.25s ease;
+    background: rgba(202, 202, 202, 0.5);
+    transform: scale(1);
+    border-radius: 10px;
+    transition: all .25s ease;
 }
+
 
 /*
   ANTD : CHECKBOX
@@ -210,65 +212,65 @@
 
 /* ===== Disabled + NOT checked (false) ===== */
 .ant-checkbox-disabled:not(.ant-checkbox-checked) .ant-checkbox-inner {
-  background-color: rgba(99, 102, 241, 0.1);
-  border-color: var(--status-approved-text);
+    background-color: rgba(99, 102, 241, 0.1);
+    border-color: var(--status-approved-text);
 }
 
 /* ===== Disabled + checked (true) ===== */
 .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner {
-  background-color: rgba(99, 102, 241, 0.9);
-  border-color: var(--status-approved-text);
+    background-color: rgba(99, 102, 241, 0.9);
+    border-color: var(--status-approved-text);
 }
 
 /* สีเครื่องหมายถูก */
 .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
-  border-color: #94a3b8;
+    border-color: #94a3b8;
 }
 
 // antd tooltip
 .ant-tooltip-inner {
-  background: var(--bg-card) !important;
-  padding: 16px;
-  color: var(--text);
-  border-radius: 16px;
-  box-shadow: var(--shadow) !important;
+    background: var(--bg-card) !important;
+    padding: 16px;
+    color: var(--text);
+    border-radius: 16px;
+    box-shadow: var(--shadow) !important;
 }
 
 .ant-tooltip-arrow::before,
 .ant-tooltip-arrow::after {
-  background-color: var(--bg-card) !important;
+    background-color: var(--bg-card) !important;
 }
 
 /*
   ANTD : INPUT / INPUT-WRAPPER
 */
 .ant-input-affix-wrapper {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--input-text);
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
 
-  &:hover {
-    border-color: var(--input-border-hover);
-  }
+    &:hover {
+        border-color: var(--input-border-hover);
+    }
 
-  &:focus,
-  &.ant-input-affix-wrapper-focused {
-    background-color: var(--input-focus-bg);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-  }
+    &:focus,
+    &.ant-input-affix-wrapper-focused {
+        background-color: var(--input-focus-bg);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+    }
 
-  .ant-input-prefix {
-    color: var(--text-muted);
-  }
+    .ant-input-prefix {
+        color: var(--text-muted);
+    }
 }
 
 .ant-input-affix-wrapper .ant-input,
 .ant-input {
-  background-color: transparent;
-  color: var(--input-text);
+    background-color: transparent;
+    color: var(--input-text);
 
-  &::placeholder {
-    color: var(--input-text-placeholder);
-  }
+    &::placeholder {
+        color: var(--input-text-placeholder);
+    }
 }

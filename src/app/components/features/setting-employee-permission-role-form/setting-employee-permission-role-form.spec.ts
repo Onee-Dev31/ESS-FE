@@ -8,8 +8,9 @@ describe('SettingEmployeePermissionRoleForm', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingEmployeePermissionRoleForm],
-    }).compileComponents();
+      imports: [SettingEmployeePermissionRoleForm]
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(SettingEmployeePermissionRoleForm);
     component = fixture.componentInstance;

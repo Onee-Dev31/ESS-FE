@@ -8,8 +8,9 @@ describe('ResignDetail', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResignDetail],
-    }).compileComponents();
+      imports: [ResignDetail]
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(ResignDetail);
     component = fixture.componentInstance;

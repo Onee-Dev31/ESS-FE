@@ -1,222 +1,196 @@
-@if (approvalItem) {
-  <div class="form-root">
+<div class="form-root">
     <header class="top-header-strip">
-      <div class="header-info-inline">
-        <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
-        <div class="requester-line">
-          Created on:
-          <span class="highlight">{{
-            dateUtil.formatDateToBE(approvalItem.requestDate, 'DD/MM/YYYY')
-          }}</span>
+        <div class="header-info-inline">
+            <h2 class="request-title">{{ approvalItem.requestNo }}: {{ approvalItem.requestType }}</h2>
+            <div class="requester-line">Created on: <span class="highlight">{{
+                    dateUtil.formatDateToBE(approvalItem.requestDate, 'DD/MM/YYYY')
+                    }}</span></div>
         </div>
-      </div>
-      <div class="right">
-        <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
-          @if (!isActionConfirm()) {
-            <button class="btn-action-green" (click)="openActionConfirm('Approved')">
-              Approve
-            </button>
-            <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
-          }
+        <div class="right">
+            <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
+                @if (!isActionConfirm()) {
+                <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
+                <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button> }
+            </div>
+            <button class="btn-close-modal" type="button" title="ปิด" (click)="close()"><i
+                    class="fas fa-times"></i></button>
         </div>
-        <button class="btn-close-modal" type="button" title="ปิด" (click)="close()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
     </header>
 
     <main class="content-card">
-      <div class="approval-progress-bar">
-        <div class="progress-stepper">
-          <div class="stepper-points">
-            <div class="progress-line-bg"></div>
-            <div
-              class="progress-line-fill"
-              [style.width.%]="
-                Math.min((Math.max(0, currentStepIndex() - 1) / (steps.length - 1)) * 80, 80)
-              "
-            ></div>
+        <div class="approval-progress-bar">
+            <div class="progress-stepper">
+                <div class="stepper-points">
+                    <div class="progress-line-bg"></div>
+                    <div class="progress-line-fill"
+                        [style.width.%]="Math.min((Math.max(0, currentStepIndex() - 1) / (steps.length - 1)) * 80, 80)">
+                    </div>
 
-            @for (step of steps; track step.id) {
-              <div
-                class="progress-step"
-                [class.completed]="currentStepIndex() > step.id"
-                [class.active]="currentStepIndex() === step.id"
-                [class.rejected]="currentStepIndex() === -1"
-              >
-                <div class="step-icon-circle">
-                  @if (currentStepIndex() > step.id) {
-                    <i class="fas fa-check"></i>
-                  } @else {
-                    <i [class]="step.icon"></i>
-                  }
+                    @for (step of steps; track step.id) {
+                    <div class="progress-step" [class.completed]="currentStepIndex() > step.id"
+                        [class.active]="currentStepIndex() === step.id" [class.rejected]="currentStepIndex() === -1">
+
+                        <div class="step-icon-circle">
+                            @if (currentStepIndex() > step.id) {
+                            <i class="fas fa-check"></i>
+                            } @else {
+                            <i [class]="step.icon"></i>
+                            }
+                        </div>
+
+                        <div class="step-label">{{ step.label }}</div>
+                    </div>
+                    }
                 </div>
-
-                <div class="step-label">{{ step.label }}</div>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="content">
-        <div class="main-panel">
-          <div class="summary-cards-grid">
-            <div class="summary-card status-card" [ngClass]="getStatusClass(getDisplayStatus())">
-              <div class="s-data">
-                <label>Status</label>
-                <div class="s-value">
-                  {{ detailedStatus() || approvalItem.rawStatus | statusLabel }}
-                </div>
-              </div>
             </div>
-            <div class="summary-card">
-              <div class="s-data">
-                <label>ยอดขอเบิก</label>
-
-                <div class="s-value amount" [class.text-success]="isApproved">
-                  {{ approvalItem.amount | number: '1.2-2' }}
-
-                  <i *ngIf="isApproved" class="fas fa-check-circle ms-2"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          @if (medicalClaim) {
-            <div class="medical-info-grid">
-              <div class="med-info-item">
-                <label><i class="fas fa-tag"></i> ประเภทการเบิก</label>
-                <span>{{ medicalClaim.expenseTypeName }}</span>
-              </div>
-              <div class="med-info-item">
-                <label><i class="fas fa-hospital-alt"></i> สถานพยาบาล</label>
-                <span>{{ medicalClaim.hospitalName }}</span>
-              </div>
-              <div class="med-info-item">
-                <label><i class="fas fa-virus"></i> โรค / อาการ</label>
-                <span
-                  >{{ medicalClaim.diseaseName }}
-                  @if (medicalClaim.icd10Code) {
-                    <span class="text-muted">({{ medicalClaim.icd10Code }})</span>
-                  }
-                </span>
-              </div>
-              <div class="med-info-item">
-                <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
-                <span
-                  >{{ dateUtil.formatDateToBE(medicalClaim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                  {{ dateUtil.formatDateToBE(medicalClaim.treatmentDateTo, 'DD/MM/YYYY') }}
-                  <span class="text-muted">({{ medicalClaim.treatmentDays }} วัน)</span>
-                </span>
-              </div>
-              @if (medicalClaim.remark) {
-                <div class="med-info-item med-info-full">
-                  <label><i class="fas fa-comment-alt"></i> หมายเหตุ</label>
-                  <span>{{ medicalClaim.remark }}</span>
-                </div>
-              }
-              @if (medicalClaim.rejectionReason) {
-                <div class="med-info-item med-info-full">
-                  <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
-                  <span class="text-danger">{{ medicalClaim.rejectionReason }}</span>
-                </div>
-              }
-            </div>
-
-            <div class="medical-info-grid">
-              <div class="med-info-item">
-                <label><i class="fa-solid fa-comment"></i>Remark</label>
-                <span>{{ medicalClaim.remark ? medicalClaim.remark : '-' }}</span>
-              </div>
-            </div>
-
-            <div class="medical-info-grid">
-              <div class="med-info-item">
-                <label><i class="fa-solid fa-paperclip"></i>เอกสารแนบ </label>
-
-                <span>
-                  <div
-                    *ngIf="medicalClaim.attachments.length"
-                    type="button"
-                    class="btn-view-all"
-                    (click)="openAllAttachments()"
-                  >
-                    <i class="far fa-eye"></i>
-                    ดูไฟล์แนบ ({{ medicalClaim.attachments.length || 0 }} ไฟล์)
-                  </div>
-                </span>
-              </div>
-            </div>
-          } @else {
-            <div class="content-header">
-              <h3>รายการเบิก (Items)</h3>
-            </div>
-          }
         </div>
 
-        <div class="side-panel">
-          <h3 class="side-title">Requester Info</h3>
-          <div class="side-group">
-            <label>Name</label>
-            <div class="side-val">{{ approvalItem.requestBy.name }}</div>
-          </div>
-          <div class="side-group">
-            <label>Employee ID</label>
-            <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
-          </div>
-          <div class="side-group">
-            <label>Department</label>
-            <div class="side-val">{{ approvalItem.requestBy.department }}</div>
-          </div>
-          <div class="side-group">
-            <label>Company</label>
-            <div class="side-val">{{ approvalItem.requestBy.company }}</div>
-          </div>
+        <div class="content">
+            <div class="main-panel">
+                <div class="summary-cards-grid">
+                    <div class="summary-card status-card" [ngClass]="getStatusClass(getDisplayStatus())">
+                        <div class="s-data">
+                            <label>Status</label>
+                            <div class="s-value">{{ (detailedStatus() || approvalItem.rawStatus) | statusLabel }}</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="s-data">
+                            <label>ยอดขอเบิก</label>
 
-          <div class="side-divider"></div>
+                            <div class="s-value amount" [class.text-success]="isApproved">
+                                {{ approvalItem.amount | number:'1.2-2' }}
+
+                                <i *ngIf="isApproved" class="fas fa-check-circle ms-2"></i>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                @if (medicalClaim) {
+                <div class="medical-info-grid">
+                    <div class="med-info-item">
+                        <label><i class="fas fa-tag"></i> ประเภทการเบิก</label>
+                        <span>{{ medicalClaim.expenseTypeName }}</span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="fas fa-hospital-alt"></i> สถานพยาบาล</label>
+                        <span>{{ medicalClaim.hospitalName }}</span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="fas fa-virus"></i> โรค / อาการ</label>
+                        <span>{{ medicalClaim.diseaseName }}
+                            @if (medicalClaim.icd10Code) {
+                            <span class="text-muted">({{ medicalClaim.icd10Code }})</span>
+                            }
+                        </span>
+                    </div>
+                    <div class="med-info-item">
+                        <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
+                        <span>{{ dateUtil.formatDateToBE(medicalClaim.treatmentDateFrom, 'DD/MM/YYYY') }} – {{
+                            dateUtil.formatDateToBE(medicalClaim.treatmentDateTo, 'DD/MM/YYYY') }}
+                            <span class="text-muted">({{ medicalClaim.treatmentDays }} วัน)</span>
+                        </span>
+                    </div>
+                    @if (medicalClaim.remark) {
+                    <div class="med-info-item med-info-full">
+                        <label><i class="fas fa-comment-alt"></i> หมายเหตุ</label>
+                        <span>{{ medicalClaim.remark }}</span>
+                    </div>
+                    }
+                    @if (medicalClaim.rejectionReason) {
+                    <div class="med-info-item med-info-full">
+                        <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
+                        <span class="text-danger">{{ medicalClaim.rejectionReason }}</span>
+                    </div>
+                    }
+                </div>
+
+                <div class="medical-info-grid">
+                    <div class="med-info-item">
+                        <label><i class="fa-solid fa-comment"></i>Remark</label>
+                        <span>{{ medicalClaim.remark ? medicalClaim.remark : '-'}}</span>
+                    </div>
+                </div>
+
+
+                <div class="medical-info-grid">
+                    <div class="med-info-item">
+                        <label><i class="fa-solid fa-paperclip"></i>เอกสารแนบ </label>
+
+                        <span>
+                            <div *ngIf="medicalClaim.attachments.length" type="button" class="btn-view-all"
+                                (click)="openAllAttachments()">
+                                <i class="far fa-eye"></i>
+                                ดูไฟล์แนบ ({{ medicalClaim.attachments.length || 0 }} ไฟล์)
+                            </div>
+                        </span>
+                    </div>
+                </div>
+
+                }
+                @else {
+                <div class="content-header">
+                    <h3>รายการเบิก (Items)</h3>
+                </div>
+                }
+            </div>
+
+            <div class="side-panel">
+                <h3 class="side-title">Requester Info</h3>
+                <div class="side-group"><label>Name</label>
+                    <div class="side-val">{{ approvalItem.requestBy.name }}</div>
+                </div>
+                <div class="side-group"><label>Employee ID</label>
+                    <div class="side-val">{{ approvalItem.requestBy.employeeId }}</div>
+                </div>
+                <div class="side-group"><label>Department</label>
+                    <div class="side-val">{{ approvalItem.requestBy.department }}</div>
+                </div>
+                <div class="side-group"><label>Company</label>
+                    <div class="side-val">{{ approvalItem.requestBy.company }}</div>
+                </div>
+
+                <div class="side-divider"></div>
+            </div>
         </div>
-      </div>
     </main>
 
     @if (!isActionConfirm()) {
-      <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
+    <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
         <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
-          <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
-          <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
+            <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
+            <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
         </div>
-      </div>
+    </div>
     }
 
-    @if (isActionConfirm()) {
-      <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
+
+    @if (isActionConfirm() ) {
+    <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
         <div class="action-title">
-          Confirm Action: <span class="action-name">{{ actionType() }}</span>
+            Confirm Action: <span class="action-name">{{ actionType() }}</span>
         </div>
 
         @if (actionType() === 'Rejected' || actionType() === 'Referred Back') {
-          <div class="reason-section">
+        <div class="reason-section">
             <label for="reason">ระบุเหตุผล (Reason):</label>
-            <textarea
-              id="reason"
-              class="reason-input"
-              [(ngModel)]="reasonText"
-              placeholder="ระบุเหตุผลที่นี่..."
-            ></textarea>
-          </div>
+            <textarea id="reason" class="reason-input" [(ngModel)]="reasonText"
+                placeholder="ระบุเหตุผลที่นี่..."></textarea>
+        </div>
         }
 
         <div class="action-footer">
-          <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
-          <button class="btn-cancel" (click)="closeActionConfirm()">ยกเลิก (Cancel)</button>
+            <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
+            <button class="btn-cancel" (click)="closeActionConfirm()">ยกเลิก (Cancel)</button>
         </div>
-      </div>
-      <!-- </div> -->
+    </div>
+    <!-- </div> -->
     }
-  </div>
-}
+</div>
 
 @if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-  </app-file-preview-modal>
+<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+</app-file-preview-modal>
 }

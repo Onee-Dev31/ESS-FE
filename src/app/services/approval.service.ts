@@ -5,24 +5,24 @@ import { delay, Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root',
 })
 export class ApprovalService {
-  private baseUrl = environment.api_url;
+    private baseUrl = environment.api_url;
 
-  constructor(
-    private _http: HttpClient,
-    private authservice: AuthService,
-  ) {}
+    constructor(private _http: HttpClient,
+        private authservice: AuthService
+    ) { }
 
-  //   updateTicket(id: string, formData: FormData): Observable<any> {
-  //     console.log('ticketId type:', id);
-  //     // console.log(id, payload)
-  //     // return of({ success: true }).pipe(delay(1500));
-  //     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
-  //   }
 
-  updateTypeClaims(id: string | number, payload: any): Observable<any> {
-    return this._http.patch(`${this.baseUrl}/medical/claims/${id}/review`, payload);
-  }
+    //   updateTicket(id: string, formData: FormData): Observable<any> {
+    //     console.log('ticketId type:', id);
+    //     // console.log(id, payload)
+    //     // return of({ success: true }).pipe(delay(1500));
+    //     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
+    //   }
+
+    updateTypeClaims(id: string | number, payload: any): Observable<any> {
+        return this._http.patch(`${this.baseUrl}/medical/claims/${id}/review`, payload);
+    }
 }

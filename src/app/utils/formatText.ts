@@ -1,8 +1,10 @@
 export class formatText {
-  static getFormatTextHTML(text: string | null): string {
-    if (!text) return '';
-    return text.replace(/\r?\n/g, '<br>');
-  }
+
+    static getFormatTextHTML(text: string | null): string {
+        if (!text) return '';
+        return text.replace(/\r?\n/g, '<br>');
+    }
+
 }
 
 // export function formatMoney(value: any): string {
@@ -33,30 +35,30 @@ export class formatText {
 // }
 
 export function formatMoneyInput(value: string): string {
-  if (!value) return '';
+    if (!value) return '';
 
-  // ลบตัวอักษรที่ไม่ใช่ตัวเลข, จุด และ comma
-  let sanitized = value.replace(/[^0-9\.,]/g, '');
+    // ลบตัวอักษรที่ไม่ใช่ตัวเลข, จุด และ comma
+    let sanitized = value.replace(/[^0-9\.,]/g, '');
 
-  // แยก comma ออกก่อน
-  sanitized = sanitized.replace(/,/g, '');
+    // แยก comma ออกก่อน
+    sanitized = sanitized.replace(/,/g, '');
 
-  // ตรวจสอบว่ามีจุดมากกว่า 1 จุด
-  const parts = sanitized.split('.');
-  if (parts.length > 2) {
-    sanitized = parts[0] + '.' + parts[1];
-  }
+    // ตรวจสอบว่ามีจุดมากกว่า 1 จุด
+    const parts = sanitized.split('.');
+    if (parts.length > 2) {
+        sanitized = parts[0] + '.' + parts[1];
+    }
 
-  // แยกจำนวนเต็มกับทศนิยม
-  let [integerPart, decimalPart] = sanitized.split('.');
+    // แยกจำนวนเต็มกับทศนิยม
+    let [integerPart, decimalPart] = sanitized.split('.');
 
-  // ถ้ามีทศนิยม ให้จำกัดแค่ 2 หลัก
-  if (decimalPart !== undefined) {
-    decimalPart = decimalPart.substring(0, 2);
-  }
+    // ถ้ามีทศนิยม ให้จำกัดแค่ 2 หลัก
+    if (decimalPart !== undefined) {
+        decimalPart = decimalPart.substring(0, 2);
+    }
 
-  // ใส่ comma เฉพาะจำนวนเต็ม
-  const formattedInteger = parseInt(integerPart || '0', 10).toLocaleString('en-US');
+    // ใส่ comma เฉพาะจำนวนเต็ม
+    const formattedInteger = parseInt(integerPart || '0', 10).toLocaleString('en-US');
 
-  return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+    return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
 }

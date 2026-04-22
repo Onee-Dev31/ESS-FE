@@ -1,43 +1,24 @@
 <div class="vehicle-form-page">
   <header class="top-header-strip">
-    <h2>
-      {{ MODE_EDIT ? 'แก้ไขรายการเบิกค่ารถ' : 'เบิกค่ารถ (ก่อน 06:00 / หลัง 22:00)' }}
-      <span class="request-id-badge" *ngIf="requests?.claimNo"
-        >เลขที่การเบิก : {{ requests?.claimNo }}</span
-      >
+    <h2>{{ MODE_EDIT ? 'แก้ไขรายการเบิกค่ารถ' : 'เบิกค่ารถ (ก่อน 06:00 / หลัง 22:00)'}} <span class="request-id-badge"
+        *ngIf="requests?.claimNo">เลขที่การเบิก : {{ requests?.claimNo }}</span>
     </h2>
-    <button
-      type="button"
-      class="btn-close-modal"
-      (click)="closeModal()"
-      title="ปิด"
-      aria-label="ปิด"
-    >
-      <i class="fas fa-times"></i>
-    </button>
+    <button type="button" class="btn-close-modal" (click)="closeModal()" title="ปิด" aria-label="ปิด"><i
+        class="fas fa-times"></i></button>
   </header>
 
   <main class="content-card">
+
     <section class="filter-controls" *ngIf="!MODE_EDIT">
       <div class="month-selector">
         <label>ประจำเดือน :</label>
         <div class="inputs-row">
-          <select
-            [(ngModel)]="selectedMonthIndex"
-            (change)="generateCalendar()"
-            class="form-control"
-            title="เลือกเดือน"
-            aria-label="เลือกเดือน"
-          >
-            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i + 1">{{ m }}</option>
+          <select [(ngModel)]="selectedMonthIndex" (change)="generateCalendar()" class="form-control" title="เลือกเดือน"
+            aria-label="เลือกเดือน">
+            <option *ngFor="let m of thaiMonths; let i = index" [ngValue]="i+1">{{ m }}</option>
           </select>
-          <select
-            [(ngModel)]="selectedYearBE"
-            (change)="generateCalendar()"
-            class="form-control"
-            title="เลือกปี"
-            aria-label="เลือกปี"
-          >
+          <select [(ngModel)]="selectedYearBE" (change)="generateCalendar()" class="form-control" title="เลือกปี"
+            aria-label="เลือกปี">
             <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
           </select>
           <button class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
@@ -48,55 +29,35 @@
     <section class="filter-controls" *ngIf="MODE_EDIT">
       <div class="alert-delete" *ngIf="isDelete()">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+        รายการที่ยกเลิก {{isDelete()}} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
       </div>
 
       <div class="display-order">
         <div class="left">
-          <span class="keep"
-            ><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep() }} รายการ</span
-          >
-          <span class="delete"
-            ><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span
-          >
+          <span class="keep"><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep()}} รายการ</span>
+          <span class="delete"><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span>
         </div>
         <div class="right">
-          <span
-            >ยอดรวม: <span class="total"> {{ totalClaims() }}</span></span
-          >
+          <span>ยอดรวม: <span class="total"> {{totalClaims()}}</span></span>
         </div>
       </div>
+
     </section>
 
+
     <div class="mobile-cards-view mobile-only">
-      <div
-        *ngFor="let log of logs"
-        class="log-card"
-        [class.highlight-card]="log.selected"
-        [class.disable]="log.isDuplicate || (!log.selected && MODE_EDIT)"
-      >
+      <div *ngFor="let log of logs" class="log-card" [class.highlight-card]="log.selected"
+        [class.disable]="log.isDuplicate || (!log.selected && MODE_EDIT)">
         <div class="card-header">
           <div class="date-info">
-            <span
-              class="day-dot"
-              [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"
-            ></span>
+            <span class="day-dot" [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"></span>
             <span class="date">{{ dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY') }}</span>
-            <span
-              class="day-type"
-              [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
-              >({{ log.dayType }})</span
-            >
+            <span class="day-type" [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'">({{
+              log.dayType
+              }})</span>
           </div>
-          <input
-            type="checkbox"
-            [(ngModel)]="log.selected"
-            (change)="onToggleCheck(log)"
-            class="card-checkbox"
-            [disabled]="log.isDuplicate"
-            title="เลือกรายการ"
-            aria-label="เลือกรายการ"
-          />
+          <input type="checkbox" [(ngModel)]="log.selected" (change)="onToggleCheck(log)" class="card-checkbox"
+            [disabled]="log.isDuplicate" title="เลือกรายการ" aria-label="เลือกรายการ" />
         </div>
 
         <div class="card-grid">
@@ -114,32 +75,25 @@
           </div>
           <div class="grid-item">
             <label>ยอดรวม (บาท)</label>
-            <div class="val highlight-green">{{ log.amount || 0 | number }}.-</div>
+            <div class="val highlight-green">{{ (log.amount || 0) | number }}.-</div>
           </div>
         </div>
 
         <div class="card-input-section">
           <label>รายละเอียดการเบิก <span *ngIf="log.selected" class="required">*</span></label>
-          <input
-            type="text"
-            class="card-input"
-            [(ngModel)]="log.description"
-            placeholder="ระบุรายละเอียด..."
-            [class.is-invalid]="log.selected && !log.description"
-            (ngModelChange)="onInputChange(log)"
-            [disabled]="log.isDuplicate"
-          />
+          <input type="text" class="card-input" [(ngModel)]="log.description" placeholder="ระบุรายละเอียด..."
+            [class.is-invalid]="log.selected && !log.description" (ngModelChange)="onInputChange(log)"
+            [disabled]="log.isDuplicate" />
         </div>
+
       </div>
     </div>
   </main>
 
   <div class="form-actions">
     <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
-      <i class="fas fa-check"></i>
-      {{
-        !MODE_EDIT ? 'ยืนยันการเบิก' : hasDelete() ? 'ลบรายการเบิกทั้งหมด' : 'ยืนยันการแก้ไขการเบิก'
-      }}
+      <i class="fas fa-check"></i> {{ !MODE_EDIT ?'ยืนยันการเบิก' : hasDelete()? 'ลบรายการเบิกทั้งหมด'
+      :'ยืนยันการแก้ไขการเบิก' }}
     </button>
   </div>
 </div>

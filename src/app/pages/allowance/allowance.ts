@@ -1,12 +1,4 @@
-import {
-  Component,
-  OnInit,
-  signal,
-  computed,
-  inject,
-  DestroyRef,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, OnInit, signal, computed, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,27 +6,22 @@ import { AllowanceFormComponent } from '../../components/features/allowance-form
 import { AllowanceService } from '../../services/allowance.service';
 import { AllowanceApiService } from '../../services/allowance-api.service';
 import { AuthService } from '../../services/auth.service';
-import {
-  AllowanceRequest,
-  AllowanceItem,
-  MealAllowanceClaim,
-} from '../../interfaces/allowance.interface';
+import { AllowanceRequest, AllowanceItem, MealAllowanceClaim } from '../../interfaces/allowance.interface';
 import { LoadingService } from '../../services/loading';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { StatusUtil } from '../../utils/status.util';
-import {
-  createListingState,
-  clearListingFilters,
-  TableSortHelper,
-  createListingComputeds_v2,
-} from '../../utils/listing.util';
+import { createListingState, clearListingFilters, TableSortHelper, createListingComputeds_v2 } from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { combineLatest, debounce, timer, switchMap, catchError, of } from 'rxjs';
-import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
+import {
+  createAngularTable,
+  getCoreRowModel,
+  SortingState,
+} from '@tanstack/angular-table';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -99,49 +86,42 @@ export class AllowanceComponent implements OnInit {
 
   isLoading = this.loadingService.loading('allowance-list');
 
-  constructor(private i18n: NzI18nService) {
+  constructor(
+    private i18n: NzI18nService,
+  ) {
     this.i18n.setLocale(en_US);
   }
 
   ngOnInit() {
-    this.loadData();
+    this.loadData()
   }
 
   loadData() {
-    // this.loadingService.start('vehicle-list');
-
     let [start, end]: [any, any] = ['', ''];
     if (this.dateRange && this.dateRange.length === 2) {
       [start, end] = this.dateRange;
-      // console.log('Selected date range:', dayjs(start).format("YYYY-MM-DD"), dayjs(end).format("YYYY-MM-DD"));
     }
 
     const param = {
       employee_code: this.authService.userData().CODEMPID,
-      date_from: start ? dayjs(start).format('YYYY-MM-DD') : '',
-      date_to: end ? dayjs(end).format('YYYY-MM-DD') : '',
+      date_from: start ? dayjs(start).format("YYYY-MM-DD") : '',
+      date_to: end ? dayjs(end).format("YYYY-MM-DD") : '',
       status: this.listing.filterStatus(),
       search: this.listing.searchText() || '',
       page_number: this.listing.currentPage() + 1 || 1,
       page_size: this.listing.pageSize(),
-    };
-
-    // console.log(param)
-
+    }
     this.allowanceApiService.getClaims(param).subscribe({
       next: (res) => {
-        this.dataFromApi(res);
-        // this.loadingService.stop('vehicle-list');
+        this.dataFromApi(res)
       },
       error: (error) => {
-        // this.loadingService.stop('vehicle-list');
-      },
-    });
+      }
+    })
   }
 
   private dataFromApi(res: any) {
-    const items = res.data ?? [];
-    // console.log(res)
+    const items = res.data ?? []
     this.allRequests.set(this.mapApiData(items));
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
@@ -150,7 +130,6 @@ export class AllowanceComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): any[] {
-    // console.log("items >> ", items)
     return items.map((claim: any) => ({
       id: claim.claimId,
       claimNo: claim.voucherNo,
@@ -167,15 +146,14 @@ export class AllowanceComponent implements OnInit {
         amount: d.rate_amount ?? 0,
         selected: false,
       })),
-      ...claim,
+      ...claim
     }));
   }
 
   openModal(claimId?: string) {
     if (claimId) {
-      const result = this.allRequests().find((item) => item.id === claimId);
-      this.selectedRequest = result;
-      // console.log("result: ", result)
+      const result = this.allRequests().find(item => item.id === claimId);
+      this.selectedRequest = result
     }
     this.isModalOpen = true;
   }
@@ -209,13 +187,7 @@ export class AllowanceComponent implements OnInit {
     return req.id;
   }
 
-  trackByRowId(
-    _index: number,
-    itemOrRow:
-      | AllowanceRequest
-      | FlatAllowanceRow
-      | import('@tanstack/angular-table').Row<FlatAllowanceRow>,
-  ): string {
+  trackByRowId(_index: number, itemOrRow: AllowanceRequest | FlatAllowanceRow | import('@tanstack/angular-table').Row<FlatAllowanceRow>): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     const id = (item as FlatAllowanceRow).requestId || (item as AllowanceRequest).id || 'row';
     const date = (item as FlatAllowanceRow).date || '';
@@ -228,11 +200,11 @@ export class AllowanceComponent implements OnInit {
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
-    this.loadData();
+    this.loadData()
   }
 
   goToPage(page: number) {
     this.listing.currentPage.set(page);
-    this.loadData();
+    this.loadData()
   }
 }

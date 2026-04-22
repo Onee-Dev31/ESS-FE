@@ -9,49 +9,50 @@ dayjs.extend(buddhistEra);
 dayjs.locale('th');
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root'
 })
 
 /** Service สำหรับจัดการและฟอร์แมตวันที่ (รองรับ พ.ศ. และ Dayjs) */
 export class DateUtilityService {
-  formatDateToThaiMonth(dateStr: string | Date): string {
-    return dayjs(dateStr).format('DD-MMM-YYYY');
-  }
 
-  /** แปลงวันที่ ISO เป็นรูปแบบ พ.ศ. (DD/MM/BBBB) */
-  formatDateToBE(isoDate: string, format = 'DD/MM/BBBB', local = 'en'): string {
-    if (!isoDate) return '';
-    return dayjs(isoDate).locale(local).format(format);
-  }
+    formatDateToThaiMonth(dateStr: string | Date): string {
+        return dayjs(dateStr).format('DD-MMM-YYYY');
+    }
 
-  /** แปลงวันที่ พ.ศ. กลับเป็นรูปแบบ ISO (YYYY-MM-DD) สำหรับ API */
-  formatBEToISO(beDate: string): string {
-    if (!beDate) return '';
-    const parts = beDate.split('/');
-    if (parts.length !== 3) return beDate;
+    /** แปลงวันที่ ISO เป็นรูปแบบ พ.ศ. (DD/MM/BBBB) */
+    formatDateToBE(isoDate: string, format = 'DD/MM/BBBB', local = 'en'): string {
+        if (!isoDate) return '';
+        return dayjs(isoDate).locale(local).format(format);
+    }
 
-    const yearCE = parseInt(parts[2]) - 543;
-    return `${yearCE}-${parts[1]}-${parts[0]}`;
-  }
+    /** แปลงวันที่ พ.ศ. กลับเป็นรูปแบบ ISO (YYYY-MM-DD) สำหรับ API */
+    formatBEToISO(beDate: string): string {
+        if (!beDate) return '';
+        const parts = beDate.split('/');
+        if (parts.length !== 3) return beDate;
 
-  getCurrentDateISO(): string {
-    return dayjs().format('YYYY-MM-DD');
-  }
+        const yearCE = parseInt(parts[2]) - 543;
+        return `${yearCE}-${parts[1]}-${parts[0]}`;
+    }
 
-  isValidDateRange(startDate: string, endDate: string): boolean {
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
-    return start.isBefore(end) || start.isSame(end);
-  }
+    getCurrentDateISO(): string {
+        return dayjs().format('YYYY-MM-DD');
+    }
 
-  /** คำนวณเวลาที่ผ่านไปเป็นภาษาไทย (เช่น "3 วันที่แล้ว") */
-  getTimeAgo(date: string | Date): string {
-    return dayjs(date).fromNow();
-  }
+    isValidDateRange(startDate: string, endDate: string): boolean {
+        const start = dayjs(startDate);
+        const end = dayjs(endDate);
+        return start.isBefore(end) || start.isSame(end);
+    }
 
-  diffInDays(startDate: string | Date, endDate: string | Date): number {
-    const start = dayjs(startDate).startOf('day');
-    const end = dayjs(endDate).startOf('day');
-    return end.diff(start, 'day') + 1;
-  }
+    /** คำนวณเวลาที่ผ่านไปเป็นภาษาไทย (เช่น "3 วันที่แล้ว") */
+    getTimeAgo(date: string | Date): string {
+        return dayjs(date).fromNow();
+    }
+
+    diffInDays(startDate: string | Date, endDate: string | Date): number {
+        const start = dayjs(startDate).startOf('day');
+        const end = dayjs(endDate).startOf('day');
+        return end.diff(start, 'day') + 1;
+    }
 }

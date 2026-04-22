@@ -10,10 +10,9 @@ import { AuthService } from './auth.service';
 export class ResignManagementService {
   private baseUrl = environment.api_url;
 
-  constructor(
-    private _http: HttpClient,
-    private authservice: AuthService,
-  ) {}
+  constructor(private _http: HttpClient,
+    private authservice: AuthService
+  ) { }
 
   getEmployee(params: {
     page?: number;
@@ -34,10 +33,10 @@ export class ResignManagementService {
     if (params.empStatus) queryParams.empStatus = params.empStatus;
     if (params.adExpiredDate === 'true') queryParams.adExpiredDate = params.adExpiredDate;
 
-    console.log('params >>> ', queryParams);
+    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/employees`, {
-      params: queryParams,
+      params: queryParams
     });
   }
 
@@ -71,6 +70,7 @@ export class ResignManagementService {
     costCent?: any;
     empStatus?: string;
   }): Observable<any> {
+
     const queryParams: any = {};
 
     if (params.page) queryParams.page = params.page;
@@ -86,7 +86,7 @@ export class ResignManagementService {
     // });
 
     return this._http.get<any>(`${this.baseUrl}/employees-with-ad`, {
-      params: queryParams,
+      params: queryParams
     });
   }
 }

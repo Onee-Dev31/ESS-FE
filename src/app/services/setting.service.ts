@@ -9,7 +9,7 @@ import { delay, Observable } from 'rxjs';
 export class SettingService {
   private baseUrl = environment.api_url;
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) { }
 
   // MENU
   getMenu(): Observable<any> {
@@ -21,10 +21,7 @@ export class SettingService {
   }
 
   updateMenuRolePermission(menuID: string, payload: any): Observable<any> {
-    return this._http.post(
-      `${this.baseUrl}/Master/menu-role-permissions?menuID=${menuID}`,
-      payload,
-    );
+    return this._http.post(`${this.baseUrl}/Master/menu-role-permissions?menuID=${menuID}`, payload);
   }
 
   updateMenu(payload: any): Observable<any> {
@@ -50,15 +47,16 @@ export class SettingService {
     if (params.roleName) queryParams.roleName = params.roleName;
     // if (params.empStatus) queryParams.empStatus = params.empStatus;
 
-    console.log('params >>> ', queryParams);
+    console.log("params >>> ", queryParams)
 
     return this._http.get<any>(`${this.baseUrl}/Master/employees`, {
-      params: queryParams,
+      params: queryParams
     });
   }
 
   settingUserRole(payload: any): Observable<any> {
-    console.log(payload);
+    console.log(payload)
     return this._http.post(`${this.baseUrl}/Master/user-roles`, payload);
   }
+
 }

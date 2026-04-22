@@ -10,8 +10,9 @@ import { FormsModule } from '@angular/forms';
   template: `
     <div class="pagination-container">
       <div class="pagination-info">
-        แสดง {{ currentPage * pageSize + 1 }} ถึง
-        {{ Math.min((currentPage + 1) * pageSize, totalItems) }} จาก {{ totalItems }} รายการ
+        แสดง {{ currentPage * pageSize + 1 }}
+        ถึง {{ Math.min((currentPage + 1) * pageSize, totalItems) }}
+        จาก {{ totalItems }} รายการ
       </div>
       <div class="pagination-controls">
         <div class="page-size-selector">
@@ -29,35 +30,23 @@ import { FormsModule } from '@angular/forms';
           <button class="page-btn" (click)="onPageChange.emit(0)" [disabled]="currentPage === 0">
             <i class="fas fa-angle-double-left"></i>
           </button>
-          <button
-            class="page-btn"
-            (click)="onPageChange.emit(currentPage - 1)"
-            [disabled]="currentPage === 0"
-          >
+          <button class="page-btn" (click)="onPageChange.emit(currentPage - 1)" [disabled]="currentPage === 0">
             <i class="fas fa-angle-left"></i>
           </button>
           <span class="page-info">
             <strong>หน้า {{ currentPage + 1 }} จาก {{ totalPages }}</strong>
           </span>
-          <button
-            class="page-btn"
-            (click)="onPageChange.emit(currentPage + 1)"
-            [disabled]="currentPage >= totalPages - 1"
-          >
+          <button class="page-btn" (click)="onPageChange.emit(currentPage + 1)" [disabled]="currentPage >= totalPages - 1">
             <i class="fas fa-angle-right"></i>
           </button>
-          <button
-            class="page-btn"
-            (click)="onPageChange.emit(totalPages - 1)"
-            [disabled]="currentPage >= totalPages - 1"
-          >
+          <button class="page-btn" (click)="onPageChange.emit(totalPages - 1)" [disabled]="currentPage >= totalPages - 1">
             <i class="fas fa-angle-double-right"></i>
           </button>
         </div>
       </div>
     </div>
   `,
-  styleUrls: ['./pagination.scss'],
+  styleUrls: ['./pagination.scss']
 })
 export class PaginationComponent {
   @Input({ required: true }) currentPage: number = 0;

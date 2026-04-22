@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './spinner.html',
-  styleUrl: './spinner.scss',
+  styleUrl: './spinner.scss'
 })
 export class SpinnerComponent {
   @Input() size: 'small' | 'medium' | 'large' = 'medium';

@@ -8,8 +8,9 @@ describe('TimeOffForm', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimeOffForm],
-    }).compileComponents();
+      imports: [TimeOffForm]
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(TimeOffForm);
     component = fixture.componentInstance;

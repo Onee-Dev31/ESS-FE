@@ -1,154 +1,148 @@
 <div class="modal-overlay info">
-  <div class="modal-container">
-    <div>
-      <header class="top-header-strip">
-        <h2>ข้อมูล</h2>
-        <div class="header-right-meta">
-          <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
+    <div class="modal-container">
+        <div>
+            <header class="top-header-strip">
+                <h2>ข้อมูล</h2>
+                <div class="header-right-meta">
+                    <button class="btn-close" (click)="close()"><i class="fas fa-times"></i></button>
+                </div>
+            </header>
+            <div class="content-card">
+                @if (loading) {
+                <div class="loading-box">
+                    <div class="spinner"></div>
+                    <div>Loading employee asset...</div>
+                </div>
+                }
+                @else {
+                <!-- Employee -->
+                <section>
+                    <div class="section-title">Employee</div>
+                    <div class="info-grid">
+
+
+                        <div>
+                            <span class="label">Name (TH)</span>
+                            <div class="value">{{emp.firstNameTh}} {{emp.lastNameTh}} ({{emp.nickName}})</div>
+                        </div>
+
+                        <div>
+                            <span class="label">Name (EN)</span>
+                            <div class="value">{{emp.firstNameEn}} {{emp.lastNameEn}}</div>
+                        </div>
+
+                        <div>
+                            <span class="label">Employee Code</span>
+                            <div class="value">{{emp.empCode}}</div>
+                        </div>
+
+                        <div>
+                            <span class="label">Position</span>
+                            <div class="value">{{emp.position}}</div>
+                        </div>
+                        <div>
+                            <span class="label">Department</span>
+                            <div class="value">{{emp.department}}</div>
+                        </div>
+                        <div>
+                            <span class="label">Company</span>
+                            <div class="value">{{emp.company}}</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AD INFO -->
+                <section>
+                    <div class="section-title">Active Directory</div>
+
+                    <div class="info-grid">
+                        <div>
+                            <span class="label">AD User</span>
+                            <div class="value">{{emp.adUser}}</div>
+                        </div>
+                        <div>
+                            <span class="label">Status</span>
+                            <div class="value" [class.status-active]="onee_user.STATUS === 'Active'"
+                                [class.status-lock]="onee_user.STATUS === 'Lock'"
+                                [class.status-expired]="onee_user.STATUS === 'Expired'">
+                                {{onee_user.STATUS}}</div>
+                        </div>
+
+                        <div>
+                            <span class="label">Password Expiration</span>
+                            <div class="value">
+                                {{dataUtil.formatDateToBE(onee_user.PasswordExpirationDate, 'DD/MM/YYYY HH:mm:ss')}}
+                                <span>({{onee_user.PasswordExpirationRemaining}})</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="label">Last Password Change</span>
+                            <div class="value">{{dataUtil.formatDateToBE(onee_user.PwdLastSet, 'DD/MM/YYYY HH:mm:ss')}}
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="label">Last date</span>
+                            <div class="value">{{dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY')}}</div>
+                        </div>
+
+                        <div>
+                            <span class="label">Effective date</span>
+                            <div class="value">{{dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY')}}</div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ASSET -->
+                @if (emp_asset.length) {
+                <section>
+                    <div class="section-title">Assigned Assets</div>
+                    <div class="table-scroll">
+                        <table class="asset-table">
+                            <thead>
+                                <tr>
+                                    <th>Asset Tag</th>
+                                    <th>Serial</th>
+                                    <th>Model</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
+                                    <th>CPU</th>
+                                    <th>RAM</th>
+                                    <th>Hard Disk Drive</th>
+                                    <th>OS</th>
+                                    <th>PO</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (item of emp_asset; track item) {
+                                <tr>
+                                    <td>{{item.asset_tag || ''}}</td>
+                                    <td>{{item.serial || ''}}</td>
+                                    <td>{{item.model.name || ''}}</td>
+                                    <td>{{item.category.name || ''}}</td>
+                                    <td>{{item.status_label.name || ''}}</td>
+                                    <td>{{item.location.name || ''}}</td>
+                                    <td>{{item.custom_fields?.CPU?.value || ''}}</td>
+                                    <td>{{item.custom_fields?.RAM?.value || ''}}</td>
+                                    <td>{{item.custom_fields?.["Hard Disk Drive"]?.value || ''}}</td>
+                                    <td>{{item.custom_fields?.OS?.value || ''}}</td>
+                                    <td>{{item.custom_fields?.PO?.value || ''}}</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                }
+                @else {
+                <div class="no-data">No asset found</div>
+                }
+                }
+            </div>
         </div>
-      </header>
-      <div class="content-card">
-        @if (loading) {
-          <div class="loading-box">
-            <div class="spinner"></div>
-            <div>Loading employee asset...</div>
-          </div>
-        } @else {
-          <!-- Employee -->
-          <section>
-            <div class="section-title">Employee</div>
-            <div class="info-grid">
-              <div>
-                <span class="label">Name (TH)</span>
-                <div class="value">
-                  {{ emp.firstNameTh }} {{ emp.lastNameTh }} ({{ emp.nickName }})
-                </div>
-              </div>
-
-              <div>
-                <span class="label">Name (EN)</span>
-                <div class="value">{{ emp.firstNameEn }} {{ emp.lastNameEn }}</div>
-              </div>
-
-              <div>
-                <span class="label">Employee Code</span>
-                <div class="value">{{ emp.empCode }}</div>
-              </div>
-
-              <div>
-                <span class="label">Position</span>
-                <div class="value">{{ emp.position }}</div>
-              </div>
-              <div>
-                <span class="label">Department</span>
-                <div class="value">{{ emp.department }}</div>
-              </div>
-              <div>
-                <span class="label">Company</span>
-                <div class="value">{{ emp.company }}</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- AD INFO -->
-          <section>
-            <div class="section-title">Active Directory</div>
-
-            <div class="info-grid">
-              <div>
-                <span class="label">AD User</span>
-                <div class="value">{{ emp.adUser }}</div>
-              </div>
-              <div>
-                <span class="label">Status</span>
-                <div
-                  class="value"
-                  [class.status-active]="onee_user.STATUS === 'Active'"
-                  [class.status-lock]="onee_user.STATUS === 'Lock'"
-                  [class.status-expired]="onee_user.STATUS === 'Expired'"
-                >
-                  {{ onee_user.STATUS }}
-                </div>
-              </div>
-
-              <div>
-                <span class="label">Password Expiration</span>
-                <div class="value">
-                  {{
-                    dataUtil.formatDateToBE(onee_user.PasswordExpirationDate, 'DD/MM/YYYY HH:mm:ss')
-                  }}
-                  <span>({{ onee_user.PasswordExpirationRemaining }})</span>
-                </div>
-              </div>
-
-              <div>
-                <span class="label">Last Password Change</span>
-                <div class="value">
-                  {{ dataUtil.formatDateToBE(onee_user.PwdLastSet, 'DD/MM/YYYY HH:mm:ss') }}
-                </div>
-              </div>
-
-              <div>
-                <span class="label">Last date</span>
-                <div class="value">{{ dataUtil.formatDateToBE(emp.lastDate, 'DD/MM/YYYY') }}</div>
-              </div>
-
-              <div>
-                <span class="label">Effective date</span>
-                <div class="value">
-                  {{ dataUtil.formatDateToBE(emp.effectiveDate, 'DD/MM/YYYY') }}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- ASSET -->
-          @if (emp_asset.length) {
-            <section>
-              <div class="section-title">Assigned Assets</div>
-              <div class="table-scroll">
-                <table class="asset-table">
-                  <thead>
-                    <tr>
-                      <th>Asset Tag</th>
-                      <th>Serial</th>
-                      <th>Model</th>
-                      <th>Category</th>
-                      <th>Status</th>
-                      <th>Location</th>
-                      <th>CPU</th>
-                      <th>RAM</th>
-                      <th>Hard Disk Drive</th>
-                      <th>OS</th>
-                      <th>PO</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    @for (item of emp_asset; track item) {
-                      <tr>
-                        <td>{{ item.asset_tag || '' }}</td>
-                        <td>{{ item.serial || '' }}</td>
-                        <td>{{ item.model.name || '' }}</td>
-                        <td>{{ item.category.name || '' }}</td>
-                        <td>{{ item.status_label.name || '' }}</td>
-                        <td>{{ item.location.name || '' }}</td>
-                        <td>{{ item.custom_fields?.CPU?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.RAM?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.['Hard Disk Drive']?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.OS?.value || '' }}</td>
-                        <td>{{ item.custom_fields?.PO?.value || '' }}</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          } @else {
-            <div class="no-data">No asset found</div>
-          }
-        }
-      </div>
     </div>
-  </div>
 </div>

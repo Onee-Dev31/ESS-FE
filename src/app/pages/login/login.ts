@@ -12,7 +12,7 @@ import { take, finalize } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
+  styleUrl: './login.scss'
 })
 export class LoginComponent implements OnDestroy {
   private authService = inject(AuthService);
@@ -23,7 +23,7 @@ export class LoginComponent implements OnDestroy {
 
   loginForm = new FormGroup({
     username: new FormControl(localStorage.getItem('rememberedEmail') || '', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required])
   });
 
   passwordFieldType: string = 'password';
@@ -55,22 +55,21 @@ export class LoginComponent implements OnDestroy {
 
     const { username, password } = this.loginForm.value;
 
-    this.authService
-      .login(username || '', password || '')
-      .pipe(take(1))
-      .subscribe({
-        next: () => {
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-          if (returnUrl) {
-            this.router.navigateByUrl(returnUrl);
-          } else {
-            this.router.navigate(['/welcome']);
-          }
-        },
-        error: (err) => {
-          console.log('Login error:', err);
-        },
-      });
+    this.authService.login(username || '', password || '').pipe(
+      take(1)
+    ).subscribe({
+      next: () => {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          this.router.navigate(['/welcome']);
+        }
+      },
+      error: (err) => {
+        console.log('Login error:', err);
+      }
+    });
   }
 
   switchToQr() {
@@ -92,42 +91,36 @@ export class LoginComponent implements OnDestroy {
     this.qrImage = '';
     this.stopPolling();
 
-    this.authService
-      .generateQr()
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          this.qrImage = res.qrImage;
-          this.qrToken = res.qrToken;
-          this.qrLoading = false;
-          this.startPolling();
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.qrLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
+    this.authService.generateQr().pipe(take(1)).subscribe({
+      next: (res) => {
+        this.qrImage = res.qrImage;
+        this.qrToken = res.qrToken;
+        this.qrLoading = false;
+        this.startPolling();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.qrLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private startPolling() {
     this.pollingTimer = setInterval(() => {
-      this.authService
-        .getQrStatus(this.qrToken)
-        .pipe(take(1))
-        .subscribe({
-          next: (res) => {
-            if (res['success'] === true) {
-              this.stopPolling();
-              this.authService.storeLoginResponse(res);
-              this.router.navigate(['/welcome']);
-            } else if (res.status === 'expired') {
-              this.stopPolling();
-              this.qrExpired = true;
-              this.cdr.detectChanges();
-            }
-          },
-        });
+      this.authService.getQrStatus(this.qrToken).pipe(take(1)).subscribe({
+        next: (res) => {
+          if (res['success'] === true) {
+            this.stopPolling();
+            this.authService.storeLoginResponse(res);
+            this.router.navigate(['/welcome']);
+          } else if (res.status === 'expired') {
+            this.stopPolling();
+            this.qrExpired = true;
+            this.cdr.detectChanges();
+          }
+        }
+      });
     }, 3000);
   }
 

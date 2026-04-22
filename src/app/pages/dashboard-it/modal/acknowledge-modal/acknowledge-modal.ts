@@ -1,10 +1,7 @@
 import { Component, EventEmitter, Input, Output, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import {
-  FilePreviewItem,
-  FilePreviewModalComponent,
-} from '../../../../components/modals/file-preview-modal/file-preview-modal';
+import { FilePreviewItem, FilePreviewModalComponent } from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 
 @Component({
@@ -19,16 +16,15 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
-  message: string = '';
+  message: string = "";
   attachments: any[] = [];
 
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['ticket'] && this.ticket) {
-      console.log(this.ticket.ticketTypeId);
 
+    if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
     }
   }
@@ -38,6 +34,7 @@ export class AcknowledgeModal {
   }
 
   save() {
+
     if (!this.selectedTag) {
       return;
     }
@@ -45,9 +42,8 @@ export class AcknowledgeModal {
     const payload = {
       ticketTypeId: this.selectedTag,
       message: this.message,
-      attachments: this.attachments,
-    };
-    console.log(payload);
+      attachments: this.attachments
+    }
     this.submitModal.emit(payload);
   }
 
@@ -64,14 +60,18 @@ export class AcknowledgeModal {
   }
 
   private addFiles(files: FileList) {
-    const newFiles = Array.from(files).map((f) => ({
+    const newFiles = Array.from(files).map(f => ({
       name: f.name,
       size: f.size,
-      file: f,
+      file: f
     }));
 
-    this.attachments = [...this.attachments, ...newFiles];
+    this.attachments = [
+      ...this.attachments,
+      ...newFiles
+    ];
   }
+
 
   removeAttachment(index: number) {
     this.attachments.splice(index, 1);
@@ -79,9 +79,11 @@ export class AcknowledgeModal {
     if (this.attachments.length === 0) {
       this.message = '';
     }
+
   }
 
   viewFile(file: any) {
+
     let url = '';
 
     if (file.file) {
@@ -97,14 +99,17 @@ export class AcknowledgeModal {
         fileName: file.name || file.fileName,
         date: dayjs().format('DD/MM/YYYY HH:mm'),
         url: url,
-        type: file.file?.type || file.type || 'application/octet-stream',
-      },
+        type: file.file?.type || file.type || 'application/octet-stream'
+      }
     ]);
 
     this.isPreviewModalOpen.set(true);
+
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
+
+
 }

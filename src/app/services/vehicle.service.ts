@@ -5,84 +5,86 @@ import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+    providedIn: 'root'
 })
 export class VehicleService {
-  private baseUrl = environment.api_url;
-  private ONEEJOB_url = environment.api_ONEEJOB_url;
 
-  constructor(
-    private _http: HttpClient,
-    private authservice: AuthService,
-  ) {}
+    private baseUrl = environment.api_url;
+    private ONEEJOB_url = environment.api_ONEEJOB_url;
 
-  getEmployee(params: {
-    page?: number;
-    pageSize?: number;
-    searchText?: string;
-    companyCode?: any;
-    costCent?: any;
-    empStatus?: string;
-  }): Observable<any> {
-    const queryParams: any = {};
+    constructor(private _http: HttpClient,
+        private authservice: AuthService
+    ) { }
 
-    if (params.page) queryParams.page = params.page;
-    if (params.pageSize) queryParams.perPage = params.pageSize;
-    if (params.searchText) queryParams.searchText = params.searchText;
-    if (params.companyCode) queryParams.companyCode = params.companyCode;
-    if (params.costCent) queryParams.costCent = params.costCent;
-    if (params.empStatus) queryParams.empStatus = params.empStatus;
+    getEmployee(params: {
+        page?: number;
+        pageSize?: number;
+        searchText?: string;
+        companyCode?: any;
+        costCent?: any;
+        empStatus?: string;
+    }): Observable<any> {
+        const queryParams: any = {};
 
-    // console.log("params >>> ", queryParams)
+        if (params.page) queryParams.page = params.page;
+        if (params.pageSize) queryParams.perPage = params.pageSize;
+        if (params.searchText) queryParams.searchText = params.searchText;
+        if (params.companyCode) queryParams.companyCode = params.companyCode;
+        if (params.costCent) queryParams.costCent = params.costCent;
+        if (params.empStatus) queryParams.empStatus = params.empStatus;
 
-    return this._http.get<any>(`${this.baseUrl}/employees`, {
-      params: queryParams,
-    });
-  }
+        // console.log("params >>> ", queryParams)
 
-  getVehicleClaimByEmpcode(params: {
-    page?: number;
-    pageSize?: number;
-    empCode?: string;
-    searchText?: string;
-    claimStatus?: string;
-    dateFrom?: string;
-    dateTo?: string;
-  }): Observable<any> {
-    const queryParams: any = {};
+        return this._http.get<any>(`${this.baseUrl}/employees`, {
+            params: queryParams
+        });
+    }
 
-    if (params.page) queryParams.page_number = params.page;
-    if (params.pageSize) queryParams.page_size = params.pageSize;
-    if (params.empCode) queryParams.employee_code = params.empCode;
+    getVehicleClaimByEmpcode(params: {
+        page?: number;
+        pageSize?: number;
+        empCode?: string;
+        searchText?: string;
+        claimStatus?: string;
+        dateFrom?: string;
+        dateTo?: string;
+    }): Observable<any> {
 
-    if (params.searchText) queryParams.search = params.searchText;
-    if (params.claimStatus) queryParams.status = params.claimStatus;
-    if (params.dateFrom) queryParams.date_from = params.dateFrom;
-    if (params.dateTo) queryParams.date_to = params.dateTo;
+        const queryParams: any = {};
 
-    // console.log("params >>> ", queryParams)
+        if (params.page) queryParams.page_number = params.page;
+        if (params.pageSize) queryParams.page_size = params.pageSize;
+        if (params.empCode) queryParams.employee_code = params.empCode;
 
-    return this._http.get(`${this.baseUrl}/transport-claim/claims`, {
-      params: queryParams,
-    });
-  }
+        if (params.searchText) queryParams.search = params.searchText;
+        if (params.claimStatus) queryParams.status = params.claimStatus;
+        if (params.dateFrom) queryParams.date_from = params.dateFrom;
+        if (params.dateTo) queryParams.date_to = params.dateTo;
 
-  getVehicleByEmpcode(year: string, month: string): Observable<any> {
-    const empCode = this.authservice.userData().CODEMPID;
-    return this._http.get(
-      `${this.baseUrl}/transport-claim/eligible-dates?employee_code=${empCode}&year=${year}&month=${month}`,
-    );
-  }
+        // console.log("params >>> ", queryParams)
 
-  createVehicleByEmpcode(payload: any): Observable<any> {
-    return this._http.post(`${this.baseUrl}/transport-claim`, payload);
-  }
+        return this._http.get(`${this.baseUrl}/transport-claim/claims`, {
+            params: queryParams
+        });
+    }
 
-  updateVehicleByClaimId(id: string, payload: any): Observable<any> {
-    return this._http.patch(`${this.baseUrl}/transport-claim/${id}`, payload);
-  }
+    getVehicleByEmpcode(year: string, month: string): Observable<any> {
+        const empCode = this.authservice.userData().CODEMPID
+        return this._http.get(`${this.baseUrl}/transport-claim/eligible-dates?employee_code=${empCode}&year=${year}&month=${month}`);
+    }
 
-  deleteVehicleByEmpCode(id: string, empCode: string): Observable<any> {
-    return this._http.delete(`${this.baseUrl}/transport-claim/${id}?employee_code=${empCode}`);
-  }
+    createVehicleByEmpcode(payload: any): Observable<any> {
+        return this._http.post(`${this.baseUrl}/transport-claim`, payload);
+    }
+
+    updateVehicleByClaimId(id: string, payload: any): Observable<any> {
+        return this._http.patch(`${this.baseUrl}/transport-claim/${id}`, payload);
+    }
+
+    deleteVehicleByEmpCode(id: string, empCode: string): Observable<any> {
+        return this._http.delete(`${this.baseUrl}/transport-claim/${id}?employee_code=${empCode}`);
+    }
+
 }
+
+

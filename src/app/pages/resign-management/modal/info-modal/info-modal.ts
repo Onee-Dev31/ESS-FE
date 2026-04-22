@@ -1,13 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ItAssetService } from '../../../../services/it-asset.service';
 import { DateUtilityService } from '../../../../services/date-utility.service';
 import { catchError, forkJoin, of } from 'rxjs';
@@ -37,20 +28,20 @@ export class InfoModal implements OnChanges {
 
       forkJoin({
         asset: this.getItAssetByAduser(this.emp.adUser).pipe(
-          catchError((err) => {
+          catchError(err => {
             console.error('asset error', err);
             return of(null);
-          }),
+          })
         ),
         onee: this.getOneeuserByAduser(this.emp.adUser).pipe(
-          catchError((err) => {
+          catchError(err => {
             console.error('onee error', err);
             return of(null);
-          }),
-        ),
+          })
+        )
       }).subscribe({
         next: (res) => {
-          console.log('res', res);
+          console.log("res", res)
           // API 1
           this.emp_asset = res.asset.data.rows;
           this.userId_asset = res.asset.userId_asset;
@@ -58,7 +49,7 @@ export class InfoModal implements OnChanges {
           // API 2
           const statusMap: any = {
             Lock: 'Lock',
-            Expired: 'Expired',
+            Expired: 'Expired'
           };
 
           const STATUS = statusMap[res.onee.IsLocked] || 'Active';
@@ -70,7 +61,7 @@ export class InfoModal implements OnChanges {
         error: (error) => {
           console.error('Error fetching data:', error);
           this.loading = false;
-        },
+        }
       });
     }
   }
@@ -78,17 +69,18 @@ export class InfoModal implements OnChanges {
   constructor(
     private itAssetService: ItAssetService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+  }
 
   close() {
     this.closeModal.emit();
   }
 
   getItAssetByAduser(adUser: string) {
-    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser);
+    return this.itAssetService.GetItAssetByAD('SNIPE-IT', adUser)
   }
 
   getOneeuserByAduser(adUser: string) {
-    return this.itAssetService.getOneeuserByAd(adUser);
+    return this.itAssetService.getOneeuserByAd(adUser)
   }
 }

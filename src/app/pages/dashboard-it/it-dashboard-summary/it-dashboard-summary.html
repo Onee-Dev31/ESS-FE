@@ -1,282 +1,202 @@
 <!-- KPI CARDS -->
 <section class="kpi-row">
-  <div
-    class="kpi"
-    *ngFor="let k of kpis; trackBy: trackByStatus"
-    [class.active]="activeStatus === k.status"
-    (click)="selectStatus(k.status, true)"
-  >
-    <div class="kpi-top">
-      <div class="kpi-title">{{ k.title }}</div>
+    <div class="kpi" *ngFor="let k of kpis; trackBy: trackByStatus" [class.active]="activeStatus === k.status"
+        (click)="selectStatus(k.status,true)">
 
-      <span
-        class="kpi-pill"
-        [class.pill-blue]="k.status === 'open'"
-        [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'"
-        [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'"
-        [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'"
-      >
-        <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
-      </span>
+        <div class="kpi-top">
+            <div class="kpi-title">{{ k.title }}</div>
+
+            <span class="kpi-pill" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
+                [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
+                [class.pill-red]="k.status==='denied'" [class.pill-hold]="k.status==='hold'"
+                [class.pill-gray]="k.status==='all'">
+                <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
+            </span>
+        </div>
+
+        <div class="kpi-value">
+            {{ k.value | number }}
+            <!-- <span> -->
+            <span class="kpi-delta" [class.pill-blue]="k.status==='open'" [class.pill-cyan]="k.status==='assigned'"
+                [class.pill-orange]="k.status==='inprogress'" [class.pill-green]="k.status==='done'"
+                [class.pill-red]="k.status==='denied'" [class.pill-hold]="k.status==='hold'"
+                [class.pill-gray]="k.status==='all'">
+                <span>{{ getPercent(k) }}%</span>
+            </span>
+            <!-- </span> -->
+        </div>
+
+        <div class="kpi-hint">{{ k.hint }}</div>
     </div>
-
-    <div class="kpi-value">
-      {{ k.value | number }}
-      <!-- <span> -->
-      <span
-        class="kpi-delta"
-        [class.pill-blue]="k.status === 'open'"
-        [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'"
-        [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'"
-        [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'"
-      >
-        <span>{{ getPercent(k) }}%</span>
-      </span>
-      <!-- </span> -->
-    </div>
-
-    <div class="kpi-hint">{{ k.hint }}</div>
-  </div>
 </section>
 
 <!-- ================= CHART ROW ================= -->
 
 <div class="chart-row">
-  <!-- Status Pie -->
-  <div class="chart-card">
-    <div class="chart-title">Status Distribution</div>
 
-    <div
-      echarts
-      class="echart"
-      [options]="statusPieOption"
-      (chartInit)="onStatusChartInit($event)"
-      (chartClick)="onStatusPieClick($event)"
-    ></div>
-  </div>
+    <!-- Status Pie -->
+    <div class="chart-card">
+        <div class="chart-title">Status Distribution</div>
 
-  <!-- Service Pie -->
-  <div class="chart-card">
-    <div class="chart-title">Service Type</div>
-
-    <div echarts class="echart" [options]="servicePieOption"></div>
-  </div>
-
-  <!-- Company Bar -->
-  <div class="chart-card bar-card">
-    <div class="chart-title">Top 5 Companies</div>
-    <div
-      echarts
-      class="echart bar"
-      [options]="companyBarOption"
-      (chartClick)="onCompanyBarClick($event)"
-    ></div>
-  </div>
-  <div class="chart-card bar-card">
-    <div class="chart-title">Top 5 Deparment</div>
-    <div class="dept-drill">
-      <div echarts class="echart dept" [options]="deptBarOption"></div>
+        <div echarts class="echart" [options]="statusPieOption" (chartInit)="onStatusChartInit($event)"
+            (chartClick)="onStatusPieClick($event)">
+        </div>
     </div>
-  </div>
+
+    <!-- Service Pie -->
+    <div class="chart-card">
+        <div class="chart-title">Service Type</div>
+
+        <div echarts class="echart" [options]="servicePieOption">
+        </div>
+    </div>
+
+    <!-- Company Bar -->
+    <div class="chart-card bar-card">
+        <div class="chart-title">Top 5 Companies</div>
+        <div echarts class="echart bar" [options]="companyBarOption" (chartClick)="onCompanyBarClick($event)">
+        </div>
+    </div>
+    <div class="chart-card bar-card">
+        <div class="chart-title">Top 5 Deparment</div>
+        <div class="dept-drill">
+            <div echarts class="echart dept" [options]="deptBarOption"></div>
+        </div>
+    </div>
+
+
 </div>
 
 <!-- overlay -->
 <div class="log-overlay" *ngIf="isLogModalVisible" (click)="handleCancel()">
-  <div class="log-modal" (click)="$event.stopPropagation()">
-    <div class="log-modal-header">
-      <div class="log-modal-title">
-        <span>Ticket Logs - </span>
+    <div class="log-modal" (click)="$event.stopPropagation()">
+        <div class="log-modal-header">
+            <div class="log-modal-title">
+                <span>Ticket Logs - </span>
 
-        <span
-          class="status-pill"
-          [class.pill-blue]="currentStatus === 'Open'"
-          [class.pill-cyan]="currentStatus === 'Assigned'"
-          [class.pill-orange]="currentStatus === 'In Progress'"
-          [class.pill-green]="currentStatus === 'Closed'"
-        >
-          {{ currentStatus }}
-        </span>
-      </div>
+                <span class="status-pill" [class.pill-blue]="currentStatus==='Open'"
+                    [class.pill-cyan]="currentStatus==='Assigned'" [class.pill-orange]="currentStatus==='In Progress'"
+                    [class.pill-green]="currentStatus==='Closed'">
+                    {{ currentStatus }}
+                </span>
+            </div>
 
-      <!-- <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button> -->
-      <button class="log-close-btn" (click)="handleCancel()"><i class="fas fa-times"></i></button>
-    </div>
+            <!-- <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button> -->
+            <button class="log-close-btn" (click)="handleCancel()"><i class="fas fa-times"></i></button>
+        </div>
 
-    <div class="log-modal-body">
-      <div class="log-filter">
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Ticket No"
-          [(ngModel)]="filter.ticketNo"
-          (ngModelChange)="applyFilter()"
-        />
+        <div class="log-modal-body">
+            <div class="log-filter">
 
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Subject"
-          [(ngModel)]="filter.subject"
-          (ngModelChange)="applyFilter()"
-        />
+                <input type="text" class="search-input" placeholder="Ticket No" [(ngModel)]="filter.ticketNo"
+                    (ngModelChange)="applyFilter()" />
 
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Requester"
-          [(ngModel)]="filter.requester"
-          (ngModelChange)="applyFilter()"
-        />
+                <input type="text" class="search-input" placeholder="Subject" [(ngModel)]="filter.subject"
+                    (ngModelChange)="applyFilter()" />
 
-        <select
-          class="search-select-company"
-          [(ngModel)]="filter.company"
-          (ngModelChange)="onCompanyChange()"
-        >
-          <option value="">All Company</option>
-          <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
-            {{ c.COMPANY_CODE }}
-          </option>
-        </select>
+                <input type="text" class="search-input" placeholder="Requester" [(ngModel)]="filter.requester"
+                    (ngModelChange)="applyFilter()" />
 
-        <select
-          class="search-select"
-          [(ngModel)]="filter.department"
-          (ngModelChange)="applyFilter()"
-          [disabled]="!filter.company"
-        >
-          <option value="">All Department</option>
-          <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
-            {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
-          </option>
-        </select>
+                <select class="search-select-company" [(ngModel)]="filter.company" (ngModelChange)="onCompanyChange()">
+                    <option value="">All Company</option>
+                    <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
+                        {{ c.COMPANY_CODE }}
+                    </option>
+                </select>
 
-        <nz-range-picker
-          nzFormat="dd/MM/yyyy"
-          [(ngModel)]="filter.dateRange"
-          (ngModelChange)="applyFilter()"
-        >
-        </nz-range-picker>
+                <select class="search-select" [(ngModel)]="filter.department" (ngModelChange)="applyFilter()"
+                    [disabled]="!filter.company">
+                    <option value="">All Department</option>
+                    <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
+                        {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
+                    </option>
+                </select>
 
-        <button class="export-btn" (click)="exportData()">
-          <i class="fas fa-file-excel"></i> Export
-        </button>
-      </div>
-      <div class="log-summary">ทั้งหมด {{ ticketLogs.length }} รายการ</div>
 
-      <div class="table-wrap">
-        <table class="log-table">
-          <thead>
-            <tr>
-              <th style="width: 150px">Ticket No</th>
-              <th>Subject</th>
-              <th style="width: 15%">Requester</th>
-              <th style="width: 14%">Department</th>
-              <th>Company</th>
-              <th style="width: 250px" *ngIf="currentStatus === 'Assigned'">assign</th>
-              <th>Updated</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+                <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="filter.dateRange" (ngModelChange)="applyFilter()">
+                </nz-range-picker>
 
-          <tbody>
-            <tr *ngFor="let data of filteredTicketLogs">
-              <td>{{ data.ticket_number }}</td>
-              <td>{{ data.subject }}</td>
-              <td>{{ data.requester_name || '-' }}</td>
-              <td>
-                <div>{{ data.coscent }}</div>
-                <div class="dept-name">{{ data.deptName }}</div>
-              </td>
-              <td>
-                {{ data.COMPANY_CODE }}
-              </td>
-              <td *ngIf="currentStatus === 'Assigned'">
-                <div class="groups-container">
-                  <ng-container *ngFor="let group of data.assignees">
-                    <!-- assigned_count = total_members → แสดงแค่ชื่อกลุ่ม + tooltip -->
-                    <div
-                      class="group-tag full"
-                      *ngIf="
-                        group.assigned_count === group.total_members && group.assigned_count > 0
-                      "
-                      [title]="getAssignedNames(group.members_json)"
-                    >
-                      <i class="fas fa-users"></i>
-                      <span>{{ group.group_name }}</span>
-                      <span class="tag-count">{{ group.total_members }}</span>
-                    </div>
-
-                    <!-- assigned_count < total_members → แสดงชื่อคนที่ assigned -->
-                    <ng-container
-                      *ngIf="group.assigned_count > 0 && group.assigned_count < group.total_members"
-                    >
-                      <div
-                        class="member-item"
-                        *ngFor="let m of getAssignedMembers(group.members_json)"
-                      >
-                        <div class="member-info">
-                          <span class="member-name">{{ m.assigned_name }}</span>
-                        </div>
-                      </div>
-                    </ng-container>
-                  </ng-container>
-                </div>
-              </td>
-              <td>
-                {{ data.updated_at || data.created_at | date: 'dd/MM/yyyy HH:mm' }}
-              </td>
-              <td>
-                <button class="view-btn" type="button" (click)="viewTicket(data)">
-                  <i class="fas fa-info-circle"></i>
+                <button class="export-btn" (click)="exportData()">
+                    <i class="fas fa-file-excel"></i> Export
                 </button>
-              </td>
-            </tr>
 
-            <tr *ngIf="pagedTicketLogs.length === 0">
-              <td colspan="8" class="empty-row">ไม่พบข้อมูล</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            </div>
+            <div class="log-summary">
+                ทั้งหมด {{ ticketLogs.length }} รายการ
+            </div>
 
-      <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
-        <button
-          class="page-btn"
-          type="button"
-          [disabled]="page === 1"
-          (click)="onPageIndexChange(page - 1)"
-        >
-          Prev
-        </button>
+            <div class="table-wrap">
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Ticket No</th>
+                            <th>Subject</th>
+                            <th style="width: 15%;">Requester</th>
+                            <th style="width: 15%;">Department</th>
+                            <th>Company</th>
+                            <th *ngIf="currentStatus==='Assigned'">assign</th>
+                            <th style="width: 12%;">Updated</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
 
-        <span class="page-info"> Page {{ page }} / {{ totalPages }} </span>
+                    <tbody>
+                        <tr *ngFor="let data of filteredTicketLogs">
+                            <td>{{ data.ticket_number }}</td>
+                            <td>{{ data.subject }}</td>
+                            <td>{{ data.requester_name || '-' }}</td>
+                            <td>
+                                <div>{{ data.coscent }}</div>
+                                <div class="dept-name">{{ data.deptName }}</div>
+                            </td>
+                            <td>
+                                {{ data.COMPANY_CODE }}
+                            </td>
+                            <td *ngIf="currentStatus==='Assigned'">
+                                <div class="assignee-list">
+                                    <div class="assignee-item" *ngFor="let a of data.assignees">
+                                        <div class="assignee-info">
+                                            <span class="assignee-name">{{ a.name }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {{ (data.updated_at || data.created_at) | date:'dd/MM/yyyy HH:mm' }}
+                            </td>
+                            <td>
+                                <button class="view-btn" type="button" (click)="viewTicket(data)"> <i
+                                        class="fas fa-info-circle"></i></button>
+                            </td>
+                        </tr>
 
-        <button
-          class="page-btn"
-          type="button"
-          [disabled]="page === totalPages"
-          (click)="onPageIndexChange(page + 1)"
-        >
-          Next
-        </button>
+                        <tr *ngIf="pagedTicketLogs.length === 0">
+                            <td colspan="8" class="empty-row">ไม่พบข้อมูล</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <select
-          class="page-size-select"
-          [ngModel]="pageSize"
-          (ngModelChange)="onPageSizeChange($event)"
-        >
-          <option [ngValue]="10">10</option>
-          <option [ngValue]="20">20</option>
-          <option [ngValue]="50">50</option>
-        </select>
-      </div>
+            <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
+                <button class="page-btn" type="button" [disabled]="page === 1" (click)="onPageIndexChange(page - 1)">
+                    Prev
+                </button>
+
+                <span class="page-info">
+                    Page {{ page }} / {{ totalPages }}
+                </span>
+
+                <button class="page-btn" type="button" [disabled]="page === totalPages"
+                    (click)="onPageIndexChange(page + 1)">
+                    Next
+                </button>
+
+                <select class="page-size-select" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="20">20</option>
+                    <option [ngValue]="50">50</option>
+                </select>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

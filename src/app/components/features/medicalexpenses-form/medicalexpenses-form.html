@@ -1,341 +1,249 @@
 <div class="form-root">
-  <header class="top-header-strip">
-    <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
-    <button class="btn-close-modal" type="button" title="ปิด" (click)="close()">
-      <i class="fas fa-times"></i>
-    </button>
-  </header>
+    <header class="top-header-strip">
+        <h2>{{ isEditMode() ? 'แก้ไขข้อมูลค่ารักษาพยาบาล' : 'บันทึกข้อมูลค่ารักษาพยาบาล' }}</h2>
+        <button class="btn-close-modal" type="button" title="ปิด" (click)="close()"><i
+                class="fas fa-times"></i></button>
+    </header>
 
-  <main class="content-card">
-    <div class="item-info-bar">
-      <div class="badge-item">
-        <i class="far fa-calendar-alt"></i>
-        <span class="label">วันที่ขอ :</span>
-        <span class="value">{{ currentDate() }}</span>
-      </div>
-      <div class="badge-item">
-        <i class="far fa-user"></i>
-        <span class="label">รหัสพนักงาน :</span>
-        <span class="value">{{ employeeId() }}</span>
-      </div>
-    </div>
+    <main class="content-card">
 
-    <section class="form-section-wrapper" #claimTypeSection>
-      <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
-      <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
-        <div class="claim-groups-labels">
-          <div
-            class="claim-group-label-cell"
-            [style.flex]="outpatientTypes.length"
-            *ngIf="outpatientTypes.length"
-          >
-            <span class="claim-group-label outpatient"
-              ><i class="fas fa-walking"></i> ผู้ป่วยนอก & ทั่วไป</span
-            >
-          </div>
-          <div
-            class="claim-group-label-cell"
-            [style.flex]="inpatientTypes.length"
-            *ngIf="inpatientTypes.length"
-          >
-            <span class="claim-group-label inpatient"><i class="fas fa-bed"></i> ผู้ป่วยใน</span>
-          </div>
-        </div>
-        <div class="claim-cards-row">
-          <div
-            class="claim-type-card outpatient-card"
-            *ngFor="let type of outpatientTypes"
-            [class.active]="selectedClaimType() === type.id"
-            (click)="selectClaimType(type.id)"
-          >
-            <div class="card-content">
-              <div class="type-info">
-                <span class="type-label">{{ type.label }}</span>
-                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
-                <span class="balance-label">ยอดคงเหลือ</span>
-              </div>
-              <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
-                <i [class]="type.icon" [style.color]="type.color"></i>
-              </div>
+        <div class="item-info-bar">
+            <div class="badge-item">
+                <i class="far fa-calendar-alt"></i>
+                <span class="label">วันที่ขอ :</span>
+                <span class="value">{{ currentDate() }}</span>
             </div>
-          </div>
-          <div
-            class="claim-type-card inpatient-card"
-            *ngFor="let type of inpatientTypes"
-            [class.active]="selectedClaimType() === type.id"
-            (click)="selectClaimType(type.id)"
-          >
-            <div class="card-content">
-              <div class="type-info">
-                <span class="type-label">{{ type.label }}</span>
-                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
-                <span class="balance-label">ยอดคงเหลือ</span>
-              </div>
-              <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
-                <i [class]="type.icon" [style.color]="type.color"></i>
-              </div>
+            <div class="badge-item">
+                <i class="far fa-user"></i>
+                <span class="label">รหัสพนักงาน :</span>
+                <span class="value">{{ employeeId() }}</span>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section
-      class="form-section-wrapper mt-4 animated-fade-in section-with-dropdown"
-      *ngIf="selectedClaimType()"
-    >
-      <h4 class="section-heading">2. กรอกรายละเอียด</h4>
-      <div class="details-grid">
-        <div class="input-field-group">
-          <label>สถานพยาบาล <span class="required">*</span></label>
-          <div class="hospital-autocomplete">
-            <div class="search-input-wrapper">
-              <input
-                #hospitalInput
-                type="text"
-                class="custom-form-control"
-                placeholder="ค้นหาโรงพยาบาล/คลินิก"
-                [class.input-highlight]="hospitalHighlight()"
-                [ngModel]="hospital()"
-                (ngModelChange)="onHospitalInput($event)"
-                (focus)="onHospitalFocus()"
-                (blur)="onHospitalBlur()"
-              />
-              <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
-              <i class="fas fa-search search-icon" *ngIf="!isHospitalLoading()"></i>
-            </div>
-            <div
-              class="hospital-dropdown"
-              #hospitalDropdownEl
-              *ngIf="isHospitalDropdownOpen()"
-              (scroll)="onDropdownScroll($event)"
-            >
-              <div
-                class="hospital-option"
-                *ngFor="let h of hospitalDropdown()"
-                (mousedown)="selectHospital(h)"
-              >
-                <span class="hospital-name">{{ h.nameTh }}</span>
-                <span class="hospital-contracted" *ngIf="h.isContracted">
-                  <i class="fas fa-check-circle"></i> ในเครือ
-                </span>
-              </div>
-              <div class="dropdown-loading-more" *ngIf="isHospitalLoadingMore()">
-                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div class="input-field-group">
-          <label>ประเภทโรค <span class="required">*</span></label>
-          <div class="hospital-autocomplete">
-            <div class="search-input-wrapper">
-              <input
-                #diseaseInput
-                type="text"
-                class="custom-form-control"
-                placeholder="ค้นหาประเภทโรค"
-                [class.input-highlight]="diseaseHighlight()"
-                [ngModel]="disease()"
-                (ngModelChange)="onDiseaseInput($event)"
-                (focus)="onDiseaseFocus()"
-                (blur)="onDiseaseBlur()"
-              />
-              <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
-              <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
+        <section class="form-section-wrapper" #claimTypeSection>
+            <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
+            <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
+                <div class="claim-groups-labels">
+                    <div class="claim-group-label-cell" [style.flex]="outpatientTypes.length"
+                        *ngIf="outpatientTypes.length">
+                        <span class="claim-group-label outpatient"><i class="fas fa-walking"></i> ผู้ป่วยนอก &
+                            ทั่วไป</span>
+                    </div>
+                    <div class="claim-group-label-cell" [style.flex]="inpatientTypes.length"
+                        *ngIf="inpatientTypes.length">
+                        <span class="claim-group-label inpatient"><i class="fas fa-bed"></i> ผู้ป่วยใน</span>
+                    </div>
+                </div>
+                <div class="claim-cards-row">
+                    <div class="claim-type-card outpatient-card" *ngFor="let type of outpatientTypes"
+                        [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
+                        <div class="card-content">
+                            <div class="type-info">
+                                <span class="type-label">{{ type.label }}</span>
+                                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
+                                <span class="balance-label">ยอดคงเหลือ</span>
+                            </div>
+                            <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
+                                <i [class]="type.icon" [style.color]="type.color"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="claim-type-card inpatient-card" *ngFor="let type of inpatientTypes"
+                        [class.active]="selectedClaimType() === type.id" (click)="selectClaimType(type.id)">
+                        <div class="card-content">
+                            <div class="type-info">
+                                <span class="type-label">{{ type.label }}</span>
+                                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
+                                <span class="balance-label">ยอดคงเหลือ</span>
+                            </div>
+                            <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
+                                <i [class]="type.icon" [style.color]="type.color"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div
-              class="hospital-dropdown"
-              #diseaseDropdownEl
-              *ngIf="isDiseaseDropdownOpen()"
-              (scroll)="onDiseaseDropdownScroll($event)"
-            >
-              <div
-                class="hospital-option"
-                *ngFor="let d of diseaseDropdown()"
-                (mousedown)="selectDisease(d)"
-              >
-                <span class="hospital-name">{{ d.nameTh }}</span>
-                <span class="disease-code">{{ d.icd10Code }}</span>
-              </div>
-              <div class="dropdown-loading-more" *ngIf="isDiseaseLoadingMore()">
-                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
 
-        <div class="input-field-group">
-          <label>วันที่รักษา ตั้งแต่ <span class="required">*</span></label>
-          <!-- <div class="custom-input-wrapper">
+        <section class="form-section-wrapper mt-4 animated-fade-in section-with-dropdown" *ngIf="selectedClaimType()">
+            <h4 class="section-heading">2. กรอกรายละเอียด</h4>
+            <div class="details-grid">
+                <div class="input-field-group">
+                    <label>สถานพยาบาล <span class="required">*</span></label>
+                    <div class="hospital-autocomplete">
+                        <div class="search-input-wrapper">
+                            <input #hospitalInput type="text" class="custom-form-control"
+                                placeholder="ค้นหาโรงพยาบาล/คลินิก" [class.input-highlight]="hospitalHighlight()"
+                                [ngModel]="hospital()" (ngModelChange)="onHospitalInput($event)"
+                                (focus)="onHospitalFocus()" (blur)="onHospitalBlur()">
+                            <i class="fas fa-spinner fa-spin search-icon" *ngIf="isHospitalLoading()"></i>
+                            <i class="fas fa-search search-icon" *ngIf="!isHospitalLoading()"></i>
+                        </div>
+                        <div class="hospital-dropdown" #hospitalDropdownEl *ngIf="isHospitalDropdownOpen()"
+                            (scroll)="onDropdownScroll($event)">
+                            <div class="hospital-option" *ngFor="let h of hospitalDropdown()"
+                                (mousedown)="selectHospital(h)">
+                                <span class="hospital-name">{{ h.nameTh }}</span>
+                                <span class="hospital-contracted" *ngIf="h.isContracted">
+                                    <i class="fas fa-check-circle"></i> ในเครือ
+                                </span>
+                            </div>
+                            <div class="dropdown-loading-more" *ngIf="isHospitalLoadingMore()">
+                                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>ประเภทโรค <span class="required">*</span></label>
+                    <div class="hospital-autocomplete">
+                        <div class="search-input-wrapper">
+                            <input #diseaseInput type="text" class="custom-form-control" placeholder="ค้นหาประเภทโรค"
+                                [class.input-highlight]="diseaseHighlight()" [ngModel]="disease()"
+                                (ngModelChange)="onDiseaseInput($event)" (focus)="onDiseaseFocus()"
+                                (blur)="onDiseaseBlur()">
+                            <i class="fas fa-spinner fa-spin search-icon" *ngIf="isDiseaseLoading()"></i>
+                            <i class="fas fa-search search-icon" *ngIf="!isDiseaseLoading()"></i>
+                        </div>
+                        <div class="hospital-dropdown" #diseaseDropdownEl *ngIf="isDiseaseDropdownOpen()"
+                            (scroll)="onDiseaseDropdownScroll($event)">
+                            <div class="hospital-option" *ngFor="let d of diseaseDropdown()"
+                                (mousedown)="selectDisease(d)">
+                                <span class="hospital-name">{{ d.nameTh }}</span>
+                                <span class="disease-code">{{ d.icd10Code }}</span>
+                            </div>
+                            <div class="dropdown-loading-more" *ngIf="isDiseaseLoadingMore()">
+                                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>วันที่รักษา ตั้งแต่ <span class="required">*</span></label>
+                    <!-- <div class="custom-input-wrapper">
                         <input type="date" class="input-field" title="วันที่รักษา ตั้งแต่" [ngModel]="startDate()"
                             (ngModelChange)="startDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
                         </div>
                     </div> -->
-          <nz-date-picker
-            class="input-field"
-            nzFormat="dd/MM/yyyy"
-            [ngModel]="startDate()"
-            (ngModelChange)="startDate.set($event)"
-          />
-        </div>
+                    <nz-date-picker class="input-field" nzFormat="dd/MM/yyyy" [ngModel]="startDate()"
+                        (ngModelChange)="startDate.set($event)" />
+                </div>
 
-        <div class="input-field-group">
-          <label>ถึงวันที่ <span class="required">*</span></label>
-          <!-- <div class="custom-input-wrapper">
+                <div class="input-field-group">
+                    <label>ถึงวันที่ <span class="required">*</span></label>
+                    <!-- <div class="custom-input-wrapper">
                         <input type="date" class="input-field" title="ถึงวันที่" [ngModel]="endDate()"
                             (ngModelChange)="endDate.set($event)">
                         <div class="icon-box">
                             <i class="far fa-calendar-alt"></i>
                         </div>
                     </div> -->
-          <nz-date-picker
-            class="input-field"
-            nzFormat="dd/MM/yyyy"
-            [ngModel]="endDate()"
-            (ngModelChange)="endDate.set($event)"
-          />
-        </div>
+                    <nz-date-picker class="input-field" nzFormat="dd/MM/yyyy" [ngModel]="endDate()"
+                        (ngModelChange)="endDate.set($event)" />
+                </div>
 
-        <div class="input-field-group">
-          <label>จำนวนวัน</label>
-          <div class="custom-input-wrapper">
-            <input
-              type="text"
-              class="input-field text-center readonly-highlight"
-              title="จำนวนวัน"
-              [value]="calculatedDays()"
-              readonly
-            />
-            <div class="icon-box">
-              <i class="fas fa-calculator"></i>
+                <div class="input-field-group">
+                    <label>จำนวนวัน</label>
+                    <div class="custom-input-wrapper">
+                        <input type="text" class="input-field text-center readonly-highlight" title="จำนวนวัน"
+                            [value]="calculatedDays()" readonly>
+                        <div class="icon-box">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>จำนวนเงินที่ขอเบิก <span class="required">*</span></label>
+                    <div class="amount-input-wrapper">
+                        <input #amountInput type="text" class="custom-form-control text-right" placeholder="0.00"
+                            [class.input-highlight]="amountHighlight()" [ngModel]="amount"
+                            (input)="onAmountInput($event)" />
+                        <span class="currency-tag">บาท</span>
+                    </div>
+                    <div *ngIf="amountError" class="error">
+                        {{ amountError }}
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label>หมายเหตุ</label>
+                    <textarea class="custom-form-control" placeholder="ระบุหมายเหตุ (ถ้ามี)" [ngModel]="remark()"
+                        (ngModelChange)="remark.set($event)"></textarea>
+                </div>
             </div>
-          </div>
-        </div>
+        </section>
 
-        <div class="input-field-group">
-          <label>จำนวนเงินที่ขอเบิก <span class="required">*</span></label>
-          <div class="amount-input-wrapper">
-            <input
-              #amountInput
-              type="text"
-              class="custom-form-control text-right"
-              placeholder="0.00"
-              [class.input-highlight]="amountHighlight()"
-              [ngModel]="amount"
-              (input)="onAmountInput($event)"
-            />
-            <span class="currency-tag">บาท</span>
-          </div>
-          <div *ngIf="amountError" class="error">
-            {{ amountError }}
-          </div>
-        </div>
-
-        <div class="input-field-group">
-          <label>หมายเหตุ</label>
-          <textarea
-            class="custom-form-control"
-            placeholder="ระบุหมายเหตุ (ถ้ามี)"
-            [ngModel]="remark()"
-            (ngModelChange)="remark.set($event)"
-          ></textarea>
-        </div>
-      </div>
-    </section>
-
-    <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
-      <div class="section-header-row">
-        <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
-        <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
-          <i class="fas fa-file-upload"></i> Upload file
-        </button>
-        <input
-          #fileInput
-          type="file"
-          class="hidden-input"
-          title="เลือกไฟล์แนบ"
-          (change)="onFileSelected($event)"
-          multiple
-        />
-      </div>
-      <div class="attachment-table-container">
-        <table class="excel-table">
-          <thead>
-            <tr>
-              <th class="col-xs">#</th>
-              <th>Upload file</th>
-              <th class="col-xs"><i class="far fa-trash-alt"></i></th>
-              <th>รายละเอียด</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let file of attachments(); let i = index">
-              <td class="text-center">{{ i + 1 }}</td>
-              <td class="clickable-file" (click)="openPreview(file)">
-                <div class="file-name-container">
-                  <i class="far fa-file-alt mr-2 text-primary"></i>
-                  <span class="file-text">{{ file.name }}</span>
-                </div>
-              </td>
-              <td class="text-center">
-                <button
-                  class="btn-delete-row"
-                  type="button"
-                  title="ลบไฟล์แนบ"
-                  (click)="deleteAttachment(file.id)"
-                >
-                  <i class="far fa-trash-alt"></i>
+        <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
+            <div class="section-header-row">
+                <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
+                <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
+                    <i class="fas fa-file-upload"></i> Upload file
                 </button>
-              </td>
-              <td>
-                <div class="desc-input-wrapper">
-                  <input
-                    type="text"
-                    class="desc-control"
-                    [(ngModel)]="file.description"
-                    [class.is-invalid]="!file.description"
-                    placeholder="ระบุรายละเอียด (ถ้ามี)"
-                  />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+                <input #fileInput type="file" class="hidden-input" title="เลือกไฟล์แนบ"
+                    (change)="onFileSelected($event)" multiple>
+            </div>
+            <div class="attachment-table-container">
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th class="col-xs">#</th>
+                            <th>Upload file</th>
+                            <th class="col-xs"><i class="far fa-trash-alt"></i></th>
+                            <th>รายละเอียด</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let file of attachments(); let i = index">
+                            <td class="text-center">{{ i + 1 }}</td>
+                            <td class="clickable-file" (click)="openPreview(file)">
+                                <div class="file-name-container">
+                                    <i class="far fa-file-alt mr-2 text-primary"></i>
+                                    <span class="file-text">{{ file.name }}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-delete-row" type="button" title="ลบไฟล์แนบ"
+                                    (click)="deleteAttachment(file.id)">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <div class="desc-input-wrapper">
+                                    <input type="text" class="desc-control" [(ngModel)]="file.description"
+                                        [class.is-invalid]="!file.description" placeholder="ระบุรายละเอียด (ถ้ามี)">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedClaimType()">
-      <div class="placeholder-content">
-        <i class="fas fa-mouse-pointer pulse-icon"></i>
-        <p>กรุณาเลือกประเภทการเบิกด้านบนเพื่อดำเนินการต่อ</p>
-        <span class="sub-text"
-          >Please select a claim type to view details and proceed with your request</span
-        >
-      </div>
+        <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedClaimType()">
+            <div class="placeholder-content">
+                <i class="fas fa-mouse-pointer pulse-icon"></i>
+                <p>กรุณาเลือกประเภทการเบิกด้านบนเพื่อดำเนินการต่อ</p>
+                <span class="sub-text">Please select a claim type to view details and proceed with your request</span>
+            </div>
+        </div>
+    </main>
+
+    <div class="form-actions-footer">
+        <button class="btn-back-custom" (click)="close()">
+            <i class="fas fa-times"></i> ยกเลิก
+        </button>
+        <button class="btn-save-custom" [class.disable]="!isValidSave()" (click)="save()"
+            [disabled]="isSaving() || !isValidSave()">
+            <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
+            {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
+        </button>
     </div>
-  </main>
 
-  <div class="form-actions-footer">
-    <button class="btn-back-custom" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
-    <button
-      class="btn-save-custom"
-      [class.disable]="!isValidSave()"
-      (click)="save()"
-      [disabled]="isSaving() || !isValidSave()"
-    >
-      <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
-      {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
-    </button>
-  </div>
-
-  <app-file-preview-modal
-    *ngIf="isPreviewModalOpen()"
-    [files]="previewFiles()"
-    (onClose)="closePreview()"
-  >
-  </app-file-preview-modal>
+    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
 </div>

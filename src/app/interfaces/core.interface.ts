@@ -1,18 +1,18 @@
 export interface DateConfig {
-  months: string[];
-  years: number[];
+    months: string[];
+    years: number[];
 }
 
 export interface Requester {
-  name: string;
-  employeeId: string;
-  department: string;
-  company: string;
+    name: string;
+    employeeId: string;
+    department: string;
+    company: string;
 }
 
 export interface RequestBase {
-  id: string;
-  createDate: string;
-  status: string;
-  requester?: Requester;
+    id: string;
+    createDate: string;
+    status: string;
+    requester?: Requester;
 }
