@@ -48,7 +48,7 @@
               />
             </nz-input-wrapper>
           </div>
-          <div style="display: flex; align-items: end; gap: 8px">
+          <div class="filter-actions">
             <button type="button" class="btn-search" (click)="loadData()">
               <i class="fas fa-search"></i> ค้นหา
             </button>
@@ -74,6 +74,22 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+                @if (claim.status === 'New') {
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); editRequest(claim.id)"
+                    title="แก้ไข"
+                  >
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim.id)"
+                    title="ลบ"
+                  >
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
               </div>
             </div>
 
@@ -135,6 +151,7 @@
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
               <th>วันที่สร้างรายการ</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -186,17 +203,29 @@
                 </td>
 
                 <!-- สถานะ -->
-                <td style="text-align: center">
+                <td class="text-center">
                   <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                     {{ claim.status | statusLabel }}
                   </span>
                 </td>
 
                 <!-- ข้อมูลเพิ่มเติม -->
-                <td style="text-align: center">
+                <td class="text-center">
                   <div class="sub-text">
                     {{ dateUtil.formatDateToBE(claim.createDate, 'DD MMM YYYY') }}
                   </div>
+                </td>
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  @if (claim.status === 'New') {
+                    <div class="action-btns">
+                      <button class="btn-icon edit" (click)="editRequest(claim.id)" title="แก้ไข">
+                        <i class="far fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" (click)="deleteRequest(claim.id)" title="ลบ">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  }
                 </td>
               </tr>
             } @empty {
