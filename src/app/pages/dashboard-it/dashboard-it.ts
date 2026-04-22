@@ -206,6 +206,11 @@ export class DashboardIT implements OnInit {
         openFor: res.requestFor.emp_code ? res.requestFor : null,
       };
       this.selectedTicket.set(objectData);
+
+      const codeempid = this.authService.userData()?.CODEMPID;
+      if (ticketId && codeempid) {
+        this.itServiceService.markTicketRead(ticketId, codeempid).subscribe();
+      }
     });
   }
 

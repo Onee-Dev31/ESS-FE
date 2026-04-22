@@ -152,6 +152,11 @@ export class ReportDetail {
       console.log('selectedTicket:', objectData);
       this.selectedTicket.set(objectData);
       this.cdr.detectChanges();
+
+      const codeempid = this.authService.userData()?.CODEMPID;
+      if (this.queryId && codeempid) {
+        this.itServiceService.markTicketRead(this.queryId, codeempid).subscribe();
+      }
     });
   }
 

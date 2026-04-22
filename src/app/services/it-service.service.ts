@@ -293,4 +293,14 @@ export class ItServiceService {
   assignNotify(ticketId: number): Observable<any> {
     return this._http.post(`${this.baseUrl}/notification/it-assign-notify`, { ticketId });
   }
+
+  markTicketRead(ticketId: string | number, readerCodeempid: string): Observable<any> {
+    return this._http.post(`${this.baseUrl}/tickets/${ticketId}/read`, { readerCodeempid });
+  }
+
+  getUnreadCount(readerCodeempid: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/unread-count`, {
+      params: { readerCodeempid },
+    });
+  }
 }
