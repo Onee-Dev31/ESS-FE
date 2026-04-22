@@ -209,6 +209,7 @@
               [id]="'taxi-card-' + i"
               class="log-card"
               [class.highlight-card]="item.selected"
+              [class.disable]="!item.selected && isEditMode"
             >
               <div class="card-header">
                 <div class="date-info">
