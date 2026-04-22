@@ -39,7 +39,7 @@ export class FileConverterService {
         const blob = await response.blob();
         const file = new File([blob], (fileData.FILE_NAME || fileData.file_name), { type: (fileData.FILE_TYPE || fileData.file_type) });
 
-        // console.log("fileData", fileData)
+        console.log("fileData", fileData)
         return {
             fieldId: fileData.FileID || fileData.attachment_id,
             name: fileData.FILE_NAME || fileData.file_name,
@@ -61,7 +61,7 @@ export class FileConverterService {
     }
 
     buildPreviewFile(file: any) {
-        // console.log(file)
+        console.log(file)
         let url = file.fileUrl || file.filePath || file.url;
 
         if (!url) {
@@ -77,7 +77,7 @@ export class FileConverterService {
             }
         }
 
-        // console.log(url)
+        console.log(url)
         if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
             url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
         }
