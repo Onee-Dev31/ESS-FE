@@ -14,7 +14,11 @@ import { PaginationComponent } from '../../components/shared/pagination/paginati
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
-import { createListingState, createListingComputeds_v2, clearListingFilters } from '../../utils/listing.util';
+import {
+  createListingState,
+  createListingComputeds_v2,
+  clearListingFilters,
+} from '../../utils/listing.util';
 import { COMMON_STATUS_OPTIONS } from '../../constants/request-status.constant';
 import { AuthService } from '../../services/auth.service';
 
@@ -25,6 +29,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import dayjs from 'dayjs';
+import { SwalService } from '../../services/swal.service';
 
 /** หน้าแสดงรายการคำขอเบี้ยเลี้ยงค่าแท็กซี่ (Vehicle Taxi) */
 @Component({
@@ -54,7 +59,8 @@ export class VehicleTaxiComponent implements OnInit {
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
   private errorService = inject(ErrorService);
-  private authService = inject(AuthService);
+  private authservice = inject(AuthService);
+  private swalService = inject(SwalService);
   dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('taxi-list');
@@ -101,11 +107,11 @@ export class VehicleTaxiComponent implements OnInit {
     const param = {
       page: this.listing.currentPage() + 1 || 1,
       pageSize: this.listing.pageSize(),
-      empCode: this.authService.userData().CODEMPID,
+      empCode: this.authservice.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
-      dateFrom: start ? dayjs(start).format("YYYY-MM-DD") : '',
-      dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
+      dateFrom: start ? dayjs(start).format('YYYY-MM-DD') : '',
+      dateTo: end ? dayjs(end).format('YYYY-MM-DD') : '',
     };
     this.taxiService.getTaxiClaims(param).subscribe({
       next: (res: any) => {
@@ -119,7 +125,7 @@ export class VehicleTaxiComponent implements OnInit {
       error: (error: any) => {
         this.loadingService.stop('taxi-list');
         this.errorService.handle(error, { component: 'VehicleTaxi', action: 'load-data' });
-      }
+      },
     });
   }
 
@@ -139,29 +145,59 @@ export class VehicleTaxiComponent implements OnInit {
           return {
             date: d.work_date ?? '',
             description: d.description ?? '',
-            destination: fromName && toName ? `${fromName} → ${toName}` : (fromName || toName),
+            destination: fromName && toName ? `${fromName} → ${toName}` : fromName || toName,
             distance: 0,
             amount: d.rate_amount ?? 0,
             attachedFile: attachments.length > 0 ? (attachments[0].file_url ?? null) : null,
           };
         }),
-        ...item
+        ...item,
       } as TaxiRequest;
     });
   }
 
-  async deleteRequest(id: string) {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการลบ',
-      message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
-      type: 'danger',
-      confirmText: 'ลบรายการ'
-    });
+  async deleteRequest(claim: any) {
+    console.log(claim);
+    this.swalService
+      .confirm(
+        'ยืนยันการลบรายการเบิกทั้งหมด?',
+        undefined,
+        `
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">เลขที่การเบิก</span>
+                <span style="font-size:16px; font-weight:700; color:#4f6ef7">${claim.claimNo}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; justify-content:center">
+                <span style="font-size:14px; color:#94a3b8">จำนวนรายการ</span>
+                <span style="font-size:16px; font-weight:700; color:#ef4444">${claim.details.length} รายการ</span>
+            </div>
+        `,
+      )
+      .then((result) => {
+        if (!result.isConfirmed) return;
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-    if (confirmed) {
-      this.toastService.success('ลบรายการเบิกเรียบร้อยแล้ว');
-      this.loadData();
-    }
+        this.taxiService.deleteTaxiClaim(claim.id, this.authservice.userData().CODEMPID).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
+
+            this.swalService.success(res.message || 'ลบรายการเบิกสำเร็จ');
+            this.closeModal();
+          },
+
+          error: (error) => {
+            console.error('Delete Taxi Claim Error:', error);
+
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
+      });
   }
 
   openModal(id: string = '') {
@@ -175,9 +211,9 @@ export class VehicleTaxiComponent implements OnInit {
 
     if (!this.selectedRequestId) return;
 
-    const result = this.allRequests().find(item => item.id === this.selectedRequestId);
+    const result = this.allRequests().find((item) => item.id === this.selectedRequestId);
 
-    this.selectedRequest = result
+    this.selectedRequest = result;
   }
 
   closeModal() {
@@ -187,7 +223,7 @@ export class VehicleTaxiComponent implements OnInit {
   }
 
   openPreviewModalForRequest(requestId: string) {
-    const request = this.allRequests().find(r => r.id === requestId);
+    const request = this.allRequests().find((r) => r.id === requestId);
     if (request?.items) {
       const files = request.items
         .filter((item: any) => item.attachedFile)
@@ -210,7 +246,7 @@ export class VehicleTaxiComponent implements OnInit {
   clearFilters() {
     clearListingFilters(this.listing);
     this.dateRange = null;
-    this.loadData()
+    this.loadData();
   }
 
   trackByRowId(index: number, req: TaxiRequest): string {

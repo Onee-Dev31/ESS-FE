@@ -582,7 +582,6 @@ $border-color: var(--border-color);
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
-  border-radius: 6px;
 }
 
 .btn-delete-sm,
@@ -591,7 +590,6 @@ $border-color: var(--border-color);
   padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
-  border-radius: 6px;
   color: var(--danger);
   border-color: var(--danger);
 
@@ -666,52 +664,6 @@ select.form-control {
   @include tablet {
     flex: 1 1 120px;
     min-width: 120px;
-  }
-}
-
-// Action Buttons
-.action-btns {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-
-.btn-icon {
-  &.view {
-    @include icon-btn-ghost(var(--text-table-head));
-  }
-
-  &.edit {
-    @include icon-btn-ghost(#0ea5e9);
-  }
-
-  &.delete {
-    @include icon-btn-ghost(var(--danger));
-  }
-}
-
-.btn-edit-sm {
-  @include btn-secondary;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
-}
-
-.btn-delete-sm {
-  @include btn-outline;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
-  color: var(--danger);
-  border-color: var(--danger);
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.05);
-    border-color: #dc2626;
-  }
-
-  &:active {
-    background: rgba(239, 68, 68, 0.1);
   }
 }
 

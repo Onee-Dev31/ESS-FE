@@ -609,30 +609,10 @@
   @include btn-outline;
 }
 
-.action-btns {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.btn-icon {
-  &.view {
-    @include icon-btn-ghost(var(--text-table-head));
-  }
-
-  &.edit {
-    @include icon-btn-ghost(#0ea5e9);
-  }
-
-  &.delete {
-    @include icon-btn-ghost(var(--danger));
-  }
-}
-
 .btn-edit-sm,
 .btn-icon.edit {
   @include btn-secondary;
-  padding: 8px 20px;
+  padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
 }
@@ -640,7 +620,7 @@
 .btn-delete-sm,
 .btn-icon.delete {
   @include btn-outline;
-  padding: 8px 20px;
+  padding: 8px 12px;
   font-size: 0.875rem;
   height: 36px;
   color: var(--danger);
