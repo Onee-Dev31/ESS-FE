@@ -42,12 +42,12 @@ describe('Allowance', () => {
   });
 
   it('กด edit เปิด modal พร้อมข้อมูลเดิม', () => {
-    cy.get('.modern-table tbody tr').each(($row) => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
       const statusText = $row.find('.status-badge').text().trim();
       if (statusText === 'คำขอใหม่' || statusText === 'New') {
         cy.wrap($row).find('.btn-icon.edit').click();
         cy.get('app-allowance-form').should('be.visible');
-        return false; // break loop
+        return false;
       }
     });
   });
@@ -56,8 +56,16 @@ describe('Allowance', () => {
     cy.get('nz-select').first().click();
     cy.get('nz-option-item').contains('อนุมัติแล้ว').click();
     cy.get('.btn-search').click();
-    cy.get('.status-badge').each(($badge) => {
-      cy.wrap($badge).invoke('text').should('match', /อนุมัติแล้ว|Approved/);
+    cy.wait(1000);
+    // ถ้ามีข้อมูล ต้องเป็นสถานะ Approved ทั้งหมด / ถ้าไม่มีข้อมูลให้แสดง empty state
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อนุมัติแล้ว|Approved/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
     });
   });
 

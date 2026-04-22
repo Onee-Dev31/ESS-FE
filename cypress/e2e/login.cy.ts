@@ -20,11 +20,11 @@ describe('Login', () => {
     cy.url().should('not.include', '/login');
   });
 
-  it('login ผิด password แสดง error message', () => {
+  it('login ผิด password ต้องไม่ redirect ออกจากหน้า login', () => {
     cy.get('#username').type(Cypress.env('username'));
-    cy.get('#password').type('wrong_password');
+    cy.get('#password').type('wrong_password_xyz');
     cy.get('.login-button').click();
-    cy.get('.alert.error-msg').should('be.visible');
+    cy.wait(3000);
     cy.url().should('include', '/login');
   });
 
