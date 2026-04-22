@@ -435,6 +435,7 @@ export class DashboardIT implements OnInit {
 
   // GET MASTER
   getAllTickets(trackNew = false) {
+    console.log(this.myTicket)
     this.itServiceService
       .getAllTickets({
         page: 1,
