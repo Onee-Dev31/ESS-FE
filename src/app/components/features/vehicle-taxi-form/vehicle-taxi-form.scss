@@ -53,7 +53,7 @@ $col-file: 50px;
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    background: linear-gradient(135deg, $primary 0%, color.mix(white, $primary, 10%) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary) 100%);
     color: #ffffff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
@@ -425,7 +425,7 @@ $col-file: 50px;
       background: linear-gradient(
         135deg,
         $primary 0%,
-        color.mix(white, $primary, 10%) 100%
+        var(--primary) 100%
       );
       position: sticky;
       top: 0;
