@@ -3,15 +3,7 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable, tap, catchError, of, retry } from 'rxjs';
 import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 import { environment } from '../../environments/environment';
-import {
-  MealAllowanceClaimsResponse,
-  MealAllowanceRate,
-  MealAllowanceRatesResponse,
-  EligibleDatesResponse,
-  CreateClaimRequest,
-  CreateClaimResponse,
-  MealAllowanceClaimDetail,
-} from '../interfaces/allowance.interface';
+import { MealAllowanceClaimsResponse, MealAllowanceRate, MealAllowanceRatesResponse, EligibleDatesResponse, CreateClaimRequest, CreateClaimResponse } from '../interfaces/allowance.interface';
 export type { MealAllowanceClaimsResponse };
 
 @Injectable({ providedIn: 'root' })
@@ -70,30 +62,14 @@ export class AllowanceApiService {
         return this._http.get<EligibleDatesResponse>(`${this.baseUrl}/meal-allowance/eligible-dates`, { params });
     }
 
-  /**
-   * แก้ไขใบเบิกเบี้ยเลี้ยง
-   * PUT api/meal-allowance/claim/:id
-   */
-  updateClaim(claimId: number, body: { details: MealAllowanceClaimDetail[] }): Observable<any> {
-    return this._http.put(`${this.baseUrl}/meal-allowance/claim/${claimId}`, body);
-  }
-
-  /**
-   * ลบใบเบิกเบี้ยเลี้ยง
-   * DELETE api/meal-allowance/claim/:id
-   */
-  deleteClaim(claimId: number): Observable<any> {
-    return this._http.delete(`${this.baseUrl}/meal-allowance/claim/${claimId}`);
-  }
-
-  /**
-   * สร้างใบเบิกเบี้ยเลี้ยง
-   * POST api/meal-allowance/claim
-   */
-  createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
-    console.log(request);
-    return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
-  }
+    /**
+     * สร้างใบเบิกเบี้ยเลี้ยง
+     * POST api/meal-allowance/claim
+     */
+    createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
+        console.log(request)
+        return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
+    }
 
     /**
      * ดึงรายการเบิกเบี้ยเลี้ยง
