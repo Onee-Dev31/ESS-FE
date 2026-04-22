@@ -75,10 +75,18 @@
                   {{ claim.status | statusLabel }}
                 </span>
                 @if (claim.status === 'New') {
-                  <button class="btn-icon edit" (click)="$event.stopPropagation(); editRequest(claim.id)" title="แก้ไข">
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); editRequest(claim.id)"
+                    title="แก้ไข"
+                  >
                     <i class="far fa-edit"></i>
                   </button>
-                  <button class="btn-icon delete" (click)="$event.stopPropagation(); deleteRequest(claim.id)" title="ลบ">
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim.id)"
+                    title="ลบ"
+                  >
                     <i class="far fa-trash-alt"></i>
                   </button>
                 }
