@@ -4,7 +4,7 @@ import { NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 
 export default [
   provideHttpClientTesting(),
-  provideRouter([]),
+  provideRouter([{ path: '**', redirectTo: '' }]),
   {
     provide: NGX_ECHARTS_CONFIG,
     useValue: {
