@@ -686,7 +686,7 @@ export class ItDashboardSummary {
         this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
         this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
           ...t,
-          assignees: t.assignees_json ? JSON.parse(t.assignees_json) : [],
+          assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
         console.log(this.filteredTicketLogs);
 
@@ -810,6 +810,17 @@ export class ItDashboardSummary {
       SheetNames: ['Tickets'],
     };
     XLSX.writeFile(workbook, 'TicketLogs.xlsx');
+  }
+
+  getAssignedMembers(members: any[]): any[] {
+    return members?.filter((m) => m.is_assigned === 1) ?? [];
+  }
+
+  getAssignedNames(members: any[]): string {
+    return members
+      .filter((m) => m.is_assigned === 1)
+      .map((m) => `${m.assigned_name}`)
+      .join('\n');
   }
 
   // GET MASTER

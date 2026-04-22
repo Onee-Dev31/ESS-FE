@@ -540,50 +540,66 @@
   border-radius: 10px !important;
 }
 
-.assignee-list {
+// ASSIGNEES
+.groups-container {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.assignee-item {
+// กลุ่มเต็ม
+.group-tag.full {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #eef1ff;
+  border: 1px solid #c7d2fe;
+  color: #4f6ef7;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: default;
+  width: fit-content;
+  transition: background 0.15s;
+
+  i {
+    font-size: 11px;
+  }
+
+  &:hover {
+    background: #e0e7ff;
+  }
+
+  .tag-count {
+    background: #4f6ef7;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+}
+
+// member assigned
+.member-item {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
-.avatar-sm {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #eef1ff;
-  color: #4f6ef7;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.assignee-info {
+.member-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-.assignee-name {
-  font-size: 13px;
-  font-weight: 500;
+.member-name {
+  font-size: 12px;
+  font-weight: 600;
   color: #0f172a;
-}
-
-.assignee-role {
-  font-size: 11px;
-  color: #94a3b8;
-
-  &.primary {
-    color: #4f6ef7;
-    font-weight: 600;
-  }
 }
