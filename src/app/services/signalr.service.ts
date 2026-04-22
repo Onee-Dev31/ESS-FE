@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { Subject } from 'rxjs';
+import { Subject, throttleTime } from 'rxjs';
 import { HttpClient, } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -14,6 +14,12 @@ export class SignalrService {
     private authService = inject(AuthService);
     private hubConnection!: signalR.HubConnection;
     private eventMap = new Map<string, Subject<any>>();
+    private eventRoutes = new Map<string, string | undefined>();
+    private processedIds = new Set<string>();
+
+    pendingNewTickets = signal(0);
+    pendingTicketNumbers = signal<Set<string>>(new Set());
+    refreshTrigger = signal(0);
 
     sendTestRealtime() {
         this.http.post(`${this.baseUrl}/notification/it-service`, {})
@@ -24,10 +30,14 @@ export class SignalrService {
     }
 
     assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
-        this.http.post(`${this.baseUrl}/notification/it-assign-notify`, { ticketId, assigneeAdUsers })
+        return this.http.post(`${this.baseUrl}/notification/it-assign-notify`, { ticketId, assigneeAdUsers });
+    }
+
+    sendNewTicketNotification(ticketNumber: string) {
+        this.http.post(`${this.baseUrl}/notification/it-service/open-tickets`, { ticketNumber })
         .subscribe({
-            next: () => console.log('AssignNotify sent', ticketId),
-            error: (err) => console.error('AssignNotify error', err)
+        next: () => console.log('New ticket notification sent'),
+        error: (err) => console.error(err)
         });
     }
 
@@ -53,21 +63,34 @@ export class SignalrService {
     }
 
     on(eventName: string, route?: string) {
+        if (route) {
+            this.eventRoutes.set(eventName, route);
+        }
+
         if (!this.eventMap.has(eventName)) {
             const subject = new Subject<any>();
             this.eventMap.set(eventName, subject);
             this.hubConnection.on(eventName, (data) => {
+                if (eventName === 'NewTicket') {
+                    if (data.messageId && this.processedIds.has(data.messageId)) return;
+                    if (data.messageId) {
+                        if (this.processedIds.size >= 500) this.processedIds.clear();
+                        this.processedIds.add(data.messageId);
+                    }
+                    this.pendingNewTickets.update(n => n + 1);
+                    if (data.ticketNumber) {
+                        this.pendingTicketNumbers.update(s => new Set([...s, data.ticketNumber]));
+                    }
+                }
                 this.showBrowserNotification(
                     'แจ้งเตือนใหม่',
                     data.message || 'มีรายการใหม่',
-                    route
+                    this.eventRoutes.get(eventName)
                 );
-
                 subject.next(data);
             });
         }
-        return this.eventMap.get(eventName)!.asObservable();
-        
+        return this.eventMap.get(eventName)!.asObservable().pipe(throttleTime(500));
     }
 
     private async joinUserGroups() {

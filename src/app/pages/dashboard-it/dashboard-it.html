@@ -46,7 +46,9 @@
 
         <div class="ticket-list">
             <div class="ticket-item" *ngFor="let ticket of filteredTickets()"
-                [class.active]="selectedTicket()?.ticketId === ticket.ticketId" (click)="selectTicket(ticket.ticketId)">
+                [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
+                [class.is-new]="newTicketIds().has(ticket.ticketId)"
+                (click)="selectTicket(ticket.ticketId)">
                 <div class="avatar">
                     <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'"
                         (error)="onImgError($event)" />
@@ -693,4 +695,11 @@
 
 @if (showAllServices) {
 <app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()"></app-services-detail-modal>
+}
+
+@if (newTicketCount() > 0) {
+  <div class="new-ticket-banner" (click)="refreshTickets()">
+    <i class="fas fa-bell"></i>
+    มี {{ newTicketCount() }} Ticket ใหม่ — คลิกเพื่อโหลด
+  </div>
 }

@@ -2,6 +2,38 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes highlight-fade {
+    0%   { background-color: #e6f4ff; }
+    50%  { background-color: #bae0ff; }
+    100% { background-color: #e6f4ff; }
+}
+
+.new-ticket-banner {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #1677ff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(22, 119, 255, 0.4);
+    transition: background-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+        background-color: #0958d9;
+        box-shadow: 0 6px 16px rgba(22, 119, 255, 0.5);
+    }
+}
+
 .modal-overlay {
     @include modal-overlay-styles;
 
@@ -314,6 +346,12 @@
                 background-color: var(--bg-slate);
                 border-left: 4px solid var(--primary);
                 padding-left: 16px;
+            }
+
+            &.is-new {
+                border-left: 4px solid #1677ff;
+                padding-left: 16px;
+                animation: highlight-fade 1.2s ease-in-out 3;
             }
 
             // .avatar {

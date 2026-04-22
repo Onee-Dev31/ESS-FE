@@ -1,4 +1,5 @@
-import { Component, HostListener, ElementRef, inject, computed, signal, NgZone } from '@angular/core';
+import { Component, HostListener, ElementRef, inject, computed, signal, NgZone, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
@@ -14,6 +15,8 @@ interface NotificationItem {
   message: string;
   status: 'pending' | 'approved' | 'rejected';
   time: string;
+  route?: string;
+  ticketNumber?: string;
 }
 
 interface SearchMenuItem {
@@ -43,6 +46,7 @@ export class NavbarComponent {
   private zone = inject(NgZone);
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
   themeService = inject(ThemeService);
   private notifyAudio = new Audio('/notification1.wav');
 
@@ -62,6 +66,7 @@ export class NavbarComponent {
     this.notifyAudio.volume = 0.7;
     this.signalrService
       .on('NewTicket', '/it-service-list')
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(data => {
 
         this.zone.run(() => {
@@ -73,7 +78,8 @@ export class NavbarComponent {
             title: 'แจ้งเตือนใหม่',
             message,
             status: 'pending',
-            time: 'เมื่อสักครู่'
+            time: 'เมื่อสักครู่',
+            route: '/it-dashboard'
           };
 
           this.notifications.update(list => [newNoti, ...list]);
@@ -88,6 +94,7 @@ export class NavbarComponent {
 
     this.signalrService
       .on('TicketAssigned', '/dashboard-it')
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(data => {
         this.zone.run(() => {
           const message = data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign แล้ว`;
@@ -97,7 +104,9 @@ export class NavbarComponent {
             title: 'มีการ Assign Ticket',
             message,
             status: 'pending',
-            time: 'เมื่อสักครู่'
+            time: 'เมื่อสักครู่',
+            route: '/dashboard-it',
+            ticketNumber: data.ticket_number ?? undefined
           };
 
           this.notifications.update(list => [newNoti, ...list]);
@@ -148,13 +157,7 @@ export class NavbarComponent {
   });
 
   notifications = signal<NotificationItem[]>([
-    {
-      id: 1,
-      title: 'รายการรออนุมัติ',
-      message: 'รายการ #REQ-2024-001 รอการอนุมัติ',
-      status: 'pending',
-      time: 'เมื่อสักครู่'
-    }
+    
   ]);
 
   // startSignalR() {
@@ -188,6 +191,17 @@ export class NavbarComponent {
   //     })
   //   });
   // }
+
+  onNotificationClick(item: NotificationItem) {
+    this.isNotificationOpen = false;
+    if (item.route) {
+      if (item.ticketNumber) {
+        this.signalrService.pendingTicketNumbers.update(s => new Set([...s, item.ticketNumber!]));
+      }
+      this.signalrService.refreshTrigger.update(n => n + 1);
+      this.navigateTo(item.route);
+    }
+  }
 
   toggleSidebar() {
     this.sidebarService.toggle();

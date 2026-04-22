@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -29,6 +29,7 @@ import { ServicesDetailModal } from "../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
+
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -83,6 +84,11 @@ export class DashboardIT implements OnInit {
   assigneeGroups: any[] = [];
 
   IS_OPEN_IT_SERVICE = signal(0);
+  newTicketIds = signal<Set<number>>(new Set());
+  private prevTicketIds = new Set<number>();
+
+  get newTicketCount() { return this.signalrService.pendingNewTickets; }
+  private initialized = false;
   IS_DENY_TICKET = signal(false);
   IS_ONHOLD_TICKET = signal(false);
   IS_ACKNOWLEDGE_TICKET = signal(false);
@@ -102,15 +108,37 @@ export class DashboardIT implements OnInit {
   constructor(
     private msg: NzMessageService,
     private sanitizer: DomSanitizer
-  ) { }
+  ) {
+    effect(() => {
+      const trigger = this.signalrService.refreshTrigger();
+      if (trigger > 0 && this.initialized) {
+        untracked(() => this.refreshTickets());
+      }
+    });
+  }
 
   ngOnInit() {
-    this.getAllTickets();
+    const hasTrigger = this.signalrService.refreshTrigger() > 0;
+    this.signalrService.refreshTrigger.set(0);
+    if (hasTrigger || this.signalrService.pendingNewTickets() > 0) {
+      this.refreshTickets();
+    } else {
+      this.getAllTickets();
+    }
+    this.initialized = true;
     this.getAssignItDropdown();
+
+    this.signalrService.on('NewTicket', '/it-dashboard');
+    this.signalrService.on('TicketAssigned', '/it-dashboard');
   }
 
   close() {
     this.IS_OPEN_IT_SERVICE.set(0)
+  }
+
+  refreshTickets() {
+    this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
+    this.getAllTickets(true);
   }
 
   onStatusChange(status: string | null) {
@@ -402,16 +430,14 @@ export class DashboardIT implements OnInit {
   }
 
   // GET MASTER
-  getAllTickets() {
-    // console.log(this.myTicket, this.myTicket ? this.authService.userData().AD_USER : null)
+  getAllTickets(trackNew = false) {
     this.itServiceService.getAllTickets({
       page: 1,
       pageSize: 50,
       myTicket: this.myTicket ? this.authService.userData().AD_USER : null
     }).subscribe({
       next: (res) => {
-        console.log("res: ", res)
-        this.Tickets.set(res.data.map((ticket: any) => ({
+        const mapped = res.data.map((ticket: any) => ({
           ...ticket,
           ticketId: ticket.id,
           ticketNumber: ticket.ticket_number,
@@ -420,7 +446,23 @@ export class DashboardIT implements OnInit {
           createdDate: new Date(ticket.created_at).toISOString(),
           requesterEmpId: ticket.requester_code,
           subject: ticket.subject
-        })))
+        }));
+        this.Tickets.set(mapped);
+
+        if (trackNew) {
+          const pendingNumbers = this.signalrService.pendingTicketNumbers();
+          const ids = new Set<number>(
+            mapped
+              .filter((t: any) => pendingNumbers.size > 0
+                ? pendingNumbers.has(t.ticketNumber)
+                : !this.prevTicketIds.has(t.ticketId))
+              .map((t: any) => t.ticketId)
+          );
+          this.newTicketIds.set(ids);
+          this.signalrService.pendingTicketNumbers.set(new Set());
+          this.signalrService.pendingNewTickets.set(0);
+          setTimeout(() => this.newTicketIds.set(new Set()), 5000);
+        }
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -767,7 +809,11 @@ export class DashboardIT implements OnInit {
           const adUsers = data.assignees
             .map((x: any) => x.adUser)
             .filter((ad: any) => !!ad);
-          setTimeout(() => this.signalrService.assignNotify(ticketId, adUsers), 500);
+          setTimeout(() => {
+            this.signalrService.assignNotify(ticketId, adUsers).subscribe({
+              error: () => this.msg.error('ไม่สามารถส่ง Notification ให้ผู้รับผิดชอบได้')
+            });
+          }, 500);
 
           this.selectTicket(res.ticketId || ticketId);
           this.getAllTickets();

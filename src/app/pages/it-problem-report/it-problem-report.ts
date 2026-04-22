@@ -244,7 +244,7 @@ export class ItProblemReportComponent implements OnInit {
       ).subscribe({
         next: (res) => {
           if (res.success) {
-            this.signalrService.sendTestRealtime()
+            this.signalrService.sendNewTicketNotification(res.ticketNumber)
             this.swalService.success('แจ้งปัญหาสำเร็จ', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
