@@ -4,7 +4,6 @@
   </header>
 
   <main class="content-body">
-
     <div class="main-layout-grid">
       <div class="left-col-wrapper">
         <div class="banner-avatar-section">
@@ -12,17 +11,24 @@
             <i class="fas fa-pen"></i>
           </button>
           <div class="avatar-frame">
-            <img [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + authService.userData()?.CODEMPID + '.jpg'"
-              (error)="onAvatarError($event)" (click)="openProfileLightbox()" alt="Profile Avatar"
-              class="avatar-img avatar-clickable" title="คลิกเพื่อดูรูปขนาดใหญ่" />
+            <img
+              [src]="
+                'https://empimg.oneeclick.co:8048/employeeimage/' +
+                authService.userData()?.CODEMPID +
+                '.jpg'
+              "
+              (error)="onAvatarError($event)"
+              (click)="openProfileLightbox()"
+              alt="Profile Avatar"
+              class="avatar-img avatar-clickable"
+              title="คลิกเพื่อดูรูปขนาดใหญ่"
+            />
           </div>
         </div>
 
         <div class="card attendance-card">
           <div class="card-header border-0">
-            <h4 class="card-heading">
-              <i class="fas fa-calendar-check"></i>My Time Attendance
-            </h4>
+            <h4 class="card-heading"><i class="fas fa-calendar-check"></i>My Time Attendance</h4>
           </div>
 
           <div class="card-body">
@@ -35,10 +41,10 @@
 
             <div class="attendance-list-clean">
               @for (item of attendanceList; track item.label) {
-              <div class="att-clean-item">
-                <div class="att-label">{{ item.label }}</div>
-                <div class="att-value">{{ item.value }}</div>
-              </div>
+                <div class="att-clean-item">
+                  <div class="att-label">{{ item.label }}</div>
+                  <div class="att-value">{{ item.value }}</div>
+                </div>
               }
             </div>
           </div>
@@ -53,33 +59,41 @@
 
         <div class="card performance-card">
           <div class="card-header border-0">
-            <h4 class="card-heading">
-              <i class="fas fa-tachometer-alt"></i>My Performance
-            </h4>
+            <h4 class="card-heading"><i class="fas fa-tachometer-alt"></i>My Performance</h4>
           </div>
 
           <div class="card-body">
             <div class="work-meta-group">
               <div class="meta-row">
                 <span class="meta-label">วันที่เริ่มงาน</span>
-                <span class="meta-value">{{dateUtil.formatDateToBE(performanceData()?.service_info?.start_date_raw,
-                  'DD/MM/YYYY')}}</span>
+                <span class="meta-value">{{
+                  dateUtil.formatDateToBE(
+                    performanceData()?.service_info?.start_date_raw,
+                    'DD/MM/YYYY'
+                  )
+                }}</span>
               </div>
               <div class="meta-row">
                 <span class="meta-label">อายุงาน</span>
-                <span class="meta-value">{{ performanceData()?.service_info?.service_years }} ปี</span>
+                <span class="meta-value"
+                  >{{ performanceData()?.service_info?.service_years }} ปี</span
+                >
               </div>
             </div>
 
             <h6 class="perf-subtitle" *ngIf="performanceData()?.service_info?.service_years !== 0">
-              ประวัติผลการประเมินการทำงาน</h6>
+              ประวัติผลการประเมินการทำงาน
+            </h6>
 
-            <div class="performance-list" *ngIf="performanceData()?.service_info?.service_years !== 0">
+            <div
+              class="performance-list"
+              *ngIf="performanceData()?.service_info?.service_years !== 0"
+            >
               @for (p of performanceData()?.evaluations; track p.year) {
-              <div class="perf-item">
-                <span class="perf-year">{{ p.year }}</span>
-                <span class="perf-grade">{{ p.hr_grade }}</span>
-              </div>
+                <div class="perf-item">
+                  <span class="perf-year">{{ p.year }}</span>
+                  <span class="perf-grade">{{ p.hr_grade }}</span>
+                </div>
               }
             </div>
           </div>
@@ -93,17 +107,15 @@
 
         <div class="card it-story-card">
           <div class="card-header border-0">
-            <h4 class="card-heading">
-              <i class="fas fa-laptop-code"></i>My IT Story
-            </h4>
+            <h4 class="card-heading"><i class="fas fa-laptop-code"></i>My IT Story</h4>
           </div>
           <div class="card-body">
             <div class="profile-info-list">
               @for (item of itStoryMap(); track item.label) {
-              <div class="profile-display-group">
-                <label class="display-label">{{ item.label }}</label>
-                <div class="display-value">{{ item.value }}</div>
-              </div>
+                <div class="profile-display-group">
+                  <label class="display-label">{{ item.label }}</label>
+                  <div class="display-value">{{ item.value }}</div>
+                </div>
               }
             </div>
           </div>
@@ -122,32 +134,39 @@
 
           <div class="card-body profile-layout">
             @if (authService.userData(); as user) {
-            <div class="profile-left-section">
-              <div class="user-id-badge">{{ user.CODEMPID }}</div>
-              <div class="user-name">{{ user.USR_FNAME }} {{ user.USR_LNAME }}
-                @if (user.NICKNAME) { <span class="user-nickname">({{ user.NICKNAME }})</span> }
+              <div class="profile-left-section">
+                <div class="user-id-badge">{{ user.CODEMPID }}</div>
+                <div class="user-name">
+                  {{ user.USR_FNAME }} {{ user.USR_LNAME }}
+                  @if (user.NICKNAME) {
+                    <span class="user-nickname">({{ user.NICKNAME }})</span>
+                  }
+                </div>
+                <div class="user-role">{{ user.POST }}</div>
+                <div class="user-meta">
+                  <span>แผนก : {{ user.DEPARTMENT }}</span>
+                </div>
+                <div class="user-meta">
+                  <span>บริษัท : {{ user.COMPANY_NAME }}</span>
+                </div>
               </div>
-              <div class="user-role">{{ user.POST }}</div>
-              <div class="user-meta"><span>แผนก : {{ user.DEPARTMENT }}</span></div>
-              <div class="user-meta"><span>บริษัท : {{ user.COMPANY_NAME }}</span></div>
-            </div>
             } @else {
-            <div class="profile-left-section">
-              <app-skeleton type="text" [rows]="5"></app-skeleton>
-            </div>
+              <div class="profile-left-section">
+                <app-skeleton type="text" [rows]="5"></app-skeleton>
+              </div>
             }
 
             <hr class="section-divider" />
 
             <div class="profile-info-list">
               @for (item of profileList(); track item.label) {
-              <div class="profile-display-group">
-                <label class="display-label">
-                  <i [class]="item.icon" [style.color]="item.iconColor"></i>
-                  {{ item.label }}
-                </label>
-                <div class="display-value">{{ item.value }}</div>
-              </div>
+                <div class="profile-display-group">
+                  <label class="display-label">
+                    <i [class]="item.icon" [style.color]="item.iconColor"></i>
+                    {{ item.label }}
+                  </label>
+                  <div class="display-value">{{ item.value }}</div>
+                </div>
               }
             </div>
           </div>
@@ -157,169 +176,202 @@
           <div class="section-header-flex">
             <div class="stats-group-header">
               <i class="fas fa-hand-holding-medical"></i> ค่ารักษาพยาบาล
-              <button class="btn-info-circle" (click)="isPolicyModalOpen.set(true)"
-                title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ">
+              <button
+                class="btn-info-circle"
+                (click)="isPolicyModalOpen.set(true)"
+                title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ"
+              >
                 <i class="fa-solid fa-circle-info"></i>
               </button>
             </div>
             <div class="medical-header-actions">
-              <button type="button" class="btn-view-medical" (click)="navigateTo('/medicalexpenses')">
+              <button
+                type="button"
+                class="btn-view-medical"
+                (click)="navigateTo('/medicalexpenses')"
+              >
                 <i class="fas fa-list-alt"></i> ดูรายการ
               </button>
               @if (userRole() === 'Admin') {
-              <button class="btn-pending-approvals" (click)="navigateTo('/approvals-medicalexpenses')">
-                <div class="icon-shake">
-                  <i class="fas fa-bell"></i>
-                  @if (medicalPendingCount(); as count) {
-                  @if (count > 0) {
-                  <span class="notification-badge">{{ count }}</span>
-                  }
-                  }
-                </div>
-                รายการรออนุมัติ
-              </button>
+                <button
+                  class="btn-pending-approvals"
+                  (click)="navigateTo('/approvals-medicalexpenses')"
+                >
+                  <div class="icon-shake">
+                    <i class="fas fa-bell"></i>
+                    @if (medicalPendingCount(); as count) {
+                      @if (count > 0) {
+                        <span class="notification-badge">{{ count }}</span>
+                      }
+                    }
+                  </div>
+                  รายการรออนุมัติ
+                </button>
               }
             </div>
           </div>
 
           @if (medicalStatsDisplay(); as stats) {
-          <div class="stat-items-grid">
-            @for (stat of stats; track stat.label) {
-            <div class="stat-item" [ngClass]="'type-' + stat.type">
-              <div class="stat-top-row">
-                <span class="stat-title">{{ stat.label }}</span>
-                <span class="stat-percent-badge" [ngClass]="stat.progressColor">{{ stat.percent }}%</span>
-              </div>
-              <div class="stat-limit-label">วงเงิน {{ stat.subLabel }}</div>
+            <div class="stat-items-grid">
+              @for (stat of stats; track stat.label) {
+                <div class="stat-item" [ngClass]="'type-' + stat.type">
+                  <div class="stat-top-row">
+                    <span class="stat-title">{{ stat.label }}</span>
+                    <span class="stat-percent-badge" [ngClass]="stat.progressColor"
+                      >{{ stat.percent }}%</span
+                    >
+                  </div>
+                  <div class="stat-limit-label">วงเงิน {{ stat.subLabel }}</div>
 
-              <div class="stat-values-row">
-                <div class="stat-val-group">
-                  <span class="val-label">ใช้ไป</span>
-                  <span class="val-num">{{ stat.used }}</span>
-                </div>
-                <div class="stat-val-divider"></div>
-                <div class="stat-val-group accent">
-                  <span class="val-label">คงเหลือ</span>
-                  <span class="val-num" [ngClass]="stat.balanceColor">{{ stat.balance }}</span>
-                </div>
-              </div>
+                  <div class="stat-values-row">
+                    <div class="stat-val-group">
+                      <span class="val-label">ใช้ไป</span>
+                      <span class="val-num">{{ stat.used }}</span>
+                    </div>
+                    <div class="stat-val-divider"></div>
+                    <div class="stat-val-group accent">
+                      <span class="val-label">คงเหลือ</span>
+                      <span class="val-num" [ngClass]="stat.balanceColor">{{ stat.balance }}</span>
+                    </div>
+                  </div>
 
-              <div class="stat-progress">
-                <div class="progress-bar" [ngClass]="stat.progressColor" [style.width.%]="stat.percent"></div>
-              </div>
+                  <div class="stat-progress">
+                    <div
+                      class="progress-bar"
+                      [ngClass]="stat.progressColor"
+                      [style.width.%]="stat.percent"
+                    ></div>
+                  </div>
+                </div>
+              }
             </div>
-            }
-          </div>
           } @else {
-          <div class="stat-items-grid">
-            <app-skeleton type="card" [rows]="4"></app-skeleton>
-          </div>
+            <div class="stat-items-grid">
+              <app-skeleton type="card" [rows]="4"></app-skeleton>
+            </div>
           }
         </section>
 
         @defer (on viewport) {
-        <div class="welfare-section">
-          <div class="section-header-flex">
-            <p class="section-title mb-0">สวัสดิการ</p>
-            @if (userRole() === 'Admin') {
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                @if (pendingCount(); as count) {
-                @if (count > 0) {
-                <span class="notification-badge">{{ count }}</span>
-                }
-                }
-              </div>
-              รายการรออนุมัติ
-            </button>
-            }
-          </div>
-          <div class="bottom-stats-grid">
-
-            @for (stat of welfareStats(); track stat.label) {
-            <div class="card mini-stat-card" [ngClass]="stat.colorClass || ''"
-              [style.cursor]="stat.path ? 'pointer' : 'default'" (click)="stat.path && navigateTo(stat.path)">
-              <div class="card-body">
-                <div class="mini-icon"><i [class]="stat.icon"></i></div>
-                <div class="card-info">
-                  <h6>
-                    <span class="title-text">{{ stat.label }}</span>
-                    @if (stat.tooltip) {
-                    <div class="tooltip-container">
-                      <button class="btn-info-circle" (click)="openTooltip(stat.tooltip); $event.stopPropagation()"
-                        title="ข้อมูลเพิ่มเติม">
-                        <i class="fa-solid fa-circle-info"></i>
-                      </button>
-                    </div>
+          <div class="welfare-section">
+            <div class="section-header-flex">
+              <p class="section-title mb-0">สวัสดิการ</p>
+              @if (userRole() === 'Admin') {
+                <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+                  <div class="icon-shake">
+                    <i class="fas fa-bell"></i>
+                    @if (pendingCount(); as count) {
+                      @if (count > 0) {
+                        <span class="notification-badge">{{ count }}</span>
+                      }
                     }
-                  </h6>
-                  <h3>{{ stat.value }}</h3>
-                </div>
-                <div class="card-arrow" [class.disabled-arrow]="!stat.path">
-                  <i class="fas fa-chevron-right"></i>
-                </div>
-              </div>
+                  </div>
+                  รายการรออนุมัติ
+                </button>
+              }
             </div>
-            }
+            <div class="bottom-stats-grid">
+              @for (stat of welfareStats(); track stat.label) {
+                <div
+                  class="card mini-stat-card"
+                  [ngClass]="stat.colorClass || ''"
+                  [style.cursor]="stat.path ? 'pointer' : 'default'"
+                  (click)="stat.path && navigateTo(stat.path)"
+                >
+                  <div class="card-body">
+                    <div class="mini-icon"><i [class]="stat.icon"></i></div>
+                    <div class="card-info">
+                      <h6>
+                        <span class="title-text">{{ stat.label }}</span>
+                        @if (stat.tooltip) {
+                          <div class="tooltip-container">
+                            <button
+                              class="btn-info-circle"
+                              (click)="openTooltip(stat.tooltip); $event.stopPropagation()"
+                              title="ข้อมูลเพิ่มเติม"
+                            >
+                              <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                          </div>
+                        }
+                      </h6>
+                      <h3>{{ stat.value }}</h3>
+                    </div>
+                    <div class="card-arrow" [class.disabled-arrow]="!stat.path">
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
-        </div>
         } @placeholder {
-        <div class="welfare-section">
-          <app-skeleton type="card" [rows]="1"></app-skeleton>
-        </div>
+          <div class="welfare-section">
+            <app-skeleton type="card" [rows]="1"></app-skeleton>
+          </div>
         }
 
         @defer (on viewport) {
-        <div class="leave-section">
-          <div class="section-header-flex">
-            <p class="section-title">ลาหยุดงาน</p>
-            @if (userRole() === 'Admin') {
-            <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
-              <div class="icon-shake">
-                <i class="fas fa-bell"></i>
-                @if (pendingCount(); as count) {
-                @if (count > 0) {
-                <span class="notification-badge">{{ count }}</span>
-                }
-                }
-              </div>
-              รายการรออนุมัติ
-            </button>
-            }
-          </div>
-          @if (leaveStatsDisplay(); as lstats) {
-          <div class="leave-stats-grid">
-            @for (leave of lstats; track leave.leave_type_id) {
-            <div class="card leave-card" [ngClass]="leave.theme" (click)="navigateTo('/timeoff')">
-              <div class="leave-body">
-                <div class="leave-header">
-                  <h3 class="leave-count" [style.color]="leave.countColor">{{ leave.used_days }}
-                    <span *ngIf="leave.quota_days">/ {{leave.quota_days}}</span>
-                  </h3>
-                  <div class="leave-icon">
-                    <i [class]="leave.iconClass" [style.color]="leave.iconColor || '#888'"></i>
+          <div class="leave-section">
+            <div class="section-header-flex">
+              <p class="section-title">ลาหยุดงาน</p>
+              @if (userRole() === 'Admin') {
+                <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
+                  <div class="icon-shake">
+                    <i class="fas fa-bell"></i>
+                    @if (pendingCount(); as count) {
+                      @if (count > 0) {
+                        <span class="notification-badge">{{ count }}</span>
+                      }
+                    }
                   </div>
-                </div>
-                <p class="leave-label">{{ leave.leave_name_th }}</p>
-              </div>
-              <div class="leave-footer">
-                <span class="">คงเหลือ {{leave.quota_days ? leave.quota_days - leave.used_days : '-'}} วัน</span>
-                <i class="fas fa-chevron-right"></i>
-              </div>
+                  รายการรออนุมัติ
+                </button>
+              }
             </div>
+            @if (leaveStatsDisplay(); as lstats) {
+              <div class="leave-stats-grid">
+                @for (leave of lstats; track leave.leave_type_id) {
+                  <div
+                    class="card leave-card"
+                    [ngClass]="leave.theme"
+                    (click)="navigateTo('/timeoff')"
+                  >
+                    <div class="leave-body">
+                      <div class="leave-header">
+                        <h3 class="leave-count" [style.color]="leave.countColor">
+                          {{ leave.used_days }}
+                          <span *ngIf="leave.quota_days">/ {{ leave.quota_days }}</span>
+                        </h3>
+                        <div class="leave-icon">
+                          <i
+                            [class]="leave.iconClass"
+                            [style.color]="leave.iconColor || '#888'"
+                          ></i>
+                        </div>
+                      </div>
+                      <p class="leave-label">{{ leave.leave_name_th }}</p>
+                    </div>
+                    <div class="leave-footer">
+                      <span class=""
+                        >คงเหลือ
+                        {{ leave.quota_days ? leave.quota_days - leave.used_days : '-' }} วัน</span
+                      >
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="leave-stats-grid">
+                <app-skeleton type="card" [rows]="3"></app-skeleton>
+              </div>
             }
           </div>
-          } @else {
-          <div class="leave-stats-grid">
+        } @placeholder {
+          <div class="leave-section">
             <app-skeleton type="card" [rows]="3"></app-skeleton>
           </div>
-          }
-        </div>
-        } @placeholder {
-        <div class="leave-section">
-          <app-skeleton type="card" [rows]="3"></app-skeleton>
-        </div>
         }
         <div class="schedule-section">
           <p class="section-title">ตารางการปฏิบัติงาน</p>
@@ -335,41 +387,40 @@
               <div class="holiday-list-panel">
                 <h5 class="panel-title text-blue">วันหยุดประเพณี</h5>
                 @if (holidays.length) {
-                <ul class="holiday-list">
-                  <li class="holiday-item" *ngFor="let h of holidays">
-                    <span class="status-dot dot-green"></span>
-                    <div class="holiday-info">
-                      <span class="h-date">{{ formatThaiDate(h.date) }}</span>
-                      <span class="h-name">{{ h.name }}</span>
-                    </div>
-                  </li>
-                </ul>
+                  <ul class="holiday-list">
+                    <li class="holiday-item" *ngFor="let h of holidays">
+                      <span class="status-dot dot-green"></span>
+                      <div class="holiday-info">
+                        <span class="h-date">{{ formatThaiDate(h.date) }}</span>
+                        <span class="h-name">{{ h.name }}</span>
+                      </div>
+                    </li>
+                  </ul>
                 } @else {
-                <div class="no-holiday">ไม่มีการประกาศวันหยุดประเพณี</div>
+                  <div class="no-holiday">ไม่มีการประกาศวันหยุดประเพณี</div>
                 }
               </div>
 
               <div class="calendar-panel">
                 @defer (on viewport) {
-                <full-calendar [options]="calendarOptions"></full-calendar>
+                  <full-calendar [options]="calendarOptions"></full-calendar>
                 } @placeholder {
-                <div class="calendar-placeholder">
-                  <app-skeleton type="card" height="300px"></app-skeleton>
-                  <p>กำลังโหลดปฏิทิน...</p>
-                </div>
+                  <div class="calendar-placeholder">
+                    <app-skeleton type="card" height="300px"></app-skeleton>
+                    <p>กำลังโหลดปฏิทิน...</p>
+                  </div>
                 } @loading (after 100ms; minimum 500ms) {
-                <div class="calendar-loading">
-                  <i class="fas fa-spinner fa-spin"></i>
-                  <p>กำลังเตรียมข้อมูลปฏิทิน...</p>
-                </div>
+                  <div class="calendar-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>กำลังเตรียมข้อมูลปฏิทิน...</p>
+                  </div>
                 } @error {
-                <div class="calendar-error">
-                  <p>ไม่สามารถโหลดปฏิทินได้ กรุณาลองใหม่</p>
-                </div>
+                  <div class="calendar-error">
+                    <p>ไม่สามารถโหลดปฏิทินได้ กรุณาลองใหม่</p>
+                  </div>
                 }
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -380,73 +431,96 @@
   </main>
 
   @if (isPolicyModalOpen()) {
-  <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)">
-  </app-medical-policy-modal>
+    <app-medical-policy-modal (onClose)="isPolicyModalOpen.set(false)"> </app-medical-policy-modal>
   }
 
   @if (isTimeOffModalOpen()) {
-  <app-time-off-form [initialLeaveTypeId]="selectedLeaveTypeId()" (onClose)="closeTimeOffForm()">
-  </app-time-off-form>
+    <app-time-off-form [initialLeaveTypeId]="selectedLeaveTypeId()" (onClose)="closeTimeOffForm()">
+    </app-time-off-form>
   }
 
   @if (profileLightbox()) {
-  <div class="profile-lightbox-overlay" (click)="closeProfileLightbox()">
-    <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
-      <i class="fas fa-times"></i>
-    </button>
-    <img [src]="profileLightbox()?.url" alt="{{ profileLightbox()?.name }}" title="{{ profileLightbox()?.name }}"
-      role="img" (click)="$event.stopPropagation()" />
-    <div class="lightbox-name">{{ profileLightbox()?.name }}</div>
-  </div>
+    <div class="profile-lightbox-overlay" (click)="closeProfileLightbox()">
+      <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
+        <i class="fas fa-times"></i>
+      </button>
+      <img
+        [src]="profileLightbox()?.url"
+        alt="{{ profileLightbox()?.name }}"
+        title="{{ profileLightbox()?.name }}"
+        role="img"
+        (click)="$event.stopPropagation()"
+      />
+      <div class="lightbox-name">{{ profileLightbox()?.name }}</div>
+    </div>
   }
 
   @if (isTooltipModalOpen()) {
-  <app-tooltip-modal (onClose)="closeTooltip()">
-    <ng-container [ngSwitch]="tooltipModalId()">
-      <div *ngSwitchCase="'transport'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+    <app-tooltip-modal (onClose)="closeTooltip()">
+      <ng-container [ngSwitch]="tooltipModalId()">
+        <div *ngSwitchCase="'transport'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item">
+            <span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span>
+          </div>
+          <div class="tooltip-condition-item">
+            <span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120 บาท/ครั้ง</span>
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- ค่ารถก่อน 06.00 น. ต้องเข้างานก่อน 06:00 เบิกได้ไม่เกิน 120
-            บาท/ครั้ง</span></div>
-        <div class="tooltip-condition-item"><span>- ค่ารถหลัง 22.00 น. ต้องทำงานเกิน 22:00 เบิกได้ไม่เกิน 120
-            บาท/ครั้ง</span></div>
-      </div>
-      <div *ngSwitchCase="'taxi'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        <div *ngSwitchCase="'taxi'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div>
+          <div class="tooltip-condition-item">
+            <span>- ค่า Taxi สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span>
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- 1,000 บาท / ปี</span></div>
-        <div class="tooltip-condition-item"><span>- ค่า Taxi
-            สำหรับการเดินทางจากสำนักงานและกลับมาที่สำนักงานเท่านั้น</span></div>
-      </div>
-      <div *ngSwitchCase="'wedding'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        <div *ngSwitchCase="'wedding'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div>
+          <div class="tooltip-condition-item">
+            <span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span>
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี</span></div>
-        <div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>
-      </div>
-      <div *ngSwitchCase="'ordination'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        <div *ngSwitchCase="'ordination'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div>
+          <div class="tooltip-condition-item">
+            <span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span>
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- อายุงาน 1 ปี เพศชาย</span></div>
-        <div class="tooltip-condition-item"><span>- เบิกได้ 5,000 บาท 1 ครั้ง ตลอดอายุงาน</span></div>
-      </div>
-      <div *ngSwitchCase="'funeral'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        <div *ngSwitchCase="'funeral'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div>
+          <div class="tooltip-condition-item">
+            <span
+              >- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา 10,000
+              บาท/คน</span
+            >
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- เบิกได้ 80,000 บาท / ตลอดอายุงาน</span></div>
-        <div class="tooltip-condition-item"><span>- พนักงาน 20,000 บาท ครอบครัว (คู่สมรส,บุตร) 10,000บาท/คน บิดามารดา
-            10,000 บาท/คน</span></div>
-      </div>
-      <div *ngSwitchCase="'wreath'">
-        <div class="tooltip-condition-item"><i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+        <div *ngSwitchCase="'wreath'">
+          <div class="tooltip-condition-item">
+            <i class="fas fa-info-circle text-blue-500"></i><strong>เงื่อนไข :</strong>
+          </div>
+          <div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div>
+          <div class="tooltip-condition-item">
+            <span
+              >- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา 1,500 บาท/คน</span
+            >
+          </div>
         </div>
-        <div class="tooltip-condition-item"><span>- เบิกได้ 12,000 บาท / ตลอดอายุงาน</span></div>
-        <div class="tooltip-condition-item"><span>- พนักงาน 1,500 บาท ครอบครัว (คู่สมรส,บุตร) 1,500บาท/คน บิดามารดา
-            1,500
-            บาท/คน</span></div>
-      </div>
-    </ng-container>
-  </app-tooltip-modal>
+      </ng-container>
+    </app-tooltip-modal>
   }
 </div>
 
@@ -457,17 +531,20 @@
 </ng-template>
 
 @if (isFormOpen()) {
-<div class="modal-overlay">
-  <div class="modal-container">
-    @defer {
-    <app-time-off-form [selectedDate]="selectedDate()" [requestStatus]="selectedRequestStatus()"
-      (onClose)="closeForm()">
-    </app-time-off-form>
-    } @loading {
-    <div class="p-4 text-center">
-      <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+  <div class="modal-overlay">
+    <div class="modal-container">
+      @defer {
+        <app-time-off-form
+          [selectedDate]="selectedDate()"
+          [requestStatus]="selectedRequestStatus()"
+          (onClose)="closeForm()"
+        >
+        </app-time-off-form>
+      } @loading {
+        <div class="p-4 text-center">
+          <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+        </div>
+      }
     </div>
-    }
   </div>
-</div>
 }

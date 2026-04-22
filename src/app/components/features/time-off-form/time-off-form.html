@@ -1,221 +1,291 @@
 <div class="time-off-form-page">
-    <header class="top-header-strip">
-        <h2>บันทึกข้อมูลการลา (Time Off)</h2>
-        <div class="header-right-meta">
-            <div class="header-meta-list">
-                <div class="meta-item">
-                    <i class="far fa-calendar-alt"></i>
-                    <span class="meta-label">วันที่ขอ :</span>
-                    <span class="meta-value">{{ currentDate() }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-hashtag"></i>
-                    <span class="meta-label">ลำดับที่ :</span>
-                    <span class="meta-value">{{ requestId() }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="far fa-user"></i>
-                    <span class="meta-label">รหัสพนักงาน :</span>
-                    <span class="meta-value">{{ employeeId() }}</span>
-                </div>
-            </div>
-            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+  <header class="top-header-strip">
+    <h2>บันทึกข้อมูลการลา (Time Off)</h2>
+    <div class="header-right-meta">
+      <div class="header-meta-list">
+        <div class="meta-item">
+          <i class="far fa-calendar-alt"></i>
+          <span class="meta-label">วันที่ขอ :</span>
+          <span class="meta-value">{{ currentDate() }}</span>
         </div>
-    </header>
-
-    <main class="content-card">
-        <section class="form-section-wrapper">
-            <h4 class="section-heading">1. เลือกประเภทการลา</h4>
-            <div class="leave-type-grid">
-                <div class="leave-type-card" *ngFor="let type of leaveTypes"
-                    [class.active]="selectedLeaveType() === type.id" (click)="selectLeaveType(type.id)">
-                    <div class="leave-body">
-                        <div class="leave-header">
-                            <div class="leave-icon">
-                                <i [class]="type.icon" [style.color]="type.color"></i>
-                            </div>
-                        </div>
-                        <div class="info-col">
-                            <p class="leave-label">{{ type.label }}</p>
-                            <div class="leave-remaining">คงเหลือ: {{ type.remaining }} วัน</div>
-                        </div>
-                    </div>
-                    <div class="leave-footer" [style.background-color]="type.color + '15'" [style.color]="type.color">
-                        <span>คลิกเพื่อเลือก</span>
-                        <i class="fas fa-check-circle" *ngIf="selectedLeaveType() === type.id"></i>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedLeaveType()">
-            <h4 class="section-heading">2. รายละเอียดการลา</h4>
-
-            <div class="input-field-group mb-4">
-                <label>ประเภทการลา</label>
-                <div class="leave-period-options">
-                    <label class="period-option" [class.active]="leavePeriod() === 'morning'"
-                        [class.disabled]="isHalfDayDisabled()">
-                        <input type="radio" name="leavePeriod" value="morning" [checked]="leavePeriod() === 'morning'"
-                            [disabled]="isHalfDayDisabled()" (change)="onLeavePeriodChange('morning')">
-                        <span class="option-label">
-                            <i class="fas fa-sun"></i>
-                            ลาเช้า
-                        </span>
-                    </label>
-                    <label class="period-option" [class.active]="leavePeriod() === 'afternoon'"
-                        [class.disabled]="isHalfDayDisabled()">
-                        <input type="radio" name="leavePeriod" value="afternoon"
-                            [checked]="leavePeriod() === 'afternoon'" [disabled]="isHalfDayDisabled()"
-                            (change)="onLeavePeriodChange('afternoon')">
-                        <span class="option-label">
-                            <i class="fas fa-cloud-sun"></i>
-                            ลาบ่าย
-                        </span>
-                    </label>
-                    <label class="period-option" [class.active]="leavePeriod() === 'full-day'">
-                        <input type="radio" name="leavePeriod" value="full-day" [checked]="leavePeriod() === 'full-day'"
-                            (change)="onLeavePeriodChange('full-day')">
-                        <span class="option-label">
-                            <i class="fas fa-calendar-day"></i>
-                            ลาเต็มวัน
-                        </span>
-                    </label>
-                    <label class="period-option" [class.active]="leavePeriod() === 'custom'">
-                        <input type="radio" name="leavePeriod" value="custom" [checked]="leavePeriod() === 'custom'"
-                            (change)="onLeavePeriodChange('custom')">
-                        <span class="option-label">
-                            <i class="fas fa-user-clock"></i>
-                            กำหนดเอง
-                        </span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="details-grid">
-                <div class="input-field-group left-half">
-                    <label>ตั้งแต่วันที่ <span class="required">*</span></label>
-                    <div class="custom-input-wrapper">
-                        <nz-date-picker [ngModel]="startDate()" nzFormat="dd/MM/yyyy"
-                            (ngModelChange)="startDate.set($event)">
-                        </nz-date-picker>
-                    
-                    </div>
-                </div>
-
-                <div class="input-field-group left-half">
-                    <label>ตั้งแต่เวลา</label>
-                    <div class="custom-input-wrapper">
-                        <input type="time" class="input-field" [ngModel]="shiftStartTime()"
-                            (ngModelChange)="shiftStartTime.set($event)">
-                        <div class="icon-box">
-                            <i class="far fa-clock"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-field-group left-half">
-                    <label>ถึงวันที่ <span class="required">*</span></label>
-                    <div class="custom-input-wrapper">
-                        <nz-date-picker [ngModel]="endDate()" nzFormat="dd/MM/yyyy"
-                            (ngModelChange)="endDate.set($event)">
-                        </nz-date-picker>
-                       
-                    </div>
-                </div>
-
-                <div class="input-field-group left-half">
-                    <label>ถึงเวลา</label>
-                    <div class="custom-input-wrapper">
-                        <input type="time" class="input-field" [ngModel]="shiftEndTime()"
-                            (ngModelChange)="shiftEndTime.set($event)">
-                        <div class="icon-box">
-                            <i class="far fa-clock"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-field-group left-half">
-                    <label>จำนวนวันลา</label>
-                    <div class="custom-input-wrapper">
-                        <input type="text" class="input-field text-center readonly-highlight" [value]="calculatedDays()"
-                            readonly>
-                        <div class="icon-box">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-field-group full-width mt-4">
-                <label>เหตุผลการลา</label>
-                <textarea class="custom-form-control" rows="3" placeholder="ระบุเหตุผลการลา..." [ngModel]="reason()"
-                    (ngModelChange)="reason.set($event)"></textarea>
-            </div>
-        </section>
-
-        <section class="form-section-wrapper mt-5 animated-fade-in" *ngIf="selectedLeaveType()">
-            <div class="section-header-row">
-                <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
-                <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
-                    <i class="fas fa-file-upload"></i> Upload file
-                </button>
-                <input #fileInput type="file" class="hidden-input" (change)="onFileSelected($event)" multiple>
-            </div>
-            <div class="attachment-table-container" *ngIf="attachments().length > 0">
-                <table class="excel-table">
-                    <thead>
-                        <tr>
-                            <th class="w-px-50 text-center">#</th>
-                            <th class="w-35">Upload file</th>
-                            <th class="w-px-50 text-center"><i class="far fa-trash-alt"></i></th>
-                            <th class="w-auto">รายละเอียด</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let file of attachments(); let i = index">
-                            <td class="text-center">{{ i + 1 }}</td>
-                            <td class="clickable-file" (click)="openPreview(file)">
-                                <div class="file-name-container">
-                                    <i class="far fa-file-alt mr-2 text-primary"></i>
-                                    <span class="file-text">{{ file.name }}</span>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <div class="desc-input-wrapper">
-                                    <input type="text" class="desc-control" [(ngModel)]="file.description"
-                                        placeholder="ระบุรายละเอียด (ถ้ามี)">
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedLeaveType()">
-            <div class="placeholder-content">
-                <i class="fas fa-mouse-pointer pulse-icon"></i>
-                <p>กรุณาเลือกประเภทการลาด้านบนเพื่อดำเนินการต่อ</p>
-                <span class="sub-text">Please select a leave type to view details and upload documents</span>
-            </div>
+        <div class="meta-item">
+          <i class="fas fa-hashtag"></i>
+          <span class="meta-label">ลำดับที่ :</span>
+          <span class="meta-value">{{ requestId() }}</span>
         </div>
-    </main>
-
-    <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
-        <button class="btn-back-custom" (click)="close()">
-            <i class="fas fa-times"></i> ยกเลิก
-        </button>
-        <button class="btn-save-custom" (click)="save()">
-            <i class="fas fa-paper-plane"></i> ส่งใบลา
-        </button>
+        <div class="meta-item">
+          <i class="far fa-user"></i>
+          <span class="meta-label">รหัสพนักงาน :</span>
+          <span class="meta-value">{{ employeeId() }}</span>
+        </div>
+      </div>
+      <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
     </div>
+  </header>
 
-    <app-file-preview-modal *ngIf="isPreviewModalOpen()" [files]="previewFiles()" (onClose)="closePreview()">
-    </app-file-preview-modal>
+  <main class="content-card">
+    <section class="form-section-wrapper">
+      <h4 class="section-heading">1. เลือกประเภทการลา</h4>
+      <div class="leave-type-grid">
+        <div
+          class="leave-type-card"
+          *ngFor="let type of leaveTypes"
+          [class.active]="selectedLeaveType() === type.id"
+          (click)="selectLeaveType(type.id)"
+        >
+          <div class="leave-body">
+            <div class="leave-header">
+              <div class="leave-icon">
+                <i [class]="type.icon" [style.color]="type.color"></i>
+              </div>
+            </div>
+            <div class="info-col">
+              <p class="leave-label">{{ type.label }}</p>
+              <div class="leave-remaining">คงเหลือ: {{ type.remaining }} วัน</div>
+            </div>
+          </div>
+          <div
+            class="leave-footer"
+            [style.background-color]="type.color + '15'"
+            [style.color]="type.color"
+          >
+            <span>คลิกเพื่อเลือก</span>
+            <i class="fas fa-check-circle" *ngIf="selectedLeaveType() === type.id"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedLeaveType()">
+      <h4 class="section-heading">2. รายละเอียดการลา</h4>
+
+      <div class="input-field-group mb-4">
+        <label>ประเภทการลา</label>
+        <div class="leave-period-options">
+          <label
+            class="period-option"
+            [class.active]="leavePeriod() === 'morning'"
+            [class.disabled]="isHalfDayDisabled()"
+          >
+            <input
+              type="radio"
+              name="leavePeriod"
+              value="morning"
+              [checked]="leavePeriod() === 'morning'"
+              [disabled]="isHalfDayDisabled()"
+              (change)="onLeavePeriodChange('morning')"
+            />
+            <span class="option-label">
+              <i class="fas fa-sun"></i>
+              ลาเช้า
+            </span>
+          </label>
+          <label
+            class="period-option"
+            [class.active]="leavePeriod() === 'afternoon'"
+            [class.disabled]="isHalfDayDisabled()"
+          >
+            <input
+              type="radio"
+              name="leavePeriod"
+              value="afternoon"
+              [checked]="leavePeriod() === 'afternoon'"
+              [disabled]="isHalfDayDisabled()"
+              (change)="onLeavePeriodChange('afternoon')"
+            />
+            <span class="option-label">
+              <i class="fas fa-cloud-sun"></i>
+              ลาบ่าย
+            </span>
+          </label>
+          <label class="period-option" [class.active]="leavePeriod() === 'full-day'">
+            <input
+              type="radio"
+              name="leavePeriod"
+              value="full-day"
+              [checked]="leavePeriod() === 'full-day'"
+              (change)="onLeavePeriodChange('full-day')"
+            />
+            <span class="option-label">
+              <i class="fas fa-calendar-day"></i>
+              ลาเต็มวัน
+            </span>
+          </label>
+          <label class="period-option" [class.active]="leavePeriod() === 'custom'">
+            <input
+              type="radio"
+              name="leavePeriod"
+              value="custom"
+              [checked]="leavePeriod() === 'custom'"
+              (change)="onLeavePeriodChange('custom')"
+            />
+            <span class="option-label">
+              <i class="fas fa-user-clock"></i>
+              กำหนดเอง
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="input-field-group left-half">
+          <label>ตั้งแต่วันที่ <span class="required">*</span></label>
+          <div class="custom-input-wrapper">
+            <nz-date-picker
+              [ngModel]="startDate()"
+              nzFormat="dd/MM/yyyy"
+              (ngModelChange)="startDate.set($event)"
+            >
+            </nz-date-picker>
+          </div>
+        </div>
+
+        <div class="input-field-group left-half">
+          <label>ตั้งแต่เวลา</label>
+          <div class="custom-input-wrapper">
+            <input
+              type="time"
+              class="input-field"
+              [ngModel]="shiftStartTime()"
+              (ngModelChange)="shiftStartTime.set($event)"
+            />
+            <div class="icon-box">
+              <i class="far fa-clock"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-field-group left-half">
+          <label>ถึงวันที่ <span class="required">*</span></label>
+          <div class="custom-input-wrapper">
+            <nz-date-picker
+              [ngModel]="endDate()"
+              nzFormat="dd/MM/yyyy"
+              (ngModelChange)="endDate.set($event)"
+            >
+            </nz-date-picker>
+          </div>
+        </div>
+
+        <div class="input-field-group left-half">
+          <label>ถึงเวลา</label>
+          <div class="custom-input-wrapper">
+            <input
+              type="time"
+              class="input-field"
+              [ngModel]="shiftEndTime()"
+              (ngModelChange)="shiftEndTime.set($event)"
+            />
+            <div class="icon-box">
+              <i class="far fa-clock"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-field-group left-half">
+          <label>จำนวนวันลา</label>
+          <div class="custom-input-wrapper">
+            <input
+              type="text"
+              class="input-field text-center readonly-highlight"
+              [value]="calculatedDays()"
+              readonly
+            />
+            <div class="icon-box">
+              <i class="fas fa-calculator"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-field-group full-width mt-4">
+        <label>เหตุผลการลา</label>
+        <textarea
+          class="custom-form-control"
+          rows="3"
+          placeholder="ระบุเหตุผลการลา..."
+          [ngModel]="reason()"
+          (ngModelChange)="reason.set($event)"
+        ></textarea>
+      </div>
+    </section>
+
+    <section class="form-section-wrapper mt-5 animated-fade-in" *ngIf="selectedLeaveType()">
+      <div class="section-header-row">
+        <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
+        <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
+          <i class="fas fa-file-upload"></i> Upload file
+        </button>
+        <input
+          #fileInput
+          type="file"
+          class="hidden-input"
+          (change)="onFileSelected($event)"
+          multiple
+        />
+      </div>
+      <div class="attachment-table-container" *ngIf="attachments().length > 0">
+        <table class="excel-table">
+          <thead>
+            <tr>
+              <th class="w-px-50 text-center">#</th>
+              <th class="w-35">Upload file</th>
+              <th class="w-px-50 text-center"><i class="far fa-trash-alt"></i></th>
+              <th class="w-auto">รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let file of attachments(); let i = index">
+              <td class="text-center">{{ i + 1 }}</td>
+              <td class="clickable-file" (click)="openPreview(file)">
+                <div class="file-name-container">
+                  <i class="far fa-file-alt mr-2 text-primary"></i>
+                  <span class="file-text">{{ file.name }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <button class="btn-delete-row" (click)="deleteAttachment(file.id)">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </td>
+              <td>
+                <div class="desc-input-wrapper">
+                  <input
+                    type="text"
+                    class="desc-control"
+                    [(ngModel)]="file.description"
+                    placeholder="ระบุรายละเอียด (ถ้ามี)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="selection-placeholder mt-5 mb-5" *ngIf="!selectedLeaveType()">
+      <div class="placeholder-content">
+        <i class="fas fa-mouse-pointer pulse-icon"></i>
+        <p>กรุณาเลือกประเภทการลาด้านบนเพื่อดำเนินการต่อ</p>
+        <span class="sub-text"
+          >Please select a leave type to view details and upload documents</span
+        >
+      </div>
+    </div>
+  </main>
+
+  <div class="form-actions-footer" *ngIf="requestStatus === 'NEW'">
+    <button class="btn-back-custom" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
+    <button class="btn-save-custom" (click)="save()">
+      <i class="fas fa-paper-plane"></i> ส่งใบลา
+    </button>
+  </div>
+
+  <app-file-preview-modal
+    *ngIf="isPreviewModalOpen()"
+    [files]="previewFiles()"
+    (onClose)="closePreview()"
+  >
+  </app-file-preview-modal>
 </div>

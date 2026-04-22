@@ -61,7 +61,10 @@ describe('Allowance', () => {
     cy.get('body').then(($body) => {
       if ($body.find('.status-badge').length > 0) {
         cy.get('.status-badge').each(($badge) => {
-          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อนุมัติแล้ว|Approved/);
+          cy.wrap($badge)
+            .invoke('text')
+            .invoke('trim')
+            .should('match', /อนุมัติแล้ว|Approved/);
         });
       } else {
         cy.get('app-empty-state').should('be.visible');

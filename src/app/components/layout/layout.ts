@@ -10,23 +10,18 @@ import { fadeSlideAnimation } from '../../animations/animations';
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    NavbarComponent,
-    Sidebar
-  ],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, Sidebar],
   animations: [fadeSlideAnimation],
   templateUrl: './layout.html',
-  styleUrls: ['./layout.scss']
+  styleUrls: ['./layout.scss'],
 })
 export class LayoutComponent implements OnInit {
   private lastIsSmallScreen: boolean | null = null;
 
   constructor(
     public sidebarService: SidebarService,
-    private contexts: ChildrenOutletContexts
-  ) { }
+    private contexts: ChildrenOutletContexts,
+  ) {}
 
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];

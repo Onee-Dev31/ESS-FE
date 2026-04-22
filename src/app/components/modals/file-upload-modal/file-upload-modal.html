@@ -2,14 +2,18 @@
   <div class="upload-modal-content">
     <div class="modal-header">
       <h3>แนบไฟล์เอกสาร</h3>
-      <button class="close-btn" (click)="close()" title="ปิด" aria-label="ปิด"><i class="fas fa-times"></i></button>
+      <button class="close-btn" (click)="close()" title="ปิด" aria-label="ปิด">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
 
     <div class="modal-body">
-      <p class="date-label">สำหรับวันที่: <strong>{{ dateUtil.formatDateToBE(dateLabel, 'DD/MM/YYYY') }}</strong></p>
+      <p class="date-label">
+        สำหรับวันที่: <strong>{{ dateUtil.formatDateToBE(dateLabel, 'DD/MM/YYYY') }}</strong>
+      </p>
 
       <div class="upload-box" (dragover)="$event.preventDefault()" (drop)="onDrop($event)">
-        <input type="file" id="fileInput" multiple (change)="onFileSelected($event)" hidden>
+        <input type="file" id="fileInput" multiple (change)="onFileSelected($event)" hidden />
 
         <!-- Upload area -->
         <label for="fileInput" class="upload-trigger">
@@ -20,8 +24,11 @@
 
         <!-- File list -->
         <div class="file-list" *ngIf="tempFiles.length > 0">
-          <div *ngFor="let file of tempFiles; let i = index" class="file-item" (click)="viewFile(file)">
-
+          <div
+            *ngFor="let file of tempFiles; let i = index"
+            class="file-item"
+            (click)="viewFile(file)"
+          >
             <!-- icon -->
             <div class="file-icon">
               <i [ngClass]="getFileIcon(file)"></i>
@@ -37,7 +44,6 @@
             <button class="remove-btn" (click)="$event.stopPropagation(); removeFile(i)">
               <i class="fas fa-times"></i>
             </button>
-
           </div>
         </div>
       </div>
@@ -45,7 +51,11 @@
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="close()">ยกเลิก</button>
-      <button class="btn-confirm" (click)="confirm()" [disabled]="tempFiles.length === 0 && !isDeleted">
+      <button
+        class="btn-confirm"
+        (click)="confirm()"
+        [disabled]="tempFiles.length === 0 && !isDeleted"
+      >
         บันทึก
       </button>
     </div>
@@ -53,6 +63,6 @@
 </div>
 
 @if (isPreviewModalOpen()) {
-<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-</app-file-preview-modal>
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  </app-file-preview-modal>
 }

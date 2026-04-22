@@ -12,12 +12,8 @@ describe('Layout', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LayoutComponent],
-      providers: [
-        provideRouter([]),
-        provideNoopAnimations()
-      ]
-    })
-      .compileComponents();
+      providers: [provideRouter([]), provideNoopAnimations()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LayoutComponent);
     component = fixture.componentInstance;

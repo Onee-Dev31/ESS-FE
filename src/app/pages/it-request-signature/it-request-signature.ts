@@ -1,7 +1,14 @@
 import {
-  Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, signal, inject, computed,
-  ChangeDetectorRef
+  Component,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  signal,
+  inject,
+  computed,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -63,8 +70,8 @@ const MOCK_REQUESTS: MockRequestData[] = [
     brand: 'Dell',
     model: 'Latitude 3420',
     symptom: 'จอฟ้า เครื่องเปิดไม่ติด',
-    attachments: ['bsod.jpg']
-  }
+    attachments: ['bsod.jpg'],
+  },
 ];
 
 @Component({
@@ -95,7 +102,8 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   signatureImage = signal<string | null>(null);
   approvalStatus = signal<string>('');
 
-  private ctx: CanvasRenderingContext2D | null = null; private isDrawing = false;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private isDrawing = false;
   private lastX = 0;
   private lastY = 0;
 
@@ -104,14 +112,12 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   private ticketLoaded = false;
   private resizeHandler = () => this.onResize();
 
-  ticketNumber: string = "";
+  ticketNumber: string = '';
   currentApprover = signal<string>('');
   constructor(
     private ticketService: TicketService,
     private cdr: ChangeDetectorRef,
-  ) {
-
-  }
+  ) {}
 
   ngOnInit() {
     this.ticketNumber = this.route.snapshot.queryParamMap.get('ticket') || '';
@@ -156,58 +162,57 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadTicket(ticketNumber: string) {
-    this.ticketService.getTicket(ticketNumber)
-      .subscribe({
-        next: (ticket) => {
-          if (ticket.NameApprover) {
-            this.signerName.set(ticket.NameApprover);
-          }
-
-          this.approvalStatus.set(ticket.approval_status ?? '');
-          this.requestNo.set(ticket.ticket_number);
-
-          const data: any = {
-            requestNo: ticket.ticket_number,
-            requestDate: ticket.created_at,
-            requester: ticket.RequesterName,
-            phone: ticket.contact_phone,
-            openFor: ticket.openFor,
-            detail: this.formatDetail(ticket.Tdescription),
-            ticketType: ticket.code === 'repair' ? 'repair' : 'service',
-            device: ticket.DeviceNameTH,
-            brand: ticket.brand,
-            model: ticket.model,
-            symptom: ticket.Tdescription,
-            requestCategory: ticket.TicketTypeName,
-            basicSystems: ticket.basic,
-            specificSystems: ticket.specific,
-            attachments: ticket.attachments?.map((a: any) => a.file_name),
-            ticketId: ticket.ticketID,
-          };
-
-          this.requestData.set(data);
-          this.cdr.detectChanges();
-
-          if (ticket.APSignature) {
-            this.pendingSignature = ticket.APSignature;
-            this.signatureImage.set(ticket.APSignature);
-
-            setTimeout(() => {
-              this.drawSignatureFromPending();
-            }, 0);
-          } else {
-            this.pendingSignature = null;
-            this.signatureImage.set(null);
-            this.hasSignature.set(false);
-            setTimeout(() => {
-              this.initCanvas();
-            }, 0);
-          }
-        },
-        error: () => {
-          this.isNotFound.set(true);
+    this.ticketService.getTicket(ticketNumber).subscribe({
+      next: (ticket) => {
+        if (ticket.NameApprover) {
+          this.signerName.set(ticket.NameApprover);
         }
-      });
+
+        this.approvalStatus.set(ticket.approval_status ?? '');
+        this.requestNo.set(ticket.ticket_number);
+
+        const data: any = {
+          requestNo: ticket.ticket_number,
+          requestDate: ticket.created_at,
+          requester: ticket.RequesterName,
+          phone: ticket.contact_phone,
+          openFor: ticket.openFor,
+          detail: this.formatDetail(ticket.Tdescription),
+          ticketType: ticket.code === 'repair' ? 'repair' : 'service',
+          device: ticket.DeviceNameTH,
+          brand: ticket.brand,
+          model: ticket.model,
+          symptom: ticket.Tdescription,
+          requestCategory: ticket.TicketTypeName,
+          basicSystems: ticket.basic,
+          specificSystems: ticket.specific,
+          attachments: ticket.attachments?.map((a: any) => a.file_name),
+          ticketId: ticket.ticketID,
+        };
+
+        this.requestData.set(data);
+        this.cdr.detectChanges();
+
+        if (ticket.APSignature) {
+          this.pendingSignature = ticket.APSignature;
+          this.signatureImage.set(ticket.APSignature);
+
+          setTimeout(() => {
+            this.drawSignatureFromPending();
+          }, 0);
+        } else {
+          this.pendingSignature = null;
+          this.signatureImage.set(null);
+          this.hasSignature.set(false);
+          setTimeout(() => {
+            this.initCanvas();
+          }, 0);
+        }
+      },
+      error: () => {
+        this.isNotFound.set(true);
+      },
+    });
   }
 
   formatDetail(text: string) {
@@ -259,7 +264,10 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
       const touch = event.touches[0];
       return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
     }
-    return { x: (event as MouseEvent).clientX - rect.left, y: (event as MouseEvent).clientY - rect.top };
+    return {
+      x: (event as MouseEvent).clientX - rect.left,
+      y: (event as MouseEvent).clientY - rect.top,
+    };
   }
 
   startDrawing(event: MouseEvent | TouchEvent) {
@@ -324,22 +332,27 @@ export class ItRequestSignature implements OnInit, AfterViewInit, OnDestroy {
     const base64 = this.getSignatureBase64();
     const ticketId = this.requestData()?.ticketId;
 
-    this.itServiceService.updateTicket(ticketId, formData).pipe(
-      switchMap(() => this.http.post(`${this.baseUrl}/employee-signature`, {
-        codeEmpId: empId,
-        base64Signature: base64,
-        isActive: true
-      }))
-    ).subscribe({
-      next: () => {
-        this.isSubmitting.set(false);
-        this.toastService.success('บันทึกลายเซนต์และอนุมัติเรียบร้อยแล้ว');
-      },
-      error: () => {
-        this.isSubmitting.set(false);
-        this.toastService.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
-      }
-    });
+    this.itServiceService
+      .updateTicket(ticketId, formData)
+      .pipe(
+        switchMap(() =>
+          this.http.post(`${this.baseUrl}/employee-signature`, {
+            codeEmpId: empId,
+            base64Signature: base64,
+            isActive: true,
+          }),
+        ),
+      )
+      .subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.toastService.success('บันทึกลายเซนต์และอนุมัติเรียบร้อยแล้ว');
+        },
+        error: () => {
+          this.isSubmitting.set(false);
+          this.toastService.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        },
+      });
   }
 
   editAction() {

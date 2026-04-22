@@ -7,7 +7,11 @@ import { ToastService } from '../../services/toast';
 import { DialogService } from '../../services/dialog';
 import { VehicleFormComponent } from '../../components/features/vehicle-form/vehicle-form';
 import { StatusUtil } from '../../utils/status.util';
-import { createListingState, clearListingFilters, createListingComputeds_v2 } from '../../utils/listing.util';
+import {
+  createListingState,
+  clearListingFilters,
+  createListingComputeds_v2,
+} from '../../utils/listing.util';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -40,7 +44,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     NzInputModule,
     NzIconModule,
     NzDatePickerModule,
-    NzSelectModule 
+    NzSelectModule,
   ],
   templateUrl: './vehicle.html',
   styleUrl: './vehicle.scss',
@@ -65,24 +69,29 @@ export class VehicleComponent implements OnInit {
   listing = createListingState();
   comps = createListingComputeds_v2(this.allRequests, this.listing);
 
-  hasActiveFilters = computed(() =>
-    !!this.listing.searchText() ||
-    !!this.listing.filterStatus() ||
-    !!this.listing.filterStartDate() ||
-    !!this.listing.filterEndDate()
+  hasActiveFilters = computed(
+    () =>
+      !!this.listing.searchText() ||
+      !!this.listing.filterStatus() ||
+      !!this.listing.filterStartDate() ||
+      !!this.listing.filterEndDate(),
   );
 
-  emptyTitle = computed(() => this.hasActiveFilters() ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการเบิก');
-  emptyDescription = computed(() => this.hasActiveFilters() ? 'ลองเปลี่ยนเงื่อนไขการค้นหาหรือล้างตัวกรอง' : 'กดปุ่ม "สร้างรายการเบิก" เพื่อเริ่มต้นเบิกค่าพาหนะ');
-  emptyIcon = computed(() => this.hasActiveFilters() ? 'fas fa-search' : 'fas fa-car');
+  emptyTitle = computed(() =>
+    this.hasActiveFilters() ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการเบิก',
+  );
+  emptyDescription = computed(() =>
+    this.hasActiveFilters()
+      ? 'ลองเปลี่ยนเงื่อนไขการค้นหาหรือล้างตัวกรอง'
+      : 'กดปุ่ม "สร้างรายการเบิก" เพื่อเริ่มต้นเบิกค่าพาหนะ',
+  );
+  emptyIcon = computed(() => (this.hasActiveFilters() ? 'fas fa-search' : 'fas fa-car'));
 
   ngOnInit() {
     this.loadData();
   }
 
-  constructor(
-    private i18n: NzI18nService,
-  ) {
+  constructor(private i18n: NzI18nService) {
     this.i18n.setLocale(en_US);
   }
 
@@ -104,27 +113,26 @@ export class VehicleComponent implements OnInit {
       empCode: this.authservice.userData().CODEMPID,
       searchText: this.listing.searchText() || '',
       claimStatus: this.listing.filterStatus(),
-      dateFrom: start ? dayjs(start).format("YYYY-MM-DD") : '',
-      dateTo: end ? dayjs(end).format("YYYY-MM-DD") : ''
-    }
+      dateFrom: start ? dayjs(start).format('YYYY-MM-DD') : '',
+      dateTo: end ? dayjs(end).format('YYYY-MM-DD') : '',
+    };
 
     // console.log(param)
 
     this.vehicleService.getVehicleClaimByEmpcode(param).subscribe({
       next: (res) => {
         // console.log(res)
-        this.dataFromApi(res)
+        this.dataFromApi(res);
         // this.loadingService.stop('vehicle-list');
       },
       error: (error) => {
         // this.loadingService.stop('vehicle-list');
-
-      }
-    })
+      },
+    });
   }
 
   private dataFromApi(res: any) {
-    const items = res.data ?? []
+    const items = res.data ?? [];
     // console.log(items)
     this.allRequests.set(this.mapApiData(items));
 
@@ -141,7 +149,7 @@ export class VehicleComponent implements OnInit {
       createDate: item.claimDate,
       status: item.status,
       amount: item.totalAmount,
-      ...item
+      ...item,
     }));
   }
 
@@ -150,7 +158,7 @@ export class VehicleComponent implements OnInit {
       title: 'ยืนยันการลบ',
       message: `ยืนยันการลบรายการเบิกเลขที่ ${id}?`,
       type: 'danger',
-      confirmText: 'ลบรายการ'
+      confirmText: 'ลบรายการ',
     });
 
     if (confirmed) {
@@ -172,9 +180,9 @@ export class VehicleComponent implements OnInit {
 
     if (!this.selectedRequestId) return;
 
-    const result = this.allRequests().find(item => item.id === this.selectedRequestId);
+    const result = this.allRequests().find((item) => item.id === this.selectedRequestId);
 
-    this.selectedRequest = result
+    this.selectedRequest = result;
   }
 
   closeModal() {
@@ -187,14 +195,17 @@ export class VehicleComponent implements OnInit {
   clearFilters() {
     clearListingFilters(this.listing);
     this.dateRange = null;
-    this.loadData()
+    this.loadData();
   }
 
   trackById(_: number, claim: any): number {
     return claim.claimId;
   }
 
-  trackByRowId(index: number, itemOrRow: VehicleRequest | import('@tanstack/angular-table').Row<VehicleRequest>): string {
+  trackByRowId(
+    index: number,
+    itemOrRow: VehicleRequest | import('@tanstack/angular-table').Row<VehicleRequest>,
+  ): string {
     const item = 'original' in itemOrRow ? itemOrRow.original : itemOrRow;
     return `${item.id}-${index}`;
   }
@@ -206,14 +217,11 @@ export class VehicleComponent implements OnInit {
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
-    this.loadData()
+    this.loadData();
   }
 
   goToPage(page: number) {
     this.listing.currentPage.set(page);
-    this.loadData()
+    this.loadData();
   }
-
-
-
 }

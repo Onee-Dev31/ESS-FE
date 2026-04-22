@@ -9,7 +9,7 @@ export interface ErrorContext {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ErrorService {
   /** จัดการ Error โดยแสดง Toast และ Log ข้อมูล */
@@ -25,7 +25,7 @@ export class ErrorService {
     console.error('[ErrorService]', {
       error,
       context,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -61,10 +61,7 @@ export class ErrorService {
   }
 
   /** รัน Async operation พร้อมจัดการ Error อัตโนมัติ */
-  async handleAsync<T>(
-    operation: () => Promise<T>,
-    context?: ErrorContext
-  ): Promise<T | null> {
+  async handleAsync<T>(operation: () => Promise<T>, context?: ErrorContext): Promise<T | null> {
     try {
       return await operation();
     } catch (error) {

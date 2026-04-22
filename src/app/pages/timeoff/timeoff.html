@@ -1,294 +1,360 @@
 <div class="timeoff-page">
-    <app-page-header title="รายการลา"></app-page-header>
-    <div class="content-card">
-        <div class="card-header-title">รายการลาของฉัน</div>
+  <app-page-header title="รายการลา"></app-page-header>
+  <div class="content-card">
+    <div class="card-header-title">รายการลาของฉัน</div>
 
-        <div class="toolbar-container">
-            <div class="toolbar-top-row">
-                <div class="left-action">
-                    <button class="btn-create" (click)="openForm()">
-                        <i class="fas fa-plus"></i> สร้างรายการลา
-                    </button>
-                </div>
+    <div class="toolbar-container">
+      <div class="toolbar-top-row">
+        <div class="left-action">
+          <button class="btn-create" (click)="openForm()">
+            <i class="fas fa-plus"></i> สร้างรายการลา
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar-bottom-row">
+        <div class="right-filters">
+          <div class="filter-group">
+            <span class="filter-label">วันที่สร้างรายการ</span>
+            <div class="date-input-group">
+              <input
+                type="date"
+                class="form-control"
+                [ngModel]="listing.filterStartDate()"
+                (ngModelChange)="listing.filterStartDate.set($event)"
+              />
             </div>
+          </div>
 
-            <div class="toolbar-bottom-row">
-                <div class="right-filters">
-                    <div class="filter-group">
-                        <span class="filter-label">วันที่สร้างรายการ</span>
-                        <div class="date-input-group">
-                            <input type="date" class="form-control" [ngModel]="listing.filterStartDate()"
-                                (ngModelChange)="listing.filterStartDate.set($event)" />
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <span class="filter-label">ถึง</span>
-                        <div class="date-input-group">
-                            <input type="date" class="form-control" [ngModel]="listing.filterEndDate()"
-                                (ngModelChange)="listing.filterEndDate.set($event)" />
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <span class="filter-label">สถานะ</span>
-                        <div class="select-input-group">
-                            <select class="form-control select-status" [ngModel]="listing.filterStatus()"
-                                (ngModelChange)="listing.filterStatus.set($event)">
-                                <option value="">ทั้งหมด</option>
-                                @for (status of statuses; track status.value) {
-                                <option [value]="status.value">{{ status.label }}</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-clear" (click)="clearFilters()">
-                        <i class="fas fa-sync-alt"></i> คืนค่า
-                    </button>
-                </div>
-
-                <div class="search-input-group">
-                    <input type="text" class="form-control" placeholder="ค้นหา..." [ngModel]="listing.searchText()"
-                        (ngModelChange)="listing.searchText.set($event)">
-                    <button class="btn-search">
-                        <i class="fas fa-search"></i> ค้นหา
-                    </button>
-                </div>
+          <div class="filter-group">
+            <span class="filter-label">ถึง</span>
+            <div class="date-input-group">
+              <input
+                type="date"
+                class="form-control"
+                [ngModel]="listing.filterEndDate()"
+                (ngModelChange)="listing.filterEndDate.set($event)"
+              />
             </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">สถานะ</span>
+            <div class="select-input-group">
+              <select
+                class="form-control select-status"
+                [ngModel]="listing.filterStatus()"
+                (ngModelChange)="listing.filterStatus.set($event)"
+              >
+                <option value="">ทั้งหมด</option>
+                @for (status of statuses; track status.value) {
+                  <option [value]="status.value">{{ status.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <button class="btn-clear" (click)="clearFilters()">
+            <i class="fas fa-sync-alt"></i> คืนค่า
+          </button>
         </div>
 
-        <div class="card-list-view">
-            @if (isLoading()) {
-            <app-skeleton type="card" [rows]="3"></app-skeleton>
-            } @else {
-            @for (request of comps.paginatedData(); track request.id) {
-            <div class="mobile-card">
-                <div class="card-header">
-                    <div class="header-content">
-                        <span class="ticket-no">{{ request.leaveType }}</span>
-                    </div>
+        <div class="search-input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="ค้นหา..."
+            [ngModel]="listing.searchText()"
+            (ngModelChange)="listing.searchText.set($event)"
+          />
+          <button class="btn-search"><i class="fas fa-search"></i> ค้นหา</button>
+        </div>
+      </div>
+    </div>
 
-                    <div class="card-actions-top">
-                        @if (request.attachments && request.attachments.length > 0) {
-                        <button class="action-btn folder" (click)="openPreview(request.attachments)" title="ดูเอกสาร">
-                            <i class="far fa-folder-open"></i>
-                        </button>
-                        }
-                        <div class="status-badge" [ngClass]="getStatusClass(request.status)">
-                            {{ request.status | statusLabel }}
-                        </div>
-                    </div>
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3"></app-skeleton>
+      } @else {
+        @for (request of comps.paginatedData(); track request.id) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="ticket-no">{{ request.leaveType }}</span>
+              </div>
+
+              <div class="card-actions-top">
+                @if (request.attachments && request.attachments.length > 0) {
+                  <button
+                    class="action-btn folder"
+                    (click)="openPreview(request.attachments)"
+                    title="ดูเอกสาร"
+                  >
+                    <i class="far fa-folder-open"></i>
+                  </button>
+                }
+                <div class="status-badge" [ngClass]="getStatusClass(request.status)">
+                  {{ request.status | statusLabel }}
                 </div>
+              </div>
+            </div>
 
-                <div class="card-body">
-                    <div class="info-row request-id">
-                        <span class="label">รหัสคำขอ:</span>
-                        <span class="value">{{ request.id }}</span>
+            <div class="card-body">
+              <div class="info-row request-id">
+                <span class="label">รหัสคำขอ:</span>
+                <span class="value">{{ request.id }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="far fa-clock"></i> วันที่ทำรายการ:</span>
+                <span class="value">{{ request.createDate }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-suitcase-rolling"></i> ประเภทการลา:</span>
+                <span class="value">{{ request.leaveType }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="far fa-calendar-check"></i> วันที่ลา:</span>
+                <span class="value" style="text-align: right">
+                  {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
+                  @if (request.shiftStartTime) {
+                    <div class="text-muted small">
+                      ({{ request.shiftStartTime }} - {{ request.shiftEndTime }})
                     </div>
-                    <div class="info-row">
-                        <span class="label"><i class="far fa-clock"></i> วันที่ทำรายการ:</span>
-                        <span class="value">{{ request.createDate }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-suitcase-rolling"></i> ประเภทการลา:</span>
-                        <span class="value">{{ request.leaveType }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="label"><i class="far fa-calendar-check"></i> วันที่ลา:</span>
-                        <span class="value" style="text-align: right;">
-                            {{ formatDate(request.startDate) }} - {{ formatDate(request.endDate) }}
-                            @if (request.shiftStartTime) {
-                            <div class="text-muted small">
-                                ({{ request.shiftStartTime }} - {{ request.shiftEndTime }})
-                            </div>
-                            }
-                        </span>
-                    </div>
-                    @if (request.days) {
-                    <div class="info-row">
-                        <span class="label"><i class="fas fa-hourglass-half"></i> จำนวนวัน:</span>
-                        <span class="value">{{ request.days }} วัน <span class="text-muted">({{
-                                getPeriodLabel(request.leavePeriod) }})</span></span>
-                    </div>
+                  }
+                </span>
+              </div>
+              @if (request.days) {
+                <div class="info-row">
+                  <span class="label"><i class="fas fa-hourglass-half"></i> จำนวนวัน:</span>
+                  <span class="value"
+                    >{{ request.days }} วัน
+                    <span class="text-muted"
+                      >({{ getPeriodLabel(request.leavePeriod) }})</span
+                    ></span
+                  >
+                </div>
+              }
+
+              <div class="reason-box">
+                <strong>เหตุผล:</strong>
+                {{ request.reason }}
+              </div>
+
+              <div class="card-footer-actions">
+                @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                  <button class="btn-edit-sm" (click)="openForm(request.status)">
+                    <i class="far fa-edit"></i> แก้ไข
+                  </button>
+                  <button class="btn-delete-sm" (click)="deleteRequest(request)">
+                    <i class="far fa-trash-alt"></i> ลบ
+                  </button>
+                } @else {
+                  <button class="btn-view-sm" (click)="openForm(request.status)">
+                    <i class="far fa-eye"></i> ดูรายละเอียด
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบรายการ"
+            description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+            icon="fas fa-inbox"
+          >
+          </app-empty-state>
+        }
+      }
+    </div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="w-px-100 sortable-header" (click)="toggleSort('id')">
+                <i class="fas fa-hashtag mr-1"></i> รหัสคำขอ
+                <i class="fas ml-1" [ngClass]="getSortIcon('id')"></i>
+              </th>
+              <th colspan="2" class="w-px-250 text-center">
+                <i class="far fa-clock mr-1"></i> วัน-เวลา ที่ขอลา
+              </th>
+              <th
+                rowspan="2"
+                class="text-center w-px-100 sortable-header"
+                (click)="toggleSort('days')"
+              >
+                <i class="fas fa-calendar-day mr-1"></i> จำนวน
+                <i class="fas ml-1" [ngClass]="getSortIcon('days')"></i>
+              </th>
+              <th
+                rowspan="2"
+                class="text-center w-15 sortable-header"
+                (click)="toggleSort('leaveType')"
+              >
+                <i class="fas fa-suitcase-rolling mr-1"></i> ประเภทการลา
+                <i class="fas ml-1" [ngClass]="getSortIcon('leaveType')"></i>
+              </th>
+              <th
+                rowspan="2"
+                class="text-center w-10 sortable-header"
+                (click)="toggleSort('leavePeriod')"
+              >
+                <i class="fas fa-hourglass-half mr-1"></i> ช่วงเวลา
+                <i class="fas ml-1" [ngClass]="getSortIcon('leavePeriod')"></i>
+              </th>
+              <th
+                rowspan="2"
+                class="w-auto sortable-header text-center"
+                (click)="toggleSort('reason')"
+              >
+                <i class="fas fa-comment-alt mr-1"></i> เหตุผล
+                <i class="fas ml-1" [ngClass]="getSortIcon('reason')"></i>
+              </th>
+              <th
+                rowspan="2"
+                class="text-center w-px-140 sortable-header"
+                (click)="toggleSort('status')"
+              >
+                <i class="fas fa-tasks mr-1"></i> สถานะ
+                <i class="fas ml-1" [ngClass]="getSortIcon('status')"></i>
+              </th>
+              <th rowspan="2" class="text-center w-px-160">Actions</th>
+            </tr>
+            <tr>
+              <th class="text-center w-px-120 sortable-header" (click)="toggleSort('startDate')">
+                <i class="fas fa-calendar-check mr-1"></i> จาก
+                <i class="fas ml-1" [ngClass]="getSortIcon('startDate')"></i>
+              </th>
+              <th class="text-center w-px-120 sortable-header" (click)="toggleSort('endDate')">
+                <i class="fas fa-calendar-times mr-1"></i> ถึง
+                <i class="fas ml-1" [ngClass]="getSortIcon('endDate')"></i>
+              </th>
+            </tr>
+          </thead>
+          @for (request of comps.paginatedData(); track request.id) {
+            <tbody>
+              <tr>
+                <td class="text-center merged-col">
+                  <span class="text-primary-link">{{ request.id }}</span>
+                </td>
+                <td class="text-center">
+                  <div class="font-bold">{{ formatDate(request.startDate) }}</div>
+                  @if (request.shiftStartTime) {
+                    <div class="small text-muted">{{ request.shiftStartTime }}</div>
+                  }
+                </td>
+                <td class="text-center">
+                  <div class="font-bold">{{ formatDate(request.endDate) }}</div>
+                  @if (request.shiftEndTime) {
+                    <div class="small text-muted">{{ request.shiftEndTime }}</div>
+                  }
+                </td>
+                <td class="text-center">
+                  <span class="days-badge">{{ request.days }}</span>
+                </td>
+                <td class="text-center">
+                  <div class="leave-type-cell centered">
+                    <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
+                    {{ request.leaveType }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
+                </td>
+                <td class="reason-cell text-center">{{ request.reason }}</td>
+                <td class="text-center merged-col">
+                  <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+                    {{ request.status | statusLabel }}
+                  </span>
+                </td>
+                <td class="text-center merged-col">
+                  <div class="action-btns">
+                    @if (request.attachments && request.attachments.length > 0) {
+                      <button
+                        class="btn-icon view"
+                        title="ดูเอกสารแนบ"
+                        (click)="openPreview(request.attachments)"
+                      >
+                        <i class="far fa-folder-open"></i>
+                      </button>
                     }
 
-                    <div class="reason-box">
-                        <strong>เหตุผล:</strong>
-                        {{ request.reason }}
-                    </div>
-
-                    <div class="card-footer-actions">
-                        @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
-                        <button class="btn-edit-sm" (click)="openForm(request.status)">
-                            <i class="far fa-edit"></i> แก้ไข
-                        </button>
-                        <button class="btn-delete-sm" (click)="deleteRequest(request)">
-                            <i class="far fa-trash-alt"></i> ลบ
-                        </button>
-                        } @else {
-                        <button class="btn-view-sm" (click)="openForm(request.status)">
-                            <i class="far fa-eye"></i> ดูรายละเอียด
-                        </button>
-                        }
-                    </div>
-                </div>
-            </div>
-            } @empty {
-            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา" icon="fas fa-inbox">
-            </app-empty-state>
-            }
-            }
-        </div>
-
-        <div class="table-responsive">
-            @if (isLoading()) {
-            <app-skeleton type="table" [rows]="5"></app-skeleton>
-            } @else {
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="w-px-100 sortable-header" (click)="toggleSort('id')">
-                            <i class="fas fa-hashtag mr-1"></i> รหัสคำขอ <i class="fas ml-1"
-                                [ngClass]="getSortIcon('id')"></i>
-                        </th>
-                        <th colspan="2" class="w-px-250 text-center"><i class="far fa-clock mr-1"></i> วัน-เวลา ที่ขอลา
-                        </th>
-                        <th rowspan="2" class="text-center w-px-100 sortable-header" (click)="toggleSort('days')">
-                            <i class="fas fa-calendar-day mr-1"></i> จำนวน <i class="fas ml-1"
-                                [ngClass]="getSortIcon('days')"></i>
-                        </th>
-                        <th rowspan="2" class="text-center w-15 sortable-header" (click)="toggleSort('leaveType')">
-                            <i class="fas fa-suitcase-rolling mr-1"></i> ประเภทการลา <i class="fas ml-1"
-                                [ngClass]="getSortIcon('leaveType')"></i>
-                        </th>
-                        <th rowspan="2" class="text-center w-10 sortable-header" (click)="toggleSort('leavePeriod')">
-                            <i class="fas fa-hourglass-half mr-1"></i> ช่วงเวลา <i class="fas ml-1"
-                                [ngClass]="getSortIcon('leavePeriod')"></i>
-                        </th>
-                        <th rowspan="2" class="w-auto sortable-header text-center" (click)="toggleSort('reason')">
-                            <i class="fas fa-comment-alt mr-1"></i> เหตุผล <i class="fas ml-1"
-                                [ngClass]="getSortIcon('reason')"></i>
-                        </th>
-                        <th rowspan="2" class="text-center w-px-140 sortable-header" (click)="toggleSort('status')">
-                            <i class="fas fa-tasks mr-1"></i> สถานะ <i class="fas ml-1"
-                                [ngClass]="getSortIcon('status')"></i>
-                        </th>
-                        <th rowspan="2" class="text-center w-px-160">Actions</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center w-px-120 sortable-header" (click)="toggleSort('startDate')">
-                            <i class="fas fa-calendar-check mr-1"></i> จาก <i class="fas ml-1"
-                                [ngClass]="getSortIcon('startDate')"></i>
-                        </th>
-                        <th class="text-center w-px-120 sortable-header" (click)="toggleSort('endDate')">
-                            <i class="fas fa-calendar-times mr-1"></i> ถึง <i class="fas ml-1"
-                                [ngClass]="getSortIcon('endDate')"></i>
-                        </th>
-                    </tr>
-                </thead>
-                @for (request of comps.paginatedData(); track request.id) {
-                <tbody>
-                    <tr>
-                        <td class="text-center merged-col">
-                            <span class="text-primary-link">{{ request.id }}</span>
-                        </td>
-                        <td class="text-center">
-                            <div class="font-bold">{{ formatDate(request.startDate) }}</div>
-                            @if (request.shiftStartTime) {
-                            <div class="small text-muted">{{ request.shiftStartTime }}</div>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <div class="font-bold">{{ formatDate(request.endDate) }}</div>
-                            @if (request.shiftEndTime) {
-                            <div class="small text-muted">{{ request.shiftEndTime }}</div>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <span class="days-badge">{{ request.days }}</span>
-                        </td>
-                        <td class="text-center">
-                            <div class="leave-type-cell centered">
-                                <i [class]="getLeaveTypeIcon(request.leaveType)"></i>
-                                {{ request.leaveType }}
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <span class="period-text">{{ getPeriodLabel(request.leavePeriod) }}</span>
-                        </td>
-                        <td class="reason-cell text-center">{{ request.reason }}</td>
-                        <td class="text-center merged-col">
-                            <span class="status-badge" [ngClass]="getStatusClass(request.status)">
-                                {{ request.status | statusLabel }}
-                            </span>
-                        </td>
-                        <td class="text-center merged-col">
-                            <div class="action-btns">
-                                @if (request.attachments && request.attachments.length > 0) {
-                                <button class="btn-icon view" title="ดูเอกสารแนบ"
-                                    (click)="openPreview(request.attachments)">
-                                    <i class="far fa-folder-open"></i>
-                                </button>
-                                }
-
-                                @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
-                                <button class="btn-icon edit" title="แก้ไข" (click)="openForm(request.status)">
-                                    <i class="far fa-edit"></i>
-                                </button>
-                                <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                                } @else {
-                                <button class="btn-icon view" title="ดูรายละเอียด" (click)="openForm(request.status)">
-                                    <i class="far fa-eye"></i>
-                                </button>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                }
-                @empty {
-                <tbody>
-                    <tr>
-                        <td colspan="9" class="no-data-cell">
-                            <app-empty-state title="ไม่พบรายการ" description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                                icon="fas fa-inbox"></app-empty-state>
-                        </td>
-                    </tr>
-                </tbody>
-                }
-            </table>
-
-            }
-        </div>
-
-        <div class="pagination-wrapper">
-            <app-pagination [currentPage]="listing.currentPage()" [pageSize]="listing.pageSize()"
-                [totalItems]="comps.totalItems()" (onPageChange)="goToPage($event)"
-                (onPageSizeChange)="setPageSize($event)">
-            </app-pagination>
-        </div>
+                    @if (request.status === 'NEW' || request.status === 'คำขอใหม่') {
+                      <button
+                        class="btn-icon edit"
+                        title="แก้ไข"
+                        (click)="openForm(request.status)"
+                      >
+                        <i class="far fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" title="ลบ" (click)="deleteRequest(request)">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    } @else {
+                      <button
+                        class="btn-icon view"
+                        title="ดูรายละเอียด"
+                        (click)="openForm(request.status)"
+                      >
+                        <i class="far fa-eye"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="9" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบรายการ"
+                    description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                    icon="fas fa-inbox"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
     </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="listing.currentPage()"
+        [pageSize]="listing.pageSize()"
+        [totalItems]="comps.totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      >
+      </app-pagination>
+    </div>
+  </div>
 </div>
 
 @if (isPreviewModalOpen()) {
-@defer {
-<app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-</app-file-preview-modal>
-}
+  @defer {
+    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+    </app-file-preview-modal>
+  }
 }
 
 @if (isFormOpen()) {
-<div class="modal-overlay">
+  <div class="modal-overlay">
     <div class="modal-container">
-        @defer {
-        <app-time-off-form [requestStatus]="selectedRequestStatus()" (onClose)="closeForm()"></app-time-off-form>
-        } @loading {
+      @defer {
+        <app-time-off-form
+          [requestStatus]="selectedRequestStatus()"
+          (onClose)="closeForm()"
+        ></app-time-off-form>
+      } @loading {
         <div class="p-4 text-center">
-            <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
+          <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
         </div>
-        }
+      }
     </div>
-</div>
+  </div>
 }

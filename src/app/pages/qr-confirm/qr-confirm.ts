@@ -10,7 +10,7 @@ import { take } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './qr-confirm.html',
-  styleUrl: './qr-confirm.scss'
+  styleUrl: './qr-confirm.scss',
 })
 export class QrConfirmComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -48,19 +48,22 @@ export class QrConfirmComponent implements OnInit {
     this.state = 'loading';
     this.cdr.detectChanges();
 
-    this.authService.confirmQr(this.qrToken).pipe(take(1)).subscribe({
-      next: () => {
-        this.state = 'success';
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.isConfirming = false;
-        this.state = 'error';
-        this.errorMessage = `${err?.error?.message}` || 'ไม่สามารถยืนยันได้ กรุณาลองใหม่';
-        const returnUrl = `/qr-confirm?token=${this.qrToken}`;
-        this.router.navigate(['/login'], { queryParams: { returnUrl } });
-        this.cdr.detectChanges();
-      }
-    });
+    this.authService
+      .confirmQr(this.qrToken)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.state = 'success';
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.isConfirming = false;
+          this.state = 'error';
+          this.errorMessage = `${err?.error?.message}` || 'ไม่สามารถยืนยันได้ กรุณาลองใหม่';
+          const returnUrl = `/qr-confirm?token=${this.qrToken}`;
+          this.router.navigate(['/login'], { queryParams: { returnUrl } });
+          this.cdr.detectChanges();
+        },
+      });
   }
 }
