@@ -166,7 +166,7 @@ export class ItServiceService {
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
     if (params.myTicket) queryParams.myTicket = params.myTicket;
 
-    // console.log("params >>> ", queryParams)
+    // console.log('params >>> ', queryParams);
 
     return this._http.get<any>(`${this.baseUrl}/tickets`, {
       params: queryParams,
