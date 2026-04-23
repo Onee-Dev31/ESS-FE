@@ -2,18 +2,26 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 
 import { LayoutComponent } from './layout';
 import { SignalrService } from '../../services/signalr.service';
+import { ItServiceService } from '../../services/it-service.service';
 
 const mockSignalrService = {
   startConnection: () => Promise.resolve(),
   on: () => EMPTY,
   sendNewTicketNotification: () => {},
   pendingNewTickets: { asReadonly: () => () => 0 },
-  pendingTicketNumbers: { asReadonly: () => () => new Set() },
-  refreshTrigger: { asReadonly: () => () => 0 },
+  pendingTicketNumbers: { update: () => {} },
+  refreshTrigger: { update: () => {} },
+  ticketReadTrigger: new Subject<void>(),
+};
+
+const mockItService = {
+  getUnreadCount: () => EMPTY,
+  getUnreadTickets: () => EMPTY,
+  markTicketRead: () => EMPTY,
 };
 
 describe('Layout', () => {
@@ -27,6 +35,7 @@ describe('Layout', () => {
         provideRouter([]),
         provideNoopAnimations(),
         { provide: SignalrService, useValue: mockSignalrService },
+        { provide: ItServiceService, useValue: mockItService },
       ],
     }).compileComponents();
 

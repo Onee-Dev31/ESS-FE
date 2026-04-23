@@ -88,6 +88,7 @@ export class DashboardIT implements OnInit {
 
   IS_OPEN_IT_SERVICE = signal(0);
   newTicketIds = signal<Set<number>>(new Set());
+  unreadTicketIds = signal<Set<number>>(new Set());
   private prevTicketIds = new Set<number>();
 
   get newTicketCount() {
@@ -209,7 +210,14 @@ export class DashboardIT implements OnInit {
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
-        this.itServiceService.markTicketRead(ticketId, codeempid).subscribe();
+        this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
+          complete: () => this.signalrService.ticketReadTrigger.next(),
+        });
+        this.unreadTicketIds.update((s) => {
+          const next = new Set(s);
+          next.delete(Number(ticketId));
+          return next;
+        });
       }
     });
   }
@@ -460,6 +468,7 @@ export class DashboardIT implements OnInit {
             subject: ticket.subject,
           }));
           this.Tickets.set(mapped);
+          this.fetchUnreadIds();
 
           if (trackNew) {
             const pendingNumbers = this.signalrService.pendingTicketNumbers();
@@ -475,13 +484,25 @@ export class DashboardIT implements OnInit {
             this.newTicketIds.set(ids);
             this.signalrService.pendingTicketNumbers.set(new Set());
             this.signalrService.pendingNewTickets.set(0);
-            setTimeout(() => this.newTicketIds.set(new Set()), 5000);
+            setTimeout(() => this.newTicketIds.set(new Set()), 60000);
           }
         },
         error: (error) => {
           console.error('Error fetching data:', error);
         },
       });
+  }
+
+  fetchUnreadIds() {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    if (!codeempid) return;
+    this.itServiceService.getUnreadTickets(codeempid).subscribe({
+      next: (res: any) => {
+        const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
+        this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
+      },
+      error: () => {},
+    });
   }
 
   getTicketById(ticketId: string) {
