@@ -90,10 +90,7 @@
             </div>
           </div>
           <div class="ticket-title-row">
-            <div
-              class="ticket-title"
-              [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
-            >
+            <div class="ticket-title" [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)">
               {{ ticket.subject }}
             </div>
             <span class="ticket-time">

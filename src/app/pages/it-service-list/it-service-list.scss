@@ -3,15 +3,34 @@
 @use '../../../styles/mixins' as *;
 
 @keyframes ticket-highlight {
-  0%   { box-shadow: inset 0 0 0 2px $primary, 0 0 12px rgba(99, 102, 241, 0.5); }
-  40%  { box-shadow: inset 0 0 0 2px $primary, 0 0 6px rgba(99, 102, 241, 0.2); }
-  60%  { box-shadow: inset 0 0 0 2px $primary, 0 0 12px rgba(99, 102, 241, 0.4); }
-  100% { box-shadow: none; }
+  0% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 12px rgba(99, 102, 241, 0.5);
+  }
+  40% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 6px rgba(99, 102, 241, 0.2);
+  }
+  60% {
+    box-shadow:
+      inset 0 0 0 2px $primary,
+      0 0 12px rgba(99, 102, 241, 0.4);
+  }
+  100% {
+    box-shadow: none;
+  }
 }
 
 @keyframes badge-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .modal-overlay {

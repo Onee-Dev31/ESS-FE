@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, effect, untracked, HostListener, DestroyRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  effect,
+  untracked,
+  HostListener,
+  DestroyRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -66,7 +75,6 @@ import { SignalrService } from '../../services/signalr.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
-
   isTablet = false;
   isMobile = false;
   isSmallMobile = false;
@@ -160,18 +168,16 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
-    this.route.queryParams
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        if (params['ticketId']) {
-          // ✅ Ensure the ticket is visible by resetting filters
-          this.filterStatus = 'all';
-          this.myTicket = false;
-          this.getAllTickets(); 
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      if (params['ticketId']) {
+        // ✅ Ensure the ticket is visible by resetting filters
+        this.filterStatus = 'all';
+        this.myTicket = false;
+        this.getAllTickets();
 
-          this.selectTicket(params['ticketId']);
-        }
-      });
+        this.selectTicket(params['ticketId']);
+      }
+    });
 
     this.signalrService.on('NewTicket', '/it-dashboard');
     this.signalrService.on('TicketAssigned', '/it-dashboard');
@@ -982,15 +988,11 @@ export class DashboardIT implements OnInit {
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
-      
         if (!res?.success) {
-  
-          
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
         this.swalService.close();
-
 
         const requesterAdUser = this.selectedTicket()?.requesterAduser;
         const userData = this.authService.userData();
