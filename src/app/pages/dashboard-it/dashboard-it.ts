@@ -892,6 +892,13 @@ export class DashboardIT implements OnInit {
 
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+          this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+          this.signalrService.ticketStatusNotify(
+            ticketId,
+            this.selectedTicket()?.requesterAduser ?? '',
+            'Closed',
+          );
+
           this.selectTicket(ticketId);
           this.getAllTickets();
         },

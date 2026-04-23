@@ -21,6 +21,18 @@ export class SignalrService {
   pendingTicketNumbers = signal<Set<string>>(new Set());
   refreshTrigger = signal(0);
   ticketReadTrigger = new Subject<void>();
+  ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
+
+  ticketStatusNotify(ticketId: any, requesterAdUser: string, status: string) {
+    if (!ticketId || !requesterAdUser) return;
+    this.http
+      .post(`${this.baseUrl}/notification/ticket-status-notify`, {
+        ticketId,
+        requesterAdUser,
+        status,
+      })
+      .subscribe({ error: (err) => console.error('ticketStatusNotify error', err) });
+  }
 
   sendTestRealtime() {
     this.http.post(`${this.baseUrl}/notification/it-service`, {}).subscribe({

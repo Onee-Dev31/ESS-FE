@@ -27,7 +27,7 @@ const mockItService = {
 
 const mockAuthService = {
   currentUser: () => 'tester',
-  userRole: () => 'IT',
+  userRole: () => 'it-staff',
   userData: () => ({
     CODEMPID: 'EMP001',
     NAMFIRSTT: 'Test',

@@ -13,6 +13,7 @@
         class="ticket-item"
         *ngFor="let ticket of Tickets()"
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
+        [class.highlight]="highlightedTicketId() === ticket.ticketId"
         (click)="selectTicket(ticket.ticketId)"
       >
         <div class="ticket-info">

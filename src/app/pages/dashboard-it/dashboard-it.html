@@ -23,7 +23,7 @@
   <aside class="tk-left">
     <div class="tk-left__top">
       <div class="tk-left__title">Tickets</div>
-      <div style="display: flex; flex-direction: column; align-items: end; gap: 10px">
+      <div class="tk-left__filter-col">
         <nz-select
           class="tk-left__select"
           [(ngModel)]="filterStatus"
@@ -67,6 +67,8 @@
             [src]="
               'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
             "
+            alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+            title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
             (error)="onImgError($event)"
           />
         </div>
@@ -147,7 +149,13 @@
   <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
     <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
       <div class="mobile-detail-header">
-        <button class="btn-back" (click)="closeTicketDetail()">
+        <button
+          class="btn-back"
+          type="button"
+          title="ย้อนกลับ"
+          aria-label="ย้อนกลับ"
+          (click)="closeTicketDetail()"
+        >
           <i class="fas fa-arrow-left"></i>
         </button>
         <span>รายละเอียด Ticket</span>
@@ -176,6 +184,8 @@
       <div class="avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+          alt="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
+          title="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           (error)="onImgError($event)"
         />
       </div>
@@ -277,7 +287,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title">Note</div>
       <button
-        style="border-radius: 10px"
+        class="btn-note-add"
         nz-button
         nzType="primary"
         (click)="openAddNote()"
@@ -301,6 +311,8 @@
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
+                  alt="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
+                  title="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -336,18 +348,17 @@
   <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
     <div class="btn-group">
       <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
-        <i class="fa-solid fa-play" style="margin-right: 4px"></i> Resume
+        <i class="fa-solid fa-play btn-action-icon"></i> Resume
       </button>
       <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
-        <i class="fa-solid fa-pause" style="margin-right: 4px"></i> On Hold
+        <i class="fa-solid fa-pause btn-action-icon"></i> On Hold
       </button>
       <button
-        class="btn btn-deny"
-        style="margin-right: auto"
+        class="btn btn-deny btn-deny-spacer"
         (click)="openDenyModal()"
         *ngIf="t.status !== 'Hold'"
       >
-        <i class="fa-solid fa-ban" style="margin-right: 4px"></i> Deny
+        <i class="fa-solid fa-ban btn-action-icon"></i> Deny
       </button>
     </div>
     <div class="btn-group" *ngIf="t.status !== 'Hold'">
@@ -358,13 +369,13 @@
           t.status !== 'In Progress' && t.status !== 'Assigned' && t.approval_status !== 'Approved'
         "
       >
-        <i class="fa-solid fa-tag" style="margin-right: 4px"></i> รับเรื่อง
+        <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง
       </button>
       <button class="btn btn-send" (click)="openAssignModal()">
-        <i class="fa-solid fa-share" style="margin-right: 4px"></i> ส่งต่อ
+        <i class="fa-solid fa-share btn-action-icon"></i> ส่งต่อ
       </button>
       <button class="btn btn-done" (click)="closeTicket()">
-        <i class="fa-solid fa-circle-check" style="margin-right: 4px"></i> ปิดงาน
+        <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน
       </button>
     </div>
   </section>
@@ -379,6 +390,8 @@
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          alt="รูปโปรไฟล์ของ {{ requester.fullname }}"
+          title="รูปโปรไฟล์ของ {{ requester.fullname }}"
           (error)="onImgError($event)"
         />
       </div>
@@ -451,6 +464,8 @@
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  alt="รูปโปรไฟล์ของ {{ a.nickName }}"
+                  title="รูปโปรไฟล์ของ {{ a.nickName }}"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -462,7 +477,13 @@
           @if (isVisibleAssignee()) {
             <div class="assignee-modal-overlay" (click)="closeAssignee()">
               <div class="assignee-card" (click)="$event.stopPropagation()">
-                <button class="btn-close" (click)="closeAssignee()">
+                <button
+                  class="btn-close"
+                  type="button"
+                  title="ปิดข้อมูลผู้รับผิดชอบ"
+                  aria-label="ปิดข้อมูลผู้รับผิดชอบ"
+                  (click)="closeAssignee()"
+                >
                   <i class="fas fa-times"></i>
                 </button>
                 @if (selectedAssignee()) {
@@ -474,6 +495,8 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
+                      alt="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
+                      title="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
                       (error)="onImgError($event)"
                     />
                     <h3>{{ selectedAssignee().nickName }}</h3>
@@ -521,7 +544,15 @@
             }}
           </h2>
           <div class="header-right-meta">
-            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+            <button
+              class="btn-close-modal"
+              type="button"
+              title="ปิดหน้าต่าง"
+              aria-label="ปิดหน้าต่าง"
+              (click)="close()"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </header>
         <div class="content-card">

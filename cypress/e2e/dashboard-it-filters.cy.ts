@@ -1,4 +1,4 @@
-type TicketRecord = {
+type DashboardTicketRecord = {
   id: number;
   ticket_number: string;
   subject: string;
@@ -18,7 +18,7 @@ type TicketRecord = {
   source: string;
 };
 
-const tickets: TicketRecord[] = [
+const tickets: DashboardTicketRecord[] = [
   {
     id: 101,
     ticket_number: '#IT-00101',
