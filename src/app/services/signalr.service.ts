@@ -30,16 +30,33 @@ export class SignalrService {
   }
 
   assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
+    const senderAdUser = this.authService.currentUser() ?? '';
     return this.http.post(`${this.baseUrl}/notification/it-assign-notify`, {
       ticketId,
       assigneeAdUsers,
+      senderAdUser,
     });
   }
 
-  noteNotify(requesterAdUser: string, note: string, senderName: string) {
+  noteNotify(
+    ticketId: number,
+    requesterAdUser: string,
+    senderAdUser: string,
+    senderName: string,
+    note: string,
+  ) {
     this.http
-      .post(`${this.baseUrl}/notification/note-notify`, { requesterAdUser, note, senderName })
-      .subscribe({ error: (err) => console.error('noteNotify error', err) });
+      .post(`${this.baseUrl}/notification/note-notify`, {
+        ticketId,
+        requesterAdUser,
+        senderAdUser,
+        senderName,
+        note,
+      })
+      .subscribe({
+        next: (res) => console.log('[noteNotify] response:', res),
+        error: (err) => console.error('[noteNotify] error:', err),
+      });
   }
 
   sendNewTicketNotification(ticketNumber: string) {
@@ -103,21 +120,22 @@ export class SignalrService {
   }
 
   private async joinUserGroups() {
+    const adUser = this.authService.currentUser();
     const roleString = this.authService.userRole();
-    if (!roleString) return;
 
-    const roles = roleString
-      .split(',')
-      .map((r) => r.trim())
-      .filter((r) => r.length > 0);
+    if (adUser && roleString) {
+      const roles = roleString
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r) => r.length > 0);
 
-    for (const role of roles) {
-      await this.hubConnection.invoke('JoinGroup', role);
+      for (const role of roles) {
+        await this.hubConnection.invoke('JoinGroup', adUser, role);
+      }
     }
 
-    const adUser = this.authService.currentUser();
     if (adUser) {
-      await this.hubConnection.invoke('JoinGroup', `user:${adUser}`);
+      await this.hubConnection.invoke('JoinUserGroup', adUser);
     }
   }
 

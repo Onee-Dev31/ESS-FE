@@ -531,13 +531,15 @@ export class DashboardIT implements OnInit {
   fetchUnreadIds() {
     const codeempid = this.authService.userData()?.CODEMPID;
     if (!codeempid) return;
-    this.itServiceService.getUnreadTickets(codeempid).subscribe({
-      next: (res: any) => {
-        const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
-        this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
-      },
-      error: () => {},
-    });
+    this.itServiceService
+      .getUnreadTickets(codeempid, this.authService.userRole() ?? undefined)
+      .subscribe({
+        next: (res: any) => {
+          const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
+          this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
+        },
+        error: () => {},
+      });
   }
 
   getTicketById(ticketId: string) {
@@ -957,6 +959,21 @@ export class DashboardIT implements OnInit {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
+        }
+
+        const requesterAdUser = this.selectedTicket()?.requesterAduser;
+        const userData = this.authService.userData();
+        const senderAdUser = this.authService.currentUser() ?? '';
+        const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+
+        if (requesterAdUser && senderAdUser) {
+          this.signalrService.noteNotify(
+            data.id,
+            requesterAdUser,
+            senderAdUser,
+            senderName,
+            data.message,
+          );
         }
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');

@@ -1,12 +1,12 @@
 import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { AuthService } from '../../../../services/auth.service';
+import { SignalrService } from '../../../../services/signalr.service';
 import {
   FilePreviewItem,
   FilePreviewModalComponent,
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../../services/auth.service';
-import { SignalrService } from '../../../../services/signalr.service';
 
 @Component({
   selector: 'app-note-modal',
@@ -42,11 +42,31 @@ export class NoteModal {
     };
     this.submitModal.emit(payload);
 
+    const ticketId = this.ticket?.ticketId;
     const requesterAdUser = this.ticket?.requesterAduser;
     const userData = this.authService.userData();
+    const senderAdUser = this.authService.currentUser() ?? '';
     const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
-    if (requesterAdUser && senderName) {
-      this.signalrService.noteNotify(requesterAdUser, this.noteForm.message, senderName);
+    console.log(
+      '[noteNotify] ticketId:',
+      ticketId,
+      'requesterAdUser:',
+      requesterAdUser,
+      'senderAdUser:',
+      senderAdUser,
+      'senderName:',
+      senderName,
+    );
+    if (ticketId && requesterAdUser && senderAdUser) {
+      this.signalrService.noteNotify(
+        ticketId,
+        requesterAdUser,
+        senderAdUser,
+        senderName,
+        this.noteForm.message,
+      );
+    } else {
+      console.warn('[noteNotify] blocked — missing field');
     }
   }
 

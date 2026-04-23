@@ -14,17 +14,23 @@ describe('Login', () => {
   });
 
   it('login สำเร็จแล้ว redirect ออกจากหน้า login', () => {
+    cy.mockLoginApi();
     cy.get('#username').type(Cypress.env('username'));
     cy.get('#password').type(Cypress.env('password'));
     cy.get('.login-button').click();
+    cy.wait('@loginRequest');
     cy.url().should('not.include', '/login');
   });
 
   it('login ผิด password ต้องไม่ redirect ออกจากหน้า login', () => {
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 401,
+      body: { message: 'Unauthorized' },
+    }).as('loginFailure');
     cy.get('#username').type(Cypress.env('username'));
     cy.get('#password').type('wrong_password_xyz');
     cy.get('.login-button').click();
-    cy.wait(3000);
+    cy.wait('@loginFailure');
     cy.url().should('include', '/login');
   });
 
