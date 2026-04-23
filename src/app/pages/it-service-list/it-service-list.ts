@@ -100,6 +100,7 @@ export class ItService implements OnInit {
   Tickets = signal<any[]>([]);
   selectedTicket = signal<any | undefined>(undefined);
   highlightedTicketId = signal<number | null>(null);
+  newNoteTicketId = signal<number | null>(null);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
@@ -124,9 +125,11 @@ export class ItService implements OnInit {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const ticketId = params['ticketId'];
       if (ticketId) {
-        this.highlightedTicketId.set(Number(ticketId));
+        const id = Number(ticketId);
+        this.highlightedTicketId.set(id);
+        this.newNoteTicketId.set(id);
         this.selectTicket(ticketId);
-        setTimeout(() => this.highlightedTicketId.set(null), 3000);
+        setTimeout(() => this.highlightedTicketId.set(null), 8000);
       }
     });
 
@@ -154,7 +157,9 @@ export class ItService implements OnInit {
    * NEW!!
    */
   selectTicket(ticketId: string) {
-    // console.log(ticketId)
+    if (this.newNoteTicketId() === Number(ticketId)) {
+      this.newNoteTicketId.set(null);
+    }
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];

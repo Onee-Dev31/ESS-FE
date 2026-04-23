@@ -19,6 +19,9 @@
         <div class="ticket-info">
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+            <span *ngIf="newNoteTicketId() === ticket.ticketId" class="new-note-badge">
+              <i class="fas fa-comment-dots"></i> ข้อความใหม่
+            </span>
           </div>
           <div class="ticket-title-row">
             <div class="ticket-title">{{ ticket.subject }}</div>
