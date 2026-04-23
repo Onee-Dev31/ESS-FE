@@ -514,9 +514,6 @@ export class DashboardIT implements OnInit {
         },
         error: () => {},
       });
-      error: () => {},
-    });
->>>>>>> 978e090 (feat: show unread tickets in navbar bell and dashboard envelope icons)
   }
 
   getTicketById(ticketId: string) {
