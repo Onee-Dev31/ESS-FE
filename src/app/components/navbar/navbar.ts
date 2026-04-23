@@ -130,16 +130,21 @@ export class NavbarComponent {
 
     this.userCodeEmp = this.authService.userData().CODEMPID;
     this.fetchUnreadCount();
+    this.fetchUnreadTickets();
 
     this.signalrService
       .on('NewTicket')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.zone.run(() => this.fetchUnreadCount()));
+      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
 
     this.signalrService
       .on('TicketAssigned')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.zone.run(() => this.fetchUnreadCount()));
+      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
+
+    this.signalrService.ticketReadTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
   }
 
   fetchUnreadCount() {
@@ -149,6 +154,46 @@ export class NavbarComponent {
       next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
       error: () => this.unreadTicketCount.set(0),
     });
+  }
+
+  fetchUnreadTickets() {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    if (!codeempid) return;
+    this.itService.getUnreadTickets(codeempid).subscribe({
+      next: (res: any) => {
+        const list: any[] = Array.isArray(res) ? res : (res?.data ?? res?.tickets ?? []);
+        const items: NotificationItem[] = list.map((t: any) => ({
+          id: t.id ?? t.ticketId,
+          title: t.ticket_number ?? t.ticketNumber ?? 'Ticket',
+          message: t.subject ?? '',
+          status: this.mapTicketStatus(t.user_status ?? t.status),
+          time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
+          route: '/it-dashboard',
+          ticketNumber: t.ticket_number ?? t.ticketNumber,
+        }));
+        this.notifications.set(items);
+      },
+      error: (err) => console.error('[Navbar] fetchUnreadTickets error:', err),
+    });
+  }
+
+  private mapTicketStatus(s: string): 'pending' | 'approved' | 'rejected' {
+    if (!s) return 'pending';
+    const lower = s.toLowerCase();
+    if (lower === 'approved') return 'approved';
+    if (lower === 'rejected' || lower === 'referred_back') return 'rejected';
+    return 'pending';
+  }
+
+  private formatRelativeTime(dateStr: string): string {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'เมื่อสักครู่';
+    if (mins < 60) return `${mins} นาทีที่แล้ว`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} ชั่วโมงที่แล้ว`;
+    return `${Math.floor(hrs / 24)} วันที่แล้ว`;
   }
 
   private allSearchMenus: SearchMenuItem[] = [
@@ -244,6 +289,12 @@ export class NavbarComponent {
 
   onNotificationClick(item: NotificationItem) {
     this.isNotificationOpen = false;
+    const codeempid = this.authService.userData()?.CODEMPID;
+    if (codeempid && item.id) {
+      this.itService.markTicketRead(item.id, codeempid).subscribe({
+        complete: () => { this.fetchUnreadCount(); this.fetchUnreadTickets(); },
+      });
+    }
     if (item.route) {
       if (item.ticketNumber) {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));

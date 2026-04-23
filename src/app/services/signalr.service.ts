@@ -20,6 +20,7 @@ export class SignalrService {
   pendingNewTickets = signal(0);
   pendingTicketNumbers = signal<Set<string>>(new Set());
   refreshTrigger = signal(0);
+  ticketReadTrigger = new Subject<void>();
 
   sendTestRealtime() {
     this.http.post(`${this.baseUrl}/notification/it-service`, {}).subscribe({
