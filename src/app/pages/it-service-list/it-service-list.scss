@@ -4,10 +4,10 @@
 
 @keyframes ticket-highlight {
   0% {
-    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: inset 0 0 0 2px $primary, 0 0 10px rgba(99, 102, 241, 0.4);
   }
   100% {
-    background-color: transparent;
+    box-shadow: none;
   }
 }
 

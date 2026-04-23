@@ -121,12 +121,14 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
-    const ticketId = this.route.snapshot.queryParamMap.get('ticketId');
-    if (ticketId) {
-      this.highlightedTicketId.set(Number(ticketId));
-      this.selectTicket(ticketId);
-      setTimeout(() => this.highlightedTicketId.set(null), 3000);
-    }
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const ticketId = params['ticketId'];
+      if (ticketId) {
+        this.highlightedTicketId.set(Number(ticketId));
+        this.selectTicket(ticketId);
+        setTimeout(() => this.highlightedTicketId.set(null), 3000);
+      }
+    });
 
     this.signalrService.ticketStatusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
