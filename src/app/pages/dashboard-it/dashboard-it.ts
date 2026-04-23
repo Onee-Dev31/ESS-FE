@@ -328,10 +328,6 @@ export class DashboardIT implements OnInit {
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(f.file_path);
   }
 
-  downloadFile(f: Attachment) {
-    this.msg.info(`ดาวน์โหลด: ${f.name}`);
-  }
-
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
     if (!img.src.includes('user.png')) {
@@ -351,57 +347,6 @@ export class DashboardIT implements OnInit {
       date.getFullYear() === now.getFullYear()
     );
   }
-
-  // private async convertUrlToFile(fileData: any) {
-
-  //   try {
-
-  //     const response = await fetch(fileData.filePath);
-
-  //     if (!response.ok) {
-  //       throw new Error('Fetch failed');
-  //     }
-
-  //     const blob = await response.blob();
-
-  //     const file = new File(
-  //       [blob],
-  //       fileData.fileName,
-  //       { type: fileData.fileType }
-  //     );
-
-  //     return {
-  //       fileId: fileData.id,
-  //       name: fileData.file_name,
-  //       file: file,
-  //       description: fileData.file_description || '',
-  //       uploadedByAduser: fileData.uploadedByaAduser,
-  //       createdDate: fileData.created_at,
-  //       filePath: fileData.file_path,
-  //       size: fileData.file_size,
-  //       type: fileData.file_type,
-  //       isError: false
-  //     };
-
-  //   } catch (error) {
-
-  //     console.warn('File fetch failed:', fileData.fileName);
-
-  //     // 🔥 fallback return
-  //     return {
-  //       fileId: fileData.id,
-  //       name: fileData.fileName,
-  //       file: null,  // ไม่มี blob
-  //       description: fileData.fileDescription || '',
-  //       uploadedByAduser: fileData.uploadedByaAduser,
-  //       createdDate: fileData.created_date,
-  //       filePath: fileData.filePath,
-  //       size: fileData.fileSize,
-  //       type: fileData.fileType,
-  //       isError: true
-  //     };
-  //   }
-  // }
 
   private extractNickName(name: string) {
     const match = name.match(/\((.*?)\)/);
@@ -475,6 +420,38 @@ export class DashboardIT implements OnInit {
     );
 
     return notes;
+  }
+
+  isPreviewable(fileName: string): boolean {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'pdf'].includes(ext ?? '');
+  }
+
+  getFileIcon(fileName: string): string {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    const iconMap: Record<string, string> = {
+      pdf: 'fas fa-file-pdf',
+      jpg: 'fas fa-file-image',
+      jpeg: 'fas fa-file-image',
+      png: 'fas fa-file-image',
+      doc: 'fas fa-file-word',
+      docx: 'fas fa-file-word',
+      xls: 'fas fa-file-excel',
+      xlsx: 'fas fa-file-excel',
+      ppt: 'fas fa-file-powerpoint',
+      pptx: 'fas fa-file-powerpoint',
+      txt: 'fas fa-file-alt',
+    };
+    return iconMap[ext ?? ''] ?? 'fas fa-file';
+  }
+
+  downloadFile(file: any) {
+    const url = file.fileUrl || file.filePath;
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    a.click();
   }
 
   onMyTicketChange() {
