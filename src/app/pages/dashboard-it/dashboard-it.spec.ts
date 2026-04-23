@@ -116,7 +116,13 @@ describe('DashboardIT', () => {
     });
 
     expect(mockItService.replyTicket).toHaveBeenCalled();
-    expect(mockSignalrService.noteNotify).toHaveBeenCalledWith('123', 'req.aduser', 'testuser', 'Test User', 'hello');
+    expect(mockSignalrService.noteNotify).toHaveBeenCalledWith(
+      '123',
+      'req.aduser',
+      'testuser',
+      'Test User',
+      'hello',
+    );
   });
 
   it('does not send note notification when note save fails', () => {
