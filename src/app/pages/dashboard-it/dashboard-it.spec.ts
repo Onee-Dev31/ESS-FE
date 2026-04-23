@@ -53,6 +53,8 @@ const mockAuthService = {
     NAMFIRSTT: 'Test',
     NAMLASTT: 'User',
   }),
+  userRole: () => 'it-staff',
+  currentUser: () => 'testuser',
 };
 
 describe('DashboardIT', () => {
@@ -114,7 +116,7 @@ describe('DashboardIT', () => {
     });
 
     expect(mockItService.replyTicket).toHaveBeenCalled();
-    expect(mockSignalrService.noteNotify).toHaveBeenCalledWith('req.aduser', 'hello', 'Test User');
+    expect(mockSignalrService.noteNotify).toHaveBeenCalledWith('123', 'req.aduser', 'testuser', 'Test User', 'hello');
   });
 
   it('does not send note notification when note save fails', () => {
