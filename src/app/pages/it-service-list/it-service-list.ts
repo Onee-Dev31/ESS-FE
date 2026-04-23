@@ -47,6 +47,7 @@ import { FileConverterService } from '../../services/file-converter';
 export class ItService implements OnInit {
   isLaptop = false;
   isMobile = false;
+  isSmallMobile = false;
   isTicketDetailOpen = signal(false);
 
   @HostListener('window:resize')
@@ -61,6 +62,7 @@ export class ItService implements OnInit {
   }
   checkMobile() {
     this.isMobile = window.innerWidth <= 860;
+    this.isSmallMobile = window.innerWidth <= 460;
   }
 
   private itServiceMock = inject(ItServiceMockService);
