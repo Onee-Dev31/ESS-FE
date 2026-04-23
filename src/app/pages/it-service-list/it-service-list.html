@@ -375,10 +375,10 @@
                   t.assignTimeline.length !== 1 &&
                   !(
                     step.title.includes('ปิด') ||
-                    step.title.includes('Rejected') ||
+                    step.title.includes('ปฏิเสธ') ||
                     step.title.includes('Hold')
                   ),
-                deny: step.title.includes('Rejected'),
+                deny: step.title.includes('ปฏิเสธ'),
                 hold: step.title.includes('Hold'),
               }"
             ></div>

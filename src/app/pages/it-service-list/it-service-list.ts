@@ -158,7 +158,7 @@ export class ItService implements OnInit {
         rejection_reason: ticket.rejection_reason,
       };
 
-      console.log('selectedTicket:', objectData);
+      // console.log('selectedTicket:', objectData);
       this.selectedTicket.set(objectData);
     });
   }
