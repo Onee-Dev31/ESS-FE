@@ -36,10 +36,25 @@ export class SignalrService {
     });
   }
 
-  noteNotify(requesterAdUser: string, note: string, senderName: string) {
+  noteNotify(
+    ticketId: number,
+    requesterAdUser: string,
+    senderAdUser: string,
+    senderName: string,
+    note: string,
+  ) {
     this.http
-      .post(`${this.baseUrl}/notification/note-notify`, { requesterAdUser, note, senderName })
-      .subscribe({ error: (err) => console.error('noteNotify error', err) });
+      .post(`${this.baseUrl}/notification/note-notify`, {
+        ticketId,
+        requesterAdUser,
+        senderAdUser,
+        senderName,
+        note,
+      })
+      .subscribe({
+        next: (res) => console.log('[noteNotify] response:', res),
+        error: (err) => console.error('[noteNotify] error:', err),
+      });
   }
 
   sendNewTicketNotification(ticketNumber: string) {

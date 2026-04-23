@@ -26,6 +26,7 @@ interface NotificationItem {
   status: 'pending' | 'approved' | 'rejected';
   time: string;
   route?: string;
+  readTicketId?: number;
   ticketNumber?: string;
 }
 
@@ -111,7 +112,7 @@ export class NavbarComponent {
       });
 
     this.signalrService
-      .on('TicketAssigned', '/dashboard-it')
+      .on('TicketAssigned', '/it-dashboard')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
@@ -123,7 +124,7 @@ export class NavbarComponent {
             message,
             status: 'pending',
             time: 'เมื่อสักครู่',
-            route: '/dashboard-it',
+            route: '/it-dashboard',
             ticketNumber: data.ticket_number ?? undefined,
           };
 
@@ -149,7 +150,7 @@ export class NavbarComponent {
             message,
             status: 'pending',
             time: 'เมื่อสักครู่',
-            route: '/dashboard-it',
+            route: '/it-dashboard',
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
@@ -220,6 +221,7 @@ export class NavbarComponent {
           status: this.mapTicketStatus(t.user_status ?? t.status),
           time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
           route: '/it-dashboard',
+          readTicketId: t.id ?? t.ticketId,
           ticketNumber: t.ticket_number ?? t.ticketNumber,
         }));
         this.notifications.set(items);
@@ -341,8 +343,8 @@ export class NavbarComponent {
   onNotificationClick(item: NotificationItem) {
     this.isNotificationOpen = false;
     const codeempid = this.authService.userData()?.CODEMPID;
-    if (codeempid && item.id) {
-      this.itService.markTicketRead(item.id, codeempid).subscribe({
+    if (codeempid && item.readTicketId) {
+      this.itService.markTicketRead(item.readTicketId, codeempid).subscribe({
         complete: () => {
           this.fetchUnreadCount();
           this.fetchUnreadTickets();

@@ -64,8 +64,6 @@ import { SignalrService } from '../../services/signalr.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
-  [x: string]: any;
-
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
@@ -934,6 +932,21 @@ export class DashboardIT implements OnInit {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
+        }
+
+        const requesterAdUser = this.selectedTicket()?.requesterAduser;
+        const userData = this.authService.userData();
+        const senderAdUser = this.authService.currentUser() ?? '';
+        const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+
+        if (requesterAdUser && senderAdUser) {
+          this.signalrService.noteNotify(
+            data.id,
+            requesterAdUser,
+            senderAdUser,
+            senderName,
+            data.message,
+          );
         }
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
