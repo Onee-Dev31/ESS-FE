@@ -410,6 +410,7 @@
   padding: 20px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 
   @include mobile {
