@@ -939,6 +939,14 @@ export class DashboardIT implements OnInit {
           return;
         }
 
+        const requesterAdUser = this.selectedTicket()?.requesterAduser;
+        const userData = this.authService.userData();
+        const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+
+        if (requesterAdUser && senderName) {
+          this.signalrService.noteNotify(requesterAdUser, data.message, senderName);
+        }
+
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
         this.selectTicket(data.id);
