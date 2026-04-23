@@ -156,10 +156,12 @@ export class ItService implements OnInit {
    *
    * NEW!!
    */
+  onTicketClick(ticketId: number) {
+    this.newNoteTicketId.set(null);
+    this.selectTicket(String(ticketId));
+  }
+
   selectTicket(ticketId: string) {
-    if (this.newNoteTicketId() === Number(ticketId)) {
-      this.newNoteTicketId.set(null);
-    }
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
