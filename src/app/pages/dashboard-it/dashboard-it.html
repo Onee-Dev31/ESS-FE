@@ -80,8 +80,12 @@
             <div class="ticket-meta-right">
               <i
                 class="fas text-icon"
-                [ngClass]="unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'"
-                [style.color]="unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'"
+                [ngClass]="
+                  unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'
+                "
+                [style.color]="
+                  unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'
+                "
               ></i>
             </div>
           </div>

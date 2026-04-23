@@ -160,16 +160,29 @@ export class NavbarComponent {
     this.signalrService
       .on('NewTicket')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
+      .subscribe(() =>
+        this.zone.run(() => {
+          this.fetchUnreadCount();
+          this.fetchUnreadTickets();
+        }),
+      );
 
     this.signalrService
       .on('TicketAssigned')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
+      .subscribe(() =>
+        this.zone.run(() => {
+          this.fetchUnreadCount();
+          this.fetchUnreadTickets();
+        }),
+      );
 
-    this.signalrService.ticketReadTrigger
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.zone.run(() => { this.fetchUnreadCount(); this.fetchUnreadTickets(); }));
+    this.signalrService.ticketReadTrigger.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() =>
+      this.zone.run(() => {
+        this.fetchUnreadCount();
+        this.fetchUnreadTickets();
+      }),
+    );
   }
 
   fetchUnreadCount() {
@@ -317,7 +330,10 @@ export class NavbarComponent {
     const codeempid = this.authService.userData()?.CODEMPID;
     if (codeempid && item.id) {
       this.itService.markTicketRead(item.id, codeempid).subscribe({
-        complete: () => { this.fetchUnreadCount(); this.fetchUnreadTickets(); },
+        complete: () => {
+          this.fetchUnreadCount();
+          this.fetchUnreadTickets();
+        },
       });
     }
     if (item.route) {

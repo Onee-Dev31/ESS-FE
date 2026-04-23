@@ -169,41 +169,41 @@
         <div class="dropdown-menu" *ngIf="isNotificationOpen">
           <div class="dropdown-header">การแจ้งเตือนล่าสุด</div>
 
-        <div class="dropdown-list-wrap">
-          <div class="dropdown-list">
-            <a
-              class="dropdown-item"
-              *ngFor="let item of notifications()"
-              [class.clickable]="item.route"
-              (click)="onNotificationClick(item)"
-            >
-              <div
-                class="icon-circle"
-                [ngClass]="{
-                  blue: item.status === 'pending',
-                  green: item.status === 'approved',
-                  red: item.status === 'rejected',
-                }"
+          <div class="dropdown-list-wrap">
+            <div class="dropdown-list">
+              <a
+                class="dropdown-item"
+                *ngFor="let item of notifications()"
+                [class.clickable]="item.route"
+                (click)="onNotificationClick(item)"
               >
-                <i
-                  class="fas"
+                <div
+                  class="icon-circle"
                   [ngClass]="{
-                    'fa-hourglass-half': item.status === 'pending',
-                    'fa-check': item.status === 'approved',
-                    'fa-times': item.status === 'rejected',
+                    blue: item.status === 'pending',
+                    green: item.status === 'approved',
+                    red: item.status === 'rejected',
                   }"
-                ></i>
-              </div>
+                >
+                  <i
+                    class="fas"
+                    [ngClass]="{
+                      'fa-hourglass-half': item.status === 'pending',
+                      'fa-check': item.status === 'approved',
+                      'fa-times': item.status === 'rejected',
+                    }"
+                  ></i>
+                </div>
 
-              <div class="content">
-                <p class="title">{{ item.title }}</p>
-                <p class="message">{{ item.message }}</p>
-                <span class="time">{{ item.time }}</span>
-              </div>
-            </a>
+                <div class="content">
+                  <p class="title">{{ item.title }}</p>
+                  <p class="message">{{ item.message }}</p>
+                  <span class="time">{{ item.time }}</span>
+                </div>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
       </div>
 
       <div class="user-profile" (click)="$event.stopPropagation()">
