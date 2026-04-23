@@ -2,6 +2,11 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes ticket-highlight {
+  0%   { background-color: color-mix(in srgb, var(--primary) 20%, transparent); }
+  100% { background-color: transparent; }
+}
+
 .modal-overlay {
   @include modal-overlay-styles;
 
@@ -435,6 +440,10 @@ textarea.form-input {
         background-color: var(--bg-slate);
         border-left: 4px solid var(--primary);
         padding-left: 16px;
+      }
+
+      &.highlight {
+        animation: ticket-highlight 3s ease-out forwards;
       }
 
       // .avatar {
