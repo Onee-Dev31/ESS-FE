@@ -97,37 +97,20 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadData() {
     this.generateCalendar();
-    // if (!this.requestId) {
-    //   this.allowanceService.generateNextAllowanceId().pipe(
-    //     switchMap(id => {
-    //       this.requestId = id;
-    //       return this.allowanceService.getAllowanceRequestById(id);
-    //     })
-    //   ).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // } else {
-    //   this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // }
   }
 
   mapData() {
     this.logs = this.requests.details.map((item: any) => {
+      // console.log(item, this.formatDuration(item.extra_hours));
       return {
         date: item.work_date,
         dayType: item.day_type,
         timeIn: item.actual_checkin,
         timeOut: item.actual_checkout,
-        hours: item.rounded_hours,
+        hours: item.extra_hours,
         amount: item.rate_amount ?? 0,
         actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
-        displayHours: item.total_hours_text,
+        displayHours: this.formatDuration(item.extra_hours),
         selected: true,
         description: item.description,
         shiftCode: item.shift_code,
@@ -136,6 +119,15 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         rateId: item.rate_id,
       } as AllowanceItem;
     });
+  }
+
+  formatDuration(hours: number): string {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+
+    if (h === 0) return `${m} นาที`;
+    if (m === 0) return `${h} ชม.`;
+    return `${h}:${m}`;
   }
 
   isKeep(): number {

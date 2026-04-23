@@ -248,7 +248,7 @@ label {
   padding: 8px 30px !important;
 
   &:hover {
-    background-color: color-mix(in srgb, var(--primary), var(--text) 10%) !important;
+    background-color: #2563eb !important;
     transform: translateY(-0.5px);
   }
 }
@@ -261,7 +261,7 @@ label {
   color: var(--text-header);
 
   &:hover {
-    background-color: color-mix(in srgb, var(--border-color), var(--text) 10%) !important;
+    background-color: #cbd5e1 !important;
     transform: translateY(-0.5px);
   }
 }

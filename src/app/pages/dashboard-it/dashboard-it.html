@@ -1,19 +1,15 @@
 <div class="btn-command">
   <button class="btn-type approve-out" (click)="viewApproveResign()">
-    <i class="fa-solid fa-person-walking-arrow-right"></i>
-    อนุมัติพนักงานลาออก
+    <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
   </button>
   <button class="btn-type problem" (click)="this.IS_OPEN_IT_SERVICE.set(2)">
-    <i class="fas fa-exclamation-triangle"></i>
-    แจ้งปัญหา
+    <i class="fas fa-exclamation-triangle"></i> แจ้งปัญหา
   </button>
   <button class="btn-type repair" (click)="this.IS_OPEN_IT_SERVICE.set(1)">
-    <i class="fas fa-tools"></i>
-    แจ้งซ่อม
+    <i class="fas fa-tools"></i> แจ้งซ่อม
   </button>
   <button class="btn-type service" (click)="this.IS_OPEN_IT_SERVICE.set(3)">
-    <i class="fas fa-concierge-bell"></i>
-    แจ้งขอใช้บริการ
+    <i class="fas fa-concierge-bell"></i> แจ้งขอใช้บริการ
   </button>
 </div>
 
@@ -23,22 +19,21 @@
 ></app-it-dashboard-summary>
 
 <div class="tk-page">
-  <!-- LEFT: ticket list -->
+  <!-- LEFT -->
   <aside class="tk-left">
     <div class="tk-left__top">
       <div class="tk-left__title">Tickets</div>
-      <div style="display: flex; flex-direction: column; align-items: end; gap: 10px">
+      <div class="tk-left__filter-col">
         <nz-select
           class="tk-left__select"
-          (ngModelChange)="onFilterStatusChange($event)"
           [(ngModel)]="filterStatus"
+          (ngModelChange)="onFilterStatusChange($event)"
           nzBorderless
           nzSize="small"
         >
           <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
           <nz-option nzValue="open" nzLabel="Open"></nz-option>
           <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
-          <!-- <nz-option nzValue="inprogress" nzLabel="In Progress"></nz-option> -->
           <nz-option nzValue="done" nzLabel="Closed"></nz-option>
           <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
           <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
@@ -48,8 +43,9 @@
           class="checkbox-my-ticket"
           [(ngModel)]="myTicket"
           (ngModelChange)="onMyTicketChange()"
-          >My Ticket</label
         >
+          My Ticket
+        </label>
       </div>
     </div>
 
@@ -71,6 +67,8 @@
             [src]="
               'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
             "
+            alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+            title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
             (error)="onImgError($event)"
           />
         </div>
@@ -86,7 +84,8 @@
                 [style.color]="
                   unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'
                 "
-              ></i>
+              >
+              </i>
             </div>
           </div>
           <div class="ticket-title-row">
@@ -110,473 +109,276 @@
     </div>
   </aside>
 
-  <ng-container *ngIf="selectedTicket() as t; else emptyState">
-    <!-- CENTER: ticket content -->
-    <main class="tk-center">
-      <!-- HERO -->
-      <section class="tk-hero">
-        <div class="tk-hero__left">
-          <div class="avatar">
-            <img
-              [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
-              (error)="onImgError($event)"
-            />
-          </div>
-          <div>
-            <div class="tk-hero__title">{{ t.subject }}</div>
-            <div class="tk-hero__sub">
-              <span class="muted">Ticket</span>
-              <b class="mono">#{{ t.ticketNumber }}</b>
+  <!-- DESKTOP: CENTER + RIGHT -->
+  @if (!isMobile) {
+    <ng-container *ngIf="selectedTicket() as t; else emptyState">
+      <main class="tk-center">
+        <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
+      </main>
+      <aside class="tk-right">
+        <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+      </aside>
+    </ng-container>
+  }
 
-              <span class="sep">•</span>
-              <span class="muted">
-                <span class="header-date"
-                  ><i class="far fa-calendar-alt"></i>
-                  {{ dateUtil.formatDateToBE(t.createdDate, 'DD MMMM YYYY') }}</span
-                >
-                <span class="header-time"
-                  ><i class="far fa-clock"></i> {{ t.createdDate | date: 'shortTime' }}</span
-                >
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="tk-hero__right">
-          <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
-            <span class="dot"></span>
-            {{ statusLabel(t.status) }}
-          </span>
-        </div>
-      </section>
-
-      <!-- DETAILS -->
-      <section class="tk-card">
-        <div class="tk-card__head">
-          <div class="tk-card__title">รายละเอียด</div>
-          <div class="services">
-            @for (service of t.services.slice(0, 3); track service.service_type_id) {
-              <span class="tag-service">
-                {{ service.service_name_th }}
-              </span>
-            }
-
-            @if (t.services.length > 3) {
-              <span class="tag-more" (click)="showAll(t.services)">
-                +{{ t.services.length - 3 }}
-              </span>
-            }
-          </div>
-        </div>
-
-        <div class="tk-card__body">
-          <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)">
-            <!-- {{ t.description }} -->
-          </div>
-        </div>
-      </section>
-
-      <!-- REASON [Denied] -->
-      <section class="tk-card reason" *ngIf="t.status === 'Denied'">
-        <div class="tk-card__head">
-          <div class="tk-card__title">
-            เหตุผลในการ
-            <span class="tk-pill" [ngStyle]="StatusColor_text.getStyle(t.status)">
-              {{ statusLabel(t.status) }}
-            </span>
-          </div>
-        </div>
-
-        <div class="tk-card__body">
-          <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div>
-        </div>
-      </section>
-
-      <!-- ATTACHMENTS -->
-      <section class="tk-card">
-        <div class="tk-card__head">
-          <div class="tk-card__title">เอกสารแนบ</div>
-        </div>
-        <div class="tk-card__body">
-          <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
-            <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
-              <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-              <span class="file-name">{{ file.name }}</span>
-              <!-- <i class="fas fa-download download-small"
-                                (click)="downloadFile(file); $event.stopPropagation()"></i> -->
-            </li>
-          </ul>
-          <ng-template #noAttachments>
-            <p class="text-muted">ไม่มีเอกสารแนบ</p>
-          </ng-template>
-        </div>
-      </section>
-
-      <!-- NOTES -->
-      <section class="tk-card note">
-        <div class="tk-card__head">
-          <div class="tk-card__title">Note</div>
-          <button
-            style="border-radius: 10px"
-            nz-button
-            nzType="primary"
-            (click)="openAddNote()"
-            *ngIf="t.status !== 'Closed'"
-          >
-            <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
-            เพิ่ม Note
-          </button>
-        </div>
-
-        <div class="tk-card__body">
-          <div class="note-list" *ngIf="t.itNotes.length; else noNote">
-            <div
-              class="note"
-              *ngFor="let n of t.itNotes.slice().reverse()"
-              [class.note--me]="n.createBy.empCode === currentUserEmpCode"
-            >
-              <div class="note__top">
-                <div class="note__who">
-                  <div class="avatar">
-                    <img
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        n.createBy.empCode +
-                        '.jpg'
-                      "
-                      (error)="onImgError($event)"
-                    />
-                  </div>
-
-                  <div>
-                    <b>{{ n.createBy.nickName }}</b>
-                    <!-- <div class="muted">{{ n.createBy.role }}</div> -->
-                  </div>
-                </div>
-
-                <div class="muted">
-                  @if (isToday(n.createdDate)) {
-                    {{ n.createdDate | date: 'HH:mm' }}
-                  } @else {
-                    {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
-                  }
-                </div>
-              </div>
-
-              <div class="note__msg">{{ n.message }}</div>
-
-              <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
-                <li
-                  *ngFor="let file of n.attachments"
-                  class="attachment-item"
-                  (click)="viewFile(file)"
-                >
-                  <div class="file-icon-box">
-                    <i class="far fa-file-alt"></i>
-                  </div>
-
-                  <span class="file-name">{{ file.name }}</span>
-
-                  <i class="fas fa-download download-small"></i>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <ng-template #noNote>
-            <div class="tk-empty">ยังไม่มี Note</div>
-          </ng-template>
-        </div>
-      </section>
-
-      <!-- bottom actions (optional, keep like original) -->
-      <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
-        <div class="btn-group">
-          <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
-            <i class="fa-solid fa-play" style="margin-right: 4px"></i>
-            Resume
-          </button>
-          <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
-            <i class="fa-solid fa-pause" style="margin-right: 4px"></i>
-            On Hold
-          </button>
-          <button
-            class="btn btn-deny"
-            style="margin-right: auto"
-            (click)="openDenyModal()"
-            *ngIf="t.status !== 'Hold'"
-          >
-            <i class="fa-solid fa-ban" style="margin-right: 4px"></i>
-            Deny
-          </button>
-        </div>
-        <div class="btn-group" *ngIf="t.status !== 'Hold'">
-          <button
-            class="btn btn-accept"
-            (click)="openAcknowledgeModal()"
-            *ngIf="
-              t.status !== 'In Progress' &&
-              t.status !== 'Assigned' &&
-              t.approval_status !== 'Approved'
-            "
-          >
-            <i class="fa-solid fa-tag" style="margin-right: 4px"></i>
-            รับเรื่อง
-          </button>
-          <button class="btn btn-send" (click)="openAssignModal()">
-            <i class="fa-solid fa-share" style="margin-right: 4px"></i>
-            ส่งต่อ
-          </button>
-          <button class="btn btn-done" (click)="closeTicket()">
-            <i class="fa-solid fa-circle-check" style="margin-right: 4px"></i>
-            ปิดงาน
-          </button>
-        </div>
-      </section>
-    </main>
-
-    <!-- RIGHT: assignee/requester -->
-    <aside class="tk-right" *ngIf="selectedTicket() as t">
-      <section class="side-card requester" *ngIf="t.requester as requester">
-        <div class="side-title">ผู้ขอใช้บริการ</div>
-
-        <div class="side-profile">
-          <div class="side-avatar">
-            <img
-              [src]="
-                'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'
-              "
-              (error)="onImgError($event)"
-            />
-          </div>
-          <div class="side-detail">
-            <div>{{ requester.fullname }} ({{ requester.nickname }})</div>
-            <div>{{ requester.department_name }}</div>
-            <div>{{ requester.company_name }}</div>
-          </div>
-        </div>
-
-        <div class="side-contact">
-          <p>ช่องทางการติดต่อ</p>
-          <div>อีเมล: {{ requester.email }}</div>
-          <div>ติดต่อ: {{ requester.contact_phone }}</div>
-        </div>
-      </section>
-      <section class="side-card requester" *ngIf="t.openFor as openFor">
-        <div class="side-title">เปิดให้</div>
-        <div class="side-detail">
-          <div>
-            {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
-          </div>
-          <div>{{ openFor.department_name }}</div>
-          <div>{{ openFor.company_name }}</div>
-        </div>
-      </section>
-      <section class="side-card assignee">
-        <div class="side-title">Progress</div>
-
-        <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
-          <div
-            class="timeline-item"
-            *ngFor="
-              let step of t.assignTimeline.slice().reverse();
-              let i = index;
-              let first = first
-            "
-          >
-            <div
-              class="timeline-icon"
-              [ngClass]="{
-                done: !first || t.assignTimeline.length === 1 || step.title.includes('ปิด'),
-                active:
-                  first &&
-                  t.assignTimeline.length !== 1 &&
-                  !(
-                    step.title.includes('ปิด') ||
-                    step.title.includes('ปฏิเสธ') ||
-                    step.title.includes('Hold')
-                  ),
-                deny: step.title.includes('ปฏิเสธ'),
-                hold: step.title.includes('Hold'),
-              }"
-            ></div>
-
-            <div class="timeline-content">
-              <div class="timeline-title">
-                <div>
-                  Step {{ step.step }} - {{ step.title }}
-                  <br />
-                  <small>
-                    by {{ step.createBy.nickName }}
-                    {{ step.createBy.department.includes('10806') ? '(IT)' : '' }} •
-                    @if (isToday(step.createdDate)) {
-                      {{ step.createdDate | date: 'HH:mm' }}
-                    } @else {
-                      {{ step.createdDate | date: 'EEE dd - HH:mm' : '' : 'en' }}
-                    }
-                  </small>
-                </div>
-              </div>
-
-              <div class="timeline-assignee" *ngIf="step.Assignee?.length">
-                <div
-                  class="assignee-item"
-                  *ngFor="let a of step.Assignee"
-                  (click)="selectAssignee(a)"
-                >
-                  <div class="avatar">
-                    <img
-                      [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
-                      (error)="onImgError($event)"
-                    />
-                  </div>
-
-                  <div class="name">
-                    {{ a.nickName }}
-                  </div>
-                </div>
-              </div>
-
-              @if (isVisibleAssignee()) {
-                <div class="assignee-modal-overlay" (click)="closeAssignee()">
-                  <div class="assignee-card" (click)="$event.stopPropagation()">
-                    <button class="btn-close" (click)="closeAssignee()">
-                      <i class="fas fa-times"></i>
-                    </button>
-
-                    @if (selectedAssignee()) {
-                      <div class="assignee-profile">
-                        <img
-                          class="avatar"
-                          [src]="
-                            'https://empimg.oneeclick.co:8048/employeeimage/' +
-                            selectedAssignee().empCode +
-                            '.jpg'
-                          "
-                          (error)="onImgError($event)"
-                        />
-
-                        <h3>{{ selectedAssignee().nickName }}</h3>
-                        <!-- <div>{{selectedAssignee().fullName}}</div> -->
-
-                        <div class="side-contact">
-                          <p>ช่องทางการติต่อ</p>
-                          <div>อีเมล: {{ selectedAssignee().email || '-' }}</div>
-                          <div>ติดต่อ: {{ selectedAssignee().phone || '-' }}</div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-        <ng-template #noAssignee>
-          <div class="side-profile no-assignee">
-            <div class="side-avatar empty">?</div>
-            <div class="side-name muted">ยังไม่มีผู้รับผิดชอบ</div>
-            <div class="side-email muted">กรุณากดรับเรื่อง</div>
-          </div>
-        </ng-template>
-
-        <div class="side-fields" *ngIf="t.assigneeName">
-          <div class="sf">
-            <div class="sf__label">Ticket number</div>
-            <div class="sf__value mono">
-              #{{ t.ticketNo }}
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                class="copy"
-                (click)="copy('#' + t.ticketNo)"
-              >
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="sf">
-            <div class="sf__label">Name</div>
-            <div class="sf__value">
-              {{ t.requester.name }}
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                class="copy"
-                (click)="copy(t.requester.name)"
-              >
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="sf">
-            <div class="sf__label">Email</div>
-            <div class="sf__value">
-              {{ t.requester.email }}
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                class="copy"
-                (click)="copy(t.requester.email)"
-              >
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="sf">
-            <div class="sf__label">Phone</div>
-            <div class="sf__value">
-              {{ t.requester.phone }}
-              <button
-                nz-button
-                nzType="text"
-                nzSize="small"
-                class="copy"
-                (click)="copy(t.requester.phone)"
-              >
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </aside>
-  </ng-container>
-
-  <!-- Empty State Placeholder -->
+  <!-- Empty State -->
   <ng-template #emptyState>
     <div class="empty-selection-placeholder hide-on-mobile">
       <div class="empty-content">
-        <div class="empty-icon-wrapper">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
+        <div class="empty-icon-wrapper"><i class="fas fa-ticket-alt"></i></div>
         <h3>กรุณาเลือก Ticket</h3>
         <p>โปรดเลือกรายการ Ticket จากทางด้านซ้ายเพื่อดูรายละเอียด</p>
       </div>
     </div>
   </ng-template>
-
-  @if (isPreviewModalOpen()) {
-    <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-    </app-file-preview-modal>
-  }
 </div>
 
-<!-- replace-tk-right -->
-<div class="replace-tk-right" [class.has-open-for]="t.openFor" *ngIf="selectedTicket() as t">
+<!-- TABLET: replace-tk-right -->
+@if (!isMobile && isTablet) {
+  <div
+    class="replace-tk-right"
+    [class.has-open-for]="selectedTicket()?.openFor"
+    *ngIf="selectedTicket() as t"
+  >
+    <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+  </div>
+}
+
+<!-- MOBILE: popup -->
+@if (isMobile && isTicketDetailOpen()) {
+  <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
+    <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
+      <div class="mobile-detail-header">
+        <button
+          class="btn-back"
+          type="button"
+          title="ย้อนกลับ"
+          aria-label="ย้อนกลับ"
+          (click)="closeTicketDetail()"
+        >
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <span>รายละเอียด Ticket</span>
+        <span></span>
+      </div>
+      <div class="mobile-detail-body">
+        <ng-container *ngIf="selectedTicket() as t">
+          <ng-container *ngTemplateOutlet="ticketCenter; context: { t: t }"></ng-container>
+          <div class="replace-tk-right" [class.has-open-for]="t.openFor">
+            <ng-container *ngTemplateOutlet="ticketRight; context: { t: t }"></ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================================ -->
+<!-- TEMPLATES                                                      -->
+<!-- ============================================================ -->
+
+<!-- CENTER TEMPLATE -->
+<ng-template #ticketCenter let-t="t">
+  <section class="tk-hero">
+    <div class="tk-hero__left">
+      <div class="avatar">
+        <img
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+          alt="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
+          title="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
+          (error)="onImgError($event)"
+        />
+      </div>
+      <div>
+        <div class="tk-hero__title">{{ t.subject }}</div>
+        <div class="tk-hero__sub">
+          <span class="muted">Ticket</span>
+          <b class="mono">#{{ t.ticketNumber }}</b>
+          <span class="sep">•</span>
+          <span class="muted">
+            <span class="header-date">
+              <i class="far fa-calendar-alt"></i>
+              {{ dateUtil.formatDateToBE(t.createdDate, 'DD MMMM YYYY') }}
+            </span>
+            <span class="header-time">
+              <i class="far fa-clock"></i> {{ t.createdDate | date: 'shortTime' }}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="tk-hero__right">
+      <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
+        <span class="dot"></span>
+        {{ statusLabel(t.status) }}
+      </span>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section class="tk-card">
+    <div class="tk-card__head">
+      <div class="tk-card__title">รายละเอียด</div>
+      <div class="services">
+        @for (
+          service of t.services.slice(0, isSmallMobile ? 1 : isMobile ? 2 : 3);
+          track service.service_type_id
+        ) {
+          <span class="tag-service">{{ service.service_name_th }}</span>
+        }
+        @if (t.services.length > 3) {
+          <span class="tag-more" (click)="showAll(t.services)">+{{ t.services.length - 3 }}</span>
+        }
+      </div>
+    </div>
+    <div class="tk-card__body">
+      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
+    </div>
+  </section>
+
+  <!-- REASON [Denied] -->
+  <section class="tk-card reason" *ngIf="t.status === 'Denied'">
+    <div class="tk-card__head">
+      <div class="tk-card__title">
+        เหตุผลในการ
+        <span class="tk-pill" [ngStyle]="StatusColor_text.getStyle(t.status)">
+          {{ statusLabel(t.status) }}
+        </span>
+      </div>
+    </div>
+    <div class="tk-card__body">
+      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div>
+    </div>
+  </section>
+
+  <!-- ATTACHMENTS -->
+  <section class="tk-card">
+    <div class="tk-card__head">
+      <div class="tk-card__title">เอกสารแนบ</div>
+    </div>
+    <div class="tk-card__body">
+      <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+        <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
+          <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+          <span class="file-name">{{ file.name }}</span>
+        </li>
+      </ul>
+      <ng-template #noAttachments>
+        <p class="text-muted">ไม่มีเอกสารแนบ</p>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="tk-card note">
+    <div class="tk-card__head">
+      <div class="tk-card__title">Note</div>
+      <button
+        class="btn-note-add"
+        nz-button
+        nzType="primary"
+        (click)="openAddNote()"
+        *ngIf="t.status !== 'Closed' && isAssigned()"
+      >
+        <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
+        เพิ่ม Note
+      </button>
+    </div>
+    <div class="tk-card__body">
+      <div class="note-list" *ngIf="t.itNotes.length; else noNote">
+        <div
+          class="note"
+          *ngFor="let n of t.itNotes.slice().reverse()"
+          [class.note--me]="n.createBy.empCode === currentUserEmpCode"
+        >
+          <div class="note__top">
+            <div class="note__who">
+              <div class="avatar">
+                <img
+                  [src]="
+                    'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
+                  "
+                  alt="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
+                  title="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
+                  (error)="onImgError($event)"
+                />
+              </div>
+              <div>
+                <b>{{ n.createBy.nickName }}</b>
+              </div>
+            </div>
+            <div class="muted">
+              @if (isToday(n.createdDate)) {
+                {{ n.createdDate | date: 'HH:mm' }}
+              } @else {
+                {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+              }
+            </div>
+          </div>
+          <div class="note__msg">{{ n.message }}</div>
+          <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+            <li *ngFor="let file of n.attachments" class="attachment-item" (click)="viewFile(file)">
+              <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+              <span class="file-name">{{ file.name }}</span>
+              <i class="fas fa-download download-small"></i>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <ng-template #noNote>
+        <div class="tk-empty">ยังไม่มี Note</div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- ACTIONS -->
+  <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+    <div class="btn-group">
+      <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
+        <i class="fa-solid fa-play btn-action-icon"></i> Resume
+      </button>
+      <button class="btn btn-onhold" (click)="onHoldTicket()" *ngIf="t.status !== 'Hold'">
+        <i class="fa-solid fa-pause btn-action-icon"></i> On Hold
+      </button>
+      <button
+        class="btn btn-deny btn-deny-spacer"
+        (click)="openDenyModal()"
+        *ngIf="t.status !== 'Hold'"
+      >
+        <i class="fa-solid fa-ban btn-action-icon"></i> Deny
+      </button>
+    </div>
+    <div class="btn-group" *ngIf="t.status !== 'Hold'">
+      <button
+        class="btn btn-accept"
+        (click)="openAcknowledgeModal()"
+        *ngIf="
+          t.status !== 'In Progress' && t.status !== 'Assigned' && t.approval_status !== 'Approved'
+        "
+      >
+        <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง
+      </button>
+      <button class="btn btn-send" (click)="openAssignModal()">
+        <i class="fa-solid fa-share btn-action-icon"></i> ส่งต่อ
+      </button>
+      <button class="btn btn-done" (click)="closeTicket()">
+        <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน
+      </button>
+    </div>
+  </section>
+</ng-template>
+
+<!-- RIGHT TEMPLATE -->
+<ng-template #ticketRight let-t="t">
+  <!-- Requester -->
   <section class="side-card requester" *ngIf="t.requester as requester">
     <div class="side-title">ผู้ขอใช้บริการ</div>
-
     <div class="side-profile">
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          alt="รูปโปรไฟล์ของ {{ requester.fullname }}"
+          title="รูปโปรไฟล์ของ {{ requester.fullname }}"
           (error)="onImgError($event)"
         />
       </div>
@@ -586,20 +388,32 @@
         <div>{{ requester.company_name }}</div>
       </div>
     </div>
-
     <div class="side-contact">
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
     </div>
   </section>
+
+  <!-- Open For -->
+  <section class="side-card requester" *ngIf="t.openFor as openFor">
+    <div class="side-title">เปิดให้</div>
+    <div class="side-detail">
+      <div>
+        {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
+      </div>
+      <div>{{ openFor.department_name }}</div>
+      <div>{{ openFor.company_name }}</div>
+    </div>
+  </section>
+
+  <!-- Progress / Timeline -->
   <section class="side-card assignee">
     <div class="side-title">Progress</div>
-
     <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
       <div
         class="timeline-item"
-        *ngFor="let step of t.assignTimeline.slice().reverse(); let i = index; let first = first"
+        *ngFor="let step of t.assignTimeline.slice().reverse(); let first = first"
       >
         <div
           class="timeline-icon"
@@ -617,15 +431,13 @@
             hold: step.title.includes('Hold'),
           }"
         ></div>
-
         <div class="timeline-content">
           <div class="timeline-title">
             <div>
-              Step {{ step.step }} - {{ step.title }}
-              <br />
+              Step {{ step.step }} - {{ step.title }}<br />
               <small>
                 by {{ step.createBy.nickName }}
-                {{ step.createBy.department.includes('10806') ? '(IT)' : '' }} •
+                {{ step.createBy.department?.includes('10806') ? '(IT)' : '' }} •
                 @if (isToday(step.createdDate)) {
                   {{ step.createdDate | date: 'HH:mm' }}
                 } @else {
@@ -634,29 +446,33 @@
               </small>
             </div>
           </div>
-
           <div class="timeline-assignee" *ngIf="step.Assignee?.length">
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  alt="รูปโปรไฟล์ของ {{ a.nickName }}"
+                  title="รูปโปรไฟล์ของ {{ a.nickName }}"
                   (error)="onImgError($event)"
                 />
               </div>
-
-              <div class="name">
-                {{ a.nickName }}
-              </div>
+              <div class="name">{{ a.nickName }}</div>
             </div>
           </div>
 
+          <!-- Assignee popup -->
           @if (isVisibleAssignee()) {
             <div class="assignee-modal-overlay" (click)="closeAssignee()">
               <div class="assignee-card" (click)="$event.stopPropagation()">
-                <button class="btn-close" (click)="closeAssignee()">
+                <button
+                  class="btn-close"
+                  type="button"
+                  title="ปิดข้อมูลผู้รับผิดชอบ"
+                  aria-label="ปิดข้อมูลผู้รับผิดชอบ"
+                  (click)="closeAssignee()"
+                >
                   <i class="fas fa-times"></i>
                 </button>
-
                 @if (selectedAssignee()) {
                   <div class="assignee-profile">
                     <img
@@ -666,14 +482,13 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
+                      alt="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
+                      title="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
                       (error)="onImgError($event)"
                     />
-
                     <h3>{{ selectedAssignee().nickName }}</h3>
-                    <!-- <div>{{selectedAssignee().fullName}}</div> -->
-
                     <div class="side-contact">
-                      <p>ช่องทางการติต่อ</p>
+                      <p>ช่องทางการติดต่อ</p>
                       <div>อีเมล: {{ selectedAssignee().email || '-' }}</div>
                       <div>ติดต่อ: {{ selectedAssignee().phone || '-' }}</div>
                     </div>
@@ -692,84 +507,12 @@
         <div class="side-email muted">กรุณากดรับเรื่อง</div>
       </div>
     </ng-template>
-
-    <div class="side-fields" *ngIf="t.assigneeName">
-      <div class="sf">
-        <div class="sf__label">Ticket number</div>
-        <div class="sf__value mono">
-          #{{ t.ticketNo }}
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            class="copy"
-            (click)="copy('#' + t.ticketNo)"
-          >
-            <span class="material-symbols-outlined">content_copy</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="sf">
-        <div class="sf__label">Name</div>
-        <div class="sf__value">
-          {{ t.requester.name }}
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            class="copy"
-            (click)="copy(t.requester.name)"
-          >
-            <span class="material-symbols-outlined">content_copy</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="sf">
-        <div class="sf__label">Email</div>
-        <div class="sf__value">
-          {{ t.requester.email }}
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            class="copy"
-            (click)="copy(t.requester.email)"
-          >
-            <span class="material-symbols-outlined">content_copy</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="sf">
-        <div class="sf__label">Phone</div>
-        <div class="sf__value">
-          {{ t.requester.phone }}
-          <button
-            nz-button
-            nzType="text"
-            nzSize="small"
-            class="copy"
-            (click)="copy(t.requester.phone)"
-          >
-            <span class="material-symbols-outlined">content_copy</span>
-          </button>
-        </div>
-      </div>
-    </div>
   </section>
-  <section class="side-card requester" *ngIf="t.openFor as openFor">
-    <div class="side-title">เปิดให้</div>
-    <div class="side-detail">
-      <div>
-        {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
-      </div>
-      <div>{{ openFor.department_name }}</div>
-      <div>{{ openFor.company_name }}</div>
-    </div>
-  </section>
-</div>
+</ng-template>
+
+<!-- ============================================================ -->
+<!-- MODALS                                                         -->
+<!-- ============================================================ -->
 
 @if (IS_OPEN_IT_SERVICE()) {
   <div class="modal-overlay OPEN">
@@ -788,7 +531,15 @@
             }}
           </h2>
           <div class="header-right-meta">
-            <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+            <button
+              class="btn-close-modal"
+              type="button"
+              title="ปิดหน้าต่าง"
+              aria-label="ปิดหน้าต่าง"
+              (click)="close()"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </header>
         <div class="content-card">
@@ -810,7 +561,8 @@
     [ticket]="selectedTicket()"
     (closeModal)="closeAddNoteModal()"
     (submitModal)="submitNote($event)"
-  ></app-note-modal>
+  >
+  </app-note-modal>
 }
 
 @if (IS_DENY_TICKET()) {
@@ -818,7 +570,8 @@
     [ticket]="selectedTicket()"
     (closeModal)="closeDenyModal()"
     (submitModal)="submitDeny($event)"
-  ></app-deny-modal>
+  >
+  </app-deny-modal>
 }
 
 @if (IS_ACKNOWLEDGE_TICKET()) {
@@ -826,7 +579,8 @@
     [ticket]="selectedTicket()"
     (closeModal)="closeAcknowledgeModal()"
     (submitModal)="submitAcknowledge($event)"
-  ></app-acknowledge-modal>
+  >
+  </app-acknowledge-modal>
 }
 
 @if (IS_ASSIGN_TICKET()) {
@@ -835,14 +589,18 @@
     [ticket]="selectedTicket()"
     (closeModal)="closeAssignModal()"
     (submitModal)="submitAssign($event)"
-  ></app-assign-modal>
+  >
+  </app-assign-modal>
 }
 
 @if (showAllServices) {
-  <app-services-detail-modal
-    [services]="selectedServices"
-    (onClose)="closeModal_showAll()"
-  ></app-services-detail-modal>
+  <app-services-detail-modal [services]="selectedServices" (onClose)="closeModal_showAll()">
+  </app-services-detail-modal>
+}
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  </app-file-preview-modal>
 }
 
 @if (newTicketCount() > 0) {
