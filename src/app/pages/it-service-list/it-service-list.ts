@@ -1,4 +1,12 @@
-import { Component, signal, inject, ChangeDetectorRef, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  ChangeDetectorRef,
+  OnInit,
+  HostListener,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -26,6 +34,8 @@ import { SwalService } from '../../services/swal.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from '../../components/modals/services-detail-modal/services-detail-modal';
 import { FileConverterService } from '../../services/file-converter';
+import { SignalrService } from '../../services/signalr.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-it-service',
@@ -63,6 +73,8 @@ export class ItService implements OnInit {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
+  private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private userData = this.authService.userData();
 
@@ -97,6 +109,24 @@ export class ItService implements OnInit {
   ngOnInit() {
     this.getMyTicket();
     this.checkScreen();
+
+    this.signalrService.ticketStatusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ ticketId, status }) => this.applyStatusChange(ticketId, status));
+
+    this.signalrService
+      .on('TicketStatusChanged')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => this.applyStatusChange(data.ticketId, data.status));
+  }
+
+  private applyStatusChange(ticketId: any, status: string) {
+    this.Tickets.update((list) =>
+      list.map((t) => (t.ticketId == ticketId ? { ...t, IT_Status: status, status } : t)),
+    );
+    if (this.selectedTicket()?.ticketId == ticketId) {
+      this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
+    }
   }
 
   /**
