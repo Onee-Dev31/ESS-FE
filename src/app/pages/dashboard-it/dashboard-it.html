@@ -263,10 +263,23 @@
       <div class="tk-card__title">เอกสารแนบ</div>
     </div>
     <div class="tk-card__body">
-      <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+      <!-- <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
         <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
           <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
           <span class="file-name">{{ file.name }}</span>
+        </li>
+      </ul> -->
+      <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
+        <li
+          *ngFor="let file of t.attachments"
+          class="attachment-item"
+          (click)="isPreviewable(file.name) ? viewFile(file) : downloadFile(file)"
+        >
+          <div class="file-icon-box">
+            <i [class]="getFileIcon(file.name)"></i>
+          </div>
+          <span class="file-name">{{ file.name }}</span>
+          <i class="fas fa-download download-small" *ngIf="!isPreviewable(file.name)"></i>
         </li>
       </ul>
       <ng-template #noAttachments>
