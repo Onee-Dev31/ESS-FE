@@ -10,7 +10,12 @@ import dayjs from 'dayjs';
 import { ItServiceMockService, Ticket } from '../../services/it-service-mock.service';
 import { ItServiceService } from '../../services/it-service.service';
 import { AuthService } from '../../services/auth.service';
-import { StatusColor, ticketTypyColor, StatusColor_Reverse } from '../../utils/status.util';
+import {
+  StatusColor,
+  ticketTypyColor,
+  StatusColor_Reverse,
+  StatusColor_text,
+} from '../../utils/status.util';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { StatusKey } from '../../interfaces/it-dashboard.interface';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -64,6 +69,7 @@ export class ItService implements OnInit {
   formatText = formatText;
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
+  StatusColor_text = StatusColor_text;
 
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
@@ -149,9 +155,10 @@ export class ItService implements OnInit {
         services: services,
         requester: res.requester,
         openFor: res.requestFor.fullname ? res.requestFor : null,
+        rejection_reason: ticket.rejection_reason,
       };
 
-      console.log('selectedTicket:', objectData);
+      // console.log('selectedTicket:', objectData);
       this.selectedTicket.set(objectData);
     });
   }

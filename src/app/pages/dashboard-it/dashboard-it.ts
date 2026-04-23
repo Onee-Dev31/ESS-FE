@@ -10,7 +10,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ItDashboardSummary } from './it-dashboard-summary/it-dashboard-summary';
 import { ItServiceService } from '../../services/it-service.service';
-import { StatusColor, ticketTypyColor, StatusColor_Reverse } from '../../utils/status.util';
+import {
+  StatusColor,
+  ticketTypyColor,
+  StatusColor_Reverse,
+  StatusColor_text,
+} from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   FilePreviewItem,
@@ -73,6 +78,7 @@ export class DashboardIT implements OnInit {
   formatText = formatText;
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
+  StatusColor_text = StatusColor_text;
 
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
@@ -162,6 +168,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -183,7 +190,6 @@ export class DashboardIT implements OnInit {
         description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
-        status: ticket.IT_Status,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -196,6 +202,7 @@ export class DashboardIT implements OnInit {
         requesterCompanyName: ticket.requester_companyName,
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
+        status: ticket.IT_Status,
         it_satus: ticket.IT_Status,
         approval_status: ticket.approval_status,
         attachments: attachments,
@@ -205,8 +212,11 @@ export class DashboardIT implements OnInit {
         services: services,
         requester: res.requester,
         openFor: res.requestFor.emp_code ? res.requestFor : null,
+        rejection_reason: ticket.rejection_reason,
       };
       this.selectedTicket.set(objectData);
+
+      console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {

@@ -176,6 +176,22 @@
         </div>
       </section>
 
+      <!-- REASON [Denied] -->
+      <section class="tk-card reason" *ngIf="t.status === 'Denied'">
+        <div class="tk-card__head">
+          <div class="tk-card__title">
+            เหตุผลในการ
+            <span class="tk-pill" [ngStyle]="StatusColor_text.getStyle(t.status)">
+              {{ statusLabel(t.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="tk-card__body">
+          <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.rejection_reason)"></div>
+        </div>
+      </section>
+
       <!-- ATTACHMENTS -->
       <section class="tk-card">
         <div class="tk-card__head">

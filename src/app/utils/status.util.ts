@@ -118,3 +118,33 @@ export class StatusColor_Reverse {
     };
   }
 }
+
+export class StatusColor_text {
+  private static statusMap: Record<string, string> = {
+    New: 'new',
+    Open: 'open',
+    Assigned: 'assigned',
+    'In Progress': 'progress',
+    Hold: 'hold',
+    Denied: 'deny',
+    Closed: 'closed',
+    'Waiting you': 'waiting',
+    Rejected: 'rejected',
+  };
+
+  static getStyle(status: string) {
+    const key = this.statusMap[status];
+
+    if (!key) {
+      return {
+        background: 'rgba(158,158,158,0.2)',
+        color: '#9E9E9E',
+      };
+    }
+
+    return {
+      // border: `1px solid var(--status-${key}-text)`,
+      color: `color-mix(in srgb, var(--status-${key}-text), var(--text-reverse) 20%) !important`,
+    };
+  }
+}
