@@ -309,4 +309,10 @@ export class ItServiceService {
       params: role ? { readerCodeempid, role } : { readerCodeempid },
     });
   }
+
+  getUnreadTickets(readerCodeempid: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/unread`, {
+      params: { readerCodeempid },
+    });
+  }
 }
