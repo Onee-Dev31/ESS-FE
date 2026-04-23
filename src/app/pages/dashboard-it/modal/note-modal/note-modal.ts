@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { AuthService } from '../../../../services/auth.service';
+import { SignalrService } from '../../../../services/signalr.service';
 import {
   FilePreviewItem,
   FilePreviewModalComponent,
@@ -13,6 +15,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './note-modal.scss',
 })
 export class NoteModal {
+  private authService = inject(AuthService);
+  private signalrService = inject(SignalrService);
+
   @Input() ticket: any;
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
@@ -36,6 +41,18 @@ export class NoteModal {
       attachments: this.noteForm.attachments,
     };
     this.submitModal.emit(payload);
+
+    const ticketId = this.ticket?.ticketId;
+    const requesterAdUser = this.ticket?.requesterAduser;
+    const userData = this.authService.userData();
+    const senderAdUser = this.authService.currentUser() ?? '';
+    const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+    console.log('[noteNotify] ticketId:', ticketId, 'requesterAdUser:', requesterAdUser, 'senderAdUser:', senderAdUser, 'senderName:', senderName);
+    if (ticketId && requesterAdUser && senderAdUser) {
+      this.signalrService.noteNotify(ticketId, requesterAdUser, senderAdUser, senderName, this.noteForm.message);
+    } else {
+      console.warn('[noteNotify] blocked — missing field');
+    }
   }
 
   onDragOver(event: DragEvent) {

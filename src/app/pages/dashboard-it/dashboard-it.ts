@@ -64,7 +64,6 @@ import { SignalrService } from '../../services/signalr.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
-  [x: string]: any;
 
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
