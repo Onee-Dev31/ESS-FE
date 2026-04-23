@@ -99,3 +99,17 @@ jobs:
           script: |
             const script = require('./.github/scripts/pr-gates-summary.js')
             await script({ github, context, core })
+
+  auto-merge:
+    name: Auto Merge
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test-coverage, security]
+    if: github.event_name == 'pull_request' && success()
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}

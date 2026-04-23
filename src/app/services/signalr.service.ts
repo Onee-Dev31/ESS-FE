@@ -20,6 +20,7 @@ export class SignalrService {
   pendingNewTickets = signal(0);
   pendingTicketNumbers = signal<Set<string>>(new Set());
   refreshTrigger = signal(0);
+  ticketReadTrigger = new Subject<void>();
 
   sendTestRealtime() {
     this.http.post(`${this.baseUrl}/notification/it-service`, {}).subscribe({
@@ -33,6 +34,12 @@ export class SignalrService {
       ticketId,
       assigneeAdUsers,
     });
+  }
+
+  noteNotify(requesterAdUser: string, note: string, senderName: string) {
+    this.http
+      .post(`${this.baseUrl}/notification/note-notify`, { requesterAdUser, note, senderName })
+      .subscribe({ error: (err) => console.error('noteNotify error', err) });
   }
 
   sendNewTicketNotification(ticketNumber: string) {

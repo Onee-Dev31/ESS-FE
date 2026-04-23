@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EMPTY } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 
 import { DashboardIT } from './dashboard-it';
 import { SignalrService } from '../../services/signalr.service';
@@ -19,6 +19,7 @@ const mockSignalrService = {
   pendingNewTickets: mockSignal(0),
   pendingTicketNumbers: mockSignal(new Set<string>()),
   refreshTrigger: mockSignal(0),
+  ticketReadTrigger: new Subject<void>(),
 };
 
 describe('DashboardIT', () => {
