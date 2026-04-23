@@ -3,8 +3,12 @@
 @use '../../../styles/mixins' as *;
 
 @keyframes ticket-highlight {
-  0%   { background-color: color-mix(in srgb, var(--primary) 20%, transparent); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .modal-overlay {
