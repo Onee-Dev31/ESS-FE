@@ -325,7 +325,11 @@ export class ItService implements OnInit {
           return;
         }
 
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.swalService.close();
+
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
 
         this.selectTicket(data.id);
         this.getMyTicket();

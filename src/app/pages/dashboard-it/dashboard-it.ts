@@ -1005,10 +1005,15 @@ export class DashboardIT implements OnInit {
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
+      
         if (!res?.success) {
+  
+          
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
+        this.swalService.close();
+
 
         const requesterAdUser = this.selectedTicket()?.requesterAduser;
         const userData = this.authService.userData();
@@ -1025,7 +1030,9 @@ export class DashboardIT implements OnInit {
           );
         }
 
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
 
         this.selectTicket(data.id);
         this.getAllTickets();
