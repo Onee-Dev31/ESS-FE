@@ -30,9 +30,11 @@ export class SignalrService {
   }
 
   assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
+    const senderAdUser = this.authService.currentUser() ?? '';
     return this.http.post(`${this.baseUrl}/notification/it-assign-notify`, {
       ticketId,
       assigneeAdUsers,
+      senderAdUser,
     });
   }
 
