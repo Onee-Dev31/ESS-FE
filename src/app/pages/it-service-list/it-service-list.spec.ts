@@ -1,6 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { EMPTY, Subject } from 'rxjs';
+
 import { ItService } from './it-service-list';
+import { SignalrService } from '../../services/signalr.service';
+
+const mockSignalrService = {
+  startConnection: () => Promise.resolve(),
+  on: () => EMPTY,
+  sendNewTicketNotification: () => {},
+  ticketStatusTrigger: new Subject<{ ticketId: any; status: string }>(),
+  ticketReadTrigger: new Subject<void>(),
+  pendingTicketNumbers: { update: () => {} },
+  refreshTrigger: { update: () => {} },
+};
 
 describe('ItService', () => {
   let component: ItService;
@@ -9,6 +22,7 @@ describe('ItService', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ItService],
+      providers: [{ provide: SignalrService, useValue: mockSignalrService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ItService);

@@ -28,6 +28,7 @@ interface NotificationItem {
   route?: string;
   readTicketId?: number;
   ticketNumber?: string;
+  ticketId?: number;
 }
 
 interface SearchMenuItem {
@@ -150,10 +151,17 @@ export class NavbarComponent {
             message,
             status: 'pending',
             time: 'เมื่อสักครู่',
-            route: '/it-dashboard',
+            route: this.isItRole() ? '/it-dashboard' : '/it-service-list',
+            ticketId: data.ticketId ?? undefined,
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
+          if (this.isItRole()) {
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          } else {
+            this.unreadTicketCount.update((n) => n + 1);
+          }
           if (!document.hidden) {
             this.toastService.info(message);
             this.notifyAudio.currentTime = 0;
@@ -343,20 +351,31 @@ export class NavbarComponent {
   onNotificationClick(item: NotificationItem) {
     this.isNotificationOpen = false;
     const codeempid = this.authService.userData()?.CODEMPID;
-    if (codeempid && item.readTicketId) {
-      this.itService.markTicketRead(item.readTicketId, codeempid).subscribe({
-        complete: () => {
-          this.fetchUnreadCount();
-          this.fetchUnreadTickets();
-        },
-      });
+    if (this.isItRole()) {
+      if (codeempid && item.readTicketId) {
+        this.itService.markTicketRead(item.readTicketId, codeempid).subscribe({
+          complete: () => {
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          },
+        });
+      }
+    } else {
+      this.notifications.update((list) => list.filter((n) => n.id !== item.id));
+      this.unreadTicketCount.update((n) => Math.max(0, n - 1));
     }
     if (item.route) {
       if (item.ticketNumber) {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
-      this.navigateTo(item.route);
+      if (item.ticketId) {
+        this.router.navigate([item.route], { queryParams: { ticketId: item.ticketId } });
+        this.clearSearch();
+        this.isMobileSearchOpen.set(false);
+      } else {
+        this.navigateTo(item.route);
+      }
     }
   }
 

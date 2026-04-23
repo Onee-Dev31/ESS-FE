@@ -1,6 +1,15 @@
-import { Component, signal, inject, ChangeDetectorRef, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  ChangeDetectorRef,
+  OnInit,
+  HostListener,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   FilePreviewModalComponent,
   FilePreviewItem,
@@ -26,6 +35,8 @@ import { SwalService } from '../../services/swal.service';
 import { formatText } from '../../utils/formatText';
 import { ServicesDetailModal } from '../../components/modals/services-detail-modal/services-detail-modal';
 import { FileConverterService } from '../../services/file-converter';
+import { SignalrService } from '../../services/signalr.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-it-service',
@@ -70,7 +81,10 @@ export class ItService implements OnInit {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
+  private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
   private userData = this.authService.userData();
 
   formatText = formatText;
@@ -85,6 +99,7 @@ export class ItService implements OnInit {
   mockTickets = this.itServiceMock.ticketsSignal;
   Tickets = signal<any[]>([]);
   selectedTicket = signal<any | undefined>(undefined);
+  highlightedTicketId = signal<number | null>(null);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
@@ -105,6 +120,31 @@ export class ItService implements OnInit {
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
+
+    const ticketId = this.route.snapshot.queryParamMap.get('ticketId');
+    if (ticketId) {
+      this.highlightedTicketId.set(Number(ticketId));
+      this.selectTicket(ticketId);
+      setTimeout(() => this.highlightedTicketId.set(null), 3000);
+    }
+
+    this.signalrService.ticketStatusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ ticketId, status }) => this.applyStatusChange(ticketId, status));
+
+    this.signalrService
+      .on('TicketStatusChanged')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => this.applyStatusChange(data.ticketId, data.status));
+  }
+
+  private applyStatusChange(ticketId: any, status: string) {
+    this.Tickets.update((list) =>
+      list.map((t) => (t.ticketId == ticketId ? { ...t, IT_Status: status, status } : t)),
+    );
+    if (this.selectedTicket()?.ticketId == ticketId) {
+      this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
+    }
   }
 
   /**
@@ -127,7 +167,7 @@ export class ItService implements OnInit {
       const assignments = res.assignments;
       this.desNew = ticket.description;
 
-      const itNotes = await this.buildItNotes(replies, replyAttachments);
+      const itNotes = this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       let status = this.getTicketStatus(ticket);
 
@@ -426,30 +466,25 @@ export class ItService implements OnInit {
     });
   }
 
-  async buildItNotes(replies: any[], attachments: any[]) {
-    const notes = await Promise.all(
-      replies.map(async (r) => {
-        const files = attachments.filter((a) => a.reply_id === r.id);
-        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
-        return {
-          id: r.id,
-          message: r.message,
-          attachments: convertedFiles,
-          createdDate: r.created_at,
-          createBy: {
-            fullName: r.sender_name,
-            nickName: this.extractNickName(r.sender_name),
-            empCode: r.user_code,
-            adUser: r.user_aduser,
-            role: 'user',
-          },
-          referred_title: r.Referred_Title,
-          isReferred: r.IsReferred,
-        };
-      }),
-    );
-
-    return notes;
+  buildItNotes(replies: any[], attachments: any[]) {
+    return replies.map((r) => {
+      const files = attachments.filter((a) => a.reply_id === r.id);
+      return {
+        id: r.id,
+        message: r.message,
+        attachments: files,
+        createdDate: r.created_at,
+        createBy: {
+          fullName: r.sender_name,
+          nickName: this.extractNickName(r.sender_name),
+          empCode: r.user_code,
+          adUser: r.user_aduser,
+          role: 'user',
+        },
+        referred_title: r.Referred_Title,
+        isReferred: r.IsReferred,
+      };
+    });
   }
 
   getTicketStatus(ticket: any) {
