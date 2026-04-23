@@ -60,6 +60,7 @@
         *ngFor="let ticket of filteredTickets()"
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
         [class.is-new]="newTicketIds().has(ticket.ticketId)"
+        [id]="'ticket-' + ticket.ticketId"
         (click)="selectTicket(ticket.ticketId)"
       >
         <div class="avatar">
@@ -89,7 +90,12 @@
             </div>
           </div>
           <div class="ticket-title-row">
-            <div class="ticket-title">{{ ticket.subject }}</div>
+            <div
+              class="ticket-title"
+              [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
+            >
+              {{ ticket.subject }}
+            </div>
             <span class="ticket-time">
               @if (isToday(ticket.createdDate)) {
                 {{ ticket.createdDate | date: 'HH:mm' }}

@@ -129,6 +129,18 @@ export class ItService implements OnInit {
         this.highlightedTicketId.set(id);
         this.newNoteTicketId.set(id);
         this.selectTicket(ticketId);
+
+        // ✅ Scroll to ticket in sidebar (with retry logic)
+        const scrollToTicket = (id: string, retries = 10) => {
+          const el = document.getElementById('ticket-' + id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (retries > 0) {
+            setTimeout(() => scrollToTicket(id, retries - 1), 300);
+          }
+        };
+        scrollToTicket(ticketId);
+
         setTimeout(() => this.highlightedTicketId.set(null), 8000);
       }
     });
@@ -141,6 +153,22 @@ export class ItService implements OnInit {
       .on('TicketStatusChanged')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => this.applyStatusChange(data.ticketId, data.status));
+
+    // ✅ Listen for New Note (Real-time)
+    this.signalrService
+      .on('NewNote')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        if (data.ticketId) {
+          // 1. Show "New Message" badge on the left list
+          this.newNoteTicketId.set(data.ticketId);
+
+          // 2. If viewing this ticket, refresh details to show new note instantly
+          if (this.selectedTicket()?.ticketId === data.ticketId) {
+            this.selectTicket(String(data.ticketId));
+          }
+        }
+      });
   }
 
   private applyStatusChange(ticketId: any, status: string) {

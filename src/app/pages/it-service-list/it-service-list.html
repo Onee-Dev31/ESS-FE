@@ -14,6 +14,7 @@
         *ngFor="let ticket of Tickets()"
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
         [class.highlight]="highlightedTicketId() === ticket.ticketId"
+        [id]="'ticket-' + ticket.ticketId"
         (click)="onTicketClick(ticket.ticketId)"
       >
         <div class="ticket-info">
@@ -24,7 +25,12 @@
             </span>
           </div>
           <div class="ticket-title-row">
-            <div class="ticket-title">{{ ticket.subject }}</div>
+            <div
+              class="ticket-title"
+              [class.is-new-text]="newNoteTicketId() === ticket.ticketId"
+            >
+              {{ ticket.subject }}
+            </div>
             <span class="ticket-time">
               @if (isToday(ticket.createdDate)) {
                 {{ ticket.createdDate | date: 'HH:mm' }}
