@@ -46,16 +46,21 @@ import { FileConverterService } from '../../services/file-converter';
 })
 export class ItService implements OnInit {
   isLaptop = false;
+  isMobile = false;
+  isTicketDetailOpen = signal(false);
 
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
+    this.checkMobile();
   }
 
   checkScreen() {
     const width = window.innerWidth;
     this.isLaptop = width >= 1024 && width <= 1440;
-    // console.log("isLabtop, ", width, ' > ', this.isLaptop)
+  }
+  checkMobile() {
+    this.isMobile = window.innerWidth <= 860;
   }
 
   private itServiceMock = inject(ItServiceMockService);
@@ -97,6 +102,7 @@ export class ItService implements OnInit {
   ngOnInit() {
     this.getMyTicket();
     this.checkScreen();
+    this.checkMobile();
   }
 
   /**
@@ -158,9 +164,15 @@ export class ItService implements OnInit {
         rejection_reason: ticket.rejection_reason,
       };
 
-      // console.log('selectedTicket:', objectData);
       this.selectedTicket.set(objectData);
+      if (this.isMobile) {
+        this.isTicketDetailOpen.set(true);
+      }
     });
+  }
+
+  closeTicketDetail() {
+    this.isTicketDetailOpen.set(false);
   }
 
   showAllServices: boolean = false;
