@@ -506,13 +506,15 @@ export class DashboardIT implements OnInit {
   fetchUnreadIds() {
     const codeempid = this.authService.userData()?.CODEMPID;
     if (!codeempid) return;
-    this.itServiceService.getUnreadTickets(codeempid).subscribe({
-      next: (res: any) => {
-        const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
-        this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
-      },
-      error: () => {},
-    });
+    this.itServiceService
+      .getUnreadTickets(codeempid, this.authService.userRole() ?? undefined)
+      .subscribe({
+        next: (res: any) => {
+          const list: any[] = Array.isArray(res) ? res : (res?.data ?? []);
+          this.unreadTicketIds.set(new Set(list.map((t: any) => t.id ?? t.ticketId)));
+        },
+        error: () => {},
+      });
   }
 
   getTicketById(ticketId: string) {

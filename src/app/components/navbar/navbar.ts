@@ -65,8 +65,16 @@ export class NavbarComponent {
 
   unreadTicketCount = signal(0);
 
+  private static readonly IT_ROLES = new Set(['it-staff', 'it-director', 'system-admin']);
+
   userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
+  isItRole = computed(() =>
+    (this.authService.userRole() ?? '')
+      .split(',')
+      .map((r) => r.trim())
+      .some((r) => NavbarComponent.IT_ROLES.has(r)),
+  );
 
   userCodeEmp: any = '';
 
@@ -154,41 +162,46 @@ export class NavbarComponent {
       });
 
     this.userCodeEmp = this.authService.userData().CODEMPID;
-    this.fetchUnreadCount();
-    this.fetchUnreadTickets();
 
-    this.signalrService
-      .on('NewTicket')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() =>
-        this.zone.run(() => {
-          this.fetchUnreadCount();
-          this.fetchUnreadTickets();
-        }),
-      );
+    if (this.isItRole()) {
+      this.fetchUnreadCount();
+      this.fetchUnreadTickets();
 
-    this.signalrService
-      .on('TicketAssigned')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() =>
-        this.zone.run(() => {
-          this.fetchUnreadCount();
-          this.fetchUnreadTickets();
-        }),
-      );
+      this.signalrService
+        .on('NewTicket')
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() =>
+          this.zone.run(() => {
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          }),
+        );
 
-    this.signalrService.ticketReadTrigger.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() =>
-      this.zone.run(() => {
-        this.fetchUnreadCount();
-        this.fetchUnreadTickets();
-      }),
-    );
+      this.signalrService
+        .on('TicketAssigned')
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() =>
+          this.zone.run(() => {
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          }),
+        );
+
+      this.signalrService.ticketReadTrigger
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() =>
+          this.zone.run(() => {
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          }),
+        );
+    }
   }
 
   fetchUnreadCount() {
     const codeempid = this.authService.userData()?.CODEMPID;
     if (!codeempid) return;
-    this.itService.getUnreadCount(codeempid).subscribe({
+    this.itService.getUnreadCount(codeempid, this.authService.userRole() ?? undefined).subscribe({
       next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
       error: () => this.unreadTicketCount.set(0),
     });
@@ -197,7 +210,7 @@ export class NavbarComponent {
   fetchUnreadTickets() {
     const codeempid = this.authService.userData()?.CODEMPID;
     if (!codeempid) return;
-    this.itService.getUnreadTickets(codeempid).subscribe({
+    this.itService.getUnreadTickets(codeempid, this.authService.userRole() ?? undefined).subscribe({
       next: (res: any) => {
         const list: any[] = Array.isArray(res) ? res : (res?.data ?? res?.tickets ?? []);
         const items: NotificationItem[] = list.map((t: any) => ({

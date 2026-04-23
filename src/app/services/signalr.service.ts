@@ -103,21 +103,22 @@ export class SignalrService {
   }
 
   private async joinUserGroups() {
+    const adUser = this.authService.currentUser();
     const roleString = this.authService.userRole();
-    if (!roleString) return;
 
-    const roles = roleString
-      .split(',')
-      .map((r) => r.trim())
-      .filter((r) => r.length > 0);
+    if (adUser && roleString) {
+      const roles = roleString
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r) => r.length > 0);
 
-    for (const role of roles) {
-      await this.hubConnection.invoke('JoinGroup', role);
+      for (const role of roles) {
+        await this.hubConnection.invoke('JoinGroup', adUser, role);
+      }
     }
 
-    const adUser = this.authService.currentUser();
     if (adUser) {
-      await this.hubConnection.invoke('JoinGroup', `user:${adUser}`);
+      await this.hubConnection.invoke('JoinUserGroup', adUser);
     }
   }
 
