@@ -100,6 +100,7 @@ export class ItService implements OnInit {
   Tickets = signal<any[]>([]);
   selectedTicket = signal<any | undefined>(undefined);
   highlightedTicketId = signal<number | null>(null);
+  newNoteTicketId = signal<number | null>(null);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
@@ -121,12 +122,28 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
-    const ticketId = this.route.snapshot.queryParamMap.get('ticketId');
-    if (ticketId) {
-      this.highlightedTicketId.set(Number(ticketId));
-      this.selectTicket(ticketId);
-      setTimeout(() => this.highlightedTicketId.set(null), 3000);
-    }
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const ticketId = params['ticketId'];
+      if (ticketId) {
+        const id = Number(ticketId);
+        this.highlightedTicketId.set(id);
+        this.newNoteTicketId.set(id);
+        this.selectTicket(ticketId);
+
+        // ✅ Scroll to ticket in sidebar (with retry logic)
+        const scrollToTicket = (id: string, retries = 10) => {
+          const el = document.getElementById('ticket-' + id);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (retries > 0) {
+            setTimeout(() => scrollToTicket(id, retries - 1), 300);
+          }
+        };
+        scrollToTicket(ticketId);
+
+        setTimeout(() => this.highlightedTicketId.set(null), 8000);
+      }
+    });
 
     this.signalrService.ticketStatusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -136,6 +153,22 @@ export class ItService implements OnInit {
       .on('TicketStatusChanged')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => this.applyStatusChange(data.ticketId, data.status));
+
+    // ✅ Listen for New Note (Real-time)
+    this.signalrService
+      .on('NewNote')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        if (data.ticketId) {
+          // 1. Show "New Message" badge on the left list
+          this.newNoteTicketId.set(data.ticketId);
+
+          // 2. If viewing this ticket, refresh details to show new note instantly
+          if (this.selectedTicket()?.ticketId === data.ticketId) {
+            this.selectTicket(String(data.ticketId));
+          }
+        }
+      });
   }
 
   private applyStatusChange(ticketId: any, status: string) {
@@ -151,8 +184,12 @@ export class ItService implements OnInit {
    *
    * NEW!!
    */
+  onTicketClick(ticketId: number) {
+    this.newNoteTicketId.set(null);
+    this.selectTicket(String(ticketId));
+  }
+
   selectTicket(ticketId: string) {
-    // console.log(ticketId)
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
@@ -288,7 +325,11 @@ export class ItService implements OnInit {
           return;
         }
 
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.swalService.close();
+
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
 
         this.selectTicket(data.id);
         this.getMyTicket();

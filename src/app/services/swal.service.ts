@@ -6,6 +6,7 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
 })
 export class SwalService {
   success(title: string, text?: string) {
+    Swal.close();
     return Swal.fire({
       icon: 'success',
       title,
@@ -15,6 +16,7 @@ export class SwalService {
   }
 
   error(title: string, text?: string) {
+    Swal.close();
     return Swal.fire({
       icon: 'error',
       title,
@@ -24,6 +26,7 @@ export class SwalService {
   }
 
   warning(title: string, text?: string) {
+    Swal.close();
     return Swal.fire({
       icon: 'warning',
       title,
@@ -33,6 +36,7 @@ export class SwalService {
   }
 
   info(title: string, text?: string) {
+    Swal.close();
     return Swal.fire({
       icon: 'info',
       title,

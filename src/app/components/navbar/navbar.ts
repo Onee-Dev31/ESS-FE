@@ -370,7 +370,9 @@ export class NavbarComponent {
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
       if (item.ticketId) {
-        this.router.navigate([item.route], { queryParams: { ticketId: item.ticketId } });
+        this.router.navigate([item.route], {
+          queryParams: { ticketId: item.ticketId, _t: Date.now() },
+        });
         this.clearSearch();
         this.isMobileSearchOpen.set(false);
       } else {

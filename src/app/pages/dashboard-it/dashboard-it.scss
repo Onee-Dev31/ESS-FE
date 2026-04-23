@@ -434,6 +434,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             flex: 1;
+
+            &.is-new-text {
+              color: var(--primary) !important;
+              font-weight: 800 !important;
+            }
           }
 
           .ticket-time {
