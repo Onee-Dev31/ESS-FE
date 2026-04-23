@@ -47,9 +47,24 @@ export class NoteModal {
     const userData = this.authService.userData();
     const senderAdUser = this.authService.currentUser() ?? '';
     const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
-    console.log('[noteNotify] ticketId:', ticketId, 'requesterAdUser:', requesterAdUser, 'senderAdUser:', senderAdUser, 'senderName:', senderName);
+    console.log(
+      '[noteNotify] ticketId:',
+      ticketId,
+      'requesterAdUser:',
+      requesterAdUser,
+      'senderAdUser:',
+      senderAdUser,
+      'senderName:',
+      senderName,
+    );
     if (ticketId && requesterAdUser && senderAdUser) {
-      this.signalrService.noteNotify(ticketId, requesterAdUser, senderAdUser, senderName, this.noteForm.message);
+      this.signalrService.noteNotify(
+        ticketId,
+        requesterAdUser,
+        senderAdUser,
+        senderName,
+        this.noteForm.message,
+      );
     } else {
       console.warn('[noteNotify] blocked — missing field');
     }
