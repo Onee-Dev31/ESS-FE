@@ -126,11 +126,30 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
   cy.intercept('GET', '**/Master/company-costcent', { data: [] }).as('getDepartments');
 };
 
+const forceItStaffRole = () => {
+  cy.window().then((win) => {
+    win.localStorage.setItem('userRole', 'it-staff');
+
+    const allDataRaw = win.localStorage.getItem('allData');
+    if (!allDataRaw) return;
+
+    const allData = JSON.parse(allDataRaw);
+    allData.permission = {
+      ...(allData.permission ?? {}),
+      Role: 'it-staff',
+    };
+    win.localStorage.setItem('allData', JSON.stringify(allData));
+  });
+};
+
 describe('IT unread notifications', () => {
   it('แสดง badge และ notification unread ticket ใน navbar', () => {
     setupItNotificationApi([101]);
 
-    cy.login();
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
     cy.visit('/allowance');
 
     cy.wait('@getUnreadCount');
@@ -147,7 +166,10 @@ describe('IT unread notifications', () => {
   it('กด notification แล้ว mark read, redirect และ icon ซองจดหมายอัปเดตได้', () => {
     setupItNotificationApi([101]);
 
-    cy.login();
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
     cy.visit('/allowance');
 
     cy.wait('@getUnreadCount');
@@ -179,7 +201,10 @@ describe('IT unread notifications', () => {
   it('กด ticket unread ใน dashboard แล้วเรียก mark read และเปลี่ยนเป็น envelope-open', () => {
     setupItNotificationApi([101]);
 
-    cy.login();
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
     cy.visit('/it-dashboard');
 
     cy.wait('@getAllTickets');
