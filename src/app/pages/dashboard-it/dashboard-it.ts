@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, effect, untracked } from '@angular/core';
+import { Component, inject, OnInit, signal, effect, untracked, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -66,6 +66,23 @@ import { SignalrService } from '../../services/signalr.service';
 export class DashboardIT implements OnInit {
   [x: string]: any;
 
+  isTablet = false;
+  isMobile = false;
+  isSmallMobile = false;
+  isTicketDetailOpen = signal(false);
+
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreen();
+  }
+
+  checkScreen() {
+    const width = window.innerWidth;
+    this.isMobile = width <= 860;
+    this.isTablet = width > 860 && width <= 1200;
+    this.isSmallMobile = window.innerWidth <= 460;
+  }
+
   private itServiceService = inject(ItServiceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
@@ -130,6 +147,7 @@ export class DashboardIT implements OnInit {
   }
 
   ngOnInit() {
+    this.checkScreen();
     const hasTrigger = this.signalrService.refreshTrigger() > 0;
     this.signalrService.refreshTrigger.set(0);
     if (hasTrigger || this.signalrService.pendingNewTickets() > 0) {
@@ -229,7 +247,14 @@ export class DashboardIT implements OnInit {
           return next;
         });
       }
+      if (this.isMobile) {
+        this.isTicketDetailOpen.set(true);
+      }
     });
+  }
+
+  closeTicketDetail() {
+    this.isTicketDetailOpen.set(false);
   }
 
   showAllServices: boolean = false;
@@ -949,5 +974,14 @@ export class DashboardIT implements OnInit {
         );
       },
     });
+  }
+
+  isAssigned(): boolean {
+    const assignments = this.selectedTicket()?.assignments ?? [];
+    return assignments.some(
+      (a: any) =>
+        a.aduser === this.authService.userData().AD_USER ||
+        a.codeempid === this.authService.userData().CODEMPID,
+    );
   }
 }
