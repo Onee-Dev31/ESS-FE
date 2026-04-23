@@ -128,6 +128,31 @@ export class NavbarComponent {
         });
       });
 
+    this.signalrService
+      .on('NewNote')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.zone.run(() => {
+          const message = data.message || `มี Note ใหม่จาก ${data.senderName ?? ''}`;
+
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'มี Note ใหม่',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่',
+            route: '/dashboard-it',
+          };
+
+          this.notifications.update((list) => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => {});
+          }
+        });
+      });
+
     this.userCodeEmp = this.authService.userData().CODEMPID;
     this.fetchUnreadCount();
     this.fetchUnreadTickets();

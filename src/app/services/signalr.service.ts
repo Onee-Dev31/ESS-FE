@@ -36,6 +36,12 @@ export class SignalrService {
     });
   }
 
+  noteNotify(requesterAdUser: string, note: string, senderName: string) {
+    this.http
+      .post(`${this.baseUrl}/notification/note-notify`, { requesterAdUser, note, senderName })
+      .subscribe({ error: (err) => console.error('noteNotify error', err) });
+  }
+
   sendNewTicketNotification(ticketNumber: string) {
     this.http
       .post(`${this.baseUrl}/notification/it-service/open-tickets`, { ticketNumber })
