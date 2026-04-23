@@ -97,29 +97,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   loadData() {
     this.generateCalendar();
-    // if (!this.requestId) {
-    //   this.allowanceService.generateNextAllowanceId().pipe(
-    //     switchMap(id => {
-    //       this.requestId = id;
-    //       return this.allowanceService.getAllowanceRequestById(id);
-    //     })
-    //   ).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // } else {
-    //   this.allowanceService.getAllowanceRequestById(this.requestId).subscribe(existing => {
-    //     this.loadedRequest = existing;
-    //     this.generateCalendar();
-    //     this.cdr.markForCheck();
-    //   });
-    // }
   }
 
   mapData() {
     this.logs = this.requests.details.map((item: any) => {
-      console.log(item, this.formatDuration(item.extra_hours));
+      // console.log(item, this.formatDuration(item.extra_hours));
       return {
         date: item.work_date,
         dayType: item.day_type,
