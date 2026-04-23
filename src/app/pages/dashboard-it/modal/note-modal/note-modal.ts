@@ -1,12 +1,10 @@
-import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import {
   FilePreviewItem,
   FilePreviewModalComponent,
 } from '../../../../components/modals/file-preview-modal/file-preview-modal';
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../../services/auth.service';
-import { SignalrService } from '../../../../services/signalr.service';
 
 @Component({
   selector: 'app-note-modal',
@@ -15,9 +13,6 @@ import { SignalrService } from '../../../../services/signalr.service';
   styleUrl: './note-modal.scss',
 })
 export class NoteModal {
-  private authService = inject(AuthService);
-  private signalrService = inject(SignalrService);
-
   @Input() ticket: any;
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
@@ -41,13 +36,6 @@ export class NoteModal {
       attachments: this.noteForm.attachments,
     };
     this.submitModal.emit(payload);
-
-    const requesterAdUser = this.ticket?.requesterAduser;
-    const userData = this.authService.userData();
-    const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
-    if (requesterAdUser && senderName) {
-      this.signalrService.noteNotify(requesterAdUser, this.noteForm.message, senderName);
-    }
   }
 
   onDragOver(event: DragEvent) {
