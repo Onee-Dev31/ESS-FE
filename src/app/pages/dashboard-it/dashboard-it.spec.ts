@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EMPTY, of, Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ActivatedRoute } from '@angular/router';
 
 import { DashboardIT } from './dashboard-it';
 import { SignalrService } from '../../services/signalr.service';
@@ -28,6 +29,7 @@ const mockSignalrService = {
   pendingTicketNumbers: mockSignal(new Set<string>()),
   refreshTrigger: mockSignal(0),
   ticketReadTrigger: new Subject<void>(),
+  ticketFocusTrigger: new Subject<number>(),
 };
 
 const mockItService = {
@@ -57,6 +59,10 @@ const mockAuthService = {
   currentUser: () => 'testuser',
 };
 
+const mockActivatedRoute = {
+  queryParams: of({}),
+};
+
 describe('DashboardIT', () => {
   let component: DashboardIT;
   let fixture: ComponentFixture<DashboardIT>;
@@ -64,6 +70,7 @@ describe('DashboardIT', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignalrService.ticketReadTrigger = new Subject<void>();
+    mockSignalrService.ticketFocusTrigger = new Subject<number>();
   });
 
   beforeEach(async () => {
@@ -73,6 +80,7 @@ describe('DashboardIT', () => {
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: ItServiceService, useValue: mockItService },
         { provide: AuthService, useValue: mockAuthService },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();
 

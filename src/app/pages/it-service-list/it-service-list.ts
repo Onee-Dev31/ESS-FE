@@ -37,6 +37,7 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-it-service',
@@ -122,31 +123,49 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const ticketId = params['ticketId'];
-      if (ticketId) {
-        const id = Number(ticketId);
-        this.highlightedTicketId.set(id);
+    (this.route.queryParams ?? EMPTY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const ticketId = params['ticketId'];
+        if (ticketId) {
+          const id = Number(ticketId);
+          this.highlightedTicketId.set(id);
+          this.newNoteTicketIds.update((s) => {
+            s.delete(id);
+            return new Set(s);
+          });
+          this.selectTicket(ticketId);
+
+          // ✅ Scroll to ticket in sidebar (with retry logic)
+          const scrollToTicket = (id: string, retries = 10) => {
+            const el = document.getElementById('ticket-' + id);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (retries > 0) {
+              setTimeout(() => scrollToTicket(id, retries - 1), 300);
+            }
+          };
+          scrollToTicket(ticketId);
+
+          setTimeout(() => this.highlightedTicketId.set(null), 8000);
+        }
+      });
+
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ticketId) => {
         this.newNoteTicketIds.update((s) => {
-          s.delete(id);
+          s.delete(ticketId);
           return new Set(s);
         });
-        this.selectTicket(ticketId);
-
-        // ✅ Scroll to ticket in sidebar (with retry logic)
+        this.selectTicket(String(ticketId));
         const scrollToTicket = (id: string, retries = 10) => {
           const el = document.getElementById('ticket-' + id);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else if (retries > 0) {
-            setTimeout(() => scrollToTicket(id, retries - 1), 300);
-          }
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          else if (retries > 0) setTimeout(() => scrollToTicket(id, retries - 1), 300);
         };
-        scrollToTicket(ticketId);
-
-        setTimeout(() => this.highlightedTicketId.set(null), 8000);
-      }
-    });
+        scrollToTicket(String(ticketId));
+      });
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
