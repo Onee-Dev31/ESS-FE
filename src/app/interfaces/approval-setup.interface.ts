@@ -25,3 +25,14 @@ export interface ApprovalSetupGroup {
   companyName: string;
   departments: ApprovalSetupRow[];
 }
+
+export interface ApprovalCategory {
+  categoryId: number;
+  categoryCode: string;
+  categoryName: string;
+  skipApprover1: boolean;
+  skipApprover2: boolean;
+  skipApprover3: boolean;
+  skipApprover4: boolean;
+  activeFlag: boolean;
+}

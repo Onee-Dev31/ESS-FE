@@ -7,7 +7,10 @@
         <i class="fas fa-route"></i>
         ตั้งค่าการอนุมัติ
       </h1>
-      <!-- <p class="page-subtitle">กำหนดผู้อนุมัติลำดับที่ 1 สำหรับแต่ละแผนก</p> -->
+      <button type="button" class="btn-outline btn-setup" (click)="openSetupModal()">
+        <i class="fa-solid fa-code-compare"></i>
+        <span class="btn-text">ตั้งค่าลำดับการอนุมัติ</span>
+      </button>
     </div>
     <div class="page-header__right">
       <button class="btn-refresh" (click)="loadSetupList()">
@@ -352,3 +355,10 @@
     </div>
   </div>
 </div>
+
+@if (isSetupModalOpen()) {
+  <app-approval-setup-chain-modal
+    (onClose)="closeSetupModal()"
+    (onSaved)="loadSetupList()"
+  ></app-approval-setup-chain-modal>
+}
