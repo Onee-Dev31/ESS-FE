@@ -204,6 +204,15 @@ export class NavbarComponent {
             this.fetchUnreadTickets();
           }),
         );
+    } else {
+      this.signalrService.ticketReadTrigger
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(({ ticketId }) =>
+          this.zone.run(() => {
+            this.notifications.update((list) => list.filter((n) => n.ticketId !== ticketId));
+            this.unreadTicketCount.update((n) => Math.max(0, n - 1));
+          }),
+        );
     }
   }
 

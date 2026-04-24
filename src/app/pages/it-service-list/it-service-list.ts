@@ -261,7 +261,7 @@ export class ItService implements OnInit {
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
-          complete: () => this.signalrService.ticketReadTrigger.next(),
+          complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
       }
 
