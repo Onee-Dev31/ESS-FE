@@ -163,7 +163,8 @@ export class DashboardIT implements OnInit {
     this.checkScreen();
     const hasTrigger = this.signalrService.refreshTrigger() > 0;
     this.signalrService.refreshTrigger.set(0);
-    if (hasTrigger || this.signalrService.pendingNewTickets() > 0) {
+    const navigatingToTicket = !!this.route.snapshot.queryParamMap.get('ticketId');
+    if (!navigatingToTicket && (hasTrigger || this.signalrService.pendingNewTickets() > 0)) {
       this.refreshTickets();
     } else {
       this.getAllTickets();
