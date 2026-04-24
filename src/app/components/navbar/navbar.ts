@@ -90,6 +90,7 @@ export class NavbarComponent {
       .on('NewTicket', '/it-service-list')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
+        if (!this.isItRole()) return;
         this.zone.run(() => {
           const message = data.message || 'มี Ticket ใหม่เข้ามา';
 
