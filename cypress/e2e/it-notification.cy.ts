@@ -57,6 +57,25 @@ const baseTickets: TicketRecord[] = [
     priority: 'high',
     source: 'web',
   },
+  {
+    id: 303,
+    ticket_number: '#IT-00303',
+    subject: 'Archive old mailbox',
+    ticket_type_name_th: 'Service Request',
+    created_at: '2026-04-21T02:00:00.000Z',
+    requester_code: 'EMP003',
+    requester_name: 'Tester Three',
+    requester_aduser: 'tester.three',
+    requester_email: 'tester.three@example.com',
+    requester_dept: 'HR',
+    requester_companyCode: 'ONEE',
+    requester_companyName: 'Onee',
+    contact_phone: '2222222222',
+    IT_Status: 'Open',
+    approval_status: 'approved',
+    priority: 'low',
+    source: 'web',
+  },
 ];
 
 const createTicketDetailResponse = (ticket: TicketRecord) => ({
@@ -120,6 +139,8 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
   }).as('getAllTickets');
 
   cy.intercept('GET', '**/tickets/101', createTicketDetailResponse(tickets[0])).as('getTicket101');
+  cy.intercept('GET', '**/tickets/202', createTicketDetailResponse(tickets[1])).as('getTicket202');
+  cy.intercept('GET', '**/tickets/303', createTicketDetailResponse(tickets[2])).as('getTicket303');
 
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
   cy.intercept('GET', '**/Master/companies', { data: [] }).as('getCompanies');
@@ -143,6 +164,25 @@ const forceItStaffRole = () => {
 };
 
 describe('IT unread notifications', () => {
+  it('ไม่มี unread ticket แล้วไม่แสดง badge และ dropdown ว่าง', () => {
+    setupItNotificationApi([]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .badge').should('not.exist');
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('be.visible');
+    cy.get('.dropdown-item').should('have.length', 0);
+    cy.contains('.dropdown-header', 'การแจ้งเตือนล่าสุด').should('be.visible');
+  });
+
   it('แสดง badge และ notification unread ticket ใน navbar', () => {
     setupItNotificationApi([101]);
 
@@ -224,5 +264,36 @@ describe('IT unread notifications', () => {
       .closest('.ticket-item')
       .find('.text-icon')
       .should('have.class', 'fa-envelope-open');
+  });
+
+  it('มี unread หลายรายการแล้วกดอ่านหนึ่งรายการ badge ต้องลดลงและเหลือ notification ที่ยังไม่อ่าน', () => {
+    setupItNotificationApi([101, 202]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .badge').should('contain', '2');
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 2);
+    cy.get('.dropdown-item').first().click();
+
+    cy.wait('@markTicketRead').its('request.url').should('contain', '/tickets/101/read');
+    cy.url().should('include', '/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.get('.notification-dropdown .badge').should('contain', '1');
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 1);
+    cy.get('.dropdown-item .title').first().should('contain', '#IT-00202');
+    cy.get('.dropdown-item .message').first().should('contain', 'Replace broken keyboard');
   });
 });
