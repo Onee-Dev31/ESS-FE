@@ -127,7 +127,7 @@ export class ItService implements OnInit {
       if (ticketId) {
         const id = Number(ticketId);
         this.highlightedTicketId.set(id);
-        this.newNoteTicketId.set(id);
+        this.newNoteTicketId.set(null);
         this.selectTicket(ticketId);
 
         // ✅ Scroll to ticket in sidebar (with retry logic)

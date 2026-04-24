@@ -231,6 +231,7 @@ export class NavbarComponent {
           time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
           route: '/it-dashboard',
           readTicketId: t.id ?? t.ticketId,
+          ticketId: t.id ?? t.ticketId,
           ticketNumber: t.ticket_number ?? t.ticketNumber,
         }));
         this.notifications.set(items);
