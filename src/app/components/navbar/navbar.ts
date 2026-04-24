@@ -406,6 +406,12 @@ export class NavbarComponent {
         }
         this.clearSearch();
         this.isMobileSearchOpen.set(false);
+      } else if (item.route === '/it-dashboard') {
+        this.router.navigate([item.route], {
+          queryParams: { focusZone: 'tickets', _t: Date.now() },
+        });
+        this.clearSearch();
+        this.isMobileSearchOpen.set(false);
       } else {
         this.navigateTo(item.route);
       }
