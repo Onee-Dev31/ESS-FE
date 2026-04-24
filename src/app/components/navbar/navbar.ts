@@ -371,8 +371,14 @@ export class NavbarComponent {
         });
       }
     } else {
-      this.notifications.update((list) => list.filter((n) => n.id !== item.id));
-      this.unreadTicketCount.update((n) => Math.max(0, n - 1));
+      if (item.ticketId) {
+        const removed = this.notifications().filter((n) => n.ticketId === item.ticketId).length;
+        this.notifications.update((list) => list.filter((n) => n.ticketId !== item.ticketId));
+        this.unreadTicketCount.update((n) => Math.max(0, n - removed));
+      } else {
+        this.notifications.update((list) => list.filter((n) => n.id !== item.id));
+        this.unreadTicketCount.update((n) => Math.max(0, n - 1));
+      }
     }
     if (item.route) {
       if (item.ticketNumber) {
