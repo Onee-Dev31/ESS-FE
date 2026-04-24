@@ -379,23 +379,23 @@ export class NavbarComponent {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
-      // if (item.ticketId) {
-      //   const alreadyOnPage = this.router.url.startsWith(item.route);
-      //   if (alreadyOnPage) {
-      //     this.signalrService.ticketFocusTrigger.next(item.ticketId);
-      //   } else {
-      //     this.router.navigate([item.route], {
-      //       queryParams: { ticketId: item.ticketId, _t: Date.now() },
-      //     });
-      //   }
-      if (item.route === '/it-dashboard') {
-        this.router.navigate([item.route], {
-          queryParams: {
-            ...(item.ticketId ? { ticketId: item.ticketId } : {}),
-            focusZone: 'tickets',
-            _t: Date.now(),
-          },
-        });
+      if (item.ticketId) {
+        const alreadyOnPage = this.router.url.startsWith(item.route);
+        if (alreadyOnPage) {
+          this.signalrService.ticketFocusTrigger.next(item.ticketId);
+        } else if (item.route === '/it-dashboard') {
+          this.router.navigate([item.route], {
+            queryParams: {
+              ticketId: item.ticketId,
+              focusZone: 'tickets',
+              _t: Date.now(),
+            },
+          });
+        } else {
+          this.router.navigate([item.route], {
+            queryParams: { ticketId: item.ticketId, _t: Date.now() },
+          });
+        }
         this.clearSearch();
         this.isMobileSearchOpen.set(false);
       } else {
