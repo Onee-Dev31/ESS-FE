@@ -159,11 +159,7 @@ export class NavbarComponent {
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
-          if (this.isItRole()) {
-            this.fetchUnreadCount();
-          } else {
-            this.unreadTicketCount.update((n) => n + 1);
-          }
+          this.unreadTicketCount.update((n) => n + 1);
           if (!document.hidden) {
             this.toastService.info(message);
             this.notifyAudio.currentTime = 0;
