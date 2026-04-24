@@ -14,6 +14,12 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import {
+  ApprovalSetupGroup,
+  ApprovalSetupRow,
+  Approve3Emp,
+} from '../../interfaces/approval-setup.interface';
+import { onImgError } from '../../utils/image.util';
 
 @Component({
   selector: 'app-approval-setup',
@@ -37,6 +43,8 @@ export class ApprovalSetup implements OnInit {
   private approvalService = inject(ApprovalSetupService);
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
+
+  onImgError = onImgError;
 
   // ===== State =====
   setupList = signal<any[]>([]);
@@ -129,40 +137,11 @@ export class ApprovalSetup implements OnInit {
     this.isLoading.set(true);
     this.approvalService.getApprovalSetupList().subscribe({
       next: (res) => {
-        const mapped = (res?.data ?? []).map((emp: any) => ({
-          costCent: emp.COSTCENT,
-          costCenterName: emp.DepartmentName,
-          companyCode: emp.COMPANY_CODE,
-          approve1EmpNo: emp.Approve1EmpNo,
-          approve1EmpName: emp.Approve1Name,
-          approve2EmpNo: emp.Approve2EmpNo,
-          approve2EmpName: emp.Approve2Name,
-          isSkipApprove1: emp.ConfigMode === 'AutoSkip',
-          modifiedDate: emp.ModifiedDate,
-          modifiedBy: emp.ModifiedBy,
-        }));
+        const mapped = (res?.data ?? []).map((emp: any) => this.mapSetupRow(emp));
+        const grouped = this.groupByCompany(mapped);
 
-        const groupMap = new Map<
-          string,
-          { companyCode: string; companyName: string; departments: any[] }
-        >();
-
-        mapped.forEach((row: any) => {
-          const key = row.companyCode ?? 'UNKNOWN';
-          if (!groupMap.has(key)) {
-            groupMap.set(key, {
-              companyCode: row.companyCode,
-              companyName: row.companyName,
-              departments: [],
-            });
-          }
-          groupMap.get(key)!.departments.push(row);
-        });
-
-        const grouped = Array.from(groupMap.values());
-
-        this.originalGroupedList.set(grouped); // ตัวเต็ม
-        this.groupedList.set(grouped); // ตัวแสดง
+        this.originalGroupedList.set(grouped);
+        this.groupedList.set(grouped);
 
         this.setupList.set(mapped);
         this.isLoading.set(false);
@@ -178,6 +157,7 @@ export class ApprovalSetup implements OnInit {
 
   // ===== Open Drawer =====
   openEdit(row: any) {
+    console.log(row);
     this.editingRow.set({ ...row });
     this.skipApprove1.set(row.isSkipApprove1);
     this.selectedApprove1.set(
@@ -287,5 +267,65 @@ export class ApprovalSetup implements OnInit {
           this.swalService.error('เกิดข้อผิดพลาด', err?.error?.message ?? '');
         },
       });
+  }
+
+  // MAP
+  private mapApprove3Emps(empNos: string | null, empNames: string | null): Approve3Emp[] {
+    const nos = empNos
+      ? empNos
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    const names = empNames
+      ? empNames
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    return nos.map((empNo, i) => ({
+      empNo,
+      empName: names[i] ?? '',
+    }));
+  }
+
+  private mapSetupRow(emp: any): ApprovalSetupRow {
+    return {
+      costCent: emp.COSTCENT,
+      costCenterName: emp.DepartmentName,
+      companyCode: emp.COMPANY_CODE,
+      approve1EmpNo: emp.Approve1EmpNo,
+      approve1EmpName: emp.Approve1Name,
+      approve2EmpNo: emp.Approve2EmpNo,
+      approve2EmpName: emp.Approve2Name,
+      approve3Emps: this.mapApprove3Emps(emp.Approve3EmpNo, emp.Approve3Users),
+      approve4EmpNo: emp.Approve4EmpNo,
+      approve4EmpName: emp.Approve4Name,
+      isSkipApprove1: emp.ConfigMode === 'AutoSkip',
+      modifiedDate: emp.ModifiedDate,
+      modifiedBy: emp.ModifiedBy,
+    };
+  }
+
+  private groupByCompany(rows: any[]): ApprovalSetupGroup[] {
+    const groupMap = new Map<
+      string,
+      { companyCode: string; companyName: string; departments: any[] }
+    >();
+
+    rows.forEach((row) => {
+      const key = row.companyCode ?? 'UNKNOWN';
+      if (!groupMap.has(key)) {
+        groupMap.set(key, {
+          companyCode: row.companyCode,
+          companyName: row.companyName,
+          departments: [],
+        });
+      }
+      groupMap.get(key)!.departments.push(row);
+    });
+
+    return Array.from(groupMap.values());
   }
 }

@@ -1235,8 +1235,8 @@ $table-label-bg: var(--border-toolbar);
     align-items: flex-start;
     gap: 1rem;
     padding: 24px 32px;
-    background: var(--bg-table-head);
     border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--btn-problem-bg) 0%, transparent 100%);
 
     .header-icon-wrap {
       width: 44px;
@@ -1499,7 +1499,7 @@ $table-label-bg: var(--border-toolbar);
 
       &:hover {
         color: var(--danger);
-        background: #fee2e2;
+        background: color-mix(in srgb, var(--danger), transparent 80%);
       }
     }
   }

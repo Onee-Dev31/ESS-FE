@@ -75,20 +75,21 @@ export const routes: Routes = [
         data: { animation: 'VehicleTaxi' },
       },
       {
-        path: 'approvals',
+        path: 'approvals-medical',
         loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
+          import('./pages/approval-medical/approval-medical').then(
+            (m) => m.ApprovalMedicalComponent,
+          ),
         canActivate: [menuGuard],
-        // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
-        data: { animation: 'Approvals' },
       },
       {
-        path: 'approvals-medicalexpenses',
+        path: 'approvals-allowance',
         loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
+          import('./pages/approval-allowance/approval-allowance').then(
+            (m) => m.ApprovalAllowanceComponent,
+          ),
         canActivate: [menuGuard],
-        // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
-        data: { category: 'medical', animation: 'ApprovalsMedical' },
+        data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
         path: 'medicalexpenses',
