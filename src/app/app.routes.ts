@@ -38,6 +38,7 @@ export const routes: Routes = [
         path: 'it-dashboard',
         loadChildren: () => import('./pages/dashboard-it/it-dasbord.route').then((m) => m.default),
         canActivate: [menuGuard],
+        runGuardsAndResolvers: 'pathParamsChange',
         data: { animation: 'Welcome' },
       },
       // {
