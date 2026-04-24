@@ -309,6 +309,7 @@
           class="note"
           *ngFor="let n of t.itNotes.slice().reverse()"
           [class.note--me]="n.createBy.empCode === currentUserEmpCode"
+          [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
         >
           <div class="note__top">
             <div class="note__who">

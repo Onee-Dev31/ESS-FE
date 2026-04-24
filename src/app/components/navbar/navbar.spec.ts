@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -66,7 +66,8 @@ describe('Navbar', () => {
   });
 
   it('marks unread ticket notifications as read and navigates', () => {
-    const navigateSpy = vi.spyOn(component, 'navigateTo');
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     const fetchUnreadCountSpy = vi.spyOn(component, 'fetchUnreadCount');
     const fetchUnreadTicketsSpy = vi.spyOn(component, 'fetchUnreadTickets');
 
@@ -86,11 +87,15 @@ describe('Navbar', () => {
     expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
     expect(fetchUnreadCountSpy).toHaveBeenCalled();
     expect(fetchUnreadTicketsSpy).toHaveBeenCalled();
-    expect(navigateSpy).toHaveBeenCalledWith('/it-dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/it-dashboard'],
+      expect.objectContaining({ queryParams: expect.objectContaining({ focusZone: 'tickets' }) }),
+    );
   });
 
   it('does not mark informational notifications as read', () => {
-    const navigateSpy = vi.spyOn(component, 'navigateTo');
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
     component.onNotificationClick({
       id: 99,
@@ -104,6 +109,9 @@ describe('Navbar', () => {
     expect(mockItService.markTicketRead).not.toHaveBeenCalled();
     expect(mockSignalrService.pendingTicketNumbers.update).not.toHaveBeenCalled();
     expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
-    expect(navigateSpy).toHaveBeenCalledWith('/it-dashboard');
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/it-dashboard'],
+      expect.objectContaining({ queryParams: expect.objectContaining({ focusZone: 'tickets' }) }),
+    );
   });
 });

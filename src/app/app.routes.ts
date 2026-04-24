@@ -38,6 +38,7 @@ export const routes: Routes = [
         path: 'it-dashboard',
         loadChildren: () => import('./pages/dashboard-it/it-dasbord.route').then((m) => m.default),
         canActivate: [menuGuard],
+        runGuardsAndResolvers: 'pathParamsChange',
         data: { animation: 'Welcome' },
       },
       // {
@@ -188,6 +189,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/save-signature/save-signature').then((m) => m.SaveSignature),
         data: { animation: 'ITRequest' },
+      },
+      {
+        path: 'approval-setup',
+        loadComponent: () =>
+          import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
       },
       {
         path: '',
