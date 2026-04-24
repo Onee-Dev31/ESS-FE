@@ -29,6 +29,7 @@ interface NotificationItem {
   readTicketId?: number;
   ticketNumber?: string;
   ticketId?: number;
+  type?: 'note' | 'ticket' | 'assign' | 'status';
 }
 
 interface SearchMenuItem {
@@ -144,24 +145,21 @@ export class NavbarComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
-          const message = data.message || `มี Note ใหม่จาก ${data.senderName ?? ''}`;
+          const message = data.message || `มี Chat ใหม่จาก ${data.senderName ?? ''}`;
 
           const newNoti: NotificationItem = {
             id: Date.now(),
-            title: 'มี Note ใหม่',
+            title: 'มี Chat ใหม่',
             message,
             status: 'pending',
             time: 'เมื่อสักครู่',
             route: this.isItRole() ? '/it-dashboard' : '/it-service-list',
             ticketId: data.ticketId ?? undefined,
+            type: 'note',
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
-          if (this.isItRole()) {
-            this.fetchUnreadCount();
-          } else {
-            this.unreadTicketCount.update((n) => n + 1);
-          }
+          this.unreadTicketCount.update((n) => n + 1);
           if (!document.hidden) {
             this.toastService.info(message);
             this.notifyAudio.currentTime = 0;
@@ -371,30 +369,46 @@ export class NavbarComponent {
         });
       }
     } else {
-      this.notifications.update((list) => list.filter((n) => n.id !== item.id));
-      this.unreadTicketCount.update((n) => Math.max(0, n - 1));
+      if (item.ticketId && item.type === 'note') {
+        const removed = this.notifications().filter(
+          (n) => n.ticketId === item.ticketId && n.type === 'note',
+        ).length;
+        this.notifications.update((list) =>
+          list.filter((n) => !(n.ticketId === item.ticketId && n.type === 'note')),
+        );
+        this.unreadTicketCount.update((n) => Math.max(0, n - removed));
+      } else {
+        this.notifications.update((list) => list.filter((n) => n.id !== item.id));
+        this.unreadTicketCount.update((n) => Math.max(0, n - 1));
+      }
     }
     if (item.route) {
       if (item.ticketNumber) {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
-      // if (item.ticketId) {
-      //   const alreadyOnPage = this.router.url.startsWith(item.route);
-      //   if (alreadyOnPage) {
-      //     this.signalrService.ticketFocusTrigger.next(item.ticketId);
-      //   } else {
-      //     this.router.navigate([item.route], {
-      //       queryParams: { ticketId: item.ticketId, _t: Date.now() },
-      //     });
-      //   }
-      if (item.route === '/it-dashboard') {
+      if (item.ticketId) {
+        const alreadyOnPage = this.router.url.startsWith(item.route);
+        if (alreadyOnPage) {
+          this.signalrService.ticketFocusTrigger.next(item.ticketId);
+        } else if (item.route === '/it-dashboard') {
+          this.router.navigate([item.route], {
+            queryParams: {
+              ticketId: item.ticketId,
+              focusZone: 'tickets',
+              _t: Date.now(),
+            },
+          });
+        } else {
+          this.router.navigate([item.route], {
+            queryParams: { ticketId: item.ticketId, _t: Date.now() },
+          });
+        }
+        this.clearSearch();
+        this.isMobileSearchOpen.set(false);
+      } else if (item.route === '/it-dashboard') {
         this.router.navigate([item.route], {
-          queryParams: {
-            ...(item.ticketId ? { ticketId: item.ticketId } : {}),
-            focusZone: 'tickets',
-            _t: Date.now(),
-          },
+          queryParams: { focusZone: 'tickets', _t: Date.now() },
         });
         this.clearSearch();
         this.isMobileSearchOpen.set(false);

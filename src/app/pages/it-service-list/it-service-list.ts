@@ -102,6 +102,7 @@ export class ItService implements OnInit {
   selectedTicket = signal<any | undefined>(undefined);
   highlightedTicketId = signal<number | null>(null);
   newNoteTicketIds = signal<Set<number>>(new Set());
+  highlightedNoteTicketId = signal<number | null>(null);
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
@@ -158,6 +159,8 @@ export class ItService implements OnInit {
           s.delete(ticketId);
           return new Set(s);
         });
+        this.highlightedTicketId.set(ticketId);
+        this.highlightedNoteTicketId.set(ticketId);
         this.selectTicket(String(ticketId));
         const scrollToTicket = (id: string, retries = 10) => {
           const el = document.getElementById('ticket-' + id);
@@ -165,6 +168,8 @@ export class ItService implements OnInit {
           else if (retries > 0) setTimeout(() => scrollToTicket(id, retries - 1), 300);
         };
         scrollToTicket(String(ticketId));
+        setTimeout(() => this.highlightedTicketId.set(null), 8000);
+        setTimeout(() => this.highlightedNoteTicketId.set(null), 5000);
       });
 
     this.signalrService.ticketStatusTrigger

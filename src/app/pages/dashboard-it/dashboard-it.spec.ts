@@ -61,6 +61,7 @@ const mockAuthService = {
 
 const mockActivatedRoute = {
   queryParams: of({}),
+  snapshot: { queryParamMap: { get: () => null } },
 };
 
 describe('DashboardIT', () => {
