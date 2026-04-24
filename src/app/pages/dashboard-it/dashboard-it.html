@@ -61,7 +61,7 @@
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
         [class.is-new]="newTicketIds().has(ticket.ticketId)"
         [id]="'ticket-' + ticket.ticketId"
-        (click)="selectTicket(ticket.ticketId)"
+        (click)="onTicketClick(ticket.ticketId)"
       >
         <div class="avatar">
           <img
@@ -76,6 +76,9 @@
         <div class="ticket-info">
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+            @if (newNoteTicketIds().has(ticket.ticketId)) {
+              <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
+            }
             <div class="ticket-meta-right">
               <i
                 class="fas text-icon"

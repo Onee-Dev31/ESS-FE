@@ -220,10 +220,15 @@ describe('IT unread notifications', () => {
 
     cy.wait('@markTicketRead').its('request.url').should('contain', '/tickets/101/read');
     cy.url().should('include', '/it-dashboard');
+    cy.url().should('include', 'focusZone=tickets');
     cy.wait('@getAllTickets');
     cy.wait('@getAssignDropdown');
     cy.wait('@getCompanies');
     cy.wait('@getDepartments');
+
+    cy.focused().should('have.attr', 'id', 'tickets-zone');
+    cy.get('#tickets-zone').should('be.visible');
+    cy.contains('#tickets-zone .tk-left__title', 'Tickets').should('be.visible');
 
     cy.contains('.ticket-item .ticket-number', '#IT-00101')
       .closest('.ticket-item')

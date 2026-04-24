@@ -159,7 +159,6 @@ export class NavbarComponent {
           this.notifications.update((list) => [newNoti, ...list]);
           if (this.isItRole()) {
             this.fetchUnreadCount();
-            this.fetchUnreadTickets();
           } else {
             this.unreadTicketCount.update((n) => n + 1);
           }
@@ -203,6 +202,15 @@ export class NavbarComponent {
           this.zone.run(() => {
             this.fetchUnreadCount();
             this.fetchUnreadTickets();
+          }),
+        );
+    } else {
+      this.signalrService.ticketReadTrigger
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(({ ticketId }) =>
+          this.zone.run(() => {
+            this.notifications.update((list) => list.filter((n) => n.ticketId !== ticketId));
+            this.unreadTicketCount.update((n) => Math.max(0, n - 1));
           }),
         );
     }
@@ -371,6 +379,15 @@ export class NavbarComponent {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
+      // if (item.ticketId) {
+      //   const alreadyOnPage = this.router.url.startsWith(item.route);
+      //   if (alreadyOnPage) {
+      //     this.signalrService.ticketFocusTrigger.next(item.ticketId);
+      //   } else {
+      //     this.router.navigate([item.route], {
+      //       queryParams: { ticketId: item.ticketId, _t: Date.now() },
+      //     });
+      //   }
       if (item.route === '/it-dashboard') {
         this.router.navigate([item.route], {
           queryParams: {

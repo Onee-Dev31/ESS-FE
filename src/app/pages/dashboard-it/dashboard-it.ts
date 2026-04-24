@@ -10,6 +10,7 @@ import {
   DestroyRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
@@ -123,6 +124,7 @@ export class DashboardIT implements OnInit {
   IS_OPEN_IT_SERVICE = signal(0);
   newTicketIds = signal<Set<number>>(new Set());
   unreadTicketIds = signal<Set<number>>(new Set());
+  newNoteTicketIds = signal<Set<number>>(new Set());
   private prevTicketIds = new Set<number>();
 
   get newTicketCount() {
@@ -168,23 +170,35 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      if (params['focusZone'] === 'tickets') {
-        this.focusTicketsZone();
-      }
+    (this.route.queryParams ?? EMPTY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['focusZone'] === 'tickets') {
+          this.focusTicketsZone();
+        }
 
-      if (params['ticketId']) {
-        // ✅ Ensure the ticket is visible by resetting filters
-        this.filterStatus = 'all';
-        this.myTicket = false;
-        this.getAllTickets();
+        if (params['ticketId']) {
+          // ✅ Ensure the ticket is visible by resetting filters
+          this.filterStatus = 'all';
+          this.myTicket = false;
+          this.getAllTickets();
 
-        this.selectTicket(params['ticketId']);
-      }
-    });
+          this.selectTicket(params['ticketId']);
+        }
+      });
 
     this.signalrService.on('NewTicket', '/it-dashboard');
     this.signalrService.on('TicketAssigned', '/it-dashboard');
+
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ticketId) => {
+        this.newNoteTicketIds.update((s) => {
+          s.delete(ticketId);
+          return new Set(s);
+        });
+        this.selectTicket(String(ticketId));
+      });
 
     // ✅ Listen for New Note (Real-time)
     this.signalrService
@@ -192,8 +206,9 @@ export class DashboardIT implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
         if (data.ticketId) {
-          // 1. Mark as unread (envelope icon)
+          // 1. Mark as unread (envelope icon + ข้อความใหม่ badge)
           this.unreadTicketIds.update((s) => new Set([...s, data.ticketId]));
+          this.newNoteTicketIds.update((s) => new Set([...s, Number(data.ticketId)]));
 
           // 2. If viewing this ticket, refresh details to show new note instantly
           if (this.selectedTicket()?.ticketId === data.ticketId) {
@@ -239,6 +254,14 @@ export class DashboardIT implements OnInit {
     if (retries > 0) {
       setTimeout(() => this.focusTicketsZone(retries - 1), 200);
     }
+  }
+
+  onTicketClick(ticketId: any) {
+    this.newNoteTicketIds.update((s) => {
+      s.delete(Number(ticketId));
+      return new Set(s);
+    });
+    this.selectTicket(String(ticketId));
   }
 
   selectTicket(ticketId: string) {
@@ -296,7 +319,7 @@ export class DashboardIT implements OnInit {
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
         this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
-          complete: () => this.signalrService.ticketReadTrigger.next(),
+          complete: () => this.signalrService.ticketReadTrigger.next({ ticketId }),
         });
         this.unreadTicketIds.update((s) => {
           const next = new Set(s);
@@ -731,6 +754,12 @@ export class DashboardIT implements OnInit {
 
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+          this.signalrService.ticketStatusNotify(
+            ticketId,
+            ticket?.requesterAduser ?? '',
+            'In Progress',
+          );
+
           this.selectTicket(ticketId);
           this.getAllTickets();
         },
@@ -772,6 +801,8 @@ export class DashboardIT implements OnInit {
 
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+          this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+
           this.selectTicket(ticketId);
           this.getAllTickets();
         },
@@ -810,6 +841,12 @@ export class DashboardIT implements OnInit {
           }
 
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+          this.signalrService.ticketStatusNotify(
+            ticketId,
+            ticket?.requesterAduser ?? '',
+            'In Progress',
+          );
 
           this.selectTicket(ticketId);
           this.getAllTickets();
@@ -854,6 +891,8 @@ export class DashboardIT implements OnInit {
         }
 
         this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Denied');
 
         this.selectTicket(ticketId);
         this.getAllTickets();
@@ -919,6 +958,8 @@ export class DashboardIT implements OnInit {
             error: () => this.msg.error('ไม่สามารถส่ง Notification ให้ผู้รับผิดชอบได้'),
           });
         }, 500);
+
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Assigned');
 
         this.selectTicket(res.ticketId || ticketId);
         this.getAllTickets();
