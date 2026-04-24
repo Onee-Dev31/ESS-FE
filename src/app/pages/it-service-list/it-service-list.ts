@@ -100,7 +100,7 @@ export class ItService implements OnInit {
   Tickets = signal<any[]>([]);
   selectedTicket = signal<any | undefined>(undefined);
   highlightedTicketId = signal<number | null>(null);
-  newNoteTicketId = signal<number | null>(null);
+  newNoteTicketIds = signal<Set<number>>(new Set());
 
   isPreviewModalOpen = signal<boolean>(false);
   isRatingModalOpen = signal<boolean>(false);
@@ -127,7 +127,10 @@ export class ItService implements OnInit {
       if (ticketId) {
         const id = Number(ticketId);
         this.highlightedTicketId.set(id);
-        this.newNoteTicketId.set(null);
+        this.newNoteTicketIds.update((s) => {
+          s.delete(id);
+          return new Set(s);
+        });
         this.selectTicket(ticketId);
 
         // ✅ Scroll to ticket in sidebar (with retry logic)
@@ -148,7 +151,10 @@ export class ItService implements OnInit {
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((ticketId) => {
-        this.newNoteTicketId.set(null);
+        this.newNoteTicketIds.update((s) => {
+          s.delete(ticketId);
+          return new Set(s);
+        });
         this.selectTicket(String(ticketId));
         const scrollToTicket = (id: string, retries = 10) => {
           const el = document.getElementById('ticket-' + id);
@@ -174,7 +180,7 @@ export class ItService implements OnInit {
       .subscribe((data) => {
         if (data.ticketId) {
           // 1. Show "New Message" badge on the left list
-          this.newNoteTicketId.set(data.ticketId);
+          this.newNoteTicketIds.update((s) => new Set([...s, Number(data.ticketId)]));
 
           // 2. If viewing this ticket, refresh details to show new note instantly
           if (this.selectedTicket()?.ticketId === data.ticketId) {
@@ -198,7 +204,10 @@ export class ItService implements OnInit {
    * NEW!!
    */
   onTicketClick(ticketId: number) {
-    this.newNoteTicketId.set(null);
+    this.newNoteTicketIds.update((s) => {
+      s.delete(ticketId);
+      return new Set(s);
+    });
     this.selectTicket(String(ticketId));
   }
 

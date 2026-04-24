@@ -20,12 +20,12 @@
         <div class="ticket-info">
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
-            <span *ngIf="newNoteTicketId() === ticket.ticketId" class="new-note-badge">
+            <span *ngIf="newNoteTicketIds().has(ticket.ticketId)" class="new-note-badge">
               <i class="fas fa-comment-dots"></i> ข้อความใหม่
             </span>
           </div>
           <div class="ticket-title-row">
-            <div class="ticket-title" [class.is-new-text]="newNoteTicketId() === ticket.ticketId">
+            <div class="ticket-title" [class.is-new-text]="newNoteTicketIds().has(ticket.ticketId)">
               {{ ticket.subject }}
             </div>
             <span class="ticket-time">
@@ -242,7 +242,7 @@
           class="note"
           *ngFor="let n of t.itNotes.slice().reverse(); let i = index"
           [class.note--me]="n.createBy.empCode === currentUserEmpCode"
-          [class.note--new-highlight]="i === 0 && newNoteTicketId() === t.ticketId"
+          [class.note--new-highlight]="i === 0 && newNoteTicketIds().has(t.ticketId)"
         >
           <div class="note__top">
             <div class="note__who">
