@@ -229,7 +229,10 @@ export class DashboardIT implements OnInit {
     const zone = document.getElementById('tickets-zone');
     if (zone) {
       zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      zone.focus({ preventScroll: true });
+      // blur first so :focus state changes even if element was already focused,
+      // ensuring the glow animation replays every time
+      zone.blur();
+      requestAnimationFrame(() => zone.focus({ preventScroll: true }));
       return;
     }
 
