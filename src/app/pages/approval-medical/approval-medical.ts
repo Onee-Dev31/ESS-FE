@@ -46,11 +46,11 @@ import { NzInputModule } from 'ng-zorro-antd/input';
     NzInputModule,
   ],
   animations: [listAnimation],
-  templateUrl: './approvals.html',
-  styleUrl: './approvals.scss',
+  templateUrl: './approval-medical.html',
+  styleUrl: './approval-medical.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ApprovalsComponent implements OnInit {
+export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalApiService);
   dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);

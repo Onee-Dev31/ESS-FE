@@ -74,18 +74,20 @@ export const routes: Routes = [
         canActivate: [menuGuard],
         data: { animation: 'VehicleTaxi' },
       },
-      {
-        path: 'approvals',
-        loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
-        canActivate: [menuGuard],
-        // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
-        data: { animation: 'Approvals' },
-      },
+      // {
+      //   path: 'approvals',
+      //   loadComponent: () =>
+      //     import('./pages/approval-medical/approval-medical').then((m) => m.ApprovalsComponent),
+      //   canActivate: [menuGuard],
+      //   // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
+      //   data: { animation: 'Approvals' },
+      // },
       {
         path: 'approvals-medicalexpenses',
         loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
+          import('./pages/approval-medical/approval-medical').then(
+            (m) => m.ApprovalMedicalComponent,
+          ),
         canActivate: [menuGuard],
         // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
         data: { category: 'medical', animation: 'ApprovalsMedical' },
