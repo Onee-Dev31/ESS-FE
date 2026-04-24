@@ -123,31 +123,33 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
-    (this.route.queryParams ?? EMPTY).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const ticketId = params['ticketId'];
-      if (ticketId) {
-        const id = Number(ticketId);
-        this.highlightedTicketId.set(id);
-        this.newNoteTicketIds.update((s) => {
-          s.delete(id);
-          return new Set(s);
-        });
-        this.selectTicket(ticketId);
+    (this.route.queryParams ?? EMPTY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const ticketId = params['ticketId'];
+        if (ticketId) {
+          const id = Number(ticketId);
+          this.highlightedTicketId.set(id);
+          this.newNoteTicketIds.update((s) => {
+            s.delete(id);
+            return new Set(s);
+          });
+          this.selectTicket(ticketId);
 
-        // ✅ Scroll to ticket in sidebar (with retry logic)
-        const scrollToTicket = (id: string, retries = 10) => {
-          const el = document.getElementById('ticket-' + id);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else if (retries > 0) {
-            setTimeout(() => scrollToTicket(id, retries - 1), 300);
-          }
-        };
-        scrollToTicket(ticketId);
+          // ✅ Scroll to ticket in sidebar (with retry logic)
+          const scrollToTicket = (id: string, retries = 10) => {
+            const el = document.getElementById('ticket-' + id);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (retries > 0) {
+              setTimeout(() => scrollToTicket(id, retries - 1), 300);
+            }
+          };
+          scrollToTicket(ticketId);
 
-        setTimeout(() => this.highlightedTicketId.set(null), 8000);
-      }
-    });
+          setTimeout(() => this.highlightedTicketId.set(null), 8000);
+        }
+      });
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))

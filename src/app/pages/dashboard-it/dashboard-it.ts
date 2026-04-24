@@ -170,20 +170,22 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
-    (this.route.queryParams ?? EMPTY).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      if (params['focusZone'] === 'tickets') {
-        this.focusTicketsZone();
-      }
+    (this.route.queryParams ?? EMPTY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['focusZone'] === 'tickets') {
+          this.focusTicketsZone();
+        }
 
-      if (params['ticketId']) {
-        // ✅ Ensure the ticket is visible by resetting filters
-        this.filterStatus = 'all';
-        this.myTicket = false;
-        this.getAllTickets();
+        if (params['ticketId']) {
+          // ✅ Ensure the ticket is visible by resetting filters
+          this.filterStatus = 'all';
+          this.myTicket = false;
+          this.getAllTickets();
 
-        this.selectTicket(params['ticketId']);
-      }
-    });
+          this.selectTicket(params['ticketId']);
+        }
+      });
 
     this.signalrService.on('NewTicket', '/it-dashboard');
     this.signalrService.on('TicketAssigned', '/it-dashboard');
