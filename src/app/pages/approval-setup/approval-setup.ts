@@ -170,6 +170,7 @@ export class ApprovalSetup implements OnInit {
 
   // ===== Open Drawer =====
   openEdit(row: any) {
+    console.log(row);
     this.editingRow.set({ ...row });
     this.skipApprove1.set(row.isSkipApprove1);
     this.selectedApprove1.set(
