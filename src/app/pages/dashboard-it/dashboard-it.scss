@@ -553,7 +553,7 @@
   padding: 2px 4px;
   border-radius: 999px;
   border: 1.5px solid #e2e8f0;
-  background: #f8fafc;
+  background: var(--bg-table-head);
   font-size: 13px;
   font-weight: 600;
   color: #94a3b8;
@@ -568,7 +568,7 @@
   &:hover {
     border-color: #4f6ef7;
     color: #4f6ef7;
-    background: #eef1ff;
+    background: var(--bg-card);
   }
 
   // ตอน checked
@@ -1017,6 +1017,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--bg-card);
 }
 
 .note {
@@ -1027,10 +1028,14 @@
   width: 55%;
 }
 
+.note--they {
+  background: var(--bg-page);
+}
+
 .note--me {
   align-self: flex-end;
   width: 55%;
-  background: var(--bg-card);
+  background: var(--bg-page);
 }
 
 .note__top {
