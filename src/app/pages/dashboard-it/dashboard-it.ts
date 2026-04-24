@@ -186,6 +186,12 @@ export class DashboardIT implements OnInit {
     this.signalrService.on('NewTicket', '/it-dashboard');
     this.signalrService.on('TicketAssigned', '/it-dashboard');
 
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ticketId) => {
+        this.selectTicket(String(ticketId));
+      });
+
     // ✅ Listen for New Note (Real-time)
     this.signalrService
       .on('NewNote')

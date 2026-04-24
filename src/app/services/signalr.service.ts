@@ -22,6 +22,7 @@ export class SignalrService {
   refreshTrigger = signal(0);
   ticketReadTrigger = new Subject<void>();
   ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
+  ticketFocusTrigger = new Subject<number>();
 
   ticketStatusNotify(ticketId: any, requesterAdUser: string, status: string) {
     if (!ticketId || !requesterAdUser) return;

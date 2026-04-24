@@ -145,6 +145,19 @@ export class ItService implements OnInit {
       }
     });
 
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((ticketId) => {
+        this.newNoteTicketId.set(null);
+        this.selectTicket(String(ticketId));
+        const scrollToTicket = (id: string, retries = 10) => {
+          const el = document.getElementById('ticket-' + id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          else if (retries > 0) setTimeout(() => scrollToTicket(id, retries - 1), 300);
+        };
+        scrollToTicket(String(ticketId));
+      });
+
     this.signalrService.ticketStatusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ ticketId, status }) => this.applyStatusChange(ticketId, status));
