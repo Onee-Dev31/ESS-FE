@@ -1,5 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, effect, untracked, HostListener } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  effect,
+  untracked,
+  HostListener,
+  DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -64,8 +75,6 @@ import { SignalrService } from '../../services/signalr.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
-  [x: string]: any;
-
   isTablet = false;
   isMobile = false;
   isSmallMobile = false;
@@ -88,6 +97,8 @@ export class DashboardIT implements OnInit {
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
   private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
 
   myTicket: boolean = false;
@@ -157,9 +168,39 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      if (params['focusZone'] === 'tickets') {
+        this.focusTicketsZone();
+      }
+
+      if (params['ticketId']) {
+        // ✅ Ensure the ticket is visible by resetting filters
+        this.filterStatus = 'all';
+        this.myTicket = false;
+        this.getAllTickets();
+
+        this.selectTicket(params['ticketId']);
+      }
+    });
 
     this.signalrService.on('NewTicket', '/it-dashboard');
     this.signalrService.on('TicketAssigned', '/it-dashboard');
+
+    // ✅ Listen for New Note (Real-time)
+    this.signalrService
+      .on('NewNote')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        if (data.ticketId) {
+          // 1. Mark as unread (envelope icon)
+          this.unreadTicketIds.update((s) => new Set([...s, data.ticketId]));
+
+          // 2. If viewing this ticket, refresh details to show new note instantly
+          if (this.selectedTicket()?.ticketId === data.ticketId) {
+            this.selectTicket(String(data.ticketId));
+          }
+        }
+      });
   }
 
   close() {
@@ -183,6 +224,19 @@ export class DashboardIT implements OnInit {
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
+
+  private focusTicketsZone(retries = 10) {
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      zone.focus({ preventScroll: true });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.focusTicketsZone(retries - 1), 200);
+    }
+  }
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -250,6 +304,17 @@ export class DashboardIT implements OnInit {
       if (this.isMobile) {
         this.isTicketDetailOpen.set(true);
       }
+
+      // ✅ Scroll to ticket in sidebar (with retry logic in case list is still loading)
+      const scrollToTicket = (id: string, retries = 10) => {
+        const el = document.getElementById('ticket-' + id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (retries > 0) {
+          setTimeout(() => scrollToTicket(id, retries - 1), 300);
+        }
+      };
+      scrollToTicket(ticketId);
     });
   }
 
@@ -944,6 +1009,7 @@ export class DashboardIT implements OnInit {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
+        this.swalService.close();
 
         const requesterAdUser = this.selectedTicket()?.requesterAduser;
         const userData = this.authService.userData();
@@ -960,7 +1026,9 @@ export class DashboardIT implements OnInit {
           );
         }
 
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
 
         this.selectTicket(data.id);
         this.getAllTickets();

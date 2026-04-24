@@ -14,14 +14,20 @@
         *ngFor="let ticket of Tickets()"
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
         [class.highlight]="highlightedTicketId() === ticket.ticketId"
-        (click)="selectTicket(ticket.ticketId)"
+        [id]="'ticket-' + ticket.ticketId"
+        (click)="onTicketClick(ticket.ticketId)"
       >
         <div class="ticket-info">
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+            <span *ngIf="newNoteTicketId() === ticket.ticketId" class="new-note-badge">
+              <i class="fas fa-comment-dots"></i> ข้อความใหม่
+            </span>
           </div>
           <div class="ticket-title-row">
-            <div class="ticket-title">{{ ticket.subject }}</div>
+            <div class="ticket-title" [class.is-new-text]="newNoteTicketId() === ticket.ticketId">
+              {{ ticket.subject }}
+            </div>
             <span class="ticket-time">
               @if (isToday(ticket.createdDate)) {
                 {{ ticket.createdDate | date: 'HH:mm' }}
