@@ -3,14 +3,30 @@
 @use '../../../styles/mixins' as *;
 
 @keyframes highlight-fade {
-  0% {
-    background-color: #e6f4ff;
+  0%,
+  100% {
+    background-color: var(--ticket-highlight-bg-0);
   }
   50% {
-    background-color: #bae0ff;
+    background-color: var(--ticket-highlight-bg-50);
+  }
+}
+
+@keyframes tickets-zone-focus-glow {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(124, 137, 217, 0),
+      0 10px 30px rgba(17, 24, 39, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(124, 137, 217, 0.18),
+      0 12px 34px rgba(17, 24, 39, 0.12);
   }
   100% {
-    background-color: #e6f4ff;
+    box-shadow:
+      0 0 0 2px rgba(124, 137, 217, 0.14),
+      0 10px 30px rgba(17, 24, 39, 0.08);
   }
 }
 
@@ -330,11 +346,39 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  outline: none;
+  transition:
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    animation: tickets-zone-focus-glow 0.9s ease-out 1;
+    box-shadow:
+      0 0 0 2px rgba(124, 137, 217, 0.14),
+      0 10px 30px rgba(17, 24, 39, 0.08);
+  }
+
+  [data-theme='dark'] &,
+  body[data-theme='dark'] & {
+    box-shadow: 0 14px 36px rgba(2, 6, 23, 0.34);
+
+    &:focus,
+    &:focus-visible {
+      box-shadow:
+        0 0 0 2px rgba(124, 137, 217, 0.18),
+        0 14px 36px rgba(2, 6, 23, 0.38);
+    }
+  }
 
   .ticket-list {
     flex: 1;
     overflow-y: auto;
     -ms-overflow-style: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 
     &::-webkit-scrollbar {
       display: none;
@@ -348,6 +392,9 @@
       position: relative;
       transition: background-color 0.2s;
       gap: 10px;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
 
       &:hover {
         background-color: var(--bg-slate);
@@ -360,9 +407,14 @@
       }
 
       &.is-new {
-        border-left: 4px solid #1677ff;
+        border-left: 4px solid var(--primary);
         padding-left: 16px;
         animation: highlight-fade 1.2s ease-in-out 3;
+      }
+
+      &::selection,
+      *::selection {
+        background: transparent;
       }
 
       // .avatar {
