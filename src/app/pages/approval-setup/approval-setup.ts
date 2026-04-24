@@ -137,6 +137,9 @@ export class ApprovalSetup implements OnInit {
           approve1EmpName: emp.Approve1Name,
           approve2EmpNo: emp.Approve2EmpNo,
           approve2EmpName: emp.Approve2Name,
+          isSkipApprove1: emp.ConfigMode === 'AutoSkip',
+          modifiedDate: emp.ModifiedDate,
+          modifiedBy: emp.ModifiedBy,
         }));
 
         const groupMap = new Map<
@@ -241,7 +244,7 @@ export class ApprovalSetup implements OnInit {
 
   onSkipToggle(skip: boolean) {
     this.skipApprove1.set(skip);
-    if (skip) this.clearApprove1();
+    // if (skip) this.clearApprove1();
   }
 
   // ===== Save =====
