@@ -473,23 +473,6 @@
             font-weight: 500;
           }
 
-          .new-note-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: #fff;
-            background: $primary;
-            padding: 2px 8px;
-            border-radius: 20px;
-            animation: badge-pulse 1.5s ease-in-out infinite;
-
-            i {
-              font-size: 0.7rem;
-            }
-          }
-
           .ticket-meta-right {
             display: flex;
             gap: 12px;
@@ -1734,18 +1717,19 @@
 }
 
 .new-note-badge {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   gap: 4px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #fff !important;
-  background: $primary !important;
+  color: #ffffff !important;
+  background-color: #6366f1 !important;
   padding: 2px 8px;
   border-radius: 20px;
   animation: badge-pulse 1.5s ease-in-out infinite;
 
   i {
     font-size: 0.7rem;
+    color: #ffffff !important;
   }
 }
