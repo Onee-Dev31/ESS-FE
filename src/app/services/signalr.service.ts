@@ -20,8 +20,9 @@ export class SignalrService {
   pendingNewTickets = signal(0);
   pendingTicketNumbers = signal<Set<string>>(new Set());
   refreshTrigger = signal(0);
-  ticketReadTrigger = new Subject<void>();
+  ticketReadTrigger = new Subject<{ ticketId: any }>();
   ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
+  ticketFocusTrigger = new Subject<number>();
 
   ticketStatusNotify(ticketId: any, requesterAdUser: string, status: string) {
     if (!ticketId || !requesterAdUser) return;

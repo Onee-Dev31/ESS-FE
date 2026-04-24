@@ -1085,6 +1085,21 @@ textarea.form-input {
   background: var(--bg-card);
 }
 
+.note--new-highlight {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  animation: note-pulse 2.5s ease-out forwards;
+}
+
+@keyframes note-pulse {
+  0% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
 .note__top {
   display: flex;
   align-items: center;
