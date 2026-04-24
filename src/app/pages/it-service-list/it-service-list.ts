@@ -257,6 +257,14 @@ export class ItService implements OnInit {
       };
 
       this.selectedTicket.set(objectData);
+
+      const codeempid = this.authService.userData()?.CODEMPID;
+      if (ticketId && codeempid) {
+        this.itServiceService.markTicketRead(ticketId, codeempid).subscribe({
+          complete: () => this.signalrService.ticketReadTrigger.next(),
+        });
+      }
+
       if (this.isMobile) {
         this.isTicketDetailOpen.set(true);
       }
