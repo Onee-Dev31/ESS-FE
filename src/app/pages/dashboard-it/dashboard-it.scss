@@ -1732,3 +1732,20 @@
   gap: 12px;
   scrollbar-width: thin;
 }
+
+.new-note-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: $primary !important;
+  padding: 2px 8px;
+  border-radius: 20px;
+  animation: badge-pulse 1.5s ease-in-out infinite;
+
+  i {
+    font-size: 0.7rem;
+  }
+}
