@@ -169,6 +169,10 @@ export class DashboardIT implements OnInit {
     this.initialized = true;
     this.getAssignItDropdown();
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      if (params['focusZone'] === 'tickets') {
+        this.focusTicketsZone();
+      }
+
       if (params['ticketId']) {
         // ✅ Ensure the ticket is visible by resetting filters
         this.filterStatus = 'all';
@@ -220,6 +224,19 @@ export class DashboardIT implements OnInit {
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
+
+  private focusTicketsZone(retries = 10) {
+    const zone = document.getElementById('tickets-zone');
+    if (zone) {
+      zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      zone.focus({ preventScroll: true });
+      return;
+    }
+
+    if (retries > 0) {
+      setTimeout(() => this.focusTicketsZone(retries - 1), 200);
+    }
+  }
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
