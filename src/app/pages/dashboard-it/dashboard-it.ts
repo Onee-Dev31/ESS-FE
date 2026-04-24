@@ -123,6 +123,7 @@ export class DashboardIT implements OnInit {
   IS_OPEN_IT_SERVICE = signal(0);
   newTicketIds = signal<Set<number>>(new Set());
   unreadTicketIds = signal<Set<number>>(new Set());
+  newNoteTicketId = signal<number | null>(null);
   private prevTicketIds = new Set<number>();
 
   get newTicketCount() {
@@ -189,6 +190,7 @@ export class DashboardIT implements OnInit {
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((ticketId) => {
+        this.newNoteTicketId.set(null);
         this.selectTicket(String(ticketId));
       });
 
@@ -198,8 +200,9 @@ export class DashboardIT implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data: any) => {
         if (data.ticketId) {
-          // 1. Mark as unread (envelope icon)
+          // 1. Mark as unread (envelope icon + ข้อความใหม่ badge)
           this.unreadTicketIds.update((s) => new Set([...s, data.ticketId]));
+          this.newNoteTicketId.set(data.ticketId);
 
           // 2. If viewing this ticket, refresh details to show new note instantly
           if (this.selectedTicket()?.ticketId === data.ticketId) {

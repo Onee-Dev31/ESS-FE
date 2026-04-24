@@ -159,7 +159,6 @@ export class NavbarComponent {
           this.notifications.update((list) => [newNoti, ...list]);
           if (this.isItRole()) {
             this.fetchUnreadCount();
-            this.fetchUnreadTickets();
           } else {
             this.unreadTicketCount.update((n) => n + 1);
           }
