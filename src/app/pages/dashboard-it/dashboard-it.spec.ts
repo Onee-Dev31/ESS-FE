@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EMPTY, of, Subject, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ActivatedRoute } from '@angular/router';
 
 import { DashboardIT } from './dashboard-it';
 import { SignalrService } from '../../services/signalr.service';
@@ -57,6 +58,10 @@ const mockAuthService = {
   currentUser: () => 'testuser',
 };
 
+const mockActivatedRoute = {
+  queryParams: of({}),
+};
+
 describe('DashboardIT', () => {
   let component: DashboardIT;
   let fixture: ComponentFixture<DashboardIT>;
@@ -73,6 +78,7 @@ describe('DashboardIT', () => {
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: ItServiceService, useValue: mockItService },
         { provide: AuthService, useValue: mockAuthService },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();
 
