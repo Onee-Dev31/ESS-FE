@@ -29,6 +29,7 @@ interface NotificationItem {
   readTicketId?: number;
   ticketNumber?: string;
   ticketId?: number;
+  type?: 'note' | 'ticket' | 'assign' | 'status';
 }
 
 interface SearchMenuItem {
@@ -154,6 +155,7 @@ export class NavbarComponent {
             time: 'เมื่อสักครู่',
             route: this.isItRole() ? '/it-dashboard' : '/it-service-list',
             ticketId: data.ticketId ?? undefined,
+            type: 'note',
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
@@ -371,9 +373,13 @@ export class NavbarComponent {
         });
       }
     } else {
-      if (item.ticketId) {
-        const removed = this.notifications().filter((n) => n.ticketId === item.ticketId).length;
-        this.notifications.update((list) => list.filter((n) => n.ticketId !== item.ticketId));
+      if (item.ticketId && item.type === 'note') {
+        const removed = this.notifications().filter(
+          (n) => n.ticketId === item.ticketId && n.type === 'note',
+        ).length;
+        this.notifications.update((list) =>
+          list.filter((n) => !(n.ticketId === item.ticketId && n.type === 'note')),
+        );
         this.unreadTicketCount.update((n) => Math.max(0, n - removed));
       } else {
         this.notifications.update((list) => list.filter((n) => n.id !== item.id));
