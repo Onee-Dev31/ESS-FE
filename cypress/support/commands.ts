@@ -14,6 +14,7 @@ const defaultLoginResponse = {
     { RoutePath: '/welcome' },
     { RoutePath: '/dashboard' },
     { RoutePath: '/allowance' },
+    { RoutePath: '/timeoff' },
     { RoutePath: '/it-dashboard' },
   ],
 };
