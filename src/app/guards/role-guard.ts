@@ -28,11 +28,31 @@ export const menuGuard: CanActivateFn = (route, state) => {
 
   const allowedPaths = authService.getAllowedPaths();
   const currentPath = route.routeConfig?.path;
+  const allData = JSON.parse(localStorage.getItem(STORAGE_KEYS.ALL_DATA) || '');
 
-  if (allowedPaths.includes(currentPath || '')) {
+  const roles = allData.permission.Role?.split(',').map((r: string) => r.trim()) ?? [];
+
+  const pathExceptions: { grantPath: string; roles: string[]; allowedPaths: string[] }[] = [
+    {
+      grantPath: 'it-dashboard',
+      roles: ['it-staff', 'system-admin'],
+      allowedPaths: ['resign-management'],
+    },
+  ];
+
+  const hasExceptionAccess = pathExceptions.some(
+    (ex) =>
+      ex.roles.some((r) => roles.includes(r)) &&
+      allowedPaths.includes(ex.grantPath) &&
+      ex.allowedPaths.includes(currentPath || ''),
+  );
+
+  if (allowedPaths.includes(currentPath || '') || hasExceptionAccess) {
     return true;
   }
 
-  router.navigate(['/dashboard']);
+  // router.navigate(['/dashboard']);
+  const firstPath = allowedPaths[0];
+  router.navigate([firstPath ? `/${firstPath}` : '/dashboard']);
   return false;
 };

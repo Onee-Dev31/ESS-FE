@@ -191,6 +191,13 @@ export const routes: Routes = [
         data: { animation: 'ITRequest' },
       },
       {
+        path: 'approval-setup',
+        loadComponent: () =>
+          import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',
