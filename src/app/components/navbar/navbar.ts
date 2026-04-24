@@ -231,6 +231,7 @@ export class NavbarComponent {
           time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
           route: '/it-dashboard',
           readTicketId: t.id ?? t.ticketId,
+          ticketId: t.id ?? t.ticketId,
           ticketNumber: t.ticket_number ?? t.ticketNumber,
         }));
         this.notifications.set(items);
@@ -370,9 +371,13 @@ export class NavbarComponent {
         this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
       }
       this.signalrService.refreshTrigger.update((n) => n + 1);
-      if (item.ticketId) {
+      if (item.route === '/it-dashboard') {
         this.router.navigate([item.route], {
-          queryParams: { ticketId: item.ticketId, _t: Date.now() },
+          queryParams: {
+            ...(item.ticketId ? { ticketId: item.ticketId } : {}),
+            focusZone: 'tickets',
+            _t: Date.now(),
+          },
         });
         this.clearSearch();
         this.isMobileSearchOpen.set(false);
