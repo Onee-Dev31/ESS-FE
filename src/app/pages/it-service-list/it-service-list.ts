@@ -37,6 +37,7 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY } from 'rxjs';
 
 @Component({
   selector: 'app-it-service',
@@ -122,7 +123,7 @@ export class ItService implements OnInit {
     this.checkScreen();
     this.checkMobile();
 
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+    (this.route.queryParams ?? EMPTY).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const ticketId = params['ticketId'];
       if (ticketId) {
         const id = Number(ticketId);

@@ -29,6 +29,7 @@ const mockSignalrService = {
   pendingTicketNumbers: mockSignal(new Set<string>()),
   refreshTrigger: mockSignal(0),
   ticketReadTrigger: new Subject<void>(),
+  ticketFocusTrigger: new Subject<number>(),
 };
 
 const mockItService = {
@@ -69,6 +70,7 @@ describe('DashboardIT', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignalrService.ticketReadTrigger = new Subject<void>();
+    mockSignalrService.ticketFocusTrigger = new Subject<number>();
   });
 
   beforeEach(async () => {

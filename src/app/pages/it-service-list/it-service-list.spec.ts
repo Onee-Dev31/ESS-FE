@@ -12,6 +12,7 @@ const mockSignalrService = {
   sendNewTicketNotification: () => {},
   ticketStatusTrigger: new Subject<{ ticketId: any; status: string }>(),
   ticketReadTrigger: new Subject<void>(),
+  ticketFocusTrigger: new Subject<number>(),
   pendingTicketNumbers: { update: () => {} },
   refreshTrigger: { update: () => {} },
 };
