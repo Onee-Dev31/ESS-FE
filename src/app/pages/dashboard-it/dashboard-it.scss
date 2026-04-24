@@ -2,6 +2,16 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+@keyframes badge-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 @keyframes highlight-fade {
   0%,
   100% {
@@ -461,6 +471,23 @@
             font-size: 0.8rem;
             color: var(--primary);
             font-weight: 500;
+          }
+
+          .new-note-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #fff;
+            background: $primary;
+            padding: 2px 8px;
+            border-radius: 20px;
+            animation: badge-pulse 1.5s ease-in-out infinite;
+
+            i {
+              font-size: 0.7rem;
+            }
           }
 
           .ticket-meta-right {

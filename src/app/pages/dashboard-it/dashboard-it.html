@@ -77,7 +77,9 @@
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
             @if (newNoteTicketId() === ticket.ticketId) {
-              <span class="new-note-badge">ข้อความใหม่</span>
+              <span class="new-note-badge">
+                <i class="fas fa-comment-dots"></i> ข้อความใหม่
+              </span>
             }
             <div class="ticket-meta-right">
               <i
