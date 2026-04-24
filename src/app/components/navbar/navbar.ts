@@ -144,11 +144,11 @@ export class NavbarComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
-          const message = data.message || `มี Note ใหม่จาก ${data.senderName ?? ''}`;
+          const message = data.message || `มี Chat ใหม่จาก ${data.senderName ?? ''}`;
 
           const newNoti: NotificationItem = {
             id: Date.now(),
-            title: 'มี Note ใหม่',
+            title: 'มี Chat ใหม่',
             message,
             status: 'pending',
             time: 'เมื่อสักครู่',

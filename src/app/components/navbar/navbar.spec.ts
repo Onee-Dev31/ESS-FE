@@ -99,7 +99,7 @@ describe('Navbar', () => {
 
     component.onNotificationClick({
       id: 99,
-      title: 'มี Note ใหม่',
+      title: 'มี Chat ใหม่',
       message: 'Informational notification',
       status: 'pending',
       time: 'เมื่อสักครู่',
