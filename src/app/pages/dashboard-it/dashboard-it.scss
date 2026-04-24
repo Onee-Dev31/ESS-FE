@@ -1134,15 +1134,22 @@
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
   transition: 0.2s;
-  box-shadow: 0.5px 0.5px 5px 0px #d5d5d5;
+  // box-shadow: 0.5px 0.5px 5px 0px #d5d5d5;
+
+  i {
+    display: inline-block;
+    transition: transform 0.4s ease-in-out;
+  }
 
   &:hover {
-    background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);
-    // transform: translateY(-0.5px);
+    background: color-mix(in srgb, var(--btn-bg), var(--text) 25%);
+    i {
+      transform: rotate(20deg);
+    }
   }
 
   &:active {
-    background: color-mix(in srgb, var(--btn-bg), var(--text) 20%);
+    background: color-mix(in srgb, var(--btn-bg), var(--text) 30%);
     transform: translateY(2px);
   }
 
@@ -1282,7 +1289,7 @@
     height: 18px;
     border-radius: 50%;
     background: #cfcfcf;
-    border: 3px solid #fff;
+    border: 3px solid var(--bg-card);
     box-shadow: 0 0 0 2px #e4e6ef;
   }
 
