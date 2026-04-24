@@ -75,9 +75,7 @@
         </div>
         <div class="ticket-info">
           <div class="ticket-header">
-            <span class="ticket-number">{{
-              ticket.ticketNumber
-            }}</span>
+            <span class="ticket-number">{{ ticket.ticketNumber }}</span>
             <div class="ticket-meta-right">
               <i
                 class="fas text-icon"
@@ -92,10 +90,7 @@
             </div>
           </div>
           <div class="ticket-title-row">
-            <div
-              class="ticket-title"
-              [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
-            >
+            <div class="ticket-title" [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)">
               {{ ticket.subject }}
             </div>
             <span class="ticket-time">
