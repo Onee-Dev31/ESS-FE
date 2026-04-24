@@ -20,6 +20,8 @@ import {
   Approve3Emp,
 } from '../../interfaces/approval-setup.interface';
 import { onImgError } from '../../utils/image.util';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-chain-modal/approval-setup-chain-modal';
 
 @Component({
   selector: 'app-approval-setup',
@@ -35,6 +37,8 @@ import { onImgError } from '../../utils/image.util';
     NzIconModule,
     NzDrawerModule,
     NzSwitchModule,
+    SkeletonComponent,
+    ApprovalSetupChainModal,
   ],
   templateUrl: './approval-setup.html',
   styleUrl: './approval-setup.scss',
@@ -53,6 +57,7 @@ export class ApprovalSetup implements OnInit {
   isLoading = signal(false);
   isDrawerOpen = signal(false);
   isSaving = signal(false);
+  isSetupModalOpen = signal<boolean>(false);
 
   // ===== Filter =====
   filterCompany = '';
@@ -73,7 +78,6 @@ export class ApprovalSetup implements OnInit {
   // ===== Computed =====
   filteredList = computed(() => {
     const kw = this.searchKeyword().toLowerCase();
-    console.log(kw);
     return this.setupList().filter((row) => {
       const matchKw =
         !kw ||
@@ -109,7 +113,18 @@ export class ApprovalSetup implements OnInit {
             !keyword ||
             dep.costCent?.toLowerCase().includes(keyword) ||
             dep.costCenterName?.toLowerCase().includes(keyword) ||
-            dep.approve1EmpName?.toLowerCase().includes(keyword);
+            dep.approve1EmpName?.toLowerCase().includes(keyword) ||
+            dep.approve1EmpNo?.toLowerCase().includes(keyword) ||
+            dep.approve2EmpName?.toLowerCase().includes(keyword) ||
+            dep.approve2EmpNo?.toLowerCase().includes(keyword) ||
+            dep.approve3Emps?.some(
+              (emp: any) =>
+                emp.empNo?.toLowerCase().includes(keyword) ||
+                emp.empName?.toLowerCase().includes(keyword),
+            );
+
+          // dep.approve4EmpName?.toLowerCase().includes(keyword) ||
+          // dep.approve4EmpNo?.toLowerCase().includes(keyword);
 
           // 🔘 skip filter
           let matchSkip = true;
@@ -145,8 +160,6 @@ export class ApprovalSetup implements OnInit {
 
         this.setupList.set(mapped);
         this.isLoading.set(false);
-
-        console.log(res?.data);
       },
       error: (err) => {
         console.error(err);
@@ -190,7 +203,6 @@ export class ApprovalSetup implements OnInit {
       )
       .subscribe({
         next: (res: any) => {
-          console.log(res.data);
           const mapped = (res?.data ?? []).map((emp: any) => ({
             empNo: emp.EmpNo,
             empName: emp.FullName,
@@ -240,13 +252,6 @@ export class ApprovalSetup implements OnInit {
 
     const approve1EmpNo = this.skipApprove1() ? null : (this.selectedApprove1()?.empNo ?? null);
 
-    console.log({
-      costCent: row.costCent,
-      approve1EmpNo,
-      modifiedBy: this.authService.userData().AD_USER,
-      companyCode: row.companyCode ?? '',
-    });
-
     this.approvalService
       .saveApprovalSetup({
         costCent: row.costCent,
@@ -256,7 +261,6 @@ export class ApprovalSetup implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           this.isSaving.set(false);
           this.swalService.success('บันทึกสำเร็จ');
           this.closeDrawer();
@@ -327,5 +331,13 @@ export class ApprovalSetup implements OnInit {
     });
 
     return Array.from(groupMap.values());
+  }
+
+  openSetupModal() {
+    this.isSetupModalOpen.set(true);
+  }
+
+  closeSetupModal() {
+    this.isSetupModalOpen.set(false);
   }
 }

@@ -44,4 +44,9 @@ export class ApprovalSetupService {
       params,
     });
   }
+
+  // GET /api/approval/setup/:costCent
+  getApprovalSetupChain(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/categories`);
+  }
 }

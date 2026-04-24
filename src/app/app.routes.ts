@@ -41,12 +41,6 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'pathParamsChange',
         data: { animation: 'Welcome' },
       },
-      // {
-      //     path: 'it-dashboard',
-      //     loadComponent: () => import('./pages/dashboard-it/dashboard-it').then(m => m.DashboardIT),
-      //     canActivate: [menuGuard],
-      //     data: { animation: 'Welcome' }
-      // },
       {
         path: 'welcome',
         loadComponent: () => import('./pages/welcome/welcome').then((m) => m.WelcomeComponent),
@@ -191,12 +185,18 @@ export const routes: Routes = [
           import('./pages/save-signature/save-signature').then((m) => m.SaveSignature),
         data: { animation: 'ITRequest' },
       },
+      // {
+      //   path: 'approval-setup',
+      //   loadComponent: () =>
+      //     import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
+      //   // canActivate: [menuGuard],
+      //   data: { animation: 'Dashboard' },
+      // },
       {
         path: 'approval-setup',
-        loadComponent: () =>
-          import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
-        // canActivate: [menuGuard],
-        data: { animation: 'Dashboard' },
+        loadChildren: () =>
+          import('./pages/approval-setup/approval-setup.route').then((m) => m.default),
+        canActivate: [menuGuard],
       },
       {
         path: '',
