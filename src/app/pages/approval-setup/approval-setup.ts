@@ -20,6 +20,7 @@ import {
   Approve3Emp,
 } from '../../interfaces/approval-setup.interface';
 import { onImgError } from '../../utils/image.util';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-approval-setup',
@@ -35,6 +36,7 @@ import { onImgError } from '../../utils/image.util';
     NzIconModule,
     NzDrawerModule,
     NzSwitchModule,
+    SkeletonComponent,
   ],
   templateUrl: './approval-setup.html',
   styleUrl: './approval-setup.scss',
