@@ -251,6 +251,7 @@ export class AuthService {
             this._currentUser.set(response.adUser);
             this._userRole.set(response.permission.Role);
             this._userData.set(response.employee);
+            this._allData.set(response);
           }
         }),
         finalize(() => {
