@@ -11,6 +11,9 @@ import {
   CreateClaimRequest,
   CreateClaimResponse,
   MealAllowanceClaimDetail,
+  MealAllowanceReviewRequest,
+  MealAllowanceReviewResponse,
+  MealAllowancePendingApprovalsResponse,
 } from '../interfaces/allowance.interface';
 export type { MealAllowanceClaimsResponse };
 
@@ -132,14 +135,26 @@ export class AllowanceApiService {
       .pipe(tap((res) => this.lastResponse.set(res)));
   }
 
-  reviewClaim(claimId: number, body: any): Observable<any> {
-    return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
+  reviewClaim(
+    claimId: number,
+    body: MealAllowanceReviewRequest,
+  ): Observable<MealAllowanceReviewResponse> {
+    return this._http.patch<MealAllowanceReviewResponse>(
+      `${this.baseUrl}/meal-allowance/claims/${claimId}/review`,
+      body,
+    );
   }
 
-  getPendingApprovals(approver_aduser: string, voucher_no?: string): Observable<any> {
+  getPendingApprovals(
+    approver_aduser: string,
+    voucher_no?: string,
+  ): Observable<MealAllowancePendingApprovalsResponse> {
     let p = new HttpParams().set('approver_aduser', approver_aduser);
     if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
-    return this._http.get<any>(`${this.baseUrl}/meal-allowance/approvals/pending`, { params: p });
+    return this._http.get<MealAllowancePendingApprovalsResponse>(
+      `${this.baseUrl}/meal-allowance/approvals/pending`,
+      { params: p },
+    );
   }
 
   getFileUrl(path: string): string {
