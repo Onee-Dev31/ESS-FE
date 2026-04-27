@@ -67,17 +67,23 @@ export class SignalrService {
     senderName: string,
     note: string,
   ) {
+    const body = { ticketId, requesterAdUser, senderAdUser, senderName, note };
+    console.log('[noteNotify] sending →', body);
+
     this.http
-      .post(`${this.baseUrl}/notification/note-notify`, {
-        ticketId,
-        requesterAdUser,
-        senderAdUser,
-        senderName,
-        note,
-      })
+      .post<{
+        success: boolean;
+        targets?: string[];
+      }>(`${this.baseUrl}/notification/note-notify`, body)
       .subscribe({
-        next: (res) => console.log('[noteNotify] response:', res),
-        error: (err) => console.error('[noteNotify] error:', err),
+        next: (res) => {
+          if (!res?.targets?.length) {
+            console.warn('[noteNotify] ⚠️ targets เป็น empty — ไม่มี user ได้รับ notification');
+          } else {
+            console.log('[noteNotify] ✅ ส่งถึง targets:', res.targets);
+          }
+        },
+        error: (err) => console.error('[noteNotify] ❌ error:', err),
       });
   }
 
@@ -155,7 +161,11 @@ export class SignalrService {
     const adUser = this.authService.currentUser();
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
-      await this.hubConnection.invoke('JoinGroup', `user:${adUser}`);
+      console.log(`[SignalR] ✅ joined user group → "user:${adUser}"`);
+    } else {
+      console.warn(
+        '[SignalR] ⚠️ adUser เป็น null — ไม่ได้ join user group เลย! ไม่มีทางรับ notification',
+      );
     }
   }
 
