@@ -1825,7 +1825,7 @@ $balance: $status-success-text;
       word-break: break-word;
 
       &.text-green {
-        background: #dcfce7;
+        background: var(--public-holiday-bg);
         color: #166534;
       }
 
