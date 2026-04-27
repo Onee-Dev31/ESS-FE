@@ -369,6 +369,21 @@ export class ItService implements OnInit {
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
         }, 100);
 
+        const ticket = this.selectedTicket();
+        const requesterAdUser = ticket?.requesterAduser;
+        const userData = this.authService.userData();
+        const senderAdUser = this.authService.currentUser() ?? '';
+        const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
+        if (data.id && requesterAdUser && senderAdUser) {
+          this.signalrService.noteNotify(
+            data.id,
+            requesterAdUser,
+            senderAdUser,
+            senderName,
+            data.message,
+          );
+        }
+
         this.selectTicket(data.id);
         this.getMyTicket();
       },

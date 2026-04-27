@@ -1,4 +1,13 @@
-import { Component, EventEmitter, inject, Input, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  computed,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
@@ -18,14 +27,23 @@ export class AssignModal {
 
   @Input() ticket: any;
   @Input() visible = false;
-  @Input() assigneeGroups: any[] = [];
+  // @Input() assigneeGroups: any[] = [];
+
+  // เพิ่ม property
+  assignSearchKeyword = signal('');
+  private _assigneeGroups = signal<any[]>([]);
+
+  // setter สำหรับ Input
+  @Input() set assigneeGroups(val: any[]) {
+    this._assigneeGroups.set(val);
+  }
 
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitModal = new EventEmitter<any>();
 
   selectedAssigneeEmpCodes: any[] = [];
   selectedTag: number | null = null;
-  assignSearchKeyword = '';
+  // assignSearchKeyword = '';
   ticketId: number | null = null;
 
   ngOnChanges(changes: SimpleChanges) {
@@ -46,16 +64,26 @@ export class AssignModal {
     this.closeModal.emit();
   }
 
-  get filteredAssigneeGroups() {
-    const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
-    if (!kw) return this.assigneeGroups;
-    return this.assigneeGroups
+  // get filteredAssigneeGroups() {
+  //   const kw = (this.assignSearchKeyword || '').trim().toLowerCase();
+  //   if (!kw) return this.assigneeGroups;
+  //   return this.assigneeGroups
+  //     .map((g) => ({
+  //       ...g,
+  //       members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw)),
+  //     }))
+  //     .filter((g) => g.members.length > 0);
+  // }
+  filteredAssigneeGroups = computed(() => {
+    const kw = this.assignSearchKeyword().trim().toLowerCase();
+    if (!kw) return this._assigneeGroups();
+    return this._assigneeGroups()
       .map((g) => ({
         ...g,
         members: g.members.filter((m: any) => m.name.toLowerCase().includes(kw)),
       }))
       .filter((g) => g.members.length > 0);
-  }
+  });
 
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
