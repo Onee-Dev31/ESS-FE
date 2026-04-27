@@ -284,7 +284,7 @@ export class ApprovalAllowanceComponent implements OnInit {
       requestDetail: `ขั้นตอนที่ ${claim.stepNo}`,
       amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),
-      rawStatus: claim.status,
+      rawStatus: (claim.status || '').toLowerCase(),
       type: 'allowance',
       originalData: {
         claimId: claim.claimID,
