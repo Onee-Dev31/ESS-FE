@@ -49,7 +49,11 @@ export const menuGuard: CanActivateFn = (route, state) => {
 
   const ssoLandingPath = (localStorage.getItem('landingPath') || '').replace(/^\/+/, '');
 
-  if (allowedPaths.includes(currentPath || '') || hasExceptionAccess || (ssoLandingPath && ssoLandingPath === currentPath)) {
+  if (
+    allowedPaths.includes(currentPath || '') ||
+    hasExceptionAccess ||
+    (ssoLandingPath && ssoLandingPath === currentPath)
+  ) {
     return true;
   }
 
