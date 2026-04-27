@@ -152,6 +152,7 @@ export class SignalrService {
 
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
+      await this.hubConnection.invoke('JoinGroup', `user:${adUser}`);
     }
   }
 
