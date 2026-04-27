@@ -32,6 +32,12 @@ export class SignalrService {
 
       if (adUser && state === 'Connected') {
         this.joinUserGroups();
+      } else if (!adUser) {
+        console.warn('[SignalR effect] ⚠️ currentUser ยังเป็น null — รอ login');
+      } else if (state !== signalR.HubConnectionState.Connected) {
+        console.warn(
+          `[SignalR effect] ⚠️ hub ยังไม่ Connected (state="${state}") — joinUserGroups จะถูกเรียกอีกครั้งใน onreconnected/startConnection`,
+        );
       }
     });
   }
