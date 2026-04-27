@@ -101,6 +101,8 @@ export class SignalrService {
     }
   }
 
+  private static readonly THROTTLE_EVENTS = new Set(['NewTicket', 'TicketAssigned']);
+
   on(eventName: string, route?: string) {
     if (route) {
       this.eventRoutes.set(eventName, route);
@@ -129,7 +131,8 @@ export class SignalrService {
         subject.next(data);
       });
     }
-    return this.eventMap.get(eventName)!.asObservable().pipe(throttleTime(500));
+    const obs = this.eventMap.get(eventName)!.asObservable();
+    return SignalrService.THROTTLE_EVENTS.has(eventName) ? obs.pipe(throttleTime(500)) : obs;
   }
 
   private async joinUserGroups() {
