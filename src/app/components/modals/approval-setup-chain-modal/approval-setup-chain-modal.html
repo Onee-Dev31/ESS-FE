@@ -1,0 +1,61 @@
+<div class="modal-overlay" (click)="close()" @fadeIn>
+  <div class="approval-setup-chain-modal" (click)="$event.stopPropagation()" @modalAnimation>
+    <div class="modal-header">
+      <h2 class="request-title">
+        <i class="fa-solid fa-code-compare"></i>
+        ตั้งค่าลำดับการอนุมัติ
+      </h2>
+      <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>กำลังโหลด...</span>
+        </div>
+      } @else {
+        <table class="category-table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              @for (step of approverSteps; track step.key) {
+                <th class="text-center">ข้าม {{ step.label }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (cat of categories(); track cat.categoryId) {
+              <tr>
+                <td>
+                  <div class="category-name">{{ cat.categoryName }}</div>
+                  <div class="category-code">{{ cat.categoryCode }}</div>
+                </td>
+                @for (step of approverSteps; track step.key) {
+                  <td class="text-center">
+                    <div
+                      class="toggle"
+                      [class.on]="cat[step.key]"
+                      (click)="toggle(cat.categoryId, step.key)"
+                    >
+                      <div class="toggle-thumb"></div>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+    <div class="modal-footer">
+      <!-- <div class="setup-modal__footer"> -->
+      <button type="button" class="btn-outline" (click)="close()">ยกเลิก</button>
+      <button type="button" class="btn-primary" (click)="save()" [disabled]="isSaving()">
+        <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+        {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+      </button>
+      <!-- </div> -->
+    </div>
+  </div>
+</div>

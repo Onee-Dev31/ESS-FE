@@ -41,12 +41,6 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'pathParamsChange',
         data: { animation: 'Welcome' },
       },
-      // {
-      //     path: 'it-dashboard',
-      //     loadComponent: () => import('./pages/dashboard-it/dashboard-it').then(m => m.DashboardIT),
-      //     canActivate: [menuGuard],
-      //     data: { animation: 'Welcome' }
-      // },
       {
         path: 'welcome',
         loadComponent: () => import('./pages/welcome/welcome').then((m) => m.WelcomeComponent),
@@ -75,20 +69,21 @@ export const routes: Routes = [
         data: { animation: 'VehicleTaxi' },
       },
       {
-        path: 'approvals',
+        path: 'approvals-medical',
         loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
+          import('./pages/approval-medical/approval-medical').then(
+            (m) => m.ApprovalMedicalComponent,
+          ),
         canActivate: [menuGuard],
-        // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'all', animation: 'Approvals' }
-        data: { animation: 'Approvals' },
       },
       {
-        path: 'approvals-medicalexpenses',
+        path: 'approvals-allowance',
         loadComponent: () =>
-          import('./pages/approvals/approvals').then((m) => m.ApprovalsComponent),
+          import('./pages/approval-allowance/approval-allowance').then(
+            (m) => m.ApprovalAllowanceComponent,
+          ),
         canActivate: [menuGuard],
-        // data: { role: [USER_ROLES.ADMIN, USER_ROLES.HR, USER_ROLES.EXECUTIVE, USER_ROLES.SUPERVISOR], category: 'medical', animation: 'ApprovalsMedical' }
-        data: { category: 'medical', animation: 'ApprovalsMedical' },
+        data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
         path: 'medicalexpenses',
@@ -190,12 +185,18 @@ export const routes: Routes = [
           import('./pages/save-signature/save-signature').then((m) => m.SaveSignature),
         data: { animation: 'ITRequest' },
       },
+      // {
+      //   path: 'approval-setup',
+      //   loadComponent: () =>
+      //     import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
+      //   // canActivate: [menuGuard],
+      //   data: { animation: 'Dashboard' },
+      // },
       {
         path: 'approval-setup',
-        loadComponent: () =>
-          import('./pages/approval-setup/approval-setup').then((m) => m.ApprovalSetup),
-        // canActivate: [menuGuard],
-        data: { animation: 'Dashboard' },
+        loadChildren: () =>
+          import('./pages/approval-setup/approval-setup.route').then((m) => m.default),
+        canActivate: [menuGuard],
       },
       {
         path: '',

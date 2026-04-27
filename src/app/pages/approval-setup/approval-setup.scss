@@ -1,5 +1,6 @@
-// approval-setup.scss
+@use 'sass:color';
 @use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 // ===== PAGE =====
 .page-wrapper {
@@ -159,6 +160,7 @@
   border: 1px solid var(--border-color);
   overflow: hidden;
   position: relative;
+  overflow-x: auto;
 }
 
 .loading-overlay {
@@ -175,6 +177,7 @@
 
 .setup-table {
   width: 100%;
+  min-width: 1310px;
   border-collapse: collapse;
   font-size: 13px;
 
@@ -257,6 +260,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
+
+  &.approver3 {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+.approver-item {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  background: var(--bg-table-head);
+  padding: 6px 12px;
+  border-radius: 40px;
+  align-items: center;
 }
 
 .approver-avatar {
@@ -283,7 +301,7 @@
 .approver-name {
   font-weight: 500;
   color: var(--text-header);
-  font-size: 13px;
+  font-size: $font-size-hint;
 }
 
 .approver-code {
@@ -532,6 +550,10 @@
   color: var(--text-muted);
   font-size: 14px;
   padding: 2px 0;
+
+  .knowledge {
+    font-size: $font-size-hint;
+  }
 }
 
 // ===== TOGGLE =====
@@ -791,5 +813,54 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+.modal-overlay {
+  @include modal-overlay-styles;
+  .modal-container {
+    width: 70%;
+    max-width: 1200px;
+  }
+}
+
+// scss — เพิ่มใน .utility-btns หรือ .page-header__right
+.btn-setup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-table-head);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-sub);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  i {
+    color: var(--primary);
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(var(--primary-rgb, 99, 102, 241), 0.06);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.12);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// responsive — ซ่อนข้อความบน mobile
+@media (max-width: 575.98px) {
+  .btn-setup .btn-text {
+    display: none;
   }
 }

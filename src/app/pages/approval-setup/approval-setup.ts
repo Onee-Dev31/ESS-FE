@@ -14,6 +14,14 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import {
+  ApprovalSetupGroup,
+  ApprovalSetupRow,
+  Approve3Emp,
+} from '../../interfaces/approval-setup.interface';
+import { onImgError } from '../../utils/image.util';
+import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
+import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-chain-modal/approval-setup-chain-modal';
 
 @Component({
   selector: 'app-approval-setup',
@@ -29,6 +37,8 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
     NzIconModule,
     NzDrawerModule,
     NzSwitchModule,
+    SkeletonComponent,
+    ApprovalSetupChainModal,
   ],
   templateUrl: './approval-setup.html',
   styleUrl: './approval-setup.scss',
@@ -38,6 +48,8 @@ export class ApprovalSetup implements OnInit {
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
 
+  onImgError = onImgError;
+
   // ===== State =====
   setupList = signal<any[]>([]);
   originalGroupedList = signal<any[]>([]); // เก็บตัวเต็ม
@@ -45,6 +57,7 @@ export class ApprovalSetup implements OnInit {
   isLoading = signal(false);
   isDrawerOpen = signal(false);
   isSaving = signal(false);
+  isSetupModalOpen = signal<boolean>(false);
 
   // ===== Filter =====
   filterCompany = '';
@@ -65,7 +78,6 @@ export class ApprovalSetup implements OnInit {
   // ===== Computed =====
   filteredList = computed(() => {
     const kw = this.searchKeyword().toLowerCase();
-    console.log(kw);
     return this.setupList().filter((row) => {
       const matchKw =
         !kw ||
@@ -101,7 +113,18 @@ export class ApprovalSetup implements OnInit {
             !keyword ||
             dep.costCent?.toLowerCase().includes(keyword) ||
             dep.costCenterName?.toLowerCase().includes(keyword) ||
-            dep.approve1EmpName?.toLowerCase().includes(keyword);
+            dep.approve1EmpName?.toLowerCase().includes(keyword) ||
+            dep.approve1EmpNo?.toLowerCase().includes(keyword) ||
+            dep.approve2EmpName?.toLowerCase().includes(keyword) ||
+            dep.approve2EmpNo?.toLowerCase().includes(keyword) ||
+            dep.approve3Emps?.some(
+              (emp: any) =>
+                emp.empNo?.toLowerCase().includes(keyword) ||
+                emp.empName?.toLowerCase().includes(keyword),
+            );
+
+          // dep.approve4EmpName?.toLowerCase().includes(keyword) ||
+          // dep.approve4EmpNo?.toLowerCase().includes(keyword);
 
           // 🔘 skip filter
           let matchSkip = true;
@@ -129,45 +152,14 @@ export class ApprovalSetup implements OnInit {
     this.isLoading.set(true);
     this.approvalService.getApprovalSetupList().subscribe({
       next: (res) => {
-        const mapped = (res?.data ?? []).map((emp: any) => ({
-          costCent: emp.COSTCENT,
-          costCenterName: emp.DepartmentName,
-          companyCode: emp.COMPANY_CODE,
-          approve1EmpNo: emp.Approve1EmpNo,
-          approve1EmpName: emp.Approve1Name,
-          approve2EmpNo: emp.Approve2EmpNo,
-          approve2EmpName: emp.Approve2Name,
-          isSkipApprove1: emp.ConfigMode === 'AutoSkip',
-          modifiedDate: emp.ModifiedDate,
-          modifiedBy: emp.ModifiedBy,
-        }));
+        const mapped = (res?.data ?? []).map((emp: any) => this.mapSetupRow(emp));
+        const grouped = this.groupByCompany(mapped);
 
-        const groupMap = new Map<
-          string,
-          { companyCode: string; companyName: string; departments: any[] }
-        >();
-
-        mapped.forEach((row: any) => {
-          const key = row.companyCode ?? 'UNKNOWN';
-          if (!groupMap.has(key)) {
-            groupMap.set(key, {
-              companyCode: row.companyCode,
-              companyName: row.companyName,
-              departments: [],
-            });
-          }
-          groupMap.get(key)!.departments.push(row);
-        });
-
-        const grouped = Array.from(groupMap.values());
-
-        this.originalGroupedList.set(grouped); // ตัวเต็ม
-        this.groupedList.set(grouped); // ตัวแสดง
+        this.originalGroupedList.set(grouped);
+        this.groupedList.set(grouped);
 
         this.setupList.set(mapped);
         this.isLoading.set(false);
-
-        console.log(res?.data);
       },
       error: (err) => {
         console.error(err);
@@ -178,6 +170,7 @@ export class ApprovalSetup implements OnInit {
 
   // ===== Open Drawer =====
   openEdit(row: any) {
+    console.log(row);
     this.editingRow.set({ ...row });
     this.skipApprove1.set(row.isSkipApprove1);
     this.selectedApprove1.set(
@@ -210,7 +203,6 @@ export class ApprovalSetup implements OnInit {
       )
       .subscribe({
         next: (res: any) => {
-          console.log(res.data);
           const mapped = (res?.data ?? []).map((emp: any) => ({
             empNo: emp.EmpNo,
             empName: emp.FullName,
@@ -260,13 +252,6 @@ export class ApprovalSetup implements OnInit {
 
     const approve1EmpNo = this.skipApprove1() ? null : (this.selectedApprove1()?.empNo ?? null);
 
-    console.log({
-      costCent: row.costCent,
-      approve1EmpNo,
-      modifiedBy: this.authService.userData().AD_USER,
-      companyCode: row.companyCode ?? '',
-    });
-
     this.approvalService
       .saveApprovalSetup({
         costCent: row.costCent,
@@ -276,7 +261,6 @@ export class ApprovalSetup implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           this.isSaving.set(false);
           this.swalService.success('บันทึกสำเร็จ');
           this.closeDrawer();
@@ -287,5 +271,73 @@ export class ApprovalSetup implements OnInit {
           this.swalService.error('เกิดข้อผิดพลาด', err?.error?.message ?? '');
         },
       });
+  }
+
+  // MAP
+  private mapApprove3Emps(empNos: string | null, empNames: string | null): Approve3Emp[] {
+    const nos = empNos
+      ? empNos
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    const names = empNames
+      ? empNames
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    return nos.map((empNo, i) => ({
+      empNo,
+      empName: names[i] ?? '',
+    }));
+  }
+
+  private mapSetupRow(emp: any): ApprovalSetupRow {
+    return {
+      costCent: emp.COSTCENT,
+      costCenterName: emp.DepartmentName,
+      companyCode: emp.COMPANY_CODE,
+      approve1EmpNo: emp.Approve1EmpNo,
+      approve1EmpName: emp.Approve1Name,
+      approve2EmpNo: emp.Approve2EmpNo,
+      approve2EmpName: emp.Approve2Name,
+      approve3Emps: this.mapApprove3Emps(emp.Approve3EmpNo, emp.Approve3Users),
+      approve4EmpNo: emp.Approve4EmpNo,
+      approve4EmpName: emp.Approve4Name,
+      isSkipApprove1: emp.ConfigMode === 'AutoSkip',
+      modifiedDate: emp.ModifiedDate,
+      modifiedBy: emp.ModifiedBy,
+    };
+  }
+
+  private groupByCompany(rows: any[]): ApprovalSetupGroup[] {
+    const groupMap = new Map<
+      string,
+      { companyCode: string; companyName: string; departments: any[] }
+    >();
+
+    rows.forEach((row) => {
+      const key = row.companyCode ?? 'UNKNOWN';
+      if (!groupMap.has(key)) {
+        groupMap.set(key, {
+          companyCode: row.companyCode,
+          companyName: row.companyName,
+          departments: [],
+        });
+      }
+      groupMap.get(key)!.departments.push(row);
+    });
+
+    return Array.from(groupMap.values());
+  }
+
+  openSetupModal() {
+    this.isSetupModalOpen.set(true);
+  }
+
+  closeSetupModal() {
+    this.isSetupModalOpen.set(false);
   }
 }

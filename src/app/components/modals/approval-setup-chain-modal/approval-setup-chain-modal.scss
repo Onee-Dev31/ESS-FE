@@ -1,0 +1,302 @@
+@use 'sass:color';
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.modal-overlay {
+  @include modal-overlay-styles;
+}
+
+.approval-setup-chain-modal {
+  width: 900px !important;
+  max-width: 95vw;
+  height: 90vh;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-toolbar);
+  display: flex;
+  flex-direction: column;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 30px;
+    background-color: var(--bg-slate);
+    border-bottom: 1px solid var(--border-color);
+
+    .request-title {
+      margin: 0;
+      font-size: $font-size-header;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-direction: row;
+
+      span {
+        font-size: $font-size-label;
+        display: inline;
+      }
+
+      @include mobile {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    .btn-close-x {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-sub);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--danger);
+      }
+    }
+
+    .btn-close-modal {
+      @include close-btn-style;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+
+      &:hover {
+        background: var(--border-toolbar);
+        color: $danger;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    padding: 30px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: var(--bg-card);
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+
+    // ── Loading ─────────────────────────────────────────────────
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+
+      i {
+        color: var(--primary);
+        font-size: 1.2rem;
+      }
+    }
+
+    // ── Table ───────────────────────────────────────────────────
+    .category-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+
+      thead tr {
+        background: var(--bg-table-head);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      th {
+        padding: 10px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-table-head);
+        white-space: nowrap;
+        text-align: left;
+
+        &.text-center {
+          text-align: center;
+        }
+      }
+
+      tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background 0.15s;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: var(--bg-slate);
+        }
+      }
+
+      td {
+        padding: 14px 16px;
+        vertical-align: middle;
+
+        &.text-center {
+          text-align: center;
+        }
+      }
+    }
+
+    .category-name {
+      font-weight: 600;
+      color: var(--text-header);
+      font-size: 0.875rem;
+    }
+
+    .category-code {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    // ── Toggle ──────────────────────────────────────────────────
+    .toggle {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--border-color);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+
+      &.on {
+        background: var(--primary);
+      }
+
+      .toggle-thumb {
+        position: absolute;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        transition: left 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      &.on .toggle-thumb {
+        left: 21px;
+      }
+    }
+
+    @include mobile {
+      padding: 18px;
+
+      .info-section {
+        .section-header {
+          padding: 6px 10px;
+        }
+
+        .section-content {
+          padding: 10px;
+          font-size: $font-size-label;
+
+          .info-row {
+            .info-label {
+              width: 100px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 30px;
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-outline {
+      padding: 8px 24px;
+      border: 1px solid var(--border-table-head);
+      background: transparent;
+      color: var(--text-sub);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--bg-slate);
+        color: var(--text);
+      }
+
+      &.btn-reject {
+        border-color: var(--danger);
+        color: var(--danger);
+
+        &:hover {
+          background: rgba(220, 38, 38, 0.08);
+          color: var(--danger);
+        }
+      }
+    }
+
+    .btn-primary {
+      padding: 8px 24px;
+      background-color: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.88;
+      }
+    }
+
+    .btn-referred {
+      border: 1px solid #f59e0b;
+      color: #f59e0b;
+    }
+
+    .btn-referred:hover {
+      background: #f59e0b;
+      color: white;
+    }
+  }
+
+  @include mobile {
+    width: 100% !important;
+    max-width: 100vw;
+    height: 100%;
+    border-radius: 0;
+
+    .modal-body {
+      max-height: 100vh;
+    }
+
+    .modal-footer {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+}

@@ -7,7 +7,10 @@
         <i class="fas fa-route"></i>
         ตั้งค่าการอนุมัติ
       </h1>
-      <!-- <p class="page-subtitle">กำหนดผู้อนุมัติลำดับที่ 1 สำหรับแต่ละแผนก</p> -->
+      <button type="button" class="btn-outline btn-setup" (click)="openSetupModal()">
+        <i class="fa-solid fa-code-compare"></i>
+        <span class="btn-text">ตั้งค่าลำดับการอนุมัติ</span>
+      </button>
     </div>
     <div class="page-header__right">
       <button class="btn-refresh" (click)="loadSetupList()">
@@ -27,158 +30,177 @@
         placeholder="ค้นหาแผนก, รหัส, ชื่อผู้อนุมัติ..."
       />
     </div>
-    <!-- <div class="filter-chips">
-      <button class="chip" [class.active]="filterSkip() === null" (click)="filterSkip.set(null)">
-        ทั้งหมด
-      </button>
-      <button class="chip" [class.active]="filterSkip() === false" (click)="filterSkip.set(false)">
-        <span class="chip-dot normal"></span> มีผู้อนุมัติ
-      </button>
-      <button class="chip" [class.active]="filterSkip() === true" (click)="filterSkip.set(true)">
-        <span class="chip-dot skip"></span> ข้ามไป Approve 2
-      </button>
-    </div> -->
     <div class="filter-count">{{ getTotalCount() }} รายการ</div>
   </div>
 
   <!-- Table -->
   <div class="table-wrapper">
-    <div class="loading-overlay" *ngIf="isLoading()">
-      <i class="fas fa-spinner fa-spin"></i>
-    </div>
-
-    <table class="setup-table">
-      <thead>
-        <tr>
-          <th>แผนก</th>
-          <th>Approve 1</th>
-          <th>Approve 2</th>
-          <!-- <th>Approve 3</th> -->
-          <!-- <th>สถานะ</th> -->
-          <th>แก้ไขล่าสุด</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let group of groupedList()">
-          <tr class="company-row">
-            <td colspan="7">
-              <div class="company-header">
-                <i class="fas fa-building"></i>
-                {{ group.companyName }} ({{ group.companyCode }})
-                <span class="dept-count">{{ group.departments.length }} แผนก</span>
-              </div>
-            </td>
+    @if (isLoading()) {
+      <app-skeleton type="card" [rows]="5"></app-skeleton>
+    } @else {
+      <table class="setup-table">
+        <thead>
+          <tr>
+            <th style="width: 250px">แผนก</th>
+            <th style="width: 250px">Approve 1</th>
+            <th style="width: 250px">Approve 2</th>
+            <th style="width: 250px">Approve 3</th>
+            <th style="width: 250px">Approve 4</th>
+            <th style="width: 10px">แก้ไขล่าสุด</th>
+            <th style="width: 50px"></th>
           </tr>
-          <tr *ngFor="let row of group.departments" class="table-row">
-            <!-- แผนก -->
-            <td>
-              <div class="dept-cell">
-                <span class="dept-code">{{ row.costCent }}</span>
-                <span class="dept-name">{{ row.costCenterName }}</span>
-              </div>
-            </td>
-
-            <!-- Approve 1 -->
-            <td>
-              <div
-                class="approver-cell"
-                *ngIf="!row.isSkipApprove1 && row.approve1EmpNo; else skipCell"
-              >
-                <div class="approver-avatar">
-                  <img
-                    [src]="
-                      'https://empimg.oneeclick.co:8048/employeeimage/' + row.approve1EmpNo + '.jpg'
-                    "
-                    (error)="$any($event.target).src = 'user.png'"
-                  />
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let group of groupedList()">
+            <tr class="company-row">
+              <td colspan="7">
+                <div class="company-header">
+                  <i class="fas fa-building"></i>
+                  {{ group.companyName }} ({{ group.companyCode }})
+                  <span class="dept-count">{{ group.departments.length }} แผนก</span>
                 </div>
-                <div class="approver-info">
-                  <span class="approver-name">{{ row.approve1EmpName }}</span>
-                  <span class="approver-code">{{ row.approve1EmpNo }}</span>
+              </td>
+            </tr>
+            <tr *ngFor="let row of group.departments" class="table-row">
+              <!-- แผนก -->
+              <td>
+                <div class="dept-cell">
+                  <span class="dept-code">{{ row.costCent }}</span>
+                  <span class="dept-name">{{ row.costCenterName }}</span>
                 </div>
-              </div>
-              <ng-template #skipCell>
-                <div class="skip-badge">
-                  <i class="fas fa-forward"></i>
-                  ข้ามไป Approve 2
+              </td>
+
+              <!-- Approve 1 -->
+              <td>
+                <div
+                  class="approver-cell"
+                  *ngIf="!row.isSkipApprove1 && row.approve1EmpNo; else skipCell"
+                >
+                  <div class="approver-item">
+                    <div class="approver-avatar">
+                      <img
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          row.approve1EmpNo +
+                          '.jpg'
+                        "
+                        (error)="$any($event.target).src = 'user.png'"
+                      />
+                    </div>
+                    <div class="approver-info">
+                      <span class="approver-name">{{ row.approve1EmpName }}</span>
+                      <span class="approver-code">{{ row.approve1EmpNo }}</span>
+                    </div>
+                  </div>
                 </div>
-              </ng-template>
-            </td>
+                <ng-template #skipCell>
+                  <div class="skip-badge">
+                    <i class="fas fa-forward"></i>
+                    ข้ามไป Approve 2
+                  </div>
+                </ng-template>
+              </td>
 
-            <!-- Approve 2 -->
-            <td>
-              <div class="approver-cell" *ngIf="row.approve2EmpNo">
-                <div class="approver-avatar">
-                  <img
-                    [src]="
-                      'https://empimg.oneeclick.co:8048/employeeimage/' + row.approve2EmpNo + '.jpg'
-                    "
-                    (error)="$any($event.target).src = 'user.png'"
-                  />
+              <!-- Approve 2 -->
+              <td>
+                <div class="approver-cell" *ngIf="row.approve2EmpNo">
+                  <div class="approver-item">
+                    <div class="approver-avatar">
+                      <img
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          row.approve2EmpNo +
+                          '.jpg'
+                        "
+                        (error)="$any($event.target).src = 'user.png'"
+                      />
+                    </div>
+                    <div class="approver-info">
+                      <span class="approver-name">{{ row.approve2EmpName }}</span>
+                      <span class="approver-code">{{ row.approve2EmpNo }}</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="approver-info">
-                  <span class="approver-name">{{ row.approve2EmpName }}</span>
-                  <span class="approver-code">{{ row.approve2EmpNo }}</span>
+                <span class="text-muted" *ngIf="!row.approve2EmpNo">-</span>
+              </td>
+
+              <!-- Approve 3 -->
+              <td>
+                <div class="approver-cell approver3" *ngIf="row.approve3Emps">
+                  @for (emp of row.approve3Emps; track emp.empNo) {
+                    <div class="approver-item">
+                      <div class="approver-avatar">
+                        <img
+                          [src]="
+                            'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empNo + '.jpg'
+                          "
+                          (error)="$any($event.target).src = 'user.png'"
+                        />
+                      </div>
+                      <div class="approver-info">
+                        <span class="approver-name">{{ emp.empName }}</span>
+                        <span class="approver-code">{{ emp.empNo }}</span>
+                      </div>
+                    </div>
+                  }
                 </div>
-              </div>
-              <span class="text-muted" *ngIf="!row.approve2EmpNo">-</span>
-            </td>
+                <span class="text-muted" *ngIf="!row.approve3Emps">-</span>
+              </td>
 
-            <!-- Approve 3 -->
-            <!-- <td>
-            <div class="approver-cell" *ngIf="row.approve3EmpNo">
-              <div class="approver-avatar">
-                <img
-                  [src]="
-                    'https://empimg.oneeclick.co:8048/employeeimage/' + row.approve3EmpNo + '.jpg'
-                  "
-                  (error)="$any($event.target).src = 'user.png'"
-                />
-              </div>
-              <div class="approver-info">
-                <span class="approver-name">{{ row.approve3EmpName }}</span>
-                <span class="approver-code">{{ row.approve3EmpNo }}</span>
-              </div>
-            </div>
-            <span class="text-muted" *ngIf="!row.approve3EmpNo">-</span>
-          </td> -->
+              <!-- Approve 4 -->
+              <td>
+                <div class="approver-cell" *ngIf="row.approve4EmpNo">
+                  <div class="approver-item">
+                    <div class="approver-avatar">
+                      <img
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          row.approve4EmpNo +
+                          '.jpg'
+                        "
+                        (error)="onImgError($event)"
+                      />
+                    </div>
+                    <div class="approver-info">
+                      <span class="approver-name">{{ row.approve4EmpName }}</span>
+                      <span class="approver-code">{{ row.approve4EmpNo }}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-muted" *ngIf="!row.approve4EmpNo">-</span>
+              </td>
 
-            <!-- สถานะ -->
-            <!-- <td>
-              <span class="status-badge" [class.skip]="row.isSkipApprove1">
-                {{ row.isSkipApprove1 ? 'ข้าม Approve 1' : 'มีผู้อนุมัติ' }}
-              </span>
-            </td> -->
+              <!-- แก้ไขล่าสุด -->
+              <td>
+                <div class="modified-cell" *ngIf="row.modifiedBy">
+                  <span class="modified-by">{{ row.modifiedBy }}</span>
+                  <span class="modified-date">{{
+                    row.modifiedDate | date: 'dd/MM/yyyy HH:mm'
+                  }}</span>
+                </div>
+                <span class="text-muted" *ngIf="!row.modifiedBy">-</span>
+              </td>
 
-            <!-- แก้ไขล่าสุด -->
-            <td>
-              <div class="modified-cell" *ngIf="row.modifiedBy">
-                <span class="modified-by">{{ row.modifiedBy }}</span>
-                <span class="modified-date">{{ row.modifiedDate | date: 'dd/MM/yyyy HH:mm' }}</span>
-              </div>
-              <span class="text-muted" *ngIf="!row.modifiedBy">-</span>
-            </td>
+              <!-- Action -->
+              <td>
+                <button class="btn-edit" (click)="openEdit(row)">
+                  <i class="fas fa-pen"></i>
+                  แก้ไข
+                </button>
+              </td>
+            </tr>
 
-            <!-- Action -->
-            <td>
-              <button class="btn-edit" (click)="openEdit(row)">
-                <i class="fas fa-pen"></i>
-                แก้ไข
-              </button>
-            </td>
-          </tr>
-
-          <!-- Empty -->
-          <tr *ngIf="group.departments.length === 0 && !isLoading()">
-            <td colspan="7" class="empty-row">
-              <i class="fas fa-inbox"></i>
-              <p>ไม่พบข้อมูล</p>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+            <!-- Empty -->
+            <tr *ngIf="group.departments.length === 0 && !isLoading()">
+              <td colspan="7" class="empty-row">
+                <i class="fas fa-inbox"></i>
+                <p>ไม่พบข้อมูล</p>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    }
   </div>
 </div>
 
@@ -228,12 +250,25 @@
               <span class="step-code">{{ editingRow()?.approve2EmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
-          <div class="flow-arrow" *ngIf="editingRow()?.approve3EmpNo">↓</div>
-          <div class="flow-step" *ngIf="editingRow()?.approve3EmpNo">
+          <div class="flow-arrow" *ngIf="editingRow()?.approve3Emps">↓</div>
+          <div class="flow-step" *ngIf="editingRow()?.approve3Emps">
             <div class="step-badge">3</div>
             <div class="step-info">
-              <span class="step-name">{{ editingRow()?.approve3EmpName }}</span>
-              <span class="step-code">{{ editingRow()?.approve3EmpNo }}</span>
+              @for (emp of editingRow()?.approve3Emps; track emp.empNo) {
+                <span class="step-name">{{ emp.empName }}</span>
+                <span class="step-code">{{ emp.empNo }}</span>
+              }
+            </div>
+          </div>
+          <div class="flow-arrow" *ngIf="editingRow()?.approve4EmpNo">
+            ↓
+            <div class="knowledge">(ในกรณี IT Request)</div>
+          </div>
+          <div class="flow-step">
+            <div class="step-badge">4</div>
+            <div class="step-info">
+              <span class="step-name">{{ editingRow()?.approve4EmpName || '-' }}</span>
+              <span class="step-code">{{ editingRow()?.approve4EmpNo || 'ไม่มีข้อมูล' }}</span>
             </div>
           </div>
         </div>
@@ -320,3 +355,10 @@
     </div>
   </div>
 </div>
+
+@if (isSetupModalOpen()) {
+  <app-approval-setup-chain-modal
+    (onClose)="closeSetupModal()"
+    (onSaved)="loadSetupList()"
+  ></app-approval-setup-chain-modal>
+}
