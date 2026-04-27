@@ -15,6 +15,13 @@ vi.mock('@microsoft/signalr', () => ({
   }),
   LogLevel: { None: 0 },
   HttpTransportType: { WebSockets: 1 },
+  HubConnectionState: {
+    Disconnected: 'Disconnected',
+    Connecting: 'Connecting',
+    Connected: 'Connected',
+    Disconnecting: 'Disconnecting',
+    Reconnecting: 'Reconnecting',
+  },
 }));
 
 Object.defineProperty(window, 'matchMedia', {
