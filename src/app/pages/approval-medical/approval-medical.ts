@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
@@ -52,6 +53,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 })
 export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalApiService);
+  private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
@@ -91,11 +93,12 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMedicalClaims();
+    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo') || '';
+    this.loadMedicalClaims(voucherNo);
   }
 
   /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
-  loadMedicalClaims() {
+  loadMedicalClaims(autoOpenVoucherNo?: string) {
     const fromYear = parseInt(this.fromYear());
     const toYear = parseInt(this.toYear());
     const keyword = this.listing.searchText().trim() || undefined;
@@ -116,11 +119,17 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          this.approvals.set(res.data.map((c) => this.mapClaimToApproval(c)));
+          const mapped = res.data.map((c) => this.mapClaimToApproval(c));
+          this.approvals.set(mapped);
           this.listing.currentPage.set(0);
           this.loadingService.stop('approvals-list');
           this.isRefreshing.set(false);
           this.initialized = true;
+
+          if (autoOpenVoucherNo) {
+            const target = mapped.find((item) => item.requestNo === autoOpenVoucherNo);
+            if (target) this.viewDetail(target);
+          }
         },
         error: (error) => {
           this.loadingService.stop('approvals-list');
