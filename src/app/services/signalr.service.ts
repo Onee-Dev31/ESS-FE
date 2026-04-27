@@ -27,7 +27,7 @@ export class SignalrService {
   constructor() {
     effect(() => {
       const adUser = this.authService.currentUser();
-      if (adUser && this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+      if (adUser && this.hubConnection?.state === 'Connected') {
         this.joinUserGroups();
       }
     });
