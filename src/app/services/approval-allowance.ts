@@ -161,4 +161,15 @@ export class ApprovalAllowanceService {
     params.file_remarks?.forEach((r) => fd.append('file_remarks', r));
     return this._http.post<{ success: boolean; data: any }>(`${this.baseUrl}/medical/claim`, fd);
   }
+
+  //NEW!!
+  reviewClaim(claimId: number, body: any): Observable<any> {
+    return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
+  }
+
+  getPendingApprovals(approver_aduser: string, voucher_no?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/approvals/pending`, { params: p });
+  }
 }

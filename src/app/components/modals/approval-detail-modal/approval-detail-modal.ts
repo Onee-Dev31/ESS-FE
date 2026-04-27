@@ -25,6 +25,7 @@ import { SwalService } from '../../../services/swal.service';
 import dayjs from 'dayjs';
 import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { ApprovalAllowanceService } from '../../../services/approval-allowance';
 
 interface PreviewFile {
   fileName: string;
