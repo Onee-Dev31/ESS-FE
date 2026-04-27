@@ -85,7 +85,10 @@ export class SignalrService {
     console.log('[noteNotify] sending →', body);
 
     this.http
-      .post<{ success: boolean; targets?: string[] }>(`${this.baseUrl}/notification/note-notify`, body)
+      .post<{
+        success: boolean;
+        targets?: string[];
+      }>(`${this.baseUrl}/notification/note-notify`, body)
       .subscribe({
         next: (res) => {
           if (!res?.targets?.length) {
@@ -175,7 +178,9 @@ export class SignalrService {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
       console.log(`[SignalR] ✅ joined user group → "user:${adUser}"`);
     } else {
-      console.warn('[SignalR] ⚠️ adUser เป็น null — ไม่ได้ join user group เลย! ไม่มีทางรับ notification');
+      console.warn(
+        '[SignalR] ⚠️ adUser เป็น null — ไม่ได้ join user group เลย! ไม่มีทางรับ notification',
+      );
     }
   }
 
