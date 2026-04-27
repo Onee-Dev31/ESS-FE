@@ -33,7 +33,7 @@ export interface ApprovalItem {
   amount: number;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
   rawStatus: string;
-  type?: 'allowance' | 'taxi' | 'transport' | 'medical' | 'it-request';
+  type?: 'allowance' | 'taxi' | 'transport' | 'medical' | 'it-request' | 'vehicle';
   originalData?: AllowanceRequest | MedicalRequest | any;
   remark?: string;
 }

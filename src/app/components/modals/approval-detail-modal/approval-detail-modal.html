@@ -145,10 +145,43 @@
               </span>
             </div>
           </div>
-        } @else {
-          <div class="content-header">
-            <h3>รายการเบิก (Items)</h3>
-          </div>
+        }
+        @if (allowanceClaim) {
+          @if (allowanceDetail()?.details?.length) {
+            <div class="content-header">
+              <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>
+            </div>
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>กะ</th>
+                  <th class="text-center">ประเภทวัน</th>
+                  <th>เวลาเข้า - ออก</th>
+                  <th class="text-center">ชั่วโมง OT</th>
+                  <th class="text-right">ยอดเงิน</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of allowanceDetail()?.details; track d.detail_id) {
+                  <tr>
+                    <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
+                    <td>{{ d.shift_code }}</td>
+                    <td class="text-center">
+                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                      </span>
+                    </td>
+                    <td>{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
+                    <td class="text-center">{{ d.extra_hours }} ชม.</td>
+                    <td class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
+                    <td>{{ d.description || '-' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
         }
       </div>
 

@@ -251,7 +251,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   // MAP
   private mapClaimToApproval(claim: any): ApprovalItem {
     return {
-      requestId: claim.approvalID,
+      requestId: claim.claimID,
       requestNo: claim.voucherNo ?? `#${claim.claimID}`,
       requestDate: claim.submittedAt,
       requestBy: {
@@ -267,7 +267,7 @@ export class ApprovalAllowanceComponent implements OnInit {
       amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),
       rawStatus: claim.status.toLowerCase(),
-      type: 'medical',
+      type: 'allowance',
       originalData: {
         ...claim,
         employeeImageUrl: `https://empimg.oneeclick.co:8048/employeeimage/${claim.employeeCode}.jpg`,

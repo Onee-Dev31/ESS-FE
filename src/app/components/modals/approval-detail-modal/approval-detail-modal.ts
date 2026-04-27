@@ -46,6 +46,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
   private approvelService = inject(ApprovalService);
+  private approvalAllowanceService = inject(ApprovalAllowanceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
@@ -68,26 +69,21 @@ export class ApprovalDetailModalComponent implements OnInit {
   currentDetailType = signal<string | null>(null);
   detailedStatus = signal<string>('');
 
+  allowanceDetail = signal<any>(null);
+
   steps = [
-    { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
-    // { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
-    { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
-    // { label: 'ผู้บริหารอนุมัติ', id: 4, icon: 'fas fa-user-tie' },
-    // { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
+    { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
+    { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
+    { label: 'อนุมัติแล้ว', id: 3, icon: 'fa-solid fa-stamp' },
   ];
 
   currentStepIndex = computed(() => {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
     if (!status) return 0;
-    if (status === 'pending') return 1;
+    if (status === 'new') return 1;
+    if (status === 'pending') return 2;
     if (status === 'rejected') return -1;
     if (status === 'approved') return 6;
-
-    // if (status === REQUEST_STATUS.WAITING_CHECK || status === REQUEST_STATUS.NEW) return 1;
-    // if (status === REQUEST_STATUS.PENDING_APPROVAL) return 4;
-    // if (status === REQUEST_STATUS.APPROVED) return 6;
-    // if (status === REQUEST_STATUS.REJECTED || status === REQUEST_STATUS.REFERRED_BACK) return -1;
-    // if (status === REQUEST_STATUS.VERIFIED) return 2;
     return 1;
   });
 
@@ -133,48 +129,54 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.currentDetailType.set(item.type);
 
-    // ถ้าเป็น medical claim จาก API ใหม่ — ใช้ originalData โดยตรง
-    if (item.type === 'medical') {
-      const claim = item.originalData as MedicalClaim;
-      if (claim?.claimId != null) {
-        this.detailedStatus.set(claim.status);
-        const unifiedItems: UnifiedItem[] = [
-          {
-            date: `${claim.treatmentDateFrom} – ${claim.treatmentDateTo}`,
-            description: `${claim.diseaseName} | ${claim.hospitalName}`,
-            amount: claim.requestedAmount,
-            attachedFile: claim.attachments?.[0]?.fileUrl ?? '',
-          },
-        ];
-        this.currentDetailItems.set(unifiedItems);
-        return;
-      }
+    switch (item.type) {
+      case 'medical':
+        this.loadMedicalDetail(item);
+        break;
+      case 'allowance':
+      case 'taxi':
+      case 'vehicle':
+        this.loadAllowanceDetail(item); // logic คล้ายกัน ใช้ร่วมกันได้
+        break;
+      default:
+        this.loadFallbackDetail(item);
+    }
+  }
+
+  private loadMedicalDetail(item: ApprovalItem) {
+    const claim = item.originalData as MedicalClaim;
+    if (claim?.claimId == null) {
+      this.loadFallbackDetail(item);
+      return;
+    }
+    this.detailedStatus.set(claim.status);
+  }
+
+  private loadAllowanceDetail(item: ApprovalItem) {
+    console.log(item);
+    const claim = item.originalData as any;
+    if (claim?.claimID == null) {
+      this.loadFallbackDetail(item);
+      return;
     }
 
-    // fallback: mock service (ใช้กับ non-medical หรือ medical ข้อมูลเก่า)
-    const service = this.approvalsHelper.getServiceByType(item.type);
+    this.approvalAllowanceService.getClaimById(item.requestId).subscribe((res) => {
+      if (!res) return;
+      console.log(res);
+      this.allowanceDetail.set(res.data);
+      this.detailedStatus.set(res.data.status?.toLowerCase());
+    });
+
+    this.detailedStatus.set(item.rawStatus);
+  }
+
+  private loadFallbackDetail(item: ApprovalItem) {
+    console.log(item);
+    const service = this.approvalsHelper.getServiceByType(item.type || 'transport');
     service.getRequestById(item.requestNo).subscribe((data) => {
       if (!data) return;
       this.detailedStatus.set(data.status);
-      if (item.type === 'medical') {
-        const unifiedItems: UnifiedItem[] = (data.items || []).map(
-          (m: {
-            treatmentDateFrom?: string;
-            diseaseType?: string;
-            hospital?: string;
-            requestedAmount?: number;
-            attachedFile?: string;
-          }) => ({
-            date: m.treatmentDateFrom || data.createDate,
-            description: `${m.diseaseType} (${m.hospital})` || '',
-            amount: m.requestedAmount || 0,
-            attachedFile: m.attachedFile || '',
-          }),
-        );
-        this.currentDetailItems.set(unifiedItems);
-      } else {
-        this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
-      }
+      this.currentDetailItems.set((data.items || []) as UnifiedItem[]);
     });
   }
 
@@ -202,7 +204,17 @@ export class ApprovalDetailModalComponent implements OnInit {
       return;
     }
 
-    this.updateStatus(item, action, reason);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    switch (item.type) {
+      case 'medical':
+        this.updateMedicalStatus(item, action, reason);
+        break;
+      case 'allowance':
+        this.updateAllowanceStatus(item, action, reason);
+        break;
+      default:
+        this.updateStatus(item, action, reason); // fallback เดิม
+    }
   }
 
   /** อัปเดตสถานะไปยัง Service และแสดงข้อความตอบกลับไปยังผู้ใช้ */
@@ -211,42 +223,85 @@ export class ApprovalDetailModalComponent implements OnInit {
     newStatus: 'Approved' | 'Rejected' | 'Referred Back',
     reason?: string,
   ) {
-    if (!item.type) return;
+    console.log(item, newStatus, reason);
+    // if (!item.type) return;
 
-    let statusCode = REQUEST_STATUS.WAITING_CHECK;
-    if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
-    else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
-    else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
+    // let statusCode = REQUEST_STATUS.WAITING_CHECK;
+    // if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
+    // else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
+    // else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
 
-    const payload = {
-      action: newStatus.toLowerCase(),
+    // const payload = {
+    //   action: newStatus.toLowerCase(),
+    //   reviewedBy: this.authService.userData().CODEMPID,
+    //   ...(newStatus.toLowerCase() === 'rejected' && {
+    //     rejectionReason: reason?.trim() || '',
+    //   }),
+    // };
+
+    // this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
+    //   next: (res) => {
+    //     if (!res?.success) {
+    //       this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+    //       return;
+    //     }
+
+    //     this.swalService.success(res.message || 'บันทึกสำเร็จ');
+    //   },
+
+    //   error: (error) => {
+    //     console.error('Approved Claim Error:', error);
+
+    //     this.swalService.warning(
+    //       'เกิดข้อผิดพลาด',
+    //       error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+    //     );
+    //   },
+    // });
+    // this.onStatusUpdated.emit();
+    // this.onClose.emit();
+  }
+
+  private updateMedicalStatus(item: ApprovalItem, action: string, reason?: string) {
+    const payload = this.buildPayload(action, reason);
+    this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private updateAllowanceStatus(item: ApprovalItem, action: string, reason?: string) {
+    const payload = this.buildPayload(action, reason);
+    // TODO: เปลี่ยนเป็น allowanceService จริง
+    this.approvalAllowanceService.updateStatusClaim(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private buildPayload(action: string, reason?: string) {
+    return {
+      action: action.toLowerCase(),
       reviewedBy: this.authService.userData().CODEMPID,
-      ...(newStatus.toLowerCase() === 'rejected' && {
+      ...(action.toLowerCase() === 'rejected' && {
         rejectionReason: reason?.trim() || '',
       }),
     };
+  }
 
-    this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
-      next: (res) => {
-        if (!res?.success) {
-          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-          return;
-        }
-
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
-      },
-
-      error: (error) => {
-        console.error('Approved Claim Error:', error);
-
-        this.swalService.warning(
-          'เกิดข้อผิดพลาด',
-          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-        );
-      },
-    });
+  private handleResponse(res: any) {
+    if (!res?.success) {
+      this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+      return;
+    }
+    this.swalService.success(res.message || 'บันทึกสำเร็จ');
     this.onStatusUpdated.emit();
     this.onClose.emit();
+  }
+
+  private handleError(error: any) {
+    console.error(error);
+    this.swalService.warning('เกิดข้อผิดพลาด', error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
   }
 
   close() {
@@ -267,8 +322,16 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   get medicalClaim(): MedicalClaim | null {
+    if (this.approvalItem?.type !== 'medical') return null;
     const claim = this.approvalItem?.originalData as MedicalClaim;
     return claim?.claimId != null ? claim : null;
+  }
+
+  get allowanceClaim(): any | null {
+    if (this.approvalItem?.type !== 'allowance') return null;
+    return (this.approvalItem?.originalData as any)?.claimID != null
+      ? this.approvalItem.originalData
+      : null;
   }
 
   get isApproved(): boolean {

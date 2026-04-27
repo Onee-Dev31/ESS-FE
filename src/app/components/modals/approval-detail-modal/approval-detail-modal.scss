@@ -752,3 +752,76 @@
     transform: translateY(0);
   }
 }
+
+// NEW!!
+// ── Modern Table (shared) ────────────────────────────────────
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-top: 8px;
+
+  thead tr {
+    background: var(--bg-table-head);
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  th {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-table-head);
+    white-space: nowrap;
+    text-align: left;
+
+    &.text-center {
+      text-align: center;
+    }
+    &.text-right {
+      text-align: right;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s;
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: var(--bg-slate);
+    }
+  }
+
+  td {
+    padding: 10px 12px;
+    vertical-align: middle;
+    color: var(--text);
+    font-size: 0.8rem;
+
+    &.text-center {
+      text-align: center;
+    }
+    &.text-right {
+      text-align: right;
+      font-weight: 700;
+    }
+  }
+}
+
+// ── Day type badge ───────────────────────────────────────────
+.ot-day-type {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--border-toolbar);
+  color: var(--text-muted);
+
+  &.holiday {
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--danger, #dc2626);
+  }
+}
