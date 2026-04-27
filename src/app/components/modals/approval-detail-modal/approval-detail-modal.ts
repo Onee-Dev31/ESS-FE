@@ -15,6 +15,7 @@ import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-mo
 import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
 import { MedicalClaim } from '../../../interfaces/medical.interface';
+import { MealAllowanceClaim } from '../../../interfaces/allowance.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
@@ -132,6 +133,23 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.currentDetailType.set(item.type);
 
+    // ถ้าเป็น allowance claim — ใช้ originalData โดยตรง
+    if (item.type === 'allowance') {
+      const claim = item.originalData as MealAllowanceClaim;
+      if (claim?.claimId != null) {
+        this.detailedStatus.set(claim.status?.toLowerCase());
+        this.currentDetailItems.set(
+          (claim.details || []).map((d) => ({
+            date: d.work_date,
+            description: d.description || `${d.actual_checkin} – ${d.actual_checkout}`,
+            amount: d.rate_amount,
+            attachedFile: '',
+          })),
+        );
+        return;
+      }
+    }
+
     // ถ้าเป็น medical claim จาก API ใหม่ — ใช้ originalData โดยตรง
     if (item.type === 'medical') {
       const claim = item.originalData as MedicalClaim;
@@ -225,7 +243,7 @@ export class ApprovalDetailModalComponent implements OnInit {
       }),
     };
 
-    this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
+    this.approvelService.updateTypeClaims(item.requestId, payload, item.type).subscribe({
       next: (res) => {
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -266,7 +284,14 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   get medicalClaim(): MedicalClaim | null {
+    if (this.approvalItem?.type !== 'medical') return null;
     const claim = this.approvalItem?.originalData as MedicalClaim;
+    return claim?.claimId != null ? claim : null;
+  }
+
+  get allowanceClaim(): MealAllowanceClaim | null {
+    if (this.approvalItem?.type !== 'allowance') return null;
+    const claim = this.approvalItem?.originalData as MealAllowanceClaim;
     return claim?.claimId != null ? claim : null;
   }
 

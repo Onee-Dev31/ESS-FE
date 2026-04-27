@@ -22,7 +22,10 @@ export class ApprovalService {
   //     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
   //   }
 
-  updateTypeClaims(id: string | number, payload: any): Observable<any> {
+  updateTypeClaims(id: string | number, payload: any, type?: string): Observable<any> {
+    if (type === 'allowance') {
+      return this._http.patch(`${this.baseUrl}/meal-allowance/claims/${id}/review`, payload);
+    }
     return this._http.patch(`${this.baseUrl}/medical/claims/${id}/review`, payload);
   }
 }

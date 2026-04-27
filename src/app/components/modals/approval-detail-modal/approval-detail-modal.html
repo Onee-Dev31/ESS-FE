@@ -145,6 +145,23 @@
               </span>
             </div>
           </div>
+        } @else if (allowanceClaim) {
+          <div class="medical-info-grid">
+            <div class="med-info-item">
+              <label><i class="far fa-calendar-alt"></i> วันที่ยื่น</label>
+              <span>{{ dateUtil.formatDateToBE(allowanceClaim.claimDate, 'DD/MM/YYYY') }}</span>
+            </div>
+            <div class="med-info-item">
+              <label><i class="fas fa-list-ol"></i> รายละเอียด</label>
+              <span>{{ approvalItem.requestDetail }}</span>
+            </div>
+            @if (allowanceClaim.rejectionReason) {
+              <div class="med-info-item med-info-full">
+                <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
+                <span class="text-danger">{{ allowanceClaim.rejectionReason }}</span>
+              </div>
+            }
+          </div>
         } @else {
           <div class="content-header">
             <h3>รายการเบิก (Items)</h3>
@@ -197,15 +214,20 @@
           <textarea
             id="reason"
             class="reason-input"
-            [(ngModel)]="reasonText"
+            [ngModel]="reasonText()"
+            (ngModelChange)="reasonText.set($event)"
             placeholder="ระบุเหตุผลที่นี่..."
           ></textarea>
         </div>
       }
 
       <div class="action-footer">
-        <button class="btn-confirm" (click)="confirmAction()">ยืนยัน (Confirm)</button>
-        <button class="btn-cancel" (click)="closeActionConfirm()">ยกเลิก (Cancel)</button>
+        <button type="button" class="btn-confirm" (click)="confirmAction()">
+          ยืนยัน (Confirm)
+        </button>
+        <button type="button" class="btn-cancel" (click)="closeActionConfirm()">
+          ยกเลิก (Cancel)
+        </button>
       </div>
     </div>
     <!-- </div> -->
