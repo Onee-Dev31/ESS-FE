@@ -89,7 +89,7 @@ export class SignalrService {
       .post<{
         success: boolean;
         targets?: string[];
-      }>(`${this.baseUrl}/notification/note-notify`, body)
+      }>(`${this.baseUrl}/notification/note-notifyV2`, body)
       .subscribe({
         next: (res) => {
           if (!res?.targets?.length) {

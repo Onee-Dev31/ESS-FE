@@ -17,6 +17,7 @@ export type { MealAllowanceClaimsResponse };
 @Injectable({ providedIn: 'root' })
 export class AllowanceApiService {
   private readonly baseUrl = environment.api_url;
+  private readonly fileBaseUrl = environment.file_base_url;
   private _http = inject(HttpClient);
 
   /** Cache ผลลัพธ์ล่าสุดไว้แสดงทันทีเมื่อ navigate กลับมา */
@@ -129,5 +130,21 @@ export class AllowanceApiService {
     return this._http
       .get<MealAllowanceClaimsResponse>(`${this.baseUrl}/meal-allowance/claims`, { params: p })
       .pipe(tap((res) => this.lastResponse.set(res)));
+  }
+
+  reviewClaim(claimId: number, body: any): Observable<any> {
+    return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
+  }
+
+  getPendingApprovals(approver_aduser: string, voucher_no?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/approvals/pending`, { params: p });
+  }
+
+  getFileUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${this.fileBaseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
   }
 }

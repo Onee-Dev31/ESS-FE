@@ -54,6 +54,12 @@ export class ValidateLoginSso {
                 ? `${basePath}?voucherNo=${encodeURIComponent(this.voucherNo.trim())}`
                 : basePath;
               this.router.navigateByUrl(url);
+            } else if (res.systmeCode == 'ESS-EMAIL-Allowance') {
+              const basePath = res.landingPath || '/approvals-allowance';
+              const url = this.voucherNo
+                ? `${basePath}?voucherNo=${encodeURIComponent(this.voucherNo.trim())}`
+                : basePath;
+              this.router.navigateByUrl(url);
             } else {
               const url = `${res.landingPath || '/'}?applicantId=${encodeURIComponent(encryptValue(this.applicantId.trim()))}`;
               // console.log('go url:', url);

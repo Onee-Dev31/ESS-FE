@@ -58,7 +58,7 @@
         <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
         @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-          @let claim = getMedicalClaim(req);
+          @let claim = getAllowanceClaim(req);
           @if (claim) {
             <div class="claim-card">
               <div class="claim-card__header">
@@ -66,16 +66,6 @@
                   <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
                 </div>
                 <div class="claim-card__actions">
-                  @if (claim.attachments.length) {
-                    <button
-                      type="button"
-                      class="btn-attach"
-                      (click)="openPreview(claim)"
-                      title="ดูเอกสาร"
-                    >
-                      <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
-                    </button>
-                  }
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.rawStatus | statusLabel }}
                   </span>
@@ -117,7 +107,7 @@
 
               <div class="claim-card__body">
                 <div class="claim-card__main">
-                  <div class="claim-date">
+                  <!-- <div class="claim-date">
                     <i class="far fa-calendar-alt"></i>
                     <span
                       >{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
@@ -132,12 +122,12 @@
                   <div class="claim-disease">
                     <i class="fas fa-virus"></i>
                     <span>{{ claim.diseaseName }}</span>
-                  </div>
+                  </div> -->
                 </div>
 
                 <div class="claim-card__amount">
                   <span class="amount-label">ขอเบิก</span>
-                  <span class="amount-value">฿{{ claim.requestedAmount | number: '1.2-2' }}</span>
+                  <span class="amount-value">฿{{ claim.totalAmount | number: '1.2-2' }}</span>
                   @if (claim.approvedAmount > 0) {
                     <span class="amount-approved"
                       >อนุมัติ ฿{{ claim.approvedAmount | number: '1.2-2' }}</span
@@ -224,13 +214,12 @@
               <th>โรค</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
-              <th>เอกสาร</th>
               <th>จัดการ</th>
             </tr>
           </thead>
           <tbody>
             @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-              @let claim = getMedicalClaim(req);
+              @let claim = getAllowanceClaim(req);
               @if (claim) {
                 <tr>
                   <td>
@@ -289,15 +278,6 @@
                     <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                       {{ req.rawStatus | statusLabel }}
                     </span>
-                  </td>
-                  <td class="text-center">
-                    @if (claim.attachments.length) {
-                      <button class="btn-attach" (click)="openPreview(claim)">
-                        <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
-                      </button>
-                    } @else {
-                      -
-                    }
                   </td>
                   <td>
                     <div class="table-actions">

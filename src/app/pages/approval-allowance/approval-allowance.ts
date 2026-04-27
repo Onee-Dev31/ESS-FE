@@ -20,6 +20,7 @@ import { AllowanceApiService } from '../../services/allowance-api.service';
 import { ApprovalAllowanceService } from '../../services/approval-allowance';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-approval-allowance',
@@ -46,6 +47,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
+  private authService = inject(AuthService);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -76,11 +78,11 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMedicalClaims();
+    this.loadAllowanceClaims();
   }
 
   refresh() {
-    this.loadMedicalClaims();
+    this.loadAllowanceClaims();
   }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
@@ -178,19 +180,12 @@ export class ApprovalAllowanceComponent implements OnInit {
     return `${item.requestNo}-${index}`;
   }
 
-  getMedicalClaim(item: ApprovalItem): any | null {
-    return (item.originalData as any)?.claimId != null ? (item.originalData as any) : null;
+  getAllowanceClaim(item: ApprovalItem): any | null {
+    return (item.originalData as any)?.claimID != null ? (item.originalData as any) : null;
   }
 
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
-  }
-
-  onImgError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    if (!img.src.includes('user.png')) {
-      img.src = 'user.png';
-    }
   }
 
   viewDetail(item: ApprovalItem) {
@@ -209,11 +204,18 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
-    this.loadMedicalClaims();
+    this.loadAllowanceClaims();
   }
 
   onStatusUpdated() {
     this.refresh();
+  }
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (!img.src.includes('user.png')) {
+      img.src = 'user.png';
+    }
   }
 
   // PREVIEW-PROFILE
@@ -249,26 +251,31 @@ export class ApprovalAllowanceComponent implements OnInit {
   // MAP
   private mapClaimToApproval(claim: any): ApprovalItem {
     return {
-      requestId: claim.claimId,
-      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
-      requestDate: claim.claimDate,
+      requestId: claim.claimID,
+      requestNo: claim.voucherNo ?? `#${claim.claimID}`,
+      requestDate: claim.submittedAt,
       requestBy: {
         name: claim.employeeName ?? claim.employeeCode,
         employeeId: claim.employeeCode,
         department: claim.departmentName ?? '-',
         company: claim.companyName ?? '-',
       },
-      requestType: 'ค่ารักษาพยาบาล',
+      requestType: 'ค่าเบี้ยเลี้ยง',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
       remark: claim.remark || '',
-      amount: claim.requestedAmount,
+      amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),
-      rawStatus: claim.status,
-      type: 'medical',
-      originalData: claim,
+      rawStatus: claim.status.toLowerCase(),
+      type: 'allowance',
+      originalData: {
+        ...claim,
+        employeeImageUrl: `https://empimg.oneeclick.co:8048/employeeimage/${claim.employeeCode}.jpg`,
+        expenseTypeName: 'เบิกค่าเบี้ยเลี้ยง',
+      },
     };
   }
+
   private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
     switch (status?.toUpperCase()) {
       case 'APPROVED':
@@ -284,38 +291,27 @@ export class ApprovalAllowanceComponent implements OnInit {
 
   // GET
   /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
-  loadMedicalClaims() {
-    const fromYear = parseInt(this.fromYear());
-    const toYear = parseInt(this.toYear());
-    const keyword = this.listing.searchText().trim() || undefined;
-
+  loadAllowanceClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: string) {
+    const adUser = this.authService.currentUser() || '';
     if (!this.initialized) {
       this.loadingService.start('approvals-list');
     } else {
       this.isRefreshing.set(true);
     }
-
-    this.approvalAllowanceService
-      .getClaims({
-        from_month: this.fromMonth() + 1,
-        from_year: isNaN(fromYear) ? undefined : fromYear,
-        to_month: this.toMonth() + 1,
-        to_year: isNaN(toYear) ? undefined : toYear,
-        keyword,
-      })
-      .subscribe({
-        next: (res) => {
-          this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
-          this.listing.currentPage.set(0);
-          this.loadingService.stop('approvals-list');
-          this.isRefreshing.set(false);
-          this.initialized = true;
-        },
-        error: (error) => {
-          this.loadingService.stop('approvals-list');
-          this.isRefreshing.set(false);
-          this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
-        },
-      });
+    this.approvalAllowanceService.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
+        this.listing.currentPage.set(0);
+        this.loadingService.stop('approvals-list');
+        this.isRefreshing.set(false);
+        this.initialized = true;
+      },
+      error: (error) => {
+        this.loadingService.stop('approvals-list');
+        this.isRefreshing.set(false);
+        this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
+      },
+    });
   }
 }

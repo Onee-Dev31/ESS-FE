@@ -126,12 +126,12 @@ export class ApprovalAllowanceService {
     return this._http.get<any>(`${this.baseUrl}/medical/claims`, { params: p });
   }
 
-  getClaimById(id: number, employee_code: string): Observable<any> {
-    const p = new HttpParams().set('employee_code', employee_code);
-    return this._http.get<any>(`${this.baseUrl}/medical/claims/${id}`, {
-      params: p,
-    });
-  }
+  // getClaimById(id: number, employee_code: string): Observable<any> {
+  //   const p = new HttpParams().set('employee_code', employee_code);
+  //   return this._http.get<any>(`${this.baseUrl}/medical/claims/${id}`, {
+  //     params: p,
+  //   });
+  // }
 
   submitClaim(params: {
     employee_code: string;
@@ -160,5 +160,21 @@ export class ApprovalAllowanceService {
     params.files?.forEach((f) => fd.append('files', f, f.name));
     params.file_remarks?.forEach((r) => fd.append('file_remarks', r));
     return this._http.post<{ success: boolean; data: any }>(`${this.baseUrl}/medical/claim`, fd);
+  }
+
+  //NEW!!
+  updateStatusClaim(claimId: number, body: any): Observable<any> {
+    console.log(claimId, body);
+    return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
+  }
+
+  getPendingApprovals(approver_aduser: string, voucher_no?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/approvals/pending`, { params: p });
+  }
+
+  getClaimById(claimId: number): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}`);
   }
 }

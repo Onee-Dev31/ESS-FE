@@ -119,6 +119,7 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
+          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);
@@ -254,6 +255,7 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   openProfileImage(claim: MedicalClaim) {
+    console.log(claim);
     if (!claim.employeeImageUrl) return;
     this.profileLightbox.set({
       url: claim.employeeImageUrl,
