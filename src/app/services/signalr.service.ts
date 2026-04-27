@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, effect } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject, throttleTime } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -23,6 +23,15 @@ export class SignalrService {
   ticketReadTrigger = new Subject<{ ticketId: any }>();
   ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
   ticketFocusTrigger = new Subject<number>();
+
+  constructor() {
+    effect(() => {
+      const adUser = this.authService.currentUser();
+      if (adUser && this.hubConnection?.state === signalR.HubConnectionState.Connected) {
+        this.joinUserGroups();
+      }
+    });
+  }
 
   ticketStatusNotify(ticketId: any, requesterAdUser: string, status: string) {
     if (!ticketId || !requesterAdUser) return;
@@ -58,17 +67,20 @@ export class SignalrService {
     senderName: string,
     note: string,
   ) {
+    const body = { ticketId, requesterAdUser, senderAdUser, senderName, note };
+    console.log('[noteNotify] sending →', body);
+
     this.http
-      .post(`${this.baseUrl}/notification/note-notify`, {
-        ticketId,
-        requesterAdUser,
-        senderAdUser,
-        senderName,
-        note,
-      })
+      .post<{ success: boolean; targets?: string[] }>(`${this.baseUrl}/notification/note-notify`, body)
       .subscribe({
-        next: (res) => console.log('[noteNotify] response:', res),
-        error: (err) => console.error('[noteNotify] error:', err),
+        next: (res) => {
+          if (!res?.targets?.length) {
+            console.warn('[noteNotify] ⚠️ targets เป็น empty — ไม่มี user ได้รับ notification');
+          } else {
+            console.log('[noteNotify] ✅ ส่งถึง targets:', res.targets);
+          }
+        },
+        error: (err) => console.error('[noteNotify] ❌ error:', err),
       });
   }
 
@@ -87,17 +99,24 @@ export class SignalrService {
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection.onreconnected(async () => {
-      console.log('Reconnected');
+    this.hubConnection.onclose((err) => {
+      console.warn('[SignalR] ❌ connection CLOSED', err ?? '');
+    });
+
+    this.hubConnection.onreconnecting((err) => {
+      console.warn('[SignalR] 🔄 RECONNECTING — user ออกจาก group ชั่วคราว, event ที่ส่งช่วงนี้จะหาย', err ?? '');
+    });
+
+    this.hubConnection.onreconnected(async (connectionId) => {
       await this.joinUserGroups();
     });
 
     try {
       await this.hubConnection.start();
-      console.log('SignalR Connected');
+      console.log('[SignalR] ✅ Connected, state:', this.hubConnection.state);
       await this.joinUserGroups();
     } catch (err) {
-      console.error('SignalR start error:', err);
+      console.error('[SignalR] ❌ start error:', err);
     }
   }
 
@@ -144,11 +163,15 @@ export class SignalrService {
 
       for (const role of roles) {
         await this.hubConnection.invoke('JoinGroup', adUser, role);
+        console.log(`[SignalR] joined role group → adUser:"${adUser}" role:"${role}"`);
       }
     }
 
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
+      console.log(`[SignalR] ✅ joined user group → "user:${adUser}"`);
+    } else {
+      console.warn('[SignalR] ⚠️ adUser เป็น null — ไม่ได้ join user group เลย! ไม่มีทางรับ notification');
     }
   }
 
