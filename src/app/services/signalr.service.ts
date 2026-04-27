@@ -27,8 +27,16 @@ export class SignalrService {
   constructor() {
     effect(() => {
       const adUser = this.authService.currentUser();
-      if (adUser && this.hubConnection?.state === 'Connected') {
+      const state = this.hubConnection?.state;
+      console.log(`[SignalR effect] currentUser="${adUser}" hubState="${state}"`);
+
+      if (adUser && state === signalR.HubConnectionState.Connected) {
+        console.log('[SignalR effect] → calling joinUserGroups');
         this.joinUserGroups();
+      } else if (!adUser) {
+        console.warn('[SignalR effect] ⚠️ currentUser ยังเป็น null — รอ login');
+      } else if (state !== signalR.HubConnectionState.Connected) {
+        console.warn(`[SignalR effect] ⚠️ hub ยังไม่ Connected (state="${state}") — joinUserGroups จะถูกเรียกอีกครั้งใน onreconnected/startConnection`);
       }
     });
   }
@@ -38,7 +46,7 @@ export class SignalrService {
     this.http
       .post(`${this.baseUrl}/notification/ticket-status-notify`, {
         ticketId,
-        requesterAdUser,
+        requesterAdUser: requesterAdUser.toLowerCase(),
         status,
       })
       .subscribe({ error: (err) => console.error('ticketStatusNotify error', err) });
@@ -52,10 +60,10 @@ export class SignalrService {
   }
 
   assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
-    const senderAdUser = this.authService.currentUser() ?? '';
+    const senderAdUser = (this.authService.currentUser() ?? '').toLowerCase();
     return this.http.post(`${this.baseUrl}/notification/it-assign-notify`, {
       ticketId,
-      assigneeAdUsers,
+      assigneeAdUsers: assigneeAdUsers.map((u) => u.toLowerCase()),
       senderAdUser,
     });
   }
@@ -67,7 +75,13 @@ export class SignalrService {
     senderName: string,
     note: string,
   ) {
-    const body = { ticketId, requesterAdUser, senderAdUser, senderName, note };
+    const body = {
+      ticketId,
+      requesterAdUser: requesterAdUser.toLowerCase(),
+      senderAdUser: senderAdUser.toLowerCase(),
+      senderName,
+      note,
+    };
     console.log('[noteNotify] sending →', body);
 
     this.http
@@ -155,7 +169,8 @@ export class SignalrService {
   }
 
   private async joinUserGroups() {
-    const adUser = this.authService.currentUser();
+    const raw = localStorage.getItem('currentUser');
+    const adUser = raw?.toLowerCase() ?? null;
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
       console.log(`[SignalR] ✅ joined user group → "user:${adUser}"`);
