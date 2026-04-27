@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, effect } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject, throttleTime } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -23,6 +23,15 @@ export class SignalrService {
   ticketReadTrigger = new Subject<{ ticketId: any }>();
   ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
   ticketFocusTrigger = new Subject<number>();
+
+  constructor() {
+    effect(() => {
+      const adUser = this.authService.currentUser();
+      if (adUser && this.hubConnection?.state === 'Connected') {
+        this.joinUserGroups();
+      }
+    });
+  }
 
   ticketStatusNotify(ticketId: any, requesterAdUser: string, status: string) {
     if (!ticketId || !requesterAdUser) return;
@@ -87,17 +96,24 @@ export class SignalrService {
       .withAutomaticReconnect()
       .build();
 
+    this.hubConnection.onclose((err) => {
+      console.warn('[SignalR] connection CLOSED', err ?? '');
+    });
+
+    this.hubConnection.onreconnecting((err) => {
+      console.warn('[SignalR] RECONNECTING', err ?? '');
+    });
+
     this.hubConnection.onreconnected(async () => {
-      console.log('Reconnected');
       await this.joinUserGroups();
     });
 
     try {
       await this.hubConnection.start();
-      console.log('SignalR Connected');
+      console.log('[SignalR] Connected');
       await this.joinUserGroups();
     } catch (err) {
-      console.error('SignalR start error:', err);
+      console.error('[SignalR] start error:', err);
     }
   }
 
@@ -137,19 +153,6 @@ export class SignalrService {
 
   private async joinUserGroups() {
     const adUser = this.authService.currentUser();
-    const roleString = this.authService.userRole();
-
-    if (adUser && roleString) {
-      const roles = roleString
-        .split(',')
-        .map((r) => r.trim())
-        .filter((r) => r.length > 0);
-
-      for (const role of roles) {
-        await this.hubConnection.invoke('JoinGroup', adUser, role);
-      }
-    }
-
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
       await this.hubConnection.invoke('JoinGroup', `user:${adUser}`);
