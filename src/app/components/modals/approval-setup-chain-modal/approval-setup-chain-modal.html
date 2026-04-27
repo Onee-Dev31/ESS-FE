@@ -49,7 +49,7 @@
         </table>
       }
     </div>
-    <div class="modal-footer" *ngIf="isVisible">
+    <div class="modal-footer">
       <button type="button" class="btn-outline" (click)="close()">ยกเลิก</button>
       <button type="button" class="btn-primary" (click)="save()" [disabled]="isSaving()">
         <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>

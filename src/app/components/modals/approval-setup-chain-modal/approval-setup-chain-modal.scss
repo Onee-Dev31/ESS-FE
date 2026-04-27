@@ -15,7 +15,6 @@
   background-color: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-toolbar);
   display: flex;
   flex-direction: column;
 
@@ -24,14 +23,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 24px 30px;
-    background-color: var(--bg-slate);
+    background-color: var(--primary);
     border-bottom: 1px solid var(--border-color);
 
     .request-title {
       margin: 0;
       font-size: $font-size-header;
       font-weight: 600;
-      color: var(--text);
+      color: var(--text-reverse);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -48,26 +47,14 @@
       }
     }
 
-    .btn-close-x {
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      color: var(--text-sub);
-      cursor: pointer;
-
-      &:hover {
-        color: var(--danger);
-      }
-    }
-
     .btn-close-modal {
       @include close-btn-style;
-      color: var(--text-muted);
+      color: var(--text-reverse);
       font-size: 1.25rem;
       flex-shrink: 0;
 
       &:hover {
-        background: var(--border-toolbar);
+        background: rgba(255, 255, 255, 0.15);
         color: $danger;
         transform: rotate(90deg);
       }
