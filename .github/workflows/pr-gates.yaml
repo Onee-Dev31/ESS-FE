@@ -57,7 +57,14 @@ jobs:
       - run: npm install
       - run: cp src/environments/environment.example.ts src/environments/environment.ts
       - name: Run Tests + Coverage
+        id: tests
         run: npx ng test --no-watch 2>&1 | tee test-output.txt; exit ${PIPESTATUS[0]}
+      - name: Show Failed Tests
+        if: failure() && steps.tests.conclusion == 'failure'
+        run: |
+          echo "::group::❌ Failed Tests"
+          grep -E "FAIL|Error:|✗|×|expected|received" test-output.txt || cat test-output.txt
+          echo "::endgroup::"
       - name: Parse Coverage
         id: cov
         if: always()
