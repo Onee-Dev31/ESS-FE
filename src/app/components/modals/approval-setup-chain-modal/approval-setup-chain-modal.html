@@ -36,6 +36,7 @@
                     <div
                       class="toggle"
                       [class.on]="cat[step.key]"
+                      [class.readonly]="!isVisible"
                       (click)="toggle(cat.categoryId, step.key)"
                     >
                       <div class="toggle-thumb"></div>
@@ -48,14 +49,12 @@
         </table>
       }
     </div>
-    <div class="modal-footer">
-      <!-- <div class="setup-modal__footer"> -->
+    <div class="modal-footer" *ngIf="isVisible">
       <button type="button" class="btn-outline" (click)="close()">ยกเลิก</button>
       <button type="button" class="btn-primary" (click)="save()" [disabled]="isSaving()">
         <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
         {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
       </button>
-      <!-- </div> -->
     </div>
   </div>
 </div>

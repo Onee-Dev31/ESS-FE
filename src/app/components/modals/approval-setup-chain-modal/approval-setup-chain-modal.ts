@@ -7,34 +7,11 @@ import { fadeIn, modalAnimation } from '../../../animations/animations';
 import { SwalService } from '../../../services/swal.service';
 import { ApprovalSetupService } from '../../../services/approval-setup.service';
 import { AuthService } from '../../../services/auth.service';
-
-// TODO: เปลี่ยนเป็น API จริง
-const MOCK_CATEGORIES: any[] = [
-  {
-    CategoryID: 1,
-    CategoryCode: 'IT_REQUEST',
-    CategoryName: 'IT Request',
-    SkipApprover1: true,
-    SkipApprover2: false,
-    SkipApprover3: true,
-    SkipApprover4: false,
-    ActiveFlag: true,
-  },
-  {
-    CategoryID: 2,
-    CategoryCode: 'WELFARE',
-    CategoryName: 'สวัสดิการ',
-    SkipApprover1: true,
-    SkipApprover2: false,
-    SkipApprover3: false,
-    SkipApprover4: true,
-    ActiveFlag: true,
-  },
-];
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-approval-setup-chain-modal',
-  imports: [],
+  imports: [CommonModule],
   animations: [modalAnimation, fadeIn],
   templateUrl: './approval-setup-chain-modal.html',
   styleUrl: './approval-setup-chain-modal.scss',
@@ -42,6 +19,8 @@ const MOCK_CATEGORIES: any[] = [
 export class ApprovalSetupChainModal {
   onClose = output<void>();
   onSaved = output<void>();
+
+  isVisible: boolean = false;
 
   private approvalService = inject(ApprovalSetupService);
   private swalService = inject(SwalService);
