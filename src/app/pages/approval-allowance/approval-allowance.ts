@@ -1,34 +1,42 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { DateUtilityService } from '../../services/date-utility.service';
-import { ExportService } from '../../services/export';
-import { ToastService } from '../../services/toast';
-import { LoadingService } from '../../services/loading';
-import { ErrorService } from '../../services/error';
-import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { ApprovalDetailModalComponent } from '../../components/modals/approval-detail-modal/approval-detail-modal';
-import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { StatusLabelPipe } from '../../pipes/status-label.pipe';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { ApprovalItem } from '../../interfaces/approval.interface';
+import {
+  MealAllowanceClaim,
+  MealAllowancePendingApproval,
+} from '../../interfaces/allowance.interface';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
-import dayjs from 'dayjs';
+import { DateUtilityService } from '../../services/date-utility.service';
+import { LoadingService } from '../../services/loading';
+import { ErrorService } from '../../services/error';
 import { AllowanceApiService } from '../../services/allowance-api.service';
-import { ApprovalAllowanceService } from '../../services/approval-allowance';
+import { AuthService } from '../../services/auth.service';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
 
 @Component({
   selector: 'app-approval-allowance',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    ApprovalDetailModalComponent,
-    FilePreviewModalComponent,
     PageHeaderComponent,
+    ApprovalDetailModalComponent,
     SkeletonComponent,
     EmptyStateComponent,
     StatusLabelPipe,
@@ -36,129 +44,55 @@ import { StatusUtil } from '../../utils/status.util';
   ],
   templateUrl: './approval-allowance.html',
   styleUrl: './approval-allowance.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApprovalAllowanceComponent implements OnInit {
-  readonly pageTitle = signal('อนุมัติค่าเบี้ยเลี้ยง');
-
-  dateUtil = inject(DateUtilityService);
-  private approvalAllowanceService = inject(ApprovalAllowanceService);
-  private exportService = inject(ExportService);
-  private toastService = inject(ToastService);
+  private route = inject(ActivatedRoute);
+  private allowanceApi = inject(AllowanceApiService);
+  private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
 
-  isLoading = this.loadingService.loading('approvals-list');
-  isExporting = this.loadingService.loading('export');
-  isRefreshing = signal<boolean>(false);
-  private initialized = false;
+  dateUtil = inject(DateUtilityService);
 
-  fromMonth = signal<number>(0);
-  fromYear = signal<string>((dayjs().year() - 1).toString());
-  toMonth = signal<number>(11);
-  toYear = signal<string>(dayjs().year().toString());
+  readonly pageTitle = signal('อนุมัติใบเบิกเบี้ยเลี้ยง');
+  readonly listing = createListingState();
+  readonly allowanceTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
 
-  isPreviewModalOpen = signal<boolean>(false);
-  previewFiles = signal<{ fileName: string; url: string; date: string; type: string }[]>([]);
-
-  profileLightbox = signal<{ url: string; name: string } | null>(null);
-
-  isModalOpen = signal<boolean>(false);
+  isLoading = this.loadingService.loading('allowance-approvals-list');
+  isRefreshing = signal(false);
+  isModalOpen = signal(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
-
-  approvals = signal<any[]>([]);
-  showExportMenu = signal<boolean>(false);
-  listing = createListingState();
-  medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
+  approvals = signal<ApprovalItem[]>([]);
+  private initialized = false;
 
   constructor() {
     this.listing.filterStatus.set('Pending');
   }
 
   ngOnInit() {
-    this.loadMedicalClaims();
-  }
-
-  refresh() {
-    this.loadMedicalClaims();
+    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo') || '';
+    const claimId = this.route.snapshot.queryParamMap.get('id') || '';
+    this.loadClaims(voucherNo, claimId);
   }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
     const matchStatus = !status || item.status === status;
+    const normalizedSearch = search.trim();
     const matchSearch =
-      !search ||
-      item.requestNo.toLowerCase().includes(search) ||
-      item.requestBy.name.toLowerCase().includes(search) ||
-      item.requestDetail.toLowerCase().includes(search);
+      !normalizedSearch ||
+      item.requestNo.toLowerCase().includes(normalizedSearch) ||
+      item.requestBy.name.toLowerCase().includes(normalizedSearch) ||
+      item.requestBy.employeeId.toLowerCase().includes(normalizedSearch) ||
+      item.requestDetail.toLowerCase().includes(normalizedSearch);
     return matchStatus && matchSearch;
   });
 
-  toggleExportMenu() {
-    this.showExportMenu.set(!this.showExportMenu());
+  refresh() {
+    this.loadClaims();
   }
 
-  async exportPDF() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      await this.exportService.exportToPDF('approvals-table', 'approvals');
-      this.toastService.success('Export PDF สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-pdf' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  async exportExcel() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      const data = this.comps.paginatedData().map((item) => ({
-        requestNo: item.requestNo,
-        requestDate: item.requestDate,
-        requestBy: item.requestBy.name,
-        employeeId: item.requestBy.employeeId,
-        department: item.requestBy.department,
-        requestType: item.requestType,
-        requestDetail: item.requestDetail,
-        amount: item.amount,
-        status: item.status,
-      }));
-
-      const columns = [
-        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
-        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
-        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
-        { header: 'ประเภท', key: 'requestType', width: 15 },
-        { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
-        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
-        { header: 'สถานะ', key: 'status', width: 15 },
-      ];
-
-      await this.exportService.exportToExcel(data, columns, 'approvals-medical');
-      this.toastService.success('Export Excel สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  print() {
-    this.showExportMenu.set(false);
-    this.loadingService.start('export');
-    try {
-      this.exportService.printElement('approvals-table');
-      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'print' });
-    } finally {
-      this.loadingService.stop('export');
-    }
-  }
-
-  // FUNCTION
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.listing.searchText.set(input.value);
@@ -175,22 +109,19 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   trackByRowId(index: number, item: ApprovalItem): string {
-    return `${item.requestNo}-${index}`;
+    return `${item.requestId}-${item.requestNo}-${index}`;
   }
 
-  getMedicalClaim(item: ApprovalItem): any | null {
-    return (item.originalData as any)?.claimId != null ? (item.originalData as any) : null;
+  getClaim(item: ApprovalItem): MealAllowanceClaim | null {
+    return item.originalData?.claimId != null ? (item.originalData as MealAllowanceClaim) : null;
   }
 
   getStatusClass(status: string) {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
 
-  onImgError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    if (!img.src.includes('user.png')) {
-      img.src = 'user.png';
-    }
+  isPending(item: ApprovalItem): boolean {
+    return (item.rawStatus || '').toLowerCase() === 'pending';
   }
 
   viewDetail(item: ApprovalItem) {
@@ -199,7 +130,7 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.isModalOpen.set(true);
   }
 
-  openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected' | 'Referred Back') {
+  openActionModal(item: ApprovalItem, action: 'Approved' | 'Rejected') {
     this.selectedItem.set(item);
     this.initialAction.set(action);
     this.isModalOpen.set(true);
@@ -209,113 +140,114 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.isModalOpen.set(false);
     this.selectedItem.set(null);
     this.initialAction.set(null);
-    this.loadMedicalClaims();
+    this.loadClaims();
   }
 
   onStatusUpdated() {
     this.refresh();
   }
 
-  // PREVIEW-PROFILE
-  openProfileImage(claim: any) {
-    if (!claim.employeeImageUrl) return;
-    this.profileLightbox.set({
-      url: claim.employeeImageUrl,
-      name: claim.employeeName ?? claim.employeeCode,
-    });
-  }
-  closeProfileLightbox() {
-    this.profileLightbox.set(null);
-  }
-
-  // PREVIEW
-  openPreview(claim: any) {
-    if (!claim.attachments?.length) return;
-    this.previewFiles.set(
-      claim.attachments.map((a: any) => ({
-        fileName: a.fileName,
-        url: this.approvalAllowanceService.getFileUrl(a.fileUrl),
-        date: claim.claimDate,
-        type: a.fileType,
-      })),
-    );
-    this.isPreviewModalOpen.set(true);
-  }
-
-  closePreview() {
-    this.isPreviewModalOpen.set(false);
-  }
-
-  // MAP
-  private mapClaimToApproval(claim: any): ApprovalItem {
-    return {
-      requestId: claim.claimId,
-      requestNo: claim.voucherNo ?? `#${claim.claimId}`,
-      requestDate: claim.claimDate,
-      requestBy: {
-        name: claim.employeeName ?? claim.employeeCode,
-        employeeId: claim.employeeCode,
-        department: claim.departmentName ?? '-',
-        company: claim.companyName ?? '-',
-      },
-      requestType: 'ค่ารักษาพยาบาล',
-      typeId: claim.expenseTypeId,
-      requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
-      remark: claim.remark || '',
-      amount: claim.requestedAmount,
-      status: this.mapClaimStatus(claim.status),
-      rawStatus: claim.status,
-      type: 'medical',
-      originalData: claim,
-    };
-  }
-  private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-    switch (status?.toUpperCase()) {
-      case 'APPROVED':
-        return 'Approved';
-      case 'REJECTED':
-        return 'Rejected';
-      case 'REFERRED_BACK':
-        return 'Referred Back';
-      default:
-        return 'Pending';
+  getClaimDateRange(claim: MealAllowanceClaim): string {
+    if (!claim.details?.length) {
+      return this.dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY');
     }
+
+    const dates = claim.details
+      .map((detail) => detail.work_date)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+
+    if (!dates.length) {
+      return this.dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY');
+    }
+
+    const first = this.dateUtil.formatDateToBE(dates[0], 'DD/MM/YYYY');
+    const last = this.dateUtil.formatDateToBE(dates[dates.length - 1], 'DD/MM/YYYY');
+    return first === last ? first : `${first} - ${last}`;
   }
 
-  // GET
-  /** โหลดข้อมูลค่ารักษาพยาบาลจาก API */
-  loadMedicalClaims() {
-    const fromYear = parseInt(this.fromYear());
-    const toYear = parseInt(this.toYear());
-    const keyword = this.listing.searchText().trim() || undefined;
+  readonly summary = computed(() => ({
+    totalClaims: this.approvals().length,
+    pendingClaims: this.approvals().filter((item) => item.status === 'Pending').length,
+  }));
 
+  private loadClaims(autoOpenVoucherNo?: string, autoOpenClaimId?: string) {
+    const adUser = this.authService.currentUser() || '';
     if (!this.initialized) {
-      this.loadingService.start('approvals-list');
+      this.loadingService.start('allowance-approvals-list');
     } else {
       this.isRefreshing.set(true);
     }
 
-    this.approvalAllowanceService
-      .getClaims({
-        from_month: this.fromMonth() + 1,
-        from_year: isNaN(fromYear) ? undefined : fromYear,
-        to_month: this.toMonth() + 1,
-        to_year: isNaN(toYear) ? undefined : toYear,
-        keyword,
-      })
-      .subscribe({
-        next: (res) => {
-          this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
-          this.listing.currentPage.set(0);
-          this.loadingService.stop('approvals-list');
-          this.isRefreshing.set(false);
-          this.initialized = true;
-        },
-        error: (error) => {
-          this.loadingService.stop('approvals-list');
-          this.isRefreshing.set(false);
-          this.errorService.handle(error, { component: 'ApprovalsM', action: 'load-claims' });
-        },
-      });
+    this.allowanceApi.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
+      next: (res) => {
+        const mapped = (res.data || []).map((claim) => this.mapClaimToApproval(claim));
+        this.approvals.set(mapped);
+        this.listing.currentPage.set(0);
+        this.loadingService.stop('allowance-approvals-list');
+        this.isRefreshing.set(false);
+        this.initialized = true;
+
+        const claimToOpen =
+          mapped.find((item) => item.requestNo === autoOpenVoucherNo) ||
+          mapped.find((item) => item.requestId.toString() === autoOpenClaimId);
+
+        if (claimToOpen) {
+          this.viewDetail(claimToOpen);
+        }
+      },
+      error: (error) => {
+        this.loadingService.stop('allowance-approvals-list');
+        this.isRefreshing.set(false);
+        this.errorService.handle(error, {
+          component: 'ApprovalAllowance',
+          action: 'load-claims',
+        });
+      },
+    });
+  }
+
+  private mapClaimToApproval(claim: MealAllowancePendingApproval): ApprovalItem {
+    return {
+      requestId: claim.claimID,
+      requestNo: claim.voucherNo ?? `#${claim.claimID}`,
+      requestDate: claim.submittedAt,
+      requestBy: {
+        name: claim.employeeName ?? claim.employeeCode,
+        employeeId: claim.employeeCode,
+        department: '-',
+        company: '-',
+      },
+      requestType: 'ค่าเบี้ยเลี้ยง',
+      typeId: 0,
+      requestDetail: `ขั้นตอนที่ ${claim.stepNo}`,
+      amount: claim.totalAmount,
+      status: this.mapClaimStatus(claim.status),
+      rawStatus: claim.status,
+      type: 'allowance',
+      originalData: {
+        claimId: claim.claimID,
+        voucherNo: claim.voucherNo,
+        employeeCode: claim.employeeCode,
+        employeeName: claim.employeeName,
+        totalAmount: claim.totalAmount,
+        claimDate: claim.submittedAt,
+        status: claim.status,
+        createdAt: claim.submittedAt,
+        details: [],
+      } as MealAllowanceClaim,
+      remark: '',
+    };
+  }
+
+  private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
+    switch ((status || '').toUpperCase()) {
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED':
+        return 'Rejected';
+      default:
+        return 'Pending';
+    }
   }
 }

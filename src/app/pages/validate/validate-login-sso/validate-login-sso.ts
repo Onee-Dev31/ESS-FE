@@ -28,7 +28,10 @@ export class ValidateLoginSso {
       this.systemCode = params.get('systemCode') || '';
       this.applicantId = params.get('applicantId') || '';
       this.ticketNumber = this.systemCode === 'ESS-EMAIL-IT-Req' ? params.get('ticket') || '' : '';
-      this.voucherNo = this.systemCode === 'ESS-EMAIL-Medical' ? params.get('voucherNo') || '' : '';
+      this.voucherNo =
+        this.systemCode === 'ESS-EMAIL-Medical' || this.systemCode === 'ESS-EMAIL-Allowance'
+          ? params.get('voucherNo') || ''
+          : '';
 
       this.token = token;
 
@@ -40,23 +43,24 @@ export class ValidateLoginSso {
       this.authService.loginSSO(this.token, this.systemCode).subscribe({
         next: (res) => {
           if (res?.success) {
-            console.log('[SSO] full response:', res);
-            console.log('[SSO] systmeCode:', JSON.stringify(res.systmeCode));
-            console.log('[SSO] landingPath:', res.landingPath);
-            console.log('[SSO] voucherNo from param:', JSON.stringify(this.voucherNo));
             if (res.systmeCode == 'ESS-EMAIL-IT-Req') {
               const url = `${res.landingPath || '/'}?ticket=${encodeURIComponent(this.ticketNumber.trim())}`;
-              // console.log('go url:', url);
               this.router.navigateByUrl(url);
-            } else if (res.systmeCode == 'ESS-EMAIL-Medical') {
-              const basePath = res.landingPath || '/approvals-medical';
+            } else if (
+              res.systmeCode == 'ESS-EMAIL-Medical' ||
+              res.systmeCode == 'ESS-EMAIL-Allowance'
+            ) {
+              const fallback =
+                res.systmeCode == 'ESS-EMAIL-Allowance'
+                  ? '/approvals-allowance'
+                  : '/approvals-medical';
+              const basePath = res.landingPath || fallback;
               const url = this.voucherNo
                 ? `${basePath}?voucherNo=${encodeURIComponent(this.voucherNo.trim())}`
                 : basePath;
               this.router.navigateByUrl(url);
             } else {
               const url = `${res.landingPath || '/'}?applicantId=${encodeURIComponent(encryptValue(this.applicantId.trim()))}`;
-              // console.log('go url:', url);
               this.router.navigateByUrl(url || '/');
             }
           } else {
