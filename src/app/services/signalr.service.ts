@@ -30,8 +30,7 @@ export class SignalrService {
       const state = this.hubConnection?.state;
       console.log(`[SignalR effect] currentUser="${adUser}" hubState="${state}"`);
 
-      if (adUser && state === signalR.HubConnectionState.Connected) {
-        console.log('[SignalR effect] → calling joinUserGroups');
+      if (adUser && state === 'Connected') {
         this.joinUserGroups();
       } else if (!adUser) {
         console.warn('[SignalR effect] ⚠️ currentUser ยังเป็น null — รอ login');
@@ -174,15 +173,26 @@ export class SignalrService {
   }
 
   private async joinUserGroups() {
-    const raw = localStorage.getItem('currentUser');
-    const adUser = raw?.toLowerCase() ?? null;
+    const adUser = this.authService.currentUser();
+    const roleString = this.authService.userRole();
+
+    if (adUser && roleString) {
+      const roles = roleString
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r) => r.length > 0);
+
+      for (const role of roles) {
+        try {
+          await this.hubConnection.invoke('JoinGroup', adUser, role);
+        } catch {
+          // backend hub method signature may differ — silently skip
+        }
+      }
+    }
+
     if (adUser) {
       await this.hubConnection.invoke('JoinUserGroup', adUser);
-      console.log(`[SignalR] ✅ joined user group → "user:${adUser}"`);
-    } else {
-      console.warn(
-        '[SignalR] ⚠️ adUser เป็น null — ไม่ได้ join user group เลย! ไม่มีทางรับ notification',
-      );
     }
   }
 

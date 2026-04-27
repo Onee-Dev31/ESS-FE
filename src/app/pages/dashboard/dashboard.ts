@@ -6,6 +6,7 @@ import {
   computed,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -39,6 +40,7 @@ import { color } from 'echarts';
 import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ItAssetService } from '../../services/it-asset.service';
+import { ThemeService } from '../../services/theme.service';
 
 interface ProfileItem {
   label: string;
@@ -83,6 +85,7 @@ export class DashboardComponent implements OnInit {
   private vehicleService = inject(VehicleService);
   private taxiService = inject(TaxiService);
   private itAssetService = inject(ItAssetService);
+  private themeService = inject(ThemeService);
   authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
 
@@ -90,7 +93,12 @@ export class DashboardComponent implements OnInit {
     private teamCalendarService: TeamCalendarService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone,
-  ) {}
+  ) {
+    effect(() => {
+      this.themeService.isDarkMode();
+      this.getTeamCalendar();
+    });
+  }
 
   userRole = this.authService.userRole;
 
@@ -557,11 +565,16 @@ export class DashboardComponent implements OnInit {
       this.allHolidays.forEach((h) => {
         this.holidayMap[h.date] = { id: h.id, name: h.name };
       });
-      const colorMap: Record<string, string> = {};
+      const colorMap: Record<string, any> = {};
       (color || []).forEach((c: any) => {
-        colorMap[c.Type] = c.Rgb;
+        colorMap[c.Type] = {
+          rgb: c.Rgb,
+          rgbDark: c.RgbDark,
+        };
       });
       const holidayDates = new Set(Object.keys(this.holidayMap));
+
+      const isDark = this.themeService.isDarkMode();
 
       const events: any[] = [];
       (team || []).forEach((emp: any) => {
@@ -576,8 +589,16 @@ export class DashboardComponent implements OnInit {
             allDay: true,
             display: 'block',
             classNames: ['leave-event'],
-            backgroundColor: colorMap[lv.LeaveType] || undefined,
-            borderColor: colorMap[lv.LeaveType] || undefined,
+            backgroundColor: colorMap[lv.LeaveType]
+              ? isDark
+                ? colorMap[lv.LeaveType].rgbDark
+                : colorMap[lv.LeaveType].rgb
+              : undefined,
+            borderColor: colorMap[lv.LeaveType]
+              ? isDark
+                ? colorMap[lv.LeaveType].rgbDark
+                : colorMap[lv.LeaveType].rgb
+              : undefined,
             extendedProps: {
               type: 'leave',
               empId: emp.EmpId,
