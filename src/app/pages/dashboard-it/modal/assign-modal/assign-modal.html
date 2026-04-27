@@ -36,7 +36,8 @@
         <input
           nz-input
           placeholder="ค้นหาชื่อคน"
-          [(ngModel)]="assignSearchKeyword"
+          [ngModel]="assignSearchKeyword()"
+          (ngModelChange)="assignSearchKeyword.set($event)"
           name="assign"
           class="form-input"
         />
@@ -59,7 +60,7 @@
         </div>
 
         <div class="assign-list-container">
-          <div class="assign-group" *ngFor="let g of filteredAssigneeGroups">
+          <div class="assign-group" *ngFor="let g of filteredAssigneeGroups()">
             <div class="assign-group-header">
               <div class="assign-group-label">{{ g.name }}</div>
 

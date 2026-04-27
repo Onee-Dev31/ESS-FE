@@ -1785,8 +1785,8 @@ $balance: $status-success-text;
       border: 1px solid transparent;
 
       &.circle-green-outline {
-        background: #ecfdf5;
-        color: #059669;
+        background: var(--public-holiday-bg);
+        color: var(--public-holiday-text);
         border-color: transparent;
       }
 
@@ -1797,8 +1797,8 @@ $balance: $status-success-text;
       }
 
       &.circle-red-outline {
-        color: var(--danger);
-        background: #fef2f2;
+        color: var(--weekend-text);
+        background: var(--weekend-bg);
       }
     }
 

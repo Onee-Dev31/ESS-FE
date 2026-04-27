@@ -118,6 +118,14 @@
   // ticket highlight animation
   --ticket-highlight-bg-0: #e6f4ff;
   --ticket-highlight-bg-50: #bae0ff;
+
+  // DATE
+  --weekend-text: #dc2626;
+  --weekend-bg: #fef2f2;
+  --public-holiday-text: #059669;
+  --public-holiday-bg: #ecfdf5;
+  --working-day-text: #000000;
+  --working-day-bg: #eeeeee00;
 }
 
 [data-theme='dark'] {
@@ -239,6 +247,14 @@
   // ticket highlight animation
   --ticket-highlight-bg-0: #1a2540;
   --ticket-highlight-bg-50: #4a148c;
+
+  // DATE
+  --weekend-text: #dc2626;
+  --weekend-bg: #b37f7f;
+  --public-holiday-text: #059669;
+  --public-holiday-bg: #6d9b85;
+  --working-day-text: #000000;
+  --working-day-bg: #eeeeee00;
 }
 
 // Keep Original SASS variables mapping to CSS Variables to ensure backwards compatibility
