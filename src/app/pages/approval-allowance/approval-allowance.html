@@ -40,7 +40,7 @@
       </div>
 
       <div class="tab-navigation">
-        @for (tab of medicalTabs; track tab) {
+        @for (tab of allowanceTabs; track tab) {
           <button
             type="button"
             class="tab-item"
@@ -58,24 +58,14 @@
         <app-skeleton type="card" [rows]="3"></app-skeleton>
       } @else {
         @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-          @let claim = getMedicalClaim(req);
+          @let claim = getClaim(req);
           @if (claim) {
             <div class="claim-card">
               <div class="claim-card__header">
                 <div class="claim-card__type-badge">
-                  <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
+                  <i class="fas fa-utensils"></i> ค่าเบี้ยเลี้ยง
                 </div>
                 <div class="claim-card__actions">
-                  @if (claim.attachments.length) {
-                    <button
-                      type="button"
-                      class="btn-attach"
-                      (click)="openPreview(claim)"
-                      title="ดูเอกสาร"
-                    >
-                      <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
-                    </button>
-                  }
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
                     {{ req.rawStatus | statusLabel }}
                   </span>
@@ -83,25 +73,9 @@
               </div>
 
               <div class="claim-card__employee">
-                <div
-                  class="emp-avatar"
-                  [class.clickable]="claim.employeeImageUrl"
-                  (click)="openProfileImage(claim)"
-                  title="คลิกดูรูปขนาดใหญ่"
-                >
-                  <img
-                    [src]="claim.employeeImageUrl"
-                    alt="{{ claim.employeeCode }}"
-                    (error)="onImgError($event)"
-                  />
-                  <i class="fas fa-user-circle fallback-icon"></i>
-                </div>
                 <div class="emp-info">
                   <div class="emp-name">
                     {{ claim.employeeName ?? claim.employeeCode }}
-                    @if (claim.employeeNickname) {
-                      <span class="emp-nickname">({{ claim.employeeNickname }})</span>
-                    }
                   </div>
                   <div class="emp-meta">
                     <span><i class="fas fa-id-badge"></i> {{ claim.employeeCode }}</span>
@@ -119,53 +93,19 @@
                 <div class="claim-card__main">
                   <div class="claim-date">
                     <i class="far fa-calendar-alt"></i>
-                    <span
-                      >{{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                      {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}</span
-                    >
-                    <span class="claim-days">{{ claim.treatmentDays }} วัน</span>
+                    <span>{{ getClaimDateRange(claim) }}</span>
                   </div>
-                  <div class="claim-hospital">
-                    <i class="fas fa-hospital-alt"></i>
-                    <span>{{ claim.hospitalName }}</span>
-                  </div>
-                  <div class="claim-disease">
-                    <i class="fas fa-virus"></i>
-                    <span>{{ claim.diseaseName }}</span>
+                  <div class="claim-step">
+                    <i class="fas fa-list-ol"></i>
+                    <span>{{ req.requestDetail }}</span>
                   </div>
                 </div>
 
                 <div class="claim-card__amount">
-                  <span class="amount-label">ขอเบิก</span>
-                  <span class="amount-value">฿{{ claim.requestedAmount | number: '1.2-2' }}</span>
-                  @if (claim.approvedAmount > 0) {
-                    <span class="amount-approved"
-                      >อนุมัติ ฿{{ claim.approvedAmount | number: '1.2-2' }}</span
-                    >
-                  }
+                  <span class="amount-label">ยอดเงิน</span>
+                  <span class="amount-value">฿{{ claim.totalAmount | number: '1.2-2' }}</span>
                 </div>
               </div>
-
-              @if (claim.typeTotalLimit > 0) {
-                <div class="claim-card__budget">
-                  <div class="budget-row">
-                    <span class="budget-label">วงเงิน {{ claim.expenseTypeCode }}</span>
-                    <span class="budget-remaining"
-                      >คงเหลือ ฿{{ claim.typeRemainingAmount | number: '1.0-0' }}</span
-                    >
-                  </div>
-                  <div class="budget-bar">
-                    <div
-                      class="budget-bar__used"
-                      [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                    ></div>
-                  </div>
-                  <div class="budget-meta">
-                    <span>ใช้ไป ฿{{ claim.typeUsedAmount | number: '1.2-2' }}</span>
-                    <span>วงเงินทั้งหมด ฿{{ claim.typeTotalLimit | number: '1.2-2' }}</span>
-                  </div>
-                </div>
-              }
 
               <div class="claim-card__footer">
                 <span class="claim-id">{{ req.requestNo }}</span>
@@ -178,24 +118,24 @@
                   >
                     <i class="fas fa-eye"></i>
                   </button>
-                  <button
-                    type="button"
-                    class="act-btn act-approve"
-                    title="อนุมัติ"
-                    *ngIf="req.rawStatus === 'pending'"
-                    (click)="openActionModal(req, 'Approved')"
-                  >
-                    <i class="fas fa-check"></i>
-                  </button>
-                  <button
-                    type="button"
-                    class="act-btn act-reject"
-                    title="ไม่อนุมัติ"
-                    *ngIf="req.rawStatus === 'pending'"
-                    (click)="openActionModal(req, 'Rejected')"
-                  >
-                    <i class="fas fa-times"></i>
-                  </button>
+                  @if (req.rawStatus === 'pending') {
+                    <button
+                      type="button"
+                      class="act-btn act-approve"
+                      title="อนุมัติ"
+                      (click)="openActionModal(req, 'Approved')"
+                    >
+                      <i class="fas fa-check"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="act-btn act-reject"
+                      title="ไม่อนุมัติ"
+                      (click)="openActionModal(req, 'Rejected')"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  }
                 </div>
               </div>
             </div>
@@ -214,32 +154,24 @@
       @if (isLoading()) {
         <app-skeleton type="table" [rows]="5"></app-skeleton>
       } @else {
-        <table class="modern-table">
+        <table class="modern-table" id="allowance-approvals-table">
           <thead>
             <tr>
               <th>พนักงาน</th>
-              <th>ประเภท</th>
-              <th>วันที่รักษา</th>
-              <th>สถานพยาบาล</th>
-              <th>โรค</th>
+              <th>วันที่</th>
+              <th>รายละเอียด</th>
               <th class="text-right">ยอดเงิน</th>
               <th>สถานะ</th>
-              <th>เอกสาร</th>
               <th>จัดการ</th>
             </tr>
           </thead>
           <tbody>
             @for (req of comps.paginatedData(); track trackByRowId($index, req)) {
-              @let claim = getMedicalClaim(req);
+              @let claim = getClaim(req);
               @if (claim) {
                 <tr>
                   <td>
                     <div class="emp-cell">
-                      <img
-                        class="emp-avatar"
-                        [src]="claim.employeeImageUrl"
-                        (error)="onImgError($event)"
-                      />
                       <div>
                         <div class="emp-name">{{ claim.employeeName ?? claim.employeeCode }}</div>
                         <div class="emp-meta">{{ claim.employeeCode }}</div>
@@ -247,42 +179,17 @@
                     </div>
                   </td>
                   <td>
-                    <div class="type-badge">
-                      <span class="type-name">{{ claim.expenseTypeName }}</span>
-                    </div>
+                    {{ getClaimDateRange(claim) }}
+                  </td>
+                  <td>
                     <div class="request-no">
                       <i class="fa-solid fa-tag"></i> {{ req.requestNo }}
                     </div>
+                    <div class="sub-text">{{ req.requestDetail }}</div>
                   </td>
-                  <td>
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                    {{ dateUtil.formatDateToBE(claim.treatmentDateTo, 'DD/MM/YYYY') }}
-                    <span class="sub-text">{{ claim.treatmentDays }} วัน</span>
-                  </td>
-                  <td>{{ claim.hospitalName }}</td>
-                  <td>{{ claim.diseaseName }}</td>
                   <td class="text-right">
                     <div class="amount-cell">
-                      <div class="amount-main" [class.is-approved]="claim.approvedAmount > 0">
-                        @if (claim.approvedAmount > 0) {
-                          <i class="fas fa-check check-icon"></i>
-                        }
-                        ฿{{ claim.requestedAmount | number: '1.2-2' }}
-                      </div>
-                      @if (claim.typeTotalLimit > 0) {
-                        <div class="budget-section">
-                          <div class="budget-bar">
-                            <div
-                              class="budget-bar__used"
-                              [style.width.%]="(claim.typeUsedAmount / claim.typeTotalLimit) * 100"
-                            ></div>
-                          </div>
-                          <div class="budget-text">
-                            {{ claim.typeUsedAmount | number: '1.0-0' }} /
-                            {{ claim.typeTotalLimit | number: '1.0-0' }}
-                          </div>
-                        </div>
-                      }
+                      <div class="amount-main">฿{{ claim.totalAmount | number: '1.2-2' }}</div>
                     </div>
                   </td>
                   <td>
@@ -290,29 +197,29 @@
                       {{ req.rawStatus | statusLabel }}
                     </span>
                   </td>
-                  <td class="text-center">
-                    @if (claim.attachments.length) {
-                      <button class="btn-attach" (click)="openPreview(claim)">
-                        <i class="fas fa-file-alt"></i> {{ claim.attachments.length }}
-                      </button>
-                    } @else {
-                      -
-                    }
-                  </td>
                   <td>
                     <div class="table-actions">
-                      <button class="act-btn act-view" (click)="viewDetail(req)">
+                      <button
+                        type="button"
+                        class="act-btn act-view"
+                        title="ดูรายละเอียด"
+                        (click)="viewDetail(req)"
+                      >
                         <i class="fas fa-eye"></i>
                       </button>
                       @if (req.rawStatus === 'pending') {
                         <button
+                          type="button"
                           class="act-btn act-approve"
+                          title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
                         </button>
                         <button
+                          type="button"
                           class="act-btn act-reject"
+                          title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
                         >
                           <i class="fas fa-times"></i>
@@ -324,7 +231,7 @@
               }
             } @empty {
               <tr>
-                <td colspan="9">
+                <td colspan="6">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -359,26 +266,3 @@
     </div>
   </div>
 }
-
-@if (isPreviewModalOpen()) {
-  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
-  </app-file-preview-modal>
-}
-
-@if (profileLightbox()) {
-  <div class="profile-lightbox-overlay" (click)="closeProfileLightbox()">
-    <button type="button" class="lightbox-close" title="ปิด" (click)="closeProfileLightbox()">
-      <i class="fas fa-times"></i>
-    </button>
-    <img
-      [src]="profileLightbox()?.url"
-      alt="{{ profileLightbox()?.name || 'Profile image' }}"
-      title="{{ profileLightbox()?.name || 'Profile image' }}"
-      [attr.aria-label]="profileLightbox()?.name || 'Profile image'"
-      role="img"
-      (click)="$event.stopPropagation()"
-    />
-    <div class="lightbox-name">{{ profileLightbox()?.name || 'Profile image' }}</div>
-  </div>
-}
->

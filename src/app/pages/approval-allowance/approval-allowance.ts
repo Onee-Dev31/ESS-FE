@@ -24,6 +24,8 @@ import { createListingComputeds, createListingState } from '../../utils/listing.
 import { DateUtilityService } from '../../services/date-utility.service';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
+import { ExportService } from '../../services/export';
+import { ToastService } from '../../services/toast';
 import { AllowanceApiService } from '../../services/allowance-api.service';
 import { AuthService } from '../../services/auth.service';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
@@ -52,6 +54,8 @@ export class ApprovalAllowanceComponent implements OnInit {
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
+  private exportService = inject(ExportService);
+  private toastService = inject(ToastService);
 
   dateUtil = inject(DateUtilityService);
 
@@ -62,6 +66,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   isLoading = this.loadingService.loading('allowance-approvals-list');
   isRefreshing = signal(false);
   isModalOpen = signal(false);
+  showExportMenu = signal(false);
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
   approvals = signal<ApprovalItem[]>([]);
@@ -120,10 +125,6 @@ export class ApprovalAllowanceComponent implements OnInit {
     return StatusUtil.getStatusBadgeClaims(status.toLowerCase());
   }
 
-  isPending(item: ApprovalItem): boolean {
-    return (item.rawStatus || '').toLowerCase() === 'pending';
-  }
-
   viewDetail(item: ApprovalItem) {
     this.selectedItem.set(item);
     this.initialAction.set(null);
@@ -145,6 +146,66 @@ export class ApprovalAllowanceComponent implements OnInit {
 
   onStatusUpdated() {
     this.refresh();
+  }
+
+  toggleExportMenu() {
+    this.showExportMenu.set(!this.showExportMenu());
+  }
+
+  async exportPDF() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      await this.exportService.exportToPDF('allowance-approvals-table', 'approvals-allowance');
+      this.toastService.success('Export PDF สำเร็จ');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'ApprovalAllowance', action: 'export-pdf' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
+
+  async exportExcel() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      const data = this.comps.paginatedData().map((item) => ({
+        requestNo: item.requestNo,
+        requestDate: item.requestDate,
+        requestBy: item.requestBy.name,
+        employeeId: item.requestBy.employeeId,
+        requestDetail: item.requestDetail,
+        amount: item.amount,
+        status: item.status,
+      }));
+      const columns = [
+        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
+        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
+        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
+        { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
+        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
+        { header: 'สถานะ', key: 'status', width: 15 },
+      ];
+      await this.exportService.exportToExcel(data, columns, 'approvals-allowance');
+      this.toastService.success('Export Excel สำเร็จ');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'ApprovalAllowance', action: 'export-excel' });
+    } finally {
+      this.loadingService.stop('export');
+    }
+  }
+
+  print() {
+    this.showExportMenu.set(false);
+    this.loadingService.start('export');
+    try {
+      this.exportService.printElement('allowance-approvals-table');
+      this.toastService.success('เปิดหน้าพิมพ์แล้ว');
+    } catch (error) {
+      this.errorService.handle(error, { component: 'ApprovalAllowance', action: 'print' });
+    } finally {
+      this.loadingService.stop('export');
+    }
   }
 
   getClaimDateRange(claim: MealAllowanceClaim): string {
