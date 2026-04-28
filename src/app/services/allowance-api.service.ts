@@ -14,6 +14,7 @@ import {
   MealAllowanceReviewRequest,
   MealAllowanceReviewResponse,
   MealAllowancePendingApprovalsResponse,
+  MealAllowanceClaimResponse,
 } from '../interfaces/allowance.interface';
 export type { MealAllowanceClaimsResponse };
 
@@ -105,7 +106,6 @@ export class AllowanceApiService {
    * POST api/meal-allowance/claim
    */
   createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
-    console.log(request);
     return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
   }
 
@@ -149,11 +149,17 @@ export class AllowanceApiService {
     approver_aduser: string,
     voucher_no?: string,
   ): Observable<MealAllowancePendingApprovalsResponse> {
-    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    let p = new HttpParams().set('approver_aduser', approver_aduser).set('status', 'all');
     if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
     return this._http.get<MealAllowancePendingApprovalsResponse>(
-      `${this.baseUrl}/meal-allowance/approvals/pending`,
+      `${this.baseUrl}/meal-allowance/approvals`,
       { params: p },
+    );
+  }
+
+  getClaimById(claimId: number): Observable<MealAllowanceClaimResponse> {
+    return this._http.get<MealAllowanceClaimResponse>(
+      `${this.baseUrl}/meal-allowance/claims/${claimId}`,
     );
   }
 

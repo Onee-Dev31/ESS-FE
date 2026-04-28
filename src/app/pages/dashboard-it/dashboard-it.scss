@@ -1725,7 +1725,19 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
+  }
 }
 
 .new-note-badge {

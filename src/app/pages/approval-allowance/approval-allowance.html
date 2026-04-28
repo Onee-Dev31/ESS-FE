@@ -32,7 +32,7 @@
           <nz-icon nzInputPrefix nzType="search" />
           <input
             nz-input
-            placeholder="ค้นหา Request No, ชื่อ-นามสกุล"
+            placeholder="ค้นหาเลขที่เอกสาร, ชื่อ, รหัสพนักงาน"
             [value]="listing.searchText()"
             (input)="onSearch($event)"
           />
@@ -52,6 +52,13 @@
         }
       </div>
     </div>
+
+    @if (voucherFilter()) {
+      <div class="voucher-filter-banner">
+        <i class="fas fa-envelope-open-text"></i>
+        เปิดจากอีเมลสำหรับเอกสาร <strong>{{ voucherFilter() }}</strong>
+      </div>
+    }
 
     <div class="claim-cards-grid">
       @if (isLoading()) {
@@ -73,6 +80,22 @@
               </div>
 
               <div class="claim-card__employee">
+                <div
+                  class="emp-avatar"
+                  [class.clickable]="claim.employeeImageUrl"
+                >
+                  @if (claim.employeeImageUrl) {
+                    <img
+                      [src]="claim.employeeImageUrl"
+                      [alt]="(claim.employeeName ?? claim.employeeCode) + ' photo'"
+                      title="รูปพนักงาน"
+                      (error)="onImgError($event)"
+                    />
+                    <i class="fas fa-user-circle fallback-icon"></i>
+                  } @else {
+                    <i class="fas fa-user-circle emp-avatar__placeholder"></i>
+                  }
+                </div>
                 <div class="emp-info">
                   <div class="emp-name">
                     {{ claim.employeeName ?? claim.employeeCode }}
@@ -115,6 +138,7 @@
                     class="act-btn act-view"
                     title="ดูรายละเอียด"
                     (click)="viewDetail(req)"
+                    [disabled]="isDetailLoading()"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -124,6 +148,7 @@
                       class="act-btn act-approve"
                       title="อนุมัติ"
                       (click)="openActionModal(req, 'Approved')"
+                      [disabled]="isDetailLoading()"
                     >
                       <i class="fas fa-check"></i>
                     </button>
@@ -132,6 +157,7 @@
                       class="act-btn act-reject"
                       title="ไม่อนุมัติ"
                       (click)="openActionModal(req, 'Rejected')"
+                      [disabled]="isDetailLoading()"
                     >
                       <i class="fas fa-times"></i>
                     </button>
@@ -172,6 +198,19 @@
                 <tr>
                   <td>
                     <div class="emp-cell">
+                      <div class="emp-avatar" [class.clickable]="claim.employeeImageUrl">
+                        @if (claim.employeeImageUrl) {
+                          <img
+                            [src]="claim.employeeImageUrl"
+                            [alt]="(claim.employeeName ?? claim.employeeCode) + ' photo'"
+                            title="รูปพนักงาน"
+                            (error)="onImgError($event)"
+                          />
+                          <i class="fas fa-user-circle fallback-icon"></i>
+                        } @else {
+                          <i class="fas fa-user-circle emp-avatar__placeholder"></i>
+                        }
+                      </div>
                       <div>
                         <div class="emp-name">{{ claim.employeeName ?? claim.employeeCode }}</div>
                         <div class="emp-meta">{{ claim.employeeCode }}</div>
@@ -204,6 +243,7 @@
                         class="act-btn act-view"
                         title="ดูรายละเอียด"
                         (click)="viewDetail(req)"
+                        [disabled]="isDetailLoading()"
                       >
                         <i class="fas fa-eye"></i>
                       </button>
@@ -213,6 +253,7 @@
                           class="act-btn act-approve"
                           title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
+                          [disabled]="isDetailLoading()"
                         >
                           <i class="fas fa-check"></i>
                         </button>
@@ -221,6 +262,7 @@
                           class="act-btn act-reject"
                           title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
+                          [disabled]="isDetailLoading()"
                         >
                           <i class="fas fa-times"></i>
                         </button>
@@ -263,6 +305,15 @@
           <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
         </div>
       }
+    </div>
+  </div>
+}
+
+@if (isDetailLoading()) {
+  <div class="detail-loading-overlay">
+    <div class="detail-loading-card">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>กำลังโหลดรายละเอียดรายการ...</span>
     </div>
   </div>
 }

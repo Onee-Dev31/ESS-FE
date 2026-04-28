@@ -127,6 +127,7 @@ export interface MealAllowanceClaim {
   voucherNo: string;
   employeeCode: string;
   employeeName?: string | null;
+  employeeImageUrl?: string | null;
   departmentName?: string | null;
   companyName?: string | null;
   totalAmount: number;
@@ -135,6 +136,7 @@ export interface MealAllowanceClaim {
   createdAt: string;
   rejectionReason?: string | null;
   details: MealAllowanceClaimDetail[];
+  currentStep?: number;
 }
 
 export interface MealAllowancePagination {
@@ -158,19 +160,37 @@ export interface MealAllowanceReviewResponse {
   data?: MealAllowanceClaim;
 }
 
+export interface MealAllowanceClaimResponse {
+  success: boolean;
+  data: MealAllowanceClaim;
+}
+
 export interface MealAllowancePendingApproval {
   approvalID: number;
   claimID: number;
   stepNo: number;
+  originalStep?: number;
   voucherNo: string;
   employeeCode: string;
   employeeName: string | null;
+  employeeImageUrl?: string | null;
   totalAmount: number;
   submittedAt: string;
-  status: string;
+  status: string;       // approval step status: pending | approved | rejected
+  claimStatus?: string; // overall claim status: Pending | Approved | Rejected
+  approverEmpNo?: string;
+  approverName?: string;
+}
+
+export interface MealAllowancePendingApprovalsSummary {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
 }
 
 export interface MealAllowancePendingApprovalsResponse {
   success: boolean;
   data: MealAllowancePendingApproval[];
+  summary?: MealAllowancePendingApprovalsSummary;
 }

@@ -51,7 +51,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    background: linear-gradient(135deg, $primary 0%, color-mix(in srgb, $primary, white 10%) 100%);
+    background: var(--primary);
     color: #ffffff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: $font-size-label;
@@ -107,7 +107,7 @@
         background: var(--green);
 
         &:hover {
-          background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
+          filter: brightness(0.88);
         }
       }
 
@@ -115,7 +115,7 @@
         background: var(--red);
 
         &:hover {
-          background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+          filter: brightness(0.88);
         }
       }
 
@@ -198,11 +198,7 @@
             top: 24px;
             left: 10%;
             height: 4px;
-            background: linear-gradient(
-              90deg,
-              var(--green) 0%,
-              color-mix(in srgb, var(--green), black 10%) 100%
-            );
+            background: var(--green);
             border-radius: 2px;
             z-index: 1;
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -265,14 +261,28 @@
               }
             }
 
+            .step-status {
+              margin-top: 4px;
+              font-size: 10px;
+              font-weight: 500;
+              color: $text-muted;
+              text-align: center;
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              white-space: nowrap;
+
+              i { font-size: 9px; }
+            }
+
             &.completed {
+              .step-status {
+                color: var(--green);
+              }
+
               .step-icon-circle {
-                background: linear-gradient(
-                  135deg,
-                  var(--green) 0%,
-                  color-mix(in srgb, var(--green), black 10%) 100%
-                );
-                border-color: color-mix(in srgb, var(--green), black 10%);
+                background: var(--green);
+                border-color: var(--green);
                 color: #ffffff;
                 box-shadow: 0 6px 16px rgba(var(--green), 0.35);
                 transform: scale(1.05);
@@ -285,6 +295,11 @@
             }
 
             &.active {
+              .step-status {
+                color: var(--blue);
+                font-weight: 600;
+              }
+
               .step-icon-circle {
                 background: $bg-card;
                 border-color: var(--blue);
@@ -309,13 +324,13 @@
             }
 
             &.rejected {
+              .step-status {
+                color: var(--red);
+              }
+
               .step-icon-circle {
-                background: linear-gradient(
-                  135deg,
-                  var(--red) 0%,
-                  color-mix(in srgb, var(--red), black 10%) 100%
-                );
-                border-color: color-mix(in srgb, var(--red), black 10%);
+                background: var(--red);
+                border-color: var(--red);
                 color: #ffffff;
                 box-shadow: 0 6px 16px rgba(var(--red), 0.35);
               }
@@ -391,7 +406,7 @@
             background: rgba($warning, 0.1);
 
             .s-value {
-              color: color-mix(in srgb, $warning, black 10%);
+              color: var(--warning);
             }
 
             label {
@@ -513,7 +528,62 @@
         transition: background 0.2s;
 
         &:hover {
-          color: color-mix(in srgb, var(--primary) 100%, var(--text) 20%);
+          color: var(--primary);
+        }
+      }
+    }
+
+    .allowance-detail-table {
+      margin: 16px 0 20px;
+      border: 1px solid var(--border-toolbar);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-card);
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border-toolbar);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--bg-table-head);
+        color: var(--text-sub);
+        font-size: $font-size-hint;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      td {
+        font-size: $font-size-label;
+        color: var(--text);
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .empty-row {
+        text-align: center;
+        color: var(--text-muted);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      @media (max-width: 768px) {
+        overflow-x: auto;
+
+        table {
+          min-width: 920px;
         }
       }
     }
@@ -677,7 +747,7 @@
       border: none;
 
       &:hover {
-        background: color-mix(in srgb, var(--blue), black 10%);
+        filter: brightness(0.88);
         transform: translateY(-1px);
       }
     }
@@ -691,6 +761,12 @@
         background: $border-color;
         color: $text;
       }
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
     }
   }
 
@@ -718,7 +794,7 @@
     background: var(--green);
 
     &:hover {
-      background: color-mix(in srgb, var(--green) 100%, var(--text-reverse) 20%);
+      filter: brightness(0.88);
     }
   }
 
@@ -736,7 +812,7 @@
     background: var(--red);
 
     &:hover {
-      background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+      filter: brightness(0.88);
     }
   }
 }
@@ -751,4 +827,45 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.status-badge-wrap {
+  margin-top: 4px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: $text;
+
+  &.pending,
+  &.รออนุมัติ {
+    background: rgba(234, 179, 8, 0.15);
+    color: #ca8a04;
+  }
+
+  &.approved,
+  &.อนุมัติแล้ว {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+  }
+
+  &.rejected,
+  &.ไม่อนุมัติ {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+  }
+}
+
+.amount-currency {
+  font-size: 0.85em;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-right: 2px;
 }

@@ -1170,6 +1170,29 @@ app-empty-state {
   }
 }
 
+.fallback-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba($primary, 0.16), rgba(99, 102, 241, 0.28));
+  border: 2px solid rgba($primary, 0.14);
+  color: $primary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  &.small {
+    width: 36px;
+    height: 36px;
+    font-size: 0.72rem;
+  }
+}
+
 // ============================================================
 // Action buttons — colored with hover
 // ============================================================
@@ -1190,6 +1213,13 @@ app-empty-state {
 
   &:active {
     transform: scale(0.92);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   &.act-view {
@@ -1239,6 +1269,11 @@ app-empty-state {
   &.img-error .fallback-icon {
     display: flex;
   }
+}
+
+.emp-avatar__placeholder {
+  font-size: 2rem;
+  opacity: 0.5;
 }
 
 // clickable avatar
@@ -1441,6 +1476,23 @@ app-empty-state {
   }
 }
 
+.voucher-filter-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 24px 20px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba($primary, 0.08);
+  color: var(--text-header);
+  border: 1px solid rgba($primary, 0.15);
+
+  i,
+  strong {
+    color: $primary;
+  }
+}
+
 // ============================================================
 // Status badge
 // ============================================================
@@ -1467,4 +1519,30 @@ app-empty-state {
 
 .modal-overlay {
   @include modal-overlay-styles;
+}
+
+.detail-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+
+  .detail-loading-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    color: var(--text-header);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+
+    i {
+      color: $primary;
+      font-size: 1rem;
+    }
+  }
 }

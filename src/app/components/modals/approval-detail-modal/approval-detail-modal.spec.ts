@@ -1,8 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
 
 import { ApprovalDetailModalComponent } from './approval-detail-modal';
+import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
+import { ApprovalService } from '../../../services/approval.service';
+import { AllowanceApiService } from '../../../services/allowance-api.service';
+import { AuthService } from '../../../services/auth.service';
+import { SwalService } from '../../../services/swal.service';
+import { FileConverterService } from '../../../services/file-converter';
+import { DateUtilityService } from '../../../services/date-utility.service';
 
 describe('ApprovalDetailModalComponent', () => {
   let component: ApprovalDetailModalComponent;
@@ -11,7 +19,56 @@ describe('ApprovalDetailModalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ApprovalDetailModalComponent],
-      providers: [provideNoopAnimations()],
+      providers: [
+        provideNoopAnimations(),
+        {
+          provide: ApprovalsHelperService,
+          useValue: {
+            getServiceByType: () => ({
+              getRequestById: () => of(null),
+            }),
+          },
+        },
+        {
+          provide: ApprovalService,
+          useValue: {
+            updateTypeClaims: () => of({ success: true }),
+          },
+        },
+        {
+          provide: AllowanceApiService,
+          useValue: {
+            reviewClaim: () => of({ success: true }),
+          },
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            userData: () => ({ CODEMPID: 'EMP001', AD_USER: 'ad.user' }),
+            currentUser: () => 'ad.user',
+          },
+        },
+        {
+          provide: SwalService,
+          useValue: {
+            success: () => undefined,
+            warning: () => undefined,
+          },
+        },
+        {
+          provide: FileConverterService,
+          useValue: {
+            buildPreviewFile: (file: unknown) => file,
+            buildPreviewFiles: (files: unknown[]) => files,
+          },
+        },
+        {
+          provide: DateUtilityService,
+          useValue: {
+            formatDateToBE: (value: string) => value,
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ApprovalDetailModalComponent);

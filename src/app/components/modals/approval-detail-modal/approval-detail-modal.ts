@@ -15,7 +15,10 @@ import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-mo
 import { StatusLabelPipe } from '../../../pipes/status-label.pipe';
 import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interface';
 import { MedicalClaim } from '../../../interfaces/medical.interface';
-import { MealAllowanceClaim } from '../../../interfaces/allowance.interface';
+import {
+  MealAllowanceClaim,
+  MealAllowanceReviewRequest,
+} from '../../../interfaces/allowance.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
 import { StatusUtil } from '../../../utils/status.util';
 import { ApprovalsHelperService } from '../../../services/approvals-helper.service';
@@ -23,9 +26,9 @@ import { modalAnimation, fadeIn } from '../../../animations/animations';
 import { ApprovalService } from '../../../services/approval.service';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
-import dayjs from 'dayjs';
 import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { AllowanceApiService } from '../../../services/allowance-api.service';
 
 interface PreviewFile {
   fileName: string;
@@ -46,6 +49,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
   private approvelService = inject(ApprovalService);
+  private allowanceApiService = inject(AllowanceApiService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
@@ -67,38 +71,139 @@ export class ApprovalDetailModalComponent implements OnInit {
   currentDetailItems = signal<UnifiedItem[]>([]);
   currentDetailType = signal<string | null>(null);
   detailedStatus = signal<string>('');
+  isSubmitting = signal<boolean>(false);
 
-  steps = [
-    { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
-    // { label: 'ต้นสังกัดอนุมัติ', id: 2, icon: 'fas fa-sitemap' },
-    { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
-    // { label: 'ผู้บริหารอนุมัติ', id: 4, icon: 'fas fa-user-tie' },
-    // { label: 'ฝ่ายบัญชีอนุมัติ', id: 5, icon: 'fas fa-file-invoice-dollar' }
-  ];
+  allowanceCurrentStep = computed(() => {
+    if (this.approvalItem?.type !== 'allowance') return 0;
+    const step = Number((this.approvalItem.originalData as MealAllowanceClaim)?.currentStep ?? 0);
+    return Number.isFinite(step) ? step : 0;
+  });
+
+  rejectedAtStep = computed<number | null>(() => {
+    const idx = this.currentStepIndex();
+    return idx < 0 ? Math.abs(idx) : null;
+  });
+
+  steps = computed(() =>
+    this.approvalItem?.type === 'allowance'
+      ? [
+          { label: 'Approver 1', id: 1, icon: 'fas fa-user-check' },
+          { label: 'Approver 2', id: 2, icon: 'fas fa-user-check' },
+          { label: 'HR Parallel', id: 3, icon: 'fas fa-users-cog' },
+        ]
+      : [
+          { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
+          { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
+        ],
+  );
 
   currentStepIndex = computed(() => {
-    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    const status = (this.detailedStatus() || this.approvalItem.rawStatus || '').toLowerCase();
+    const stepCount = this.steps().length;
     if (!status) return 0;
-    if (status === 'pending') return 1;
-    if (status === 'rejected') return -1;
-    if (status === 'approved') return 6;
-
-    // if (status === REQUEST_STATUS.WAITING_CHECK || status === REQUEST_STATUS.NEW) return 1;
-    // if (status === REQUEST_STATUS.PENDING_APPROVAL) return 4;
-    // if (status === REQUEST_STATUS.APPROVED) return 6;
-    // if (status === REQUEST_STATUS.REJECTED || status === REQUEST_STATUS.REFERRED_BACK) return -1;
-    // if (status === REQUEST_STATUS.VERIFIED) return 2;
+    if (
+      status === 'rejected' ||
+      status === REQUEST_STATUS.REJECTED.toLowerCase() ||
+      status === 'ไม่อนุมัติ'
+    ) {
+      const step = this.allowanceCurrentStep();
+      return step ? -step : -1;
+    }
+    if (status === 'approved' || status === REQUEST_STATUS.APPROVED.toLowerCase()) {
+      return stepCount + 1;
+    }
+    if (this.approvalItem?.type === 'allowance') {
+      const step = this.allowanceCurrentStep();
+      if (step) return step;
+    }
     return 1;
   });
 
+  progressFillWidth = computed(() => {
+    const stepCount = this.steps().length;
+    const current = this.rejectedAtStep() ?? this.currentStepIndex();
+    return Math.min((Math.max(0, current - 1) / (stepCount - 1 || 1)) * 80, 80);
+  });
+
+  stepStates = computed(() => {
+    const currentIndex = this.currentStepIndex();
+    const rejectedAt = this.rejectedAtStep();
+
+    return this.steps().map((step) => {
+      const completed = rejectedAt ? step.id < rejectedAt : currentIndex > step.id;
+      const active = currentIndex > 0 && currentIndex === step.id;
+      const rejected = rejectedAt !== null && step.id === rejectedAt;
+
+      if (completed) {
+        return {
+          ...step,
+          completed,
+          active: false,
+          rejected: false,
+          circleIcon: 'fas fa-check',
+          statusIcon: 'fas fa-check-circle',
+          statusText: 'อนุมัติแล้ว',
+        };
+      }
+
+      if (rejected) {
+        return {
+          ...step,
+          completed: false,
+          active: false,
+          rejected,
+          circleIcon: 'fas fa-times',
+          statusIcon: 'fas fa-times-circle',
+          statusText: 'ไม่อนุมัติ',
+        };
+      }
+
+      if (active) {
+        return {
+          ...step,
+          completed: false,
+          active,
+          rejected: false,
+          circleIcon: step.icon,
+          statusIcon: 'fas fa-circle-notch fa-spin',
+          statusText: 'รออนุมัติ',
+        };
+      }
+
+      return {
+        ...step,
+        completed: false,
+        active: false,
+        rejected: false,
+        circleIcon: step.icon,
+        statusIcon: 'fas fa-clock',
+        statusText: 'ยังไม่ถึงขั้นตอน',
+      };
+    });
+  });
+
   getDisplayStatus(): string {
-    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    const status = (this.detailedStatus() || this.approvalItem.rawStatus || '').trim().toLowerCase();
     const s = status?.trim();
     if (!s) return 'รออนุมัติ';
-    if (s === REQUEST_STATUS.REJECTED || s === 'ไม่อนุมัติ') return 'ไม่อนุมัติ';
-    if (s === REQUEST_STATUS.REFERRED_BACK || s === 'รอแก้ไข') return 'รอแก้ไข';
-    if (s === REQUEST_STATUS.APPROVED || s === 'อนุมัติแล้ว' || s.includes('จ่าย'))
+    if (s === REQUEST_STATUS.REJECTED.toLowerCase() || s === 'rejected' || s === 'ไม่อนุมัติ') {
+      return 'ไม่อนุมัติ';
+    }
+    if (
+      s === REQUEST_STATUS.REFERRED_BACK.toLowerCase() ||
+      s === 'referred_back' ||
+      s === 'รอแก้ไข'
+    ) {
+      return 'รอแก้ไข';
+    }
+    if (
+      s === REQUEST_STATUS.APPROVED.toLowerCase() ||
+      s === 'approved' ||
+      s === 'อนุมัติแล้ว' ||
+      s.includes('จ่าย')
+    ) {
       return 'อนุมัติแล้ว';
+    }
     return 'รออนุมัติ';
   }
 
@@ -137,11 +242,14 @@ export class ApprovalDetailModalComponent implements OnInit {
     if (item.type === 'allowance') {
       const claim = item.originalData as MealAllowanceClaim;
       if (claim?.claimId != null) {
-        this.detailedStatus.set(claim.status?.toLowerCase());
+        this.detailedStatus.set((claim.status || '').toLowerCase());
         this.currentDetailItems.set(
           (claim.details || []).map((d) => ({
             date: d.work_date,
             description: d.description || `${d.actual_checkin} – ${d.actual_checkout}`,
+            timeIn: d.actual_checkin,
+            timeOut: d.actual_checkout,
+            shiftCode: d.shift_code,
             amount: d.rate_amount,
             attachedFile: '',
           })),
@@ -230,30 +338,45 @@ export class ApprovalDetailModalComponent implements OnInit {
   ) {
     if (!item.type) return;
 
-    let statusCode = REQUEST_STATUS.WAITING_CHECK;
-    if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
-    else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
-    else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
+    const payload =
+      item.type === 'allowance'
+        ? this.buildAllowanceReviewPayload(newStatus, reason)
+        : {
+            action: newStatus.toLowerCase(),
+            reviewedBy: this.authService.userData().CODEMPID,
+            ...(newStatus.toLowerCase() === 'rejected' && {
+              rejectionReason: reason?.trim() || '',
+            }),
+          };
 
-    const payload = {
-      action: newStatus.toLowerCase(),
-      reviewedBy: this.authService.userData().CODEMPID,
-      ...(newStatus.toLowerCase() === 'rejected' && {
-        rejectionReason: reason?.trim() || '',
-      }),
-    };
+    if (item.type === 'allowance' && !(payload as MealAllowanceReviewRequest).reviewedBy) {
+      this.swalService.warning('ไม่พบ AD User', 'กรุณาเข้าสู่ระบบใหม่แล้วลองอีกครั้ง');
+      return;
+    }
 
-    this.approvelService.updateTypeClaims(item.requestId, payload, item.type).subscribe({
+    this.isSubmitting.set(true);
+    const request$ =
+      item.type === 'allowance'
+        ? this.allowanceApiService.reviewClaim(item.requestId, payload as MealAllowanceReviewRequest)
+        : this.approvelService.updateTypeClaims(item.requestId, payload, item.type);
+
+    request$.subscribe({
       next: (res) => {
+        this.isSubmitting.set(false);
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.swalService.success(
+          res.message || (newStatus === 'Approved' ? 'อนุมัติรายการสำเร็จ' : 'ไม่อนุมัติรายการสำเร็จ'),
+        );
+        this.onStatusUpdated.emit();
+        this.onClose.emit();
       },
 
       error: (error) => {
+        this.isSubmitting.set(false);
         console.error('Approved Claim Error:', error);
 
         this.swalService.warning(
@@ -262,8 +385,21 @@ export class ApprovalDetailModalComponent implements OnInit {
         );
       },
     });
-    this.onStatusUpdated.emit();
-    this.onClose.emit();
+  }
+
+  private buildAllowanceReviewPayload(
+    newStatus: 'Approved' | 'Rejected' | 'Referred Back',
+    reason?: string,
+  ): MealAllowanceReviewRequest {
+    return {
+      action: newStatus === 'Approved' ? 'approved' : 'rejected',
+      reviewedBy: this.getAllowanceReviewer(),
+      ...(newStatus === 'Rejected' && { rejectionReason: reason?.trim() || '' }),
+    };
+  }
+
+  private getAllowanceReviewer(): string {
+    return this.authService.currentUser() || this.authService.userData()?.AD_USER || '';
   }
 
   close() {
@@ -296,7 +432,16 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   get isApproved(): boolean {
-    return (this.medicalClaim?.approvedAmount ?? 0) > 0;
+    return (
+      (this.medicalClaim?.approvedAmount ?? 0) > 0 ||
+      (this.allowanceClaim?.status || '').toLowerCase() === 'approved'
+    );
+  }
+
+  get canTakeAction(): boolean {
+    return ['pending', REQUEST_STATUS.PENDING_APPROVAL.toLowerCase()].includes(
+      (this.detailedStatus() || this.approvalItem.rawStatus || '').toLowerCase(),
+    );
   }
   closePreview() {
     this.isPreviewModalOpen.set(false);

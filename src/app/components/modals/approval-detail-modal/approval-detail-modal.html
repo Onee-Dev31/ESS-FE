@@ -29,27 +29,24 @@
           <div class="progress-line-bg"></div>
           <div
             class="progress-line-fill"
-            [style.width.%]="
-              Math.min((Math.max(0, currentStepIndex() - 1) / (steps.length - 1)) * 80, 80)
-            "
+            [style.width.%]="progressFillWidth()"
           ></div>
 
-          @for (step of steps; track step.id) {
+          @for (step of stepStates(); track step.id) {
             <div
               class="progress-step"
-              [class.completed]="currentStepIndex() > step.id"
-              [class.active]="currentStepIndex() === step.id"
-              [class.rejected]="currentStepIndex() === -1"
+              [class.completed]="step.completed"
+              [class.active]="step.active"
+              [class.rejected]="step.rejected"
             >
               <div class="step-icon-circle">
-                @if (currentStepIndex() > step.id) {
-                  <i class="fas fa-check"></i>
-                } @else {
-                  <i [class]="step.icon"></i>
-                }
+                <i [class]="step.circleIcon"></i>
               </div>
 
               <div class="step-label">{{ step.label }}</div>
+              <div class="step-status">
+                <i [class]="step.statusIcon"></i> {{ step.statusText }}
+              </div>
             </div>
           }
         </div>
@@ -59,22 +56,31 @@
     <div class="content">
       <div class="main-panel">
         <div class="summary-cards-grid">
-          <div class="summary-card status-card" [ngClass]="getStatusClass(getDisplayStatus())">
+          <div class="summary-card status-card">
             <div class="s-data">
-              <label>Status</label>
-              <div class="s-value">
-                {{ detailedStatus() || approvalItem.rawStatus | statusLabel }}
+              <label>สถานะ</label>
+              <div class="status-badge-wrap">
+                <span class="status-pill" [ngClass]="getStatusClass(getDisplayStatus())">
+                  @if (getDisplayStatus() === 'อนุมัติแล้ว') {
+                    <i class="fas fa-check-circle"></i>
+                  } @else if (getDisplayStatus() === 'ไม่อนุมัติ') {
+                    <i class="fas fa-times-circle"></i>
+                  } @else {
+                    <i class="fas fa-hourglass-half"></i>
+                  }
+                  {{ detailedStatus() || approvalItem.rawStatus | statusLabel }}
+                </span>
               </div>
             </div>
           </div>
           <div class="summary-card">
             <div class="s-data">
               <label>ยอดขอเบิก</label>
-
               <div class="s-value amount" [class.text-success]="isApproved">
-                {{ approvalItem.amount | number: '1.2-2' }}
-
-                <i *ngIf="isApproved" class="fas fa-check-circle ms-2"></i>
+                <span class="amount-currency">฿</span>{{ approvalItem.amount | number: '1.2-2' }}
+                @if (isApproved) {
+                  <i class="fas fa-check-circle ms-2"></i>
+                }
               </div>
             </div>
           </div>
@@ -148,12 +154,28 @@
         } @else if (allowanceClaim) {
           <div class="medical-info-grid">
             <div class="med-info-item">
-              <label><i class="far fa-calendar-alt"></i> วันที่ยื่น</label>
+              <label><i class="fas fa-file-alt"></i> เลขที่เอกสาร</label>
+              <span>{{ allowanceClaim.voucherNo || ('#' + allowanceClaim.claimId) }}</span>
+            </div>
+            <div class="med-info-item">
+              <label><i class="fas fa-id-badge"></i> Employee Code</label>
+              <span>{{ allowanceClaim.employeeCode }}</span>
+            </div>
+            <div class="med-info-item">
+              <label><i class="fas fa-user"></i> Employee Name</label>
+              <span>{{ allowanceClaim.employeeName || approvalItem.requestBy.name }}</span>
+            </div>
+            <div class="med-info-item">
+              <label><i class="far fa-calendar-alt"></i> วันที่ยื่นเบิก</label>
               <span>{{ dateUtil.formatDateToBE(allowanceClaim.claimDate, 'DD/MM/YYYY') }}</span>
             </div>
             <div class="med-info-item">
-              <label><i class="fas fa-list-ol"></i> รายละเอียด</label>
-              <span>{{ approvalItem.requestDetail }}</span>
+              <label><i class="far fa-clock"></i> วันที่สร้างรายการ</label>
+              <span>{{ dateUtil.formatDateToBE(allowanceClaim.createdAt, 'DD/MM/YYYY') }}</span>
+            </div>
+            <div class="med-info-item">
+              <label><i class="fas fa-signal"></i> สถานะปัจจุบัน</label>
+              <span>{{ allowanceClaim.status | statusLabel }}</span>
             </div>
             @if (allowanceClaim.rejectionReason) {
               <div class="med-info-item med-info-full">
@@ -161,6 +183,45 @@
                 <span class="text-danger">{{ allowanceClaim.rejectionReason }}</span>
               </div>
             }
+          </div>
+
+          <div class="content-header">
+            <h3>รายการเบี้ยเลี้ยง</h3>
+          </div>
+
+          <div class="allowance-detail-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>กะ</th>
+                  <th>ประเภทวัน</th>
+                  <th>เวลาเข้างาน</th>
+                  <th>เวลาออกงาน</th>
+                  <th>OT</th>
+                  <th class="text-right">ยอดเบิก</th>
+                  <th>รายละเอียด</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (detail of allowanceClaim.details; track detail.detail_id) {
+                  <tr>
+                    <td>{{ dateUtil.formatDateToBE(detail.work_date, 'DD/MM/YYYY') }}</td>
+                    <td>{{ detail.shift_code || '-' }}</td>
+                    <td>{{ detail.day_type || '-' }}</td>
+                    <td>{{ detail.actual_checkin || '-' }}</td>
+                    <td>{{ detail.actual_checkout || '-' }}</td>
+                    <td>{{ detail.extra_hours || 0 }}</td>
+                    <td class="text-right">฿{{ detail.rate_amount | number: '1.2-2' }}</td>
+                    <td>{{ detail.description || '-' }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="8" class="empty-row">ไม่พบรายละเอียดการเบิก</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         } @else {
           <div class="content-header">
@@ -222,10 +283,20 @@
       }
 
       <div class="action-footer">
-        <button type="button" class="btn-confirm" (click)="confirmAction()">
-          ยืนยัน (Confirm)
+        <button
+          type="button"
+          class="btn-confirm"
+          (click)="confirmAction()"
+          [disabled]="isSubmitting()"
+        >
+          {{ isSubmitting() ? 'กำลังบันทึก...' : 'ยืนยัน (Confirm)' }}
         </button>
-        <button type="button" class="btn-cancel" (click)="closeActionConfirm()">
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closeActionConfirm()"
+          [disabled]="isSubmitting()"
+        >
           ยกเลิก (Cancel)
         </button>
       </div>
