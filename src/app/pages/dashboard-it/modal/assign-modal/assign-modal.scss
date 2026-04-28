@@ -197,9 +197,9 @@
       }
 
       &:disabled {
-        background: #cbd5e1;
-        border-color: #cbd5e1;
-        color: #64748b;
+        background: var(--border-color);
+        border-color: var(--border-color);
+        color: var(--text-muted);
         cursor: not-allowed;
         box-shadow: none;
         opacity: 0.8;

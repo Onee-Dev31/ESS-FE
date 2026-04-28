@@ -219,9 +219,9 @@
       }
 
       &:disabled {
-        background: #cbd5e1;
-        border-color: #cbd5e1;
-        color: #64748b;
+        background: var(--border-color);
+        border-color: var(--border-color);
+        color: var(--text-muted);
         cursor: not-allowed;
         box-shadow: none;
         opacity: 0.8;
@@ -288,13 +288,13 @@ textarea.form-input {
   justify-content: center;
   padding: 60px 20px;
   gap: 12px;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .spinner {
   width: 30px;
   height: 30px;
-  border: 3px solid #2a2a2a;
+  border: 3px solid var(--border-color);
   border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -313,7 +313,7 @@ section {
   border-radius: 14px;
   padding: 18px 20px;
   margin-bottom: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
 }
 
 /* TITLE */
@@ -358,17 +358,17 @@ section {
 /* STATUS BADGE */
 
 .status-active {
-  color: #22c55e !important;
+  color: var(--success) !important;
   font-weight: 600;
 }
 
 .status-lock {
-  color: #c52222 !important;
+  color: var(--danger) !important;
   font-weight: 600;
 }
 
-.status-lock {
-  color: #e59f1d !important;
+.status-pending {
+  color: var(--warning) !important;
   font-weight: 600;
 }
 
@@ -410,7 +410,7 @@ section {
 .asset-table td {
   padding: 11px 10px;
   font-size: 13px;
-  border-bottom: 1px solid #1f1f1f;
+  border-bottom: 1px solid var(--border-table);
   color: var(--text-header);
 }
 
@@ -430,6 +430,6 @@ section {
 .no-data {
   padding: 40px;
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 14px;
 }

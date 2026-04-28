@@ -743,7 +743,7 @@ $balance: $status-success-text;
   flex-direction: column;
   gap: 10px;
   background: var(--bg-slate);
-  border-left: 4px solid #ccc;
+  border-left: 4px solid var(--border-color);
   min-width: 0;
   transition: box-shadow 0.2s;
 
@@ -850,7 +850,7 @@ $balance: $status-success-text;
         font-family: $font-main;
 
         &.text-balance {
-          color: #22c55e;
+          color: var(--success);
         }
       }
     }
@@ -976,7 +976,7 @@ $balance: $status-success-text;
   &.card-green {
     h6,
     h3 {
-      color: #15803d !important;
+      color: var(--success) !important;
     }
   }
 
@@ -990,7 +990,7 @@ $balance: $status-success-text;
   &.card-yellow {
     h6,
     h3 {
-      color: #9a3412 !important;
+      color: var(--warning) !important;
     }
   }
 
@@ -1690,7 +1690,7 @@ $balance: $status-success-text;
   }
 
   .fc-h-event .fc-event-main {
-    color: #1e2b37;
+    color: var(--text-header);
   }
 
   .fc {
@@ -1698,7 +1698,7 @@ $balance: $status-success-text;
     --fc-border-color: var(--border-toolbar);
     --fc-today-bg-color: transparent;
     --fc-neutral-bg-color: var(--bg-table-head);
-    --fc-page-bg-color: #ffffff;
+    --fc-page-bg-color: var(--bg-card);
 
     .fc-toolbar {
       margin-bottom: 24px !important;
@@ -1791,8 +1791,8 @@ $balance: $status-success-text;
       }
 
       &.circle-orange-outline {
-        background: #fff7ed;
-        color: #ea580c;
+        background: color-mix(in srgb, var(--warning), var(--bg-card) 85%);
+        color: var(--warning);
         border-color: transparent;
       }
 
@@ -1830,8 +1830,8 @@ $balance: $status-success-text;
       }
 
       &.text-orange {
-        background: #ffedd5;
-        color: #9a3412;
+        background: color-mix(in srgb, var(--warning), var(--bg-card) 85%);
+        color: var(--warning);
       }
 
       &.text-red {
@@ -1875,7 +1875,7 @@ $balance: $status-success-text;
     background: linear-gradient(
       90deg,
       var(--border-color) 25%,
-      #e0e0e0 50%,
+      var(--bg-table-head) 50%,
       var(--border-color) 75%
     );
     background-size: 200% 100%;
