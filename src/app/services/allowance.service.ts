@@ -21,17 +21,16 @@ export type { AllowanceItem, AllowanceRequest };
 @Injectable({
   providedIn: 'root',
 })
-export class AllowanceService extends BaseRequestService<AllowanceRequest> {
-  protected override readonly STORAGE_KEY = STORAGE_KEYS.MOCK_ALLOWANCE_DATA;
-  private allowanceApi = inject(AllowanceApiService);
+export class AllowanceService {
+  private _http = inject(HttpClient);
+  FILE_BASE = environment.file_base_url;
+  private baseUrl = `${environment.api_url}`;
+  /** Cache ผลลัพธ์ล่าสุดไว้แสดงทันทีเมื่อ navigate กลับมา */
+  readonly lastResponse = signal<MealAllowanceClaimsResponse | null>(null);
 
-  constructor() {
-    super();
-    this.initializeData(() => AllowanceMock.generateRequestsByRole(20, 'Admin'));
-  }
-
-  getAllowanceRequests(): Observable<AllowanceRequest[]> {
-    return this.getRequests();
+  /** GET api/meal-allowance/rates */
+  getRates(): Observable<MealAllowanceRatesResponse> {
+    return this._http.get<MealAllowanceRatesResponse>(`${this.baseUrl}/meal-allowance/rates`);
   }
 
   /**
