@@ -22,6 +22,10 @@
 
     <section class="form-section-wrapper" #claimTypeSection>
       <h4 class="section-heading">1. เลือกประเภทการเบิก</h4>
+      <div class="claim-eligibility-hint" *ngIf="!isEditMode()">
+        <div class="hint-title"><i class="fas fa-circle-info"></i> เงื่อนไขการใช้สิทธิ์</div>
+        <div class="hint-line" *ngFor="let line of eligibilityHintLines">{{ line }}</div>
+      </div>
       <div class="claim-type-groups" [class.highlight-required]="claimTypeHighlight()">
         <div class="claim-groups-labels">
           <div
@@ -46,36 +50,98 @@
             class="claim-type-card outpatient-card"
             *ngFor="let type of outpatientTypes"
             [class.active]="selectedClaimType() === type.id"
-            (click)="selectClaimType(type.id)"
+            [class.disabled-card]="type.disabled"
+            [class.is-disabled]="isSaving()"
+            [attr.aria-disabled]="type.disabled || isSaving()"
+            [attr.title]="type.disabled ? type.disabledReason : type.helperText"
+            (click)="selectClaimType(type)"
           >
             <div class="card-content">
               <div class="type-info">
-                <span class="type-label">{{ type.label }}</span>
+                <div class="type-topline">
+                  <span class="type-label">{{ type.label }}</span>
+                  <span class="type-badge" *ngIf="type.ruleBadge">{{ type.ruleBadge }}</span>
+                </div>
                 <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
                 <span class="balance-label">ยอดคงเหลือ</span>
+                <span class="type-helper" [class.type-helper--disabled]="type.disabled">
+                  {{ type.helperText }}
+                </span>
               </div>
               <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
                 <i [class]="type.icon" [style.color]="type.color"></i>
               </div>
+            </div>
+            <div class="card-state-lock" *ngIf="type.disabled">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="card-disabled-overlay" *ngIf="type.disabled">
+              <div class="overlay-badge"><i class="fas fa-ban"></i> เลือกไม่ได้</div>
             </div>
           </div>
           <div
             class="claim-type-card inpatient-card"
             *ngFor="let type of inpatientTypes"
             [class.active]="selectedClaimType() === type.id"
-            (click)="selectClaimType(type.id)"
+            [class.disabled-card]="type.disabled"
+            [class.is-disabled]="isSaving()"
+            [attr.aria-disabled]="type.disabled || isSaving()"
+            [attr.title]="type.disabled ? type.disabledReason : type.helperText"
+            (click)="selectClaimType(type)"
           >
             <div class="card-content">
               <div class="type-info">
-                <span class="type-label">{{ type.label }}</span>
+                <div class="type-topline">
+                  <span class="type-label">{{ type.label }}</span>
+                  <span class="type-badge" *ngIf="type.ruleBadge">{{ type.ruleBadge }}</span>
+                </div>
                 <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
                 <span class="balance-label">ยอดคงเหลือ</span>
+                <span class="type-helper" [class.type-helper--disabled]="type.disabled">
+                  {{ type.helperText }}
+                </span>
               </div>
               <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
                 <i [class]="type.icon" [style.color]="type.color"></i>
               </div>
             </div>
+            <div class="card-state-lock" *ngIf="type.disabled">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="card-disabled-overlay" *ngIf="type.disabled">
+              <div class="overlay-badge"><i class="fas fa-ban"></i> เลือกไม่ได้</div>
+            </div>
           </div>
+        </div>
+      </div>
+      <div
+        class="claim-selection-notice"
+        *ngIf="selectedClaimType() && getSelectedClaimTypeMeta() as selectedType"
+        [class.claim-selection-notice--warning]="selectedType.requiresEligibilityCheck"
+        [class.claim-selection-notice--disabled]="selectedType.disabled"
+      >
+        <div class="notice-icon">
+          <i
+            [class]="
+              selectedType.disabled
+                ? 'fas fa-ban'
+                : selectedType.requiresEligibilityCheck
+                  ? 'fas fa-shield-heart'
+                  : 'fas fa-circle-check'
+            "
+          ></i>
+        </div>
+        <div class="notice-copy">
+          <div class="notice-title">
+            @if (selectedType.disabled) {
+              ประเภทนี้ยังไม่สามารถเลือกได้
+            } @else if (selectedType.requiresEligibilityCheck) {
+              ระบบจะตรวจสิทธิ์อีกครั้งก่อนส่งเบิก
+            } @else {
+              ประเภทนี้พร้อมส่งเบิกได้
+            }
+          </div>
+          <div class="notice-text">{{ selectedType.guidanceText }}</div>
         </div>
       </div>
     </section>
@@ -250,7 +316,7 @@
     <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
       <div class="section-header-row">
         <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
-        <button class="btn-upload-file" (click)="triggerFileInput(fileInput)">
+        <button class="btn-upload-file" type="button" [disabled]="isSaving()" (click)="triggerFileInput(fileInput)">
           <i class="fas fa-file-upload"></i> Upload file
         </button>
         <input
@@ -286,6 +352,7 @@
                   class="btn-delete-row"
                   type="button"
                   title="ลบไฟล์แนบ"
+                  [disabled]="isSaving()"
                   (click)="deleteAttachment(file.id)"
                 >
                   <i class="far fa-trash-alt"></i>
@@ -297,6 +364,7 @@
                     type="text"
                     class="desc-control"
                     [(ngModel)]="file.description"
+                    [disabled]="isSaving()"
                     [class.is-invalid]="!file.description"
                     placeholder="ระบุรายละเอียด (ถ้ามี)"
                   />
@@ -320,7 +388,13 @@
   </main>
 
   <div class="form-actions-footer">
-    <button class="btn-back-custom" (click)="close()"><i class="fas fa-times"></i> ยกเลิก</button>
+    <div class="submit-hint" *ngIf="selectedClaimType() && !isEditMode()">
+      <i class="fas fa-shield-heart"></i>
+      ระบบจะตรวจสิทธิ์ก่อนส่งเบิก หากไม่ผ่านเงื่อนไขจะแจ้งเหตุผลให้ทราบทันที
+    </div>
+    <button class="btn-back-custom" type="button" [disabled]="isSaving()" (click)="close()">
+      <i class="fas fa-times"></i> ยกเลิก
+    </button>
     <button
       class="btn-save-custom"
       [class.disable]="!isValidSave()"

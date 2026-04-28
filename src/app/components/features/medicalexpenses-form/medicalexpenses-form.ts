@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
 import { ToastService } from '../../../services/toast';
@@ -124,6 +125,12 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   removedAttachmentIds = signal<number[]>([]);
   isSaving = signal<boolean>(false);
 
+  private probationEligibility = computed<'passed' | 'not_passed' | 'unknown'>(() => {
+    const employee = this.authService.userData();
+    const allData = this.authService.allData();
+    return this.resolveProbationEligibility(employee, allData);
+  });
+
   calculatedDays = computed(() => {
     if (!this.startDate() || !this.endDate()) return 0;
     const start = dayjs(this.startDate());
@@ -145,14 +152,62 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       DENTAL: 'var(--primary)',
       VISION: 'var(--primary)',
     };
+    const code = type.code.toUpperCase();
+    const usesOpdBalance = type.isSubOfOpd || ['DENTAL', 'VISION'].includes(code);
     const inpatientCodes = ['IPD'];
+    const backendMessage = type.eligibilityMessage?.trim() || undefined;
+    const probationStatus = this.probationEligibility();
+    const blockedByProbation = type.eligibleAfterProbation;
+    const disabled = type.isSelectable === false || type.remainingAmount <= 0 || blockedByProbation;
+    const disabledReason = disabled
+      ? backendMessage ||
+        (blockedByProbation
+          ? 'ยังไม่ผ่านโปร ไม่สามารถเลือกประเภทนี้ได้'
+          : usesOpdBalance
+            ? 'วงเงิน OPD คงเหลือไม่พอ'
+            : 'วงเงินคงเหลือไม่เพียงพอ')
+      : undefined;
+    const requiresEligibilityCheck =
+      !disabled &&
+      (!!backendMessage ||
+        type.isSelectable !== true ||
+        (type.eligibleAfterProbation && probationStatus === 'unknown'));
+    const helperText = disabled
+      ? disabledReason
+      : requiresEligibilityCheck
+        ? backendMessage || 'ระบบจะตรวจสิทธิ์ก่อนส่งเบิก'
+        : usesOpdBalance
+          ? 'ใช้วงเงิน OPD คงเหลือ'
+          : 'เบิกได้ตามสิทธิ์ปัจจุบัน';
+    const ruleBadge = disabled
+      ? 'เลือกไม่ได้'
+      : requiresEligibilityCheck
+        ? 'ตรวจสิทธิ์'
+        : usesOpdBalance
+          ? 'อิง OPD'
+          : undefined;
+    const guidanceText = disabled
+      ? disabledReason
+      : backendMessage ||
+        (type.eligibleAfterProbation && probationStatus === 'unknown'
+          ? 'สิทธิ์ประเภทนี้อาจใช้ได้เฉพาะพนักงานที่ผ่านโปรแล้ว'
+          : usesOpdBalance
+            ? 'ประเภทนี้จะหักจากวงเงิน OPD คงเหลือ'
+            : 'สามารถกรอกและส่งเบิกได้ตามสิทธิ์ปัจจุบัน');
+
     return {
       id: type.code.toLowerCase(),
       label: type.nameTh,
       amount: type.remainingAmount.toLocaleString('th-TH'),
       icon: iconMap[type.icon ?? ''] ?? 'fas fa-medkit',
       color: colorMap[type.code] ?? 'var(--primary)',
-      group: inpatientCodes.includes(type.code.toUpperCase()) ? 'inpatient' : 'outpatient',
+      group: inpatientCodes.includes(code) ? 'inpatient' : 'outpatient',
+      disabled,
+      disabledReason,
+      helperText,
+      ruleBadge,
+      requiresEligibilityCheck,
+      guidanceText,
     };
   }
 
@@ -164,6 +219,133 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return this.claimTypes.filter((t) => t.group === 'inpatient');
   }
   remark = signal<string>('');
+
+  readonly eligibilityHintLines = [
+    'พนักงานที่ยังไม่ผ่านโปรไม่สามารถเบิก IPD, Dental และ Vision ได้',
+    'Dental และ Vision ใช้วงเงิน OPD คงเหลือ',
+  ];
+
+  getSelectedClaimTypeMeta(): ClaimType | undefined {
+    return this.claimTypes.find((type) => type.id === this.selectedClaimType());
+  }
+
+  private resolveProbationEligibility(employee: any, allData: any): 'passed' | 'not_passed' | 'unknown' {
+    const candidates = [employee, allData?.employee, allData, employee?.profile, employee?.info].filter(
+      Boolean,
+    );
+
+    for (const source of candidates) {
+      const directFlag = this.readProbationBoolean(source);
+      if (directFlag !== null) {
+        return directFlag ? 'passed' : 'not_passed';
+      }
+
+      const status = this.readStringField(source, [
+        'EMP_STATUS',
+        'empStatus',
+        'employmentStatus',
+        'employeeStatus',
+        'STATUS',
+        'status',
+      ]);
+      const statusResult = this.mapStatusToProbation(status);
+      if (statusResult !== 'unknown') {
+        return statusResult;
+      }
+
+      const endDate = this.readDateField(source, [
+        'PROBATION_END_DATE',
+        'probationEndDate',
+        'probation_end_date',
+        'ProbationEndDate',
+      ]);
+      if (endDate) {
+        return dayjs().isAfter(endDate, 'day') || dayjs().isSame(endDate, 'day')
+          ? 'passed'
+          : 'not_passed';
+      }
+    }
+
+    return 'unknown';
+  }
+
+  private readProbationBoolean(source: any): boolean | null {
+    const passKeys = [
+      'isPastProbation',
+      'passedProbation',
+      'probationPassed',
+      'isProbationPassed',
+      'canClaimAfterProbation',
+    ];
+    const probationKeys = ['isOnProbation', 'onProbation', 'isUnderProbation'];
+
+    for (const key of passKeys) {
+      if (typeof source?.[key] === 'boolean') {
+        return source[key];
+      }
+    }
+
+    for (const key of probationKeys) {
+      if (typeof source?.[key] === 'boolean') {
+        return !source[key];
+      }
+    }
+
+    return null;
+  }
+
+  private readStringField(source: any, keys: string[]): string | undefined {
+    for (const key of keys) {
+      if (typeof source?.[key] === 'string' && source[key].trim()) {
+        return source[key].trim();
+      }
+    }
+    return undefined;
+  }
+
+  private readDateField(source: any, keys: string[]): dayjs.Dayjs | null {
+    for (const key of keys) {
+      if (typeof source?.[key] === 'string' && source[key].trim()) {
+        const parsed = dayjs(source[key]);
+        if (parsed.isValid()) {
+          return parsed;
+        }
+      }
+    }
+    return null;
+  }
+
+  private mapStatusToProbation(status?: string): 'passed' | 'not_passed' | 'unknown' {
+    if (!status) return 'unknown';
+    const normalized = status.trim().toLowerCase();
+
+    const passedKeywords = [
+      'active',
+      'regular',
+      'passed probation',
+      'pass probation',
+      'confirmed',
+      'permanent',
+      'ผ่านโปร',
+      'ผ่านทดลองงาน',
+    ];
+    if (passedKeywords.some((keyword) => normalized.includes(keyword))) {
+      return 'passed';
+    }
+
+    const probationKeywords = [
+      'probation',
+      'ทดลองงาน',
+      'under probation',
+      'on probation',
+      'รอผ่านโปร',
+    ];
+    if (probationKeywords.some((keyword) => normalized.includes(keyword))) {
+      return 'not_passed';
+    }
+
+    return 'unknown';
+  }
 
   ngOnInit() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
@@ -410,8 +592,15 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.endDate.set(today);
   }
 
-  selectClaimType(id: string) {
-    this.selectedClaimType.set(id);
+  selectClaimType(type: ClaimType | string) {
+    if (this.isSaving()) return;
+    const selected = typeof type === 'string' ? this.claimTypes.find((item) => item.id === type) : type;
+    if (!selected) return;
+    if (selected.disabled) {
+      this.toastService.warning(selected.disabledReason || 'ประเภทนี้ยังไม่สามารถเลือกได้');
+      return;
+    }
+    this.selectedClaimType.set(selected.id);
   }
 
   deleteAttachment(id: number) {
@@ -478,6 +667,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   async save() {
+    if (this.isSaving()) return;
+
     if (!this.selectedClaimType()) {
       this.toastService.warning('กรุณาเลือกประเภทการเบิกก่อนดำเนินการต่อ');
       this.claimTypeSectionEl?.nativeElement.scrollIntoView({
@@ -582,11 +773,64 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
         );
         this.close();
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.isSaving.set(false);
-        this.swalService.warning('เกิดข้อผิดพลาดในการส่งเรื่อง');
+        const message = this.getSubmitErrorMessage(error);
+        this.swalService.warning(
+          this.isEditMode() ? 'ไม่สามารถแก้ไขรายการได้' : 'ไม่สามารถส่งเรื่องเบิกได้',
+          message,
+        );
       },
     });
+  }
+
+  private getSubmitErrorMessage(error: HttpErrorResponse): string {
+    const apiMessage = this.extractApiMessage(error);
+
+    if (error.status === 422 && apiMessage) {
+      return apiMessage;
+    }
+
+    if (apiMessage) {
+      return apiMessage;
+    }
+
+    return this.isEditMode()
+      ? 'เกิดข้อผิดพลาดในการแก้ไขรายการ กรุณาลองใหม่อีกครั้ง'
+      : 'เกิดข้อผิดพลาดในการส่งเรื่อง กรุณาลองใหม่อีกครั้ง';
+  }
+
+  private extractApiMessage(error: HttpErrorResponse): string | undefined {
+    const payload = error?.error;
+
+    if (typeof payload === 'string' && payload.trim()) {
+      return payload.trim();
+    }
+
+    if (payload?.message && typeof payload.message === 'string' && payload.message.trim()) {
+      return payload.message.trim();
+    }
+
+    if (
+      payload?.error?.message &&
+      typeof payload.error.message === 'string' &&
+      payload.error.message.trim()
+    ) {
+      return payload.error.message.trim();
+    }
+
+    if (payload?.error && typeof payload.error === 'string' && payload.error.trim()) {
+      return payload.error.trim();
+    }
+
+    if (Array.isArray(payload?.errors) && payload.errors.length > 0) {
+      const firstError = payload.errors.find((item: unknown) => typeof item === 'string');
+      if (typeof firstError === 'string' && firstError.trim()) {
+        return firstError.trim();
+      }
+    }
+
+    return undefined;
   }
 
   // FUNCTION
