@@ -41,6 +41,8 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   styleUrl: './medicalexpenses-form.scss',
 })
 export class MedicalexpensesForm implements OnInit, OnDestroy {
+  private static readonly PROBATION_DAYS = 119;
+
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -157,21 +159,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const inpatientCodes = ['IPD'];
     const backendMessage = type.eligibilityMessage?.trim() || undefined;
     const probationStatus = this.probationEligibility();
-    const blockedByProbation = type.eligibleAfterProbation;
-    const disabled = type.isSelectable === false || type.remainingAmount <= 0 || blockedByProbation;
+    const hasBackendEligibility =
+      typeof type.isSelectable === 'boolean' || typeof type.eligibilityMessage === 'string';
+    const blockedByProbation = type.eligibleAfterProbation && probationStatus !== 'passed';
+    const disabled = hasBackendEligibility
+      ? type.isSelectable === false
+      : type.remainingAmount <= 0 || blockedByProbation;
     const disabledReason = disabled
       ? backendMessage ||
         (blockedByProbation
-          ? 'ยังไม่ผ่านโปร ไม่สามารถเลือกประเภทนี้ได้'
+          ? 'ยังไม่ผ่านโปรหรือยังยืนยันสิทธิ์ไม่ได้ จึงยังไม่สามารถเลือกประเภทนี้ได้'
           : usesOpdBalance
             ? 'วงเงิน OPD คงเหลือไม่พอ'
             : 'วงเงินคงเหลือไม่เพียงพอ')
       : undefined;
     const requiresEligibilityCheck =
       !disabled &&
-      (!!backendMessage ||
-        type.isSelectable !== true ||
-        (type.eligibleAfterProbation && probationStatus === 'unknown'));
+      !hasBackendEligibility &&
+      (!!backendMessage || type.eligibleAfterProbation);
     const helperText = disabled
       ? disabledReason
       : requiresEligibilityCheck
@@ -189,11 +194,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const guidanceText = disabled
       ? disabledReason
       : backendMessage ||
-        (type.eligibleAfterProbation && probationStatus === 'unknown'
-          ? 'สิทธิ์ประเภทนี้อาจใช้ได้เฉพาะพนักงานที่ผ่านโปรแล้ว'
-          : usesOpdBalance
-            ? 'ประเภทนี้จะหักจากวงเงิน OPD คงเหลือ'
-            : 'สามารถกรอกและส่งเบิกได้ตามสิทธิ์ปัจจุบัน');
+        (usesOpdBalance
+          ? 'ประเภทนี้จะหักจากวงเงิน OPD คงเหลือ'
+          : 'สามารถกรอกและส่งเบิกได้ตามสิทธิ์ปัจจุบัน');
 
     return {
       id: type.code.toLowerCase(),
@@ -271,6 +274,25 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           ? 'passed'
           : 'not_passed';
       }
+
+      const startDate = this.readDateField(source, [
+        'CONTRACT_START_DATE',
+        'contractStartDate',
+        'contract_start_date',
+        'START_DATE',
+        'startDate',
+        'JOIN_DATE',
+        'joinDate',
+        'HIRE_DATE',
+        'hireDate',
+        'employeeStartDate',
+        'workStartDate',
+      ]);
+      if (startDate) {
+        return dayjs().diff(startDate, 'day') >= MedicalexpensesForm.PROBATION_DAYS
+          ? 'passed'
+          : 'not_passed';
+      }
     }
 
     return 'unknown';
@@ -327,7 +349,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const normalized = status.trim().toLowerCase();
 
     const passedKeywords = [
+      'a',
       'active',
+      'employee',
+      'employed',
       'regular',
       'passed probation',
       'pass probation',
@@ -336,18 +361,27 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
       'ผ่านโปร',
       'ผ่านทดลองงาน',
     ];
-    if (passedKeywords.some((keyword) => normalized.includes(keyword))) {
+    if (
+      passedKeywords.some((keyword) =>
+        keyword.length === 1 ? normalized === keyword : normalized.includes(keyword),
+      )
+    ) {
       return 'passed';
     }
 
     const probationKeywords = [
+      'p',
       'probation',
       'ทดลองงาน',
       'under probation',
       'on probation',
       'รอผ่านโปร',
     ];
-    if (probationKeywords.some((keyword) => normalized.includes(keyword))) {
+    if (
+      probationKeywords.some((keyword) =>
+        keyword.length === 1 ? normalized === keyword : normalized.includes(keyword),
+      )
+    ) {
       return 'not_passed';
     }
 
