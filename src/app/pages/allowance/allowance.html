@@ -94,24 +94,7 @@
             </div>
 
             <div class="claim-card__body">
-              <div class="claim-card__main">
-                จำนวน {{ claim.items.length }} รายการ
-                <!-- @for (item of claim.items; track $index) {
-            <div class="nested-item">
-              <div class="claim-date">
-                <span class="item-title"><i class="far fa-calendar-alt"></i> {{dateUtil.formatDateToBE(item.date, 'DD MMMM YYYY')}}</span>
-              </div>
-              <div class="item-detail">
-                <div class="claim-time">
-                  <i class="far fa-clock"></i> {{ item.hours }} ชม.
-                </div>
-                <div class="claim-date">
-                  <i class="fas fa-info-circle"></i> {{ item.description }}
-                </div>
-              </div>
-            </div>
-            } -->
-              </div>
+              <div class="claim-card__main">จำนวน {{ claim.items.length }} รายการ</div>
 
               <div class="claim-card__amount">
                 <span class="amount-label">ขอเบิก</span>
@@ -158,45 +141,13 @@
           <tbody>
             @for (claim of comps.paginatedData(); track claim.id) {
               <tr (click)="openModal(claim.id)">
-                <!-- ประเภท -->
-                <!-- <td>
-                  <div class="type-badge">
-                    <span class="type-name">เบิกค่าเบี้ยเลี้ยง</span>
-                  </div>
-
-                  <div class="request-no">
-                    <i class="fa-solid fa-tag"></i>
-                    {{ claim.claimNo ?? claim.claimId }}
-                  </div>
-                </td> -->
-
                 <!-- รายการ -->
                 <td>
                   <div class="request-no">
                     <i class="fa-solid fa-tag"></i>
                     {{ claim.claimNo ?? claim.claimId }}
                   </div>
-                  <div class="nested-items">
-                    จำนวน {{ claim.items.length }} รายการ
-                    <!-- @for (item of claim.items; track $index) {
-                <div class="nested-item">
-                  <div class="claim-date">
-                    <span class="item-title">
-                      <i class="far fa-calendar-alt"></i>
-                      {{ dateUtil.formatDateToBE(item.date, 'DD MMM YYYY') }}
-                    </span>
-                  </div>
-                  <div class="item-detail">
-                    <div class="claim-time">
-                      <i class="far fa-clock"></i> {{ item.hours }} ชม.
-                    </div>
-                    <div class="claim-desc">
-                      <i class="fas fa-info-circle"></i> {{ item.description }}
-                    </div>
-                  </div>
-                </div>
-                } -->
-                  </div>
+                  <div class="nested-items">จำนวน {{ claim.items.length }} รายการ</div>
                 </td>
 
                 <!-- ยอดเงิน -->

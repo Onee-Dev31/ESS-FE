@@ -212,6 +212,15 @@
             @media (max-width: 991px) {
               top: 18px;
             }
+
+            &.rejected-line {
+              background: linear-gradient(
+                90deg,
+                var(--red) 0%,
+                color-mix(in srgb, var(--red), black 10%) 100%
+              );
+              box-shadow: 0 0 8px rgba(var(--red), 0.3);
+            }
           }
 
           .progress-step {
@@ -362,7 +371,7 @@
 
         h3 {
           margin: 0;
-          font-size: 1.1rem;
+          font-size: $font-size-label;
           color: $text;
         }
       }
@@ -499,6 +508,29 @@
           font-size: $font-size-label;
           color: var(--text);
           font-weight: 500;
+        }
+      }
+
+      .approver-done {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-header);
+
+        .text-success {
+          color: var(--green);
+        }
+
+        .text-danger {
+          color: var(--red);
+        }
+
+        .text-muted {
+          color: var(--text-muted);
+          font-weight: 400;
+          font-size: 0.75rem;
         }
       }
 

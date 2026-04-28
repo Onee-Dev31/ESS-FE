@@ -16,7 +16,6 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
 import dayjs from 'dayjs';
-import { AllowanceApiService } from '../../services/allowance-api.service';
 import { ApprovalAllowanceService } from '../../services/approval-allowance';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
@@ -181,6 +180,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   getAllowanceClaim(item: ApprovalItem): any | null {
+    // console.log(item);
     return (item.originalData as any)?.claimID != null ? (item.originalData as any) : null;
   }
 
@@ -263,6 +263,7 @@ export class ApprovalAllowanceComponent implements OnInit {
       requestType: 'ค่าเบี้ยเลี้ยง',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
+      claimStatus: claim.claimStatus,
       remark: claim.remark || '',
       amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),
@@ -298,9 +299,9 @@ export class ApprovalAllowanceComponent implements OnInit {
     } else {
       this.isRefreshing.set(true);
     }
-    this.approvalAllowanceService.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
+    this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');

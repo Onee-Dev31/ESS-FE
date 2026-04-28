@@ -13,7 +13,7 @@ import { ApprovalDetailModalComponent } from '../../components/modals/approval-d
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { MedicalClaim } from '../../interfaces/medical.interface';
-import { MedicalApiService } from '../../services/medical-api.service';
+import { MedicalService } from '../../services/medical.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -52,7 +52,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApprovalMedicalComponent implements OnInit {
-  private medicalApiService = inject(MedicalApiService);
+  private medicalApiService = inject(MedicalService);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);

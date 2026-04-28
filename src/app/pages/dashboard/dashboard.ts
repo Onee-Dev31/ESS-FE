@@ -19,7 +19,6 @@ import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { UserService, UserProfile } from '../../services/user.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { DialogService } from '../../services/dialog';
-import { AllowanceApiService } from '../../services/allowance-api.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MedicalStat, LeaveItem, HolidayItem } from '../../interfaces/dashboard.interface';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
@@ -41,6 +40,7 @@ import { TaxiService } from '../../services/taxi.service';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ItAssetService } from '../../services/it-asset.service';
 import { ThemeService } from '../../services/theme.service';
+import { AllowanceService } from '../../services/allowance.service';
 
 interface ProfileItem {
   label: string;
@@ -81,7 +81,7 @@ export class DashboardComponent implements OnInit {
   private userService = inject(UserService);
   private dashboardService = inject(DashboardService);
   private dialogService = inject(DialogService);
-  private allowanceApiService = inject(AllowanceApiService);
+  private allowancService = inject(AllowanceService);
   private vehicleService = inject(VehicleService);
   private taxiService = inject(TaxiService);
   private itAssetService = inject(ItAssetService);
@@ -112,6 +112,10 @@ export class DashboardComponent implements OnInit {
   medicalStats = toSignal(this.dashboardService.getMedicalStats());
 
   isLoading = true;
+  // pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
+  // medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), {
+  //   initialValue: 0,
+  // });
 
   // MASTER
   leavePolicyMaster = signal<any[]>([]);
@@ -120,10 +124,6 @@ export class DashboardComponent implements OnInit {
   oneeUser = signal<any>(null);
   itStoryMap = signal<any>(null);
   leaveStats = signal<any>([]);
-  pendingCount = toSignal(this.dashboardService.getGlobalPendingCount(), { initialValue: 0 });
-  medicalPendingCount = toSignal(this.dashboardService.getMedicalPendingCount(), {
-    initialValue: 0,
-  });
 
   /** แปลงข้อมูลสถิติการเบิกค่ารักษาพยาบาลเพื่อใช้ในการแสดงผล (ProgressBar และสี) */
   medicalStatsDisplay = computed(() => {
@@ -495,7 +495,7 @@ export class DashboardComponent implements OnInit {
   loadAllowanceSummary() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
     if (!employeeCode) return of(0);
-    return this.allowanceApiService.getClaims({ employee_code: employeeCode, page_size: 200 }).pipe(
+    return this.allowancService.getClaims({ employee_code: employeeCode, page_size: 200 }).pipe(
       map((res: any) => {
         const items = res.data ?? [];
         const total = items.reduce(

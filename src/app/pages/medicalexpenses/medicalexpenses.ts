@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, inject, Inject, PLATFORM_ID } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicalClaim } from '../../interfaces/medical.interface';
-import { MedicalApiService } from '../../services/medical-api.service';
+import { MedicalService } from '../../services/medical.service';
 import { AuthService } from '../../services/auth.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
@@ -46,7 +46,7 @@ import { FileConverterService } from '../../services/file-converter';
   styleUrl: './medicalexpenses.scss',
 })
 export class MedicalexpensesComponent implements OnInit {
-  private medicalApiService = inject(MedicalApiService);
+  private medicalService = inject(MedicalService);
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
@@ -152,7 +152,7 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.medicalApiService.getStatuses().subscribe({
+    this.medicalService.getStatuses().subscribe({
       next: (res) => {
         this.statusOptions.set(
           res.data
@@ -197,7 +197,7 @@ export class MedicalexpensesComponent implements OnInit {
 
     // console.log(payload)
 
-    this.medicalApiService.getClaims(payload).subscribe({
+    this.medicalService.getClaims(payload).subscribe({
       next: (res) => {
         console.log(res.data);
         this.allClaims.set(res.data);

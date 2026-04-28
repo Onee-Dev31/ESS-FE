@@ -18,12 +18,12 @@ import {
   AllowanceItem,
   AllowanceRequest,
 } from '../../../services/allowance.service';
-import { AllowanceApiService } from '../../../services/allowance-api.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast';
 import { switchMap } from 'rxjs';
 import { SwalService } from '../../../services/swal.service';
 import { DateUtilityService } from '../../../services/date-utility.service';
+import { MealAllowanceRate } from '../../../interfaces';
 
 @Component({
   selector: 'app-allowance-form',
@@ -38,7 +38,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   @Output() onClose = new EventEmitter<void>();
 
   private allowanceService = inject(AllowanceService);
-  protected allowanceApi = inject(AllowanceApiService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private swalService = inject(SwalService);
@@ -72,12 +71,10 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   MODE_EDIT: boolean = false;
 
   isPolicyPopupOpen = signal(false);
-  protected readonly rates = computed(() => this.allowanceApi.rates());
+  rates = signal<MealAllowanceRate[]>([]);
 
   ngOnInit(): void {
-    if (!this.allowanceApi.rates().length) {
-      this.allowanceApi.reloadRates();
-    }
+    this.getRates();
     if (!this.requests) {
       this.loadData();
     }
@@ -166,8 +163,9 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     const yearCE = this.selectedYearBE - 543; // API รับปี ค.ศ.
     const month = this.selectedMonthIndex + 1; // 0-based → 1-based
 
-    this.allowanceApi.getEligibleDates(employeeCode, yearCE, month).subscribe({
+    this.allowanceService.getEligibleDates(employeeCode, yearCE, month).subscribe({
       next: (res) => {
+        // console.log(res);
         this.logs = (res.data ?? []).map((item) => {
           const dateStr = item.work_date.split('T')[0]; // "2026-03-02"
           const eligible = item.is_eligible === 1;
@@ -212,12 +210,6 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     });
   }
 
-  autoCalculate(log: AllowanceItem) {
-    const calculated = this.allowanceService.calculateAllowance(log);
-    Object.assign(log, calculated);
-    this.updateTotal();
-  }
-
   onInputChange(log: AllowanceItem) {
     if (log.description && log.description.trim() !== '') {
       log.selected = true;
@@ -249,17 +241,12 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const selectedLogs = this.logs.filter((l) => l.selected);
 
-    // if (selectedLogs.length === 0) {
-    //   this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
-    //   return;
-    // }
-
     if (this.MODE_EDIT && selectedLogs.length === 0) {
       this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
         if (!result.isConfirmed) return;
         this.swalService.loading('กำลังบันทึกข้อมูล...');
-        console.log(this.requests);
-        this.allowanceApi.deleteClaim(this.requests.id).subscribe({
+        // console.log(this.requests);
+        this.allowanceService.deleteClaim(this.requests.id).subscribe({
           next: () => {
             this.swalService.success('ลบรายการสำเร็จ');
             this.loadData();
@@ -280,7 +267,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
     if (this.MODE_EDIT) {
       this.swalService.loading('กำลังบันทึกข้อมูล...');
-      this.allowanceApi
+      this.allowanceService
         .updateClaim(this.requests.claimId, {
           details: selectedLogs.map((log) => ({
             work_date: log.date,
@@ -305,7 +292,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     }
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.allowanceApi
+    this.allowanceService
       .createClaim({
         employee_code: employeeCode,
         details: selectedLogs.map((log) => ({
@@ -335,5 +322,15 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
   closeModal() {
     this.onClose.emit();
+  }
+
+  getRates() {
+    this.allowanceService.getRates().subscribe({
+      next: (res) => {
+        // console.log(res);
+        this.rates.set(res.data);
+      },
+      error: () => {},
+    });
   }
 }

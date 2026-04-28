@@ -156,18 +156,6 @@ export class AuthService {
     this._currentUser.set(null);
     this._userRole.set(null);
     this._userData.set(null);
-    // this._ticketDetail.set(null);
-
-    this.refreshAllMockData();
-  }
-
-  /** อัปเดตข้อมูล Mock Data ใหม่ตามสิทธิ์ของผู้ใช้ปัจจุบัน */
-  private refreshAllMockData() {
-    this.allowanceService.refreshMockData();
-    this.medicalService.refreshMockData();
-    this.taxiService.refreshMockData();
-    this.transportService.refreshMockData();
-    this.timeOffService.refreshMockData();
   }
 
   getUserRole(): string | null {

@@ -43,7 +43,7 @@
         </div>
       </div>
     </section>
-    <section class="filter-controls" *ngIf="MODE_EDIT">
+    <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'New'">
       <div class="alert-delete" *ngIf="isDelete()">
         <i class="fa-solid fa-triangle-exclamation"></i>
         รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -65,21 +65,6 @@
         </div>
       </div>
     </section>
-
-    <!-- <div class="allowance-policy-note desktop-only">
-      <span class="note-header">
-        <i class="fas fa-info-circle"></i> <strong>เงื่อนไขการคำนวณเบี้ยเลี้ยง :</strong>
-      </span>
-      <span class="note-desc">ทำงานวันปกติ หลังจากครบ 9 ชม. อัตราการจ่ายเงินล่วงเวลา :</span>
-      <span class="note-rates">
-        @for (rate of rates(); track rate.rate_id) {
-        <span><strong>{{ rate.description }} :</strong> {{ rate.rate_amount | number }} บาท</span>
-        @if (!$last) { <span class="divider">|</span> }
-        } @empty {
-        <span class="rates-loading"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</span>
-        }
-      </span>
-    </div> -->
 
     @if (isPolicyPopupOpen()) {
       <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
@@ -247,6 +232,7 @@
               <label class="sr-only-label">
                 <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
                 <input
+                  *ngIf="requests.status === 'New'"
                   type="checkbox"
                   [(ngModel)]="log.selected"
                   (change)="onToggleCheck(log, cardDescInput)"
@@ -278,7 +264,7 @@
             <div class="card-input-section">
               <label
                 >รายละเอียดการเบิก
-                @if (log.selected) {
+                @if (log.selected && requests.status === 'New') {
                   <span class="required">*</span>
                 }
               </label>
@@ -290,6 +276,7 @@
                 placeholder="ระบุรายละเอียด..."
                 [class.is-invalid]="log.selected && !log.description"
                 (ngModelChange)="onInputChange(log)"
+                [readonly]="requests.status !== 'New'"
               />
             </div>
           </div>
@@ -298,10 +285,7 @@
     </div>
   </main>
 
-  <div class="form-actions">
-    <!-- <button type="button" class="btn-submit" (click)="onSubmit()">
-      <i class="fas fa-check"></i> ยืนยันการเบิก
-    </button> -->
+  <div class="form-actions" *ngIf="requests?.status === 'New'">
     <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
       <i class="fas fa-check"></i>
       {{

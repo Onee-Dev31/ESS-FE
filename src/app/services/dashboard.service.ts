@@ -14,7 +14,7 @@ import {
 import DateHolidays from 'date-holidays';
 import dayjs from 'dayjs';
 import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constants';
-import { MedicalApiService } from './medical-api.service';
+import { MedicalService } from './medical.service';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
@@ -26,7 +26,7 @@ export class DashboardService {
 
   private loadingService = inject(LoadingService);
   private approvalsHelper = inject(ApprovalsHelperService);
-  private medicalApiService = inject(MedicalApiService);
+  private medicalService = inject(MedicalService);
   private authService = inject(AuthService);
 
   private readonly PENDING_STATUSES = [
@@ -44,26 +44,6 @@ export class DashboardService {
     private authservice: AuthService,
   ) {}
 
-  getGlobalPendingCount(): Observable<number> {
-    return this.approvalsHelper
-      .getAllCategoriesApprovals()
-      .pipe(
-        map(
-          (items) => items.filter((item) => this.PENDING_STATUSES.includes(item.rawStatus)).length,
-        ),
-      );
-  }
-
-  getMedicalPendingCount(): Observable<number> {
-    return this.approvalsHelper
-      .getApprovals('medical')
-      .pipe(
-        map(
-          (items) => items.filter((item) => this.PENDING_STATUSES.includes(item.rawStatus)).length,
-        ),
-      );
-  }
-
   private readonly CODE_TYPE_MAP: Record<string, MedicalStat['type']> = {
     OPD: 'outpatient',
     IPD: 'inpatient',
@@ -76,7 +56,7 @@ export class DashboardService {
     const fiscalYear = dayjs().year();
 
     return this.loadingService.wrap(
-      this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).pipe(
+      this.medicalService.getExpenseTypesWithBalance(employeeCode, fiscalYear).pipe(
         map((res) =>
           res.data.map((t) => {
             const fmt = (n: number) => n.toLocaleString('th-TH');

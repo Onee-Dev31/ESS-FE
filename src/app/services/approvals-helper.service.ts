@@ -20,35 +20,10 @@ import { APPROVAL_STATUS, APPROVAL_LABELS } from '../constants/approval.constant
 /** Service ตัวช่วยจัดการข้อมูลและ Mapping ข้อมูลสำหรับการอนุมัติ (Approvals) */
 export class ApprovalsHelperService {
   private dateUtil = inject(DateUtilityService);
-  private allowanceService = inject(AllowanceService);
   private taxiService = inject(TaxiService);
   private transportService = inject(TransportService);
   private medicalService = inject(MedicalexpensesService);
-
-  /** ดึงข้อมูลรายการจากทุกหมวดหมู่ (เบี้ยเลี้ยง, รถ, แท็กซี่, การรักษา) */
-  getApprovals(category: 'all' | 'medical'): Observable<ApprovalItem[]> {
-    if (category === 'medical') {
-      return this.medicalService.getRequests().pipe(
-        take(1),
-        map((requests) => this.processMedicalData(requests)),
-      );
-    }
-
-    return forkJoin({
-      allowances: this.allowanceService.getAllowanceRequests().pipe(take(1)),
-      taxis: this.taxiService.getTaxiRequests().pipe(take(1)),
-      vehicles: this.transportService.getRequests().pipe(take(1)),
-    }).pipe(
-      map(({ allowances, taxis, vehicles }) => this.processData(allowances, taxis, vehicles)),
-    );
-  }
-
-  getAllCategoriesApprovals(): Observable<ApprovalItem[]> {
-    return forkJoin({
-      general: this.getApprovals('all'),
-      medical: this.getApprovals('medical'),
-    }).pipe(map(({ general, medical }) => [...general, ...medical]));
-  }
+  private allowanceService = inject(AllowanceService);
 
   processData(
     allowance: AllowanceRequest[],
@@ -163,8 +138,8 @@ export class ApprovalsHelperService {
 
   getServiceByType(type: string): BaseRequestService<any> {
     switch (type) {
-      case 'allowance':
-        return this.allowanceService;
+      // case 'allowance':
+      //   return this.allowanceService;
       case 'taxi':
         return this.taxiService;
       case 'transport':
