@@ -119,7 +119,6 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);

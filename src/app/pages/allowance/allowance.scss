@@ -204,26 +204,6 @@ $status-cancelled-text: var(--text-table-head);
           }
         }
 
-        .action-btns {
-          display: flex;
-          gap: 6px;
-          justify-content: center;
-
-          .btn-icon {
-            &.view {
-              @include icon-btn-ghost(var(--text-table-head));
-            }
-
-            &.edit {
-              @include icon-btn-ghost(#0ea5e9);
-            }
-
-            &.delete {
-              @include icon-btn-ghost(var(--danger));
-            }
-          }
-        }
-
         .btn-view-sm {
           @include btn-secondary;
           padding: 6px 12px;
@@ -853,4 +833,10 @@ $status-cancelled-text: var(--text-table-head);
 
 .text-center {
   text-align: center;
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
 }
