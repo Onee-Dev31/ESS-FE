@@ -303,7 +303,9 @@ export class ApprovalAllowanceComponent implements OnInit {
 
     this.allowanceApi.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        const mapped = (res.data || []).map((claim) => this.mapClaimToApproval(claim));
+        const mapped = (res.data || [])
+          .filter((claim) => (claim.status || '').toLowerCase() !== 'cancelled')
+          .map((claim) => this.mapClaimToApproval(claim));
         this.approvals.set(mapped);
         this.approvalSummary.set(res.summary ?? null);
         this.listing.currentPage.set(0);
