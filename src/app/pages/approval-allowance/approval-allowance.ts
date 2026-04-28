@@ -181,6 +181,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   getAllowanceClaim(item: ApprovalItem): any | null {
+    console.log(item);
     return (item.originalData as any)?.claimID != null ? (item.originalData as any) : null;
   }
 
@@ -298,7 +299,7 @@ export class ApprovalAllowanceComponent implements OnInit {
     } else {
       this.isRefreshing.set(true);
     }
-    this.approvalAllowanceService.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
+    this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
         console.log(res);
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));

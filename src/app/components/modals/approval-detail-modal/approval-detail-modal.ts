@@ -83,7 +83,7 @@ export class ApprovalDetailModalComponent implements OnInit {
     if (status === 'new') return 1;
     if (status === 'pending') return 2;
     if (status === 'rejected') return -1;
-    if (status === 'approved') return 6;
+    if (status === 'approved') return 4;
     return 1;
   });
 

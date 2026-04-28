@@ -131,11 +131,8 @@ export class AllowanceComponent implements OnInit {
     this.allowanceApiService.getClaims(param).subscribe({
       next: (res) => {
         this.dataFromApi(res);
-        // this.loadingService.stop('vehicle-list');
       },
-      error: (error) => {
-        // this.loadingService.stop('vehicle-list');
-      },
+      error: (error) => {},
     });
   }
 
@@ -150,7 +147,7 @@ export class AllowanceComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): any[] {
-    // console.log("items >> ", items)
+    console.log('items >> ', items);
     return items.map((claim: any) => ({
       id: claim.claimId,
       claimNo: claim.voucherNo,
@@ -167,6 +164,7 @@ export class AllowanceComponent implements OnInit {
         amount: d.rate_amount ?? 0,
         selected: false,
       })),
+
       ...claim,
     }));
   }
