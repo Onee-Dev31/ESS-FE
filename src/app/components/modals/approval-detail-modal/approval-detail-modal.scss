@@ -281,7 +281,7 @@
                   var(--green) 0%,
                   color-mix(in srgb, var(--green), black 10%) 100%
                 );
-                border-color: color-mix(in srgb, var(--green), black 10%);
+                border-color: var(--green);
                 color: #ffffff;
                 box-shadow: 0 6px 16px rgba(var(--green), 0.35);
                 transform: scale(1.05);
@@ -324,7 +324,7 @@
                   var(--red) 0%,
                   color-mix(in srgb, var(--red), black 10%) 100%
                 );
-                border-color: color-mix(in srgb, var(--red), black 10%);
+                border-color: var(--red);
                 color: #ffffff;
                 box-shadow: 0 6px 16px rgba(var(--red), 0.35);
               }
@@ -400,7 +400,7 @@
             background: rgba($warning, 0.1);
 
             .s-value {
-              color: color-mix(in srgb, $warning, black 10%);
+              color: var(--warning);
             }
 
             label {
@@ -545,7 +545,7 @@
         transition: background 0.2s;
 
         &:hover {
-          color: color-mix(in srgb, var(--primary) 100%, var(--text) 20%);
+          color: var(--primary);
         }
       }
     }

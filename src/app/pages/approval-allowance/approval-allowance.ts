@@ -85,6 +85,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   comps = createListingComputeds(this.approvals, this.listing, (item, search, status) => {
+    if (item.rawStatus === 'cancelled') return false;
     const matchStatus = !status || item.status === status;
     const matchSearch =
       !search ||
