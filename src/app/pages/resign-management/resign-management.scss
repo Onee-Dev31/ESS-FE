@@ -921,7 +921,7 @@ $border: var(--border);
   }
 
   .btn-ghost:hover {
-    background: #3941b6;
+    background: color-mix(in srgb, var(--primary), black 15%);
   }
 
   .btn-submit {
@@ -1072,7 +1072,7 @@ $border: var(--border);
   }
 
   .btn-ghost:hover {
-    background: #3941b6;
+    background: color-mix(in srgb, var(--primary), black 15%);
   }
 
   // Edit button

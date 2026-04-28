@@ -325,8 +325,8 @@ $table-label-bg: var(--border-toolbar);
 
           &:hover {
             color: $danger;
-            background: #fee2e2;
-            border-color: #fecaca;
+            background: color-mix(in srgb, var(--danger), var(--bg-card) 85%);
+            border-color: color-mix(in srgb, var(--danger), var(--bg-card) 70%);
             transform: rotate(90deg);
           }
         }
@@ -519,7 +519,7 @@ $table-label-bg: var(--border-toolbar);
       }
 
       &:hover:not(.disabled) {
-        background-color: #e8e8ed;
+        background-color: var(--bg-table-head);
         transform: none;
       }
 
@@ -680,7 +680,7 @@ $table-label-bg: var(--border-toolbar);
     font-size: $font-size-label;
 
     &:hover {
-      background: #0077ed;
+      background: color-mix(in srgb, var(--primary), black 15%);
       transform: scale(1.02);
       box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
     }
@@ -829,8 +829,8 @@ $table-label-bg: var(--border-toolbar);
         justify-content: flex-start;
 
         .tag {
-          background: #e0f2fe;
-          color: #0369a1;
+          background: color-mix(in srgb, var(--primary), var(--bg-card) 85%);
+          color: var(--primary);
           padding: 0.25rem 0.75rem;
           border-radius: 9999px;
           font-size: $font-size-body;
@@ -970,15 +970,15 @@ $table-label-bg: var(--border-toolbar);
 // Request ID Badge in Modal
 .req-id {
   font-size: $font-size-label;
-  color: #0369a1;
-  background: #e0f2fe;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary), var(--bg-card) 85%);
   padding: 4px 10px;
   border-radius: 99px;
   margin-left: 12px;
   vertical-align: middle;
   font-weight: 600;
   letter-spacing: 0.02em;
-  border: 1px solid #bae6fd;
+  border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
 }
 
 .text-yellow {
@@ -998,7 +998,7 @@ $table-label-bg: var(--border-toolbar);
       background: var(--status-new-bg);
       color: $primary;
       border-radius: 6px;
-      border: 1px solid #dbeafe;
+      border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
       font-family: 'Courier New', monospace;
       font-weight: 600;
     }
@@ -1026,7 +1026,7 @@ $table-label-bg: var(--border-toolbar);
   &:hover {
     background: var(--status-new-bg);
     color: $primary;
-    border-color: #dbeafe;
+    border-color: color-mix(in srgb, var(--primary), var(--bg-card) 65%);
     transform: translateY(-2px);
     box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -1035,7 +1035,7 @@ $table-label-bg: var(--border-toolbar);
 
   &:active {
     transform: translateY(0);
-    background: #dbeafe;
+    background: color-mix(in srgb, var(--primary), var(--bg-card) 85%);
   }
 
   i {
@@ -1107,11 +1107,11 @@ $table-label-bg: var(--border-toolbar);
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background: #fff9db;
-  border: 1px solid #fff3bf;
+  background: color-mix(in srgb, var(--warning), var(--bg-card) 85%);
+  border: 1px solid color-mix(in srgb, var(--warning), var(--bg-card) 70%);
   border-radius: 8px;
   font-size: $font-size-body;
-  color: #856404;
+  color: var(--warning);
 
   i {
     font-size: $font-size-header;
@@ -1230,7 +1230,7 @@ $table-label-bg: var(--border-toolbar);
   margin-top: 16px;
   margin-bottom: 24px;
   overflow: hidden;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
 
   .repair-card-header {
     display: flex;
@@ -1443,8 +1443,8 @@ $table-label-bg: var(--border-toolbar);
           align-items: center;
 
           &:hover {
-            background: #fff1f2;
-            color: #f43f5e;
+            background: color-mix(in srgb, var(--danger), var(--bg-card) 90%);
+            color: var(--danger);
             padding-left: 20px;
           }
         }
@@ -1481,7 +1481,7 @@ $table-label-bg: var(--border-toolbar);
   .styled-input {
     width: 100%;
     padding: 10px 14px;
-    border: 1.5px solid #d1d5db;
+    border: 1.5px solid var(--border-color);
     border-radius: 10px;
     font-size: $font-size-label;
     color: var(--text);
@@ -1528,11 +1528,11 @@ $table-label-bg: var(--border-toolbar);
     gap: 12px;
     padding: 20px 32px;
     background: var(--bg-table-head);
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--border-color);
 
     .btn-secondary-action {
       padding: 10px 22px;
-      border: 1.5px solid #d1d5db;
+      border: 1.5px solid var(--border-color);
       border-radius: 10px;
       background: var(--bg-card);
       color: var(--text-muted);
@@ -1607,7 +1607,7 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .unified-input-group {
-    border: 1.5px solid #d1d5db;
+    border: 1.5px solid var(--border-color);
     border-radius: 12px;
     background: var(--bg-card);
     overflow: hidden;
@@ -1646,7 +1646,7 @@ $table-label-bg: var(--border-toolbar);
 
         .btn-mini-upload {
           background: var(--bg-card);
-          border: 1px solid #d1d5db;
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           padding: 5px 12px;
           font-size: $font-size-hint;

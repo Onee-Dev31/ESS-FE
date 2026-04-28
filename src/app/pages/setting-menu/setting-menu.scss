@@ -72,34 +72,34 @@ $border: var(--border);
   &.status-waiting,
   &.NEW,
   &.WAITING_CHECK {
-    background: #e0f2fe;
-    color: #0284c7;
-    border-color: #bae6fd;
+    background: var(--status-open-bg);
+    color: var(--status-open-text);
+    border-color: color-mix(in srgb, var(--status-open-text), transparent 70%);
   }
 
   &.status-approved,
   &.status-verified,
   &.APPROVED,
   &.VERIFIED {
-    background: #dcfce7;
-    color: #16a34a;
-    border-color: #bbf7d0;
+    background: var(--status-closed-bg);
+    color: var(--status-closed-text);
+    border-color: color-mix(in srgb, var(--status-closed-text), transparent 70%);
   }
 
   &.status-rejected,
   &.status-cancelled,
   &.REJECTED,
   &.CANCELLED {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #fecaca;
+    background: var(--status-deny-bg);
+    color: var(--status-deny-text);
+    border-color: color-mix(in srgb, var(--status-deny-text), transparent 70%);
   }
 
   &.status-pending,
   &.PENDING_APPROVAL {
-    background: #ffedd5;
-    color: #ea580c;
-    border-color: #fed7aa;
+    background: var(--status-hold-bg);
+    color: var(--status-hold-text);
+    border-color: color-mix(in srgb, var(--status-hold-text), transparent 70%);
   }
 }
 
@@ -174,7 +174,7 @@ $border: var(--border);
       }
 
       &:hover {
-        background: #eaf2fb; // hover ให้เข้มขึ้นนิดนึง
+        background: var(--bg-table-hover);
       }
     }
 
@@ -182,7 +182,7 @@ $border: var(--border);
       padding: 16px;
       font-size: 0.9rem;
       color: $text;
-      border-bottom: 1px solid #e9ecef;
+      border-bottom: 1px solid var(--border-table);
       vertical-align: middle;
     }
 
@@ -228,7 +228,7 @@ $border: var(--border);
       border-color: rgba(0, 0, 0, 0.08);
 
       .card-header {
-        background: #f0f9ff;
+        background: var(--bg-table-head);
       }
 
       .card-header::after {
@@ -332,13 +332,13 @@ $border: var(--border);
         }
 
         .btn-edit-sm {
-          background: #f0f9ff;
+          background: var(--bg-table-head);
           color: #0ea5e9;
           border: 1px solid transparent;
 
           &:hover {
-            background: #e0f2fe;
-            color: #0284c7;
+            background: var(--status-open-bg);
+            color: var(--status-open-text);
             transform: translateY(-1px);
           }
         }
@@ -427,7 +427,7 @@ $border: var(--border);
           }
 
           &:hover {
-            background-color: #f5f5f5 !important;
+            background-color: var(--bg-table-head) !important;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           }
 
@@ -457,7 +457,7 @@ $border: var(--border);
           border: 1px solid var(--border-table-head);
           border-radius: 50px;
           padding: 0 1.25rem;
-          background-color: #ffffff;
+          background-color: var(--bg-card);
           font-size: 0.9rem;
           color: var(--text-sub);
 
@@ -797,7 +797,7 @@ $border: var(--border);
 }
 
 .summary-table tr.level-0-row td:first-child {
-  background: #f3f3f3;
+  background: var(--bg-table-head);
 }
 
 /* ===== Hover Effect ===== */
@@ -818,7 +818,7 @@ $border: var(--border);
 
 /* ===== Full Access Highlight ===== */
 .summary-table td:has(span.full-access) {
-  background: #ecfdf5 !important;
-  color: #065f46;
+  background: color-mix(in srgb, var(--success), var(--bg-card) 85%) !important;
+  color: var(--success);
   font-weight: 600;
 }

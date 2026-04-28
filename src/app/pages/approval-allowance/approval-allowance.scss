@@ -377,7 +377,7 @@ $status-danger-text: var(--status-danger-text);
     }
 
     .text-success {
-      color: #16a34a;
+      color: var(--success);
     }
 
     .small {
@@ -391,13 +391,13 @@ $status-danger-text: var(--status-danger-text);
 
     .budget-bar {
       height: 6px;
-      background: #e5e7eb;
+      background: var(--border-color);
       border-radius: 4px;
       overflow: hidden;
 
       &__used {
         height: 100%;
-        background: #2563eb;
+        background: var(--primary);
       }
     }
 
@@ -411,7 +411,7 @@ $status-danger-text: var(--status-danger-text);
     }
 
     .amount-main.is-approved {
-      color: #16a34a;
+      color: var(--success);
     }
 
     .check-icon {
@@ -541,25 +541,25 @@ $status-danger-text: var(--status-danger-text);
 
     .budget-bar {
       height: 5px;
-      background: #e5e7eb;
+      background: var(--border-color);
       border-radius: 4px;
       overflow: hidden;
 
       &__used {
         height: 100%;
-        background: #2563eb;
+        background: var(--primary);
       }
     }
 
     .budget-text {
       font-size: 0.7rem;
-      color: #6b7280;
+      color: var(--text-muted);
       text-align: right;
     }
 
     .sub-text {
       font-size: 0.75rem;
-      color: #6b7280;
+      color: var(--text-muted);
       background: var(--bg-slate);
       padding: 6px 8px;
       border-radius: 10px;
@@ -831,7 +831,7 @@ $status-danger-text: var(--status-danger-text);
         background: transparent;
         border-radius: 8px;
         font-size: 0.9rem;
-        color: #202124;
+        color: var(--text);
         cursor: pointer;
         transition: all 0.2s;
         text-align: left;
