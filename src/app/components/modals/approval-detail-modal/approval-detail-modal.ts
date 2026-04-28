@@ -129,7 +129,12 @@ export class ApprovalDetailModalComponent implements OnInit {
     const currentIndex = this.currentStepIndex();
     const rejectedAt = this.rejectedAtStep();
 
-    return this.steps().map((step) => {
+    // ถ้ามีการ reject แล้ว ให้แสดงเฉพาะ step ที่ <= rejectedAt เท่านั้น
+    const visibleSteps = rejectedAt !== null
+      ? this.steps().filter((step) => step.id <= rejectedAt)
+      : this.steps();
+
+    return visibleSteps.map((step) => {
       const completed = rejectedAt ? step.id < rejectedAt : currentIndex > step.id;
       const active = currentIndex > 0 && currentIndex === step.id;
       const rejected = rejectedAt !== null && step.id === rejectedAt;
