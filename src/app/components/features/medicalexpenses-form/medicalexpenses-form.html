@@ -327,8 +327,8 @@
       (click)="save()"
       [disabled]="isSaving() || !isValidSave()"
     >
-      <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'"></i>
-      {{ isSaving() ? 'กำลังส่ง...' : 'ส่งเรื่องเบิก' }}
+      <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : (isEditMode() ? 'fas fa-save' : 'fas fa-paper-plane')"></i>
+      {{ isSaving() ? 'กำลังบันทึก...' : (isEditMode() ? 'ยืนยันการแก้ไข' : 'ส่งเรื่องเบิก') }}
     </button>
   </div>
 

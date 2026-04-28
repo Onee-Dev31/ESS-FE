@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MedicalexpensesService } from '../../../services/medicalexpenses.service';
 import { AuthService } from '../../../services/auth.service';
 import { MedicalExpenseTypeWithBalance } from '../../../interfaces/medical.interface';
 import { ToastService } from '../../../services/toast';
@@ -41,7 +40,6 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   styleUrl: './medicalexpenses-form.scss',
 })
 export class MedicalexpensesForm implements OnInit, OnDestroy {
-  private medicalService1 = inject(MedicalexpensesService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
@@ -120,7 +118,8 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return diff > 0 ? diff : 0;
   });
 
-  attachments = signal<{ id: number; name: string; description: string; file?: File }[]>([]);
+  attachments = signal<{ id: number; attachmentId?: number; name: string; description: string; file?: File }[]>([]);
+  removedAttachmentIds = signal<number[]>([]);
   isSaving = signal<boolean>(false);
 
   calculatedDays = computed(() => {
@@ -331,32 +330,63 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   loadRequestData() {
     if (this.requestId) {
-      this.medicalService1.getRequestById(this.requestId).subscribe((req) => {
-        if (req) {
-          this.isEditMode.set(true);
-          this.currentDate.set(this.dateUtil.formatDateToThaiMonth(req.createDate));
+      const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+      this.medicalService.getClaimById(+this.requestId, employeeCode).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            const claim = res.data;
+            this.isEditMode.set(true);
+            this.currentDate.set(this.dateUtil.formatDateToThaiMonth(new Date(claim.createdAt)));
 
-          if (req.items && req.items.length > 0) {
-            const item = req.items[0];
-            this.hospital.set(item.hospital);
-            this.disease.set(item.diseaseType);
+            this.hospital.set(claim.hospitalName);
+            this.selectedHospitalObj.set({
+              hospitalId: claim.hospitalId,
+              nameTh: claim.hospitalName,
+              nameEn: claim.hospitalName,
+              shortName: claim.hospitalShortName,
+              hospitalType: null, province: null, address: null, phone: null,
+              isContracted: false, totalCount: 1,
+            });
 
-            const typeMatch = this.claimTypes.find((t) => t.label === item.limitType);
-            if (typeMatch) {
-              this.selectedClaimType.set(typeMatch.id);
-            }
+            this.disease.set(claim.diseaseName);
+            this.selectedDiseaseObj.set({
+              diseaseId: claim.diseaseId,
+              code: claim.icd10Code ?? '',
+              nameTh: claim.diseaseName,
+              nameEn: claim.diseaseName,
+              icd10Code: claim.icd10Code,
+              category: null, expenseTypeId: null, isExcluded: false,
+              excludeReason: null, sortOrder: 0, totalCount: 1,
+            });
 
-            this.startDate.set(this.dateUtil.formatBEToISO(item.treatmentDateFrom));
-            this.endDate.set(this.dateUtil.formatBEToISO(item.treatmentDateTo));
-            this.amount = item.requestedAmount.toString();
-            // this.amount.set(item.requestedAmount.toString());
-            // this.amount = item.requestedAmount
+            const matchedType = this.expenseTypesRaw.find((t) => t.typeId === claim.expenseTypeId);
+            if (matchedType) this.selectedClaimType.set(matchedType.code.toLowerCase());
+
+            this.startDate.set(claim.treatmentDateFrom.split('T')[0]);
+            this.endDate.set(claim.treatmentDateTo.split('T')[0]);
+            this.amount = claim.requestedAmount.toString();
+            this.remark.set(claim.remark ?? '');
+
+            this.attachments.set(
+              claim.attachments.map((a, i) => ({
+                id: i + 1,
+                attachmentId: a.attachmentId,
+                name: a.fileName,
+                description: a.remark ?? '',
+              })),
+            );
+            this.removedAttachmentIds.set([]);
+          } else {
+            this.isEditMode.set(false);
+            this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
+            this.resetDates();
           }
-        } else {
+        },
+        error: () => {
           this.isEditMode.set(false);
           this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
           this.resetDates();
-        }
+        },
       });
     } else {
       this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
@@ -375,6 +405,10 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   }
 
   deleteAttachment(id: number) {
+    const att = this.attachments().find((a) => a.id === id);
+    if (att?.attachmentId != null) {
+      this.removedAttachmentIds.update((ids) => [...ids, att.attachmentId!]);
+    }
     this.attachments.update((current) => current.filter((a) => a.id !== id));
   }
 
@@ -497,9 +531,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const fileRemarks = attachmentList.map((a) => a.description);
 
     const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการส่งเรื่องเบิก',
-      message: `ต้องการส่งเรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
-      confirmText: 'ส่งเรื่องเบิก',
+      title: this.isEditMode() ? 'ยืนยันการแก้ไขการเบิก' : 'ยืนยันการส่งเรื่องเบิก',
+      message: `ต้องการ${this.isEditMode() ? 'แก้ไข' : 'ส่ง'}เรื่องเบิกค่ารักษาพยาบาล <strong>${rawType.nameTh}</strong><br>จำนวน <strong>${this.parseNumber(this.amount).toLocaleString('th-TH')} บาท</strong> ใช่หรือไม่?`,
+      confirmText: this.isEditMode() ? 'ยืนยันการแก้ไข' : 'ส่งเรื่องเบิก',
       cancelText: 'ยกเลิก',
       type: 'info',
     });
@@ -508,33 +542,40 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     this.isSaving.set(true);
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.medicalService
-      .submitClaim({
-        employee_code: this.employeeId(),
-        expense_type_id: rawType.typeId,
-        hospital_id: hosp.hospitalId,
-        disease_id: disease.diseaseId,
-        treatment_date_from: dayjs(this.startDate()).format('YYYY-MM-DD'),
-        treatment_date_to: dayjs(this.endDate()).format('YYYY-MM-DD'),
-        treatment_days: this.calculatedDays(),
-        requested_amount: this.parseNumber(this.amount),
-        remark: this.remark() || undefined,
-        files: files.length > 0 ? files : undefined,
-        file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.swalService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
-          // this.toastService.success('ส่งเรื่องเบิกเรียบร้อยแล้ว');
-          this.close();
-        },
-        error: () => {
-          this.isSaving.set(false);
-          this.swalService.warning('เกิดข้อผิดพลาดในการส่งเรื่อง');
-          // this.toastService.error('เกิดข้อผิดพลาดในการส่งเรื่อง');
-        },
-      });
+
+    const commonParams = {
+      employee_code: this.employeeId(),
+      expense_type_id: rawType.typeId,
+      hospital_id: hosp.hospitalId,
+      disease_id: disease.diseaseId,
+      treatment_date_from: dayjs(this.startDate()).format('YYYY-MM-DD'),
+      treatment_date_to: dayjs(this.endDate()).format('YYYY-MM-DD'),
+      requested_amount: this.parseNumber(this.amount),
+      remark: this.remark() || undefined,
+      files: files.length > 0 ? files : undefined,
+      file_remarks: fileRemarks.length > 0 ? fileRemarks : undefined,
+    };
+
+    const request$ = this.isEditMode()
+      ? this.medicalService.updateClaim(+this.requestId, {
+          ...commonParams,
+          remove_attachment_ids: this.removedAttachmentIds().length > 0
+            ? this.removedAttachmentIds()
+            : undefined,
+        })
+      : this.medicalService.submitClaim({ ...commonParams, treatment_days: this.calculatedDays() });
+
+    request$.subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.swalService.success(this.isEditMode() ? 'แก้ไขรายการสำเร็จ' : 'ส่งเรื่องเบิกเรียบร้อยแล้ว');
+        this.close();
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.swalService.warning('เกิดข้อผิดพลาดในการส่งเรื่อง');
+      },
+    });
   }
 
   // FUNCTION

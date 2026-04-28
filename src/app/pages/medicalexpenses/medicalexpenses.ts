@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MedicalClaim } from '../../interfaces/medical.interface';
 import { MedicalService } from '../../services/medical.service';
 import { AuthService } from '../../services/auth.service';
+import { SwalService } from '../../services/swal.service';
 import { MedicalPolicyModalComponent } from '../../components/modals/medical-policy-modal/medical-policy-modal';
 import { MedicalexpensesForm } from '../../components/features/medicalexpenses-form/medicalexpenses-form';
 import { FilePreviewModalComponent } from '../../components/modals/file-preview-modal/file-preview-modal';
@@ -51,6 +52,7 @@ export class MedicalexpensesComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private fileConverter = inject(FileConverterService);
+  private swalService = inject(SwalService);
   dateUtil = inject(DateUtilityService);
 
   isLoading = this.loadingService.loading('medical-list');
@@ -73,6 +75,7 @@ export class MedicalexpensesComponent implements OnInit {
 
   isModalOpen = signal<boolean>(false);
   isPolicyModalOpen = signal<boolean>(false);
+  selectedClaimId = signal<number | null>(null);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<any[]>([]);
 
@@ -214,12 +217,37 @@ export class MedicalexpensesComponent implements OnInit {
     });
   }
 
-  openModal() {
+  openModal(claimId?: number) {
+    this.selectedClaimId.set(claimId ?? null);
     this.isModalOpen.set(true);
+  }
+
+  editRequest(claim: MedicalClaim) {
+    this.openModal(claim.claimId);
+  }
+
+  deleteRequest(claim: MedicalClaim) {
+    this.swalService.confirm(
+      'ยืนยันการยกเลิกรายการ?',
+      undefined,
+      `<div style="display:flex;align-items:center;gap:8px;justify-content:center">
+        <span style="font-size:14px;color:#94a3b8">เลขที่</span>
+        <span style="font-size:16px;font-weight:700;color:#4f6ef7">${claim.voucherNo ?? claim.claimId}</span>
+      </div>`,
+    ).then((result) => {
+      if (result.isConfirmed) {
+        const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+        this.medicalService.cancelClaim(claim.claimId, employeeCode).subscribe({
+          next: () => { this.swalService.success('ยกเลิกรายการสำเร็จ'); this.loadData(); },
+          error: () => this.swalService.error('เกิดข้อผิดพลาดในการยกเลิกรายการ'),
+        });
+      }
+    });
   }
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.selectedClaimId.set(null);
     this.loadData();
   }
 

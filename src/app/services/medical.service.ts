@@ -167,6 +167,41 @@ export class MedicalService {
     return this._http.post<{ success: boolean; data: any }>(`${this.baseUrl}/medical/claim`, fd);
   }
 
+  cancelClaim(id: number, employee_code: string): Observable<{ success: boolean; data: any }> {
+    return this._http.patch<{ success: boolean; data: any }>(
+      `${this.baseUrl}/medical/claims/${id}/cancel`,
+      { employeeCode: employee_code },
+    );
+  }
+
+  updateClaim(id: number, params: {
+    employee_code: string;
+    expense_type_id: number;
+    hospital_id: number;
+    disease_id: number;
+    treatment_date_from: string;
+    treatment_date_to: string;
+    requested_amount: number;
+    remark?: string;
+    remove_attachment_ids?: number[];
+    files?: File[];
+    file_remarks?: string[];
+  }): Observable<{ success: boolean; data: any }> {
+    const fd = new FormData();
+    fd.append('employee_code', params.employee_code);
+    fd.append('expense_type_id', params.expense_type_id.toString());
+    fd.append('hospital_id', params.hospital_id.toString());
+    fd.append('disease_id', params.disease_id.toString());
+    fd.append('treatment_date_from', params.treatment_date_from);
+    fd.append('treatment_date_to', params.treatment_date_to);
+    fd.append('requested_amount', params.requested_amount.toString());
+    if (params.remark) fd.append('remark', params.remark);
+    params.remove_attachment_ids?.forEach((id) => fd.append('remove_attachment_ids', id.toString()));
+    params.files?.forEach((f) => fd.append('files', f, f.name));
+    params.file_remarks?.forEach((r) => fd.append('file_remarks', r));
+    return this._http.put<{ success: boolean; data: any }>(`${this.baseUrl}/medical/claims/${id}`, fd);
+  }
+
   updateTypeClaims(id: string | number, payload: any): Observable<any> {
     return this._http.patch(`${this.baseUrl}/medical/claims/${id}/review`, payload);
   }
