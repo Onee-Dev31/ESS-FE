@@ -247,29 +247,45 @@ $border: var(--border);
   color: var(--text-muted);
 }
 
-// .search-input-group {
-//     position: relative;
+// Main action buttons
+.btn-create {
+  @include btn-primary;
+}
 
-//     .search-icon-inner {
-//         position: absolute;
-//         left: 12px;
-//         top: 50%;
-//         transform: translateY(-50%);
-//         color: var(--text-muted);
-//         font-size: 0.85rem;
-//         pointer-events: none;
-//     }
+.btn-search {
+  @include btn-primary;
+}
 
-//     .search-control {
-//         padding-left: 34px;
-//         min-width: 200px;
+.btn-clear {
+  @include btn-outline;
+}
 
-//         @include mobile {
-//             min-width: 0;
-//             width: 100%;
-//         }
-//     }
-// }
+.btn-edit-sm,
+.btn-icon.edit {
+  @include btn-secondary;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+}
+
+.btn-delete-sm,
+.btn-icon.delete {
+  @include btn-outline;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  color: var(--danger);
+  border-color: var(--danger);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: #dc2626;
+  }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
 
 // ============================================================
 // Status badge
@@ -337,7 +353,7 @@ app-empty-state {
   display: none;
   grid-template-columns: repeat(3, 1fr);
 
-  @include tablet {
+  @include large-tablet {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -543,7 +559,7 @@ app-empty-state {
   display: block;
   overflow-x: auto;
 
-  @include tablet {
+  @include large-tablet {
     display: none;
   }
 }
@@ -649,16 +665,6 @@ app-empty-state {
   display: flex;
   justify-content: center;
   gap: 6px;
-}
-
-.btn-icon {
-  &.view {
-    @include icon-btn-ghost(var(--text-table-head));
-  }
-
-  &.edit {
-    @include icon-btn-ghost(var(--primary));
-  }
 }
 
 // ============================================================
@@ -768,36 +774,5 @@ app-empty-state {
   .error {
     color: rgb(255, 166, 166);
     text-align: center;
-  }
-}
-
-.action-btns {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-}
-
-.btn-icon.edit {
-  @include btn-secondary;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
-}
-
-.btn-icon.delete {
-  @include btn-outline;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-  height: 36px;
-  color: var(--danger);
-  border-color: var(--danger);
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.05);
-    border-color: #dc2626;
-  }
-
-  &:active {
-    background: rgba(239, 68, 68, 0.1);
   }
 }
