@@ -103,6 +103,15 @@ export interface CreateClaimResponse {
 
 // ─── Meal Allowance API interfaces ───────────────────────────────────────────
 
+export interface MealAllowanceApprovalStep {
+  stepNo: number;
+  approverEmpNo: string;
+  approverName: string | null;
+  status: string; // pending | approved | rejected | cancelled
+  actedAt?: string | null;
+  rejectionReason?: string | null;
+}
+
 export interface MealAllowanceClaimDetail {
   detail_id: number;
   work_date: string;
@@ -137,6 +146,7 @@ export interface MealAllowanceClaim {
   rejectionReason?: string | null;
   details: MealAllowanceClaimDetail[];
   currentStep?: number;
+  approvalSteps?: MealAllowanceApprovalStep[]; // all approvers grouped by step
 }
 
 export interface MealAllowancePagination {

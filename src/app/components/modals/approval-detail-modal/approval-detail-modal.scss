@@ -275,6 +275,38 @@
               i { font-size: 9px; }
             }
 
+            .step-approvers {
+              margin-top: 5px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 2px;
+
+              .step-approver-name {
+                font-size: 9px;
+                color: $text-muted;
+                opacity: 0.8;
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                text-align: center;
+                max-width: 100px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                .step-approver-icon {
+                  font-size: 7px;
+                  opacity: 0.6;
+                  flex-shrink: 0;
+                }
+              }
+            }
+
+            &.completed .step-approvers .step-approver-name { color: var(--green); opacity: 0.85; }
+            &.rejected  .step-approvers .step-approver-name { color: var(--red);   opacity: 0.85; }
+            &.active    .step-approvers .step-approver-name { color: var(--blue);  opacity: 0.85; }
+
             &.completed {
               .step-status {
                 color: var(--green);

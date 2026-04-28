@@ -17,6 +17,7 @@ import { UnifiedItem, ApprovalItem } from '../../../interfaces/approval.interfac
 import { MedicalClaim } from '../../../interfaces/medical.interface';
 import {
   MealAllowanceClaim,
+  MealAllowanceApprovalStep,
   MealAllowanceReviewRequest,
 } from '../../../interfaces/allowance.interface';
 import { REQUEST_STATUS } from '../../../constants/request-status.constant';
@@ -84,18 +85,54 @@ export class ApprovalDetailModalComponent implements OnInit {
     return idx < 0 ? Math.abs(idx) : null;
   });
 
-  steps = computed(() =>
-    this.approvalItem?.type === 'allowance'
-      ? [
-          { label: 'Approver 1', id: 1, icon: 'fas fa-user-check' },
-          { label: 'Approver 2', id: 2, icon: 'fas fa-user-check' },
-          { label: 'HR Parallel', id: 3, icon: 'fas fa-users-cog' },
-        ]
-      : [
-          { label: 'พนักงานยืนยัน', id: 1, icon: 'fas fa-user-check' },
-          { label: 'ฝ่ายบุคคลอนุมัติ', id: 3, icon: 'fas fa-users-cog' },
-        ],
-  );
+  // Group approvalSteps from API by stepNo → รองรับ parallel approvers ใน step เดียวกัน
+  groupedAllowanceSteps = computed(() => {
+    if (this.approvalItem?.type !== 'allowance') return null;
+    const claim = this.approvalItem.originalData as MealAllowanceClaim;
+    const rawSteps = claim?.approvalSteps;
+    if (!rawSteps?.length) return null;
+
+    const map = new Map<number, {
+      id: number;
+      label: string;
+      icon: string;
+      approvers: { name: string | null; empNo: string; status: string }[];
+    }>();
+
+    for (const s of rawSteps) {
+      if (!map.has(s.stepNo)) {
+        map.set(s.stepNo, {
+          id: s.stepNo,
+          label: s.stepNo === 3 ? 'HR Parallel' : `Approver ${s.stepNo}`,
+          icon: s.stepNo === 3 ? 'fas fa-users-cog' : 'fas fa-user-check',
+          approvers: [],
+        });
+      }
+      map.get(s.stepNo)!.approvers.push({
+        name: s.approverName,
+        empNo: s.approverEmpNo,
+        status: s.status,
+      });
+    }
+    return Array.from(map.values()).sort((a, b) => a.id - b.id);
+  });
+
+  steps = computed(() => {
+    if (this.approvalItem?.type === 'allowance') {
+      const grouped = this.groupedAllowanceSteps();
+      if (grouped) return grouped;
+      // fallback hardcoded ถ้า backend ยังไม่ส่ง approvalSteps มา
+      return [
+        { id: 1, label: 'Approver 1', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+        { id: 2, label: 'Approver 2', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+        { id: 3, label: 'HR Parallel', icon: 'fas fa-users-cog', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+      ];
+    }
+    return [
+      { id: 1, label: 'พนักงานยืนยัน', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+      { id: 3, label: 'ฝ่ายบุคคลอนุมัติ', icon: 'fas fa-users-cog', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+    ];
+  });
 
   currentStepIndex = computed(() => {
     const status = (this.detailedStatus() || this.approvalItem.rawStatus || '').toLowerCase();

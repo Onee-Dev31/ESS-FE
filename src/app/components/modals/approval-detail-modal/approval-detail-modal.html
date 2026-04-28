@@ -47,6 +47,17 @@
               <div class="step-status">
                 <i [class]="step.statusIcon"></i> {{ step.statusText }}
               </div>
+
+              @if (step.approvers && step.approvers.length > 0) {
+                <div class="step-approvers">
+                  @for (approver of step.approvers; track approver.empNo) {
+                    <div class="step-approver-name">
+                      <i class="fas fa-user step-approver-icon"></i>
+                      {{ approver.name || approver.empNo }}
+                    </div>
+                  }
+                </div>
+              }
             </div>
           }
         </div>
