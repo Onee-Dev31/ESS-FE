@@ -292,15 +292,32 @@
                 align-items: center;
                 gap: 3px;
                 text-align: center;
-                max-width: 100px;
+                max-width: 120px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+
+                &.is-actual-approver {
+                  font-weight: 600;
+                  opacity: 1;
+                }
 
                 .step-approver-icon {
                   font-size: 7px;
                   opacity: 0.6;
                   flex-shrink: 0;
+                }
+
+                .actual-approver-badge {
+                  flex-shrink: 0;
+                  font-size: 7px;
+                  font-weight: 700;
+                  padding: 1px 4px;
+                  border-radius: 3px;
+                  background: rgba(var(--green), 0.2);
+                  color: var(--green);
+                  border: 1px solid rgba(var(--green), 0.4);
+                  white-space: nowrap;
                 }
               }
             }
