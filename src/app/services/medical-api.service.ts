@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 import { environment } from '../../environments/environment';
 const FILE_BASE = environment.file_base_url;
 import {
@@ -132,6 +133,35 @@ export class MedicalApiService {
     const p = new HttpParams().set('employee_code', employee_code);
     return this._http.get<MedicalClaimResponse>(`${this.baseUrl}/medical/claims/${id}`, {
       params: p,
+    });
+  }
+
+  /**
+   * Export รายการอนุมัติค่ารักษาพยาบาลเป็น Excel
+   * GET /api/medical/claims/export-excel
+   */
+  exportClaimsExcel(params: {
+    approver_aduser: string;
+    status?: string;
+    from_month?: number;
+    from_year?: number;
+    to_month?: number;
+    to_year?: number;
+    keyword?: string;
+    claim_ids?: number[];
+  }): Observable<Blob> {
+    let p = new HttpParams().set('approver_aduser', params.approver_aduser);
+    if (params.status?.trim()) p = p.set('status', params.status);
+    if (params.from_month != null) p = p.set('from_month', params.from_month);
+    if (params.from_year != null) p = p.set('from_year', params.from_year);
+    if (params.to_month != null) p = p.set('to_month', params.to_month);
+    if (params.to_year != null) p = p.set('to_year', params.to_year);
+    if (params.keyword?.trim()) p = p.set('keyword', params.keyword);
+    if (params.claim_ids?.length) p = p.set('claim_ids', params.claim_ids.join(','));
+    return this._http.get(`${this.baseUrl}/medical/claims/export-excel`, {
+      params: p,
+      responseType: 'blob',
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
   }
 

@@ -30,6 +30,7 @@ import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { AuthService } from '../../services/auth.service';
 
 /** หน้าจัดการรายการอนุมัติค่ารักษาพยาบาล */
 @Component({
@@ -54,6 +55,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalApiService);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
@@ -85,6 +87,15 @@ export class ApprovalMedicalComponent implements OnInit {
 
   approvals = signal<ApprovalItem[]>([]);
   showExportMenu = signal<boolean>(false);
+  selectedIds = signal<Set<number>>(new Set());
+
+  readonly isAllSelected = computed(() => {
+    const ids = this.selectedIds();
+    const data = this.comps.paginatedData();
+    return data.length > 0 && data.every((item) => ids.has(item.requestId));
+  });
+
+  readonly isSomeSelected = computed(() => this.selectedIds().size > 0 && !this.isAllSelected());
 
   readonly pageTitle = signal('อนุมัติค่ารักษาพยาบาล');
 
@@ -281,6 +292,33 @@ export class ApprovalMedicalComponent implements OnInit {
     this.showExportMenu.set(!this.showExportMenu());
   }
 
+  toggleSelect(id: number) {
+    const current = new Set(this.selectedIds());
+    if (current.has(id)) {
+      current.delete(id);
+    } else {
+      current.add(id);
+    }
+    this.selectedIds.set(current);
+  }
+
+  toggleSelectAll() {
+    const data = this.comps.paginatedData();
+    if (this.isAllSelected()) {
+      this.selectedIds.set(new Set());
+    } else {
+      this.selectedIds.set(new Set(data.map((item) => item.requestId)));
+    }
+  }
+
+  isSelected(id: number): boolean {
+    return this.selectedIds().has(id);
+  }
+
+  clearSelection() {
+    this.selectedIds.set(new Set());
+  }
+
   async exportPDF() {
     this.showExportMenu.set(false);
     this.loadingService.start('export');
@@ -297,36 +335,59 @@ export class ApprovalMedicalComponent implements OnInit {
   async exportExcel() {
     this.showExportMenu.set(false);
     this.loadingService.start('export');
-    try {
-      const data = this.comps.paginatedData().map((item) => ({
-        requestNo: item.requestNo,
-        requestDate: item.requestDate,
-        requestBy: item.requestBy.name,
-        employeeId: item.requestBy.employeeId,
-        department: item.requestBy.department,
-        requestType: item.requestType,
-        requestDetail: item.requestDetail,
-        amount: item.amount,
-        status: item.status,
-      }));
 
-      const columns = [
-        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
-        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
-        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
-        { header: 'ประเภท', key: 'requestType', width: 15 },
-        { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
-        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
-        { header: 'สถานะ', key: 'status', width: 15 },
-      ];
+    const adUser = this.authService.currentUser() || '';
+    const fromYear = parseInt(this.fromYear());
+    const toYear = parseInt(this.toYear());
 
-      await this.exportService.exportToExcel(data, columns, 'approvals-medical');
-      this.toastService.success('Export Excel สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
-    } finally {
-      this.loadingService.stop('export');
-    }
+    // map display status → API status
+    const statusMap: Record<string, string> = {
+      Pending: 'PENDING',
+      Approved: 'APPROVED',
+      Rejected: 'REJECTED',
+      'Referred Back': 'REFERRED_BACK',
+    };
+    const activeStatus = this.listing.filterStatus();
+    const apiStatus = activeStatus ? statusMap[activeStatus] : undefined;
+
+    const exportParams = {
+      approver_aduser: adUser,
+      status: apiStatus,
+      from_month: this.fromMonth() + 1,
+      from_year: isNaN(fromYear) ? undefined : fromYear,
+      to_month: this.toMonth() + 1,
+      to_year: isNaN(toYear) ? undefined : toYear,
+      keyword: this.listing.searchText().trim() || undefined,
+      claim_ids: this.selectedIds().size > 0 ? [...this.selectedIds()] : undefined,
+    };
+    console.log('[Export Excel] params:', exportParams);
+
+    this.medicalApiService
+      .exportClaimsExcel(exportParams)
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `approvals-medical-${dayjs().format('YYYYMMDD')}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          this.toastService.success('Export Excel สำเร็จ');
+          this.selectedIds.set(new Set());
+          this.loadingService.stop('export');
+        },
+        error: (error) => {
+          console.error('[Export Excel] error:', error?.status, error);
+          if (error?.status === 404) {
+            this.toastService.warning('ไม่พบข้อมูลที่ตรงกับเงื่อนไข');
+          } else {
+            this.toastService.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+          }
+          this.loadingService.stop('export');
+        },
+      });
   }
 
   print() {
