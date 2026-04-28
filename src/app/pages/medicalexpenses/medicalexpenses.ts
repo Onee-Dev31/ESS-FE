@@ -227,22 +227,27 @@ export class MedicalexpensesComponent implements OnInit {
   }
 
   deleteRequest(claim: MedicalClaim) {
-    this.swalService.confirm(
-      'ยืนยันการยกเลิกรายการ?',
-      undefined,
-      `<div style="display:flex;align-items:center;gap:8px;justify-content:center">
+    this.swalService
+      .confirm(
+        'ยืนยันการยกเลิกรายการ?',
+        undefined,
+        `<div style="display:flex;align-items:center;gap:8px;justify-content:center">
         <span style="font-size:14px;color:#94a3b8">เลขที่</span>
         <span style="font-size:16px;font-weight:700;color:#4f6ef7">${claim.voucherNo ?? claim.claimId}</span>
       </div>`,
-    ).then((result) => {
-      if (result.isConfirmed) {
-        const employeeCode = this.authService.userData()?.CODEMPID ?? '';
-        this.medicalService.cancelClaim(claim.claimId, employeeCode).subscribe({
-          next: () => { this.swalService.success('ยกเลิกรายการสำเร็จ'); this.loadData(); },
-          error: () => this.swalService.error('เกิดข้อผิดพลาดในการยกเลิกรายการ'),
-        });
-      }
-    });
+      )
+      .then((result) => {
+        if (result.isConfirmed) {
+          const employeeCode = this.authService.userData()?.CODEMPID ?? '';
+          this.medicalService.cancelClaim(claim.claimId, employeeCode).subscribe({
+            next: () => {
+              this.swalService.success('ยกเลิกรายการสำเร็จ');
+              this.loadData();
+            },
+            error: () => this.swalService.error('เกิดข้อผิดพลาดในการยกเลิกรายการ'),
+          });
+        }
+      });
   }
 
   closeModal() {

@@ -118,7 +118,9 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     return diff > 0 ? diff : 0;
   });
 
-  attachments = signal<{ id: number; attachmentId?: number; name: string; description: string; file?: File }[]>([]);
+  attachments = signal<
+    { id: number; attachmentId?: number; name: string; description: string; file?: File }[]
+  >([]);
   removedAttachmentIds = signal<number[]>([]);
   isSaving = signal<boolean>(false);
 
@@ -344,8 +346,12 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
               nameTh: claim.hospitalName,
               nameEn: claim.hospitalName,
               shortName: claim.hospitalShortName,
-              hospitalType: null, province: null, address: null, phone: null,
-              isContracted: false, totalCount: 1,
+              hospitalType: null,
+              province: null,
+              address: null,
+              phone: null,
+              isContracted: false,
+              totalCount: 1,
             });
 
             this.disease.set(claim.diseaseName);
@@ -355,8 +361,12 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
               nameTh: claim.diseaseName,
               nameEn: claim.diseaseName,
               icd10Code: claim.icd10Code,
-              category: null, expenseTypeId: null, isExcluded: false,
-              excludeReason: null, sortOrder: 0, totalCount: 1,
+              category: null,
+              expenseTypeId: null,
+              isExcluded: false,
+              excludeReason: null,
+              sortOrder: 0,
+              totalCount: 1,
             });
 
             const matchedType = this.expenseTypesRaw.find((t) => t.typeId === claim.expenseTypeId);
@@ -559,16 +569,17 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     const request$ = this.isEditMode()
       ? this.medicalService.updateClaim(+this.requestId, {
           ...commonParams,
-          remove_attachment_ids: this.removedAttachmentIds().length > 0
-            ? this.removedAttachmentIds()
-            : undefined,
+          remove_attachment_ids:
+            this.removedAttachmentIds().length > 0 ? this.removedAttachmentIds() : undefined,
         })
       : this.medicalService.submitClaim({ ...commonParams, treatment_days: this.calculatedDays() });
 
     request$.subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.swalService.success(this.isEditMode() ? 'แก้ไขรายการสำเร็จ' : 'ส่งเรื่องเบิกเรียบร้อยแล้ว');
+        this.swalService.success(
+          this.isEditMode() ? 'แก้ไขรายการสำเร็จ' : 'ส่งเรื่องเบิกเรียบร้อยแล้ว',
+        );
         this.close();
       },
       error: () => {
