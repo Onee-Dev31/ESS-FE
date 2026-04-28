@@ -98,6 +98,8 @@ export interface MedicalExpenseTypeWithBalance {
   isSubOfOpd: boolean;
   eligibleFromFirstDay: boolean;
   eligibleAfterProbation: boolean;
+  isSelectable?: boolean;
+  eligibilityMessage?: string | null;
   sortOrder: number;
   totalLimit: number;
   usedAmount: number;

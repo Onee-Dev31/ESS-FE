@@ -138,6 +138,7 @@ export class AuthService {
     this._currentUser.set(response.adUser);
     this._userRole.set(response.permission.Role);
     this._userData.set(response.employee);
+    this._allData.set(response);
   }
 
   /** ล้างข้อมูลการเข้าสู่ระบบ (Logout) และรีเซ็ตสถานะทั้งหมด */
@@ -156,6 +157,7 @@ export class AuthService {
     this._currentUser.set(null);
     this._userRole.set(null);
     this._userData.set(null);
+    this._allData.set(null);
   }
 
   getUserRole(): string | null {
