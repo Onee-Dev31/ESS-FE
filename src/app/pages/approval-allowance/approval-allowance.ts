@@ -272,7 +272,10 @@ export class ApprovalAllowanceComponent implements OnInit {
         this.selectedItem.set({
           ...item,
           amount: detail.totalAmount,
-          rawStatus: (detail.status || '').toLowerCase(),
+          // คงค่า rawStatus จาก step status ของ item เดิม (pending/approved/rejected)
+          // ไม่ override ด้วย overall claim status เพื่อให้ปุ่ม Approve/Reject
+          // แสดงเฉพาะ item ที่ยังรออนุมัติ (rawStatus === 'pending') เท่านั้น
+          rawStatus: item.rawStatus,
           status: detailStatus,
           originalData: detail,
         });
@@ -360,9 +363,7 @@ export class ApprovalAllowanceComponent implements OnInit {
         status: claim.status,
         createdAt: claim.submittedAt,
         details: [],
-        // originalStep = step ที่ทำ action จริง (approve/reject) อาจต่างจาก stepNo ของ approver นี้
-        // เช่น Approver1 (stepNo=1) เห็น claim ที่ถูก reject โดย Approver2 → originalStep=2
-        currentStep: claim.originalStep ?? claim.stepNo,
+        currentStep: claim.stepNo,
       } as MealAllowanceClaim,
       remark: '',
     };
