@@ -285,7 +285,7 @@
     </div>
   </main>
 
-  <div class="form-actions" *ngIf="requests.status === 'New'">
+  <div class="form-actions" *ngIf="requests?.status === 'New'">
     <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
       <i class="fas fa-check"></i>
       {{
