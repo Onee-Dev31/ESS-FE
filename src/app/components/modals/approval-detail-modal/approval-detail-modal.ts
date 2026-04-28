@@ -166,6 +166,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   private loadMedicalDetail(item: ApprovalItem) {
+    console.log('loadMedicalDetail', item);
     const claim = item.originalData as MedicalClaim;
     if (claim?.claimId == null) {
       this.loadFallbackDetail(item);
@@ -177,6 +178,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   private loadAllowanceDetail(item: ApprovalItem) {
+    console.log('loadAllowanceDetail', item);
     const claim = item.originalData as any;
     if (claim?.claimID == null) {
       this.loadFallbackDetail(item);
@@ -189,7 +191,7 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.allowanceDetail.set(res.data);
     });
 
-    this.detailedStatus.set(item.rawStatus);
+    this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
   }
 
   private loadFallbackDetail(item: ApprovalItem) {

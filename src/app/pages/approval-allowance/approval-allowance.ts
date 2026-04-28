@@ -263,6 +263,7 @@ export class ApprovalAllowanceComponent implements OnInit {
       requestType: 'ค่าเบี้ยเลี้ยง',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
+      claimStatus: claim.claimStatus,
       remark: claim.remark || '',
       amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),

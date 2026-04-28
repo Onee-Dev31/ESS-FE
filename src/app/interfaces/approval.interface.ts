@@ -30,6 +30,7 @@ export interface ApprovalItem {
   requestType: 'ค่าเบี้ยเลี้ยง' | 'ค่ารถ' | 'ค่าแท็กซี่' | 'ค่ารักษาพยาบาล' | 'IT Request';
   typeId: number;
   requestDetail: string;
+  claimStatus?: string;
   amount: number;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Referred Back';
   rawStatus: string;
