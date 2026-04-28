@@ -291,7 +291,7 @@ textarea.form-input {
   border: 1px solid var(--btn-border);
   background: var(--btn-bg);
   transition: 0.2s;
-  box-shadow: 0.5px 0.5px 5px 0px #d5d5d5;
+  box-shadow: var(--shadow);
 
   &:hover {
     background: color-mix(in srgb, var(--btn-bg), var(--text) 15%);
@@ -682,7 +682,7 @@ textarea.form-input {
 }
 
 .pill-orange {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   color: var(--warning);
   font-weight: 600;
 }
@@ -692,7 +692,7 @@ textarea.form-input {
 }
 
 .pill-blue {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   color: var(--primary);
   font-weight: 600;
 }
@@ -702,7 +702,7 @@ textarea.form-input {
 }
 
 .pill-green {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   color: var(--success);
   font-weight: 600;
 }
@@ -970,7 +970,7 @@ textarea.form-input {
 .tag-more {
   padding: 4px 10px;
   border-radius: 50px;
-  background-color: #eee;
+  background-color: var(--bg-table-head);
   cursor: pointer;
   font-size: 12px;
 }
@@ -1294,26 +1294,26 @@ textarea.form-input {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: #cfcfcf;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px #e4e6ef;
+    background: var(--border-color);
+    border: 3px solid var(--bg-card);
+    box-shadow: 0 0 0 2px var(--border-color);
   }
 
   /* status */
   .timeline-icon.done {
-    background: #22c55e;
+    background: var(--success);
   }
 
   .timeline-icon.deny {
-    background: #c52a22;
+    background: var(--danger);
   }
 
   .timeline-icon.hold {
-    background: #6a6a6a;
+    background: var(--text-muted);
   }
 
   .timeline-icon.active {
-    background: #f59e0b;
+    background: var(--warning);
     animation: pulse 1.2s ease-in-out infinite;
   }
 
@@ -1349,7 +1349,7 @@ textarea.form-input {
   /* creator */
   .timeline-title small {
     font-size: 12px;
-    color: #8b8b8b;
+    color: var(--text-muted);
   }
 
   /* assignee area */
@@ -1491,7 +1491,7 @@ textarea.form-input {
   text-align: center;
   gap: 6px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #0f172a0f;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .side-name {

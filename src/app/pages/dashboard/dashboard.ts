@@ -749,21 +749,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /** ล้างข้อมูลใน LocalStorage เพื่อรีเซ็ตสถานะระบบใหม่ */
-  async clearStorage() {
-    const confirmed = await this.dialogService.confirm({
-      title: 'ยืนยันการล้างข้อมูล',
-      message: 'คุณต้องการล้างข้อมูลทั้งหมดเพื่อให้ระบบเริ่มใหม่หรือไม่?',
-      type: 'danger',
-      confirmText: 'ล้างข้อมูล',
-    });
-
-    if (confirmed) {
-      localStorage.clear();
-      window.location.reload();
-    }
-  }
-
   formatThaiDate(dateStr: string): string {
     const d = new Date(dateStr);
 

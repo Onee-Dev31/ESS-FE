@@ -252,7 +252,7 @@ $border: var(--border);
       border-color: rgba(0, 0, 0, 0.08);
 
       .card-header {
-        background: #f0f9ff;
+        background: var(--bg-table-head);
       }
 
       .card-header::after {
@@ -357,13 +357,13 @@ $border: var(--border);
         }
 
         .btn-edit-sm {
-          background: #f0f9ff;
-          color: #0ea5e9;
+          background: var(--status-open-bg);
+          color: var(--status-open-text);
           border: 1px solid transparent;
 
           &:hover {
-            background: #e0f2fe;
-            color: #0284c7;
+            background: color-mix(in srgb, var(--status-open-bg), var(--text) 8%);
+            color: var(--status-open-text);
             transform: translateY(-1px);
           }
         }
@@ -973,7 +973,7 @@ $border: var(--border);
         background: transparent;
         border-radius: 8px;
         font-size: 0.9rem;
-        color: #202124;
+        color: var(--text);
         cursor: pointer;
         transition: all 0.2s;
         text-align: left;

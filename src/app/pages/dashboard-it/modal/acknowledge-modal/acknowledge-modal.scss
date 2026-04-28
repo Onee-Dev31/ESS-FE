@@ -216,9 +216,9 @@
       }
 
       &:disabled {
-        background: #cbd5e1;
-        border-color: #cbd5e1;
-        color: #64748b;
+        background: var(--border-color);
+        border-color: var(--border-color);
+        color: var(--text-muted);
         cursor: not-allowed;
         box-shadow: none;
         opacity: 0.8;
@@ -319,7 +319,7 @@ textarea.form-input {
   gap: 6px;
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: var(--primary);
   font-size: 14px;
   cursor: pointer;
   padding: 4px 0;
@@ -341,11 +341,11 @@ textarea.form-input {
   align-items: center;
   gap: 6px;
   background: var(--bg-slate);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 13px;
-  color: #374151;
+  color: var(--text);
   transition: all 0.15s ease;
 }
 
@@ -365,14 +365,14 @@ textarea.form-input {
 .chip-remove {
   border: none;
   background: transparent;
-  color: #9ca3af;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 11px;
   padding: 0;
 }
 
 .chip-remove:hover {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 /* File list */
@@ -420,7 +420,7 @@ textarea.form-input {
 
     &:hover {
       color: var(--danger);
-      background: #fee2e2;
+      background: color-mix(in srgb, var(--danger), var(--bg-card) 85%);
     }
   }
 }

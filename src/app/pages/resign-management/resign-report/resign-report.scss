@@ -1296,7 +1296,7 @@ $border: var(--border);
     width: 18px;
     height: 18px;
     border-radius: 6px;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--border-color);
     background: var(--bg-slate);
     display: inline-flex;
     align-items: center;
