@@ -92,12 +92,15 @@ export class ApprovalDetailModalComponent implements OnInit {
     const rawSteps = claim?.approvalSteps;
     if (!rawSteps?.length) return null;
 
-    const map = new Map<number, {
-      id: number;
-      label: string;
-      icon: string;
-      approvers: { name: string | null; empNo: string; status: string }[];
-    }>();
+    const map = new Map<
+      number,
+      {
+        id: number;
+        label: string;
+        icon: string;
+        approvers: { name: string | null; empNo: string; status: string }[];
+      }
+    >();
 
     for (const s of rawSteps) {
       if (!map.has(s.stepNo)) {
@@ -123,14 +126,39 @@ export class ApprovalDetailModalComponent implements OnInit {
       if (grouped) return grouped;
       // fallback hardcoded ถ้า backend ยังไม่ส่ง approvalSteps มา
       return [
-        { id: 1, label: 'Approver 1', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
-        { id: 2, label: 'Approver 2', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
-        { id: 3, label: 'HR Parallel', icon: 'fas fa-users-cog', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+        {
+          id: 1,
+          label: 'Approver 1',
+          icon: 'fas fa-user-check',
+          approvers: [] as { name: string | null; empNo: string; status: string }[],
+        },
+        {
+          id: 2,
+          label: 'Approver 2',
+          icon: 'fas fa-user-check',
+          approvers: [] as { name: string | null; empNo: string; status: string }[],
+        },
+        {
+          id: 3,
+          label: 'HR Parallel',
+          icon: 'fas fa-users-cog',
+          approvers: [] as { name: string | null; empNo: string; status: string }[],
+        },
       ];
     }
     return [
-      { id: 1, label: 'พนักงานยืนยัน', icon: 'fas fa-user-check', approvers: [] as { name: string | null; empNo: string; status: string }[] },
-      { id: 3, label: 'ฝ่ายบุคคลอนุมัติ', icon: 'fas fa-users-cog', approvers: [] as { name: string | null; empNo: string; status: string }[] },
+      {
+        id: 1,
+        label: 'พนักงานยืนยัน',
+        icon: 'fas fa-user-check',
+        approvers: [] as { name: string | null; empNo: string; status: string }[],
+      },
+      {
+        id: 3,
+        label: 'ฝ่ายบุคคลอนุมัติ',
+        icon: 'fas fa-users-cog',
+        approvers: [] as { name: string | null; empNo: string; status: string }[],
+      },
     ];
   });
 

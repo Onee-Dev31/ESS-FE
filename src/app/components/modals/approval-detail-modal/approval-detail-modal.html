@@ -27,10 +27,7 @@
       <div class="progress-stepper">
         <div class="stepper-points">
           <div class="progress-line-bg"></div>
-          <div
-            class="progress-line-fill"
-            [style.width.%]="progressFillWidth()"
-          ></div>
+          <div class="progress-line-fill" [style.width.%]="progressFillWidth()"></div>
 
           @for (step of stepStates(); track step.id) {
             <div
@@ -44,9 +41,7 @@
               </div>
 
               <div class="step-label">{{ step.label }}</div>
-              <div class="step-status">
-                <i [class]="step.statusIcon"></i> {{ step.statusText }}
-              </div>
+              <div class="step-status"><i [class]="step.statusIcon"></i> {{ step.statusText }}</div>
 
               @if (step.approvers && step.approvers.length > 0) {
                 <div class="step-approvers">
@@ -166,7 +161,7 @@
           <div class="medical-info-grid">
             <div class="med-info-item">
               <label><i class="fas fa-file-alt"></i> เลขที่เอกสาร</label>
-              <span>{{ allowanceClaim.voucherNo || ('#' + allowanceClaim.claimId) }}</span>
+              <span>{{ allowanceClaim.voucherNo || '#' + allowanceClaim.claimId }}</span>
             </div>
             <div class="med-info-item">
               <label><i class="fas fa-id-badge"></i> Employee Code</label>

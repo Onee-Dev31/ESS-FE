@@ -272,7 +272,9 @@
               gap: 4px;
               white-space: nowrap;
 
-              i { font-size: 9px; }
+              i {
+                font-size: 9px;
+              }
             }
 
             .step-approvers {
@@ -303,9 +305,18 @@
               }
             }
 
-            &.completed .step-approvers .step-approver-name { color: var(--green); opacity: 0.85; }
-            &.rejected  .step-approvers .step-approver-name { color: var(--red);   opacity: 0.85; }
-            &.active    .step-approvers .step-approver-name { color: var(--blue);  opacity: 0.85; }
+            &.completed .step-approvers .step-approver-name {
+              color: var(--green);
+              opacity: 0.85;
+            }
+            &.rejected .step-approvers .step-approver-name {
+              color: var(--red);
+              opacity: 0.85;
+            }
+            &.active .step-approvers .step-approver-name {
+              color: var(--blue);
+              opacity: 0.85;
+            }
 
             &.completed {
               .step-status {
