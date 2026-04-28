@@ -29,17 +29,19 @@
           <div class="progress-line-bg"></div>
           <div
             class="progress-line-fill"
+            [class.rejected-line]="isRejected()"
             [style.width.%]="
-              Math.min((Math.max(0, currentStepIndex() - 1) / (steps.length - 1)) * 80, 80)
+              Math.min((Math.max(0, currentStepIndex() - 1) / (steps().length - 1)) * 80, 80)
             "
           ></div>
 
-          @for (step of steps; track step.id) {
+          @for (step of steps(); track step.id) {
             <div
               class="progress-step"
-              [class.completed]="currentStepIndex() > step.id"
-              [class.active]="currentStepIndex() === step.id"
-              [class.rejected]="currentStepIndex() === -1"
+              class="progress-step"
+              [class.completed]="currentStepIndex() > step.id && !isRejected()"
+              [class.active]="currentStepIndex() === step.id && !isRejected()"
+              [class.rejected]="isRejected()"
             >
               <div class="step-icon-circle">
                 @if (currentStepIndex() > step.id) {

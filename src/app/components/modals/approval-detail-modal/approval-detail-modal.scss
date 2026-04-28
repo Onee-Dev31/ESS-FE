@@ -212,6 +212,15 @@
             @media (max-width: 991px) {
               top: 18px;
             }
+
+            &.rejected-line {
+              background: linear-gradient(
+                90deg,
+                var(--red) 0%,
+                color-mix(in srgb, var(--red), black 10%) 100%
+              );
+              box-shadow: 0 0 8px rgba(var(--red), 0.3);
+            }
           }
 
           .progress-step {

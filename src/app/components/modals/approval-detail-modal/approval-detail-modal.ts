@@ -73,20 +73,40 @@ export class ApprovalDetailModalComponent implements OnInit {
   medicalDetail = signal<any>(null);
   allowanceDetail = signal<any>(null);
 
-  steps = [
-    { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
-    { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
-    { label: 'อนุมัติแล้ว', id: 3, icon: 'fa-solid fa-stamp' },
-  ];
+  // steps = [
+  //   { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
+  //   { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
+  //   { label: 'อนุมัติแล้ว', id: 3, icon: 'fa-solid fa-stamp' },
+  // ];
+
+  steps = computed(() => {
+    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    const isRejected = status === 'rejected';
+
+    return [
+      { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
+      { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
+      {
+        label: isRejected ? 'ไม่ผ่านการอนุมัติ' : 'อนุมัติแล้ว',
+        id: 3,
+        icon: isRejected ? 'fas fa-times-circle' : 'fa-solid fa-stamp',
+      },
+    ];
+  });
 
   currentStepIndex = computed(() => {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
     if (!status) return 0;
     if (status === 'new') return 1;
     if (status === 'pending') return 2;
-    if (status === 'rejected') return -1;
+    if (status === 'rejected') return 3;
     if (status === 'approved') return 4;
     return 1;
+  });
+
+  isRejected = computed(() => {
+    const status = this.detailedStatus() || this.approvalItem.rawStatus;
+    return status === 'rejected';
   });
 
   getDisplayStatus(): string {
