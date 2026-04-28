@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MedicalApiService } from '../../../services/medical-api.service';
+import { MedicalService } from '../../../services/medical.service';
 import { BenefitPlan, PolicyContent } from '../../../interfaces/medical.interface';
 
 @Component({
@@ -13,7 +13,7 @@ import { BenefitPlan, PolicyContent } from '../../../interfaces/medical.interfac
 export class MedicalPolicyModalComponent implements OnInit {
   @Output() onClose = new EventEmitter<void>();
 
-  private medicalApi = inject(MedicalApiService);
+  private MedicalService = inject(MedicalService);
 
   isLoading = signal(true);
   benefitPlans = signal<BenefitPlan[]>([]);
@@ -22,7 +22,7 @@ export class MedicalPolicyModalComponent implements OnInit {
   metaContent = signal<PolicyContent | null>(null);
 
   ngOnInit() {
-    this.medicalApi.getPolicy().subscribe({
+    this.MedicalService.getPolicy().subscribe({
       next: (res) => {
         this.benefitPlans.set(res.data.benefit_plans);
         this.allContent.set(res.data.policy_content);

@@ -7,11 +7,9 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
-import { AllowanceApiService } from '../../services/allowance-api.service';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import {
@@ -42,6 +40,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 import dayjs from 'dayjs';
+import { AllowanceService } from '../../services/allowance.service';
 
 interface FlatAllowanceRow extends AllowanceItem {
   requestId: string;
@@ -75,7 +74,8 @@ interface FlatAllowanceRow extends AllowanceItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AllowanceComponent implements OnInit {
-  private allowanceApiService = inject(AllowanceApiService);
+  // private allowanceApiService = inject(AllowanceApiService);
+  private allowanceService = inject(AllowanceService);
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
@@ -128,7 +128,7 @@ export class AllowanceComponent implements OnInit {
 
     // console.log(param)
 
-    this.allowanceApiService.getClaims(param).subscribe({
+    this.allowanceService.getClaims(param).subscribe({
       next: (res) => {
         this.dataFromApi(res);
       },
@@ -201,7 +201,7 @@ export class AllowanceComponent implements OnInit {
       )
       .then((result) => {
         if (result.isConfirmed) {
-          this.allowanceApiService.deleteClaim(Number(claim.id)).subscribe({
+          this.allowanceService.deleteClaim(Number(claim.id)).subscribe({
             next: () => {
               this.swalService.success('ลบรายการสำเร็จ');
               this.loadData();

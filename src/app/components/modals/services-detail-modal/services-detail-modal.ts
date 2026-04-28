@@ -1,7 +1,4 @@
 import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
-import { AnyRender } from '@tanstack/angular-table';
-import { MedicalApiService } from '../../../services/medical-api.service';
-import { BenefitPlan, PolicyContent } from '../../../interfaces';
 import { CommonModule } from '@angular/common';
 
 @Component({

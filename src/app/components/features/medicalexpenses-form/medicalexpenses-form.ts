@@ -27,7 +27,7 @@ import dayjs from 'dayjs';
 import { Subject, Subscription, debounceTime, switchMap, catchError, of } from 'rxjs';
 
 import { ClaimType } from '../../../services/master-data.service';
-import { MedicalApiService } from '../../../services/medical-api.service';
+import { MedicalService } from '../../../services/medical.service';
 import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 import { formatMoneyInput } from '../../../utils/formatText';
 import { SwalService } from '../../../services/swal.service';
@@ -41,11 +41,11 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   styleUrl: './medicalexpenses-form.scss',
 })
 export class MedicalexpensesForm implements OnInit, OnDestroy {
-  private medicalService = inject(MedicalexpensesService);
+  private medicalService1 = inject(MedicalexpensesService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
   private dateUtil = inject(DateUtilityService);
-  private medicalApiService = inject(MedicalApiService);
+  private medicalService = inject(MedicalService);
   private dialogService = inject(DialogService);
   private swalService = inject(SwalService);
 
@@ -169,7 +169,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
     this.employeeId.set(employeeCode);
 
     const fiscalYear = dayjs().year();
-    this.medicalApiService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
+    this.medicalService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
       next: (res) => {
         this.expenseTypesRaw = res.data;
         this.claimTypes = res.data.map((t) => this.mapExpenseType(t));
@@ -186,14 +186,12 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           this.currentKeyword = keyword;
           this.currentPage = 1;
           this.isHospitalLoading.set(true);
-          return this.medicalApiService
-            .searchHospitals(keyword || undefined, 1, this.PAGE_SIZE)
-            .pipe(
-              catchError(() => {
-                this.isHospitalLoading.set(false);
-                return of({ success: false, data: [], pagination: undefined });
-              }),
-            );
+          return this.medicalService.searchHospitals(keyword || undefined, 1, this.PAGE_SIZE).pipe(
+            catchError(() => {
+              this.isHospitalLoading.set(false);
+              return of({ success: false, data: [], pagination: undefined });
+            }),
+          );
         }),
       )
       .subscribe((res) => {
@@ -210,7 +208,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
           this.diseaseKeyword = keyword;
           this.diseasePage = 1;
           this.isDiseaseLoading.set(true);
-          return this.medicalApiService
+          return this.medicalService
             .searchDiseaseTypes(keyword || undefined, undefined, undefined, 1, this.PAGE_SIZE)
             .pipe(
               catchError(() => {
@@ -262,7 +260,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private loadMoreHospitals() {
     this.isHospitalLoadingMore.set(true);
     const nextPage = this.currentPage + 1;
-    this.medicalApiService
+    this.medicalService
       .searchHospitals(this.currentKeyword || undefined, nextPage, this.PAGE_SIZE)
       .pipe(catchError(() => of({ success: false, data: [], pagination: undefined })))
       .subscribe((res) => {
@@ -308,7 +306,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   private loadMoreDiseases() {
     this.isDiseaseLoadingMore.set(true);
     const nextPage = this.diseasePage + 1;
-    this.medicalApiService
+    this.medicalService
       .searchDiseaseTypes(
         this.diseaseKeyword || undefined,
         undefined,
@@ -333,7 +331,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   loadRequestData() {
     if (this.requestId) {
-      this.medicalService.getRequestById(this.requestId).subscribe((req) => {
+      this.medicalService1.getRequestById(this.requestId).subscribe((req) => {
         if (req) {
           this.isEditMode.set(true);
           this.currentDate.set(this.dateUtil.formatDateToThaiMonth(req.createDate));
@@ -510,7 +508,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
     this.isSaving.set(true);
     this.swalService.loading('กำลังบันทึกข้อมูล...');
-    this.medicalApiService
+    this.medicalService
       .submitClaim({
         employee_code: this.employeeId(),
         expense_type_id: rawType.typeId,

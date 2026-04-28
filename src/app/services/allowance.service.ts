@@ -1,11 +1,20 @@
 /** Service สำหรับจัดการข้อมูลคำขอเบี้ยเลี้ยง (Allowance) และคำนวณเบี้ยเลี้ยงตามชั่วโมงงาน */
-import { Injectable, inject } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { AllowanceItem, AllowanceRequest } from '../interfaces/allowance.interface';
+import { Observable, of, delay, tap } from 'rxjs';
+import {
+  AllowanceItem,
+  AllowanceRequest,
+  CreateClaimRequest,
+  CreateClaimResponse,
+  EligibleDatesResponse,
+  MealAllowanceClaimDetail,
+  MealAllowanceClaimsResponse,
+  MealAllowanceRate,
+  MealAllowanceRatesResponse,
+} from '../interfaces/allowance.interface';
 import { AllowanceMock } from '../mocks/allowance.mock';
-import { STORAGE_KEYS } from '../constants/storage.constants';
-import { BaseRequestService } from './base-request.service';
-import { AllowanceApiService } from './allowance-api.service';
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export type { AllowanceItem, AllowanceRequest };
 
@@ -25,68 +34,88 @@ export class AllowanceService extends BaseRequestService<AllowanceRequest> {
     return this.getRequests();
   }
 
-  getAllowanceRequestById(id: string): Observable<AllowanceRequest | undefined> {
-    return this.getRequestById(id);
+  /**
+   * ดึงรายการเบิกเบี้ยเลี้ยง
+   * GET api/meal-allowance/claims
+   */
+  getClaims(params: {
+    employee_code?: string;
+    date_from?: string;
+    date_to?: string;
+    status?: string;
+    search?: string;
+    page_number?: number;
+    page_size?: number;
+  }): Observable<MealAllowanceClaimsResponse> {
+    let p = new HttpParams();
+    if (params.employee_code?.trim()) p = p.set('employee_code', params.employee_code);
+    if (params.date_from?.trim()) p = p.set('date_from', params.date_from);
+    if (params.date_to?.trim()) p = p.set('date_to', params.date_to);
+    if (params.status?.trim()) p = p.set('status', params.status);
+    if (params.search?.trim()) p = p.set('search', params.search);
+    if (params.page_number != null) p = p.set('page_number', params.page_number);
+    if (params.page_size != null) p = p.set('page_size', params.page_size);
+    return this._http
+      .get<MealAllowanceClaimsResponse>(`${this.baseUrl}/meal-allowance/claims`, { params: p })
+      .pipe(tap((res) => this.lastResponse.set(res)));
   }
 
-  addAllowanceRequest(request: AllowanceRequest): Observable<void> {
-    return this.addRequest(request);
+  /**
+   * ดึงวันที่มีสิทธิ์เบิกเบี้ยเลี้ยงของพนักงาน
+   * GET api/meal-allowance/eligible-dates
+   */
+  getEligibleDates(
+    employee_code: string,
+    year: number,
+    month: number,
+  ): Observable<EligibleDatesResponse> {
+    const params = new HttpParams()
+      .set('employee_code', employee_code)
+      .set('year', year)
+      .set('month', month);
+    return this._http.get<EligibleDatesResponse>(`${this.baseUrl}/meal-allowance/eligible-dates`, {
+      params,
+    });
   }
 
-  updateAllowanceRequest(id: string, updatedRequest: AllowanceRequest): Observable<void> {
-    return this.updateRequest(updatedRequest);
+  /**
+   * สร้างใบเบิกเบี้ยเลี้ยง
+   * POST api/meal-allowance/claim
+   */
+  createClaim(request: CreateClaimRequest): Observable<CreateClaimResponse> {
+    console.log(request);
+    return this._http.post<CreateClaimResponse>(`${this.baseUrl}/meal-allowance/claim`, request);
   }
 
-  deleteAllowanceRequest(id: string): Observable<void> {
-    return this.deleteRequest(id);
+  /**
+   * แก้ไขใบเบิกเบี้ยเลี้ยง
+   * PUT api/meal-allowance/claim/:id
+   */
+  updateClaim(claimId: number, body: { details: MealAllowanceClaimDetail[] }): Observable<any> {
+    return this._http.put(`${this.baseUrl}/meal-allowance/claim/${claimId}`, body);
   }
 
-  generateNextAllowanceId(): Observable<string> {
-    return this.generateNextId();
+  /**
+   * ลบใบเบิกเบี้ยเลี้ยง
+   * DELETE api/meal-allowance/claim/:id
+   */
+  deleteClaim(claimId: number): Observable<any> {
+    return this._http.delete(`${this.baseUrl}/meal-allowance/claim/${claimId}`);
   }
 
-  updateAllowanceStatus(id: string, status: string): void {
-    this.updateStatus(id, status);
+  updateStatusClaim(claimId: number, body: any): Observable<any> {
+    console.log(claimId, body);
+    return this._http.patch<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}/review`, body);
   }
 
-  getMockAllowanceLogs(month: number, year: number): Observable<AllowanceItem[]> {
-    const results = AllowanceMock.getMockAllowanceLogs(month, year);
-    return of(results as unknown as AllowanceItem[]).pipe(delay(100));
+  getApprovals(approver_aduser: string, voucher_no?: string, status?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    if (status?.trim()) p = p.set('status', status.trim());
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/approvals`, { params: p });
   }
 
-  calculateAllowance(log: Partial<AllowanceItem>): Partial<AllowanceItem> {
-    if (!log.selected || !log.timeIn || !log.timeOut) {
-      return {
-        ...log,
-        displayHours: '0.00',
-        actualExtraHours: 0,
-        amount: 0,
-      };
-    }
-
-    const [startHour, startMinute] = log.timeIn.split(':').map(Number);
-    const [endHour, endMinute] = log.timeOut.split(':').map(Number);
-
-    let totalMinutes = endHour * 60 + endMinute - (startHour * 60 + startMinute);
-    if (totalMinutes < 0) totalMinutes += 1440;
-
-    let extraMinutes = totalMinutes - 540;
-    if (extraMinutes < 0) extraMinutes = 0;
-
-    const extraHoursDecimal = extraMinutes / 60;
-    const actualExtraHours = extraHoursDecimal;
-
-    const hours = Math.floor(extraMinutes / 60);
-    const minutes = extraMinutes % 60;
-    const displayHours = `${hours}.${minutes.toString().padStart(2, '0')}`;
-
-    const amount = this.allowanceApi.calculateAmount(extraHoursDecimal);
-
-    return {
-      ...log,
-      actualExtraHours,
-      displayHours,
-      amount,
-    };
+  getClaimById(claimId: number): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/meal-allowance/claims/${claimId}`);
   }
 }

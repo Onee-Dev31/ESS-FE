@@ -80,73 +80,73 @@
           </div>
         </div>
 
-        @if (medicalClaim) {
+        @if (medicalDetail()) {
           <div class="medical-info-grid">
             <div class="med-info-item">
               <label><i class="fas fa-tag"></i> ประเภทการเบิก</label>
-              <span>{{ medicalClaim.expenseTypeName }}</span>
+              <span>{{ medicalDetail()?.expenseTypeName }}</span>
             </div>
             <div class="med-info-item">
               <label><i class="fas fa-hospital-alt"></i> สถานพยาบาล</label>
-              <span>{{ medicalClaim.hospitalName }}</span>
+              <span>{{ medicalDetail()?.hospitalName }}</span>
             </div>
             <div class="med-info-item">
               <label><i class="fas fa-virus"></i> โรค / อาการ</label>
-              <span
-                >{{ medicalClaim.diseaseName }}
-                @if (medicalClaim.icd10Code) {
+              <span>
+                {{ medicalDetail()?.diseaseName }}
+                <!-- @if (medicalClaim.icd10Code) {
                   <span class="text-muted">({{ medicalClaim.icd10Code }})</span>
-                }
+                } -->
               </span>
             </div>
             <div class="med-info-item">
               <label><i class="far fa-calendar-alt"></i> วันที่รักษา</label>
-              <span
-                >{{ dateUtil.formatDateToBE(medicalClaim.treatmentDateFrom, 'DD/MM/YYYY') }} –
-                {{ dateUtil.formatDateToBE(medicalClaim.treatmentDateTo, 'DD/MM/YYYY') }}
-                <span class="text-muted">({{ medicalClaim.treatmentDays }} วัน)</span>
+              <span>
+                {{ dateUtil.formatDateToBE(medicalDetail()?.treatmentDateFrom, 'DD/MM/YYYY') }}
+                –
+                {{ dateUtil.formatDateToBE(medicalDetail()?.treatmentDateTo, 'DD/MM/YYYY') }}
+                <span class="text-muted">({{ medicalDetail()?.treatmentDays }} วัน)</span>
               </span>
             </div>
-            @if (medicalClaim.remark) {
+            @if (medicalDetail().remark) {
               <div class="med-info-item med-info-full">
                 <label><i class="fas fa-comment-alt"></i> หมายเหตุ</label>
-                <span>{{ medicalClaim.remark }}</span>
+                <span>{{ medicalDetail().remark }}</span>
               </div>
             }
-            @if (medicalClaim.rejectionReason) {
+            @if (medicalDetail().rejectionReason) {
               <div class="med-info-item med-info-full">
                 <label><i class="fas fa-times-circle text-danger"></i> เหตุผลที่ไม่อนุมัติ</label>
-                <span class="text-danger">{{ medicalClaim.rejectionReason }}</span>
+                <span class="text-danger">{{ medicalDetail().rejectionReason }}</span>
               </div>
             }
           </div>
 
+          <!-- Remark -->
           <div class="medical-info-grid">
             <div class="med-info-item">
-              <label><i class="fa-solid fa-comment"></i>Remark</label>
-              <span>{{ medicalClaim.remark ? medicalClaim.remark : '-' }}</span>
+              <label><i class="fa-solid fa-comment"></i> Remark</label>
+              <span>{{ medicalDetail()?.remark ?? '-' }}</span>
             </div>
           </div>
 
-          <div class="medical-info-grid">
-            <div class="med-info-item">
-              <label><i class="fa-solid fa-paperclip"></i>เอกสารแนบ </label>
-
-              <span>
-                <div
-                  *ngIf="medicalClaim.attachments.length"
-                  type="button"
-                  class="btn-view-all"
-                  (click)="openAllAttachments()"
-                >
-                  <i class="far fa-eye"></i>
-                  ดูไฟล์แนบ ({{ medicalClaim.attachments.length || 0 }} ไฟล์)
-                </div>
-              </span>
+          <!-- เอกสารแนบ -->
+          @if (medicalDetail()?.attachments?.length) {
+            <div class="medical-info-grid">
+              <div class="med-info-item">
+                <label><i class="fa-solid fa-paperclip"></i> เอกสารแนบ</label>
+                <span>
+                  <div type="button" class="btn-view-all" (click)="openAllAttachments()">
+                    <i class="far fa-eye"></i>
+                    ดูไฟล์แนบ ({{ medicalDetail()?.attachments?.length }} ไฟล์)
+                  </div>
+                </span>
+              </div>
             </div>
-          </div>
+          }
         }
-        @if (allowanceClaim) {
+
+        @if (allowanceDetail()) {
           @if (allowanceDetail()?.details?.length) {
             <div class="content-header">
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>

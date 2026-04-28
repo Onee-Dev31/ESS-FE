@@ -16,7 +16,6 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { ApprovalItem } from '../../interfaces/approval.interface';
 import { createListingComputeds, createListingState } from '../../utils/listing.util';
 import dayjs from 'dayjs';
-import { AllowanceApiService } from '../../services/allowance-api.service';
 import { ApprovalAllowanceService } from '../../services/approval-allowance';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
@@ -181,7 +180,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   getAllowanceClaim(item: ApprovalItem): any | null {
-    console.log(item);
+    // console.log(item);
     return (item.originalData as any)?.claimID != null ? (item.originalData as any) : null;
   }
 

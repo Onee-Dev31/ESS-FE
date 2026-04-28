@@ -22,10 +22,10 @@ import { modalAnimation, fadeIn } from '../../../animations/animations';
 import { ApprovalService } from '../../../services/approval.service';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
-import dayjs from 'dayjs';
 import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { ApprovalAllowanceService } from '../../../services/approval-allowance';
+import { MedicalService } from '../../../services/medical.service';
 
 interface PreviewFile {
   fileName: string;
@@ -46,6 +46,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvalsHelper = inject(ApprovalsHelperService);
   private toastService = inject(ToastService);
   private approvelService = inject(ApprovalService);
+  private medicalService = inject(MedicalService);
   private approvalAllowanceService = inject(ApprovalAllowanceService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
@@ -69,6 +70,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   currentDetailType = signal<string | null>(null);
   detailedStatus = signal<string>('');
 
+  medicalDetail = signal<any>(null);
   allowanceDetail = signal<any>(null);
 
   steps = [
@@ -149,11 +151,12 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.loadFallbackDetail(item);
       return;
     }
+
+    this.medicalDetail.set(claim);
     this.detailedStatus.set(claim.status);
   }
 
   private loadAllowanceDetail(item: ApprovalItem) {
-    console.log(item);
     const claim = item.originalData as any;
     if (claim?.claimID == null) {
       this.loadFallbackDetail(item);
@@ -164,7 +167,6 @@ export class ApprovalDetailModalComponent implements OnInit {
       if (!res) return;
       console.log(res);
       this.allowanceDetail.set(res.data);
-      this.detailedStatus.set(res.data.status?.toLowerCase());
     });
 
     this.detailedStatus.set(item.rawStatus);
@@ -321,22 +323,10 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.isPreviewModalOpen.set(true);
   }
 
-  get medicalClaim(): MedicalClaim | null {
-    if (this.approvalItem?.type !== 'medical') return null;
-    const claim = this.approvalItem?.originalData as MedicalClaim;
-    return claim?.claimId != null ? claim : null;
-  }
-
-  get allowanceClaim(): any | null {
-    if (this.approvalItem?.type !== 'allowance') return null;
-    return (this.approvalItem?.originalData as any)?.claimID != null
-      ? this.approvalItem.originalData
-      : null;
-  }
-
   get isApproved(): boolean {
-    return (this.medicalClaim?.approvedAmount ?? 0) > 0;
+    return (this.medicalDetail()?.approvedAmount ?? 0) > 0;
   }
+
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }

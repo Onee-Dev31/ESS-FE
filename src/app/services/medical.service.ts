@@ -27,7 +27,7 @@ export type {
 };
 
 @Injectable({ providedIn: 'root' })
-export class MedicalApiService {
+export class MedicalService {
   private readonly baseUrl = environment.api_url;
   private _http = inject(HttpClient);
 
@@ -165,5 +165,9 @@ export class MedicalApiService {
     params.files?.forEach((f) => fd.append('files', f, f.name));
     params.file_remarks?.forEach((r) => fd.append('file_remarks', r));
     return this._http.post<{ success: boolean; data: any }>(`${this.baseUrl}/medical/claim`, fd);
+  }
+
+  updateTypeClaims(id: string | number, payload: any): Observable<any> {
+    return this._http.patch(`${this.baseUrl}/medical/claims/${id}/review`, payload);
   }
 }
