@@ -399,6 +399,8 @@ export class ApprovalAllowanceComponent implements OnInit {
   private mergeClaimDetail(claim: MealAllowanceClaim, item: ApprovalItem): MealAllowanceClaim {
     const listData = item.originalData as MealAllowanceClaim | undefined;
     const listStep = listData?.currentStep ?? 0;
+    // resolvedStep: ให้ priority กับ currentStep จาก getClaimById (รู้ step จริง ๆ ที่ reject/pending)
+    // fallback ไป listStep (stepNo ของ approver นี้) เฉพาะตอน API ไม่ส่งมา
     const resolvedStep = claim.currentStep ?? listStep;
 
     const thisApproverStatus = (item.rawStatus || '').toLowerCase();
@@ -412,11 +414,9 @@ export class ApprovalAllowanceComponent implements OnInit {
       currentStep = listStep + 1;
     }
 
-    // ถ้า approver คนนี้ reject → ใช้ listStep (stepNo จาก list API) เป็น ground truth
-    // เพราะ getClaimById อาจ return currentStep ผิด (e.g. คืนค่า step ก่อนหน้า)
-    if (thisApproverStatus === 'rejected' && listStep > 0) {
-      currentStep = listStep;
-    }
+    // หมายเหตุ: สำหรับ rejected case ไม่ต้อง override currentStep ด้วย listStep
+    // เพราะ getClaimById คือ source of truth ที่รู้ว่า reject ที่ step ไหน
+    // การใช้ listStep จะผิดเมื่อ Approver2 มาดู claim ที่ถูก reject โดย Approver1
 
     return {
       ...claim,

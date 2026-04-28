@@ -130,9 +130,8 @@ export class ApprovalDetailModalComponent implements OnInit {
     const rejectedAt = this.rejectedAtStep();
 
     // ถ้ามีการ reject แล้ว ให้แสดงเฉพาะ step ที่ <= rejectedAt เท่านั้น
-    const visibleSteps = rejectedAt !== null
-      ? this.steps().filter((step) => step.id <= rejectedAt)
-      : this.steps();
+    const visibleSteps =
+      rejectedAt !== null ? this.steps().filter((step) => step.id <= rejectedAt) : this.steps();
 
     return visibleSteps.map((step) => {
       const completed = rejectedAt ? step.id < rejectedAt : currentIndex > step.id;
@@ -188,7 +187,9 @@ export class ApprovalDetailModalComponent implements OnInit {
   });
 
   getDisplayStatus(): string {
-    const status = (this.detailedStatus() || this.approvalItem.rawStatus || '').trim().toLowerCase();
+    const status = (this.detailedStatus() || this.approvalItem.rawStatus || '')
+      .trim()
+      .toLowerCase();
     const s = status?.trim();
     if (!s) return 'รออนุมัติ';
     if (s === REQUEST_STATUS.REJECTED.toLowerCase() || s === 'rejected' || s === 'ไม่อนุมัติ') {
@@ -362,7 +363,10 @@ export class ApprovalDetailModalComponent implements OnInit {
     this.isSubmitting.set(true);
     const request$ =
       item.type === 'allowance'
-        ? this.allowanceApiService.reviewClaim(item.requestId, payload as MealAllowanceReviewRequest)
+        ? this.allowanceApiService.reviewClaim(
+            item.requestId,
+            payload as MealAllowanceReviewRequest,
+          )
         : this.approvelService.updateTypeClaims(item.requestId, payload, item.type);
 
     request$.subscribe({
@@ -374,7 +378,8 @@ export class ApprovalDetailModalComponent implements OnInit {
         }
 
         this.swalService.success(
-          res.message || (newStatus === 'Approved' ? 'อนุมัติรายการสำเร็จ' : 'ไม่อนุมัติรายการสำเร็จ'),
+          res.message ||
+            (newStatus === 'Approved' ? 'อนุมัติรายการสำเร็จ' : 'ไม่อนุมัติรายการสำเร็จ'),
         );
         this.onStatusUpdated.emit();
         this.onClose.emit();
