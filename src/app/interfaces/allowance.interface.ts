@@ -108,7 +108,7 @@ export interface MealAllowanceApprovalStep {
   approverEmpNo: string;
   approverName: string | null;
   status: string; // pending | approved | rejected | cancelled
-  actedBy?: string | null;  // empNo ของคนที่กด action จริง (อาจต่างจาก approverEmpNo ใน parallel)
+  actedBy?: string | null; // empNo ของคนที่กด action จริง (อาจต่างจาก approverEmpNo ใน parallel)
   actedAt?: string | null;
   remark?: string | null;
   rejectionReason?: string | null;

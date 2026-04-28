@@ -103,20 +103,27 @@ export class ApprovalDetailModalComponent implements OnInit {
     >();
 
     for (const s of rawSteps) {
-      if (!map.has(s.stepNo)) {
-        map.set(s.stepNo, {
-          id: s.stepNo,
-          label: s.stepNo === 3 ? 'HR Parallel' : `Approver ${s.stepNo}`,
-          icon: s.stepNo === 3 ? 'fas fa-users-cog' : 'fas fa-user-check',
+      // รองรับทั้ง camelCase (stepNo) และ snake_case (step_no) จาก API
+      const raw = s as any;
+      const stepNo: number = raw.stepNo ?? raw.step_no ?? 0;
+      const approverEmpNo: string = raw.approverEmpNo ?? raw.approver_emp_no ?? '';
+      const approverName: string | null = raw.approverName ?? raw.approver_name ?? null;
+      const status: string = raw.status ?? '';
+
+      if (!stepNo) continue; // skip ถ้า stepNo ไม่ถูกต้อง
+
+      if (!map.has(stepNo)) {
+        map.set(stepNo, {
+          id: stepNo,
+          label: stepNo === 3 ? 'HR Parallel' : `Approver ${stepNo}`,
+          icon: stepNo === 3 ? 'fas fa-users-cog' : 'fas fa-user-check',
           approvers: [],
         });
       }
-      map.get(s.stepNo)!.approvers.push({
-        name: s.approverName,
-        empNo: s.approverEmpNo,
-        status: s.status,
-      });
+      map.get(stepNo)!.approvers.push({ name: approverName, empNo: approverEmpNo, status });
     }
+
+    if (!map.size) return null;
     return Array.from(map.values()).sort((a, b) => a.id - b.id);
   });
 
