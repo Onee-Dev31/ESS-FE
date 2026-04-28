@@ -303,7 +303,21 @@ export class ApprovalAllowanceComponent implements OnInit {
 
     this.allowanceApi.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        const mapped = (res.data || []).map((claim) => this.mapClaimToApproval(claim));
+        const mapped = (res.data || [])
+          .filter((claim) => {
+            // กรอง cascade rejection ออก:
+            // ถ้า claim ถูก reject ที่ step ก่อนหน้า (originalStep < stepNo)
+            // แสดงว่า step นี้ไม่เคยถูก execute → approver นี้ไม่ควรเห็น claim นี้
+            if (
+              (claim.status || '').toLowerCase() === 'rejected' &&
+              claim.originalStep != null &&
+              claim.originalStep < claim.stepNo
+            ) {
+              return false;
+            }
+            return true;
+          })
+          .map((claim) => this.mapClaimToApproval(claim));
         this.approvals.set(mapped);
         this.approvalSummary.set(res.summary ?? null);
         this.listing.currentPage.set(0);
