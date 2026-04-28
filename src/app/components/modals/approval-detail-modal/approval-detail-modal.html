@@ -149,6 +149,48 @@
         }
 
         @if (allowanceDetail()) {
+          <div class="medical-info-grid">
+            <!-- @for (step of allowanceDetail().approvalSteps; track $index) {
+              <div class="med-info-item">
+                <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
+                <span>
+                  @for (approver of step.approvers; track approver.approver_emp_no) {
+                    <div>{{ approver.approver_name }} ({{ approver.approver_emp_no }})</div>
+                  }
+                </span>
+              </div>
+            } -->
+            @for (step of groupedSteps(); track step.stepNo) {
+              <div class="med-info-item">
+                <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
+                <span>
+                  @if (step.acted) {
+                    <!-- มีคนที่ approve หรือ reject แล้ว → แสดงคนนั้น -->
+                    <div class="approver-done">
+                      @if (step.acted.status === 'approved') {
+                        <i class="fas fa-check-circle text-success"></i>
+                      } @else {
+                        <i class="fas fa-times-circle text-danger"></i>
+                      }
+                      {{ step.acted.approver_name }}
+                      <span class="text-muted">{{ step.acted.acted_at | date: 'dd/MM/yyyy' }}</span>
+                    </div>
+                  } @else if (step.approvers.length > 1) {
+                    <!-- ยังไม่มีใด act → แสดงทุกคน -->
+                    @for (a of step.approvers; track a.approver_emp_no) {
+                      <div class="approver-done">
+                        {{ a.approver_name }}
+                      </div>
+                    }
+                  } @else {
+                    <div class="approver-done">
+                      {{ step.approvers[0].approver_name }}
+                    </div>
+                  }
+                </span>
+              </div>
+            }
+          </div>
           @if (allowanceDetail()?.details?.length) {
             <div class="content-header">
               <h3>รายการเบิก ({{ allowanceDetail()?.details?.length }} รายการ)</h3>

@@ -144,6 +144,41 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
+  // groupedSteps = computed(() => {
+  //   const steps = this.allowanceDetail().approvalSteps;
+  //   const map = new Map<number, any[]>();
+
+  //   steps.forEach((s: any) => {
+  //     if (!map.has(s.step_no)) map.set(s.step_no, []);
+  //     map.get(s.step_no)!.push(s);
+  //   });
+
+  //   return Array.from(map.entries()).map(([stepNo, approvers]) => {
+  //     // step ที่มีหลายคน → เอาคนที่ approved ก่อน ถ้าไม่มีให้เป็น null
+  //     const approved = approvers.find((a) => a.status === 'approved');
+  //     const display = approvers.length > 1 ? (approved ?? null) : approvers[0];
+
+  //     return { stepNo, display };
+  //   });
+  // });
+
+  groupedSteps = computed(() => {
+    const steps = this.allowanceDetail().approvalSteps;
+    const map = new Map<number, any[]>();
+
+    steps.forEach((s: any) => {
+      if (!map.has(s.step_no)) map.set(s.step_no, []);
+      map.get(s.step_no)!.push(s);
+    });
+
+    return Array.from(map.entries()).map(([stepNo, approvers]) => {
+      const approved = approvers.find((a) => a.status === 'approved');
+      const rejected = approvers.find((a) => a.status === 'rejected');
+      const acted = approved ?? rejected ?? null;
+
+      return { stepNo, approvers, acted };
+    });
+  });
   /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */
   loadDetails() {
     const item = this.approvalItem;
