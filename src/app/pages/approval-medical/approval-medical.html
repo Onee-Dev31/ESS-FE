@@ -303,7 +303,12 @@
                   </td>
                   <td>
                     <div class="table-actions">
-                      <button type="button" class="act-btn act-view" title="ดูรายละเอียด" (click)="viewDetail(req)">
+                      <button
+                        type="button"
+                        class="act-btn act-view"
+                        title="ดูรายละเอียด"
+                        (click)="viewDetail(req)"
+                      >
                         <i class="fas fa-eye"></i>
                       </button>
                       @if (req.rawStatus === 'pending') {
