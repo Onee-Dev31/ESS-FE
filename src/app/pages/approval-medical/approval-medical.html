@@ -53,6 +53,30 @@
       </div>
     </div>
 
+    <div class="bulk-toolbar">
+      <label class="checkbox-custom">
+        <input
+          type="checkbox"
+          [checked]="isAllSelected()"
+          [indeterminate]="isSomeSelected()"
+          (change)="toggleSelectAll($event)"
+        />
+        <span class="checkmark"></span>
+        <span class="toolbar-label">
+          {{ isSomeSelected() || isAllSelected() ? 'ยกเลิกการเลือก' : 'เลือกทั้งหมด' }}
+        </span>
+      </label>
+
+      @if (selectedItems().size > 0) {
+        <div class="toolbar-divider"></div>
+
+        <button class="toolbar-btn btn-export" (click)="exportExcel()">
+          <i class="fas fa-file-excel"></i> Export Excel
+        </button>
+
+        <span class="selected-count">เลือก {{ selectedItems().size }} รายการ</span>
+      }
+    </div>
     <div class="claim-cards-grid">
       @if (isLoading()) {
         <app-skeleton type="card" [rows]="3"></app-skeleton>
@@ -63,6 +87,14 @@
             <div class="claim-card">
               <div class="claim-card__header">
                 <div class="claim-card__type-badge">
+                  <label class="checkbox-custom">
+                    <input
+                      type="checkbox"
+                      [checked]="isChecked(req.requestId)"
+                      (change)="toggleSelect(req.requestId, $any($event.target).checked)"
+                    />
+                    <span class="checkmark"></span>
+                  </label>
                   <i class="fas fa-notes-medical"></i> {{ claim.expenseTypeName }}
                 </div>
                 <div class="claim-card__actions">
@@ -235,6 +267,14 @@
                 <tr>
                   <td>
                     <div class="emp-cell">
+                      <label class="checkbox-custom">
+                        <input
+                          type="checkbox"
+                          [checked]="isChecked(req.requestId)"
+                          (change)="toggleSelect(req.requestId, $any($event.target).checked)"
+                        />
+                        <span class="checkmark"></span>
+                      </label>
                       <img
                         class="emp-avatar"
                         [src]="claim.employeeImageUrl"
@@ -347,6 +387,17 @@
           </tbody>
         </table>
       }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="listing.currentPage()"
+        [pageSize]="listing.pageSize()"
+        [totalItems]="listing.totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      >
+      </app-pagination>
     </div>
   </div>
 </div>

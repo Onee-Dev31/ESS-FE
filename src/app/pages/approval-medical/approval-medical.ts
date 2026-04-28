@@ -30,6 +30,8 @@ import dayjs from 'dayjs';
 import { MONTHS_TH } from '../../constants/date.constant';
 import { StatusUtil } from '../../utils/status.util';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { AuthService } from '../../services/auth.service';
 
 /** หน้าจัดการรายการอนุมัติค่ารักษาพยาบาล */
 @Component({
@@ -45,6 +47,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
     EmptyStateComponent,
     StatusLabelPipe,
     NzInputModule,
+    PaginationComponent,
   ],
   animations: [listAnimation],
   templateUrl: './approval-medical.html',
@@ -53,6 +56,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 })
 export class ApprovalMedicalComponent implements OnInit {
   private medicalApiService = inject(MedicalService);
+  private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
   private exportService = inject(ExportService);
@@ -65,7 +69,13 @@ export class ApprovalMedicalComponent implements OnInit {
   isRefreshing = signal<boolean>(false);
   private initialized = false;
 
+  approvals = signal<ApprovalItem[]>([]);
+  selectedItems = signal<Set<number>>(new Set());
+  showExportMenu = signal<boolean>(false);
+
   listing = createListingState();
+  Comps = createListingComputeds(this.approvals, this.listing);
+
   medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
   months = MONTHS_TH;
 
@@ -82,9 +92,6 @@ export class ApprovalMedicalComponent implements OnInit {
   previewFiles = signal<{ fileName: string; url: string; date: string; type: string }[]>([]);
 
   profileLightbox = signal<{ url: string; name: string } | null>(null);
-
-  approvals = signal<ApprovalItem[]>([]);
-  showExportMenu = signal<boolean>(false);
 
   readonly pageTitle = signal('อนุมัติค่ารักษาพยาบาล');
 
@@ -119,10 +126,15 @@ export class ApprovalMedicalComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
           const mapped = res.data.map((c) => this.mapClaimToApproval(c));
           this.approvals.set(mapped);
           this.listing.currentPage.set(0);
+          this.listing.totalItems.set(
+            mapped.filter(
+              (item) => !this.listing.filterStatus() || item.status === this.listing.filterStatus(),
+            ).length,
+          );
+
           this.loadingService.stop('approvals-list');
           this.isRefreshing.set(false);
           this.initialized = true;
@@ -193,6 +205,12 @@ export class ApprovalMedicalComponent implements OnInit {
   setActiveTab(tab: string) {
     this.listing.filterStatus.set(tab);
     this.listing.currentPage.set(0);
+    this.listing.totalItems.set(
+      this.approvals().filter(
+        (item) => !this.listing.filterStatus() || item.status === this.listing.filterStatus(),
+      ).length,
+    );
+    this.selectedItems.set(new Set());
   }
 
   getTabCount(tab: string) {
@@ -255,7 +273,6 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   openProfileImage(claim: MedicalClaim) {
-    console.log(claim);
     if (!claim.employeeImageUrl) return;
     this.profileLightbox.set({
       url: claim.employeeImageUrl,
@@ -277,6 +294,15 @@ export class ApprovalMedicalComponent implements OnInit {
     return `${item.requestNo}-${index}`;
   }
 
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+  }
+
   toggleExportMenu() {
     this.showExportMenu.set(!this.showExportMenu());
   }
@@ -295,38 +321,59 @@ export class ApprovalMedicalComponent implements OnInit {
   }
 
   async exportExcel() {
+    // console.log(this.selectedItems());
     this.showExportMenu.set(false);
     this.loadingService.start('export');
-    try {
-      const data = this.comps.paginatedData().map((item) => ({
-        requestNo: item.requestNo,
-        requestDate: item.requestDate,
-        requestBy: item.requestBy.name,
-        employeeId: item.requestBy.employeeId,
-        department: item.requestBy.department,
-        requestType: item.requestType,
-        requestDetail: item.requestDetail,
-        amount: item.amount,
-        status: item.status,
-      }));
 
-      const columns = [
-        { header: 'เลขที่เอกสาร', key: 'requestNo', width: 15 },
-        { header: 'วันที่สร้าง', key: 'requestDate', width: 15 },
-        { header: 'รหัสพนักงาน', key: 'employeeId', width: 15 },
-        { header: 'ประเภท', key: 'requestType', width: 15 },
-        { header: 'รายละเอียด', key: 'requestDetail', width: 35 },
-        { header: 'จำนวนเงิน', key: 'amount', width: 15 },
-        { header: 'สถานะ', key: 'status', width: 15 },
-      ];
+    const adUser = this.authService.currentUser() || '';
+    const fromYear = parseInt(this.fromYear());
+    const toYear = parseInt(this.toYear());
 
-      await this.exportService.exportToExcel(data, columns, 'approvals-medical');
-      this.toastService.success('Export Excel สำเร็จ');
-    } catch (error) {
-      this.errorService.handle(error, { component: 'Approvals', action: 'export-excel' });
-    } finally {
-      this.loadingService.stop('export');
-    }
+    // map display status → API status
+    const statusMap: Record<string, string> = {
+      Pending: 'PENDING',
+      Approved: 'APPROVED',
+      Rejected: 'REJECTED',
+      'Referred Back': 'REFERRED_BACK',
+    };
+    const activeStatus = this.listing.filterStatus();
+    const apiStatus = activeStatus ? statusMap[activeStatus] : undefined;
+
+    const exportParams = {
+      approver_aduser: adUser,
+      status: apiStatus,
+      from_month: this.fromMonth() + 1,
+      from_year: isNaN(fromYear) ? undefined : fromYear,
+      to_month: this.toMonth() + 1,
+      to_year: isNaN(toYear) ? undefined : toYear,
+      keyword: this.listing.searchText().trim() || undefined,
+      claim_ids: this.selectedItems().size > 0 ? [...this.selectedItems()] : undefined,
+    };
+
+    this.medicalApiService.exportClaimsExcel(exportParams).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `approvals-medical-${dayjs().format('YYYYMMDD')}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        this.toastService.success('Export Excel สำเร็จ');
+        this.selectedItems.set(new Set());
+        this.loadingService.stop('export');
+      },
+      error: (error) => {
+        console.error('[Export Excel] error:', error?.status, error);
+        if (error?.status === 404) {
+          this.toastService.warning('ไม่พบข้อมูลที่ตรงกับเงื่อนไข');
+        } else {
+          this.toastService.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+        }
+        this.loadingService.stop('export');
+      },
+    });
   }
 
   print() {
@@ -340,5 +387,44 @@ export class ApprovalMedicalComponent implements OnInit {
     } finally {
       this.loadingService.stop('export');
     }
+  }
+
+  get currentTabItems() {
+    return this.comps.filteredData();
+  }
+
+  isAllSelected() {
+    const current = this.currentTabItems;
+    return current.length > 0 && current.every((item) => this.selectedItems().has(item.requestId));
+  }
+
+  isSomeSelected() {
+    const current = this.currentTabItems;
+    return (
+      current.some((item) => this.selectedItems().has(item.requestId)) && !this.isAllSelected()
+    );
+  }
+
+  isChecked(requestId: number) {
+    return this.selectedItems().has(requestId);
+  }
+
+  toggleSelectAll(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    const next = new Set(this.selectedItems());
+
+    this.currentTabItems.forEach((item) => {
+      if (checked) next.add(item.requestId);
+      else next.delete(item.requestId);
+    });
+
+    this.selectedItems.set(next);
+  }
+
+  toggleSelect(requestId: number, checked: boolean) {
+    const next = new Set(this.selectedItems());
+    if (checked) next.add(requestId);
+    else next.delete(requestId);
+    this.selectedItems.set(next);
   }
 }
