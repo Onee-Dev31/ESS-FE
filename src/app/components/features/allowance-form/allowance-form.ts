@@ -165,6 +165,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
 
     this.allowanceService.getEligibleDates(employeeCode, yearCE, month).subscribe({
       next: (res) => {
+        // console.log(res);
         this.logs = (res.data ?? []).map((item) => {
           const dateStr = item.work_date.split('T')[0]; // "2026-03-02"
           const eligible = item.is_eligible === 1;
@@ -240,16 +241,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   onSubmit() {
     const selectedLogs = this.logs.filter((l) => l.selected);
 
-    // if (selectedLogs.length === 0) {
-    //   this.toastService.warning('กรุณาเลือกรายการอย่างน้อย 1 รายการ');
-    //   return;
-    // }
-
     if (this.MODE_EDIT && selectedLogs.length === 0) {
       this.swalService.confirm('ยืนยันการลบรายการเบิกทั้งหมด').then((result) => {
         if (!result.isConfirmed) return;
         this.swalService.loading('กำลังบันทึกข้อมูล...');
-        console.log(this.requests);
+        // console.log(this.requests);
         this.allowanceService.deleteClaim(this.requests.id).subscribe({
           next: () => {
             this.swalService.success('ลบรายการสำเร็จ');
@@ -331,7 +327,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   getRates() {
     this.allowanceService.getRates().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.rates.set(res.data);
       },
       error: () => {},

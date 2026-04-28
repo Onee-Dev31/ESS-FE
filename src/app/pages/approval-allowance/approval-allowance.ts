@@ -301,7 +301,7 @@ export class ApprovalAllowanceComponent implements OnInit {
     }
     this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');

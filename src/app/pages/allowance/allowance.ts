@@ -147,7 +147,7 @@ export class AllowanceComponent implements OnInit {
   }
 
   private mapApiData(items: any[]): any[] {
-    console.log('items >> ', items);
+    // console.log('items >> ', items);
     return items.map((claim: any) => ({
       id: claim.claimId,
       claimNo: claim.voucherNo,
@@ -183,7 +183,7 @@ export class AllowanceComponent implements OnInit {
   }
 
   deleteRequest(claim: any) {
-    console.log(claim);
+    // console.log(claim);
     this.swalService
       .confirm(
         'ยืนยันการลบรายการเบิกทั้งหมด?',
