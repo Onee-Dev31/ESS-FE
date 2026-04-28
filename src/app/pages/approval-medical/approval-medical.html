@@ -238,6 +238,8 @@
                       <img
                         class="emp-avatar"
                         [src]="claim.employeeImageUrl"
+                        [alt]="(claim.employeeName ?? claim.employeeCode) + ' photo'"
+                        title="รูปพนักงาน"
                         (error)="onImgError($event)"
                       />
                       <div>
@@ -301,18 +303,22 @@
                   </td>
                   <td>
                     <div class="table-actions">
-                      <button class="act-btn act-view" (click)="viewDetail(req)">
+                      <button type="button" class="act-btn act-view" title="ดูรายละเอียด" (click)="viewDetail(req)">
                         <i class="fas fa-eye"></i>
                       </button>
                       @if (req.rawStatus === 'pending') {
                         <button
+                          type="button"
                           class="act-btn act-approve"
+                          title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
                         </button>
                         <button
+                          type="button"
                           class="act-btn act-reject"
+                          title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
                         >
                           <i class="fas fa-times"></i>
