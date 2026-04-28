@@ -337,7 +337,7 @@ app-empty-state {
   display: none;
   grid-template-columns: repeat(3, 1fr);
 
-  @include large-tablet {
+  @include tablet {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -543,7 +543,7 @@ app-empty-state {
   display: block;
   overflow-x: auto;
 
-  @include large-tablet {
+  @include tablet {
     display: none;
   }
 }
@@ -768,5 +768,36 @@ app-empty-state {
   .error {
     color: rgb(255, 166, 166);
     text-align: center;
+  }
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.btn-icon.edit {
+  @include btn-secondary;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+}
+
+.btn-icon.delete {
+  @include btn-outline;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  color: var(--danger);
+  border-color: var(--danger);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: #dc2626;
+  }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.1);
   }
 }
