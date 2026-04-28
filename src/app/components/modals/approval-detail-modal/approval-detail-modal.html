@@ -46,10 +46,15 @@
               @if (step.approvers && step.approvers.length > 0) {
                 <div class="step-approvers">
                   @for (approver of step.approvers; track approver.empNo) {
-                    <div class="step-approver-name" [class.is-actual-approver]="approver.isActualApprover">
+                    <div
+                      class="step-approver-name"
+                      [class.is-actual-approver]="
+                        step.approvers.length > 1 && approver.isActualApprover
+                      "
+                    >
                       <i class="fas fa-user step-approver-icon"></i>
                       {{ approver.name || approver.empNo }}
-                      @if (approver.isActualApprover) {
+                      @if (step.approvers.length > 1 && approver.isActualApprover) {
                         <span class="actual-approver-badge">อนุมัติ</span>
                       }
                     </div>

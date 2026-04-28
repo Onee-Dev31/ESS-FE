@@ -98,7 +98,12 @@ export class ApprovalDetailModalComponent implements OnInit {
         id: number;
         label: string;
         icon: string;
-        approvers: { name: string | null; empNo: string; status: string; isActualApprover: boolean }[];
+        approvers: {
+          name: string | null;
+          empNo: string;
+          status: string;
+          isActualApprover: boolean;
+        }[];
       }
     >();
 
@@ -123,7 +128,9 @@ export class ApprovalDetailModalComponent implements OnInit {
           approvers: [],
         });
       }
-      map.get(stepNo)!.approvers.push({ name: approverName, empNo: approverEmpNo, status, isActualApprover });
+      map
+        .get(stepNo)!
+        .approvers.push({ name: approverName, empNo: approverEmpNo, status, isActualApprover });
     }
 
     if (!map.size) return null;
@@ -140,19 +147,34 @@ export class ApprovalDetailModalComponent implements OnInit {
           id: 1,
           label: 'Approver 1',
           icon: 'fas fa-user-check',
-          approvers: [] as { name: string | null; empNo: string; status: string; isActualApprover: boolean }[],
+          approvers: [] as {
+            name: string | null;
+            empNo: string;
+            status: string;
+            isActualApprover: boolean;
+          }[],
         },
         {
           id: 2,
           label: 'Approver 2',
           icon: 'fas fa-user-check',
-          approvers: [] as { name: string | null; empNo: string; status: string; isActualApprover: boolean }[],
+          approvers: [] as {
+            name: string | null;
+            empNo: string;
+            status: string;
+            isActualApprover: boolean;
+          }[],
         },
         {
           id: 3,
           label: 'HR Parallel',
           icon: 'fas fa-users-cog',
-          approvers: [] as { name: string | null; empNo: string; status: string; isActualApprover: boolean }[],
+          approvers: [] as {
+            name: string | null;
+            empNo: string;
+            status: string;
+            isActualApprover: boolean;
+          }[],
         },
       ];
     }
@@ -161,13 +183,23 @@ export class ApprovalDetailModalComponent implements OnInit {
         id: 1,
         label: 'พนักงานยืนยัน',
         icon: 'fas fa-user-check',
-        approvers: [] as { name: string | null; empNo: string; status: string; isActualApprover: boolean }[],
+        approvers: [] as {
+          name: string | null;
+          empNo: string;
+          status: string;
+          isActualApprover: boolean;
+        }[],
       },
       {
         id: 3,
         label: 'ฝ่ายบุคคลอนุมัติ',
         icon: 'fas fa-users-cog',
-        approvers: [] as { name: string | null; empNo: string; status: string; isActualApprover: boolean }[],
+        approvers: [] as {
+          name: string | null;
+          empNo: string;
+          status: string;
+          isActualApprover: boolean;
+        }[],
       },
     ];
   });

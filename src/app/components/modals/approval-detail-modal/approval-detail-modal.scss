@@ -290,12 +290,11 @@
                 opacity: 0.8;
                 display: flex;
                 align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
                 gap: 3px;
                 text-align: center;
-                max-width: 120px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                max-width: 140px;
 
                 &.is-actual-approver {
                   font-weight: 600;
