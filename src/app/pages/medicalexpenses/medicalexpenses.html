@@ -119,6 +119,22 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
+                @if (claim.status.toLowerCase() === 'pending') {
+                  <button
+                    class="btn-icon edit"
+                    (click)="$event.stopPropagation(); editRequest(claim)"
+                    title="แก้ไข"
+                  >
+                    <i class="far fa-edit"></i>
+                  </button>
+                  <button
+                    class="btn-icon delete"
+                    (click)="$event.stopPropagation(); deleteRequest(claim)"
+                    title="ลบ"
+                  >
+                    <i class="far fa-trash-alt"></i>
+                  </button>
+                }
               </div>
             </div>
 
@@ -186,6 +202,7 @@
               <th>สถานะ</th>
               <th>เอกสาร</th>
               <th>วันที่สร้างรายการ</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -255,10 +272,27 @@
                     {{ dateUtil.formatDateToBE(claim.claimDate, 'DD/MM/YYYY') }}
                   </div>
                 </td>
+
+                <td class="text-center" (click)="$event.stopPropagation()">
+                  @if (claim.status.toLowerCase() === 'pending') {
+                    <div class="action-btns">
+                      <button
+                        class="btn-icon edit mr-10"
+                        (click)="editRequest(claim)"
+                        title="แก้ไข"
+                      >
+                        <i class="far fa-edit"></i>
+                      </button>
+                      <button class="btn-icon delete" (click)="deleteRequest(claim)" title="ลบ">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  }
+                </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="8">
+                <td colspan="9">
                   <app-empty-state
                     title="ไม่พบรายการ"
                     description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
@@ -278,7 +312,10 @@
     <div class="modal-overlay">
       <div class="modal-container">
         @defer {
-          <app-medicalexpenses-form (onClose)="closeModal()"> </app-medicalexpenses-form>
+          <app-medicalexpenses-form
+            [requestId]="selectedClaimId()?.toString() ?? ''"
+            (onClose)="closeModal()"
+          ></app-medicalexpenses-form>
         } @loading {
           <div class="p-4 text-center">
             <i class="fas fa-spinner fa-spin fa-2x text-primary p-4"></i>
