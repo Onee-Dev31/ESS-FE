@@ -533,7 +533,7 @@
   }
 
   &.outpatient {
-    color: var(--danger);
+    color: var(--danger) !important;
     background: color-mix(in srgb, var(--danger) 10%, transparent);
   }
 
@@ -601,7 +601,6 @@
   &.disabled-card {
     cursor: not-allowed;
     border-color: rgba(148, 163, 184, 0.4);
-    background: rgba(15, 23, 42, 0.68);
     overflow: hidden;
 
     &:hover {
@@ -617,8 +616,9 @@
 
     .card-state-lock {
       background: rgba(15, 23, 42, 0.55);
-      color: #e2e8f0;
+      color: var(--text-reverse) !important;
       border: 1px solid rgba(255, 255, 255, 0.08);
+      background: color-mix(in srgb, var(--text), transparent 50%);
     }
   }
 
@@ -637,7 +637,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.08);
+    background: color-mix(in srgb, var(--text-reverse), transparent 50%);
     color: var(--text-muted);
     font-size: 0.8rem;
     z-index: 3;
@@ -650,15 +650,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-      linear-gradient(rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.46)),
-      repeating-linear-gradient(
-        -45deg,
-        rgba(255, 255, 255, 0.04) 0,
-        rgba(255, 255, 255, 0.04) 10px,
-        rgba(255, 255, 255, 0.01) 10px,
-        rgba(255, 255, 255, 0.01) 20px
-      );
+    opacity: 0.7;
 
     .overlay-badge {
       display: inline-flex;
@@ -709,7 +701,7 @@
         padding: 3px 8px;
         border-radius: 999px;
         background: rgba(59, 130, 246, 0.12);
-        color: var(--blue);
+        color: var(--blue) !important;
         font-size: 0.72rem;
         font-weight: 700;
         line-height: 1;
@@ -723,7 +715,7 @@
 
       .balance-label {
         font-size: 0.75rem;
-        color: var(--text-muted);
+        color: var(--text-muted) !important;
         font-weight: 600;
       }
 
@@ -731,7 +723,7 @@
         margin-top: 4px;
         font-size: 0.78rem;
         line-height: 1.45;
-        color: var(--text-sub);
+        color: var(--text-sub) !important;
       }
 
       .type-helper--disabled {

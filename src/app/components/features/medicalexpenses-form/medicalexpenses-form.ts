@@ -222,17 +222,24 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   readonly eligibilityHintLines = [
     'พนักงานที่ยังไม่ผ่านโปรไม่สามารถเบิก IPD, Dental และ Vision ได้',
-    'Dental และ Vision ใช้วงเงิน OPD คงเหลือ',
+    // 'Dental และ Vision ใช้วงเงิน OPD คงเหลือ',
   ];
 
   getSelectedClaimTypeMeta(): ClaimType | undefined {
     return this.claimTypes.find((type) => type.id === this.selectedClaimType());
   }
 
-  private resolveProbationEligibility(employee: any, allData: any): 'passed' | 'not_passed' | 'unknown' {
-    const candidates = [employee, allData?.employee, allData, employee?.profile, employee?.info].filter(
-      Boolean,
-    );
+  private resolveProbationEligibility(
+    employee: any,
+    allData: any,
+  ): 'passed' | 'not_passed' | 'unknown' {
+    const candidates = [
+      employee,
+      allData?.employee,
+      allData,
+      employee?.profile,
+      employee?.info,
+    ].filter(Boolean);
 
     for (const source of candidates) {
       const directFlag = this.readProbationBoolean(source);
@@ -594,10 +601,11 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   selectClaimType(type: ClaimType | string) {
     if (this.isSaving()) return;
-    const selected = typeof type === 'string' ? this.claimTypes.find((item) => item.id === type) : type;
+    const selected =
+      typeof type === 'string' ? this.claimTypes.find((item) => item.id === type) : type;
     if (!selected) return;
     if (selected.disabled) {
-      this.toastService.warning(selected.disabledReason || 'ประเภทนี้ยังไม่สามารถเลือกได้');
+      // this.toastService.warning(selected.disabledReason || 'ประเภทนี้ยังไม่สามารถเลือกได้');
       return;
     }
     this.selectedClaimType.set(selected.id);

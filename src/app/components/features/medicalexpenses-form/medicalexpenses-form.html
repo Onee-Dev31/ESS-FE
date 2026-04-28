@@ -62,22 +62,24 @@
                   <span class="type-label">{{ type.label }}</span>
                   <span class="type-badge" *ngIf="type.ruleBadge">{{ type.ruleBadge }}</span>
                 </div>
-                <span class="balance-value" [style.color]="type.color">{{ type.amount }}</span>
+                <span class="balance-value" [style.color]="type.color + ' !important'">{{
+                  type.amount
+                }}</span>
                 <span class="balance-label">ยอดคงเหลือ</span>
                 <span class="type-helper" [class.type-helper--disabled]="type.disabled">
                   {{ type.helperText }}
                 </span>
               </div>
               <div class="type-icon-wrapper" [style.background-color]="type.color + '15'">
-                <i [class]="type.icon" [style.color]="type.color"></i>
+                <i [class]="type.icon" [style.color]="type.color + ' !important'"></i>
               </div>
             </div>
             <div class="card-state-lock" *ngIf="type.disabled">
               <i class="fas fa-lock"></i>
             </div>
-            <div class="card-disabled-overlay" *ngIf="type.disabled">
+            <!-- <div class="card-disabled-overlay" *ngIf="type.disabled">
               <div class="overlay-badge"><i class="fas fa-ban"></i> เลือกไม่ได้</div>
-            </div>
+            </div> -->
           </div>
           <div
             class="claim-type-card inpatient-card"
@@ -108,42 +110,47 @@
             <div class="card-state-lock" *ngIf="type.disabled">
               <i class="fas fa-lock"></i>
             </div>
-            <div class="card-disabled-overlay" *ngIf="type.disabled">
+            <!-- <div class="card-disabled-overlay" *ngIf="type.disabled">
               <div class="overlay-badge"><i class="fas fa-ban"></i> เลือกไม่ได้</div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+      @if (selectedClaimType()) {
+        @let selectedType = getSelectedClaimTypeMeta();
+        @if (selectedType && !selectedType.disabled) {
+          <div
+            class="claim-selection-notice"
+            *ngIf="selectedClaimType() && getSelectedClaimTypeMeta() as selectedType"
+            [class.claim-selection-notice--warning]="selectedType.requiresEligibilityCheck"
+            [class.claim-selection-notice--disabled]="selectedType.disabled"
+          >
+            <div class="notice-icon">
+              <i
+                [class]="
+                  selectedType.disabled
+                    ? 'fas fa-ban'
+                    : selectedType.requiresEligibilityCheck
+                      ? 'fas fa-shield-heart'
+                      : 'fas fa-circle-check'
+                "
+              ></i>
+            </div>
+            <div class="notice-copy">
+              <div class="notice-title">
+                @if (selectedType.disabled) {
+                  ประเภทนี้ยังไม่สามารถเลือกได้
+                } @else if (selectedType.requiresEligibilityCheck) {
+                  ระบบจะตรวจสิทธิ์อีกครั้งก่อนส่งเบิก
+                } @else {
+                  ประเภทนี้พร้อมส่งเบิกได้
+                }
+              </div>
+              <div class="notice-text">{{ selectedType.guidanceText }}</div>
             </div>
           </div>
-        </div>
-      </div>
-      <div
-        class="claim-selection-notice"
-        *ngIf="selectedClaimType() && getSelectedClaimTypeMeta() as selectedType"
-        [class.claim-selection-notice--warning]="selectedType.requiresEligibilityCheck"
-        [class.claim-selection-notice--disabled]="selectedType.disabled"
-      >
-        <div class="notice-icon">
-          <i
-            [class]="
-              selectedType.disabled
-                ? 'fas fa-ban'
-                : selectedType.requiresEligibilityCheck
-                  ? 'fas fa-shield-heart'
-                  : 'fas fa-circle-check'
-            "
-          ></i>
-        </div>
-        <div class="notice-copy">
-          <div class="notice-title">
-            @if (selectedType.disabled) {
-              ประเภทนี้ยังไม่สามารถเลือกได้
-            } @else if (selectedType.requiresEligibilityCheck) {
-              ระบบจะตรวจสิทธิ์อีกครั้งก่อนส่งเบิก
-            } @else {
-              ประเภทนี้พร้อมส่งเบิกได้
-            }
-          </div>
-          <div class="notice-text">{{ selectedType.guidanceText }}</div>
-        </div>
-      </div>
+        }
+      }
     </section>
 
     <section
@@ -316,7 +323,12 @@
     <section class="form-section-wrapper mt-4 animated-fade-in" *ngIf="selectedClaimType()">
       <div class="section-header-row">
         <h4 class="section-heading">3. แนบเอกสาร (ถ้ามี)</h4>
-        <button class="btn-upload-file" type="button" [disabled]="isSaving()" (click)="triggerFileInput(fileInput)">
+        <button
+          class="btn-upload-file"
+          type="button"
+          [disabled]="isSaving()"
+          (click)="triggerFileInput(fileInput)"
+        >
           <i class="fas fa-file-upload"></i> Upload file
         </button>
         <input
