@@ -303,21 +303,7 @@ export class ApprovalAllowanceComponent implements OnInit {
 
     this.allowanceApi.getPendingApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
-        const mapped = (res.data || [])
-          .filter((claim) => {
-            // กรอง cascade rejection ออก:
-            // ถ้า claim ถูก reject ที่ step ก่อนหน้า (originalStep < stepNo)
-            // แสดงว่า step นี้ไม่เคยถูก execute → approver นี้ไม่ควรเห็น claim นี้
-            if (
-              (claim.status || '').toLowerCase() === 'rejected' &&
-              claim.originalStep != null &&
-              claim.originalStep < claim.stepNo
-            ) {
-              return false;
-            }
-            return true;
-          })
-          .map((claim) => this.mapClaimToApproval(claim));
+        const mapped = (res.data || []).map((claim) => this.mapClaimToApproval(claim));
         this.approvals.set(mapped);
         this.approvalSummary.set(res.summary ?? null);
         this.listing.currentPage.set(0);
@@ -412,32 +398,12 @@ export class ApprovalAllowanceComponent implements OnInit {
 
   private mergeClaimDetail(claim: MealAllowanceClaim, item: ApprovalItem): MealAllowanceClaim {
     const listData = item.originalData as MealAllowanceClaim | undefined;
-    const listStep = listData?.currentStep ?? 0;
-    // resolvedStep: ให้ priority กับ currentStep จาก getClaimById (รู้ step จริง ๆ ที่ reject/pending)
-    // fallback ไป listStep (stepNo ของ approver นี้) เฉพาะตอน API ไม่ส่งมา
-    const resolvedStep = claim.currentStep ?? listStep;
-
-    const thisApproverStatus = (item.rawStatus || '').toLowerCase();
-    const claimNotFullyApproved = (claim.status || '').toUpperCase() !== 'APPROVED';
-
-    let currentStep = resolvedStep;
-
-    // ถ้า approver คนนี้ approve ไปแล้ว แต่ overall claim ยังไม่ fully approved
-    // → bump currentStep ขึ้น 1 เพื่อให้ step ของ approver นี้แสดงเป็น "อนุมัติแล้ว"
-    if (thisApproverStatus === 'approved' && claimNotFullyApproved && resolvedStep <= listStep) {
-      currentStep = listStep + 1;
-    }
-
-    // หมายเหตุ: สำหรับ rejected case ไม่ต้อง override currentStep ด้วย listStep
-    // เพราะ getClaimById คือ source of truth ที่รู้ว่า reject ที่ step ไหน
-    // การใช้ listStep จะผิดเมื่อ Approver2 มาดู claim ที่ถูก reject โดย Approver1
-
     return {
       ...claim,
       employeeName: claim.employeeName ?? item.requestBy.name,
       departmentName: claim.departmentName ?? item.requestBy.department,
       companyName: claim.companyName ?? item.requestBy.company,
-      currentStep,
+      currentStep: claim.currentStep ?? listData?.currentStep,
       employeeImageUrl: claim.employeeImageUrl ?? listData?.employeeImageUrl,
     };
   }
