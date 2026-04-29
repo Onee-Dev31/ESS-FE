@@ -69,7 +69,7 @@
                 </div>
                 <div class="claim-card__actions">
                   <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
-                    {{ req.rawStatus | statusLabel }}
+                    {{ (req.approverStepStatus || req.rawStatus) | statusLabel }}
                   </span>
                 </div>
               </div>
@@ -261,7 +261,7 @@
                   </td>
                   <td>
                     <span class="status-badge" [ngStyle]="getStatusClass(req.status)">
-                      {{ req.rawStatus | statusLabel }}
+                      {{ (req.approverStepStatus || req.rawStatus) | statusLabel }}
                     </span>
                   </td>
                   <td>
