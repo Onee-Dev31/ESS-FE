@@ -32,11 +32,18 @@ import { Hospital, DiseaseType } from '../../../interfaces/medical.interface';
 import { formatMoneyInput } from '../../../utils/formatText';
 import { SwalService } from '../../../services/swal.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton';
 
 @Component({
   selector: 'app-medicalexpenses-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, FilePreviewModalComponent, NzDatePickerModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FilePreviewModalComponent,
+    NzDatePickerModule,
+    SkeletonComponent,
+  ],
   templateUrl: './medicalexpenses-form.html',
   styleUrl: './medicalexpenses-form.scss',
 })
@@ -52,6 +59,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
 
   @Input() requestId: string = '';
   @Output() onClose = new EventEmitter<void>();
+  isLoading = signal<boolean>(true);
 
   currentDate = signal<string>('');
   employeeId = signal<string>('');
@@ -389,7 +397,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
   ngOnInit() {
     const employeeCode = this.authService.userData()?.CODEMPID ?? '';
     this.employeeId.set(employeeCode);
-
+    this.isLoading.set(true);
     const fiscalYear = dayjs().year();
     this.medicalService.getExpenseTypesWithBalance(employeeCode, fiscalYear).subscribe({
       next: (res) => {
@@ -612,16 +620,19 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
             this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
             this.resetDates();
           }
+          this.isLoading.set(false);
         },
         error: () => {
           this.isEditMode.set(false);
           this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
           this.resetDates();
+          this.isLoading.set(false);
         },
       });
     } else {
       this.currentDate.set(this.dateUtil.formatDateToThaiMonth(dayjs().toDate()));
       this.resetDates();
+      this.isLoading.set(false);
     }
   }
 

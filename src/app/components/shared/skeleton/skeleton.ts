@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './skeleton.scss',
 })
 export class SkeletonComponent {
-  @Input() type: 'table' | 'card' | 'text' = 'table';
+  @Input() type: 'table' | 'card' | 'text' | 'form' = 'table';
   @Input() rows: number = 5;
   @Input() height: string = '20px';
 
