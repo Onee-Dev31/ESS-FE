@@ -54,4 +54,10 @@ export class DateUtilityService {
     const end = dayjs(endDate).startOf('day');
     return end.diff(start, 'day') + 1;
   }
+
+  hoursToHHMM(hours: number): string {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
 }

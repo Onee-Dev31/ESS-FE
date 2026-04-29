@@ -85,7 +85,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     //   this.loadData();
     // }
     if (changes['requests'] && this.requests && this.requests !== '') {
-      // console.log('requests เข้ามาแล้ว:', this.requests);
+      console.log('requests เข้ามาแล้ว:', this.requests);
       this.MODE_EDIT = true;
       this.mapData();
       return;
@@ -155,6 +155,12 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     return this.logs.some(
       (log) => log.selected && (!log.description || log.description.trim() === ''),
     );
+  }
+
+  totalHour(): string {
+    const selectedLogs = this.logs.filter((log) => log.selected);
+    const total = selectedLogs.reduce((sum, log) => sum + (log.hours || 0), 0);
+    return this.dateUtil.hoursToHHMM(total);
   }
 
   generateCalendar() {
