@@ -234,7 +234,7 @@ export class ItService implements OnInit {
       const assignments = res.assignments;
       this.desNew = ticket.description;
 
-      const itNotes = this.buildItNotes(replies, replyAttachments);
+      const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       let status = this.getTicketStatus(ticket);
 
@@ -272,6 +272,8 @@ export class ItService implements OnInit {
         openFor: res.requestFor.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
       };
+
+      // console.log(objectData);
 
       this.selectedTicket.set(objectData);
 
@@ -326,7 +328,7 @@ export class ItService implements OnInit {
   }
 
   handleRate(event: { rating: number; comment: string }) {
-    console.log('Rating submitted:', event);
+    // console.log('Rating submitted:', event);
     // Here you would typically call a service to save the rating
     this.closeRating();
   }
@@ -350,13 +352,13 @@ export class ItService implements OnInit {
         formData.append('Files', item.file);
       }
     });
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
 
         if (!res?.success) {
           this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
@@ -560,29 +562,34 @@ export class ItService implements OnInit {
     });
   }
 
-  buildItNotes(replies: any[], attachments: any[]) {
-    return replies.map((r) => {
-      const files = attachments.filter((a) => a.reply_id === r.id);
-      return {
-        id: r.id,
-        message: r.message,
-        attachments: files,
-        createdDate: r.created_at,
-        createBy: {
-          fullName: r.sender_name,
-          nickName: this.extractNickName(r.sender_name),
-          empCode: r.user_code,
-          adUser: r.user_aduser,
-          role: 'user',
-        },
-        referred_title: r.Referred_Title,
-        isReferred: r.IsReferred,
-      };
-    });
+  async buildItNotes(replies: any[], attachments: any[]) {
+    const notes = await Promise.all(
+      replies.map(async (r) => {
+        const files = attachments.filter((a) => a.reply_id === r.id);
+        const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+
+        return {
+          id: r.id,
+          message: r.message,
+          attachments: convertedFiles,
+          createdDate: r.created_at,
+          createBy: {
+            fullName: r.sender_name,
+            nickName: this.extractNickName(r.sender_name),
+            empCode: r.user_code,
+            adUser: r.user_aduser,
+            role: 'user',
+          },
+          referred_title: r.Referred_Title,
+          isReferred: r.IsReferred,
+        };
+      }),
+    );
+
+    return notes;
   }
 
   getTicketStatus(ticket: any) {
-    // console.log(ticket)
     if (
       (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') ||
       ticket.user_status === 'Referred_Back'
@@ -675,8 +682,8 @@ export class ItService implements OnInit {
       attachments: updatedAttachments,
     });
 
-    console.log('deletedAttachmentIds:', this.deletedAttachmentIds);
-    console.log('attachments:', updatedAttachments);
+    // console.log('deletedAttachmentIds:', this.deletedAttachmentIds);
+    // console.log('attachments:', updatedAttachments);
   }
 
   Resubmit(ticket: any) {
@@ -716,14 +723,14 @@ export class ItService implements OnInit {
         formData.append('DeletedAttachmentIds', String(id));
       });
 
-      console.log('===== REOPEN FORM DATA =====');
+      // console.log('===== REOPEN FORM DATA =====');
       for (const pair of (formData as any).entries()) {
-        console.log(pair[0], pair[1]);
+        // console.log(pair[0], pair[1]);
       }
       // ยิงจริง
       this.itServiceService.re_open(formData).subscribe({
         next: (res) => {
-          console.log('re_open success:', res);
+          // console.log('re_open success:', res);
 
           Swal.fire({
             icon: 'success',
