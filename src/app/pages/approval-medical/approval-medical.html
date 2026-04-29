@@ -90,6 +90,7 @@
                   <label class="checkbox-custom">
                     <input
                       type="checkbox"
+                      aria-label="เลือกรายการ"
                       [checked]="isChecked(req.requestId)"
                       (change)="toggleSelect(req.requestId, $any($event.target).checked)"
                     />
@@ -270,6 +271,7 @@
                       <label class="checkbox-custom">
                         <input
                           type="checkbox"
+                          aria-label="เลือกรายการ"
                           [checked]="isChecked(req.requestId)"
                           (change)="toggleSelect(req.requestId, $any($event.target).checked)"
                         />
