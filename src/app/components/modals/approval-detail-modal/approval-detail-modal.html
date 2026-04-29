@@ -150,16 +150,6 @@
 
         @if (allowanceDetail()) {
           <div class="medical-info-grid">
-            <!-- @for (step of allowanceDetail().approvalSteps; track $index) {
-              <div class="med-info-item">
-                <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
-                <span>
-                  @for (approver of step.approvers; track approver.approver_emp_no) {
-                    <div>{{ approver.approver_name }} ({{ approver.approver_emp_no }})</div>
-                  }
-                </span>
-              </div>
-            } -->
             @for (step of groupedSteps(); track step.stepNo) {
               <div class="med-info-item">
                 <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
@@ -209,6 +199,76 @@
               </thead>
               <tbody>
                 @for (d of allowanceDetail()?.details; track d.detail_id) {
+                  <tr>
+                    <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
+                    <td>{{ d.shift_code }}</td>
+                    <td class="text-center">
+                      <span class="ot-day-type" [class.holiday]="d.day_type === 'H'">
+                        {{ d.day_type === 'H' ? 'วันหยุด' : 'วันทำงาน' }}
+                      </span>
+                    </td>
+                    <td>{{ d.actual_checkin }} – {{ d.actual_checkout }}</td>
+                    <td class="text-center">{{ d.extra_hours }} ชม.</td>
+                    <td class="text-right">฿{{ d.rate_amount | number: '1.2-2' }}</td>
+                    <td>{{ d.description || '-' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        }
+
+        @if (vehicleDetail()) {
+          <div class="medical-info-grid">
+            @for (step of groupedSteps(); track step.stepNo) {
+              <div class="med-info-item">
+                <label><i class="fas fa-user-check"></i> Approve Step {{ step.stepNo }}</label>
+                <span>
+                  @if (step.acted) {
+                    <!-- มีคนที่ approve หรือ reject แล้ว → แสดงคนนั้น -->
+                    <div class="approver-done">
+                      @if (step.acted.status === 'approved') {
+                        <i class="fas fa-check-circle text-success"></i>
+                      } @else {
+                        <i class="fas fa-times-circle text-danger"></i>
+                      }
+                      {{ step.acted.approver_name }}
+                      <span class="text-muted">{{ step.acted.acted_at | date: 'dd/MM/yyyy' }}</span>
+                    </div>
+                  } @else if (step.approvers.length > 1) {
+                    <!-- ยังไม่มีใด act → แสดงทุกคน -->
+                    @for (a of step.approvers; track a.approver_emp_no) {
+                      <div class="approver-done">
+                        {{ a.approver_name }}
+                      </div>
+                    }
+                  } @else {
+                    <div class="approver-done">
+                      {{ step.approvers[0].approver_name }}
+                    </div>
+                  }
+                </span>
+              </div>
+            }
+          </div>
+          @if (vehicleDetail()?.details?.length) {
+            <div class="content-header">
+              <h3>รายการเบิก ({{ vehicleDetail()?.details?.length }} รายการ)</h3>
+            </div>
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>กะ</th>
+                  <th class="text-center">ประเภทวัน</th>
+                  <th>เวลาเข้า - ออก</th>
+                  <th class="text-center">ชั่วโมง OT</th>
+                  <th class="text-right">ยอดเงิน</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of vehicleDetail()?.details; track d.detail_id) {
                   <tr>
                     <td>{{ dateUtil.formatDateToBE(d.work_date, 'DD/MM/YYYY') }}</td>
                     <td>{{ d.shift_code }}</td>

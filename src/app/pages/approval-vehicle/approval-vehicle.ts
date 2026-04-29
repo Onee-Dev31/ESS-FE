@@ -191,6 +191,7 @@ export class ApprovalVehicleComponent {
   }
 
   viewDetail(item: ApprovalItem) {
+    // console.log(item);
     this.selectedItem.set(item);
     this.initialAction.set(null);
     this.isModalOpen.set(true);
@@ -270,11 +271,11 @@ export class ApprovalVehicleComponent {
       amount: claim.totalAmount,
       status: this.mapClaimStatus(claim.status),
       rawStatus: claim.status.toLowerCase(),
-      type: 'allowance',
+      type: 'vehicle',
       originalData: {
         ...claim,
         employeeImageUrl: `https://empimg.oneeclick.co:8048/employeeimage/${claim.employeeCode}.jpg`,
-        expenseTypeName: 'เบิกค่าเบี้ยเลี้ยง',
+        expenseTypeName: 'เบิกค่ารถ',
       },
     };
   }
