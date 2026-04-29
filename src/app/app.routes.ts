@@ -86,7 +86,7 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
-        path: 'approvals-transport',
+        path: 'approvals-velhicle',
         loadComponent: () =>
           import('./pages/approval-transport/approval-transport').then(
             (m) => m.ApprovalTransportComponent,
