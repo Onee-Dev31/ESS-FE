@@ -139,6 +139,9 @@ export class ApprovalDetailModalComponent implements OnInit {
   );
 
   ngOnInit() {
+    console.log('[modal] approverStepStatus:', JSON.stringify(this.approvalItem.approverStepStatus));
+    console.log('[modal] rawStatus:', this.approvalItem.rawStatus);
+    console.log('[modal] status:', this.approvalItem.status);
     this.loadDetails();
     if (this.initialAction) {
       this.isActionConfirm.set(true);
@@ -353,12 +356,14 @@ export class ApprovalDetailModalComponent implements OnInit {
     const actionKey =
       action === 'Referred Back' ? 'referred_back' : action.toLowerCase();
     const payload: any = {
-      approver_aduser: this.authService.currentUser(),
+      approver_aduser: this.authService.currentUser() || '',
       action: actionKey,
     };
     if (action !== 'Approved') {
       payload.remark = reason?.trim() || '';
     }
+    console.log('[updateVehicleStatus] claimId:', item.requestId);
+    console.log('[updateVehicleStatus] payload:', JSON.stringify(payload));
     this.approvalTransportService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
@@ -395,7 +400,8 @@ export class ApprovalDetailModalComponent implements OnInit {
   }
 
   private handleError(error: any) {
-    console.error(error);
+    console.error('[handleError] status:', error?.status);
+    console.error('[handleError] BE message:', error?.error?.message ?? error?.error ?? error?.message);
     this.swalService.warning('เกิดข้อผิดพลาด', error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
   }
 

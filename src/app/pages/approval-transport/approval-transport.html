@@ -156,7 +156,7 @@
                     type="button"
                     class="act-btn act-approve"
                     title="อนุมัติ"
-                    *ngIf="req.rawStatus === 'pending'"
+                    *ngIf="req.approverStepStatus === 'pending'"
                     (click)="openActionModal(req, 'Approved')"
                   >
                     <i class="fas fa-check"></i>
@@ -165,7 +165,7 @@
                     type="button"
                     class="act-btn act-refer"
                     title="ส่งกลับแก้ไข"
-                    *ngIf="req.rawStatus === 'pending'"
+                    *ngIf="req.approverStepStatus === 'pending'"
                     (click)="openActionModal(req, 'Referred Back')"
                   >
                     <i class="fas fa-undo"></i>
@@ -174,7 +174,7 @@
                     type="button"
                     class="act-btn act-reject"
                     title="ไม่อนุมัติ"
-                    *ngIf="req.rawStatus === 'pending'"
+                    *ngIf="req.approverStepStatus === 'pending'"
                     (click)="openActionModal(req, 'Rejected')"
                   >
                     <i class="fas fa-times"></i>
@@ -274,7 +274,7 @@
                       >
                         <i class="fas fa-eye"></i>
                       </button>
-                      @if (req.rawStatus === 'pending') {
+                      @if (req.approverStepStatus === 'pending') {
                         <button
                           type="button"
                           class="act-btn act-approve"

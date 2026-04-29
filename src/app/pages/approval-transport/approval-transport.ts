@@ -261,8 +261,9 @@ export class ApprovalTransportComponent implements OnInit {
       claimStatus: claim.status,
       remark: claim.remark || '',
       amount: claim.totalAmount,
-      status: this.mapClaimStatus(claim.status),
+      status: this.mapClaimStatus(claim.approverStepStatus ?? claim.status),
       rawStatus: claim.status.toLowerCase(),
+      approverStepStatus: (claim.approverStepStatus ?? '').toLowerCase(),
       type: 'vehicle',
       originalData: {
         ...claim,

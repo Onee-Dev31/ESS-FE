@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="right">
-      <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
+      <div class="header-actions-group" *ngIf="(approvalItem.approverStepStatus ?? approvalItem.rawStatus) === 'pending'">
         @if (!isActionConfirm()) {
           <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
           <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
@@ -255,7 +255,7 @@
 
   @if (!isActionConfirm()) {
     <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
-      <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
+      <div class="header-actions-group" *ngIf="(approvalItem.approverStepStatus ?? approvalItem.rawStatus) === 'pending'">
         <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
         <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
       </div>
