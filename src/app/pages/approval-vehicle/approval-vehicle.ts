@@ -253,6 +253,7 @@ export class ApprovalVehicleComponent {
 
   // MAP
   private mapClaimToApproval(claim: any): ApprovalItem {
+    // console.log(claim);
     return {
       requestId: claim.claimID,
       requestNo: claim.voucherNo ?? `#${claim.claimID}`,
@@ -266,11 +267,11 @@ export class ApprovalVehicleComponent {
       requestType: 'ค่าเบี้ยเลี้ยง',
       typeId: claim.expenseTypeId,
       requestDetail: `${claim.expenseTypeName} — ${claim.diseaseName} (${claim.hospitalName})`,
-      claimStatus: claim.claimStatus,
+      claimStatus: claim.status,
       remark: claim.remark || '',
       amount: claim.totalAmount,
-      status: this.mapClaimStatus(claim.status),
-      rawStatus: claim.status.toLowerCase(),
+      status: this.mapClaimStatus(claim.approverStepStatus),
+      rawStatus: claim.approverStepStatus.toLowerCase(),
       type: 'vehicle',
       originalData: {
         ...claim,
