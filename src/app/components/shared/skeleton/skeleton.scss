@@ -88,3 +88,34 @@ $border: var(--border);
     border-radius: 16px;
   }
 }
+
+//------- FORM -------
+.skeleton-form {
+  padding: 0.5rem 0;
+}
+
+.skeleton-form-cards {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.skeleton-form-card {
+  flex: 1;
+  height: 96px;
+  border-radius: 10px;
+  background: var(--border-color);
+}
+
+.skeleton-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.skeleton-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}

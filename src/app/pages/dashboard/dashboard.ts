@@ -467,6 +467,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
+        this.router.navigate(['/welcome']);
         console.error('Error loading initial data', err);
       },
     });

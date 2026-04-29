@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 export class VehicleService {
   private baseUrl = environment.api_url;
   private ONEEJOB_url = environment.api_ONEEJOB_url;
+  FILE_BASE = environment.file_base_url;
 
   constructor(
     private _http: HttpClient,
@@ -84,5 +85,28 @@ export class VehicleService {
 
   deleteVehicleByEmpCode(id: string, empCode: string): Observable<any> {
     return this._http.delete(`${this.baseUrl}/transport-claim/${id}?employee_code=${empCode}`);
+  }
+
+  // NEW!!
+
+  getFileUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${this.FILE_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+  }
+  updateStatusClaim(claimId: number, body: any): Observable<any> {
+    console.log(claimId, body);
+    return this._http.patch<any>(`${this.baseUrl}/transport-claim/claims/${claimId}/review`, body);
+  }
+
+  getApprovals(approver_aduser: string, voucher_no?: string, status?: string): Observable<any> {
+    let p = new HttpParams().set('approver_aduser', approver_aduser);
+    if (voucher_no?.trim()) p = p.set('voucher_no', voucher_no.trim());
+    if (status?.trim()) p = p.set('status', status.trim());
+    return this._http.get<any>(`${this.baseUrl}/transport-claim/approvals`, { params: p });
+  }
+
+  getClaimById(claimId: number): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/transport-claim/claims/${claimId}`);
   }
 }

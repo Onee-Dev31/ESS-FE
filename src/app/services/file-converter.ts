@@ -62,7 +62,7 @@ export class FileConverterService {
   }
 
   buildPreviewFile(file: any) {
-    // console.log(file)
+    console.log(file);
     let url = file.fileUrl || file.filePath || file.url;
 
     if (!url) {

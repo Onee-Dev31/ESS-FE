@@ -26,6 +26,7 @@ import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { ApprovalAllowanceService } from '../../../services/approval-allowance';
 import { MedicalService } from '../../../services/medical.service';
+import { VehicleService } from '../../../services/vehicle.service';
 
 interface PreviewFile {
   fileName: string;
@@ -48,6 +49,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvelService = inject(ApprovalService);
   private medicalService = inject(MedicalService);
   private approvalAllowanceService = inject(ApprovalAllowanceService);
+  private vehicleService = inject(VehicleService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
@@ -72,12 +74,7 @@ export class ApprovalDetailModalComponent implements OnInit {
 
   medicalDetail = signal<any>(null);
   allowanceDetail = signal<any>(null);
-
-  // steps = [
-  //   { label: 'คำร้องใหม่', id: 1, icon: 'fas fa-user-check' },
-  //   { label: 'อยู่ระหว่างการอนุมัติ', id: 2, icon: 'fas fa-users-cog' },
-  //   { label: 'อนุมัติแล้ว', id: 3, icon: 'fa-solid fa-stamp' },
-  // ];
+  vehicleDetail = signal<any>(null);
 
   steps = computed(() => {
     const status = this.detailedStatus() || this.approvalItem.rawStatus;
@@ -144,26 +141,8 @@ export class ApprovalDetailModalComponent implements OnInit {
     }
   }
 
-  // groupedSteps = computed(() => {
-  //   const steps = this.allowanceDetail().approvalSteps;
-  //   const map = new Map<number, any[]>();
-
-  //   steps.forEach((s: any) => {
-  //     if (!map.has(s.step_no)) map.set(s.step_no, []);
-  //     map.get(s.step_no)!.push(s);
-  //   });
-
-  //   return Array.from(map.entries()).map(([stepNo, approvers]) => {
-  //     // step ที่มีหลายคน → เอาคนที่ approved ก่อน ถ้าไม่มีให้เป็น null
-  //     const approved = approvers.find((a) => a.status === 'approved');
-  //     const display = approvers.length > 1 ? (approved ?? null) : approvers[0];
-
-  //     return { stepNo, display };
-  //   });
-  // });
-
-  groupedSteps = computed(() => {
-    const steps = this.allowanceDetail().approvalSteps;
+  private buildGroupedSteps(steps: any[]) {
+    if (!steps?.length) return [];
     const map = new Map<number, any[]>();
 
     steps.forEach((s: any) => {
@@ -178,7 +157,34 @@ export class ApprovalDetailModalComponent implements OnInit {
 
       return { stepNo, approvers, acted };
     });
+  }
+
+  groupedSteps = computed(() => {
+    const type = this.approvalItem.type;
+
+    if (type === 'allowance') return this.buildGroupedSteps(this.allowanceDetail()?.approvalSteps);
+    if (type === 'vehicle') return this.buildGroupedSteps(this.vehicleDetail()?.approvalSteps);
+
+    return [];
   });
+  // groupedSteps = computed(() => {
+  //   const steps = this.allowanceDetail().approvalSteps;
+  //   const map = new Map<number, any[]>();
+
+  //   steps.forEach((s: any) => {
+  //     if (!map.has(s.step_no)) map.set(s.step_no, []);
+  //     map.get(s.step_no)!.push(s);
+  //   });
+
+  //   return Array.from(map.entries()).map(([stepNo, approvers]) => {
+  //     const approved = approvers.find((a) => a.status === 'approved');
+  //     const rejected = approvers.find((a) => a.status === 'rejected');
+  //     const acted = approved ?? rejected ?? null;
+
+  //     return { stepNo, approvers, acted };
+  //   });
+  // });
+
   /** โหลดข้อมูลรายละเอียดเพิ่มเติมตามประเภทของคำขอ */
   loadDetails() {
     const item = this.approvalItem;
@@ -191,9 +197,11 @@ export class ApprovalDetailModalComponent implements OnInit {
         this.loadMedicalDetail(item);
         break;
       case 'allowance':
+        this.loadAllowanceDetail(item);
+        break;
       case 'taxi':
       case 'vehicle':
-        this.loadAllowanceDetail(item); // logic คล้ายกัน ใช้ร่วมกันได้
+        this.loadVehicleDetail(item);
         break;
       default:
         this.loadFallbackDetail(item);
@@ -222,8 +230,25 @@ export class ApprovalDetailModalComponent implements OnInit {
 
     this.approvalAllowanceService.getClaimById(item.requestId).subscribe((res) => {
       if (!res) return;
-      console.log(res);
+      // console.log(res);
       this.allowanceDetail.set(res.data);
+    });
+
+    this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
+  }
+
+  private loadVehicleDetail(item: ApprovalItem) {
+    console.log('loadVehicleDetail', item);
+    const claim = item.originalData as any;
+    if (claim?.claimID == null) {
+      this.loadFallbackDetail(item);
+      return;
+    }
+
+    this.vehicleService.getClaimById(item.requestId).subscribe((res) => {
+      if (!res) return;
+      // console.log(res.data);
+      this.vehicleDetail.set(res.data);
     });
 
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
@@ -271,6 +296,9 @@ export class ApprovalDetailModalComponent implements OnInit {
       case 'allowance':
         this.updateAllowanceStatus(item, action, reason);
         break;
+      case 'vehicle':
+        this.updateVehicleStatus(item, action, reason);
+        break;
       default:
         this.updateStatus(item, action, reason); // fallback เดิม
     }
@@ -284,12 +312,10 @@ export class ApprovalDetailModalComponent implements OnInit {
   ) {
     console.log(item, newStatus, reason);
     // if (!item.type) return;
-
     // let statusCode = REQUEST_STATUS.WAITING_CHECK;
     // if (newStatus === 'Rejected') statusCode = REQUEST_STATUS.REJECTED;
     // else if (newStatus === 'Referred Back') statusCode = REQUEST_STATUS.REFERRED_BACK;
     // else if (newStatus === 'Approved') statusCode = REQUEST_STATUS.APPROVED;
-
     // const payload = {
     //   action: newStatus.toLowerCase(),
     //   reviewedBy: this.authService.userData().CODEMPID,
@@ -297,20 +323,16 @@ export class ApprovalDetailModalComponent implements OnInit {
     //     rejectionReason: reason?.trim() || '',
     //   }),
     // };
-
     // this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
     //   next: (res) => {
     //     if (!res?.success) {
     //       this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
     //       return;
     //     }
-
     //     this.swalService.success(res.message || 'บันทึกสำเร็จ');
     //   },
-
     //   error: (error) => {
     //     console.error('Approved Claim Error:', error);
-
     //     this.swalService.warning(
     //       'เกิดข้อผิดพลาด',
     //       error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
@@ -333,6 +355,23 @@ export class ApprovalDetailModalComponent implements OnInit {
     const payload = this.buildPayload(action, reason);
     // TODO: เปลี่ยนเป็น allowanceService จริง
     this.approvalAllowanceService.updateStatusClaim(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private updateVehicleStatus(item: ApprovalItem, action: string, reason?: string) {
+    const payload = {
+      action: action.toLowerCase(),
+      approver_aduser: this.authService.userData().CODEMPID,
+      ...(action.toLowerCase() === 'rejected' && {
+        remark: reason?.trim() || '',
+      }),
+    };
+
+    console.log('>>', item.requestId, payload);
+    // TODO: เปลี่ยนเป็น VehicleService จริง
+    this.vehicleService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
     });

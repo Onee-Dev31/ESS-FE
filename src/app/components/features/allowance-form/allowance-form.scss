@@ -831,3 +831,10 @@
     grid-template-columns: repeat(1, 1fr);
   }
 }
+
+.controls {
+  display: none;
+  @include large-tablet {
+    display: block;
+  }
+}

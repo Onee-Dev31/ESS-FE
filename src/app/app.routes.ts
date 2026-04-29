@@ -86,6 +86,15 @@ export const routes: Routes = [
         data: { category: 'medical', animation: 'ApprovalAllowance' },
       },
       {
+        path: 'approvals-velhicle',
+        loadComponent: () =>
+          import('./pages/approval-vehicle/approval-vehicle').then(
+            (m) => m.ApprovalVehicleComponent,
+          ),
+        canActivate: [menuGuard],
+        data: { category: 'medical', animation: 'ApprovalAllowance' },
+      },
+      {
         path: 'medicalexpenses',
         loadComponent: () =>
           import('./pages/medicalexpenses/medicalexpenses').then((m) => m.MedicalexpensesComponent),

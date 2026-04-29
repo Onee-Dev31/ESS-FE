@@ -15,56 +15,85 @@
   </header>
 
   <main class="content-card">
-    <section class="filter-controls" *ngIf="!MODE_EDIT">
-      <div class="month-selector">
-        <label>ประจำเดือน :</label>
-        <div class="inputs-row">
-          <select
-            [(ngModel)]="selectedMonthIndex"
-            (change)="generateCalendar()"
-            class="form-control"
-            title="เลือกเดือน"
-          >
-            @for (m of thaiMonths; track $index) {
-              <option [ngValue]="$index">{{ m }}</option>
-            }
-          </select>
-          <select
-            [(ngModel)]="selectedYearBE"
-            (change)="generateCalendar()"
-            class="form-control"
-            title="เลือกปี"
-          >
-            @for (y of years; track y) {
-              <option [ngValue]="y">{{ y }}</option>
-            }
-          </select>
-          <button type="button" class="btn-search" (click)="generateCalendar()">ค้นหาข้อมูล</button>
+    <div class="controls">
+      <!-- create -->
+      <section class="filter-controls" *ngIf="!MODE_EDIT">
+        <div class="month-selector">
+          <label>ประจำเดือน :</label>
+          <div class="inputs-row">
+            <select
+              [(ngModel)]="selectedMonthIndex"
+              (change)="generateCalendar()"
+              class="form-control"
+              title="เลือกเดือน"
+            >
+              @for (m of thaiMonths; track $index) {
+                <option [ngValue]="$index">{{ m }}</option>
+              }
+            </select>
+            <select
+              [(ngModel)]="selectedYearBE"
+              (change)="generateCalendar()"
+              class="form-control"
+              title="เลือกปี"
+            >
+              @for (y of years; track y) {
+                <option [ngValue]="y">{{ y }}</option>
+              }
+            </select>
+            <button type="button" class="btn-search" (click)="generateCalendar()">
+              ค้นหาข้อมูล
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
-    <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'New'">
-      <div class="alert-delete" *ngIf="isDelete()">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
-      </div>
+      </section>
+      <!-- update -->
+      <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'New'">
+        <div class="alert-delete" *ngIf="isDelete()">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+        </div>
 
-      <div class="display-order">
-        <div class="left">
-          <span class="keep"
+        <div class="display-order">
+          <div class="left">
+            <span class="keep"
+              ><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep() }} รายการ</span
+            >
+            <span class="delete"
+              ><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span
+            >
+          </div>
+          <div class="right">
+            <span
+              >ยอดรวม: <span class="total"> {{ totalClaims() }}</span></span
+            >
+          </div>
+        </div>
+      </section>
+      <!-- view only -->
+      <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'New'">
+        <div class="alert-delete" *ngIf="isDelete()">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
+        </div>
+
+        <div class="display-order">
+          <div class="left">
+            <!-- <span class="keep"
             ><i class="fa-solid fa-circle-check"></i> เก็บไว้ {{ isKeep() }} รายการ</span
           >
           <span class="delete"
             ><i class="fa-solid fa-circle-xmark"></i> ลบ {{ isDelete() }} รายการ</span
-          >
+          > -->
+          </div>
+          <div class="right">
+            <span
+              >ยอดรวม: <span class="total"> {{ totalClaims() }}</span></span
+            >
+          </div>
         </div>
-        <div class="right">
-          <span
-            >ยอดรวม: <span class="total"> {{ totalClaims() }}</span></span
-          >
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     @if (isPolicyPopupOpen()) {
       <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
@@ -200,9 +229,9 @@
           <tr class="footer-row">
             <td colspan="6" class="total-label">รวมยอดเบิกทั้งสิ้น</td>
             <td class="total-val text-center total-hours">
-              {{ totalHoursStr }}
+              {{ totalHour() }}
             </td>
-            <td class="total-val text-center">{{ totalAmount | number }}</td>
+            <td class="total-val text-center">{{ totalClaims() }}</td>
             <td class="bg-white"></td>
           </tr>
         </tfoot>

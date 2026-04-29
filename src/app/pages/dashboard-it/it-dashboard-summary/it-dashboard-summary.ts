@@ -597,12 +597,14 @@ export class ItDashboardSummary {
 
   private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
     const data = [...rows]
-      .sort((a, b) => b.value - a.value)
+      // .sort((a, b) => b.value - a.value)
       .slice(0, 5)
       .map((x) => ({
         name: x.label,
         value: x.value,
       }));
+
+    // console.log(rows, data);
 
     const labels = data.map((x) => x.name);
 
