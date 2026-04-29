@@ -112,7 +112,9 @@ export class AuthService {
   }
 
   generateQr(): Observable<{ qrToken: string; qrImage: string; expiresAt: string }> {
+    const frontendUrl = environment.frontend_url || window.location.origin;
     return this._http.get<any>(`${this.baseUrl}/auth/qr/generate`, {
+      params: { frontendUrl },
       context: new HttpContext().set(SKIP_AUTH, true),
     });
   }
