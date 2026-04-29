@@ -296,6 +296,9 @@ export class ApprovalDetailModalComponent implements OnInit {
       case 'allowance':
         this.updateAllowanceStatus(item, action, reason);
         break;
+      case 'vehicle':
+        this.updateVehicleStatus(item, action, reason);
+        break;
       default:
         this.updateStatus(item, action, reason); // fallback เดิม
     }
@@ -352,6 +355,23 @@ export class ApprovalDetailModalComponent implements OnInit {
     const payload = this.buildPayload(action, reason);
     // TODO: เปลี่ยนเป็น allowanceService จริง
     this.approvalAllowanceService.updateStatusClaim(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private updateVehicleStatus(item: ApprovalItem, action: string, reason?: string) {
+    const payload = {
+      action: action.toLowerCase(),
+      approver_aduser: this.authService.userData().CODEMPID,
+      ...(action.toLowerCase() === 'rejected' && {
+        remark: reason?.trim() || '',
+      }),
+    };
+
+    console.log('>>', item.requestId, payload);
+    // TODO: เปลี่ยนเป็น VehicleService จริง
+    this.vehicleService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
     });
