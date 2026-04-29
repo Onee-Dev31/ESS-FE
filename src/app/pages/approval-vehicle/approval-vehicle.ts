@@ -20,6 +20,7 @@ import { ApprovalAllowanceService } from '../../services/approval-allowance';
 import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { StatusUtil } from '../../utils/status.util';
 import { AuthService } from '../../services/auth.service';
+import { VehicleService } from '../../services/vehicle.service';
 
 @Component({
   selector: 'app-approval-vehicle',
@@ -41,7 +42,7 @@ export class ApprovalVehicleComponent {
   readonly pageTitle = signal('อนุมัติค่ารถ');
 
   dateUtil = inject(DateUtilityService);
-  private approvalAllowanceService = inject(ApprovalAllowanceService);
+  private vehicleService = inject(VehicleService);
   private exportService = inject(ExportService);
   private toastService = inject(ToastService);
   private loadingService = inject(LoadingService);
@@ -237,7 +238,7 @@ export class ApprovalVehicleComponent {
     this.previewFiles.set(
       claim.attachments.map((a: any) => ({
         fileName: a.fileName,
-        url: this.approvalAllowanceService.getFileUrl(a.fileUrl),
+        url: this.vehicleService.getFileUrl(a.fileUrl),
         date: claim.claimDate,
         type: a.fileType,
       })),
@@ -300,7 +301,7 @@ export class ApprovalVehicleComponent {
     } else {
       this.isRefreshing.set(true);
     }
-    this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
+    this.vehicleService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
         // console.log(res);
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
