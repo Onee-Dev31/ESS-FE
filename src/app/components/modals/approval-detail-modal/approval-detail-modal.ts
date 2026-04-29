@@ -25,6 +25,7 @@ import { SwalService } from '../../../services/swal.service';
 import { FileConverterService } from '../../../services/file-converter';
 import { DateUtilityService } from '../../../services/date-utility.service';
 import { ApprovalAllowanceService } from '../../../services/approval-allowance';
+import { ApprovalTransportService } from '../../../services/approval-transport.service';
 import { MedicalService } from '../../../services/medical.service';
 
 interface PreviewFile {
@@ -48,6 +49,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   private approvelService = inject(ApprovalService);
   private medicalService = inject(MedicalService);
   private approvalAllowanceService = inject(ApprovalAllowanceService);
+  private approvalTransportService = inject(ApprovalTransportService);
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private fileConverter = inject(FileConverterService);
@@ -163,7 +165,7 @@ export class ApprovalDetailModalComponent implements OnInit {
   // });
 
   groupedSteps = computed(() => {
-    const steps = this.allowanceDetail().approvalSteps;
+    const steps = this.allowanceDetail()?.approvalSteps ?? [];
     const map = new Map<number, any[]>();
 
     steps.forEach((s: any) => {
@@ -192,8 +194,10 @@ export class ApprovalDetailModalComponent implements OnInit {
         break;
       case 'allowance':
       case 'taxi':
+        this.loadAllowanceDetail(item);
+        break;
       case 'vehicle':
-        this.loadAllowanceDetail(item); // logic คล้ายกัน ใช้ร่วมกันได้
+        this.loadVehicleDetail(item);
         break;
       default:
         this.loadFallbackDetail(item);
@@ -226,6 +230,19 @@ export class ApprovalDetailModalComponent implements OnInit {
       this.allowanceDetail.set(res.data);
     });
 
+    this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
+  }
+
+  private loadVehicleDetail(item: ApprovalItem) {
+    const claim = item.originalData as any;
+    if (claim?.claimID == null) {
+      this.loadFallbackDetail(item);
+      return;
+    }
+    this.approvalTransportService.getClaimById(item.requestId).subscribe((res) => {
+      if (!res) return;
+      this.allowanceDetail.set(res.data);
+    });
     this.detailedStatus.set((item.claimStatus || item.rawStatus).toLowerCase());
   }
 
@@ -270,6 +287,9 @@ export class ApprovalDetailModalComponent implements OnInit {
         break;
       case 'allowance':
         this.updateAllowanceStatus(item, action, reason);
+        break;
+      case 'vehicle':
+        this.updateVehicleStatus(item, action, reason);
         break;
       default:
         this.updateStatus(item, action, reason); // fallback เดิม
@@ -324,6 +344,22 @@ export class ApprovalDetailModalComponent implements OnInit {
   private updateMedicalStatus(item: ApprovalItem, action: string, reason?: string) {
     const payload = this.buildPayload(action, reason);
     this.approvelService.updateTypeClaims(item.requestId, payload).subscribe({
+      next: (res) => this.handleResponse(res),
+      error: (err) => this.handleError(err),
+    });
+  }
+
+  private updateVehicleStatus(item: ApprovalItem, action: string, reason?: string) {
+    const actionKey =
+      action === 'Referred Back' ? 'referred_back' : action.toLowerCase();
+    const payload: any = {
+      approver_aduser: this.authService.currentUser(),
+      action: actionKey,
+    };
+    if (action !== 'Approved') {
+      payload.remark = reason?.trim() || '';
+    }
+    this.approvalTransportService.updateStatusClaim(item.requestId, payload).subscribe({
       next: (res) => this.handleResponse(res),
       error: (err) => this.handleError(err),
     });

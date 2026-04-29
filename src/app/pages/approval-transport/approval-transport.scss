@@ -1,0 +1,70 @@
+@use '../approval-allowance/approval-allowance' as *;
+
+// ────────────────────────────────────────────────
+// Transport-specific overrides
+// ────────────────────────────────────────────────
+
+.claim-route-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-header);
+  min-width: 0;
+
+  i {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.claim-route-more {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding-left: 22px;
+}
+
+.claim-remark {
+  padding: 6px 16px 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--bg-table-head);
+  border-top: 1px solid var(--border-toolbar);
+
+  i {
+    margin-right: 4px;
+    opacity: 0.7;
+  }
+}
+
+.route-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+// Referred Back button
+.act-btn.act-refer {
+  background: rgba(234, 179, 8, 0.12);
+  color: #b45309;
+
+  &:hover {
+    background: #f59e0b;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(234, 179, 8, 0.35);
+  }
+}
