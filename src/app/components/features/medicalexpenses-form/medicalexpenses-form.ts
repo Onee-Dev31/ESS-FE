@@ -174,9 +174,7 @@ export class MedicalexpensesForm implements OnInit, OnDestroy {
             : 'วงเงินคงเหลือไม่เพียงพอ')
       : undefined;
     const requiresEligibilityCheck =
-      !disabled &&
-      !hasBackendEligibility &&
-      (!!backendMessage || type.eligibleAfterProbation);
+      !disabled && !hasBackendEligibility && (!!backendMessage || type.eligibleAfterProbation);
     const helperText = disabled
       ? disabledReason
       : requiresEligibilityCheck
