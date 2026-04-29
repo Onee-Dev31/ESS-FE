@@ -202,9 +202,10 @@ export class ItService implements OnInit {
     this.Tickets.update((list) =>
       list.map((t) => (t.ticketId == ticketId ? { ...t, IT_Status: status, status } : t)),
     );
-    if (this.selectedTicket()?.ticketId == ticketId) {
-      this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
-    }
+    this.selectTicket(ticketId); //เพราะต้องเรียก progress ด้านขวา
+    // if (this.selectedTicket()?.ticketId == ticketId) {
+    //   this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
+    // }
   }
 
   /**
