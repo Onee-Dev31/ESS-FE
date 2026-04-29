@@ -15,6 +15,12 @@ export interface ClaimType {
   icon: string;
   color: string;
   group: 'outpatient' | 'inpatient';
+  disabled?: boolean;
+  disabledReason?: string;
+  helperText?: string;
+  ruleBadge?: string;
+  requiresEligibilityCheck?: boolean;
+  guidanceText?: string;
 }
 
 @Injectable({
