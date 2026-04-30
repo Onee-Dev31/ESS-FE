@@ -32,9 +32,9 @@
           nzSize="small"
         >
           <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
-          <nz-option nzValue="open" nzLabel="Open"></nz-option>
-          <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
           <nz-option nzValue="done" nzLabel="Closed"></nz-option>
+          <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+          <nz-option nzValue="open" nzLabel="Open"></nz-option>
           <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
           <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
         </nz-select>
@@ -247,6 +247,23 @@
     </div>
   </section>
 
+  <!-- NOTE FOR IT -->
+  <section
+    class="tk-card"
+    *ngIf="
+      allDataUserLogin.permission.Role.includes('it-staff') ||
+      allDataUserLogin.permission.Role.includes('system-admin')
+    "
+  >
+    <div class="tk-card__head">
+      <div class="tk-card__title"><i class="fa-solid fa-note-sticky"></i>Note for IT</div>
+      <div class="btn-edit"><i class="fa-solid fa-pen-to-square"></i></div>
+    </div>
+    <div class="tk-card__body">
+      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
+    </div>
+  </section>
+
   <!-- REASON [Denied] -->
   <section class="tk-card reason" *ngIf="t.status === 'Denied'">
     <div class="tk-card__head">
@@ -290,7 +307,7 @@
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title">Chat</div>
+      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
         class="btn-note-add"
         nz-button

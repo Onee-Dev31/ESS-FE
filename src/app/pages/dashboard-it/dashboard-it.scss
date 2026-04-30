@@ -911,6 +911,28 @@
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 
+  .btn-edit {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    color: var(--primary);
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+
+    &:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+  }
+
   @media (min-width: 1024px) and (max-width: 1440px) {
     padding: 6px 12px;
   }
@@ -919,6 +941,10 @@
 .tk-card__title {
   font-weight: 900;
   color: var(--text-header);
+
+  i {
+    padding-right: 20px;
+  }
 
   span {
     font-size: 0.8rem;

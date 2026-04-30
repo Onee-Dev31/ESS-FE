@@ -951,6 +951,10 @@ textarea.form-input {
   font-weight: 900;
   color: var(--text-header);
 
+  i {
+    padding-right: 20px;
+  }
+
   span {
     font-size: 0.8rem;
     font-weight: 600;
@@ -1002,6 +1006,14 @@ textarea.form-input {
   /* Firefox */
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+
+  .info-hint {
+    font-size: $font-size-hint;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 10px;
+    opacity: 0.8;
+  }
 
   @media (min-width: 1024px) and (max-width: 1440px) {
     padding: 6px 12px;

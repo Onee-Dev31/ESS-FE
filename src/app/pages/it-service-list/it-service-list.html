@@ -229,7 +229,7 @@
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title">Chat</div>
+      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
         style="border-radius: 10px"
         nz-button
@@ -245,7 +245,7 @@
       <div class="note-list" *ngIf="t.itNotes.length; else noNote">
         <div
           class="note"
-          *ngFor="let n of t.itNotes.slice().reverse(); let i = index"
+          *ngFor="let n of t.itNotes.slice(); let i = index"
           [class.note--me]="n.createBy.empCode === currentUserEmpCode"
           [class.note--new-highlight]="i === 0 && highlightedNoteTicketId() === t.ticketId"
         >
@@ -292,6 +292,10 @@
             </li>
           </ul>
         </div>
+      </div>
+      <div class="info-hint">
+        ให้บริการเฉพาะจันทร์ – ศุกร์ 09:00 – 18:00 น.
+        <div>หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์</div>
       </div>
       <ng-template #noNote>
         <div class="tk-empty">ยังไม่มีข้อความ</div>

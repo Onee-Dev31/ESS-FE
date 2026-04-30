@@ -78,6 +78,8 @@ import { SignalrService } from '../../services/signalr.service';
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
+  allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
   isTablet = false;
   isMobile = false;
   isSmallMobile = false;
@@ -291,6 +293,7 @@ export class DashboardIT implements OnInit {
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
+        noteForIt: ticket.noteForit || 'mock ไว้ก่อน',
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         priority: ticket.priority,
@@ -457,7 +460,6 @@ export class DashboardIT implements OnInit {
   }
 
   openAllAttachments(files: any) {
-    // console.log(files);
     this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
     this.isPreviewModalOpen.set(true);
   }
