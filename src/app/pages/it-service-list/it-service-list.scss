@@ -824,7 +824,7 @@ textarea.form-input {
   box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
   border: 1px solid rgba(15, 23, 42, 0.06);
   overflow: hidden;
-  height: 25%;
+  height: 35%;
 
   display: flex;
   flex-direction: column;
@@ -929,7 +929,7 @@ textarea.form-input {
 }
 
 .tk-card.note {
-  height: 55%;
+  height: 100%;
   width: 100%;
   padding: 0;
 }
@@ -1299,6 +1299,27 @@ textarea.form-input {
     p {
       margin: 0;
       font-weight: 600;
+    }
+  }
+
+  .side-cc {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid var(--border-color);
+
+    color: var(--text-muted);
+    font-size: $font-size-hint;
+
+    .cc-title {
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary);
+      }
+
+      &:active {
+        color: var(--primary);
+      }
     }
   }
 

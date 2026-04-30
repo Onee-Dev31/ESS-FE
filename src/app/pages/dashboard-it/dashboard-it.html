@@ -429,6 +429,18 @@
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
     </div>
+    <div class="side-cc">
+      <div class="cc-title">CC:</div>
+
+      <div class="cc-list">
+        @for (cc of t.ccList; track cc.id) {
+          <div class="cc-item">
+            {{ cc.name }}
+            <span class="cc-email">({{ cc.email }})</span>
+          </div>
+        }
+      </div>
+    </div>
   </section>
 
   <!-- Open For -->

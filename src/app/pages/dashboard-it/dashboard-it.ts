@@ -284,6 +284,7 @@ export class DashboardIT implements OnInit {
       const attachments = convertedFiles;
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
+      const ccList = res.ccList;
 
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
@@ -319,6 +320,7 @@ export class DashboardIT implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
+        ccList: ccList,
       };
       this.selectedTicket.set(objectData);
       this.scrollToBottom();

@@ -334,6 +334,10 @@
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
     </div>
+    <div class="side-cc" *ngIf="t.ccList.length > 0">
+      CC:
+      <span class="cc-title" (click)="openCcModal()">{{ t.ccList.length }} คน</span>
+    </div>
   </section>
 
   <!-- Open For -->
@@ -481,4 +485,8 @@
 @if (isPreviewModalOpen()) {
   <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
   </app-file-preview-modal>
+}
+
+@if (isCcModalVisible) {
+  <app-cc-modal [ticket]="selectedTicket()" (closeModal)="handleCancel()"> </app-cc-modal>
 }
