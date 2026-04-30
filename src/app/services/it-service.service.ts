@@ -309,4 +309,12 @@ export class ItServiceService {
       params: role ? { readerCodeempid, role } : { readerCodeempid },
     });
   }
+
+  searchEmployees(params: { search?: string; page?: number; pageSize?: number }): Observable<any> {
+    let httpParams = new HttpParams();
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.page) httpParams = httpParams.set('page', String(params.page));
+    if (params.pageSize) httpParams = httpParams.set('pageSize', String(params.pageSize));
+    return this._http.get(`${this.baseUrl}/master/employees`, { params: httpParams });
+  }
 }

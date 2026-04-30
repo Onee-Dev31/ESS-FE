@@ -69,41 +69,6 @@
       </div>
     </div>
 
-    <!-- Field: รายละเอียด -->
-    <div class="form-field-row">
-      <div class="field-label-col">
-        <label class="field-label">
-          <i class="fas fa-align-left field-icon"></i>
-          รายละเอียดปัญหา
-          <span class="required-badge">*</span>
-        </label>
-      </div>
-      <div class="field-input-col">
-        <!-- Selected category chips (appear inside box) -->
-        @if (problemFormData().categories.length > 0) {
-          <div class="selected-chips-bar">
-            @for (cat of problemFormData().categories; track cat.id) {
-              <span class="selected-chip">
-                <i class="fas fa-tag chip-icon"></i>
-                {{ cat.sub_category_name }}
-                <button type="button" class="chip-remove" (click)="toggleCategory(cat)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </span>
-            }
-          </div>
-        }
-        <textarea
-          [ngModel]="problemFormData().detail"
-          (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
-          class="styled-input styled-textarea"
-          [class.textarea-with-chips]="problemFormData().categories.length > 0"
-          rows="5"
-          placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
-        ></textarea>
-      </div>
-    </div>
-
     <!-- Field: หมวดหมู่ -->
     <div class="form-field-row">
       <div class="field-label-col">
@@ -112,7 +77,7 @@
           หมวดหมู่ปัญหา
           <span class="required-badge">*</span>
         </label>
-        <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p>
+        <!-- <p class="field-hint">กดเพื่อเพิ่มหมวดหมู่เข้าในช่องรายละเอียด</p> -->
       </div>
       <div class="field-input-col">
         <div class="category-tags">
@@ -128,6 +93,27 @@
             </button>
           }
         </div>
+      </div>
+    </div>
+
+    <!-- Field: รายละเอียด -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-align-left field-icon"></i>
+          รายละเอียดปัญหา
+          <span class="required-badge">*</span>
+        </label>
+      </div>
+      <div class="field-input-col">
+        <textarea
+          [ngModel]="problemFormData().detail"
+          (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
+          class="styled-input"
+          [class.textarea-with-chips]="problemFormData().categories.length > 0"
+          rows="5"
+          placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
+        ></textarea>
       </div>
     </div>
 
@@ -174,6 +160,40 @@
       </div>
     </div>
 
+    <!-- Field: CC -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fa-solid fa-closed-captioning field-icon"></i>
+          ผู้รับสำเนา
+        </label>
+      </div>
+      <div class="field-input-col select">
+        <nz-select
+          nzMode="multiple"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="ค้นหาพนักงาน..."
+          [nzFilterOption]="nzFilterOption"
+          [ngModel]="ccSelected()"
+          (ngModelChange)="ccSelected.set($event)"
+          (nzOnSearch)="onCcSearch($event)"
+          [nzNotFoundContent]="ccNotFound"
+        >
+          @for (opt of ccOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+          <ng-template #ccNotFound>
+            @if (ccSearched()) {
+              <span>ไม่พบข้อมูล</span>
+            } @else {
+              <span>พิมพ์เพื่อค้นหาพนักงาน</span>
+            }
+          </ng-template>
+        </nz-select>
+      </div>
+    </div>
+
     <!-- Field: เบอร์โทรติดต่อ -->
     <div class="form-field-row">
       <div class="field-label-col">
@@ -188,9 +208,13 @@
           type="text"
           [value]="phoneModel"
           (input)="onPhoneInput($event)"
+          [class.input-error]="phoneError"
           class="styled-input"
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
+        @if (phoneError) {
+          <span class="error-text">{{ phoneError }}</span>
+        }
       </div>
     </div>
 

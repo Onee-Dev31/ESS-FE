@@ -1296,6 +1296,10 @@ $table-label-bg: var(--border-toolbar);
         color: var(--text-muted);
         width: 14px;
         text-align: center;
+
+        &.fa-closed-captioning {
+          font-size: $font-size-body;
+        }
       }
 
       .required-badge {
@@ -1318,6 +1322,17 @@ $table-label-bg: var(--border-toolbar);
         border: 1.5px solid var(--border);
         border-radius: 10px;
         padding: 5px 10px 5px 10px;
+      }
+
+      .input-error {
+        border-color: #ff4d4f;
+      }
+
+      .error-text {
+        color: #ff4d4f;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
       }
     }
   }
@@ -1635,11 +1650,6 @@ $table-label-bg: var(--border-toolbar);
         color: var(--danger);
       }
     }
-  }
-
-  .styled-textarea.textarea-with-chips {
-    border-top: none;
-    border-radius: 0 0 10px 10px;
   }
 
   @keyframes fadeIn {
