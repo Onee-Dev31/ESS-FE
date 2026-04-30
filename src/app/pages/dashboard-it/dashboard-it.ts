@@ -52,6 +52,7 @@ import { FileConverterService } from '../../services/file-converter';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
+import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -75,6 +76,7 @@ import { CcModal } from './modal/cc-modal/cc-modal';
     ServicesDetailModal,
     NzCheckboxModule,
     CcModal,
+    NoteForItModal,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -144,6 +146,8 @@ export class DashboardIT implements OnInit {
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
   IS_ASSIGN_TICKET = signal(false);
+  IS_NOTEFORIT_TICKET = signal(false);
+  isCcModalVisible = false;
 
   keyword = '';
   TicketStatus: any;
@@ -154,8 +158,6 @@ export class DashboardIT implements OnInit {
   // isAssignModalVisible = false;
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: any[] = [];
-
-  isCcModalVisible = false;
 
   constructor(
     private msg: NzMessageService,
@@ -277,7 +279,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -298,7 +300,7 @@ export class DashboardIT implements OnInit {
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
-        noteForIt: ticket.noteForit || 'mock ไว้ก่อน',
+        noteForIt: ticket.noteForIt || 'mock ไว้ก่อน',
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         priority: ticket.priority,
@@ -324,7 +326,7 @@ export class DashboardIT implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
-        ccList: ccList,
+        ccList: ccList || [],
       };
       this.selectedTicket.set(objectData);
       this.scrollToBottom();
@@ -1132,5 +1134,49 @@ export class DashboardIT implements OnInit {
         a.aduser === this.authService.userData().AD_USER ||
         a.codeempid === this.authService.userData().CODEMPID,
     );
+  }
+
+  // -- note for IT --
+  openNoteForItModal() {
+    console.log(this.IS_NOTEFORIT_TICKET());
+    this.IS_NOTEFORIT_TICKET.set(true);
+  }
+
+  closeNoteForItModal() {
+    this.IS_NOTEFORIT_TICKET.set(false);
+  }
+
+  submitNoteForIt(data: any) {
+    const payload = {
+      note: data.message,
+      updatedBy: this.authService.userData()?.CODEMPID ?? '',
+      role: 'it-staff',
+    };
+
+    this.itServiceService.updateNoteForIt(data.id, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+        this.swalService.close();
+        this.IS_NOTEFORIT_TICKET.set(false);
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+      },
+
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 }

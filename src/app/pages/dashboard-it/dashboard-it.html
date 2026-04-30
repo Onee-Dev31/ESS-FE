@@ -257,7 +257,9 @@
   >
     <div class="tk-card__head">
       <div class="tk-card__title"><i class="fa-solid fa-note-sticky"></i>Note for IT</div>
-      <div class="btn-edit"><i class="fa-solid fa-pen-to-square"></i></div>
+      <div class="btn-edit" (click)="openNoteForItModal()">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </div>
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
@@ -653,4 +655,12 @@
 @if (isCcModalVisible) {
   <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
   </app-cc-modal>
+}
+
+@if (IS_NOTEFORIT_TICKET()) {
+  <app-note-for-it-modal
+    [ticket]="selectedTicket()"
+    (closeModal)="closeNoteForItModal()"
+    (submitModal)="submitNoteForIt($event)"
+  ></app-note-for-it-modal>
 }

@@ -317,4 +317,8 @@ export class ItServiceService {
     if (params.pageSize) httpParams = httpParams.set('pageSize', String(params.pageSize));
     return this._http.get(`${this.baseUrl}/master/employees`, { params: httpParams });
   }
+
+  updateNoteForIt(ticketId: string, payload: any): Observable<any> {
+    return this._http.put<any>(`${this.baseUrl}/tickets/${ticketId}/note-for-it `, payload);
+  }
 }
