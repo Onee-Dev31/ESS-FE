@@ -530,6 +530,12 @@ export class ItService implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
+  openAllAttachments(files: any) {
+    // console.log(files);
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
+    this.isPreviewModalOpen.set(true);
+  }
+
   buildTimeline(timelines: any[], assignees: any[]) {
     return timelines.map((t) => {
       const assigneeList = assignees

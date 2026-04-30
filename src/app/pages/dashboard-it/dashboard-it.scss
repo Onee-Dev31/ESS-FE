@@ -919,6 +919,24 @@
 .tk-card__title {
   font-weight: 900;
   color: var(--text-header);
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    transition:
+      background 0.2s,
+      color 0.2s;
+
+    &:hover {
+      color: color-mix(in srgb, var(--primary), var(--text) 30%);
+    }
+  }
 }
 
 .services {

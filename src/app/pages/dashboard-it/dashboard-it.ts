@@ -8,6 +8,8 @@ import {
   untracked,
   HostListener,
   DestroyRef,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY } from 'rxjs';
@@ -80,6 +82,8 @@ export class DashboardIT implements OnInit {
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+
+  @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
 
   @HostListener('window:resize')
   onResize() {
@@ -314,6 +318,7 @@ export class DashboardIT implements OnInit {
         rejection_reason: ticket.rejection_reason,
       };
       this.selectedTicket.set(objectData);
+      this.scrollToBottom();
 
       // console.log(objectData);
 
@@ -451,6 +456,12 @@ export class DashboardIT implements OnInit {
     this.isPreviewModalOpen.set(true);
   }
 
+  openAllAttachments(files: any) {
+    // console.log(files);
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
+    this.isPreviewModalOpen.set(true);
+  }
+
   closePreview() {
     this.isPreviewModalOpen.set(false);
   }
@@ -511,7 +522,15 @@ export class DashboardIT implements OnInit {
       }),
     );
 
+    console.log(notes);
     return notes;
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      const el = this.cardBodyEl?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
   }
 
   isPreviewable(fileName: string): boolean {

@@ -153,7 +153,12 @@
   <!-- DETAILS -->
   <section class="tk-card">
     <div class="tk-card__head">
-      <div class="tk-card__title">รายละเอียด</div>
+      <div class="tk-card__title">
+        รายละเอียด
+        <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
+          ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
+        >
+      </div>
       <div class="services">
         @for (
           service of t.services.slice(0, isSmallMobile ? 1 : isMobile ? 2 : 3);
@@ -190,7 +195,7 @@
   </section>
 
   <!-- ATTACHMENTS -->
-  <section class="tk-card">
+  <!-- <section class="tk-card">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
       <div *ngIf="t.status === 'Waiting you'">
@@ -219,7 +224,7 @@
         <p class="text-muted">ไม่มีเอกสารแนบ</p>
       </ng-template>
     </div>
-  </section>
+  </section> -->
 
   <!-- NOTES -->
   <section class="tk-card note">
