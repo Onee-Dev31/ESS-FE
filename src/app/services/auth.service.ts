@@ -112,9 +112,15 @@ export class AuthService {
   }
 
   generateQr(): Observable<{ qrToken: string; qrImage: string; expiresAt: string }> {
-    return this._http.get<any>(`${this.baseUrl}/auth/qr/generate`, {
-      context: new HttpContext().set(SKIP_AUTH, true),
-    });
+    const isLocalhost = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+    const envUrl = (environment.frontend_url || '').trim();
+    const frontendBaseUrl = isLocalhost && envUrl ? envUrl : window.location.origin;
+
+    return this._http.post<any>(
+      `${this.baseUrl}/auth/qr/generate`,
+      { frontendBaseUrl },
+      { context: new HttpContext().set(SKIP_AUTH, true) },
+    );
   }
 
   getQrStatus(qrToken: string): Observable<{ status: string; [key: string]: any }> {
