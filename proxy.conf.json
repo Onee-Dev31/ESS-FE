@@ -1,4 +1,17 @@
 {
+  "/api": {
+    "target": "http://localhost:5258",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/notificationHub": {
+    "target": "http://localhost:5258",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "logLevel": "debug"
+  },
   "/uploads": {
     "target": "http://10.31.1.85:5259",
     "secure": false,
