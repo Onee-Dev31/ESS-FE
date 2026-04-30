@@ -38,7 +38,9 @@ import { FileConverterService } from '../../services/file-converter';
 import { SignalrService } from '../../services/signalr.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY } from 'rxjs';
-
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -52,6 +54,9 @@ import { EMPTY } from 'rxjs';
     NzButtonModule,
     NoteModal,
     ServicesDetailModal,
+    NzTooltipModule,
+    NzModalModule,
+    CcModal,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
@@ -222,6 +227,7 @@ export class ItService implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -233,6 +239,7 @@ export class ItService implements OnInit {
       const attachments = convertedFiles;
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
+      const ccList = res.ccList;
       this.desNew = ticket.description;
 
       const itNotes = await this.buildItNotes(replies, replyAttachments);
@@ -272,6 +279,7 @@ export class ItService implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
+        ccList: ccList,
       };
 
       // console.log(objectData);
@@ -530,6 +538,12 @@ export class ItService implements OnInit {
     this.isPreviewModalOpen.set(false);
   }
 
+  openAllAttachments(files: any) {
+    // console.log(files);
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
+    this.isPreviewModalOpen.set(true);
+  }
+
   buildTimeline(timelines: any[], assignees: any[]) {
     return timelines.map((t) => {
       const assigneeList = assignees
@@ -756,5 +770,15 @@ export class ItService implements OnInit {
         },
       });
     });
+  }
+
+  isCcModalVisible = false;
+
+  openCcModal(): void {
+    this.isCcModalVisible = true;
+  }
+
+  handleCancel(): void {
+    this.isCcModalVisible = false;
   }
 }

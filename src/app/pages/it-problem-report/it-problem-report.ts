@@ -59,6 +59,7 @@ export class ItProblemReportComponent implements OnInit {
     attachments: [] as { name: string; size?: number; file: File }[],
   });
   phoneModel = '';
+  phoneError = '';
 
   // MASTER
   availableCategories: any[] = [];
@@ -68,15 +69,40 @@ export class ItProblemReportComponent implements OnInit {
   // CONDITION
   @Input() openBy!: string;
 
+  // CC
+  ccSelected = signal<string[]>([]);
+  ccOptions = signal<{ label: string; value: string }[]>([]);
+  readonly nzFilterOption = () => true;
+  ccSearched = signal<boolean>(false);
+
   ngOnInit() {
     this.getSubProblem();
     this.getOpenFor();
-    const userData = this.authService.userData();
-    if (userData?.USR_MOBILE) {
-      const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
-      this.phoneModel = formatted;
-      this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
+    // const userData = this.authService.userData();
+    // if (userData?.USR_MOBILE) {
+    //   const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
+    //   this.phoneModel = formatted;
+    //   this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
+    // }
+  }
+
+  onCcSearch(search: string) {
+    if (!search?.trim()) {
+      this.ccOptions.set([]);
+      this.ccSearched.set(false);
+      return;
     }
+    this.ccSearched.set(true);
+    this.itServiceService.searchEmployees({ search, pageSize: 20 }).subscribe({
+      next: (res) => {
+        this.ccOptions.set(
+          (res.data || []).map((e: any) => ({
+            label: `${e.FullNameThai || e.FullNameEng || e.FullName || e.fullname || e.name || '-'} (${e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '-'})`,
+            value: e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '',
+          })),
+        );
+      },
+    });
   }
 
   onPhoneInput(event: Event) {
@@ -87,6 +113,15 @@ export class ItProblemReportComponent implements OnInit {
     input.value = formatted;
     this.phoneModel = formatted;
     this.problemFormData.update((data) => ({ ...data, phoneNumber: this.phoneModel }));
+
+    const len = digitsOnly.length;
+    if (len === 0) {
+      this.phoneError = '';
+    } else if (len !== 4 && len !== 10) {
+      this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
+    } else {
+      this.phoneError = '';
+    }
   }
 
   onPhoneNumberChange(value: string) {
@@ -100,7 +135,8 @@ export class ItProblemReportComponent implements OnInit {
       topic.trim().length > 0 &&
       detail.trim().length > 0 &&
       categories.length > 0 &&
-      phoneNumber !== ''
+      phoneNumber !== '' &&
+      !this.phoneError
     );
   });
 
@@ -256,6 +292,11 @@ export class ItProblemReportComponent implements OnInit {
       formData.append('openForCodeempid', this.selectedOpenFor());
     }
     formData.append('ticketTypeId', '2');
+
+    const cc = this.ccSelected();
+    if (cc.length > 0) {
+      formData.append('CcCodeEmpIdsJson', JSON.stringify(cc));
+    }
 
     data.attachments.forEach((item: any) => {
       if (item?.file instanceof File) {

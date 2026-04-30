@@ -153,7 +153,12 @@
   <!-- DETAILS -->
   <section class="tk-card">
     <div class="tk-card__head">
-      <div class="tk-card__title">รายละเอียด</div>
+      <div class="tk-card__title">
+        รายละเอียด
+        <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
+          ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
+        >
+      </div>
       <div class="services">
         @for (
           service of t.services.slice(0, isSmallMobile ? 1 : isMobile ? 2 : 3);
@@ -190,7 +195,7 @@
   </section>
 
   <!-- ATTACHMENTS -->
-  <section class="tk-card">
+  <!-- <section class="tk-card">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
       <div *ngIf="t.status === 'Waiting you'">
@@ -219,12 +224,12 @@
         <p class="text-muted">ไม่มีเอกสารแนบ</p>
       </ng-template>
     </div>
-  </section>
+  </section> -->
 
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title">Chat</div>
+      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
         style="border-radius: 10px"
         nz-button
@@ -240,7 +245,7 @@
       <div class="note-list" *ngIf="t.itNotes.length; else noNote">
         <div
           class="note"
-          *ngFor="let n of t.itNotes.slice().reverse(); let i = index"
+          *ngFor="let n of t.itNotes.slice(); let i = index"
           [class.note--me]="n.createBy.empCode === currentUserEmpCode"
           [class.note--new-highlight]="i === 0 && highlightedNoteTicketId() === t.ticketId"
         >
@@ -288,6 +293,10 @@
           </ul>
         </div>
       </div>
+      <div class="info-hint">
+        เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น.
+        <div>หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์</div>
+      </div>
       <ng-template #noNote>
         <div class="tk-empty">ยังไม่มีข้อความ</div>
       </ng-template>
@@ -324,6 +333,10 @@
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
+    </div>
+    <div class="side-cc" *ngIf="t.ccList.length > 0">
+      CC:
+      <span class="cc-title" (click)="openCcModal()">{{ t.ccList.length }} คน</span>
     </div>
   </section>
 
@@ -472,4 +485,8 @@
 @if (isPreviewModalOpen()) {
   <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
   </app-file-preview-modal>
+}
+
+@if (isCcModalVisible) {
+  <app-cc-modal [ticket]="selectedTicket()" (closeModal)="handleCancel()"> </app-cc-modal>
 }

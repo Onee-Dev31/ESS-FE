@@ -8,6 +8,8 @@ import {
   untracked,
   HostListener,
   DestroyRef,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY } from 'rxjs';
@@ -49,6 +51,8 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
+import { CcModal } from './modal/cc-modal/cc-modal';
+import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -71,15 +75,21 @@ import { SignalrService } from '../../services/signalr.service';
     NoteModal,
     ServicesDetailModal,
     NzCheckboxModule,
+    CcModal,
+    NoteForItModal,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
 })
 export class DashboardIT implements OnInit {
+  allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
   isTablet = false;
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+
+  @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
 
   @HostListener('window:resize')
   onResize() {
@@ -136,6 +146,8 @@ export class DashboardIT implements OnInit {
   IS_ACKNOWLEDGE_TICKET = signal(false);
   IS_NOTE_TICKET = signal(false);
   IS_ASSIGN_TICKET = signal(false);
+  IS_NOTEFORIT_TICKET = signal(false);
+  isCcModalVisible = false;
 
   keyword = '';
   TicketStatus: any;
@@ -267,7 +279,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -278,6 +290,7 @@ export class DashboardIT implements OnInit {
       const attachments = convertedFiles;
       const assignGroups = res.assignGroups;
       const assignments = res.assignments;
+      const ccList = res.ccList;
 
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
@@ -287,6 +300,7 @@ export class DashboardIT implements OnInit {
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
+        noteForIt: ticket.noteForIt || 'mock ไว้ก่อน',
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         priority: ticket.priority,
@@ -312,8 +326,10 @@ export class DashboardIT implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.emp_code ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
+        ccList: ccList || [],
       };
       this.selectedTicket.set(objectData);
+      this.scrollToBottom();
 
       // console.log(objectData);
 
@@ -427,6 +443,14 @@ export class DashboardIT implements OnInit {
     }
   }
 
+  openCcModal(): void {
+    this.isCcModalVisible = true;
+  }
+
+  handleCancel(): void {
+    this.isCcModalVisible = false;
+  }
+
   // FUNCTION
 
   isToday(dateValue: string | Date): boolean {
@@ -448,6 +472,11 @@ export class DashboardIT implements OnInit {
 
   viewFile(file: any) {
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  openAllAttachments(files: any) {
+    this.previewFiles.set(this.fileConverter.buildPreviewFiles(files));
     this.isPreviewModalOpen.set(true);
   }
 
@@ -511,7 +540,15 @@ export class DashboardIT implements OnInit {
       }),
     );
 
+    console.log(notes);
     return notes;
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      const el = this.cardBodyEl?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
   }
 
   isPreviewable(fileName: string): boolean {
@@ -1097,5 +1134,49 @@ export class DashboardIT implements OnInit {
         a.aduser === this.authService.userData().AD_USER ||
         a.codeempid === this.authService.userData().CODEMPID,
     );
+  }
+
+  // -- note for IT --
+  openNoteForItModal() {
+    console.log(this.IS_NOTEFORIT_TICKET());
+    this.IS_NOTEFORIT_TICKET.set(true);
+  }
+
+  closeNoteForItModal() {
+    this.IS_NOTEFORIT_TICKET.set(false);
+  }
+
+  submitNoteForIt(data: any) {
+    const payload = {
+      note: data.message,
+      updatedBy: this.authService.userData()?.CODEMPID ?? '',
+      role: 'it-staff',
+    };
+
+    this.itServiceService.updateNoteForIt(data.id, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+        this.swalService.close();
+        this.IS_NOTEFORIT_TICKET.set(false);
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+
+        this.selectTicket(data.id);
+        this.getAllTickets();
+      },
+
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 }

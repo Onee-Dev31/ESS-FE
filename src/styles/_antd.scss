@@ -74,6 +74,16 @@
   color: var(--input-text);
 }
 
+// select-multiple
+.ant-select-multiple.ant-select .ant-select-selection-item {
+  height: 28px;
+  background: transparent;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
 /*
   ANTD : PICKER
 */

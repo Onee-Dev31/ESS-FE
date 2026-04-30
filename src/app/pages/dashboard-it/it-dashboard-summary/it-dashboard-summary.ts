@@ -52,20 +52,20 @@ export class ItDashboardSummary {
   selectedStatus: string = 'all';
   kpis: KpiCard[] = [
     {
-      status: 'Open',
-      title: 'Open tickets',
+      status: 'All',
+      title: 'All Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-      icon: 'inbox',
+      hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'appstore',
     },
     {
-      status: 'Assigned',
-      title: 'Assigned Tickets',
+      status: 'Closed',
+      title: 'Closed Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
+      hint: 'Tickets ที่ปิดแล้ว',
+      icon: 'check-circle',
     },
     // {
     //   status: 'In Progress',
@@ -76,13 +76,22 @@ export class ItDashboardSummary {
     //   icon: 'sync',
     // },
     {
-      status: 'Closed',
-      title: 'Closed Tickets',
+      status: 'Assigned',
+      title: 'Assigned Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ปิดแล้ว',
-      icon: 'check-circle',
+      hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'user',
     },
+    {
+      status: 'Open',
+      title: 'Open tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+      icon: 'inbox',
+    },
+
     {
       status: 'Hold',
       title: 'Hold Tickets',
@@ -98,14 +107,6 @@ export class ItDashboardSummary {
       delta: 0,
       hint: 'Tickets ที่ถูกปฏิเสธ',
       icon: 'stop',
-    },
-    {
-      status: 'All',
-      title: 'All Tickets',
-      value: 0,
-      delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
     },
   ];
   showDeptBar = false;
@@ -167,13 +168,22 @@ export class ItDashboardSummary {
   private updateKpis(summary: any) {
     this.kpis = [
       {
-        status: 'open',
-        title: 'Open tickets',
-        value: summary.open ?? 0,
+        status: 'all',
+        title: 'All Tickets',
+        value: summary.all ?? 0,
         delta: 0,
-        hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-        icon: 'inbox',
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'appstore',
       },
+      {
+        status: 'done',
+        title: 'Closed Tickets',
+        value: summary.closed ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ปิดแล้ว',
+        icon: 'check-circle',
+      },
+
       {
         status: 'assigned',
         title: 'Assigned Tickets (In progress)',
@@ -181,6 +191,14 @@ export class ItDashboardSummary {
         delta: 0,
         hint: 'Tickets ที่ได้รับมอบหมาย',
         icon: 'user',
+      },
+      {
+        status: 'open',
+        title: 'Open tickets',
+        value: summary.open ?? 0,
+        delta: 0,
+        hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+        icon: 'inbox',
       },
       // {
       //   status: 'inprogress',
@@ -190,14 +208,7 @@ export class ItDashboardSummary {
       //   hint: 'Tickets ที่กำลังดำเนินการ',
       //   icon: 'sync',
       // },
-      {
-        status: 'done',
-        title: 'Closed Tickets',
-        value: summary.closed ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
-      },
+
       {
         status: 'hold',
         title: 'Hold Tickets',
@@ -214,24 +225,16 @@ export class ItDashboardSummary {
         hint: 'Tickets ที่ถูกปฏิเสธ',
         icon: 'stop',
       },
-      {
-        status: 'all',
-        title: 'All Tickets',
-        value: summary.all ?? 0,
-        delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
-      },
     ];
   }
   private buildStatusPie(summary: any) {
     const data: PieDatum[] = [
-      { name: 'Open', value: summary.open ?? 0, key: 'open' },
-      { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
-      // { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
-      { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
+      { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
+      { name: 'Open', value: summary.open ?? 0, key: 'open' },
+      // { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Hold', value: summary.hold ?? 0, key: 'hold' },
+      { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
     ];
 
     const total = data.reduce((s, x) => s + x.value, 0);

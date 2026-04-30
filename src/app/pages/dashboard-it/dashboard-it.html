@@ -32,9 +32,9 @@
           nzSize="small"
         >
           <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
-          <nz-option nzValue="open" nzLabel="Open"></nz-option>
-          <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
           <nz-option nzValue="done" nzLabel="Closed"></nz-option>
+          <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
+          <nz-option nzValue="open" nzLabel="Open"></nz-option>
           <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
           <nz-option nzValue="denied" nzLabel="Deny"></nz-option>
         </nz-select>
@@ -224,7 +224,12 @@
   <!-- DETAILS -->
   <section class="tk-card">
     <div class="tk-card__head">
-      <div class="tk-card__title">รายละเอียด</div>
+      <div class="tk-card__title">
+        รายละเอียด
+        <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
+          ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
+        >
+      </div>
       <div class="services">
         @for (
           service of t.services.slice(0, isSmallMobile ? 1 : isMobile ? 2 : 3);
@@ -239,6 +244,25 @@
     </div>
     <div class="tk-card__body">
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
+    </div>
+  </section>
+
+  <!-- NOTE FOR IT -->
+  <section
+    class="tk-card"
+    *ngIf="
+      allDataUserLogin.permission.Role.includes('it-staff') ||
+      allDataUserLogin.permission.Role.includes('system-admin')
+    "
+  >
+    <div class="tk-card__head">
+      <div class="tk-card__title"><i class="fa-solid fa-note-sticky"></i>Note for IT</div>
+      <div class="btn-edit" (click)="openNoteForItModal()">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </div>
+    </div>
+    <div class="tk-card__body">
+      <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.noteForIt)"></div>
     </div>
   </section>
 
@@ -258,17 +282,11 @@
   </section>
 
   <!-- ATTACHMENTS -->
-  <section class="tk-card">
+  <!-- <section class="tk-card">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
     </div>
     <div class="tk-card__body">
-      <!-- <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
-        <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
-          <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-          <span class="file-name">{{ file.name }}</span>
-        </li>
-      </ul> -->
       <ul class="attachment-list" *ngIf="t.attachments.length > 0; else noAttachments">
         <li
           *ngFor="let file of t.attachments"
@@ -286,12 +304,12 @@
         <p class="text-muted">ไม่มีเอกสารแนบ</p>
       </ng-template>
     </div>
-  </section>
+  </section> -->
 
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title">Chat</div>
+      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
         class="btn-note-add"
         nz-button
@@ -303,11 +321,11 @@
         เพิ่มข้อความ
       </button>
     </div>
-    <div class="tk-card__body">
+    <div class="tk-card__body" #cardBody>
       <div class="note-list" *ngIf="t.itNotes.length; else noNote">
         <div
           class="note"
-          *ngFor="let n of t.itNotes.slice().reverse()"
+          *ngFor="let n of t.itNotes.slice()"
           [class.note--me]="n.createBy.empCode === currentUserEmpCode"
           [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
         >
@@ -412,6 +430,10 @@
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
+    </div>
+    <div class="side-cc" *ngIf="t.ccList.length > 0">
+      CC:
+      <span class="cc-title" (click)="openCcModal()">{{ t.ccList.length }} คน</span>
     </div>
   </section>
 
@@ -628,4 +650,17 @@
     <i class="fas fa-bell"></i>
     มี {{ newTicketCount() }} Ticket ใหม่ — คลิกเพื่อโหลด
   </div>
+}
+
+@if (isCcModalVisible) {
+  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
+  </app-cc-modal>
+}
+
+@if (IS_NOTEFORIT_TICKET()) {
+  <app-note-for-it-modal
+    [ticket]="selectedTicket()"
+    (closeModal)="closeNoteForItModal()"
+    (submitModal)="submitNoteForIt($event)"
+  ></app-note-for-it-modal>
 }
