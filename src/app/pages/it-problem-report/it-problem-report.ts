@@ -60,6 +60,11 @@ export class ItProblemReportComponent implements OnInit {
   });
   phoneModel = '';
 
+  // CC
+  ccSelected = signal<string[]>([]);
+  ccOptions = signal<{ label: string; value: string }[]>([]);
+  readonly nzFilterOption = () => true;
+
   // MASTER
   availableCategories: any[] = [];
   openForOptions = signal<any[]>([]);
@@ -213,12 +218,31 @@ export class ItProblemReportComponent implements OnInit {
     this.showSummaryModal.set(true);
   }
 
+  onCcSearch(search: string) {
+    if (!search?.trim()) {
+      this.ccOptions.set([]);
+      return;
+    }
+    this.itServiceService.searchEmployees({ search, pageSize: 20 }).subscribe({
+      next: (res) => {
+        this.ccOptions.set(
+          (res.data || []).map((e: any) => ({
+            label: `${e.FullNameThai || e.FullNameEng || e.FullName || e.fullname || e.name || '-'} (${e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '-'})`,
+            value: e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '',
+          })),
+        );
+      },
+    });
+  }
+
   clearForm() {
     const original = this.authService.userPhone();
     this.phoneModel = '';
     this.cdr.detectChanges();
     this.phoneModel = original;
 
+    this.ccSelected.set([]);
+    this.ccOptions.set([]);
     this.problemFormData.set({
       topic: '',
       detail: '',
@@ -256,6 +280,11 @@ export class ItProblemReportComponent implements OnInit {
       formData.append('openForCodeempid', this.selectedOpenFor());
     }
     formData.append('ticketTypeId', '2');
+
+    const cc = this.ccSelected();
+    if (cc.length > 0) {
+      formData.append('CcCodeEmpIdsJson', JSON.stringify(cc));
+    }
 
     data.attachments.forEach((item: any) => {
       if (item?.file instanceof File) {

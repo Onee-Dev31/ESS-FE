@@ -326,7 +326,7 @@ $table-label-bg: var(--border-toolbar);
           &:hover {
             color: $danger;
             background: color-mix(in srgb, var(--danger), var(--bg-card) 85%);
-            border-color: color-mix(in srgb, var(--danger), var(--bg-card) 70%);
+            border-color: rgba(var(--danger-rgb), 0.3);
             transform: rotate(90deg);
           }
         }
@@ -506,7 +506,7 @@ $table-label-bg: var(--border-toolbar);
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
-      min-height: auto;
+      min-height: initial;
       min-width: auto;
       box-shadow: none;
       font-size: $font-size-hint;
@@ -978,7 +978,7 @@ $table-label-bg: var(--border-toolbar);
   vertical-align: middle;
   font-weight: 600;
   letter-spacing: 0.02em;
-  border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
 }
 
 .text-yellow {
@@ -998,7 +998,7 @@ $table-label-bg: var(--border-toolbar);
       background: var(--status-new-bg);
       color: $primary;
       border-radius: 6px;
-      border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
+      border: 1px solid rgba(var(--primary-rgb), 0.35);
       font-family: 'Courier New', monospace;
       font-weight: 600;
     }
@@ -1026,7 +1026,7 @@ $table-label-bg: var(--border-toolbar);
   &:hover {
     background: var(--status-new-bg);
     color: $primary;
-    border-color: color-mix(in srgb, var(--primary), var(--bg-card) 65%);
+    border-color: rgba(var(--primary-rgb), 0.35);
     transform: translateY(-2px);
     box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -1108,7 +1108,7 @@ $table-label-bg: var(--border-toolbar);
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   background: color-mix(in srgb, var(--warning), var(--bg-card) 85%);
-  border: 1px solid color-mix(in srgb, var(--warning), var(--bg-card) 70%);
+  border: 1px solid rgba(var(--warning-rgb), 0.3);
   border-radius: 8px;
   font-size: $font-size-body;
   color: var(--warning);
@@ -1320,6 +1320,10 @@ $table-label-bg: var(--border-toolbar);
         border: 1.5px solid var(--border);
         border-radius: 10px;
         padding: 5px 10px 5px 10px;
+
+        nz-select {
+          width: 100%;
+        }
       }
     }
   }
@@ -1634,6 +1638,15 @@ $table-label-bg: var(--border-toolbar);
     .file-upload-section {
       padding: 10px 14px;
       background: var(--bg-table-head);
+
+      .file-input-hidden {
+        display: none;
+      }
+
+      .field-attach-hint {
+        font-size: 0.75rem;
+        padding-left: 22px;
+      }
       border-top: 1px solid var(--border-table-head);
       display: flex;
       flex-direction: column;
@@ -1750,8 +1763,8 @@ $table-label-bg: var(--border-toolbar);
   }
 
   .btn-view-file {
-    appearance: none !important;
     -webkit-appearance: none !important;
+    appearance: none !important;
     background: var(--bg-card) !important;
     color: var(--primary) !important;
     border: 1.5px solid #d1e9ff !important;

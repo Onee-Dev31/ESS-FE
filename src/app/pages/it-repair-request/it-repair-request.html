@@ -79,7 +79,7 @@
               </button>
             }
 
-            <button class="dropdown-toggle" (click)="toggleDropdown()">
+            <button class="dropdown-toggle" aria-label="เลือกอุปกรณ์" (click)="toggleDropdown()">
               <i
                 class="fas"
                 [class.fa-chevron-down]="!isDropdownOpen()"
@@ -145,10 +145,7 @@
           ลักษณะอาการที่พบ
           <span class="required-badge">*</span>
         </label>
-        <div
-          class="mt-1 text-muted font-weight-normal"
-          style="font-size: 0.75rem; padding-left: 22px"
-        >
+        <div class="mt-1 text-muted font-weight-normal field-attach-hint">
           <i class="fas fa-paperclip mr-1"></i> แนบรูปภาพประกอบ (ถ้ามี)
         </div>
       </div>
@@ -168,9 +165,9 @@
               #fileInput
               (change)="onFileSelected($event)"
               accept="image/*"
-              capture="environment"
               multiple
-              style="display: none"
+              class="file-input-hidden"
+              aria-label="แนบไฟล์"
             />
             <div class="upload-trigger-row">
               <button class="btn-mini-upload" (click)="fileInput.click()">
@@ -195,7 +192,7 @@
                       title="คลิกเพื่อดูตัวอย่าง"
                       >{{ file.name }}</span
                     >
-                    <button class="remove-btn" (click)="removeAttachment($index)">
+                    <button class="remove-btn" aria-label="ลบไฟล์" (click)="removeAttachment($index)">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
@@ -204,6 +201,33 @@
             }
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Field: ผู้รับสำเนา (CC) -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-user-friends field-icon"></i>
+          ผู้รับสำเนา (CC)
+        </label>
+        <p class="field-hint">ค้นหาจากชื่อหรือรหัสพนักงาน</p>
+      </div>
+      <div class="field-input-col select">
+        <nz-select
+          nzMode="multiple"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="ค้นหาพนักงาน..."
+          [nzFilterOption]="nzFilterOption"
+          [ngModel]="ccSelected()"
+          (ngModelChange)="ccSelected.set($event)"
+          (nzOnSearch)="onCcSearch($event)"
+        >
+          @for (opt of ccOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
       </div>
     </div>
 
@@ -252,7 +276,7 @@
             ยืนยันการแจ้งซ่อม
             <!-- <span class="req-id">{{ nextRequestId }}</span> -->
           </h2>
-          <button class="btn-close-modal" (click)="closeSummaryModal()">
+          <button class="btn-close-modal" aria-label="ปิด" (click)="closeSummaryModal()">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -282,13 +306,25 @@
                   <td class="text-primary font-weight-bold">{{ repairFormData().phoneNumber }}</td>
                 </tr>
               }
+              @if (ccSelected().length > 0) {
+                <tr>
+                  <th>ผู้รับสำเนา (CC)</th>
+                  <td>
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (empId of ccSelected(); track empId) {
+                        <span class="badge badge-secondary mr-1">{{ empId }}</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
               <tr>
                 <th>ไฟล์แนบ</th>
                 <td>
                   @if (repairFormData().attachments.length > 0) {
-                    <ul class="list-unstyled mb-0">
+                    <div class="attachment-list-modal">
                       @for (file of repairFormData().attachments; track file.name) {
-                        <li class="attachment-item mb-2">
+                        <div class="attachment-item mb-2">
                           <div class="file-info">
                             <i class="fas fa-paperclip"></i>
                             <span>{{ file.name }}</span>
@@ -296,9 +332,9 @@
                           <button class="btn-view-file" (click)="viewFile(file)">
                             <i class="fas fa-eye"></i> ดูไฟล์
                           </button>
-                        </li>
+                        </div>
                       }
-                    </ul>
+                    </div>
                   } @else {
                     <span class="text-muted">-</span>
                   }
@@ -323,7 +359,7 @@
           <h3>
             <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
           </h3>
-          <button class="btn-close-modal" (click)="closeHistoryDetailModal()">
+          <button class="btn-close-modal" aria-label="ปิด" (click)="closeHistoryDetailModal()">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -370,9 +406,9 @@
                 <th>ไฟล์แนบ</th>
                 <td>
                   @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
-                    <ul class="list-unstyled mb-0">
+                    <div class="attachment-list-modal">
                       @for (file of selectedRequest().attachments; track file.name) {
-                        <li class="attachment-item mb-2">
+                        <div class="attachment-item mb-2">
                           <div class="file-info">
                             <i class="fas fa-paperclip"></i>
                             <span>{{ file.name }}</span>
@@ -380,9 +416,9 @@
                           <button class="btn-view-file" (click)="viewFile(file)">
                             <i class="fas fa-eye"></i> ดูไฟล์
                           </button>
-                        </li>
+                        </div>
                       }
-                    </ul>
+                    </div>
                   } @else {
                     <span class="text-muted">-</span>
                   }

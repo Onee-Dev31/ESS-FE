@@ -161,6 +161,32 @@
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
       </div>
+
+      <div class="form-group mb-4">
+        <label class="form-label">
+          <i class="fas fa-user-friends field-icon"></i>
+          ผู้รับสำเนา (CC)
+        </label>
+        <nz-select
+          class="cc-select"
+          nzMode="multiple"
+          nzShowSearch
+          nzServerSearch
+          nzAllowClear
+          nzPlaceHolder="ค้นหาพนักงาน..."
+          nzDropdownClassName="cc-select-dropdown"
+          [nzFilterOption]="nzFilterOption"
+          [nzLoading]="ccSearchLoading()"
+          [nzNotFoundContent]="ccNotFoundContent()"
+          [ngModel]="ccSelected()"
+          (ngModelChange)="onCcSelectionChange($event)"
+          (nzOnSearch)="onCcSearch($event)"
+        >
+          @for (opt of ccOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
+      </div>
     </div>
 
     <div class="form-section">
@@ -481,6 +507,18 @@
               <h3>รายละเอียด (Details)</h3>
               <div class="detail-text p-3 bg-light rounded text-muted">
                 {{ requestDetails() }}
+              </div>
+            </div>
+          }
+
+          <!-- 5. CC -->
+          @if (ccSelected().length > 0) {
+            <div class="summary-section">
+              <h3>ผู้รับสำเนา (CC)</h3>
+              <div class="d-flex flex-wrap gap-1">
+                @for (empId of ccSelected(); track empId) {
+                  <span class="badge badge-secondary mr-1">{{ empId }}</span>
+                }
               </div>
             </div>
           }

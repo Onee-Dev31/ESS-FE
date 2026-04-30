@@ -2,12 +2,16 @@
 :root {
   // Brand & Semantic
   --primary: #1a73e8;
+  --primary-rgb: 26, 115, 232;
   --success: #16a34a;
   --danger: #dc2626;
+  --danger-rgb: 220, 38, 38;
   --warning: #f59e0b;
+  --warning-rgb: 245, 158, 11;
 
   // Text Colors
   --text: #202124;
+  --text-rgb: 32, 33, 36;
   --text-sub: #5f6368;
   --text-header: #475569;
   --text-muted: #94a3b8;
@@ -131,12 +135,16 @@
 [data-theme='dark'] {
   // Brand & Semantic
   --primary: #6366f1;
+  --primary-rgb: 99, 102, 241;
   --success: #4ade80;
   --danger: #f87171;
+  --danger-rgb: 248, 113, 113;
   --warning: #fbbf24;
+  --warning-rgb: 251, 191, 36;
 
   // Text Colors
   --text: #e2e8f0;
+  --text-rgb: 226, 232, 240;
   --text-sub: #94a3b8;
   --text-header: #f8fafc;
   --text-muted: #64748b;

@@ -137,6 +137,10 @@ $table-label-bg: var(--border-toolbar);
     gap: 0.75rem;
     width: 100%;
 
+    nz-select {
+      width: 100%;
+    }
+
     label,
     .form-label {
       font-size: $font-size-label;
@@ -326,7 +330,7 @@ $table-label-bg: var(--border-toolbar);
           &:hover {
             color: $danger;
             background: color-mix(in srgb, var(--danger), var(--bg-card) 85%);
-            border-color: color-mix(in srgb, var(--danger), var(--bg-card) 70%);
+            border-color: rgba(var(--danger-rgb), 0.3);
             transform: rotate(90deg);
           }
         }
@@ -506,7 +510,7 @@ $table-label-bg: var(--border-toolbar);
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
-      min-height: auto;
+      min-height: initial;
       min-width: auto;
       box-shadow: none;
       font-size: $font-size-body;
@@ -983,7 +987,7 @@ $table-label-bg: var(--border-toolbar);
   vertical-align: middle;
   font-weight: 600;
   letter-spacing: 0.02em;
-  border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
 }
 
 .text-yellow {
@@ -1003,7 +1007,7 @@ $table-label-bg: var(--border-toolbar);
       background: var(--status-new-bg);
       color: $primary;
       border-radius: 6px;
-      border: 1px solid color-mix(in srgb, var(--primary), var(--bg-card) 65%);
+      border: 1px solid rgba(var(--primary-rgb), 0.35);
       font-family: 'Courier New', monospace;
       font-weight: 600;
     }
@@ -1113,7 +1117,7 @@ $table-label-bg: var(--border-toolbar);
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   background: color-mix(in srgb, var(--warning), var(--bg-card) 85%);
-  border: 1px solid color-mix(in srgb, var(--warning), var(--bg-card) 70%);
+  border: 1px solid rgba(var(--warning-rgb), 0.3);
   border-radius: 8px;
   font-size: $font-size-body;
   color: var(--warning);
@@ -1420,4 +1424,47 @@ $table-label-bg: var(--border-toolbar);
 
 ::ng-deep .ant-select-selection-placeholder {
   color: var(--text-muted) !important;
+}
+
+::ng-deep .cc-select.ant-select-multiple .ant-select-selection-item {
+  background: rgba(var(--primary-rgb), 0.14) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.28) !important;
+  border-radius: 999px !important;
+  color: var(--text-header) !important;
+  padding-inline: 10px 6px !important;
+  min-height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .cc-select.ant-select-multiple .ant-select-selection-item-content {
+  color: var(--text-header) !important;
+}
+
+::ng-deep .cc-select.ant-select-multiple .ant-select-selection-item-remove {
+  color: var(--text-muted) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .cc-select.ant-select-multiple .ant-select-selection-item-remove:hover {
+  color: var(--danger) !important;
+}
+
+::ng-deep .cc-select-dropdown {
+  padding-block: 8px !important;
+}
+
+::ng-deep .cc-select-dropdown .ant-select-item {
+  border-radius: 10px;
+  margin-inline: 6px;
+}
+
+::ng-deep .cc-select-dropdown .ant-empty {
+  margin-block: 12px !important;
+}
+
+::ng-deep .cc-select-dropdown .ant-select-item-empty {
+  min-height: initial !important;
+  padding: 18px 12px !important;
 }

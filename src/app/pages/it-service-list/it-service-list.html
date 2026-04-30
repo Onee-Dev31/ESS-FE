@@ -94,7 +94,7 @@
   <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
     <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
       <div class="mobile-detail-header">
-        <button class="btn-back" (click)="closeTicketDetail()">
+        <button class="btn-back" aria-label="กลับ" (click)="closeTicketDetail()">
           <i class="fas fa-arrow-left"></i>
         </button>
         <span>รายละเอียด Ticket</span>
@@ -170,7 +170,7 @@
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
-      <textarea [(ngModel)]="t.description" class="form-input"></textarea>
+      <textarea [(ngModel)]="t.description" class="form-input" aria-label="รายละเอียด"></textarea>
     </div>
   </section>
 
@@ -209,6 +209,7 @@
             *ngIf="t.status_user === 'Pending'"
             type="button"
             class="btn-close"
+            aria-label="ลบไฟล์"
             (click)="removeAttachment(file); $event.stopPropagation()"
           >
             <i class="fa-solid fa-xmark"></i>
@@ -226,7 +227,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title">Chat</div>
       <button
-        style="border-radius: 10px"
+        class="btn-add-note"
         nz-button
         nzType="primary"
         (click)="openAddNote()"
@@ -251,6 +252,7 @@
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
+                  alt=""
                   (error)="onImgError($event)"
                 />
               </div>
@@ -297,7 +299,7 @@
   <!-- ACTIONS -->
   <section class="tk-actions" *ngIf="t.status === 'Waiting you'">
     <button class="btn btn-send" (click)="Resubmit(t)">
-      <i class="fas fa-history" style="margin-right: 4px"></i> Re Submit
+      <i class="fas fa-history resubmit-icon"></i> Re Submit
     </button>
   </section>
 </ng-template>
@@ -311,6 +313,7 @@
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          alt=""
           (error)="onImgError($event)"
         />
       </div>
@@ -324,6 +327,15 @@
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
+    </div>
+  </section>
+
+  <!-- CC List -->
+  <section class="side-card requester" *ngIf="t.ccList?.length > 0">
+    <div class="side-title">ผู้รับสำเนา (CC)</div>
+    <div *ngFor="let cc of t.ccList" class="side-detail cc-item">
+      <div>{{ cc.name }}</div>
+      <div class="muted cc-email">{{ cc.email }}</div>
     </div>
   </section>
 
@@ -382,6 +394,7 @@
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  alt=""
                   (error)="onImgError($event)"
                 />
               </div>
@@ -393,7 +406,7 @@
           @if (isVisibleAssignee()) {
             <div class="assignee-modal-overlay" (click)="closeAssignee()">
               <div class="assignee-card" (click)="$event.stopPropagation()">
-                <button class="btn-close" (click)="closeAssignee()">✕</button>
+                <button class="btn-close" aria-label="ปิด" (click)="closeAssignee()">✕</button>
                 @if (selectedAssignee()) {
                   <div class="assignee-profile">
                     <img
@@ -403,6 +416,7 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
+                      alt=""
                       (error)="onImgError($event)"
                     />
                     <h3>{{ selectedAssignee().nickName }}</h3>

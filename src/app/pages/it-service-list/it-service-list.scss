@@ -354,7 +354,7 @@ textarea.form-input {
 
   &:hover {
     cursor: pointer;
-    color: color-mix(in srgb, var(--primary), var(--text) 20%);
+    color: var(--primary);
     transform: translateY(-1px);
   }
 }
@@ -442,7 +442,6 @@ textarea.form-input {
   .ticket-list {
     flex: 1;
     overflow-y: auto;
-    scrollbar-width: none;
     -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
@@ -665,7 +664,7 @@ textarea.form-input {
   font-size: 12px;
   font-weight: 700;
   background: var(--bg-card);
-  border: 2px solid color-mix(in srgb, white, transparent 50%);
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .tk-pill .dot {
@@ -939,7 +938,7 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-bottom: 1px solid rgba(var(--text-rgb), 0.1);
   flex-shrink: 0;
 
   @media (min-width: 1024px) and (max-width: 1440px) {
@@ -982,9 +981,6 @@ textarea.form-input {
   min-height: 0;
 
   /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-
   @media (min-width: 1024px) and (max-width: 1440px) {
     padding: 6px 12px;
   }
@@ -1462,6 +1458,22 @@ textarea.form-input {
   flex-shrink: 0;
 }
 
+.cc-item {
+  margin-bottom: 6px;
+}
+
+.cc-email {
+  font-size: 0.8em;
+}
+
+.btn-add-note {
+  border-radius: 10px;
+}
+
+.resubmit-icon {
+  margin-right: 4px;
+}
+
 .side-card.assignee {
   flex: 1;
   overflow-y: auto;
@@ -1469,8 +1481,6 @@ textarea.form-input {
 
   // scrollbar-width: none;
   // -ms-overflow-style: none;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
 }
 
 .side-card.assignee::-webkit-scrollbar {
@@ -1711,5 +1721,4 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scrollbar-width: thin;
 }

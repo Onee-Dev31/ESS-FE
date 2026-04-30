@@ -272,6 +272,7 @@ export class ItService implements OnInit {
         requester: res.requester,
         openFor: res.requestFor.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
+        ccList: res.ccList || [],
       };
 
       // console.log(objectData);

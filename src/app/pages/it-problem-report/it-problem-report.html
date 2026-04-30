@@ -86,7 +86,7 @@
               <span class="selected-chip">
                 <i class="fas fa-tag chip-icon"></i>
                 {{ cat.sub_category_name }}
-                <button type="button" class="chip-remove" (click)="toggleCategory(cat)">
+                <button type="button" class="chip-remove" aria-label="ลบหมวดหมู่" (click)="toggleCategory(cat)">
                   <i class="fas fa-times"></i>
                 </button>
               </span>
@@ -153,8 +153,9 @@
           <input
             type="file"
             #fileInput
-            style="display: none"
+            class="file-input-hidden"
             multiple
+            aria-label="แนบไฟล์"
             (change)="onFileSelected($event)"
           />
         </div>
@@ -164,13 +165,40 @@
               <div class="file-item">
                 <i class="fas fa-file-alt file-icon"></i>
                 <span class="file-name">{{ file.name }}</span>
-                <button type="button" class="file-remove" (click)="removeAttachment(i)">
+                <button type="button" class="file-remove" aria-label="ลบไฟล์" (click)="removeAttachment(i)">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
             }
           </div>
         }
+      </div>
+    </div>
+
+    <!-- Field: ผู้รับสำเนา (CC) -->
+    <div class="form-field-row">
+      <div class="field-label-col">
+        <label class="field-label">
+          <i class="fas fa-user-friends field-icon"></i>
+          ผู้รับสำเนา (CC)
+        </label>
+        <p class="field-hint">ค้นหาจากชื่อหรือรหัสพนักงาน</p>
+      </div>
+      <div class="field-input-col select">
+        <nz-select
+          nzMode="multiple"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="ค้นหาพนักงาน..."
+          [nzFilterOption]="nzFilterOption"
+          [ngModel]="ccSelected()"
+          (ngModelChange)="ccSelected.set($event)"
+          (nzOnSearch)="onCcSearch($event)"
+        >
+          @for (opt of ccOptions(); track opt.value) {
+            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+          }
+        </nz-select>
       </div>
     </div>
 
@@ -219,7 +247,7 @@
             ยืนยันการแจ้งปัญหา
             <!-- <span class="req-id">{{ nextRequestId }}</span> -->
           </h2>
-          <button class="btn-close-modal" (click)="closeSummaryModal()">
+          <button class="btn-close-modal" aria-label="ปิด" (click)="closeSummaryModal()">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -257,13 +285,25 @@
                   <td class="text-primary font-weight-bold">{{ problemFormData().phoneNumber }}</td>
                 </tr>
               }
+              @if (ccSelected().length > 0) {
+                <tr>
+                  <th>ผู้รับสำเนา (CC)</th>
+                  <td>
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (empId of ccSelected(); track empId) {
+                        <span class="badge badge-secondary mr-1">{{ empId }}</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
               <tr>
                 <th>ไฟล์แนบ</th>
                 <td>
                   @if (problemFormData().attachments.length > 0) {
-                    <ul class="list-unstyled mb-0">
+                    <div class="attachment-list-modal">
                       @for (file of problemFormData().attachments; track file.name) {
-                        <li class="attachment-item mb-2">
+                        <div class="attachment-item mb-2">
                           <div class="file-info">
                             <i class="fas fa-paperclip"></i>
                             <span>{{ file.name }}</span>
@@ -271,9 +311,9 @@
                           <button class="btn-view-file" (click)="viewFile(file)">
                             <i class="fas fa-eye"></i> ดูไฟล์
                           </button>
-                        </li>
+                        </div>
                       }
-                    </ul>
+                    </div>
                   } @else {
                     <span class="text-muted">-</span>
                   }
@@ -298,7 +338,7 @@
           <h3>
             <i class="fas fa-file-alt mr-2"></i> รายละเอียดคำขอ {{ selectedRequest().displayId }}
           </h3>
-          <button class="btn-close-modal" (click)="closeHistoryDetailModal()">
+          <button class="btn-close-modal" aria-label="ปิด" (click)="closeHistoryDetailModal()">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -355,9 +395,9 @@
                 <th>ไฟล์แนบ</th>
                 <td>
                   @if (selectedRequest().attachments && selectedRequest().attachments.length > 0) {
-                    <ul class="list-unstyled mb-0">
+                    <div class="attachment-list-modal">
                       @for (file of selectedRequest().attachments; track file.name) {
-                        <li class="attachment-item mb-2">
+                        <div class="attachment-item mb-2">
                           <div class="file-info">
                             <i class="fas fa-paperclip"></i>
                             <span>{{ file.name }}</span>
@@ -365,9 +405,9 @@
                           <button class="btn-view-file" (click)="viewFile(file)">
                             <i class="fas fa-eye"></i> ดูไฟล์
                           </button>
-                        </li>
+                        </div>
                       }
-                    </ul>
+                    </div>
                   } @else {
                     <span class="text-muted">-</span>
                   }

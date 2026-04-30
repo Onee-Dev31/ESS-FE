@@ -43,6 +43,16 @@ export class ITServiceRequestComponent implements OnInit {
   phoneNumber = signal('');
   requestDetails = signal('');
 
+  // CC
+  ccSelected = signal<string[]>([]);
+  ccOptions = signal<{ label: string; value: string }[]>([]);
+  ccSearchKeyword = signal('');
+  ccSearchLoading = signal(false);
+  readonly nzFilterOption = () => true;
+  readonly ccNotFoundContent = computed(() =>
+    this.ccSearchKeyword().trim() ? 'ไม่พบพนักงานที่ค้นหา' : 'พิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา',
+  );
+
   // CONDITION
   @Input() openBy!: string;
 
@@ -261,7 +271,58 @@ export class ITServiceRequestComponent implements OnInit {
     this.showSummaryModal.set(false);
   }
 
+  onCcSearch(search: string) {
+    const keyword = search?.trim() || '';
+    this.ccSearchKeyword.set(keyword);
+
+    if (!keyword) {
+      this.ccOptions.set([]);
+      this.ccSearchLoading.set(false);
+      return;
+    }
+
+    this.ccSearchLoading.set(true);
+
+    this.itServiceService
+      .searchEmployees({ search: keyword, pageSize: 20 })
+      .pipe(finalize(() => this.ccSearchLoading.set(false)))
+      .subscribe({
+        next: (res) => {
+          if (keyword !== this.ccSearchKeyword()) {
+            return;
+          }
+
+          this.ccOptions.set(
+            (res.data || [])
+              .map((e: any) => ({
+                label: `${e.FullNameThai || e.FullNameEng || e.FullName || e.fullname || e.name || '-'} (${e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '-'})`,
+                value: e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '',
+              }))
+              .filter((opt: { label: string; value: string }) => !!opt.value),
+          );
+        },
+        error: () => {
+          this.ccOptions.set([]);
+        },
+      });
+  }
+
+  onCcSelectionChange(values: string[]) {
+    this.ccSelected.set(values);
+    this.ccSearchKeyword.set('');
+    this.ccOptions.set([]);
+  }
+
+  resetCcSearchState() {
+    this.ccSearchKeyword.set('');
+    this.ccSearchLoading.set(false);
+    this.ccOptions.set([]);
+  }
+
   clearForm() {
+    this.ccSelected.set([]);
+    this.ccOptions.set([]);
+    this.resetCcSearchState();
     this.serviceOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
     this.isSystemCategorySelected.set(false);
     this.userSubOptions.update((items) => items.map((i) => ({ ...i, checked: false })));
@@ -314,6 +375,12 @@ export class ITServiceRequestComponent implements OnInit {
     );
     formData.append('requesterAduser', this.authService.currentUser() || '-');
     formData.append('contactPhone', this.phoneNumber());
+
+    const cc = this.ccSelected();
+    if (cc.length > 0) {
+      formData.append('CcCodeEmpIdsJson', JSON.stringify(cc));
+    }
+
     formData.append(
       'IsSelfRequestByIT',
       this.openBy
