@@ -8,9 +8,8 @@ describe('CcModal', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CcModal]
-    })
-    .compileComponents();
+      imports: [CcModal],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CcModal);
     component = fixture.componentInstance;
