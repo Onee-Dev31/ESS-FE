@@ -51,6 +51,7 @@ import { ServicesDetailModal } from '../../components/modals/services-detail-mod
 import { FileConverterService } from '../../services/file-converter';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
+import { CcModal } from './modal/cc-modal/cc-modal';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -73,6 +74,7 @@ import { SignalrService } from '../../services/signalr.service';
     NoteModal,
     ServicesDetailModal,
     NzCheckboxModule,
+    CcModal,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -152,6 +154,8 @@ export class DashboardIT implements OnInit {
   // isAssignModalVisible = false;
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: any[] = [];
+
+  isCcModalVisible = false;
 
   constructor(
     private msg: NzMessageService,
@@ -435,6 +439,14 @@ export class DashboardIT implements OnInit {
     if (!img.src.includes('user.png')) {
       img.src = 'user.png';
     }
+  }
+
+  openCcModal(): void {
+    this.isCcModalVisible = true;
+  }
+
+  handleCancel(): void {
+    this.isCcModalVisible = false;
   }
 
   // FUNCTION

@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 })
 export class CcModal {
   @Input() ticket: any;
+  @Input() isItDashboard: boolean = false;
   @Output() submitModal = new EventEmitter<any>();
   @Output() closeModal = new EventEmitter<void>();
 

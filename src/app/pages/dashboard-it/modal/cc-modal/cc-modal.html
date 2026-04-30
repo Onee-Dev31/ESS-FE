@@ -30,7 +30,9 @@
             </div>
           </div>
         </div>
-        <button class="btn-add-cc" (click)="addCC()"><i class="fas fa-plus"></i> เพิ่ม CC</button>
+        <button class="btn-add-cc" (click)="addCC()" *ngIf="isItDashboard">
+          <i class="fas fa-plus"></i> เพิ่ม CC
+        </button>
       </div>
     </div>
   </div>

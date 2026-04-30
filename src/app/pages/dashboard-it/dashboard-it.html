@@ -429,17 +429,9 @@
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
     </div>
-    <div class="side-cc">
-      <div class="cc-title">CC:</div>
-
-      <div class="cc-list">
-        @for (cc of t.ccList; track cc.id) {
-          <div class="cc-item">
-            {{ cc.name }}
-            <span class="cc-email">({{ cc.email }})</span>
-          </div>
-        }
-      </div>
+    <div class="side-cc" *ngIf="t.ccList.length > 0">
+      CC:
+      <span class="cc-title" (click)="openCcModal()">{{ t.ccList.length }} คน</span>
     </div>
   </section>
 
@@ -656,4 +648,9 @@
     <i class="fas fa-bell"></i>
     มี {{ newTicketCount() }} Ticket ใหม่ — คลิกเพื่อโหลด
   </div>
+}
+
+@if (isCcModalVisible) {
+  <app-cc-modal [ticket]="selectedTicket()" [isItDashboard]="true" (closeModal)="handleCancel()">
+  </app-cc-modal>
 }

@@ -1327,6 +1327,18 @@
 
     color: var(--text-muted);
     font-size: $font-size-hint;
+
+    .cc-title {
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary);
+      }
+
+      &:active {
+        color: var(--primary);
+      }
+    }
   }
 
   .timeline {
