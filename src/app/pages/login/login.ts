@@ -103,7 +103,10 @@ export class LoginComponent implements OnDestroy {
           this.startPolling();
           this.cdr.detectChanges();
         },
-        error: () => {
+        error: (err) => {
+          console.error('[QR] generateQr error:', err);
+          console.error('[QR] error body:', JSON.stringify(err?.error));
+          console.error('[QR] status:', err?.status, '| url:', err?.url);
           this.qrLoading = false;
           this.cdr.detectChanges();
         },
