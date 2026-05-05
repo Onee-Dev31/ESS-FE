@@ -280,7 +280,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);

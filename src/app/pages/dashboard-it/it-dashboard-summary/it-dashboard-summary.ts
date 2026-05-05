@@ -64,8 +64,8 @@ export class ItDashboardSummary {
       title: 'Open tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-      icon: 'inbox',
+      hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'appstore',
     },
     // {
     //   status: 'In Progress',
@@ -88,9 +88,18 @@ export class ItDashboardSummary {
       title: 'Closed Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ปิดแล้ว',
-      icon: 'check-circle',
+      hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'user',
     },
+    {
+      status: 'Open',
+      title: 'Open tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+      icon: 'inbox',
+    },
+
     {
       status: 'Hold',
       title: 'Hold Tickets',
@@ -180,8 +189,8 @@ export class ItDashboardSummary {
         title: 'New tickets',
         value: summary.open ?? 0,
         delta: 0,
-        hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-        icon: 'inbox',
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'appstore',
       },
       // {
       //   status: 'inprogress',
