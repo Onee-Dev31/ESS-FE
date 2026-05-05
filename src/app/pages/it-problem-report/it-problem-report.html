@@ -136,6 +136,13 @@
           <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
           <p class="dropzone-text">คลิกหรือลากไฟล์มาวางที่นี่</p>
           <p class="dropzone-hint">รองรับหลายไฟล์พร้อมกัน</p>
+          <p class="dropzone-hint2">
+            @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
+              <span>{{ ext.toUpperCase() }}</span>
+            }
+            <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+            <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+          </p>
           <input
             type="file"
             #fileInput
@@ -144,6 +151,7 @@
             (change)="onFileSelected($event)"
           />
         </div>
+
         @if (problemFormData().attachments.length > 0) {
           <div class="file-list">
             @for (file of problemFormData().attachments; track file.name; let i = $index) {

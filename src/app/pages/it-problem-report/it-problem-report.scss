@@ -1467,6 +1467,26 @@ $table-label-bg: var(--border-toolbar);
       color: var(--text-muted);
       margin: 0;
     }
+
+    .dropzone-hint2 {
+      font-size: 11px;
+      color: #aaa;
+      margin: 4px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      span {
+        background: #f0f0f0;
+        color: #666;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+    }
   }
 
   /* File list */

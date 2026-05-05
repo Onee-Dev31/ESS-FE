@@ -11,11 +11,57 @@
           [(ngModel)]="noteForm.message"
         ></textarea>
         <!-- Field: ไฟล์แนบ -->
-        <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
+        <div class="attach-section">
+          <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
+
+          <div class="attach-row">
+            <button type="button" class="attach-btn" (click)="fileInput.click()">
+              <i class="fas fa-paperclip"></i> แนบไฟล์
+            </button>
+            <span class="attach-count">
+              {{ noteForm.attachments.length }} / {{ FILE_CONFIG.maxFiles }} ไฟล์
+            </span>
+          </div>
+
+          <div class="attach-hint">
+            @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
+              <span class="hint-tag">{{ ext.toUpperCase() }}</span>
+            }
+            <span class="hint-tag hint-tag--info">สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+            <span class="hint-tag hint-tag--info">ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+          </div>
+
+          @if (noteForm.attachments.length > 0) {
+            <div class="file-chips">
+              @for (file of noteForm.attachments; track file.name; let i = $index) {
+                <div class="file-chip" (click)="viewFile(file)">
+                  <i class="far fa-file" style="font-size: 12px"></i>
+                  <span class="file-name">{{ file.name }}</span>
+                  <button
+                    type="button"
+                    class="chip-remove"
+                    (click)="removeAttachment(i); $event.stopPropagation()"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <!-- <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
         <button type="button" class="attach-btn" (click)="fileInput.click()">
           <i class="fas fa-paperclip"></i>
           แนบไฟล์
         </button>
+
+        <p class="attach-hint">
+          @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
+            <span>{{ ext.toUpperCase() }}</span>
+          }
+          <span>สูงสุด {{ FILE_CONFIG.maxFiles }} ไฟล์</span>
+          <span>ไม่เกิน {{ FILE_CONFIG.maxSizeMB }} MB</span>
+        </p>
 
         @if (noteForm.attachments.length > 0) {
           <div class="file-chips">
@@ -37,7 +83,7 @@
               </div>
             }
           </div>
-        }
+        } -->
       </div>
       <div class="form-actions-footer">
         <button class="btn-back-custom" (click)="close()">
