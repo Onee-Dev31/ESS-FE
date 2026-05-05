@@ -112,13 +112,9 @@ export class AuthService {
   }
 
   generateQr(): Observable<{ qrToken: string; qrImage: string; expiresAt: string }> {
-    const isLocalhost = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
-    const envUrl = (environment.frontend_url || '').trim();
-    const frontendBaseUrl = isLocalhost && envUrl ? envUrl : window.location.origin;
-
     return this._http.post<any>(
       `${this.baseUrl}/auth/qr/generate`,
-      { frontendBaseUrl },
+      { frontendBaseUrl: window.location.origin },
       { context: new HttpContext().set(SKIP_AUTH, true) },
     );
   }
