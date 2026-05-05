@@ -963,6 +963,10 @@
       color: color-mix(in srgb, var(--primary), var(--text) 30%);
     }
   }
+
+  .tk-pill {
+    cursor: default;
+  }
 }
 
 .services {

@@ -2,7 +2,7 @@ import { REQUEST_STATUS } from '../constants/request-status.constant';
 
 export const MAP_LABEL_STATUS: Record<string, string> = {
   open: 'New',
-  assigned: 'In Progress',
+  // assigned: 'In Progress',
   closed: 'Closed',
   hold: 'Hold',
   deny: 'Deny',

@@ -271,7 +271,7 @@ export class ItServiceService {
     return this._http.patch(`${this.baseUrl}/tickets/${id}/approve`, formData);
   }
 
-  re_open(formData: FormData): Observable<any> {
+  re_submit(formData: FormData): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/re-open`, formData);
   }
 
