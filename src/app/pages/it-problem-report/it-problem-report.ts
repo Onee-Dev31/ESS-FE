@@ -76,6 +76,21 @@ export class ItProblemReportComponent implements OnInit {
   ccSearched = signal<boolean>(false);
   readonly CC_CATEGORIES = ['BMS', 'Oracle', 'Onee App'];
 
+  readonly FILE_CONFIG = {
+    maxFiles: 5,
+    maxSizeMB: 5,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
+  };
+
   ngOnInit() {
     this.getSubProblem();
     this.getOpenFor();
@@ -174,21 +189,67 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   private addFiles(files: FileList) {
-    if (files && files.length > 0) {
-      const newAttachments = Array.from(files).map((f) => ({
-        name: f.name,
-        size: f.size,
-        file: f,
+    if (!files || files.length === 0) return;
+
+    const current = this.problemFormData().attachments;
+    const errors: string[] = [];
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const f of Array.from(files)) {
+      const reasons: string[] = [];
+
+      // เช็คจำนวน
+      if (current.length + validFiles.length >= this.FILE_CONFIG.maxFiles) {
+        reasons.push(`เกินจำนวนสูงสุด ${this.FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      // เช็คขนาด
+      const sizeMB = f.size / (1024 * 1024);
+      if (sizeMB > this.FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      // เช็ค type
+      const ext = f.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.FILE_CONFIG.allowedTypes.includes(f.type) &&
+        !this.FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push(`ประเภทไฟล์ไม่รองรับ`);
+      }
+
+      if (reasons.length > 0) {
+        errors.push(`${f.name} (${reasons.join(', ')})`);
+        this.swalService.warning(errors.join('\n'));
+      } else {
+        validFiles.push({ name: f.name, size: f.size, file: f });
+      }
+    }
+
+    if (validFiles.length > 0) {
+      this.problemFormData.update((data) => ({
+        ...data,
+        attachments: [...current, ...validFiles],
       }));
-
-      const currentAttachments = this.problemFormData().attachments;
-
-      this.problemFormData.set({
-        ...this.problemFormData(),
-        attachments: [...currentAttachments, ...newAttachments],
-      });
     }
   }
+
+  // private addFiles(files: FileList) {
+  //   if (files && files.length > 0) {
+  //     const newAttachments = Array.from(files).map((f) => ({
+  //       name: f.name,
+  //       size: f.size,
+  //       file: f,
+  //     }));
+
+  //     const currentAttachments = this.problemFormData().attachments;
+
+  //     this.problemFormData.set({
+  //       ...this.problemFormData(),
+  //       attachments: [...currentAttachments, ...newAttachments],
+  //     });
+  //   }
+  // }
 
   viewFile(fileObj: any) {
     if (fileObj.file) {

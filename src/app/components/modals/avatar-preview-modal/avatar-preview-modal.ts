@@ -14,6 +14,6 @@ export class AvatarPreviewModal {
 
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/images/user.png';
+    img.src = 'user.png';
   }
 }
