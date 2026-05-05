@@ -442,7 +442,7 @@ export class ItService implements OnInit {
         }, 100);
       },
       error: (error) => {
-        console.error('Error fetching data:', error);
+        console.error('Error Re-open:', error.error);
       },
     });
   }
