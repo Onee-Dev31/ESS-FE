@@ -345,10 +345,16 @@
     <div class="side-title">เปิดให้</div>
     <div class="side-detail">
       <div>
-        {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
+        {{ openFor.fullname }}
+        <span *ngIf="openFor.open_for_type === 'freelance'" class="tag-freelance">Freelance</span>
+        <span *ngIf="openFor.open_for_type !== 'freelance' && openFor.nickname"
+          >({{ openFor.nickname }})</span
+        >
       </div>
-      <div>{{ openFor.department_name }}</div>
-      <div>{{ openFor.company_name }}</div>
+      <ng-container *ngIf="openFor.open_for_type !== 'freelance'">
+        <div *ngIf="openFor.department_name">{{ openFor.department_name }}</div>
+        <div *ngIf="openFor.company_name">{{ openFor.company_name }}</div>
+      </ng-container>
     </div>
   </section>
 

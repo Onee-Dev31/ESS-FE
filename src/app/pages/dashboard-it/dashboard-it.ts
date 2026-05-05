@@ -324,7 +324,7 @@ export class DashboardIT implements OnInit {
         assignTimeline: result,
         services: services,
         requester: res.requester,
-        openFor: res.requestFor.emp_code ? res.requestFor : null,
+        openFor: res.requestFor?.fullname ? res.requestFor : null,
         rejection_reason: ticket.rejection_reason,
         ccList: ccList || [],
       };

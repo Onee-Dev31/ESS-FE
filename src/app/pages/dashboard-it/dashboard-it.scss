@@ -980,6 +980,16 @@
   font-weight: 500;
 }
 
+.tag-freelance {
+  padding: 2px 8px;
+  border-radius: 50px;
+  background-color: var(--tag-bg-orange);
+  border: 1px solid var(--tag-color-orange);
+  color: var(--tag-color-orange);
+  font-size: $font-size-hint;
+  font-weight: 500;
+}
+
 .tag-more {
   padding: 4px 10px;
   border-radius: 50px;
