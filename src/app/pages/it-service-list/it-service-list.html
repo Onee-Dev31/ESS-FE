@@ -328,7 +328,7 @@
   </section>
   <section class="tk-actions" *ngIf="t.status === 'Closed'">
     <ng-container>
-      <button class="btn btn-send" (click)="openReOpen()">
+      <button class="btn btn-send" (click)="ReOpen()">
         <i class="fas fa-history" style="margin-right: 4px"></i> Reopen
       </button>
       <!-- <button class="btn btn-done" (click)="openRating()">
@@ -496,7 +496,7 @@
 
 @if (IS_REOPEN_TICKET()) {
   <app-re-open-modal
-    [ticket]="selectTicket"
+    [ticket]="selectedTicket()"
     (closeModal)="closeReOpenModal()"
     (submitModal)="submitReOpen($event)"
   ></app-re-open-modal>

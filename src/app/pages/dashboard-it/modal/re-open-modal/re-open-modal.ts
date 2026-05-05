@@ -23,10 +23,9 @@ export class ReOpenModal {
     }
 
     const payload = {
+      ticket: this.ticket,
       reason: form.value.reason,
     };
-
-    console.log(payload);
 
     this.submitModal.emit(payload);
   }

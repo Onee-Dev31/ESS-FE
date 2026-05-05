@@ -468,6 +468,10 @@ export class DashboardIT implements OnInit {
     this.isCcModalVisible = false;
   }
 
+  ReOpen() {
+    console.log('reOpen mock');
+  }
+
   // FUNCTION
 
   isToday(dateValue: string | Date): boolean {

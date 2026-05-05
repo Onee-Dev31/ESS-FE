@@ -407,6 +407,13 @@
       </button>
     </div>
   </section>
+  <section class="tk-actions" *ngIf="t.status === 'Closed'">
+    <ng-container>
+      <button class="btn btn-send" (click)="ReOpen()">
+        <i class="fas fa-history" style="margin-right: 4px"></i> Reopen
+      </button>
+    </ng-container>
+  </section>
 </ng-template>
 
 <!-- RIGHT TEMPLATE -->
