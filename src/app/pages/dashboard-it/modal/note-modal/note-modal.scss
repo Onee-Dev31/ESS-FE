@@ -282,6 +282,43 @@ textarea.form-input {
   border-radius: 16px !important;
 }
 
+.attach-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attach-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.attach-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.attach-hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.hint-tag {
+  background: var(--bg-table-head);
+  color: var(--text-sub);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+
+  &--info {
+    background: color-mix(in srgb, var(--primary), transparent 88%);
+    color: var(--primary);
+  }
+}
+
 .attach-btn {
   display: inline-flex;
   align-items: center;
@@ -296,6 +333,22 @@ textarea.form-input {
 
 .attach-btn:hover {
   opacity: 0.8;
+}
+
+.attach-hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0 0;
+
+  span {
+    background: #f0f0f0;
+    color: #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+  }
 }
 
 .file-chips {

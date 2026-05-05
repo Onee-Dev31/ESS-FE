@@ -410,9 +410,11 @@ export class DashboardIT implements OnInit {
   }
 
   filteredTickets(): any[] {
+    const kw = (this.keyword ?? '').trim().toLowerCase();
     const statusMap: any = {
-      open: 'Open',
-      assigned: 'Assigned',
+      open: 'New',
+      // assigned: 'Assigned',
+      assigned: 'In Progress',
       inprogress: 'In Progress',
       done: 'Closed',
       hold: 'Hold',
