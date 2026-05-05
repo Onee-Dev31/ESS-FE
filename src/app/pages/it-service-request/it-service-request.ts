@@ -56,6 +56,8 @@ export class ITServiceRequestComponent implements OnInit {
     label: '',
   });
   openforOneejob: string = '';
+  freelanceName = signal<string>('');
+  isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
   isSystemCategorySelected = signal(false);
   IsOneeJob: boolean = false;
   applicantId: string = '';
@@ -87,7 +89,8 @@ export class ITServiceRequestComponent implements OnInit {
     const detailValid = this.requestDetails().trim().length > 0;
     const phoneValid = this.phoneNumber().trim().length > 0;
     const openForValid = this.selectedOpenFor() !== null;
-    return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
+    const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
+    return hasService && openForValid && subValidationPassed && detailValid && phoneValid && freelanceValid;
   });
 
   ngOnInit() {
@@ -126,10 +129,10 @@ export class ITServiceRequestComponent implements OnInit {
 
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
-    this.selectedOpenFor.set({
-      value,
-      label: option?.label ?? '',
-    });
+    this.selectedOpenFor.set({ value, label: option?.label ?? '' });
+    if (value !== '__FREELANCE__') {
+      this.freelanceName.set('');
+    }
   }
 
   onPhoneInput(event: Event) {
@@ -269,6 +272,7 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
+    this.freelanceName.set('');
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
@@ -292,10 +296,6 @@ export class ITServiceRequestComponent implements OnInit {
   confirmSubmission() {
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
-    let openForDisplay = '';
-    const selected = this.openForOptions().find((o) => o.value === this.selectedOpenFor());
-    openForDisplay = selected ? selected.label : '';
-
     const userOptions = this.userSubOptions().filter((o) => o.checked);
     const systemOptions = this.systemSubOptions().filter((o) => o.checked);
 
@@ -303,11 +303,15 @@ export class ITServiceRequestComponent implements OnInit {
     formData.append('ticketTypeId', '3');
     if (this.IsOneeJob) {
       formData.append('openForType', 'ONEEJOB');
+      formData.append('openForCodeempid', this.openforOneejob);
+    } else if (this.isFreelanceSelected()) {
+      formData.append('openForType', 'freelance');
+      formData.append('openForFreelanceName', this.freelanceName());
+    } else {
+      const isSelf = this.selectedOpenFor().value === this.authService.userData().CODEMPID;
+      formData.append('openForType', isSelf ? 'self' : 'other');
+      formData.append('openForCodeempid', this.selectedOpenFor().value);
     }
-    formData.append(
-      'openForCodeempid',
-      this.IsOneeJob ? this.openforOneejob : this.selectedOpenFor().value,
-    );
     formData.append(
       'description',
       this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),
