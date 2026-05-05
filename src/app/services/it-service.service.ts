@@ -321,4 +321,8 @@ export class ItServiceService {
   updateNoteForIt(ticketId: string, payload: any): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/${ticketId}/note-for-it `, payload);
   }
+
+  re_open(formData: FormData): Observable<any> {
+    return this._http.put<any>(`${this.baseUrl}/tickets/re-open/staff`, formData);
+  }
 }

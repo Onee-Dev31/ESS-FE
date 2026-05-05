@@ -6,6 +6,7 @@ export const MAP_LABEL_STATUS: Record<string, string> = {
   closed: 'Closed',
   hold: 'Hold',
   deny: 'Deny',
+  reopened: 'Re-Opened',
 };
 
 export class StatusUtil {
@@ -79,6 +80,7 @@ export class StatusColor {
     Closed: 'closed',
     'Waiting you': 'waiting',
     Rejected: 'rejected',
+    'Re-Opened': 'reopen',
   };
 
   static getStyle(status: string) {
@@ -108,6 +110,7 @@ export class StatusColor_Reverse {
     Closed: 'closed',
     'Waiting you': 'waiting',
     Rejected: 'rejected',
+    'Re-Opened': 'reopen',
   };
 
   static getStyle(status: string) {

@@ -468,6 +468,37 @@ export class DashboardIT implements OnInit {
     this.isCcModalVisible = false;
   }
 
+  ReOpen() {
+    console.log('reOpen mock', this.selectedTicket());
+
+    this.swalService.confirm('ยืนยันการเปิดงานอีกครั้ง (Re-open)').then((result) => {
+      if (!result.isConfirmed) return;
+
+      const formData = new FormData();
+
+      formData.append('TicketId', this.selectedTicket().ticketId);
+      formData.append('Requester', this.authService.userData().CODEMPID ?? '');
+      console.log('formData', [...formData.entries()]);
+
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
+      this.itServiceService.re_open(formData).subscribe({
+        next: (res) => {
+          console.log(res);
+          setTimeout(() => {
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
+          }, 100);
+
+          this.selectTicket(this.selectedTicket().ticketId);
+          this.getAllTickets();
+        },
+        error: (error) => {
+          console.error('Error Re-open:', error.error);
+          this.swalService.close();
+        },
+      });
+    });
+  }
+
   // FUNCTION
 
   isToday(dateValue: string | Date): boolean {

@@ -415,7 +415,7 @@ export class ItService implements OnInit {
     });
   }
 
-  openReOpen() {
+  ReOpen() {
     this.IS_REOPEN_TICKET.set(true);
   }
 
@@ -425,7 +425,27 @@ export class ItService implements OnInit {
 
   submitReOpen(data: any) {
     console.log(data);
+    const formData = new FormData();
+
+    formData.append('TicketId', data.ticket.ticketId);
+    formData.append('Requester', this.authService.userData().CODEMPID ?? '');
+    if (data.reason) {
+      formData.append('Description', data.reason ?? '');
+    }
+    console.log('formData', [...formData.entries()]);
     this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.itServiceService.re_open(formData).subscribe({
+      next: (res) => {
+        console.log(res);
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+        this.closeReOpenModal();
+      },
+      error: (error) => {
+        console.error('Error Re-open:', error.error);
+      },
+    });
   }
 
   copy(text: string) {

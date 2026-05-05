@@ -161,7 +161,10 @@
     <div class="tk-card__head">
       <div class="tk-card__title">
         รายละเอียด
-        <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
+        <span
+          class="files"
+          (click)="openAllAttachments(t.attachments)"
+          *ngIf="t.attachments.length > 0"
           ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
         >
       </div>
@@ -328,7 +331,7 @@
   </section>
   <section class="tk-actions" *ngIf="t.status === 'Closed'">
     <ng-container>
-      <button class="btn btn-send" (click)="openReOpen()">
+      <button class="btn btn-send" (click)="ReOpen()">
         <i class="fas fa-history" style="margin-right: 4px"></i> Reopen
       </button>
       <!-- <button class="btn btn-done" (click)="openRating()">
@@ -496,7 +499,7 @@
 
 @if (IS_REOPEN_TICKET()) {
   <app-re-open-modal
-    [ticket]="selectTicket"
+    [ticket]="selectedTicket()"
     (closeModal)="closeReOpenModal()"
     (submitModal)="submitReOpen($event)"
   ></app-re-open-modal>

@@ -1038,23 +1038,23 @@ textarea.form-input {
     padding-right: 20px;
   }
 
-  // span {
-  //   font-size: 0.8rem;
-  //   font-weight: 600;
-  //   color: var(--primary);
-  //   cursor: pointer;
-  //   display: inline-flex;
-  //   align-items: center;
-  //   gap: 4px;
-  //   padding: 3px 10px;
-  //   transition:
-  //     background 0.2s,
-  //     color 0.2s;
+  .files {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    transition:
+      background 0.2s,
+      color 0.2s;
 
-  //   &:hover {
-  //     color: color-mix(in srgb, var(--primary), var(--text) 30%);
-  //   }
-  // }
+    &:hover {
+      color: color-mix(in srgb, var(--primary), var(--text) 30%);
+    }
+  }
 
   .info-hint {
     font-size: $font-size-hint;
