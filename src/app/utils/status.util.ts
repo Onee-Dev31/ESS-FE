@@ -1,5 +1,13 @@
 import { REQUEST_STATUS } from '../constants/request-status.constant';
 
+export const MAP_LABEL_STATUS: Record<string, string> = {
+  open: 'New',
+  assigned: 'In Progress',
+  closed: 'Closed',
+  hold: 'Hold',
+  deny: 'Deny',
+};
+
 export class StatusUtil {
   static getStatusBadgeClass(status: string): string {
     const s = status?.trim();
@@ -118,7 +126,6 @@ export class StatusColor_Reverse {
     };
   }
 }
-
 export class StatusColor_text {
   private static statusMap: Record<string, string> = {
     New: 'new',
@@ -147,4 +154,8 @@ export class StatusColor_text {
       color: `color-mix(in srgb, var(--status-${key}-text), var(--text-reverse) 20%) !important`,
     };
   }
+}
+
+export function getStatusLabel(status: string): string {
+  return MAP_LABEL_STATUS[status.toLowerCase()] || status;
 }

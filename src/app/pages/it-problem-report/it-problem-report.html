@@ -161,38 +161,40 @@
     </div>
 
     <!-- Field: CC -->
-    <div class="form-field-row">
-      <div class="field-label-col">
-        <label class="field-label">
-          <i class="fa-solid fa-closed-captioning field-icon"></i>
-          ผู้รับสำเนา
-        </label>
-      </div>
-      <div class="field-input-col select">
-        <nz-select
-          nzMode="multiple"
-          nzShowSearch
-          nzAllowClear
-          nzPlaceHolder="ค้นหาพนักงาน..."
-          [nzFilterOption]="nzFilterOption"
-          [ngModel]="ccSelected()"
-          (ngModelChange)="ccSelected.set($event)"
-          (nzOnSearch)="onCcSearch($event)"
-          [nzNotFoundContent]="ccNotFound"
-        >
-          @for (opt of ccOptions(); track opt.value) {
-            <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
-          }
-          <ng-template #ccNotFound>
-            @if (ccSearched()) {
-              <span>ไม่พบข้อมูล</span>
-            } @else {
-              <span>พิมพ์เพื่อค้นหาพนักงาน</span>
+    @if (isVisibleCC()) {
+      <div class="form-field-row">
+        <div class="field-label-col">
+          <label class="field-label">
+            <i class="fa-solid fa-closed-captioning field-icon"></i>
+            ผู้รับสำเนา
+          </label>
+        </div>
+        <div class="field-input-col select">
+          <nz-select
+            nzMode="multiple"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ค้นหาพนักงาน..."
+            [nzFilterOption]="nzFilterOption"
+            [ngModel]="ccSelected()"
+            (ngModelChange)="ccSelected.set($event)"
+            (nzOnSearch)="onCcSearch($event)"
+            [nzNotFoundContent]="ccNotFound"
+          >
+            @for (opt of ccOptions(); track opt.value) {
+              <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
             }
-          </ng-template>
-        </nz-select>
+            <ng-template #ccNotFound>
+              @if (ccSearched()) {
+                <span>ไม่พบข้อมูล</span>
+              } @else {
+                <span>พิมพ์เพื่อค้นหาพนักงาน</span>
+              }
+            </ng-template>
+          </nz-select>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- Field: เบอร์โทรติดต่อ -->
     <div class="form-field-row">
@@ -303,6 +305,16 @@
                   }
                 </td>
               </tr>
+              @if (ccSelected().length) {
+                <tr>
+                  <th>ผู้รับสำเนา</th>
+                  <td class="text-primary font-weight-bold">
+                    @for (cc of ccSelected(); track cc.value; let last = $last) {
+                      {{ cc.label }}{{ !last ? ', ' : '' }}
+                    }
+                  </td>
+                </tr>
+              }
             </table>
           </div>
         </div>

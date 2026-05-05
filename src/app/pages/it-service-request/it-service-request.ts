@@ -40,6 +40,7 @@ export class ITServiceRequestComponent implements OnInit {
   private router = inject(Router);
 
   phoneModel = '';
+  phoneError = '';
   phoneNumber = signal('');
   requestDetails = signal('');
 
@@ -56,6 +57,8 @@ export class ITServiceRequestComponent implements OnInit {
     label: '',
   });
   openforOneejob: string = '';
+  freelanceName = signal<string>('');
+  isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
   isSystemCategorySelected = signal(false);
   IsOneeJob: boolean = false;
   applicantId: string = '';
@@ -63,8 +66,6 @@ export class ITServiceRequestComponent implements OnInit {
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    // const otherNameValid = openFor !== 'other' || this.otherOpenForName().trim().length > 0;
-
     // Sub-validation for "Request System" (ขอใช้ระบบ)
     const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
     let subValidationPassed = true;
@@ -87,18 +88,20 @@ export class ITServiceRequestComponent implements OnInit {
     const detailValid = this.requestDetails().trim().length > 0;
     const phoneValid = this.phoneNumber().trim().length > 0;
     const openForValid = this.selectedOpenFor() !== null;
-    return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
+    const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
+    return (
+      hasService &&
+      openForValid &&
+      subValidationPassed &&
+      detailValid &&
+      phoneValid &&
+      freelanceValid
+    );
   });
 
   ngOnInit() {
     this.getServiceType();
     this.getOpenFor();
-    const userData = this.authService.userData();
-    if (userData?.USR_MOBILE) {
-      const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
-      this.phoneModel = formatted;
-      this.phoneNumber.set(formatted);
-    }
 
     const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
@@ -126,11 +129,21 @@ export class ITServiceRequestComponent implements OnInit {
 
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
-    this.selectedOpenFor.set({
-      value,
-      label: option?.label ?? '',
-    });
+    this.selectedOpenFor.set({ value, label: option?.label ?? '' });
+    if (value !== '__FREELANCE__') {
+      this.freelanceName.set('');
+    }
   }
+
+  // onPhoneInput(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   let digitsOnly = input.value.replace(/\D/g, '');
+  //   digitsOnly = digitsOnly.slice(0, 10);
+  //   const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
+  //   input.value = formatted;
+  //   this.phoneModel = formatted;
+  //   this.phoneNumber.set(formatted);
+  // }
 
   onPhoneInput(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -140,6 +153,15 @@ export class ITServiceRequestComponent implements OnInit {
     input.value = formatted;
     this.phoneModel = formatted;
     this.phoneNumber.set(formatted);
+
+    const len = digitsOnly.length;
+    if (len === 0) {
+      this.phoneError = '';
+    } else if (len !== 4 && len !== 10) {
+      this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
+    } else {
+      this.phoneError = '';
+    }
   }
 
   onPhoneNumberChange(value: string) {
@@ -269,6 +291,7 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
+    this.freelanceName.set('');
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
@@ -292,10 +315,6 @@ export class ITServiceRequestComponent implements OnInit {
   confirmSubmission() {
     const selectedServices = this.serviceOptions().filter((s) => s.checked);
 
-    let openForDisplay = '';
-    const selected = this.openForOptions().find((o) => o.value === this.selectedOpenFor());
-    openForDisplay = selected ? selected.label : '';
-
     const userOptions = this.userSubOptions().filter((o) => o.checked);
     const systemOptions = this.systemSubOptions().filter((o) => o.checked);
 
@@ -303,11 +322,15 @@ export class ITServiceRequestComponent implements OnInit {
     formData.append('ticketTypeId', '3');
     if (this.IsOneeJob) {
       formData.append('openForType', 'ONEEJOB');
+      formData.append('openForCodeempid', this.openforOneejob);
+    } else if (this.isFreelanceSelected()) {
+      formData.append('openForType', 'freelance');
+      formData.append('openForFreelanceName', this.freelanceName());
+    } else {
+      const isSelf = this.selectedOpenFor().value === this.authService.userData().CODEMPID;
+      formData.append('openForType', isSelf ? 'self' : 'other');
+      formData.append('openForCodeempid', this.selectedOpenFor().value);
     }
-    formData.append(
-      'openForCodeempid',
-      this.IsOneeJob ? this.openforOneejob : this.selectedOpenFor().value,
-    );
     formData.append(
       'description',
       this.IsOneeJob ? `[ONEE JOBS]\n ${this.requestDetails()}` : this.requestDetails(),

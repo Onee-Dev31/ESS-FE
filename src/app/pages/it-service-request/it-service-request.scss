@@ -155,6 +155,7 @@ $table-label-bg: var(--border-toolbar);
       color: var(--text-header);
       transition: all 0.2s ease;
       width: 100%;
+      height: 45px !important;
       box-sizing: border-box;
       box-shadow: none;
       appearance: none;
@@ -191,6 +192,17 @@ $table-label-bg: var(--border-toolbar);
 
     &.slide-in-right {
       animation: slideInRight 0.3s ease-out;
+    }
+
+    .input-error {
+      border-color: #ff4d4f;
+    }
+
+    .error-text {
+      color: #ff4d4f;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
     }
   }
 

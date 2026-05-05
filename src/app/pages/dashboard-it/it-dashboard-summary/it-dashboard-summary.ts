@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ChartMode, KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
+import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -60,12 +60,12 @@ export class ItDashboardSummary {
       icon: 'appstore',
     },
     {
-      status: 'Closed',
-      title: 'Closed Tickets',
+      status: 'Open',
+      title: 'Open tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ปิดแล้ว',
-      icon: 'check-circle',
+      hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'appstore',
     },
     // {
     //   status: 'In Progress',
@@ -77,7 +77,15 @@ export class ItDashboardSummary {
     // },
     {
       status: 'Assigned',
-      title: 'Assigned Tickets',
+      title: 'In Progress Tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'user',
+    },
+    {
+      status: 'Closed',
+      title: 'Closed Tickets',
       value: 0,
       delta: 0,
       hint: 'Tickets ที่ได้รับมอบหมาย',
@@ -125,8 +133,9 @@ export class ItDashboardSummary {
   private statusIndexMap: Record<string, number> = {
     open: 0,
     assigned: 1,
-    inprogress: 2,
-    done: 3,
+    done: 2,
+    hold: 3,
+    denied: 4,
     all: -1,
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
@@ -176,29 +185,12 @@ export class ItDashboardSummary {
         icon: 'appstore',
       },
       {
-        status: 'done',
-        title: 'Closed Tickets',
-        value: summary.closed ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
-      },
-
-      {
-        status: 'assigned',
-        title: 'Assigned Tickets (In progress)',
-        value: summary.assigned ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ได้รับมอบหมาย',
-        icon: 'user',
-      },
-      {
         status: 'open',
-        title: 'Open tickets',
+        title: 'New tickets',
         value: summary.open ?? 0,
         delta: 0,
-        hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-        icon: 'inbox',
+        hint: 'Tickets ทั้งหมดทุกสถานะ',
+        icon: 'appstore',
       },
       // {
       //   status: 'inprogress',
@@ -208,7 +200,22 @@ export class ItDashboardSummary {
       //   hint: 'Tickets ที่กำลังดำเนินการ',
       //   icon: 'sync',
       // },
-
+      {
+        status: 'assigned',
+        title: 'In Progress Ticket',
+        value: summary.assigned ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ได้รับมอบหมาย',
+        icon: 'user',
+      },
+      {
+        status: 'done',
+        title: 'Closed Tickets',
+        value: summary.closed ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ปิดแล้ว',
+        icon: 'check-circle',
+      },
       {
         status: 'hold',
         title: 'Hold Tickets',
@@ -229,9 +236,9 @@ export class ItDashboardSummary {
   }
   private buildStatusPie(summary: any) {
     const data: PieDatum[] = [
+      { name: 'New', value: summary.open ?? 0, key: 'open' },
+      { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
-      { name: 'Assigned', value: summary.assigned ?? 0, key: 'assigned' },
-      { name: 'Open', value: summary.open ?? 0, key: 'open' },
       // { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
       { name: 'Hold', value: summary.hold ?? 0, key: 'hold' },
       { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
@@ -366,8 +373,8 @@ export class ItDashboardSummary {
         this.getCssVar('--status-assigned-text'),
         // this.getCssVar('--status-progress-text'),
         this.getCssVar('--status-closed-text'),
-        this.getCssVar('--status-deny-text'),
         this.getCssVar('--status-hold-text'),
+        this.getCssVar('--status-deny-text'),
       ],
       series: [
         {
@@ -502,6 +509,7 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
+    console.log(k, isClick);
     this.currentStatus = this.statusLabel(k);
     this.activeStatus = k;
     this.selectedStatus = k;
@@ -693,7 +701,7 @@ export class ItDashboardSummary {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
-        console.log(this.filteredTicketLogs);
+        // console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },

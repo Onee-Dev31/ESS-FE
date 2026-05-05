@@ -127,6 +127,15 @@
               <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
             }
           </nz-select>
+          @if (isFreelanceSelected()) {
+            <input
+              type="text"
+              class="form-control"
+              placeholder="ระบุชื่อ Freelance *"
+              [ngModel]="freelanceName()"
+              (ngModelChange)="freelanceName.set($event)"
+            />
+          }
         </div>
       </div>
     </div>
@@ -160,14 +169,17 @@
           (input)="onPhoneInput($event)"
           placeholder="ระบุเบอร์โทรศัพท์ที่สามารถติดต่อได้..."
         />
+        @if (phoneError) {
+          <span class="error-text">{{ phoneError }}</span>
+        }
       </div>
     </div>
 
-    <div class="form-section">
+    <!-- <div class="form-section">
       <h3 class="section-title">
         ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
       </h3>
-    </div>
+    </div> -->
 
     <!-- Actions Footer -->
     <div class="form-actions-row">
@@ -393,7 +405,11 @@
               <tr>
                 <th>ชื่อผู้ขอสิทธิ์</th>
                 <td>
-                  {{ selectedOpenFor().label }}
+                  @if (isFreelanceSelected()) {
+                    Freelance: {{ freelanceName() }}
+                  } @else {
+                    {{ selectedOpenFor().label }}
+                  }
                 </td>
               </tr>
               @if (phoneNumber()) {

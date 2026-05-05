@@ -29,6 +29,7 @@ import {
   ticketTypyColor,
   StatusColor_Reverse,
   StatusColor_text,
+  getStatusLabel,
 } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
@@ -53,6 +54,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
 import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
+import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -77,6 +79,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
     NzCheckboxModule,
     CcModal,
     NoteForItModal,
+    AvatarPreviewModal,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -295,12 +298,20 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
+      // const status_for_it =
+      //   assignments.length === 1 &&
+      //   assignments[0].codeempid === this.authService.userData().CODEMPID
+      //     ? 'In Progress'
+      //     : ticket.IT_Status;
+
+      // console.log(status_for_it);
+
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
-        noteForIt: ticket.noteForIt || 'mock ไว้ก่อน',
+        noteForIt: ticket.noteForIt,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         priority: ticket.priority,
@@ -316,7 +327,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
-        it_satus: ticket.IT_Status,
+        it_satus: getStatusLabel(ticket.IT_Status), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -465,9 +476,14 @@ export class DashboardIT implements OnInit {
   }
 
   private extractNickName(name: string) {
-    const match = name.match(/\((.*?)\)/);
+    const nickMatch = name.match(/\((.*?)\)/);
+    const firstName = name.split(' ')[0];
 
-    return match ? match[1] : name;
+    if (nickMatch) {
+      return `${firstName} (${nickMatch[1]})`;
+    }
+
+    return firstName;
   }
 
   viewFile(file: any) {
@@ -540,7 +556,7 @@ export class DashboardIT implements OnInit {
       }),
     );
 
-    console.log(notes);
+    // console.log(notes);
     return notes;
   }
 
@@ -598,12 +614,14 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
+          // console.log(res);
           const mapped = res.data.map((ticket: any) => ({
             ...ticket,
             ticketId: ticket.id,
             ticketNumber: ticket.ticket_number,
             ticketType: ticket.ticket_type_name_th,
             status: ticket.status,
+            IT_Status: getStatusLabel(ticket.IT_Status),
             createdDate: new Date(ticket.created_at).toISOString(),
             requesterEmpId: ticket.requester_code,
             subject: ticket.subject,
@@ -1138,7 +1156,7 @@ export class DashboardIT implements OnInit {
 
   // -- note for IT --
   openNoteForItModal() {
-    console.log(this.IS_NOTEFORIT_TICKET());
+    // console.log(this.IS_NOTEFORIT_TICKET());
     this.IS_NOTEFORIT_TICKET.set(true);
   }
 

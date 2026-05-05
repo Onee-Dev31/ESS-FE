@@ -41,6 +41,8 @@ import { EMPTY } from 'rxjs';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
+import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
+import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -57,6 +59,8 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
     NzTooltipModule,
     NzModalModule,
     CcModal,
+    ReOpenModal,
+    AvatarPreviewModal,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
@@ -317,6 +321,7 @@ export class ItService implements OnInit {
 
   selectAssignee(item: any) {
     this.isVisibleAssignee.set(true);
+    console.log(item);
     this.selectedAssignee.set(item);
   }
 
@@ -418,6 +423,11 @@ export class ItService implements OnInit {
     this.IS_REOPEN_TICKET.set(false);
   }
 
+  submitReOpen(data: any) {
+    console.log(data);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+  }
+
   copy(text: string) {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -516,9 +526,6 @@ export class ItService implements OnInit {
   }
 
   private extractNickName(name: string) {
-    //   const match = name.match(/\((.*?)\)/);
-    //   return match ? match[1] : name;
-
     const nickMatch = name.match(/\((.*?)\)/);
     const firstName = name.split(' ')[0];
 
