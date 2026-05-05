@@ -434,6 +434,14 @@ textarea.form-input {
   }
 }
 
+.btn-add-note {
+  border-radius: 10px;
+}
+
+.btn-send__icon {
+  margin-right: 4px;
+}
+
 .tk-page {
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr) 320px;
