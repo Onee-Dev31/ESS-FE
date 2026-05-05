@@ -128,6 +128,17 @@
             }
           </nz-select>
         </div>
+        @if (isFreelanceSelected()) {
+          <div class="mt-2">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="ระบุชื่อ Freelance *"
+              [ngModel]="freelanceName()"
+              (ngModelChange)="freelanceName.set($event)"
+            />
+          </div>
+        }
       </div>
     </div>
 
@@ -393,7 +404,11 @@
               <tr>
                 <th>ชื่อผู้ขอสิทธิ์</th>
                 <td>
-                  {{ selectedOpenFor().label }}
+                  @if (isFreelanceSelected()) {
+                    Freelance: {{ freelanceName() }}
+                  } @else {
+                    {{ selectedOpenFor().label }}
+                  }
                 </td>
               </tr>
               @if (phoneNumber()) {
