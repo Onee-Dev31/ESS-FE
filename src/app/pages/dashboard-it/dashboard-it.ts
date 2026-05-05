@@ -311,13 +311,12 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      // const status_for_it =
-      //   assignments.length === 1 &&
-      //   assignments[0].codeempid === this.authService.userData().CODEMPID
-      //     ? 'In Progress'
-      //     : ticket.IT_Status;
-
-      // console.log(status_for_it);
+      const status_for_it =
+        assignments.length === 1 &&
+        assignments[0].codeempid === this.authService.userData().CODEMPID &&
+        ticket.IT_Status === 'Assigned'
+          ? 'In Progress'
+          : ticket.IT_Status;
 
       const objectData = {
         ticketId: ticket.id,
@@ -340,7 +339,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
-        it_satus: getStatusLabel(ticket.IT_Status), //ticket.IT_Status
+        it_satus: getStatusLabel(status_for_it), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -617,7 +616,6 @@ export class DashboardIT implements OnInit {
   getAllTickets(trackNew = false) {
     const searchText = this.keyword.trim();
 
-    // console.log(this.myTicket);
     this.itServiceService
       .getAllTickets({
         page: 1,
@@ -628,17 +626,27 @@ export class DashboardIT implements OnInit {
       .subscribe({
         next: (res) => {
           // console.log(res);
-          const mapped = res.data.map((ticket: any) => ({
-            ...ticket,
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticket_number,
-            ticketType: ticket.ticket_type_name_th,
-            status: ticket.status,
-            IT_Status: getStatusLabel(ticket.IT_Status),
-            createdDate: new Date(ticket.created_at).toISOString(),
-            requesterEmpId: ticket.requester_code,
-            subject: ticket.subject,
-          }));
+
+          const mapped = res.data.map((ticket: any) => {
+            const assignments = ticket.assignments ?? [];
+            const status_for_it =
+              assignments.length === 1 &&
+              assignments[0].codeempid === this.authService.userData().CODEMPID &&
+              ticket.IT_Status === 'Assigned'
+                ? 'In Progress'
+                : ticket.IT_Status;
+            return {
+              ...ticket,
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              ticketType: ticket.ticket_type_name_th,
+              status: ticket.status,
+              IT_Status: getStatusLabel(status_for_it),
+              createdDate: new Date(ticket.created_at).toISOString(),
+              requesterEmpId: ticket.requester_code,
+              subject: ticket.subject,
+            };
+          });
           this.Tickets.set(mapped);
           this.fetchUnreadIds();
 
