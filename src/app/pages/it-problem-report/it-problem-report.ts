@@ -70,7 +70,7 @@ export class ItProblemReportComponent implements OnInit {
   @Input() openBy!: string;
 
   // CC
-  ccSelected = signal<string[]>([]);
+  ccSelected = signal<{ label: string; value: string }[]>([]);
   ccOptions = signal<{ label: string; value: string }[]>([]);
   readonly nzFilterOption = () => true;
   ccSearched = signal<boolean>(false);
@@ -96,7 +96,7 @@ export class ItProblemReportComponent implements OnInit {
     this.ccSearched.set(true);
     this.itServiceService.searchEmployees({ search, pageSize: 20 }).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.ccOptions.set(
           (res.data || []).map((e: any) => ({
             // label: `${e.FullNameThai || e.FullNameEng || e.FullName || e.fullname || e.name || '-'} (${e.UserID || e.CODEEMPID || e.EmpNo || e.codeempid || '-'})`,
@@ -154,8 +154,6 @@ export class ItProblemReportComponent implements OnInit {
       ...current,
       categories: isSelected ? [] : [cat],
     });
-
-    console.log(current, cat);
   }
 
   onDragOver(event: DragEvent) {
@@ -293,14 +291,16 @@ export class ItProblemReportComponent implements OnInit {
           ? 'true'
           : 'false',
     ); //it เปิดให้ตัวเอง ?
+
     if (this.openBy === 'IT') {
       formData.append('openForCodeempid', this.selectedOpenFor());
     }
     formData.append('ticketTypeId', '2');
 
     const cc = this.ccSelected();
-    if (cc.length > 0) {
-      formData.append('CcCodeEmpIdsJson', JSON.stringify(cc));
+    if (cc.length > 0 && this.isVisibleCC()) {
+      const ids = cc.map((c) => c.value);
+      formData.append('CcCodeEmpIdsJson', JSON.stringify(ids));
     }
 
     data.attachments.forEach((item: any) => {
@@ -311,7 +311,6 @@ export class ItProblemReportComponent implements OnInit {
     });
 
     console.log('formData', [...formData.entries()]);
-    console.log();
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService
@@ -359,7 +358,7 @@ export class ItProblemReportComponent implements OnInit {
   getSubProblem() {
     this.itServiceService.getSubProblem().subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.availableCategories = res.data;
         this.cdr.detectChanges();
       },

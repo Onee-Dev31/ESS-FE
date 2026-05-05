@@ -182,7 +182,7 @@
             [nzNotFoundContent]="ccNotFound"
           >
             @for (opt of ccOptions(); track opt.value) {
-              <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
+              <nz-option [nzLabel]="opt.label" [nzValue]="opt" />
             }
             <ng-template #ccNotFound>
               @if (ccSearched()) {
@@ -305,6 +305,16 @@
                   }
                 </td>
               </tr>
+              @if (ccSelected().length) {
+                <tr>
+                  <th>ผู้รับสำเนา</th>
+                  <td class="text-primary font-weight-bold">
+                    @for (cc of ccSelected(); track cc.value; let last = $last) {
+                      {{ cc.label }}{{ !last ? ', ' : '' }}
+                    }
+                  </td>
+                </tr>
+              }
             </table>
           </div>
         </div>
