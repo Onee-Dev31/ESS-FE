@@ -41,6 +41,7 @@ import { EMPTY } from 'rxjs';
 import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
+import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -57,6 +58,7 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
     NzTooltipModule,
     NzModalModule,
     CcModal,
+    ReOpenModal,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
@@ -416,6 +418,11 @@ export class ItService implements OnInit {
 
   closeReOpenModal() {
     this.IS_REOPEN_TICKET.set(false);
+  }
+
+  submitReOpen(data: any) {
+    console.log(data);
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
   }
 
   copy(text: string) {

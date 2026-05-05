@@ -309,6 +309,16 @@
       <i class="fas fa-history" style="margin-right: 4px"></i> Re Submit
     </button>
   </section>
+  <section class="tk-actions" *ngIf="t.status === 'Closed'">
+    <ng-container>
+      <button class="btn btn-send" (click)="openReOpen()">
+        <i class="fas fa-history" style="margin-right: 4px"></i> Reopen
+      </button>
+      <!-- <button class="btn btn-done" (click)="openRating()">
+        <i class="fas fa-star" style="margin-right: 4px"></i> Rate Us
+      </button> -->
+    </ng-container>
+  </section>
 </ng-template>
 
 <!-- RIGHT TEMPLATE -->
@@ -455,20 +465,11 @@
 }
 
 @if (IS_REOPEN_TICKET()) {
-  <div class="modal-overlay denyTicket">
-    <div class="modal-container">
-      <header class="top-header-strip"><h2>อธิบายเหตุผล</h2></header>
-      <div class="content-card">
-        <textarea class="form-input reopen" placeholder="อธิบายรายละเอียด..."></textarea>
-      </div>
-      <div class="form-actions-footer">
-        <button class="btn-back-custom" (click)="closeReOpenModal()">
-          <i class="fas fa-times"></i> ยกเลิก
-        </button>
-        <button class="btn-save-custom"><i class="fas fa-paper-plane"></i> ส่ง</button>
-      </div>
-    </div>
-  </div>
+  <app-re-open-modal
+    [ticket]="selectTicket"
+    (closeModal)="closeReOpenModal()"
+    (submitModal)="submitReOpen($event)"
+  ></app-re-open-modal>
 }
 
 @if (isRatingModalOpen()) {
