@@ -94,7 +94,13 @@
   <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
     <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
       <div class="mobile-detail-header">
-        <button class="btn-back" (click)="closeTicketDetail()">
+        <button
+          class="btn-back"
+          type="button"
+          aria-label="ย้อนกลับ"
+          title="ย้อนกลับ"
+          (click)="closeTicketDetail()"
+        >
           <i class="fas fa-arrow-left"></i>
         </button>
         <span>รายละเอียด Ticket</span>
@@ -175,7 +181,13 @@
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
-      <textarea [(ngModel)]="t.description" class="form-input"></textarea>
+      <textarea
+        [(ngModel)]="t.description"
+        class="form-input"
+        aria-label="รายละเอียด ticket"
+        title="รายละเอียด ticket"
+        placeholder="กรอกรายละเอียด ticket"
+      ></textarea>
     </div>
   </section>
 
@@ -231,7 +243,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
-        style="border-radius: 10px"
+        class="btn-add-note"
         nz-button
         nzType="primary"
         (click)="openAddNote()"
@@ -256,6 +268,8 @@
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
+                  alt="รูปโปรไฟล์ของ {{ n.createBy.nickName || 'ผู้ใช้งาน' }}"
+                  title="รูปโปรไฟล์ของ {{ n.createBy.nickName || 'ผู้ใช้งาน' }}"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -306,7 +320,7 @@
   <!-- ACTIONS -->
   <section class="tk-actions" *ngIf="t.status === 'Waiting you'">
     <button class="btn btn-send" (click)="Resubmit(t)">
-      <i class="fas fa-history" style="margin-right: 4px"></i> Re Submit
+      <i class="fas fa-history btn-send__icon"></i> Re Submit
     </button>
   </section>
 </ng-template>
@@ -320,6 +334,8 @@
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          alt="รูปโปรไฟล์ของ {{ requester.fullname || 'ผู้ขอใช้บริการ' }}"
+          title="รูปโปรไฟล์ของ {{ requester.fullname || 'ผู้ขอใช้บริการ' }}"
           (error)="onImgError($event)"
         />
       </div>
@@ -395,6 +411,8 @@
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  alt="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
+                  title="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -416,6 +434,8 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
+                      alt="รูปโปรไฟล์ของ {{ selectedAssignee().nickName || 'ผู้รับผิดชอบ' }}"
+                      title="รูปโปรไฟล์ของ {{ selectedAssignee().nickName || 'ผู้รับผิดชอบ' }}"
                       (error)="onImgError($event)"
                     />
                     <h3>{{ selectedAssignee().nickName }}</h3>
