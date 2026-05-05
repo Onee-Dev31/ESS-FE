@@ -94,8 +94,8 @@
   <div class="mobile-detail-overlay" (click)="closeTicketDetail()">
     <div class="mobile-detail-panel" (click)="$event.stopPropagation()">
       <div class="mobile-detail-header">
-        <button class="btn-back" (click)="closeTicketDetail()">
-          <i class="fas fa-arrow-left"></i>
+        <button class="btn-back" (click)="closeTicketDetail()" aria-label="ย้อนกลับ">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
         </button>
         <span>รายละเอียด Ticket</span>
         <span></span>
@@ -175,7 +175,7 @@
       <div class="tk-text" [innerHTML]="formatText.getFormatTextHTML(t.description)"></div>
     </div>
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
-      <textarea [(ngModel)]="t.description" class="form-input"></textarea>
+      <textarea [(ngModel)]="t.description" class="form-input" placeholder="กรอกรายละเอียด..." aria-label="รายละเอียด"></textarea>
     </div>
   </section>
 
@@ -231,7 +231,7 @@
     <div class="tk-card__head">
       <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
       <button
-        style="border-radius: 10px"
+        class="btn-add-note"
         nz-button
         nzType="primary"
         (click)="openAddNote()"
@@ -256,6 +256,8 @@
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
+                  [alt]="'รูปโปรไฟล์ของ ' + n.createBy.name"
+                  [title]="'รูปโปรไฟล์ของ ' + n.createBy.name"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -306,7 +308,7 @@
   <!-- ACTIONS -->
   <section class="tk-actions" *ngIf="t.status === 'Waiting you'">
     <button class="btn btn-send" (click)="Resubmit(t)">
-      <i class="fas fa-history" style="margin-right: 4px"></i> Re Submit
+      <i class="fas fa-history mr-1"></i> Re Submit
     </button>
   </section>
 </ng-template>
@@ -320,6 +322,8 @@
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          [alt]="'รูปโปรไฟล์ของ ' + requester.fullname"
+          [title]="'รูปโปรไฟล์ของ ' + requester.fullname"
           (error)="onImgError($event)"
         />
       </div>
@@ -401,6 +405,8 @@
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  [alt]="'รูปโปรไฟล์ของ ' + a.fullname"
+                  [title]="'รูปโปรไฟล์ของ ' + a.fullname"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -422,6 +428,8 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
+                      [alt]="'รูปโปรไฟล์ของ ' + selectedAssignee().fullname"
+                      [title]="'รูปโปรไฟล์ของ ' + selectedAssignee().fullname"
                       (error)="onImgError($event)"
                     />
                     <h3>{{ selectedAssignee().nickName }}</h3>
