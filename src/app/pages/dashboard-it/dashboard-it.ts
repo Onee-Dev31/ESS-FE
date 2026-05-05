@@ -487,6 +487,9 @@ export class DashboardIT implements OnInit {
           setTimeout(() => {
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
           }, 100);
+
+          this.selectTicket(this.selectedTicket().ticketId);
+          this.getAllTickets();
         },
         error: (error) => {
           console.error('Error Re-open:', error.error);

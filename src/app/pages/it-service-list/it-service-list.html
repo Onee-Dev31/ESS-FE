@@ -161,7 +161,10 @@
     <div class="tk-card__head">
       <div class="tk-card__title">
         รายละเอียด
-        <span (click)="openAllAttachments(t.attachments)" *ngIf="t.attachments.length > 0"
+        <span
+          class="files"
+          (click)="openAllAttachments(t.attachments)"
+          *ngIf="t.attachments.length > 0"
           ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
         >
       </div>

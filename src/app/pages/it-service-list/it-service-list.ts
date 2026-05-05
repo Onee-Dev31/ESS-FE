@@ -440,6 +440,7 @@ export class ItService implements OnInit {
         setTimeout(() => {
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
         }, 100);
+        this.closeReOpenModal();
       },
       error: (error) => {
         console.error('Error Re-open:', error.error);
