@@ -51,7 +51,11 @@
 
     <div class="tk-left__search">
       <span class="material-symbols-outlined ic">search</span>
-      <input [(ngModel)]="keyword" placeholder="Search by Ticket Number and Name" />
+      <input
+        [(ngModel)]="keyword"
+        (ngModelChange)="onKeywordChange($event)"
+        placeholder="Search by Ticket Number and Name"
+      />
     </div>
 
     <div class="ticket-list">
