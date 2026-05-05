@@ -750,7 +750,7 @@ export class ItService implements OnInit {
         // console.log(pair[0], pair[1]);
       }
       // ยิงจริง
-      this.itServiceService.re_open(formData).subscribe({
+      this.itServiceService.re_submit(formData).subscribe({
         next: (res) => {
           // console.log('re_open success:', res);
 
