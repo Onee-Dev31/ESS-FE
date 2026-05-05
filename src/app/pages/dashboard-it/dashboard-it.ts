@@ -29,6 +29,7 @@ import {
   ticketTypyColor,
   StatusColor_Reverse,
   StatusColor_text,
+  getStatusLabel,
 } from '../../utils/status.util';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
@@ -295,11 +296,11 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
-      const status_for_it =
-        assignments.length === 1 &&
-        assignments[0].codeempid === this.authService.userData().CODEMPID
-          ? 'In Progress'
-          : ticket.IT_Status;
+      // const status_for_it =
+      //   assignments.length === 1 &&
+      //   assignments[0].codeempid === this.authService.userData().CODEMPID
+      //     ? 'In Progress'
+      //     : ticket.IT_Status;
 
       // console.log(status_for_it);
 
@@ -324,7 +325,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
-        it_satus: status_for_it, //ticket.IT_Status
+        it_satus: getStatusLabel(ticket.IT_Status), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -613,6 +614,7 @@ export class DashboardIT implements OnInit {
             ticketNumber: ticket.ticket_number,
             ticketType: ticket.ticket_type_name_th,
             status: ticket.status,
+            IT_Status: getStatusLabel(ticket.IT_Status),
             createdDate: new Date(ticket.created_at).toISOString(),
             requesterEmpId: ticket.requester_code,
             subject: ticket.subject,
