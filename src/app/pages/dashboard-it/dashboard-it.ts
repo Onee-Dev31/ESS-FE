@@ -414,7 +414,7 @@ export class DashboardIT implements OnInit {
       assigned: 'In Progress',
       closed: 'Closed',
       hold: 'Hold',
-      deny: 'Denied',
+      denied: 'Denied',
     };
 
     const mappedStatus = statusMap[this.filterStatus ?? ''];
