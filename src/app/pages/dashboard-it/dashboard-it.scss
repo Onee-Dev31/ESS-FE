@@ -63,6 +63,7 @@
   white-space: nowrap;
 
   &:hover {
+    background-color: var(--primary);
     background-color: color-mix(in srgb, var(--primary), black 15%);
     box-shadow: 0 6px 16px rgba(22, 119, 255, 0.5);
   }
@@ -960,6 +961,7 @@
       color 0.2s;
 
     &:hover {
+      color: var(--primary);
       color: color-mix(in srgb, var(--primary), var(--text) 30%);
     }
   }
@@ -1800,7 +1802,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scrollbar-width: thin;
+  @supports (scrollbar-width: thin) {
+    scrollbar-width: thin;
+  }
 }
 
 .new-note-badge {

@@ -256,8 +256,8 @@
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
-                  [alt]="'รูปโปรไฟล์ของ ' + n.createBy.name"
-                  [title]="'รูปโปรไฟล์ของ ' + n.createBy.name"
+                  alt="รูปโปรไฟล์ของ {{ n.createBy.name }}"
+                  title="รูปโปรไฟล์ของ {{ n.createBy.name }}"
                   (error)="onImgError($event)"
                 />
               </div>
@@ -322,8 +322,8 @@
       <div class="side-avatar">
         <img
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
-          [alt]="'รูปโปรไฟล์ของ ' + requester.fullname"
-          [title]="'รูปโปรไฟล์ของ ' + requester.fullname"
+          alt="รูปโปรไฟล์ของ {{ requester.fullname }}"
+          title="รูปโปรไฟล์ของ {{ requester.fullname }}"
           (error)="onImgError($event)"
         />
       </div>
@@ -428,8 +428,8 @@
                         selectedAssignee().empCode +
                         '.jpg'
                       "
-                      [alt]="'รูปโปรไฟล์ของ ' + selectedAssignee().fullname"
-                      [title]="'รูปโปรไฟล์ของ ' + selectedAssignee().fullname"
+                      alt="รูปโปรไฟล์ของ {{ selectedAssignee().fullname }}"
+                      title="รูปโปรไฟล์ของ {{ selectedAssignee().fullname }}"
                       (error)="onImgError($event)"
                     />
                     <h3>{{ selectedAssignee().nickName }}</h3>

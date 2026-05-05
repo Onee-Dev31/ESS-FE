@@ -354,6 +354,7 @@ textarea.form-input {
 
   &:hover {
     cursor: pointer;
+    color: var(--primary);
     color: color-mix(in srgb, var(--primary), var(--text) 20%);
     transform: translateY(-1px);
   }
@@ -665,6 +666,7 @@ textarea.form-input {
   font-size: 12px;
   font-weight: 700;
   background: var(--bg-card);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border: 2px solid color-mix(in srgb, white, transparent 50%);
 }
 
@@ -947,6 +949,7 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
   flex-shrink: 0;
 
@@ -977,6 +980,7 @@ textarea.form-input {
       color 0.2s;
 
     &:hover {
+      color: var(--primary);
       color: color-mix(in srgb, var(--primary), var(--text) 30%);
     }
   }
@@ -1021,9 +1025,10 @@ textarea.form-input {
   flex: 1;
   min-height: 0;
 
-  /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  @supports (scrollbar-width: thin) {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
 
   .info-hint {
     font-size: $font-size-hint;
@@ -1538,8 +1543,10 @@ textarea.form-input {
 
   // scrollbar-width: none;
   // -ms-overflow-style: none;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  @supports (scrollbar-width: thin) {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
 }
 
 .side-card.assignee::-webkit-scrollbar {
@@ -1780,5 +1787,7 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scrollbar-width: thin;
+  @supports (scrollbar-width: thin) {
+    scrollbar-width: thin;
+  }
 }
