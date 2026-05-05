@@ -229,7 +229,12 @@
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
+      <div class="tk-card__title">
+        <i class="fa-solid fa-comments"></i>Chat
+        <span class="info-hint">
+          (เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์)
+        </span>
+      </div>
       <button
         style="border-radius: 10px"
         nz-button
@@ -252,11 +257,11 @@
           <div class="note__top">
             <div class="note__who">
               <div class="avatar">
-                <img
+                <app-avatar-preview-modal
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
-                  (error)="onImgError($event)"
+                  [name]="n.createBy.nickName"
                 />
               </div>
               <div>
@@ -293,10 +298,10 @@
           </ul>
         </div>
       </div>
-      <div class="info-hint">
+      <!-- <div class="info-hint">
         เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น.
         <div>หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์</div>
-      </div>
+      </div> -->
       <ng-template #noNote>
         <div class="tk-empty">ยังไม่มีข้อความ</div>
       </ng-template>
@@ -328,9 +333,13 @@
     <div class="side-title">ผู้ขอใช้บริการ</div>
     <div class="side-profile">
       <div class="side-avatar">
-        <img
+        <app-avatar-preview-modal
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
-          (error)="onImgError($event)"
+          [name]="
+            requester.nickname
+              ? requester.fullname + ' (' + requester.nickname + ')'
+              : requester.fullname
+          "
         />
       </div>
       <div class="side-detail">
@@ -355,7 +364,9 @@
     <div class="side-title">เปิดให้</div>
     <div class="side-detail">
       <div>
-        {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
+        {{ openFor.fullname }}
+        <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
+        <span *ngIf="openFor.open_for_type">({{ openFor.open_for_type }})</span>
       </div>
       <div>{{ openFor.department_name }}</div>
       <div>{{ openFor.company_name }}</div>
@@ -418,16 +429,21 @@
               <div class="assignee-card" (click)="$event.stopPropagation()">
                 <button class="btn-close" (click)="closeAssignee()">✕</button>
                 @if (selectedAssignee()) {
-                  <div class="assignee-profile">
-                    <img
-                      class="avatar"
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        selectedAssignee().empCode +
-                        '.jpg'
-                      "
-                      (error)="onImgError($event)"
-                    />
+                  <div class="assignee-avatar">
+                    <div class="side-avatar">
+                      <app-avatar-preview-modal
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          selectedAssignee().empCode +
+                          '.jpg'
+                        "
+                        [name]="
+                          selectedAssignee().nickname
+                            ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'
+                            : selectedAssignee().fullname
+                        "
+                      />
+                    </div>
                     <h3>{{ selectedAssignee().nickName }}</h3>
                     <div class="side-contact">
                       <p>ช่องทางการติดต่อ</p>
@@ -491,3 +507,10 @@
 @if (isCcModalVisible) {
   <app-cc-modal [ticket]="selectedTicket()" (closeModal)="handleCancel()"> </app-cc-modal>
 }
+
+<!-- @if {
+  <app-avatar-preview
+    [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+    [name]="requester.name"
+  />
+} -->

@@ -335,13 +335,11 @@
           <div class="note__top">
             <div class="note__who">
               <div class="avatar">
-                <img
+                <app-avatar-preview-modal
                   [src]="
                     'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
                   "
-                  alt="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
-                  title="รูปโปรไฟล์ของ {{ n.createBy.nickName }}"
-                  (error)="onImgError($event)"
+                  [name]="n.createBy.nickName"
                 />
               </div>
               <div>
@@ -416,11 +414,13 @@
     <div class="side-title">ผู้ขอใช้บริการ</div>
     <div class="side-profile">
       <div class="side-avatar">
-        <img
+        <app-avatar-preview-modal
           [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
-          alt="รูปโปรไฟล์ของ {{ requester.fullname }}"
-          title="รูปโปรไฟล์ของ {{ requester.fullname }}"
-          (error)="onImgError($event)"
+          [name]="
+            requester.nickname
+              ? requester.fullname + ' (' + requester.nickname + ')'
+              : requester.fullname
+          "
         />
       </div>
       <div class="side-detail">
@@ -519,18 +519,21 @@
                   <i class="fas fa-times"></i>
                 </button>
                 @if (selectedAssignee()) {
-                  <div class="assignee-profile">
-                    <img
-                      class="avatar"
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        selectedAssignee().empCode +
-                        '.jpg'
-                      "
-                      alt="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
-                      title="รูปโปรไฟล์ของ {{ selectedAssignee().nickName }}"
-                      (error)="onImgError($event)"
-                    />
+                  <div class="assignee-avatar">
+                    <div class="side-avatar">
+                      <app-avatar-preview-modal
+                        [src]="
+                          'https://empimg.oneeclick.co:8048/employeeimage/' +
+                          selectedAssignee().empCode +
+                          '.jpg'
+                        "
+                        [name]="
+                          selectedAssignee().nickname
+                            ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'
+                            : selectedAssignee().fullname
+                        "
+                      />
+                    </div>
                     <h3>{{ selectedAssignee().nickName }}</h3>
                     <div class="side-contact">
                       <p>ช่องทางการติดต่อ</p>

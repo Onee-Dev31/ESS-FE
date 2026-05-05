@@ -40,6 +40,7 @@ export class ITServiceRequestComponent implements OnInit {
   private router = inject(Router);
 
   phoneModel = '';
+  phoneError = '';
   phoneNumber = signal('');
   requestDetails = signal('');
 
@@ -65,8 +66,6 @@ export class ITServiceRequestComponent implements OnInit {
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    // const otherNameValid = openFor !== 'other' || this.otherOpenForName().trim().length > 0;
-
     // Sub-validation for "Request System" (ขอใช้ระบบ)
     const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
     let subValidationPassed = true;
@@ -90,18 +89,19 @@ export class ITServiceRequestComponent implements OnInit {
     const phoneValid = this.phoneNumber().trim().length > 0;
     const openForValid = this.selectedOpenFor() !== null;
     const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
-    return hasService && openForValid && subValidationPassed && detailValid && phoneValid && freelanceValid;
+    return (
+      hasService &&
+      openForValid &&
+      subValidationPassed &&
+      detailValid &&
+      phoneValid &&
+      freelanceValid
+    );
   });
 
   ngOnInit() {
     this.getServiceType();
     this.getOpenFor();
-    const userData = this.authService.userData();
-    if (userData?.USR_MOBILE) {
-      const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
-      this.phoneModel = formatted;
-      this.phoneNumber.set(formatted);
-    }
 
     const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
@@ -135,6 +135,16 @@ export class ITServiceRequestComponent implements OnInit {
     }
   }
 
+  // onPhoneInput(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   let digitsOnly = input.value.replace(/\D/g, '');
+  //   digitsOnly = digitsOnly.slice(0, 10);
+  //   const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
+  //   input.value = formatted;
+  //   this.phoneModel = formatted;
+  //   this.phoneNumber.set(formatted);
+  // }
+
   onPhoneInput(event: Event) {
     const input = event.target as HTMLInputElement;
     let digitsOnly = input.value.replace(/\D/g, '');
@@ -143,6 +153,15 @@ export class ITServiceRequestComponent implements OnInit {
     input.value = formatted;
     this.phoneModel = formatted;
     this.phoneNumber.set(formatted);
+
+    const len = digitsOnly.length;
+    if (len === 0) {
+      this.phoneError = '';
+    } else if (len !== 4 && len !== 10) {
+      this.phoneError = 'เบอร์โทรศัพท์ต้องมี 4 หรือ 10 หลักเท่านั้น';
+    } else {
+      this.phoneError = '';
+    }
   }
 
   onPhoneNumberChange(value: string) {

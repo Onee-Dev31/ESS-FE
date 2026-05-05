@@ -54,6 +54,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
 import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
+import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -78,6 +79,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
     NzCheckboxModule,
     CcModal,
     NoteForItModal,
+    AvatarPreviewModal,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -474,9 +476,14 @@ export class DashboardIT implements OnInit {
   }
 
   private extractNickName(name: string) {
-    const match = name.match(/\((.*?)\)/);
+    const nickMatch = name.match(/\((.*?)\)/);
+    const firstName = name.split(' ')[0];
 
-    return match ? match[1] : name;
+    if (nickMatch) {
+      return `${firstName} (${nickMatch[1]})`;
+    }
+
+    return firstName;
   }
 
   viewFile(file: any) {

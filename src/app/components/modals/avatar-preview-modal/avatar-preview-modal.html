@@ -1,0 +1,18 @@
+<div class="avatar-wrapper" (click)="isOpen = true">
+  <img [src]="src" (error)="onImgError($event)" class="avatar-img" />
+  <!-- <ng-content /> -->
+</div>
+
+@if (isOpen) {
+  <div class="avatar-overlay" (click)="isOpen = false">
+    <div class="avatar-preview-box" (click)="$event.stopPropagation()">
+      <button class="avatar-close-btn" (click)="isOpen = false">
+        <i class="fas fa-times"></i>
+      </button>
+      <img [src]="src" (error)="onImgError($event)" class="preview-img" />
+      @if (name) {
+        <div class="avatar-name">{{ name }}</div>
+      }
+    </div>
+  </div>
+}
