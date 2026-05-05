@@ -80,6 +80,7 @@
               <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
             }
             <div class="ticket-meta-right">
+              <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
               <i
                 class="fas text-icon"
                 [ngClass]="
@@ -214,9 +215,9 @@
       </div>
     </div>
     <div class="tk-hero__right">
-      <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.status)">
+      <span class="tk-pill" [ngStyle]="StatusColor_Reverse.getStyle(t.it_satus)">
         <span class="dot"></span>
-        {{ statusLabel(t.status) }}
+        {{ statusLabel(t.it_satus) }}
       </span>
     </div>
   </section>

@@ -279,7 +279,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
+      // console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -295,12 +295,20 @@ export class DashboardIT implements OnInit {
       const itNotes = await this.buildItNotes(replies, replyAttachments);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
+      const status_for_it =
+        assignments.length === 1 &&
+        assignments[0].codeempid === this.authService.userData().CODEMPID
+          ? 'In Progress'
+          : ticket.IT_Status;
+
+      // console.log(status_for_it);
+
       const objectData = {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
         description: ticket.description,
-        noteForIt: ticket.noteForIt || 'mock ไว้ก่อน',
+        noteForIt: ticket.noteForIt,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         priority: ticket.priority,
@@ -316,7 +324,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
-        it_satus: ticket.IT_Status,
+        it_satus: status_for_it, //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
         assignments: assignments,
@@ -540,7 +548,7 @@ export class DashboardIT implements OnInit {
       }),
     );
 
-    console.log(notes);
+    // console.log(notes);
     return notes;
   }
 
@@ -598,6 +606,7 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
+          // console.log(res);
           const mapped = res.data.map((ticket: any) => ({
             ...ticket,
             ticketId: ticket.id,
@@ -1138,7 +1147,7 @@ export class DashboardIT implements OnInit {
 
   // -- note for IT --
   openNoteForItModal() {
-    console.log(this.IS_NOTEFORIT_TICKET());
+    // console.log(this.IS_NOTEFORIT_TICKET());
     this.IS_NOTEFORIT_TICKET.set(true);
   }
 
