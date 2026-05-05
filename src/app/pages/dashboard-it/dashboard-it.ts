@@ -161,6 +161,7 @@ export class DashboardIT implements OnInit {
   // isAssignModalVisible = false;
   assignSearchKeyword = '';
   selectedAssigneeEmpCodes: any[] = [];
+  private keywordSearchTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private msg: NzMessageService,
@@ -252,6 +253,18 @@ export class DashboardIT implements OnInit {
   onFilterStatusChange(status: string) {
     this.filterStatus = status;
     this.filteredTickets();
+  }
+
+  onKeywordChange(value: string) {
+    this.keyword = value;
+
+    if (this.keywordSearchTimer) {
+      clearTimeout(this.keywordSearchTimer);
+    }
+
+    this.keywordSearchTimer = setTimeout(() => {
+      this.getAllTickets();
+    }, 300);
   }
 
   trackById = (_: number, item: TicketItem) => item.id;
@@ -397,8 +410,6 @@ export class DashboardIT implements OnInit {
   }
 
   filteredTickets(): any[] {
-    const kw = (this.keyword ?? '').trim().toLowerCase();
-
     const statusMap: any = {
       open: 'Open',
       assigned: 'Assigned',
@@ -412,10 +423,7 @@ export class DashboardIT implements OnInit {
 
     return this.Tickets().filter((t: any) => {
       const matchStatus = this.filterStatus === 'all' ? true : t.IT_Status === mappedStatus;
-      const matchKw = !kw
-        ? true
-        : t.ticketNumber.toLowerCase().includes(kw) || t.subject.toLowerCase().includes(kw);
-      return matchStatus && matchKw;
+      return matchStatus;
     });
   }
 
@@ -605,11 +613,14 @@ export class DashboardIT implements OnInit {
 
   // GET MASTER
   getAllTickets(trackNew = false) {
+    const searchText = this.keyword.trim();
+
     // console.log(this.myTicket);
     this.itServiceService
       .getAllTickets({
         page: 1,
         pageSize: 50,
+        searchText: searchText || undefined,
         myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
       })
       .subscribe({
