@@ -64,7 +64,9 @@
 
   &:hover {
     background-color: var(--primary);
-    background-color: color-mix(in srgb, var(--primary), black 15%);
+    @supports (color: color-mix(in srgb, red, blue)) {
+      background-color: color-mix(in srgb, var(--primary), black 15%);
+    }
     box-shadow: 0 6px 16px rgba(22, 119, 255, 0.5);
   }
 }
@@ -962,7 +964,9 @@
 
     &:hover {
       color: var(--primary);
-      color: color-mix(in srgb, var(--primary), var(--text) 30%);
+      @supports (color: color-mix(in srgb, red, blue)) {
+        color: color-mix(in srgb, var(--primary), var(--text) 30%);
+      }
     }
   }
 }

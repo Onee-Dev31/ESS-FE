@@ -355,7 +355,9 @@ textarea.form-input {
   &:hover {
     cursor: pointer;
     color: var(--primary);
-    color: color-mix(in srgb, var(--primary), var(--text) 20%);
+    @supports (color: color-mix(in srgb, red, blue)) {
+      color: color-mix(in srgb, var(--primary), var(--text) 20%);
+    }
     transform: translateY(-1px);
   }
 }
@@ -443,7 +445,9 @@ textarea.form-input {
   .ticket-list {
     flex: 1;
     overflow-y: auto;
-    scrollbar-width: none;
+    @supports (scrollbar-width: none) {
+      scrollbar-width: none;
+    }
     -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
@@ -667,7 +671,9 @@ textarea.form-input {
   font-weight: 700;
   background: var(--bg-card);
   border: 2px solid rgba(255, 255, 255, 0.5);
-  border: 2px solid color-mix(in srgb, white, transparent 50%);
+  @supports (color: color-mix(in srgb, red, blue)) {
+    border: 2px solid color-mix(in srgb, white, transparent 50%);
+  }
 }
 
 .tk-pill .dot {
@@ -950,7 +956,9 @@ textarea.form-input {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  @supports (color: color-mix(in srgb, red, blue)) {
+    border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  }
   flex-shrink: 0;
 
   @media (min-width: 1024px) and (max-width: 1440px) {
@@ -981,7 +989,9 @@ textarea.form-input {
 
     &:hover {
       color: var(--primary);
-      color: color-mix(in srgb, var(--primary), var(--text) 30%);
+      @supports (color: color-mix(in srgb, red, blue)) {
+        color: color-mix(in srgb, var(--primary), var(--text) 30%);
+      }
     }
   }
 }

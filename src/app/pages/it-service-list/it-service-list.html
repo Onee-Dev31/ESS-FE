@@ -405,8 +405,8 @@
               <div class="avatar">
                 <img
                   [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
-                  [alt]="'รูปโปรไฟล์ของ ' + a.fullname"
-                  [title]="'รูปโปรไฟล์ของ ' + a.fullname"
+                  alt="รูปโปรไฟล์ของ {{ a.fullname }}"
+                  title="รูปโปรไฟล์ของ {{ a.fullname }}"
                   (error)="onImgError($event)"
                 />
               </div>
