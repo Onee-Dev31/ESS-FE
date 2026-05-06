@@ -39,6 +39,8 @@ export class ITServiceRequestComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
 
+  authData = JSON.parse(localStorage.getItem('allData') || '{}');
+
   phoneModel = '';
   phoneError = '';
   phoneNumber = signal('');
@@ -66,7 +68,6 @@ export class ITServiceRequestComponent implements OnInit {
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    // Sub-validation for "Request System" (ขอใช้ระบบ)
     const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
     let subValidationPassed = true;
 
@@ -86,7 +87,9 @@ export class ITServiceRequestComponent implements OnInit {
     }
 
     const detailValid = this.requestDetails().trim().length > 0;
-    const phoneValid = this.phoneNumber().trim().length > 0;
+    const phoneValid =
+      this.phoneNumber().trim().length > 0 &&
+      (this.phoneNumber().trim().length === 4 || this.phoneNumber().trim().length === 10);
     const openForValid = this.selectedOpenFor() !== null;
     const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
     return (
@@ -102,6 +105,13 @@ export class ITServiceRequestComponent implements OnInit {
   ngOnInit() {
     this.getServiceType();
     this.getOpenFor();
+
+    const userData = this.authService.userData();
+    if (userData?.TELOFF) {
+      const formatted = PhoneUtil.formatPhoneNumber(userData.TELOFF);
+      this.phoneModel = formatted;
+      this.phoneNumber.set(formatted);
+    }
 
     const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
@@ -296,20 +306,11 @@ export class ITServiceRequestComponent implements OnInit {
 
     this.phoneNumber.set('');
 
-    const original = this.authService.userPhone();
+    const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
     this.phoneModel = original;
-
-    // Re-fetch phone number from profile
-    this.userService.getUserProfile().subscribe((profile: UserProfile) => {
-      if (profile?.phone) {
-        const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
-        this.phoneNumber.set(formatted);
-      } else {
-        this.phoneNumber.set('');
-      }
-    });
+    this.phoneNumber.set(original);
   }
 
   confirmSubmission() {

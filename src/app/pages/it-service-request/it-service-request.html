@@ -26,83 +26,23 @@
     </div>
 
     <div class="form-section">
-      <h3 class="section-title">
-        ประเภทบริการ (Service Type) <span class="required-badge">*</span>
-        <i class="fas fa-laptop-medical ml-2 text-muted"></i>
-      </h3>
-      <div class="checkbox-grid">
-        @for (service of serviceOptions(); track service.value; let i = $index) {
-          <label
-            class="checkbox-item"
-            [class.checked]="service.checked"
-            [class.disabled]="service.disabled"
-          >
-            <input
-              type="checkbox"
-              [checked]="service.checked"
-              [disabled]="service.disabled"
-              (change)="toggleService(i)"
-            />
-            <span class="checkmark"></span>
-            <span class="label-text">{{ service.label }}</span>
-          </label>
-        }
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-circle-info"></i>
+          ข้อมูลผู้ขอสิทธิ์
+          <span class="info">
+            <span class="user-name-inline">
+              {{ authData.employee.NAMFIRSTT }} {{ authData.employee.NAMLASTT }} ({{
+                authData.employee.CODEMPID
+              }})
+            </span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">{{ authData.employee.AD_USER }}</span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
+          </span>
+        </label>
       </div>
-
-      @if (isSystemCategorySelected()) {
-        <div class="sub-options-section">
-          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
-
-          <div class="type-selector mb-4">
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('user')"
-              (click)="toggleSystemType('user')"
-            >
-              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
-            </button>
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('system')"
-              (click)="toggleSystemType('system')"
-            >
-              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
-            </button>
-          </div>
-
-          @if (selectedSystemTypes().includes('system')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleSystemSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-
-          @if (selectedSystemTypes().includes('user')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of userSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleUserSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-        </div>
-      }
     </div>
 
     <div class="form-section" *ngIf="!IsOneeJob">
@@ -141,22 +81,7 @@
     </div>
 
     <div class="form-section">
-      <div class="form-group mb-4">
-        <label class="form-label">
-          <i class="fas fa-align-left"></i>
-          รายละเอียด (Details)
-          <span class="required-badge">*</span>
-        </label>
-        <textarea
-          class="form-control"
-          rows="4"
-          placeholder="กรอกรายละเอียดความต้องการ..."
-          [ngModel]="requestDetails()"
-          (ngModelChange)="requestDetails.set($event)"
-        ></textarea>
-      </div>
-
-      <div class="form-group mb-4 mt-3">
+      <div class="form-group">
         <label class="form-label">
           <i class="fas fa-phone-alt field-icon"></i>
           เบอร์โทรติดต่อ (Phone Number)
@@ -175,6 +100,104 @@
       </div>
     </div>
 
+    <div class="form-section">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-laptop-medical field-icon"></i>
+          ประเภทบริการ (Service Type) <span class="required-badge">*</span>
+        </label>
+        <div class="checkbox-grid">
+          @for (service of serviceOptions(); track service.value; let i = $index) {
+            <label
+              class="checkbox-item"
+              [class.checked]="service.checked"
+              [class.disabled]="service.disabled"
+            >
+              <input
+                type="checkbox"
+                [checked]="service.checked"
+                [disabled]="service.disabled"
+                (change)="toggleService(i)"
+              />
+              <span class="checkmark"></span>
+              <span class="label-text">{{ service.label }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      @if (isSystemCategorySelected()) {
+        <div class="sub-options-section">
+          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
+
+          <div class="type-selector mb-2">
+            <button
+              class="type-btn"
+              [class.active]="selectedSystemTypes().includes('user')"
+              (click)="toggleSystemType('user')"
+            >
+              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
+            </button>
+            <button
+              class="type-btn"
+              [class.active]="selectedSystemTypes().includes('system')"
+              (click)="toggleSystemType('system')"
+            >
+              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
+            </button>
+          </div>
+
+          @if (selectedSystemTypes().includes('system')) {
+            <div class="checkbox-grid slide-down mb-2">
+              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="opt.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="opt.checked"
+                    (change)="toggleSystemSubOption(i)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="label-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          }
+
+          @if (selectedSystemTypes().includes('user')) {
+            <div class="checkbox-grid slide-down">
+              @for (opt of userSubOptions(); track opt.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="opt.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="opt.checked"
+                    (change)="toggleUserSubOption(i)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="label-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-section">
+      <div class="form-group mb-4">
+        <label class="form-label">
+          <i class="fas fa-align-left"></i>
+          รายละเอียด (Details)
+          <span class="required-badge">*</span>
+        </label>
+        <textarea
+          class="form-control"
+          rows="4"
+          placeholder="กรอกรายละเอียดความต้องการ..."
+          [ngModel]="requestDetails()"
+          (ngModelChange)="requestDetails.set($event)"
+        ></textarea>
+      </div>
+    </div>
     <!-- <div class="form-section">
       <h3 class="section-title">
         ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
