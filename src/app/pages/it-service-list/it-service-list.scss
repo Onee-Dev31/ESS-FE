@@ -444,7 +444,7 @@ textarea.form-input {
 
 .tk-page {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) 320px;
+  grid-template-columns: 320px minmax(0, 1fr) 300px;
   gap: 16px;
   padding: 16px;
   background: var(--bg-page);
@@ -534,7 +534,7 @@ textarea.form-input {
 
     .ticket-item {
       display: flex;
-      padding: 16px 20px;
+      padding: 14px 16px;
       border-bottom: 1px solid var(--border-color);
       cursor: pointer;
       position: relative;

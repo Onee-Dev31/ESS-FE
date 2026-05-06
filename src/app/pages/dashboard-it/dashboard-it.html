@@ -67,53 +67,67 @@
         [id]="'ticket-' + ticket.ticketId"
         (click)="onTicketClick(ticket.ticketId)"
       >
-        <div class="avatar">
-          <img
-            [src]="
-              'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
+        @if (newNoteTicketIds().has(ticket.ticketId)) {
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: flex-end;
+              margin-bottom: 5px;
             "
-            alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
-            title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
-            (error)="onImgError($event)"
-          />
-        </div>
-        <div class="ticket-info">
-          <div class="ticket-header">
-            <span class="ticket-number">{{ ticket.ticketNumber }}</span>
-            @if (newNoteTicketIds().has(ticket.ticketId)) {
-              <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
-            }
-            <div class="ticket-meta-right">
-              <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
-              <i
-                class="fas text-icon"
-                [ngClass]="
-                  unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'
-                "
-                [style.color]="
-                  unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'
-                "
+          >
+            <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
+          </div>
+        }
+        <div class="ticket-item-2">
+          <div class="avatar">
+            <img
+              [src]="
+                'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
+              "
+              alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+              title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
+              (error)="onImgError($event)"
+            />
+          </div>
+          <div class="ticket-info">
+            <div class="ticket-header">
+              <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+              <div class="ticket-meta-right">
+                <i class="fa-solid fa-paperclip" *ngIf="ticket.attachment_count > 0"></i>
+                <i
+                  class="fas text-icon"
+                  [ngClass]="
+                    unreadTicketIds().has(ticket.ticketId) ? 'fa-envelope' : 'fa-envelope-open'
+                  "
+                  [style.color]="
+                    unreadTicketIds().has(ticket.ticketId) ? 'var(--primary)' : 'var(--text-muted)'
+                  "
+                >
+                </i>
+              </div>
+            </div>
+            <div class="ticket-title-row">
+              <div
+                class="ticket-title"
+                [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)"
               >
-              </i>
+                {{ ticket.subject }}
+              </div>
+              <span class="ticket-time">
+                @if (isToday(ticket.createdDate)) {
+                  {{ ticket.createdDate | date: 'HH:mm' }}
+                } @else {
+                  {{ ticket.createdDate | date: 'EEE dd' : '' : 'en' }}
+                }
+              </span>
             </div>
-          </div>
-          <div class="ticket-title-row">
-            <div class="ticket-title" [class.is-new-text]="unreadTicketIds().has(ticket.ticketId)">
-              {{ ticket.subject }}
+            <div class="ticket-footer">
+              <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
+              <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
+                <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
+              </span>
             </div>
-            <span class="ticket-time">
-              @if (isToday(ticket.createdDate)) {
-                {{ ticket.createdDate | date: 'HH:mm' }}
-              } @else {
-                {{ ticket.createdDate | date: 'EEE dd' : '' : 'en' }}
-              }
-            </span>
-          </div>
-          <div class="ticket-footer">
-            <span class="badge badge-outline ticket-type">{{ ticket.ticketType }}</span>
-            <span class="ticket-status-inline" [ngStyle]="StatusColor.getStyle(ticket.IT_Status)">
-              <i class="fas fa-sync-alt"></i> {{ ticket.IT_Status }}
-            </span>
           </div>
         </div>
       </div>
@@ -394,7 +408,10 @@
         class="btn btn-accept"
         (click)="openAcknowledgeModal()"
         *ngIf="
-          t.status !== 'In Progress' && t.status !== 'Assigned' && t.approval_status !== 'Approved'
+          t.status !== 'In Progress' &&
+          t.status !== 'Assigned' &&
+          t.status !== 'ReOpened' &&
+          t.approval_status !== 'Approved'
         "
       >
         <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง

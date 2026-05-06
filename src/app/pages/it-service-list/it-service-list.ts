@@ -6,6 +6,8 @@ import {
   OnInit,
   HostListener,
   DestroyRef,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -85,6 +87,8 @@ export class ItService implements OnInit {
     this.isMobile = window.innerWidth <= 860;
     this.isSmallMobile = window.innerWidth <= 460;
   }
+
+  @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
 
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -289,6 +293,7 @@ export class ItService implements OnInit {
       // console.log(objectData);
 
       this.selectedTicket.set(objectData);
+      this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
@@ -631,6 +636,13 @@ export class ItService implements OnInit {
     return notes;
   }
 
+  scrollToBottom() {
+    setTimeout(() => {
+      const el = this.cardBodyEl?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
+  }
+
   getTicketStatus(ticket: any) {
     if (
       (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') ||
@@ -639,6 +651,8 @@ export class ItService implements OnInit {
       return 'Waiting you';
     } else if (ticket.user_status === 'Approved') {
       return 'In Progress';
+    } else if (ticket.user_status !== 'Approved' && ticket.user_status === 'ReOpened') {
+      return 'Re-Opened';
     } else if (ticket.user_status !== 'Approved') {
       return ticket.user_status;
     }
