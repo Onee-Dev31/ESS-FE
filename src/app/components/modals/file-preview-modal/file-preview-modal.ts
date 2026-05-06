@@ -73,4 +73,16 @@ export class FilePreviewModalComponent implements OnInit {
     if (!url) return '';
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
+  async downloadFile(file: FilePreviewItem) {
+    alert('mocl');
+  }
+
+  // downloadAll() {
+  //   this.files.forEach((file, index) => {
+  //     setTimeout(() => {
+  //       this.downloadFile(file);
+  //     }, index * 500); // delay เพื่อไม่ให้ browser block
+  //   });
+  // }
 }

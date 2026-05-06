@@ -201,6 +201,10 @@ $text-sub: var(--text-sub);
           .preview-header {
             margin-bottom: 16px;
             padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
             border-bottom: 1px solid var(--border-toolbar);
 
             h4 {
@@ -208,6 +212,22 @@ $text-sub: var(--text-sub);
               font-size: 1rem;
               font-weight: 600;
               color: var(--text);
+            }
+          }
+
+          .btn-download {
+            flex-shrink: 0;
+            border: none;
+            background: var(--primary);
+            color: var(--text-reverse);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+
+            &:hover {
+              background: color-mix(in srgb, var(--primary), transparent 20%);
             }
           }
 
@@ -233,6 +253,8 @@ $text-sub: var(--text-sub);
               width: 100%;
               height: 100%;
               border: none;
+              outline: none;
+              display: block;
             }
 
             .mock-image {

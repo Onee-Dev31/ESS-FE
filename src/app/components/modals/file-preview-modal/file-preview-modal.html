@@ -37,6 +37,9 @@
         <div *ngIf="selectedFile" class="preview-content">
           <div class="preview-header">
             <h4>{{ selectedFile.fileName }}</h4>
+            <button class="btn-download" (click)="downloadFile(selectedFile)" title="ดาวน์โหลด">
+              ดาวน์โหลด<i class="fas fa-download"></i>
+            </button>
           </div>
           <div class="image-box">
             <ng-container [ngSwitch]="true">
