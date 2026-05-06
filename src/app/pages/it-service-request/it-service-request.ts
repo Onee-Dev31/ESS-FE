@@ -199,7 +199,28 @@ export class ITServiceRequestComponent implements OnInit {
 
   toggleSystemType(type: string) {
     this.selectedSystemTypes.update((types) => {
-      console.log('types', types);
+      // console.log('types', types);
+
+      if (type === 'user') {
+        const allUserValues = this.userSubOptions().map((opt) => opt.value);
+        const allSelected = allUserValues.every((v) => types.includes(v));
+
+        if (allSelected) {
+          // เอาออกทั้งหมด
+          this.userSubOptions.update((opts) => opts.map((opt) => ({ ...opt, checked: false })));
+          return types.filter((t) => !allUserValues.includes(t) && t !== 'user');
+        } else {
+          // เลือกทั้งหมด
+          this.userSubOptions.update((opts) => opts.map((opt) => ({ ...opt, checked: true })));
+          const merged = [
+            ...types.filter((t) => !allUserValues.includes(t)),
+            ...allUserValues,
+            'user',
+          ];
+          return merged;
+        }
+      }
+
       if (types.includes(type)) {
         return types.filter((t) => t !== type);
       } else {

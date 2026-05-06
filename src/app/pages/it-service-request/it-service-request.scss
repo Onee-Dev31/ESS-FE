@@ -194,7 +194,7 @@ $table-label-bg: var(--border-toolbar);
 
     textarea.form-control {
       resize: vertical;
-      min-height: 120px;
+      min-height: 240px;
     }
 
     &.slide-in-right {
@@ -213,6 +213,11 @@ $table-label-bg: var(--border-toolbar);
     }
   }
 
+  .detail-section {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .input-pair-row {
     display: flex;
     flex-direction: row;
@@ -222,7 +227,8 @@ $table-label-bg: var(--border-toolbar);
     transition: all 0.3s ease;
 
     .form-control-select {
-      width: calc(50% - 0.5rem);
+      // width: calc(50% - 0.5rem);
+      width: 100%;
       flex: none;
       min-width: 250px;
       height: 45px;
@@ -512,6 +518,13 @@ $table-label-bg: var(--border-toolbar);
       flex-wrap: wrap;
       gap: 0.7rem;
       // margin-bottom: 1.5rem;
+    }
+
+    .basic-system {
+      background: var(--bg-page);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
     }
 
     .checkbox-item {
@@ -1440,4 +1453,10 @@ $table-label-bg: var(--border-toolbar);
 
 ::ng-deep .ant-select-selection-placeholder {
   color: var(--text-muted) !important;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }

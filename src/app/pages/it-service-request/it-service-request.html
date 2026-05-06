@@ -45,14 +45,14 @@
       </div>
     </div>
 
-    <div class="form-section" *ngIf="!IsOneeJob">
-      <!-- Open For Dropdown -->
-      <div class="form-group">
+    <div class="form-section two-col">
+      <!-- Open For -->
+      <div class="form-group" *ngIf="!IsOneeJob">
         <label class="form-label">
           <i class="fa-solid fa-book-open-reader"></i>
           เปิดสิทธิ์ให้ (Open For)
-          <span class="required-badge">*</span></label
-        >
+          <span class="required-badge">*</span>
+        </label>
         <div class="input-pair-row">
           <nz-select
             nzShowSearch
@@ -78,9 +78,8 @@
           }
         </div>
       </div>
-    </div>
 
-    <div class="form-section">
+      <!-- Phone -->
       <div class="form-group">
         <label class="form-label">
           <i class="fas fa-phone-alt field-icon"></i>
@@ -146,6 +145,27 @@
               <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
             </button>
           </div>
+          @if (selectedSystemTypes().includes('user')) {
+            <div class="basic-system">
+              <b>ระบบพื้นฐาน : </b>
+              @for (opt of userSubOptions(); track opt.value; let last = $last) {
+                <span>{{ opt.label }}{{ !last ? ', ' : '' }}</span>
+              }
+            </div>
+            <!-- <div class="checkbox-grid slide-down">
+              @for (opt of userSubOptions(); track opt.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="opt.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="opt.checked"
+                    (change)="toggleUserSubOption(i)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="label-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div> -->
+          }
 
           @if (selectedSystemTypes().includes('system')) {
             <div class="checkbox-grid slide-down mb-2">
@@ -162,36 +182,23 @@
               }
             </div>
           }
-
-          @if (selectedSystemTypes().includes('user')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of userSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleUserSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
         </div>
       }
     </div>
 
     <div class="form-section">
       <div class="form-group mb-4">
-        <label class="form-label">
-          <i class="fas fa-align-left"></i>
-          รายละเอียด (Details)
-          <span class="required-badge">*</span>
+        <label class="detail-section">
+          <div class="form-label">
+            <i class="fas fa-align-left"></i>
+            รายละเอียด (Details)
+            <span class="required-badge">*</span>
+          </div>
+          <div class="example">ตัวอย่างการกรอก</div>
         </label>
         <textarea
           class="form-control"
-          rows="4"
+          rows="6"
           placeholder="กรอกรายละเอียดความต้องการ..."
           [ngModel]="requestDetails()"
           (ngModelChange)="requestDetails.set($event)"
