@@ -6,6 +6,8 @@ import {
   computed,
   ChangeDetectorRef,
   Input,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,11 +22,18 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
+import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
 
 @Component({
   selector: 'app-it-service-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    NzSelectModule,
+    ExampleServiceRequestModal,
+  ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
 })
@@ -38,6 +47,8 @@ export class ITServiceRequestComponent implements OnInit {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+
+  @ViewChild('detailTextarea') detailTextarea!: ElementRef;
 
   authData = JSON.parse(localStorage.getItem('allData') || '{}');
 
@@ -60,7 +71,10 @@ export class ITServiceRequestComponent implements OnInit {
   });
   openforOneejob: string = '';
   freelanceName = signal<string>('');
+  isAnnounceChooseFreelance = signal<boolean>(false);
   isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
+  IS_EXAMPLE = signal<boolean>(false);
+
   isSystemCategorySelected = signal(false);
   IsOneeJob: boolean = false;
   applicantId: string = '';
@@ -90,7 +104,7 @@ export class ITServiceRequestComponent implements OnInit {
     const phoneValid =
       this.phoneNumber().trim().length > 0 &&
       (this.phoneNumber().trim().length === 4 || this.phoneNumber().trim().length === 10);
-    const openForValid = this.selectedOpenFor() !== null;
+    const openForValid = this.selectedOpenFor().value !== null;
     const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
     return (
       hasService &&
@@ -140,20 +154,28 @@ export class ITServiceRequestComponent implements OnInit {
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
     this.selectedOpenFor.set({ value, label: option?.label ?? '' });
-    if (value !== '__FREELANCE__') {
-      this.freelanceName.set('');
+    if (value === '__FREELANCE__') {
+      this.isAnnounceChooseFreelance.set(true);
+      setTimeout(() => {
+        this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    } else {
+      this.isAnnounceChooseFreelance.set(false);
     }
   }
 
-  // onPhoneInput(event: Event) {
-  //   const input = event.target as HTMLInputElement;
-  //   let digitsOnly = input.value.replace(/\D/g, '');
-  //   digitsOnly = digitsOnly.slice(0, 10);
-  //   const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
-  //   input.value = formatted;
-  //   this.phoneModel = formatted;
-  //   this.phoneNumber.set(formatted);
-  // }
+  example() {
+    console.log('example');
+    this.IS_EXAMPLE.set(true);
+  }
+
+  openExample() {
+    this.IS_EXAMPLE.set(true);
+  }
+
+  closeExample() {
+    this.IS_EXAMPLE.set(false);
+  }
 
   onPhoneInput(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -259,6 +281,12 @@ export class ITServiceRequestComponent implements OnInit {
       return newItems;
     });
   }
+
+  isShowExample = computed(() => {
+    const targetIds = [10, 11, 12];
+    console.log();
+    return this.systemSubOptions().some((opt) => targetIds.includes(opt.id) && opt.checked);
+  });
 
   toggleSystemSubOption(index: number) {
     this.systemSubOptions.update((items) => {

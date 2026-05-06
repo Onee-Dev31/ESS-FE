@@ -143,6 +143,11 @@ $table-label-bg: var(--border-toolbar);
       font-weight: 600;
       color: $text-header;
       margin-left: 0.25rem;
+
+      .announce {
+        padding: 0 5px;
+        color: var(--danger) !important;
+      }
     }
 
     .form-control {
@@ -189,7 +194,8 @@ $table-label-bg: var(--border-toolbar);
       font-weight: 300;
       margin-left: 10px;
       background: var(--bg-page);
-      padding: 4px;
+      padding: 5px;
+      border-radius: 5px;
     }
 
     textarea.form-control {
@@ -525,6 +531,18 @@ $table-label-bg: var(--border-toolbar);
       padding: 10px;
       border-radius: 10px;
       margin-bottom: 10px;
+    }
+
+    .example {
+      cursor: pointer;
+      background: var(--bg-table-head);
+      padding: 4px 6px;
+      border-radius: 10px;
+
+      &:hover {
+        color: var(--primary) !important;
+        background: color-mix(in srgb, var(--bg-table-head), var(--text) 20%);
+      }
     }
 
     .checkbox-item {
@@ -1459,4 +1477,23 @@ $table-label-bg: var(--border-toolbar);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes blink-border {
+  0%,
+  100% {
+    border-color: var(--border-color);
+  }
+  50% {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  }
+}
+
+.blink {
+  animation: blink-border 1s ease-in-out 3;
 }

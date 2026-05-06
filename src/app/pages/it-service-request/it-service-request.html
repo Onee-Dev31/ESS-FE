@@ -52,6 +52,9 @@
           <i class="fa-solid fa-book-open-reader"></i>
           เปิดสิทธิ์ให้ (Open For)
           <span class="required-badge">*</span>
+          <span *ngIf="isAnnounceChooseFreelance()" class="announce"
+            >กรุณากรอกรายละเอียดเพิ่มเติมด้านล่าง</span
+          >
         </label>
         <div class="input-pair-row">
           <nz-select
@@ -194,22 +197,23 @@
             รายละเอียด (Details)
             <span class="required-badge">*</span>
           </div>
-          <div class="example">ตัวอย่างการกรอก</div>
+          @if (isShowExample()) {
+            <div class="example" (click)="example()">
+              <i class="fa-solid fa-bullhorn"></i> ตัวอย่างการกรอก
+            </div>
+          }
         </label>
         <textarea
+          #detailTextarea
           class="form-control"
           rows="6"
+          [class.blink]="isAnnounceChooseFreelance()"
           placeholder="กรอกรายละเอียดความต้องการ..."
           [ngModel]="requestDetails()"
           (ngModelChange)="requestDetails.set($event)"
         ></textarea>
       </div>
     </div>
-    <!-- <div class="form-section">
-      <h3 class="section-title">
-        ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
-      </h3>
-    </div> -->
 
     <!-- Actions Footer -->
     <div class="form-actions-row">
@@ -539,3 +543,11 @@
     </div>
   }
 </div>
+
+@if (IS_EXAMPLE()) {
+  <app-example-service-request-modal
+    (onClose)="closeExample()"
+    [type]="isAnnounceChooseFreelance() ? 1 : 2"
+  >
+  </app-example-service-request-modal>
+}
