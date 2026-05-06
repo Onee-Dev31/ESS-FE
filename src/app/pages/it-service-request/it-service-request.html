@@ -70,15 +70,6 @@
               <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
             }
           </nz-select>
-          @if (isFreelanceSelected()) {
-            <input
-              type="text"
-              class="form-control"
-              placeholder="ระบุชื่อ Freelance *"
-              [ngModel]="freelanceName()"
-              (ngModelChange)="freelanceName.set($event)"
-            />
-          }
         </div>
       </div>
 
@@ -198,7 +189,7 @@
             <span class="required-badge">*</span>
           </div>
           @if (isShowExample()) {
-            <div class="example" (click)="example()">
+            <div class="example" (click)="openExample()">
               <i class="fa-solid fa-bullhorn"></i> ตัวอย่างการกรอก
             </div>
           }
@@ -439,11 +430,7 @@
               <tr>
                 <th>ชื่อผู้ขอสิทธิ์</th>
                 <td>
-                  @if (isFreelanceSelected()) {
-                    Freelance: {{ freelanceName() }}
-                  } @else {
-                    {{ selectedOpenFor().label }}
-                  }
+                  {{ selectedOpenFor().label }}
                 </td>
               </tr>
               @if (phoneNumber()) {

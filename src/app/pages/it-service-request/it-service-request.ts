@@ -70,7 +70,6 @@ export class ITServiceRequestComponent implements OnInit {
     label: '',
   });
   openforOneejob: string = '';
-  freelanceName = signal<string>('');
   isAnnounceChooseFreelance = signal<boolean>(false);
   isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
   IS_EXAMPLE = signal<boolean>(false);
@@ -105,15 +104,8 @@ export class ITServiceRequestComponent implements OnInit {
       this.phoneNumber().trim().length > 0 &&
       (this.phoneNumber().trim().length === 4 || this.phoneNumber().trim().length === 10);
     const openForValid = this.selectedOpenFor().value !== null;
-    const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
-    return (
-      hasService &&
-      openForValid &&
-      subValidationPassed &&
-      detailValid &&
-      phoneValid &&
-      freelanceValid
-    );
+    // const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
+    return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
   });
 
   ngOnInit() {
@@ -162,11 +154,6 @@ export class ITServiceRequestComponent implements OnInit {
     } else {
       this.isAnnounceChooseFreelance.set(false);
     }
-  }
-
-  example() {
-    console.log('example');
-    this.IS_EXAMPLE.set(true);
   }
 
   openExample() {
@@ -284,7 +271,6 @@ export class ITServiceRequestComponent implements OnInit {
 
   isShowExample = computed(() => {
     const targetIds = [10, 11, 12];
-    console.log();
     return this.systemSubOptions().some((opt) => targetIds.includes(opt.id) && opt.checked);
   });
 
@@ -350,7 +336,6 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
-    this.freelanceName.set('');
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
@@ -375,7 +360,6 @@ export class ITServiceRequestComponent implements OnInit {
       formData.append('openForCodeempid', this.openforOneejob);
     } else if (this.isFreelanceSelected()) {
       formData.append('openForType', 'freelance');
-      formData.append('openForFreelanceName', this.freelanceName());
     } else {
       const isSelf = this.selectedOpenFor().value === this.authService.userData().CODEMPID;
       formData.append('openForType', isSelf ? 'self' : 'other');
@@ -516,7 +500,7 @@ export class ITServiceRequestComponent implements OnInit {
   getServiceType() {
     this.itServiceService.getServiceType().subscribe({
       next: (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         const mappedServices_main = res.data.mainServices.map((item: any) => ({
           ...item,
           checked: false,
@@ -552,7 +536,6 @@ export class ITServiceRequestComponent implements OnInit {
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
       .subscribe({
         next: (res) => {
-          console.log(res.data);
           this.openForOptions.set(res.data);
           const defaultOption = this.openForOptions().find(
             (opt) => opt.value === this.authService.userData().CODEMPID,
