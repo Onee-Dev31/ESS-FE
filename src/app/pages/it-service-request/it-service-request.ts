@@ -101,8 +101,8 @@ export class ITServiceRequestComponent implements OnInit {
 
     const detailValid = this.requestDetails().trim().length > 0;
     const phoneValid =
-      this.phoneNumber().trim().length > 0 &&
-      (this.phoneNumber().trim().length === 4 || this.phoneNumber().trim().length === 10);
+      this.phoneNumber().length > 0 &&
+      (this.phoneNumber().length === 4 || this.phoneNumber().length === 10);
     const openForValid = this.selectedOpenFor().value !== null;
     // const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
     return hasService && openForValid && subValidationPassed && detailValid && phoneValid;

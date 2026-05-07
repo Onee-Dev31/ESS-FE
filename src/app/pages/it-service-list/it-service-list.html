@@ -192,6 +192,13 @@
         placeholder="กรอกรายละเอียด ticket"
       ></textarea>
     </div>
+    <div
+      class="btn-expand-detail"
+      *ngIf="t.description?.split('\n').length > 3"
+      (click)="openDetail(t.description)"
+    >
+      <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
+    </div>
   </section>
 
   <!-- REASON [Denied] -->
@@ -366,7 +373,7 @@
     <div class="side-contact">
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
-      <div>ติดต่อ: {{ requester.contact_phone }}</div>
+      <div>ติดต่อ: {{ requester.contact_phone || '-' }}</div>
     </div>
     <div class="side-cc" *ngIf="t.ccList.length > 0">
       CC:
@@ -377,7 +384,7 @@
   <!-- Open For -->
   <section class="side-card requester" *ngIf="t.openFor as openFor">
     <div class="side-title">เปิดให้</div>
-    <div class="side-detail">
+    <div class="side-detail" *ngIf="openFor.open_for_type !== 'freelance'">
       <div>
         {{ openFor.fullname }}
         <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
@@ -385,6 +392,9 @@
       </div>
       <div>{{ openFor.department_name }}</div>
       <div>{{ openFor.company_name }}</div>
+    </div>
+    <div class="side-detail" *ngIf="openFor.open_for_type === 'freelance'">
+      <div>Freelance หรือ หลายบุคคล</div>
     </div>
   </section>
 
@@ -525,9 +535,18 @@
   <app-cc-modal [ticket]="selectedTicket()" (closeModal)="handleCancel()"> </app-cc-modal>
 }
 
-<!-- @if {
-  <app-avatar-preview
-    [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
-    [name]="requester.name"
-  />
-} -->
+@if (isDetailModalOpen()) {
+  <div class="modal-overlay expandDetail" (click)="isDetailModalOpen.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="request-title">รายละเอียด</h2>
+        <button class="btn-close-modal" (click)="isDetailModalOpen.set(false)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div [innerHTML]="formatText.getFormatTextHTML(selectedDetail())"></div>
+      </div>
+    </div>
+  </div>
+}

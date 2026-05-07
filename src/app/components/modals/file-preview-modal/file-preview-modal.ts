@@ -6,6 +6,7 @@ import {
   OnInit,
   inject,
   SimpleChanges,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -26,6 +27,7 @@ export interface FilePreviewItem {
 })
 export class FilePreviewModalComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() files: FilePreviewItem[] = [];
   @Output() onClose = new EventEmitter<void>();
@@ -33,11 +35,11 @@ export class FilePreviewModalComponent implements OnInit {
   selectedFile: FilePreviewItem | null = null;
   hasError: boolean = false;
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //     if (changes['files']) {
-  //         console.log('files changed:', changes['files'].currentValue);
-  //     }
-  // }
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['files']) {
+      console.log('files changed:', changes['files'].currentValue);
+    }
+  }
 
   ngOnInit() {
     if (this.files.length > 0) {
@@ -74,15 +76,28 @@ export class FilePreviewModalComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  async downloadFile(file: FilePreviewItem) {
-    alert('mocl');
-  }
+  isDownloading = false;
 
-  // downloadAll() {
-  //   this.files.forEach((file, index) => {
-  //     setTimeout(() => {
-  //       this.downloadFile(file);
-  //     }, index * 500); // delay เพื่อไม่ให้ browser block
-  //   });
-  // }
+  async downloadFile(file: FilePreviewItem) {
+    if (!file.url) return;
+    this.isDownloading = true;
+
+    try {
+      const response = await fetch(file.url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = file.fileName;
+      a.click();
+
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      this.isDownloading = false;
+      this.cdr.detectChanges();
+    }
+  }
 }
