@@ -26,93 +26,36 @@
     </div>
 
     <div class="form-section">
-      <h3 class="section-title">
-        ประเภทบริการ (Service Type) <span class="required-badge">*</span>
-        <i class="fas fa-laptop-medical ml-2 text-muted"></i>
-      </h3>
-      <div class="checkbox-grid">
-        @for (service of serviceOptions(); track service.value; let i = $index) {
-          <label
-            class="checkbox-item"
-            [class.checked]="service.checked"
-            [class.disabled]="service.disabled"
-          >
-            <input
-              type="checkbox"
-              [checked]="service.checked"
-              [disabled]="service.disabled"
-              (change)="toggleService(i)"
-            />
-            <span class="checkmark"></span>
-            <span class="label-text">{{ service.label }}</span>
-          </label>
-        }
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-circle-info"></i>
+          ข้อมูลผู้ขอสิทธิ์
+          <span class="info">
+            <span class="user-name-inline">
+              {{ authData.employee.NAMFIRSTT }} {{ authData.employee.NAMLASTT }} ({{
+                authData.employee.CODEMPID
+              }})
+            </span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">{{ authData.employee.AD_USER }}</span>
+            <span class="user-divider"> • </span>
+            <span class="user-email-inline">{{ authData.employee.EMAIL }}</span>
+          </span>
+        </label>
       </div>
-
-      @if (isSystemCategorySelected()) {
-        <div class="sub-options-section">
-          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
-
-          <div class="type-selector mb-4">
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('user')"
-              (click)="toggleSystemType('user')"
-            >
-              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
-            </button>
-            <button
-              class="type-btn"
-              [class.active]="selectedSystemTypes().includes('system')"
-              (click)="toggleSystemType('system')"
-            >
-              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
-            </button>
-          </div>
-
-          @if (selectedSystemTypes().includes('system')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleSystemSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-
-          @if (selectedSystemTypes().includes('user')) {
-            <div class="checkbox-grid slide-down">
-              @for (opt of userSubOptions(); track opt.value; let i = $index) {
-                <label class="checkbox-item" [class.checked]="opt.checked">
-                  <input
-                    type="checkbox"
-                    [checked]="opt.checked"
-                    (change)="toggleUserSubOption(i)"
-                  />
-                  <span class="checkmark"></span>
-                  <span class="label-text">{{ opt.label }}</span>
-                </label>
-              }
-            </div>
-          }
-        </div>
-      }
     </div>
 
-    <div class="form-section" *ngIf="!IsOneeJob">
-      <!-- Open For Dropdown -->
-      <div class="form-group">
+    <div class="form-section two-col">
+      <!-- Open For -->
+      <div class="form-group" *ngIf="!IsOneeJob">
         <label class="form-label">
           <i class="fa-solid fa-book-open-reader"></i>
           เปิดสิทธิ์ให้ (Open For)
-          <span class="required-badge">*</span></label
-        >
+          <span class="required-badge">*</span>
+          <span *ngIf="isAnnounceChooseFreelance()" class="announce"
+            >กรุณากรอกรายละเอียดเพิ่มเติมด้านล่าง</span
+          >
+        </label>
         <div class="input-pair-row">
           <nz-select
             nzShowSearch
@@ -127,36 +70,11 @@
               <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
             }
           </nz-select>
-          @if (isFreelanceSelected()) {
-            <input
-              type="text"
-              class="form-control"
-              placeholder="ระบุชื่อ Freelance *"
-              [ngModel]="freelanceName()"
-              (ngModelChange)="freelanceName.set($event)"
-            />
-          }
         </div>
       </div>
-    </div>
 
-    <div class="form-section">
-      <div class="form-group mb-4">
-        <label class="form-label">
-          <i class="fas fa-align-left"></i>
-          รายละเอียด (Details)
-          <span class="required-badge">*</span>
-        </label>
-        <textarea
-          class="form-control"
-          rows="4"
-          placeholder="กรอกรายละเอียดความต้องการ..."
-          [ngModel]="requestDetails()"
-          (ngModelChange)="requestDetails.set($event)"
-        ></textarea>
-      </div>
-
-      <div class="form-group mb-4 mt-3">
+      <!-- Phone -->
+      <div class="form-group">
         <label class="form-label">
           <i class="fas fa-phone-alt field-icon"></i>
           เบอร์โทรติดต่อ (Phone Number)
@@ -175,11 +93,118 @@
       </div>
     </div>
 
-    <!-- <div class="form-section">
-      <h3 class="section-title">
-        ส่งคำขอ (Submit Request) <i class="fas fa-paper-plane ml-2 text-muted"></i>
-      </h3>
-    </div> -->
+    <div class="form-section">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-laptop-medical field-icon"></i>
+          ประเภทบริการ (Service Type) <span class="required-badge">*</span>
+        </label>
+        <div class="checkbox-grid">
+          @for (service of serviceOptions(); track service.value; let i = $index) {
+            <label
+              class="checkbox-item"
+              [class.checked]="service.checked"
+              [class.disabled]="service.disabled"
+            >
+              <input
+                type="checkbox"
+                [checked]="service.checked"
+                [disabled]="service.disabled"
+                (change)="toggleService(i)"
+              />
+              <span class="checkmark"></span>
+              <span class="label-text">{{ service.label }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      @if (isSystemCategorySelected()) {
+        <div class="sub-options-section">
+          <h4 class="sub-section-title">กรุณาเลือกประเภท (Please Select Type)</h4>
+
+          <div class="type-selector mb-2">
+            <button
+              class="type-btn"
+              [class.active]="selectedSystemTypes().includes('user')"
+              (click)="toggleSystemType('user')"
+            >
+              <i class="fas fa-users mr-2"></i> ระบบพื้นฐาน (Basic System)
+            </button>
+            <button
+              class="type-btn"
+              [class.active]="selectedSystemTypes().includes('system')"
+              (click)="toggleSystemType('system')"
+            >
+              <i class="fas fa-server mr-2"></i> ระบบเฉพาะ (Specific System)
+            </button>
+          </div>
+          @if (selectedSystemTypes().includes('user')) {
+            <div class="basic-system">
+              <b>ระบบพื้นฐาน : </b>
+              @for (opt of userSubOptions(); track opt.value; let last = $last) {
+                <span>{{ opt.label }}{{ !last ? ', ' : '' }}</span>
+              }
+            </div>
+            <!-- <div class="checkbox-grid slide-down">
+              @for (opt of userSubOptions(); track opt.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="opt.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="opt.checked"
+                    (change)="toggleUserSubOption(i)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="label-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div> -->
+          }
+
+          @if (selectedSystemTypes().includes('system')) {
+            <div class="checkbox-grid slide-down mb-2">
+              @for (opt of systemSubOptions(); track opt.value; let i = $index) {
+                <label class="checkbox-item" [class.checked]="opt.checked">
+                  <input
+                    type="checkbox"
+                    [checked]="opt.checked"
+                    (change)="toggleSystemSubOption(i)"
+                  />
+                  <span class="checkmark"></span>
+                  <span class="label-text">{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="form-section">
+      <div class="form-group mb-4">
+        <label class="detail-section">
+          <div class="form-label">
+            <i class="fas fa-align-left"></i>
+            รายละเอียด (Details)
+            <span class="required-badge">*</span>
+          </div>
+          @if (isShowExample()) {
+            <div class="example" (click)="openExample()">
+              <i class="fa-solid fa-bullhorn"></i> ตัวอย่างการกรอก
+            </div>
+          }
+        </label>
+        <textarea
+          #detailTextarea
+          class="form-control"
+          rows="6"
+          [class.blink]="isAnnounceChooseFreelance()"
+          placeholder="กรอกรายละเอียดความต้องการ..."
+          [ngModel]="requestDetails()"
+          (ngModelChange)="requestDetails.set($event)"
+        ></textarea>
+      </div>
+    </div>
 
     <!-- Actions Footer -->
     <div class="form-actions-row">
@@ -405,11 +430,7 @@
               <tr>
                 <th>ชื่อผู้ขอสิทธิ์</th>
                 <td>
-                  @if (isFreelanceSelected()) {
-                    Freelance: {{ freelanceName() }}
-                  } @else {
-                    {{ selectedOpenFor().label }}
-                  }
+                  {{ selectedOpenFor().label }}
                 </td>
               </tr>
               @if (phoneNumber()) {
@@ -509,3 +530,11 @@
     </div>
   }
 </div>
+
+@if (IS_EXAMPLE()) {
+  <app-example-service-request-modal
+    (onClose)="closeExample()"
+    [type]="isAnnounceChooseFreelance() ? 1 : 2"
+  >
+  </app-example-service-request-modal>
+}

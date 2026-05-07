@@ -60,6 +60,7 @@ export class ItProblemReportComponent implements OnInit {
   });
   phoneModel = '';
   phoneError = '';
+  authData = JSON.parse(localStorage.getItem('allData') || '{}');
 
   // MASTER
   availableCategories: any[] = [];
@@ -94,12 +95,12 @@ export class ItProblemReportComponent implements OnInit {
   ngOnInit() {
     this.getSubProblem();
     this.getOpenFor();
-    // const userData = this.authService.userData();
-    // if (userData?.USR_MOBILE) {
-    //   const formatted = PhoneUtil.formatPhoneNumber(userData.USR_MOBILE);
-    //   this.phoneModel = formatted;
-    //   this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
-    // }
+    const userData = this.authService.userData();
+    if (userData?.TELOFF) {
+      const formatted = PhoneUtil.formatPhoneNumber(userData.TELOFF);
+      this.phoneModel = formatted;
+      this.problemFormData.update((data) => ({ ...data, phoneNumber: formatted }));
+    }
   }
 
   onCcSearch(search: string) {
@@ -314,7 +315,7 @@ export class ItProblemReportComponent implements OnInit {
   }
 
   clearForm() {
-    const original = this.authService.userPhone();
+    const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
     this.phoneModel = original;
@@ -322,7 +323,7 @@ export class ItProblemReportComponent implements OnInit {
     this.problemFormData.set({
       topic: '',
       detail: '',
-      phoneNumber: '',
+      phoneNumber: original,
       categories: [],
       attachments: [],
     });

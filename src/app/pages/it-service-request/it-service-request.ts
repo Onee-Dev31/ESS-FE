@@ -6,6 +6,8 @@ import {
   computed,
   ChangeDetectorRef,
   Input,
+  ElementRef,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,11 +22,18 @@ import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
+import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
 
 @Component({
   selector: 'app-it-service-request',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    NzSelectModule,
+    ExampleServiceRequestModal,
+  ],
   templateUrl: './it-service-request.html',
   styleUrl: './it-service-request.scss',
 })
@@ -38,6 +47,10 @@ export class ITServiceRequestComponent implements OnInit {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+
+  @ViewChild('detailTextarea') detailTextarea!: ElementRef;
+
+  authData = JSON.parse(localStorage.getItem('allData') || '{}');
 
   phoneModel = '';
   phoneError = '';
@@ -57,8 +70,10 @@ export class ITServiceRequestComponent implements OnInit {
     label: '',
   });
   openforOneejob: string = '';
-  freelanceName = signal<string>('');
+  isAnnounceChooseFreelance = signal<boolean>(false);
   isFreelanceSelected = computed(() => this.selectedOpenFor().value === '__FREELANCE__');
+  IS_EXAMPLE = signal<boolean>(false);
+
   isSystemCategorySelected = signal(false);
   IsOneeJob: boolean = false;
   applicantId: string = '';
@@ -66,7 +81,6 @@ export class ITServiceRequestComponent implements OnInit {
   isFormValid = computed(() => {
     const services = this.serviceOptions();
     const hasService = services.some((s) => s.checked);
-    // Sub-validation for "Request System" (ขอใช้ระบบ)
     const isRequestSystemChecked = services.find((s) => s.value === 'request_system')?.checked;
     let subValidationPassed = true;
 
@@ -86,22 +100,24 @@ export class ITServiceRequestComponent implements OnInit {
     }
 
     const detailValid = this.requestDetails().trim().length > 0;
-    const phoneValid = this.phoneNumber().trim().length > 0;
-    const openForValid = this.selectedOpenFor() !== null;
-    const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
-    return (
-      hasService &&
-      openForValid &&
-      subValidationPassed &&
-      detailValid &&
-      phoneValid &&
-      freelanceValid
-    );
+    const phoneValid =
+      this.phoneNumber().length > 0 &&
+      (this.phoneNumber().length === 4 || this.phoneNumber().length === 10);
+    const openForValid = this.selectedOpenFor().value !== null;
+    // const freelanceValid = !this.isFreelanceSelected() || this.freelanceName().trim().length > 0;
+    return hasService && openForValid && subValidationPassed && detailValid && phoneValid;
   });
 
   ngOnInit() {
     this.getServiceType();
     this.getOpenFor();
+
+    const userData = this.authService.userData();
+    if (userData?.TELOFF) {
+      const formatted = PhoneUtil.formatPhoneNumber(userData.TELOFF);
+      this.phoneModel = formatted;
+      this.phoneNumber.set(formatted);
+    }
 
     const hasQueryParams = Object.keys(this.route.snapshot.queryParams).length > 0;
 
@@ -130,20 +146,23 @@ export class ITServiceRequestComponent implements OnInit {
   onOpenForChange(value: string) {
     const option = this.openForOptions().find((opt) => opt.value === value);
     this.selectedOpenFor.set({ value, label: option?.label ?? '' });
-    if (value !== '__FREELANCE__') {
-      this.freelanceName.set('');
+    if (value === '__FREELANCE__') {
+      this.isAnnounceChooseFreelance.set(true);
+      setTimeout(() => {
+        this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    } else {
+      this.isAnnounceChooseFreelance.set(false);
     }
   }
 
-  // onPhoneInput(event: Event) {
-  //   const input = event.target as HTMLInputElement;
-  //   let digitsOnly = input.value.replace(/\D/g, '');
-  //   digitsOnly = digitsOnly.slice(0, 10);
-  //   const formatted = PhoneUtil.formatPhoneNumber(digitsOnly);
-  //   input.value = formatted;
-  //   this.phoneModel = formatted;
-  //   this.phoneNumber.set(formatted);
-  // }
+  openExample() {
+    this.IS_EXAMPLE.set(true);
+  }
+
+  closeExample() {
+    this.IS_EXAMPLE.set(false);
+  }
 
   onPhoneInput(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -189,7 +208,28 @@ export class ITServiceRequestComponent implements OnInit {
 
   toggleSystemType(type: string) {
     this.selectedSystemTypes.update((types) => {
-      console.log('types', types);
+      // console.log('types', types);
+
+      if (type === 'user') {
+        const allUserValues = this.userSubOptions().map((opt) => opt.value);
+        const allSelected = allUserValues.every((v) => types.includes(v));
+
+        if (allSelected) {
+          // เอาออกทั้งหมด
+          this.userSubOptions.update((opts) => opts.map((opt) => ({ ...opt, checked: false })));
+          return types.filter((t) => !allUserValues.includes(t) && t !== 'user');
+        } else {
+          // เลือกทั้งหมด
+          this.userSubOptions.update((opts) => opts.map((opt) => ({ ...opt, checked: true })));
+          const merged = [
+            ...types.filter((t) => !allUserValues.includes(t)),
+            ...allUserValues,
+            'user',
+          ];
+          return merged;
+        }
+      }
+
       if (types.includes(type)) {
         return types.filter((t) => t !== type);
       } else {
@@ -228,6 +268,11 @@ export class ITServiceRequestComponent implements OnInit {
       return newItems;
     });
   }
+
+  isShowExample = computed(() => {
+    const targetIds = [10, 11, 12];
+    return this.systemSubOptions().some((opt) => targetIds.includes(opt.id) && opt.checked);
+  });
 
   toggleSystemSubOption(index: number) {
     this.systemSubOptions.update((items) => {
@@ -291,25 +336,15 @@ export class ITServiceRequestComponent implements OnInit {
     // this.selectedOpenFor.set('self');
     // this.otherOpenForName.set('');
     this.requestDetails.set('');
-    this.freelanceName.set('');
     this.selectedSystemTypes.set([]);
 
     this.phoneNumber.set('');
 
-    const original = this.authService.userPhone();
+    const original = this.authData.employee.TELOFF;
     this.phoneModel = '';
     this.cdr.detectChanges();
     this.phoneModel = original;
-
-    // Re-fetch phone number from profile
-    this.userService.getUserProfile().subscribe((profile: UserProfile) => {
-      if (profile?.phone) {
-        const formatted = PhoneUtil.formatPhoneNumber(profile.phone);
-        this.phoneNumber.set(formatted);
-      } else {
-        this.phoneNumber.set('');
-      }
-    });
+    this.phoneNumber.set(original);
   }
 
   confirmSubmission() {
@@ -325,7 +360,6 @@ export class ITServiceRequestComponent implements OnInit {
       formData.append('openForCodeempid', this.openforOneejob);
     } else if (this.isFreelanceSelected()) {
       formData.append('openForType', 'freelance');
-      formData.append('openForFreelanceName', this.freelanceName());
     } else {
       const isSelf = this.selectedOpenFor().value === this.authService.userData().CODEMPID;
       formData.append('openForType', isSelf ? 'self' : 'other');
@@ -466,7 +500,7 @@ export class ITServiceRequestComponent implements OnInit {
   getServiceType() {
     this.itServiceService.getServiceType().subscribe({
       next: (res) => {
-        console.log(res.data);
+        // console.log(res.data);
         const mappedServices_main = res.data.mainServices.map((item: any) => ({
           ...item,
           checked: false,
@@ -502,7 +536,6 @@ export class ITServiceRequestComponent implements OnInit {
       .getOpenFor({ currentEmpId: this.authService.userData().CODEMPID })
       .subscribe({
         next: (res) => {
-          console.log(res.data);
           this.openForOptions.set(res.data);
           const defaultOption = this.openForOptions().find(
             (opt) => opt.value === this.authService.userData().CODEMPID,

@@ -1,0 +1,58 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="request-title">
+        <i class="fa-solid fa-bullhorn"></i>
+        <span>ตัวอย่างการกรอกข้อมูล</span>
+      </h2>
+      <button class="btn-close-modal" (click)="close()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal-body">
+      @if (type === 1) {
+        <div class="info-card">
+          <p class="info-hint">
+            ระบุรหัสพนักงาน, ชื่อ-นามสกุลภาษาอังกฤษและภาษาไทย พร้อมฟังก์ชั่น เมนู
+            หรือสิทธิที่ต้องการ เช่น
+          </p>
+          <div class="info-example">
+            <div class="info-row">
+              <span class="info-label">รหัสพนักงาน : ONE000001</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ชื่อ (EN) : Mr. Onee Sandee</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ชื่อ (TH) : นายวันอี แสนดี</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ตำแหน่ง : Admin</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">บริษัท : ONE</span>
+            </div>
+          </div>
+        </div>
+      }
+      @if (type === 2) {
+        <div class="info-card">
+          <p class="info-hint">ระบุฟังก์ชั่น เมนู หรือสิทธิที่ต้องการ เช่น</p>
+          <div class="info-example">
+            <div class="info-row">
+              <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ตำแหน่ง : Admin</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">บริษัท : ONE</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

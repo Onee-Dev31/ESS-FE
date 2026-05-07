@@ -279,7 +279,7 @@
 
 .tk-page {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) 320px;
+  grid-template-columns: 320px minmax(0, 1fr) 300px;
   gap: 16px;
   padding: 16px;
   background: var(--bg-page);
@@ -395,16 +395,10 @@
     }
 
     .ticket-item {
-      display: flex;
-      padding: 16px 20px;
+      flex: 1;
+      padding: 14px 16px;
       border-bottom: 1px solid var(--border-color);
       cursor: pointer;
-      position: relative;
-      transition: background-color 0.2s;
-      gap: 10px;
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
 
       &:hover {
         background-color: var(--bg-slate);
@@ -415,6 +409,16 @@
         border-left: 4px solid var(--primary);
         padding-left: 16px;
       }
+    }
+
+    .ticket-item-2 {
+      display: flex;
+      position: relative;
+      transition: background-color 0.2s;
+      gap: 10px;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
 
       &.is-new {
         border-left: 4px solid var(--primary);
@@ -426,20 +430,6 @@
       *::selection {
         background: transparent;
       }
-
-      // .avatar {
-      //     width: 40px;
-      //     height: 40px;
-      //     border-radius: 50%;
-      //     color: #ffffff;
-      //     display: flex;
-      //     align-items: center;
-      //     justify-content: center;
-      //     font-weight: 600;
-      //     font-size: 0.9rem;
-      //     margin-right: 12px;
-      //     flex-shrink: 0;
-      // }
 
       .avatar {
         width: 40px;
@@ -761,7 +751,7 @@
     font-size: 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     flex-wrap: wrap;
 
     .muted {
@@ -772,10 +762,6 @@
 
     .sep {
       opacity: 0.55;
-    }
-
-    @media (min-width: 1024px) and (max-width: 1440px) {
-      padding: 6px 14px;
     }
   }
 }

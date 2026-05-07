@@ -37,10 +37,21 @@
         <div *ngIf="selectedFile" class="preview-content">
           <div class="preview-header">
             <h4>{{ selectedFile.fileName }}</h4>
+            <button
+              class="btn-download"
+              (click)="downloadFile(selectedFile)"
+              title="ดาวน์โหลด"
+              [disabled]="isDownloading"
+            >
+              @if (isDownloading) {
+                <i class="fas fa-spinner fa-spin"></i> กำลังดาวน์โหลด...
+              } @else {
+                <i class="fas fa-download"></i> ดาวน์โหลด
+              }
+            </button>
           </div>
-          <div class="image-box">
+          <!-- <div class="image-box">
             <ng-container [ngSwitch]="true">
-              <!-- Image View -->
               <ng-container *ngSwitchCase="isImage(selectedFile)">
                 <img
                   *ngIf="!hasError"
@@ -51,7 +62,6 @@
                 />
               </ng-container>
 
-              <!-- PDF View -->
               <ng-container *ngSwitchCase="isPdf(selectedFile)">
                 <embed
                   [src]="getSafeUrl(selectedFile.url)"
@@ -60,7 +70,6 @@
                 />
               </ng-container>
 
-              <!-- Other Files -->
               <ng-container *ngSwitchDefault>
                 <div class="mock-image">
                   <i class="fas fa-file-alt fa-3x"></i>
@@ -70,12 +79,43 @@
               </ng-container>
             </ng-container>
 
-            <!-- Error Fallback -->
+       
             <div class="mock-image error-fallback" *ngIf="hasError && selectedFile">
               <i class="fas fa-exclamation-triangle fa-6x text-warning mb-4"></i>
               <p>ไม่สามารถโหลดไฟล์ "{{ selectedFile.fileName }}" ได้</p>
               <small class="text-sub">ลิงก์ไฟล์อาจไม่ถูกต้องหรือไฟล์ถูกย้ายที่</small>
             </div>
+          </div> -->
+
+          <div class="image-box">
+            @if (!hasError) {
+              @if (isImage(selectedFile)) {
+                <img
+                  [src]="selectedFile.url"
+                  class="preview-image"
+                  [alt]="selectedFile.fileName"
+                  (error)="onPreviewError()"
+                />
+              } @else if (isPdf(selectedFile)) {
+                <iframe
+                  [src]="getSafeUrl(selectedFile.url)"
+                  class="preview-pdf"
+                  frameborder="0"
+                ></iframe>
+              } @else {
+                <div class="mock-image">
+                  <i class="fas fa-file-alt fa-3x"></i>
+                  <p>{{ selectedFile.fileName }}</p>
+                  <small class="text-sub">ไม่สามารถแสดงตัวอย่างไฟล์ประเภทนี้ได้</small>
+                </div>
+              }
+            } @else {
+              <div class="mock-image error-fallback">
+                <i class="fas fa-exclamation-triangle fa-6x text-warning mb-4"></i>
+                <p>ไม่สามารถโหลดไฟล์ "{{ selectedFile.fileName }}" ได้</p>
+                <small class="text-sub">ลิงก์ไฟล์อาจไม่ถูกต้องหรือไฟล์ถูกย้ายที่</small>
+              </div>
+            }
           </div>
         </div>
       </div>

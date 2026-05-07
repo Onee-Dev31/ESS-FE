@@ -143,6 +143,11 @@ $table-label-bg: var(--border-toolbar);
       font-weight: 600;
       color: $text-header;
       margin-left: 0.25rem;
+
+      .announce {
+        padding: 0 5px;
+        color: var(--danger) !important;
+      }
     }
 
     .form-control {
@@ -185,9 +190,17 @@ $table-label-bg: var(--border-toolbar);
       }
     }
 
+    .info {
+      font-weight: 300;
+      margin-left: 10px;
+      background: var(--bg-page);
+      padding: 5px;
+      border-radius: 5px;
+    }
+
     textarea.form-control {
       resize: vertical;
-      min-height: 120px;
+      min-height: 240px;
     }
 
     &.slide-in-right {
@@ -206,6 +219,11 @@ $table-label-bg: var(--border-toolbar);
     }
   }
 
+  .detail-section {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .input-pair-row {
     display: flex;
     flex-direction: row;
@@ -215,7 +233,8 @@ $table-label-bg: var(--border-toolbar);
     transition: all 0.3s ease;
 
     .form-control-select {
-      width: calc(50% - 0.5rem);
+      // width: calc(50% - 0.5rem);
+      width: 100%;
       flex: none;
       min-width: 250px;
       height: 45px;
@@ -503,15 +522,34 @@ $table-label-bg: var(--border-toolbar);
     .checkbox-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      gap: 0.7rem;
+      // margin-bottom: 1.5rem;
+    }
+
+    .basic-system {
+      background: var(--bg-page);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .example {
+      cursor: pointer;
+      background: var(--bg-table-head);
+      padding: 4px 6px;
+      border-radius: 10px;
+
+      &:hover {
+        color: var(--primary) !important;
+        background: color-mix(in srgb, var(--bg-table-head), var(--text) 20%);
+      }
     }
 
     .checkbox-item {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0.6rem 1.2rem;
+      padding: 10px 12px;
       background-color: var(--bg-table-head);
       border: 1px solid var(--border);
       border-radius: 999px;
@@ -521,7 +559,8 @@ $table-label-bg: var(--border-toolbar);
       min-height: auto;
       min-width: auto;
       box-shadow: none;
-      font-size: $font-size-body;
+      font-size: $font-size-label;
+      font-weight: 300;
 
       &.disabled {
         opacity: 0.5;
@@ -586,17 +625,17 @@ $table-label-bg: var(--border-toolbar);
     }
 
     .sub-options-section {
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       padding: 0;
       background-color: transparent;
       border: none;
       animation: slideDown 0.3s ease-out;
 
       .sub-section-title {
-        font-size: $font-size-header;
+        font-size: $font-size-hint;
         font-weight: 600;
         color: $text-muted;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.5rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -608,13 +647,13 @@ $table-label-bg: var(--border-toolbar);
         margin-bottom: 2rem;
 
         .type-btn {
-          padding: 0.75rem 2rem;
+          padding: 10px 12px;
           border-radius: 999px;
           border: 1px solid var(--border);
           background: var(--bg-card);
           color: $text;
-          font-size: $font-size-body;
-          font-weight: 500;
+          font-size: $font-size-label;
+          font-weight: 300;
           cursor: pointer;
           transition: all 0.2s ease;
           display: flex;
@@ -1432,4 +1471,29 @@ $table-label-bg: var(--border-toolbar);
 
 ::ng-deep .ant-select-selection-placeholder {
   color: var(--text-muted) !important;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes blink-border {
+  0%,
+  100% {
+    border-color: var(--border-color);
+  }
+  50% {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  }
+}
+
+.blink {
+  animation: blink-border 1s ease-in-out 3;
 }
