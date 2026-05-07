@@ -55,7 +55,8 @@ import { SignalrService } from '../../services/signalr.service';
 import { CcModal } from './modal/cc-modal/cc-modal';
 import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
-
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -80,6 +81,7 @@ import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal
     CcModal,
     NoteForItModal,
     AvatarPreviewModal,
+    NzDatePickerModule,
   ],
   templateUrl: './dashboard-it.html',
   styleUrl: './dashboard-it.scss',
@@ -125,6 +127,7 @@ export class DashboardIT implements OnInit {
   currentUserEmpCode = this.authService.userData().CODEMPID;
 
   Tickets = signal<any[]>(tickets);
+  summaryRes = signal<any>(null);
   selectedTicket = signal<any | undefined>(undefined);
   isPreviewModalOpen = signal<boolean>(false);
   previewFiles = signal<FilePreviewItem[]>([]);
@@ -166,6 +169,7 @@ export class DashboardIT implements OnInit {
   constructor(
     private msg: NzMessageService,
     private sanitizer: DomSanitizer,
+    private i18n: NzI18nService,
   ) {
     effect(() => {
       const trigger = this.signalrService.refreshTrigger();
@@ -173,6 +177,7 @@ export class DashboardIT implements OnInit {
         untracked(() => this.refreshTickets());
       }
     });
+    this.i18n.setLocale(en_US);
   }
 
   ngOnInit() {
@@ -643,17 +648,21 @@ export class DashboardIT implements OnInit {
   // GET MASTER
   getAllTickets(trackNew = false) {
     const searchText = this.keyword.trim();
+    const [from, to] = this.filter.dateRange ?? [];
+    const dateFrom = dayjs(from).format('YYYY-MM-DD');
+    const dateTo = dayjs(to).format('YYYY-MM-DD');
 
     this.itServiceService
       .getAllTickets({
-        page: 1,
-        pageSize: 50,
         searchText: searchText || undefined,
         myTicket: this.myTicket ? this.authService.userData().AD_USER : null,
+        dateFrom,
+        dateTo,
       })
       .subscribe({
         next: (res) => {
-          // console.log(res);
+          console.log(res);
+          this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
             const assignments = ticket.assignments ?? [];
@@ -1245,5 +1254,53 @@ export class DashboardIT implements OnInit {
         );
       },
     });
+  }
+
+  filter = {
+    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+  };
+
+  applyFilter() {
+    console.log(this.filter.dateRange);
+    this.getAllTickets();
+  }
+
+  resetFilter() {
+    this.filter = {
+      dateRange: null,
+    };
+  }
+
+  export() {
+    const [from, to] = this.filter.dateRange ?? [];
+    const dateFrom = dayjs(from).format('YYYY-MM-DD');
+    const dateTo = dayjs(to).format('YYYY-MM-DD');
+
+    this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Export failed:', error);
+      },
+    });
+  }
+
+  clearFilter() {
+    this.filter = {
+      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+    };
+
+    this.getAllTickets();
+  }
+
+  @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
+  exportCharts() {
+    this.dashboardSummary.exportCharts();
   }
 }

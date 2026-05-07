@@ -1,3 +1,7 @@
+<!-- <button class="btn-export" (click)="exportCharts()">
+  <i class="fa-solid fa-upload"></i>Export Chart
+</button> -->
+
 <!-- KPI CARDS -->
 <section class="kpi-row">
   <div
@@ -65,7 +69,12 @@
   <div class="chart-card">
     <div class="chart-title">Service Type</div>
 
-    <div echarts class="echart" [options]="servicePieOption"></div>
+    <div
+      echarts
+      class="echart"
+      [options]="servicePieOption"
+      (chartInit)="onServiceChartInit($event)"
+    ></div>
   </div>
 
   <!-- Company Bar -->
@@ -75,13 +84,19 @@
       echarts
       class="echart bar"
       [options]="companyBarOption"
+      (chartInit)="onCompanyChartInit($event)"
       (chartClick)="onCompanyBarClick($event)"
     ></div>
   </div>
   <div class="chart-card bar-card">
     <div class="chart-title">Top 5 Deparment</div>
     <div class="dept-drill">
-      <div echarts class="echart dept" [options]="deptBarOption"></div>
+      <div
+        echarts
+        class="echart dept"
+        [options]="deptBarOption"
+        (chartInit)="onDeptChartInit($event)"
+      ></div>
     </div>
   </div>
 </div>

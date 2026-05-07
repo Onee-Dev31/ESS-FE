@@ -151,6 +151,8 @@ export class ItServiceService {
     subCategoryId?: string;
     managerEmpNo?: string;
     myTicket?: string | null;
+    dateFrom?: string;
+    dateTo?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
@@ -165,6 +167,8 @@ export class ItServiceService {
     if (params.subCategoryId) queryParams.subCategoryId = params.subCategoryId;
     if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
     if (params.myTicket) queryParams.myTicket = params.myTicket;
+    if (params.dateFrom) queryParams.dateFrom = params.dateFrom;
+    if (params.dateTo) queryParams.dateTo = params.dateTo;
 
     // console.log('params >>> ', queryParams);
 
@@ -324,5 +328,38 @@ export class ItServiceService {
 
   re_open(formData: FormData): Observable<any> {
     return this._http.put<any>(`${this.baseUrl}/tickets/re-open/staff`, formData);
+  }
+
+  exportTicket(params: {
+    status?: string;
+    priority?: string;
+    searchText?: string;
+    requesterAduser?: string;
+    ticketTypeId?: string;
+    categoryId?: string;
+    subCategoryId?: string;
+    managerEmpNo?: string;
+    myTicket?: string | null;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Observable<Blob> {
+    const queryParams: any = {};
+
+    if (params.status) queryParams.status = params.status;
+    if (params.priority) queryParams.priority = params.priority;
+    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+    if (params.ticketTypeId) queryParams.ticketTypeId = params.ticketTypeId;
+    if (params.categoryId) queryParams.categoryId = params.categoryId;
+    if (params.subCategoryId) queryParams.subCategoryId = params.subCategoryId;
+    if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
+    if (params.myTicket) queryParams.myTicket = params.myTicket;
+    if (params.dateFrom) queryParams.dateFrom = params.dateFrom;
+    if (params.dateTo) queryParams.dateTo = params.dateTo;
+
+    return this._http.get(`${this.baseUrl}/tickets/export`, {
+      params: queryParams,
+      responseType: 'blob',
+    });
   }
 }

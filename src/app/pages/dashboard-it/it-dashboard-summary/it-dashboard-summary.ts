@@ -19,6 +19,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 type PieDatum = { name: string; value: number; key?: string };
 import { encryptValue } from '../../../utils/crypto.js ';
 import { MasterDataService } from '../../../services/master-data.service';
+import { ViewChildren, QueryList } from '@angular/core';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -45,6 +46,15 @@ export class ItDashboardSummary {
     if (status && status !== this.activeStatus) {
       this.selectStatus(status, false);
     }
+  }
+  @Input() set summaryData(res: any) {
+    if (!res) return;
+    this.updateKpis(res.summary);
+    this.buildStatusPie(res.summary);
+    this.buildServicePie(res.serviceTypes);
+    this.buildDeptTop5Map(res.topDepartments);
+    this.buildCompanyBar(res.topCompanies);
+    this.cdr.detectChanges();
   }
 
   // ===== KPI =====
@@ -167,7 +177,7 @@ export class ItDashboardSummary {
 
   ngOnInit(): void {
     this.selectStatus('all', false);
-    this.getAllTickets();
+    // this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
   }
@@ -390,6 +400,12 @@ export class ItDashboardSummary {
           center: ['50%', '53%'],
           label: { show: false },
           labelLine: { show: false },
+          // label: {
+          //   show: true,
+          //   formatter: '{b}: {c}',
+          //   fontSize: 11,
+          // },
+          // labelLine: { show: true },
           avoidLabelOverlap: true,
           emphasis: { scale: true, scaleSize: 6 },
           data,
@@ -670,26 +686,33 @@ export class ItDashboardSummary {
           barWidth: 16,
           itemStyle: { borderRadius: [10, 10, 10, 10] },
           emphasis: { focus: 'series' },
+          label: {
+            show: true,
+            position: 'right',
+            color: textColor,
+            fontWeight: 700,
+            fontSize: 12,
+          },
         },
       ],
     };
   }
 
-  getAllTickets() {
-    this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
-      next: (res) => {
-        this.updateKpis(res.summary);
-        this.buildStatusPie(res.summary);
-        this.buildServicePie(res.serviceTypes);
-        this.buildDeptTop5Map(res.topDepartments);
-        this.buildCompanyBar(res.topCompanies);
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
-  }
+  // getAllTickets() {
+  //   this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
+  //     next: (res) => {
+  //       this.updateKpis(res.summary);
+  //       this.buildStatusPie(res.summary);
+  //       this.buildServicePie(res.serviceTypes);
+  //       this.buildDeptTop5Map(res.topDepartments);
+  //       this.buildCompanyBar(res.topCompanies);
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching data:', error);
+  //     },
+  //   });
+  // }
 
   openTicketLogs(status: string): void {
     this.currentStatus = status;
@@ -890,5 +913,111 @@ export class ItDashboardSummary {
     );
 
     this.applyFilter();
+  }
+
+  @ViewChildren(NgxEchartsDirective) charts!: QueryList<NgxEchartsDirective>;
+
+  private serviceChart?: ECharts;
+  private companyChart?: ECharts;
+  private deptChart?: ECharts;
+
+  onServiceChartInit(ec: any) {
+    this.serviceChart = ec;
+  }
+  onCompanyChartInit(ec: any) {
+    this.companyChart = ec;
+  }
+  onDeptChartInit(ec: any) {
+    this.deptChart = ec;
+  }
+
+  async exportCharts() {
+    // override label ก่อน export
+    this.statusChart?.setOption({
+      series: [
+        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
+      ],
+    });
+    this.serviceChart?.setOption({
+      series: [
+        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
+      ],
+    });
+    this.companyChart?.setOption({
+      series: [
+        { label: { show: true, position: 'top', fontSize: 11, color: '#333', fontWeight: 'bold' } },
+      ],
+    });
+
+    await new Promise((r) => setTimeout(r, 500));
+
+    const charts = [
+      { chart: this.statusChart, name: 'Status Distribution' },
+      { chart: this.serviceChart, name: 'Service Type' },
+      { chart: this.companyChart, name: 'Top Companies' },
+      { chart: this.deptChart, name: 'Top Departments' },
+    ];
+
+    const validCharts = charts.filter((c) => !!c.chart);
+    if (validCharts.length === 0) return;
+
+    const chartSizes = validCharts.map(({ chart }) => {
+      const dom = (chart as any).getDom() as HTMLElement;
+      return { w: dom.offsetWidth, h: dom.offsetHeight };
+    });
+
+    const cols = 2;
+    const padding = 20;
+    const titleH = 30;
+    const rows = Math.ceil(validCharts.length / cols);
+    const colW = Math.max(...chartSizes.map((s) => s.w));
+    const rowH = Math.max(...chartSizes.map((s) => s.h));
+    const totalW = cols * colW + (cols + 1) * padding;
+    const totalH = rows * (rowH + titleH) + (rows + 1) * padding;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = totalW;
+    canvas.height = totalH;
+    const ctx = canvas.getContext('2d')!;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, totalW, totalH);
+
+    for (let i = 0; i < validCharts.length; i++) {
+      const { chart, name } = validCharts[i];
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = padding + col * (colW + padding);
+      const y = padding + row * (rowH + titleH + padding);
+
+      ctx.fillStyle = '#333';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(name, x, y + 18);
+
+      const url = chart!.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+      await new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, x, y + titleH, colW, rowH);
+          resolve();
+        };
+        img.src = url;
+      });
+    }
+
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'dashboard_charts.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // restore กลับ
+    this.statusChart?.setOption({
+      series: [{ label: { show: false }, labelLine: { show: false } }],
+    });
+    this.serviceChart?.setOption({
+      series: [{ label: { show: false }, labelLine: { show: false } }],
+    });
   }
 }
