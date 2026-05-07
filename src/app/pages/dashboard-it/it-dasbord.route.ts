@@ -9,5 +9,9 @@ const routes: Routes = [
     path: 'report-detail',
     loadComponent: () => import('./report-detail/report-detail').then((c) => c.ReportDetail),
   },
+  {
+    path: 'report',
+    loadComponent: () => import('./report/report').then((c) => c.Report),
+  },
 ];
 export default routes;

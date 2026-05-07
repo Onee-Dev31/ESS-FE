@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Attachment, StatusKey, TicketItem } from '../../interfaces/it-dashboard.interface';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -89,10 +89,16 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 export class DashboardIT implements OnInit {
   allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
 
+  private router = inject(Router);
+
   isTablet = false;
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+
+  filter = {
+    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+  };
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
 
@@ -1256,51 +1262,57 @@ export class DashboardIT implements OnInit {
     });
   }
 
-  filter = {
-    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
-  };
-
-  applyFilter() {
-    console.log(this.filter.dateRange);
-    this.getAllTickets();
+  viewExport() {
+    window.open('/it-dashboard/report', '_blank');
+    // this.router.navigate(['/it-dashboard/report']);
   }
 
-  resetFilter() {
-    this.filter = {
-      dateRange: null,
-    };
-  }
+  /**
+   *
+   * EXPORT
+   *
+   */
+  // applyFilter() {
+  //   console.log(this.filter.dateRange);
+  //   this.getAllTickets();
+  // }
 
-  export() {
-    const [from, to] = this.filter.dateRange ?? [];
-    const dateFrom = dayjs(from).format('YYYY-MM-DD');
-    const dateTo = dayjs(to).format('YYYY-MM-DD');
+  // resetFilter() {
+  //   this.filter = {
+  //     dateRange: null,
+  //   };
+  // }
 
-    this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
-      next: (blob: Blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-      error: (error) => {
-        console.error('Export failed:', error);
-      },
-    });
-  }
+  // export() {
+  //   const [from, to] = this.filter.dateRange ?? [];
+  //   const dateFrom = dayjs(from).format('YYYY-MM-DD');
+  //   const dateTo = dayjs(to).format('YYYY-MM-DD');
 
-  clearFilter() {
-    this.filter = {
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
-    };
+  //   this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
+  //     next: (blob: Blob) => {
+  //       const url = URL.createObjectURL(blob);
+  //       const a = document.createElement('a');
+  //       a.href = url;
+  //       a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
+  //       a.click();
+  //       URL.revokeObjectURL(url);
+  //     },
+  //     error: (error) => {
+  //       console.error('Export failed:', error);
+  //     },
+  //   });
+  // }
 
-    this.getAllTickets();
-  }
+  // clearFilter() {
+  //   this.filter = {
+  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+  //   };
 
-  @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
-  exportCharts() {
-    this.dashboardSummary.exportCharts();
-  }
+  //   this.getAllTickets();
+  // }
+
+  // @ViewChild(ItDashboardSummary) dashboardSummary!: ItDashboardSummary;
+  // exportCharts() {
+  //   this.dashboardSummary.exportCharts();
+  // }
 }

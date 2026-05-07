@@ -1,5 +1,10 @@
 <div class="top-bar">
-  <div class="filter">
+  <div>
+    <button (click)="viewExport()" class="btn-report">
+      <i class="fa-solid fa-folder-open"></i>report
+    </button>
+  </div>
+  <!-- <div class="filter">
     <div class="form-field">
       <nz-range-picker
         nzFormat="dd/MM/yyyy"
@@ -15,7 +20,7 @@
     <button class="btn-export" (click)="exportCharts()">
       <i class="fa-solid fa-upload"></i>Export Chart
     </button>
-  </div>
+  </div> -->
   <div class="btn-command">
     <button class="btn-type approve-out" (click)="viewApproveResign()">
       <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
@@ -470,7 +475,10 @@
         />
       </div>
       <div class="side-detail">
-        <div>{{ requester.fullname }} ({{ requester.nickname }})</div>
+        <div>
+          {{ requester.fullname }}
+          <span *ngIf="requester.nickname"> ({{ requester.nickname }})</span>
+        </div>
         <div>{{ requester.department_name }}</div>
         <div>{{ requester.company_name }}</div>
       </div>

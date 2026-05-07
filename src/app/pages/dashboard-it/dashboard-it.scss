@@ -222,6 +222,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 18px 18px 0 18px;
 }
 
 .filter {
@@ -245,7 +246,7 @@
 }
 
 .btn-command {
-  padding: 18px 18px 0 0;
+  // padding: 18px 18px 0 0;
   display: flex;
   justify-content: flex-end;
   align-items: end;
@@ -1908,4 +1909,8 @@
     color: rgb(255, 166, 166);
     text-align: center;
   }
+}
+
+.btn-report {
+  @include btn-primary;
 }

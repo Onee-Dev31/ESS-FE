@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,10 +27,10 @@ type PieDatum = { name: string; value: number; key?: string };
 import { encryptValue } from '../../../utils/crypto.js ';
 import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
+import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary';
 
 @Component({
-  selector: 'app-it-dashboard-summary',
-  standalone: true,
+  selector: 'app-report',
   imports: [
     CommonModule,
     FormsModule,
@@ -37,25 +44,26 @@ import { ViewChildren, QueryList } from '@angular/core';
     NzPaginationModule,
     NzDatePickerModule,
   ],
-  templateUrl: './it-dashboard-summary.html',
-  styleUrl: './it-dashboard-summary.scss',
+  templateUrl: './report.html',
+  styleUrl: './report.scss',
 })
-export class ItDashboardSummary {
+export class Report {
   @Output() statusChange = new EventEmitter<string | null>();
   @Input() set externalStatus(status: string | null) {
     if (status && status !== this.activeStatus) {
       this.selectStatus(status, false);
     }
   }
-  @Input() set summaryData(res: any) {
-    if (!res) return;
-    this.updateKpis(res.summary);
-    this.buildStatusPie(res.summary);
-    this.buildServicePie(res.serviceTypes);
-    this.buildDeptTop5Map(res.topDepartments);
-    this.buildCompanyBar(res.topCompanies);
-    this.cdr.detectChanges();
-  }
+
+  // @Input() set summaryData(res: any) {
+  //   if (!res) return;
+  //   this.updateKpis(res.summary);
+  //   this.buildStatusPie(res.summary);
+  //   this.buildServicePie(res.serviceTypes);
+  //   this.buildDeptTop5Map(res.topDepartments);
+  //   this.buildCompanyBar(res.topCompanies);
+  //   this.cdr.detectChanges();
+  // }
 
   // ===== KPI =====
   activeStatus: string = 'all';
@@ -101,6 +109,15 @@ export class ItDashboardSummary {
       hint: 'Tickets ที่ได้รับมอบหมาย',
       icon: 'user',
     },
+    {
+      status: 'Open',
+      title: 'Open tickets',
+      value: 0,
+      delta: 0,
+      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
+      icon: 'inbox',
+    },
+
     {
       status: 'Hold',
       title: 'Hold Tickets',
@@ -168,7 +185,7 @@ export class ItDashboardSummary {
 
   ngOnInit(): void {
     this.selectStatus('all', false);
-    // this.getAllTickets();
+    this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
   }
@@ -689,21 +706,25 @@ export class ItDashboardSummary {
     };
   }
 
-  // getAllTickets() {
-  //   this.itServiceService.getAllTickets({ page: 1, pageSize: 9999 }).subscribe({
-  //     next: (res) => {
-  //       this.updateKpis(res.summary);
-  //       this.buildStatusPie(res.summary);
-  //       this.buildServicePie(res.serviceTypes);
-  //       this.buildDeptTop5Map(res.topDepartments);
-  //       this.buildCompanyBar(res.topCompanies);
-  //       this.cdr.detectChanges();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error fetching data:', error);
-  //     },
-  //   });
-  // }
+  getAllTickets() {
+    const [from, to] = this.filterAll.dateRange ?? [];
+    const dateFrom = dayjs(from).format('YYYY-MM-DD');
+    const dateTo = dayjs(to).format('YYYY-MM-DD');
+    this.itServiceService.getAllTickets({ dateFrom, dateTo }).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.updateKpis(res.summary);
+        this.buildStatusPie(res.summary);
+        this.buildServicePie(res.serviceTypes);
+        this.buildDeptTop5Map(res.topDepartments);
+        this.buildCompanyBar(res.topCompanies);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
 
   openTicketLogs(status: string): void {
     this.currentStatus = status;
@@ -836,6 +857,49 @@ export class ItDashboardSummary {
     });
 
     this.page = 1;
+  }
+
+  filterAll = {
+    dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+  };
+
+  applyFilterAll() {
+    console.log(this.filterAll.dateRange);
+    this.getAllTickets();
+  }
+
+  resetFilter() {
+    this.filterAll = {
+      dateRange: null,
+    };
+  }
+
+  export() {
+    const [from, to] = this.filterAll.dateRange ?? [];
+    const dateFrom = dayjs(from).format('YYYY-MM-DD');
+    const dateTo = dayjs(to).format('YYYY-MM-DD');
+
+    this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Export failed:', error);
+      },
+    });
+  }
+
+  clearFilter() {
+    this.filterAll = {
+      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+    };
+
+    this.getAllTickets();
   }
 
   exportData() {
