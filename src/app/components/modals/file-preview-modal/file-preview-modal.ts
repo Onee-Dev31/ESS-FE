@@ -6,6 +6,7 @@ import {
   OnInit,
   inject,
   SimpleChanges,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -26,6 +27,7 @@ export interface FilePreviewItem {
 })
 export class FilePreviewModalComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() files: FilePreviewItem[] = [];
   @Output() onClose = new EventEmitter<void>();
@@ -74,10 +76,6 @@ export class FilePreviewModalComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  // async downloadFile(file: FilePreviewItem) {
-  //   alert('mocl');
-  // }
-
   isDownloading = false;
 
   async downloadFile(file: FilePreviewItem) {
@@ -99,13 +97,7 @@ export class FilePreviewModalComponent implements OnInit {
       console.error('Download failed:', error);
     } finally {
       this.isDownloading = false;
+      this.cdr.detectChanges();
     }
   }
-  // downloadAll() {
-  //   this.files.forEach((file, index) => {
-  //     setTimeout(() => {
-  //       this.downloadFile(file);
-  //     }, index * 500); // delay เพื่อไม่ให้ browser block
-  //   });
-  // }
 }
