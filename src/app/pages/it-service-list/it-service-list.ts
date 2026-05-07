@@ -453,6 +453,14 @@ export class ItService implements OnInit {
     });
   }
 
+  isDetailModalOpen = signal(false);
+  selectedDetail = signal('');
+
+  openDetail(description: string) {
+    this.selectedDetail.set(description);
+    this.isDetailModalOpen.set(true);
+  }
+
   copy(text: string) {
     if (!text) return;
     navigator.clipboard.writeText(text);
