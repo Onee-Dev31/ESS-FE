@@ -185,6 +185,14 @@ export class ItDashboardSummary {
         icon: 'appstore',
       },
       {
+        status: 'done',
+        title: 'Closed Tickets',
+        value: summary.closed ?? 0,
+        delta: 0,
+        hint: 'Tickets ที่ปิดแล้ว',
+        icon: 'check-circle',
+      },
+      {
         status: 'open',
         title: 'New tickets',
         value: summary.open ?? 0,
@@ -207,14 +215,6 @@ export class ItDashboardSummary {
         delta: 0,
         hint: 'Tickets ที่ได้รับมอบหมาย',
         icon: 'user',
-      },
-      {
-        status: 'done',
-        title: 'Closed Tickets',
-        value: summary.closed ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
       },
       {
         status: 'hold',
@@ -260,11 +260,17 @@ export class ItDashboardSummary {
     this.servicePieOption = this.makeDonutOptionService('Service Type', data, total, 'Total');
   }
   // ====== 3) Top Companies Bar ======
+  private remapCompanyCode(code: string): string {
+    if (code === 'OTD') return 'ONEE';
+    if (code === 'OTV') return 'ONE31';
+    return code;
+  }
+
   private buildCompanyBar(res: any[]) {
     const chartData = res.map((x) => ({
       value: x.ticket_count,
-      code: x.COMPANY_CODE,
-      name: x.COMPANY_NAME,
+      code: this.remapCompanyCode(x.COMPANY_CODE),
+      name: this.remapCompanyCode(x.COMPANY_NAME),
     }));
 
     const labels = chartData.map((x) => x.code);
@@ -328,7 +334,7 @@ export class ItDashboardSummary {
     const map: Record<string, Array<{ label: string; value: number }>> = {};
 
     for (const row of rows ?? []) {
-      const companyCode = row.COMPANY_CODE;
+      const companyCode = this.remapCompanyCode(row.COMPANY_CODE);
       if (!companyCode) continue;
 
       if (!map[companyCode]) {
@@ -696,7 +702,10 @@ export class ItDashboardSummary {
   loadTickets(status: string): void {
     this.itServiceService.getTicketByStatus(status).subscribe({
       next: (res: any) => {
-        this.ticketLogs = Array.isArray(res?.data) ? res.data : [];
+        this.ticketLogs = (Array.isArray(res?.data) ? res.data : []).map((t: any) => ({
+          ...t,
+          COMPANY_CODE: this.remapCompanyCode(t.COMPANY_CODE),
+        }));
         this.filteredTicketLogs = this.ticketLogs.map((t: any) => ({
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
@@ -840,7 +849,12 @@ export class ItDashboardSummary {
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
       next: (data) => {
-        this.companyList = data;
+        this.companyList = data.map((c: any) => ({
+          ...c,
+          COMPANY_CODE: this.remapCompanyCode(c.COMPANY_CODE),
+          COMPANY_NAME: this.remapCompanyCode(c.COMPANY_NAME),
+        }));
+        console.log(this.companyList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -851,7 +865,11 @@ export class ItDashboardSummary {
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
       next: (data) => {
-        this.departmentList = data;
+        this.departmentList = data.map((d: any) => ({
+          ...d,
+          COMPANY_CODE: this.remapCompanyCode(d.COMPANY_CODE),
+        }));
+        console.log(this.departmentList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
