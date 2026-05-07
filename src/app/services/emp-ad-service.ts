@@ -14,5 +14,4 @@ export class EmpAdService {
   getEmployeeManagement(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Employee/EmployeeManagement`);
   }
-
 }
