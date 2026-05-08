@@ -650,14 +650,14 @@
   font-size: 12px;
   font-weight: 700;
   background: var(--bg-card);
-  border: 2px solid var(--border-color);
+  border: 1px solid #e9ecef8a;
 }
 
 .tk-pill .dot {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: var(--bg-card);
+  background: #e9ecefd5;
 }
 
 .pill-lg {
