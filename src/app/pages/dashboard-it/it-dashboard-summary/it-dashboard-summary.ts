@@ -30,7 +30,7 @@ import { ViewChildren, QueryList } from '@angular/core';
     NzSelectModule,
     NzButtonModule,
     NzIconModule,
-    NgxEchartsDirective,
+    // NgxEchartsDirective,
     NgxEchartsModule,
     NzTableModule,
     NzModalModule,

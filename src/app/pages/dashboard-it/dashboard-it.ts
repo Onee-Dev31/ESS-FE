@@ -423,7 +423,7 @@ export class DashboardIT implements OnInit {
     const statusMap: Record<string, string> = {
       open: 'New',
       assigned: 'In Progress',
-      closed: 'Closed',
+      done: 'Closed',
       hold: 'Hold',
       denied: 'Denied',
     };

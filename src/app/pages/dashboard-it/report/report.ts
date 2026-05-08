@@ -638,7 +638,7 @@ export class Report {
 
   private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
     const data = [...rows]
-      // .sort((a, b) => b.value - a.value)
+      .sort((a, b) => a.value - b.value)
       .slice(0, 5)
       .map((x) => ({
         name: x.label,
@@ -710,7 +710,7 @@ export class Report {
     const [from, to] = this.filterAll.dateRange ?? [];
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
-    this.itServiceService.getAllTickets({ dateFrom, dateTo }).subscribe({
+    this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
         console.log(res);
         this.updateKpis(res.summary);

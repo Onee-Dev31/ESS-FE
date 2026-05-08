@@ -177,6 +177,44 @@ export class ItServiceService {
     });
   }
 
+  getAllTickets_real(params: {
+    page?: number;
+    pageSize?: number;
+    status?: string;
+    priority?: string;
+    searchText?: string;
+    requesterAduser?: string;
+    ticketTypeId?: string;
+    categoryId?: string;
+    subCategoryId?: string;
+    managerEmpNo?: string;
+    myTicket?: string | null;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Observable<any> {
+    const queryParams: any = {};
+
+    if (params.page) queryParams.page = params.page;
+    if (params.pageSize) queryParams.pageSize = params.pageSize;
+    if (params.status) queryParams.status = params.status;
+    if (params.priority) queryParams.priority = params.priority;
+    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+    if (params.ticketTypeId) queryParams.ticketTypeId = params.ticketTypeId;
+    if (params.categoryId) queryParams.categoryId = params.categoryId;
+    if (params.subCategoryId) queryParams.subCategoryId = params.subCategoryId;
+    if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
+    if (params.myTicket) queryParams.myTicket = params.myTicket;
+    if (params.dateFrom) queryParams.dateFrom = params.dateFrom;
+    if (params.dateTo) queryParams.dateTo = params.dateTo;
+
+    // console.log('params >>> ', queryParams);
+
+    return this._http.get<any>(`${this.baseUrl}/tickets/real`, {
+      params: queryParams,
+    });
+  }
+
   getMyTickets(params: {
     page?: number;
     pageSize?: number;
