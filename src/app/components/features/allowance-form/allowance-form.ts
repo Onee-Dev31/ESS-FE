@@ -263,6 +263,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
       return;
     }
 
+    if (!this.MODE_EDIT && selectedLogs.length === 0) {
+      this.toastService.warning('กรุณาเลือกรายการที่ต้องการเบิกอย่างน้อย 1 รายการ');
+      return;
+    }
+
     const missingDesc = selectedLogs.filter((l) => !l.description?.trim());
     if (missingDesc.length > 0) {
       this.toastService.warning('กรุณากรอกรายละเอียดการเบิกให้ครบถ้วน');

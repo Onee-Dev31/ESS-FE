@@ -315,7 +315,7 @@
   </main>
 
   <div class="form-actions" *ngIf="!MODE_EDIT || requests?.status === 'New'">
-    <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
+    <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid() || (!MODE_EDIT && hasDelete())">
       <i class="fas fa-check"></i>
       {{
         !MODE_EDIT ? 'ยืนยันการเบิก' : hasDelete() ? 'ลบรายการเบิกทั้งหมด' : 'ยืนยันการแก้ไขการเบิก'
