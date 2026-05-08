@@ -135,6 +135,8 @@
               [ngModel]="startDate()"
               nzFormat="dd/MM/yyyy"
               (ngModelChange)="startDate.set($event)"
+              class="input-field custom-picker"
+              nzDropdownClassName="custom-picker-popup"
             >
             </nz-date-picker>
           </div>
@@ -162,6 +164,8 @@
               [ngModel]="endDate()"
               nzFormat="dd/MM/yyyy"
               (ngModelChange)="endDate.set($event)"
+              class="input-field custom-picker"
+              nzDropdownClassName="custom-picker-popup"
             >
             </nz-date-picker>
           </div>
