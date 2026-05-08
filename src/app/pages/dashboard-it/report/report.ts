@@ -329,6 +329,15 @@ export class Report {
         axisLabel: { show: false },
       },
 
+      // series: [
+      //   {
+      //     type: 'bar',
+      //     data: chartData,
+      //     barWidth: 46,
+      //     itemStyle: { borderRadius: [12, 12, 12, 12] },
+      //     emphasis: { focus: 'series' },
+      //   },
+      // ],
       series: [
         {
           type: 'bar',
@@ -336,6 +345,19 @@ export class Report {
           barWidth: 46,
           itemStyle: { borderRadius: [12, 12, 12, 12] },
           emphasis: { focus: 'series' },
+          z: 2,
+        },
+        {
+          type: 'bar',
+          barWidth: 46,
+          barGap: '-100%',
+          data: chartData.map((x) => ({
+            ...x,
+            value: Math.max(...chartData.map((d: any) => d.value)) || 1,
+          })),
+          itemStyle: { color: 'rgba(0,0,0,0)' },
+          emphasis: { disabled: true },
+          z: 3,
         },
       ],
     };
