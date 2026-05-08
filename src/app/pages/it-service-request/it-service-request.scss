@@ -190,6 +190,12 @@ $table-label-bg: var(--border-toolbar);
       }
     }
 
+    .form-control.blink:focus {
+      border-color: #f59e0b !important;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+      animation: blink-border 1s ease-in-out 3 !important;
+    }
+
     .info {
       font-weight: 300;
       margin-left: 10px;
@@ -1486,14 +1492,11 @@ $table-label-bg: var(--border-toolbar);
 @keyframes blink-border {
   0%,
   100% {
-    border-color: var(--border-color);
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
   }
   50% {
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15) !important;
   }
-}
-
-.blink {
-  animation: blink-border 1s ease-in-out 3;
 }

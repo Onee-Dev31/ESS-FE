@@ -149,6 +149,7 @@ export class ITServiceRequestComponent implements OnInit {
     if (value === '__FREELANCE__') {
       this.isAnnounceChooseFreelance.set(true);
       setTimeout(() => {
+        this.detailTextarea.nativeElement.focus();
         this.detailTextarea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     } else {
