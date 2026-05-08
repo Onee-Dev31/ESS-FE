@@ -5,7 +5,8 @@
         nzFormat="dd/MM/yyyy"
         [(ngModel)]="filterAll.dateRange"
         (ngModelChange)="applyFilterAll()"
-        class="form-input dateRange"
+        class="form-input dateRange custom-range-picker"
+        nzDropdownClassName="custom-range-picker-popup"
       />
     </div>
     <button class="btn-export" (click)="export()"><i class="fa-solid fa-upload"></i>Export</button>

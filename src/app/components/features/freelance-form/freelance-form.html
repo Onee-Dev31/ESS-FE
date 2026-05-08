@@ -134,7 +134,8 @@
               [(ngModel)]="formData.startDate"
               nzFormat="dd/MM/yyyy"
               name="startDate"
-              class="form-input"
+              class="form-input custom-picker"
+              nzDropdownClassName="custom-picker-popup"
               required
               #startDate="ngModel"
               [class.input-error]="startDate.invalid && startDate.touched"
@@ -150,7 +151,8 @@
               [(ngModel)]="formData.endDate"
               nzFormat="dd/MM/yyyy"
               name="endDate"
-              class="form-input"
+              class="form-input custom-picker"
+              nzDropdownClassName="custom-picker-popup"
               required
               #endDate="ngModel"
               [class.input-error]="endDate.invalid && endDate.touched"
@@ -456,7 +458,8 @@
                 [(ngModel)]="formResignData.lastWorkingDate"
                 nzFormat="dd/MM/yyyy"
                 name="lastWorkingDate"
-                class="form-input"
+                class="form-input custom-picker"
+                nzDropdownClassName="custom-picker-popup"
                 required
                 #lastWorkingDate="ngModel"
                 [class.input-error]="lastWorkingDate.invalid && lastWorkingDate.touched"

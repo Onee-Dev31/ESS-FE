@@ -131,7 +131,8 @@
                       <nz-date-picker
                         nzFormat="dd/MM/yyyy"
                         name="lastDate"
-                        class="form-input"
+                        class="form-input custom-picker"
+                        nzDropdownClassName="custom-picker-popup"
                         [ngModel]="activeDates[emp.empCode]?.lastDate"
                         (ngModelChange)="setDate(emp, 'lastDate', $event)"
                         required
@@ -148,7 +149,8 @@
                       <nz-date-picker
                         nzFormat="dd/MM/yyyy"
                         name="effectiveDate"
-                        class="form-input"
+                        class="form-input custom-picker"
+                        nzDropdownClassName="custom-picker-popup"
                         [ngModel]="activeDates[emp.empCode]?.effectiveDate"
                         (ngModelChange)="setDate(emp, 'effectiveDate', $event)"
                         required
@@ -464,10 +466,11 @@
                 <div>
                   <div class="label">Last Date</div>
                   <nz-date-picker
-                    class="input"
+                    class="input custom-picker"
                     [ngModel]="lastDate()"
                     (ngModelChange)="lastDate.set($event)"
                     nzFormat="dd/MM/yyyy"
+                    nzDropdownClassName="custom-picker-popup"
                   >
                   </nz-date-picker>
                 </div>
@@ -475,10 +478,11 @@
                 <div>
                   <div class="label">Effective Date</div>
                   <nz-date-picker
-                    class="input"
+                    class="input custom-picker"
                     [ngModel]="effectiveDate()"
                     (ngModelChange)="effectiveDate.set($event)"
                     nzFormat="dd/MM/yyyy"
+                    nzDropdownClassName="custom-picker-popup"
                   >
                   </nz-date-picker>
                 </div>

@@ -15,7 +15,12 @@
         <div class="group-filter">
           <div class="form-field">
             <label>วันที่เริ่มต้น-วันที่สิ้นสุด</label>
-            <nz-range-picker nzFormat="dd/MM/yyyy" [(ngModel)]="dateRange" class="form-input" />
+            <nz-range-picker
+              nzFormat="dd/MM/yyyy"
+              [(ngModel)]="dateRange"
+              class="form-input custom-range-picker"
+              nzDropdownClassName="custom-range-picker-popup"
+            />
             <!-- <nz-range-picker nzMode="month" nzFormat="MM/yyyy" [(ngModel)]="dateRange" class="form-input" /> -->
           </div>
           <div class="form-field">

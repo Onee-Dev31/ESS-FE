@@ -88,107 +88,301 @@
   ANTD : PICKER
 */
 
-//antd picker
+/*
+|--------------------------------------------------------------------------
+| 1. ANTD : CUSTOM PICKER
+|--------------------------------------------------------------------------
+*/
 
-.ant-picker {
+/* input */
+.custom-picker.ant-picker {
   border: 1px solid var(--border-table-head);
   color: var(--input-text);
   background-color: var(--input-bg);
 }
 
-.ant-picker-dropdown .ant-picker-panel {
+/* popup */
+.custom-picker-popup .ant-picker-panel {
   background: var(--bg-card);
 }
 
-.ant-picker-cell-today .ant-picker-cell-inner::before {
+/* today */
+.custom-picker-popup .ant-picker-cell-today .ant-picker-cell-inner::before {
   border: none !important;
   display: none !important;
 }
 
-.ant-picker-input > input {
+/* input text */
+.custom-picker.ant-picker .ant-picker-input > input {
   color: var(--text);
 }
 
-.ant-picker-clear {
+/* clear icon */
+.custom-picker.ant-picker .ant-picker-clear {
   background-color: transparent;
   color: var(--input-text) !important;
 }
 
-.ant-picker-suffix {
+/* suffix */
+.custom-picker.ant-picker .ant-picker-suffix {
   color: var(--text);
 }
 
-.ant-picker:hover input:not(:placeholder-shown) ~ .ant-picker-suffix {
+/* hide suffix */
+.custom-picker.ant-picker:hover input:not(:placeholder-shown) ~ .ant-picker-suffix {
   opacity: 0;
 }
 
-/* fix ขนาดแต่ละช่องให้ตายตัว */
-.ant-picker-cell {
+/*
+|--------------------------------------------------------------------------
+| CELL
+|--------------------------------------------------------------------------
+*/
+
+/* fix size */
+.custom-picker-popup .ant-picker-cell {
   width: 30px !important;
   height: 35px !important;
   padding: 0 !important;
 }
 
-/* fix inner ให้เต็ม cell และเป็นวงกลม */
-.ant-picker-cell-inner {
+/* inner */
+.custom-picker-popup .ant-picker-cell-inner {
   width: 100% !important;
   height: 100% !important;
+
   display: flex !important;
   align-items: center;
   justify-content: center;
+
   border-radius: 50% !important;
+
   transition: background-color 0.2s ease;
 }
 
-/* ทำให้วันที่ที่เลือกเป็นวงกลม */
-.ant-picker-cell-selected .ant-picker-cell-inner {
+/* selected */
+.custom-picker-popup .ant-picker-cell-selected .ant-picker-cell-inner {
   background-color: var(--primary) !important;
   color: #ffffff !important;
+
   border-radius: 50% !important;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* hover ตอนชี้เมาส์ */
-.ant-picker-cell-inner:hover {
-  background-color: #b3b3b3 !important;
+/* hover */
+.custom-picker-popup .ant-picker-cell-inner:hover {
+  background-color: color-mix(in srgb, var(--primary) 18%, transparent) !important;
+
   border-radius: 50% !important;
+
   width: 30px;
   height: 30px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* month & year mode */
-.ant-picker-month-panel .ant-picker-cell-inner,
-.ant-picker-year-panel .ant-picker-cell-inner,
-.ant-picker-decade-panel .ant-picker-cell-inner {
+/*
+|--------------------------------------------------------------------------
+| MONTH / YEAR MODE
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup .ant-picker-month-panel .ant-picker-cell-inner,
+.custom-picker-popup .ant-picker-year-panel .ant-picker-cell-inner,
+.custom-picker-popup .ant-picker-decade-panel .ant-picker-cell-inner {
   border-radius: 10% !important;
 }
 
-/* ลบ background ของ disabled date */
-.ant-picker-cell-disabled::before {
+/*
+|--------------------------------------------------------------------------
+| DISABLED
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup .ant-picker-cell-disabled::before {
   background: color-mix(in srgb, var(--text-muted), var(--text-reverse) 80%) !important;
 }
 
-/* สีตัวเลขของวันที่ disabled */
-.ant-picker-cell-disabled .ant-picker-cell-inner {
+/* disabled text */
+.custom-picker-popup .ant-picker-cell-disabled .ant-picker-cell-inner {
   color: var(--text) !important;
   opacity: 0.6;
 }
 
-/* ตอนเป็น range เลื่อนซ้าย-ขวาได้*/
-.ant-picker-dropdown,
-.ant-picker-panel-container {
+/*
+|--------------------------------------------------------------------------
+| MOBILE
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup,
+.custom-picker-popup .ant-picker-panel-container {
+  z-index: 1150 !important;
+
+  position: fixed !important;
+
+  max-width: calc(100vw - 24px) !important;
+
+  box-sizing: border-box;
+
+  overflow-x: auto;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2. ANTD : CUSTOM RANGE PICKER
+|--------------------------------------------------------------------------
+*/
+
+nz-range-picker {
+  width: 300px;
+  border-radius: 10px !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2. ANTD : CUSTOM RANGE PICKER
+|--------------------------------------------------------------------------
+*/
+
+/* input */
+.custom-range-picker.ant-picker {
+  border: 1px solid var(--border-table-head);
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  border-radius: 10px !important;
+  width: 300px;
+}
+
+/* input text */
+.custom-range-picker.ant-picker .ant-picker-input > input {
+  color: var(--text);
+}
+
+/* suffix / clear */
+.custom-range-picker.ant-picker .ant-picker-suffix {
+  color: var(--text);
+}
+.custom-range-picker.ant-picker .ant-picker-clear {
+  background-color: transparent;
+  color: var(--input-text) !important;
+}
+
+/* separator */
+.custom-range-picker.ant-picker .ant-picker-range-separator {
+  color: var(--text-muted);
+}
+
+/*
+|--------------------------------------------------------------------------
+| POPUP
+|--------------------------------------------------------------------------
+*/
+
+/* panel bg */
+.custom-range-picker-popup .ant-picker-panel {
+  background: var(--bg-card);
+}
+
+/* header */
+.custom-range-picker-popup .ant-picker-header {
+  color: var(--text-header);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.custom-range-picker-popup .ant-picker-header button {
+  color: var(--text-muted);
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+/* today border */
+.custom-range-picker-popup .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--primary) !important;
+}
+
+/* cell text */
+.custom-range-picker-popup .ant-picker-cell {
+  color: var(--text-muted);
+}
+
+.custom-range-picker-popup .ant-picker-cell-in-view {
+  color: var(--text);
+}
+
+/* range start / end — วงกลม */
+.custom-range-picker-popup .ant-picker-cell-range-start .ant-picker-cell-inner,
+.custom-range-picker-popup .ant-picker-cell-range-end .ant-picker-cell-inner {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+}
+
+/* range in-between — pill bg */
+.custom-range-picker-popup .ant-picker-cell-in-range::before {
+  background: color-mix(in srgb, var(--primary), transparent 85%) !important;
+}
+
+/* range start tail */
+.custom-range-picker-popup
+  .ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before,
+.custom-range-picker-popup
+  .ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before {
+  background: color-mix(in srgb, var(--primary), transparent 85%) !important;
+}
+
+/* hover */
+.custom-range-picker-popup
+  .ant-picker-cell:not(.ant-picker-cell-disabled):hover
+  .ant-picker-cell-inner {
+  background: color-mix(in srgb, var(--primary), transparent 50%) !important;
+  border-radius: 50% !important;
+}
+
+/* disabled */
+.custom-range-picker-popup .ant-picker-cell-disabled .ant-picker-cell-inner {
+  color: var(--text-muted) !important;
+  opacity: 0.5;
+}
+
+.custom-range-picker-popup .ant-picker-cell-disabled::before {
+  background: color-mix(in srgb, var(--text-muted), transparent 85%) !important;
+}
+
+/* footer */
+.custom-range-picker-popup .ant-picker-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+/* mobile */
+.custom-range-picker-popup,
+.custom-range-picker-popup .ant-picker-panel-container {
   z-index: 1150 !important;
   position: fixed !important;
   max-width: calc(100vw - 24px) !important;
   box-sizing: border-box;
   overflow-x: auto;
+  background: var(--bg-card) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
+.custom-range-picker-popup .ant-picker-cell-range-hover-start .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-end .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-edge-start .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-edge-end .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-start-near-hover .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-end-near-hover .ant-picker-cell-inner::after {
+  background: transparent !important;
+  display: none !important;
+}
 /*
   ANTD : MODAL
 */
@@ -212,15 +406,6 @@
   transform: scale(1);
   border-radius: 10px;
   transition: all 0.25s ease;
-}
-
-/*
-  ANTD : RANGE PICKER
-*/
-
-nz-range-picker {
-  width: 300px;
-  border-radius: 10px !important;
 }
 
 /*
