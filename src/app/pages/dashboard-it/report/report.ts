@@ -319,6 +319,7 @@ export class Report {
         axisTick: { show: false },
         axisLine: { show: false },
         axisLabel: { fontWeight: 700, color: textColor },
+        triggerEvent: true,
       },
 
       yAxis: {
@@ -350,20 +351,26 @@ export class Report {
 
   private buildDeptTop5Map(rows: any[]) {
     const map: Record<string, Array<{ label: string; value: number }>> = {};
+    const allMap: Record<string, { value: number; company: string }> = {};
 
     for (const row of rows ?? []) {
       const companyCode = this.remapCompanyCode(row.COMPANY_CODE);
       if (!companyCode) continue;
 
-      if (!map[companyCode]) {
-        map[companyCode] = [];
-      }
+      if (!map[companyCode]) map[companyCode] = [];
+      map[companyCode].push({ label: row.dept_display, value: row.ticket_count });
 
-      map[companyCode].push({
-        label: row.dept_display,
-        value: row.ticket_count,
-      });
+      const key = row.dept_display;
+      if (!allMap[key]) {
+        allMap[key] = { value: 0, company: companyCode };
+      }
+      allMap[key].value += row.ticket_count;
     }
+
+    map['ALL'] = Object.entries(allMap)
+      .map(([label, { value, company }]) => ({ label: `${label} (${company})`, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
 
     this.deptTop5Map = map;
   }
@@ -539,7 +546,7 @@ export class Report {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
-    console.log(k, isClick);
+    // console.log(k, isClick);
     this.currentStatus = this.statusLabel(k);
     this.activeStatus = k;
     this.selectedStatus = k;
@@ -626,13 +633,26 @@ export class Report {
   }
 
   onCompanyBarClick(e: any) {
-    const company = (e?.data.code ?? '').toString();
+    console.log('event:', e);
+    console.log('componentType:', e?.componentType);
+    console.log('value:', e?.value);
+    console.log('data:', e?.data);
+    // // console.log(e.data);
+    // const company = (e?.data.code ?? '').toString();
+    let company = '';
+
+    if (e?.componentType === 'xAxis') {
+      company = e.value; // click ที่ label
+    } else {
+      company = (e?.data?.code ?? '').toString(); // click ที่ bar
+    }
+
     if (!company) return;
 
     this.selectedCompany = company;
     this.showDeptBar = true;
 
-    const depts = this.deptTop5Map[company] ?? [];
+    const depts = (this.deptTop5Map[company] ?? []).sort((a, b) => b.value - a.value).slice(0, 5);
     this.buildDeptBar(company, depts);
   }
 
@@ -708,11 +728,12 @@ export class Report {
 
   getAllTickets() {
     const [from, to] = this.filterAll.dateRange ?? [];
-    const dateFrom = dayjs(from).format('YYYY-MM-DD');
-    const dateTo = dayjs(to).format('YYYY-MM-DD');
+    const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
+    const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
+
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -866,7 +887,7 @@ export class Report {
   };
 
   applyFilterAll() {
-    console.log(this.filterAll.dateRange);
+    // console.log(this.filterAll.dateRange);
     this.getAllTickets();
   }
 
@@ -934,7 +955,7 @@ export class Report {
           COMPANY_CODE: this.remapCompanyCode(c.COMPANY_CODE),
           COMPANY_NAME: this.remapCompanyCode(c.COMPANY_NAME),
         }));
-        console.log(this.companyList);
+        // console.log(this.companyList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -949,7 +970,7 @@ export class Report {
           ...d,
           COMPANY_CODE: this.remapCompanyCode(d.COMPANY_CODE),
         }));
-        console.log(this.departmentList);
+        // console.log(this.departmentList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
