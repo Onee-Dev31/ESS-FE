@@ -192,11 +192,7 @@
         placeholder="กรอกรายละเอียด ticket"
       ></textarea>
     </div>
-    <div
-      class="btn-expand-detail"
-      *ngIf="t.description?.split('\n').length > 3"
-      (click)="openDetail(t.description)"
-    >
+    <div class="btn-expand-detail" (click)="openDetail(t.description)">
       <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
     </div>
   </section>
