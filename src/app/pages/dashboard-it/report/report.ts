@@ -713,6 +713,8 @@ export class Report {
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
         console.log(res);
+        this.deptTop5Map = {};
+        this.deptBarOption = {};
         this.updateKpis(res.summary);
         this.buildStatusPie(res.summary);
         this.buildServicePie(res.serviceTypes);
