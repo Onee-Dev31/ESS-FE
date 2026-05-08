@@ -833,8 +833,8 @@
 }
 
 .controls {
-  display: none;
-  @include large-tablet {
-    display: block;
-  }
+  // display: none;
+  // @include large-tablet {
+  //   display: block;
+  // }
 }
