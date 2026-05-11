@@ -168,11 +168,17 @@ $border: var(--border);
       }
     }
 
-@keyframes highlight-fade {
-  0%   { background-color: rgba(245, 158, 11, 0.25); }
-  80%  { background-color: rgba(245, 158, 11, 0.15); }
-  100% { background-color: transparent; }
-}
+    @keyframes highlight-fade {
+      0% {
+        background-color: rgba(245, 158, 11, 0.25);
+      }
+      80% {
+        background-color: rgba(245, 158, 11, 0.15);
+      }
+      100% {
+        background-color: transparent;
+      }
+    }
 
     td {
       padding: 16px;

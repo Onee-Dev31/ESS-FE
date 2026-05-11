@@ -119,7 +119,8 @@ export class NavbarComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
-          const message = data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign ให้คุณแล้ว`;
+          const message =
+            data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign ให้คุณแล้ว`;
 
           const newNoti: NotificationItem = {
             id: Date.now(),
@@ -256,7 +257,9 @@ export class NavbarComponent {
         const list = raw.filter((t: any) => {
           const typeId = Number(t.ticket_type_id ?? t.ticketTypeId);
           if (typeId === 3) {
-            const approvalStatus = String(t.approval_status ?? t.approvalStatus ?? '').toLowerCase();
+            const approvalStatus = String(
+              t.approval_status ?? t.approvalStatus ?? '',
+            ).toLowerCase();
             if (approvalStatus === 'approved') return false;
             return (t.approver_codeempid ?? t.approverCodeempid) === codeempid;
           }
@@ -268,7 +271,10 @@ export class NavbarComponent {
           message: t.subject ?? '',
           status: this.mapTicketStatus(t.user_status ?? t.status),
           time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
-          route: Number(t.ticket_type_id ?? t.ticketTypeId) === 3 ? '/approval-it-request' : '/it-dashboard',
+          route:
+            Number(t.ticket_type_id ?? t.ticketTypeId) === 3
+              ? '/approval-it-request'
+              : '/it-dashboard',
           readTicketId: t.id ?? t.ticketId,
           ticketId: t.id ?? t.ticketId,
           ticketNumber: t.ticket_number ?? t.ticketNumber,

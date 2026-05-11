@@ -71,8 +71,10 @@
           </thead>
           @for (row of table.getRowModel().rows; track trackByRowId($index, row)) {
             <tbody [@listAnimation]>
-              <tr [id]="'approval-row-' + row.original.requestId"
-                  [class.highlighted-row]="highlightedTicketId() === row.original.requestId">
+              <tr
+                [id]="'approval-row-' + row.original.requestId"
+                [class.highlighted-row]="highlightedTicketId() === row.original.requestId"
+              >
                 <td class="col-requestNo detail" (click)="viewRequestDetail(row.original)">
                   {{ row.original.requestNo }}
                 </td>

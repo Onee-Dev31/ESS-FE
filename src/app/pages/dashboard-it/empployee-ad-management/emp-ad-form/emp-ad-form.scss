@@ -128,9 +128,13 @@ input.invalid {
   border-radius: 6px !important;
   background: var(--input-bg) !important;
 
-  .ant-select-selection-search-input { height: 36px !important; }
+  .ant-select-selection-search-input {
+    height: 36px !important;
+  }
   .ant-select-selection-placeholder,
-  .ant-select-selection-item { line-height: 36px !important; }
+  .ant-select-selection-item {
+    line-height: 36px !important;
+  }
 }
 
 ::ng-deep .field-nz-select.ant-select-focused .ant-select-selector {

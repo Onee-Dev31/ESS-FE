@@ -126,7 +126,9 @@ export class ApprovalItRequestComponent implements OnInit {
     this.highlightedTicketId.set(ticketId);
     this.cdr.markForCheck();
     setTimeout(() => {
-      document.getElementById(`approval-row-${ticketId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document
+        .getElementById(`approval-row-${ticketId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
     setTimeout(() => {
       this.highlightedTicketId.set(null);
