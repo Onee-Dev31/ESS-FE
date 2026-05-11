@@ -346,6 +346,13 @@ export class Report {
           itemStyle: { borderRadius: [12, 12, 12, 12] },
           emphasis: { focus: 'series' },
           z: 2,
+          label: {
+            show: true,
+            position: 'top',
+            fontWeight: 700,
+            fontSize: 12,
+            color: textColor,
+          },
         },
         {
           type: 'bar',
@@ -701,7 +708,7 @@ export class Report {
         top: 0,
         textStyle: { fontSize: 14, fontWeight: 800, color: textColor },
       },
-      grid: { left: 10, right: 18, top: 36, bottom: 10, containLabel: true },
+      grid: { left: 16, right: 24, top: 36, bottom: 10, containLabel: true },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
@@ -923,6 +930,8 @@ export class Report {
     const [from, to] = this.filterAll.dateRange ?? [];
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
+
+    console.log({ dateFrom, dateTo });
 
     this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
       next: (blob: Blob) => {
