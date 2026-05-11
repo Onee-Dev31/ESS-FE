@@ -1,4 +1,5 @@
 <div class="page">
+
   <app-page-header [title]="pageTitle"></app-page-header>
 
   <div class="total-results-bar">
@@ -30,7 +31,9 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <button class="btn-add"><i class="fas fa-plus"></i> Add Employee</button>
+        <button class="btn-add" (click)="openAdd()">
+          <i class="fas fa-plus"></i> Add Employee
+        </button>
         <button class="btn-filter" [class.active]="isFilterOpen" (click)="toggleFilter()">
           <i class="fas fa-sliders-h"></i> Filter
         </button>
@@ -63,11 +66,8 @@
                 (ngModelChange)="onCompanyChange($event)"
                 name="companyCode"
               >
-                @for (c of companyList; track c.COMPANY_CODE) {
-                  <nz-option
-                    [nzLabel]="c.COMPANY_NAME + ' (' + c.COMPANY_CODE + ')'"
-                    [nzValue]="c"
-                  />
+                @for (c of companyList; track $index) {
+                  <nz-option [nzLabel]="c.COMPANY_NAME + ' (' + c.COMPANY_CODE + ')'" [nzValue]="c" />
                 }
               </nz-select>
             </div>
@@ -147,24 +147,12 @@
                 </td>
                 <td class="col-actions">
                   <div class="action-btns">
-                    <button class="act-btn act-info" title="ข้อมูล">
-                      <i class="fas fa-info"></i>
-                    </button>
-                    <button class="act-btn act-edit" title="แก้ไข">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="act-btn act-key" title="AD User">
-                      <i class="fas fa-key"></i>
-                    </button>
-                    <button class="act-btn act-sync" title="Sync">
-                      <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button class="act-btn act-delete" title="ลบ">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <button class="act-btn act-view" title="ดูรายละเอียด">
-                      <i class="fas fa-eye"></i>
-                    </button>
+                    <button class="act-btn act-info" title="ข้อมูล" (click)="openView(emp)"><i class="fas fa-info"></i></button>
+                    <button class="act-btn act-edit" title="แก้ไข"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="act-btn act-key" title="AD User"><i class="fas fa-key"></i></button>
+                    <button class="act-btn act-sync" title="Sync"><i class="fas fa-sync-alt"></i></button>
+                    <button class="act-btn act-delete" title="ลบ"><i class="fas fa-trash-alt"></i></button>
+                    <button class="act-btn act-view" title="ดูรายละเอียด" (click)="openView(emp)"><i class="fas fa-eye"></i></button>
                   </div>
                 </td>
               </tr>
@@ -228,20 +216,12 @@
                 <span class="value ad-user">{{ emp.adUser || '-' }}</span>
               </div>
               <div class="card-footer-actions">
-                <button class="act-btn act-info" title="ข้อมูล"><i class="fas fa-info"></i></button>
-                <button class="act-btn act-edit" title="แก้ไข">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
+                <button class="act-btn act-info" title="ข้อมูล" (click)="openView(emp)"><i class="fas fa-info"></i></button>
+                <button class="act-btn act-edit" title="แก้ไข"><i class="fas fa-pencil-alt"></i></button>
                 <button class="act-btn act-key" title="AD User"><i class="fas fa-key"></i></button>
-                <button class="act-btn act-sync" title="Sync">
-                  <i class="fas fa-sync-alt"></i>
-                </button>
-                <button class="act-btn act-delete" title="ลบ">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-                <button class="act-btn act-view" title="ดูรายละเอียด">
-                  <i class="fas fa-eye"></i>
-                </button>
+                <button class="act-btn act-sync" title="Sync"><i class="fas fa-sync-alt"></i></button>
+                <button class="act-btn act-delete" title="ลบ"><i class="fas fa-trash-alt"></i></button>
+                <button class="act-btn act-view" title="ดูรายละเอียด" (click)="openView(emp)"><i class="fas fa-eye"></i></button>
               </div>
             </div>
           </div>
@@ -266,4 +246,23 @@
       ></app-pagination>
     </div>
   </div>
+
+
+  <!-- Modal -->
+  <nz-modal
+    [(nzVisible)]="showForm"
+    [nzTitle]="formMode === 'add' ? 'Add Employee' : 'View Employee'"
+    [nzWidth]="1200"
+    nzCentered
+    (nzOnCancel)="closeForm()"
+    [nzFooter]="null"
+  >
+    <ng-container *nzModalContent>
+      <app-emp-ad-form
+        [mode]="formMode"
+        [employeeId]="selectedEmployeeId"
+      ></app-emp-ad-form>
+    </ng-container>
+  </nz-modal>
+
 </div>

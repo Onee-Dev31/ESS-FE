@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { PageHeaderComponent } from '../../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
@@ -9,6 +10,7 @@ import { EmptyStateComponent } from '../../../components/shared/empty-state/empt
 import { SkeletonComponent } from '../../../components/shared/skeleton/skeleton';
 import { EmpAdService } from '../../../services/emp-ad-service';
 import { MasterDataService } from '../../../services/master-data.service';
+import { EmpAdForm } from './emp-ad-form/emp-ad-form';
 
 @Component({
   selector: 'app-empployee-ad-management',
@@ -16,11 +18,13 @@ import { MasterDataService } from '../../../services/master-data.service';
     CommonModule,
     FormsModule,
     NzButtonModule,
+    NzModalModule,
     NzSelectModule,
     PageHeaderComponent,
     PaginationComponent,
     EmptyStateComponent,
     SkeletonComponent,
+    EmpAdForm,
   ],
   templateUrl: './empployee-ad-management.html',
   styleUrl: './empployee-ad-management.scss',
@@ -28,6 +32,10 @@ import { MasterDataService } from '../../../services/master-data.service';
 export class EmpployeeAdManagement {
   pageTitle = 'จัดการ Employee AD';
   isLoading = false;
+
+  showForm = false;
+  formMode: 'view' | 'add' = 'view';
+  selectedEmployeeId = '';
   isFilterOpen = false;
 
   searchText = '';
@@ -154,6 +162,23 @@ export class EmpployeeAdManagement {
     this.loadData(1, this.pageSize);
   }
 
+  openAdd() {
+    this.formMode = 'add';
+    this.selectedEmployeeId = '';
+    this.showForm = true;
+  }
+
+  openView(emp: any) {
+    this.formMode = 'view';
+    this.selectedEmployeeId = emp.employeeId;
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.selectedEmployeeId = '';
+  }
+
   goToPage(page: number) {
     this.currentPage = page;
     this.loadData(page + 1, this.pageSize);
@@ -191,6 +216,7 @@ export class EmpployeeAdManagement {
       headName1,
       headName2,
       adUser: item.ADUser ?? '',
+      nickname: item.Nickname ?? item.nickname ?? '',
       employeeType: item.EmployeeType ?? '',
       employeeStatus: item.EmployeeStatus ?? '',
     };
