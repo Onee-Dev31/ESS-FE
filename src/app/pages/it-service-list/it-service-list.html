@@ -300,8 +300,9 @@
         <li *ngFor="let file of t.attachments" class="attachment-item" (click)="viewFile(file)">
           <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
           <span class="file-name">{{ file.name }}</span>
+          <!-- *ngIf="t.status_user === 'Pending'" -->
           <button
-            *ngIf="t.status_user === 'Pending'"
+            *ngIf="t.status === 'Waiting you'"
             type="button"
             class="btn-close"
             (click)="removeAttachment(file); $event.stopPropagation()"
