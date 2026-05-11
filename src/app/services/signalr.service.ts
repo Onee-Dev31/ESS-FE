@@ -60,6 +60,18 @@ export class SignalrService {
     });
   }
 
+  ticketApprovalNotify(requesterCodeEmpId: string, ticketNumber: string) {
+    this.http
+      .post(`${this.baseUrl}/notification/ticket-approval-notify`, {
+        ticketTypeId: 3,
+        requesterCodeEmpId,
+        ticketNumber,
+      })
+      .subscribe({
+        error: (err) => console.error('ticketApprovalNotify error', err),
+      });
+  }
+
   assignNotify(ticketId: number, assigneeAdUsers: string[] = []) {
     const senderAdUser = (this.authService.currentUser() ?? '').toLowerCase();
     return this.http.post(`${this.baseUrl}/notification/it-assign-notify`, {
