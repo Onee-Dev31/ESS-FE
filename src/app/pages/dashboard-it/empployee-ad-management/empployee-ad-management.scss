@@ -440,7 +440,10 @@
 .act-edit {
   background: #fa8c16;
 }
-.act-key {
+.act-locked {
+  background: #ff4d4f;
+}
+.act-unlocked {
   background: #13c2c2;
 }
 .act-sync {
@@ -449,8 +452,11 @@
 .act-delete {
   background: #ff4d4f;
 }
-.act-view {
+.act-enable {
   background: #2f54eb;
+}
+.act-disable {
+  background: #722ed1;
 }
 
 // ==================== MOBILE CARD VIEW ====================
@@ -552,6 +558,134 @@
         flex-wrap: wrap;
       }
     }
+  }
+}
+
+// ==================== EDIT MODAL ====================
+.edit-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0;
+
+  .edit-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-toolbar);
+
+    .edit-label {
+      color: var(--text-muted);
+    }
+    .edit-value {
+      font-weight: 600;
+      color: var(--text-header);
+    }
+  }
+
+  .edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+
+    label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+  }
+
+  .password-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .edit-input {
+      padding-right: 38px;
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+
+      &:hover {
+        color: var(--text);
+      }
+    }
+  }
+
+  .edit-input {
+    height: 40px;
+    border: 1px solid var(--border-table-head);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 0.95rem;
+    color: var(--input-text);
+    background: var(--input-bg);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+
+    &:focus {
+      border-color: $primary;
+    }
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+}
+
+::ng-deep .ant-modal-content {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+::ng-deep .ant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+}
+
+.btn-edit-cancel {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-table-head);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: var(--border-toolbar);
+  }
+}
+
+.btn-edit-confirm {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: $primary;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+  &:hover {
+    background: color-mix(in srgb, $primary, black 12%);
   }
 }
 

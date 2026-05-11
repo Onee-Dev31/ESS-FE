@@ -1,0 +1,171 @@
+extends _pug-includes/layout.pug
+
+
+block vars 
+    - var home = true; 
+    - var current = "index-projects.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Calendar'})   
+
+block content
+
+    include _pug-includes/inc-datatable-data.pug
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-data-tickets.pug
+
+    include _pug-includes/inc-data-widget.pug
+
+    +pageHeader('Projects Dashboard')
+
+    section.mb-3.mb-lg-5
+
+        .row.mb-3
+            each val in widget1
+                .col-md-6.col-lg-3
+                    .card.mb-4
+                        .card-body
+                            .icon.icon-lg(class=`bg-${val.bgClass}-light`, style='position: absolute; top: 1rem; right: 1rem;')
+                                        +svgIcon(val.icon1, val.textClass + ' svg-icon-md svg-icon-heavy')
+
+                            h6 #{val.title}
+                            h3(class=val.textClass, style='inline-size: min-content;') #{val.value}
+                            p.text-muted.text-sm.mb-0 May 23 - June 01 (2018)
+
+        .row.mb-3
+            // <Projects Table>
+            .col-lg-8.mb-4
+                .card.card-table.h-100
+                    .card-header
+                        h5.card-heading Projects
+                        +cardOptions
+                        
+                    .card-body
+                        .table-responsive
+                            table.table.table-borderless.table-hover.mb-0
+                                thead.light
+                                    tr
+                                        th Assigned 
+                                        th Name
+                                        th Due 
+                                        th.text-end Priority
+                                tbody.align-middle
+                                    each val, index in dataTable
+                                        if (index < 6)
+                                            tr
+                                                td 
+                                                    span.d-flex.align-items-center
+                                                        img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                                        span.d-inline-block
+                                                            strong #{val.person}
+                                                            br
+                                                            span.text-muted.text-sm #{val.city}
+                                                td #{val.company}
+                                                td January 25
+
+                                                - badgeIndex  = index % badges.length
+
+                                                td.text-end
+                                                    span.badge(class=badges[badgeIndex].badgeClass) #{badges[badgeIndex].priority}
+                                    
+                    .card-footer.text-end
+                        a.btn.btn-primary(href='#!') View all projects
+            // </Projects Table>
+            // <Team Members>
+            .col-lg-4.mb-4
+                .card.h-100
+                    .card-header
+                        h5.card-heading  Team Members
+                        +cardOptions
+                    .card-body.pb-2
+                        each val, index in dataTable
+                            if (index < 7)                    
+                                .d-flex.align-items-center.mb-3
+                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                    .mt-1
+                                       a.text-dark.fw-bold.text-decoration-none(href='#!') #{val.person}
+                                       p.text-muted.text-sm.mb-0 #{val.company}
+                        
+                    .card-footer.text-end
+                        a.btn.btn-outline-primary(href='#!') View all people
+            // </Team Members>
+
+        .row.mb-3
+            each val, index in projects 
+                if (index < 2)
+                    +widgetStats7(val, index, 'col-md-6 mb-4')   
+
+        .row.mb-3
+            .col-lg-7.mb-4
+                .card.h-100
+                    .card-header
+                        h4.card-heading Closed Projects
+                    .card-body.d-flex.align-items-center
+                        .chart-holder.w-100
+                            canvas#lineChart1
+            
+            .col-lg-5.mb-4
+                .h-50.pb-4.pb-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span 86.4
+                                        span.dot.bg-green.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small Work hours
+                                    hr
+                                    small.text-muted Hours worked this month
+                                .col-sm-7
+                                    canvas#pieChartHome1
+                            
+                .h-50.pt-lg-2
+                    .card.h-100
+                        .card-body.d-flex
+                            .row.w-100.align-items-center
+                                .col-sm-5.mb-4.mb-sm-0
+                                    h2.mb-0.d-flex.align-items-center
+                                        span 325
+                                        span.dot.bg-indigo.d-inline-block.ms-3
+                                    span.text-muted.text-uppercase.small Tasks Completed
+                                    hr
+                                    small.text-muted Tasks Completed this months
+                                .col-sm-7
+                                    canvas#pieChartHome2
+
+        .card.card-table.mb-4
+            .card-header
+                h5.card-heading  Active Tickets
+                +cardOptions
+            .card-body
+                .table-responsive
+                    table.table.table-hover.table-borderless.align-middle.mb-0
+                        thead
+                            tr
+                                th
+                                    .position-relative.form-check.mb-0(style="top:2px;")
+                                        input#activeCheckAll.form-check-input(type='checkbox' value='')
+                                        label.form-check-label(for='activeCheckAll') Due
+                                th(style="min-width: 200px;") User
+                                th(style="min-width: 400px;") Description
+                        tbody
+                            each val, index in tickets
+                                if (index < 5)
+                                    tr
+                                        td
+                                            .form-check
+                                                input.form-check-input(type='checkbox' value='' id='ticketCheck'+index)
+                                                label.form-check-label(for='ticketCheck'+index)
+                                                    strong #{val.updated2}
+                                                    span.text-muted &nbsp;#{val.updated2Subtitle}
+                                        td
+                                            img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=dataTable[index].person)
+                                            span.d-inline-block.mb-0 #{dataTable[index].person}
+                                        td
+                                            strong [##{index + 2568}]  #{val.title}
+                                            p.text-muted.text-sm.mb-0 #{dummyText[index].substr(0,100)}
+                            
+            .card-footer.text-end
+                a.btn.btn-primary(href='#!') View all tickets

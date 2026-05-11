@@ -1,0 +1,218 @@
+extends _pug-includes/layout
+
+block vars 
+    - var eCommerce = true;
+    - var current = 'e-commerce-product-new.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Products', link: 'e-commerce-products.html'}) 
+    - breadcrumbs.push({name: 'Edit Product'}) 
+
+block content
+
+        - var images = ['soroush-zargar-zFSUhqGual8-unsplash.jpg', 'faruk-kaymak-CNVvDjVDiVI-unsplash.jpg',  'aron-visuals-3jBU9TbKW7o-unsplash.jpg', 'elizabeth-gottwald-dnIWYrliZfU-unsplash.jpg',  'willian-justen-de-vasconcellos-4hMET7vYTAQ-unsplash.jpg', 'sorasak-_UIN-pFfJ7c-unsplash.jpg', 'montylov-ktZZiHb-GoI-unsplash.jpg', 'joseph-barrientos-Ji_G7Bu1MoM-unsplash.jpg', 'henrique-ferreira-RKsLQoSnuTc-unsplash.jpg','luca-bravo-O453M2Liufs-unsplash.jpg', 'mesut-kaya-eOcyhe5-9sQ-unsplash.jpg', 'stefan-stefancik-0wMmxNB6Xzc-unsplash.jpg', 'soroush-zargar-zFSUhqGual8-unsplash.jpg', 'faruk-kaymak-CNVvDjVDiVI-unsplash.jpg',  'aron-visuals-3jBU9TbKW7o-unsplash.jpg', 'elizabeth-gottwald-dnIWYrliZfU-unsplash.jpg',  'willian-justen-de-vasconcellos-4hMET7vYTAQ-unsplash.jpg', 'sorasak-_UIN-pFfJ7c-unsplash.jpg', 'montylov-ktZZiHb-GoI-unsplash.jpg', 'joseph-barrientos-Ji_G7Bu1MoM-unsplash.jpg', 'henrique-ferreira-RKsLQoSnuTc-unsplash.jpg','luca-bravo-O453M2Liufs-unsplash.jpg', 'mesut-kaya-eOcyhe5-9sQ-unsplash.jpg', 'stefan-stefancik-0wMmxNB6Xzc-unsplash.jpg']
+        
+        - var imageCount = images.length; 
+
+        include _pug-includes/inc-datatable-data
+
+        +breadcrumbs(breadcrumbs)
+
+        // Page Header
+        .page-header
+            h1.page-heading Product Name
+            ul.list-inline.text-sm
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-copy.me-2 
+                        | Duplicate
+                li.list-inline-item
+                    a.text-gray-600(href="#!")
+                        i.fas.fa-download.me-2 
+                        | Export
+
+        section
+            .row.mb-5
+                .col-lg-8.col-xxl-9.mb-4.mb-lg-0
+                    .card.mb-4
+                        .card-header
+                            .card-heading Main Info
+                        .card-body
+                            label.form-label(for="postTitle") Title
+                            input.form-control.mb-4#postTitle(type="text")
+                            
+                            button.btn.btn-outline-primary.mb-4 Add Media
+
+                            #editorWithToolbar
+                                include _pug-includes/inc-editor-toolbar
+                                #editor-container.bg-white(style="min-height: 200px; max-height: 600px;overflow-y: auto;")
+                                    include _pug-includes/inc-post-text-short
+
+                    .card.mb-4
+                        .card-header
+                            .card-heading Prices & Stock                 
+                        .card-body                                    
+                            .row.gy-3
+                                .col-12 
+                                    label.form-label.fw-bold Main Price
+                                    .input-group
+                                        .input-group-text $
+                                        input.form-control 
+
+                                .col-12.col-lg-6.text-sm
+                                    label.form-label.text-muted Regular Price
+                                    .form-check.form-switch.float-end
+                                        label.form-check-label.text-sm.sr-only(for='displayRegular') Display Regular price
+                                        input#displayRegular.form-check-input(type='checkbox')
+                                    .input-group
+                                        .input-group-text $                                        
+                                        input.form-control
+
+                                .col-12.col-lg-6.text-sm
+                                    label.form-label.text-muted Discounted Price
+                                    .form-check.form-switch.float-end
+                                        label.form-check-label.text-sm.sr-only(for='displayDiscounted') Display Discounted price
+                                        input#displayDiscounted.form-check-input(type='checkbox')
+                                    .input-group
+                                        .input-group-text $                                    
+                                        input.form-control
+
+                            hr.bg-gray-500.my-4
+
+                            label.form-label.fw-bold Items in stock
+                            input.form-control                             
+
+                    .card.mb-4
+                        .card-header
+                            .card-heading Images                    
+                        .card-body                                    
+                            .row.gy-4.mb-4
+                                each val, index in images
+                                    - var photoNo = index + 1
+
+                                    if index < 7
+
+                                        .col-6.col-md-4
+                                            .card.display-hover
+                                                a.glightbox(href='img/photos/' + val, data-gallery='gallery', data-title="Image " + photoNo)
+                                                    img.card-img-top(src='img/photos/w-600/' + val, alt="Image " + photoNo)
+                                                .card-body.p-3
+                                                    .d-flex.align-items-center.justify-content-between
+                                                                            
+                                                        p.mb-0.text-muted.text-sm Image #{photoNo} das dad ad adas
+
+                                                        a(href="#!").badge.badge-primary-light.text-base.flex-shrink-0.display-hover-content
+                                                            i.far.fa-trash-alt                                                     
+                            form#demo-upload.dropzone.bg-gray-100.rounded-4(action='#')
+                                .dz-message
+                                    p Drop files here or click to upload.
+                                    p
+                                        span.note (This is just a demo dropzone. Selected files are <STRONG>not</STRONG> actually uploaded.)                            
+
+                .col-lg-4.col-xxl-3
+                    .card.card-sm.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Publish
+                        .card-body.text-gray-700
+                            .d-flex.mb-4.justify-content-between
+                                button.btn.btn-sm.btn-outline-secondary Save Draft
+                                button.btn.btn-sm.btn-outline-secondary Preview
+                            hr.bg-gray-500
+                            .mb-3 
+                                | Status: 
+                                strong Draft 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapseStatus' role='button' aria-expanded='false' aria-controls='collapseStatus') Edit
+                                #collapseStatus.collapse
+                                    .py-2
+                                        select.form-select.form-select-sm(aria-label='Default select example')
+                                            option Draft
+                                            option Pending Review
+
+
+                            .mb-3 
+                                | Visibility: 
+                                strong Public 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapseVisibility' role='button' aria-expanded='false' aria-controls='collapseVisibility') Edit
+                                #collapseVisibility.collapse
+                                    .py-2
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility1')
+                                            label.form-check-label(for='visibility1') Public
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility2')
+                                            label.form-check-label(for='visibility2') Password protected
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility3')
+                                            label.form-check-label(for='visibility3') Private
+
+                            div 
+                                | Publish 
+                                strong immediately 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapsePublish' role='button' aria-expanded='false' aria-controls='collapsePublish') Edit
+                                #collapsePublish.collapse
+                                    .py-3
+                                        .row.g-2
+                                            .col-lg-6     
+                                                input.form-control.form-control-sm#datePublished(value='10/20/2017') 
+                                            .col-lg-6
+                                                .d-flex.align-items-center.text-sm
+                                                    span.me-1 at
+                                                    input.form-control.form-control-sm.text-center#hoursPublished(type="text", value="8")
+                                                    span.mx-1 :
+                                                    input.form-control.form-control-sm.text-center#minutesPublished(type="text", value="00")
+                        .card-footer.text-end
+                            button.btn.btn-primary Publish
+
+                    .card.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Categorization
+                        .card-body
+                            - var categories = [ 'Gear', 'Stories', 'Tips & Tricks', 'Trips', 'Uncategorized']
+                            label.form-label Category
+                            select.form-select
+                                each val, index in categories
+                                    option(value='category' + index)  #{val}
+
+                            hr.bg-gray-500.my-4
+
+                            label.form-label Brand
+                            select.form-select
+                                each val, index in dataTable
+                                    if (index < 25)
+                                        option(value='brand' + index)  #{val.company}                 
+
+                            hr.bg-gray-500.my-4 
+
+                            - var collections = [ 'Spring', 'Summer', 'Autumn', 'Winter']
+                            label.form-label Collection
+                            select.form-select
+                                option(value='') Not Set
+                                each val, index in collections
+                                    option(value='collection' + index)  #{val}
+
+                            hr.bg-gray-500.my-4
+
+                            label.form-label Tags
+                            input#tags.form-control(type='text' value='Tag 1, Tag 2' placeholder='Enter something')
+
+                                                                  
+
+
+                    .card.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Format
+                        .card-body
+                            - var formats = []
+                            - formats.push({name: 'Standard', icon: ''})
+                            - formats.push({name: 'Aside', icon: ''})
+                            - formats.push({name: 'Image', icon: ''})
+                            - formats.push({name: 'Video', icon: ''})
+                            - formats.push({name: 'Quote', icon: ''})
+                            - formats.push({name: 'Link', icon: ''})
+
+                            each val, index in formats
+                                .form-check
+                                    input.form-check-input(type='radio' name='format', id='format' + index, checked = (index==0))
+                                    label.form-check-label(for='format' + index) #{val.name}
+
+                            

@@ -1,0 +1,54 @@
+/*
+* ==========================================================
+*     FULL CALENDAR
+* ==========================================================
+*/
+
+.fc {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    .fc-toolbar-title {
+        font-size: 1.2rem;
+    }
+
+    .fc-toolbar .fc-center {
+        padding-top: .25rem;
+    }
+
+    .fc-event,
+    .fc-event-dot {
+        /* default BACKGROUND color */
+        color: #fff !important;
+        border-color: $primary;
+        background-color: $primary;
+    }
+
+    .alert-info {
+        background-color: lighten($primary, 20%);
+    }
+
+    .panel {
+        padding: 20px;
+        background: $white;
+    }
+
+    .fc-popover {
+        border-width: 0;
+        border-radius: $border-radius;
+        box-shadow: $box-shadow;
+    }
+
+    .fc-popover-header {
+        padding: .5rem;
+    }
+
+    .fc-daygrid-day.fc-day-today {
+        background: rgba($primary, .15);
+    }
+
+    .fc-daygrid-dot-event.fc-event-mirror,
+    .fc-daygrid-dot-event:hover {
+        background: rgba($primary, .65);
+    }
+}

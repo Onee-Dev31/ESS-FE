@@ -1,0 +1,101 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var tables = true;
+    - var current = 'tables.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Tables'})   
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Tables') 
+
+    include _pug-includes/inc-datatable-data.pug
+
+    section
+        .row
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Basic Table
+                    .card-body
+                        table.table.card-text
+                            thead
+                                tr
+                                    th #
+                                    th Name 
+                                    th Company 
+                                    th Email
+                            tbody
+                                each val, index in dataTable 
+                                    if (index < 3)
+                                        tr
+                                            th(scope='row') #{index + 1}
+                                            td #{val.person}
+                                            td #{val.company}
+                                            td #{val.email}
+
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Striped Table
+                    .card-body                            
+                        table.table.table-striped.card-text
+                            thead
+                                tr
+                                    th #
+                                    th Name 
+                                    th Company 
+                                    th Email
+                            tbody
+                                each val, index in dataTable 
+                                    if (index < 3)
+                                        tr
+                                            th(scope='row') #{index + 1}
+                                            td #{val.person}
+                                            td #{val.company}
+                                            td #{val.email}                      
+                        
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Striped table with hover effect
+                    .card-body                            
+                        table.table.table-striped.table-hover.card-text
+                            thead
+                                tr
+                                    th #
+                                    th Name 
+                                    th Company 
+                                    th Email
+                            tbody
+                                each val, index in dataTable 
+                                    if (index < 3)
+                                        tr
+                                            th(scope='row') #{index + 1}
+                                            td #{val.person}
+                                            td #{val.company}
+                                            td #{val.email}                      
+                        
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Compact Table
+                    .card-body                           
+                        table.table.table-striped.table-sm.card-text
+                            thead
+                                tr
+                                    th #
+                                    th Name 
+                                    th Company 
+                                    th Email
+                            tbody
+                                each val, index in dataTable 
+                                    if (index < 5)
+                                        tr
+                                            th(scope='row') #{index + 1}
+                                            td #{val.person}
+                                            td #{val.company}
+                                            td #{val.email}          

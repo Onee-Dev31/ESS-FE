@@ -1,0 +1,37 @@
+extends _pug-includes/layout
+
+block vars 
+    - var pages = true;
+    - var current = 'pages-contacts.html';  
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Contacts'})   
+
+block content
+        +breadcrumbs(breadcrumbs)
+        +pageHeader('Contacts')
+        
+        section
+
+            include _pug-includes/inc-datatable-data
+
+            .row
+                each val, index in dataTable
+                    if (index < 12)
+                        .col-md-6.col-xl-4                        
+                            .card.mb-4
+                                .card-body
+                                    .d-flex.align-items-center
+                                        .flex-shrink-0
+                                            img.avatar.avatar-lg.p-1(src=`img/avatar-${index}.jpg`, alt=val.person)
+                                        .flex-grow-1.ps-3.overflow-hidden
+                                            h5.card-text.mb-0 #{val.person}
+                                            p.card-text.text-uppercase.text-muted #{val.company}
+                                            p.card-text 
+                                                | #{val.email}
+                                                br
+                                                abbr(title="Phone") P:  
+                                                | #{val.phone}
+                                    a.stretched-link(href="pages-profile.html")
+
+

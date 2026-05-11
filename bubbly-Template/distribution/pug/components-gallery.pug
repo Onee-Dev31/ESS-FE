@@ -1,0 +1,46 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var components = true;
+    - var current = 'components-gallery.html';   
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Gallery'})  
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Gallery') 
+
+    section
+        .row 
+
+            - var images = ['soroush-zargar-zFSUhqGual8-unsplash.jpg', 'faruk-kaymak-CNVvDjVDiVI-unsplash.jpg',  'aron-visuals-3jBU9TbKW7o-unsplash.jpg', 'elizabeth-gottwald-dnIWYrliZfU-unsplash.jpg',  'willian-justen-de-vasconcellos-4hMET7vYTAQ-unsplash.jpg', 'sorasak-_UIN-pFfJ7c-unsplash.jpg', 'montylov-ktZZiHb-GoI-unsplash.jpg', 'joseph-barrientos-Ji_G7Bu1MoM-unsplash.jpg', 'henrique-ferreira-RKsLQoSnuTc-unsplash.jpg','luca-bravo-O453M2Liufs-unsplash.jpg', 'mesut-kaya-eOcyhe5-9sQ-unsplash.jpg', 'stefan-stefancik-0wMmxNB6Xzc-unsplash.jpg']
+
+            each val, index in images
+                - var photoNo = index + 1
+                .col-6.col-md-4.col-lg-3
+                    .card.mb-4
+                        a.glightbox(href='img/photos/' + val, data-gallery='gallery', data-title="Image " + photoNo)
+                            img.card-img-top(src='img/photos/w-600/' + val, alt="Image " + photoNo)
+                        .card-body.p-3.p-lg-4
+                            h6.card-title.fw-bold.mb-1 Image #{photoNo}
+                            p.card-text.text-muted.text-sm Image sample text
+
+        .card.mb-4
+            .card-header
+                h4.card-heading Lightbox
+            .card-body   
+                  
+                p  GLightbox is a pure JavaScript lightbox. It can display images, iframes, inline content and videos with optional autoplay for YouTube, Vimeo and even self hosted videos.
+                p Read more about GLightbox on its <a href="https://github.com/biati-digital/glightbox">GitHub</a>.
+                p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample">Show code sample</a>
+
+                .collapse#codeSample
+                    pre.code-sample
+                        code.language-js
+                            +escape.
+                                const lightbox = GLightbox({
+                                    touchNavigation: true,
+                                    loop: true,
+                                    autoplayVideos: true,
+                                });

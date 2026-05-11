@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bubbly - Boootstrap 5 Admin template by Bootstrapious.com</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Google fonts - Popppins for copy-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+    <!-- Prism Syntax Highlighting-->
+    <link rel="stylesheet" href="vendor/prismjs/plugins/toolbar/prism-toolbar.css">
+    <link rel="stylesheet" href="vendor/prismjs/themes/prism-okaidia.css">
+    <!-- The Main Theme stylesheet (Contains also Bootstrap CSS)-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/favicon.png">
+  </head>
+  <body>
+    <!-- navbar-->
+    <header class="header">
+      <nav class="navbar navbar-expand-lg px-4 py-2 bg-white shadow"><a class="sidebar-toggler text-gray-500 me-4 me-lg-5 lead" href="#"><i class="fas fa-align-left"></i></a><a class="navbar-brand fw-bold text-uppercase text-base" href="index.html"><span class="d-none d-brand-partial">Bubbly </span><span class="d-none d-sm-inline">Dashboard</span></a>
+        <ul class="ms-auto d-flex align-items-center list-unstyled mb-0">
+          <li class="nav-item dropdown">
+            <form class="ms-auto me-4 d-none d-lg-block" id="searchForm">
+              <div class="input-group input-group-sm input-group-navbar">
+                <input class="form-control" id="searchInput" type="search" placeholder="Search">
+                <button class="btn" type="button"> <i class="fas fa-search"></i></button>
+              </div>
+            </form>
+            <div class="dropdown-menu dropdown-menu-animated text-sm" id="searchDropdownMenu">
+              <h6 class="dropdown-header text-uppercase fw-normal">Recent pages</h6><a class="dropdown-item py-1" href="cms-post.html"> <i class="far fa-file me-2"> </i>Posts</a><a class="dropdown-item py-1" href="widgets-stats.html"> <i class="far fa-file me-2"> </i>Widgets</a><a class="dropdown-item py-1" href="pages-profile.html"> <i class="far fa-file me-2"> </i>Profile</a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Users</h6><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe"><span>Jason Doe</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams"><span>Frank Williams</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood"><span>Ashley Wood</span></a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Filters</h6><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-success-light">Posts</span><span class="text-xs">Search all posts</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-danger-light">Users</span><span class="text-xs">Only in users</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-warning-light">Campaigns</span><span class="text-xs">Only in campaigns</span></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown me-2"><a class="nav-link nav-link-icon text-gray-400 px-1" id="notifications" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#sales-up-1"> </use>
+                  </svg><span class="notification-badge bg-green"></span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="notifications"><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#"> 
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-green text-white"><i class="fas fa-envelope"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 6 new messages</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-blue text-white"><i class="fas fa-upload"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">Server rebooted</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"><small class="fw-bold text-uppercase">View all notifications</small></a>
+            </div>
+          </li>
+          <!-- Messages                        -->
+          <li class="nav-item dropdown me-2 me-lg-3"> <a class="nav-link nav-link-icon text-gray-400 px-1" id="messages" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#paper-plane-1"> </use>
+                  </svg><span class="notification-badge notification-badge-number bg-primary">10</span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="messages"><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Jason Doe</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Frank Williams</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Ashley Wood</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"> <small class="fw-bold text-uppercase">View all messages                          </small></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown ms-auto"><a class="nav-link pe-0" id="userInfo" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="avatar p-1" src="img/avatar-6.jpg" alt="Jason Doe"></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated" aria-labelledby="userInfo">
+              <div class="dropdown-header text-gray-700">
+                <h6 class="text-uppercase font-weight-bold">Mark Stephen</h6><small>Web Developer</small>
+              </div>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="#">Settings</a><a class="dropdown-item" href="#">Activity log       </a>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="login.html">Logout</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="d-flex align-items-stretch">
+      <div class="sidebar py-3" id="sidebar">
+        <h6 class="sidebar-heading">Main</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted active" href="#" data-bs-target="#dashboardsDropdown" role="button" aria-expanded="true" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#real-estate-1"> </use>
+                      </svg><span class="sidebar-link-title">Dashboards </span></a>
+                <ul class="sidebar-menu list-unstyled collapse show" id="dashboardsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link active text-muted" href="index.html">Default</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-cms.html">CMS</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-e-commerce.html">E-commerce</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-projects.html">Projects</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-charts.html">Charts</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#cmsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#reading-1"> </use>
+                      </svg><span class="sidebar-link-title">CMS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="cmsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-post.html">Posts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-post-new.html">Add new post</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-category.html">Categories</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-media.html">Media library</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#widgetsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#statistic-1"> </use>
+                      </svg><span class="sidebar-link-title">Widgets </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="widgetsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-stats.html">Stats</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-data.html">Data</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#e-commerceDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#delivery-truck-1"> </use>
+                      </svg><span class="sidebar-link-title">E-commerce </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="e-commerceDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-products.html">Products</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-product-new.html">Products - New</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-orders.html">Orders</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-order.html">Order - Detail</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-customers.html">Customers</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#pagesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#paper-stack-1"> </use>
+                      </svg><span class="sidebar-link-title">Pages </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="pagesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-profile.html">Profile</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-pricing.html">Pricing table</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-contacts.html">Contacts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-invoice.html">Invoice</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base.html">Knowledge base</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base-topic.html">Knowledge base - Topic</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#userDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#man-1"> </use>
+                      </svg><span class="sidebar-link-title">User </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="userDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login.html">Login page</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register.html">Register</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login-2.html">Login v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register-2.html">Register v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#componentsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#sorting-1"> </use>
+                      </svg><span class="sidebar-link-title">Components </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="componentsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-cards.html">Cards</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-calendar.html">Calendar</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-gallery.html">Gallery</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-loading-buttons.html">Loading buttons</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-map.html">Maps</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-notifications.html">Notifications</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-preloader.html">Preloaders</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#chartsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#pie-chart-1"> </use>
+                      </svg><span class="sidebar-link-title">Charts </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="chartsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts.html">Charts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts-gauge-sparkline.html">Gauge + Sparkline</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#formsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#file-storage-1"> </use>
+                      </svg><span class="sidebar-link-title">Forms </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="formsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms.html">Basic forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-advanced.html">Advanced forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-dropzone.html">Files upload</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-texteditor.html">Text editor</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-validation.html">Validation</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#tablesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#grid-1"> </use>
+                      </svg><span class="sidebar-link-title">Tables </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="tablesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables.html">Bootstrap tables</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables-datatable.html">Datatable</a></li>
+                </ul>
+              </li>
+        </ul>
+        <h6 class="sidebar-heading">Docs</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/introduction.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#angle-brackets-1"> </use>
+                      </svg><span class="sidebar-link-title">Introduction</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/directory-structure.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#table-content-1"> </use>
+                      </svg><span class="sidebar-link-title">Directory structure</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/gulp.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#keyboard-1"> </use>
+                      </svg><span class="sidebar-link-title">Gulp.js</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#cssDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#design-1"> </use>
+                      </svg><span class="sidebar-link-title">CSS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="cssDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/components-theme.html">CSS Components</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/customizing-css.html">Customizing CSS</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/credits.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#star-medal-1"> </use>
+                      </svg><span class="sidebar-link-title">Credits</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/changelog.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#new-1"> </use>
+                      </svg><span class="sidebar-link-title">Changelog</span></a></li>
+        </ul>
+      </div>
+      <div class="page-holder bg-gray-100">
+        <div class="container-fluid px-lg-4 px-xl-5">
+              <!-- Page Header-->
+              <div class="page-header">
+                <h1 class="page-heading">Default dashboard</h1>
+              </div>
+          <section class="mb-3 mb-lg-5">
+            <div class="row mb-3">
+                  <!-- Widget Type 1-->
+                  <div class="mb-4 col-sm-6 col-lg-3 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div>
+                            <h4 class="fw-normal text-red">$10,500</h4>
+                            <p class="subtitle text-sm text-muted mb-0">Earnings</p>
+                          </div>
+                          <div class="flex-shrink-0 ms-3">
+                                <svg class="svg-icon text-red">
+                                  <use xlink:href="icons/orion-svg-sprite.svg#speed-1"> </use>
+                                </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-footer py-3 bg-red-light">
+                        <div class="row align-items-center text-red">
+                          <div class="col-10">
+                            <p class="mb-0">20% increase</p>
+                          </div>
+                          <div class="col-2 text-end"><i class="fas fa-caret-up"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 1-->
+                  <!-- Widget Type 1-->
+                  <div class="mb-4 col-sm-6 col-lg-3 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div>
+                            <h4 class="fw-normal text-blue">584</h4>
+                            <p class="subtitle text-sm text-muted mb-0">Readers</p>
+                          </div>
+                          <div class="flex-shrink-0 ms-3">
+                                <svg class="svg-icon text-blue">
+                                  <use xlink:href="icons/orion-svg-sprite.svg#news-1"> </use>
+                                </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-footer py-3 bg-blue-light">
+                        <div class="row align-items-center text-blue">
+                          <div class="col-10">
+                            <p class="mb-0">3% increase</p>
+                          </div>
+                          <div class="col-2 text-end"><i class="fas fa-caret-up"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 1-->
+                  <!-- Widget Type 1-->
+                  <div class="mb-4 col-sm-6 col-lg-3 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div>
+                            <h4 class="fw-normal text-primary">876</h4>
+                            <p class="subtitle text-sm text-muted mb-0">Bookmarks</p>
+                          </div>
+                          <div class="flex-shrink-0 ms-3">
+                                <svg class="svg-icon text-primary">
+                                  <use xlink:href="icons/orion-svg-sprite.svg#bookmark-1"> </use>
+                                </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-footer py-3 bg-primary-light">
+                        <div class="row align-items-center text-primary">
+                          <div class="col-10">
+                            <p class="mb-0">10% increase</p>
+                          </div>
+                          <div class="col-2 text-end"><i class="fas fa-caret-up"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 1-->
+                  <!-- Widget Type 1-->
+                  <div class="mb-4 col-sm-6 col-lg-3 mb-4">
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div>
+                            <h4 class="fw-normal text-green">3,500</h4>
+                            <p class="subtitle text-sm text-muted mb-0">Visitors</p>
+                          </div>
+                          <div class="flex-shrink-0 ms-3">
+                                <svg class="svg-icon text-green">
+                                  <use xlink:href="icons/orion-svg-sprite.svg#world-map-1"> </use>
+                                </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-footer py-3 bg-green-light">
+                        <div class="row align-items-center text-green">
+                          <div class="col-10">
+                            <p class="mb-0">5% decrease</p>
+                          </div>
+                          <div class="col-2 text-end"><i class="fas fa-caret-down"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 1-->
+            </div>
+            <div class="row">
+              <!-- Sales-->
+              <div class="col-xl-9 mb-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-heading">Sales by channel</h5>
+                        <div class="card-header-more">
+                          <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                          <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                        </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row mb-5">
+                      <div class="col-12 col-sm-auto flex-sm-grow-1 py-3">
+                        <h3 class="subtitle text-gray-500">Total Revenue</h3>
+                        <div class="h1 text-primary">$19,200</div>
+                        <p class="mb-0"><span class="text-muted me-3">+$2,032 </span><span class="badge badge-success-light"><i class="fas fa-arrow-up me-2"></i>19.5%</span></p>
+                      </div>
+                      <div class="col-6 col-sm-auto flex-sm-grow-1 border-start py-3 d-flex align-items-center">
+                        <div>
+                          <h3 class="subtitle text-gray-500 fw-normal">Organic Search </h3>
+                          <div class="h4 fw-normal text-dark">$19,200</div>
+                          <p class="mb-0"><span class="text-muted me-2">+$2,123 </span><span class="badge badge-success-light"><i class="fas fa-arrow-up me-2"></i>21.3%</span></p>
+                        </div>
+                      </div>
+                      <div class="col-6 col-sm-auto flex-sm-grow-1 border-start py-3 d-flex align-items-center">
+                        <div>
+                          <h3 class="subtitle text-gray-500 fw-normal">Facebook Ads </h3>
+                          <div class="h4 fw-normal text-dark">$2,500</div>
+                          <p class="mb-0"><span class="text-muted me-2">-$233 </span><span class="badge badge-danger-light"><i class="fas fa-arrow-down me-2"></i>-2.1%           </span></p>
+                        </div>
+                      </div>
+                      <div class="col-auto d-none d-md-flex d-xl-none d-xxl-flex align-items-center">
+                        <div class="icon icon-xl ms-2 bg-primary-light">
+                              <svg class="svg-icon text-primary">
+                                <use xlink:href="icons/orion-svg-sprite.svg#pay-1"> </use>
+                              </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <canvas id="barChart"></canvas>
+                    <ul class="mt-4 text-gray-500 list-inline card-text text-center">
+                      <li class="list-inline-item"> <span class="indicator bg-primary"></span>Organic Search </li>
+                      <li class="list-inline-item"><span class="indicator" style="background: #d0d2f3"> </span>Facebook Ads </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- /Sales-->
+              <!-- <Latest activity>-->
+              <div class="col-xl-3">
+                <div class="card-adjust-height-xl">
+                  <div class="card mb-4 mb-xl-0">
+                    <div class="card-header">
+                      <h5 class="card-heading">Latest activity</h5>
+                          <div class="card-header-more">
+                            <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                          </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="list-group list-group-flush list-group-timeline">
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-0.jpg" alt="Nielsen Cobb"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Nielsen Cobb </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">3m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-1.jpg" alt="Margret Cote"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Margret Cote </strong> liked your post 🎉
+                              <div class="text-gray-500 small">4m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-2.jpg" alt="Rachel Vinson"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Rachel Vinson </strong> placed an order.
+                              <div class="text-gray-500 small">5m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-3.jpg" alt="Gabrielle Aguirre"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Gabrielle Aguirre </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">6m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-4.jpg" alt="Spears Collier"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Spears Collier </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">7m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-5.jpg" alt="Keisha Thomas"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Keisha Thomas </strong> liked your post 🎉
+                              <div class="text-gray-500 small">8m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-6.jpg" alt="Elisabeth Key"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Elisabeth Key </strong> placed an order.
+                              <div class="text-gray-500 small">9m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-7.jpg" alt="Patel Mack"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Patel Mack </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">10m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-8.jpg" alt="Erika Whitaker"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Erika Whitaker </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">11m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-9.jpg" alt="Meyers Swanson"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Meyers Swanson </strong> liked your post 🎉
+                              <div class="text-gray-500 small">12m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-10.jpg" alt="Townsend Sloan"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Townsend Sloan </strong> placed an order.
+                              <div class="text-gray-500 small">13m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-11.jpg" alt="Millicent Henry"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Millicent Henry </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">14m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- </Latest activity>-->
+            </div>
+            <div class="card card-table mb-4">
+              <div class="card-header">
+                <h5 class="card-heading"> Latest Contracts</h5>
+                    <div class="card-header-more">
+                      <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                      <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                    </div>
+              </div>
+              <div class="card-body">
+                <div class="preload-wrapper">
+                  <div class="table-responsive">
+                    <table class="table table-hover text-sm text-gray-700 mb-0" id="ordersDatatable">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Company</th>
+                          <th>Status</th>
+                          <th>Contract</th>
+                          <th>Date                                </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-primary-light">N                                                </span></span>
+                              <div class="pt-1"><strong>Nielsen Cobb</strong><br><span class="text-muted text-sm">nielsencobb@memora.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Memora</strong><br><span class="text-muted">Graniteville</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">22%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100" style="width:22%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/23</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-1.jpg" alt="Margret Cote">
+                              <div class="pt-1"><strong>Margret Cote</strong><br><span class="text-muted text-sm">margretcote@zilidium.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Zilidium</strong><br><span class="text-muted">Foxworth</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">81%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="81" aria-valuemin="0" aria-valuemax="100" style="width:81%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/10/01</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-2.jpg" alt="Rachel Vinson">
+                              <div class="pt-1"><strong>Rachel Vinson</strong><br><span class="text-muted text-sm">rachelvinson@chorizon.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Chorizon</strong><br><span class="text-muted">Eastmont</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">17%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="17" aria-valuemin="0" aria-valuemax="100" style="width:17%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/04/19</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-warning-light">G                                                </span></span>
+                              <div class="pt-1"><strong>Gabrielle Aguirre</strong><br><span class="text-muted text-sm">gabrielleaguirre@comverges.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Comverges</strong><br><span class="text-muted">Whitewater</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">43%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100" style="width:43%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/11/31</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-4.jpg" alt="Spears Collier">
+                              <div class="pt-1"><strong>Spears Collier</strong><br><span class="text-muted text-sm">spearscollier@remold.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Remold</strong><br><span class="text-muted">Hebron</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">3%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100" style="width:3%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/07/23</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-5.jpg" alt="Keisha Thomas">
+                              <div class="pt-1"><strong>Keisha Thomas</strong><br><span class="text-muted text-sm">keishathomas@euron.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Euron</strong><br><span class="text-muted">Levant</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">3%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100" style="width:3%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/12/21</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-primary-light">E                                                </span></span>
+                              <div class="pt-1"><strong>Elisabeth Key</strong><br><span class="text-muted text-sm">elisabethkey@netagy.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Netagy</strong><br><span class="text-muted">Nile</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">79%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="79" aria-valuemin="0" aria-valuemax="100" style="width:79%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/16</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-7.jpg" alt="Patel Mack">
+                              <div class="pt-1"><strong>Patel Mack</strong><br><span class="text-muted text-sm">patelmack@zedalis.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Zedalis</strong><br><span class="text-muted">Albrightsville</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">75%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/06</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-8.jpg" alt="Erika Whitaker">
+                              <div class="pt-1"><strong>Erika Whitaker</strong><br><span class="text-muted text-sm">erikawhitaker@uniworld.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Uniworld</strong><br><span class="text-muted">Leola</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">82%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100" style="width:82%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/03</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-warning-light">M                                                </span></span>
+                              <div class="pt-1"><strong>Meyers Swanson</strong><br><span class="text-muted text-sm">meyersswanson@candecor.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Candecor</strong><br><span class="text-muted">Finderne</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">75%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/04/03</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-1.jpg" alt="Townsend Sloan">
+                              <div class="pt-1"><strong>Townsend Sloan</strong><br><span class="text-muted text-sm">townsendsloan@rameon.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Rameon</strong><br><span class="text-muted">Coultervillle</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">64%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" style="width:64%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/05/15</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-2.jpg" alt="Millicent Henry">
+                              <div class="pt-1"><strong>Millicent Henry</strong><br><span class="text-muted text-sm">millicenthenry@balooba.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Balooba</strong><br><span class="text-muted">Caron</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">11%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="11" aria-valuemin="0" aria-valuemax="100" style="width:11%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/11/12</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-primary-light">M                                                </span></span>
+                              <div class="pt-1"><strong>Madelyn Brock</strong><br><span class="text-muted text-sm">madelynbrock@combogene.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Combogene</strong><br><span class="text-muted">Ballico</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">18%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="18" aria-valuemin="0" aria-valuemax="100" style="width:18%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/28</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-4.jpg" alt="Jenkins Carney">
+                              <div class="pt-1"><strong>Jenkins Carney</strong><br><span class="text-muted text-sm">jenkinscarney@dadabase.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Dadabase</strong><br><span class="text-muted">Chesterfield</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">78%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100" style="width:78%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/25</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-5.jpg" alt="Grimes Delaney">
+                              <div class="pt-1"><strong>Grimes Delaney</strong><br><span class="text-muted text-sm">grimesdelaney@progenex.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Progenex</strong><br><span class="text-muted">Cazadero</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">21%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="21" aria-valuemin="0" aria-valuemax="100" style="width:21%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/02/06</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-warning-light">V                                                </span></span>
+                              <div class="pt-1"><strong>Valencia Rivera</strong><br><span class="text-muted text-sm">valenciarivera@xleen.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Xleen</strong><br><span class="text-muted">Kirk</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">12%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" style="width:12%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/05/24</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-7.jpg" alt="Helene Solomon">
+                              <div class="pt-1"><strong>Helene Solomon</strong><br><span class="text-muted text-sm">helenesolomon@zomboid.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Zomboid</strong><br><span class="text-muted">Riverton</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">79%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="79" aria-valuemin="0" aria-valuemax="100" style="width:79%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/06/04</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-8.jpg" alt="Kathleen Holman">
+                              <div class="pt-1"><strong>Kathleen Holman</strong><br><span class="text-muted text-sm">kathleenholman@hotcakes.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Hotcakes</strong><br><span class="text-muted">Darlington</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">21%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="21" aria-valuemin="0" aria-valuemax="100" style="width:21%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/10/20</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-10.jpg" alt="Merrill Garrett">
+                              <div class="pt-1"><strong>Merrill Garrett</strong><br><span class="text-muted text-sm">merrillgarrett@affluex.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Affluex</strong><br><span class="text-muted">Utting</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">72%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" style="width:72%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/02/12</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-11.jpg" alt="Sallie Booth">
+                              <div class="pt-1"><strong>Sallie Booth</strong><br><span class="text-muted text-sm">salliebooth@ziggles.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Ziggles</strong><br><span class="text-muted">Waiohinu</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">22%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100" style="width:22%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/05/14</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-2.jpg" alt="Doris Ward">
+                              <div class="pt-1"><strong>Doris Ward</strong><br><span class="text-muted text-sm">dorisward@imaginart.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Imaginart</strong><br><span class="text-muted">Wyano</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">93%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="93" aria-valuemin="0" aria-valuemax="100" style="width:93%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/03/12</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-warning-light">L                                                </span></span>
+                              <div class="pt-1"><strong>Lester Roach</strong><br><span class="text-muted text-sm">lesterroach@applica.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Applica</strong><br><span class="text-muted">Coventry</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">24%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="24" aria-valuemin="0" aria-valuemax="100" style="width:24%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/10/31</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-4.jpg" alt="Garza Shaw">
+                              <div class="pt-1"><strong>Garza Shaw</strong><br><span class="text-muted text-sm">garzashaw@capscreen.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Capscreen</strong><br><span class="text-muted">Beyerville</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">7%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="7" aria-valuemin="0" aria-valuemax="100" style="width:7%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/03/22</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-5.jpg" alt="Charmaine Castro">
+                              <div class="pt-1"><strong>Charmaine Castro</strong><br><span class="text-muted text-sm">charmainecastro@naxdis.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Naxdis</strong><br><span class="text-muted">Cotopaxi</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">62%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" style="width:62%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/08</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-primary-light">C                                                </span></span>
+                              <div class="pt-1"><strong>Carey Petersen</strong><br><span class="text-muted text-sm">careypetersen@telepark.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Telepark</strong><br><span class="text-muted">Lowell</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">98%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="98" aria-valuemin="0" aria-valuemax="100" style="width:98%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/09/09</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-7.jpg" alt="Sargent Gray">
+                              <div class="pt-1"><strong>Sargent Gray</strong><br><span class="text-muted text-sm">sargentgray@orbean.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Orbean</strong><br><span class="text-muted">Allison</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">63%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="63" aria-valuemin="0" aria-valuemax="100" style="width:63%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/03/23</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-8.jpg" alt="Dodson Goff">
+                              <div class="pt-1"><strong>Dodson Goff</strong><br><span class="text-muted text-sm">dodsongoff@elentrix.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Elentrix</strong><br><span class="text-muted">Wedgewood</span></td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">43%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100" style="width:43%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/07/03</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-10.jpg" alt="Medina Ellison">
+                              <div class="pt-1"><strong>Medina Ellison</strong><br><span class="text-muted text-sm">medinaellison@glukgluk.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Glukgluk</strong><br><span class="text-muted">Rosburg</span></td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">40%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/06/14</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><img class="avatar p-1 me-2" src="img/avatar-11.jpg" alt="Tisha Velazquez">
+                              <div class="pt-1"><strong>Tisha Velazquez</strong><br><span class="text-muted text-sm">tishavelazquez@ginkogene.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Ginkogene</strong><br><span class="text-muted">Kapowsin</span></td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">75%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/03/05</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td>
+                            <div class="d-flex align-items-center"><span class="avatar p-1 me-2"><span class="avatar-text avatar-warning-light">Y                                                </span></span>
+                              <div class="pt-1"><strong>Young Bowers</strong><br><span class="text-muted text-sm">youngbowers@shepard.com</span></div>
+                            </div>
+                          </td>
+                          <td> <strong>Shepard</strong><br><span class="text-muted">Eureka</span></td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td style="min-width: 125px;">
+                            <div class="d-flex align-items-center"><span class="me-2">83%</span>
+                              <div class="progress progress-table">
+                                <div class="progress-bar bg-undefined" role="progressbar" aria-valuenow="83" aria-valuemin="0" aria-valuemax="100" style="width:83%">  </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style="max-width: 120px">
+                            <div class="d-flex align-items-center justify-content-between"><span class="me-3">2021/06/29</span>
+                                  <div>
+                                    <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-edit opacity-5 me-2"></i>Edit</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                                  </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div><span class="me-2" id="categoryBulkActionOrders">
+                    <select class="form-select form-select-sm d-inline w-auto" name="categoryBulkAction">
+                      <option>Bulk Actions</option>
+                      <option>Delete</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-primary align-top">Apply   </button></span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                  <!-- Widget Type 12-->
+                  <div class="col-md-6 mb-4">   
+                    <div class="card h-100">
+                      <div class="card-body">
+                        <div class="row gx-2 gx-lg-4 gy-5">
+                          <div class="col-sm-5">
+                            <div class="h2">625</div>
+                            <p class="subtitle">New Customers</p>
+                            <div class="progress">
+                              <div class="progress-bar bg-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:60%"></div>
+                            </div>
+                          </div>
+                          <div class="col-sm-7">
+                            <div class="row">
+                              <div class="col-6 text-center">
+                                <div class="h3">254</div>
+                                <p class="text-muted fw-normal">Affiliates</p>
+                                <hr>
+                                <p class="text-muted mb-0">+125</p>
+                              </div>
+                              <div class="col-6 text-center">
+                                <div class="h3">328</div>
+                                <p class="text-muted">SEM</p>
+                                <hr>
+                                <p class="text-muted mb-0">+144    </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 12-->
+                  <!-- Widget Type 13-->
+                  <div class="col-md-6 mb-4">   
+                    <div class="card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="row gy-5 flex-fill"> 
+                          <div class="col-sm-6">
+                            <div class="row">
+                              <div class="col-sm-2 text-lg"><i class="fas fa-arrow-down text-danger"></i></div>
+                              <div class="col-sm-10">
+                                <h2>1,112</h2>
+                                <h6 class="text-muted fw-normal p-b-20 p-t-10">Affiliate Sales</h6>
+                                <div class="progress">
+                                  <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6">
+                            <div class="row">
+                              <div class="col-sm-2 text-lg"><i class="fas fa-arrow-up text-success"></i></div>
+                              <div class="col-sm-10">
+                                <h2>258</h2>
+                                <h6 class="text-muted fw-normal p-b-20 p-t-10">Ads Sales</h6>
+                                <div class="progress">
+                                  <div class="progress-bar bg-success" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%"> </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /Widget Type 13-->
+            </div>
+            <div class="row"> 
+              <!-- <Projects Widget>-->
+              <div class="col-lg-4 mb-4 mb-lg-0">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h5 class="card-heading">Project updates</h5>
+                        <div class="card-header-more">
+                          <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                          <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                        </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="card-text">
+                      <p class="mb-2"><strong>Publish New Theme </strong><span class="float-end text-gray-500 text-sm">10 mins ago </span></p>
+                      <p class="card-text"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-0.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Nielsen Cobb"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-1.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Margret Cote">
+                      </p>
+                      <p class="mb-2"><strong>Internal Linkbuilding </strong><span class="float-end text-gray-500 text-sm">2 hours ago </span></p>
+                      <p class="card-text"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-1.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Nielsen Cobb"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-2.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Margret Cote"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-3.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Rachel Vinson"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-4.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Gabrielle Aguirre">
+                      </p>
+                      <p class="mb-2"><strong>New Writer Onboarding </strong><span class="float-end text-gray-500 text-sm">3 days ago </span></p>
+                      <p class="card-text"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-2.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Nielsen Cobb"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-3.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Margret Cote"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-4.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Rachel Vinson">
+                      </p>
+                      <p class="mb-2"><strong>Blog Post Drafts </strong><span class="float-end text-gray-500 text-sm">5 days ago </span></p>
+                      <p class="card-text"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-3.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Nielsen Cobb"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-4.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Margret Cote"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-5.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Rachel Vinson"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-6.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Gabrielle Aguirre"><img class="avatar avatar-sm avatar-stacked p-1" src="img/avatar-7.jpg" alt="User" data-bs-toggle="tooltip" data-placement="top" title="Spears Collier">
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- </Projects Widget>-->
+              <div class="col-lg-4 mb-4 mb-lg-0">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h5 class="card-heading">Closed projects</h5>
+                        <div class="card-header-more">
+                          <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                          <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                        </div>
+                  </div>
+                  <div class="card-body d-flex align-items-center">
+                    <canvas id="donut3"></canvas>
+                  </div>
+                  <div class="card-footer bg-white">
+                    <h3 class="subtitle text-gray-500 fw-normal text-center">Total closed projects</h3>
+                    <div class="row justify-content-center align-items-center">
+                      <div class="col-auto">
+                        <div class="h4 mb-0">2,235</div>
+                      </div>
+                      <div class="col-auto"> <span class="text-muted me-2">+128</span><span class="badge badge-success-light"><i class="fas fa-arrow-up me-2"></i>21.3%</span></div>
+                    </div>
+                    <div class="row mt-4 card-text text-sm justify-content-center">
+                      <div class="col-auto"><span class="indicator" style="background: #0d6efd"> </span><span class="text-gray-500">Sandra</span>
+                        <div class="ms-3 h6">250</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #3d8bfd"> </span><span class="text-gray-500">Becky</span>
+                        <div class="ms-3 h6">50</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #6ea8fe"> </span><span class="text-gray-500">Julie</span>
+                        <div class="ms-3 h6">100</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #9ec5fe"> </span><span class="text-gray-500">Romero</span>
+                        <div class="ms-3 h6">40</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <h5 class="card-heading">Tickets solved</h5>
+                        <div class="card-header-more">
+                          <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                          <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                        </div>
+                  </div>
+                  <div class="card-body d-flex align-items-center">
+                    <canvas id="pieChartCustom3"></canvas>
+                  </div>
+                  <div class="card-footer bg-white">
+                    <h3 class="subtitle text-gray-500 fw-normal text-center">Tickets solved</h3>
+                    <div class="row justify-content-center align-items-center">
+                      <div class="col-auto">
+                        <div class="h4 mb-0">530</div>
+                      </div>
+                      <div class="col-auto"> <span class="text-muted me-2">-85</span><span class="badge badge-danger-light"><i class="fas fa-arrow-down me-2"></i>-15.6%</span></div>
+                    </div>
+                    <div class="row mt-4 card-text text-sm justify-content-center">
+                      <div class="col-auto"><span class="indicator" style="background: #6610f2"> </span><span class="text-gray-500">John</span>
+                        <div class="ms-3 h6">300</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #8540f5"> </span><span class="text-gray-500">Mark</span>
+                        <div class="ms-3 h6">50</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #a370f7"> </span><span class="text-gray-500">Frank</span>
+                        <div class="ms-3 h6">100</div>
+                      </div>
+                      <div class="col-auto"><span class="indicator" style="background: #c29ffa"> </span><span class="text-gray-500">Danny</span>
+                        <div class="ms-3 h6">80</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6 text-center text-md-start fw-bold">
+                <p class="mb-2 mb-md-0 fw-bold">Your company &copy; 2023</p>
+              </div>
+              <div class="col-md-6 text-center text-md-end text-gray-400">
+                <p class="mb-0">Version 1.3.2</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- Data Tables-->
+    <script src="vendor/simple-datatables/umd/simple-datatables.js"></script>
+    <!-- Init Charts on Homepage-->
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="js/charts-defaults.js"></script>
+    <script src="js/index-default.js"></script>
+    <!-- Main Theme JS File-->
+    <script src="js/theme.js"></script>
+    <!-- Prism for syntax highlighting-->
+    <script src="vendor/prismjs/prism.js"></script>
+    <script src="vendor/prismjs/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+    <script src="vendor/prismjs/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="vendor/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script type="text/javascript">
+      // Optional
+      Prism.plugins.NormalizeWhitespace.setDefaults({
+      'remove-trailing': true,
+      'remove-indent': true,
+      'left-trim': true,
+      'right-trim': true,
+      });
+          
+    </script>
+    <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  </body>
+</html>

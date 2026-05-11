@@ -1,0 +1,252 @@
+
+mixin widgetStats1(val, index, classname)
+    // Widget Type 1
+    .mb-4(class=classname)
+        .card.h-100
+            .card-body
+                .d-flex.align-items-center.justify-content-between
+                    div
+                        h4.fw-normal(class=val.textClass) #{val.value}
+                        p.subtitle.text-sm.text-muted.mb-0 #{val.title}
+                    .flex-shrink-0.ms-3
+                        +svgIcon(val.icon1, val.textClass)
+            .card-footer.py-3(class=`bg-${val.bgClass}-light`)
+                .row.align-items-center(class=val.textClass)
+                    .col-10
+                        p.mb-0 #{val.info}
+                    .col-2.text-end
+                        if val.increase
+                            i.fas.fa-caret-up
+                        else 
+                            i.fas.fa-caret-down
+    // /Widget Type 1
+
+mixin widgetStats2(val, index, classname)   
+    // Widget Type 2
+    div(class=classname)
+        h6.subtitle.fw-normal.text-muted #{val.title}
+        h5.m-b-25
+            | #{val.value}
+            span.ms-3.float-end(class=val.textClass) #{val.infoNumber}
+        .progress
+            .progress-bar(role="progressbar",  aria-valuenow=val.progress, aria-valuemin="0",aria-valuemax="100", style=`width:${val.progress}%`, class=`bg-${val.bgClass}`)            
+
+    // /Widget Type 2
+mixin widgetStats3(val, index, classname)   
+    
+    // Widget Type 3
+    div(class=classname)
+        .card.mb-4
+            .card-body
+                .icon.icon-lg.float-end(class=`bg-${val.bgClass}-light`, style='position: relative; top: -.8rem; right: -.8rem;')
+                            +svgIcon(val.icon1, val.textClass + ' svg-icon-md svg-icon-heavy')
+
+                h6 #{val.title}
+                h3(class=val.textClass) #{val.value}
+                p.text-muted.text-sm.mb-0 May 23 - June 01 (2022)    
+
+    // /Widget Type 3
+
+mixin widgetStats4(val, index, classname)   
+    // Widget Type 4
+    div(class=classname)
+        .card.h-100
+            .card-body.p-3.p-sm-4.d-flex.align-items-center.justify-content-between
+                div
+                    .subtitle.mb-2.text-muted #{val.title}
+                    h4.fw-normal.h2(class=val.textClass) #{val.value}
+                    p.mb-0
+                        | $2,123 
+                        i.fas.fa-arrow-up.ms-2(class=val.textClass)
+                .d-none.d-md-flex.icon.icon-xl.ms-2(class=`${val.bgClass}-light`)
+                    +svgIcon(val.icon1, val.textClass)   
+
+    // /Widget Type 4
+
+mixin widgetStats5(val, index, classname)   
+    // Widget Type 5
+    div(class=classname)
+        .card.text-center.h-100
+            .card-body
+                h6.mb-3 #{val.title}
+                h4.mb-3
+                    if val.increase
+                        i.fas.fa-arrow-up.text-success.me-2
+                    else 
+                        i.fas.fa-arrow-down.text-danger.me-2 
+                    | #{val.value}
+                p.card-text #{val.info}        
+
+    // /Widget Type 5
+
+mixin widgetStats6(val, index, classname)   
+    // Widget Type 6
+    div(class=classname)
+        .card.h-100
+            .card-body.text-center
+                .icon.icon-xl.mx-auto.mb-4(class=val.bgClass)
+                    +svgIcon(val.icon1, val.textClass)
+                h4.mt-3
+                    span(class=val.textClass) #{val.value}
+                    span.fw-normal  #{val.title}
+                p.mb-4 #{val.info}
+                button.btn(class=val.buttonClass) #{val.buttonText}         
+
+    // /Widget Type 6
+
+mixin widgetStats7(val, index, classname)   
+    // Widget Type 7
+    div(class=classname)
+        .card
+            .card-body
+                button.btn.float-end(class=`btn-${val.bg}`) Completed
+                h4.h6 #{val.title}
+                p(class=`text-${val.bg}`) #{val.category}
+                p.text-muted #{dummyText[index].substr(0,150)}
+                .mb-3
+                    .d-inline-block.me-3
+                        .h3.mb-1 #{val.data1}
+                        .text-muted.text-sm #{val.data1Label}
+                    .d-inline-block
+                        .h3.mb-1 #{val.data2}
+                        .text-muted.text-sm #{val.data2Label}
+
+                .mb-4
+                    each _, i in Array(val.avatars)
+                        img.avatar.avatar-sm.avatar-stacked.p-1(src=`${path}img/avatar-${i + index}.jpg`, alt=``,  data-bs-toggle='tooltip' data-placement='top' title=`User ${i}`)
+                
+                p.sr-only Progress
+                .progress
+                    .progress-bar(style=`width:${val.progress}%`, class=`bg-${val.bg}` )
+
+    // /Widget Type 7
+
+mixin widgetStats8(val, index, classname)   
+    // Widget Type 8
+    div(class=classname)
+        .card.h-100
+            .card-header
+                h6.card-heading #{val.title}
+            .card-body
+                h2.mb-3 #{val.value}
+                .row
+                    .col-auto
+                        p.text-muted.text-sm.mt-2 Planned for next month
+                    .col.text-end.text-lg #{val.planned}
+                .progress
+                    .progress-bar(role="progressbar",  aria-valuenow=val.progress, aria-valuemin="0",aria-valuemax="100", style=`width:${val.progress}%`, class=`bg-${val.bgClass}`)                            
+            .card-footer.text-end
+                button.btn(class=`btn-${val.bgClass}`) Take action   
+
+    // /Widget Type 8
+
+mixin widgetStats9(val, index, classname)   
+    // Widget Type 9
+    div(class=classname)
+        .card.h-100
+            .card-body.d-flex.flex-column.justify-content-between
+                .row.gx-1
+                    .col
+                        +svgIcon(val.icon1, `${val.textClass} mb-3`)
+                    .col.text-end
+                        h4.h3.mb-1(class=val.textClass) #{val.value}
+                        p   
+                            if (val.increase)                  
+                                span.badge.badge-success-light
+                                    i.fas.fa-arrow-up.me-2
+                                    | #{val.infoNumber}
+                            else
+                                span.badge.badge-danger-light
+                                    i.fas.fa-arrow-down.me-2
+                                    | #{val.infoNumber}
+
+                p.subtitle.text-gray-600.mb-1
+                    | #{val.title}
+
+                .progress
+                    .progress-bar(role="progressbar",  aria-valuenow=val.progress, aria-valuemin="0",aria-valuemax="100", style=`width:${val.progress}%`, class=`bg-${val.bgClass}`)      
+
+    // /Widget Type 9
+
+mixin widgetStats10(val, index, classname)   
+    // Widget Type 10
+    div(class=classname)
+        .card(class=`bg-${val.bgClass}-light`)
+            .card-body.d-flex.align-items-center.justify-content-between
+                div
+                    h6 #{val.title}
+                    h3.mb-0(class=val.textClass) #{val.value}
+                +svgIcon(val.icon1, val.textClass + ' ')
+    // /Widget Type 10
+
+mixin widgetStats11(val, index, classname)   
+    // Widget Type 11
+    div(class=classname)
+        .card.h-100
+            .card-body.d-flex.flex-column.justify-content-between
+                .row.gx-1
+                    .col
+                        +svgIcon(val.icon1, `${val.textClass} mb-3`)
+                    .col.text-end
+                        h4.h3(class=val.textClass) #{val.value}
+                        
+
+                p.subtitle.text-gray-600.mb-1
+                    | #{val.title}
+
+                .progress
+                    .progress-bar(role="progressbar",  aria-valuenow=val.progress, aria-valuemin="0",aria-valuemax="100", style=`width:${val.progress}%`, class=`bg-${val.bgClass}`)      
+
+    // /Widget Type 11  
+
+mixin widgetStats12(classname)   
+    // Widget Type 12
+    div(class=classname)    
+        .card.h-100
+            .card-body
+                .row.gx-2.gx-lg-4.gy-5
+                    .col-sm-5
+                        .h2 625
+                        p.subtitle New Customers
+                        .progress
+                            .progress-bar.bg-success(role="progressbar",  aria-valuenow="60", aria-valuemin="0",aria-valuemax="100", style=`width:60%`,)
+                    .col-sm-7
+                        .row
+                            .col-6.text-center
+                                .h3 254
+                                p.text-muted.fw-normal Affiliates
+                                hr
+                                p.text-muted.mb-0 +125
+                            .col-6.text-center
+                                .h3 328
+                                p.text-muted SEM
+                                hr
+                                p.text-muted.mb-0 +144    
+    
+    // /Widget Type 12
+
+mixin widgetStats13(classname)   
+    // Widget Type 13
+    div(class=classname)    
+        .card.h-100
+            .card-body.d-flex.align-items-center
+                .row.gy-5.flex-fill 
+                    .col-sm-6
+                        .row
+                            .col-sm-2.text-lg
+                                i.fas.fa-arrow-down.text-danger
+                            .col-sm-10
+                                h2 1,112
+                                h6.text-muted.fw-normal.p-b-20.p-t-10 Affiliate Sales
+                                .progress
+                                    .progress-bar.bg-danger(role="progressbar",  aria-valuenow="75", aria-valuemin="0",aria-valuemax="100", style=`width:75%`,)
+                    .col-sm-6
+                        .row
+                            .col-sm-2.text-lg
+                                i.fas.fa-arrow-up.text-success
+                            .col-sm-10
+                                h2 258
+                                h6.text-muted.fw-normal.p-b-20.p-t-10 Ads Sales
+                                .progress
+                                    .progress-bar.bg-success(role="progressbar",  aria-valuenow="50", aria-valuemin="0",aria-valuemax="100", style=`width:50%`,) 
+    // /Widget Type 13

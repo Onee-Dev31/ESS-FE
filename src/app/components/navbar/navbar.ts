@@ -70,7 +70,11 @@ export class NavbarComponent {
 
   private static readonly IT_ROLES = new Set(['it-staff', 'it-director', 'system-admin']);
 
-  userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
+  userName = computed(
+    () =>
+      this.authService.userData().NAMFIRSTE + ' ' + this.authService.userData().NAMLASTE[0] + '.' ||
+      'MARK STEPHEN',
+  );
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
   isItRole = computed(() =>
     (this.authService.userRole() ?? '')
@@ -190,6 +194,47 @@ export class NavbarComponent {
             route: this.isItRole() ? '/it-dashboard' : '/it-service-list',
             ticketId: data.ticketId ?? undefined,
             type: 'note',
+          };
+
+          this.notifications.update((list) => [newNoti, ...list]);
+          this.unreadTicketCount.update((n) => n + 1);
+          if (!document.hidden) {
+            this.toastService.info(message);
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => {});
+          }
+        });
+      });
+
+    this.signalrService
+      .on('TicketStatusChanged')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        if (this.isItRole()) return;
+        this.zone.run(() => {
+          const statusLabel: Record<string, string> = {
+            'In Progress': 'กำลังดำเนินการ',
+            Hold: 'พักเรื่องชั่วคราว',
+            Closed: 'ปิดเรื่องแล้ว',
+            Denied: 'ปฏิเสธคำขอ',
+            Assigned: 'รับเรื่องแล้ว',
+          };
+          const rawStatus = data.status ?? '';
+          const [status, typeName] = rawStatus.split('|');
+          const label = statusLabel[status] ?? status;
+          const message = typeName
+            ? `IT รับเรื่องของคุณแล้ว ประเภท "${typeName}"`
+            : `Ticket ของคุณมีการอัพเดทสถานะเป็น "${label}"`;
+
+          const newNoti: NotificationItem = {
+            id: Date.now(),
+            title: 'อัพเดทสถานะ Ticket',
+            message,
+            status: 'pending',
+            time: 'เมื่อสักครู่',
+            route: '/it-service-list',
+            ticketId: data.ticketId ?? undefined,
+            type: 'status',
           };
 
           this.notifications.update((list) => [newNoti, ...list]);

@@ -1,0 +1,78 @@
+mixin ie(condition)
+  <!--[!{condition}]>
+  block
+  <![endif]-->
+
+meta(charset='utf-8')
+meta(http-equiv='X-UA-Compatible', content='IE=edge')
+title Bubbly - Boootstrap 5 Admin template by Bootstrapious.com
+meta(name='description', content='')
+meta(name='viewport', content='width=device-width, initial-scale=1')
+if (locals.noIndex)
+    meta(name='robots', content='noindex')
+else
+    meta(name='robots', content='all,follow')
+
+// Google fonts - Popppins for copy
+link(rel='preconnect' href='https://fonts.gstatic.com')
+link(href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap' rel='stylesheet')
+
+if (current == 'forms-advanced.html')
+    // VanillaJs Datepicker CSS
+    link(rel='stylesheet', href=`${path}vendor/vanillajs-datepicker/css/datepicker-bs4.min.css`)
+
+    // No UI Slider
+    link(rel='stylesheet', href=`${path}vendor/nouislider/nouislider.css`)
+
+
+if (current == 'forms-texteditor.html')
+    // Quill Themes
+    link(rel='stylesheet', href=`${path}vendor/quill/quill.snow.css`)
+    link(rel='stylesheet', href=`${path}vendor/quill/quill.bubble.css`)
+
+if (current == 'cms-post-new.html')
+    // Quill Themes
+    link(rel='stylesheet', href=`${path}vendor/quill/quill.snow.css`)
+    // VanillaJs Datepicker CSS
+    link(rel='stylesheet', href=`${path}vendor/vanillajs-datepicker/css/datepicker-bs4.min.css`)    
+
+if (current == 'cms-media.html')
+    // Lightbox gallery
+    link(rel="stylesheet", href=`${path}vendor/glightbox/css/glightbox.min.css`)
+
+if (current == 'components-loading-buttons.html')    
+    // Ladda
+    link(rel='stylesheet', href=`${path}vendor/ladda/ladda-themeless.min.css`)
+
+if (current == 'components-calendar.html')    
+    // Full Calendar
+    link(rel='stylesheet', href=`${path}vendor/fullcalendar/main.min.css`)
+
+if (current == 'components-gallery.html')
+    // Lightbox gallery
+    link(rel="stylesheet", href=`${path}vendor/glightbox/css/glightbox.min.css`)
+
+if (current == 'components-map.html')
+    // Leaflet Maps
+    link(rel='stylesheet' href='https://unpkg.com/leaflet@1.7.1/dist/leaflet.css' integrity='sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==' crossorigin='')
+
+if (current == 'e-commerce-product-new.html')
+    // Quill Themes
+    link(rel='stylesheet', href=`${path}vendor/quill/quill.snow.css`)
+    // VanillaJs Datepicker CSS
+    link(rel='stylesheet', href=`${path}vendor/vanillajs-datepicker/css/datepicker-bs4.min.css`)
+    // Lightbox gallery
+    link(rel="stylesheet", href=`${path}vendor/glightbox/css/glightbox.min.css`)        
+
+// Prism Syntax Highlighting
+link(rel='stylesheet', href=`${path}vendor/prismjs/plugins/toolbar/prism-toolbar.css`)
+link(rel='stylesheet', href=`${path}vendor/prismjs/themes/prism-okaidia.css`)
+
+// The Main Theme stylesheet (Contains also Bootstrap CSS)
+link(rel='stylesheet', href=`${path}css/style.default.css`, id='theme-stylesheet')
+
+// Custom stylesheet - for your changes
+link(rel='stylesheet', href=`${path}css/custom.css`)
+
+// Favicon
+link(rel='shortcut icon', href=`${path}img/favicon.png`)

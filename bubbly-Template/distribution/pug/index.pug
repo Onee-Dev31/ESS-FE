@@ -1,0 +1,265 @@
+extends _pug-includes/layout.pug
+
+
+block vars 
+    - var home = true; 
+    - var current = "index.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Calendar'})   
+
+block content
+
+    include _pug-includes/inc-datatable-data.pug
+
+    include _pug-includes/inc-post-data
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-data-tickets.pug
+    
+    include _pug-includes/inc-data-widget.pug
+
+    +pageHeader('Default dashboard')
+
+    section.mb-3.mb-lg-5
+
+        .row.mb-3
+            each val, index in widget1
+                +widgetStats1(val, index, 'col-sm-6 col-lg-3 mb-4')
+
+
+        .row
+            // Sales
+            .col-xl-9.mb-4
+                .card
+                    .card-header
+                        h5.card-heading Sales by channel
+                        +cardOptions
+
+                    .card-body
+                        .row.mb-5
+                            .col-12.col-sm-auto.flex-sm-grow-1.py-3
+                                h3.subtitle.text-gray-500 Total Revenue
+                                .h1.text-primary $19,200
+                                p.mb-0
+                                    span.text-muted.me-3 +$2,032 
+                                    span.badge.badge-success-light
+                                        i.fas.fa-arrow-up.me-2
+                                        | 19.5%
+                            .col-6.col-sm-auto.flex-sm-grow-1.border-start.py-3.d-flex.align-items-center
+                                div
+                                    h3.subtitle.text-gray-500.fw-normal Organic Search 
+                                    .h4.fw-normal.text-dark $19,200
+                                    p.mb-0
+                                        span.text-muted.me-2 +$2,123 
+                                        span.badge.badge-success-light
+                                            i.fas.fa-arrow-up.me-2
+                                            | 21.3%
+                            .col-6.col-sm-auto.flex-sm-grow-1.border-start.py-3.d-flex.align-items-center
+                                div
+                                    h3.subtitle.text-gray-500.fw-normal Facebook Ads 
+                                    .h4.fw-normal.text-dark $2,500
+                                    p.mb-0
+                                        span.text-muted.me-2 -$233 
+                                        span.badge.badge-danger-light
+                                            i.fas.fa-arrow-down.me-2
+                                            | -2.1%           
+                            .col-auto.d-none.d-md-flex.d-xl-none.d-xxl-flex.align-items-center
+                                .icon.icon-xl.ms-2(class=`bg-primary-light`)
+                                        +svgIcon('pay-1', 'text-primary')
+
+                        canvas#barChart
+
+                        ul.mt-4.text-gray-500.list-inline.card-text.text-center
+                            li.list-inline-item 
+                                span.indicator.bg-primary
+                                | Organic Search 
+                            li.list-inline-item
+                                span.indicator(style="background: #d0d2f3") 
+                                | Facebook Ads 
+            // /Sales
+            // <Latest activity>
+            .col-xl-3
+                .card-adjust-height-xl
+                    .card.mb-4.mb-xl-0
+                        .card-header
+                            h5.card-heading Latest activity
+                            +cardOptions        
+                        .card-body
+                            .list-group.list-group-flush.list-group-timeline
+
+                                - var activity = [' subscribed to your newsletter.', ' liked your post 🎉', ' placed an order.', 'commented on "How to season your new grill."']
+                                - var activityCount = 4;
+
+                                each val, index in dataTable
+
+                                    - activityIndex = index % activityCount;
+
+                                    if (index < 12)
+                                        .list-group-item.px-0
+                                            .row
+                                                .col-auto
+                                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                                .col.ms-n3.pt-2.text-sm.text-gray-800
+                                                    strong.text-dark #{val.person} 
+                                                    | #{activity[activityIndex]}
+                                                    .text-gray-500.small
+                                                        | #{index + 3}m ago
+                                        // /.list-group-item
+            // </Latest activity>
+
+        .card.card-table.mb-4
+            .card-header
+                h5.card-heading  Latest Contracts
+                +cardOptions
+            .card-body
+                .preload-wrapper
+                    .table-responsive
+                        table#ordersDatatable.table.table-hover.text-sm.text-gray-700.mb-0
+                            thead
+                                tr
+                                    th Name
+                                    th Company
+                                    th Status
+                                    th Contract
+                                    th Date                                
+                            tbody
+                                each val, index in dataTable
+                                    if (index < 30)
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                        - price = Math.floor((Math.random() * 90) + 1) + Math.random().toFixed(2);
+                                        - badgeIndex  = index % badges.length
+                                        
+                                        - avatarIndex  = index % 10
+                                        - avatarTextClass = 'avatar-primary-light'
+                                        if (index % 2)
+                                            - avatarTextClass = 'avatar-warning-light'
+
+                                        if (index / 9 > 1)
+                                            - avatarIndex += Math.floor(index / 9)
+                                        - progress = Math.floor((Math.random() * 100) + 1)
+
+                                        tr.align-middle
+                                            td
+                                                .d-flex.align-items-center
+                                                    if (avatarIndex % 3 == 0)
+                                                        span.avatar.p-1.me-2
+                                                            span.avatar-text(class=avatarTextClass)
+                                                                | #{val.person.substr(0,1)}                                                
+                                                    else
+                                                        img.avatar.p-1.me-2(src=`img/avatar-${avatarIndex}.jpg` alt=val.person) 
+                                                    .pt-1
+                                                        strong #{val.person}
+                                                        br
+                                                        span.text-muted.text-sm #{val.email}
+                                            td 
+                                                strong #{val.company}
+                                                br
+                                                span.text-muted #{val.city}
+                                            td
+                                                span.badge(class=badges[badgeIndex].badgeClass) 
+                                                    span.indicator
+                                                    | #{badges[badgeIndex].title}
+                                            td(style="min-width: 125px;")
+                                                .d-flex.align-items-center
+                                                    span.me-2 #{progress}%
+                                                    .progress.progress-table
+                                                        .progress-bar(role="progressbar",  aria-valuenow=progress, aria-valuemin="0",aria-valuemax="100", style=`width:${progress}%`, class=`bg-${val.bgClass}`)   
+                                            td(style="max-width: 120px")
+                                                .d-flex.align-items-center.justify-content-between
+                                                    span.me-3 2021/#{month}/#{day}
+                                                    +tableOptions
+                    span#categoryBulkActionOrders.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply   
+
+        .row
+            +widgetStats12('col-md-6 mb-4')   
+
+            +widgetStats13('col-md-6 mb-4')  
+
+        .row 
+            // <Projects Widget>
+            .col-lg-4.mb-4.mb-lg-0
+                .card.h-100
+                    .card-header
+                        h5.card-heading Project updates
+                        +cardOptions
+                                            
+                    .card-body
+                        .card-text
+                            each val, index in projects
+                                p.mb-2
+                                    strong #{val.title} 
+                                    span.float-end.text-gray-500.text-sm #{val.info} 
+                                p.card-text
+                                    each _, i in Array(val.avatars)
+                                        img.avatar.avatar-sm.avatar-stacked.p-1(src=`${path}img/avatar-${i + index}.jpg`, alt='User',  data-bs-toggle='tooltip' data-placement='top' title=dataTable[i].person)
+            // </Projects Widget>
+      
+            .col-lg-4.mb-4.mb-lg-0
+                .card.h-100
+                    .card-header
+                        h5.card-heading Closed projects
+                        +cardOptions
+                    .card-body.d-flex.align-items-center
+                        canvas#donut3
+                    .card-footer.bg-white
+                        h3.subtitle.text-gray-500.fw-normal.text-center Total closed projects
+                        .row.justify-content-center.align-items-center
+                            .col-auto
+                                .h4.mb-0 2,235
+                            .col-auto 
+                                span.text-muted.me-2 +128
+                                span.badge.badge-success-light
+                                    i.fas.fa-arrow-up.me-2
+                                    | 21.3%
+                            
+
+                        - closedProjects = []
+                        - closedProjects.push({name: "Sandra", color: "#0d6efd", value: 250})
+                        - closedProjects.push({name: "Becky", color: "#3d8bfd", value: 50})
+                        - closedProjects.push({name: "Julie", color: "#6ea8fe", value: 100})
+                        - closedProjects.push({name: "Romero", color: "#9ec5fe", value: 40})
+       
+                        .row.mt-4.card-text.text-sm.justify-content-center
+                            each val in closedProjects
+                                .col-auto
+                                    span.indicator(style=`background: ${val.color}`) 
+                                    span.text-gray-500 #{val.name}
+                                    .ms-3.h6 #{val.value}
+            
+            .col-lg-4
+                .card.h-100
+                    .card-header
+                        h5.card-heading Tickets solved
+                        +cardOptions
+                    .card-body.d-flex.align-items-center
+                        canvas#pieChartCustom3
+                    .card-footer.bg-white
+                        h3.subtitle.text-gray-500.fw-normal.text-center Tickets solved
+                        .row.justify-content-center.align-items-center
+                            .col-auto
+                                .h4.mb-0 530
+                            .col-auto 
+                                span.text-muted.me-2 -85
+                                span.badge.badge-danger-light
+                                    i.fas.fa-arrow-down.me-2
+                                    | -15.6%
+
+                        - closedProjects = []
+                        - closedProjects.push({name: "John", color: "#6610f2", value: 300})
+                        - closedProjects.push({name: "Mark", color: "#8540f5", value: 50})
+                        - closedProjects.push({name: "Frank", color: "#a370f7", value: 100})
+                        - closedProjects.push({name: "Danny", color: "#c29ffa", value: 80})
+       
+                        .row.mt-4.card-text.text-sm.justify-content-center
+                            each val in closedProjects
+                                .col-auto
+                                    span.indicator(style=`background: ${val.color}`) 
+                                    span.text-gray-500 #{val.name}
+                                    .ms-3.h6 #{val.value}

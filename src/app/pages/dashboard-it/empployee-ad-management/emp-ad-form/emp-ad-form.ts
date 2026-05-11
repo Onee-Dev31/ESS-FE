@@ -1,8 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import Swal from 'sweetalert2';
 import { EmpAdService } from '../../../../services/emp-ad-service';
+import { MasterDataService } from '../../../../services/master-data.service';
 
 @Component({
   selector: 'app-emp-ad-form',
@@ -13,8 +22,10 @@ import { EmpAdService } from '../../../../services/emp-ad-service';
 export class EmpAdForm implements OnChanges {
   @Input() mode: 'view' | 'add' = 'view';
   @Input() employeeId: string = '';
+  @Output() onSaveSuccess = new EventEmitter<void>();
 
   isLoading = false;
+  isSaving = false;
   isReadOnly = true;
   submitted = false;
 
@@ -30,6 +41,8 @@ export class EmpAdForm implements OnChanges {
     'jobPosition',
     'statusEmployee',
     'floor',
+    'companyCode',
+    'department',
     'headEmployeeCode',
     'adUser',
   ];
@@ -79,6 +92,8 @@ export class EmpAdForm implements OnChanges {
     taxId: '',
     nameBank: '',
     numberBank: '',
+    companyCode: '',
+    department: '',
     headEmployeeCode: '',
     adUser: '',
   };
@@ -90,11 +105,25 @@ export class EmpAdForm implements OnChanges {
   jobPositionList: any[] = [];
   employeeStatusList: any[] = [];
   headEmployeeList: any[] = [];
+  companyList: any[] = [];
+  departmentList: any[] = [];
+  filteredDepartmentList: any[] = [];
+  selectedCompany: any = null;
 
   constructor(
     private empAdService: EmpAdService,
+    private masterService: MasterDataService,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  onCompanyChange(company: any) {
+    this.selectedCompany = company;
+    this.addForm.companyCode = company?.COMPANY_CODE ?? '';
+    this.addForm.department = '';
+    this.filteredDepartmentList = company
+      ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
+      : [];
+  }
 
   ngOnChanges() {
     this.isReadOnly = this.mode === 'view';
@@ -133,6 +162,20 @@ export class EmpAdForm implements OnChanges {
     this.empAdService.getEmployeeBasicInfo().subscribe({
       next: (res) => {
         this.headEmployeeList = Array.isArray(res) ? res : (res.data ?? []);
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
+    this.masterService.getCompanyMaster().subscribe({
+      next: (res) => {
+        this.companyList = Array.isArray(res) ? res : (res.data ?? []);
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (res) => {
+        this.departmentList = Array.isArray(res) ? res : (res.data ?? []);
         this.cdr.detectChanges();
       },
       error: () => {},
@@ -178,12 +221,41 @@ export class EmpAdForm implements OnChanges {
       FLOOR: selectedFloor?.FloorNumber ?? this.addForm.floor,
       NAMEBANK: this.addForm.nameBank,
       NUMBANK: this.addForm.numberBank,
+      COMPANY_CODE: this.addForm.companyCode,
+      DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
       AD_USER: this.addForm.adUser,
     };
 
-    console.log(JSON.stringify(payload, null, 2));
+    this.isSaving = true;
+    this.empAdService.insertEmployee(payload).subscribe({
+      next: (_) => {
+        this.isSaving = false;
+        this.submitted = false;
+        this.cdr.detectChanges();
+        Swal.fire({
+          icon: 'success',
+          title: 'บันทึกสำเร็จ',
+          text: `เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`,
+          confirmButtonText: 'ตกลง',
+          customClass: { container: 'swal-over-modal' },
+        }).then(() => {
+          this.onSaveSuccess.emit();
+        });
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.cdr.detectChanges();
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง',
+          customClass: { container: 'swal-over-modal' },
+        });
+      },
+    });
   }
 
   private loadEmployee() {
@@ -233,6 +305,8 @@ export class EmpAdForm implements OnChanges {
   }
 
   private resetAddForm() {
+    this.selectedCompany = null;
+    this.filteredDepartmentList = [];
     this.addForm = {
       employeeCode: '',
       titleThai: '',
@@ -248,6 +322,8 @@ export class EmpAdForm implements OnChanges {
       taxId: '',
       nameBank: '',
       numberBank: '',
+      companyCode: '',
+      department: '',
       headEmployeeCode: '',
       adUser: '',
     };

@@ -152,21 +152,49 @@
                     <button class="act-btn act-info" title="ข้อมูล" (click)="openView(emp)">
                       <i class="fas fa-info"></i>
                     </button>
-                    <button class="act-btn act-edit" title="แก้ไข">
+                    <button class="act-btn act-edit" title="แก้ไข" (click)="openEdit(emp)">
                       <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="act-btn act-key" title="AD User">
-                      <i class="fas fa-key"></i>
-                    </button>
-                    <button class="act-btn act-sync" title="Sync">
+                    @if (adInfoMap[emp.adUser]?.IsLocked === 'Locked') {
+                      <button class="act-btn act-locked" title="Unlock" (click)="toggleLock(emp)">
+                        <i class="fas fa-lock"></i>
+                      </button>
+                    } @else {
+                      <button class="act-btn act-unlocked" title="Lock" (click)="toggleLock(emp)">
+                        <i class="fas fa-unlock"></i>
+                      </button>
+                    }
+                    <button
+                      class="act-btn act-sync"
+                      title="Extend Password Expiration"
+                      (click)="extendPassword(emp)"
+                    >
                       <i class="fas fa-sync-alt"></i>
                     </button>
-                    <button class="act-btn act-delete" title="ลบ">
-                      <i class="fas fa-trash-alt"></i>
+                    <button
+                      class="act-btn act-delete"
+                      title="Reset Password"
+                      (click)="openReset(emp)"
+                    >
+                      <i class="fas fa-key"></i>
                     </button>
-                    <button class="act-btn act-view" title="ดูรายละเอียด" (click)="openView(emp)">
-                      <i class="fas fa-eye"></i>
-                    </button>
+                    @if (adInfoMap[emp.adUser]?.IsDisabled === 'Yes') {
+                      <button
+                        class="act-btn act-enable"
+                        title="Enable Account"
+                        (click)="toggleDisable(emp)"
+                      >
+                        <i class="fas fa-user-slash"></i>
+                      </button>
+                    } @else {
+                      <button
+                        class="act-btn act-disable"
+                        title="Disable Account"
+                        (click)="toggleDisable(emp)"
+                      >
+                        <i class="fas fa-user-check"></i>
+                      </button>
+                    }
                   </div>
                 </td>
               </tr>
@@ -233,19 +261,45 @@
                 <button class="act-btn act-info" title="ข้อมูล" (click)="openView(emp)">
                   <i class="fas fa-info"></i>
                 </button>
-                <button class="act-btn act-edit" title="แก้ไข">
+                <button class="act-btn act-edit" title="แก้ไข" (click)="openEdit(emp)">
                   <i class="fas fa-pencil-alt"></i>
                 </button>
-                <button class="act-btn act-key" title="AD User"><i class="fas fa-key"></i></button>
-                <button class="act-btn act-sync" title="Sync">
+                @if (adInfoMap[emp.adUser]?.IsLocked === 'Locked') {
+                  <button class="act-btn act-locked" title="Unlock" (click)="toggleLock(emp)">
+                    <i class="fas fa-lock"></i>
+                  </button>
+                } @else {
+                  <button class="act-btn act-unlocked" title="Lock" (click)="toggleLock(emp)">
+                    <i class="fas fa-unlock"></i>
+                  </button>
+                }
+                <button
+                  class="act-btn act-sync"
+                  title="Extend Password Expiration"
+                  (click)="extendPassword(emp)"
+                >
                   <i class="fas fa-sync-alt"></i>
                 </button>
-                <button class="act-btn act-delete" title="ลบ">
-                  <i class="fas fa-trash-alt"></i>
+                <button class="act-btn act-delete" title="Reset Password" (click)="openReset(emp)">
+                  <i class="fas fa-key"></i>
                 </button>
-                <button class="act-btn act-view" title="ดูรายละเอียด" (click)="openView(emp)">
-                  <i class="fas fa-eye"></i>
-                </button>
+                @if (adInfoMap[emp.adUser]?.IsDisabled === 'Yes') {
+                  <button
+                    class="act-btn act-enable"
+                    title="Enable Account"
+                    (click)="toggleDisable(emp)"
+                  >
+                    <i class="fas fa-user-slash"></i>
+                  </button>
+                } @else {
+                  <button
+                    class="act-btn act-disable"
+                    title="Disable Account"
+                    (click)="toggleDisable(emp)"
+                  >
+                    <i class="fas fa-user-check"></i>
+                  </button>
+                }
               </div>
             </div>
           </div>
@@ -271,6 +325,103 @@
     </div>
   </div>
 
+  <!-- Edit AD User Modal -->
+  <nz-modal
+    [(nzVisible)]="isEditOpen"
+    nzTitle="แก้ไข AD User"
+    [nzWidth]="480"
+    nzCentered
+    (nzOnCancel)="closeEdit()"
+    [nzFooter]="editFooter"
+  >
+    <ng-container *nzModalContent>
+      @if (editEmp) {
+        <div class="edit-modal-body">
+          <div class="edit-info-row">
+            <span class="edit-label">รหัสพนักงาน</span>
+            <span class="edit-value emp-id">{{ editEmp.employeeId }}</span>
+          </div>
+          <div class="edit-info-row">
+            <span class="edit-label">ชื่อ</span>
+            <span class="edit-value">{{ editEmp.nameThai1 }} {{ editEmp.nameThai2 }}</span>
+          </div>
+          <div class="edit-info-row">
+            <span class="edit-label">AD User เดิม</span>
+            <span class="edit-value ad-user">{{ editEmp.adUser || '-' }}</span>
+          </div>
+          <div class="edit-field">
+            <label>AD User ใหม่ <span style="color: #e53935">*</span></label>
+            <input
+              type="text"
+              class="edit-input"
+              [(ngModel)]="editAdUser"
+              placeholder="Enter AD User"
+            />
+          </div>
+        </div>
+      }
+    </ng-container>
+    <ng-template #editFooter>
+      <button class="btn-edit-cancel" (click)="closeEdit()">ยกเลิก</button>
+      <button class="btn-edit-confirm" (click)="confirmEdit()">
+        <i class="fas fa-save"></i> ยืนยัน
+      </button>
+    </ng-template>
+  </nz-modal>
+
+  <!-- Reset Password Modal -->
+  <nz-modal
+    [(nzVisible)]="isResetOpen"
+    nzTitle="Reset Password"
+    [nzWidth]="460"
+    nzCentered
+    (nzOnCancel)="closeReset()"
+    [nzFooter]="resetFooter"
+  >
+    <ng-container *nzModalContent>
+      @if (resetEmp) {
+        <div class="edit-modal-body">
+          <div class="edit-info-row">
+            <span class="edit-label">รหัสพนักงาน</span>
+            <span class="edit-value emp-id">{{ resetEmp.employeeId }}</span>
+          </div>
+          <div class="edit-info-row">
+            <span class="edit-label">ชื่อ</span>
+            <span class="edit-value">{{ resetEmp.nameThai1 }} {{ resetEmp.nameThai2 }}</span>
+          </div>
+          <div class="edit-info-row">
+            <span class="edit-label">AD User</span>
+            <span class="edit-value ad-user">{{ resetEmp.adUser }}</span>
+          </div>
+          <div class="edit-field">
+            <label>New Password <span style="color: #e53935">*</span></label>
+            <div class="password-input-wrap">
+              <input
+                [type]="resetShowPassword ? 'text' : 'password'"
+                class="edit-input"
+                [(ngModel)]="resetNewPassword"
+                placeholder="กรอก Password ใหม่"
+              />
+              <button
+                class="toggle-pass"
+                type="button"
+                (click)="resetShowPassword = !resetShowPassword"
+              >
+                <i [class]="resetShowPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </ng-container>
+    <ng-template #resetFooter>
+      <button class="btn-edit-cancel" (click)="closeReset()">ยกเลิก</button>
+      <button class="btn-edit-confirm" (click)="confirmReset()" [disabled]="!resetNewPassword">
+        <i class="fas fa-key"></i> Reset
+      </button>
+    </ng-template>
+  </nz-modal>
+
   <!-- Modal -->
   <nz-modal
     [(nzVisible)]="showForm"
@@ -281,7 +432,11 @@
     [nzFooter]="null"
   >
     <ng-container *nzModalContent>
-      <app-emp-ad-form [mode]="formMode" [employeeId]="selectedEmployeeId"></app-emp-ad-form>
+      <app-emp-ad-form
+        [mode]="formMode"
+        [employeeId]="selectedEmployeeId"
+        (onSaveSuccess)="closeForm()"
+      ></app-emp-ad-form>
     </ng-container>
   </nz-modal>
 </div>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bubbly - Boootstrap 5 Admin template by Bootstrapious.com</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Google fonts - Popppins for copy-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+    <!-- Prism Syntax Highlighting-->
+    <link rel="stylesheet" href="vendor/prismjs/plugins/toolbar/prism-toolbar.css">
+    <link rel="stylesheet" href="vendor/prismjs/themes/prism-okaidia.css">
+    <!-- The Main Theme stylesheet (Contains also Bootstrap CSS)-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/favicon.png">
+  </head>
+  <body>
+    <!-- navbar-->
+    <header class="header">
+      <nav class="navbar navbar-expand-lg px-4 py-2 bg-white shadow"><a class="sidebar-toggler text-gray-500 me-4 me-lg-5 lead" href="#"><i class="fas fa-align-left"></i></a><a class="navbar-brand fw-bold text-uppercase text-base" href="index.html"><span class="d-none d-brand-partial">Bubbly </span><span class="d-none d-sm-inline">Dashboard</span></a>
+        <ul class="ms-auto d-flex align-items-center list-unstyled mb-0">
+          <li class="nav-item dropdown">
+            <form class="ms-auto me-4 d-none d-lg-block" id="searchForm">
+              <div class="input-group input-group-sm input-group-navbar">
+                <input class="form-control" id="searchInput" type="search" placeholder="Search">
+                <button class="btn" type="button"> <i class="fas fa-search"></i></button>
+              </div>
+            </form>
+            <div class="dropdown-menu dropdown-menu-animated text-sm" id="searchDropdownMenu">
+              <h6 class="dropdown-header text-uppercase fw-normal">Recent pages</h6><a class="dropdown-item py-1" href="cms-post.html"> <i class="far fa-file me-2"> </i>Posts</a><a class="dropdown-item py-1" href="widgets-stats.html"> <i class="far fa-file me-2"> </i>Widgets</a><a class="dropdown-item py-1" href="pages-profile.html"> <i class="far fa-file me-2"> </i>Profile</a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Users</h6><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe"><span>Jason Doe</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams"><span>Frank Williams</span></a><a class="dropdown-item py-1" href="pages-profile.html"> <img class="avatar avatar-xs p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood"><span>Ashley Wood</span></a>
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase fw-normal">Filters</h6><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-success-light">Posts</span><span class="text-xs">Search all posts</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-danger-light">Users</span><span class="text-xs">Only in users</span></a><a class="dropdown-item py-1" href="#!"> <span class="badge me-2 badge-warning-light">Campaigns</span><span class="text-xs">Only in campaigns</span></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown me-2"><a class="nav-link nav-link-icon text-gray-400 px-1" id="notifications" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#sales-up-1"> </use>
+                  </svg><span class="notification-badge bg-green"></span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="notifications"><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#"> 
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-green text-white"><i class="fas fa-envelope"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 6 new messages</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-blue text-white"><i class="fas fa-upload"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">Server rebooted</p>
+                  </div>
+                </div></a><a class="dropdown-item" href="#">
+                <div class="d-flex align-items-center">
+                  <div class="icon icon-sm bg-indigo text-white"><i class="fab fa-twitter"></i></div>
+                  <div class="text ms-2">
+                    <p class="mb-0">You have 2 followers</p>
+                  </div>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"><small class="fw-bold text-uppercase">View all notifications</small></a>
+            </div>
+          </li>
+          <!-- Messages                        -->
+          <li class="nav-item dropdown me-2 me-lg-3"> <a class="nav-link nav-link-icon text-gray-400 px-1" id="messages" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <svg class="svg-icon svg-icon-md svg-icon-heavy">
+                    <use xlink:href="icons/orion-svg-sprite.svg#paper-plane-1"> </use>
+                  </svg><span class="notification-badge notification-badge-number bg-primary">10</span></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated text-sm" aria-labelledby="messages"><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-0.jpg" alt="Jason Doe">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Jason Doe</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-1.jpg" alt="Frank Williams">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Frank Williams</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a><a class="dropdown-item d-flex align-items-center p-3" href="#"> <img class="avatar avatar-sm p-1 me-2" src="img/avatar-2.jpg" alt="Ashley Wood">
+                <div class="pt-1">
+                  <h6 class="fw-bold mb-0">Ashley Wood</h6><span class="text-muted text-sm">Sent you a message</span>
+                </div></a>
+              <div class="dropdown-divider"></div><a class="dropdown-item text-center" href="#"> <small class="fw-bold text-uppercase">View all messages                          </small></a>
+            </div>
+          </li>
+          <li class="nav-item dropdown ms-auto"><a class="nav-link pe-0" id="userInfo" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img class="avatar p-1" src="img/avatar-6.jpg" alt="Jason Doe"></a>
+            <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated" aria-labelledby="userInfo">
+              <div class="dropdown-header text-gray-700">
+                <h6 class="text-uppercase font-weight-bold">Mark Stephen</h6><small>Web Developer</small>
+              </div>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="#">Settings</a><a class="dropdown-item" href="#">Activity log       </a>
+              <div class="dropdown-divider"></div><a class="dropdown-item" href="login.html">Logout</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="d-flex align-items-stretch">
+      <div class="sidebar py-3" id="sidebar">
+        <h6 class="sidebar-heading">Main</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted active" href="#" data-bs-target="#dashboardsDropdown" role="button" aria-expanded="true" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#real-estate-1"> </use>
+                      </svg><span class="sidebar-link-title">Dashboards </span></a>
+                <ul class="sidebar-menu list-unstyled collapse show" id="dashboardsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index.html">Default</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-cms.html">CMS</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link active text-muted" href="index-e-commerce.html">E-commerce</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-projects.html">Projects</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="index-charts.html">Charts</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#cmsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#reading-1"> </use>
+                      </svg><span class="sidebar-link-title">CMS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="cmsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-post.html">Posts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-post-new.html">Add new post</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-category.html">Categories</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="cms-media.html">Media library</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#widgetsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#statistic-1"> </use>
+                      </svg><span class="sidebar-link-title">Widgets </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="widgetsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-stats.html">Stats</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="widgets-data.html">Data</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#e-commerceDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#delivery-truck-1"> </use>
+                      </svg><span class="sidebar-link-title">E-commerce </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="e-commerceDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-products.html">Products</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-product-new.html">Products - New</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-orders.html">Orders</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-order.html">Order - Detail</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="e-commerce-customers.html">Customers</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#pagesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#paper-stack-1"> </use>
+                      </svg><span class="sidebar-link-title">Pages </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="pagesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-profile.html">Profile</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-pricing.html">Pricing table</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-contacts.html">Contacts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-invoice.html">Invoice</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base.html">Knowledge base</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="pages-knowledge-base-topic.html">Knowledge base - Topic</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#userDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#man-1"> </use>
+                      </svg><span class="sidebar-link-title">User </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="userDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login.html">Login page</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register.html">Register</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="login-2.html">Login v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="register-2.html">Register v.2 <span class="badge bg-info ms-2 text-decoration-none">New</span></a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#componentsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#sorting-1"> </use>
+                      </svg><span class="sidebar-link-title">Components </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="componentsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-cards.html">Cards</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-calendar.html">Calendar</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-gallery.html">Gallery</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-loading-buttons.html">Loading buttons</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-map.html">Maps</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-notifications.html">Notifications</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="components-preloader.html">Preloaders</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#chartsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#pie-chart-1"> </use>
+                      </svg><span class="sidebar-link-title">Charts </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="chartsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts.html">Charts</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="charts-gauge-sparkline.html">Gauge + Sparkline</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#formsDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#file-storage-1"> </use>
+                      </svg><span class="sidebar-link-title">Forms </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="formsDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms.html">Basic forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-advanced.html">Advanced forms</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-dropzone.html">Files upload</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-texteditor.html">Text editor</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="forms-validation.html">Validation</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#tablesDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#grid-1"> </use>
+                      </svg><span class="sidebar-link-title">Tables </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="tablesDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables.html">Bootstrap tables</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="tables-datatable.html">Datatable</a></li>
+                </ul>
+              </li>
+        </ul>
+        <h6 class="sidebar-heading">Docs</h6>
+        <ul class="list-unstyled">
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/introduction.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#angle-brackets-1"> </use>
+                      </svg><span class="sidebar-link-title">Introduction</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/directory-structure.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#table-content-1"> </use>
+                      </svg><span class="sidebar-link-title">Directory structure</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/gulp.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#keyboard-1"> </use>
+                      </svg><span class="sidebar-link-title">Gulp.js</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted " href="#" data-bs-target="#cssDropdown" role="button" aria-expanded="false" data-bs-toggle="collapse"> 
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#design-1"> </use>
+                      </svg><span class="sidebar-link-title">CSS </span></a>
+                <ul class="sidebar-menu list-unstyled collapse " id="cssDropdown">
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/components-theme.html">CSS Components</a></li>
+                  <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/customizing-css.html">Customizing CSS</a></li>
+                </ul>
+              </li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/credits.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#star-medal-1"> </use>
+                      </svg><span class="sidebar-link-title">Credits</span></a></li>
+              <li class="sidebar-list-item"><a class="sidebar-link text-muted" href="docs/changelog.html">
+                      <svg class="svg-icon svg-icon-md me-3">
+                        <use xlink:href="icons/orion-svg-sprite.svg#new-1"> </use>
+                      </svg><span class="sidebar-link-title">Changelog</span></a></li>
+        </ul>
+      </div>
+      <div class="page-holder bg-gray-100">
+        <div class="container-fluid px-lg-4 px-xl-5">
+              <!-- Page Header-->
+              <div class="page-header">
+                <h1 class="page-heading">E-commerce Dashboard</h1>
+              </div>
+          <section class="mb-3 mb-lg-5">
+            <div class="card mb-5">
+              <div class="card-body">
+                <div class="row g-5">
+                      <!-- Widget Type 2-->
+                      <div class="col-md-6 col-xl-3">
+                        <h6 class="subtitle fw-normal text-muted">Earnings</h6>
+                        <h5 class="m-b-25">$10,500<span class="ms-3 float-end text-red">+20.3%</span></h5>
+                        <div class="progress">
+                          <div class="progress-bar bg-red" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">           </div>
+                        </div>
+                      </div>
+                      <!-- /Widget Type 2-->
+                      <!-- Widget Type 2-->
+                      <div class="col-md-6 col-xl-3">
+                        <h6 class="subtitle fw-normal text-muted">Readers</h6>
+                        <h5 class="m-b-25">584<span class="ms-3 float-end text-blue">+3.3%</span></h5>
+                        <div class="progress">
+                          <div class="progress-bar bg-blue" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%">           </div>
+                        </div>
+                      </div>
+                      <!-- /Widget Type 2-->
+                      <!-- Widget Type 2-->
+                      <div class="col-md-6 col-xl-3">
+                        <h6 class="subtitle fw-normal text-muted">Bookmarks</h6>
+                        <h5 class="m-b-25">876<span class="ms-3 float-end text-primary">+10.5%</span></h5>
+                        <div class="progress">
+                          <div class="progress-bar bg-primary" role="progressbar" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100" style="width:67%">           </div>
+                        </div>
+                      </div>
+                      <!-- /Widget Type 2-->
+                      <!-- Widget Type 2-->
+                      <div class="col-md-6 col-xl-3">
+                        <h6 class="subtitle fw-normal text-muted">Visitors</h6>
+                        <h5 class="m-b-25">3,500<span class="ms-3 float-end text-green">-5.8%</span></h5>
+                        <div class="progress">
+                          <div class="progress-bar bg-green" role="progressbar" aria-valuenow="93" aria-valuemin="0" aria-valuemax="100" style="width:93%">           </div>
+                        </div>
+                      </div>
+                      <!-- /Widget Type 2-->
+                </div>
+              </div>
+            </div>
+            <!-- <Sales>-->
+            <div class="card mb-5">
+              <div class="card-header bg-inverse">
+                <div class="row align-items-center">
+                  <div class="col"> 
+                    <h5 class="card-heading">Sales by channel</h5>
+                  </div>
+                  <div class="col-auto">
+                    <div class="btn-group"><a class="btn btn-sm btn-outline-light active" href="#!" aria-current="page">This week</a><a class="btn btn-sm btn-outline-light" href="#!">Last week</a></div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="row align-items-center mb-5">
+                  <div class="col">
+                    <h3 class="subtitle text-gray-500">Total Revenue</h3>
+                    <div class="h1 text-primary">$19,200</div>
+                    <p class="mb-0"><span class="text-muted me-3">+$2,032 </span><span class="badge badge-success-light"><i class="fas fa-arrow-up me-2"></i>19.5%</span></p>
+                  </div>
+                  <div class="col-auto">
+                    <div class="icon icon-xl ms-2 bg-primary-light">
+                          <svg class="svg-icon text-primary">
+                            <use xlink:href="icons/orion-svg-sprite.svg#pay-1"> </use>
+                          </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-9 col-xl-10">
+                    <canvas id="barChart"></canvas>
+                    <ul class="mt-4 text-gray-500 list-inline card-text text-center">
+                      <li class="list-inline-item"> <span class="indicator bg-primary"></span>Organic Search </li>
+                      <li class="list-inline-item"><span class="indicator" style="background: #d0d2f3"> </span>Facebook Ads </li>
+                    </ul>
+                  </div>
+                  <div class="col-lg-3 col-xl-2 text-end border-start d-flex flex-column justify-content-between py-lg-3 py-xxl-5">
+                    <div>
+                      <h3 class="subtitle text-gray-500 fw-normal">Organic Search Revenue</h3>
+                      <div class="h4 fw-normal h1 text-dark">$19,200</div>
+                      <p class="mb-0"><span class="text-muted me-2">+$2,123 </span><span class="badge badge-success-light"><i class="fas fa-arrow-up me-2"></i>21.3%</span></p>
+                    </div>
+                    <hr class="bg-gray-500">
+                    <div>
+                      <h3 class="subtitle text-gray-500 fw-normal">Facebook Ads Revenue</h3>
+                      <div class="h4 fw-normal h1 text-dark">$19,200</div>
+                      <p class="mb-0"><span class="text-muted me-2">-$233 </span><span class="badge badge-danger-light"><i class="fas fa-arrow-down me-2"></i>-2.1%                   </span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- </Sales>-->
+            <div class="row">
+              <!-- <Latest activity>-->
+              <div class="col-lg-4">
+                <div class="card-adjust-height-lg">
+                  <div class="card mb-4 mb-lg-0">
+                    <div class="card-header">
+                      <h5 class="card-heading">Latest activity</h5>
+                          <div class="card-header-more">
+                            <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                          </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="list-group list-group-flush list-group-timeline">
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-0.jpg" alt="Nielsen Cobb"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Nielsen Cobb </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">3m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-1.jpg" alt="Margret Cote"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Margret Cote </strong> liked your post 🎉
+                              <div class="text-gray-500 small">4m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-2.jpg" alt="Rachel Vinson"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Rachel Vinson </strong> placed an order.
+                              <div class="text-gray-500 small">5m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-3.jpg" alt="Gabrielle Aguirre"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Gabrielle Aguirre </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">6m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-4.jpg" alt="Spears Collier"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Spears Collier </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">7m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-5.jpg" alt="Keisha Thomas"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Keisha Thomas </strong> liked your post 🎉
+                              <div class="text-gray-500 small">8m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-6.jpg" alt="Elisabeth Key"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Elisabeth Key </strong> placed an order.
+                              <div class="text-gray-500 small">9m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-7.jpg" alt="Patel Mack"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Patel Mack </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">10m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-8.jpg" alt="Erika Whitaker"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Erika Whitaker </strong> subscribed to your newsletter.
+                              <div class="text-gray-500 small">11m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-9.jpg" alt="Meyers Swanson"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Meyers Swanson </strong> liked your post 🎉
+                              <div class="text-gray-500 small">12m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-10.jpg" alt="Townsend Sloan"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Townsend Sloan </strong> placed an order.
+                              <div class="text-gray-500 small">13m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                        <div class="list-group-item px-0">
+                          <div class="row">
+                            <div class="col-auto"><img class="avatar p-1 me-2" src="img/avatar-11.jpg" alt="Millicent Henry"></div>
+                            <div class="col ms-n3 pt-2 text-sm text-gray-800"><strong class="text-dark">Millicent Henry </strong>commented on &quot;How to season your new grill.&quot;
+                              <div class="text-gray-500 small">14m ago</div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.list-group-item-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- </Latest activity>-->
+              <!-- <Products>-->
+              <div class="col-lg-8">
+                <div class="card card-table mb-4"> 
+                  <div class="card-header">
+                    <h5 class="card-heading">Bestsellers this month</h5>
+                        <div class="card-header-more">
+                          <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                          <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                        </div>
+                  </div>
+                  <div class="preload-wrapper">
+                    <table class="table table-hover table-striped table-borderless text-sm align-middle mb-0" id="productsDatatable">
+                      <thead>
+                        <tr>
+                          <th style="min-width: 300px;">Name</th>
+                          <th>Price</th>
+                          <th>Last Ordered</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-1.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Round grey hanging decor</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/11/18</td>
+                          <td>
+                            <label class="badge badge-primary-light">New Arrival</label>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-2.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>silver black round Ipod</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/03/27</td>
+                          <td>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-3.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>White USB cable</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/12/20</td>
+                          <td>
+                            <label class="badge badge-info-light">Trending</label>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-4.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Sony PS 4 game controller</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/10/05</td>
+                          <td>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-5.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Kui Ye Chen’s AirPods</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/08/27</td>
+                          <td>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-6.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Black camera lens</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/05/05</td>
+                          <td>
+                            <label class="badge badge-success-light">Hot</label>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-7.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Apple wireless keyboard</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/06/06</td>
+                          <td>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-8.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Black Canon EOS camera</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/07/12</td>
+                          <td>
+                            <label class="badge badge-danger-light">Soldout</label>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-9.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Silver round analog watch</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/07/10</td>
+                          <td>
+                            <label class="badge badge-primary-light">New Arrival</label>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td class="d-flex align-items-center"><img class="card-table-img img-fluid rounded me-3" src="img/product/product-10.jpg" alt="" width="30"><a class="text-reset text-decoration-none" href="#!"><strong>Apple Watch</strong></a></td>
+                          <td>$22.00</td>
+                          <td class="text-muted">2021/05/10</td>
+                          <td>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- </Products>-->
+            </div>
+            <!-- <Orders>-->
+            <div class="card card-table mb-4">
+              <div class="card-header">
+                <h5 class="card-heading">Latest orders</h5>
+                    <div class="card-header-more">
+                      <button class="btn-header-more" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-v"></i></button>
+                      <div class="dropdown-menu dropdown-menu-end text-sm"><a class="dropdown-item" href="#!"><i class="fas fa-expand-arrows-alt opacity-5 me-2"></i>Expand</a><a class="dropdown-item" href="#!"><i class="far fa-window-minimize opacity-5 me-2"></i>Minimize</a><a class="dropdown-item" href="#!"><i class="fas fa-redo opacity-5 me-2"></i> Reload</a><a class="dropdown-item" href="#!"><i class="far fa-trash-alt opacity-5 me-2"></i> Remove        </a></div>
+                    </div>
+              </div>
+              <div class="card-body">
+                <div class="preload-wrapper">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="ordersDatatable">
+                      <thead>
+                        <tr>
+                          <th>Order Id</th>
+                          <th>Name</th>
+                          <th>Date</th>
+                          <th>Total Price</th>
+                          <th>Status</th>
+                          <th>Review</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check0">
+                              <label class="form-check-label" for="check0">#2458</label></span></td>
+                          <td> <strong>Nielsen Cobb</strong><br><span class="text-muted text-sm">nielsencobb@memora.com</span></td>
+                          <td>2021/11/26</td>
+                          <td>$790.43</td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check1">
+                              <label class="form-check-label" for="check1">#2459</label></span></td>
+                          <td> <strong>Margret Cote</strong><br><span class="text-muted text-sm">margretcote@zilidium.com</span></td>
+                          <td>2021/10/16</td>
+                          <td>$780.49</td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check2">
+                              <label class="form-check-label" for="check2">#2460</label></span></td>
+                          <td> <strong>Rachel Vinson</strong><br><span class="text-muted text-sm">rachelvinson@chorizon.com</span></td>
+                          <td>2021/06/10</td>
+                          <td>$430.52</td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check3">
+                              <label class="form-check-label" for="check3">#2461</label></span></td>
+                          <td> <strong>Gabrielle Aguirre</strong><br><span class="text-muted text-sm">gabrielleaguirre@comverges.com</span></td>
+                          <td>2021/05/02</td>
+                          <td>$340.50</td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check4">
+                              <label class="form-check-label" for="check4">#2462</label></span></td>
+                          <td> <strong>Spears Collier</strong><br><span class="text-muted text-sm">spearscollier@remold.com</span></td>
+                          <td>2021/08/15</td>
+                          <td>$140.03</td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check5">
+                              <label class="form-check-label" for="check5">#2463</label></span></td>
+                          <td> <strong>Keisha Thomas</strong><br><span class="text-muted text-sm">keishathomas@euron.com</span></td>
+                          <td>2021/03/15</td>
+                          <td>$50.16</td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check6">
+                              <label class="form-check-label" for="check6">#2464</label></span></td>
+                          <td> <strong>Elisabeth Key</strong><br><span class="text-muted text-sm">elisabethkey@netagy.com</span></td>
+                          <td>2021/04/11</td>
+                          <td>$220.77</td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check7">
+                              <label class="form-check-label" for="check7">#2465</label></span></td>
+                          <td> <strong>Patel Mack</strong><br><span class="text-muted text-sm">patelmack@zedalis.com</span></td>
+                          <td>2021/03/16</td>
+                          <td>$560.97</td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check8">
+                              <label class="form-check-label" for="check8">#2466</label></span></td>
+                          <td> <strong>Erika Whitaker</strong><br><span class="text-muted text-sm">erikawhitaker@uniworld.com</span></td>
+                          <td>2021/12/16</td>
+                          <td>$770.03</td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check9">
+                              <label class="form-check-label" for="check9">#2467</label></span></td>
+                          <td> <strong>Meyers Swanson</strong><br><span class="text-muted text-sm">meyersswanson@candecor.com</span></td>
+                          <td>2021/05/16</td>
+                          <td>$350.69</td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check10">
+                              <label class="form-check-label" for="check10">#2468</label></span></td>
+                          <td> <strong>Townsend Sloan</strong><br><span class="text-muted text-sm">townsendsloan@rameon.com</span></td>
+                          <td>2021/06/21</td>
+                          <td>$760.53</td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check11">
+                              <label class="form-check-label" for="check11">#2469</label></span></td>
+                          <td> <strong>Millicent Henry</strong><br><span class="text-muted text-sm">millicenthenry@balooba.com</span></td>
+                          <td>2021/12/16</td>
+                          <td>$320.08</td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check12">
+                              <label class="form-check-label" for="check12">#2470</label></span></td>
+                          <td> <strong>Madelyn Brock</strong><br><span class="text-muted text-sm">madelynbrock@combogene.com</span></td>
+                          <td>2021/01/04</td>
+                          <td>$560.82</td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check13">
+                              <label class="form-check-label" for="check13">#2471</label></span></td>
+                          <td> <strong>Jenkins Carney</strong><br><span class="text-muted text-sm">jenkinscarney@dadabase.com</span></td>
+                          <td>2021/03/30</td>
+                          <td>$250.19</td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check14">
+                              <label class="form-check-label" for="check14">#2472</label></span></td>
+                          <td> <strong>Grimes Delaney</strong><br><span class="text-muted text-sm">grimesdelaney@progenex.com</span></td>
+                          <td>2021/02/15</td>
+                          <td>$240.22</td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check15">
+                              <label class="form-check-label" for="check15">#2473</label></span></td>
+                          <td> <strong>Valencia Rivera</strong><br><span class="text-muted text-sm">valenciarivera@xleen.com</span></td>
+                          <td>2021/02/19</td>
+                          <td>$340.90</td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check16">
+                              <label class="form-check-label" for="check16">#2474</label></span></td>
+                          <td> <strong>Helene Solomon</strong><br><span class="text-muted text-sm">helenesolomon@zomboid.com</span></td>
+                          <td>2021/08/16</td>
+                          <td>$130.66</td>
+                          <td><span class="badge badge-success-light"> <span class="indicator"></span>Open</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check17">
+                              <label class="form-check-label" for="check17">#2475</label></span></td>
+                          <td> <strong>Kathleen Holman</strong><br><span class="text-muted text-sm">kathleenholman@hotcakes.com</span></td>
+                          <td>2021/10/08</td>
+                          <td>$680.81</td>
+                          <td><span class="badge badge-danger-light"> <span class="indicator"></span>Closed</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check18">
+                              <label class="form-check-label" for="check18">#2476</label></span></td>
+                          <td> <strong>Merrill Garrett</strong><br><span class="text-muted text-sm">merrillgarrett@affluex.com</span></td>
+                          <td>2021/04/20</td>
+                          <td>$650.83</td>
+                          <td><span class="badge badge-warning-light"> <span class="indicator"></span>On Hold</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                        <tr class="align-middle">
+                          <td> <span class="form-check">
+                              <input class="form-check-input" type="checkbox" id="check19">
+                              <label class="form-check-label" for="check19">#2477</label></span></td>
+                          <td> <strong>Sallie Booth</strong><br><span class="text-muted text-sm">salliebooth@ziggles.com</span></td>
+                          <td>2021/06/24</td>
+                          <td>$670.70</td>
+                          <td><span class="badge badge-info-light"> <span class="indicator"></span>In Progress</span></td>
+                          <td class="text-end" style="min-width: 125px;"><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-warning"></i></a><a href="#!"><i class="fa fa-star text-gray-500"></i></a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div><span class="me-2" id="categoryBulkActionOrders">
+                    <select class="form-select form-select-sm d-inline w-auto" name="categoryBulkAction">
+                      <option>Bulk Actions</option>
+                      <option>Delete</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-primary align-top">Apply            </button></span>
+                </div>
+              </div>
+            </div>
+            <!-- </Orders>-->
+          </section>
+        </div>
+        <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6 text-center text-md-start fw-bold">
+                <p class="mb-2 mb-md-0 fw-bold">Your company &copy; 2023</p>
+              </div>
+              <div class="col-md-6 text-center text-md-end text-gray-400">
+                <p class="mb-0">Version 1.3.2</p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <!-- Data Tables-->
+    <script src="vendor/simple-datatables/umd/simple-datatables.js"></script>
+    <!-- Chart.js-->
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="js/charts-defaults.js">   </script>
+    <!-- E-commerce dashboard-->
+    <script src="js/index-e-commerce.js">    </script>
+    <!-- Main Theme JS File-->
+    <script src="js/theme.js"></script>
+    <!-- Prism for syntax highlighting-->
+    <script src="vendor/prismjs/prism.js"></script>
+    <script src="vendor/prismjs/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+    <script src="vendor/prismjs/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="vendor/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+    <script type="text/javascript">
+      // Optional
+      Prism.plugins.NormalizeWhitespace.setDefaults({
+      'remove-trailing': true,
+      'remove-indent': true,
+      'left-trim': true,
+      'right-trim': true,
+      });
+          
+    </script>
+    <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  </body>
+</html>

@@ -1,0 +1,82 @@
+extends _pug-includes/layout
+
+block vars 
+    - var cms = true;
+    - var current = 'cms-category.html';  
+
+block content
+        +pageHeader('Categories')
+        
+        - var categories = []
+        - categories.push({name: 'Gear', count: 23})
+        - categories.push({name: 'Stories', count: 2})
+        - categories.push({name: 'Tips & Tricks', count: 4})
+        - categories.push({name: 'Trips', count: 5})
+        - categories.push({name: 'Gear', count: 23})
+        - categories.push({name: 'Stories', count: 2})
+        - categories.push({name: 'Tips & Tricks', count: 4})
+        - categories.push({name: 'Trips', count: 5})
+        - categories.push({name: 'Uncategorized', count: 2})
+
+        section
+            .row.mb-5
+                .col-lg-4
+                    .card.mb-4.mb-lg-0
+                        .card-body
+                            .mb-4
+                                label.form-label(for="categoryName") Name
+                                input.form-control#categoryName(type="text")
+                                .form-text The name is how it appears on your site.
+                                    
+
+                            .mb-4
+                                label.form-label(for="categorySlug") Slug
+                                input.form-control#categorySlug(type="text")
+                                .form-text The “slug” is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.
+                                    
+                            .mb-4
+                                label.form-label(for="categoryParent") Parent
+                                
+                                select#categoryParent.form-select(name="categoryParent")
+                                    option(value="0") None
+                                    each val, index in categories
+                                        option(value=index) #{val.name}
+                                .form-text Categories, unlike tags, can have a hierarchy. You might have a Jazz category, and under that have children categories for Bebop and Big Band. Totally optional.
+
+                            .mb-4
+                                label.form-label(for="categoryDescription") Parent
+                                textarea#categoryDescription.form-control(name="categoryDescription")
+                                .form-text The description is not prominent by default; however, some themes may show it.
+
+                            
+                            button.btn.btn-primary.mb-4 Add New Category
+
+                            
+                    
+                .col-lg-8
+                    .card.card-table
+                        .preload-wrapper
+                            table#categoryDatatable.table.table-hover.mb-0
+                                thead
+                                    tr
+                                        th(style="width: 20px;") 
+                                        th Name
+                                        th Description
+                                        th Slug
+                                        th Count
+                                tbody
+                                    each val, index in categories
+                                        - slug = val.name.replace(' ','-').toLowerCase()
+                                        tr
+                                            td <span class="form-check"><input class="form-check-input" type="checkbox"></span>
+                                            td <a href="javascript:void(0)" class="text-decoration-none text-reset fw-bolder">#{val.name}</a>
+                                            td -
+                                            td #{slug}
+                                            td.text-end <a href="cms-post.html" class="text-decoration-none">#{val.count}</a>
+
+                            span#categoryBulkAction.me-2
+                                select.form-select.form-select-sm.d-inline.w-auto.mb-1.mb-lg-0(name="categoryBulkAction")
+                                    option Bulk Actions
+                                    option Delete
+                                button.btn.btn-sm.btn-outline-primary.align-top.mb-1.mb-lg-0 Apply
+    

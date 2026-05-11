@@ -1,0 +1,64 @@
+extends ../_pug-includes/layout
+
+block vars
+    - var active = 'docs'  
+    - var bodyAttrs = {'data-spy': "scroll", 'data-target': "#components-nav", 'data-offset':"80"}
+    - var path = '../'    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: '../index.html'})
+    - breadcrumbs.push({name: 'Documentation', link: 'introduction.html'})
+    - breadcrumbs.push({name: 'Credits'})
+    - var heroHeading = 'Credits'
+    - var current = 'docs/credits.html'    
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader(heroHeading) 
+
+    section.mb-5 
+        .row
+            .col-xl-10
+                .card
+                    .card-header
+                    .card-body 
+                            li.mb-3
+                                a(href='https://getbootstrap.com/')  Bootstrap
+                            li.mb-3
+                                a(href='https://fonts.google.com/specimen/Poppins') Google Fonts - Poppins
+                            li.mb-3
+                                a(href='https://orioniconlibrary.com') Orion Icons 
+                            li.mb-3
+                                a(href='http://fontawesome.io/get-started/') Font Awesome 
+                            li.mb-3
+                                a(href='https://leafletjs.com/') LeafletJS
+                            li.mb-3
+                                a(href='https://www.chartjs.org/') Chart.js
+                            li.mb-3
+                                a(href='https://github.com/jshjohnson/Choices') Choices.js 
+                            li.mb-3
+                                a(href='https://refreshless.com/nouislider/')  NoUI Slider 
+                            li.mb-3
+                                a(href='https://biati-digital.github.io/glightbox/') GLightbox                                
+                            li.mb-3
+                                a(href='https://github.com/fnando/sparkline') Sparkline                                
+                            li.mb-3
+                                a(href='https://www.dropzonejs.com/') Dropzone.js                                
+                            li.mb-3
+                                a(href='https://fullcalendar.io/') FullCalendar
+                            li.mb-3
+                                a(href='https://bernii.github.io/gauge.js/') Gauge.js
+                            li.mb-3
+                                a(href='https://imask.js.org/') iMask.js
+                            li.mb-3
+                                a(href='https://github.com/hakimel/Ladda/') Ladda
+                            li.mb-3
+                                a(href='https://quilljs.com/') Quill
+                            li.mb-3
+                                a(href='https://github.com/fiduswriter/Simple-DataTables') Simple-DataTables
+
+                            li.mb-3
+                                a(href='https://github.com/mymth/vanillajs-datepicker') Vanilla JS Datepicker
+
+                            li.mb-3
+                                a(href="https://unsplash.com/") Unsplash

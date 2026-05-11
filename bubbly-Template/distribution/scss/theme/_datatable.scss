@@ -1,0 +1,355 @@
+/*
+* ==========================================================
+*     DataTable
+* ==========================================================
+*/
+
+.dataTable-wrapper {
+	overflow-x: auto;
+	max-width: 100%;
+}
+
+.dataTable-wrapper.no-header {
+	.dataTable-container {
+		border-top: 1px solid #d9d9d9;
+	}
+}
+
+.dataTable-wrapper.no-footer {
+	.dataTable-container {
+		border-bottom: 1px solid #d9d9d9;
+	}
+}
+
+.dataTable-top {
+	padding: 8px 10px;
+	font-size: $font-size-sm;
+
+	>nav {
+		&:first-child {
+			float: left;
+		}
+
+		&:last-child {
+			float: right;
+		}
+	}
+
+	>div {
+		&:first-child {
+			float: left;
+
+			@include media-breakpoint-down(md) {
+
+				float: none;
+			}
+		}
+
+		&:last-child {
+			float: right;
+
+			@include media-breakpoint-down(md) {
+				margin-top: .25rem;
+				float: none;
+			}
+		}
+	}
+
+	&::after {
+		display: table;
+		clear: both;
+		content: " ";
+	}
+}
+
+.dataTable-bottom {
+	padding: 8px 10px;
+
+	>nav {
+		&:first-child {
+			float: left;
+		}
+
+		&:last-child {
+			float: right;
+		}
+	}
+
+	>div {
+		&:first-child {
+			float: left;
+		}
+
+		&:last-child {
+			float: right;
+		}
+	}
+
+	&::after {
+		display: table;
+		clear: both;
+		content: " ";
+	}
+}
+
+.dataTable-selector {
+	display: inline !important;
+	width: auto;
+}
+
+.dataTable-input {
+	padding: $input-padding-y $input-padding-x;
+	border: solid 1px $input-border-color;
+	border-radius: $input-border-radius;
+
+	&.form-control-sm {
+		padding: $input-padding-y-sm $input-padding-x-sm;
+	}
+}
+
+.dataTable-info {
+	margin: 7px 0;
+}
+
+.dataTable-pagination {
+	ul {
+		margin: 0;
+		padding-left: 0;
+	}
+
+	li {
+		float: left;
+		list-style: none;
+	}
+
+	a {
+		position: relative;
+		float: left;
+		margin-left: 2px;
+		padding: 6px 12px;
+		text-decoration: none;
+		color: #333;
+		border: 1px solid transparent;
+
+		&:hover {
+			background-color: #d9d9d9;
+		}
+	}
+
+	.active {
+		a {
+			cursor: default;
+			background-color: #d9d9d9;
+
+			&:focus {
+				cursor: default;
+				background-color: #d9d9d9;
+			}
+
+			&:hover {
+				cursor: default;
+				background-color: #d9d9d9;
+			}
+		}
+	}
+
+	.ellipsis {
+		a {
+			cursor: not-allowed;
+		}
+	}
+
+	.disabled {
+		a {
+			cursor: not-allowed;
+			cursor: not-allowed;
+			opacity: 0.4;
+
+			&:focus {
+				cursor: not-allowed;
+				cursor: not-allowed;
+				opacity: 0.4;
+			}
+
+			&:hover {
+				cursor: not-allowed;
+				cursor: not-allowed;
+				opacity: 0.4;
+			}
+		}
+	}
+
+	.pager {
+		a {
+			font-weight: bold;
+		}
+	}
+}
+
+.dataTable-table {
+	width: 100%;
+	max-width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+
+	>thead {
+		>tr {
+			>td {
+				padding: 8px 10px;
+				vertical-align: top;
+			}
+
+			>th {
+				padding: 8px 10px;
+				text-align: left;
+				vertical-align: top;
+				vertical-align: bottom;
+				border-bottom: 1px solid #d9d9d9;
+			}
+		}
+	}
+
+	th {
+		text-align: left;
+		vertical-align: bottom;
+
+		a {
+			text-decoration: none;
+			color: inherit;
+		}
+	}
+}
+
+.preload-wrapper {
+	opacity: 0;
+	transition: all .5s;
+
+	&.opacity-10 {
+		opacity: 1;
+	}
+}
+
+
+.card-table {
+
+	.dataTable-wrapper {
+		background: $gray-100;
+	}
+
+	.dataTable-top {
+		padding: 2rem 2rem;
+		background: $gray-100;
+	}
+
+	.dataTable-table {
+		background: $white;
+
+		>thead {
+			>tr {
+				>td {
+					padding-top: $spacer * 1.5;
+					padding-bottom: $spacer * 1.5;
+					vertical-align: top;
+				}
+
+				>th {
+					padding-top: $spacer * 1.5;
+					padding-bottom: $spacer * 1.5;
+					text-align: left;
+					vertical-align: top;
+					vertical-align: bottom;
+					border-bottom: 1px solid #d9d9d9;
+				}
+			}
+		}
+	}
+
+	.dataTable-sorter {
+		&::before {
+			opacity: 0.4;
+			border-top: 4px solid $white;
+		}
+
+		&::after {
+			opacity: 0.4;
+			border-bottom: 4px solid $white;
+		}
+	}
+
+	.asc {
+		.dataTable-sorter {
+			&::after {
+				opacity: 1;
+			}
+		}
+	}
+
+	.desc {
+		.dataTable-sorter {
+			&::before {
+				opacity: 1;
+			}
+		}
+	}
+
+	.dataTable-bottom {
+		padding: 2rem;
+		background: $gray-100;
+	}
+
+}
+
+.dataTable-sorter {
+	display: inline-block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding-right: 15px;
+
+	&::before {
+		position: absolute;
+		right: 4px;
+		bottom: 0px;
+		width: 0;
+		height: 0;
+		content: "";
+		opacity: 0.2;
+		border-top: 4px solid #000;
+		border-right: 4px solid transparent;
+		border-left: 4px solid transparent;
+	}
+
+	&::after {
+		position: absolute;
+		top: 0px;
+		right: 4px;
+		width: 0;
+		height: 0;
+		content: "";
+		opacity: 0.2;
+		border-top: 4px solid transparent;
+		border-right: 4px solid transparent;
+		border-bottom: 4px solid #000;
+		border-left: 4px solid transparent;
+	}
+}
+
+.asc {
+	.dataTable-sorter {
+		&::after {
+			opacity: 0.6;
+		}
+	}
+}
+
+.desc {
+	.dataTable-sorter {
+		&::before {
+			opacity: 0.6;
+		}
+	}
+}
+
+.dataTables-empty {
+	text-align: center;
+}
