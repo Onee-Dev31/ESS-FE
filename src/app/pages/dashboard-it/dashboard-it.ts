@@ -471,6 +471,14 @@ export class DashboardIT implements OnInit {
     }
   }
 
+  isDetailModalOpen = signal(false);
+  selectedDetail = signal('');
+
+  openDetail(description: string) {
+    this.selectedDetail.set(description);
+    this.isDetailModalOpen.set(true);
+  }
+
   openCcModal(): void {
     this.isCcModalVisible = true;
   }
