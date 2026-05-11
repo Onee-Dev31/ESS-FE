@@ -240,8 +240,13 @@ label {
   border-bottom: 1px solid #f0f0f0;
   font-size: 0.875rem;
 
-  .swal-reset-label { color: #999; }
-  .swal-reset-value { font-weight: 600; color: #333; }
+  .swal-reset-label {
+    color: #999;
+  }
+  .swal-reset-value {
+    font-weight: 600;
+    color: #333;
+  }
 }
 
 .swal-reset-field-label {
@@ -291,7 +296,9 @@ label {
   background: #1677ff !important;
   box-shadow: none !important;
 
-  &:hover { background: #0958d9 !important; }
+  &:hover {
+    background: #0958d9 !important;
+  }
 }
 
 .swal-reset-cancel {
@@ -303,7 +310,9 @@ label {
   color: #333 !important;
   box-shadow: none !important;
 
-  &:hover { background: #e8e8e8 !important; }
+  &:hover {
+    background: #e8e8e8 !important;
+  }
 }
 
 /* Popup */

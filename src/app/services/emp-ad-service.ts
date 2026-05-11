@@ -91,35 +91,50 @@ export class EmpAdService {
 
   enableAccount(samAccountName: string): Observable<any> {
     return this._http.post(`${this.baseUrl}/ActiveDirectory/enable-account`, null, {
-      params: new HttpParams()
-        .set('samAccountName', samAccountName)
-        .set('newPassword', 'P@ssw0rd'),
+      params: new HttpParams().set('samAccountName', samAccountName).set('newPassword', 'P@ssw0rd'),
       responseType: 'text',
     });
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this._http.post(`${this.baseUrl}/ActiveDirectory/ResetPassword`, { token, newPassword }, {
-      responseType: 'text',
-    });
+    return this._http.post(
+      `${this.baseUrl}/ActiveDirectory/ResetPassword`,
+      { token, newPassword },
+      {
+        responseType: 'text',
+      },
+    );
   }
 
   extendPasswordExpiration(samAccountName: string): Observable<any> {
-    return this._http.post(`${this.baseUrl}/ActiveDirectory/ExtendPasswordExpirationSimulated`, null, {
-      params: new HttpParams().set('samAccountName', samAccountName),
-      responseType: 'text',
-    });
+    return this._http.post(
+      `${this.baseUrl}/ActiveDirectory/ExtendPasswordExpirationSimulated`,
+      null,
+      {
+        params: new HttpParams().set('samAccountName', samAccountName),
+        responseType: 'text',
+      },
+    );
   }
 
   updateEmployeeX1(params: {
-    codeMpId: string; adUser: string; empTypeId?: number | null;
-    staEmp?: string; firstName?: string; lastName?: string;
-    displayName?: string; email?: string; jobTitle?: string;
-    department?: string; company?: string; description?: string;
+    codeMpId: string;
+    adUser: string;
+    empTypeId?: number | null;
+    staEmp?: string;
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    email?: string;
+    jobTitle?: string;
+    department?: string;
+    company?: string;
+    description?: string;
     adUserOld?: string;
   }): Observable<any> {
     let httpParams = new HttpParams().set('codeMpId', params.codeMpId).set('adUser', params.adUser);
-    if (params.empTypeId != null) httpParams = httpParams.set('empTypeId', String(params.empTypeId));
+    if (params.empTypeId != null)
+      httpParams = httpParams.set('empTypeId', String(params.empTypeId));
     if (params.staEmp) httpParams = httpParams.set('staEmp', params.staEmp);
     if (params.firstName) httpParams = httpParams.set('firstName', params.firstName);
     if (params.lastName) httpParams = httpParams.set('lastName', params.lastName);
@@ -130,6 +145,9 @@ export class EmpAdService {
     if (params.company) httpParams = httpParams.set('company', params.company);
     if (params.description) httpParams = httpParams.set('description', params.description);
     if (params.adUserOld) httpParams = httpParams.set('adUserOld', params.adUserOld);
-    return this._http.put(`${this.baseUrl}/Employee/UpdateEmployeeX1`, null, { params: httpParams, responseType: 'text' });
+    return this._http.put(`${this.baseUrl}/Employee/UpdateEmployeeX1`, null, {
+      params: httpParams,
+      responseType: 'text',
+    });
   }
 }

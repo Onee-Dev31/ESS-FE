@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import Swal from 'sweetalert2';
@@ -23,10 +30,21 @@ export class EmpAdForm implements OnChanges {
   submitted = false;
 
   requiredFields: (keyof typeof this.addForm)[] = [
-    'employeeCode', 'titleThai', 'firstNameThai', 'surNameThai',
-    'titleEng', 'firstNameEng', 'surNameEng', 'nickname',
-    'jobPosition', 'statusEmployee', 'floor', 'companyCode', 'department',
-    'headEmployeeCode', 'adUser',
+    'employeeCode',
+    'titleThai',
+    'firstNameThai',
+    'surNameThai',
+    'titleEng',
+    'firstNameEng',
+    'surNameEng',
+    'nickname',
+    'jobPosition',
+    'statusEmployee',
+    'floor',
+    'companyCode',
+    'department',
+    'headEmployeeCode',
+    'adUser',
   ];
 
   // View form
@@ -149,11 +167,17 @@ export class EmpAdForm implements OnChanges {
       error: () => {},
     });
     this.masterService.getCompanyMaster().subscribe({
-      next: (res) => { this.companyList = Array.isArray(res) ? res : (res.data ?? []); this.cdr.detectChanges(); },
+      next: (res) => {
+        this.companyList = Array.isArray(res) ? res : (res.data ?? []);
+        this.cdr.detectChanges();
+      },
       error: () => {},
     });
     this.masterService.getDepartmentMaster().subscribe({
-      next: (res) => { this.departmentList = Array.isArray(res) ? res : (res.data ?? []); this.cdr.detectChanges(); },
+      next: (res) => {
+        this.departmentList = Array.isArray(res) ? res : (res.data ?? []);
+        this.cdr.detectChanges();
+      },
       error: () => {},
     });
   }
@@ -194,16 +218,15 @@ export class EmpAdForm implements OnChanges {
         this.addForm.jobPosition,
       STAEMP: selectedStatus?.StatusCode ?? this.addForm.statusEmployee,
       StatusDescription: selectedStatus?.StatusDescription ?? '',
-      FLOOR:         selectedFloor?.FloorNumber ?? this.addForm.floor,
-      NAMEBANK:      this.addForm.nameBank,
-      NUMBANK:       this.addForm.numberBank,
-      COMPANY_CODE:  this.addForm.companyCode,
-      DEPARTMENT:    this.addForm.department,
-      CODEMPIDH:     this.addForm.headEmployeeCode,
-      HEAD_NAME:     selectedHead?.NAMETHAI ?? '',
-      AD_USER:       this.addForm.adUser,
+      FLOOR: selectedFloor?.FloorNumber ?? this.addForm.floor,
+      NAMEBANK: this.addForm.nameBank,
+      NUMBANK: this.addForm.numberBank,
+      COMPANY_CODE: this.addForm.companyCode,
+      DEPARTMENT: this.addForm.department,
+      CODEMPIDH: this.addForm.headEmployeeCode,
+      HEAD_NAME: selectedHead?.NAMETHAI ?? '',
+      AD_USER: this.addForm.adUser,
     };
-
 
     this.isSaving = true;
     this.empAdService.insertEmployee(payload).subscribe({
@@ -285,11 +308,24 @@ export class EmpAdForm implements OnChanges {
     this.selectedCompany = null;
     this.filteredDepartmentList = [];
     this.addForm = {
-      employeeCode: '', titleThai: '', firstNameThai: '', surNameThai: '',
-      titleEng: '', firstNameEng: '', surNameEng: '', nickname: '',
-      jobPosition: '', statusEmployee: '', floor: '', taxId: '',
-      nameBank: '', numberBank: '', companyCode: '', department: '',
-      headEmployeeCode: '', adUser: '',
+      employeeCode: '',
+      titleThai: '',
+      firstNameThai: '',
+      surNameThai: '',
+      titleEng: '',
+      firstNameEng: '',
+      surNameEng: '',
+      nickname: '',
+      jobPosition: '',
+      statusEmployee: '',
+      floor: '',
+      taxId: '',
+      nameBank: '',
+      numberBank: '',
+      companyCode: '',
+      department: '',
+      headEmployeeCode: '',
+      adUser: '',
     };
   }
 }

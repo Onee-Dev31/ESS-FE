@@ -22,7 +22,9 @@
     gap: 4px;
     overflow-x: auto;
     scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -46,7 +48,9 @@
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
   transform: translateY(0);
 
-  i { font-size: 0.875rem; }
+  i {
+    font-size: 0.875rem;
+  }
 
   &:hover:not(.active) {
     color: var(--text);
@@ -64,7 +68,9 @@
     box-shadow: none;
     z-index: 1;
 
-    i { color: $primary; }
+    i {
+      color: $primary;
+    }
 
     &::after {
       content: '';
@@ -80,8 +86,12 @@
   @include mobile {
     padding: 8px 16px;
     font-size: 0.8rem;
-    span { display: none; }
-    i { font-size: 1rem; }
+    span {
+      display: none;
+    }
+    i {
+      font-size: 1rem;
+    }
   }
 }
 

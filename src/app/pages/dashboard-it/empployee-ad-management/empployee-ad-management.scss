@@ -576,8 +576,13 @@
     padding: 6px 0;
     border-bottom: 1px solid var(--border-toolbar);
 
-    .edit-label { color: var(--text-muted); }
-    .edit-value { font-weight: 600; color: var(--text-header); }
+    .edit-label {
+      color: var(--text-muted);
+    }
+    .edit-value {
+      font-weight: 600;
+      color: var(--text-header);
+    }
   }
 
   .edit-field {
@@ -598,7 +603,9 @@
     display: flex;
     align-items: center;
 
-    .edit-input { padding-right: 38px; }
+    .edit-input {
+      padding-right: 38px;
+    }
 
     .toggle-pass {
       position: absolute;
@@ -612,7 +619,9 @@
       line-height: 1;
       transition: color 0.2s;
 
-      &:hover { color: var(--text); }
+      &:hover {
+        color: var(--text);
+      }
     }
   }
 
@@ -628,8 +637,12 @@
     transition: border-color 0.2s;
     width: 100%;
 
-    &:focus { border-color: $primary; }
-    &::placeholder { color: var(--text-muted); }
+    &:focus {
+      border-color: $primary;
+    }
+    &::placeholder {
+      color: var(--text-muted);
+    }
   }
 }
 
@@ -654,7 +667,9 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
-  &:hover { background: var(--border-toolbar); }
+  &:hover {
+    background: var(--border-toolbar);
+  }
 }
 
 .btn-edit-confirm {
@@ -669,7 +684,9 @@
   align-items: center;
   gap: 6px;
   transition: background 0.2s;
-  &:hover { background: color-mix(in srgb, $primary, black 12%); }
+  &:hover {
+    background: color-mix(in srgb, $primary, black 12%);
+  }
 }
 
 // ==================== PAGINATION ====================

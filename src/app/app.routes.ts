@@ -222,9 +222,7 @@ export const routes: Routes = [
       {
         path: 'employee-Info',
         loadComponent: () =>
-          import('./pages/dashboard-it/emp-ad-hub/emp-ad-hub').then(
-            (m) => m.EmpAdHub,
-          ),
+          import('./pages/dashboard-it/emp-ad-hub/emp-ad-hub').then((m) => m.EmpAdHub),
         data: { animation: 'Dashboard' },
         pathMatch: 'full',
       },

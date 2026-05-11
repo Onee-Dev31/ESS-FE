@@ -239,7 +239,9 @@
         <div class="field-group span-2">
           <label>บริษัท <span class="req">*</span></label>
           <nz-select
-            nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกบริษัท"
             class="field-nz-select"
             [ngModel]="selectedCompany"
             (ngModelChange)="onCompanyChange($event)"
@@ -254,7 +256,9 @@
         <div class="field-group span-2">
           <label>แผนก <span class="req">*</span></label>
           <nz-select
-            nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกแผนก"
             class="field-nz-select"
             [(ngModel)]="addForm.department"
             name="department"
@@ -262,7 +266,10 @@
             [nzStatus]="isInvalid('department') ? 'error' : ''"
           >
             @for (d of filteredDepartmentList; track d.COSTCENT) {
-              <nz-option [nzValue]="d.COSTCENT + ' ' + d.NAMECOSTCENT" [nzLabel]="d.COSTCENT + ' - ' + d.NAMECOSTCENT" />
+              <nz-option
+                [nzValue]="d.COSTCENT + ' ' + d.NAMECOSTCENT"
+                [nzLabel]="d.COSTCENT + ' - ' + d.NAMECOSTCENT"
+              />
             }
           </nz-select>
         </div>

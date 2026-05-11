@@ -206,19 +206,21 @@ export class EmpployeeAdManagement {
   }
 
   private loadAdInfo(employees: any[]) {
-    const withAd = employees.filter(e => e.adUser);
+    const withAd = employees.filter((e) => e.adUser);
     if (!withAd.length) return;
 
-    const requests = withAd.map(e =>
+    const requests = withAd.map((e) =>
       this.empAdService.getAdUserInfo(e.adUser).pipe(
-        map(res => ({ adUser: e.adUser, data: res })),
+        map((res) => ({ adUser: e.adUser, data: res })),
         catchError(() => of({ adUser: e.adUser, data: null })),
       ),
     );
 
-    forkJoin(requests).subscribe(results => {
+    forkJoin(requests).subscribe((results) => {
       const newMap: { [k: string]: any } = {};
-      results.forEach(r => { if (r.data) newMap[r.adUser] = r.data; });
+      results.forEach((r) => {
+        if (r.data) newMap[r.adUser] = r.data;
+      });
       this.adInfoMap = newMap;
       this.cdr.detectChanges();
     });
@@ -373,19 +375,19 @@ export class EmpployeeAdManagement {
 
     const emp = this.editEmp;
     const payload = {
-      codeMpId:    emp.employeeId,
-      adUser:      this.editAdUser,
-      empTypeId:   emp.empTypeId ?? null,
-      staEmp:      emp.employeeStatus ?? '',
-      firstName:   emp.nameEng1 ?? emp.firstName ?? '',
-      lastName:    emp.nameEng2 ?? emp.lastName ?? '',
+      codeMpId: emp.employeeId,
+      adUser: this.editAdUser,
+      empTypeId: emp.empTypeId ?? null,
+      staEmp: emp.employeeStatus ?? '',
+      firstName: emp.nameEng1 ?? emp.firstName ?? '',
+      lastName: emp.nameEng2 ?? emp.lastName ?? '',
       displayName: `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim(),
-      email:       emp.email ?? '',
-      jobTitle:    emp.position ?? '',
-      department:  emp.department ?? '',
-      company:     emp.companyCode ?? '',
+      email: emp.email ?? '',
+      jobTitle: emp.position ?? '',
+      department: emp.department ?? '',
+      company: emp.companyCode ?? '',
       description: '',
-      adUserOld:   emp.adUser ?? '',
+      adUserOld: emp.adUser ?? '',
     };
 
     this.empAdService.updateEmployeeX1(payload).subscribe({
