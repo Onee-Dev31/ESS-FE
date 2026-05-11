@@ -78,26 +78,39 @@ export class FilePreviewModalComponent implements OnInit {
 
   isDownloading = false;
 
-  async downloadFile(file: FilePreviewItem) {
+  // async downloadFile(file: FilePreviewItem) {
+  //   if (!file.url) return;
+  //   this.isDownloading = true;
+
+  //   try {
+  //     const response = await fetch(file.url);
+  //     const blob = await response.blob();
+  //     const blobUrl = URL.createObjectURL(blob);
+
+  //     const a = document.createElement('a');
+  //     a.href = blobUrl;
+  //     a.download = file.fileName;
+  //     a.click();
+
+  //     URL.revokeObjectURL(blobUrl);
+  //   } catch (error) {
+  //     console.error('Download failed:', error);
+  //   } finally {
+  //     this.isDownloading = false;
+  //     this.cdr.detectChanges();
+  //   }
+  // }
+
+  downloadFile(file: FilePreviewItem) {
     if (!file.url) return;
-    this.isDownloading = true;
 
-    try {
-      const response = await fetch(file.url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = file.url;
+    a.target = '_blank';
+    a.download = file.fileName;
 
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = file.fileName;
-      a.click();
-
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error('Download failed:', error);
-    } finally {
-      this.isDownloading = false;
-      this.cdr.detectChanges();
-    }
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }
