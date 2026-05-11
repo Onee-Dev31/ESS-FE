@@ -45,6 +45,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -63,6 +64,7 @@ import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal
     CcModal,
     ReOpenModal,
     AvatarPreviewModal,
+    NzDatePickerModule,
   ],
   templateUrl: './it-service-list.html',
   styleUrl: './it-service-list.scss',
@@ -125,13 +127,17 @@ export class ItService implements OnInit {
   IS_NOTE_TICKET = signal(false);
   IS_REOPEN_TICKET = signal(false);
 
-  filterStatus: StatusKey | null = 'all';
+  filterStatus: any | null = 'all';
   keyword = '';
   convertedFiles: any[] = [];
   attachments: any[] = [];
   deletedAttachmentIds: number[] = [];
   newFiles: any[] = [];
   desNew: string = '';
+
+  dateRange: Date[] | null = null;
+  showFilter = false;
+
   ngOnInit() {
     this.getMyTicket();
     this.checkScreen();
@@ -456,6 +462,8 @@ export class ItService implements OnInit {
         setTimeout(() => {
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
         }, 100);
+        this.getMyTicket();
+        this.selectTicket(data.ticket.ticketId);
         this.closeReOpenModal();
       },
       error: (error) => {
@@ -524,49 +532,6 @@ export class ItService implements OnInit {
       date.getMonth() === now.getMonth() &&
       date.getFullYear() === now.getFullYear()
     );
-  }
-
-  private async convertUrlToFile(fileData: any) {
-    try {
-      const response = await fetch(fileData.filePath);
-
-      if (!response.ok) {
-        throw new Error('Fetch failed');
-      }
-
-      const blob = await response.blob();
-
-      const file = new File([blob], fileData.fileName, { type: fileData.fileType });
-
-      return {
-        fileId: fileData.id,
-        name: fileData.file_name,
-        file: file,
-        description: fileData.file_description || '',
-        uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_at,
-        filePath: fileData.file_path,
-        size: fileData.file_size,
-        type: fileData.file_type,
-        isError: false,
-      };
-    } catch (error) {
-      console.warn('File fetch failed:', fileData.fileName);
-
-      // 🔥 fallback return
-      return {
-        fileId: fileData.id,
-        name: fileData.fileName,
-        file: null, // ไม่มี blob
-        description: fileData.fileDescription || '',
-        uploadedByAduser: fileData.uploadedByaAduser,
-        createdDate: fileData.created_date,
-        filePath: fileData.filePath,
-        size: fileData.fileSize,
-        type: fileData.fileType,
-        isError: true,
-      };
-    }
   }
 
   private extractNickName(name: string) {
@@ -664,7 +629,7 @@ export class ItService implements OnInit {
 
   getTicketStatus(ticket: any) {
     if (
-      (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') ||
+      (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') || //it เปลี่ยน type request
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
@@ -685,28 +650,90 @@ export class ItService implements OnInit {
     return 'Unknown';
   }
 
+  onFilterStatusChange(status: string) {
+    this.filterStatus = status;
+    this.filteredTickets();
+  }
+
+  filter = {
+    dateRange: null as [Date, Date] | null,
+    // dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+  };
+
+  private keywordSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  onKeywordChange(value: string) {
+    this.keyword = value;
+
+    if (this.keywordSearchTimer) {
+      clearTimeout(this.keywordSearchTimer);
+    }
+
+    this.keywordSearchTimer = setTimeout(() => {
+      this.getMyTicket();
+    }, 300);
+  }
+
+  filteredTickets(): any[] {
+    const statusMap: Record<string, string> = {
+      open: 'New',
+      reopen: 'Re-Opened',
+      waiting: 'Waiting you',
+      assigned: 'In Progress',
+      done: 'Closed',
+      hold: 'Hold',
+      denied: 'Denied',
+    };
+
+    const mappedStatus = statusMap[this.filterStatus ?? ''];
+
+    return this.Tickets().filter((t: any) => {
+      const matchStatus = this.filterStatus === 'all' ? true : t.status === mappedStatus;
+      return matchStatus;
+    });
+  }
+
   // GET
   getMyTicket() {
     // { requesterCodeempid: this.userData.CODEMPID }
     // { requesterAduser: this.userData.AD_USER }
 
-    this.itServiceService.getMyTickets({ requesterCodeempid: this.userData.CODEMPID }).subscribe({
-      next: (res) => {
-        this.Tickets.set(
-          res.data.map((ticket: any) => ({
-            ...ticket,
-            ticketId: ticket.id,
-            ticketNumber: ticket.ticket_number,
-            ticketType: ticket.ticket_type_name_th,
-            status: this.getTicketStatus(ticket),
-            createdDate: new Date(ticket.created_at).toISOString(),
-          })),
-        );
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
+    const searchText = this.keyword.trim();
+    const [from, to] = this.filter.dateRange ?? [];
+    const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
+    const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
+
+    console.log({
+      searchText: searchText || undefined,
+      requesterAduser: this.userData.AD_USER,
+      dateFrom,
+      dateTo,
     });
+
+    this.itServiceService
+      .getMyTickets({
+        searchText: searchText || undefined,
+        requesterAduser: this.userData.AD_USER,
+        dateFrom,
+        dateTo,
+      })
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          this.Tickets.set(
+            res.data.map((ticket: any) => ({
+              ...ticket,
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticket_number,
+              ticketType: ticket.ticket_type_name_th,
+              status: this.getTicketStatus(ticket),
+              createdDate: new Date(ticket.created_at).toISOString(),
+            })),
+          );
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        },
+      });
   }
 
   getTicketById(ticketId: string) {

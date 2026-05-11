@@ -234,6 +234,40 @@
         </div>
       </div>
 
+      <div class="section-title">Company Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>บริษัท <span class="req">*</span></label>
+          <nz-select
+            nzShowSearch nzAllowClear nzPlaceHolder="เลือกบริษัท"
+            class="field-nz-select"
+            [ngModel]="selectedCompany"
+            (ngModelChange)="onCompanyChange($event)"
+            name="companyCode"
+            [nzStatus]="isInvalid('companyCode') ? 'error' : ''"
+          >
+            @for (c of companyList; track $index) {
+              <nz-option [nzValue]="c" [nzLabel]="c.COMPANY_NAME + ' (' + c.COMPANY_CODE + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>แผนก <span class="req">*</span></label>
+          <nz-select
+            nzShowSearch nzAllowClear nzPlaceHolder="เลือกแผนก"
+            class="field-nz-select"
+            [(ngModel)]="addForm.department"
+            name="department"
+            [nzDisabled]="!addForm.companyCode"
+            [nzStatus]="isInvalid('department') ? 'error' : ''"
+          >
+            @for (d of filteredDepartmentList; track d.COSTCENT) {
+              <nz-option [nzValue]="d.COSTCENT + ' ' + d.NAMECOSTCENT" [nzLabel]="d.COSTCENT + ' - ' + d.NAMECOSTCENT" />
+            }
+          </nz-select>
+        </div>
+      </div>
+
       <div class="section-title">Hierarchy Information</div>
       <div class="form-grid">
         <div class="field-group span-2">

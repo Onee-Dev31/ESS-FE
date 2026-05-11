@@ -70,7 +70,11 @@ export class NavbarComponent {
 
   private static readonly IT_ROLES = new Set(['it-staff', 'it-director', 'system-admin']);
 
-  userName = computed(() => this.authService.currentUser() || 'MARK STEPHEN');
+  userName = computed(
+    () =>
+      this.authService.userData().NAMFIRSTE + ' ' + this.authService.userData().NAMLASTE[0] + '.' ||
+      'MARK STEPHEN',
+  );
   userRole = computed(() => this.authService.userRole() || 'Web Developer');
   isItRole = computed(() =>
     (this.authService.userRole() ?? '')

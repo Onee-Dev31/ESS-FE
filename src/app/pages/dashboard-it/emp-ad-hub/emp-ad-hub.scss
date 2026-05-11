@@ -1,0 +1,92 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use 'sass:color';
+
+.hub-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// ==================== TAB BAR ====================
+.tab-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 16px 24px 0;
+  background: var(--bg-table-head);
+  border-bottom: 2px solid var(--border-toolbar);
+
+  @include mobile {
+    padding: 10px 12px 0;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  bottom: -2px;
+  transition: all 0.18s ease;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
+  transform: translateY(0);
+
+  i { font-size: 0.875rem; }
+
+  &:hover:not(.active) {
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg-card), var(--border-toolbar) 40%);
+    transform: translateY(-2px);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  &.active {
+    background: var(--bg-card);
+    color: $primary;
+    border-color: var(--border-toolbar);
+    border-bottom: 2px solid var(--bg-card);
+    transform: translateY(0);
+    box-shadow: none;
+    z-index: 1;
+
+    i { color: $primary; }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--bg-card);
+    }
+  }
+
+  @include mobile {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    span { display: none; }
+    i { font-size: 1rem; }
+  }
+}
+
+// ==================== CONTENT ====================
+.tab-content {
+  flex: 1;
+  overflow: auto;
+}

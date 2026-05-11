@@ -220,10 +220,10 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'employee-ad',
+        path: 'employee-Info',
         loadComponent: () =>
-          import('./pages/dashboard-it/empployee-ad-management/empployee-ad-management').then(
-            (m) => m.EmpployeeAdManagement,
+          import('./pages/dashboard-it/emp-ad-hub/emp-ad-hub').then(
+            (m) => m.EmpAdHub,
           ),
         data: { animation: 'Dashboard' },
         pathMatch: 'full',
