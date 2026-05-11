@@ -224,7 +224,7 @@ $col-desc: auto;
             background: rgba($success, 0.15);
 
             i.fa-solid {
-              color: color.mix(white, $success, 10%) !important;
+              color: color-mix(in srgb, var(--success), white 10%) !important;
             }
           }
 
@@ -233,7 +233,7 @@ $col-desc: auto;
             background: rgba($danger, 0.15);
 
             i.fa-solid {
-              color: color.mix(white, $danger, 10%) !important;
+              color: color-mix(in srgb, var(--danger), white 10%) !important;
             }
           }
         }
@@ -246,7 +246,7 @@ $col-desc: auto;
         font-size: $font-size-hint;
 
         .total {
-          color: color.mix(white, $primary, 20%) !important;
+          color: color-mix(in srgb, var(--primary), white 20%) !important;
           font-size: $font-size-body;
           font-weight: 900;
         }
