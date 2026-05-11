@@ -232,7 +232,7 @@
         <span
           class="files"
           (click)="openAllAttachments(t.attachments)"
-          *ngIf="t.attachments.length > 0"
+          *ngIf="t.attachments.length > 0 && t.status !== 'Waiting you'"
           ><i class="far fa-eye"></i> ดูไฟล์แนบ ({{ t.attachments?.length }} ไฟล์)</span
         >
       </div>
@@ -285,10 +285,10 @@
   </section>
 
   <!-- ATTACHMENTS -->
-  <!-- <section class="tk-card">
+  <section class="tk-card" *ngIf="t.status === 'Waiting you'">
     <div class="tk-card__head">
       <div class="tk-card__title">เอกสารแนบ</div>
-      <div *ngIf="t.status === 'Waiting you'">
+      <div>
         <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
         <button type="button" class="btn-attach" (click)="fileInput.click()">
           <i class="fas fa-paperclip"></i> แนบไฟล์
@@ -314,7 +314,7 @@
         <p class="text-muted">ไม่มีเอกสารแนบ</p>
       </ng-template>
     </div>
-  </section> -->
+  </section>
 
   <!-- NOTES -->
   <section class="tk-card note">
