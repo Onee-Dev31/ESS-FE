@@ -1,0 +1,22 @@
+<div class="hub-wrapper">
+  <div class="tab-bar">
+    @for (tab of tabs; track tab.key) {
+      <button class="tab-btn" [class.active]="activeTab === tab.key" (click)="setTab(tab.key)">
+        <i [class]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="tab-content">
+    @if (activeTab === 'emp-ad') {
+      <app-empployee-ad-management></app-empployee-ad-management>
+    }
+    @if (activeTab === 'approver-flow') {
+      <app-dept-heads></app-dept-heads>
+    }
+    @if (activeTab === 'emp-list') {
+      <app-emp-list></app-emp-list>
+    }
+  </div>
+</div>

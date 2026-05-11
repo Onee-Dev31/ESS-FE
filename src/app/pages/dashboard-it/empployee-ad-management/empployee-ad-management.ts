@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -8,6 +10,7 @@ import { PageHeaderComponent } from '../../../components/shared/page-header/page
 import { PaginationComponent } from '../../../components/shared/pagination/pagination';
 import { EmptyStateComponent } from '../../../components/shared/empty-state/empty-state';
 import { SkeletonComponent } from '../../../components/shared/skeleton/skeleton';
+import Swal from 'sweetalert2';
 import { EmpAdService } from '../../../services/emp-ad-service';
 import { MasterDataService } from '../../../services/master-data.service';
 import { EmpAdForm } from './emp-ad-form/emp-ad-form';
@@ -36,6 +39,17 @@ export class EmpployeeAdManagement {
   showForm = false;
   formMode: 'view' | 'add' = 'view';
   selectedEmployeeId = '';
+
+  isEditOpen = false;
+  editEmp: any = null;
+  editAdUser = '';
+
+  isResetOpen = false;
+  resetEmp: any = null;
+  resetNewPassword = '';
+  resetShowPassword = false;
+
+  adInfoMap: { [adUser: string]: { IsDisabled: string; IsLocked: string } } = {};
   isFilterOpen = false;
 
   searchText = '';
@@ -179,6 +193,229 @@ export class EmpployeeAdManagement {
     this.selectedEmployeeId = '';
   }
 
+  openEdit(emp: any) {
+    this.editEmp = emp;
+    this.editAdUser = emp.adUser ?? '';
+    this.isEditOpen = true;
+  }
+
+  closeEdit() {
+    this.isEditOpen = false;
+    this.editEmp = null;
+    this.editAdUser = '';
+  }
+
+  private loadAdInfo(employees: any[]) {
+    const withAd = employees.filter(e => e.adUser);
+    if (!withAd.length) return;
+
+    const requests = withAd.map(e =>
+      this.empAdService.getAdUserInfo(e.adUser).pipe(
+        map(res => ({ adUser: e.adUser, data: res })),
+        catchError(() => of({ adUser: e.adUser, data: null })),
+      ),
+    );
+
+    forkJoin(requests).subscribe(results => {
+      const newMap: { [k: string]: any } = {};
+      results.forEach(r => { if (r.data) newMap[r.adUser] = r.data; });
+      this.adInfoMap = newMap;
+      this.cdr.detectChanges();
+    });
+  }
+
+  async toggleDisable(emp: any) {
+    if (!emp.adUser) return;
+
+    const info = this.adInfoMap[emp.adUser];
+    const isDisabled = info?.IsDisabled === 'Yes';
+    const actionTh = isDisabled ? 'เปิดใช้งาน' : 'ปิดใช้งาน';
+
+    const result = await Swal.fire({
+      title: `ยืนยันการ${actionTh} Account?`,
+      text: `AD User: ${emp.adUser}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    });
+    if (!result.isConfirmed) return;
+
+    const api$ = isDisabled
+      ? this.empAdService.enableAccount(emp.adUser)
+      : this.empAdService.disableAccount(emp.adUser);
+
+    api$.subscribe({
+      next: () => {
+        this.adInfoMap = {
+          ...this.adInfoMap,
+          [emp.adUser]: { ...info, IsDisabled: isDisabled ? 'No' : 'Yes' },
+        };
+        this.cdr.detectChanges();
+        Swal.fire({ icon: 'success', title: `${actionTh}สำเร็จ`, confirmButtonText: 'ตกลง' });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err?.error?.message ?? 'ลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง',
+        });
+      },
+    });
+  }
+
+  openReset(emp: any) {
+    this.resetEmp = emp;
+    this.resetNewPassword = '';
+    this.resetShowPassword = false;
+    this.isResetOpen = true;
+  }
+
+  closeReset() {
+    this.isResetOpen = false;
+    this.resetEmp = null;
+    this.resetNewPassword = '';
+  }
+
+  confirmReset() {
+    if (!this.resetNewPassword || !this.resetEmp) return;
+
+    this.empAdService.resetPassword(this.resetEmp.adUser, this.resetNewPassword).subscribe({
+      next: () => {
+        this.closeReset();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          Swal.fire({ icon: 'success', title: 'Reset Password สำเร็จ', confirmButtonText: 'ตกลง' });
+        }, 300);
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err?.error?.message ?? 'ลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง',
+        });
+      },
+    });
+  }
+
+  async extendPassword(emp: any) {
+    if (!emp.adUser) return;
+
+    const result = await Swal.fire({
+      title: 'ยืนยัน Extend Password?',
+      text: `AD User: ${emp.adUser}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    });
+    if (!result.isConfirmed) return;
+
+    this.empAdService.extendPasswordExpiration(emp.adUser).subscribe({
+      next: () => {
+        this.loadAdInfo([emp]);
+        Swal.fire({ icon: 'success', title: 'Extend Password สำเร็จ', confirmButtonText: 'ตกลง' });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err?.error?.message ?? 'ลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง',
+        });
+      },
+    });
+  }
+
+  async toggleLock(emp: any) {
+    const info = this.adInfoMap[emp.adUser];
+    const isLocked = info?.IsLocked === 'Locked';
+    const actionTh = isLocked ? 'ปลดล็อก' : 'ล็อก';
+
+    const result = await Swal.fire({
+      title: `ยืนยันการ${actionTh} User?`,
+      text: `AD User: ${emp.adUser}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    });
+    if (!result.isConfirmed) return;
+
+    const api$ = isLocked
+      ? this.empAdService.unlockUser(emp.adUser)
+      : this.empAdService.lockUserAccount(emp.adUser);
+
+    api$.subscribe({
+      next: () => {
+        this.adInfoMap = {
+          ...this.adInfoMap,
+          [emp.adUser]: { ...info, IsLocked: isLocked ? 'Unlocked' : 'Locked' },
+        };
+        this.cdr.detectChanges();
+        Swal.fire({ icon: 'success', title: `${actionTh}สำเร็จ`, confirmButtonText: 'ตกลง' });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: err?.error?.message ?? 'ลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง',
+        });
+      },
+    });
+  }
+
+  confirmEdit() {
+    if (!this.editEmp) return;
+
+    const emp = this.editEmp;
+    const payload = {
+      codeMpId:    emp.employeeId,
+      adUser:      this.editAdUser,
+      empTypeId:   emp.empTypeId ?? null,
+      staEmp:      emp.employeeStatus ?? '',
+      firstName:   emp.nameEng1 ?? emp.firstName ?? '',
+      lastName:    emp.nameEng2 ?? emp.lastName ?? '',
+      displayName: `${emp.nameThai1 ?? ''} ${emp.nameThai2 ?? ''}`.trim(),
+      email:       emp.email ?? '',
+      jobTitle:    emp.position ?? '',
+      department:  emp.department ?? '',
+      company:     emp.companyCode ?? '',
+      description: '',
+      adUserOld:   emp.adUser ?? '',
+    };
+
+    this.empAdService.updateEmployeeX1(payload).subscribe({
+      next: () => {
+        this.closeEdit();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'อัปเดตสำเร็จ',
+            text: `อัปเดต AD User สำหรับ ${payload.codeMpId} เรียบร้อยแล้ว`,
+            confirmButtonText: 'ตกลง',
+          }).then(() => this.loadData(this.currentPage + 1, this.pageSize));
+        }, 300);
+      },
+      error: (err) => {
+        this.closeEdit();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: err?.error?.message ?? 'ไม่สามารถอัปเดตข้อมูลได้ กรุณาลองใหม่',
+            confirmButtonText: 'ตกลง',
+          });
+        }, 300);
+      },
+    });
+  }
+
   goToPage(page: number) {
     this.currentPage = page;
     this.loadData(page + 1, this.pageSize);
@@ -219,6 +456,7 @@ export class EmpployeeAdManagement {
       nickname: item.Nickname ?? item.nickname ?? '',
       employeeType: item.EmployeeType ?? '',
       employeeStatus: item.EmployeeStatus ?? '',
+      empTypeId: item.EmpTypeID ?? null,
     };
   }
 
@@ -251,6 +489,7 @@ export class EmpployeeAdManagement {
 
           this.isLoading = false;
           this.cdr.detectChanges();
+          this.loadAdInfo(this.employees);
         },
         error: () => {
           this.isLoading = false;
