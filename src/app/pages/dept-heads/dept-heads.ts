@@ -160,6 +160,30 @@ export class DeptHeadsComponent implements OnInit {
     this.currentPage.set(0);
   }
 
+  getMatchingEmployees(dept: DeptHeadItem): DeptEmployee[] {
+    const text = this.appliedText().toLowerCase().trim();
+    if (!text) return [];
+    return dept.employees.filter(
+      (e) =>
+        e.emp_name.toLowerCase().includes(text) ||
+        e.emp_code.toLowerCase().includes(text) ||
+        (e.nickname ?? '').toLowerCase().includes(text),
+    );
+  }
+
+  modalEmployees = computed(() => {
+    const dept = this.selectedDept();
+    if (!dept) return [];
+    const text = this.appliedText().toLowerCase().trim();
+    if (!text) return dept.employees;
+    return dept.employees.filter(
+      (e) =>
+        e.emp_name.toLowerCase().includes(text) ||
+        e.emp_code.toLowerCase().includes(text) ||
+        (e.nickname ?? '').toLowerCase().includes(text),
+    );
+  });
+
   openDetail(dept: DeptHeadItem) {
     this.selectedDept.set(dept);
   }
@@ -168,8 +192,11 @@ export class DeptHeadsComponent implements OnInit {
     this.selectedDept.set(null);
   }
 
+  sortedHeads(heads: DeptHeadPerson[]): DeptHeadPerson[] {
+    return [...heads].sort((a, b) => b.level - a.level);
+  }
+
   getLevelLabel(level: number): string {
-    if (level === 1) return 'หัวหน้าตรง';
     return `ระดับ ${level}`;
   }
 }
