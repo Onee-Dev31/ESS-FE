@@ -66,7 +66,7 @@ $col-desc: auto;
         margin-right: 8px;
 
         &:hover {
-          color: color-mix(in srgb, #ffffff, black 20%);
+          color: color.mix(black, #ffffff, 20%);
         }
       }
 
@@ -184,8 +184,8 @@ $col-desc: auto;
       color: var(--danger);
       font-size: $font-size-hint;
       padding: 6px;
-      border: 1px solid color-mix(in srgb, var(--danger), transparent 80%);
-      background: color-mix(in srgb, var(--danger), transparent 90%);
+      border: 1px solid rgba($danger, 0.2);
+      background: rgba($danger, 0.1);
       border-radius: 6px;
       border-left: 4px solid var(--danger);
 
@@ -220,20 +220,20 @@ $col-desc: auto;
           color: var(--text);
 
           &.keep {
-            border: 1px solid color-mix(in srgb, var(--success), transparent 90%);
-            background: color-mix(in srgb, var(--success), transparent 85%);
+            border: 1px solid rgba($success, 0.1);
+            background: rgba($success, 0.15);
 
             i.fa-solid {
-              color: color-mix(in srgb, var(--success), white 10%) !important;
+              color: var(--success) !important;
             }
           }
 
           &.delete {
-            border: 1px solid color-mix(in srgb, var(--danger), transparent 90%);
-            background: color-mix(in srgb, var(--danger), transparent 85%);
+            border: 1px solid rgba($danger, 0.1);
+            background: rgba($danger, 0.15);
 
             i.fa-solid {
-              color: color-mix(in srgb, var(--danger), white 10%) !important;
+              color: var(--danger) !important;
             }
           }
         }
@@ -246,7 +246,7 @@ $col-desc: auto;
         font-size: $font-size-hint;
 
         .total {
-          color: color-mix(in srgb, var(--primary), white 20%) !important;
+          color: var(--primary) !important;
           font-size: $font-size-body;
           font-weight: 900;
         }
@@ -335,7 +335,7 @@ $col-desc: auto;
       z-index: 10;
       text-align: center;
       color: #ffffff;
-      border-top: 1px solid color-mix(in srgb, $primary, black 10%);
+      border-top: 1px solid var(--primary);
     }
 
     .sub-header th {
@@ -443,6 +443,9 @@ $col-desc: auto;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   padding: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 
   .log-card {
     background: $bg-card;
