@@ -89,7 +89,7 @@
         <button class="btn-back-custom" (click)="close()">
           <i class="fas fa-times"></i> ยกเลิก
         </button>
-        <button class="btn-save-custom" (click)="save()">
+        <button class="btn-save-custom" (click)="save()" [disabled]="!noteForm.message?.trim()">
           <i class="fas fa-paper-plane"></i> ส่ง
         </button>
       </div>

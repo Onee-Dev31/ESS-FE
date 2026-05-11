@@ -213,7 +213,11 @@ export class ItService implements OnInit {
 
   private applyStatusChange(ticketId: any, status: string) {
     this.Tickets.update((list) =>
-      list.map((t) => (t.ticketId == ticketId ? { ...t, IT_Status: status, status } : t)),
+      list.map((t) =>
+        t.ticketId == ticketId
+          ? { ...t, IT_Status: status, status: this.getTicketStatus(status) }
+          : t,
+      ),
     );
     this.selectTicket(ticketId); //เพราะต้องเรียก progress ด้านขวา
     // if (this.selectedTicket()?.ticketId == ticketId) {
