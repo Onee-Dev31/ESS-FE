@@ -208,6 +208,13 @@ export const routes: Routes = [
         canActivate: [menuGuard],
       },
       {
+        path: 'dept-heads',
+        loadComponent: () =>
+          import('./pages/dept-heads/dept-heads').then((m) => m.DeptHeadsComponent),
+        canActivate: [menuGuard],
+        data: { animation: 'DeptHeads' },
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

@@ -61,4 +61,8 @@ export class SettingService {
     console.log(payload);
     return this._http.post(`${this.baseUrl}/Master/user-roles`, payload);
   }
+
+  getDeptHeads(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/dept-heads`);
+  }
 }
