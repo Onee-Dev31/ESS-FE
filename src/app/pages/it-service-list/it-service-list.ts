@@ -211,13 +211,20 @@ export class ItService implements OnInit {
       });
   }
 
-  private applyStatusChange(ticketId: any, status: string) {
+  private applyStatusChange(ticketId: any, rawStatus: string) {
+    const [itStatus, typeName] = (rawStatus ?? '').split('|').map((s) => s.trim());
     this.Tickets.update((list) =>
-      list.map((t) =>
-        t.ticketId == ticketId
-          ? { ...t, IT_Status: status, status: this.getTicketStatus(status) }
-          : t,
-      ),
+      list.map((t) => {
+        if (t.ticketId != ticketId) return t;
+        const updated: any = { ...t, IT_Status: itStatus };
+        if (typeName) {
+          updated.ticketType = typeName;
+          updated.status = 'Waiting you';
+        } else {
+          updated.status = this.getTicketStatus(updated);
+        }
+        return updated;
+      }),
     );
     this.selectTicket(ticketId); //เพราะต้องเรียก progress ด้านขวา
     // if (this.selectedTicket()?.ticketId == ticketId) {
@@ -663,6 +670,12 @@ export class ItService implements OnInit {
       return 'Waiting you';
     } else if (ticket.user_status === 'Approved') {
       return 'In Progress';
+    } else if (ticket.IT_Status === 'In Progress') {
+      return 'In Progress';
+    } else if (ticket.IT_Status === 'Hold') {
+      return 'Hold';
+    } else if (ticket.IT_Status === 'Closed') {
+      return 'Closed';
     } else if (ticket.user_status !== 'Approved' && ticket.user_status === 'ReOpened') {
       return 'Re-Opened';
     } else if (ticket.user_status !== 'Approved') {

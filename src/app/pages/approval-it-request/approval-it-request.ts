@@ -24,7 +24,7 @@ import { DialogService } from '../../services/dialog';
 import { LoadingService } from '../../services/loading';
 import { ErrorService } from '../../services/error';
 import { ItServiceService } from '../../services/it-service.service';
-import { APPROVAL_STATUS_TABS } from '../../config/constants';
+import { APPROVAL_STATUS_TABS } from '../../config/approval.config';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 // import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
@@ -110,30 +110,54 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.refresh();
-
     const ticketId = Number(this.route.snapshot.queryParamMap.get('ticketId'));
-    if (ticketId) {
-      this.focusTicket(ticketId);
-    }
+    this.refreshAndFocus(ticketId || null);
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((id) => this.focusTicket(id));
+      .subscribe((id) => this.refreshAndFocus(id));
+
+    this.signalrService
+      .on('NewTicketForApproval')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refresh());
   }
 
-  private focusTicket(ticketId: number) {
-    this.highlightedTicketId.set(ticketId);
-    this.cdr.markForCheck();
-    setTimeout(() => {
-      document
-        .getElementById(`approval-row-${ticketId}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
-    setTimeout(() => {
-      this.highlightedTicketId.set(null);
-      this.cdr.markForCheck();
-    }, 4000);
+  private refreshAndFocus(ticketId: number | null) {
+    this.loadingService.start('approvals-it-list');
+
+    const page = this.listing.currentPage() + 1;
+    const pageSize = this.listing.pageSize();
+    const status = this.listing.filterStatus();
+    const apiStatus = this.STATUS_API_MAP[status] || status;
+    const empNo = this.authService.userData().CODEMPID;
+
+    this.itService
+      .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
+      .subscribe({
+        next: (res) => {
+          const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
+          this.approvals.set(mappedData);
+          this.totalItems.set(res.total);
+          if (res.statusSummary) this.statusCounts.set(res.statusSummary);
+          this.loadingService.stop('approvals-it-list');
+          this.cdr.markForCheck();
+
+          if (ticketId) {
+            setTimeout(() => {
+              this.highlightedTicketId.set(ticketId);
+              this.cdr.markForCheck();
+              document
+                .getElementById(`approval-row-${ticketId}`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setTimeout(() => {
+                this.highlightedTicketId.set(null);
+                this.cdr.markForCheck();
+              }, 4000);
+            }, 100);
+          }
+        },
+      });
   }
 
   refresh() {
@@ -248,9 +272,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   getTabCount(tab: string) {
-    if (tab === 'Referred Back') {
-      tab = 'ReferredBack';
-    }
+    if (tab === 'Referred Back') tab = 'ReferredBack';
     return this.statusCounts()[tab] || 0;
   }
 

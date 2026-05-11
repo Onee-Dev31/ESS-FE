@@ -882,10 +882,16 @@ export class DashboardIT implements OnInit {
 
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
+          const typeNameMap: Record<number, string> = {
+            1: 'แจ้งซ่อม',
+            2: 'แจ้งปัญหา',
+            3: 'ขอใช้บริการ',
+          };
+          const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
           this.signalrService.ticketStatusNotify(
             ticketId,
             ticket?.requesterAduser ?? '',
-            'In Progress',
+            typeName ? `In Progress|${typeName}` : 'In Progress',
           );
 
           this.selectTicket(ticketId);

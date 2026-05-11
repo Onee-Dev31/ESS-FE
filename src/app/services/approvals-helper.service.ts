@@ -188,7 +188,8 @@ export class ApprovalsHelperService {
     if (['Pending', 'Waiting Check', 'New'].includes(s)) return APPROVAL_STATUS.WAITING_CHECK;
     if (['Approved', 'Approve'].includes(s)) return APPROVAL_STATUS.APPROVED;
     if (['Rejected', 'Reject'].includes(s)) return APPROVAL_STATUS.REJECTED;
-    if (['Referred Back', 'Refer Back'].includes(s)) return APPROVAL_STATUS.REFERRED_BACK;
+    if (['Referred Back', 'Refer Back', 'Referred_Back'].includes(s))
+      return APPROVAL_STATUS.REFERRED_BACK;
     if (['Verified', 'Verify', 'Checked'].includes(s)) return APPROVAL_STATUS.VERIFIED;
 
     if (s === APPROVAL_LABELS.TH.WAITING_CHECK) return APPROVAL_STATUS.WAITING_CHECK;
