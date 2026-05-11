@@ -160,5 +160,5 @@ export class StatusColor_text {
 }
 
 export function getStatusLabel(status: string): string {
-  return MAP_LABEL_STATUS[status.toLowerCase()] || status;
+  return MAP_LABEL_STATUS[status?.toLowerCase()] || status;
 }
