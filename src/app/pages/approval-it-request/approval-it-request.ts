@@ -4,10 +4,13 @@ import {
   computed,
   inject,
   OnInit,
+  DestroyRef,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { SignalrService } from '../../services/signalr.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { createAngularTable, getCoreRowModel, SortingState } from '@tanstack/angular-table';
@@ -63,6 +66,9 @@ export class ApprovalItRequestComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private itService = inject(ItServiceService);
+  private route = inject(ActivatedRoute);
+  private signalrService = inject(SignalrService);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-it-list');
   isExporting = this.loadingService.loading('export');
@@ -77,6 +83,7 @@ export class ApprovalItRequestComponent implements OnInit {
 
   approvals = signal<ApprovalItem[]>([]);
   sorting = signal<SortingState>([{ id: 'requestNo', desc: true }]);
+  highlightedTicketId = signal<number | null>(null);
 
   statusCounts = signal<any>({
     Pending: 0,
@@ -104,6 +111,29 @@ export class ApprovalItRequestComponent implements OnInit {
 
   ngOnInit() {
     this.refresh();
+
+    const ticketId = Number(this.route.snapshot.queryParamMap.get('ticketId'));
+    if (ticketId) {
+      this.focusTicket(ticketId);
+    }
+
+    this.signalrService.ticketFocusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((id) => this.focusTicket(id));
+  }
+
+  private focusTicket(ticketId: number) {
+    this.highlightedTicketId.set(ticketId);
+    this.cdr.markForCheck();
+    setTimeout(() => {
+      document
+        .getElementById(`approval-row-${ticketId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+    setTimeout(() => {
+      this.highlightedTicketId.set(null);
+      this.cdr.markForCheck();
+    }, 4000);
   }
 
   refresh() {

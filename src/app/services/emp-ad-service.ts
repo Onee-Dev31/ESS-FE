@@ -37,4 +37,24 @@ export class EmpAdService {
 
     return this._http.get(`${this.baseUrl}/Employee/GetEmployees`, { params: httpParams });
   }
+
+  getEmployeeDetails(codeEmpId: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Employee/GetEmployeeDetails/${codeEmpId}`);
+  }
+
+  getEmployeeFloors(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/EmployeeFloor/GetEmployeeFloors`);
+  }
+
+  getJobPositions(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/JobPosition`);
+  }
+
+  getEmployeeStatuses(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/EmployeeStatus/GetEmployeeStatus`);
+  }
+
+  getEmployeeBasicInfo(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/Employee/GetEmployeeBasicInfo`);
+  }
 }

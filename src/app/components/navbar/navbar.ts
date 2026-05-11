@@ -119,7 +119,8 @@ export class NavbarComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
-          const message = data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign แล้ว`;
+          const message =
+            data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign ให้คุณแล้ว`;
 
           const newNoti: NotificationItem = {
             id: Date.now(),
@@ -132,6 +133,39 @@ export class NavbarComponent {
           };
 
           this.notifications.update((list) => [newNoti, ...list]);
+          if (!document.hidden) {
+            this.toastService.info(message);
+            this.notifyAudio.currentTime = 0;
+            this.notifyAudio.play().catch(() => {});
+          }
+        });
+      });
+
+    this.signalrService
+      .on('NewTicketForApproval')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.zone.run(() => {
+          const message = data.message || 'มี Ticket ใหม่รอการอนุมัติ';
+
+          if (this.isItRole()) {
+            // IT staff: list ถูก manage โดย fetchUnreadTickets อยู่แล้ว ไม่ push in-memory ซ้ำ
+            this.fetchUnreadCount();
+            this.fetchUnreadTickets();
+          } else {
+            const newNoti: NotificationItem = {
+              id: Date.now(),
+              title: 'มี Ticket รออนุมัติ',
+              message,
+              status: 'pending',
+              time: 'เมื่อสักครู่',
+              route: '/approval-it-request',
+              ticketNumber: data.ticketNumber ?? undefined,
+            };
+            this.notifications.update((list) => [newNoti, ...list]);
+            this.unreadTicketCount.update((n) => n + 1);
+          }
+
           if (!document.hidden) {
             this.toastService.info(message);
             this.notifyAudio.currentTime = 0;
@@ -177,22 +211,12 @@ export class NavbarComponent {
       this.signalrService
         .on('NewTicket')
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() =>
-          this.zone.run(() => {
-            this.fetchUnreadCount();
-            this.fetchUnreadTickets();
-          }),
-        );
+        .subscribe(() => this.zone.run(() => this.unreadTicketCount.update((n) => n + 1)));
 
       this.signalrService
         .on('TicketAssigned')
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() =>
-          this.zone.run(() => {
-            this.fetchUnreadCount();
-            this.fetchUnreadTickets();
-          }),
-        );
+        .subscribe(() => this.zone.run(() => this.unreadTicketCount.update((n) => n + 1)));
 
       this.signalrService.ticketReadTrigger
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -228,14 +252,29 @@ export class NavbarComponent {
     if (!codeempid) return;
     this.itService.getUnreadTickets(codeempid, this.authService.userRole() ?? undefined).subscribe({
       next: (res: any) => {
-        const list: any[] = Array.isArray(res) ? res : (res?.data ?? res?.tickets ?? []);
+        const raw: any[] = Array.isArray(res) ? res : (res?.data ?? res?.tickets ?? []);
+        // ticketTypeId=3 ที่ยังไม่ Approved → เห็นเฉพาะ approver เท่านั้น
+        const list = raw.filter((t: any) => {
+          const typeId = Number(t.ticket_type_id ?? t.ticketTypeId);
+          if (typeId === 3) {
+            const approvalStatus = String(
+              t.approval_status ?? t.approvalStatus ?? '',
+            ).toLowerCase();
+            if (approvalStatus === 'approved') return false;
+            return (t.approver_codeempid ?? t.approverCodeempid) === codeempid;
+          }
+          return true;
+        });
         const items: NotificationItem[] = list.map((t: any) => ({
           id: t.id ?? t.ticketId,
           title: t.ticket_number ?? t.ticketNumber ?? 'Ticket',
           message: t.subject ?? '',
           status: this.mapTicketStatus(t.user_status ?? t.status),
           time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
-          route: '/it-dashboard',
+          route:
+            Number(t.ticket_type_id ?? t.ticketTypeId) === 3
+              ? '/approval-it-request'
+              : '/it-dashboard',
           readTicketId: t.id ?? t.ticketId,
           ticketId: t.id ?? t.ticketId,
           ticketNumber: t.ticket_number ?? t.ticketNumber,

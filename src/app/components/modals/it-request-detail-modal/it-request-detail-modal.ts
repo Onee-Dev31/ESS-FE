@@ -17,6 +17,7 @@ import { STORAGE_KEYS } from '../../../constants/storage.constants';
 import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
 import { formatText } from '../../../utils/formatText';
+import { SignalrService } from '../../../services/signalr.service';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -32,6 +33,7 @@ export class ItRequestDetailModal {
   private authService = inject(AuthService);
   private swalService = inject(SwalService);
   private itServiceService = inject(ItServiceService);
+  private signalrService = inject(SignalrService);
   formatText = formatText;
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
@@ -259,12 +261,9 @@ export class ItRequestDetailModal {
         // console.log(res)
 
         if (res.success) {
-          const msg =
-            command === 'Rejected'
-              ? 'ปฏิเสธคำขอเรียบร้อยแล้ว'
-              : command === 'Referred_Back'
-                ? 'ส่งกลับคำขอเรียบร้อยแล้ว'
-                : 'อนุมัติคำขอเรียบร้อยแล้ว';
+          if (command === 'Approved') {
+            this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
+          }
           this.swalService.success(res.message);
         }
 

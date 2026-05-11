@@ -23,6 +23,7 @@ import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
 import { ExampleServiceRequestModal } from '../../components/modals/example-service-request-modal/example-service-request-modal';
+import { SignalrService } from '../../services/signalr.service';
 
 @Component({
   selector: 'app-it-service-request',
@@ -47,6 +48,7 @@ export class ITServiceRequestComponent implements OnInit {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private signalrService = inject(SignalrService);
 
   @ViewChild('detailTextarea') detailTextarea!: ElementRef;
 
@@ -393,7 +395,7 @@ export class ITServiceRequestComponent implements OnInit {
       formData.append('serviceTypeIds', service.id.toString());
     });
 
-    console.log('formData', [...formData.entries()]);
+    // console.log('formData', [...formData.entries()]);
 
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService
@@ -405,9 +407,13 @@ export class ITServiceRequestComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          // console.log(res);
+          // console.log('[createTicket res]', res);
           if (res.success) {
-            // this.signalrService.sendTestRealtime()
+            const codeEmpId = this.authService.userData().CODEMPID;
+            // console.log('[ticketApprovalNotify]', { codeEmpId, ticketNumber: res.ticketNumber });
+            if (codeEmpId) {
+              this.signalrService.ticketApprovalNotify(codeEmpId, res.ticketNumber);
+            }
             this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
               this.clearForm();
               this.router.navigate(['/it-service-list']);
@@ -557,10 +563,10 @@ export class ITServiceRequestComponent implements OnInit {
   getDetailFromJobsByApplicantId(id: string) {
     this.itServiceService.getDetailFromJobsByApplicant(id).subscribe({
       next: (res) => {
-        console.log('getDetailFromJobsByApplicantId', res);
+        // console.log('getDetailFromJobsByApplicantId', res);
         this.detailJobs = res;
         const data = res[0];
-        console.log('data : ', data);
+        // console.log('data : ', data);
         this.openforOneejob = data
           ? `${data.FirstNameThai} ${data.LastNameThai} (พนักงานใหม่)`
           : '';

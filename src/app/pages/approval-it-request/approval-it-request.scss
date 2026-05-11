@@ -161,6 +161,23 @@ $border: var(--border);
       &:not(:last-child) td:not(.merged-col) {
         border-bottom: none;
       }
+
+      &.highlighted-row td {
+        background: color.adjust(#f59e0b, $alpha: -0.8) !important;
+        animation: highlight-fade 4s ease forwards;
+      }
+    }
+
+    @keyframes highlight-fade {
+      0% {
+        background-color: rgba(245, 158, 11, 0.25);
+      }
+      80% {
+        background-color: rgba(245, 158, 11, 0.15);
+      }
+      100% {
+        background-color: transparent;
+      }
     }
 
     td {
