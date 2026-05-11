@@ -1,0 +1,50 @@
+/*
+* ==========================================================
+*     SPINKIT PRELOADERS
+* ==========================================================
+*/
+
+$spinkit-spinner-margin: 0 !default;
+$spinkit-size: 40px !default;
+$spinkit-spinner-color: $primary !default; 
+
+/*
+* ==========================================================
+*     PRELOADERS
+* ==========================================================
+*/
+
+.spinner-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transition: all .5s ease-in-out;
+  background-color: $white;
+  z-index: 999999;
+  &.opacity-0 {
+    visibility: hidden;
+  }
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px !important;
+  margin-left: -20px !important;
+}
+
+@import
+  "spinners/1-rotating-plane",
+  "spinners/2-double-bounce",
+  "spinners/3-wave",
+  "spinners/4-wandering-cubes",
+  "spinners/5-pulse",
+  "spinners/6-chasing-dots",
+  "spinners/7-three-bounce",
+  "spinners/8-circle",
+  "spinners/9-cube-grid",
+  "spinners/10-fading-circle",
+  "spinners/11-folding-cube";

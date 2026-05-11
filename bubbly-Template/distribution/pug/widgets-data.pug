@@ -1,0 +1,393 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var widgets = true;
+    - var current = 'widgets-data.html';   
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Widgets - Data'}) 
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Data Widgets') 
+
+    include _pug-includes/inc-datatable-data.pug
+
+    include _pug-includes/inc-post-data.pug
+    
+    include _pug-includes/inc-countries-data.pug
+
+    include _pug-includes/inc-products-data.pug
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-data-tickets.pug
+
+    include _pug-includes/inc-data-widget.pug
+
+    section
+
+        .row 
+            // <Recent Tickets>
+            .col-lg-6.mb-4 
+                .card.card-table.h-100
+                    .card-header
+                        h5.card-heading  Recent Tickets
+                        +cardOptions
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.table-borderless
+                                thead
+                                    tr
+                                        th Status
+                                        th(style="min-width: 180px;") Subject
+                                        th Department
+                                        th Date
+                                tbody
+                                    each val, index in tickets
+
+                                        - badgeIndex  = index % badges.length
+                                        tr
+                                            td
+                                                span.badge(class=badges[badgeIndex].badgeClass) #{badges[badgeIndex].title}
+                                            td.fw-bold #{val.title}
+                                            td.text-muted.text-sm #{val.department}
+                                            td.text-muted.text-sm #{val.updated}
+            // </Recent Tickets>
+            // <Latest Posts>
+            .col-lg-6.mb-4
+                .card.h-100
+                    .card-header
+                        h5.card-heading  Latest Posts
+                        +cardOptions
+                    .card-body
+                        each val, index in dataTable
+                            if index < 4
+
+                                - imageIndex = index % imageCount;
+                                - categoryIndex = index % categoryCount;
+                                - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+
+                                .row(class=`${index != 3 ? 'mb-3' : ''}`)
+                                    .col-auto.pe-0
+                                        a(href='#!')
+                                            img.img-fluid.rounded(src=path + 'img/photos/w-100/' + images[imageIndex], alt=val.company, width="100")
+                                    .col
+                                        a.text-decoration-none(href='#!')
+                                            h6 #{val.company}
+                                        p.text-sm.mb-1
+                                            i.fas.fa-portrait.me-1
+                                            | #{val.person} | #{categories[categoryIndex].name}
+                                        p.text-muted.text-sm.mb-0 #{dummyText[index].substr(0,40)}
+                        
+                    .card-footer.text-end
+                        a.btn.btn-primary(href='#!') View all posts    
+            // </Latest Posts>
+
+
+        .row 
+            // <Projects Table>
+            .col-lg-8.mb-4
+                .card.card-table.h-100
+                    .card-header
+                        h5.card-heading Projects
+                        +cardOptions
+                        
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.mb-0
+                                thead
+                                    tr
+                                        th Assigned 
+                                        th Name
+                                        th Due 
+                                        th.text-end Priority
+                                tbody.align-middle
+                                    each val, index in dataTable
+                                        if (index < 6)
+                                            tr
+                                                td 
+                                                    span.d-flex.align-items-center
+                                                        img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                                        span.d-inline-block
+                                                            strong #{val.person}
+                                                            br
+                                                            span.text-muted.text-sm #{val.city}
+                                                td #{val.company}
+                                                td January 25
+
+                                                - badgeIndex  = index % badges.length
+
+                                                td.text-end
+                                                    span.badge(class=badges[badgeIndex].badgeClass) #{badges[badgeIndex].priority}
+                                    
+                    .card-footer.text-end
+                        a.btn.btn-primary(href='#!') View all projects
+            // </Projects Table>
+            // <Team Members>
+            .col-lg-4.mb-4
+                .card.h-100
+                    .card-header
+                        h5.card-heading  Team Members
+                        +cardOptions
+                    .card-body.pb-2
+                        each val, index in dataTable
+                            if (index < 7)                    
+                                .d-flex.align-items-center.mb-3
+                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                    .mt-1
+                                       a.text-dark.fw-bold.text-decoration-none(href='#!') #{val.person}
+                                       p.text-muted.text-sm.mb-0 #{val.company}
+                        
+                    .card-footer.text-end
+                        a.btn.btn-primary(href='#!') View all people
+            // </Team Members>
+
+        .row 
+            // <To-do List>
+            .col-lg-6.mb-4 
+                - todos = ['Edit article', 'Upload new tutorial', 'Send PayPal payments', 'New post on Facebook', 'Pay coworking space', 'Contact John', 'Inbox Zero']
+                .card.h-100
+                    .card-header
+                        h5.card-heading To Do List
+                        +cardOptions
+                        
+                    .card-body.pb-0
+                        each val, index in todos 
+                            .todo.mb-3.card-text 
+                                .d-inline-block
+                                    .form-check
+                                        if (index % 4 == 0)
+                                            input.form-check-input(type='checkbox', id = 'todo' + index, checked)
+                                        else 
+                                            input.form-check-input(type='checkbox', id = 'todo' + index)
+                                        label.form-check-label(for='todo' + index) #{val}
+                                .float-end
+                                    a(href='#!')
+                                        i.far.fa-trash-alt
+                    .card-footer.pt-0.pb-4.bg-white
+                        .input-group
+                            input.form-control(type='text' placeholder='Add Task' autocomplete='off')
+                            button.btn.btn-primary(type='button')
+                                i.fas.fa-plus
+            // </To-do List>
+
+            // <Projects Widget>
+            .col-lg-6.mb-4 
+                .card.h-100
+                    .card-header
+                        h5.card-heading Projects
+                        +cardOptions
+                                            
+                    .card-body.pb-0
+                        each val, index in projects
+                            if index < 3
+                                p.mb-2
+                                    strong #{val.title} 
+                                    span.float-end.text-gray-500.text-sm #{val.info} 
+                                p.mb-3.card-text
+                                    each _, i in Array(val.avatars)
+                                        img.avatar.avatar-sm.avatar-stacked.p-1(src=`${path}img/avatar-${i + index}.jpg`, alt='User',  data-bs-toggle='tooltip' data-placement='top' title=dataTable[i].person)
+
+                    .card-footer.pt-0.pb-4.bg-white
+                        .input-group
+                            input.form-control(type='text' placeholder='Quickly Add New Project' autocomplete='off')
+                            button.btn.btn-primary(type='button')
+                                i.fas.fa-plus
+            // </Projects Widget>
+                        
+
+            .col-12
+                .card.card-table.mb-4
+                    .card-header
+                        h5.card-heading  Active Tickets
+                        +cardOptions
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.table-borderless.align-middle.mb-0
+                                thead
+                                    tr
+                                        th
+                                            .position-relative.form-check.mb-0(style="top:2px;")
+                                                input#activeCheckAll.form-check-input(type='checkbox' value='')
+                                                label.form-check-label(for='activeCheckAll') Due
+                                        th(style="min-width: 200px;") User
+                                        th(style="min-width: 400px;") Description
+                                tbody
+                                    each val, index in tickets
+                                        if (index < 5)
+                                            tr
+                                                td
+                                                    .form-check
+                                                        input.form-check-input(type='checkbox' value='' id='ticketCheck'+index)
+                                                        label.form-check-label(for='ticketCheck'+index)
+                                                            strong #{val.updated2}
+                                                            span.text-muted &nbsp;#{val.updated2Subtitle}
+                                                td
+                                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=dataTable[index].person)
+                                                    span.d-inline-block.mb-0 #{dataTable[index].person}
+                                                td
+                                                    strong [##{index + 2568}]  #{val.title}
+                                                    p.text-muted.text-sm.mb-0 #{dummyText[index].substr(0,100)}
+                                    
+                    .card-footer.text-end
+                        a.btn.btn-primary(href='#!') View all tickets
+
+        .row 
+            .col-lg-6.mb-4 
+                .card.card-table.h-100
+                    .card-header
+                        h5.card-heading  Latest Customers
+                        +cardOptions
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.table-borderless.mb-0
+                                thead
+                                    tr
+                                        th
+                                        th Country
+                                        th Name
+                                        th.text-end Orders
+                                tbody
+
+                                    - var countriesToInclude = ['cz', 'us', 'sk', 'de', 'in', 'th', 'at', 'es', 'gb']
+
+                                    each val, index in dataTable
+                                        if index < 8         
+                                            - var countryCode = countriesToInclude[index];
+
+                                            each countryVal in countries 
+                                                if (countryVal.code.toLowerCase() == countryCode.toLowerCase())
+                                                    - countryName = countryVal.name;
+
+                                            tr
+                                                td
+                                                    img.img-fluid(src=path + 'img/flag/' + countryCode + '.svg', alt=countryName, width="30", style="min-width: 30px;")
+                                                td #{countryName}
+                                                td #{val.person}
+                                                td.text-end #{val.orders + 2}
+                    .card-footer.text-end
+                        a.btn.btn-outline-primary(href='#!') See all customers
+
+            .col-lg-6.mb-4
+                // Feed Widget Start
+                .card.card-table.h-100
+                    .card-header
+                        h5.card-heading  Feed
+                        +cardOptions
+                    .card-body.py-3
+                        table.table.table-borderless.table-hover.mb-0
+                            - feedIcons = []
+                            - feedIcons.push({icon: 'fab fa-twitter', bg: 'indigo-light',  color: 'indigo'})
+                            - feedIcons.push({icon: 'fas fa-envelope', bg: 'green-light', color: 'green'})
+                            - feedIcons.push({icon: 'fas fa-upload', bg: 'gray-200', color: 'dark'})
+                            - feedIcons.push({icon: 'fab fa-facebook', bg: 'blue-light', color: 'blue'})
+
+                            tbody.align-middle
+                                each val, index in tickets
+
+                                    - feedIndex = index % feedIcons.length;
+
+                                    tr
+                                        td.position-relative
+                                            .icon.icon-sm.float-start.me-2(class=`bg-${feedIcons[feedIndex].bg} text-${feedIcons[feedIndex].color}`)
+                                                i(class=feedIcons[feedIndex].icon)
+                                            strong.d-inline-block.mt-1.text-gray-700 #{val.title}
+                                            a.stretched-link(href="#!")
+                                        td.position-relative
+                                            span.text-muted.text-sm.float-end #{val.updated}
+                                            a.stretched-link(href="#!")
+                                        
+                     
+                    .card-footer.d-grid.p-0.overflow-hidden
+                        a.btn.btn-primary.py-3.text-uppercase.rounded-0(href='#!') See All Updates
+                // Feed Widget End
+
+        .card.card-table.mb-4
+            .card-header
+                h5.card-heading  Products
+                +cardOptions
+            .card-body
+                .table-responsive
+                    table.table.table-hover.table-borderless.mb-0
+                        thead
+                            tr
+                                th Product Id
+                                th(style='min-width: 300px;') Name
+                                th Price
+                                th In Stock
+                                th Last Ordered
+                                th Status
+                                th Action
+                        tbody
+                            each val, index in products
+                                if (index < 6)
+                                    - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                    - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                    tr.align-middle
+                                        td ##{index + 2568}
+                                        td 
+                                            img.card-table-img.img-fluid.me-3(src='img/product/' + val.img, alt='', width='80')
+                                            a.text-reset.text-decoration-none(href='#!')
+                                                strong #{val.title}
+                                        td #{val.price}
+                                        td #{index + 43}
+                                        td.text-muted 2021/#{month}/#{day}
+                                        td
+                                            if (val.badge != '')
+                                                label.badge(class='badge-' + val.badge) #{val.badgeContent}
+                                        td
+                                            a(href='#!').me-3.text-lg.text-success
+                                                i.far.fa-edit
+
+                                            a(href='#!').text-lg.text-danger
+                                                i.far.fa-trash-alt
+                           
+            .card-footer.text-end
+                a.btn.btn-outline-dark(href='#!') See all orders
+
+        .card.card-table.mb-4
+            .card-header
+                h5.card-heading  Orders
+                +cardOptions
+            .card-body
+                .table-responsive
+                    table.table.table-hover.mb-0
+                        thead
+                            tr
+                                th Order Id
+                                th Name
+                                th Date
+                                th Total Price
+                                th Status
+                                th.text-end Review
+                        tbody
+                            each val, index in dataTable
+                                if (index < 10)
+                                    - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                    - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                    - price = Math.floor((Math.random() * 90) + 1) + Math.random().toFixed(2);
+                                    - badgeIndex  = index % badges.length
+
+                                    tr.align-middle
+                                        td ##{index + 2458}
+                                        td 
+                                            strong #{val.person}
+                                            br
+                                            span.text-muted.text-sm #{val.email}
+                                        td 2021/#{month}/#{day}
+                                        td $#{price}
+                                        td
+                                            span.badge(class=badges[badgeIndex].badgeClass) #{badges[badgeIndex].title}
+                                        td.text-end(style="min-width: 125px;")
+                                            a(href='#!')
+                                                i.fa.fa-star.text-warning
+                                            a(href='#!')
+                                                i.fa.fa-star.text-warning
+                                            a(href='#!')
+                                                i.fa.fa-star.text-warning
+                                            a(href='#!')
+                                                i.fa.fa-star.text-warning
+                                            a(href='#!')
+                                                i.fa.fa-star.text-gray-500

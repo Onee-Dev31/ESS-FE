@@ -1,0 +1,28 @@
+/*
+* ==========================================================
+*     Page
+* ==========================================================
+*/
+
+
+.page-holder {
+    display: flex;
+    overflow-x: hidden;
+    width: 100%;
+    min-height: calc(100vh - #{$navbarHeight});
+    padding-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.page-header {
+    margin-bottom: 3rem;
+}
+
+.page-heading {
+    @include uppercase;
+    font-weight: 300;
+}
+
+.page-breadcrumb {
+    margin-bottom: 2rem;
+}

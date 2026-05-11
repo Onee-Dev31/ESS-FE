@@ -1,0 +1,34 @@
+extends ../_pug-includes/layout
+
+block vars
+    - var path = '../'    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: '../index.html'})
+    - breadcrumbs.push({name: 'Documentation', link: 'introduction.html'})
+    - breadcrumbs.push({name: 'Introduction'})
+    - var heroHeading = 'Docs - Introduction'
+    - var current = 'docs/introduction.html'
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader(heroHeading) 
+
+    section.mb-5 
+        .row
+            .col-xl-10
+                .card
+                    .card-header
+                    .card-body
+                            p Hey, welcome to the <strong>Bubbly Theme official documentation</strong>. 
+                            p If you own a theme’s license already, thank you very much for purchasing! If not yet, you can <a href="https://themes.getbootstrap.com/product/bubbly-cms-dashboard-theme/">buy the theme’s license here</a>.
+                            p This documentation is to help you with template’s customization. Basic HTML and CSS knowledge is required to customize this template. 
+
+                            hr.bg-gray-600.my-5
+
+                            h5.text-uppercase.mb-5 Theme info
+
+                            p <span class="text-uppercase text-muted">Item Name:</span> Bubbly
+                            p <span class="text-uppercase text-muted">Author:</span> Bootstrapious
+                            p.card-text <span class="text-uppercase text-muted">Contact email for support & pre-sale questions: </span>
+                                a.text-dark(href='mailto:hello@bootstrapious.com') hello@bootstrapious.com

@@ -1,0 +1,308 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var forms = true;
+    - var current = 'forms.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Forms'})   
+
+block content
+              
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Forms') 
+
+    section
+        .row
+            // Basic Form
+            .col-lg-6.mb-5
+                .card
+                    .card-header
+                        h4.card-heading Basic Form
+                    .card-body
+                        p Lorem ipsum dolor sit amet consectetur.
+                        form
+                            .mb-3
+                                label.form-label.text-uppercase Email
+                                input.form-control(type='email', placeholder='Email Address')
+                            .mb-3        
+                                label.form-label.text-uppercase Password
+                                input.form-control(type='password', placeholder='Password')
+                            .mb-3        
+                                button.btn.btn-primary(type='submit') Log in
+                                    
+            // Horizontal Form
+            .col-lg-6.mb-5
+                .card
+                    .card-header
+                        h4.card-heading Horizontal Form
+                    .card-body
+                        p Lorem ipsum dolor sit amet consectetur.
+                        form.form-horizontal
+                            .row.mb-3
+                                label.col-md-3.form-label Email
+                                .col-md-9
+                                    input#inputHorizontalSuccess.form-control.form-control-success(type='email', placeholder='Email Address')
+                                    small.form-text.text-muted.ms-3 Example help text that remains unchanged.
+                                    
+                            .row.mb-3
+                                label.col-sm-3.form-label Password
+                                .col-md-9
+                                    input#inputHorizontalWarning.form-control.form-control-warning(type='password', placeholder='Pasword')
+                                    small.form-text.text-muted.ms-3 Example help text that remains unchanged.
+                                    
+                            .row.mb-3
+                                .col-md-9.ms-auto
+                                    input.btn.btn-primary(type='submit', value='Signin')
+                
+                        
+            // Inline Form
+            .col-lg-8.mb-5                            
+                .card
+                    .card-header
+                        h4.card-heading Inline Form
+                    .card-body
+                        form.row.row-cols-lg-auto.g-3.align-items-center
+                            .col-12
+                                input.form-control(type='text', placeholder='Username')
+                                label.visually-hidden(for='inlineFormInputGroupUsername2') Username
+                            .col-12
+                                .input-group
+                                    span.input-group-text @
+                                    input#inlineFormInputGroupUsername2.form-control(type='text', placeholder='Email')       
+                            .col-12
+                                .form-check
+                                    input#inlineFormCheck.form-check-input(type='checkbox')
+                                    label.form-check-label(for='inlineFormCheck')
+                                        | Remember me
+                            .col-12
+                                button.btn.btn-primary(type='submit') Submit
+
+            .col-lg-6.mb-5
+                .card
+                    .card-header
+                        h4.card-heading Inputs with floating labels
+                    .card-body
+                        form    
+                            .form-floating.mb-3
+                                input#floatingInput.form-control(type='email' placeholder='name@example.com')
+                                label(for='floatingInput') Email address
+                            .form-floating.mb-3
+                                input#floatingPassword.form-control(type='password' placeholder='Password')
+                                label(for='floatingPassword') Password
+                            button.btn.btn-outline-primary(type='submit') Submit
+
+                            
+            // Modal Form
+            .col-lg-4.mb-5
+                .card
+                    .card-header
+                        h4.card-heading Modal Form
+                    .card-body
+                        button.btn.btn-primary(type='button', data-bs-toggle='modal', data-bs-target='#myModal')
+                            | Form in a simple modal 
+                        
+                        // Modal
+                        #myModal.modal.fade.text-start(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+                            .modal-dialog(role='document')
+                                .modal-content
+                                    .modal-header.border-0.bg-gray-100
+                                        h3.h5.text-uppercase.modal-title#exampleModalLabel Signin Modal
+                                        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                                    .modal-body
+                                        p Lorem ipsum dolor sit amet consectetur.
+                                        form
+                                            .mb-3
+                                                label Email
+                                                input.form-control(type='email', placeholder='Email Address')
+                                            .mb-3        
+                                                label Password
+                                                input.form-control(type='password', placeholder='Password')
+
+                                    .modal-footer.border-0.bg-gray-100
+                                        button.btn.btn-secondary(type='button', data-bs-dismiss='modal') Close
+                                        button.btn.btn-primary(type='button') Save changes
+                                                    
+            
+            // Form Elements 
+            .col-lg-12.mb-5
+                .card
+                    .card-header
+                        h4.card-heading All form elements
+                    .card-body
+                        form.form-horizontal
+                            .row
+                                label.col-md-3.form-label Normal
+                                .col-md-9
+                                    input.form-control(type='text')
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Help text
+                                .col-md-9
+                                    input.form-control(type='text')
+                                    small.form-text.text-muted A block of help text that breaks onto a new line and may extend beyond one line.
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Password
+                                .col-md-9
+                                    input.form-control(type='password', name='password')
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Placeholder
+                                .col-md-9
+                                    input.form-control(type='text', placeholder='placeholder')
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Ranges
+                                .col-md-9
+                                    label(for='formControlRange') Example Range
+                                    input#formControlRange.form-range(type='range')
+                                    
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Disabled
+                                .col-md-9
+                                    input.form-control(type='text', disabled='', placeholder='Disabled input here...')
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Inline checkboxes
+                                .col-md-9
+                                    label.checkbox-inline
+                                        input#inlineCheckbox1(type='checkbox', value='option1')
+                                        |  a
+                                    label.checkbox-inline
+                                        input#inlineCheckbox2(type='checkbox', value='option2')
+                                        |  b
+                                    label.checkbox-inline
+                                        input#inlineCheckbox3(type='checkbox', value='option3')
+                                        |  c
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label
+                                    | Checkboxes &amp; radios 
+                                    br
+                                    small.text-primary Bootstrap 5 custom controls
+                                .col-md-9
+                                    .form-check.mb-4
+                                        input#customCheck1.form-check-input(type='checkbox')
+                                        label.custom-control-label(for='customCheck1') Check this custom checkbox
+                                    .form-check
+                                        input#customRadioInline1.form-check-input(type='radio', name='customRadioInline1')
+                                        label.custom-control-label(for='customRadioInline1') Toggle this custom radio
+                                    .form-check
+                                        input#customRadioInline2.form-check-input(type='radio', name='customRadioInline1')
+                                        label.custom-control-label(for='customRadioInline2') Or toggle this other custom radio
+
+                                        
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Select
+                                .col-md-9.select.mb-3
+                                    select.form-control(name='account')
+                                        option option 1
+                                        option option 2
+                                        option option 3
+                                        option option 4
+                                .col-md-9.ms-auto.select
+                                    select.form-control.rounded(multiple='')
+                                        option option 1
+                                        option option 2
+                                        option option 3
+                                        option option 4
+                            hr.bg-gray-400.my-4
+                            .row.has-success
+                                label.col-sm-3.form-label Input with success
+                                .col-sm-9
+                                    input.form-control.is-valid(type='text')
+                            hr.bg-gray-400.my-4
+                            .row.has-danger
+                                label.col-sm-3.form-label Input with error
+                                .col-sm-9
+                                    input.form-control.is-invalid(type='text')
+                                    .invalid-feedback Please provide your name.
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Control sizing
+                                .col-md-9
+                                    .mb-3
+                                        input.form-control.form-control-lg(type='text', placeholder='.input-lg')
+                                    .mb-3
+                                        input.form-control(type='text', placeholder='Default input')
+                                    .mb-3
+                                        input.form-control.form-control-sm(type='text', placeholder='.input-sm')
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Column sizing
+                                .col-md-9
+                                    .row
+                                        .col-md-3
+                                            input.form-control(type='text', placeholder='.col-md-3')
+                                        .col-md-4
+                                            input.form-control(type='text', placeholder='.col-md-4')
+                                        .col-md-5
+                                            input.form-control(type='text', placeholder='.col-md-5')
+                                                
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Input groups
+                                .col-md-9
+                                    .mb-3
+                                        .input-group.mb-3
+                                            span.input-group-text $
+                                            input.form-control(type='text', aria-label='Dollar amount (with dot and two decimal places)')
+
+                                    .mb-3
+                                        .input-group
+                                            input.form-control(type='text', aria-label='Dollar amount (with dot and two decimal places)')
+                                            span.input-group-text $
+
+                                    .mb-3
+                                        .input-group.mb-3
+                                            span.input-group-text $
+                                            input.form-control(type='text', aria-label='Amount (to the nearest dollar)')
+                                            span.input-group-text .00
+
+                                    .mb-3
+                                        .input-group.mb-3
+                                            .input-group-text
+                                                input(type='checkbox', aria-label='Checkbox for following text input')
+                                            input.form-control(type='text', aria-label='Text input with checkbox')
+                                    .mb-3
+                                        .input-group
+                                            .input-group-text
+                                                input(type='radio', aria-label='Radio button for following text input')
+                                            input.form-control(type='text', aria-label='Text input with radio button')
+
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label Button addons
+                                .col-md-9
+                                    .mb-3
+                                        .input-group.mb-3
+                                            button#button-addon1.btn.btn-outline-primary(type='button') Button
+                                            input.form-control(type='text', placeholder='', aria-label='Example text with button addon', aria-describedby='button-addon1')
+
+                                    .mb-3
+                                        .input-group.mb-3
+                                            input.form-control(type='text', placeholder="Recipient's username", aria-label="Recipient's username", aria-describedby='button-addon2')
+                                            button#button-addon2.btn.btn-outline-info(type='button') Button
+
+                            hr.bg-gray-400.my-4
+                            .row
+                                label.col-md-3.form-label With dropdowns
+                                .col-md-9
+                                    .input-group.mb-3
+                                        button.btn.btn-outline-primary.dropdown-toggle(type='button', data-bs-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Dropdown
+                                        .dropdown-menu
+                                            a.dropdown-item(href='#') Action
+                                            a.dropdown-item(href='#') Another action
+                                            a.dropdown-item(href='#') Something else here
+                                            .dropdown-divider(role='separator')
+                                            a.dropdown-item(href='#') Separated link
+                                        input.form-control(type='text', aria-label='Text input with dropdown button')
+
+                            hr.bg-gray-400.my-4
+                            .row
+                                .col-md-9.ms-auto
+                                    button.btn.btn-secondary(type='submit') Cancel
+                                    button.btn.btn-primary(type='submit') Save changes

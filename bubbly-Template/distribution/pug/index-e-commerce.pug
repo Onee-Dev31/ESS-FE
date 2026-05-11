@@ -1,0 +1,211 @@
+extends _pug-includes/layout.pug
+
+
+block vars 
+    - var home = true; 
+    - var current = "index-e-commerce.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'CMS Dashboard'})   
+
+block content
+
+    include _pug-includes/inc-datatable-data.pug
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-products-data.pug
+
+    include _pug-includes/inc-post-data.pug
+
+    include _pug-includes/inc-data-badges.pug
+
+    include _pug-includes/inc-data-tickets.pug
+    
+    include _pug-includes/inc-data-widget.pug
+
+    +pageHeader('E-commerce Dashboard')
+
+    section.mb-3.mb-lg-5
+
+        .card.mb-5
+            .card-body
+                .row.g-5
+                    each val, index in widget1
+                        +widgetStats2(val, index, 'col-md-6 col-xl-3')
+
+        
+        // <Sales>
+        .card.mb-5
+            
+            .card-header.bg-inverse
+                .row.align-items-center
+                    .col 
+                        h5.card-heading Sales by channel
+                    .col-auto
+                        .btn-group
+                            a.btn.btn-sm.btn-outline-light.active(href='#!' aria-current='page') This week
+                            a.btn.btn-sm.btn-outline-light(href='#!') Last week
+
+
+            .card-body
+                .row.align-items-center.mb-5
+                    .col
+                        h3.subtitle.text-gray-500 Total Revenue
+                        .h1.text-primary $19,200
+                        p.mb-0
+                            span.text-muted.me-3 +$2,032 
+                            span.badge.badge-success-light
+                                i.fas.fa-arrow-up.me-2
+                                | 19.5%
+                    .col-auto
+                        .icon.icon-xl.ms-2(class=`bg-primary-light`)
+                                +svgIcon('pay-1', 'text-primary')
+                .row
+                    .col-lg-9.col-xl-10
+                        canvas#barChart
+
+                        ul.mt-4.text-gray-500.list-inline.card-text.text-center
+                            li.list-inline-item 
+                                span.indicator.bg-primary
+                                | Organic Search 
+                            li.list-inline-item
+                                span.indicator(style="background: #d0d2f3") 
+                                | Facebook Ads 
+                    .col-lg-3.col-xl-2.text-end.border-start.d-flex.flex-column.justify-content-between.py-lg-3.py-xxl-5
+                        div
+                            h3.subtitle.text-gray-500.fw-normal Organic Search Revenue
+                            .h4.fw-normal.h1.text-dark $19,200
+                            p.mb-0
+                                span.text-muted.me-2 +$2,123 
+                                span.badge.badge-success-light
+                                    i.fas.fa-arrow-up.me-2
+                                    | 21.3%
+                            
+                        hr.bg-gray-500
+                        div
+                            h3.subtitle.text-gray-500.fw-normal Facebook Ads Revenue
+                            .h4.fw-normal.h1.text-dark $19,200
+                            p.mb-0
+                                span.text-muted.me-2 -$233 
+                                span.badge.badge-danger-light
+                                    i.fas.fa-arrow-down.me-2
+                                    | -2.1%                   
+        // </Sales>
+
+        .row
+            // <Latest activity>
+            .col-lg-4
+                .card-adjust-height-lg
+                    .card.mb-4.mb-lg-0
+                        .card-header
+                            h5.card-heading Latest activity
+                            +cardOptions        
+                        .card-body
+                            .list-group.list-group-flush.list-group-timeline
+
+                                - var activity = [' subscribed to your newsletter.', ' liked your post 🎉', ' placed an order.', 'commented on "How to season your new grill."']
+                                - var activityCount = 4;
+
+                                each val, index in dataTable
+
+                                    - activityIndex = index % activityCount;
+
+                                    if (index < 12)
+                                        .list-group-item.px-0
+                                            .row
+                                                .col-auto
+                                                    img.avatar.p-1.me-2(src=`img/avatar-${index}.jpg` alt=val.person)
+                                                .col.ms-n3.pt-2.text-sm.text-gray-800
+                                                    strong.text-dark #{val.person} 
+                                                    | #{activity[activityIndex]}
+                                                    .text-gray-500.small
+                                                        | #{index + 3}m ago
+                                        // /.list-group-item
+            // </Latest activity>
+            // <Products>
+            .col-lg-8
+                .card.card-table.mb-4 
+                    .card-header
+                        h5.card-heading Bestsellers this month
+                        +cardOptions        
+                    .preload-wrapper
+                        table#productsDatatable.table.table-hover.table-striped.table-borderless.text-sm.align-middle.mb-0
+                            thead
+                                tr
+                                    th(style='min-width: 300px;') Name
+                                    th Price
+                                    th Last Ordered
+                                    th Status
+                            tbody
+                                each val, index in products
+                                    if (index < 10 )
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                        tr.align-middle
+                                            td.d-flex.align-items-center
+                                                img.card-table-img.img-fluid.rounded.me-3(src='img/product/' + val.img, alt='', width='30')
+                                                a.text-reset.text-decoration-none(href='#!')
+                                                    strong #{val.title}
+                                            td #{val.price}
+                                            td.text-muted 2021/#{month}/#{day}
+                                            td
+                                                if (val.badge != '')
+                                                    label.badge(class='badge-' + val.badge) #{val.badgeContent}
+     
+                        
+            // </Products>
+
+        // <Orders>
+        .card.card-table.mb-4
+            .card-header
+                h5.card-heading Latest orders
+                +cardOptions
+            .card-body
+                .preload-wrapper
+                    .table-responsive
+                        table#ordersDatatable.table.table-hover.mb-0
+                            thead
+                                tr
+                                    th Order Id
+                                    th Name
+                                    th Date
+                                    th Total Price
+                                    th Status
+                                    th Review
+                            tbody
+                                each val, index in dataTable
+                                    if (index < 20)
+                                        - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                        - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+                                        - price = Math.floor((Math.random() * 90) + 1) + Math.random().toFixed(2);
+                                        - badgeIndex  = index % badges.length
+
+                                        tr.align-middle
+                                            td 
+                                                span.form-check
+                                                    input.form-check-input(type="checkbox", id="check" + index)
+                                                    label.form-check-label(for="check" + index) ##{index + 2458}
+                                            td 
+                                                strong #{val.person}
+                                                br
+                                                span.text-muted.text-sm #{val.email}
+                                            td 2021/#{month}/#{day}
+                                            td $#{price}
+                                            td
+                                                span.badge(class=badges[badgeIndex].badgeClass) 
+                                                    span.indicator
+                                                    | #{badges[badgeIndex].title}
+                                            td.text-end(style="min-width: 125px;")
+                                                each val in [1,2,3,4]
+                                                    a(href='#!')
+                                                        i.fa.fa-star.text-warning
+                                                a(href='#!')
+                                                    i.fa.fa-star.text-gray-500
+                    span#categoryBulkActionOrders.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply            
+        // </Orders>
+                    

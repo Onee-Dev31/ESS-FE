@@ -1,0 +1,258 @@
+/*
+* ==========================================================
+*   Cards
+* ==========================================================
+*/
+.card {
+    border: none;
+    box-shadow: $box-shadow;
+}
+
+.card-header {
+    position: relative;
+    padding: $card-spacer-y $card-spacer-x;
+    border-bottom: none;
+    background-color: white;
+    box-shadow: $box-shadow-sm;
+    z-index: 2;
+
+    &:first-child {
+        @include border-radius($card-inner-border-radius $card-inner-border-radius 0 0);
+    }
+}
+
+.card-header-tabs {
+    margin-bottom: -$card-spacer-y;
+
+    .nav-link {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+}
+
+.card-header-transparent {
+    border-bottom: none;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.card {
+    .list-group-item {
+        padding-right: $card-spacer-x;
+        padding-left: $card-spacer-x;
+    }
+}
+
+
+.card-heading {
+    margin-bottom: 0;
+    font-size: $font-size-base;
+    font-weight: 400;
+    @include uppercase;
+}
+
+.card-header-more {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: $spacer;
+    transform: translateY(-50%);
+}
+
+.card-table {
+    overflow: hidden;
+
+    .table-responsive {
+        margin-right: -1px;
+    }
+
+    .card-body {
+        padding: 0;
+    }
+
+    thead {
+        th {
+            padding-top: $spacer * 1.5;
+            padding-bottom: $spacer * 1.5;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: $white;
+            border-bottom-width: 0;
+            background: $gray-800;
+            font-size: 13px;
+        }
+
+        &.light {
+            th {
+                color: $dark;
+                background: $gray-100;
+            }
+        }
+    }
+
+
+
+
+    .table tr td:first-child,
+    .table tr th:first-child {
+        padding-left: $spacer * 2;
+    }
+
+    .table tr td:last-child,
+    .table tr th:last-child {
+        padding-right: $spacer * 2;
+    }
+}
+
+.card-table-img {
+
+    display: inline-block;
+    width: 40px;
+
+    @include media-breakpoint-up(lg) {
+        width: 70px;
+    }
+}
+
+.card-table-text {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.credit-card {
+    position: relative;
+    height: 0;
+    padding-top: 66%;
+    border-radius: 0.5rem;
+}
+
+.credict-card-content {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+
+    padding: 1.5rem;
+    justify-content: space-between;
+}
+
+.credict-card-bottom {
+    display: flex;
+    padding-top: 1rem;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+
+.card-profile .card-header {
+    height: 9rem;
+    background-position: center center;
+    background-size: cover;
+}
+
+.card-profile-img {
+    position: relative;
+    max-width: 8rem;
+    margin-top: -6rem;
+    margin-bottom: 1rem;
+    border: 3px solid #fff;
+    border-radius: 100%;
+    box-shadow: $box-shadow;
+    z-index: 2;
+}
+
+.card-status {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    left: -1px;
+    height: 8px;
+    background: rgba(0, 40, 100, 0.12);
+    @include border-radius($card-inner-border-radius $card-inner-border-radius 0 0);
+}
+
+.card-img-overlay-top {
+    position: absolute;
+    top: $card-spacer-y;
+    right: $card-spacer-x;
+    left: $card-spacer-x;
+}
+
+.card-img-overlay-bottom {
+    position: absolute;
+    right: $card-spacer-x;
+    bottom: $card-spacer-y;
+    left: $card-spacer-x;
+}
+
+.card-widget {
+    display: flex;
+    padding: map-get($spacers, 4);
+    border-radius: $rounded-pill;
+    background: $white;
+    box-shadow: $box-shadow;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-widget-body {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.card-category {
+    text-transform: uppercase;
+    color: $gray-600;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.card-adjust-height {
+    @each $breakpoint in map-keys($grid-breakpoints) {
+        $next: breakpoint-next($breakpoint, $grid-breakpoints);
+        $infix: breakpoint-infix($next, $grid-breakpoints);
+
+        &#{$infix} {
+
+            .card {
+                max-height: 50vh;
+
+            }
+
+            .card-body {
+                overflow: auto;
+                height: calc(100% - 70px);
+                margin-bottom: $card-spacer-y;
+                padding-bottom: $card-spacer-y / 2;
+            }
+
+
+            @include media-breakpoint-up($next) {
+                height: 0;
+                min-height: 100%;
+
+                .card {
+                    height: calc(100% - 24px);
+                    max-height: none;
+                }
+
+                .card-body {
+                    overflow: auto;
+                    height: calc(100% - 70px);
+                    margin-bottom: $card-spacer-y;
+                    padding-bottom: $card-spacer-y / 2;
+                }
+
+            }
+        }
+    }
+}
+
+.card-header.bg-inverse {
+    color: $light;
+    background: $dark;
+}

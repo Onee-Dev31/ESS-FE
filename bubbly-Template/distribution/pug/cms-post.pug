@@ -1,0 +1,56 @@
+extends _pug-includes/layout
+
+block vars 
+    - var cms = true;
+    - var current = 'cms-post.html';  
+
+block content
+        // Page Header
+        .page-header.d-flex.justify-content-between.align-items-center
+            h1.page-heading Posts
+            div
+                a.btn.btn-primary.text-uppercase(href="cms-post-new.html") 
+                    i.fa.fa-plus.me-2 
+                    | Add new
+
+        include _pug-includes/inc-datatable-data
+
+        include _pug-includes/inc-post-data
+
+        section.mb-5
+
+            .card.card-table
+                .preload-wrapper
+                    table#postDatatable.table.table-hover.align-middle.mb-0
+                        thead
+                            tr
+                                th 
+                                th Title
+                                th Author
+                                th Categories
+                                th Date
+            
+                        tbody
+                            each val, index in dataTable
+                                
+                                - imageIndex = index % imageCount;
+                                - categoryIndex = index % categoryCount;
+                                - month = Math.floor((Math.random() * 12) + 1).toString().padStart(2, "0");
+                                - day = Math.floor((Math.random() * 31) + 1).toString().padStart(2, "0");
+
+                                tr
+                                    td <span class="form-check"><input class="form-check-input" type="checkbox"></span>
+                                    td 
+                                        a.text-reset.text-decoration-none(href="cms-post-new.html")
+                                            img.img-fluid.rounded.me-3(src='img/photos/w-100/' + images[imageIndex], alt=val.company, width="100")
+                                            strong #{val.company}
+                                    td #{val.person}
+                                    td #{categories[categoryIndex].name}
+                                    td 2020/#{month}/#{day}
+
+                    span#categoryBulkAction.me-2
+                        select.form-select.form-select-sm.d-inline.w-auto(name="categoryBulkAction")
+                            option Bulk Actions
+                            option Delete
+                        button.btn.btn-sm.btn-outline-primary.align-top Apply
+    

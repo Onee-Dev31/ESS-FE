@@ -1,0 +1,40 @@
+extends _pug-includes/layout-login
+
+block content
+    .container-fluid.px-0.overflow-x-hidden
+        .row.gx-0.min-vh-100
+            .col-md-9.col-lg-6.col-xl-4.px-5.d-flex.align-items-center.shadow
+                .w-100.py-5
+                    .text-center
+                        img.img-fluid.mb-4(src='img/brand/brand-1.svg', alt='...', style='max-width: 6rem;')            
+                        h1.h4.text-uppercase.mb-5 Welcome Back
+                    form(method="get", action="index.html")
+                        .mb-3
+                            label.form-label Email Address
+                            input.form-control(name="loginUsername", type='email', autocomplete='off')
+                        .mb-4
+                            .row
+                                .col
+                                    label.form-label Password
+                                .col-auto
+                                    a.form-text.small.text-muted(href='#') Forgot your password?
+                                
+                            input.form-control(name="loginPassword", type='password')
+
+                        .form-check.mb-4
+                            input#remember.form-check-input(type='checkbox')
+                            label.custom-control-label(for='remember') Remember this device
+
+                        // Submit
+                        .d-grid.mb-5
+                            button.btn.btn-primary.text-uppercase Sign in
+
+                        // Link
+                        p.text-sm.text-muted.text-center 
+                            | Don't have an account yet? 
+                            a(href='register-2.html') Register
+                            | .
+                   
+            .col-md-3.col-lg-6.col-xl-8.d-none.d-md-block
+                // Image
+                .bg-cover.h-100.me-n3(style='background-image: url(img/photos/victor-ene-1301123-unsplash.jpg);')

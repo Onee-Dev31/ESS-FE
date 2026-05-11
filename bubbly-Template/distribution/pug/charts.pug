@@ -1,0 +1,296 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var charts = true;
+    - var current = "charts.html";
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Charts'})   
+
+block content
+    
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Charts') 
+
+    section
+        .row.mb-4
+            .col-lg-8.mb-4.mb-lg-0
+                .card
+                    .card-header
+                        h4.card-heading Line chart Example
+                    .card-body
+                        p.text-gray-500 Charts on this page use <a href="https://www.chartjs.org/">Chart.js</a> - Simple yet flexible JavaScript charting for designers & developers. 
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample1">Line chart - show code sample</a>
+
+                        .collapse#codeSample1
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const lineChartCustom1 = new Chart(document.getElementById("lineChartCustom1"), {
+                                                type: "line",
+                                                options: {
+                                                    tooltips: {
+                                                        mode: "index",
+                                                        intersect: false,
+                                                    },
+                                                    legend: { display: false },
+                                                    scales: {
+                                                        xAxes: [
+                                                            {
+                                                                display: true,
+                                                            },
+                                                        ],
+                                                        yAxes: [
+                                                            {
+                                                                display: true,
+                                                            },
+                                                        ],
+                                                    },
+                                                },
+                                                data: {
+                                                    labels: ["January", "February", "March", "April", "May", "June", "July"],
+                                                    datasets: [
+                                                        {
+                                                            label: "Data Set One",
+                                                            fill: true,
+                                                            lineTension: 0.3,
+                                                            backgroundColor: window.gradients.whiteBlue,
+                                                            borderColor: window.gradients.whiteBlue,
+                                                            borderCapStyle: "butt",
+                                                            borderDash: [],
+                                                            borderDashOffset: 0.0,
+                                                            borderJoinStyle: "miter",
+                                                            borderWidth: 1,
+                                                            pointBorderColor: window.gradients.whiteBlue,
+                                                            pointBackgroundColor: "#fff",
+                                                            pointBorderWidth: 1,
+                                                            pointHoverRadius: 5,
+                                                            pointHoverBackgroundColor: "#fff",
+                                                            pointHoverBorderColor: window.colors.primary,
+                                                            pointHoverBorderWidth: 2,
+                                                            pointRadius: 1,
+                                                            pointHitRadius: 15,
+                                                            data: [30, 50, 40, 61, 42, 35, 40],
+                                                            spanGaps: false,
+                                                        },
+                                                        {
+                                                            label: "Data Set Two",
+                                                            fill: true,
+                                                            lineTension: 0.3,
+                                                            backgroundColor: pinkBlue,
+                                                            borderColor: pinkBlue,
+                                                            borderCapStyle: "butt",
+                                                            borderDash: [],
+                                                            borderDashOffset: 0.0,
+                                                            borderJoinStyle: "miter",
+                                                            borderWidth: 1,
+                                                            pointBorderColor: pinkBlue,
+                                                            pointBackgroundColor: "#fff",
+                                                            pointBorderWidth: 1,
+                                                            pointHoverRadius: 5,
+                                                            pointHoverBackgroundColor: "#fff",
+                                                            pointHoverBorderColor: window.colors.pink,
+                                                            pointHoverBorderWidth: 2,
+                                                            pointRadius: 1,
+                                                            pointHitRadius: 10,
+                                                            data: [50, 40, 50, 40, 45, 40, 30],
+                                                            spanGaps: false,
+                                                        },
+                                                    ],
+                                                },
+                                            });
+                        .my-5
+                            canvas#lineChartCustom1
+
+
+                            
+            .col-lg-4
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Line chart with primary gradient
+                    .card-body
+                        canvas#lineChartCustom2
+                .card.mb-3
+                    .card-header
+                        h4.card-heading Bar chart
+
+                    .card-body
+                        canvas#barChartExample
+            
+        .row.mb-4
+            .col-lg-5
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Donut Chart
+                    .card-body
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample5">Donut chart - Show code sample</a>
+
+                        .collapse#codeSample5
+                            pre.code-sample
+                                code.language-js
+                                    +escape.  
+                                        const donut1 = new Chart(document.getElementById("donut1"), {
+                                            type: "doughnut",
+                                            options: {
+                                                cutoutPercentage: 70,
+                                                legend: {},
+                                            },
+                                            data: {
+                                                labels: ["Tasks Done", "Remaining"],
+                                                datasets: [
+                                                    {
+                                                        data: [250, 200],
+                                                        borderWidth: [0, 0],
+                                                        backgroundColor: [window.colors.cyan, "#eee"],
+                                                        hoverBackgroundColor: [window.colors.cyan, "#eee"],
+                                                    },
+                                                ],
+                                            },
+                                        });  
+                        canvas#donut1.mt-4
+                            
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Donut Chart 2
+                    .card-body
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample6">Donut chart 2 - Show code sample</a>
+
+                        .collapse#codeSample6
+                            pre.code-sample
+                                code.language-js
+                                    +escape.  
+                                        const donut2 = new Chart(document.getElementById("donut2"), {
+                                            type: "doughnut",
+                                            options: {
+                                                cutoutPercentage: 90,
+                                                legend: {
+                                                    display: false,
+                                                },
+                                            },
+                                            data: {
+                                                labels: ["First", "Second"],
+                                                datasets: [
+                                                    {
+                                                        data: [300, 50],
+                                                        borderWidth: [0, 0],
+                                                        backgroundColor: [window.colors.blue, "#eee"],
+                                                        hoverBackgroundColor: [window.colors.blue, "#eee"],
+                                                    },
+                                                ],
+                                            },
+                                        });                  
+                        canvas#donut2.mt-4
+            .col-lg-7
+                .card
+                    .card-header
+                        h4.card-heading Bar chart 2                                 
+                    .card-body
+                        p.text-gray-500.text-sm Lorem ipsum dolor sit amet, consectetur adipisicing elit
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample2">Bar Chart - Show code sample</a>
+
+                        .collapse#codeSample2
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const barChart2 = new Chart(document.getElementById("barChart2"), {
+                                            type: "bar",
+                                            options: {
+                                                scales: {
+                                                    xAxes: [
+                                                        {
+                                                            display: true,
+                                                            gridLines: {
+                                                                color: "#fff",
+                                                            },
+                                                        },
+                                                    ],
+                                                    yAxes: [
+                                                        {
+                                                            display: true,
+                                                            ticks: {
+                                                                max: 100,
+                                                                min: 20,
+                                                            },
+                                                            gridLines: {
+                                                                color: "#fff",
+                                                            },
+                                                        },
+                                                    ],
+                                                },
+                                                legend: false,
+                                            },
+                                            data: {
+                                                labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"],
+                                                datasets: [
+                                                    {
+                                                        label: "Sunny Days",
+                                                        backgroundColor: pinkBlue,
+                                                        hoverBackgroundColor: pinkBlue,
+                                                        borderColor: pinkBlue,
+                                                        borderWidth: 0,
+                                                        data: [65, 59, 80, 81, 56, 55, 40, 30, 45, 80, 44, 36, 66, 58],
+                                                    },
+                                                ],
+                                            },
+                                        });                           
+                        canvas#barChart2.mt-5
+                
+
+        .row
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Donut chart Example
+                    .card-body
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample3">Donut chart - Show code sample</a>
+
+                        .collapse#codeSample3
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const donut3 = new Chart(document.getElementById("donut3"), {
+                                            type: "doughnut",
+                                            options: {
+                                                cutoutPercentage: 70,
+                                            },
+                                            data: {
+                                                labels: ["Sandra", "Becky", "Julie", "Romero"],
+                                                datasets: [
+                                                    {
+                                                        data: [250, 50, 100, 40],
+
+                                                        backgroundColor: ["#0d6efd", "#3d8bfd", "#6ea8fe", "#9ec5fe"],
+                                                        hoverBackgroundColor: ["#0d6efd", "#3d8bfd", "#6ea8fe", "#9ec5fe"],
+                                                    },
+                                                ],
+                                            },
+                                        });                                
+                        
+                        canvas#donut3.mt-4
+            
+            .col-lg-6
+                .card.mb-4
+                    .card-header
+                        h4.card-heading Pie chart Example
+                    .card-body
+                        p.show-code-sample.text-sm <a data-bs-toggle="collapse" href="#codeSample4">Donut chart - Show code sample</a>
+
+                        .collapse#codeSample4
+                            pre.code-sample
+                                code.language-js
+                                    +escape.
+                                        const pieChartCustom3 = new Chart(document.getElementById("pieChartCustom3"), {
+                                            type: "pie",
+                                            data: {
+                                                labels: ["John", "Mark", "Frank", "Danny"],
+                                                datasets: [
+                                                    {
+                                                        data: [300, 50, 100, 80],
+                                                        backgroundColor: ["#6610f2", "#8540f5", "#a370f7", "#c29ffa"],
+                                                        hoverBackgroundColor: ["#6610f2", "#8540f5", "#a370f7", "#c29ffa"],
+                                                    },
+                                                ],
+                                            },
+                                        });                                    
+                        
+                        canvas#pieChartCustom3.mt-4

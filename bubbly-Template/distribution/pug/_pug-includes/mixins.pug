@@ -1,0 +1,161 @@
+mixin pageHeader(name)    
+    // Page Header
+    .page-header
+        h1.page-heading #{name}
+
+mixin breadcrumbs(breadcrumbs)    
+    // Breadcrumbs 
+    .page-breadcrumb
+        ul.breadcrumb
+            each val in breadcrumbs
+                if (val.link)
+                    li.breadcrumb-item
+                        a(href=val.link) #{val.name}
+                else
+                    li.breadcrumb-item.active #{val.name}     
+                     
+
+mixin sidebarDropdown(array, active, name, icon, current)
+
+    - var dropdownId = name.replace(' ','').toLowerCase() + 'Dropdown'
+
+    - var liActiveClass = ''
+    - var dropdownExpanded = 'false'
+    - var dropdownActiveClass = ''
+
+    if active 
+        - liActiveClass = 'active'
+        - dropdownExpanded = 'true'
+        - dropdownActiveClass = 'show'
+
+    li(class="sidebar-list-item")
+        a(href="#", data-bs-target=`#${dropdownId}`, role="button", aria-expanded=dropdownExpanded, data-bs-toggle="collapse", class=`sidebar-link text-muted ${liActiveClass}`) 
+            +svgIcon(icon, 'svg-icon-md me-3')
+            span.sidebar-link-title #{name} 
+        
+        ul.sidebar-menu.list-unstyled(class=`collapse ${dropdownActiveClass}`, id=dropdownId)
+            each val in array
+                if (current == val.link)
+                    li.sidebar-list-item
+                        a.sidebar-link.active.text-muted(href=path + val.link) !{val.name}
+                else
+                    li.sidebar-list-item
+                        a.sidebar-link.text-muted(href=path + val.link) !{val.name}
+
+mixin sidebarLink(link, name, icon)
+    li.sidebar-list-item
+        a.sidebar-link.text-muted(href=path + link class={active: link === current})
+            +svgIcon(icon, 'svg-icon-md me-3')
+            span.sidebar-link-title #{name}
+
+mixin svgIcon(icon, iconClass)
+    if (!iconClass)
+        - iconClass = ''
+    svg.svg-icon(class=iconClass)
+        use(xlink:href=path + 'icons/orion-svg-sprite.svg#' + icon)  
+
+mixin pricingCard(name, price, pricing, highlight, chosen)
+    - chosen = chosen || false
+    - cardClass = 'shadow'
+    
+    if (chosen)
+        - cardClass = 'card-highlight shadow-lg overflow-hidden'
+
+    // pricing card
+    .card.mb-5.mb-lg-0.border-0(class=cardClass)
+        if (chosen)
+            .card-status.bg-primary
+        .card-body
+            h2.card-heading.text-primary.text-center.fw-bold.py-3 #{name}
+            p.text-muted.text-center.mb-4
+                span.h1.text-dark.fw-bold $#{price}
+                span.ms-2 / month
+            hr.text-muted
+
+            ul.fa-ul.my-4
+
+                each val, index in pricing
+                    if index <= highlight
+                        li.mb-3
+                            span.fa-li.text-primary
+                                i.fas.fa-check
+                            | #{val}
+                    else
+                        li.mb-3.text-muted
+                            span.fa-li
+                                i.fas.fa-times
+                            | #{val}
+            .text-center
+                a.btn.btn-outline-primary(href='#') Select
+    // /pricing card 
+
+mixin svgBlob(icon, iconClass, iconStyle)
+    if (!iconClass)
+        - iconClass = ''
+    if (!iconStyle)
+        - iconStyle = ''
+    svg.svg-blob(class=iconClass, style=iconStyle)
+        use(xlink:href='#' + icon)  
+
+                
+mixin cardOptions()
+    .card-header-more
+        button.btn-header-more(type='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
+            i.fas.fa-ellipsis-v
+        .dropdown-menu.dropdown-menu-end.text-sm
+            a.dropdown-item(href='#!')
+                i.fas.fa-expand-arrows-alt.opacity-5.me-2
+                | Expand
+            a.dropdown-item(href='#!')
+                i.far.fa-window-minimize.opacity-5.me-2
+                | Minimize
+            a.dropdown-item(href='#!')
+                i.fas.fa-redo.opacity-5.me-2
+                |  Reload
+            a.dropdown-item(href='#!')
+                i.far.fa-trash-alt.opacity-5.me-2
+                |  Remove        
+
+mixin tableOptions()
+    div
+        button.btn-header-more(type='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
+            i.fas.fa-ellipsis-v
+        .dropdown-menu.dropdown-menu-end.text-sm
+            a.dropdown-item(href='#!')
+                i.fas.fa-expand-arrows-alt.opacity-5.me-2
+                | Expand
+            a.dropdown-item(href='#!')
+                i.far.fa-edit.opacity-5.me-2
+                | Edit
+            a.dropdown-item(href='#!')
+                i.far.fa-trash-alt.opacity-5.me-2
+                |  Remove        
+
+mixin componentDocItem(name, desc, showCode)
+    
+    - var componentId = name.split(' ').join('').toLowerCase()
+
+    .docs-item(id=componentId)
+        h5.mb-4 !{name}
+        div.docs-desc !{desc}
+        
+        if showCode
+            a.btn.btn-link.pl-0(data-toggle="collapse", data-target=`#${componentId}code`) Show code 
+                i.fa-arrow-right.fa.ml-2
+
+        if block
+            block
+
+mixin componentDocCode(name)
+    - var codeId = name.split(' ').join('').toLowerCase() + 'code'
+
+    pre.collapse(id=codeId)
+        code.language-html
+            +escape()
+                block
+
+mixin escape
+    - var oldBuf = pug_html;
+    - pug_html = '';
+    block
+    - pug_html = oldBuf + pug.escape(pug_html);

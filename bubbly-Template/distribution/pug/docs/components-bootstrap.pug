@@ -1,0 +1,16 @@
+extends ../_pug-includes/layout
+
+block vars
+    - var active = 'docs'  
+    - var bodyAttrs = {'data-spy': "scroll", 'data-target': "#components-nav", 'data-offset':"80"}
+    - var path = '../'    
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: '../index.html'})
+    - breadcrumbs.push({name: 'Bootstrap Components'})
+    - var heroHeading = 'Bootstrap Components'
+    - var current = 'docs/components-bootstrap.html'
+
+block content
+
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Tables') 

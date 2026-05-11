@@ -1,0 +1,56 @@
+extends _pug-includes/layout.pug
+
+block vars
+    - var forms = true;
+    - var current = 'forms-dropzone.html';
+    - var breadcrumbs = []
+    - breadcrumbs.push({name: 'Home', link: 'index.html'})
+    - breadcrumbs.push({name: 'Multiple files upload'})   
+
+block content
+    +breadcrumbs(breadcrumbs)
+    +pageHeader('Multiple files upload') 
+                    
+    section
+        .card
+            .card-header
+                h4.card-heading Multiple files upload - Dropzone.js
+            .card-body   
+                p DropzoneJS is an open source library that provides drag’n’drop file uploads with image previews.
+                p It’s lightweight, doesn’t depend on any other library (like jQuery) and is highly customizable.
+                p.show-code-sample <a data-bs-toggle="collapse" href="#codeSample4">Show code sample</a>
+
+                .collapse#codeSample4
+                    pre.code-sample
+                        code.language-js
+                            +escape.
+                                const dropzone = new Dropzone("#demo-upload", {
+                                        parallelUploads: 2,
+                                        thumbnailHeight: 120,
+                                        thumbnailWidth: 120,
+                                        maxFilesize: 3,
+                                        filesizeBase: 1000,
+                                        thumbnail: function (file, dataUrl) {
+                                            if (file.previewElement) {
+                                                file.previewElement.classList.remove("dz-file-preview");
+                                                var images = file.previewElement.querySelectorAll("[data-dz-thumbnail]");
+                                                for (var i = 0; i < images.length; i++) {
+                                                    var thumbnailElement = images[i];
+                                                    thumbnailElement.alt = file.name;
+                                                    thumbnailElement.src = dataUrl;
+                                                }
+                                                setTimeout(function () {
+                                                    file.previewElement.classList.add("dz-image-preview");
+                                                }, 1);
+                                            }
+                                        },
+                                    });
+
+                .row
+                    .col-xl-8
+                        form#demo-upload.dropzone(action='#')
+                            .dz-message
+                                p Drop files here or click to upload.
+                                p
+                                    span.note (This is just a demo dropzone. Selected files are <STRONG>not</STRONG> actually uploaded.)
+

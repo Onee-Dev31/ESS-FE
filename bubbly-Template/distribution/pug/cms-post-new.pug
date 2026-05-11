@@ -1,0 +1,110 @@
+extends _pug-includes/layout
+
+block vars 
+    - var cms = true;
+    - var current = 'cms-post-new.html';  
+
+block content
+        +pageHeader('Add new post')
+        
+        section
+            .row.mb-5
+                .col-lg-8.col-xxl-9.mb-4.mb-lg-0
+                    .card
+                        .card-body
+                            label.form-label(for="postTitle") Title
+                            input.form-control.mb-4#postTitle(type="text")
+                            
+                            button.btn.btn-outline-primary.mb-4 Add Media
+
+                            #editorWithToolbar
+                                include _pug-includes/inc-editor-toolbar
+                                #editor-container.bg-white(style="min-height: 300px; max-height: 1000px;overflow-y: auto;")
+                                    include _pug-includes/inc-post-text
+                    
+                .col-lg-4.col-xxl-3
+                    .card.card-sm.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Publish
+                        .card-body.text-gray-700
+                            .d-flex.mb-4.justify-content-between
+                                button.btn.btn-sm.btn-outline-secondary Save Draft
+                                button.btn.btn-sm.btn-outline-secondary Preview
+                            hr.bg-gray-500
+                            .mb-3 
+                                | Status: 
+                                strong Draft 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapseStatus' role='button' aria-expanded='false' aria-controls='collapseStatus') Edit
+                                #collapseStatus.collapse
+                                    .py-2
+                                        select.form-select.form-select-sm(aria-label='Default select example')
+                                            option Draft
+                                            option Pending Review
+
+
+                            .mb-3 
+                                | Visibility: 
+                                strong Public 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapseVisibility' role='button' aria-expanded='false' aria-controls='collapseVisibility') Edit
+                                #collapseVisibility.collapse
+                                    .py-2
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility1')
+                                            label.form-check-label(for='visibility1') Public
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility2')
+                                            label.form-check-label(for='visibility2') Password protected
+                                        .form-check
+                                            input.form-check-input(type='radio' name='visibility', id='visibility3')
+                                            label.form-check-label(for='visibility3') Private
+
+                            div 
+                                | Publish 
+                                strong immediately 
+                                a.ms-2.text-sm(data-bs-toggle='collapse' href='#collapsePublish' role='button' aria-expanded='false' aria-controls='collapsePublish') Edit
+                                #collapsePublish.collapse
+                                    .py-3
+                                        .row.g-2
+                                            .col-lg-6     
+                                                input.form-control.form-control-sm#datePublished(value='10/20/2017') 
+                                            .col-lg-6
+                                                .d-flex.align-items-center.text-sm
+                                                    span.me-1 at
+                                                    input.form-control.form-control-sm.text-center#hoursPublished(type="text", value="8")
+                                                    span.mx-1 :
+                                                    input.form-control.form-control-sm.text-center#minutesPublished(type="text", value="00")
+                        .card-footer.text-end
+                            button.btn.btn-primary Publish
+                    .card.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Format
+                        .card-body
+                            - var formats = []
+                            - formats.push({name: 'Standard', icon: ''})
+                            - formats.push({name: 'Aside', icon: ''})
+                            - formats.push({name: 'Image', icon: ''})
+                            - formats.push({name: 'Video', icon: ''})
+                            - formats.push({name: 'Quote', icon: ''})
+                            - formats.push({name: 'Link', icon: ''})
+
+                            each val, index in formats
+                                .form-check
+                                    input.form-check-input(type='radio' name='format', id='format' + index, checked = (index==0))
+                                    label.form-check-label(for='format' + index) #{val.name}
+                    .card.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Categories
+                        .card-body
+                            - var categories = [ 'Gear', 'Stories', 'Tips & Tricks', 'Trips', 'Uncategorized']
+                            .mb-4
+                                each val, index in categories
+                                    .form-check
+                                        input.form-check-input(type='checkbox' name='category', id='category' + index)
+                                        label.form-check-label(for='category' + index) #{val}
+
+                            a.btn-link(href="#") + Add New Category
+                    .card.shadow-sm.mb-4
+                        .card-header.py-4
+                            h4.card-heading Tags
+                        .card-body
+                            input#tags.form-control(type='text' value='Tag 1, Tag 2' placeholder='Enter something')

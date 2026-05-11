@@ -1,0 +1,205 @@
+/*
+*
+* =====================
+* SIDEBAR
+* =====================
+*
+*/
+
+.sidebar-menu {
+    position: relative;
+    background: $gray-100;
+    box-shadow: inset 4px -2px 0.25rem 0px rgba($black, .075);
+    font-size: $font-size-sm;
+
+}
+
+.sidebar-heading {
+    margin-bottom: 0;
+    padding: $spacer * 1.5;
+    color: $gray-500;
+    font-size: $font-size-sm;
+    font-weight: bold;
+    @include uppercase;
+
+    @include media-breakpoint-down(lg) {
+        padding-right: $spacer * .5;
+        padding-left: $spacer * .5;
+        text-align: center;
+    }
+}
+
+.sidebar-link {
+    display: flex;
+    padding: 0.5rem 1.5rem;
+    transition: background 0.3s;
+    text-decoration: none;
+    align-items: center;
+
+    &[data-bs-toggle="collapse"] {
+        position: relative;
+
+        &::before {
+            display: block;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            color: #aaa;
+            content: "";
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-labelledby='title' aria-describedby='desc' role='img' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3EAngle Left%3C/title%3E%3Cdesc%3EA line styled icon from Orion Icon Library.%3C/desc%3E%3Cpath data-name='layer1' fill='none' stroke='%23aaa' stroke-miterlimit='10' stroke-width='5' d='M39 20.006L25 32l14 12.006' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E");
+            background-position: right center;
+            transition: .2s;
+        }
+
+        &[aria-expanded='true'] {
+            &::before {
+                transform: translateY(-50%) rotate(-90deg);
+            }
+        }
+    }
+
+    &:hover {
+        text-decoration: none;
+        background: rgba($black, .03);
+    }
+
+    &.active,
+    &:focus {
+        text-decoration: none;
+        color: #fff !important;
+        background: $primary;
+
+        &::before {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' aria-labelledby='title' aria-describedby='desc' role='img' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3EAngle Left%3C/title%3E%3Cdesc%3EA line styled icon from Orion Icon Library.%3C/desc%3E%3Cpath data-name='layer1' fill='none' stroke='%23fff' stroke-miterlimit='10' stroke-width='5' d='M39 20.006L25 32l14 12.006' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+
+    }
+
+    &:focus {
+        background: tint-color($primary, 10%);
+    }
+
+    .sidebar-link-title {
+        display: inline-block;
+        transition: all 0.3s;
+    }
+}
+
+.sidebar-menu {
+    .sidebar-link.active {
+        background: tint-color($primary, 30%);
+    }
+}
+
+.sidebar {
+    width: 16rem;
+    transition: all 0.2s;
+    background: #fff;
+    box-shadow: $box-shadow;
+    z-index: 2;
+
+    &.shrink {
+        width: 6rem;
+        text-align: center;
+
+        .sidebar-link {
+            display: block;
+            padding-right: 0.2rem;
+            padding-left: 0.2rem;
+            font-size: 0.75rem;
+
+            .sidebar-link-title {
+                display: block;
+                font-size: 0.75rem;
+
+                @include media-breakpoint-down(sm) {
+                    font-size: 0.6rem;
+                }
+
+            }
+
+            svg {
+                margin: 0 !important;
+            }
+
+            &[data-bs-toggle="collapse"] {
+                padding-bottom: 1.5rem;
+
+                &::before {
+                    position: absolute;
+                    top: auto;
+                    right: 50%;
+                    bottom: .25rem;
+                    left: auto;
+                    transform: translateX(50%) rotate(-90deg);
+                }
+
+                &[aria-expanded='true'] {
+                    &::before {
+                        transform: translateX(50%) rotate(90deg);
+                    }
+                }
+            }
+        }
+
+        .sidebar-heading {
+            padding-right: $spacer * .5;
+            padding-left: $spacer * .5;
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            font-size: $font-size-sm;
+        }
+
+        .collapse,
+        .collapsing {
+            .sidebar-link {
+                padding-right: 0.2rem !important;
+                padding-left: 0.2rem !important;
+                transition: none;
+            }
+        }
+    }
+
+    @include media-breakpoint-down(xl) {
+        overflow: hidden;
+        width: 6rem;
+        margin-left: -6rem;
+        transition: all 0.4s;
+        text-align: center;
+
+        .sidebar-link {
+            display: block;
+            padding-right: 0.2rem;
+            padding-left: 0.2rem;
+
+            .sidebar-link-title {
+                display: block;
+                font-size: 0.75rem;
+            }
+
+            svg {
+                margin: 0 !important;
+            }
+        }
+
+        .sidebar-heading {
+            padding-right: $spacer * .5;
+            padding-left: $spacer * .5;
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            font-size: $font-size-sm;
+        }
+    }
+
+    &.show {
+        margin-left: 0;
+    }
+}

@@ -1,0 +1,22 @@
+button(type="button", class="btn btn-primary btn-sm d-none d-lg-inline-block p-3", data-bs-toggle="collapse", data-target="#style-switch", id="style-switch-button")
+    i.fa.fa-cog
+
+#style-switch.collapse
+
+    h5.mb-4 Select theme colour
+
+    form.mb-4
+        select.form-control(name="colour",id="colour")
+            option(value="") select colour variant
+            option(value="default") blue
+            option(value="pink") pink
+            option(value="violet") violet
+            option(value="sea") sea
+            option(value="red") red
+            option(value="green") green
+
+    p
+        img.img-fluid(src="img/template-mac.png", alt="")
+
+    p.text-muted.text-small Stylesheet switching is done via JavaScript and can cause a blink while page loads. This will not happen in your production code.
+          
