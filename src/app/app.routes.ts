@@ -212,6 +212,15 @@ export const routes: Routes = [
         redirectTo: 'dashboard',
         pathMatch: 'full',
       },
+      {
+        path: 'employee-ad',
+        loadComponent: () =>
+          import('./pages/dashboard-it/empployee-ad-management/empployee-ad-management').then(
+            (m) => m.EmpployeeAdManagement,
+          ),
+        data: { animation: 'Dashboard' },
+        pathMatch: 'full',
+      },
     ],
   },
 
