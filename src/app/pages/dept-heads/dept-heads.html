@@ -187,7 +187,13 @@
               {{ selectedDept()!.company_name }} ({{ selectedDept()!.company_code }})
             </div>
           </div>
-          <button class="btn-close" type="button" title="ปิด" aria-label="ปิด" (click)="closeDetail()">
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeDetail()"
+          >
             <i class="fas fa-times" aria-hidden="true"></i>
           </button>
         </div>

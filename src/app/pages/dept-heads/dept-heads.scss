@@ -61,7 +61,9 @@
   border-radius: 10px;
   padding: 10px 16px 12px;
   background: var(--input-bg);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   cursor: text;
   min-height: 62px;
 
@@ -111,7 +113,6 @@
     }
   }
 }
-
 
 .btn-search,
 .btn-clear {
