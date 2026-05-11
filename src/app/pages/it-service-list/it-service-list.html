@@ -3,15 +3,83 @@
   <aside class="tk-left">
     <div class="tk-left__top">
       <div class="tk-left__title">Tickets</div>
+      <nz-select
+        class="tk-left__select"
+        [(ngModel)]="filterStatus"
+        (ngModelChange)="onFilterStatusChange($event)"
+        nzBorderless
+        nzSize="small"
+      >
+        <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
+        <nz-option nzValue="open" nzLabel="New"></nz-option>
+        <nz-option nzValue="reopen" nzLabel="Re-Opend"></nz-option>
+        <nz-option nzValue="waiting" nzLabel="Waiting you"></nz-option>
+        <nz-option nzValue="assigned" nzLabel="In Progress"></nz-option>
+        <nz-option nzValue="done" nzLabel="Closed"></nz-option>
+        <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
+        <nz-option nzValue="denied" nzLabel="Denied"></nz-option>
+      </nz-select>
     </div>
-    <div class="tk-left__search">
-      <span class="material-symbols-outlined ic">search</span>
-      <input [(ngModel)]="keyword" placeholder="Search by Ticket Number and Name" />
+
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        justify-content: center;
+      "
+    >
+      <div style="display: flex; flex-direction: column; padding: 10px; gap: 8px">
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 8px">
+          <div class="tk-left__search">
+            <span class="material-symbols-outlined ic">search</span>
+            <input
+              [(ngModel)]="keyword"
+              (ngModelChange)="onKeywordChange($event)"
+              placeholder="Search by Ticket Number/Name"
+            />
+          </div>
+          <button
+            (click)="showFilter = !showFilter"
+            [style.background]="showFilter ? 'var(--primary)' : 'transparent'"
+            [style.color]="showFilter ? '#fff' : 'var(--text-sub)'"
+            style="
+              border: 1px solid var(--border);
+              border-radius: 8px;
+              padding: 6px 10px;
+              cursor: pointer;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 13px;
+              white-space: nowrap;
+            "
+          >
+            <i class="fa-solid fa-filter" style="font-size: 12px"></i>
+            <!-- กรองวันที่ -->
+          </button>
+        </div>
+
+        <!-- แถวล่าง: date picker (แสดงเมื่อ showFilter) -->
+        @if (showFilter) {
+          <div class="form-field" style="animation: fadeIn 0.2s ease">
+            <nz-range-picker
+              nzFormat="dd/MM/yyyy"
+              [(ngModel)]="filter.dateRange"
+              (ngModelChange)="getMyTicket()"
+              class="form-input custom-range-picker"
+              nzDropdownClassName="custom-range-picker-popup"
+              style="width: 100%"
+            />
+          </div>
+        }
+      </div>
     </div>
     <div class="ticket-list">
       <div
         class="ticket-item"
-        *ngFor="let ticket of Tickets()"
+        *ngFor="let ticket of filteredTickets()"
         [class.active]="selectedTicket()?.ticketId === ticket.ticketId"
         [class.highlight]="highlightedTicketId() === ticket.ticketId"
         [id]="'ticket-' + ticket.ticketId"
@@ -186,13 +254,17 @@
     <div class="tk-card__body detail" *ngIf="t.status === 'Waiting you'">
       <textarea
         [(ngModel)]="t.description"
-        class="form-input"
+        class="form-input-textarea"
         aria-label="รายละเอียด ticket"
         title="รายละเอียด ticket"
         placeholder="กรอกรายละเอียด ticket"
       ></textarea>
     </div>
-    <div class="btn-expand-detail" (click)="openDetail(t.description)">
+    <div
+      class="btn-expand-detail"
+      (click)="openDetail(t.description)"
+      *ngIf="t.status !== 'Waiting you'"
+    >
       <i class="fa-solid fa-expand"></i>ดูรายละเอียดเพิ่มเติม
     </div>
   </section>
@@ -247,18 +319,26 @@
   <!-- NOTES -->
   <section class="tk-card note">
     <div class="tk-card__head">
-      <div class="tk-card__title">
+      <div class="tk-card__title" *ngIf="t.status_user !== 'Referred_Back'">
         <i class="fa-solid fa-comments"></i>Chat
         <span class="info-hint">
           (เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์)
         </span>
+      </div>
+      <div class="tk-card__title" *ngIf="t.status_user === 'Referred_Back'">
+        <i class="fa-solid fa-comments"></i>ข้อความจาก Approver
       </div>
       <button
         class="btn-add-note"
         nz-button
         nzType="primary"
         (click)="openAddNote()"
-        *ngIf="t.status !== 'Closed' && t.status_user !== 'Pending'"
+        *ngIf="
+          t.status !== 'Closed' &&
+          t.status_user !== 'Referred_Back' &&
+          t.status_user !== 'Denied' &&
+          t.status_user !== 'Hold'
+        "
       >
         <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
         เพิ่มข้อความ

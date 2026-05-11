@@ -178,8 +178,6 @@ export class ItServiceService {
   }
 
   getAllTickets_real(params: {
-    page?: number;
-    pageSize?: number;
     status?: string;
     priority?: string;
     searchText?: string;
@@ -194,8 +192,6 @@ export class ItServiceService {
   }): Observable<any> {
     const queryParams: any = {};
 
-    if (params.page) queryParams.page = params.page;
-    if (params.pageSize) queryParams.pageSize = params.pageSize;
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
     if (params.searchText) queryParams.searchText = params.searchText;
@@ -215,26 +211,52 @@ export class ItServiceService {
     });
   }
 
+  // getMyTickets(params: {
+  //   page?: number;
+  //   pageSize?: number;
+  //   requesterAduser?: string;
+  //   requesterCodeempid?: string;
+  //   status?: string;
+  //   priority?: string;
+  // }): Observable<any> {
+  //   const queryParams: any = {};
+
+  //   if (params.page) queryParams.page = params.page;
+  //   if (params.pageSize) queryParams.pageSize = params.pageSize;
+  //   if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+  //   if (params.requesterCodeempid) queryParams.requesterCodeempid = params.requesterCodeempid;
+  //   if (params.status) queryParams.status = params.status;
+  //   if (params.priority) queryParams.priority = params.priority;
+
+  //   // console.log("params >>> ", queryParams)
+
+  //   return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
+  //     params: queryParams,
+  //   });
+  // }
+
   getMyTickets(params: {
-    page?: number;
-    pageSize?: number;
-    requesterAduser?: string;
-    requesterCodeempid?: string;
     status?: string;
-    priority?: string;
+    searchText?: string;
+    requesterAduser?: string;
+    ticketTypeId?: string;
+    managerEmpNo?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }): Observable<any> {
     const queryParams: any = {};
 
-    if (params.page) queryParams.page = params.page;
-    if (params.pageSize) queryParams.pageSize = params.pageSize;
-    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
-    if (params.requesterCodeempid) queryParams.requesterCodeempid = params.requesterCodeempid;
     if (params.status) queryParams.status = params.status;
-    if (params.priority) queryParams.priority = params.priority;
+    if (params.searchText) queryParams.searchText = params.searchText;
+    if (params.requesterAduser) queryParams.requesterAduser = params.requesterAduser;
+    if (params.ticketTypeId) queryParams.ticketTypeId = params.ticketTypeId;
+    if (params.managerEmpNo) queryParams.managerEmpNo = params.managerEmpNo;
+    if (params.dateFrom) queryParams.dateFrom = params.dateFrom;
+    if (params.dateTo) queryParams.dateTo = params.dateTo;
 
     // console.log("params >>> ", queryParams)
 
-    return this._http.get<any>(`${this.baseUrl}/tickets/my`, {
+    return this._http.get<any>(`${this.baseUrl}/tickets/user`, {
       params: queryParams,
     });
   }
