@@ -4,6 +4,6 @@ export const environment = {
   api_ONEEJOB_url: 'https://localhost:7113/api',
   emp_img_url: 'https://empimg.oneeclick.co:8048/employeeimage',
   file_base_url: '',
-  file_url: '',
+  file_url: '/uploads',
   frontend_url: '',
 };
