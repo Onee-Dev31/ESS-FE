@@ -1,0 +1,562 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use 'sass:color';
+
+.page {
+  padding: 20px;
+}
+
+// ==================== TOTAL RESULTS ====================
+.total-results-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: var(--text-sub);
+
+  strong {
+    color: $primary;
+    font-weight: 700;
+  }
+}
+
+// ==================== CONTENT CARD ====================
+.content-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+// ==================== TOOLBAR ====================
+.card-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-toolbar);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolbar-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    @include mobile {
+      width: 100%;
+    }
+  }
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-header);
+  white-space: nowrap;
+}
+
+// ==================== FILTERS APPLIED ====================
+.filters-applied {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.875rem;
+
+  .filters-label {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .no-filters {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--status-open-bg);
+    color: var(--status-open-text);
+    border: 1px solid var(--status-open-text);
+
+    .tag-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: inherit;
+      font-size: 0.75rem;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .btn-clear-filters {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    padding: 0;
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+}
+
+// ==================== TOOLBAR BUTTONS ====================
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: $primary;
+  color: #ffffff;
+  border: none;
+
+  &:hover {
+    background: color-mix(in srgb, $primary, black 12%);
+  }
+
+  @include mobile {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.btn-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-table-head);
+  color: var(--text);
+  border: 1px solid var(--border);
+
+  &:hover,
+  &.active {
+    background: color-mix(in srgb, $primary, white 85%);
+    color: $primary;
+    border-color: $primary;
+  }
+
+  @include mobile {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+// ==================== FILTER PANEL ====================
+.filter-panel {
+  padding: 16px 20px;
+  background: var(--bg-table-head);
+  border-bottom: 1px solid var(--border-toolbar);
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+  }
+
+  .filter-input {
+    height: 38px;
+    border: 1px solid var(--border-table-head);
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 0.9rem;
+    color: var(--input-text);
+    background: var(--input-bg);
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: $primary;
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  ::ng-deep .filter-select .ant-select-selector {
+    height: 38px !important;
+    border: 1px solid var(--border-table-head) !important;
+    border-radius: 8px !important;
+    background: var(--input-bg) !important;
+    padding: 0 12px !important;
+
+    .ant-select-selection-search-input {
+      height: 36px !important;
+    }
+
+    .ant-select-selection-placeholder,
+    .ant-select-selection-item {
+      line-height: 36px !important;
+      color: var(--input-text);
+    }
+  }
+
+  ::ng-deep .filter-select.ant-select-focused .ant-select-selector {
+    border-color: $primary !important;
+    box-shadow: none !important;
+  }
+
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+
+    &:hover {
+      background: var(--bg-table-head);
+    }
+  }
+
+  .btn-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 22px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #582d96;
+    color: #ffffff;
+    border: none;
+
+    &:hover {
+      background: #4a257d;
+    }
+  }
+}
+
+// ==================== TABLE ====================
+.table-responsive {
+  padding: 0 20px 8px;
+
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+
+  thead tr {
+    background: var(--bg-table-head);
+  }
+
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--text-sub);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody {
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--border-toolbar);
+
+      td {
+        background: transparent !important;
+      }
+    }
+
+    td {
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border-table);
+      vertical-align: middle;
+    }
+
+    &:last-of-type tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .col-no {
+    width: 52px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .col-actions {
+    width: 200px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .line2 {
+    font-size: 0.8rem;
+  }
+
+  .text-truncate {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .emp-id {
+    font-weight: 700;
+    color: $primary;
+    font-size: 0.85rem;
+  }
+
+  .ad-user {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--text-sub);
+  }
+
+  .emp-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
+  }
+
+  .no-data-cell {
+    padding: 40px 0;
+  }
+}
+
+// ==================== ACTION BUTTONS ====================
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.act-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+  color: #ffffff;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.act-info {
+  background: #1890ff;
+}
+.act-edit {
+  background: #fa8c16;
+}
+.act-key {
+  background: #13c2c2;
+}
+.act-sync {
+  background: #52c41a;
+}
+.act-delete {
+  background: #ff4d4f;
+}
+.act-view {
+  background: #2f54eb;
+}
+
+// ==================== MOBILE CARD VIEW ====================
+.card-list-view {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+
+  @include tablet {
+    display: flex !important;
+  }
+
+  .mobile-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: all 0.25s;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-toolbar);
+      background: var(--bg-card);
+
+      .header-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .emp-id-badge {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: $primary;
+      }
+
+      .emp-name {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-header);
+      }
+
+      .text-muted {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+    }
+
+    .card-body {
+      padding: 14px 16px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.875rem;
+
+        .label {
+          color: var(--text-muted);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          i {
+            width: 14px;
+            text-align: center;
+            font-size: 0.8rem;
+          }
+        }
+
+        .value {
+          font-weight: 600;
+          color: var(--text-header);
+          text-align: right;
+          max-width: 60%;
+        }
+
+        .ad-user {
+          font-family: monospace;
+          font-size: 0.85rem;
+        }
+      }
+
+      .card-footer-actions {
+        display: flex;
+        gap: 8px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-toolbar);
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
+
+// ==================== PAGINATION ====================
+.pagination-wrapper {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-toolbar);
+}

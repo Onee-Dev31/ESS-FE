@@ -1,0 +1,269 @@
+<div class="page">
+  <app-page-header [title]="pageTitle"></app-page-header>
+
+  <div class="total-results-bar">
+    <span
+      >Total Results: <strong>{{ totalItems }}</strong></span
+    >
+  </div>
+
+  <div class="content-card">
+    <!-- Toolbar -->
+    <div class="card-toolbar">
+      <div class="toolbar-left">
+        <span class="card-title">Employee Records</span>
+        <div class="filters-applied">
+          <span class="filters-label">Filters Applied:</span>
+          @if (!hasFilters) {
+            <span class="no-filters">No filters applied.</span>
+          } @else {
+            @for (f of appliedFilters; track f.key) {
+              <span class="filter-tag">
+                {{ f.label }}: {{ f.value }}
+                <button class="tag-remove" (click)="removeFilter(f.key)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+            }
+            <button class="btn-clear-filters" (click)="clearAllFilters()">ล้างทั้งหมด</button>
+          }
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn-add"><i class="fas fa-plus"></i> Add Employee</button>
+        <button class="btn-filter" [class.active]="isFilterOpen" (click)="toggleFilter()">
+          <i class="fas fa-sliders-h"></i> Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    @if (isFilterOpen) {
+      <div class="filter-panel">
+        <form (ngSubmit)="applyFilter()">
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label>ค้นหา</label>
+              <input
+                type="text"
+                class="filter-input"
+                placeholder="ชื่อ (ไทย, อังกฤษ), รหัสพนักงาน, ชื่อเล่น"
+                [(ngModel)]="searchText"
+                name="searchText"
+              />
+            </div>
+            <div class="filter-field">
+              <label>บริษัท</label>
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="เลือกบริษัท"
+                class="filter-select"
+                [ngModel]="filterCompany"
+                (ngModelChange)="onCompanyChange($event)"
+                name="companyCode"
+              >
+                @for (c of companyList; track c.COMPANY_CODE) {
+                  <nz-option
+                    [nzLabel]="c.COMPANY_NAME + ' (' + c.COMPANY_CODE + ')'"
+                    [nzValue]="c"
+                  />
+                }
+              </nz-select>
+            </div>
+            <div class="filter-field">
+              <label>แผนก</label>
+              <nz-select
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="เลือกแผนก"
+                class="filter-select"
+                [(ngModel)]="filterDepartment"
+                name="department"
+                [nzDisabled]="!filterCompany"
+              >
+                @for (d of filteredDepartmentList; track d.COSTCENT) {
+                  <nz-option [nzLabel]="d.COSTCENT + ' - ' + d.NAMECOSTCENT" [nzValue]="d" />
+                }
+              </nz-select>
+            </div>
+          </div>
+          <div class="filter-actions">
+            <button type="button" class="btn-reset" (click)="clearAllFilters()">
+              <i class="fas fa-undo"></i> รีเซ็ต
+            </button>
+            <button type="submit" class="btn-search"><i class="fas fa-search"></i> ค้นหา</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Table (desktop) -->
+    <div class="table-responsive">
+      @if (isLoading) {
+        <app-skeleton type="table" [rows]="8"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="col-no">No.</th>
+              <th>Code</th>
+              <th>NameThai</th>
+              <th>NameEng</th>
+              <th>Department</th>
+              <th>Company</th>
+              <th>HeadName</th>
+              <th>ADUser</th>
+              <th>Type</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          @for (emp of employees; track emp.employeeId; let i = $index) {
+            <tbody>
+              <tr>
+                <td class="col-no">{{ currentPage * pageSize + i + 1 }}</td>
+                <td>
+                  <span class="emp-id">{{ emp.employeeId }}</span>
+                </td>
+                <td>
+                  <div>{{ emp.nameThai1 }}</div>
+                  <div class="line2">{{ emp.nameThai2 }}</div>
+                </td>
+                <td>
+                  <div>{{ emp.nameEng1 }}</div>
+                  <div class="line2">{{ emp.nameEng2 }}</div>
+                </td>
+                <td>{{ emp.department }}</td>
+                <td>{{ emp.companyCode }}</td>
+                <td>
+                  <div>{{ emp.headName1 }}</div>
+                  <div class="line2">{{ emp.headName2 }}</div>
+                </td>
+                <td>
+                  <span class="ad-user">{{ emp.adUser }}</span>
+                </td>
+                <td>
+                  <span class="emp-type-badge">{{ emp.employeeType }}</span>
+                </td>
+                <td class="col-actions">
+                  <div class="action-btns">
+                    <button class="act-btn act-info" title="ข้อมูล">
+                      <i class="fas fa-info"></i>
+                    </button>
+                    <button class="act-btn act-edit" title="แก้ไข">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="act-btn act-key" title="AD User">
+                      <i class="fas fa-key"></i>
+                    </button>
+                    <button class="act-btn act-sync" title="Sync">
+                      <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="act-btn act-delete" title="ลบ">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button class="act-btn act-view" title="ดูรายละเอียด">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="10" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบรายชื่อพนักงาน"
+                    icon="fas fa-users-slash"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="card-list-view">
+      @if (isLoading) {
+        <app-skeleton type="card" [rows]="4"></app-skeleton>
+      } @else {
+        @for (emp of employees; track emp.employeeId) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="emp-id-badge">{{ emp.employeeId }}</span>
+                <div class="emp-name">
+                  <span>{{ emp.nameThai1 }}</span>
+                  <span class="line2">{{ emp.nameThai2 }}</span>
+                </div>
+                <div class="text-muted small">
+                  <span>{{ emp.nameEng1 }}</span>
+                  <span class="line2"> {{ emp.nameEng2 }}</span>
+                </div>
+              </div>
+              <span class="emp-type-badge">{{ emp.employeeType }}</span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label"><i class="fas fa-sitemap"></i> แผนก:</span>
+                <span class="value">{{ emp.department }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-building"></i> บริษัท:</span>
+                <span class="value">{{ emp.companyCode }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-user-tie"></i> หัวหน้า:</span>
+                <span class="value">
+                  <div>{{ emp.headName1 }}</div>
+                  <div class="line2">{{ emp.headName2 }}</div>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-user-circle"></i> AD User:</span>
+                <span class="value ad-user">{{ emp.adUser || '-' }}</span>
+              </div>
+              <div class="card-footer-actions">
+                <button class="act-btn act-info" title="ข้อมูล"><i class="fas fa-info"></i></button>
+                <button class="act-btn act-edit" title="แก้ไข">
+                  <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button class="act-btn act-key" title="AD User"><i class="fas fa-key"></i></button>
+                <button class="act-btn act-sync" title="Sync">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="act-btn act-delete" title="ลบ">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="act-btn act-view" title="ดูรายละเอียด">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบข้อมูล"
+            description="ไม่พบรายชื่อพนักงาน"
+            icon="fas fa-users-slash"
+          ></app-empty-state>
+        }
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalItems]="totalItems"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      ></app-pagination>
+    </div>
+  </div>
+</div>
