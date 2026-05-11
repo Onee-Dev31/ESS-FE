@@ -297,6 +297,40 @@
   }
 }
 
+// ==================== MATCHING EMPLOYEES ====================
+.matching-employees {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.match-emp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .match-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-header);
+  }
+
+  .match-nickname {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .match-code {
+    font-size: 0.7rem;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary), transparent 88%);
+    border-radius: 999px;
+    padding: 1px 8px;
+    white-space: nowrap;
+  }
+}
+
 // ==================== HEADS LIST ====================
 .heads-list {
   display: flex;
