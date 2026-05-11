@@ -65,15 +65,23 @@ export class EmpployeeAdManagement {
 
   getCompanies() {
     this.masterService.getCompanyMaster().subscribe({
-      next: (data) => { this.companyList = data; },
-      error: (err) => { console.error(err); },
+      next: (data) => {
+        this.companyList = data;
+      },
+      error: (err) => {
+        console.error(err);
+      },
     });
   }
 
   getDepartments() {
     this.masterService.getDepartmentMaster().subscribe({
-      next: (data) => { this.departmentList = data; },
-      error: (err) => { console.error(err); },
+      next: (data) => {
+        this.departmentList = data;
+      },
+      error: (err) => {
+        console.error(err);
+      },
     });
   }
 
@@ -87,9 +95,12 @@ export class EmpployeeAdManagement {
 
   updateAppliedFilters() {
     const filters: { key: string; label: string; value: string }[] = [];
-    if (this.appliedCompany) filters.push({ key: 'company', label: 'Company', value: this.appliedCompany });
-    if (this.appliedDepartment) filters.push({ key: 'department', label: 'Department', value: this.appliedDepartment });
-    if (this.appliedSearch) filters.push({ key: 'search', label: 'Search', value: `"${this.appliedSearch}"` });
+    if (this.appliedCompany)
+      filters.push({ key: 'company', label: 'Company', value: this.appliedCompany });
+    if (this.appliedDepartment)
+      filters.push({ key: 'department', label: 'Department', value: this.appliedDepartment });
+    if (this.appliedSearch)
+      filters.push({ key: 'search', label: 'Search', value: `"${this.appliedSearch}"` });
     this.appliedFilters = filters;
     this.hasFilters = filters.length > 0;
   }
@@ -110,9 +121,21 @@ export class EmpployeeAdManagement {
   }
 
   removeFilter(key: string) {
-    if (key === 'company') { this.filterCompany = null; this.filterDepartment = null; this.filteredDepartmentList = []; this.appliedCompany = ''; this.appliedDepartment = ''; }
-    if (key === 'department') { this.filterDepartment = null; this.appliedDepartment = ''; }
-    if (key === 'search') { this.searchText = ''; this.appliedSearch = ''; }
+    if (key === 'company') {
+      this.filterCompany = null;
+      this.filterDepartment = null;
+      this.filteredDepartmentList = [];
+      this.appliedCompany = '';
+      this.appliedDepartment = '';
+    }
+    if (key === 'department') {
+      this.filterDepartment = null;
+      this.appliedDepartment = '';
+    }
+    if (key === 'search') {
+      this.searchText = '';
+      this.appliedSearch = '';
+    }
     this.currentPage = 0;
     this.updateAppliedFilters();
     this.loadData(1, this.pageSize);
@@ -176,35 +199,37 @@ export class EmpployeeAdManagement {
   private loadData(page: number, pageSize: number) {
     this.isLoading = true;
 
-    this.empAdService.getEmployees({
-      pageNumber: page,
-      pageSize,
-      searchText: this.appliedSearch || undefined,
-      companyCode: this.appliedCompany || undefined,
-      department: this.appliedDepartment || undefined,
-    }).subscribe({
-      next: (res: any) => {
-        const items = Array.isArray(res) ? res : (res.data ?? []);
-        const pagination = res.pagination;
+    this.empAdService
+      .getEmployees({
+        pageNumber: page,
+        pageSize,
+        searchText: this.appliedSearch || undefined,
+        companyCode: this.appliedCompany || undefined,
+        department: this.appliedDepartment || undefined,
+      })
+      .subscribe({
+        next: (res: any) => {
+          const items = Array.isArray(res) ? res : (res.data ?? []);
+          const pagination = res.pagination;
 
-        this.employees = items.map((i: any) => this.mapEmployee(i));
+          this.employees = items.map((i: any) => this.mapEmployee(i));
 
-        if (pagination) {
-          this.totalItems = pagination.total ?? items.length;
-          this.totalPages = pagination.totalPages ?? Math.ceil(this.totalItems / pageSize);
-          this.currentPage = (pagination.page ?? page) - 1;
-        } else {
-          this.totalItems = items.length;
-          this.totalPages = Math.ceil(items.length / pageSize) || 1;
-        }
+          if (pagination) {
+            this.totalItems = pagination.total ?? items.length;
+            this.totalPages = pagination.totalPages ?? Math.ceil(this.totalItems / pageSize);
+            this.currentPage = (pagination.page ?? page) - 1;
+          } else {
+            this.totalItems = items.length;
+            this.totalPages = Math.ceil(items.length / pageSize) || 1;
+          }
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-    });
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 }
