@@ -1,0 +1,233 @@
+<div class="page">
+  <app-page-header [title]="pageTitle()" />
+
+  <div class="filter-card">
+    <div class="filter-title">ตัวเลือกสำหรับการค้นหา</div>
+    <div class="filter-grid">
+      <div class="field-box">
+        <label class="field-label">บริษัท</label>
+        <select
+          class="field-input"
+          aria-label="เลือกบริษัท"
+          [ngModel]="filterCompany()"
+          (ngModelChange)="onCompanyChange($event)"
+        >
+          <option value="">ทุกบริษัท</option>
+          @for (c of companyList(); track c.code) {
+            <option [value]="c.code">{{ c.name }} ({{ c.code }})</option>
+          }
+        </select>
+      </div>
+      <div class="field-box" [class.disabled]="!filterCompany()">
+        <label class="field-label">แผนก</label>
+        <select
+          class="field-input"
+          aria-label="เลือกแผนก"
+          [ngModel]="filterDept()"
+          (ngModelChange)="filterDept.set($event)"
+          [disabled]="!filterCompany()"
+        >
+          <option value="">ทุกแผนก</option>
+          @for (d of deptList(); track d.cost_cent) {
+            <option [value]="d.cost_cent">{{ d.name }} ({{ d.cost_cent }})</option>
+          }
+        </select>
+      </div>
+      <div class="filter-bottom-row">
+        <div class="field-box field-grow">
+          <label class="field-label">ค้นหาพนักงาน</label>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+            [ngModel]="filterText()"
+            (ngModelChange)="filterText.set($event)"
+            (keyup.enter)="applyFilter()"
+          />
+        </div>
+        <button type="button" class="btn-search" (click)="applyFilter()">
+          <i class="fas fa-search"></i> Search
+        </button>
+        <button type="button" class="btn-clear" (click)="clearFilter()">
+          <i class="fas fa-times"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-header-title">รายชื่อหัวหน้าแผนก</div>
+
+    <div class="table-responsive">
+      @if (isLoading()) {
+        <app-skeleton type="table" [rows]="5" />
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>บริษัท</th>
+              <th>แผนก</th>
+              <th>หัวหน้าแผนก</th>
+              <th class="text-center">พนักงาน</th>
+              <th class="text-center"></th>
+            </tr>
+          </thead>
+          @for (dept of paginatedItems(); track dept.cost_cent) {
+            <tbody>
+              <tr>
+                <td>
+                  <div class="cell-primary">{{ dept.company_name }}</div>
+                  <div class="cell-sub">{{ dept.company_code }}</div>
+                </td>
+                <td>
+                  <div class="cell-primary">{{ dept.name_cost_cent }}</div>
+                  <div class="cell-sub">{{ dept.cost_cent }}</div>
+                </td>
+                <td>
+                  <div class="heads-list">
+                    @for (head of dept.heads; track head.code) {
+                      <div class="head-item">
+                        <span class="level-badge" [class.level-1]="head.level === 1">
+                          {{ getLevelLabel(head.level) }}
+                        </span>
+                        <span class="head-name">{{ head.name }}</span>
+                      </div>
+                    }
+                  </div>
+                </td>
+                <td class="text-center">
+                  <span class="emp-count">{{ dept.employees.length }}</span>
+                </td>
+                <td class="text-center">
+                  <button class="btn-ghost" (click)="openDetail(dept)">
+                    <i class="fas fa-users"></i> พนักงาน
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="5" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบข้อมูลหัวหน้าแผนก"
+                    icon="fas fa-users-slash"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
+    </div>
+
+    <div class="card-list-view">
+      @if (isLoading()) {
+        <app-skeleton type="card" [rows]="3" />
+      } @else {
+        @for (dept of paginatedItems(); track dept.cost_cent) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="card-dept-name">{{ dept.name_cost_cent }}</span>
+                <div class="card-dept-code">{{ dept.cost_cent }}</div>
+              </div>
+              <span class="company-badge">{{ dept.company_code }}</span>
+            </div>
+            <div class="card-body">
+              @for (head of dept.heads; track head.code) {
+                <div class="info-row">
+                  <span class="label">
+                    <i class="fas fa-user-tie"></i> {{ getLevelLabel(head.level) }}:
+                  </span>
+                  <span class="value">{{ head.name }}</span>
+                </div>
+              }
+              <div class="info-row">
+                <span class="label"><i class="fas fa-users"></i> พนักงาน:</span>
+                <span class="value">{{ dept.employees.length }} คน</span>
+              </div>
+              <div class="card-footer-actions">
+                <button class="btn-detail" (click)="openDetail(dept)">
+                  <i class="fas fa-users"></i> ดูรายชื่อพนักงาน
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบข้อมูล"
+            description="ไม่พบข้อมูลหัวหน้าแผนก"
+            icon="fas fa-users-slash"
+          />
+        }
+      }
+    </div>
+
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="currentPage()"
+        [pageSize]="pageSize()"
+        [totalItems]="totalItems()"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      />
+    </div>
+  </div>
+
+  @if (selectedDept()) {
+    <div class="modal-backdrop" (click)="closeDetail()"></div>
+    <div class="modal" (click)="closeDetail()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">{{ selectedDept()!.name_cost_cent }}</div>
+            <div class="modal-subtitle">
+              {{ selectedDept()!.company_name }} ({{ selectedDept()!.company_code }})
+            </div>
+          </div>
+          <button class="btn-close" type="button" title="ปิด" aria-label="ปิด" (click)="closeDetail()">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="section-label">หัวหน้าแผนก</div>
+          <div class="heads-chain">
+            @for (head of selectedDept()!.heads; track head.code) {
+              <div class="chain-item" [class.direct-head]="head.level === 1">
+                <span class="level-badge" [class.level-1]="head.level === 1">
+                  {{ getLevelLabel(head.level) }}
+                </span>
+                <div class="person-info">
+                  <span class="person-name">{{ head.name }}</span>
+                  <span class="person-code">{{ head.code }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="section-label mt">
+            พนักงานในแผนก ({{ selectedDept()!.employees.length }} คน)
+          </div>
+          <div class="employees-list">
+            @for (emp of selectedDept()!.employees; track emp.emp_code) {
+              <div class="emp-item">
+                <div class="emp-info">
+                  <span class="emp-name">{{ emp.emp_name }}</span>
+                  @if (emp.nickname) {
+                    <span class="emp-nickname">({{ emp.nickname }})</span>
+                  }
+                </div>
+                <span class="emp-code">{{ emp.emp_code }}</span>
+              </div>
+            } @empty {
+              <div class="no-emp">ไม่มีพนักงานในแผนกนี้</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
