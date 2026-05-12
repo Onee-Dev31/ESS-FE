@@ -65,6 +65,7 @@ export class SwalService {
       text: text || 'กรุณารอสักครู่',
       allowOutsideClick: false,
       allowEscapeKey: false,
+      customClass: { container: 'swal-over-modal' },
       didOpen: () => {
         Swal.showLoading();
       },

@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
@@ -28,6 +29,8 @@ import { encryptValue } from '../../../utils/crypto.js ';
 import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
 import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary';
+import { PaginationComponent } from '../../../components/shared/pagination/pagination';
+import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
 
 @Component({
   selector: 'app-report',
@@ -43,6 +46,7 @@ import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary
     NzModalModule,
     NzPaginationModule,
     NzDatePickerModule,
+    PaginationComponent,
   ],
   templateUrl: './report.html',
   styleUrl: './report.scss',
@@ -65,6 +69,10 @@ export class Report {
   //   this.cdr.detectChanges();
   // }
 
+  allRequests = signal<any[]>([]);
+  listing = createListingState();
+  comps = createListingComputeds_v2(this.allRequests, this.listing);
+
   // ===== KPI =====
   activeStatus: string = 'all';
   selectedStatus: string = 'all';
@@ -74,65 +82,70 @@ export class Report {
       title: 'All Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      icon: 'fa-solid fa-border-all',
     },
     {
-      status: 'Open',
-      title: 'Open tickets',
+      status: 'done',
+      title: 'Closed Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      icon: 'fa-solid fa-circle-check',
     },
-    // {
-    //   status: 'In Progress',
-    //   title: 'In Progress Tickets',
-    //   value: 0,
-    //   delta: 0,
-    //   hint: 'Tickets ที่กำลังดำเนินการ',
-    //   icon: 'sync',
-    // },
     {
       status: 'Assigned',
       title: 'In Progress Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
-    },
-    {
-      status: 'Closed',
-      title: 'Closed Tickets',
-      value: 0,
-      delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
+      icon: 'fa-solid fa-diagram-project',
     },
     {
       status: 'Open',
       title: 'Open tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-      icon: 'inbox',
+      icon: 'fa-solid fa-folder-open',
     },
-
     {
-      status: 'Hold',
-      title: 'Hold Tickets',
+      status: 'ReOpened',
+      title: 'Re-Opened tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่หยุดทำการ',
-      icon: 'pause-circle',
+      icon: 'fa-solid fa-repeat',
+    },
+    {
+      status: 'waitingapproval',
+      title: 'Waiting Approval tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-hourglass-start',
+    },
+    {
+      status: 'referredBack',
+      title: 'Referred Back tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-clock-rotate-left',
+    },
+    {
+      status: 'rejected',
+      title: 'Reject Tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-ban',
     },
     {
       status: 'Deny',
       title: 'Deny Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ถูกปฏิเสธ',
-      icon: 'stop',
+      icon: 'fa-solid fa-ban',
+    },
+    {
+      status: 'Hold',
+      title: 'Hold Tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-pause',
     },
   ];
   showDeptBar = false;
@@ -149,11 +162,15 @@ export class Report {
 
   // map key -> index ใน pie (ต้องตรงกับ data ที่ใส่ใน option)
   private statusIndexMap: Record<string, number> = {
-    open: 0,
+    done: 0,
     assigned: 1,
-    done: 2,
-    hold: 3,
-    denied: 4,
+    open: 2,
+    reopen: 3,
+    waitingapproval: 4,
+    referredBack: 5,
+    rejected: 6,
+    hold: 7,
+    denied: 8,
     all: -1,
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
@@ -183,11 +200,68 @@ export class Report {
     private masterService: MasterDataService,
   ) {}
 
+  private themeObserver?: MutationObserver;
+
   ngOnInit(): void {
     this.selectStatus('all', false);
     this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
+
+    this.themeObserver = new MutationObserver(() => {
+      setTimeout(() => {
+        this.rebuildChartColors();
+      }, 100);
+    });
+
+    this.themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class'],
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.themeObserver?.disconnect();
+  }
+
+  private rebuildChartColors(): void {
+    const textColor = this.getCssVar('--text-header') || '#0f172a';
+    const mutedColor = this.getCssVar('--text-muted') || '#64748b';
+    const bgCard = this.getCssVar('--bg-card') || '#ffffff';
+    const borderColor = this.getCssVar('--border-color') || '#e2e8f0';
+
+    const updateOption = (opt: any, chart?: ECharts) => {
+      if (!opt) return;
+
+      if (opt.graphic) {
+        opt.graphic[0].style.fill = textColor;
+        opt.graphic[1].style.fill = mutedColor;
+      }
+
+      if (opt.legend?.textStyle) {
+        opt.legend.textStyle.color = textColor;
+      }
+
+      if (opt.tooltip) {
+        opt.tooltip.backgroundColor = bgCard;
+        opt.tooltip.borderColor = borderColor;
+        if (opt.tooltip.textStyle) {
+          opt.tooltip.textStyle.color = textColor;
+        }
+      }
+
+      chart?.setOption(opt);
+    };
+
+    updateOption(this.statusPieOption, this.statusChart);
+    updateOption(this.servicePieOption, this.serviceChart);
+
+    // rebuild bar chart เพราะ axisLabel color hardcode ไว้
+    if (this.selectedCompany) {
+      this.buildDeptBar(this.selectedCompany, this.deptTop5Map[this.selectedCompany] ?? []);
+    }
+
+    this.cdr.detectChanges();
   }
 
   // ====== 1) Status Donut ======
@@ -199,65 +273,83 @@ export class Report {
         title: 'All Tickets',
         value: summary.all ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
-      },
-      {
-        status: 'open',
-        title: 'New tickets',
-        value: summary.open ?? 0,
-        delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
-      },
-      // {
-      //   status: 'inprogress',
-      //   title: 'In Progress Tickets',
-      //   value: summary.inProcess ?? 0,
-      //   delta: 0,
-      //   hint: 'Tickets ที่กำลังดำเนินการ',
-      //   icon: 'sync',
-      // },
-      {
-        status: 'assigned',
-        title: 'In Progress Ticket',
-        value: summary.assigned ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ได้รับมอบหมาย',
-        icon: 'user',
+        icon: 'fa-solid fa-border-all',
       },
       {
         status: 'done',
         title: 'Closed Tickets',
         value: summary.closed ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
+        icon: 'fa-solid fa-circle-check',
       },
       {
-        status: 'hold',
-        title: 'Hold Tickets',
-        value: summary.hold ?? 0,
+        status: 'assigned',
+        title: 'In Progress Ticket',
+        value: summary.assigned ?? 0,
         delta: 0,
-        hint: 'Tickets ที่หยุดทำการ',
-        icon: 'pause-circle',
+        icon: 'fa-solid fa-diagram-project',
+      },
+      {
+        status: 'open',
+        title: 'New tickets',
+        value: summary.open ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-folder-open',
+      },
+      {
+        status: 'reopen',
+        title: 'Re-Opened tickets',
+        value: summary.reopen ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-repeat',
+      },
+      {
+        status: 'waitingapproval',
+        title: 'Waiting Approval tickets',
+        value: summary.waitingapproval ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-hourglass-start',
+      },
+      {
+        status: 'referredBack',
+        title: 'Referred Back tickets',
+        value: summary.referredBack ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-clock-rotate-left',
+      },
+      {
+        status: 'rejected',
+        title: 'Reject Tickets',
+        value: summary.rejected ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-ban',
       },
       {
         status: 'denied',
         title: 'Deny Tickets',
         value: summary.denied ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ถูกปฏิเสธ',
-        icon: 'stop',
+        icon: 'fa-solid fa-ban',
+      },
+      {
+        status: 'hold',
+        title: 'Hold Tickets',
+        value: summary.hold ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-pause',
       },
     ];
   }
+
   private buildStatusPie(summary: any) {
     const data: PieDatum[] = [
-      { name: 'New', value: summary.open ?? 0, key: 'open' },
-      { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
-      // { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
+      { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
+      { name: 'New', value: summary.open ?? 0, key: 'open' },
+      { name: 'Re-Opened', value: summary.reopen ?? 0, key: 'reopen' },
+      { name: 'Waiting Approval', value: summary.waitingapproval ?? 0, key: 'waitingapproval' },
+      { name: 'Referred Back', value: summary.referredBack ?? 0, key: 'referredBack' },
+      { name: 'Rejected', value: summary.rejected ?? 0, key: 'rejected' },
       { name: 'Hold', value: summary.hold ?? 0, key: 'hold' },
       { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
     ];
@@ -328,16 +420,6 @@ export class Report {
         axisLine: { show: false },
         axisLabel: { show: false },
       },
-
-      // series: [
-      //   {
-      //     type: 'bar',
-      //     data: chartData,
-      //     barWidth: 46,
-      //     itemStyle: { borderRadius: [12, 12, 12, 12] },
-      //     emphasis: { focus: 'series' },
-      //   },
-      // ],
       series: [
         {
           type: 'bar',
@@ -423,16 +505,26 @@ export class Report {
           fontSize: 10,
           fontWeight: 400,
           overflow: 'truncate',
+          color: this.getCssVar('--text-header') || '#0f172a',
         },
         width: '100%',
         type: 'plain',
       },
-      tooltip: { trigger: 'item' },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
+      },
       color: [
-        this.getCssVar('--status-open-text'),
-        this.getCssVar('--status-assigned-text'),
-        // this.getCssVar('--status-progress-text'),
         this.getCssVar('--status-closed-text'),
+        this.getCssVar('--status-progress-text'),
+        this.getCssVar('--status-open-text'),
+        this.getCssVar('--status-reopen-text'),
+        this.getCssVar('--status-progress-bg'),
+        this.getCssVar('--status-pending-bg'),
+        this.getCssVar('--status-deny-bg'),
         this.getCssVar('--status-hold-text'),
         this.getCssVar('--status-deny-text'),
       ],
@@ -444,12 +536,6 @@ export class Report {
           center: ['50%', '53%'],
           label: { show: false },
           labelLine: { show: false },
-          // label: {
-          //   show: true,
-          //   formatter: '{b}: {c}',
-          //   fontSize: 11,
-          // },
-          // labelLine: { show: true },
           avoidLabelOverlap: true,
           emphasis: { scale: true, scaleSize: 6 },
           data,
@@ -484,7 +570,8 @@ export class Report {
   }
 
   private getCssVar(name: string): string {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return getComputedStyle(document.body).getPropertyValue(name).trim();
+    // return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   private makeDonutOptionService(
@@ -505,11 +592,18 @@ export class Report {
           fontSize: 10,
           fontWeight: 400,
           overflow: 'truncate',
+          color: this.getCssVar('--text-header') || '#0f172a',
         },
         width: '100%',
         type: 'plain',
       },
-      tooltip: { trigger: 'item' },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
+      },
       color: [
         this.getCssVar('--btn-service-border'),
         this.getCssVar('--btn-repair-border'),
@@ -762,7 +856,7 @@ export class Report {
 
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        // console.log(res);
+        console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -783,12 +877,34 @@ export class Report {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
-    this.loadTickets(status);
+    this.loadTickets();
   }
 
-  loadTickets(status: string): void {
-    this.itServiceService.getTicketByStatus(status).subscribe({
+  loadTickets(): void {
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+
+    const params = {
+      status: this.statusLabelApi(this.currentStatus),
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: true,
+    };
+    // console.log(params);
+    this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
+        // console.log(res);
+        this.allRequests.set(res.data);
+        this.listing.totalItems.set(res.pagination.total ?? 0);
+        this.listing.totalPages.set(res.pagination.totalPages ?? 1);
+        this.listing.currentPage.set((res.pagination.page ?? 1) - 1);
+
         this.ticketLogs = (Array.isArray(res?.data) ? res.data : []).map((t: any) => ({
           ...t,
           COMPANY_CODE: this.remapCompanyCode(t.COMPANY_CODE),
@@ -808,6 +924,29 @@ export class Report {
     });
   }
 
+  clearFilter() {
+    this.filter = {
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+    };
+    this.filteredDepartmentList = [];
+    this.loadTickets();
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+    this.loadTickets();
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+    this.loadTickets();
+  }
   handleCancel(): void {
     this.isLogModalVisible = false;
     this.ticketLogs = [];
@@ -853,17 +992,25 @@ export class Report {
   statusLabel(status: string) {
     switch (status) {
       case 'open':
-        return 'Open';
+        return 'New';
+      case 'reopen':
+        return 'ReOpened';
       case 'assigned':
-        return 'Assigned';
-      case 'inprogress':
         return 'In Progress';
+      // case 'inprogress':
+      //   return 'In Progress';
       case 'done':
         return 'Closed';
       case 'denied':
         return 'Denied';
       case 'hold':
         return 'Hold';
+      case 'waitingapproval':
+        return 'Waiting Approval';
+      case 'referredBack':
+        return 'Referred Back';
+      case 'rejected':
+        return 'Rejected';
       case 'all':
         return 'All';
       default:
@@ -871,44 +1018,22 @@ export class Report {
     }
   }
 
+  statusLabelApi(status: string) {
+    switch (status) {
+      case 'In Progress':
+        return 'Assigned';
+      case 'New':
+        return 'Open';
+      default:
+        return this.currentStatus;
+    }
+  }
+
+  private filterTimer: ReturnType<typeof setTimeout> | null = null;
   applyFilter() {
-    const range = this.filter.dateRange;
-    const [rawFrom, rawTo] = range ?? [];
-    const from = rawFrom ? dayjs(rawFrom) : null;
-    const to = rawTo ? dayjs(rawTo) : null;
-
-    this.filteredTicketLogs = this.ticketLogs.filter((t) => {
-      const ticketNoMatch =
-        !this.filter.ticketNo ||
-        t.ticket_number?.toLowerCase().includes(this.filter.ticketNo.toLowerCase());
-
-      const subjectMatch =
-        !this.filter.subject ||
-        t.subject?.toLowerCase().includes(this.filter.subject.toLowerCase());
-
-      const requesterMatch =
-        !this.filter.requester ||
-        t.requester_name?.toLowerCase().includes(this.filter.requester.toLowerCase());
-
-      const deptMatch = !this.filter.department || t.deptName === this.filter.department;
-
-      const companyMatch = !this.filter.company || t.COMPANY_CODE === this.filter.company;
-
-      const rawDate = t.updated_at || t.created_at;
-      const itemDate = dayjs(rawDate);
-
-      let dateMatch = true;
-
-      if (from && to) {
-        dateMatch = itemDate.isAfter(from.startOf('day')) && itemDate.isBefore(to.endOf('day'));
-      }
-
-      return (
-        ticketNoMatch && subjectMatch && requesterMatch && deptMatch && companyMatch && dateMatch
-      );
-    });
-
-    this.page = 1;
+    this.filterTimer = setTimeout(() => {
+      this.loadTickets();
+    }, 300);
   }
 
   filterAll = {
@@ -931,8 +1056,6 @@ export class Report {
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
 
-    console.log({ dateFrom, dateTo });
-
     this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
@@ -948,13 +1071,13 @@ export class Report {
     });
   }
 
-  clearFilter() {
-    this.filterAll = {
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
-    };
+  // clearFilter() {
+  //   this.filterAll = {
+  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+  //   };
 
-    this.getAllTickets();
-  }
+  //   this.getAllTickets();
+  // }
 
   exportData() {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
@@ -983,8 +1106,9 @@ export class Report {
       next: (data) => {
         this.companyList = data.map((c: any) => ({
           ...c,
-          COMPANY_CODE: this.remapCompanyCode(c.COMPANY_CODE),
-          COMPANY_NAME: this.remapCompanyCode(c.COMPANY_NAME),
+          COMPANY_CODE: c.COMPANY_CODE,
+          COMPANY_CODE_DISPLAY: this.remapCompanyCode(c.COMPANY_CODE),
+          COMPANY_NAME: c.COMPANY_NAME,
         }));
         // console.log(this.companyList);
       },
@@ -999,7 +1123,7 @@ export class Report {
       next: (data) => {
         this.departmentList = data.map((d: any) => ({
           ...d,
-          COMPANY_CODE: this.remapCompanyCode(d.COMPANY_CODE),
+          COMPANY_CODE: d.COMPANY_CODE,
         }));
         // console.log(this.departmentList);
       },

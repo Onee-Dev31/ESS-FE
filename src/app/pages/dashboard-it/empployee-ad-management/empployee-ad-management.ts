@@ -12,7 +12,9 @@ import { EmptyStateComponent } from '../../../components/shared/empty-state/empt
 import { SkeletonComponent } from '../../../components/shared/skeleton/skeleton';
 import Swal from 'sweetalert2';
 import { EmpAdService } from '../../../services/emp-ad-service';
+import { LoadingService } from '../../../services/loading';
 import { MasterDataService } from '../../../services/master-data.service';
+import { SwalService } from '../../../services/swal.service';
 import { EmpAdForm } from './emp-ad-form/emp-ad-form';
 
 @Component({
@@ -41,6 +43,7 @@ export class EmpployeeAdManagement {
   selectedEmployeeId = '';
 
   isEditOpen = false;
+  isEditSaving = false;
   editEmp: any = null;
   editAdUser = '';
 
@@ -76,6 +79,8 @@ export class EmpployeeAdManagement {
   constructor(
     private empAdService: EmpAdService,
     private masterService: MasterDataService,
+    private loadingService: LoadingService,
+    private swalService: SwalService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -390,29 +395,26 @@ export class EmpployeeAdManagement {
       adUserOld: emp.adUser ?? '',
     };
 
+    this.isEditSaving = true;
+    this.loadingService.show();
     this.empAdService.updateEmployeeX1(payload).subscribe({
       next: () => {
+        this.isEditSaving = false;
+        this.loadingService.hide();
         this.closeEdit();
         this.cdr.detectChanges();
         setTimeout(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'อัปเดตสำเร็จ',
-            text: `อัปเดต AD User สำหรับ ${payload.codeMpId} เรียบร้อยแล้ว`,
-            confirmButtonText: 'ตกลง',
-          }).then(() => this.loadData(this.currentPage + 1, this.pageSize));
+          this.swalService.success(`อัปเดต AD User สำหรับ ${payload.codeMpId} เรียบร้อยแล้ว`);
+          this.loadData(this.currentPage + 1, this.pageSize);
         }, 300);
       },
       error: (err) => {
+        this.isEditSaving = false;
+        this.loadingService.hide();
         this.closeEdit();
         this.cdr.detectChanges();
         setTimeout(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            text: err?.error?.message ?? 'ไม่สามารถอัปเดตข้อมูลได้ กรุณาลองใหม่',
-            confirmButtonText: 'ตกลง',
-          });
+          this.swalService.error(err?.error?.message ?? 'ไม่สามารถอัปเดตข้อมูลได้ กรุณาลองใหม่');
         }, 300);
       },
     });

@@ -4,13 +4,14 @@
 
 :host {
   display: block;
+  transition: background-color 0.25s ease;
 }
 
 /* ===== KPI ===== */
 .kpi-row {
   padding: 20px;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
 
   @include large-tablet {
@@ -111,31 +112,31 @@
   font-size: 18px;
 }
 
-.pill-blue {
+.pill-open {
   background: var(--status-open-bg);
   color: var(--status-open-text);
   border-color: color-mix(in srgb, var(--status-open-text), transparent 70%);
 }
 
-.pill-cyan {
-  background: var(--status-assigned-bg);
-  color: var(--status-assigned-text);
-  border-color: color-mix(in srgb, var(--status-assigned-text), transparent 70%);
+.pill-reopen {
+  background: var(--status-reopen-bg);
+  color: var(--status-reopen-text);
+  border-color: color-mix(in srgb, var(--status-reopen-text), transparent 70%);
 }
 
-.pill-orange {
+.pill-assigned {
   background: var(--status-progress-bg);
   color: var(--status-progress-text);
   border-color: color-mix(in srgb, var(--status-progress-text), transparent 70%);
 }
 
-.pill-green {
+.pill-done {
   background: var(--status-closed-bg);
   color: var(--status-closed-text);
   border-color: color-mix(in srgb, var(--status-closed-text), transparent 70%);
 }
 
-.pill-red {
+.pill-denied {
   background: var(--status-deny-bg);
   color: var(--status-deny-text);
   border-color: color-mix(in srgb, var(--status-deny-text), transparent 70%);
@@ -147,7 +148,7 @@
   border-color: color-mix(in srgb, var(--status-hold-text), transparent 70%);
 }
 
-.pill-gray {
+.pill-all {
   background: rgba(100, 116, 139, 0.12);
   color: var(--text-table-head);
   border-color: rgba(100, 116, 139, 0.22);
@@ -500,12 +501,17 @@
 }
 
 .export-btn {
+  @include btn-primary;
   background: var(--success);
   color: #fff;
   border: none;
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--success), transparent 10%);
+  }
 }
 
 .log-filter {
@@ -743,4 +749,8 @@ body[data-theme='dark'] {
   .member-name {
     color: var(--text-header);
   }
+}
+
+.btn-clear {
+  @include btn-outline;
 }

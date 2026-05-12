@@ -19,6 +19,7 @@ import {
   PauseCircleOutline,
   PauseOutline,
   StopOutline,
+  ReloadOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const provideAppNzIcons = () =>
@@ -42,4 +43,5 @@ export const provideAppNzIcons = () =>
     PauseCircleOutline,
     PauseOutline,
     StopOutline,
+    ReloadOutline,
   ]);

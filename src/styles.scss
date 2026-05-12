@@ -36,6 +36,16 @@ body {
   height: 100%;
 }
 
+body.theme-transition,
+body.theme-transition *,
+body.theme-transition *::before,
+body.theme-transition *::after {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease !important;
+}
+
 // Global Text & Header Overrides (to fix library defaults like ng-zorro)
 h1,
 h2,

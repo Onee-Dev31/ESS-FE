@@ -88,9 +88,16 @@
         <div class="ticket-info">
           <div class="ticket-header">
             <span class="ticket-number">{{ ticket.ticketNumber }}</span>
-            <span *ngIf="newNoteTicketIds().has(ticket.ticketId)" class="new-note-badge">
-              <i class="fas fa-comment-dots"></i> ข้อความใหม่
-            </span>
+            <div class="ticket-meta-right">
+              <span *ngIf="newNoteTicketIds().has(ticket.ticketId)" class="new-note-badge">
+                <i class="fas fa-comment-dots"></i> ข้อความใหม่
+              </span>
+              <i
+                class="fa-regular fa-closed-captioning"
+                style="font-size: large"
+                *ngIf="ticket.is_cc"
+              ></i>
+            </div>
           </div>
           <div class="ticket-title-row">
             <div class="ticket-title" [class.is-new-text]="newNoteTicketIds().has(ticket.ticketId)">

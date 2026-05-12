@@ -37,5 +37,6 @@ export class ThemeService {
     } else {
       document.body.removeAttribute('data-theme');
     }
+    setTimeout(() => document.body.classList.remove('theme-transition'), 300);
   }
 }

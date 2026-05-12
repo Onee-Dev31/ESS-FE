@@ -516,7 +516,13 @@
           @if (requestDetails()) {
             <div class="summary-section">
               <h3>รายละเอียด (Details)</h3>
-              <div class="detail-text p-3 bg-light rounded text-muted">
+              <!-- <div class="detail-text p-3 bg-light rounded text-muted">
+                {{ requestDetails() }}
+              </div> -->
+              <div
+                class="detail-text p-3 bg-light rounded text-muted"
+                style="white-space: pre-wrap"
+              >
                 {{ requestDetails() }}
               </div>
             </div>
