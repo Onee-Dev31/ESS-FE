@@ -120,8 +120,8 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
     req.reply({ success: true });
   }).as('markTicketRead');
 
-  cy.intercept('GET', '**/tickets?page=*', (req) => {
-    const pageSize = Number(req.query.pageSize ?? 50);
+  cy.intercept('GET', /\/tickets\?/, (req) => {
+    const pageSize = Number(req.query['pageSize'] ?? 50);
     req.reply({
       data: tickets.slice(0, pageSize),
       summary: {
@@ -143,8 +143,8 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
   cy.intercept('GET', '**/tickets/303', createTicketDetailResponse(tickets[2])).as('getTicket303');
 
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
-  cy.intercept('GET', '**/Master/companies', { data: [] }).as('getCompanies');
-  cy.intercept('GET', '**/Master/company-costcent', { data: [] }).as('getDepartments');
+  cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
+  cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
 };
 
 const forceItStaffRole = () => {

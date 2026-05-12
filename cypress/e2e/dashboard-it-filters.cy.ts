@@ -79,12 +79,22 @@ const tickets: DashboardTicketRecord[] = [
 ];
 
 const setupDashboardApi = () => {
-  cy.intercept('GET', '**/tickets?page=*', (req) => {
-    const myTicket = req.query.myTicket;
-    const filteredTickets =
+  cy.intercept('GET', /\/tickets\?/, (req) => {
+    const myTicket = req.query['myTicket'];
+    const searchText = ((req.query['searchText'] as string) ?? '').toLowerCase();
+
+    let filteredTickets =
       myTicket === 'tester.two'
         ? tickets.filter((ticket) => ticket.requester_aduser === 'tester.two')
         : tickets;
+
+    if (searchText) {
+      filteredTickets = filteredTickets.filter(
+        (ticket) =>
+          ticket.ticket_number.toLowerCase().includes(searchText) ||
+          ticket.subject.toLowerCase().includes(searchText),
+      );
+    }
 
     req.reply({
       data: filteredTickets,
@@ -144,8 +154,8 @@ const setupDashboardApi = () => {
     requestFor: {},
   }).as('getTicket303');
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
-  cy.intercept('GET', '**/Master/companies', { data: [] }).as('getCompanies');
-  cy.intercept('GET', '**/Master/company-costcent', { data: [] }).as('getDepartments');
+  cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
+  cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
 };
 
 describe('Dashboard IT filters', () => {

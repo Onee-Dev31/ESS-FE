@@ -45,7 +45,7 @@
         >
           <nz-option nzValue="all" nzLabel="All Tickets"></nz-option>
           <nz-option nzValue="open" nzLabel="New"></nz-option>
-          <nz-option nzValue="assigned" nzLabel="In Progress"></nz-option>
+          <nz-option nzValue="assigned" nzLabel="Assigned"></nz-option>
           <nz-option nzValue="done" nzLabel="Closed"></nz-option>
           <nz-option nzValue="hold" nzLabel="Hold"></nz-option>
           <nz-option nzValue="denied" nzLabel="Denied"></nz-option>
@@ -80,14 +80,7 @@
         (click)="onTicketClick(ticket.ticketId)"
       >
         @if (newNoteTicketIds().has(ticket.ticketId)) {
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              justify-content: flex-end;
-              margin-bottom: 5px;
-            "
-          >
+          <div class="new-note-wrapper">
             <span class="new-note-badge"> <i class="fas fa-comment-dots"></i> ข้อความใหม่ </span>
           </div>
         }
@@ -442,7 +435,7 @@
   <section class="tk-actions" *ngIf="t.status === 'Closed'">
     <ng-container>
       <button class="btn btn-send" (click)="ReOpen()">
-        <i class="fas fa-history" style="margin-right: 4px"></i> Reopen
+        <i class="fas fa-history"></i> Reopen
       </button>
     </ng-container>
   </section>
@@ -720,7 +713,7 @@
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2 class="request-title">รายละเอียด</h2>
-        <button class="btn-close-modal" (click)="isDetailModalOpen.set(false)">
+        <button class="btn-close-modal" aria-label="ปิด" (click)="isDetailModalOpen.set(false)">
           <i class="fas fa-times"></i>
         </button>
       </div>
