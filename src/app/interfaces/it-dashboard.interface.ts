@@ -50,7 +50,7 @@ export interface KpiCard {
   title: string;
   value: number;
   delta: number;
-  hint: string;
+  hint?: string;
   icon: string;
 }
 

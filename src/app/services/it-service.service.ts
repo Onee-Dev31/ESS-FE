@@ -327,8 +327,34 @@ export class ItServiceService {
     return this._http.put(`${this.baseUrl}/tickets/${assignData.id}/assign`, null, { params });
   }
 
-  getTicketByStatus(status: string) {
-    return this._http.get(`${this.baseUrl}/tickets/by-status?status=${status}`);
+  // getTicketByStatus(status: string) {
+  //   return this._http.get(`${this.baseUrl}/tickets/by-status?status=${status}`);
+  // }
+
+  getTicketByStatus(params: {
+    status?: string;
+    page?: number;
+    pageSize?: number;
+    ticketNo?: string;
+    subject?: string;
+    requester?: string;
+    company?: string;
+    department?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }) {
+    let httpParams = new HttpParams();
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.page) httpParams = httpParams.set('page', String(params.page));
+    if (params.pageSize) httpParams = httpParams.set('pageSize', String(params.pageSize));
+    if (params.ticketNo) httpParams = httpParams.set('ticketNo', params.ticketNo);
+    if (params.subject) httpParams = httpParams.set('subject', params.subject);
+    if (params.requester) httpParams = httpParams.set('requester', params.requester);
+    if (params.company) httpParams = httpParams.set('company', params.company);
+    if (params.department) httpParams = httpParams.set('department', params.department);
+    if (params.dateFrom) httpParams = httpParams.set('dateFrom', params.dateFrom);
+    if (params.dateTo) httpParams = httpParams.set('dateTo', params.dateTo);
+    return this._http.get(`${this.baseUrl}/tickets/by-status`, { params: httpParams });
   }
 
   updateTicket(id: string, formData: FormData): Observable<any> {

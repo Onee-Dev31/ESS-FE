@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,8 @@ type PieDatum = { name: string; value: number; key?: string };
 import { encryptValue } from '../../../utils/crypto.js ';
 import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
+import { PaginationComponent } from '../../../components/shared/pagination/pagination';
+import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
 
 @Component({
   selector: 'app-it-dashboard-summary',
@@ -36,6 +38,7 @@ import { ViewChildren, QueryList } from '@angular/core';
     NzModalModule,
     NzPaginationModule,
     NzDatePickerModule,
+    PaginationComponent,
   ],
   templateUrl: './it-dashboard-summary.html',
   styleUrl: './it-dashboard-summary.scss',
@@ -57,6 +60,10 @@ export class ItDashboardSummary {
     this.cdr.detectChanges();
   }
 
+  allRequests = signal<any[]>([]);
+  listing = createListingState();
+  comps = createListingComputeds_v2(this.allRequests, this.listing);
+
   // ===== KPI =====
   activeStatus: string = 'all';
   selectedStatus: string = 'all';
@@ -67,15 +74,23 @@ export class ItDashboardSummary {
       value: 0,
       delta: 0,
       hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      icon: 'fa-solid fa-border-all',
     },
     {
       status: 'Open',
       title: 'Open tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      // hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'fa-solid fa-folder-open',
+    },
+    {
+      status: 'ReOpened',
+      title: 'Re-Opened tickets',
+      value: 0,
+      delta: 0,
+      // hint: 'Tickets ทั้งหมดทุกสถานะ',
+      icon: 'fa-solid fa-repeat',
     },
     // {
     //   status: 'In Progress',
@@ -90,32 +105,32 @@ export class ItDashboardSummary {
       title: 'In Progress Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
+      // hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'fa-solid fa-hourglass-start',
     },
     {
-      status: 'Closed',
+      status: 'done',
       title: 'Closed Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
+      // hint: 'Tickets ที่ได้รับมอบหมาย',
+      icon: 'fa-solid fa-circle-check',
     },
     {
       status: 'Hold',
       title: 'Hold Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่หยุดทำการ',
-      icon: 'pause-circle',
+      // hint: 'Tickets ที่หยุดทำการ',
+      icon: 'fa-solid fa-pause',
     },
     {
       status: 'Deny',
       title: 'Deny Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ถูกปฏิเสธ',
-      icon: 'stop',
+      // hint: 'Tickets ที่ถูกปฏิเสธ',
+      icon: 'fa-solid fa-ban',
     },
   ];
   showDeptBar = false;
@@ -182,56 +197,50 @@ export class ItDashboardSummary {
         title: 'All Tickets',
         value: summary.all ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
+        icon: 'fa-solid fa-border-all',
       },
       {
         status: 'open',
         title: 'New tickets',
         value: summary.open ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
+        icon: 'fa-solid fa-folder-open',
       },
-      // {
-      //   status: 'inprogress',
-      //   title: 'In Progress Tickets',
-      //   value: summary.inProcess ?? 0,
-      //   delta: 0,
-      //   hint: 'Tickets ที่กำลังดำเนินการ',
-      //   icon: 'sync',
-      // },
+      {
+        status: 'reopen',
+        title: 'Re-Opened tickets',
+        value: summary.reopen ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-repeat',
+      },
       {
         status: 'assigned',
         title: 'In Progress Ticket',
         value: summary.assigned ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ได้รับมอบหมาย',
-        icon: 'user',
+
+        icon: 'fa-solid fa-hourglass-start',
       },
       {
         status: 'done',
         title: 'Closed Tickets',
         value: summary.closed ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
+        icon: 'fa-solid fa-circle-check',
       },
       {
         status: 'hold',
         title: 'Hold Tickets',
         value: summary.hold ?? 0,
         delta: 0,
-        hint: 'Tickets ที่หยุดทำการ',
-        icon: 'pause-circle',
+        icon: 'fa-solid fa-pause',
       },
       {
         status: 'denied',
         title: 'Deny Tickets',
         value: summary.denied ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ถูกปฏิเสธ',
-        icon: 'stop',
+        icon: 'fa-solid fa-ban',
       },
     ];
   }
@@ -710,12 +719,33 @@ export class ItDashboardSummary {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
-    this.loadTickets(status);
+    this.loadTickets();
   }
 
-  loadTickets(status: string): void {
-    this.itServiceService.getTicketByStatus(status).subscribe({
+  loadTickets(): void {
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+
+    const params = {
+      status: this.currentStatus,
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      dateFrom: dateFrom ? dateFrom.format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dateTo.format('YYYY-MM-DD') : undefined,
+    };
+    console.log(params);
+    this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
+        console.log(res);
+        this.allRequests.set(res.data);
+        this.listing.totalItems.set(res.pagination.total ?? 0);
+        this.listing.totalPages.set(res.pagination.totalPages ?? 1);
+        this.listing.currentPage.set((res.pagination.page ?? 1) - 1);
+
         this.ticketLogs = (Array.isArray(res?.data) ? res.data : []).map((t: any) => ({
           ...t,
           COMPANY_CODE: this.remapCompanyCode(t.COMPANY_CODE),
@@ -724,7 +754,7 @@ export class ItDashboardSummary {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
-        // console.log(this.filteredTicketLogs);
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
@@ -733,6 +763,17 @@ export class ItDashboardSummary {
         this.ticketLogs = [];
       },
     });
+  }
+
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+    this.loadTickets();
+  }
+
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+    this.loadTickets();
   }
 
   handleCancel(): void {
@@ -781,6 +822,8 @@ export class ItDashboardSummary {
     switch (status) {
       case 'open':
         return 'Open';
+      case 'reopen':
+        return 'ReOpened';
       case 'assigned':
         return 'Assigned';
       case 'inprogress':
@@ -797,45 +840,12 @@ export class ItDashboardSummary {
         return this.currentStatus;
     }
   }
+  private filterTimer: ReturnType<typeof setTimeout> | null = null;
 
   applyFilter() {
-    const range = this.filter.dateRange;
-    const [rawFrom, rawTo] = range ?? [];
-    const from = rawFrom ? dayjs(rawFrom) : null;
-    const to = rawTo ? dayjs(rawTo) : null;
-
-    this.filteredTicketLogs = this.ticketLogs.filter((t) => {
-      const ticketNoMatch =
-        !this.filter.ticketNo ||
-        t.ticket_number?.toLowerCase().includes(this.filter.ticketNo.toLowerCase());
-
-      const subjectMatch =
-        !this.filter.subject ||
-        t.subject?.toLowerCase().includes(this.filter.subject.toLowerCase());
-
-      const requesterMatch =
-        !this.filter.requester ||
-        t.requester_name?.toLowerCase().includes(this.filter.requester.toLowerCase());
-
-      const deptMatch = !this.filter.department || t.deptName === this.filter.department;
-
-      const companyMatch = !this.filter.company || t.COMPANY_CODE === this.filter.company;
-
-      const rawDate = t.updated_at || t.created_at;
-      const itemDate = dayjs(rawDate);
-
-      let dateMatch = true;
-
-      if (from && to) {
-        dateMatch = itemDate.isAfter(from.startOf('day')) && itemDate.isBefore(to.endOf('day'));
-      }
-
-      return (
-        ticketNoMatch && subjectMatch && requesterMatch && deptMatch && companyMatch && dateMatch
-      );
-    });
-
-    this.page = 1;
+    this.filterTimer = setTimeout(() => {
+      this.loadTickets();
+    }, 300);
   }
 
   exportData() {
@@ -865,8 +875,9 @@ export class ItDashboardSummary {
       next: (data) => {
         this.companyList = data.map((c: any) => ({
           ...c,
-          COMPANY_CODE: this.remapCompanyCode(c.COMPANY_CODE),
-          COMPANY_NAME: this.remapCompanyCode(c.COMPANY_NAME),
+          COMPANY_CODE: c.COMPANY_CODE,
+          COMPANY_CODE_DISPLAY: this.remapCompanyCode(c.COMPANY_CODE),
+          COMPANY_NAME: c.COMPANY_NAME,
         }));
         console.log(this.companyList);
       },
@@ -881,7 +892,7 @@ export class ItDashboardSummary {
       next: (data) => {
         this.departmentList = data.map((d: any) => ({
           ...d,
-          COMPANY_CODE: this.remapCompanyCode(d.COMPANY_CODE),
+          COMPANY_CODE: d.COMPANY_CODE,
         }));
         console.log(this.departmentList);
       },
@@ -899,6 +910,7 @@ export class ItDashboardSummary {
       return;
     }
 
+    console.log(this.departmentList);
     this.filteredDepartmentList = this.departmentList.filter(
       (d) => d.COMPANY_CODE === this.filter.company,
     );

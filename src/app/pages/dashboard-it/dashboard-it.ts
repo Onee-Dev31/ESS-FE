@@ -422,6 +422,7 @@ export class DashboardIT implements OnInit {
   filteredTickets(): any[] {
     const statusMap: Record<string, string> = {
       open: 'New',
+      reopen: 'Re-Opened',
       assigned: 'In Progress',
       done: 'Closed',
       hold: 'Hold',
