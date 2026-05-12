@@ -101,4 +101,15 @@ describe('Timeoff', () => {
     cy.get('.date-input-group .form-control').first().should('have.attr', 'type', 'date');
     cy.get('.date-input-group .form-control').last().should('have.attr', 'type', 'date');
   });
+
+  it('click sort column header สองครั้งแล้ว sort icon เปลี่ยนเป็น desc', () => {
+    cy.viewport(1800, 900);
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header')
+      .first()
+      .find('.fa-sort-amount-down-alt')
+      .should('exist');
+    cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
+  });
 });
