@@ -1,8 +1,8 @@
 export async function forceDownloadFile(url: string, fileName: string): Promise<void> {
-  if (!isBrowserViewable(fileName)) {
-    directDownload(url, fileName);
-    return;
-  }
+  // if (!isBrowserViewable(fileName)) {
+  //   directDownload(url, fileName);
+  //   return;
+  // }
 
   try {
     await blobDownload(url, fileName);
