@@ -2,7 +2,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "types": ["cypress"],
-    "lib": ["ES2015", "dom"],
+    "lib": ["ES2016", "dom"],
+    "module": "ES2020",
+    "forceConsistentCasingInFileNames": true,
     "isolatedModules": false,
     "noEmit": true
   },
