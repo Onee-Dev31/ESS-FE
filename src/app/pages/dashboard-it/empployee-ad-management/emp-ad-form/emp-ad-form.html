@@ -273,6 +273,26 @@
             }
           </nz-select>
         </div>
+        <div class="field-group span-2">
+          <label>Email <span class="req">*</span></label>
+          <input
+            type="email"
+            [(ngModel)]="addForm.email"
+            name="email"
+            placeholder="Enter Email"
+            [class.invalid]="isInvalid('email')"
+          />
+        </div>
+        <div class="field-group span-2">
+          <label>Mobile <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.mobile"
+            name="mobile"
+            placeholder="Enter Mobile"
+            [class.invalid]="isInvalid('mobile')"
+          />
+        </div>
       </div>
 
       <div class="section-title">Hierarchy Information</div>

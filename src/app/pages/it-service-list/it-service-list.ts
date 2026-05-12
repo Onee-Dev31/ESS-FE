@@ -218,14 +218,20 @@ export class ItService implements OnInit {
   }
 
   private applyStatusChange(ticketId: any, rawStatus: string) {
-    const [itStatus, typeName] = (rawStatus ?? '').split('|').map((s) => s.trim());
+    const [itStatus, detail] = (rawStatus ?? '').split('|').map((s) => s.trim());
     this.Tickets.update((list) =>
       list.map((t) => {
         if (t.ticketId != ticketId) return t;
         const updated: any = { ...t, IT_Status: itStatus };
-        if (typeName) {
-          updated.ticketType = typeName;
+        if (itStatus === 'In Progress' && detail) {
+          updated.ticketType = detail;
           updated.status = 'Waiting you';
+        } else if (itStatus === 'Rejected') {
+          updated.status = 'Rejected';
+        } else if (itStatus === 'Referred_Back') {
+          updated.status = 'Referred Back';
+        } else if (itStatus === 'Approved') {
+          updated.status = 'Approved';
         } else {
           updated.status = this.getTicketStatus(updated);
         }

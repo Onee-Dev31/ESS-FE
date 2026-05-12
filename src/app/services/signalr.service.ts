@@ -53,6 +53,17 @@ export class SignalrService {
       .subscribe({ error: (err) => console.error('ticketStatusNotify error', err) });
   }
 
+  ticketStatusNotifyByEmpId(ticketId: any, requesterCodeEmpId: string, status: string) {
+    if (!ticketId || !requesterCodeEmpId) return;
+    this.http
+      .post(`${this.baseUrl}/notification/ticket-status-notify-by-empid`, {
+        ticketId,
+        requesterCodeEmpId,
+        status,
+      })
+      .subscribe({ error: (err) => console.error('ticketStatusNotifyByEmpId error', err) });
+  }
+
   sendTestRealtime() {
     this.http.post(`${this.baseUrl}/notification/it-service`, {}).subscribe({
       next: () => console.log('Test sent'),
