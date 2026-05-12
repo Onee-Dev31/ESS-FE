@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class EmpAdService {
-  private baseUrl = 'http://empad.oneeclick.co:5078/api';
+  private baseUrl = 'https://oneeuserapi.oneeclick.co/api';
 
   constructor(private _http: HttpClient) {}
 
