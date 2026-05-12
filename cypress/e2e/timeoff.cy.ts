@@ -106,10 +106,7 @@ describe('Timeoff', () => {
     cy.viewport(1800, 900);
     cy.get('thead .sortable-header').first().click();
     cy.get('thead .sortable-header').first().click();
-    cy.get('thead .sortable-header')
-      .first()
-      .find('.fa-sort-amount-down-alt')
-      .should('exist');
+    cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
     cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
   });
 });
