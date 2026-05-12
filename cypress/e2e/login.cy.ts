@@ -53,11 +53,12 @@ describe('Login', () => {
   });
 
   it('สลับไป QR login แล้วกลับมาได้', () => {
-    cy.intercept('GET', '**/auth/qr/generate', {
+    cy.intercept('POST', '**/auth/qr/generate', {
       qrToken: 'qr-token-1',
       qrImage: 'data:image/png;base64,fake-qr',
       expiresAt: '2026-04-24T09:00:00.000Z',
     }).as('generateQr');
+    cy.intercept('GET', '**/auth/qr/status/*', { status: 'pending' }).as('qrStatus');
 
     cy.get('.qr-toggle-button').click();
     cy.wait('@generateQr');
@@ -70,7 +71,7 @@ describe('Login', () => {
   it('QR หมดอายุแล้วสามารถกดรีเฟรชเพื่อโหลด QR ใหม่ได้', () => {
     let qrLoadCount = 0;
 
-    cy.intercept('GET', '**/auth/qr/generate', () => {
+    cy.intercept('POST', '**/auth/qr/generate', () => {
       qrLoadCount += 1;
       return {
         qrToken: `qr-token-${qrLoadCount}`,
