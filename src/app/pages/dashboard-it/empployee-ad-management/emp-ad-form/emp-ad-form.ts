@@ -247,17 +247,19 @@ export class EmpAdForm implements OnChanges {
     setTimeout(() => {
       this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      // this.empAdService.insertEmployee(payload).subscribe({
-      //   next: (_) => {
-      //     this.isSaving = false;
-      //     this.submitted = false;
-      //     this.swalService.success(`เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`);
-      //   },
-      //   error: (err) => {
-      //     this.isSaving = false;
-      //     this.swalService.error(err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
-      //   },
-      // });
+      this.empAdService.insertEmployee(payload).subscribe({
+        next: (_) => {
+          this.isSaving = false;
+          this.submitted = false;
+          this.swalService.success(`เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`);
+        },
+        error: (err) => {
+          this.isSaving = false;
+          this.swalService.error(
+            err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+          );
+        },
+      });
     }, 300);
   }
 

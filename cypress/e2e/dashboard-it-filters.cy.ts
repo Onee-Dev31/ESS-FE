@@ -79,12 +79,22 @@ const tickets: DashboardTicketRecord[] = [
 ];
 
 const setupDashboardApi = () => {
-  cy.intercept('GET', '**/tickets?page=*', (req) => {
-    const myTicket = req.query.myTicket;
-    const filteredTickets =
+  cy.intercept('GET', /\/tickets\?/, (req) => {
+    const myTicket = req.query['myTicket'];
+    const searchText = ((req.query['searchText'] as string) ?? '').toLowerCase();
+
+    let filteredTickets =
       myTicket === 'tester.two'
         ? tickets.filter((ticket) => ticket.requester_aduser === 'tester.two')
         : tickets;
+
+    if (searchText) {
+      filteredTickets = filteredTickets.filter(
+        (ticket) =>
+          ticket.ticket_number.toLowerCase().includes(searchText) ||
+          ticket.subject.toLowerCase().includes(searchText),
+      );
+    }
 
     req.reply({
       data: filteredTickets,
@@ -144,8 +154,8 @@ const setupDashboardApi = () => {
     requestFor: {},
   }).as('getTicket303');
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
-  cy.intercept('GET', '**/Master/companies', { data: [] }).as('getCompanies');
-  cy.intercept('GET', '**/Master/company-costcent', { data: [] }).as('getDepartments');
+  cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
+  cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
 };
 
 describe('Dashboard IT filters', () => {
@@ -273,5 +283,120 @@ describe('Dashboard IT filters', () => {
     cy.get('@secondTicket').should('have.class', 'active');
     cy.get('.tk-hero__title').should('contain', 'Replace broken keyboard');
     cy.contains('.tk-hero__sub b.mono', '##IT-00202').should('be.visible');
+  });
+
+  it('แสดง empty state เมื่อยังไม่ได้เลือก ticket', () => {
+    cy.get('.empty-selection-placeholder')
+      .should('be.visible')
+      .and('contain.text', 'กรุณาเลือก Ticket');
+  });
+
+  it('filter status: New แสดงเฉพาะ ticket ที่มีสถานะ Open', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'New').should('be.visible');
+  });
+
+  it('filter status: Hold และ Denied ที่ไม่มีข้อมูลแล้วไม่แสดง ticket item', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Hold').click();
+    cy.get('.ticket-item').should('have.length', 0);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Denied').click();
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('แสดง ticket type badge ถูกต้องใน ticket list', () => {
+    cy.get('.ticket-item')
+      .eq(0)
+      .find('.badge-outline.ticket-type')
+      .should('contain', 'Service Request');
+    cy.get('.ticket-item').eq(1).find('.badge-outline.ticket-type').should('contain', 'Repair');
+    cy.get('.ticket-item')
+      .eq(2)
+      .find('.badge-outline.ticket-type')
+      .should('contain', 'Service Request');
+  });
+
+  it('แสดง status badge ถูกต้องในแต่ละ ticket ใน list', () => {
+    cy.get('.ticket-item').eq(0).find('.ticket-status-inline').should('contain', 'New');
+    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'Assigned');
+    cy.get('.ticket-item').eq(2).find('.ticket-status-inline').should('contain', 'Closed');
+  });
+
+  it('ล้าง search text แล้ว ticket list กลับมาครบ', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').clear();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 3);
+  });
+
+  it('ค้นหาด้วย keyword บางส่วนแล้วแสดง ticket ที่ตรงทั้งหมด', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('00');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 3);
+  });
+
+  it('summary KPI แสดง count All Tickets ถูกต้องจาก mock data (3)', () => {
+    cy.contains('.kpi .kpi-title', 'All Tickets')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '3');
+  });
+
+  it('กด KPI card In Progress แล้ว ticket list filter เหลือ 1 รายการ', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.contains('.kpi .kpi-title', 'In Progress Ticket').closest('.kpi').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('กด KPI card All Tickets หลัง filter แล้ว ticket list กลับมาครบ', () => {
+    cy.contains('.kpi .kpi-title', 'In Progress Ticket').closest('.kpi').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.contains('.kpi .kpi-title', 'All Tickets').closest('.kpi').click({ force: true });
+    cy.get('.ticket-item').should('have.length', 3);
+  });
+
+  it('ticket item แสดง subject ของแต่ละ ticket ใน list', () => {
+    cy.get('.ticket-item').eq(0).should('contain.text', 'Reset VPN access');
+    cy.get('.ticket-item').eq(1).should('contain.text', 'Replace broken keyboard');
+    cy.get('.ticket-item').eq(2).should('contain.text', 'Archive old mailbox');
+  });
+
+  it('active class เปลี่ยนไปที่ ticket ใหม่เมื่อคลิก ticket อื่น', () => {
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').closest('.ticket-item').click();
+    cy.wait('@getTicket101');
+    cy.wait('@markTicketRead');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00101')
+      .closest('.ticket-item')
+      .should('have.class', 'active');
+    cy.contains('.ticket-item .ticket-number', '#IT-00202')
+      .closest('.ticket-item')
+      .should('not.have.class', 'active');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').closest('.ticket-item').click();
+    cy.wait('@getTicket202');
+    cy.wait('@markTicketRead');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00202')
+      .closest('.ticket-item')
+      .should('have.class', 'active');
+    cy.contains('.ticket-item .ticket-number', '#IT-00101')
+      .closest('.ticket-item')
+      .should('not.have.class', 'active');
   });
 });

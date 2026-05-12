@@ -17,4 +17,13 @@ describe('Welcome', () => {
     cy.get('.arrow-indicator').click();
     cy.url().should('include', '/dashboard');
   });
+
+  it('illustration container และ emoji แสดงขึ้น', () => {
+    cy.get('.illustration-container').should('be.visible');
+    cy.get('.emoji').should('be.visible').and('contain', '💼');
+  });
+
+  it('divider แสดงระหว่าง subtitle และ instruction', () => {
+    cy.get('.divider').should('exist');
+  });
 });

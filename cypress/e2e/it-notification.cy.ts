@@ -120,8 +120,8 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
     req.reply({ success: true });
   }).as('markTicketRead');
 
-  cy.intercept('GET', '**/tickets?page=*', (req) => {
-    const pageSize = Number(req.query.pageSize ?? 50);
+  cy.intercept('GET', /\/tickets\?/, (req) => {
+    const pageSize = Number(req.query['pageSize'] ?? 50);
     req.reply({
       data: tickets.slice(0, pageSize),
       summary: {
@@ -143,8 +143,8 @@ const setupItNotificationApi = (initialUnreadIds: number[]) => {
   cy.intercept('GET', '**/tickets/303', createTicketDetailResponse(tickets[2])).as('getTicket303');
 
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
-  cy.intercept('GET', '**/Master/companies', { data: [] }).as('getCompanies');
-  cy.intercept('GET', '**/Master/company-costcent', { data: [] }).as('getDepartments');
+  cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
+  cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
 };
 
 const forceItStaffRole = () => {
@@ -300,5 +300,102 @@ describe('IT unread notifications', () => {
     cy.get('.dropdown-item').should('have.length', 1);
     cy.get('.dropdown-item .title').first().should('contain', '#IT-00202');
     cy.get('.dropdown-item .message').first().should('contain', 'Replace broken keyboard');
+  });
+
+  it('badge แสดงตัวเลข 3 เมื่อมี unread 3 รายการ และ dropdown มีครบ 3 items', () => {
+    setupItNotificationApi([101, 202, 303]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .badge').should('contain', '3');
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 3);
+    cy.get('.dropdown-item .title').eq(0).should('contain', '#IT-00101');
+    cy.get('.dropdown-item .title').eq(1).should('contain', '#IT-00202');
+    cy.get('.dropdown-item .title').eq(2).should('contain', '#IT-00303');
+  });
+
+  it('กดนอก notification dropdown แล้ว dropdown ปิด', () => {
+    setupItNotificationApi([101]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('be.visible');
+
+    cy.contains('รายการเบิกเบี้ยเลี้ยง').click();
+
+    cy.get('.dropdown-menu').should('not.exist');
+  });
+
+  it('notification item แสดง subject ที่ถูกต้องสำหรับแต่ละ ticket', () => {
+    setupItNotificationApi([101, 303]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 2);
+
+    cy.get('.dropdown-item').eq(0).find('.message').should('contain', 'Reset VPN access');
+    cy.get('.dropdown-item').eq(1).find('.message').should('contain', 'Archive old mailbox');
+  });
+
+  it('notification item แสดง .time element ใน dropdown', () => {
+    setupItNotificationApi([101, 202]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 2);
+    cy.get('.dropdown-item').each(($item) => {
+      cy.wrap($item).find('.time').should('exist').and('not.be.empty');
+    });
+  });
+
+  it('กด icon-btn ซ้ำอีกครั้งเพื่อ toggle ปิด dropdown ได้', () => {
+    setupItNotificationApi([101]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('be.visible');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('not.exist');
   });
 });

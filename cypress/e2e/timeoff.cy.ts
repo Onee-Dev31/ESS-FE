@@ -56,4 +56,57 @@ describe('Timeoff', () => {
       }
     });
   });
+
+  it('table header แสดง column สำคัญครบ', () => {
+    cy.get('thead').should('contain', 'รหัสคำขอ');
+    cy.get('thead').should('contain', 'ประเภทการลา');
+    cy.get('thead').should('contain', 'สถานะ');
+    cy.get('thead').should('contain', 'Actions');
+  });
+
+  it('คลิก column header sort แล้ว sort icon เปลี่ยนเป็น asc', () => {
+    cy.viewport(1800, 900);
+    cy.get('thead .sortable-header').first().find('.fa-sort').should('exist');
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header')
+      .first()
+      .find('.fa-sort-amount-up, .fa-sort-amount-down-alt')
+      .should('exist');
+    cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
+  });
+
+  it('pagination wrapper แสดงขึ้นในหน้า timeoff', () => {
+    cy.get('.pagination-wrapper').should('exist');
+  });
+
+  it('ปิด form modal แล้วเปิดใหม่ได้', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+
+    cy.get('app-time-off-form .btn-close-modal').click();
+    cy.get('app-time-off-form').should('not.exist');
+
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+  });
+
+  it('status filter dropdown มี option สถานะที่ถูกต้อง', () => {
+    cy.get('.select-status').should('contain', 'คำขอใหม่');
+    cy.get('.select-status').should('contain', 'อนุมัติแล้ว');
+    cy.get('.select-status').should('contain', 'อยู่ระหว่างการอนุมัติ');
+  });
+
+  it('date filter แสดง 2 input ช่อง สำหรับเลือกวันที่', () => {
+    cy.get('.date-input-group .form-control').should('have.length', 2);
+    cy.get('.date-input-group .form-control').first().should('have.attr', 'type', 'date');
+    cy.get('.date-input-group .form-control').last().should('have.attr', 'type', 'date');
+  });
+
+  it('click sort column header สองครั้งแล้ว sort icon เปลี่ยนเป็น desc', () => {
+    cy.viewport(1800, 900);
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
+    cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
+  });
 });
