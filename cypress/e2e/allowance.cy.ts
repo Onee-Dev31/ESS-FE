@@ -176,4 +176,17 @@ describe('Allowance', () => {
     cy.get('nz-option-item').should('contain', 'อนุมัติแล้ว');
     cy.get('nz-select').first().click();
   });
+
+  it('modal form สร้างใหม่มีปุ่ม btn-submit สำหรับยืนยันการเบิก', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.get('app-allowance-form .btn-submit').should('exist');
+  });
+
+  it('modal form แสดง column header วันที่ และ จำนวนเงิน', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.contains('app-allowance-form', 'วันที่').should('be.visible');
+    cy.contains('app-allowance-form', 'จำนวนเงิน').should('be.visible');
+  });
 });
