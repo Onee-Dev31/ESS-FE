@@ -486,7 +486,7 @@
 
   <!-- Progress / Timeline -->
   <section class="side-card assignee">
-    <div class="side-title">Progress</div>
+    <div class="side-title">Progress - {{ t.ticketType }}</div>
     <div class="timeline" *ngIf="t.assignTimeline.length > 0; else noAssignee">
       <div
         class="timeline-item"
