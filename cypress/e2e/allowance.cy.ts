@@ -189,4 +189,74 @@ describe('Allowance', () => {
     cy.contains('app-allowance-form', 'วันที่').should('be.visible');
     cy.contains('app-allowance-form', 'จำนวนเงิน').should('be.visible');
   });
+
+  it('กดปุ่ม delete ของรายการสถานะ New แล้ว confirm dialog แสดงขึ้น', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.ant-modal-confirm, .confirm-dialog, [role="dialog"]').should('be.visible');
+        return false;
+      }
+    });
+  });
+
+  it('filter สถานะ "คำขอใหม่" แล้วแสดงเฉพาะรายการสถานะ New', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('.btn-search').click();
+    cy.wait(1000);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge)
+            .invoke('text')
+            .invoke('trim')
+            .should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('ปุ่ม submit ใน modal form disabled เมื่อยังไม่กรอกข้อมูลครบ', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.get('app-allowance-form .btn-submit').should('be.disabled');
+  });
+
+  it('pagination เปลี่ยนหน้าได้เมื่อมีข้อมูลมากกว่า 1 หน้า', () => {
+    cy.get('.pagination-wrapper').then(($pagination) => {
+      const hasNextPage =
+        $pagination.find('li.ant-pagination-next:not(.ant-pagination-disabled)').length > 0;
+      if (hasNextPage) {
+        cy.get('li.ant-pagination-next').click();
+        cy.get('.modern-table tbody tr').should('have.length.at.least', 1);
+      } else {
+        cy.get('.pagination-wrapper').should('exist');
+      }
+    });
+  });
+
+  it('status badge New และ Approved มี CSS class ต่างกัน', () => {
+    let newBadgeClass: string | undefined;
+    let approvedBadgeClass: string | undefined;
+
+    cy.get('.modern-table tbody tr')
+      .each(($row) => {
+        const statusText = $row.find('.status-badge').text().trim();
+        if (!newBadgeClass && (statusText === 'คำขอใหม่' || statusText === 'New')) {
+          newBadgeClass = $row.find('.status-badge').attr('class');
+        }
+        if (!approvedBadgeClass && (statusText === 'อนุมัติแล้ว' || statusText === 'Approved')) {
+          approvedBadgeClass = $row.find('.status-badge').attr('class');
+        }
+      })
+      .then(() => {
+        if (newBadgeClass && approvedBadgeClass) {
+          expect(newBadgeClass).not.to.equal(approvedBadgeClass);
+        }
+      });
+  });
 });
