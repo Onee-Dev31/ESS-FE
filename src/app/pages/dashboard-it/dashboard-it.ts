@@ -238,10 +238,34 @@ export class DashboardIT implements OnInit {
           this.unreadTicketIds.update((s) => new Set([...s, data.ticketId]));
           this.newNoteTicketIds.update((s) => new Set([...s, Number(data.ticketId)]));
 
-          // 2. If viewing this ticket, refresh details to show new note instantly
+          // 2. Re-Open note → update status in list immediately
+          if ((data.note ?? data.message ?? '').startsWith('Re-Open')) {
+            this.Tickets.update((list) =>
+              list.map((t: any) =>
+                t.ticketId === data.ticketId
+                  ? { ...t, IT_Status: getStatusLabel('ReOpened'), status: 'Re-Opened' }
+                  : t,
+              ),
+            );
+          }
+
+          // 3. If viewing this ticket, refresh details to show new note instantly
           if (this.selectedTicket()?.ticketId === data.ticketId) {
             this.selectTicket(String(data.ticketId));
           }
+        }
+      });
+
+    this.signalrService.ticketStatusTrigger
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ ticketId, status }) => {
+        this.Tickets.update((list) =>
+          list.map((t: any) =>
+            t.ticketId == ticketId ? { ...t, IT_Status: getStatusLabel(status), status } : t,
+          ),
+        );
+        if (this.selectedTicket()?.ticketId == ticketId) {
+          this.selectTicket(String(ticketId));
         }
       });
   }

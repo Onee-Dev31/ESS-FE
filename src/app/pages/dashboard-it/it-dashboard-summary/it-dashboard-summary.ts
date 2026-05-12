@@ -531,7 +531,7 @@ export class ItDashboardSummary {
   }
 
   selectStatus(k: string, isClick: boolean = true) {
-    console.log(k, isClick);
+    // console.log(k, isClick);
     this.currentStatus = this.statusLabel(k);
     this.activeStatus = k;
     this.selectedStatus = k;
@@ -726,7 +726,7 @@ export class ItDashboardSummary {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {
-      status: this.currentStatus,
+      status: this.statusLabelApi(this.currentStatus),
       page: this.listing.currentPage() + 1,
       pageSize: this.listing.pageSize(),
       ticketNo: this.filter.ticketNo || undefined,
@@ -734,13 +734,13 @@ export class ItDashboardSummary {
       requester: this.filter.requester || undefined,
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
-      dateFrom: dateFrom ? dateFrom.format('YYYY-MM-DD') : undefined,
-      dateTo: dateTo ? dateTo.format('YYYY-MM-DD') : undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
     };
-    console.log(params);
+    // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        console.log(res);
+        // console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -754,7 +754,7 @@ export class ItDashboardSummary {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
-        console.log(this.filteredTicketLogs);
+        // console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
@@ -763,6 +763,19 @@ export class ItDashboardSummary {
         this.ticketLogs = [];
       },
     });
+  }
+
+  clearFilter() {
+    this.filter = {
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+    };
+    this.filteredDepartmentList = [];
+    this.loadTickets();
   }
 
   setPageSize(size: number) {
@@ -821,25 +834,43 @@ export class ItDashboardSummary {
   statusLabel(status: string) {
     switch (status) {
       case 'open':
-        return 'Open';
+        return 'New';
       case 'reopen':
         return 'ReOpened';
       case 'assigned':
-        return 'Assigned';
-      case 'inprogress':
         return 'In Progress';
+      // case 'inprogress':
+      //   return 'In Progress';
       case 'done':
         return 'Closed';
       case 'denied':
         return 'Denied';
       case 'hold':
         return 'Hold';
+      case 'waitingapproval':
+        return 'Waiting Approval';
+      case 'referredBack':
+        return 'Referred Back';
+      case 'rejected':
+        return 'Rejected';
       case 'all':
         return 'All';
       default:
         return this.currentStatus;
     }
   }
+
+  statusLabelApi(status: string) {
+    switch (status) {
+      case 'In Progress':
+        return 'Assigned';
+      case 'New':
+        return 'Open';
+      default:
+        return this.currentStatus;
+    }
+  }
+
   private filterTimer: ReturnType<typeof setTimeout> | null = null;
 
   applyFilter() {
@@ -879,7 +910,7 @@ export class ItDashboardSummary {
           COMPANY_CODE_DISPLAY: this.remapCompanyCode(c.COMPANY_CODE),
           COMPANY_NAME: c.COMPANY_NAME,
         }));
-        console.log(this.companyList);
+        // console.log(this.companyList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -894,7 +925,7 @@ export class ItDashboardSummary {
           ...d,
           COMPANY_CODE: d.COMPANY_CODE,
         }));
-        console.log(this.departmentList);
+        // console.log(this.departmentList);
       },
       error: (error) => {
         console.error('Error fetching data:', error);
@@ -910,7 +941,6 @@ export class ItDashboardSummary {
       return;
     }
 
-    console.log(this.departmentList);
     this.filteredDepartmentList = this.departmentList.filter(
       (d) => d.COMPANY_CODE === this.filter.company,
     );

@@ -232,6 +232,9 @@ export class ItService implements OnInit {
           updated.status = 'Referred Back';
         } else if (itStatus === 'Approved') {
           updated.status = 'Approved';
+        } else if (itStatus === 'ReOpened') {
+          updated.status = 'Re-Opened';
+          updated.user_status = 'ReOpened';
         } else {
           updated.status = this.getTicketStatus(updated);
         }
@@ -461,7 +464,16 @@ export class ItService implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.itServiceService.re_open(formData).subscribe({
       next: (res) => {
-        console.log(res);
+        this.applyStatusChange(data.ticket.ticketId, 'ReOpened');
+
+        const adUser = (this.authService.userData().AD_USER ?? '').toLowerCase();
+        const fullName =
+          this.authService.userData().NAMFIRSTE +
+          ' ' +
+          (this.authService.userData().NAMLASTE ?? '');
+        const note = data.reason ? `Re-Open Ticket: ${data.reason}` : 'Re-Open Ticket';
+        this.signalrService.noteNotify(data.ticket.ticketId, adUser, adUser, fullName, note);
+
         setTimeout(() => {
           this.swalService.success(res.message || 'บันทึกสำเร็จ');
         }, 100);

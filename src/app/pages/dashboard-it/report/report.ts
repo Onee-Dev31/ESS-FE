@@ -162,11 +162,15 @@ export class Report {
 
   // map key -> index ใน pie (ต้องตรงกับ data ที่ใส่ใน option)
   private statusIndexMap: Record<string, number> = {
-    open: 0,
+    done: 0,
     assigned: 1,
-    done: 2,
-    hold: 3,
-    denied: 4,
+    open: 2,
+    reopen: 3,
+    waitingapproval: 4,
+    referredBack: 5,
+    rejected: 6,
+    hold: 7,
+    denied: 8,
     all: -1,
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
@@ -206,9 +210,6 @@ export class Report {
 
     this.themeObserver = new MutationObserver(() => {
       setTimeout(() => {
-        const textColor = this.getCssVar('--text-header');
-        const mutedColor = this.getCssVar('--text-muted');
-        console.log('theme changed:', { textColor, mutedColor });
         this.rebuildChartColors();
       }, 100);
     });
@@ -883,7 +884,7 @@ export class Report {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {
-      status: this.currentStatus,
+      status: this.statusLabelApi(this.currentStatus),
       page: this.listing.currentPage() + 1,
       pageSize: this.listing.pageSize(),
       ticketNo: this.filter.ticketNo || undefined,
@@ -891,13 +892,14 @@ export class Report {
       requester: this.filter.requester || undefined,
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
-      dateFrom: dateFrom ? dateFrom.format('YYYY-MM-DD') : undefined,
-      dateTo: dateTo ? dateTo.format('YYYY-MM-DD') : undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: true,
     };
-    console.log(params);
+    // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        console.log(res);
+        // console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -911,7 +913,7 @@ export class Report {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
-        console.log(this.filteredTicketLogs);
+        // console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
@@ -921,6 +923,20 @@ export class Report {
       },
     });
   }
+
+  clearFilter() {
+    this.filter = {
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+    };
+    this.filteredDepartmentList = [];
+    this.loadTickets();
+  }
+
   setPageSize(size: number) {
     this.listing.pageSize.set(size);
     this.listing.currentPage.set(0);
@@ -976,23 +992,43 @@ export class Report {
   statusLabel(status: string) {
     switch (status) {
       case 'open':
-        return 'Open';
+        return 'New';
+      case 'reopen':
+        return 'ReOpened';
       case 'assigned':
-        return 'Assigned';
-      case 'inprogress':
         return 'In Progress';
+      // case 'inprogress':
+      //   return 'In Progress';
       case 'done':
         return 'Closed';
       case 'denied':
         return 'Denied';
       case 'hold':
         return 'Hold';
+      case 'waitingapproval':
+        return 'Waiting Approval';
+      case 'referredBack':
+        return 'Referred Back';
+      case 'rejected':
+        return 'Rejected';
       case 'all':
         return 'All';
       default:
         return this.currentStatus;
     }
   }
+
+  statusLabelApi(status: string) {
+    switch (status) {
+      case 'In Progress':
+        return 'Assigned';
+      case 'New':
+        return 'Open';
+      default:
+        return this.currentStatus;
+    }
+  }
+
   private filterTimer: ReturnType<typeof setTimeout> | null = null;
   applyFilter() {
     this.filterTimer = setTimeout(() => {
@@ -1020,8 +1056,6 @@ export class Report {
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
 
-    console.log({ dateFrom, dateTo });
-
     this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
@@ -1037,13 +1071,13 @@ export class Report {
     });
   }
 
-  clearFilter() {
-    this.filterAll = {
-      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
-    };
+  // clearFilter() {
+  //   this.filterAll = {
+  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
+  //   };
 
-    this.getAllTickets();
-  }
+  //   this.getAllTickets();
+  // }
 
   exportData() {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
