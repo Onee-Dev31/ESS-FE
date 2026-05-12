@@ -106,7 +106,7 @@ export class ItDashboardSummary {
       value: 0,
       delta: 0,
       // hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'fa-solid fa-hourglass-start',
+      icon: 'fa-solid fa-diagram-project',
     },
     {
       status: 'done',
@@ -219,7 +219,7 @@ export class ItDashboardSummary {
         value: summary.assigned ?? 0,
         delta: 0,
 
-        icon: 'fa-solid fa-hourglass-start',
+        icon: 'fa-solid fa-diagram-project',
       },
       {
         status: 'done',

@@ -1,0 +1,226 @@
+<div class="page">
+  <app-page-header [title]="pageTitle"></app-page-header>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Filter</label>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="กรอกรหัสพนักงาน,ชื่อไทย,ชื่ออังกฤษ,ชื่อเล่น"
+        [(ngModel)]="filterText"
+        (ngModelChange)="applyFilter()"
+      />
+    </div>
+    <div class="filter-group">
+      <label>Status</label>
+      <nz-select
+        class="filter-select"
+        [(ngModel)]="filterStatus"
+        (ngModelChange)="applyFilter()"
+        nzAllowClear
+        nzPlaceHolder="All"
+      >
+        @for (s of statusOptions; track s) {
+          <nz-option [nzValue]="s" [nzLabel]="s" />
+        }
+      </nz-select>
+    </div>
+    <div class="filter-group">
+      <label>Company</label>
+      <nz-select
+        class="filter-select"
+        [ngModel]="filterCompany"
+        (ngModelChange)="onCompanyChange($event)"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="All"
+        [nzDropdownMatchSelectWidth]="false"
+      >
+        @for (c of companyList; track c.code) {
+          <nz-option [nzValue]="c.code" [nzLabel]="c.label" />
+        }
+      </nz-select>
+    </div>
+    <div class="filter-group">
+      <label>Department</label>
+      <nz-select
+        class="filter-select"
+        [(ngModel)]="filterDepartment"
+        (ngModelChange)="applyFilter()"
+        nzShowSearch
+        nzAllowClear
+        nzPlaceHolder="All"
+        [nzDisabled]="!filterCompany"
+      >
+        @for (d of filteredDepartmentOptions; track d) {
+          <nz-option [nzValue]="d" [nzLabel]="d" />
+        }
+      </nz-select>
+    </div>
+  </div>
+
+  <!-- Total -->
+  <div class="total-bar">
+    Total Results: <strong>{{ totalItems }}</strong>
+  </div>
+
+  <div class="content-card">
+    <!-- Table (desktop) -->
+    <div class="table-responsive">
+      @if (isLoading) {
+        <app-skeleton type="table" [rows]="8"></app-skeleton>
+      } @else {
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>ชื่อ (ไทย)</th>
+              <th>ชื่อ (English)</th>
+              <th>Company</th>
+              <th>Department</th>
+              <th>AD User</th>
+              <th>Tel</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Start Date</th>
+              <th>Resigndate</th>
+            </tr>
+          </thead>
+          @for (emp of pagedEmployees; track emp.ID; let i = $index) {
+            <tbody>
+              <tr>
+                <td>
+                  <span class="emp-id">{{ emp.ID }}</span>
+                </td>
+                <td>
+                  <div>{{ emp.nameThai1 }}</div>
+                  <div class="line2">{{ emp.nameThai2 }}</div>
+                  <div class="line3">{{ emp.nameThai3 }}</div>
+                </td>
+                <td>
+                  <div>{{ emp.nameEng1 }}</div>
+                  <div class="line2">{{ emp.nameEng2 }}</div>
+                </td>
+                <td>{{ emp.COMPANY }}</td>
+                <td>
+                  <div>{{ emp.dept1 }}</div>
+                  <div class="line2">{{ emp.dept2 }}</div>
+                </td>
+                <td>
+                  <span class="ad-user">{{ emp.AD_USER || '-' }}</span>
+                </td>
+                <td>{{ emp.TEL || '-' }}</td>
+                <td>{{ emp.EMAIL || '-' }}</td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="emp.STATUS === 'Active'"
+                    [class.inactive]="emp.STATUS !== 'Active'"
+                  >
+                    {{ emp.STATUS }}
+                  </span>
+                </td>
+                <td>{{ emp.START_DATE }}</td>
+                <td>{{ emp.RESIGNDATE }}</td>
+              </tr>
+            </tbody>
+          } @empty {
+            <tbody>
+              <tr>
+                <td colspan="13" class="no-data-cell">
+                  <app-empty-state
+                    title="ไม่พบข้อมูล"
+                    description="ไม่พบรายชื่อพนักงาน"
+                    icon="fas fa-users-slash"
+                  ></app-empty-state>
+                </td>
+              </tr>
+            </tbody>
+          }
+        </table>
+      }
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="card-list-view">
+      @if (isLoading) {
+        <app-skeleton type="card" [rows]="4"></app-skeleton>
+      } @else {
+        @for (emp of pagedEmployees; track emp.ID) {
+          <div class="mobile-card">
+            <div class="card-header">
+              <div class="header-content">
+                <span class="emp-id">{{ emp.ID }}</span>
+                <div class="emp-name">
+                  <div>{{ emp.nameThai1 }}</div>
+                  <div class="line2">{{ emp.nameThai2 }}</div>
+                  <div class="line3">{{ emp.nameThai3 }}</div>
+                </div>
+                <div class="text-muted small">{{ emp.nameEng1 }} {{ emp.nameEng2 }}</div>
+              </div>
+              <span
+                class="status-badge"
+                [class.active]="emp.STATUS === 'Active'"
+                [class.inactive]="emp.STATUS !== 'Active'"
+              >
+                {{ emp.STATUS }}
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label"><i class="fas fa-building"></i> Company:</span>
+                <span class="value">{{ emp.COMPANY }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-sitemap"></i> Department:</span>
+                <span class="value">
+                  <div>{{ emp.dept1 }}</div>
+                  <div class="line2">{{ emp.dept2 }}</div>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-user-circle"></i> AD User:</span>
+                <span class="value ad-user">{{ emp.AD_USER || '-' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-envelope"></i> Email:</span>
+                <span class="value">{{ emp.EMAIL }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-phone"></i> Tel:</span>
+                <span class="value">{{ emp.TEL }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-calendar"></i> Start:</span>
+                <span class="value">{{ emp.START_DATE }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label"><i class="fas fa-calendar-times"></i> Resign:</span>
+                <span class="value">{{ emp.RESIGNDATE }}</span>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            title="ไม่พบข้อมูล"
+            description="ไม่พบรายชื่อพนักงาน"
+            icon="fas fa-users-slash"
+          ></app-empty-state>
+        }
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper">
+      <app-pagination
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalItems]="totalItems"
+        (onPageChange)="goToPage($event)"
+        (onPageSizeChange)="setPageSize($event)"
+      ></app-pagination>
+    </div>
+  </div>
+</div>

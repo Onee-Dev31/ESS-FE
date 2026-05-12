@@ -89,4 +89,8 @@ export class ResignManagementService {
       params: queryParams,
     });
   }
+
+  getEmployeeAll(): Observable<any> {
+    return this._http.get<any>(`${this.baseUrl}/employeeAll`);
+  }
 }
