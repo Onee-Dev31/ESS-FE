@@ -68,6 +68,43 @@ describe('Login', () => {
     cy.get('#username').should('be.visible');
   });
 
+  it('กรอกแค่ username โดยยังไม่มี password ปุ่ม Login ยัง disabled', () => {
+    cy.get('#username').type(Cypress.env('username'));
+    cy.get('.login-button').should('be.disabled');
+  });
+
+  it('กรอกครบทั้ง username และ password แล้วปุ่ม Login enabled', () => {
+    cy.get('#username').type(Cypress.env('username'));
+    cy.get('#password').type(Cypress.env('password'));
+    cy.get('.login-button').should('not.be.disabled');
+  });
+
+  it('QR scan สำเร็จ (status=success) แล้ว redirect ออกจากหน้า login', () => {
+    cy.intercept('POST', '**/auth/qr/generate', {
+      qrToken: 'qr-token-1',
+      qrImage: 'data:image/png;base64,fake-qr',
+      expiresAt: '2026-04-24T09:00:00.000Z',
+    }).as('generateQr');
+    cy.intercept('GET', '**/auth/qr/status/*', {
+      success: true,
+      adUser: 'NoppornEam',
+      accessToken: 'fake-access-token',
+      permission: { Role: 'Employee' },
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678' },
+      menus: [{ RoutePath: '/welcome' }, { RoutePath: '/dashboard' }],
+    }).as('qrStatusSuccess');
+
+    cy.clock();
+    cy.get('.qr-toggle-button').click();
+    cy.wait('@generateQr');
+    cy.get('.qr-image').should('be.visible');
+
+    cy.tick(3000);
+    cy.wait('@qrStatusSuccess');
+
+    cy.url().should('not.include', '/login');
+  });
+
   it('QR หมดอายุแล้วสามารถกดรีเฟรชเพื่อโหลด QR ใหม่ได้', () => {
     let qrLoadCount = 0;
 
