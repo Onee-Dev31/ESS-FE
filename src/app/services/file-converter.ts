@@ -25,7 +25,7 @@ export interface ConvertedFile {
   providedIn: 'root',
 })
 export class FileConverterService {
-  private readonly FILE_URL = environment.file_url;
+  private readonly FILE_URL = environment.previewUrl;
 
   constructor() {}
 

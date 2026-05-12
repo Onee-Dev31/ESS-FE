@@ -42,7 +42,7 @@ function toSameOriginFileUrl(url: string): string {
   try {
     const fileUrl = new URL(url);
 
-    if (fileUrl.hostname === '10.31.1.46' && fileUrl.pathname.startsWith('/files/')) {
+    if (fileUrl.hostname === '10.31.1.85' && fileUrl.pathname.startsWith('/uploads/')) {
       return `${fileUrl.pathname}${fileUrl.search}`;
     }
   } catch {
