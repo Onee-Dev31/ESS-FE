@@ -261,8 +261,31 @@ export class ItRequestDetailModal {
         // console.log(res)
 
         if (res.success) {
+          const raw = this.approvalItem.originalData;
+          const codeEmpId = raw?.requester?.employeeId ?? '';
+          const ticketId = this.approvalItem.requestId;
+
           if (command === 'Approved') {
             this.signalrService.sendNewTicketNotification(this.approvalItem.requestNo);
+            if (codeEmpId) {
+              this.signalrService.ticketStatusNotifyByEmpId(ticketId, codeEmpId, 'Approved');
+            }
+          } else if (command === 'Rejected') {
+            if (codeEmpId) {
+              this.signalrService.ticketStatusNotifyByEmpId(
+                ticketId,
+                codeEmpId,
+                reason ? `Rejected|${reason}` : 'Rejected',
+              );
+            }
+          } else if (command === 'Referred_Back') {
+            if (codeEmpId) {
+              this.signalrService.ticketStatusNotifyByEmpId(
+                ticketId,
+                codeEmpId,
+                reason ? `Referred_Back|${reason}` : 'Referred_Back',
+              );
+            }
           }
           this.swalService.success(res.message);
         }

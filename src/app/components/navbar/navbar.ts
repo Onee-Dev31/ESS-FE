@@ -212,19 +212,29 @@ export class NavbarComponent {
       .subscribe((data) => {
         if (this.isItRole()) return;
         this.zone.run(() => {
-          const statusLabel: Record<string, string> = {
-            'In Progress': 'กำลังดำเนินการ',
-            Hold: 'พักเรื่องชั่วคราว',
-            Closed: 'ปิดเรื่องแล้ว',
-            Denied: 'ปฏิเสธคำขอ',
-            Assigned: 'รับเรื่องแล้ว',
-          };
           const rawStatus = data.status ?? '';
-          const [status, typeName] = rawStatus.split('|');
-          const label = statusLabel[status] ?? status;
-          const message = typeName
-            ? `IT รับเรื่องของคุณแล้ว ประเภท "${typeName}"`
-            : `Ticket ของคุณมีการอัพเดทสถานะเป็น "${label}"`;
+          const [status, detail] = rawStatus.split('|');
+          let message: string;
+          if (status === 'Approved') {
+            message = 'คำขอของคุณได้รับการอนุมัติแล้ว';
+          } else if (status === 'Rejected') {
+            message = detail ? `คำขอถูกปฏิเสธ เหตุผล: "${detail}"` : 'คำขอถูกปฏิเสธ';
+          } else if (status === 'Referred_Back') {
+            message = detail
+              ? `ส่งกลับคำขอเพื่อแก้ไข เหตุผล: "${detail}"`
+              : 'ส่งกลับคำขอเพื่อแก้ไข';
+          } else if (detail) {
+            message = `IT รับเรื่องของคุณแล้ว ประเภท "${detail}"`;
+          } else {
+            const statusLabel: Record<string, string> = {
+              'In Progress': 'กำลังดำเนินการ',
+              Hold: 'พักเรื่องชั่วคราว',
+              Closed: 'ปิดเรื่องแล้ว',
+              Denied: 'ปฏิเสธคำขอ',
+              Assigned: 'รับเรื่องแล้ว',
+            };
+            message = `Ticket ของคุณมีการอัพเดทสถานะเป็น "${statusLabel[status] ?? status}"`;
+          }
 
           const newNoti: NotificationItem = {
             id: Date.now(),
