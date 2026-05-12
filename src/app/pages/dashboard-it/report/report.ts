@@ -96,7 +96,7 @@ export class Report {
       title: 'In Progress Tickets',
       value: 0,
       delta: 0,
-      icon: 'fa-solid fa-hourglass-start',
+      icon: 'fa-solid fa-diagram-project',
     },
     {
       status: 'Open',
@@ -196,11 +196,71 @@ export class Report {
     private masterService: MasterDataService,
   ) {}
 
+  private themeObserver?: MutationObserver;
+
   ngOnInit(): void {
     this.selectStatus('all', false);
     this.getAllTickets();
     this.getCompanies();
     this.getDepartments();
+
+    this.themeObserver = new MutationObserver(() => {
+      setTimeout(() => {
+        const textColor = this.getCssVar('--text-header');
+        const mutedColor = this.getCssVar('--text-muted');
+        console.log('theme changed:', { textColor, mutedColor });
+        this.rebuildChartColors();
+      }, 100);
+    });
+
+    this.themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class'],
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.themeObserver?.disconnect();
+  }
+
+  private rebuildChartColors(): void {
+    const textColor = this.getCssVar('--text-header') || '#0f172a';
+    const mutedColor = this.getCssVar('--text-muted') || '#64748b';
+    const bgCard = this.getCssVar('--bg-card') || '#ffffff';
+    const borderColor = this.getCssVar('--border-color') || '#e2e8f0';
+
+    const updateOption = (opt: any, chart?: ECharts) => {
+      if (!opt) return;
+
+      if (opt.graphic) {
+        opt.graphic[0].style.fill = textColor;
+        opt.graphic[1].style.fill = mutedColor;
+      }
+
+      if (opt.legend?.textStyle) {
+        opt.legend.textStyle.color = textColor;
+      }
+
+      if (opt.tooltip) {
+        opt.tooltip.backgroundColor = bgCard;
+        opt.tooltip.borderColor = borderColor;
+        if (opt.tooltip.textStyle) {
+          opt.tooltip.textStyle.color = textColor;
+        }
+      }
+
+      chart?.setOption(opt);
+    };
+
+    updateOption(this.statusPieOption, this.statusChart);
+    updateOption(this.servicePieOption, this.serviceChart);
+
+    // rebuild bar chart เพราะ axisLabel color hardcode ไว้
+    if (this.selectedCompany) {
+      this.buildDeptBar(this.selectedCompany, this.deptTop5Map[this.selectedCompany] ?? []);
+    }
+
+    this.cdr.detectChanges();
   }
 
   // ====== 1) Status Donut ======
@@ -359,16 +419,6 @@ export class Report {
         axisLine: { show: false },
         axisLabel: { show: false },
       },
-
-      // series: [
-      //   {
-      //     type: 'bar',
-      //     data: chartData,
-      //     barWidth: 46,
-      //     itemStyle: { borderRadius: [12, 12, 12, 12] },
-      //     emphasis: { focus: 'series' },
-      //   },
-      // ],
       series: [
         {
           type: 'bar',
@@ -454,11 +504,18 @@ export class Report {
           fontSize: 10,
           fontWeight: 400,
           overflow: 'truncate',
+          color: this.getCssVar('--text-header') || '#0f172a',
         },
         width: '100%',
         type: 'plain',
       },
-      tooltip: { trigger: 'item' },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
+      },
       color: [
         this.getCssVar('--status-closed-text'),
         this.getCssVar('--status-progress-text'),
@@ -478,12 +535,6 @@ export class Report {
           center: ['50%', '53%'],
           label: { show: false },
           labelLine: { show: false },
-          // label: {
-          //   show: true,
-          //   formatter: '{b}: {c}',
-          //   fontSize: 11,
-          // },
-          // labelLine: { show: true },
           avoidLabelOverlap: true,
           emphasis: { scale: true, scaleSize: 6 },
           data,
@@ -518,7 +569,8 @@ export class Report {
   }
 
   private getCssVar(name: string): string {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return getComputedStyle(document.body).getPropertyValue(name).trim();
+    // return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   private makeDonutOptionService(
@@ -539,11 +591,18 @@ export class Report {
           fontSize: 10,
           fontWeight: 400,
           overflow: 'truncate',
+          color: this.getCssVar('--text-header') || '#0f172a',
         },
         width: '100%',
         type: 'plain',
       },
-      tooltip: { trigger: 'item' },
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
+      },
       color: [
         this.getCssVar('--btn-service-border'),
         this.getCssVar('--btn-repair-border'),
