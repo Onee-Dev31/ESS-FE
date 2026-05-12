@@ -26,21 +26,28 @@
     *ngFor="let k of kpis; trackBy: trackByStatus"
     [class.active]="activeStatus === k.status"
     (click)="selectStatus(k.status, true)"
+    [class.it-no-see]="
+      k.status === 'waitingapproval' || k.status === 'referredBack' || k.status === 'rejected'
+    "
   >
     <div class="kpi-top">
       <div class="kpi-title">{{ k.title }}</div>
 
       <span
         class="kpi-pill"
-        [class.pill-blue]="k.status === 'open'"
-        [class.pill-cyan]="k.status === 'assigned'"
-        [class.pill-orange]="k.status === 'inprogress'"
-        [class.pill-green]="k.status === 'done'"
-        [class.pill-red]="k.status === 'denied'"
+        [class.pill-open]="k.status === 'open'"
+        [class.pill-reopen]="k.status === 'reopen'"
+        [class.pill-assigned]="k.status === 'assigned'"
+        [class.pill-done]="k.status === 'done'"
+        [class.pill-denied]="k.status === 'denied'"
         [class.pill-hold]="k.status === 'hold'"
-        [class.pill-gray]="k.status === 'all'"
+        [class.pill-all]="k.status === 'all'"
+        [class.pill-waitingapproval]="k.status === 'waitingapproval'"
+        [class.pill-referredBack]="k.status === 'referredBack'"
+        [class.pill-rejected]="k.status === 'rejected'"
       >
-        <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon>
+        <!-- <nz-icon [nzType]="k.icon" nzTheme="outline"></nz-icon> -->
+        <i [class]="k.icon"></i>
       </span>
     </div>
 
@@ -62,7 +69,7 @@
       <!-- </span> -->
     </div>
 
-    <div class="kpi-hint">{{ k.hint }}</div>
+    <!-- <div class="kpi-hint">{{ k.hint }}</div> -->
   </div>
 </section>
 
@@ -173,7 +180,7 @@
         >
           <option value="">All Company</option>
           <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
-            {{ c.COMPANY_CODE }}
+            {{ c.COMPANY_CODE_DISPLAY }}
           </option>
         </select>
 
@@ -184,7 +191,7 @@
           [disabled]="!filter.company"
         >
           <option value="">All Department</option>
-          <option *ngFor="let d of filteredDepartmentList" [value]="d.NAMECOSTCENT">
+          <option *ngFor="let d of filteredDepartmentList" [value]="d.COSTCENT">
             {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
           </option>
         </select>
@@ -193,6 +200,8 @@
           nzFormat="dd/MM/yyyy"
           [(ngModel)]="filter.dateRange"
           (ngModelChange)="applyFilter()"
+          nzDropdownClassName="custom-range-picker-popup"
+          class="custom-range-picker"
         >
         </nz-range-picker>
 
@@ -200,7 +209,7 @@
           <i class="fas fa-file-excel"></i> Export
         </button>
       </div>
-      <div class="log-summary">ทั้งหมด {{ ticketLogs.length }} รายการ</div>
+      <div class="log-summary">ทั้งหมด {{ listing.totalItems() }} รายการ</div>
 
       <div class="table-wrap">
         <table class="log-table">
@@ -278,7 +287,17 @@
         </table>
       </div>
 
-      <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
+      <div class="pagination-wrapper">
+        <app-pagination
+          [currentPage]="listing.currentPage()"
+          [pageSize]="listing.pageSize()"
+          [totalItems]="comps.totalItems()"
+          (onPageChange)="goToPage($event)"
+          (onPageSizeChange)="setPageSize($event)"
+        >
+        </app-pagination>
+      </div>
+      <!-- <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
         <button
           class="page-btn"
           type="button"
@@ -308,7 +327,7 @@
           <option [ngValue]="20">20</option>
           <option [ngValue]="50">50</option>
         </select>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

@@ -18,6 +18,7 @@ function isBrowserViewable(fileName: string): boolean {
 }
 
 async function blobDownload(url: string, fileName: string): Promise<void> {
+  console.log('url : ', url);
   const response = await fetch(toSameOriginFileUrl(url), { credentials: 'omit' });
 
   if (!response.ok) {
@@ -43,6 +44,7 @@ function toSameOriginFileUrl(url: string): string {
     const fileUrl = new URL(url);
 
     if (fileUrl.hostname === '10.31.1.85' && fileUrl.pathname.startsWith('/uploads/')) {
+      console.log('fileUrl : ', fileUrl);
       return `${fileUrl.pathname}${fileUrl.search}`;
     }
   } catch {

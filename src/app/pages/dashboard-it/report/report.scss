@@ -62,6 +62,11 @@
   overflow: hidden;
 }
 
+.it-no-see {
+  background: color-mix(in srgb, var(--warning), var(--text-reverse) 90%);
+  // border: 1px solid var(--warning);
+}
+
 .kpi:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12);
@@ -111,31 +116,33 @@
   font-size: 18px;
 }
 
-.pill-blue {
+.pill-open {
   background: var(--status-open-bg);
   color: var(--status-open-text);
   border-color: color-mix(in srgb, var(--status-open-text), transparent 70%);
 }
 
-.pill-cyan {
-  background: var(--status-assigned-bg);
-  color: var(--status-assigned-text);
-  border-color: color-mix(in srgb, var(--status-assigned-text), transparent 70%);
+.pill-reopen {
+  background: var(--status-reopen-bg);
+  color: var(--status-reopen-text);
+  border-color: color-mix(in srgb, var(--status-reopen-text), transparent 70%);
 }
 
-.pill-orange {
+.pill-assigned,
+.pill-referredBack {
   background: var(--status-progress-bg);
   color: var(--status-progress-text);
   border-color: color-mix(in srgb, var(--status-progress-text), transparent 70%);
 }
 
-.pill-green {
+.pill-done {
   background: var(--status-closed-bg);
   color: var(--status-closed-text);
   border-color: color-mix(in srgb, var(--status-closed-text), transparent 70%);
 }
 
-.pill-red {
+.pill-denied,
+.pill-rejected {
   background: var(--status-deny-bg);
   color: var(--status-deny-text);
   border-color: color-mix(in srgb, var(--status-deny-text), transparent 70%);
@@ -147,7 +154,13 @@
   border-color: color-mix(in srgb, var(--status-hold-text), transparent 70%);
 }
 
-.pill-gray {
+.pill-all {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-table-head);
+  border-color: rgba(100, 116, 139, 0.22);
+}
+
+.pill-waitingapproval {
   background: rgba(100, 116, 139, 0.12);
   color: var(--text-table-head);
   border-color: rgba(100, 116, 139, 0.22);

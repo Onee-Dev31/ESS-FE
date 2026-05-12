@@ -4,6 +4,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { KpiCard, StatusKey } from '../../../interfaces/it-dashboard.interface';
@@ -28,6 +29,8 @@ import { encryptValue } from '../../../utils/crypto.js ';
 import { MasterDataService } from '../../../services/master-data.service';
 import { ViewChildren, QueryList } from '@angular/core';
 import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary';
+import { PaginationComponent } from '../../../components/shared/pagination/pagination';
+import { createListingComputeds_v2, createListingState } from '../../../utils/listing.util';
 
 @Component({
   selector: 'app-report',
@@ -43,6 +46,7 @@ import { ItDashboardSummary } from '../it-dashboard-summary/it-dashboard-summary
     NzModalModule,
     NzPaginationModule,
     NzDatePickerModule,
+    PaginationComponent,
   ],
   templateUrl: './report.html',
   styleUrl: './report.scss',
@@ -65,6 +69,10 @@ export class Report {
   //   this.cdr.detectChanges();
   // }
 
+  allRequests = signal<any[]>([]);
+  listing = createListingState();
+  comps = createListingComputeds_v2(this.allRequests, this.listing);
+
   // ===== KPI =====
   activeStatus: string = 'all';
   selectedStatus: string = 'all';
@@ -74,65 +82,70 @@ export class Report {
       title: 'All Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      icon: 'fa-solid fa-border-all',
     },
     {
-      status: 'Open',
-      title: 'Open tickets',
+      status: 'done',
+      title: 'Closed Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ทั้งหมดทุกสถานะ',
-      icon: 'appstore',
+      icon: 'fa-solid fa-circle-check',
     },
-    // {
-    //   status: 'In Progress',
-    //   title: 'In Progress Tickets',
-    //   value: 0,
-    //   delta: 0,
-    //   hint: 'Tickets ที่กำลังดำเนินการ',
-    //   icon: 'sync',
-    // },
     {
       status: 'Assigned',
       title: 'In Progress Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
-    },
-    {
-      status: 'Closed',
-      title: 'Closed Tickets',
-      value: 0,
-      delta: 0,
-      hint: 'Tickets ที่ได้รับมอบหมาย',
-      icon: 'user',
+      icon: 'fa-solid fa-hourglass-start',
     },
     {
       status: 'Open',
       title: 'Open tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ใหม่ทั้งหมดที่มีการเปิดมา',
-      icon: 'inbox',
+      icon: 'fa-solid fa-folder-open',
     },
-
     {
-      status: 'Hold',
-      title: 'Hold Tickets',
+      status: 'ReOpened',
+      title: 'Re-Opened tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่หยุดทำการ',
-      icon: 'pause-circle',
+      icon: 'fa-solid fa-repeat',
+    },
+    {
+      status: 'waitingapproval',
+      title: 'Waiting Approval tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-hourglass-start',
+    },
+    {
+      status: 'referredBack',
+      title: 'Referred Back tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-clock-rotate-left',
+    },
+    {
+      status: 'rejected',
+      title: 'Reject Tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-ban',
     },
     {
       status: 'Deny',
       title: 'Deny Tickets',
       value: 0,
       delta: 0,
-      hint: 'Tickets ที่ถูกปฏิเสธ',
-      icon: 'stop',
+      icon: 'fa-solid fa-ban',
+    },
+    {
+      status: 'Hold',
+      title: 'Hold Tickets',
+      value: 0,
+      delta: 0,
+      icon: 'fa-solid fa-pause',
     },
   ];
   showDeptBar = false;
@@ -199,65 +212,83 @@ export class Report {
         title: 'All Tickets',
         value: summary.all ?? 0,
         delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
-      },
-      {
-        status: 'open',
-        title: 'New tickets',
-        value: summary.open ?? 0,
-        delta: 0,
-        hint: 'Tickets ทั้งหมดทุกสถานะ',
-        icon: 'appstore',
-      },
-      // {
-      //   status: 'inprogress',
-      //   title: 'In Progress Tickets',
-      //   value: summary.inProcess ?? 0,
-      //   delta: 0,
-      //   hint: 'Tickets ที่กำลังดำเนินการ',
-      //   icon: 'sync',
-      // },
-      {
-        status: 'assigned',
-        title: 'In Progress Ticket',
-        value: summary.assigned ?? 0,
-        delta: 0,
-        hint: 'Tickets ที่ได้รับมอบหมาย',
-        icon: 'user',
+        icon: 'fa-solid fa-border-all',
       },
       {
         status: 'done',
         title: 'Closed Tickets',
         value: summary.closed ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ปิดแล้ว',
-        icon: 'check-circle',
+        icon: 'fa-solid fa-circle-check',
       },
       {
-        status: 'hold',
-        title: 'Hold Tickets',
-        value: summary.hold ?? 0,
+        status: 'assigned',
+        title: 'In Progress Ticket',
+        value: summary.assigned ?? 0,
         delta: 0,
-        hint: 'Tickets ที่หยุดทำการ',
-        icon: 'pause-circle',
+        icon: 'fa-solid fa-diagram-project',
+      },
+      {
+        status: 'open',
+        title: 'New tickets',
+        value: summary.open ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-folder-open',
+      },
+      {
+        status: 'reopen',
+        title: 'Re-Opened tickets',
+        value: summary.reopen ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-repeat',
+      },
+      {
+        status: 'waitingapproval',
+        title: 'Waiting Approval tickets',
+        value: summary.waitingapproval ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-hourglass-start',
+      },
+      {
+        status: 'referredBack',
+        title: 'Referred Back tickets',
+        value: summary.referredBack ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-clock-rotate-left',
+      },
+      {
+        status: 'rejected',
+        title: 'Reject Tickets',
+        value: summary.rejected ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-ban',
       },
       {
         status: 'denied',
         title: 'Deny Tickets',
         value: summary.denied ?? 0,
         delta: 0,
-        hint: 'Tickets ที่ถูกปฏิเสธ',
-        icon: 'stop',
+        icon: 'fa-solid fa-ban',
+      },
+      {
+        status: 'hold',
+        title: 'Hold Tickets',
+        value: summary.hold ?? 0,
+        delta: 0,
+        icon: 'fa-solid fa-pause',
       },
     ];
   }
+
   private buildStatusPie(summary: any) {
     const data: PieDatum[] = [
-      { name: 'New', value: summary.open ?? 0, key: 'open' },
-      { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
       { name: 'Closed', value: summary.closed ?? 0, key: 'done' },
-      // { name: 'In Progress', value: summary.inProcess ?? 0, key: 'inprogress' },
+      { name: 'In Progress', value: summary.assigned ?? 0, key: 'assigned' },
+      { name: 'New', value: summary.open ?? 0, key: 'open' },
+      { name: 'Re-Opened', value: summary.reopen ?? 0, key: 'reopen' },
+      { name: 'Waiting Approval', value: summary.waitingapproval ?? 0, key: 'waitingapproval' },
+      { name: 'Referred Back', value: summary.referredBack ?? 0, key: 'referredBack' },
+      { name: 'Rejected', value: summary.rejected ?? 0, key: 'rejected' },
       { name: 'Hold', value: summary.hold ?? 0, key: 'hold' },
       { name: 'Deny', value: summary.denied ?? 0, key: 'denied' },
     ];
@@ -429,10 +460,13 @@ export class Report {
       },
       tooltip: { trigger: 'item' },
       color: [
-        this.getCssVar('--status-open-text'),
-        this.getCssVar('--status-assigned-text'),
-        // this.getCssVar('--status-progress-text'),
         this.getCssVar('--status-closed-text'),
+        this.getCssVar('--status-progress-text'),
+        this.getCssVar('--status-open-text'),
+        this.getCssVar('--status-reopen-text'),
+        this.getCssVar('--status-progress-bg'),
+        this.getCssVar('--status-pending-bg'),
+        this.getCssVar('--status-deny-bg'),
         this.getCssVar('--status-hold-text'),
         this.getCssVar('--status-deny-text'),
       ],
@@ -762,7 +796,7 @@ export class Report {
 
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        // console.log(res);
+        console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -783,12 +817,33 @@ export class Report {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
-    this.loadTickets(status);
+    this.loadTickets();
   }
 
-  loadTickets(status: string): void {
-    this.itServiceService.getTicketByStatus(status).subscribe({
+  loadTickets(): void {
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
+
+    const params = {
+      status: this.currentStatus,
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      dateFrom: dateFrom ? dateFrom.format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dateTo.format('YYYY-MM-DD') : undefined,
+    };
+    console.log(params);
+    this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
+        console.log(res);
+        this.allRequests.set(res.data);
+        this.listing.totalItems.set(res.pagination.total ?? 0);
+        this.listing.totalPages.set(res.pagination.totalPages ?? 1);
+        this.listing.currentPage.set((res.pagination.page ?? 1) - 1);
+
         this.ticketLogs = (Array.isArray(res?.data) ? res.data : []).map((t: any) => ({
           ...t,
           COMPANY_CODE: this.remapCompanyCode(t.COMPANY_CODE),
@@ -797,7 +852,7 @@ export class Report {
           ...t,
           assignees: t.groups_assignees_json ? JSON.parse(t.groups_assignees_json) : [],
         }));
-        // console.log(this.filteredTicketLogs);
+        console.log(this.filteredTicketLogs);
 
         this.cdr.detectChanges();
       },
@@ -807,7 +862,16 @@ export class Report {
       },
     });
   }
+  setPageSize(size: number) {
+    this.listing.pageSize.set(size);
+    this.listing.currentPage.set(0);
+    this.loadTickets();
+  }
 
+  goToPage(page: number) {
+    this.listing.currentPage.set(page);
+    this.loadTickets();
+  }
   handleCancel(): void {
     this.isLogModalVisible = false;
     this.ticketLogs = [];
@@ -870,45 +934,11 @@ export class Report {
         return this.currentStatus;
     }
   }
-
+  private filterTimer: ReturnType<typeof setTimeout> | null = null;
   applyFilter() {
-    const range = this.filter.dateRange;
-    const [rawFrom, rawTo] = range ?? [];
-    const from = rawFrom ? dayjs(rawFrom) : null;
-    const to = rawTo ? dayjs(rawTo) : null;
-
-    this.filteredTicketLogs = this.ticketLogs.filter((t) => {
-      const ticketNoMatch =
-        !this.filter.ticketNo ||
-        t.ticket_number?.toLowerCase().includes(this.filter.ticketNo.toLowerCase());
-
-      const subjectMatch =
-        !this.filter.subject ||
-        t.subject?.toLowerCase().includes(this.filter.subject.toLowerCase());
-
-      const requesterMatch =
-        !this.filter.requester ||
-        t.requester_name?.toLowerCase().includes(this.filter.requester.toLowerCase());
-
-      const deptMatch = !this.filter.department || t.deptName === this.filter.department;
-
-      const companyMatch = !this.filter.company || t.COMPANY_CODE === this.filter.company;
-
-      const rawDate = t.updated_at || t.created_at;
-      const itemDate = dayjs(rawDate);
-
-      let dateMatch = true;
-
-      if (from && to) {
-        dateMatch = itemDate.isAfter(from.startOf('day')) && itemDate.isBefore(to.endOf('day'));
-      }
-
-      return (
-        ticketNoMatch && subjectMatch && requesterMatch && deptMatch && companyMatch && dateMatch
-      );
-    });
-
-    this.page = 1;
+    this.filterTimer = setTimeout(() => {
+      this.loadTickets();
+    }, 300);
   }
 
   filterAll = {
@@ -983,8 +1013,9 @@ export class Report {
       next: (data) => {
         this.companyList = data.map((c: any) => ({
           ...c,
-          COMPANY_CODE: this.remapCompanyCode(c.COMPANY_CODE),
-          COMPANY_NAME: this.remapCompanyCode(c.COMPANY_NAME),
+          COMPANY_CODE: c.COMPANY_CODE,
+          COMPANY_CODE_DISPLAY: this.remapCompanyCode(c.COMPANY_CODE),
+          COMPANY_NAME: c.COMPANY_NAME,
         }));
         // console.log(this.companyList);
       },
@@ -999,7 +1030,7 @@ export class Report {
       next: (data) => {
         this.departmentList = data.map((d: any) => ({
           ...d,
-          COMPANY_CODE: this.remapCompanyCode(d.COMPANY_CODE),
+          COMPANY_CODE: d.COMPANY_CODE,
         }));
         // console.log(this.departmentList);
       },
