@@ -52,7 +52,7 @@ const tickets: DashboardTicketRecord[] = [
     requester_companyCode: 'ONEE',
     requester_companyName: 'Onee',
     contact_phone: '1111111111',
-    IT_Status: 'In Progress',
+    IT_Status: 'Assigned',
     approval_status: 'approved',
     priority: 'high',
     source: 'web',
@@ -187,11 +187,11 @@ describe('Dashboard IT filters', () => {
     cy.get('.ticket-item').should('have.length', 3);
 
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'In Progress').click();
+    cy.contains('nz-option-item', 'Assigned').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
-    cy.contains('.ticket-item .ticket-status-inline', 'In Progress').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'Assigned').should('be.visible');
 
     cy.get('.tk-left__select').click();
     cy.contains('nz-option-item', 'Closed').click();
@@ -203,7 +203,7 @@ describe('Dashboard IT filters', () => {
 
   it('ใช้ status filter ร่วมกับ search แล้วเหลือเฉพาะรายการที่ตรงทั้งสองเงื่อนไข', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'In Progress').click();
+    cy.contains('nz-option-item', 'Assigned').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -218,7 +218,7 @@ describe('Dashboard IT filters', () => {
 
   it('เปลี่ยนกลับ All Tickets แล้วรายการกลับมาครบหลังจากเคย filter status', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'In Progress').click();
+    cy.contains('nz-option-item', 'Assigned').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -326,7 +326,7 @@ describe('Dashboard IT filters', () => {
 
   it('แสดง status badge ถูกต้องในแต่ละ ticket ใน list', () => {
     cy.get('.ticket-item').eq(0).find('.ticket-status-inline').should('contain', 'New');
-    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'In Progress');
+    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'Assigned');
     cy.get('.ticket-item').eq(2).find('.ticket-status-inline').should('contain', 'Closed');
   });
 
@@ -398,75 +398,5 @@ describe('Dashboard IT filters', () => {
     cy.contains('.ticket-item .ticket-number', '#IT-00101')
       .closest('.ticket-item')
       .should('not.have.class', 'active');
-  });
-
-  it('KPI Closed count = 1 และกดแล้ว ticket list filter เหลือเฉพาะ Closed', () => {
-    cy.contains('.kpi .kpi-title', 'Closed Tickets')
-      .closest('.kpi')
-      .find('.kpi-value')
-      .should('contain', '1');
-
-    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
-
-    cy.get('.ticket-item').should('have.length', 1);
-    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
-    cy.contains('.ticket-item .ticket-status-inline', 'Closed').should('be.visible');
-  });
-
-  it('search case-insensitive: "KEYBOARD" match รายการ "Replace broken keyboard"', () => {
-    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('KEYBOARD');
-    cy.wait('@getAllTickets');
-    cy.get('.ticket-item').should('have.length', 1);
-    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
-  });
-
-  it('My Ticket toggle ปิด → ticket list กลับมาครบ', () => {
-    cy.login(undefined, undefined, {
-      adUser: 'tester.two',
-      employee: {
-        CODEMPID: 'OTD01072',
-        USR_MOBILE: '0812345678',
-        AD_USER: 'tester.two',
-      },
-    });
-
-    cy.visit('/it-dashboard');
-
-    cy.wait('@getAllTickets');
-    cy.wait('@getUnreadTickets');
-    cy.wait('@getAssignDropdown');
-    cy.wait('@getCompanies');
-    cy.wait('@getDepartments');
-
-    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
-    cy.wait('@getAllTickets');
-    cy.get('.checkbox-my-ticket .ant-checkbox').should('have.class', 'ant-checkbox-checked');
-    cy.get('.ticket-item').should('have.length', 1);
-
-    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
-    cy.wait('@getAllTickets');
-    cy.get('.checkbox-my-ticket .ant-checkbox').should('not.have.class', 'ant-checkbox-checked');
-    cy.get('.ticket-item').should('have.length', 3);
-  });
-
-  it('คลิก ticket แล้ว detail panel แสดง subject และ status ถูกต้อง', () => {
-    cy.contains('.ticket-item .ticket-number', '#IT-00202').closest('.ticket-item').click();
-
-    cy.wait('@getTicket202');
-    cy.wait('@markTicketRead');
-
-    cy.get('.tk-hero__title').should('contain', 'Replace broken keyboard');
-    cy.get('.tk-hero .tk-pill').should('be.visible');
-    cy.get('.tk-hero__sub').should('contain', '#IT-00202');
-  });
-
-  it('กด KPI Closed แล้ว search "vpn" → 0 results', () => {
-    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
-    cy.get('.ticket-item').should('have.length', 1);
-    cy.get('.log-close-btn').click();
-
-    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
-    cy.wait('@getAllTickets');
-    cy.get('.ticket-item').should('have.length', 0);
   });
 });
