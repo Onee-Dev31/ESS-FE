@@ -9,9 +9,9 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import Swal from 'sweetalert2';
 import { EmpAdService } from '../../../../services/emp-ad-service';
 import { MasterDataService } from '../../../../services/master-data.service';
+import { SwalService } from '../../../../services/swal.service';
 
 @Component({
   selector: 'app-emp-ad-form',
@@ -103,8 +103,8 @@ export class EmpAdForm implements OnChanges {
     adUser: '',
   };
 
-  titleOptions = ['นาย', 'นาง', 'นางสาว', 'เด็กชาย', 'เด็กหญิง'];
-  titleEngOptions = ['Mr.', 'Mrs.', 'Ms.', 'Master', 'Miss'];
+  titleOptions = ['นาย', 'นาง', 'นางสาว'];
+  titleEngOptions = ['Mr.', 'Mrs.', 'Ms.'];
 
   floorList: any[] = [];
   jobPositionList: any[] = [];
@@ -118,6 +118,7 @@ export class EmpAdForm implements OnChanges {
   constructor(
     private empAdService: EmpAdService,
     private masterService: MasterDataService,
+    private swalService: SwalService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -241,32 +242,23 @@ export class EmpAdForm implements OnChanges {
     };
 
     this.isSaving = true;
-    this.empAdService.insertEmployee(payload).subscribe({
-      next: (_) => {
-        this.isSaving = false;
-        this.submitted = false;
-        this.onSaveSuccess.emit();
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'บันทึกสำเร็จ',
-            text: `เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`,
-            confirmButtonText: 'ตกลง',
-          });
-        }, 300);
-      },
-      error: (err) => {
-        this.isSaving = false;
-        this.cdr.detectChanges();
-        Swal.fire({
-          icon: 'error',
-          title: 'เกิดข้อผิดพลาด',
-          text: err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
-          confirmButtonText: 'ตกลง',
-        });
-      },
-    });
+    this.onSaveSuccess.emit(); // ปิด modal ก่อน
+
+    setTimeout(() => {
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
+
+      // this.empAdService.insertEmployee(payload).subscribe({
+      //   next: (_) => {
+      //     this.isSaving = false;
+      //     this.submitted = false;
+      //     this.swalService.success(`เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`);
+      //   },
+      //   error: (err) => {
+      //     this.isSaving = false;
+      //     this.swalService.error(err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง');
+      //   },
+      // });
+    }, 300);
   }
 
   private loadEmployee() {

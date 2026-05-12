@@ -364,7 +364,7 @@
     </ng-container>
     <ng-template #editFooter>
       <button class="btn-edit-cancel" (click)="closeEdit()">ยกเลิก</button>
-      <button class="btn-edit-confirm" (click)="confirmEdit()">
+      <button class="btn-edit-confirm" (click)="confirmEdit()" [disabled]="isEditSaving">
         <i class="fas fa-save"></i> ยืนยัน
       </button>
     </ng-template>
