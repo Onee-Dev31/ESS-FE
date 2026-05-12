@@ -360,4 +360,42 @@ describe('IT unread notifications', () => {
     cy.get('.dropdown-item').eq(0).find('.message').should('contain', 'Reset VPN access');
     cy.get('.dropdown-item').eq(1).find('.message').should('contain', 'Archive old mailbox');
   });
+
+  it('notification item แสดง .time element ใน dropdown', () => {
+    setupItNotificationApi([101, 202]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-item').should('have.length', 2);
+    cy.get('.dropdown-item').each(($item) => {
+      cy.wrap($item).find('.time').should('exist').and('not.be.empty');
+    });
+  });
+
+  it('กด icon-btn ซ้ำอีกครั้งเพื่อ toggle ปิด dropdown ได้', () => {
+    setupItNotificationApi([101]);
+
+    cy.login(undefined, undefined, {
+      permission: { Role: 'it-staff' },
+    });
+    forceItStaffRole();
+    cy.visit('/allowance');
+
+    cy.wait('@getUnreadCount');
+    cy.wait('@getUnreadTickets');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('be.visible');
+
+    cy.get('.notification-dropdown .icon-btn').click();
+    cy.get('.dropdown-menu').should('not.exist');
+  });
 });
