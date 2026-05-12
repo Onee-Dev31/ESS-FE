@@ -342,6 +342,7 @@ export class ItServiceService {
     department?: string;
     dateFrom?: string;
     dateTo?: string;
+    isReal?: boolean;
   }) {
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
@@ -354,6 +355,8 @@ export class ItServiceService {
     if (params.department) httpParams = httpParams.set('department', params.department);
     if (params.dateFrom) httpParams = httpParams.set('dateFrom', params.dateFrom);
     if (params.dateTo) httpParams = httpParams.set('dateTo', params.dateTo);
+    if (params.isReal) httpParams = httpParams.set('isReal', params.isReal);
+
     return this._http.get(`${this.baseUrl}/tickets/by-status`, { params: httpParams });
   }
 

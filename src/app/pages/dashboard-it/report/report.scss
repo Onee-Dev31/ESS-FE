@@ -513,12 +513,17 @@
 }
 
 .export-btn {
+  @include btn-primary;
   background: var(--success);
   color: #fff;
   border: none;
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--success), transparent 10%);
+  }
 }
 
 .log-filter {
