@@ -841,7 +841,15 @@ export class ItService implements OnInit {
       // ยิงจริง
       this.itServiceService.re_submit(formData).subscribe({
         next: (res) => {
-          // console.log('re_open success:', res);
+          const codeEmpId = requester.CODEMPID ?? '';
+          if (codeEmpId && current.ticketNumber) {
+            this.signalrService.recentlySubmittedTickets.add(current.ticketNumber);
+            setTimeout(
+              () => this.signalrService.recentlySubmittedTickets.delete(current.ticketNumber),
+              10000,
+            );
+            this.signalrService.ticketApprovalNotify(codeEmpId, current.ticketNumber);
+          }
 
           Swal.fire({
             icon: 'success',
