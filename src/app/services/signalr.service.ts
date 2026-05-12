@@ -23,6 +23,7 @@ export class SignalrService {
   ticketReadTrigger = new Subject<{ ticketId: any }>();
   ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
   ticketFocusTrigger = new Subject<number>();
+  recentlySubmittedTickets = new Set<string>();
 
   constructor() {
     effect(() => {

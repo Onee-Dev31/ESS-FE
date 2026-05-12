@@ -150,6 +150,15 @@ export class NavbarComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.zone.run(() => {
+          // ถ้าเป็น ticket ที่ตัวเองเพิ่ง submit → ไม่ต้องแจ้งตัวเอง
+          if (
+            data.ticketNumber &&
+            this.signalrService.recentlySubmittedTickets.has(data.ticketNumber)
+          ) {
+            this.signalrService.recentlySubmittedTickets.delete(data.ticketNumber);
+            return;
+          }
+
           const message = data.message || 'มี Ticket ใหม่รอการอนุมัติ';
 
           if (this.isItRole()) {
@@ -504,6 +513,17 @@ export class NavbarComponent {
         this.router.navigate([item.route], {
           queryParams: { focusZone: 'tickets', _t: Date.now() },
         });
+        this.clearSearch();
+        this.isMobileSearchOpen.set(false);
+      } else if (item.route === '/approval-it-request' && item.ticketNumber) {
+        const alreadyOnPage = this.router.url.startsWith(item.route);
+        if (alreadyOnPage) {
+          this.signalrService.ticketFocusTrigger.next(item.ticketNumber as any);
+        } else {
+          this.router.navigate([item.route], {
+            queryParams: { ticketNumber: item.ticketNumber, _t: Date.now() },
+          });
+        }
         this.clearSearch();
         this.isMobileSearchOpen.set(false);
       } else {

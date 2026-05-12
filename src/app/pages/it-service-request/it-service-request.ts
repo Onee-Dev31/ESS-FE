@@ -410,8 +410,12 @@ export class ITServiceRequestComponent implements OnInit {
           // console.log('[createTicket res]', res);
           if (res.success) {
             const codeEmpId = this.authService.userData().CODEMPID;
-            // console.log('[ticketApprovalNotify]', { codeEmpId, ticketNumber: res.ticketNumber });
             if (codeEmpId) {
+              this.signalrService.recentlySubmittedTickets.add(res.ticketNumber);
+              setTimeout(
+                () => this.signalrService.recentlySubmittedTickets.delete(res.ticketNumber),
+                10000,
+              );
               this.signalrService.ticketApprovalNotify(codeEmpId, res.ticketNumber);
             }
             this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
