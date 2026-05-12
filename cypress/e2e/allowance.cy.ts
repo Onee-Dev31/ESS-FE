@@ -157,4 +157,23 @@ describe('Allowance', () => {
     cy.get('app-allowance-form').should('be.visible');
     cy.contains('app-allowance-form', 'ประจำเดือน').should('be.visible');
   });
+
+  it('กดที่ card รายการแล้วเปิด modal รายละเอียดได้', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().click();
+        cy.get('app-allowance-form').should('be.visible');
+      } else {
+        cy.get('app-empty-state, .card-list-view').should('exist');
+      }
+    });
+  });
+
+  it('status nz-select dropdown มี option "ทั้งหมด", "คำขอใหม่", "อนุมัติแล้ว"', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').should('contain', 'ทั้งหมด');
+    cy.get('nz-option-item').should('contain', 'คำขอใหม่');
+    cy.get('nz-option-item').should('contain', 'อนุมัติแล้ว');
+    cy.get('nz-select').first().click();
+  });
 });

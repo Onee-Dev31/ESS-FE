@@ -141,4 +141,17 @@ describe('Login', () => {
         });
     });
   });
+
+  it('กด Enter ใน password field แล้ว form submit ได้', () => {
+    cy.mockLoginApi();
+    cy.get('#username').type(Cypress.env('username'));
+    cy.get('#password').type(`${Cypress.env('password')}{enter}`);
+    cy.wait('@loginRequest');
+    cy.url().should('not.include', '/login');
+  });
+
+  it('กรอก password เดียวโดยไม่มี username ปุ่ม Login ยัง disabled', () => {
+    cy.get('#password').type(Cypress.env('password'));
+    cy.get('.login-button').should('be.disabled');
+  });
 });

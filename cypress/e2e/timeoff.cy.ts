@@ -89,4 +89,16 @@ describe('Timeoff', () => {
     cy.get('.btn-create').click();
     cy.get('app-time-off-form').should('be.visible');
   });
+
+  it('status filter dropdown มี option สถานะที่ถูกต้อง', () => {
+    cy.get('.select-status').should('contain', 'คำขอใหม่');
+    cy.get('.select-status').should('contain', 'อนุมัติแล้ว');
+    cy.get('.select-status').should('contain', 'อยู่ระหว่างการอนุมัติ');
+  });
+
+  it('date filter แสดง 2 input ช่อง สำหรับเลือกวันที่', () => {
+    cy.get('.date-input-group .form-control').should('have.length', 2);
+    cy.get('.date-input-group .form-control').first().should('have.attr', 'type', 'date');
+    cy.get('.date-input-group .form-control').last().should('have.attr', 'type', 'date');
+  });
 });
