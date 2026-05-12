@@ -26,4 +26,18 @@ describe('Welcome', () => {
   it('divider แสดงระหว่าง subtitle และ instruction', () => {
     cy.get('.divider').should('exist');
   });
+
+  it('sidebar หรือ nav menu แสดงขึ้นหลัง login', () => {
+    cy.get('.sidebar, nav, app-sidenav, .sidenav').should('be.visible');
+  });
+
+  it('URL เป็น /welcome และไม่ redirect ไปที่อื่น', () => {
+    cy.url().should('include', '/welcome');
+  });
+
+  it('unauthenticated user เข้า /welcome แล้ว redirect ไปหน้า login', () => {
+    cy.clearLocalStorage();
+    cy.visit('/welcome');
+    cy.url().should('include', '/login');
+  });
 });
