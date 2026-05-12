@@ -1,0 +1,85 @@
+{
+  "name": "my-angular-app",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --host 0.0.0.0",
+    "dev": "ng serve --host 0.0.0.0 --configuration=dev",
+    "build": "ng build",
+    "build:prod": "ng build --configuration production --output-hashing=all --delete-output-path --verbose",
+    "build:uat": "ng build --configuration uat --output-hashing=all --delete-output-path --verbose",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "e2e": "cypress run --headed",
+    "e2e:ci": "cypress run",
+    "cypress:open": "cypress open"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.7.0",
+  "dependencies": {
+    "@angular/animations": "^21.1.3",
+    "@angular/cdk": "~21.1.3",
+    "@angular/common": "^21.1.3",
+    "@angular/compiler": "^21.1.3",
+    "@angular/core": "^21.1.3",
+    "@angular/forms": "^21.1.3",
+    "@angular/material": "~21.1.3",
+    "@angular/platform-browser": "^21.1.3",
+    "@angular/router": "^21.1.3",
+    "@ant-design/icons-angular": "^21.0.0",
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@fullcalendar/angular": "^6.1.20",
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@microsoft/signalr": "^10.0.0",
+    "@ng-icons/akar-icons": "^33.0.0",
+    "@ng-icons/bootstrap-icons": "^33.0.0",
+    "@ng-icons/core": "^33.0.0",
+    "@ng-icons/heroicons": "^33.0.0",
+    "@ng-icons/material-icons": "^33.0.0",
+    "@ng-icons/tabler-icons": "^33.0.0",
+    "@tanstack/angular-table": "^8.21.3",
+    "crypto-js": "^4.2.0",
+    "date-holidays": "^3.26.7",
+    "dayjs": "^1.11.19",
+    "echarts": "^6.0.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0",
+    "ng-zorro-antd": "^21.1.0",
+    "ngx-echarts": "^21.0.0",
+    "rxjs": "~7.8.0",
+    "sweetalert2": "^11.26.18",
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
+    "xlsx-js-style": "^1.2.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.3",
+    "@angular/cli": "^21.1.3",
+    "@angular/compiler-cli": "^21.1.3",
+    "@angular/material": "^21.1.3",
+    "@cypress/schematic": "^5.0.0",
+    "@types/crypto-js": "^4.2.2",
+    "@types/file-saver": "^2.0.7",
+    "@types/jspdf": "^1.3.3",
+    "cypress": "^15.9.0",
+    "jsdom": "^28.0.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}

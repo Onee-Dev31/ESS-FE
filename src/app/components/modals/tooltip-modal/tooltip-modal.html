@@ -1,0 +1,13 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-container info-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>รายละเอียด</h3>
+      <button class="close-btn" (click)="close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

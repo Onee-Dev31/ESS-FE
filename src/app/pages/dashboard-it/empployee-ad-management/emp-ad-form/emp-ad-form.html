@@ -1,0 +1,333 @@
+<div class="form-page">
+  @if (isLoading) {
+    <div class="loading-wrap"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+  }
+
+  <!-- ===== VIEW MODE ===== -->
+  @if (!isLoading && mode === 'view') {
+    <div class="form-body">
+      <div class="section-title">Basic Information</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label>Employee Code</label>
+          <input type="text" [(ngModel)]="form.employeeCode" name="employeeCode" readonly />
+        </div>
+        <div class="field-group">
+          <label>Name (Thai)</label>
+          <input type="text" [(ngModel)]="form.nameThai" name="nameThai" readonly />
+        </div>
+        <div class="field-group">
+          <label>Name (English)</label>
+          <input type="text" [(ngModel)]="form.nameEng" name="nameEng" readonly />
+        </div>
+        <div class="field-group">
+          <label>Nickname</label>
+          <input type="text" [(ngModel)]="form.Nickname" name="nickname" readonly />
+        </div>
+        <div class="field-group">
+          <label>Job Position</label>
+          <input type="text" [(ngModel)]="form.jobPosition" name="jobPosition" readonly />
+        </div>
+        <div class="field-group">
+          <label>Status Employee</label>
+          <input type="text" [(ngModel)]="form.statusEmployee" name="statusEmployee" readonly />
+        </div>
+        <div class="field-group">
+          <label>Floor</label>
+          <input type="text" [(ngModel)]="form.floor" name="floor" readonly />
+        </div>
+      </div>
+
+      <div class="section-title">Contact Information</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label>Mobile</label>
+          <input type="text" [(ngModel)]="form.mobile" name="mobile" readonly />
+        </div>
+        <div class="field-group">
+          <label>Email</label>
+          <input type="text" [(ngModel)]="form.email" name="email" readonly />
+        </div>
+      </div>
+
+      <div class="section-title">Company Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>Company Name</label>
+          <input type="text" [(ngModel)]="form.companyName" name="companyName" readonly />
+        </div>
+        <div class="field-group span-2">
+          <label>Department</label>
+          <input type="text" [(ngModel)]="form.department" name="department" readonly />
+        </div>
+      </div>
+
+      <div class="section-title">Hierarchy Information</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label>Head Employee Code</label>
+          <input type="text" [(ngModel)]="form.headEmployeeCode" name="headEmployeeCode" readonly />
+        </div>
+        <div class="field-group">
+          <label>Head Employee Name</label>
+          <input type="text" [(ngModel)]="form.headEmployeeName" name="headEmployeeName" readonly />
+        </div>
+        <div class="field-group">
+          <label>AD User</label>
+          <input type="text" [(ngModel)]="form.adUser" name="adUser" readonly />
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== ADD MODE ===== -->
+  @if (mode === 'add') {
+    <form class="form-body" (ngSubmit)="saveEmployee()">
+      <div class="section-title">Basic Information</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label>Employee Code <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.employeeCode"
+            name="employeeCode"
+            placeholder="Enter Employee Code"
+            [class.invalid]="isInvalid('employeeCode')"
+          />
+        </div>
+        <div class="field-group">
+          <label>TitleName (Thai) <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.titleThai"
+            name="titleThai"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- Select Title --"
+            [nzStatus]="isInvalid('titleThai') ? 'error' : ''"
+            class="field-nz-select"
+          >
+            @for (t of titleOptions; track t) {
+              <nz-option [nzValue]="t" [nzLabel]="t" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group">
+          <label>FirstName (Thai) <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.firstNameThai"
+            name="firstNameThai"
+            placeholder="Enter Firstname in Thai"
+            [class.invalid]="isInvalid('firstNameThai')"
+          />
+        </div>
+        <div class="field-group">
+          <label>SurName (Thai) <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.surNameThai"
+            name="surNameThai"
+            placeholder="Enter Surname in Thai"
+            [class.invalid]="isInvalid('surNameThai')"
+          />
+        </div>
+        <div class="field-group">
+          <label>TitleName (English) <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.titleEng"
+            name="titleEng"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- Select Title --"
+            [nzStatus]="isInvalid('titleEng') ? 'error' : ''"
+            class="field-nz-select"
+          >
+            @for (t of titleEngOptions; track t) {
+              <nz-option [nzValue]="t" [nzLabel]="t" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group">
+          <label>FirstName (English) <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.firstNameEng"
+            name="firstNameEng"
+            placeholder="Enter FirstName in English"
+            [class.invalid]="isInvalid('firstNameEng')"
+          />
+        </div>
+        <div class="field-group">
+          <label>SurName (English) <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.surNameEng"
+            name="surNameEng"
+            placeholder="Enter SurName in English"
+            [class.invalid]="isInvalid('surNameEng')"
+          />
+        </div>
+        <div class="field-group">
+          <label>Nickname <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.nickname"
+            name="nickname"
+            placeholder="Enter Nickname"
+            [class.invalid]="isInvalid('nickname')"
+          />
+        </div>
+      </div>
+
+      <div class="section-title">Job Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>Job Position <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.jobPosition"
+            name="jobPosition"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="Select a job position"
+            class="field-nz-select"
+            [nzStatus]="isInvalid('jobPosition') ? 'error' : ''"
+          >
+            @for (j of jobPositionList; track j.JobPositionID ?? $index) {
+              <nz-option
+                [nzValue]="j.JobPositionID"
+                [nzLabel]="j.JobPositionName ?? j.Description ?? j.Name"
+              />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>Status Employee <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.statusEmployee"
+            name="statusEmployee"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- ALL EmployeeStatus --"
+            class="field-nz-select"
+            [nzStatus]="isInvalid('statusEmployee') ? 'error' : ''"
+          >
+            @for (s of employeeStatusList; track s.StatusCode ?? $index) {
+              <nz-option [nzValue]="s.StatusCode" [nzLabel]="s.StatusDescription" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>Floor <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.floor"
+            name="floor"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- Select Floor --"
+            class="field-nz-select"
+            [nzStatus]="isInvalid('floor') ? 'error' : ''"
+          >
+            @for (f of floorList; track f.FloorID) {
+              <nz-option [nzValue]="f.FloorID" [nzLabel]="f.FloorNumber + ' - ' + f.Description" />
+            }
+          </nz-select>
+        </div>
+      </div>
+
+      <div class="section-title">Company Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>บริษัท <span class="req">*</span></label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกบริษัท"
+            class="field-nz-select"
+            [ngModel]="selectedCompany"
+            (ngModelChange)="onCompanyChange($event)"
+            name="companyCode"
+            [nzStatus]="isInvalid('companyCode') ? 'error' : ''"
+          >
+            @for (c of companyList; track $index) {
+              <nz-option [nzValue]="c" [nzLabel]="c.COMPANY_NAME + ' (' + c.COMPANY_CODE + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>แผนก <span class="req">*</span></label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="เลือกแผนก"
+            class="field-nz-select"
+            [(ngModel)]="addForm.department"
+            name="department"
+            [nzDisabled]="!addForm.companyCode"
+            [nzStatus]="isInvalid('department') ? 'error' : ''"
+          >
+            @for (d of filteredDepartmentList; track d.COSTCENT) {
+              <nz-option
+                [nzValue]="d.COSTCENT + ' ' + d.NAMECOSTCENT"
+                [nzLabel]="d.COSTCENT + ' - ' + d.NAMECOSTCENT"
+              />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>Email <span class="req">*</span></label>
+          <input
+            type="email"
+            [(ngModel)]="addForm.email"
+            name="email"
+            placeholder="Enter Email"
+            [class.invalid]="isInvalid('email')"
+          />
+        </div>
+        <div class="field-group span-2">
+          <label>Mobile <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.mobile"
+            name="mobile"
+            placeholder="Enter Mobile"
+            [class.invalid]="isInvalid('mobile')"
+          />
+        </div>
+      </div>
+
+      <div class="section-title">Hierarchy Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>Head Employee Code <span class="req">*</span></label>
+          <nz-select
+            [(ngModel)]="addForm.headEmployeeCode"
+            name="headEmployeeCode"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="Select HeadEmployee"
+            class="field-nz-select"
+            [nzStatus]="isInvalid('headEmployeeCode') ? 'error' : ''"
+          >
+            @for (h of headEmployeeList; track h.CODEMPID) {
+              <nz-option [nzValue]="h.CODEMPID" [nzLabel]="h.CODEMPID + ' - ' + h.NAMETHAI" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-group span-2">
+          <label>AD User <span class="req">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="addForm.adUser"
+            name="adUser"
+            placeholder="Enter AD User"
+            [class.invalid]="isInvalid('adUser')"
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Employee</button>
+      </div>
+    </form>
+  }
+</div>

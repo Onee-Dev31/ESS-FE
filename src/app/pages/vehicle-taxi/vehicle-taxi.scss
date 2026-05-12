@@ -1,0 +1,728 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// Vehicle Taxi Page Styles
+// ============================================
+
+// สีตัวอักษรและระดับความสำคัญ (Text Colors)
+$text: var(--text);
+$text-sub: var(--text-sub);
+$text-header: var(--text-sub);
+
+// สีพื้นหลัง (Background Colors)
+$bg-page: var(--bg-page);
+$header-bg: var(--bg-table-head);
+
+// เส้นขอบ (Border Colors)
+$border: var(--border);
+$border-color: var(--border-color);
+
+// UI Component Mixins
+// Pagination styling
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Card Header Title Mixin
+.card-header-title {
+  @include card-header-title;
+}
+
+// Icon Button Sky Mixin
+@mixin icon-btn-sky {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(14, 165, 233, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
+// ============================================
+
+.vehicle-taxi-page {
+  // ==================== LAYOUT ====================
+  padding: 24px;
+  background-color: $bg-page;
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  @include large-tablet {
+    padding: 12px;
+    padding-bottom: 5px;
+  }
+
+  .content-card {
+    @include content-card;
+    margin-top: 16px;
+  }
+
+  .card-header-title {
+    @include card-header-title;
+  }
+
+  .table-responsive {
+    display: block;
+    overflow-x: auto;
+
+    @include large-tablet {
+      display: none;
+    }
+  }
+
+  // ==================== MOBILE CARD VIEW ====================
+  .card-list-view {
+    display: none;
+    gap: 14px;
+    padding: 4px 0 8px;
+
+    app-empty-state {
+      grid-column: 1 / -1;
+    }
+
+    // display: grid;
+    // grid-template-columns: repeat(4, 1fr);
+
+    @include large-tablet {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include tablet {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mobile {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  .claim-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-toolbar);
+    border-radius: 16px;
+    overflow: hidden;
+    transition:
+      box-shadow 0.2s,
+      transform 0.2s;
+    border-left: 4px solid var(--primary);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-table-head);
+      gap: 10px;
+    }
+
+    &__type-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    &__body {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+
+      @media screen and (max-width: 455px) {
+        flex-direction: column;
+      }
+    }
+
+    &__main {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    &__amount {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 14px 16px;
+      border-left: 1px solid var(--border-toolbar);
+      min-width: 110px;
+      gap: 4px;
+
+      @media screen and (max-width: 425px) {
+        // align-items: flex-start;
+        padding: 4px 16px;
+      }
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-top: 1px solid var(--border-toolbar);
+      background: var(--bg-table-head);
+    }
+  }
+
+  .amount-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .amount-value {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--primary);
+    white-space: nowrap;
+  }
+
+  .amount-approved {
+    font-size: 0.72rem;
+    color: var(--status-success-text);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .claim-id {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .claim-date-created {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  // ==================== TABLE STYLES ====================
+  .modern-table {
+    @include modern-table;
+
+    tbody {
+      tr {
+        cursor: pointer;
+      }
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: $font-size-label;
+
+      i {
+        font-size: $font-size-body;
+        opacity: 0.9;
+      }
+
+      .type-name {
+        white-space: nowrap;
+      }
+    }
+
+    .request-no {
+      font-size: $font-size-label;
+      color: $primary;
+    }
+  }
+
+  // ==================== VOUCHER LINK ====================
+  .text-primary-link {
+    color: var(--primary);
+    font-weight: 700;
+    cursor: default;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  // // ==================== MOBILE CARD VIEW ====================
+  // .card-list-view {
+  //   @include mobile-cards-view;
+
+  //   .mobile-card .card-header .header-content {
+  //     display: flex;
+  //     flex-direction: column;
+  //     gap: 2px;
+
+  //     .create-date {
+  //       font-size: 0.75rem;
+  //       color: var(--text-muted);
+  //     }
+  //   }
+
+  //   .action-btn.folder {
+  //     @include icon-btn-sky;
+
+  //     &:hover {
+  //       transform: scale(1.05);
+  //     }
+  //   }
+  // }
+
+  // ==================== MODAL ====================
+  .modal-overlay {
+    @include modal-overlay-styles;
+  }
+}
+
+// ============================================================
+// Content card
+// ============================================================
+.content-card {
+  @include content-card;
+}
+
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+
+  @include mobile {
+    flex-wrap: wrap;
+  }
+}
+
+.card-header-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-header);
+  position: relative;
+  padding-left: 14px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 18px;
+    background: $primary;
+    border-radius: 2px;
+  }
+}
+
+// ============================================================
+// Toolbar
+// ============================================================
+.toolbar-container {
+  @include toolbar-container;
+  background: var(--bg-card);
+  border: 1px solid var(--border-toolbar);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+
+  .filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+
+    @include tablet {
+      flex-direction: column;
+    }
+  }
+
+  .group-filter {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    input {
+      width: 100%;
+    }
+
+    @media screen and (max-width: 425px) {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .form-field {
+      flex: 1;
+    }
+  }
+}
+
+.toolbar-bottom-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .right-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    flex: 1;
+    align-items: flex-end;
+
+    @include mobile {
+      gap: 8px;
+    }
+  }
+
+  .toolbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100%;
+    }
+  }
+}
+
+.filter-sep {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  line-height: 44px;
+  padding-bottom: 0;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+
+  @include tablet {
+    flex: 1 1 130px;
+  }
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text) !important;
+    margin-left: 4px;
+  }
+
+  .form-input {
+    @include input-field;
+
+    &::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #a78bfa !important;
+      box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
+    }
+
+    &.readonly,
+    &.disabled,
+    &:disabled {
+      background: var(--input-disabled-bg) !important;
+      color: var(--text-muted) !important;
+      border-color: var(--input-disabled-border) !important;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+  }
+
+  textarea.form-input {
+    height: auto !important;
+    padding: 16px 20px !important;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+    border-radius: 16px !important;
+  }
+
+  select.form-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 18px;
+    padding-right: 48px !important;
+  }
+
+  input[type='date'].form-input {
+    cursor: pointer;
+    position: relative;
+    padding-right: 16px !important;
+  }
+
+  .form-input.input-error {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.15) !important;
+  }
+
+  .error {
+    color: rgb(255, 166, 166);
+    text-align: center;
+  }
+}
+
+// ============================================
+// Button & Input Styling - AUTO-APPLIED
+// ============================================
+
+// Main action buttons
+.btn-create {
+  @include btn-primary;
+  max-width: fit-content;
+}
+
+.btn-search {
+  @include btn-primary;
+}
+
+.btn-clear {
+  @include btn-outline;
+
+  @include tablet {
+    flex: 1 0 45%;
+    min-width: 100px;
+  }
+}
+
+.btn-edit-sm,
+.btn-icon.edit {
+  @include btn-secondary;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+}
+
+.btn-delete-sm,
+.btn-icon.delete {
+  @include btn-outline;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  height: 36px;
+  color: var(--danger);
+  border-color: var(--danger);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: #dc2626;
+  }
+
+  &:active {
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+// Input fields
+.form-control {
+  @include input-field;
+}
+
+.select-status,
+select.form-control {
+  @include select-dropdown;
+}
+
+// Search input group
+.search-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  input.form-control {
+    min-width: 200px;
+  }
+
+  @include tablet {
+    width: 100%;
+
+    input.form-control {
+      flex: 1;
+      min-width: 0;
+    }
+
+    button {
+      flex: none;
+      width: auto;
+      padding: 0 20px;
+    }
+  }
+}
+
+// Filter groups styling
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .date-input-group,
+  .select-input-group {
+    width: 100%;
+    max-width: 100%;
+
+    .form-control {
+      width: 100%;
+    }
+  }
+
+  @include tablet {
+    flex: 1 1 120px;
+    min-width: 120px;
+  }
+}
+
+// Pagination wrapper spacing
+.pagination-wrapper {
+  margin-top: 24px;
+}
+
+// ============================================================
+// Status badge
+// ============================================================
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.NEW,
+  &.WAITING_CHECK {
+    background: var(--status-new-bg);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  &.PENDING_APPROVAL {
+    background: var(--status-warning-bg);
+    color: var(--status-warning-text);
+    border-color: var(--status-warning-text);
+  }
+
+  &.APPROVED,
+  &.VERIFIED {
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
+    border-color: var(--status-success-text);
+  }
+
+  &.REJECTED,
+  &.CANCELLED {
+    background: var(--status-danger-bg);
+    color: var(--status-danger-text);
+    border-color: var(--status-danger-text);
+  }
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}

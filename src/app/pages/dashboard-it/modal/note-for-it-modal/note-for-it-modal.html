@@ -1,0 +1,29 @@
+<div class="modal-overlay noteTicket">
+  <div class="modal-container">
+    <div>
+      <header class="top-header-strip">
+        <h2>Note for IT</h2>
+      </header>
+      <div class="content-card">
+        <textarea
+          class="form-input note"
+          placeholder="อธิบายรายละเอียด..."
+          [(ngModel)]="noteForm.message"
+        ></textarea>
+      </div>
+      <div class="form-actions-footer">
+        <button class="btn-back-custom" (click)="close()">
+          <i class="fas fa-times"></i> ยกเลิก
+        </button>
+        <button class="btn-save-custom" (click)="save()">
+          <i class="fas fa-paper-plane"></i> ส่ง
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (isPreviewModalOpen()) {
+  <app-file-preview-modal [files]="previewFiles()" (onClose)="closePreview()">
+  </app-file-preview-modal>
+}

@@ -1,0 +1,478 @@
+@use './variables' as *;
+
+/*
+  ANTD : SELECT
+*/
+// input
+.ant-select {
+  color: var(--input-text);
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  position: relative;
+  background-color: transparent;
+  border: 1px solid #cfcfcf00;
+}
+
+.ant-select-selection-placeholder {
+  color: var(--input-text-placeholder);
+}
+
+.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  color: var(--text-muted);
+}
+
+//input > diable
+.ant-select:not(.ant-select-disabled).ant-select-focused .ant-select-selector {
+  border-color: #40a9ff00;
+  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+}
+
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: #40a9ff00;
+  box-shadow: 0 0 0 2px rgb(24 144 255 / 0%);
+}
+
+.ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  position: relative;
+  background-color: var(--input-disabled-bg);
+  border: 1px solid #cfcfcf00;
+}
+
+// >
+.ant-select-arrow .anticon > svg {
+  color: rgba(255, 255, 255, 0);
+}
+
+// x
+.ant-select-clear,
+.ant-select-clear:hover {
+  background-color: transparent;
+  color: var(--input-text) !important;
+  font-size: 15px;
+}
+
+// option
+.ant-select-dropdown {
+  background-color: var(--bg-page);
+}
+
+.ant-select-item {
+  color: var(--input-text);
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: var(--input-bg-hover);
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: var(--input-bg-active);
+}
+
+//empty
+.ant-empty-small {
+  color: var(--input-text);
+}
+
+// select-multiple
+.ant-select-multiple.ant-select .ant-select-selection-item {
+  height: 28px;
+  background: transparent;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/*
+  ANTD : PICKER
+*/
+
+/*
+|--------------------------------------------------------------------------
+| 1. ANTD : CUSTOM PICKER
+|--------------------------------------------------------------------------
+*/
+
+/* input */
+.custom-picker.ant-picker {
+  border: 1px solid var(--border-table-head);
+  color: var(--input-text);
+  background-color: var(--input-bg);
+}
+
+/* popup */
+.custom-picker-popup .ant-picker-panel {
+  background: var(--bg-card);
+}
+
+/* today */
+.custom-picker-popup .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border: none !important;
+  display: none !important;
+}
+
+/* input text */
+.custom-picker.ant-picker .ant-picker-input > input {
+  color: var(--text);
+}
+
+/* clear icon */
+.custom-picker.ant-picker .ant-picker-clear {
+  background-color: transparent;
+  color: var(--input-text) !important;
+}
+
+/* suffix */
+.custom-picker.ant-picker .ant-picker-suffix {
+  color: var(--text);
+}
+
+/* hide suffix */
+.custom-picker.ant-picker:hover input:not(:placeholder-shown) ~ .ant-picker-suffix {
+  opacity: 0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| CELL
+|--------------------------------------------------------------------------
+*/
+
+/* fix size */
+.custom-picker-popup .ant-picker-cell {
+  width: 30px !important;
+  height: 35px !important;
+  padding: 0 !important;
+}
+
+/* inner */
+.custom-picker-popup .ant-picker-cell-inner {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50% !important;
+
+  transition: background-color 0.2s ease;
+}
+
+/* selected */
+.custom-picker-popup .ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+
+  border-radius: 50% !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hover */
+.custom-picker-popup .ant-picker-cell-inner:hover {
+  background-color: color-mix(in srgb, var(--primary) 18%, transparent) !important;
+
+  border-radius: 50% !important;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MONTH / YEAR MODE
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup .ant-picker-month-panel .ant-picker-cell-inner,
+.custom-picker-popup .ant-picker-year-panel .ant-picker-cell-inner,
+.custom-picker-popup .ant-picker-decade-panel .ant-picker-cell-inner {
+  border-radius: 10% !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| DISABLED
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup .ant-picker-cell-disabled::before {
+  background: color-mix(in srgb, var(--text-muted), var(--text-reverse) 80%) !important;
+}
+
+/* disabled text */
+.custom-picker-popup .ant-picker-cell-disabled .ant-picker-cell-inner {
+  color: var(--text) !important;
+  opacity: 0.6;
+}
+
+/*
+|--------------------------------------------------------------------------
+| MOBILE
+|--------------------------------------------------------------------------
+*/
+
+.custom-picker-popup,
+.custom-picker-popup .ant-picker-panel-container {
+  z-index: 1150 !important;
+
+  position: fixed !important;
+
+  max-width: calc(100vw - 24px) !important;
+
+  box-sizing: border-box;
+
+  overflow-x: auto;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2. ANTD : CUSTOM RANGE PICKER
+|--------------------------------------------------------------------------
+*/
+
+nz-range-picker {
+  width: 300px;
+  border-radius: 10px !important;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2. ANTD : CUSTOM RANGE PICKER
+|--------------------------------------------------------------------------
+*/
+
+/* input */
+.custom-range-picker.ant-picker {
+  border: 1px solid var(--border-table-head);
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  border-radius: 10px !important;
+  width: 300px;
+}
+
+/* input text */
+.custom-range-picker.ant-picker .ant-picker-input > input {
+  color: var(--text);
+}
+
+/* suffix / clear */
+.custom-range-picker.ant-picker .ant-picker-suffix {
+  color: var(--text);
+}
+.custom-range-picker.ant-picker .ant-picker-clear {
+  background-color: transparent;
+  color: var(--input-text) !important;
+}
+
+/* separator */
+.custom-range-picker.ant-picker .ant-picker-range-separator {
+  color: var(--text-muted);
+}
+
+/*
+|--------------------------------------------------------------------------
+| POPUP
+|--------------------------------------------------------------------------
+*/
+
+/* panel bg */
+.custom-range-picker-popup .ant-picker-panel {
+  background: var(--bg-card);
+}
+
+/* header */
+.custom-range-picker-popup .ant-picker-header {
+  color: var(--text-header);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.custom-range-picker-popup .ant-picker-header button {
+  color: var(--text-muted);
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+/* today border */
+.custom-range-picker-popup .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--primary) !important;
+}
+
+/* cell text */
+.custom-range-picker-popup .ant-picker-cell {
+  color: var(--text-muted);
+}
+
+.custom-range-picker-popup .ant-picker-cell-in-view {
+  color: var(--text);
+}
+
+/* range start / end — วงกลม */
+.custom-range-picker-popup .ant-picker-cell-range-start .ant-picker-cell-inner,
+.custom-range-picker-popup .ant-picker-cell-range-end .ant-picker-cell-inner {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+}
+
+/* range in-between — pill bg */
+.custom-range-picker-popup .ant-picker-cell-in-range::before {
+  background: color-mix(in srgb, var(--primary), transparent 85%) !important;
+}
+
+/* range start tail */
+.custom-range-picker-popup
+  .ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before,
+.custom-range-picker-popup
+  .ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before {
+  background: color-mix(in srgb, var(--primary), transparent 85%) !important;
+}
+
+/* hover */
+.custom-range-picker-popup
+  .ant-picker-cell:not(.ant-picker-cell-disabled):hover
+  .ant-picker-cell-inner {
+  background: color-mix(in srgb, var(--primary), transparent 50%) !important;
+  border-radius: 50% !important;
+}
+
+/* disabled */
+.custom-range-picker-popup .ant-picker-cell-disabled .ant-picker-cell-inner {
+  color: var(--text-muted) !important;
+  opacity: 0.5;
+}
+
+.custom-range-picker-popup .ant-picker-cell-disabled::before {
+  background: color-mix(in srgb, var(--text-muted), transparent 85%) !important;
+}
+
+/* footer */
+.custom-range-picker-popup .ant-picker-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+/* mobile */
+.custom-range-picker-popup,
+.custom-range-picker-popup .ant-picker-panel-container {
+  z-index: 1150 !important;
+  position: fixed !important;
+  max-width: calc(100vw - 24px) !important;
+  box-sizing: border-box;
+  overflow-x: auto;
+  background: var(--bg-card) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.custom-range-picker-popup .ant-picker-cell-range-hover-start .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-end .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-edge-start .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-hover-edge-end .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-start-near-hover .ant-picker-cell-inner::after,
+.custom-range-picker-popup .ant-picker-cell-range-end-near-hover .ant-picker-cell-inner::after {
+  background: transparent !important;
+  display: none !important;
+}
+/*
+  ANTD : MODAL
+*/
+.ant-modal-body {
+  background-color: var(--bg-card);
+  border-radius: 17px;
+}
+
+.ant-modal-close-x {
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+.ant-modal-close-x:hover {
+  background: rgba(202, 202, 202, 0.5);
+  transform: scale(1);
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+/*
+  ANTD : CHECKBOX
+*/
+
+/* ===== Disabled + NOT checked (false) ===== */
+.ant-checkbox-disabled:not(.ant-checkbox-checked) .ant-checkbox-inner {
+  background-color: rgba(99, 102, 241, 0.1);
+  border-color: var(--status-approved-text);
+}
+
+/* ===== Disabled + checked (true) ===== */
+.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: rgba(99, 102, 241, 0.9);
+  border-color: var(--status-approved-text);
+}
+
+/* สีเครื่องหมายถูก */
+.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: #94a3b8;
+}
+
+// antd tooltip
+.ant-tooltip-inner {
+  background: var(--bg-card) !important;
+  padding: 16px;
+  color: var(--text);
+  border-radius: 16px;
+  box-shadow: var(--shadow) !important;
+}
+
+.ant-tooltip-arrow::before,
+.ant-tooltip-arrow::after {
+  background-color: var(--bg-card) !important;
+}
+
+/*
+  ANTD : INPUT / INPUT-WRAPPER
+*/
+.ant-input-affix-wrapper {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+
+  &:hover {
+    border-color: var(--input-border-hover);
+  }
+
+  &:focus,
+  &.ant-input-affix-wrapper-focused {
+    background-color: var(--input-focus-bg);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  }
+
+  .ant-input-prefix {
+    color: var(--text-muted);
+  }
+}
+
+.ant-input-affix-wrapper .ant-input,
+.ant-input {
+  background-color: transparent;
+  color: var(--input-text);
+
+  &::placeholder {
+    color: var(--input-text-placeholder);
+  }
+}

@@ -1,0 +1,55 @@
+@if (type === 'table') {
+  <div class="skeleton-table">
+    @for (row of rowsArray; track $index) {
+      <div class="skeleton-row">
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell"></div>
+      </div>
+    }
+  </div>
+}
+
+@if (type === 'card') {
+  <div class="skeleton-card">
+    @for (row of rowsArray; track $index) {
+      <div class="skeleton-card-item">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line" [style.height]="height"></div>
+          <div class="skeleton-line" [style.height]="height" style="width: 80%"></div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (type === 'text') {
+  @for (row of rowsArray; track $index) {
+    <div class="skeleton-line" [style.height]="height"></div>
+  }
+}
+
+@if (type === 'form') {
+  <div class="skeleton-form">
+    <div class="skeleton-line" style="width: 30%; margin-bottom: 0.75rem"></div>
+    <div class="skeleton-form-cards">
+      @for (i of rowsArray; track $index) {
+        <div class="skeleton-form-card"></div>
+      }
+    </div>
+
+    <!-- fields -->
+    <div class="skeleton-line" style="width: 25%; margin-top: 1.5rem"></div>
+    <div class="skeleton-form-grid">
+      @for (i of [1, 2, 3, 4, 5, 6]; track $index) {
+        <div class="skeleton-form-field">
+          <div class="skeleton-line" style="width: 40%; height: 10px"></div>
+          <div class="skeleton-line" style="height: 38px; border-radius: 8px"></div>
+        </div>
+      }
+    </div>
+  </div>
+}

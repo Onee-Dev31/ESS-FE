@@ -1,0 +1,39 @@
+<div class="modal-overlay noteTicket">
+  <div class="modal-container">
+    <div>
+      <header class="top-header-strip">
+        <h2>CC:</h2>
+        <button type="button" class="btn-close-modal" (click)="close()" title="ปิด">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+      <div class="content-card">
+        <div class="cc-list" *ngIf="ticket?.ccList?.length > 0">
+          <div class="cc-item" *ngFor="let cc of ticket.ccList">
+            <!-- avatar -->
+            <div class="cc-avatar">
+              <img
+                [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + cc.codeempid + '.jpg'"
+                (error)="onImgError($event)"
+              />
+            </div>
+
+            <!-- info -->
+            <div class="cc-info">
+              <div class="cc-name">{{ cc.name }}</div>
+              <div class="cc-meta">
+                <span class="cc-email">{{ cc.email }}</span>
+
+                <span *ngIf="cc.department">• {{ cc.department }}</span>
+                <span *ngIf="cc.company">• {{ cc.company }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-add-cc" (click)="addCC()" *ngIf="isItDashboard">
+          <i class="fas fa-plus"></i> เพิ่ม CC
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
