@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { forceDownloadFile } from '../../../utils/download-file';
 
 export interface FilePreviewItem {
   fileName: string;
@@ -77,27 +78,17 @@ export class FilePreviewModalComponent implements OnInit {
   }
 
   isDownloading = false;
-
   async downloadFile(file: FilePreviewItem) {
     if (!file.url) return;
+
     this.isDownloading = true;
 
     try {
-      const response = await fetch(file.url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = file.fileName;
-      a.click();
-
-      URL.revokeObjectURL(blobUrl);
+      await forceDownloadFile(file.url, file.fileName);
     } catch (error) {
       console.error('Download failed:', error);
     } finally {
       this.isDownloading = false;
-      this.cdr.detectChanges();
     }
   }
 }

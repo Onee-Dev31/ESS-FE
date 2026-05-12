@@ -4,24 +4,11 @@
       <i class="fa-solid fa-folder-open"></i>report
     </button>
   </div>
-  <!-- <div class="filter">
-    <div class="form-field">
-      <nz-range-picker
-        nzFormat="dd/MM/yyyy"
-        [(ngModel)]="filter.dateRange"
-        (ngModelChange)="applyFilter()"
-        class="form-input dateRange"
-      />
-    </div>
-    <button class="btn-export" (click)="export()"><i class="fa-solid fa-upload"></i>Export</button>
-    <button class="btn-clear" (click)="clearFilter()">
-      <i class="fa-solid fa-arrows-rotate"></i>Clear
-    </button>
-    <button class="btn-export" (click)="exportCharts()">
-      <i class="fa-solid fa-upload"></i>Export Chart
-    </button>
-  </div> -->
+
   <div class="btn-command">
+    <button class="btn-type employeeInfo" (click)="viewEmployeeInfo()">
+      <i class="fa-solid fa-address-card"></i> employee Info
+    </button>
     <button class="btn-type approve-out" (click)="viewApproveResign()">
       <i class="fa-solid fa-person-walking-arrow-right"></i> อนุมัติพนักงานลาออก
     </button>

@@ -38,6 +38,11 @@ export const menuGuard: CanActivateFn = (route, state) => {
       roles: ['it-staff', 'system-admin'],
       allowedPaths: ['resign-management'],
     },
+    {
+      grantPath: 'it-dashboard',
+      roles: ['it-staff', 'system-admin'],
+      allowedPaths: ['employee-Info'],
+    },
   ];
 
   const hasExceptionAccess = pathExceptions.some(

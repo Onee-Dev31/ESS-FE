@@ -281,10 +281,7 @@ export class ItService implements OnInit {
         ticketId: ticket.id,
         ticketNumber: ticket.ticket_number,
         subject: ticket.subject,
-        description:
-          ticket.ticket_type_id === 1
-            ? `ความประสงค์จะซ่อมอุปกรณ์ : ${ticket.device_type_name}\nรายละเอียด : ${ticket.symptom ?? '-'}`
-            : ticket.description,
+        description: ticket.description,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         status: status,

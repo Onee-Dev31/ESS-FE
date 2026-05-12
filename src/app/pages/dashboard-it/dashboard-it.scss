@@ -546,6 +546,11 @@
     color: var(--text);
   }
 
+  .employeeInfo {
+    --btn-border: var(--green);
+    --btn-bg: var(--green-light);
+  }
+
   .approve-out {
     --btn-border: var(--orange);
     --btn-bg: var(--orange-light);

@@ -25,7 +25,7 @@ export interface ConvertedFile {
   providedIn: 'root',
 })
 export class FileConverterService {
-  private readonly FILE_URL = environment.file_url;
+  private readonly FILE_URL = environment.previewUrl;
 
   constructor() {}
 
@@ -68,14 +68,13 @@ export class FileConverterService {
     if (!url) {
       const actualFile =
         file instanceof File ? file : file?.file instanceof File ? file.file : null;
-
       if (actualFile) {
         url = URL.createObjectURL(actualFile);
       }
     }
 
     // console.log(url)
-    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    if (url && !url.startsWith('http://') && !url.startsWith('https://') && !file.isNew) {
       url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
     }
 
@@ -90,7 +89,7 @@ export class FileConverterService {
       fileName: file.fileName || file.name || 'unknown',
       date: date,
       url: url || '',
-      type: file.fileType || file.type || file.file_type || '',
+      type: file.fileType || file.type || file.file_type || file.file?.type || '',
     };
   }
 

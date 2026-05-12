@@ -786,6 +786,10 @@ export class DashboardIT implements OnInit {
     //  window.open(`/it-dashboard/report-detail?id=${encodeURIComponent(encryptedId)}`, '_blank');
   }
 
+  viewEmployeeInfo() {
+    window.open(`/employee-Info`, '_blank');
+  }
+
   // MODAL
   //>>> function
   updateTicket(
