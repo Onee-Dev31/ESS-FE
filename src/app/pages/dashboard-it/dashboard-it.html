@@ -416,13 +416,9 @@
       <button
         class="btn btn-accept"
         (click)="openAcknowledgeModal()"
-        *ngIf="
-          t.status !== 'In Progress' &&
-          t.status !== 'Assigned' &&
-          t.status !== 'ReOpened' &&
-          t.approval_status !== 'Approved'
-        "
+        *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned' && t.status !== 'ReOpened'"
       >
+        <!-- t.approval_status !== 'Approved' -->
         <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง
       </button>
       <button class="btn btn-send" (click)="openAssignModal()">

@@ -419,8 +419,8 @@ export class ITServiceRequestComponent implements OnInit {
               this.signalrService.ticketApprovalNotify(codeEmpId, res.ticketNumber);
             }
             this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
-              this.clearForm();
               this.router.navigate(['/it-service-list']);
+              this.clearForm();
             });
           }
         },
