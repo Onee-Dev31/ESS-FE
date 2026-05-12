@@ -1,8 +1,8 @@
 export async function forceDownloadFile(url: string, fileName: string): Promise<void> {
-  if (!isBrowserViewable(fileName)) {
-    directDownload(url, fileName);
-    return;
-  }
+  // if (!isBrowserViewable(fileName)) {
+  //   directDownload(url, fileName);
+  //   return;
+  // }
 
   try {
     await blobDownload(url, fileName);
@@ -42,7 +42,7 @@ function toSameOriginFileUrl(url: string): string {
   try {
     const fileUrl = new URL(url);
 
-    if (fileUrl.hostname === '10.31.1.46' && fileUrl.pathname.startsWith('/files/')) {
+    if (fileUrl.hostname === '10.31.1.85' && fileUrl.pathname.startsWith('/uploads/')) {
       return `${fileUrl.pathname}${fileUrl.search}`;
     }
   } catch {

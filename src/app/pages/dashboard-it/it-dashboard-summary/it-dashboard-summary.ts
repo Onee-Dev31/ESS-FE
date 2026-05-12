@@ -50,10 +50,10 @@ export class ItDashboardSummary {
   @Input() set summaryData(res: any) {
     if (!res) return;
     this.updateKpis(res.summary);
-    this.buildStatusPie(res.summary);
-    this.buildServicePie(res.serviceTypes);
-    this.buildDeptTop5Map(res.topDepartments);
-    this.buildCompanyBar(res.topCompanies);
+    // this.buildStatusPie(res.summary);
+    // this.buildServicePie(res.serviceTypes);
+    // this.buildDeptTop5Map(res.topDepartments);
+    // this.buildCompanyBar(res.topCompanies);
     this.cdr.detectChanges();
   }
 
