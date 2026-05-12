@@ -129,4 +129,32 @@ describe('Allowance', () => {
       }
     });
   });
+
+  it('table header แสดง column สำคัญครบ', () => {
+    cy.get('thead').should('contain', 'รายการ');
+    cy.get('thead').should('contain', 'ยอดเงิน');
+    cy.get('thead').should('contain', 'สถานะ');
+    cy.get('thead').should('contain', 'วันที่สร้างรายการ');
+  });
+
+  it('pagination wrapper แสดงขึ้นในหน้า allowance', () => {
+    cy.get('.pagination-wrapper').should('exist');
+  });
+
+  it('ปิด modal แล้วเปิดใหม่ได้', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+
+    cy.get('app-allowance-form .btn-close-modal').click();
+    cy.get('app-allowance-form').should('not.exist');
+
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+  });
+
+  it('modal form แสดง label ประจำเดือน เมื่อเปิดขึ้นมา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.contains('app-allowance-form', 'ประจำเดือน').should('be.visible');
+  });
 });
