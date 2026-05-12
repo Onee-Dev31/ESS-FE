@@ -111,11 +111,19 @@ export class ApprovalItRequestComponent implements OnInit {
 
   ngOnInit() {
     const ticketId = Number(this.route.snapshot.queryParamMap.get('ticketId'));
-    this.refreshAndFocus(ticketId || null);
+    const ticketNumber = this.route.snapshot.queryParamMap.get('ticketNumber') ?? '';
+    this.refreshAndFocus(ticketId || null, ticketNumber || null);
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((id) => this.refreshAndFocus(id));
+      .subscribe((val) => {
+        const num = Number(val);
+        if (!isNaN(num) && num > 0) {
+          this.refreshAndFocus(num, null);
+        } else {
+          this.refreshAndFocus(null, String(val));
+        }
+      });
 
     this.signalrService
       .on('NewTicketForApproval')
@@ -123,7 +131,7 @@ export class ApprovalItRequestComponent implements OnInit {
       .subscribe(() => this.refresh());
   }
 
-  private refreshAndFocus(ticketId: number | null) {
+  private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
     this.loadingService.start('approvals-it-list');
 
     const page = this.listing.currentPage() + 1;
@@ -143,17 +151,23 @@ export class ApprovalItRequestComponent implements OnInit {
           this.loadingService.stop('approvals-it-list');
           this.cdr.markForCheck();
 
-          if (ticketId) {
+          const resolvedId =
+            ticketId ??
+            (ticketNumber
+              ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
+              : null);
+
+          if (resolvedId) {
             setTimeout(() => {
-              this.highlightedTicketId.set(ticketId);
+              this.highlightedTicketId.set(resolvedId);
               this.cdr.markForCheck();
               document
-                .getElementById(`approval-row-${ticketId}`)
+                .getElementById(`approval-row-${resolvedId}`)
                 ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
               setTimeout(() => {
                 this.highlightedTicketId.set(null);
                 this.cdr.markForCheck();
-              }, 4000);
+              }, 10000);
             }, 100);
           }
         },

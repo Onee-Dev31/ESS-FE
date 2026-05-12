@@ -163,17 +163,37 @@ $border: var(--border);
       }
 
       &.highlighted-row td {
-        background: color.adjust(#f59e0b, $alpha: -0.8) !important;
-        animation: highlight-fade 4s ease forwards;
+        animation: highlight-blink 10s ease forwards;
       }
     }
 
-    @keyframes highlight-fade {
+    @keyframes highlight-blink {
       0% {
-        background-color: rgba(245, 158, 11, 0.25);
+        background-color: rgba(245, 158, 11, 0.35);
+      }
+      10% {
+        background-color: rgba(245, 158, 11, 0.05);
+      }
+      20% {
+        background-color: rgba(245, 158, 11, 0.35);
+      }
+      30% {
+        background-color: rgba(245, 158, 11, 0.05);
+      }
+      40% {
+        background-color: rgba(245, 158, 11, 0.35);
+      }
+      50% {
+        background-color: rgba(245, 158, 11, 0.05);
+      }
+      60% {
+        background-color: rgba(245, 158, 11, 0.3);
       }
       80% {
         background-color: rgba(245, 158, 11, 0.15);
+      }
+      100% {
+        background-color: transparent;
       }
       100% {
         background-color: transparent;
