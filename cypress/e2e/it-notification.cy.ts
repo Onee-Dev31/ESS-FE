@@ -412,7 +412,9 @@ describe('IT unread notifications', () => {
   });
 
   it('badge แสดงตัวเลขหรือ truncate เมื่อ unread มากกว่า 9 รายการ', () => {
-    cy.intercept('GET', /\/tickets\/unread-count(\?.*)?$/, { unreadCount: 10 }).as('getUnreadCount');
+    cy.intercept('GET', /\/tickets\/unread-count(\?.*)?$/, { unreadCount: 10 }).as(
+      'getUnreadCount',
+    );
     cy.intercept('GET', /\/tickets\/unread(\?.*)?$/, []).as('getUnreadTickets');
 
     cy.login(undefined, undefined, {
