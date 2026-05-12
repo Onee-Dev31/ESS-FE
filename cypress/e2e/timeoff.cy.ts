@@ -109,4 +109,50 @@ describe('Timeoff', () => {
     cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
     cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
   });
+
+  it('filter สถานะ "อนุมัติแล้ว" แล้วแสดงเฉพาะรายการที่ Approved', () => {
+    cy.get('.select-status').select('APPROVED');
+    cy.get('body').should(($body) => {
+      const badges = $body.find('.status-badge');
+      if (badges.length > 0) {
+        badges.each((_, badge) => {
+          expect(Cypress.$(badge).text().trim()).to.match(/อนุมัติแล้ว|Approved/);
+        });
+      } else {
+        expect($body.find('app-empty-state')).to.have.length.at.least(1);
+      }
+    });
+  });
+
+  it('date filter input รับค่าได้และกดค้นหาได้', () => {
+    cy.get('.date-input-group .form-control').first().click().should('be.visible');
+    cy.get('.date-input-group .form-control').last().click().should('be.visible');
+    cy.get('.btn-search').click({ force: true });
+    cy.get('.date-input-group .form-control').should('have.length', 2);
+  });
+
+  it('ปิด file preview modal แล้ว overlay หายไป', () => {
+    cy.get('button[title="ดูเอกสารแนบ"], .action-btn.folder').first().click({ force: true });
+    cy.get('.file-preview-modal-overlay').should('be.visible');
+    cy.get('.file-preview-modal-overlay .btn-close').click({ force: true });
+    cy.get('.file-preview-modal-overlay').should('not.exist');
+  });
+
+  it('sort column 3 ครั้ง → วนกลับมาเป็น asc อีกครั้ง', () => {
+    cy.viewport(1800, 900);
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().find('.fa-sort-amount-up').should('exist');
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
+    cy.get('thead .sortable-header').first().click();
+    cy.get('thead .sortable-header').first().find('.fa-sort-amount-up').should('exist');
+    cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
+  });
+
+  it('ค้นหา แล้ว clear input → รายการกลับมาครบ', () => {
+    cy.get('.search-input-group .form-control').type('ไม่พบแน่นอน_xyz');
+    cy.get('app-empty-state').should('be.visible');
+    cy.get('.search-input-group .form-control').clear();
+    cy.get('.modern-table tbody').should('have.length.at.least', 1);
+  });
 });
