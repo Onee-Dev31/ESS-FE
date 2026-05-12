@@ -45,6 +45,8 @@ export class EmpAdForm implements OnChanges {
     'department',
     'headEmployeeCode',
     'adUser',
+    'email',
+    'mobile',
   ];
 
   // View form
@@ -93,7 +95,10 @@ export class EmpAdForm implements OnChanges {
     nameBank: '',
     numberBank: '',
     companyCode: '',
+    companyName: '',
     department: '',
+    email: '',
+    mobile: '',
     headEmployeeCode: '',
     adUser: '',
   };
@@ -119,6 +124,7 @@ export class EmpAdForm implements OnChanges {
   onCompanyChange(company: any) {
     this.selectedCompany = company;
     this.addForm.companyCode = company?.COMPANY_CODE ?? '';
+    this.addForm.companyName = company?.COMPANY_NAME ?? '';
     this.addForm.department = '';
     this.filteredDepartmentList = company
       ? this.departmentList.filter((d) => d.COMPANY_CODE === company.COMPANY_CODE)
@@ -207,9 +213,12 @@ export class EmpAdForm implements OnChanges {
       TITLETHAI: this.addForm.titleThai,
       NAMFIRSTT: this.addForm.firstNameThai,
       NAMLASTT: this.addForm.surNameThai,
+      NAMETHAI:
+        `${this.addForm.titleThai}${this.addForm.firstNameThai} ${this.addForm.surNameThai}`.trim(),
       TITLEENG: this.addForm.titleEng,
       NAMFIRSTE: this.addForm.firstNameEng,
       NAMLASTE: this.addForm.surNameEng,
+      NAMEENG: `${this.addForm.firstNameEng} ${this.addForm.surNameEng}`.trim(),
       NICKNAME: this.addForm.nickname,
       POST:
         selectedJob?.JobPositionName ??
@@ -222,6 +231,9 @@ export class EmpAdForm implements OnChanges {
       NAMEBANK: this.addForm.nameBank,
       NUMBANK: this.addForm.numberBank,
       COMPANY_CODE: this.addForm.companyCode,
+      COMPANY_NAME: this.addForm.companyName,
+      EMAIL: this.addForm.email,
+      USR_MOBILE: this.addForm.mobile,
       DEPARTMENT: this.addForm.department,
       CODEMPIDH: this.addForm.headEmployeeCode,
       HEAD_NAME: selectedHead?.NAMETHAI ?? '',
@@ -233,16 +245,16 @@ export class EmpAdForm implements OnChanges {
       next: (_) => {
         this.isSaving = false;
         this.submitted = false;
+        this.onSaveSuccess.emit();
         this.cdr.detectChanges();
-        Swal.fire({
-          icon: 'success',
-          title: 'บันทึกสำเร็จ',
-          text: `เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`,
-          confirmButtonText: 'ตกลง',
-          customClass: { container: 'swal-over-modal' },
-        }).then(() => {
-          this.onSaveSuccess.emit();
-        });
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ',
+            text: `เพิ่มพนักงาน ${payload.CODEMPID} เรียบร้อยแล้ว`,
+            confirmButtonText: 'ตกลง',
+          });
+        }, 300);
       },
       error: (err) => {
         this.isSaving = false;
@@ -252,7 +264,6 @@ export class EmpAdForm implements OnChanges {
           title: 'เกิดข้อผิดพลาด',
           text: err?.error?.message ?? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
           confirmButtonText: 'ตกลง',
-          customClass: { container: 'swal-over-modal' },
         });
       },
     });
@@ -263,6 +274,7 @@ export class EmpAdForm implements OnChanges {
     this.empAdService.getEmployeeDetails(this.employeeId).subscribe({
       next: (res: any) => {
         const item = Array.isArray(res) ? res[0] : (res.data ?? res);
+        console.log('Loaded employee details:', item);
         if (item) this.mapToForm(item);
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -288,7 +300,7 @@ export class EmpAdForm implements OnChanges {
       numberBank: item.NUMBANK ?? '',
       officeTel: item.TELOFF ?? '',
       extension: item.NUMTEL ?? '',
-      mobile: item.MOBILE ?? '',
+      mobile: item.USR_MOBILE ?? '',
       email: item.EMAIL ?? '',
       companyName: item.COMPANY_NAME ?? '',
       department: item.DEPARTMENT ?? '',
@@ -323,7 +335,10 @@ export class EmpAdForm implements OnChanges {
       nameBank: '',
       numberBank: '',
       companyCode: '',
+      companyName: '',
       department: '',
+      email: '',
+      mobile: '',
       headEmployeeCode: '',
       adUser: '',
     };

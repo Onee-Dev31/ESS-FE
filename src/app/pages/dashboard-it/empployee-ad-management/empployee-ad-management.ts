@@ -436,15 +436,18 @@ export class EmpployeeAdManagement {
   }
 
   private mapEmployee(item: any) {
-    const [nameThai1, nameThai2] = this.splitAtSpace(item.NameThai ?? '');
-    const [nameEng1, nameEng2] = this.splitAtSpace(item.NameEng ?? '');
+    const nickname = item.nickname ?? item.Nickname ?? '';
     const [headName1, headName2] = this.splitAtSpace(item.HeadName ?? '');
     return {
       employeeId: item.EmployeeID ?? '',
-      nameThai1,
-      nameThai2,
-      nameEng1,
-      nameEng2,
+      nameThai1: item.FirstNameT ?? '',
+      nameThai2: item.LastNameT
+        ? nickname
+          ? `${item.LastNameT} (${nickname})`
+          : item.LastNameT
+        : '',
+      nameEng1: item.FirstName ?? '',
+      nameEng2: item.LastName ?? '',
       firstName: item.FirstName ?? '',
       lastName: item.LastName ?? '',
       email: item.Email ?? '',
@@ -455,7 +458,7 @@ export class EmpployeeAdManagement {
       headName1,
       headName2,
       adUser: item.ADUser ?? '',
-      nickname: item.Nickname ?? item.nickname ?? '',
+      nickname,
       employeeType: item.EmployeeType ?? '',
       employeeStatus: item.EmployeeStatus ?? '',
       empTypeId: item.EmpTypeID ?? null,
@@ -476,6 +479,7 @@ export class EmpployeeAdManagement {
       .subscribe({
         next: (res: any) => {
           const items = Array.isArray(res) ? res : (res.data ?? []);
+
           const pagination = res.pagination;
 
           this.employees = items.map((i: any) => this.mapEmployee(i));

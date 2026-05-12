@@ -331,6 +331,7 @@
     nzTitle="แก้ไข AD User"
     [nzWidth]="480"
     nzCentered
+    [nzMaskClosable]="false"
     (nzOnCancel)="closeEdit()"
     [nzFooter]="editFooter"
   >
@@ -375,6 +376,7 @@
     nzTitle="Reset Password"
     [nzWidth]="460"
     nzCentered
+    [nzMaskClosable]="false"
     (nzOnCancel)="closeReset()"
     [nzFooter]="resetFooter"
   >
@@ -428,6 +430,7 @@
     [nzTitle]="formMode === 'add' ? 'Add Employee' : 'View Employee'"
     [nzWidth]="1200"
     nzCentered
+    [nzMaskClosable]="false"
     (nzOnCancel)="closeForm()"
     [nzFooter]="null"
   >
