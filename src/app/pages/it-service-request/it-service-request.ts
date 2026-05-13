@@ -420,7 +420,7 @@ export class ITServiceRequestComponent implements OnInit {
             }
             this.swalService.success('ส่งคำขอเรียบร้อยแล้ว', res.ticketNumber).then(() => {
               this.router.navigate(['/it-service-list']);
-              this.clearForm();
+              // this.clearForm();
             });
           }
         },

@@ -330,3 +330,30 @@
   color: var(--text-header);
   font-weight: 500;
 }
+
+.btn-copy-all {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+}
+
+.btn-copy-all {
+  transition: all 0.2s ease;
+
+  &.copied {
+    color: var(--success);
+    border-color: var(--success);
+  }
+}
