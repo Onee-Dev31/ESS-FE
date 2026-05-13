@@ -554,4 +554,98 @@ describe('Dashboard IT filters', () => {
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
   });
+
+  it('filter New + ค้นหา "vpn" → 1 รายการ (ticket 101 ตรงทั้ง New status และ keyword)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+  });
+
+  it('filter New + ค้นหา "keyboard" → 0 รายการ (keyboard ticket เป็น In Progress ไม่ใช่ New)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('ค้นหา "keyboard" แล้วเปลี่ยน filter เป็น In Progress → ยังแสดง 1 รายการ', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    // filter เปลี่ยน client-side เท่านั้น ไม่ยิง API ใหม่
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'In Progress').click();
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('ค้นหา "keyboard" แล้วเปลี่ยน filter เป็น New → 0 รายการ (keyboard ticket เป็น In Progress)', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('กด KPI Sequential: New tickets → Closed Tickets → แต่ละ filter แสดงถูกต้อง', () => {
+    cy.contains('.kpi .kpi-title', 'New tickets').closest('.kpi').click();
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
+  });
+
+  it('My Ticket + ค้นหา "replace" → 1 รายการ (ticket ของ tester.two ที่ตรง keyword)', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('replace');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('My Ticket + ค้นหา "vpn" → 0 รายการ (VPN ticket ไม่ใช่ของ tester.two)', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 0);
+  });
 });
