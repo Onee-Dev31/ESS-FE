@@ -1,401 +1,536 @@
-type TicketRecord = {
-  id: number;
-  ticket_number: string;
-  subject: string;
-  ticket_type_name_th: string;
-  created_at: string;
-  requester_code: string;
-  requester_name: string;
-  requester_aduser: string;
-  requester_email: string;
-  requester_dept: string;
-  requester_companyCode: string;
-  requester_companyName: string;
-  contact_phone: string;
-  IT_Status: string;
-  approval_status: string;
-  priority: string;
-  source: string;
-};
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
-const baseTickets: TicketRecord[] = [
-  {
-    id: 101,
-    ticket_number: '#IT-00101',
-    subject: 'Reset VPN access',
-    ticket_type_name_th: 'Service Request',
-    created_at: '2026-04-23T08:00:00.000Z',
-    requester_code: 'EMP001',
-    requester_name: 'Tester One',
-    requester_aduser: 'tester.one',
-    requester_email: 'tester.one@example.com',
-    requester_dept: 'IT',
-    requester_companyCode: 'ONEE',
-    requester_companyName: 'Onee',
-    contact_phone: '0000000000',
-    IT_Status: 'Open',
-    approval_status: 'approved',
-    priority: 'medium',
-    source: 'web',
-  },
-  {
-    id: 202,
-    ticket_number: '#IT-00202',
-    subject: 'Replace broken keyboard',
-    ticket_type_name_th: 'Repair',
-    created_at: '2026-04-22T03:00:00.000Z',
-    requester_code: 'EMP002',
-    requester_name: 'Tester Two',
-    requester_aduser: 'tester.two',
-    requester_email: 'tester.two@example.com',
-    requester_dept: 'Finance',
-    requester_companyCode: 'ONEE',
-    requester_companyName: 'Onee',
-    contact_phone: '1111111111',
-    IT_Status: 'Assigned',
-    approval_status: 'approved',
-    priority: 'high',
-    source: 'web',
-  },
-  {
-    id: 303,
-    ticket_number: '#IT-00303',
-    subject: 'Archive old mailbox',
-    ticket_type_name_th: 'Service Request',
-    created_at: '2026-04-21T02:00:00.000Z',
-    requester_code: 'EMP003',
-    requester_name: 'Tester Three',
-    requester_aduser: 'tester.three',
-    requester_email: 'tester.three@example.com',
-    requester_dept: 'HR',
-    requester_companyCode: 'ONEE',
-    requester_companyName: 'Onee',
-    contact_phone: '2222222222',
-    IT_Status: 'Open',
-    approval_status: 'approved',
-    priority: 'low',
-    source: 'web',
-  },
-];
-
-const createTicketDetailResponse = (ticket: TicketRecord) => ({
-  ticket,
-  attachments: [],
-  replies: [],
-  services: [],
-  assignGroups: [],
-  assignments: [],
-  timeline: [],
-  timelineAssignees: [],
-  requester: null,
-  requestFor: {},
+const makeNotif = (
+  id: number,
+  overrides: Partial<{
+    isRead: boolean;
+    notificationType: string;
+    recipientRole: string;
+    ticketNumber: string;
+  }> = {},
+) => ({
+  recipient_id: id,
+  notification_id: id * 10,
+  notification_key: `notif-${id}`,
+  notification_type: overrides.notificationType ?? 'ticket_assigned',
+  title: `แจ้งเตือน ${id}`,
+  message: `รายละเอียดการแจ้งเตือน ${id}`,
+  channel: 'inbox',
+  ticket_id: 100 + id,
+  ticket_number: overrides.ticketNumber ?? `T-00${id}`,
+  actor_name: 'Admin',
+  target_type: 'ticket',
+  recipient_role: overrides.recipientRole ?? 'it-staff',
+  is_read: overrides.isRead ?? false,
+  read_at: overrides.isRead ? new Date().toISOString() : null,
+  notification_created_at: new Date(Date.now() - id * 3600000).toISOString(),
 });
 
-const setupItNotificationApi = (initialUnreadIds: number[]) => {
-  let unreadIds = [...initialUnreadIds];
-  const tickets = Cypress._.cloneDeep(baseTickets);
-
-  const unreadPayload = () =>
-    tickets
-      .filter((ticket) => unreadIds.includes(ticket.id))
-      .map((ticket) => ({
-        id: ticket.id,
-        ticket_number: ticket.ticket_number,
-        subject: ticket.subject,
-        status: ticket.IT_Status,
-        created_at: ticket.created_at,
-      }));
-
-  cy.intercept('GET', /\/tickets\/unread-count(\?.*)?$/, (req) => {
-    req.reply({ unreadCount: unreadIds.length });
+const setupNotificationApi = (
+  unreadCount: number,
+  notifications: ReturnType<typeof makeNotif>[],
+  options: { totalRecords?: number } = {},
+) => {
+  cy.intercept('GET', /\/notification\/unread-count/, (req) => {
+    req.reply({ success: true, unreadCount });
   }).as('getUnreadCount');
 
-  cy.intercept('GET', /\/tickets\/unread(\?.*)?$/, (req) => {
-    req.reply(unreadPayload());
-  }).as('getUnreadTickets');
-
-  cy.intercept('POST', '**/tickets/*/read', (req) => {
-    const ticketId = Number(String(req.url).match(/\/tickets\/(\d+)\/read/)?.[1]);
-    unreadIds = unreadIds.filter((id) => id !== ticketId);
-    req.reply({ success: true });
-  }).as('markTicketRead');
-
-  cy.intercept('GET', /\/tickets\?/, (req) => {
-    const pageSize = Number(req.query['pageSize'] ?? 50);
+  cy.intercept('GET', /\/notification\/my\?.*page=1/, (req) => {
     req.reply({
-      data: tickets.slice(0, pageSize),
-      summary: {
-        open: 1,
-        assigned: 1,
-        closed: 0,
-        hold: 0,
-        denied: 0,
-        all: tickets.length,
-      },
-      serviceTypes: [],
-      topDepartments: [],
-      topCompanies: [],
+      success: true,
+      data: notifications,
+      totalRecords: options.totalRecords ?? notifications.length,
+      page: 1,
+      pageSize: 8,
     });
-  }).as('getAllTickets');
+  }).as('getNotifications');
 
-  cy.intercept('GET', '**/tickets/101', createTicketDetailResponse(tickets[0])).as('getTicket101');
-  cy.intercept('GET', '**/tickets/202', createTicketDetailResponse(tickets[1])).as('getTicket202');
-  cy.intercept('GET', '**/tickets/303', createTicketDetailResponse(tickets[2])).as('getTicket303');
+  cy.intercept('GET', /\/notification\/my\?.*page=2/, (req) => {
+    req.reply({
+      success: true,
+      data: [makeNotif(99, { isRead: true })],
+      totalRecords: options.totalRecords ?? notifications.length,
+      page: 2,
+      pageSize: 8,
+    });
+  }).as('getNotificationsPage2');
 
-  cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
-  cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
-  cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
+  cy.intercept('POST', /\/notification\/read$/, (req) => {
+    req.reply({ success: true, affectedRows: 1 });
+  }).as('markRead');
+
+  cy.intercept('POST', /\/notification\/read-all/, (req) => {
+    req.reply({ success: true, affectedRows: unreadCount });
+  }).as('markAllRead');
 };
 
-const forceItStaffRole = () => {
-  cy.window().then((win) => {
-    win.localStorage.setItem('userRole', 'it-staff');
+const openPanel = () => cy.get('.notification-dropdown .notification-trigger').click();
 
-    const allDataRaw = win.localStorage.getItem('allData');
-    if (!allDataRaw) return;
+// ─── specs ───────────────────────────────────────────────────────────────────
 
-    const allData = JSON.parse(allDataRaw);
-    allData.permission = {
-      ...(allData.permission ?? {}),
-      Role: 'it-staff',
-    };
-    win.localStorage.setItem('allData', JSON.stringify(allData));
-  });
-};
+describe('Notification Inbox', () => {
+  // ── badge ─────────────────────────────────────────────────────────────────
 
-describe('IT unread notifications', () => {
-  it('ไม่มี unread ticket แล้วไม่แสดง badge และ dropdown ว่าง', () => {
-    setupItNotificationApi([]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
+  describe('badge', () => {
+    it('ไม่แสดง badge เมื่อไม่มี unread', () => {
+      setupNotificationApi(0, []);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      cy.get('.notification-dropdown .badge').should('not.exist');
     });
-    forceItStaffRole();
-    cy.visit('/allowance');
 
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .badge').should('not.exist');
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-menu').should('be.visible');
-    cy.get('.dropdown-item').should('have.length', 0);
-    cy.contains('.dropdown-header', 'การแจ้งเตือนล่าสุด').should('be.visible');
-  });
-
-  it('แสดง badge และ notification unread ticket ใน navbar', () => {
-    setupItNotificationApi([101]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
+    it('แสดง badge ตัวเลขเมื่อมี unread', () => {
+      setupNotificationApi(3, [makeNotif(1), makeNotif(2), makeNotif(3)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      cy.get('.notification-dropdown .badge').should('contain', '3');
     });
-    forceItStaffRole();
-    cy.visit('/allowance');
 
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .badge').should('contain', '1');
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-menu').should('be.visible');
-    cy.get('.dropdown-item').should('have.length', 1);
-    cy.get('.dropdown-item .title').first().should('contain', '#IT-00101');
-    cy.get('.dropdown-item .message').first().should('contain', 'Reset VPN access');
-  });
-
-  it('กด notification แล้ว mark read, redirect และ icon ซองจดหมายอัปเดตได้', () => {
-    setupItNotificationApi([101]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
+    it('badge แสดง 99+ เมื่อ unread มากกว่า 99', () => {
+      setupNotificationApi(150, []);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      cy.get('.notification-dropdown .badge').invoke('text').invoke('trim').should('eq', '99+');
     });
-    forceItStaffRole();
-    cy.visit('/allowance');
 
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').first().click();
-
-    cy.wait('@markTicketRead').its('request.url').should('contain', '/tickets/101/read');
-    cy.url().should('include', '/it-dashboard');
-    cy.url().should('include', 'focusZone=tickets');
-    cy.wait('@getAllTickets');
-    cy.wait('@getAssignDropdown');
-    cy.wait('@getCompanies');
-    cy.wait('@getDepartments');
-
-    cy.focused().should('have.attr', 'id', 'tickets-zone');
-    cy.get('#tickets-zone').should('be.visible');
-    cy.contains('#tickets-zone .tk-left__title', 'Tickets').should('be.visible');
-
-    cy.contains('.ticket-item .ticket-number', '#IT-00101')
-      .closest('.ticket-item')
-      .find('.text-icon')
-      .should('have.class', 'fa-envelope-open');
-
-    cy.contains('.ticket-item .ticket-number', '#IT-00202')
-      .closest('.ticket-item')
-      .find('.text-icon')
-      .should('have.class', 'fa-envelope-open');
-
-    cy.get('.notification-dropdown .badge').should('not.exist');
-  });
-
-  it('กด ticket unread ใน dashboard แล้วเรียก mark read และเปลี่ยนเป็น envelope-open', () => {
-    setupItNotificationApi([101]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/it-dashboard');
-
-    cy.wait('@getAllTickets');
-    cy.wait('@getUnreadTickets');
-
-    cy.contains('.ticket-item .ticket-number', '#IT-00101')
-      .closest('.ticket-item')
-      .find('.text-icon')
-      .should('have.class', 'fa-envelope');
-
-    cy.contains('.ticket-item .ticket-number', '#IT-00101').click();
-
-    cy.wait('@getTicket101');
-    cy.wait('@markTicketRead').its('request.url').should('contain', '/tickets/101/read');
-
-    cy.contains('.ticket-item .ticket-number', '#IT-00101')
-      .closest('.ticket-item')
-      .find('.text-icon')
-      .should('have.class', 'fa-envelope-open');
-  });
-
-  it('มี unread หลายรายการแล้วกดอ่านหนึ่งรายการ badge ต้องลดลงและเหลือ notification ที่ยังไม่อ่าน', () => {
-    setupItNotificationApi([101, 202]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/allowance');
-
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .badge').should('contain', '2');
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').should('have.length', 2);
-    cy.get('.dropdown-item').first().click();
-
-    cy.wait('@markTicketRead').its('request.url').should('contain', '/tickets/101/read');
-    cy.url().should('include', '/it-dashboard');
-    cy.wait('@getAllTickets');
-    cy.wait('@getAssignDropdown');
-    cy.wait('@getCompanies');
-    cy.wait('@getDepartments');
-
-    cy.get('.notification-dropdown .badge').should('contain', '1');
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').should('have.length', 1);
-    cy.get('.dropdown-item .title').first().should('contain', '#IT-00202');
-    cy.get('.dropdown-item .message').first().should('contain', 'Replace broken keyboard');
-  });
-
-  it('badge แสดงตัวเลข 3 เมื่อมี unread 3 รายการ และ dropdown มีครบ 3 items', () => {
-    setupItNotificationApi([101, 202, 303]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/allowance');
-
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .badge').should('contain', '3');
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').should('have.length', 3);
-    cy.get('.dropdown-item .title').eq(0).should('contain', '#IT-00101');
-    cy.get('.dropdown-item .title').eq(1).should('contain', '#IT-00202');
-    cy.get('.dropdown-item .title').eq(2).should('contain', '#IT-00303');
-  });
-
-  it('กดนอก notification dropdown แล้ว dropdown ปิด', () => {
-    setupItNotificationApi([101]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/allowance');
-
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-menu').should('be.visible');
-
-    cy.contains('รายการเบิกเบี้ยเลี้ยง').click();
-
-    cy.get('.dropdown-menu').should('not.exist');
-  });
-
-  it('notification item แสดง subject ที่ถูกต้องสำหรับแต่ละ ticket', () => {
-    setupItNotificationApi([101, 303]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/allowance');
-
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').should('have.length', 2);
-
-    cy.get('.dropdown-item').eq(0).find('.message').should('contain', 'Reset VPN access');
-    cy.get('.dropdown-item').eq(1).find('.message').should('contain', 'Archive old mailbox');
-  });
-
-  it('notification item แสดง .time element ใน dropdown', () => {
-    setupItNotificationApi([101, 202]);
-
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
-    });
-    forceItStaffRole();
-    cy.visit('/allowance');
-
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
-
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-item').should('have.length', 2);
-    cy.get('.dropdown-item').each(($item) => {
-      cy.wrap($item).find('.time').should('exist').and('not.be.empty');
+    it('subtitle แสดงจำนวน unread ที่ถูกต้อง', () => {
+      setupNotificationApi(2, [makeNotif(1), makeNotif(2)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.header-subtitle').should('contain', '2');
     });
   });
 
-  it('กด icon-btn ซ้ำอีกครั้งเพื่อ toggle ปิด dropdown ได้', () => {
-    setupItNotificationApi([101]);
+  // ── panel open / close ────────────────────────────────────────────────────
 
-    cy.login(undefined, undefined, {
-      permission: { Role: 'it-staff' },
+  describe('panel toggle', () => {
+    beforeEach(() => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
     });
-    forceItStaffRole();
-    cy.visit('/allowance');
 
-    cy.wait('@getUnreadCount');
-    cy.wait('@getUnreadTickets');
+    it('คลิก bell เปิด panel ได้', () => {
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-menu').should('be.visible');
+    });
 
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-menu').should('be.visible');
+    it('คลิก bell ซ้ำปิด panel ได้', () => {
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-menu').should('be.visible');
+      openPanel();
+      cy.get('.dropdown-menu').should('not.exist');
+    });
 
-    cy.get('.notification-dropdown .icon-btn').click();
-    cy.get('.dropdown-menu').should('not.exist');
+    it('คลิกนอก panel แล้ว panel ปิด', () => {
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-menu').should('be.visible');
+      // คลิกที่ page content ซึ่งอยู่นอก navbar element
+      cy.get('.allowance-page').click({ force: true });
+      cy.get('.dropdown-menu').should('not.exist');
+    });
+
+    it('header แสดง "Notification Inbox"', () => {
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.header-title').should('contain', 'Notification Inbox');
+    });
+
+    it('panel ว่างแสดง empty state เมื่อไม่มี notification', () => {
+      setupNotificationApi(0, []);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.notification-empty').should('be.visible');
+    });
+  });
+
+  // ── notification list ─────────────────────────────────────────────────────
+
+  describe('notification list', () => {
+    beforeEach(() => {
+      setupNotificationApi(2, [makeNotif(1), makeNotif(2, { isRead: true })]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+    });
+
+    it('แสดง notification items ครบตามจำนวน', () => {
+      cy.get('.dropdown-item').should('have.length', 2);
+    });
+
+    it('item ที่ยังไม่อ่านมี class .unread', () => {
+      cy.get('.dropdown-item').first().should('have.class', 'unread');
+    });
+
+    it('item ที่อ่านแล้วไม่มี class .unread', () => {
+      cy.get('.dropdown-item').last().should('not.have.class', 'unread');
+    });
+
+    it('แสดง title และ message ถูกต้อง', () => {
+      cy.get('.dropdown-item').first().find('.title').should('contain', 'แจ้งเตือน 1');
+      cy.get('.dropdown-item').first().find('.message').should('contain', 'รายละเอียดการแจ้งเตือน 1');
+    });
+
+    it('แสดง ticket-chip พร้อม ticket number', () => {
+      cy.get('.dropdown-item').first().find('.ticket-chip').should('contain', 'T-001');
+    });
+
+    it('แสดง .time element ทุก item', () => {
+      cy.get('.dropdown-item').each(($item) => {
+        cy.wrap($item).find('.time').should('exist').and('not.be.empty');
+      });
+    });
+  });
+
+  // ── all roles ─────────────────────────────────────────────────────────────
+
+  describe('all roles เห็น notification', () => {
+    ['Employee', 'it-staff', 'hr', 'supervisor'].forEach((role) => {
+      it(`role "${role}" เห็น notification bell`, () => {
+        setupNotificationApi(0, []);
+        cy.login(undefined, undefined, { permission: { Role: role } });
+        cy.visit('/allowance');
+        cy.wait('@getUnreadCount');
+        cy.get('.notification-dropdown .notification-trigger').should('be.visible');
+      });
+    });
+  });
+
+  // ── mark as read ──────────────────────────────────────────────────────────
+
+  describe('mark as read', () => {
+    it('คลิก notification → POST /notification/read พร้อม notificationRecipientId', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.intercept('GET', /\/it-dashboard/, { statusCode: 200 }).as('itDashboard');
+
+      cy.login(undefined, undefined, { permission: { Role: 'it-staff' } });
+      cy.window().then((win) => {
+        win.localStorage.setItem('userRole', 'it-staff');
+        const raw = win.localStorage.getItem('allData');
+        if (raw) {
+          const d = JSON.parse(raw);
+          d.permission = { Role: 'it-staff' };
+          win.localStorage.setItem('allData', JSON.stringify(d));
+        }
+      });
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().click();
+
+      cy.wait('@markRead').its('request.body').should('have.property', 'notificationRecipientId', 1);
+    });
+
+    it('badge หายหลัง mark as read รายการสุดท้าย', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().click();
+      cy.wait('@markRead');
+
+      cy.get('.notification-dropdown .badge').should('not.exist');
+    });
+  });
+
+  // ── mark all as read ──────────────────────────────────────────────────────
+
+  describe('mark all as read', () => {
+    beforeEach(() => {
+      setupNotificationApi(3, [makeNotif(1), makeNotif(2), makeNotif(3)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+    });
+
+    it('กด Mark all → POST /notification/read-all พร้อม recipientAduser', () => {
+      cy.get('.mark-all-btn').click();
+      cy.wait('@markAllRead')
+        .its('request.body')
+        .should('have.property', 'recipientAduser');
+    });
+
+    it('badge หายหลัง mark all', () => {
+      // หลัง mark-all service เรียก refreshAll() อีกรอบ — ต้องให้ intercept ตอบ 0 ด้วย
+      let markedAll = false;
+
+      cy.intercept('GET', /\/notification\/unread-count/, (req) => {
+        req.reply({ success: true, unreadCount: markedAll ? 0 : 3 });
+      }).as('getUnreadCountRefresh');
+
+      cy.intercept('GET', /\/notification\/my/, (req) => {
+        req.reply({ success: true, data: [], totalRecords: 0 });
+      }).as('getNotificationsRefresh');
+
+      cy.intercept('POST', /\/notification\/read-all/, (req) => {
+        markedAll = true;
+        req.reply({ success: true, affectedRows: 3 });
+      }).as('markAllReadFresh');
+
+      cy.get('.mark-all-btn').click();
+      cy.wait('@markAllReadFresh');
+      // รอ refreshAll ที่ service ยิงตาม complete()
+      cy.wait('@getUnreadCountRefresh');
+      cy.get('.notification-dropdown .badge').should('not.exist');
+    });
+
+    it('ปุ่ม Mark all disable เมื่อไม่มี unread', () => {
+      setupNotificationApi(0, [makeNotif(1, { isRead: true })]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.mark-all-btn').should('be.disabled');
+    });
+  });
+
+  // ── unread only filter ────────────────────────────────────────────────────
+
+  describe('unread only filter', () => {
+    it('toggle unread only → reload พร้อม unreadOnly=true ใน query', () => {
+      setupNotificationApi(2, [makeNotif(1), makeNotif(2)]);
+
+      cy.intercept('GET', /\/notification\/my\?.*unreadOnly=true/, (req) => {
+        req.reply({ success: true, data: [makeNotif(1)], totalRecords: 1 });
+      }).as('getUnreadOnly');
+
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+
+      cy.get('.filter-toggle input[type="checkbox"]').check();
+      cy.wait('@getUnreadOnly');
+      cy.get('.dropdown-item').should('have.length', 1);
+    });
+  });
+
+  // ── load more ─────────────────────────────────────────────────────────────
+
+  describe('load more', () => {
+    it('แสดงปุ่ม Load more เมื่อมี notification มากกว่า pageSize', () => {
+      const page1 = Array.from({ length: 8 }, (_, i) => makeNotif(i + 1));
+      setupNotificationApi(10, page1, { totalRecords: 10 });
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.load-more-btn').should('be.visible');
+    });
+
+    it('กด Load more → GET /notification/my?page=2', () => {
+      const page1 = Array.from({ length: 8 }, (_, i) => makeNotif(i + 1));
+      setupNotificationApi(9, page1, { totalRecords: 9 });
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+
+      cy.get('.load-more-btn').click();
+      cy.wait('@getNotificationsPage2');
+      cy.get('.dropdown-item').should('have.length', 9);
+    });
+
+    it('ไม่แสดงปุ่ม Load more เมื่อ items ครบแล้ว (totalRecords = items ที่โหลด)', () => {
+      setupNotificationApi(3, [makeNotif(1), makeNotif(2), makeNotif(3)], { totalRecords: 3 });
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.load-more-btn').should('not.exist');
+    });
+  });
+
+  // ── subtitle text ─────────────────────────────────────────────────────────
+
+  describe('subtitle text', () => {
+    it('subtitle แสดง "Inbox พร้อมใช้งาน" เมื่อ unread = 0', () => {
+      setupNotificationApi(0, []);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.header-subtitle').should('contain', 'Inbox พร้อมใช้งาน');
+    });
+
+    it('subtitle แสดง "มี 1 รายการที่ยังไม่อ่าน" เมื่อ unread = 1', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.header-subtitle').should('contain', 'มี 1 รายการที่ยังไม่อ่าน');
+    });
+  });
+
+  // ── refresh button ────────────────────────────────────────────────────────
+
+  describe('refresh button', () => {
+    it('กดปุ่ม refresh → ยิง GET /notification/my ใหม่', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+
+      cy.get('.refresh-btn').click();
+      cy.wait('@getNotifications');
+    });
+  });
+
+  // ── error state ───────────────────────────────────────────────────────────
+
+  describe('error state', () => {
+    it('แสดง error state เมื่อ GET /my ตอบ 500', () => {
+      cy.intercept('GET', /\/notification\/unread-count/, { unreadCount: 0 }).as('getUnreadCount');
+      cy.intercept('GET', /\/notification\/my/, { statusCode: 500 }).as('getNotificationsError');
+
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotificationsError');
+      cy.get('.notification-error').should('be.visible');
+    });
+
+    it('กดปุ่ม Retry ใน error state → ยิง GET /my อีกรอบ', () => {
+      // Start with a successful load so items are populated
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').should('have.length', 1);
+
+      // Override intercept to simulate error on next request (refresh)
+      cy.intercept('GET', /\/notification\/my/, { statusCode: 500 }).as('getNotificationsError');
+      cy.get('.refresh-btn').click();
+      cy.wait('@getNotificationsError');
+      cy.get('.notification-error').should('be.visible');
+
+      // Override intercept to return success for the retry
+      cy.intercept('GET', /\/notification\/my/, (req) => {
+        req.reply({ success: true, data: [makeNotif(1)], totalRecords: 1 });
+      }).as('getNotificationsRetry');
+      cy.get('.notification-error button').click();
+      cy.wait('@getNotificationsRetry');
+      cy.get('.dropdown-item').should('have.length', 1);
+    });
+  });
+
+  // ── unread dot ────────────────────────────────────────────────────────────
+
+  describe('unread dot', () => {
+    it('item ที่อ่านแล้วไม่มี .unread-dot', () => {
+      setupNotificationApi(0, [makeNotif(1, { isRead: true })]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().find('.unread-dot').should('not.exist');
+    });
+
+    it('actor name แสดงใน notification item', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().find('.actor-name').should('contain', 'Admin');
+    });
+  });
+
+  // ── unread filter off ─────────────────────────────────────────────────────
+
+  describe('unread filter off', () => {
+    it('uncheck unread filter → reload ไม่มี unreadOnly param ใน query', () => {
+      setupNotificationApi(2, [makeNotif(1), makeNotif(2)]);
+
+      cy.intercept('GET', /\/notification\/my\?.*unreadOnly=true/, (req) => {
+        req.reply({ success: true, data: [makeNotif(1)], totalRecords: 1 });
+      }).as('getUnreadOnly');
+
+      // @getAllAgain ต้องนิยามหลังจาก initial load เสร็จ
+      // เพราะ Cypress ใช้ "last defined wins" — ถ้านิยามก่อน มันจะ override @getNotifications
+
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+
+      cy.get('.filter-toggle input[type="checkbox"]').check();
+      cy.wait('@getUnreadOnly');
+      cy.get('.dropdown-item').should('have.length', 1);
+
+      // นิยาม getAllAgain หลัง initial load เพื่อให้จับเฉพาะ request จาก uncheck
+      cy.intercept('GET', /\/notification\/my/, (req) => {
+        req.reply({ success: true, data: [makeNotif(1), makeNotif(2)], totalRecords: 2 });
+      }).as('getAllAgain');
+
+      cy.get('.filter-toggle input[type="checkbox"]').uncheck();
+      cy.wait('@getAllAgain');
+      cy.get('.dropdown-item').should('have.length', 2);
+    });
+  });
+
+  // ── no re-fetch ───────────────────────────────────────────────────────────
+
+  describe('panel reopen', () => {
+    it('เปิด panel ซ้ำ ไม่ยิง GET /my อีกครั้งถ้า items มีอยู่แล้ว', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      // เปิดครั้งแรก — รอ items แสดงใน DOM ก่อน เพื่อให้ items() signal มีค่าแน่นอน
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').should('have.length', 1);
+
+      // จดจำจำนวน request ก่อนปิด/เปิดซ้ำ
+      cy.get('@getNotifications.all').then((callsBefore) => {
+        const countBefore = callsBefore.length;
+
+        // ปิดแล้วเปิดใหม่ — ไม่ควรยิง /my อีก เพราะ items() ยังมีอยู่
+        openPanel(); // close
+        openPanel(); // reopen
+        cy.get('.dropdown-item').should('have.length', 1);
+        cy.get('@getNotifications.all').should('have.length', countBefore);
+      });
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, NgZone, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
@@ -25,6 +25,7 @@ export class NotificationService {
   private authService = inject(AuthService);
   private signalrService = inject(SignalrService);
   private toastService = inject(ToastService);
+  private zone = inject(NgZone);
 
   private readonly baseUrl = `${environment.api_url}/notification`;
   private readonly pageSize = 8;
@@ -50,6 +51,7 @@ export class NotificationService {
   );
 
   private page = 1;
+  private lastToastTime = 0;
   private activeUserKey: string | null = null;
 
   constructor() {
@@ -74,6 +76,55 @@ export class NotificationService {
       .on('NotificationCreated')
       .pipe(takeUntilDestroyed())
       .subscribe((payload) => this.handleRealtimeNotification(payload));
+
+    // Compatibility: backend ยังส่ง legacy events → refresh badge + bell + toast (ถ้า NotificationCreated ไม่ได้ส่งซ้ำ)
+    const legacyMessages: Record<string, (d: any) => string> = {
+      NewNote: (d) =>
+        d?.message || (d?.senderName ? `มี Chat ใหม่จาก ${d.senderName}` : 'มี Chat ใหม่'),
+      TicketStatusChanged: (d) => {
+        const labels: Record<string, string> = {
+          'In Progress': 'กำลังดำเนินการ',
+          Hold: 'พักเรื่องชั่วคราว',
+          Closed: 'ปิดเรื่องแล้ว',
+          Denied: 'ปฏิเสธคำขอ',
+          Assigned: 'รับเรื่องแล้ว',
+          Approved: 'อนุมัติคำขอแล้ว',
+          Rejected: 'ปฏิเสธคำขอ',
+          Referred_Back: 'ส่งกลับคำขอเพื่อแก้ไข',
+          ReOpened: 'เปิดงานอีกครั้ง',
+        };
+        const [status, detail] = (d?.status ?? '').split('|');
+        if (status === 'In Progress' && detail) return `IT รับเรื่องของคุณแล้ว ประเภท "${detail}"`;
+        if (status === 'Rejected' && detail) return `คำขอถูกปฏิเสธ เหตุผล: "${detail}"`;
+        if (status === 'Referred_Back' && detail)
+          return `ส่งกลับคำขอเพื่อแก้ไข เหตุผล: "${detail}"`;
+        return `Ticket มีการอัพเดทสถานะเป็น "${labels[status] ?? status}"`;
+      },
+      NewTicket: (d) => d?.message || 'มี Ticket ใหม่เข้ามา',
+      TicketAssigned: (d) => d?.message || 'มีการ Assign Ticket ให้คุณ',
+      NewTicketForApproval: (d) => d?.message || 'มี Ticket ใหม่รอการอนุมัติ',
+    };
+
+    for (const [event, buildMsg] of Object.entries(legacyMessages)) {
+      this.signalrService
+        .on(event)
+        .pipe(takeUntilDestroyed())
+        .subscribe((data: any) => {
+          if (!this.activeUserKey) return;
+          this.zone.run(() => {
+            this.realtimeTick.update((tick) => tick + 1);
+            this.refreshAll();
+            // แสดง toast เฉพาะเมื่อ NotificationCreated ไม่ได้ส่ง toast ภายใน 800ms ที่ผ่านมา
+            if (Date.now() - this.lastToastTime > 800 && !document.hidden) {
+              const msg = buildMsg(data);
+              if (msg) {
+                this.lastToastTime = Date.now();
+                this.toastService.info(msg);
+              }
+            }
+          });
+        });
+    }
   }
 
   refreshAll() {
@@ -283,6 +334,7 @@ export class NotificationService {
     const summaryText = mapped.ticketNumber
       ? `${mapped.title} • ${mapped.ticketNumber}`
       : mapped.title;
+    this.lastToastTime = Date.now();
     this.toastService.info(summaryText);
   }
 
