@@ -1,38 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { provideRouter, Router } from '@angular/router';
-import { of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NavbarComponent } from './navbar';
-import { SignalrService } from '../../services/signalr.service';
-import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
-
-const mockSignalrService = {
-  startConnection: () => Promise.resolve(),
-  on: () => of(),
-  sendNewTicketNotification: () => {},
-  pendingNewTickets: { asReadonly: () => () => 0 },
-  pendingTicketNumbers: { update: vi.fn() },
-  refreshTrigger: { update: vi.fn() },
-  ticketReadTrigger: new Subject<void>(),
-  ticketFocusTrigger: new Subject<number>(),
-  ticketStatusTrigger: new Subject<{ ticketId: any; status: string }>(),
-  recentlySubmittedTickets: new Set<string>(),
-};
+import { NotificationService } from '../../services/notification.service';
 
 const mockNotificationService = {
-  getUnreadCount: vi.fn(() => of({ success: true, unreadCount: 0 })),
-  getMyNotifications: vi.fn(() =>
-    of({ success: true, data: [], totalRecords: 0, page: 1, pageSize: 20, unreadOnly: true }),
-  ),
-  markAsRead: vi.fn(() => of({ success: true, message: 'ok', affectedRows: 1 })),
-  markAllAsRead: vi.fn(() => of({ success: true, message: 'ok', affectedRows: 0 })),
+  unreadCount: vi.fn(() => 2),
+  hasUnread: vi.fn(() => true),
+  items: vi.fn(() => []),
+  unreadOnly: vi.fn(() => false),
+  isListLoading: vi.fn(() => false),
+  isLoadingMore: vi.fn(() => false),
+  isMarkingAll: vi.fn(() => false),
+  listError: vi.fn(() => null),
+  isEmpty: vi.fn(() => false),
+  hasMore: vi.fn(() => false),
+  activeRecipientIds: vi.fn(() => new Set<string>()),
+  realtimeTick: vi.fn(() => 0),
+  refreshUnreadCount: vi.fn(),
+  loadFirstPage: vi.fn(),
+  setUnreadOnly: vi.fn(),
+  markAsRead: vi.fn((item, onDone?: () => void) => onDone?.()),
+  markAllAsRead: vi.fn(),
+  loadMore: vi.fn(),
+  retryList: vi.fn(),
 };
 
 const mockAuthService = {
-  currentUser: () => 'tester',
+  currentUser: () => 'tester.one',
   userRole: () => 'it-staff',
   userData: () => ({
     CODEMPID: 'EMP001',
@@ -48,9 +45,6 @@ describe('Navbar', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSignalrService.ticketReadTrigger = new Subject<void>();
-    mockSignalrService.ticketFocusTrigger = new Subject<number>();
-    mockSignalrService.ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
   });
 
   beforeEach(async () => {
@@ -58,7 +52,6 @@ describe('Navbar', () => {
       imports: [NavbarComponent],
       providers: [
         provideRouter([]),
-        { provide: SignalrService, useValue: mockSignalrService },
         { provide: NotificationService, useValue: mockNotificationService },
         { provide: AuthService, useValue: mockAuthService },
       ],
@@ -73,51 +66,54 @@ describe('Navbar', () => {
     expect(component).toBeTruthy();
   });
 
-  it('marks notification as read via NotificationService and navigates', () => {
-    const router = TestBed.inject(Router);
-    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+  it('opens notification dropdown and refreshes inbox state', () => {
+    component.toggleNotification();
 
-    component.onNotificationClick({
-      id: 10,
-      title: 'Ticket',
-      message: 'Unread ticket',
-      status: 'pending',
-      time: 'เมื่อสักครู่',
-      route: '/it-dashboard',
-      readTicketId: 55,
-      ticketNumber: 'IT-001',
-    });
-
-    expect(mockNotificationService.markAsRead).toHaveBeenCalledWith(
-      expect.objectContaining({ notificationRecipientId: 55 }),
-    );
-    expect(mockSignalrService.pendingTicketNumbers.update).toHaveBeenCalledTimes(1);
-    expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
-    expect(navigateSpy).toHaveBeenCalledWith(
-      ['/it-dashboard'],
-      expect.objectContaining({ queryParams: expect.objectContaining({ focusZone: 'tickets' }) }),
-    );
+    expect(component.isNotificationOpen).toBe(true);
+    expect(mockNotificationService.refreshUnreadCount).toHaveBeenCalledTimes(1);
+    expect(mockNotificationService.loadFirstPage).toHaveBeenCalledTimes(1);
   });
 
-  it('does not call markAsRead for notifications without readTicketId', () => {
+  it('marks notification as read and navigates to the linked ticket route', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
     component.onNotificationClick({
-      id: 99,
-      title: 'มี Chat ใหม่',
-      message: 'Informational notification',
-      status: 'pending',
-      time: 'เมื่อสักครู่',
+      notificationRecipientId: 10,
+      notificationId: 100,
+      notificationKey: 'ticket-assigned',
+      notificationType: 'ticket_assigned',
+      title: 'Assigned',
+      message: 'Ticket assigned to you',
+      channel: 'inbox',
+      ticketId: 55,
+      ticketNumber: '#IT-00055',
+      actorName: 'Admin',
+      targetType: 'ticket',
+      payload: null,
+      recipientRole: 'it-staff',
+      isRead: false,
+      readAt: null,
+      createdAt: '2026-05-12T09:00:00Z',
+      timeLabel: 'เมื่อสักครู่',
       route: '/it-dashboard',
+      routeQueryParams: { ticketId: 55, focusZone: 'tickets' },
+      raw: {},
     });
 
-    expect(mockNotificationService.markAsRead).not.toHaveBeenCalled();
-    expect(mockSignalrService.pendingTicketNumbers.update).not.toHaveBeenCalled();
-    expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
-    expect(navigateSpy).toHaveBeenCalledWith(
-      ['/it-dashboard'],
-      expect.objectContaining({ queryParams: expect.objectContaining({ focusZone: 'tickets' }) }),
-    );
+    expect(mockNotificationService.markAsRead).toHaveBeenCalledTimes(1);
+    expect(navigateSpy).toHaveBeenCalledWith(['/it-dashboard'], {
+      queryParams: { ticketId: 55, focusZone: 'tickets' },
+    });
+  });
+
+  it('toggles unread-only filter through the notification service', () => {
+    const event = {
+      target: { checked: true },
+    } as unknown as Event;
+
+    component.onUnreadOnlyChange(event);
+
+    expect(mockNotificationService.setUnreadOnly).toHaveBeenCalledWith(true);
   });
 });
