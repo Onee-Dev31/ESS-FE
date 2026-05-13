@@ -16,6 +16,7 @@ type DashboardTicketRecord = {
   approval_status: string;
   priority: string;
   source: string;
+  assignments?: { codeempid: string }[];
 };
 
 const tickets: DashboardTicketRecord[] = [
@@ -56,6 +57,8 @@ const tickets: DashboardTicketRecord[] = [
     approval_status: 'approved',
     priority: 'high',
     source: 'web',
+    // sole-assignee = logged-in user (CODEMPID from cy.login default) → component maps to 'In Progress'
+    assignments: [{ codeempid: 'OTD01072' }],
   },
   {
     id: 303,
@@ -187,11 +190,11 @@ describe('Dashboard IT filters', () => {
     cy.get('.ticket-item').should('have.length', 3);
 
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
-    cy.contains('.ticket-item .ticket-status-inline', 'Assigned').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'In Progress').should('be.visible');
 
     cy.get('.tk-left__select').click();
     cy.contains('nz-option-item', 'Closed').click();
@@ -203,7 +206,7 @@ describe('Dashboard IT filters', () => {
 
   it('ใช้ status filter ร่วมกับ search แล้วเหลือเฉพาะรายการที่ตรงทั้งสองเงื่อนไข', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -218,7 +221,7 @@ describe('Dashboard IT filters', () => {
 
   it('เปลี่ยนกลับ All Tickets แล้วรายการกลับมาครบหลังจากเคย filter status', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -326,7 +329,7 @@ describe('Dashboard IT filters', () => {
 
   it('แสดง status badge ถูกต้องในแต่ละ ticket ใน list', () => {
     cy.get('.ticket-item').eq(0).find('.ticket-status-inline').should('contain', 'New');
-    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'Assigned');
+    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'In Progress');
     cy.get('.ticket-item').eq(2).find('.ticket-status-inline').should('contain', 'Closed');
   });
 
