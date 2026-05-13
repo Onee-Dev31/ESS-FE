@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   api_url: 'https://localhost:7081/api',
-  previewUrl: 'http://10.31.1.85:5259',
+  previewUrl: 'https://ess.oneeclick.co',
   api_ONEEJOB_url: 'https://localhost:7113/api',
   emp_img_url: 'https://empimg.oneeclick.co:8048/employeeimage',
   file_base_url: 'https://localhost:7081',
