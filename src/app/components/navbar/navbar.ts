@@ -17,7 +17,7 @@ import { USER_ROLES } from '../../constants/user-roles.constant';
 import { ToastService } from '../../services/toast';
 import { SignalrService } from '../../services/signalr.service';
 import { ThemeService } from '../../services/theme.service';
-import { ItServiceService } from '../../services/it-service.service';
+import { NotificationService } from '../../services/notification.service';
 
 interface NotificationItem {
   id: number;
@@ -59,7 +59,7 @@ export class NavbarComponent {
   private toastService = inject(ToastService);
   private signalrService = inject(SignalrService);
   private destroyRef = inject(DestroyRef);
-  private itService = inject(ItServiceService);
+  private notificationService = inject(NotificationService);
   themeService = inject(ThemeService);
   private notifyAudio = new Audio('/notification1.wav');
 
@@ -90,6 +90,7 @@ export class NavbarComponent {
   isMobileSearchOpen = signal(false);
 
   ngOnInit() {
+    this.fetchUnreadTickets();
     this.notifyAudio.volume = 0.7;
     this.signalrService
       .on('NewTicket', '/it-service-list')
@@ -304,57 +305,61 @@ export class NavbarComponent {
 
   fetchUnreadCount() {
     const codeempid = this.authService.userData()?.CODEMPID;
+    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
     if (!codeempid) return;
-    this.itService.getUnreadCount(codeempid, this.authService.userRole() ?? undefined).subscribe({
-      next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
-      error: () => this.unreadTicketCount.set(0),
-    });
+    this.notificationService
+      .getUnreadCount({ recipientCodeempid: codeempid, recipientAduser: aduser })
+      .subscribe({
+        next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
+        error: () => this.unreadTicketCount.set(0),
+      });
   }
 
   fetchUnreadTickets() {
     const codeempid = this.authService.userData()?.CODEMPID;
+    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
     if (!codeempid) return;
-    this.itService.getUnreadTickets(codeempid, this.authService.userRole() ?? undefined).subscribe({
-      next: (res: any) => {
-        const raw: any[] = Array.isArray(res) ? res : (res?.data ?? res?.tickets ?? []);
-        // ticketTypeId=3 ที่ยังไม่ Approved → เห็นเฉพาะ approver เท่านั้น
-        const list = raw.filter((t: any) => {
-          const typeId = Number(t.ticket_type_id ?? t.ticketTypeId);
-          if (typeId === 3) {
-            const approvalStatus = String(
-              t.approval_status ?? t.approvalStatus ?? '',
-            ).toLowerCase();
-            if (approvalStatus === 'approved') return false;
-            return (t.approver_codeempid ?? t.approverCodeempid) === codeempid;
-          }
-          return true;
-        });
-        const items: NotificationItem[] = list.map((t: any) => ({
-          id: t.id ?? t.ticketId,
-          title: t.ticket_number ?? t.ticketNumber ?? 'Ticket',
-          message: t.subject ?? '',
-          status: this.mapTicketStatus(t.user_status ?? t.status),
-          time: this.formatRelativeTime(t.created_at ?? t.createDate ?? t.createdAt),
-          route:
-            Number(t.ticket_type_id ?? t.ticketTypeId) === 3
-              ? '/approval-it-request'
-              : '/it-dashboard',
-          readTicketId: t.id ?? t.ticketId,
-          ticketId: t.id ?? t.ticketId,
-          ticketNumber: t.ticket_number ?? t.ticketNumber,
-        }));
-        this.notifications.set(items);
-      },
-      error: (err) => console.error('[Navbar] fetchUnreadTickets error:', err),
-    });
+    this.notificationService
+      .getMyNotifications({
+        recipientCodeempid: codeempid,
+        recipientAduser: aduser,
+        unreadOnly: true,
+        page: 1,
+        pageSize: 20,
+      })
+      .subscribe({
+        next: (res) => {
+          const items: NotificationItem[] = (res.data ?? []).map((n) => ({
+            id: n.notificationRecipientId,
+            title: n.title,
+            message: n.message,
+            status: 'pending' as const,
+            time: this.formatRelativeTime(n.createdAt),
+            route: n.route,
+            readTicketId: n.notificationRecipientId,
+            ticketId: n.ticketId,
+            ticketNumber: n.ticketNumber,
+            type: n.type as any,
+          }));
+          this.notifications.set(items);
+          this.unreadTicketCount.set(res.totalRecords ?? items.length);
+        },
+        error: (err) => console.error('[Navbar] fetchUnreadTickets error:', err),
+      });
   }
 
-  private mapTicketStatus(s: string): 'pending' | 'approved' | 'rejected' {
-    if (!s) return 'pending';
-    const lower = s.toLowerCase();
-    if (lower === 'approved') return 'approved';
-    if (lower === 'rejected' || lower === 'referred_back') return 'rejected';
-    return 'pending';
+  markAllRead() {
+    const codeempid = this.authService.userData()?.CODEMPID;
+    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
+    if (!codeempid) return;
+    this.notificationService
+      .markAllAsRead({ recipientCodeempid: codeempid, recipientAduser: aduser })
+      .subscribe({
+        next: () => {
+          this.notifications.set([]);
+          this.unreadTicketCount.set(0);
+        },
+      });
   }
 
   private formatRelativeTime(dateStr: string): string {
@@ -462,16 +467,24 @@ export class NavbarComponent {
   onNotificationClick(item: NotificationItem) {
     this.isNotificationOpen = false;
     const codeempid = this.authService.userData()?.CODEMPID;
-    if (this.isItRole()) {
-      if (codeempid && item.readTicketId) {
-        this.itService.markTicketRead(item.readTicketId, codeempid).subscribe({
+    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
+
+    // Mark as read via centralized NotificationService
+    if (item.readTicketId) {
+      this.notificationService
+        .markAsRead({
+          notificationRecipientId: item.readTicketId,
+          recipientCodeempid: codeempid,
+          recipientAduser: aduser,
+        })
+        .subscribe({
           complete: () => {
-            this.fetchUnreadCount();
-            this.fetchUnreadTickets();
+            this.notifications.update((list) => list.filter((n) => n.id !== item.id));
+            this.unreadTicketCount.update((n) => Math.max(0, n - 1));
           },
         });
-      }
     } else {
+      // In-memory only (real-time noti ที่ยังไม่มี DB record)
       if (item.ticketId && item.type === 'note') {
         const removed = this.notifications().filter(
           (n) => n.ticketId === item.ticketId && n.type === 'note',

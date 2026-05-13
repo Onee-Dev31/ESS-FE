@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { NavbarComponent } from './navbar';
 import { SignalrService } from '../../services/signalr.service';
-import { ItServiceService } from '../../services/it-service.service';
+import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 
 const mockSignalrService = {
@@ -17,12 +17,18 @@ const mockSignalrService = {
   pendingTicketNumbers: { update: vi.fn() },
   refreshTrigger: { update: vi.fn() },
   ticketReadTrigger: new Subject<void>(),
+  ticketFocusTrigger: new Subject<number>(),
+  ticketStatusTrigger: new Subject<{ ticketId: any; status: string }>(),
+  recentlySubmittedTickets: new Set<string>(),
 };
 
-const mockItService = {
-  getUnreadCount: vi.fn(() => of({ unreadCount: 0 })),
-  getUnreadTickets: vi.fn(() => of([])),
-  markTicketRead: vi.fn(() => of({})),
+const mockNotificationService = {
+  getUnreadCount: vi.fn(() => of({ success: true, unreadCount: 0 })),
+  getMyNotifications: vi.fn(() =>
+    of({ success: true, data: [], totalRecords: 0, page: 1, pageSize: 20, unreadOnly: true }),
+  ),
+  markAsRead: vi.fn(() => of({ success: true, message: 'ok', affectedRows: 1 })),
+  markAllAsRead: vi.fn(() => of({ success: true, message: 'ok', affectedRows: 0 })),
 };
 
 const mockAuthService = {
@@ -30,8 +36,8 @@ const mockAuthService = {
   userRole: () => 'it-staff',
   userData: () => ({
     CODEMPID: 'EMP001',
-    NAMFIRSTT: 'Test',
-    NAMLASTT: 'User',
+    NAMFIRSTE: 'Test',
+    NAMLASTE: 'User',
   }),
   logout: vi.fn(),
 };
@@ -43,6 +49,8 @@ describe('Navbar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockSignalrService.ticketReadTrigger = new Subject<void>();
+    mockSignalrService.ticketFocusTrigger = new Subject<number>();
+    mockSignalrService.ticketStatusTrigger = new Subject<{ ticketId: any; status: string }>();
   });
 
   beforeEach(async () => {
@@ -51,7 +59,7 @@ describe('Navbar', () => {
       providers: [
         provideRouter([]),
         { provide: SignalrService, useValue: mockSignalrService },
-        { provide: ItServiceService, useValue: mockItService },
+        { provide: NotificationService, useValue: mockNotificationService },
         { provide: AuthService, useValue: mockAuthService },
       ],
     }).compileComponents();
@@ -65,11 +73,9 @@ describe('Navbar', () => {
     expect(component).toBeTruthy();
   });
 
-  it('marks unread ticket notifications as read and navigates', () => {
+  it('marks notification as read via NotificationService and navigates', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
-    const fetchUnreadCountSpy = vi.spyOn(component, 'fetchUnreadCount');
-    const fetchUnreadTicketsSpy = vi.spyOn(component, 'fetchUnreadTickets');
 
     component.onNotificationClick({
       id: 10,
@@ -82,18 +88,18 @@ describe('Navbar', () => {
       ticketNumber: 'IT-001',
     });
 
-    expect(mockItService.markTicketRead).toHaveBeenCalledWith(55, 'EMP001');
+    expect(mockNotificationService.markAsRead).toHaveBeenCalledWith(
+      expect.objectContaining({ notificationRecipientId: 55 }),
+    );
     expect(mockSignalrService.pendingTicketNumbers.update).toHaveBeenCalledTimes(1);
     expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
-    expect(fetchUnreadCountSpy).toHaveBeenCalled();
-    expect(fetchUnreadTicketsSpy).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith(
       ['/it-dashboard'],
       expect.objectContaining({ queryParams: expect.objectContaining({ focusZone: 'tickets' }) }),
     );
   });
 
-  it('does not mark informational notifications as read', () => {
+  it('does not call markAsRead for notifications without readTicketId', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
@@ -106,7 +112,7 @@ describe('Navbar', () => {
       route: '/it-dashboard',
     });
 
-    expect(mockItService.markTicketRead).not.toHaveBeenCalled();
+    expect(mockNotificationService.markAsRead).not.toHaveBeenCalled();
     expect(mockSignalrService.pendingTicketNumbers.update).not.toHaveBeenCalled();
     expect(mockSignalrService.refreshTrigger.update).toHaveBeenCalledTimes(1);
     expect(navigateSpy).toHaveBeenCalledWith(
