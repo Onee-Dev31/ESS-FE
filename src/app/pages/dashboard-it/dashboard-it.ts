@@ -532,7 +532,14 @@ export class DashboardIT implements OnInit {
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
           }, 100);
 
-          this.selectTicket(this.selectedTicket().ticketId);
+          const ticket = this.selectedTicket();
+          this.signalrService.ticketStatusNotify(
+            ticket?.ticketId,
+            ticket?.requesterAduser ?? '',
+            'ReOpened',
+          );
+
+          this.selectTicket(ticket.ticketId);
           this.getAllTickets();
         },
         error: (error) => {
@@ -1121,8 +1128,6 @@ export class DashboardIT implements OnInit {
             error: () => this.msg.error('ไม่สามารถส่ง Notification ให้ผู้รับผิดชอบได้'),
           });
         }, 500);
-
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Assigned');
 
         this.selectTicket(res.ticketId || ticketId);
         this.getAllTickets();
