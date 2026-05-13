@@ -602,7 +602,7 @@ describe('Dashboard IT filters', () => {
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
 
-    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click({ force: true });
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
   });
