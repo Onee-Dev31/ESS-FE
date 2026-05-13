@@ -402,4 +402,94 @@ describe('Dashboard IT filters', () => {
       .closest('.ticket-item')
       .should('not.have.class', 'active');
   });
+
+  it('summary KPI แสดง count New tickets (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'New tickets')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('summary KPI แสดง count In Progress Ticket (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'In Progress Ticket')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('summary KPI แสดง count Closed Tickets (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'Closed Tickets')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('กด KPI card New tickets แล้ว ticket list filter เหลือ ticket #IT-00101', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.contains('.kpi .kpi-title', 'New tickets').closest('.kpi').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'New').should('be.visible');
+  });
+
+  it('กด KPI card Closed Tickets แล้ว ticket list filter เหลือ ticket #IT-00303', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'Closed').should('be.visible');
+  });
+
+  it('filter Re-Open → ไม่มี ticket ใน mock data → แสดง 0 รายการ', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Re-Opend').click();
+
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('My Ticket แสดงเฉพาะ ticket ของ user ที่ login อยู่', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('Uncheck My Ticket แล้ว ticket list กลับมาครบ 3 รายการ', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 3);
+  });
 });
