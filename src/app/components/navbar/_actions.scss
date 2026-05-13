@@ -305,6 +305,23 @@ $text-light: #5f6368;
             color: $text-light;
             background: var(--bg-table-head);
             border-bottom: 1px solid var(--border-toolbar);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .btn-mark-all-read {
+              font-size: 11px;
+              font-weight: 500;
+              color: var(--primary);
+              background: none;
+              border: none;
+              cursor: pointer;
+              padding: 2px 6px;
+              border-radius: 4px;
+              &:hover {
+                background: var(--border-toolbar);
+              }
+            }
           }
 
           .dropdown-list {
