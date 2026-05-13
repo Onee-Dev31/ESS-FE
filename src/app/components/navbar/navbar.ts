@@ -5,32 +5,17 @@ import {
   inject,
   computed,
   signal,
-  NgZone,
-  DestroyRef,
+  effect,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarService } from '../sidebar/sidebar';
 import { AuthService } from '../../services/auth.service';
 import { USER_ROLES } from '../../constants/user-roles.constant';
-import { ToastService } from '../../services/toast';
-import { SignalrService } from '../../services/signalr.service';
 import { ThemeService } from '../../services/theme.service';
 import { NotificationService } from '../../services/notification.service';
-
-interface NotificationItem {
-  id: number;
-  title: string;
-  message: string;
-  status: 'pending' | 'approved' | 'rejected';
-  time: string;
-  route?: string;
-  readTicketId?: number;
-  ticketNumber?: string;
-  ticketId?: number;
-  type?: 'note' | 'ticket' | 'assign' | 'status';
-}
+import { NotificationInboxItem } from '../../interfaces/notification.interface';
+import { EmptyStateComponent } from '../shared/empty-state/empty-state';
 
 interface SearchMenuItem {
   label: string;
@@ -44,7 +29,7 @@ interface SearchMenuItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, EmptyStateComponent],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
@@ -54,323 +39,54 @@ export class NavbarComponent {
   private router = inject(Router);
   private eRef = inject(ElementRef);
 
-  // hubConnection!: signalR.HubConnection;
-  private zone = inject(NgZone);
-  private toastService = inject(ToastService);
-  private signalrService = inject(SignalrService);
-  private destroyRef = inject(DestroyRef);
-  private notificationService = inject(NotificationService);
+  notificationService = inject(NotificationService);
   themeService = inject(ThemeService);
+
   private notifyAudio = new Audio('/notification1.wav');
 
   isProfileOpen = false;
   isNotificationOpen = false;
-
-  unreadTicketCount = signal(0);
-
-  private static readonly IT_ROLES = new Set(['it-staff', 'it-director', 'system-admin']);
-
-  userName = computed(
-    () =>
-      this.authService.userData().NAMFIRSTE + ' ' + this.authService.userData().NAMLASTE[0] + '.' ||
-      'MARK STEPHEN',
-  );
-  userRole = computed(() => this.authService.userRole() || 'Web Developer');
-  isItRole = computed(() =>
-    (this.authService.userRole() ?? '')
-      .split(',')
-      .map((r) => r.trim())
-      .some((r) => NavbarComponent.IT_ROLES.has(r)),
-  );
-
-  userCodeEmp: any = '';
+  isBellHighlighted = signal(false);
 
   searchQuery = signal('');
   isSearchFocused = signal(false);
   isMobileSearchOpen = signal(false);
 
-  ngOnInit() {
-    this.fetchUnreadTickets();
-    this.notifyAudio.volume = 0.7;
-    this.signalrService
-      .on('NewTicket', '/it-service-list')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        if (!this.isItRole()) return;
-        this.zone.run(() => {
-          const message = data.message || 'มี Ticket ใหม่เข้ามา';
+  userName = computed(() => {
+    const user = this.authService.userData();
+    const firstName = user?.NAMFIRSTE || user?.NAMFIRSTT || 'USER';
+    const lastName = user?.NAMLASTE || user?.NAMLASTT || '';
+    return lastName ? `${firstName} ${lastName[0]}.` : firstName;
+  });
+  userRole = computed(() => this.authService.userRole() || 'Employee');
+  userCodeEmp = computed(() => this.authService.userData()?.CODEMPID || '');
+  notificationBadge = computed(() => {
+    const count = this.notificationService.unreadCount();
+    if (count > 99) return '99+';
+    return `${count}`;
+  });
+  notificationSummary = computed(() => {
+    const count = this.notificationService.unreadCount();
+    if (count <= 0) return 'Inbox พร้อมใช้งาน';
+    if (count === 1) return 'มี 1 รายการที่ยังไม่อ่าน';
+    return `มี ${count} รายการที่ยังไม่อ่าน`;
+  });
 
-          const newNoti: NotificationItem = {
-            id: Date.now(),
-            title: 'แจ้งเตือนใหม่',
-            message,
-            status: 'pending',
-            time: 'เมื่อสักครู่',
-            route: '/it-dashboard',
-          };
+  constructor() {
+    this.notifyAudio.volume = 0.55;
 
-          this.notifications.update((list) => [newNoti, ...list]);
-          if (!document.hidden) {
-            this.toastService.info(message);
+    effect(() => {
+      const tick = this.notificationService.realtimeTick();
+      if (tick <= 0) return;
 
-            this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
-          }
-        });
-      });
+      this.isBellHighlighted.set(true);
+      window.setTimeout(() => this.isBellHighlighted.set(false), 2600);
 
-    this.signalrService
-      .on('TicketAssigned', '/it-dashboard')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        this.zone.run(() => {
-          const message =
-            data.message || `Ticket ${data.ticket_number ?? ''} ถูก Assign ให้คุณแล้ว`;
-
-          const newNoti: NotificationItem = {
-            id: Date.now(),
-            title: 'มีการ Assign Ticket',
-            message,
-            status: 'pending',
-            time: 'เมื่อสักครู่',
-            route: '/it-dashboard',
-            ticketNumber: data.ticket_number ?? undefined,
-          };
-
-          this.notifications.update((list) => [newNoti, ...list]);
-          if (!document.hidden) {
-            this.toastService.info(message);
-            this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
-          }
-        });
-      });
-
-    this.signalrService
-      .on('NewTicketForApproval')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        this.zone.run(() => {
-          // ถ้าเป็น ticket ที่ตัวเองเพิ่ง submit → ไม่ต้องแจ้งตัวเอง
-          if (
-            data.ticketNumber &&
-            this.signalrService.recentlySubmittedTickets.has(data.ticketNumber)
-          ) {
-            this.signalrService.recentlySubmittedTickets.delete(data.ticketNumber);
-            return;
-          }
-
-          const message = data.message || 'มี Ticket ใหม่รอการอนุมัติ';
-
-          if (this.isItRole()) {
-            // IT staff: list ถูก manage โดย fetchUnreadTickets อยู่แล้ว ไม่ push in-memory ซ้ำ
-            this.fetchUnreadCount();
-            this.fetchUnreadTickets();
-          } else {
-            const newNoti: NotificationItem = {
-              id: Date.now(),
-              title: 'มี Ticket รออนุมัติ',
-              message,
-              status: 'pending',
-              time: 'เมื่อสักครู่',
-              route: '/approval-it-request',
-              ticketNumber: data.ticketNumber ?? undefined,
-            };
-            this.notifications.update((list) => [newNoti, ...list]);
-            this.unreadTicketCount.update((n) => n + 1);
-          }
-
-          if (!document.hidden) {
-            this.toastService.info(message);
-            this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
-          }
-        });
-      });
-
-    this.signalrService
-      .on('NewNote')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        this.zone.run(() => {
-          const message = data.message || `มี Chat ใหม่จาก ${data.senderName ?? ''}`;
-
-          const newNoti: NotificationItem = {
-            id: Date.now(),
-            title: 'มี Chat ใหม่',
-            message,
-            status: 'pending',
-            time: 'เมื่อสักครู่',
-            route: this.isItRole() ? '/it-dashboard' : '/it-service-list',
-            ticketId: data.ticketId ?? undefined,
-            type: 'note',
-          };
-
-          this.notifications.update((list) => [newNoti, ...list]);
-          this.unreadTicketCount.update((n) => n + 1);
-          if (!document.hidden) {
-            this.toastService.info(message);
-            this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
-          }
-        });
-      });
-
-    this.signalrService
-      .on('TicketStatusChanged')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        if (this.isItRole()) return;
-        this.zone.run(() => {
-          const rawStatus = data.status ?? '';
-          const [status, detail] = rawStatus.split('|');
-          let message: string;
-          if (status === 'Approved') {
-            message = 'คำขอของคุณได้รับการอนุมัติแล้ว';
-          } else if (status === 'Rejected') {
-            message = detail ? `คำขอถูกปฏิเสธ เหตุผล: "${detail}"` : 'คำขอถูกปฏิเสธ';
-          } else if (status === 'Referred_Back') {
-            message = detail
-              ? `ส่งกลับคำขอเพื่อแก้ไข เหตุผล: "${detail}"`
-              : 'ส่งกลับคำขอเพื่อแก้ไข';
-          } else if (detail) {
-            message = `IT รับเรื่องของคุณแล้ว ประเภท "${detail}"`;
-          } else {
-            const statusLabel: Record<string, string> = {
-              'In Progress': 'กำลังดำเนินการ',
-              Hold: 'พักเรื่องชั่วคราว',
-              Closed: 'ปิดเรื่องแล้ว',
-              Denied: 'ปฏิเสธคำขอ',
-              Assigned: 'รับเรื่องแล้ว',
-            };
-            message = `Ticket ของคุณมีการอัพเดทสถานะเป็น "${statusLabel[status] ?? status}"`;
-          }
-
-          const newNoti: NotificationItem = {
-            id: Date.now(),
-            title: 'อัพเดทสถานะ Ticket',
-            message,
-            status: 'pending',
-            time: 'เมื่อสักครู่',
-            route: '/it-service-list',
-            ticketId: data.ticketId ?? undefined,
-            type: 'status',
-          };
-
-          this.notifications.update((list) => [newNoti, ...list]);
-          this.unreadTicketCount.update((n) => n + 1);
-          if (!document.hidden) {
-            this.toastService.info(message);
-            this.notifyAudio.currentTime = 0;
-            this.notifyAudio.play().catch(() => {});
-          }
-        });
-      });
-
-    this.userCodeEmp = this.authService.userData().CODEMPID;
-
-    if (this.isItRole()) {
-      this.fetchUnreadCount();
-      this.fetchUnreadTickets();
-
-      this.signalrService
-        .on('NewTicket')
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => this.zone.run(() => this.unreadTicketCount.update((n) => n + 1)));
-
-      this.signalrService
-        .on('TicketAssigned')
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => this.zone.run(() => this.unreadTicketCount.update((n) => n + 1)));
-
-      this.signalrService.ticketReadTrigger
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() =>
-          this.zone.run(() => {
-            this.fetchUnreadCount();
-            this.fetchUnreadTickets();
-          }),
-        );
-    } else {
-      this.signalrService.ticketReadTrigger
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(({ ticketId }) =>
-          this.zone.run(() => {
-            this.notifications.update((list) => list.filter((n) => n.ticketId !== ticketId));
-            this.unreadTicketCount.update((n) => Math.max(0, n - 1));
-          }),
-        );
-    }
-  }
-
-  fetchUnreadCount() {
-    const codeempid = this.authService.userData()?.CODEMPID;
-    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
-    if (!codeempid) return;
-    this.notificationService
-      .getUnreadCount({ recipientCodeempid: codeempid, recipientAduser: aduser })
-      .subscribe({
-        next: (res) => this.unreadTicketCount.set(res?.unreadCount ?? 0),
-        error: () => this.unreadTicketCount.set(0),
-      });
-  }
-
-  fetchUnreadTickets() {
-    const codeempid = this.authService.userData()?.CODEMPID;
-    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
-    if (!codeempid) return;
-    this.notificationService
-      .getMyNotifications({
-        recipientCodeempid: codeempid,
-        recipientAduser: aduser,
-        unreadOnly: true,
-        page: 1,
-        pageSize: 20,
-      })
-      .subscribe({
-        next: (res) => {
-          const items: NotificationItem[] = (res.data ?? []).map((n) => ({
-            id: n.notificationRecipientId,
-            title: n.title,
-            message: n.message,
-            status: 'pending' as const,
-            time: this.formatRelativeTime(n.createdAt),
-            route: n.route,
-            readTicketId: n.notificationRecipientId,
-            ticketId: n.ticketId,
-            ticketNumber: n.ticketNumber,
-            type: n.type as any,
-          }));
-          this.notifications.set(items);
-          this.unreadTicketCount.set(res.totalRecords ?? items.length);
-        },
-        error: (err) => console.error('[Navbar] fetchUnreadTickets error:', err),
-      });
-  }
-
-  markAllRead() {
-    const codeempid = this.authService.userData()?.CODEMPID;
-    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
-    if (!codeempid) return;
-    this.notificationService
-      .markAllAsRead({ recipientCodeempid: codeempid, recipientAduser: aduser })
-      .subscribe({
-        next: () => {
-          this.notifications.set([]);
-          this.unreadTicketCount.set(0);
-        },
-      });
-  }
-
-  private formatRelativeTime(dateStr: string): string {
-    if (!dateStr) return '';
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'เมื่อสักครู่';
-    if (mins < 60) return `${mins} นาทีที่แล้ว`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs} ชั่วโมงที่แล้ว`;
-    return `${Math.floor(hrs / 24)} วันที่แล้ว`;
+      if (!document.hidden) {
+        this.notifyAudio.currentTime = 0;
+        this.notifyAudio.play().catch(() => {});
+      }
+    });
   }
 
   private allSearchMenus: SearchMenuItem[] = [
@@ -406,7 +122,6 @@ export class NavbarComponent {
     },
   ];
 
-  /** คำนวณรายการค้นหาที่กรองตามตัวอักษรและสิทธิ์ (Role) */
   filteredSearchResults = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
@@ -418,8 +133,8 @@ export class NavbarComponent {
         if (item.role) {
           if (Array.isArray(item.role)) {
             if (!item.role.includes(currentUserRole || '')) return false;
-          } else {
-            if (item.role !== currentUserRole) return false;
+          } else if (item.role !== currentUserRole) {
+            return false;
           }
         }
 
@@ -430,119 +145,8 @@ export class NavbarComponent {
       .slice(0, 5);
   });
 
-  notifications = signal<NotificationItem[]>([]);
-
-  // startSignalR() {
-  //   this.hubConnection = new signalR.HubConnectionBuilder()
-  //     .withUrl('https://localhost:7081/notificationHub')
-  //     .withAutomaticReconnect()
-  //     .build();
-
-  //   this.hubConnection.start()
-  //     .then(() => console.log('🔔 Navbar SignalR Connected'))
-  //     .catch(err => console.error(err));
-
-  //   this.hubConnection.on("NewTicket", (data) => {
-  //     this.zone.run(() => {
-  //       const newNoti: NotificationItem = {
-  //         id: Date.now(),
-  //         title: 'แจ้งเตือนใหม่',
-  //         message: data.message || 'มี Ticket ใหม่เข้ามา',
-  //         status: 'pending', // ตรงกับ union type
-  //         time: 'เมื่อสักครู่'
-  //       };
-
-  //       this.notifications.update(list => [newNoti, ...list]);
-  //       this.toastService.info(
-  //         data.message || "มี Ticket ใหม่เข้ามา"
-  //       );
-  //       const audio = new Audio('/notification1.wav');
-  //       audio.play().catch(err => console.warn('Audio blocked:', err));
-  //       audio.volume = 0.7;
-  //       audio.play().catch(() => {});
-  //     })
-  //   });
-  // }
-
-  onNotificationClick(item: NotificationItem) {
-    this.isNotificationOpen = false;
-    const codeempid = this.authService.userData()?.CODEMPID;
-    const aduser = (this.authService.currentUser() ?? '').toLowerCase();
-
-    // Mark as read via centralized NotificationService
-    if (item.readTicketId) {
-      this.notificationService
-        .markAsRead({
-          notificationRecipientId: item.readTicketId,
-          recipientCodeempid: codeempid,
-          recipientAduser: aduser,
-        })
-        .subscribe({
-          complete: () => {
-            this.notifications.update((list) => list.filter((n) => n.id !== item.id));
-            this.unreadTicketCount.update((n) => Math.max(0, n - 1));
-          },
-        });
-    } else {
-      // In-memory only (real-time noti ที่ยังไม่มี DB record)
-      if (item.ticketId && item.type === 'note') {
-        const removed = this.notifications().filter(
-          (n) => n.ticketId === item.ticketId && n.type === 'note',
-        ).length;
-        this.notifications.update((list) =>
-          list.filter((n) => !(n.ticketId === item.ticketId && n.type === 'note')),
-        );
-        this.unreadTicketCount.update((n) => Math.max(0, n - removed));
-      } else {
-        this.notifications.update((list) => list.filter((n) => n.id !== item.id));
-        this.unreadTicketCount.update((n) => Math.max(0, n - 1));
-      }
-    }
-    if (item.route) {
-      if (item.ticketNumber) {
-        this.signalrService.pendingTicketNumbers.update((s) => new Set([...s, item.ticketNumber!]));
-      }
-      this.signalrService.refreshTrigger.update((n) => n + 1);
-      if (item.ticketId) {
-        const alreadyOnPage = this.router.url.startsWith(item.route);
-        if (alreadyOnPage) {
-          this.signalrService.ticketFocusTrigger.next(item.ticketId);
-        } else if (item.route === '/it-dashboard') {
-          this.router.navigate([item.route], {
-            queryParams: {
-              ticketId: item.ticketId,
-              focusZone: 'tickets',
-              _t: Date.now(),
-            },
-          });
-        } else {
-          this.router.navigate([item.route], {
-            queryParams: { ticketId: item.ticketId, _t: Date.now() },
-          });
-        }
-        this.clearSearch();
-        this.isMobileSearchOpen.set(false);
-      } else if (item.route === '/it-dashboard') {
-        this.router.navigate([item.route], {
-          queryParams: { focusZone: 'tickets', _t: Date.now() },
-        });
-        this.clearSearch();
-        this.isMobileSearchOpen.set(false);
-      } else if (item.route === '/approval-it-request' && item.ticketNumber) {
-        const alreadyOnPage = this.router.url.startsWith(item.route);
-        if (alreadyOnPage) {
-          this.signalrService.ticketFocusTrigger.next(item.ticketNumber as any);
-        } else {
-          this.router.navigate([item.route], {
-            queryParams: { ticketNumber: item.ticketNumber, _t: Date.now() },
-          });
-        }
-        this.clearSearch();
-        this.isMobileSearchOpen.set(false);
-      } else {
-        this.navigateTo(item.route);
-      }
-    }
+  trackByNotification(_index: number, item: NotificationInboxItem) {
+    return `${item.notificationRecipientId ?? item.notificationId ?? item.notificationKey}`;
   }
 
   toggleSidebar() {
@@ -551,7 +155,13 @@ export class NavbarComponent {
 
   toggleNotification() {
     this.isNotificationOpen = !this.isNotificationOpen;
-    if (this.isNotificationOpen) this.isProfileOpen = false;
+    if (this.isNotificationOpen) {
+      this.isProfileOpen = false;
+      this.notificationService.refreshUnreadCount();
+      if (this.notificationService.items().length === 0 || this.notificationService.listError()) {
+        this.notificationService.loadFirstPage();
+      }
+    }
   }
 
   toggleProfile() {
@@ -559,7 +169,68 @@ export class NavbarComponent {
     if (this.isProfileOpen) this.isNotificationOpen = false;
   }
 
-  /** เปิด/ปิด การค้นหาบนหน้าจอมือถือ */
+  onUnreadOnlyChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.notificationService.setUnreadOnly(input.checked);
+  }
+
+  onNotificationClick(item: NotificationInboxItem) {
+    this.isNotificationOpen = false;
+    this.notificationService.markAsRead(item, () => this.navigateFromNotification(item));
+  }
+
+  navigateFromNotification(item: NotificationInboxItem) {
+    if (!item.route) return;
+
+    this.router.navigate([item.route], {
+      queryParams: item.routeQueryParams ?? undefined,
+    });
+    this.clearSearch();
+    this.isMobileSearchOpen.set(false);
+  }
+
+  markAllNotificationsAsRead() {
+    this.notificationService.markAllAsRead();
+  }
+
+  loadMoreNotifications() {
+    this.notificationService.loadMore();
+  }
+
+  retryNotificationList() {
+    this.notificationService.retryList();
+  }
+
+  isNotificationBusy(item: NotificationInboxItem) {
+    const key = String(item.notificationRecipientId ?? item.notificationId ?? item.notificationKey);
+    return this.notificationService.activeRecipientIds().has(key);
+  }
+
+  getNotificationIcon(item: NotificationInboxItem) {
+    const typeText = `${item.notificationType} ${item.targetType ?? ''}`.toLowerCase();
+    if (typeText.includes('reply') || typeText.includes('note')) return 'fa-comment-dots';
+    if (typeText.includes('assign')) return 'fa-user-plus';
+    if (typeText.includes('closed')) return 'fa-circle-check';
+    if (typeText.includes('rejected')) return 'fa-xmark';
+    if (typeText.includes('approved')) return 'fa-check';
+    if (typeText.includes('reopen')) return 'fa-rotate-left';
+    if (typeText.includes('status')) return 'fa-rotate';
+    return 'fa-bell';
+  }
+
+  getNotificationAccent(item: NotificationInboxItem) {
+    if (!item.isRead) return 'accent-unread';
+
+    const typeText = `${item.notificationType} ${item.targetType ?? ''}`.toLowerCase();
+    if (typeText.includes('closed') || typeText.includes('approved')) return 'accent-success';
+    if (typeText.includes('reply') || typeText.includes('note')) return 'accent-info';
+    return 'accent-muted';
+  }
+
+  hasTicketReference(item: NotificationInboxItem) {
+    return Boolean(item.ticketId || item.ticketNumber);
+  }
+
   toggleMobileSearch() {
     this.isMobileSearchOpen.update((v) => !v);
     if (!this.isMobileSearchOpen()) {
@@ -593,7 +264,6 @@ export class NavbarComponent {
     }
   }
 
-  /** ล้างข้อมูลการเข้าสู่ระบบและกลับไปยังหน้า Login */
   logout() {
     this.isProfileOpen = false;
     this.authService.logout();

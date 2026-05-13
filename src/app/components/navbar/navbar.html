@@ -159,54 +159,160 @@
       </div>
 
       <div class="notification-dropdown" (click)="$event.stopPropagation()">
-        <button class="icon-btn" (click)="toggleNotification()">
+        <button
+          class="icon-btn notification-trigger"
+          [class.has-unread]="notificationService.hasUnread()"
+          [class.is-live]="isBellHighlighted()"
+          (click)="toggleNotification()"
+          aria-label="Notifications"
+        >
           <i class="fas fa-bell"></i>
-          @if (unreadTicketCount() > 0) {
-            <span class="badge">{{ unreadTicketCount() }}</span>
+          @if (notificationService.hasUnread()) {
+            <span class="badge">{{ notificationBadge() }}</span>
           }
         </button>
 
         <div class="dropdown-menu" *ngIf="isNotificationOpen">
-          <div class="dropdown-header">
-            <span>การแจ้งเตือนล่าสุด</span>
-            @if (unreadTicketCount() > 0) {
-              <button class="btn-mark-all-read" (click)="markAllRead()">อ่านทั้งหมด</button>
-            }
-          </div>
+          <div class="dropdown-shell">
+            <div class="dropdown-header">
+              <div class="header-copy">
+                <div class="header-title">Notification Inbox</div>
+                <div class="header-subtitle">{{ notificationSummary() }}</div>
+              </div>
 
-          <div class="dropdown-list-wrap">
-            <div class="dropdown-list">
-              <a
-                class="dropdown-item"
-                *ngFor="let item of notifications()"
-                [class.clickable]="item.route"
-                (click)="onNotificationClick(item)"
+              <button
+                class="mark-all-btn"
+                type="button"
+                (click)="markAllNotificationsAsRead()"
+                [disabled]="!notificationService.hasUnread() || notificationService.isMarkingAll()"
               >
-                <div
-                  class="icon-circle"
-                  [ngClass]="{
-                    blue: item.status === 'pending',
-                    green: item.status === 'approved',
-                    red: item.status === 'rejected',
-                  }"
-                >
-                  <i
-                    class="fas"
-                    [ngClass]="{
-                      'fa-hourglass-half': item.status === 'pending',
-                      'fa-check': item.status === 'approved',
-                      'fa-times': item.status === 'rejected',
-                    }"
-                  ></i>
-                </div>
-
-                <div class="content">
-                  <p class="title">{{ item.title }}</p>
-                  <p class="message">{{ item.message }}</p>
-                  <span class="time">{{ item.time }}</span>
-                </div>
-              </a>
+                @if (notificationService.isMarkingAll()) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                } @else {
+                  <i class="fas fa-check-double"></i>
+                }
+                <span>Mark all</span>
+              </button>
             </div>
+
+            <div class="dropdown-toolbar">
+              <label class="filter-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="notificationService.unreadOnly()"
+                  (change)="onUnreadOnlyChange($event)"
+                />
+                <span>Unread only</span>
+              </label>
+
+              <button class="refresh-btn" type="button" (click)="retryNotificationList()">
+                <i class="fas fa-rotate-right"></i>
+              </button>
+            </div>
+
+            @if (notificationService.isListLoading()) {
+              <div class="notification-loading">
+                @for (skeleton of [1, 2, 3, 4]; track skeleton) {
+                  <div class="notification-skeleton">
+                    <div class="skeleton-dot"></div>
+                    <div class="skeleton-lines">
+                      <div class="line line-title"></div>
+                      <div class="line line-message"></div>
+                      <div class="line line-time"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else if (notificationService.listError()) {
+              <div class="notification-error">
+                <app-empty-state
+                  title="โหลดรายการแจ้งเตือนไม่สำเร็จ"
+                  description="ลองใหม่อีกครั้งเพื่อดึง inbox ล่าสุดจากระบบ"
+                  icon="fas fa-triangle-exclamation"
+                  actionLabel="Retry"
+                  actionIcon="fas fa-rotate-right"
+                  (action)="retryNotificationList()"
+                />
+              </div>
+            } @else if (notificationService.isEmpty()) {
+              <div class="notification-empty">
+                <app-empty-state
+                  [title]="
+                    notificationService.unreadOnly()
+                      ? 'ไม่มีรายการที่ยังไม่อ่าน'
+                      : 'ยังไม่มีการแจ้งเตือน'
+                  "
+                  [description]="
+                    notificationService.unreadOnly()
+                      ? 'รายการใหม่ของคุณถูกอ่านครบแล้ว'
+                      : 'เมื่อมีความเคลื่อนไหวของ Ticket รายการจะขึ้นที่นี่'
+                  "
+                  icon="fas fa-inbox"
+                />
+              </div>
+            } @else {
+              <div class="dropdown-list-wrap">
+                <div class="dropdown-list">
+                  <button
+                    class="dropdown-item"
+                    type="button"
+                    *ngFor="let item of notificationService.items(); trackBy: trackByNotification"
+                    [class.clickable]="!!item.route"
+                    [class.unread]="!item.isRead"
+                    [class.is-busy]="isNotificationBusy(item)"
+                    (click)="onNotificationClick(item)"
+                  >
+                    <div class="item-leading">
+                      <div class="icon-circle" [ngClass]="getNotificationAccent(item)">
+                        <i class="fas" [ngClass]="getNotificationIcon(item)"></i>
+                      </div>
+                      @if (!item.isRead) {
+                        <span class="unread-dot"></span>
+                      }
+                    </div>
+
+                    <div class="content">
+                      <div class="content-topline">
+                        <p class="title">{{ item.title }}</p>
+                        <span class="time">{{ item.timeLabel }}</span>
+                      </div>
+
+                      @if (hasTicketReference(item)) {
+                        <div class="meta-row">
+                          @if (item.ticketNumber) {
+                            <span class="ticket-chip">{{ item.ticketNumber }}</span>
+                          }
+                          @if (item.actorName) {
+                            <span class="actor-name">{{ item.actorName }}</span>
+                          }
+                        </div>
+                      }
+
+                      <p class="message">{{ item.message }}</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              @if (notificationService.hasMore()) {
+                <div class="dropdown-footer">
+                  <button
+                    class="load-more-btn"
+                    type="button"
+                    (click)="loadMoreNotifications()"
+                    [disabled]="notificationService.isLoadingMore()"
+                  >
+                    @if (notificationService.isLoadingMore()) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                      <span>Loading...</span>
+                    } @else {
+                      <i class="fas fa-angle-down"></i>
+                      <span>Load more</span>
+                    }
+                  </button>
+                </div>
+              }
+            }
           </div>
         </div>
       </div>
@@ -214,7 +320,7 @@
       <div class="user-profile" (click)="$event.stopPropagation()">
         <img
           class="avatar"
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + userCodeEmp + '.jpg'"
+          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + userCodeEmp() + '.jpg'"
           (error)="onImgError($event)"
           (click)="toggleProfile()"
         />
