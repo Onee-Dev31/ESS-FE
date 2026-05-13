@@ -132,8 +132,7 @@ describe('NotificationService', () => {
       service.refreshUnreadCount();
 
       const req = httpMock.expectOne(
-        (r) =>
-          r.url === `${API}/unread-count` && r.params.get('recipientAduser') === 'testuser',
+        (r) => r.url === `${API}/unread-count` && r.params.get('recipientAduser') === 'testuser',
       );
       expect(req.request.method).toBe('GET');
       req.flush({ success: true, unreadCount: 5 });
@@ -159,9 +158,7 @@ describe('NotificationService', () => {
       activate();
       service.refreshUnreadCount();
 
-      httpMock
-        .expectOne(() => true)
-        .flush(null, { status: 500, statusText: 'Server Error' });
+      httpMock.expectOne(() => true).flush(null, { status: 500, statusText: 'Server Error' });
 
       expect(service.countError()).toBe('ไม่สามารถโหลดจำนวนแจ้งเตือนใหม่ได้');
       expect(service.unreadCount()).toBe(0);
@@ -206,13 +203,15 @@ describe('NotificationService', () => {
       activate();
       service.loadFirstPage();
 
-      httpMock.expectOne(() => true).flush({
-        success: true,
-        data: [snakeCaseRecord],
-        totalRecords: 1,
-        page: 1,
-        pageSize: 8,
-      });
+      httpMock
+        .expectOne(() => true)
+        .flush({
+          success: true,
+          data: [snakeCaseRecord],
+          totalRecords: 1,
+          page: 1,
+          pageSize: 8,
+        });
 
       expect(service.items()).toHaveLength(1);
       expect(service.items()[0].notificationType).toBe('ticket_assigned');
@@ -224,10 +223,12 @@ describe('NotificationService', () => {
       activate();
       service.loadFirstPage();
 
-      httpMock.expectOne(() => true).flush({
-        data: [snakeCaseRecord],
-        totalRecords: 50,
-      });
+      httpMock
+        .expectOne(() => true)
+        .flush({
+          data: [snakeCaseRecord],
+          totalRecords: 50,
+        });
 
       expect(service.hasMore()).toBe(true);
     });
@@ -251,9 +252,7 @@ describe('NotificationService', () => {
       activate();
       service.loadFirstPage();
 
-      httpMock
-        .expectOne(() => true)
-        .flush(null, { status: 500, statusText: 'Error' });
+      httpMock.expectOne(() => true).flush(null, { status: 500, statusText: 'Error' });
 
       expect(service.listError()).toBe('โหลดรายการแจ้งเตือนไม่สำเร็จ');
       expect(service.items()).toEqual([]);
@@ -270,9 +269,7 @@ describe('NotificationService', () => {
 
       service.loadMore();
 
-      const req = httpMock.expectOne(
-        (r) => r.url === `${API}/my` && r.params.get('page') === '2',
-      );
+      const req = httpMock.expectOne((r) => r.url === `${API}/my` && r.params.get('page') === '2');
       req.flush({ data: [], totalRecords: 1 });
     });
 
@@ -386,9 +383,7 @@ describe('NotificationService', () => {
     it('แสดง toast error เมื่อ HTTP error', () => {
       service.markAsRead({ ...unreadItemWithRecipientId });
 
-      httpMock
-        .expectOne(`${API}/read`)
-        .flush(null, { status: 500, statusText: 'Error' });
+      httpMock.expectOne(`${API}/read`).flush(null, { status: 500, statusText: 'Error' });
 
       expect(mockToastService.error).toHaveBeenCalledWith('ไม่สามารถอัปเดตสถานะอ่านแล้วได้');
     });
@@ -416,8 +411,18 @@ describe('NotificationService', () => {
 
     it('reset unreadCount เป็น 0 และ mark items ทั้งหมดว่า isRead', () => {
       service['items'].set([
-        { notificationRecipientId: 1, notificationId: 1, notificationKey: 'k1', isRead: false } as any,
-        { notificationRecipientId: 2, notificationId: 2, notificationKey: 'k2', isRead: false } as any,
+        {
+          notificationRecipientId: 1,
+          notificationId: 1,
+          notificationKey: 'k1',
+          isRead: false,
+        } as any,
+        {
+          notificationRecipientId: 2,
+          notificationId: 2,
+          notificationKey: 'k2',
+          isRead: false,
+        } as any,
       ]);
 
       service.markAllAsRead();
@@ -439,9 +444,7 @@ describe('NotificationService', () => {
 
     it('แสดง toast error เมื่อ HTTP error', () => {
       service.markAllAsRead();
-      httpMock
-        .expectOne(`${API}/read-all`)
-        .flush(null, { status: 500, statusText: 'Error' });
+      httpMock.expectOne(`${API}/read-all`).flush(null, { status: 500, statusText: 'Error' });
 
       expect(mockToastService.error).toHaveBeenCalledWith(
         'ไม่สามารถทำเครื่องหมายอ่านแล้วทั้งหมดได้',
@@ -456,11 +459,13 @@ describe('NotificationService', () => {
       activate();
       service.loadFirstPage();
 
-      httpMock.expectOne(() => true).flush({
-        success: true,
-        data: [snakeCaseRecord, camelCaseRecord],
-        totalRecords: 2,
-      });
+      httpMock
+        .expectOne(() => true)
+        .flush({
+          success: true,
+          data: [snakeCaseRecord, camelCaseRecord],
+          totalRecords: 2,
+        });
 
       expect(service.items()).toHaveLength(2);
     });
@@ -469,10 +474,12 @@ describe('NotificationService', () => {
       activate();
       service.loadFirstPage();
 
-      httpMock.expectOne(() => true).flush({
-        items: [snakeCaseRecord],
-        total: 1,
-      });
+      httpMock
+        .expectOne(() => true)
+        .flush({
+          items: [snakeCaseRecord],
+          total: 1,
+        });
 
       expect(service.items()).toHaveLength(1);
     });

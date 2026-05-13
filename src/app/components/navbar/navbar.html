@@ -237,7 +237,11 @@
             } @else if (notificationService.isEmpty()) {
               <div class="notification-empty">
                 <app-empty-state
-                  [title]="notificationService.unreadOnly() ? 'ไม่มีรายการที่ยังไม่อ่าน' : 'ยังไม่มีการแจ้งเตือน'"
+                  [title]="
+                    notificationService.unreadOnly()
+                      ? 'ไม่มีรายการที่ยังไม่อ่าน'
+                      : 'ยังไม่มีการแจ้งเตือน'
+                  "
                   [description]="
                     notificationService.unreadOnly()
                       ? 'รายการใหม่ของคุณถูกอ่านครบแล้ว'
