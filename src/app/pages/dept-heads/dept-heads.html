@@ -255,17 +255,10 @@
           (ngModelChange)="onFormDeptChange($event)"
         >
           @for (d of items(); track d.cost_cent) {
-            <<<<<<< HEAD
             <nz-option
               [nzValue]="d.cost_cent"
               [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
             />
-            =======
-            <nz-option
-              [nzValue]="d.cost_cent"
-              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
-            />
-            >>>>>>> master
           }
         </nz-select>
       </div>
