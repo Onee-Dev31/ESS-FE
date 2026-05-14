@@ -98,9 +98,7 @@
           <button
             type="submit"
             class="btn-save-custom"
-            [disabled]="
-              !selectedTag || (selectedTag === 1 && attachments.length > 0 && !message.trim())
-            "
+            [disabled]="!selectedTag || (isTagChanged && !message.trim())"
           >
             <i class="fas fa-paper-plane"></i> ยืนยัน
           </button>

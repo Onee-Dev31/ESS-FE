@@ -56,10 +56,8 @@ export class AcknowledgeModal {
   }
 
   onTagChange(value: number) {
-    if (value !== 1) {
-      this.message = '';
-      this.attachments = [];
-    }
+    this.message = '';
+    this.attachments = [];
   }
 
   onFileSelected(event: any) {
