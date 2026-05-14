@@ -1,12 +1,15 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
 import { SettingService } from '../../services/setting.service';
 import { LoadingService } from '../../services/loading';
+import { AuthService } from '../../services/auth.service';
+import { SwalService } from '../../services/swal.service';
 
 interface DeptHeadPerson {
   level: number;
@@ -31,6 +34,30 @@ interface DeptHeadItem {
   employees: DeptEmployee[];
 }
 
+interface DeptHeadOverride {
+  cost_cent: string;
+  level: number;
+  codeempid: string;
+  emp_name: string;
+  num_lvl: number;
+  reason: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface FormRow {
+  level: number;
+  empCode: string;
+  isExisting: boolean;
+}
+
+interface OverrideGroup {
+  cost_cent: string;
+  name_cost_cent: string;
+  rows: DeptHeadOverride[];
+}
+
 @Component({
   selector: 'app-dept-heads',
   standalone: true,
@@ -48,36 +75,49 @@ interface DeptHeadItem {
 export class DeptHeadsComponent implements OnInit {
   private settingService = inject(SettingService);
   private loadingService = inject(LoadingService);
+  private authService = inject(AuthService);
+  private swalService = inject(SwalService);
 
   pageTitle = signal<string>('หัวหน้าแผนก');
   items = signal<DeptHeadItem[]>([]);
   isLoading = this.loadingService.loading('dept-heads');
 
-  // Filter form state
+  // Tab
+  activeTab = signal<'list' | 'override'>('list');
+
+  // Filter state
   filterText = signal<string>('');
   filterCompany = signal<string>('');
   filterDept = signal<string>('');
-
-  // Applied filters (after Search)
   appliedText = signal<string>('');
   appliedCompany = signal<string>('');
   appliedDept = signal<string>('');
 
-  // Modal
+  // Detail modal
   selectedDept = signal<DeptHeadItem | null>(null);
 
   // Pagination
   currentPage = signal<number>(0);
   pageSize = signal<number>(10);
 
-  // Unique company list
+  // Override state
+  overrides = signal<DeptHeadOverride[]>([]);
+  isOverrideLoading = this.loadingService.loading('dept-overrides');
+  isSaving = signal<boolean>(false);
+
+  // Override form
+  formDeptCode = signal<string>('');
+  formRows = signal<FormRow[]>([]);
+  formReason = signal<string>('');
+
+  // ==================== LIST TAB COMPUTEDS ====================
+
   companyList = computed(() => {
     const map = new Map<string, string>();
     this.items().forEach((d) => map.set(d.company_code, d.company_name));
     return Array.from(map.entries()).map(([code, name]) => ({ code, name }));
   });
 
-  // Department list filtered by selected company
   deptList = computed(() => {
     const company = this.filterCompany();
     return this.items()
@@ -105,15 +145,65 @@ export class DeptHeadsComponent implements OnInit {
   });
 
   totalItems = computed(() => this.filteredItems().length);
-  totalPages = computed(() => Math.ceil(this.totalItems() / this.pageSize()));
 
   paginatedItems = computed(() => {
     const start = this.currentPage() * this.pageSize();
     return this.filteredItems().slice(start, start + this.pageSize());
   });
 
+  modalEmployees = computed(() => {
+    const dept = this.selectedDept();
+    if (!dept) return [];
+    const text = this.appliedText().toLowerCase().trim();
+    if (!text) return dept.employees;
+    return dept.employees.filter(
+      (e) =>
+        e.emp_name.toLowerCase().includes(text) ||
+        e.emp_code.toLowerCase().includes(text) ||
+        (e.nickname ?? '').toLowerCase().includes(text),
+    );
+  });
+
+  // ==================== OVERRIDE TAB COMPUTEDS ====================
+
+  selectedDeptForForm = computed(() => {
+    const code = this.formDeptCode();
+    return this.items().find((d) => d.cost_cent === code) ?? null;
+  });
+
+  formEmployees = computed(() => this.selectedDeptForForm()?.employees ?? []);
+
+  isEditingOverride = computed(() =>
+    this.formDeptCode() !== '' &&
+    this.overrides().some((o) => o.cost_cent === this.formDeptCode()),
+  );
+
+  groupedOverrides = computed<OverrideGroup[]>(() => {
+    const map = new Map<string, OverrideGroup>();
+    for (const o of this.overrides()) {
+      if (!map.has(o.cost_cent)) {
+        map.set(o.cost_cent, {
+          cost_cent: o.cost_cent,
+          name_cost_cent:
+            this.items().find((d) => d.cost_cent === o.cost_cent)?.name_cost_cent ?? o.cost_cent,
+          rows: [],
+        });
+      }
+      map.get(o.cost_cent)!.rows.push(o);
+    }
+    for (const group of map.values()) {
+      group.rows.sort((a, b) => a.level - b.level);
+    }
+    return Array.from(map.values());
+  });
+
+  totalOverrideDepts = computed(() => this.groupedOverrides().length);
+
+  // ==================== LIFECYCLE ====================
+
   ngOnInit() {
     this.loadData();
+    this.loadOverrides();
   }
 
   loadData() {
@@ -123,15 +213,30 @@ export class DeptHeadsComponent implements OnInit {
         this.items.set(res.data ?? []);
         this.loadingService.stop('dept-heads');
       },
-      error: () => {
-        this.loadingService.stop('dept-heads');
-      },
+      error: () => this.loadingService.stop('dept-heads'),
     });
+  }
+
+  loadOverrides() {
+    this.loadingService.start('dept-overrides');
+    this.settingService.getDeptHeadOverrides().subscribe({
+      next: (res) => {
+        this.overrides.set(res.data ?? []);
+        this.loadingService.stop('dept-overrides');
+      },
+      error: () => this.loadingService.stop('dept-overrides'),
+    });
+  }
+
+  // ==================== LIST TAB METHODS ====================
+
+  setTab(tab: 'list' | 'override') {
+    this.activeTab.set(tab);
   }
 
   onCompanyChange(value: string) {
     this.filterCompany.set(value);
-    this.filterDept.set(''); // reset แผนกเมื่อเปลี่ยนบริษัท
+    this.filterDept.set('');
   }
 
   applyFilter() {
@@ -171,19 +276,6 @@ export class DeptHeadsComponent implements OnInit {
     );
   }
 
-  modalEmployees = computed(() => {
-    const dept = this.selectedDept();
-    if (!dept) return [];
-    const text = this.appliedText().toLowerCase().trim();
-    if (!text) return dept.employees;
-    return dept.employees.filter(
-      (e) =>
-        e.emp_name.toLowerCase().includes(text) ||
-        e.emp_code.toLowerCase().includes(text) ||
-        (e.nickname ?? '').toLowerCase().includes(text),
-    );
-  });
-
   openDetail(dept: DeptHeadItem) {
     this.selectedDept.set(dept);
   }
@@ -198,5 +290,152 @@ export class DeptHeadsComponent implements OnInit {
 
   getLevelLabel(level: number): string {
     return `ระดับ ${level}`;
+  }
+
+  // ==================== OVERRIDE FORM METHODS ====================
+
+  onFormDeptChange(code: string) {
+    this.formDeptCode.set(code);
+    this.formReason.set('');
+    if (!code) {
+      this.formRows.set([]);
+      return;
+    }
+    const existing = this.overrides()
+      .filter((o) => o.cost_cent === code)
+      .sort((a, b) => a.level - b.level);
+    if (existing.length > 0) {
+      this.formRows.set(
+        existing.map((o) => ({ level: o.level, empCode: o.codeempid, isExisting: true })),
+      );
+      this.formReason.set(existing[0].reason ?? '');
+    } else {
+      this.formRows.set([{ level: 1, empCode: '', isExisting: false }]);
+    }
+  }
+
+  addFormRow() {
+    const rows = this.formRows();
+    const maxLevel = rows.length > 0 ? Math.max(...rows.map((r) => r.level)) : 0;
+    this.formRows.update((rows) => [...rows, { level: maxLevel + 1, empCode: '', isExisting: false }]);
+  }
+
+  updateRowEmp(index: number, empCode: string) {
+    this.formRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, empCode } : r)));
+  }
+
+  async removeFormRow(index: number) {
+    const row = this.formRows()[index];
+    if (row.isExisting && this.formDeptCode()) {
+      const result = await this.swalService.confirm(
+        'ยืนยันการลบ',
+        `ต้องการลบ override ระดับ ${row.level} ของแผนกนี้ใช่หรือไม่?`,
+      );
+      if (!result.isConfirmed) return;
+
+      this.settingService.deleteDeptHeadOverride(this.formDeptCode(), row.level).subscribe({
+        next: () => {
+          this.formRows.update((rows) => rows.filter((_, i) => i !== index));
+          this.loadOverrides();
+          this.loadData();
+        },
+        error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+      });
+    } else {
+      this.formRows.update((rows) => rows.filter((_, i) => i !== index));
+    }
+  }
+
+  saveOverride() {
+    const rows = this.formRows().filter((r) => r.empCode !== '');
+    if (!this.formDeptCode() || rows.length === 0) {
+      this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกแผนกและพนักงานอย่างน้อย 1 ระดับ');
+      return;
+    }
+
+    const createdBy = this.authService.userData()?.codeempid;
+    const requests = rows.map((row) => {
+      const payload: Record<string, any> = {
+        costCent: this.formDeptCode(),
+        level: row.level,
+        codeempid: row.empCode,
+      };
+      if (this.formReason()) payload['reason'] = this.formReason();
+      if (createdBy) payload['createdBy'] = createdBy;
+      return this.settingService.saveDeptHeadOverride(payload as any);
+    });
+
+    this.isSaving.set(true);
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.swalService.success('บันทึกสำเร็จ', `บันทึก override ${rows.length} ระดับ เรียบร้อยแล้ว`);
+        this.resetForm();
+        this.loadOverrides();
+        this.loadData();
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึก override บางรายการได้');
+      },
+    });
+  }
+
+  resetForm() {
+    this.formDeptCode.set('');
+    this.formRows.set([]);
+    this.formReason.set('');
+  }
+
+  // ==================== OVERRIDE TABLE METHODS ====================
+
+  editDeptOverride(costCent: string) {
+    const existing = this.overrides()
+      .filter((o) => o.cost_cent === costCent)
+      .sort((a, b) => a.level - b.level);
+    this.formDeptCode.set(costCent);
+    this.formReason.set(existing[0]?.reason ?? '');
+    this.formRows.set(
+      existing.map((o) => ({ level: o.level, empCode: o.codeempid, isExisting: true })),
+    );
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async deleteOverrideLevel(override: DeptHeadOverride, deptName: string) {
+    const result = await this.swalService.confirm(
+      'ยืนยันการลบ',
+      `ต้องการลบ override ระดับ ${override.level} ของแผนก "${deptName}" ใช่หรือไม่?`,
+    );
+    if (!result.isConfirmed) return;
+
+    this.settingService.deleteDeptHeadOverride(override.cost_cent, override.level).subscribe({
+      next: () => {
+        this.swalService.success('ลบสำเร็จ', `Override ระดับ ${override.level} ถูกลบแล้ว`);
+        this.loadOverrides();
+        this.loadData();
+      },
+      error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+    });
+  }
+
+  async deleteAllOverrides(costCent: string, deptName: string) {
+    const result = await this.swalService.confirm(
+      'ยืนยันการลบทั้งหมด',
+      `ต้องการลบ override ทุกระดับ ของแผนก "${deptName}" และคืนค่าหัวหน้าแผนกเป็น default จาก HRMS ใช่หรือไม่?`,
+    );
+    if (!result.isConfirmed) return;
+
+    this.settingService.deleteDeptHeadOverride(costCent).subscribe({
+      next: () => {
+        this.swalService.success(
+          'ลบสำเร็จ',
+          'Override ทุกระดับถูกลบแล้ว หัวหน้าแผนกจะใช้ค่า default จาก HRMS',
+        );
+        if (this.formDeptCode() === costCent) this.resetForm();
+        this.loadOverrides();
+        this.loadData();
+      },
+      error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+    });
   }
 }

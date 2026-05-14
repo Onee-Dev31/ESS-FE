@@ -65,4 +65,26 @@ export class SettingService {
   getDeptHeads(): Observable<any> {
     return this._http.get(`${this.baseUrl}/dept-heads`);
   }
+
+  getDeptHeadOverrides(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/dept-heads/overrides`);
+  }
+
+  saveDeptHeadOverride(payload: {
+    costCent: string;
+    level: number;
+    codeempid: string;
+    reason?: string;
+    createdBy?: string;
+  }): Observable<any> {
+    return this._http.put(`${this.baseUrl}/dept-heads/overrides`, payload);
+  }
+
+  deleteDeptHeadOverride(costCent: string, level?: number): Observable<any> {
+    const url =
+      level !== undefined
+        ? `${this.baseUrl}/dept-heads/overrides/${costCent}/${level}`
+        : `${this.baseUrl}/dept-heads/overrides/${costCent}`;
+    return this._http.delete(url);
+  }
 }
