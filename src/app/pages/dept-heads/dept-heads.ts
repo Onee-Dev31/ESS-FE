@@ -59,6 +59,28 @@ interface OverrideGroup {
   rows: DeptHeadOverride[];
 }
 
+interface EmpHeadOverride {
+  id: number;
+  employee_codeempid: string;
+  emp_name: string;
+  emp_nickname: string | null;
+  cost_cent: string;
+  level: number;
+  head_codeempid: string;
+  head_name: string;
+  head_nickname: string | null;
+  reason: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface EmpOverrideFormRow {
+  level: number;
+  headCode: string;
+  isExisting: boolean;
+}
+
 @Component({
   selector: 'app-dept-heads',
   standalone: true,
@@ -85,7 +107,7 @@ export class DeptHeadsComponent implements OnInit {
   isLoading = this.loadingService.loading('dept-heads');
 
   // Tab
-  activeTab = signal<'list' | 'override'>('list');
+  activeTab = signal<'list' | 'override' | 'emp-override'>('list');
 
   // Filter state
   filterText = signal<string>('');
@@ -111,6 +133,19 @@ export class DeptHeadsComponent implements OnInit {
   formDeptCode = signal<string>('');
   formRows = signal<FormRow[]>([]);
   formReason = signal<string>('');
+
+  // Emp override state
+  empDeptFilter = signal<string>('');
+  empSearchText = signal<string>('');
+  empOverrides = signal<EmpHeadOverride[]>([]);
+  isEmpOverrideLoading = this.loadingService.loading('emp-overrides');
+
+  // Emp override modal
+  empModalOpen = signal<boolean>(false);
+  empModalEmp = signal<DeptEmployee | null>(null);
+  empModalRows = signal<EmpOverrideFormRow[]>([]);
+  empModalReason = signal<string>('');
+  isSavingEmp = signal<boolean>(false);
 
   // ==================== LIST TAB COMPUTEDS ====================
 
@@ -205,11 +240,40 @@ export class DeptHeadsComponent implements OnInit {
 
   totalOverrideDepts = computed(() => this.groupedOverrides().length);
 
+  // ==================== EMP OVERRIDE COMPUTEDS ====================
+
+  empDisplayEmployees = computed(() => {
+    const dept = this.empDeptFilter();
+    if (!dept) return [];
+    const deptData = this.items().find((d) => d.cost_cent === dept);
+    if (!deptData) return [];
+    const text = this.empSearchText().toLowerCase().trim();
+    if (!text) return deptData.employees;
+    return deptData.employees.filter(
+      (e) =>
+        e.emp_name.toLowerCase().includes(text) ||
+        e.emp_code.toLowerCase().includes(text) ||
+        (e.nickname ?? '').toLowerCase().includes(text),
+    );
+  });
+
+  totalEmpOverrideEmps = computed(() => {
+    const codes = new Set(this.empOverrides().map((o) => o.employee_codeempid));
+    return codes.size;
+  });
+
+  isEmpEditing = computed(() => {
+    const emp = this.empModalEmp();
+    if (!emp) return false;
+    return this.empOverrides().some((o) => o.employee_codeempid === emp.emp_code);
+  });
+
   // ==================== LIFECYCLE ====================
 
   ngOnInit() {
     this.loadData();
     this.loadOverrides();
+    this.loadEmpOverrides();
   }
 
   loadData() {
@@ -234,9 +298,20 @@ export class DeptHeadsComponent implements OnInit {
     });
   }
 
+  loadEmpOverrides() {
+    this.loadingService.start('emp-overrides');
+    this.settingService.getEmpHeadOverrides().subscribe({
+      next: (res) => {
+        this.empOverrides.set(res.data ?? []);
+        this.loadingService.stop('emp-overrides');
+      },
+      error: () => this.loadingService.stop('emp-overrides'),
+    });
+  }
+
   // ==================== LIST TAB METHODS ====================
 
-  setTab(tab: 'list' | 'override') {
+  setTab(tab: 'list' | 'override' | 'emp-override') {
     this.activeTab.set(tab);
   }
 
@@ -454,6 +529,132 @@ export class DeptHeadsComponent implements OnInit {
         if (this.formDeptCode() === costCent) this.resetForm();
         this.loadOverrides();
         this.loadData();
+      },
+      error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+    });
+  }
+
+  // ==================== EMP OVERRIDE METHODS ====================
+
+  onEmpDeptFilterChange(code: string) {
+    this.empDeptFilter.set(code);
+    this.empSearchText.set('');
+  }
+
+  getEmpOverridesForEmp(empCode: string): EmpHeadOverride[] {
+    return this.empOverrides()
+      .filter((o) => o.employee_codeempid === empCode)
+      .sort((a, b) => a.level - b.level);
+  }
+
+  openEmpModal(emp: DeptEmployee) {
+    const existing = this.getEmpOverridesForEmp(emp.emp_code);
+    this.empModalEmp.set(emp);
+    if (existing.length > 0) {
+      this.empModalRows.set(
+        existing.map((o) => ({ level: o.level, headCode: o.head_codeempid, isExisting: true })),
+      );
+      this.empModalReason.set(existing[0].reason ?? '');
+    } else {
+      this.empModalRows.set([{ level: 1, headCode: '', isExisting: false }]);
+      this.empModalReason.set('');
+    }
+    this.empModalOpen.set(true);
+  }
+
+  closeEmpModal() {
+    this.empModalOpen.set(false);
+    this.empModalEmp.set(null);
+    this.empModalRows.set([]);
+    this.empModalReason.set('');
+  }
+
+  addEmpModalRow() {
+    const rows = this.empModalRows();
+    const maxLevel = rows.length > 0 ? Math.max(...rows.map((r) => r.level)) : 0;
+    this.empModalRows.update((rows) => [
+      ...rows,
+      { level: maxLevel + 1, headCode: '', isExisting: false },
+    ]);
+  }
+
+  updateEmpModalRow(index: number, headCode: string) {
+    this.empModalRows.update((rows) =>
+      rows.map((r, i) => (i === index ? { ...r, headCode } : r)),
+    );
+  }
+
+  async removeEmpModalRow(index: number) {
+    const row = this.empModalRows()[index];
+    const emp = this.empModalEmp();
+    if (row.isExisting && emp) {
+      const result = await this.swalService.confirm(
+        'ยืนยันการลบ',
+        `ต้องการลบ override ระดับ ${row.level} ของพนักงานนี้ใช่หรือไม่?`,
+      );
+      if (!result.isConfirmed) return;
+
+      this.settingService.deleteEmpHeadOverride(emp.emp_code, row.level).subscribe({
+        next: () => {
+          this.empModalRows.update((rows) => rows.filter((_, i) => i !== index));
+          this.loadEmpOverrides();
+        },
+        error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+      });
+    } else {
+      this.empModalRows.update((rows) => rows.filter((_, i) => i !== index));
+    }
+  }
+
+  saveEmpOverride() {
+    const rows = this.empModalRows().filter((r) => r.headCode !== '');
+    const emp = this.empModalEmp();
+    if (!emp || rows.length === 0) {
+      this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
+      return;
+    }
+
+    const createdBy = this.authService.userData()?.codeempid;
+    const requests = rows.map((row) => {
+      const payload: Record<string, any> = {
+        employee_codeempid: emp.emp_code,
+        level: row.level,
+        head_codeempid: row.headCode,
+      };
+      if (this.empModalReason()) payload['reason'] = this.empModalReason();
+      if (createdBy) payload['created_by'] = createdBy;
+      return this.settingService.saveEmpHeadOverride(payload as any);
+    });
+
+    this.isSavingEmp.set(true);
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.isSavingEmp.set(false);
+        this.swalService.success(
+          'บันทึกสำเร็จ',
+          `บันทึก override ${rows.length} ระดับ เรียบร้อยแล้ว`,
+        );
+        this.closeEmpModal();
+        this.loadEmpOverrides();
+      },
+      error: () => {
+        this.isSavingEmp.set(false);
+        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึก override บางรายการได้');
+      },
+    });
+  }
+
+  async deleteEmpAllOverrides(emp: DeptEmployee) {
+    const result = await this.swalService.confirm(
+      'ยืนยันการลบทั้งหมด',
+      `ต้องการลบ override ทุกระดับของ "${emp.emp_name}" และคืนค่าหัวหน้าเป็น default ใช่หรือไม่?`,
+    );
+    if (!result.isConfirmed) return;
+
+    this.settingService.deleteEmpHeadOverride(emp.emp_code).subscribe({
+      next: () => {
+        this.swalService.success('ลบสำเร็จ', 'Override ทุกระดับถูกลบแล้ว');
+        this.loadEmpOverrides();
       },
       error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
     });

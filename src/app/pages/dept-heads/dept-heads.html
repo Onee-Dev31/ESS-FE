@@ -22,6 +22,17 @@
         <span class="tab-badge">{{ totalOverrideDepts() }}</span>
       }
     </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'emp-override'"
+      (click)="setTab('emp-override')"
+    >
+      <i class="fas fa-user-shield"></i> Override รายบุคคล
+      @if (totalEmpOverrideEmps() > 0) {
+        <span class="tab-badge">{{ totalEmpOverrideEmps() }}</span>
+      }
+    </button>
   </div>
 
   <!-- ==================== TAB: LIST ==================== -->
@@ -255,17 +266,10 @@
           (ngModelChange)="onFormDeptChange($event)"
         >
           @for (d of items(); track d.cost_cent) {
-            <<<<<<< HEAD
             <nz-option
               [nzValue]="d.cost_cent"
               [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
             />
-            =======
-            <nz-option
-              [nzValue]="d.cost_cent"
-              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
-            />
-            >>>>>>> master
           }
         </nz-select>
       </div>
@@ -484,11 +488,7 @@
                 <div class="info-row">
                   <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
                   <span class="value">
-                    <<<<<<< HEAD
                     {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
-                    =======
-                    {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
-                    >>>>>>> master
                   </span>
                 </div>
               </div>
@@ -500,6 +500,169 @@
               icon="fas fa-user-slash"
             />
           }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ==================== TAB: EMP OVERRIDE ==================== -->
+  @if (activeTab() === 'emp-override') {
+    <div class="filter-card">
+      <div class="filter-title">
+        <i class="fas fa-user-shield"></i> Override รายบุคคล
+      </div>
+      <div class="filter-grid">
+        <div class="field-box dept-selector-field">
+          <label class="field-label">แผนก</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกแผนก --"
+            [ngModel]="empDeptFilter()"
+            (ngModelChange)="onEmpDeptFilterChange($event)"
+          >
+            @for (d of items(); track d.cost_cent) {
+              <nz-option
+                [nzValue]="d.cost_cent"
+                [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
+              />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box field-grow">
+          <label class="field-label">ค้นหาพนักงาน</label>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+            [ngModel]="empSearchText()"
+            (ngModelChange)="empSearchText.set($event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card" style="margin-top: 16px">
+      <div class="card-header-title">
+        รายชื่อพนักงาน
+        @if (empDeptFilter()) {
+          ({{ empDisplayEmployees().length }} คน)
+        }
+      </div>
+
+      <div class="table-responsive">
+        @if (isEmpOverrideLoading()) {
+          <app-skeleton type="table" [rows]="5" />
+        } @else {
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>พนักงาน</th>
+                <th>ระดับที่ Override</th>
+                <th>หัวหน้าที่กำหนด</th>
+                <th>เหตุผล</th>
+                <th>อัปเดตล่าสุด</th>
+                <th class="text-center">จัดการ</th>
+              </tr>
+            </thead>
+            @if (empDeptFilter()) {
+              @for (emp of empDisplayEmployees(); track emp.emp_code) {
+                @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                  <tbody class="emp-override-group">
+                    @for (
+                      ov of getEmpOverridesForEmp(emp.emp_code);
+                      track ov.level;
+                      let isFirst = $first
+                    ) {
+                      <tr>
+                        @if (isFirst) {
+                          <td
+                            class="dept-cell"
+                            [attr.rowspan]="getEmpOverridesForEmp(emp.emp_code).length + 1"
+                          >
+                            <div class="cell-primary">{{ emp.emp_name }}</div>
+                            @if (emp.nickname) {
+                              <div class="cell-sub">({{ emp.nickname }})</div>
+                            }
+                            <div class="cell-sub">{{ emp.emp_code }}</div>
+                          </td>
+                        }
+                        <td>
+                          <span class="level-badge" [class.level-1]="ov.level === 1">
+                            ระดับ {{ ov.level }}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="cell-primary">{{ ov.head_name }}</div>
+                          <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                        </td>
+                        <td class="reason-cell">{{ ov.reason || '-' }}</td>
+                        <td class="date-cell">
+                          {{ ov.updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                        </td>
+                        <td></td>
+                      </tr>
+                    }
+                    <tr class="group-footer-row">
+                      <td colspan="5">
+                        <div class="group-actions">
+                          <button class="btn-group-edit" (click)="openEmpModal(emp)">
+                            <i class="fas fa-pen"></i> แก้ไข
+                          </button>
+                          <button class="btn-group-delete" (click)="deleteEmpAllOverrides(emp)">
+                            <i class="fas fa-trash-alt"></i> ลบทั้งหมด
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                } @else {
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="cell-primary">{{ emp.emp_name }}</div>
+                        @if (emp.nickname) {
+                          <div class="cell-sub">({{ emp.nickname }})</div>
+                        }
+                        <div class="cell-sub">{{ emp.emp_code }}</div>
+                      </td>
+                      <td colspan="4" class="no-override-cell">ไม่มี Override</td>
+                      <td class="text-center">
+                        <button class="btn-group-edit" (click)="openEmpModal(emp)">
+                          <i class="fas fa-plus"></i> ตั้ง Override
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                }
+              } @empty {
+                <tbody>
+                  <tr>
+                    <td colspan="6" class="no-data-cell">
+                      <app-empty-state
+                        title="ไม่พบพนักงาน"
+                        description="ไม่มีพนักงานในแผนกนี้"
+                        icon="fas fa-user-slash"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              }
+            } @else {
+              <tbody>
+                <tr>
+                  <td colspan="6" class="no-data-cell">
+                    <app-empty-state
+                      title="เลือกแผนก"
+                      description="กรุณาเลือกแผนกเพื่อดูรายชื่อพนักงาน"
+                      icon="fas fa-building"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            }
+          </table>
         }
       </div>
     </div>
@@ -557,6 +720,108 @@
             } @empty {
               <div class="no-emp">ไม่มีพนักงานในแผนกนี้</div>
             }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== EMP OVERRIDE MODAL ==================== -->
+  @if (empModalOpen()) {
+    <div class="modal-backdrop" (click)="closeEmpModal()"></div>
+    <div class="modal" (click)="closeEmpModal()">
+      <div class="modal-card emp-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-user-shield"></i>
+              {{ isEmpEditing() ? 'แก้ไข Override' : 'ตั้ง Override' }}
+              — {{ empModalEmp()?.emp_name }}
+              @if (empModalEmp()?.nickname) {
+                ({{ empModalEmp()?.nickname }})
+              }
+            </div>
+            <div class="modal-subtitle">{{ empModalEmp()?.emp_code }}</div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeEmpModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-rows">
+            @for (row of empModalRows(); track row.level; let i = $index) {
+              <div class="form-row-item">
+                <span class="level-num">ระดับ {{ row.level }}</span>
+                <div class="field-box row-emp-field">
+                  <label class="field-label">หัวหน้าแผนก (ทุกแผนก)</label>
+                  <nz-select
+                    class="field-nz-select"
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="-- เลือกหัวหน้า --"
+                    [ngModel]="row.headCode"
+                    (ngModelChange)="updateEmpModalRow(i, $event)"
+                  >
+                    @for (e of formEmployees(); track e.emp_code) {
+                      <nz-option
+                        [nzValue]="e.emp_code"
+                        [nzLabel]="
+                          e.emp_name +
+                          (e.nickname ? ' (' + e.nickname + ')' : '') +
+                          ' - ' +
+                          e.emp_code
+                        "
+                      />
+                    }
+                  </nz-select>
+                </div>
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-delete"
+                  (click)="removeEmpModalRow(i)"
+                  title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn-add-row" (click)="addEmpModalRow()">
+            <i class="fas fa-plus"></i> เพิ่มระดับ
+          </button>
+
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="empModalReason()"
+                (ngModelChange)="empModalReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveEmpOverride()"
+                [disabled]="isSavingEmp()"
+              >
+                <i class="fas fa-save"></i>
+                {{ isSavingEmp() ? 'กำลังบันทึก...' : 'บันทึก' }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeEmpModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
           </div>
         </div>
       </div>

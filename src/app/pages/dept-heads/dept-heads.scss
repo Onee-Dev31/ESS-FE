@@ -979,3 +979,20 @@
     min-width: 0;
   }
 }
+
+// ==================== EMP OVERRIDE ====================
+.emp-override-group {
+  &:not(:last-of-type) {
+    border-bottom: 2px solid var(--border-table-head);
+  }
+}
+
+.no-override-cell {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.emp-modal-card {
+  width: min(680px, 100%);
+}
