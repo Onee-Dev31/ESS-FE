@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   FilePreviewModalComponent,
   FilePreviewItem,
@@ -101,6 +101,7 @@ export class ItService implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private userData = this.authService.userData();
 
   formatText = formatText;
@@ -137,6 +138,15 @@ export class ItService implements OnInit {
 
   dateRange: Date[] | null = null;
   showFilter = false;
+
+  pendingTicketId = '';
+
+  constructor() {
+    this.route.queryParamMap.subscribe((params) => {
+      const ticketId = params.get('ticket') || '';
+      if (ticketId) this.pendingTicketId = ticketId;
+    });
+  }
 
   ngOnInit() {
     this.getMyTicket();
@@ -744,6 +754,26 @@ export class ItService implements OnInit {
               createdDate: new Date(ticket.created_at).toISOString(),
             })),
           );
+
+          if (this.pendingTicketId) {
+            const pending = this.pendingTicketId;
+            this.pendingTicketId = '';
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: {},
+              replaceUrl: true,
+            });
+
+            const matched = this.Tickets().find(
+              (t) => t.ticketNumber === pending || String(t.ticketId) === pending,
+            );
+            if (matched) {
+              setTimeout(() => {
+                this.selectTicket(String(matched.ticketId));
+                this.cdr.detectChanges();
+              }, 300);
+            }
+          }
         },
         error: (error) => {
           console.error('Error fetching data:', error);

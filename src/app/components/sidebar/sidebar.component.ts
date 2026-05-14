@@ -1,6 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { filter } from 'rxjs';
 import { SidebarService } from './sidebar';
 import { AuthService } from '../../services/auth.service';
 import { USER_ROLES } from '../../constants/user-roles.constant';
@@ -103,6 +104,14 @@ export class Sidebar {
       ],
     },
   ];
+
+  currentUrl = this.router.url.split('?')[0];
+
+  constructor() {
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e) => {
+      this.currentUrl = (e as NavigationEnd).urlAfterRedirects.split('?')[0];
+    });
+  }
 
   menuItems = computed(() => {
     const userRole = this.authService.userRole();
@@ -218,6 +227,6 @@ export class Sidebar {
   }
 
   isSubMenuActive(path: string): boolean {
-    return this.router.url === path;
+    return this.currentUrl === path;
   }
 }
