@@ -334,6 +334,7 @@ export class DeptHeadsComponent implements OnInit {
     this.loadingService.start('dept-heads');
     this.settingService.getDeptHeads().subscribe({
       next: (res) => {
+        console.log(res);
         this.items.set(res.data ?? []);
         this.loadingService.stop('dept-heads');
       },
@@ -698,7 +699,8 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   async removeEmpModalRow(index: number) {
-    const row = this.empModalRows()[index];
+    const rows = this.empModalRows();
+    const row = rows[index];
     const emp = this.empModalEmp();
     if (row.isExisting && emp) {
       const result = await this.swalService.confirm(
@@ -707,15 +709,32 @@ export class DeptHeadsComponent implements OnInit {
       );
       if (!result.isConfirmed) return;
 
-      this.settingService.deleteEmpHeadOverride(emp.emp_code, row.level).subscribe({
+      const shiftingExisting = rows.filter((r, i) => i > index && r.isExisting);
+      const deleteRequests = [
+        this.settingService.deleteEmpHeadOverride(emp.emp_code, row.level),
+        ...shiftingExisting.map((r) =>
+          this.settingService.deleteEmpHeadOverride(emp.emp_code, r.level),
+        ),
+      ];
+
+      forkJoin(deleteRequests).subscribe({
         next: () => {
-          this.empModalRows.update((rows) => rows.filter((_, i) => i !== index));
+          this.empModalRows.update((currentRows) => {
+            const filtered = currentRows.filter((_, i) => i !== index);
+            return filtered.map((r, i) => {
+              const newLevel = i + 1;
+              return r.level !== newLevel ? { ...r, level: newLevel, isExisting: false } : r;
+            });
+          });
           this.loadEmpOverrides();
         },
         error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
       });
     } else {
-      this.empModalRows.update((rows) => rows.filter((_, i) => i !== index));
+      this.empModalRows.update((currentRows) => {
+        const filtered = currentRows.filter((_, i) => i !== index);
+        return filtered.map((r, i) => ({ ...r, level: i + 1 }));
+      });
     }
   }
 
@@ -859,11 +878,26 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   removeBulkModalRow(index: number) {
-    const row = this.bulkModalRows()[index];
+    const rows = this.bulkModalRows();
+    const row = rows[index];
+
+    const levelsToDelete: number[] = [];
     if (row?.isExisting) {
-      this.bulkPendingDeleteLevels.update((levels) => [...levels, row.level]);
+      levelsToDelete.push(row.level);
     }
-    this.bulkModalRows.update((rows) => rows.filter((_, i) => i !== index));
+
+    const remaining = rows.filter((_, i) => i !== index);
+    const renumbered = remaining.map((r, i) => {
+      const newLevel = i + 1;
+      if (r.isExisting && r.level !== newLevel) {
+        levelsToDelete.push(r.level);
+        return { ...r, level: newLevel, isExisting: false };
+      }
+      return { ...r, level: newLevel };
+    });
+
+    this.bulkPendingDeleteLevels.update((levels) => [...levels, ...levelsToDelete]);
+    this.bulkModalRows.set(renumbered);
   }
 
   saveBulkOverride() {
@@ -891,9 +925,7 @@ export class DeptHeadsComponent implements OnInit {
     );
 
     const deleteRequests = empCodes.flatMap((empCode) =>
-      deleteLevels.map((level) =>
-        this.settingService.deleteEmpHeadOverride(empCode, level),
-      ),
+      deleteLevels.map((level) => this.settingService.deleteEmpHeadOverride(empCode, level)),
     );
 
     this.isSavingBulk.set(true);
