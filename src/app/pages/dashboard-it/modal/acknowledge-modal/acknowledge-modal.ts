@@ -19,6 +19,8 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
+  originalTag: number | null = null;
+
   message: string = '';
   attachments: any[] = [];
 
@@ -28,7 +30,12 @@ export class AcknowledgeModal {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
+      this.originalTag = this.ticket.ticketTypeId;
     }
+  }
+
+  get isTagChanged(): boolean {
+    return this.selectedTag !== this.originalTag;
   }
 
   close() {
