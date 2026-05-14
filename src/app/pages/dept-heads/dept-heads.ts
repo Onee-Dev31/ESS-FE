@@ -75,11 +75,17 @@ interface EmpHeadOverride {
   updated_at: string;
 }
 
+interface MixedEntry {
+  empName: string;
+  headName: string | null;
+}
+
 interface EmpOverrideFormRow {
   level: number;
   headCode: string;
   isExisting: boolean;
   isMixed?: boolean;
+  mixedEntries?: MixedEntry[];
 }
 
 @Component({
@@ -763,11 +769,27 @@ export class DeptHeadsComponent implements OnInit {
         const uniqueHeads = new Set(overridesForLevel.map((o) => o.head_codeempid));
         const allAgree = allHaveLevel && uniqueHeads.size === 1;
 
+        const overrideByEmp = new Map(overridesForLevel.map((o) => [o.employee_codeempid, o]));
+        const mixedEntries: MixedEntry[] | undefined = allAgree
+          ? undefined
+          : empCodes.map((code) => {
+              const ov = overrideByEmp.get(code);
+              const emp = this.selectedEmployees().find((e) => e.emp_code === code);
+              const empName = emp
+                ? emp.emp_name + (emp.nickname ? ` (${emp.nickname})` : '')
+                : code;
+              const headName = ov
+                ? ov.head_name + (ov.head_nickname ? ` (${ov.head_nickname})` : '')
+                : null;
+              return { empName, headName };
+            });
+
         return {
           level,
           headCode: allAgree ? overridesForLevel[0].head_codeempid : '',
           isExisting: true,
           isMixed: !allAgree,
+          mixedEntries,
         };
       });
 

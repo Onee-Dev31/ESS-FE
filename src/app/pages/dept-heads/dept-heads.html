@@ -876,6 +876,21 @@
                     <span class="badge-mixed" title="พนักงานที่เลือกมีหัวหน้าระดับนี้ต่างกัน — เลือกเพื่อตั้งค่าใหม่ให้ทุกคน">
                       <i class="fas fa-exclamation-circle"></i> ต่างกัน
                     </span>
+                    @if (row.mixedEntries && row.mixedEntries.length > 0) {
+                      <div class="mixed-names-list">
+                        @for (entry of row.mixedEntries; track entry.empName) {
+                          <div class="mixed-entry">
+                            <span class="mixed-emp-name">{{ entry.empName }}</span>
+                            <span class="mixed-arrow">→</span>
+                            @if (entry.headName) {
+                              <span class="mixed-head-name">{{ entry.headName }}</span>
+                            } @else {
+                              <span class="mixed-head-none">ไม่มี</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
                   }
                 </div>
                 <div class="field-box row-emp-field">
