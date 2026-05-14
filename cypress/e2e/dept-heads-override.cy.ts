@@ -50,20 +50,28 @@ const mockOverrides = [
 const successDelete = { success: true, message: 'ลบ override สำเร็จ' };
 const successSave = { success: true, message: 'บันทึก override สำเร็จ' };
 
+const setupDeptHeadsApi = () => {
+  cy.intercept('GET', /\/dept-heads\/overrides(\?.*)?$/, {
+    statusCode: 200,
+    body: { success: true, data: mockOverrides },
+  }).as('getOverrides');
+
+  cy.intercept('GET', /\/dept-heads(\?.*)?$/, {
+    statusCode: 200,
+    body: { success: true, data: mockDeptHeads },
+  }).as('getDeptHeads');
+};
+
 describe('Dept Heads - Override Management', () => {
   beforeEach(() => {
-    cy.intercept('GET', '**/dept-heads', {
-      statusCode: 200,
-      body: { success: true, data: mockDeptHeads },
-    }).as('getDeptHeads');
-
-    cy.intercept('GET', '**/dept-heads/overrides', {
-      statusCode: 200,
-      body: { success: true, data: mockOverrides },
-    }).as('getOverrides');
+    setupDeptHeadsApi();
 
     cy.login(undefined, undefined, {
-      menus: [{ RoutePath: '/dept-heads' }, { RoutePath: '/dashboard' }],
+      menus: [
+        { RoutePath: '/welcome' },
+        { RoutePath: '/dept-heads' },
+        { RoutePath: '/dashboard' },
+      ],
     });
     cy.visit('/dept-heads');
     cy.wait('@getDeptHeads');
@@ -239,7 +247,7 @@ describe('Dept Heads - Override Management', () => {
   // ==================== DELETE ====================
 
   it('ลบระดับ → confirm → DELETE /{costCent}/{level} ถูกเรียก', () => {
-    cy.intercept('DELETE', '**/dept-heads/overrides/10806/1', {
+    cy.intercept('DELETE', /\/dept-heads\/overrides\/10806\/1$/, {
       statusCode: 200,
       body: successDelete,
     }).as('deleteLevel');
@@ -260,7 +268,7 @@ describe('Dept Heads - Override Management', () => {
   });
 
   it('ลบทั้งหมดของแผนก → confirm → DELETE /{costCent} ถูกเรียก', () => {
-    cy.intercept('DELETE', '**/dept-heads/overrides/10806', {
+    cy.intercept('DELETE', /\/dept-heads\/overrides\/10806$/, {
       statusCode: 200,
       body: successDelete,
     }).as('deleteAll');
@@ -282,7 +290,7 @@ describe('Dept Heads - Override Management', () => {
   // ==================== SAVE ====================
 
   it('บันทึก override → PUT API ถูกเรียกพร้อม costCent และ level ถูกต้อง', () => {
-    cy.intercept('PUT', '**/dept-heads/overrides', {
+    cy.intercept('PUT', /\/dept-heads\/overrides(\?.*)?$/, {
       statusCode: 200,
       body: successSave,
     }).as('saveOverride');
@@ -300,7 +308,7 @@ describe('Dept Heads - Override Management', () => {
   });
 
   it('บันทึกสำเร็จ → Swal success ปรากฏ', () => {
-    cy.intercept('PUT', '**/dept-heads/overrides', {
+    cy.intercept('PUT', /\/dept-heads\/overrides(\?.*)?$/, {
       statusCode: 200,
       body: successSave,
     }).as('saveOverride');
@@ -317,7 +325,7 @@ describe('Dept Heads - Override Management', () => {
   // ==================== EMPTY STATE ====================
 
   it('เมื่อไม่มี override เลย แสดง empty state ในตาราง', () => {
-    cy.intercept('GET', '**/dept-heads/overrides', {
+    cy.intercept('GET', /\/dept-heads\/overrides(\?.*)?$/, {
       statusCode: 200,
       body: { success: true, data: [] },
     }).as('getEmptyOverrides');
