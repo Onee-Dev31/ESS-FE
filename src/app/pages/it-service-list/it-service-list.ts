@@ -142,17 +142,13 @@ export class ItService implements OnInit {
   pendingTicketId = '';
 
   constructor() {
-    // this.route.queryParamMap.subscribe((params) => {
-    //   const ticketId = params.get('ticket') || '';
-    //   if (ticketId) this.pendingTicketId = ticketId;
-    // });
-  }
-
-  ngOnInit() {
     this.route.queryParamMap.subscribe((params) => {
       const ticketId = params.get('ticket') || '';
       if (ticketId) this.pendingTicketId = ticketId;
     });
+  }
+
+  ngOnInit() {
     this.getMyTicket();
     this.checkScreen();
     this.checkMobile();
