@@ -164,6 +164,7 @@ export class DeptHeadsComponent implements OnInit {
   bulkModalRows = signal<EmpOverrideFormRow[]>([]);
   bulkModalReason = signal<string>('');
   isSavingBulk = signal<boolean>(false);
+  bulkPendingDeleteLevels = signal<number[]>([]);
 
   // ==================== LIST TAB COMPUTEDS ====================
 
@@ -833,6 +834,7 @@ export class DeptHeadsComponent implements OnInit {
       this.bulkModalReason.set(reasons.length === 1 ? reasons[0] : '');
     }
 
+    this.bulkPendingDeleteLevels.set([]);
     this.bulkModalOpen.set(true);
   }
 
@@ -840,6 +842,7 @@ export class DeptHeadsComponent implements OnInit {
     this.bulkModalOpen.set(false);
     this.bulkModalRows.set([]);
     this.bulkModalReason.set('');
+    this.bulkPendingDeleteLevels.set([]);
   }
 
   addBulkModalRow() {
@@ -856,19 +859,25 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   removeBulkModalRow(index: number) {
+    const row = this.bulkModalRows()[index];
+    if (row?.isExisting) {
+      this.bulkPendingDeleteLevels.update((levels) => [...levels, row.level]);
+    }
     this.bulkModalRows.update((rows) => rows.filter((_, i) => i !== index));
   }
 
   saveBulkOverride() {
     const rows = this.bulkModalRows().filter((r) => r.headCode !== '');
+    const deleteLevels = this.bulkPendingDeleteLevels();
     const empCodes = Array.from(this.selectedEmpCodes());
-    if (empCodes.length === 0 || rows.length === 0) {
+    if (empCodes.length === 0 || (rows.length === 0 && deleteLevels.length === 0)) {
       this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
       return;
     }
-    console.log(rows);
+
     const executedBy = this.authService.userData()?.CODEMPID;
-    const requests = empCodes.flatMap((empCode) =>
+
+    const saveRequests = empCodes.flatMap((empCode) =>
       rows.map((row) => {
         const payload: Record<string, any> = {
           employee_codeempid: empCode,
@@ -876,22 +885,24 @@ export class DeptHeadsComponent implements OnInit {
           head_codeempid: row.headCode,
         };
         if (this.bulkModalReason()) payload['reason'] = this.bulkModalReason();
-        if (row.isExisting) {
-          payload['updated_by'] = executedBy;
-        } else {
-          payload['created_by'] = executedBy;
-        }
+        payload[row.isExisting ? 'updated_by' : 'created_by'] = executedBy;
         return this.settingService.saveEmpHeadOverride(payload as any);
       }),
     );
 
+    const deleteRequests = empCodes.flatMap((empCode) =>
+      deleteLevels.map((level) =>
+        this.settingService.deleteEmpHeadOverride(empCode, level),
+      ),
+    );
+
     this.isSavingBulk.set(true);
-    forkJoin(requests).subscribe({
+    forkJoin([...saveRequests, ...deleteRequests]).subscribe({
       next: () => {
         this.isSavingBulk.set(false);
         this.swalService.success(
           'บันทึกสำเร็จ',
-          `บันทึก override ให้ ${empCodes.length} คน (${rows.length} ระดับ) เรียบร้อยแล้ว`,
+          `บันทึก override ให้ ${empCodes.length} คน เรียบร้อยแล้ว`,
         );
         this.closeBulkModal();
         this.clearSelection();
@@ -899,7 +910,7 @@ export class DeptHeadsComponent implements OnInit {
       },
       error: () => {
         this.isSavingBulk.set(false);
-        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึก override บางรายการได้');
+        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกหรือลบ override บางรายการได้');
       },
     });
   }
