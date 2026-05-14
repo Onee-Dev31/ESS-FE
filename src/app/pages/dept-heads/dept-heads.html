@@ -1,211 +1,504 @@
 <div class="page">
   <app-page-header [title]="pageTitle()" />
 
-  <div class="filter-card">
-    <div class="filter-title">ตัวเลือกสำหรับการค้นหา</div>
-    <div class="filter-grid">
-      <div class="field-box">
-        <label class="field-label">บริษัท</label>
-        <select
-          class="field-input"
-          aria-label="เลือกบริษัท"
-          [ngModel]="filterCompany()"
-          (ngModelChange)="onCompanyChange($event)"
-        >
-          <option value="">ทุกบริษัท</option>
-          @for (c of companyList(); track c.code) {
-            <option [value]="c.code">{{ c.name }} ({{ c.code }})</option>
-          }
-        </select>
-      </div>
-      <div class="field-box" [class.disabled]="!filterCompany()">
-        <label class="field-label">แผนก</label>
-        <select
-          class="field-input"
-          aria-label="เลือกแผนก"
-          [ngModel]="filterDept()"
-          (ngModelChange)="filterDept.set($event)"
-          [disabled]="!filterCompany()"
-        >
-          <option value="">ทุกแผนก</option>
-          @for (d of deptList(); track d.cost_cent) {
-            <option [value]="d.cost_cent">{{ d.name }} ({{ d.cost_cent }})</option>
-          }
-        </select>
-      </div>
-      <div class="filter-bottom-row">
-        <div class="field-box field-grow">
-          <label class="field-label">ค้นหาพนักงาน</label>
-          <input
-            type="text"
-            class="field-input"
-            placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
-            [ngModel]="filterText()"
-            (ngModelChange)="filterText.set($event)"
-            (keyup.enter)="applyFilter()"
-          />
-        </div>
-        <button type="button" class="btn-search" (click)="applyFilter()">
-          <i class="fas fa-search"></i> Search
-        </button>
-        <button type="button" class="btn-clear" (click)="clearFilter()">
-          <i class="fas fa-times"></i> Clear
-        </button>
-      </div>
-    </div>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'list'"
+      (click)="setTab('list')"
+    >
+      <i class="fas fa-users"></i> รายชื่อหัวหน้าแผนก
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'override'"
+      (click)="setTab('override')"
+    >
+      <i class="fas fa-user-cog"></i> จัดการ Override
+      @if (totalOverrideDepts() > 0) {
+        <span class="tab-badge">{{ totalOverrideDepts() }}</span>
+      }
+    </button>
   </div>
 
-  <div class="content-card">
-    <div class="card-header-title">รายชื่อหัวหน้าแผนก</div>
+  <!-- ==================== TAB: LIST ==================== -->
+  @if (activeTab() === 'list') {
+    <div class="filter-card">
+      <div class="filter-title">ตัวเลือกสำหรับการค้นหา</div>
+      <div class="filter-grid">
+        <div class="field-box">
+          <label class="field-label">บริษัท</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกบริษัท"
+            [ngModel]="filterCompany()"
+            (ngModelChange)="onCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
+          <label class="field-label">แผนก</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกแผนก"
+            [ngModel]="filterDept()"
+            (ngModelChange)="filterDept.set($event)"
+            [nzDisabled]="!filterCompany()"
+          >
+            @for (d of deptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหาพนักงาน</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+              [ngModel]="filterText()"
+              (ngModelChange)="filterText.set($event)"
+              (keyup.enter)="applyFilter()"
+            />
+          </div>
+          <button type="button" class="btn-search" (click)="applyFilter()">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn-clear" (click)="clearFilter()">
+            <i class="fas fa-times"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
 
-    <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5" />
-      } @else {
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>บริษัท</th>
-              <th>แผนก</th>
-              <th>หัวหน้าแผนก</th>
-              <th class="text-center">พนักงาน</th>
-              <th class="text-center"></th>
-            </tr>
-          </thead>
-          @for (dept of paginatedItems(); track dept.cost_cent) {
-            <tbody>
+    <div class="content-card">
+      <div class="card-header-title">รายชื่อหัวหน้าแผนก</div>
+
+      <div class="table-responsive">
+        @if (isLoading()) {
+          <app-skeleton type="table" [rows]="5" />
+        } @else {
+          <table class="modern-table">
+            <thead>
               <tr>
-                <td>
-                  <div class="cell-primary">{{ dept.company_name }}</div>
-                  <div class="cell-sub">{{ dept.company_code }}</div>
-                </td>
-                <td>
-                  <div class="cell-primary">{{ dept.name_cost_cent }}</div>
-                  <div class="cell-sub">{{ dept.cost_cent }}</div>
-                </td>
-                <td>
-                  <div class="heads-list">
-                    @for (head of sortedHeads(dept.heads); track head.code) {
-                      <div class="head-item">
-                        <span class="level-badge" [class.level-1]="head.level === 1">
-                          {{ getLevelLabel(head.level) }}
-                        </span>
-                        <span class="head-name">{{ head.name }}</span>
-                      </div>
-                    }
-                  </div>
-                </td>
-                <td>
-                  @if (appliedText()) {
-                    <div class="matching-employees">
-                      @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
-                        <div class="match-emp">
-                          <span class="match-name">{{ emp.emp_name }}</span>
-                          @if (emp.nickname) {
-                            <span class="match-nickname">({{ emp.nickname }})</span>
-                          }
-                          <span class="match-code">{{ emp.emp_code }}</span>
+                <th>บริษัท</th>
+                <th>แผนก</th>
+                <th>หัวหน้าแผนก</th>
+                <th class="text-center">พนักงาน</th>
+                <th class="text-center"></th>
+              </tr>
+            </thead>
+            @for (dept of paginatedItems(); track dept.cost_cent) {
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="cell-primary">{{ dept.company_name }}</div>
+                    <div class="cell-sub">{{ dept.company_code }}</div>
+                  </td>
+                  <td>
+                    <div class="cell-primary">{{ dept.name_cost_cent }}</div>
+                    <div class="cell-sub">{{ dept.cost_cent }}</div>
+                  </td>
+                  <td>
+                    <div class="heads-list">
+                      @for (head of sortedHeads(dept.heads); track head.code) {
+                        <div class="head-item">
+                          <span class="level-badge" [class.level-1]="head.level === 1">
+                            {{ getLevelLabel(head.level) }}
+                          </span>
+                          <span class="head-name">{{ head.name }}</span>
                         </div>
                       }
                     </div>
-                  } @else {
-                    <div class="text-center">
-                      <span class="emp-count">{{ dept.employees.length }}</span>
-                    </div>
-                  }
-                </td>
-                <td class="text-center">
-                  <button class="btn-ghost" (click)="openDetail(dept)">
-                    <i class="fas fa-users"></i> พนักงาน
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          } @empty {
-            <tbody>
-              <tr>
-                <td colspan="5" class="no-data-cell">
-                  <app-empty-state
-                    title="ไม่พบข้อมูล"
-                    description="ไม่พบข้อมูลหัวหน้าแผนก"
-                    icon="fas fa-users-slash"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          }
-        </table>
-      }
-    </div>
+                  </td>
+                  <td>
+                    @if (appliedText()) {
+                      <div class="matching-employees">
+                        @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                          <div class="match-emp">
+                            <span class="match-name">{{ emp.emp_name }}</span>
+                            @if (emp.nickname) {
+                              <span class="match-nickname">({{ emp.nickname }})</span>
+                            }
+                            <span class="match-code">{{ emp.emp_code }}</span>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="text-center">
+                        <span class="emp-count">{{ dept.employees.length }}</span>
+                      </div>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <button class="btn-ghost" (click)="openDetail(dept)">
+                      <i class="fas fa-users"></i> พนักงาน
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            } @empty {
+              <tbody>
+                <tr>
+                  <td colspan="5" class="no-data-cell">
+                    <app-empty-state
+                      title="ไม่พบข้อมูล"
+                      description="ไม่พบข้อมูลหัวหน้าแผนก"
+                      icon="fas fa-users-slash"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            }
+          </table>
+        }
+      </div>
 
-    <div class="card-list-view">
-      @if (isLoading()) {
-        <app-skeleton type="card" [rows]="3" />
-      } @else {
-        @for (dept of paginatedItems(); track dept.cost_cent) {
-          <div class="mobile-card">
-            <div class="card-header">
-              <div class="header-content">
-                <span class="card-dept-name">{{ dept.name_cost_cent }}</span>
-                <div class="card-dept-code">{{ dept.cost_cent }}</div>
-              </div>
-              <span class="company-badge">{{ dept.company_code }}</span>
-            </div>
-            <div class="card-body">
-              @for (head of sortedHeads(dept.heads); track head.code) {
-                <div class="info-row">
-                  <span class="label">
-                    <i class="fas fa-user-tie"></i> {{ getLevelLabel(head.level) }}:
-                  </span>
-                  <span class="value">{{ head.name }}</span>
+      <div class="card-list-view">
+        @if (isLoading()) {
+          <app-skeleton type="card" [rows]="3" />
+        } @else {
+          @for (dept of paginatedItems(); track dept.cost_cent) {
+            <div class="mobile-card">
+              <div class="card-header">
+                <div class="header-content">
+                  <span class="card-dept-name">{{ dept.name_cost_cent }}</span>
+                  <div class="card-dept-code">{{ dept.cost_cent }}</div>
                 </div>
-              }
-              @if (appliedText()) {
-                @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                <span class="company-badge">{{ dept.company_code }}</span>
+              </div>
+              <div class="card-body">
+                @for (head of sortedHeads(dept.heads); track head.code) {
                   <div class="info-row">
-                    <span class="label"><i class="fas fa-user"></i> พนักงาน:</span>
-                    <span class="value">
-                      {{ emp.emp_name }}
-                      @if (emp.nickname) {
-                        ({{ emp.nickname }})
-                      }
+                    <span class="label">
+                      <i class="fas fa-user-tie"></i> {{ getLevelLabel(head.level) }}:
                     </span>
+                    <span class="value">{{ head.name }}</span>
                   </div>
                 }
-              } @else {
-                <div class="info-row">
-                  <span class="label"><i class="fas fa-users"></i> พนักงาน:</span>
-                  <span class="value">{{ dept.employees.length }} คน</span>
+                @if (appliedText()) {
+                  @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                    <div class="info-row">
+                      <span class="label"><i class="fas fa-user"></i> พนักงาน:</span>
+                      <span class="value">
+                        {{ emp.emp_name }}
+                        @if (emp.nickname) {
+                          ({{ emp.nickname }})
+                        }
+                      </span>
+                    </div>
+                  }
+                } @else {
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-users"></i> พนักงาน:</span>
+                    <span class="value">{{ dept.employees.length }} คน</span>
+                  </div>
+                }
+                <div class="card-footer-actions">
+                  <button class="btn-detail" (click)="openDetail(dept)">
+                    <i class="fas fa-users"></i> ดูรายชื่อพนักงาน
+                  </button>
                 </div>
-              }
-              <div class="card-footer-actions">
-                <button class="btn-detail" (click)="openDetail(dept)">
-                  <i class="fas fa-users"></i> ดูรายชื่อพนักงาน
-                </button>
               </div>
             </div>
-          </div>
-        } @empty {
-          <app-empty-state
-            title="ไม่พบข้อมูล"
-            description="ไม่พบข้อมูลหัวหน้าแผนก"
-            icon="fas fa-users-slash"
-          />
+          } @empty {
+            <app-empty-state
+              title="ไม่พบข้อมูล"
+              description="ไม่พบข้อมูลหัวหน้าแผนก"
+              icon="fas fa-users-slash"
+            />
+          }
         }
+      </div>
+
+      <div class="pagination-wrapper">
+        <app-pagination
+          [currentPage]="currentPage()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          (onPageChange)="goToPage($event)"
+          (onPageSizeChange)="setPageSize($event)"
+        />
+      </div>
+    </div>
+  }
+
+  <!-- ==================== TAB: OVERRIDE ==================== -->
+  @if (activeTab() === 'override') {
+    <!-- Form card -->
+    <div class="filter-card override-form-card">
+      <div class="filter-title">
+        <i class="fas fa-user-cog"></i>
+        {{ isEditingOverride() ? 'แก้ไข Override' : 'เพิ่ม Override' }} หัวหน้าแผนก
+      </div>
+
+      <!-- Department selector -->
+      <div class="field-box dept-selector-field">
+        <label class="field-label">แผนก *</label>
+        <nz-select
+          class="field-nz-select"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="-- เลือกแผนก --"
+          [ngModel]="formDeptCode()"
+          (ngModelChange)="onFormDeptChange($event)"
+        >
+          @for (d of items(); track d.cost_cent) {
+            <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'" />
+          }
+        </nz-select>
+      </div>
+
+      <!-- Level rows -->
+      @if (formDeptCode()) {
+        <div class="form-rows">
+          @for (row of formRows(); track row.level; let i = $index) {
+            <div class="form-row-item">
+              <span class="level-num">ระดับ {{ row.level }}</span>
+              <div class="field-box row-emp-field">
+                <label class="field-label">พนักงาน (ทุกแผนก)</label>
+                <nz-select
+                  class="field-nz-select"
+                  nzShowSearch
+                  nzAllowClear
+                  nzPlaceHolder="-- เลือกพนักงาน --"
+                  [ngModel]="row.empCode"
+                  (ngModelChange)="updateRowEmp(i, $event)"
+                >
+                  @for (e of getAvailableEmployees(i); track e.emp_code) {
+                    <nz-option
+                      [nzValue]="e.emp_code"
+                      [nzLabel]="e.emp_name + (e.nickname ? ' (' + e.nickname + ')' : '') + ' - ' + e.emp_code"
+                    />
+                  }
+                </nz-select>
+              </div>
+              <button
+                type="button"
+                class="btn-icon btn-icon-delete"
+                (click)="removeFormRow(i)"
+                title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <button type="button" class="btn-add-row" (click)="addFormRow()">
+          <i class="fas fa-plus"></i> เพิ่มระดับ
+        </button>
       }
+
+      <!-- Reason + actions -->
+      <div class="form-footer">
+        <div class="field-box reason-field">
+          <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+          <input
+            type="text"
+            class="field-input"
+            placeholder="ระบุเหตุผล..."
+            [ngModel]="formReason()"
+            (ngModelChange)="formReason.set($event)"
+          />
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-search"
+            (click)="saveOverride()"
+            [disabled]="isSaving()"
+          >
+            <i class="fas fa-save"></i>
+            {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+          </button>
+          <button type="button" class="btn-clear" (click)="resetForm()">
+            <i class="fas fa-times"></i> ล้างฟอร์ม
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="pagination-wrapper">
-      <app-pagination
-        [currentPage]="currentPage()"
-        [pageSize]="pageSize()"
-        [totalItems]="totalItems()"
-        (onPageChange)="goToPage($event)"
-        (onPageSizeChange)="setPageSize($event)"
-      />
-    </div>
-  </div>
+    <!-- Overrides table -->
+    <div class="content-card" style="margin-top: 16px">
+      <div class="card-header-title">
+        Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)
+      </div>
 
+      <div class="table-responsive">
+        @if (isOverrideLoading()) {
+          <app-skeleton type="table" [rows]="4" />
+        } @else {
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>แผนก</th>
+                <th>ระดับ</th>
+                <th>พนักงาน</th>
+                <th>เหตุผล</th>
+                <th>อัปเดตล่าสุด</th>
+                <th class="text-center">จัดการ</th>
+              </tr>
+            </thead>
+            @for (group of groupedOverrides(); track group.cost_cent) {
+              <tbody class="override-group">
+                @for (row of group.rows; track row.level; let isFirst = $first) {
+                  <tr>
+                    @if (isFirst) {
+                      <td class="dept-cell" [attr.rowspan]="group.rows.length + 1">
+                        <div class="cell-primary">{{ group.name_cost_cent }}</div>
+                        <div class="cell-sub">{{ group.cost_cent }}</div>
+                      </td>
+                    }
+                    <td>
+                      <span class="level-badge" [class.level-1]="row.level === 1">
+                        ระดับ {{ row.level }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="cell-primary">{{ row.emp_name }}</div>
+                      <div class="cell-sub">{{ row.codeempid }}</div>
+                    </td>
+                    <td class="reason-cell">{{ row.reason || '-' }}</td>
+                    <td class="date-cell">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="text-center">
+                      <button
+                        class="btn-icon btn-icon-delete"
+                        (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                        title="ลบระดับนี้"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                <!-- Group footer row -->
+                <tr class="group-footer-row">
+                  <td colspan="5">
+                    <div class="group-actions">
+                      <button
+                        class="btn-group-edit"
+                        (click)="editDeptOverride(group.cost_cent)"
+                      >
+                        <i class="fas fa-pen"></i> แก้ไขแผนกนี้
+                      </button>
+                      <button
+                        class="btn-group-delete"
+                        (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                      >
+                        <i class="fas fa-trash-alt"></i> ลบทั้งหมด
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            } @empty {
+              <tbody>
+                <tr>
+                  <td colspan="6" class="no-data-cell">
+                    <app-empty-state
+                      title="ไม่มี Override"
+                      description="ยังไม่มีการตั้ง override หัวหน้าแผนก"
+                      icon="fas fa-user-slash"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            }
+          </table>
+        }
+      </div>
+
+      <!-- Mobile cards for override groups -->
+      <div class="card-list-view">
+        @if (isOverrideLoading()) {
+          <app-skeleton type="card" [rows]="3" />
+        } @else {
+          @for (group of groupedOverrides(); track group.cost_cent) {
+            <div class="mobile-card">
+              <div class="card-header">
+                <div class="header-content">
+                  <span class="card-dept-name">{{ group.name_cost_cent }}</span>
+                  <div class="card-dept-code">{{ group.cost_cent }}</div>
+                </div>
+                <div class="card-icon-actions">
+                  <button
+                    class="btn-icon btn-icon-edit"
+                    (click)="editDeptOverride(group.cost_cent)"
+                    title="แก้ไข"
+                  >
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-icon btn-icon-delete"
+                    (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                    title="ลบทั้งหมด"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                @for (row of group.rows; track row.level) {
+                  <div class="override-level-row">
+                    <div class="level-row-info">
+                      <span class="level-badge" [class.level-1]="row.level === 1">
+                        ระดับ {{ row.level }}
+                      </span>
+                      <div>
+                        <div class="cell-primary">{{ row.emp_name }}</div>
+                        <div class="cell-sub">{{ row.codeempid }}</div>
+                      </div>
+                    </div>
+                    <button
+                      class="btn-icon btn-icon-delete"
+                      (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                      title="ลบระดับนี้"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                }
+                @if (group.rows[0]?.reason) {
+                  <div class="info-row" style="margin-top: 10px">
+                    <span class="label"><i class="fas fa-comment-alt"></i> เหตุผล:</span>
+                    <span class="value">{{ group.rows[0].reason }}</span>
+                  </div>
+                }
+                <div class="info-row">
+                  <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
+                  <span class="value">
+                    {{
+                      group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm'
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <app-empty-state
+              title="ไม่มี Override"
+              description="ยังไม่มีการตั้ง override หัวหน้าแผนก"
+              icon="fas fa-user-slash"
+            />
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ==================== DETAIL MODAL ==================== -->
   @if (selectedDept()) {
     <div class="modal-backdrop" (click)="closeDetail()"></div>
     <div class="modal" (click)="closeDetail()">
@@ -227,7 +520,6 @@
             <i class="fas fa-times" aria-hidden="true"></i>
           </button>
         </div>
-
         <div class="modal-body">
           <div class="section-label">หัวหน้าแผนก</div>
           <div class="heads-chain">
@@ -243,7 +535,6 @@
               </div>
             }
           </div>
-
           <div class="section-label mt">พนักงานในแผนก ({{ modalEmployees().length }} คน)</div>
           <div class="employees-list">
             @for (emp of modalEmployees(); track emp.emp_code) {

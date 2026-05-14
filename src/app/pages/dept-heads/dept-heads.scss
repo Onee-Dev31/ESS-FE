@@ -91,6 +91,30 @@
     text-transform: uppercase;
   }
 
+  .field-nz-select {
+    width: 100%;
+
+    ::ng-deep .ant-select-selector {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+      height: 36px !important;
+
+      .ant-select-selection-search-input { height: 34px !important; }
+      .ant-select-selection-placeholder,
+      .ant-select-selection-item {
+        line-height: 34px !important;
+        font-size: 0.95rem;
+        color: var(--input-text);
+      }
+    }
+
+    ::ng-deep .ant-select-focused .ant-select-selector {
+      box-shadow: none !important;
+    }
+  }
+
   .field-input {
     width: 100%;
     border: none;
@@ -657,4 +681,299 @@
   text-align: center;
   color: var(--text-muted);
   font-size: 0.875rem;
+}
+
+// ==================== TABS ====================
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 1.5rem;
+  border-bottom: 2px solid var(--border-table-head);
+
+  @include mobile {
+    margin-top: 1rem;
+  }
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary), transparent 92%);
+  }
+
+  &.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: color-mix(in srgb, var(--primary), transparent 92%);
+  }
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+}
+
+// ==================== OVERRIDE FORM ====================
+.override-form-card {
+  margin-top: 1.5rem;
+
+  @include large-tablet {
+    margin-top: 1rem;
+  }
+}
+
+.dept-selector-field {
+  margin-bottom: 1.25rem;
+}
+
+// Dynamic level rows
+.form-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.form-row-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  @include mobile {
+    gap: 8px;
+  }
+
+  .level-num {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+
+  .row-emp-field {
+    flex: 1;
+    min-width: 0;
+    min-height: unset;
+    padding: 8px 14px 10px;
+  }
+}
+
+.btn-add-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px dashed var(--primary);
+  background: color-mix(in srgb, var(--primary), transparent 92%);
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1.25rem;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary), transparent 82%);
+  }
+}
+
+.form-footer {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--border-toolbar);
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reason-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+
+  @include mobile {
+    .btn-search,
+    .btn-clear {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}
+
+// ==================== OVERRIDE TABLE ====================
+.override-group {
+  &:not(:last-of-type) {
+    border-bottom: 2px solid var(--border-table-head);
+  }
+}
+
+.dept-cell {
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--primary), transparent 95%);
+}
+
+.reason-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.date-cell {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--text-sub);
+}
+
+.group-footer-row td {
+  padding: 8px 16px;
+  background: var(--bg-table-head);
+  border-bottom: none;
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-group-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 1px solid #3b82f6;
+  background: color-mix(in srgb, #3b82f6, transparent 88%);
+  color: #3b82f6;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, #3b82f6, transparent 75%);
+  }
+}
+
+.btn-group-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background: color-mix(in srgb, #ef4444, transparent 88%);
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, #ef4444, transparent 75%);
+  }
+}
+
+// ==================== ACTION ICON BUTTONS ====================
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-icon-edit {
+  background: color-mix(in srgb, #3b82f6, transparent 85%);
+  color: #3b82f6;
+
+  &:hover {
+    background: color-mix(in srgb, #3b82f6, transparent 70%);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-icon-delete {
+  background: color-mix(in srgb, #ef4444, transparent 85%);
+  color: #ef4444;
+
+  &:hover {
+    background: color-mix(in srgb, #ef4444, transparent 70%);
+    transform: translateY(-1px);
+  }
+}
+
+// ==================== MOBILE OVERRIDE CARDS ====================
+.card-icon-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.override-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--bg-table-head);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+
+  .level-row-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
 }
