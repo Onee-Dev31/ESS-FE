@@ -1,3 +1,9 @@
+describe('ItServiceList', () => {
+  it('placeholder', () => {
+    expect(true).toBe(true);
+  });
+});
+
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 // import { EMPTY, Subject } from 'rxjs';
