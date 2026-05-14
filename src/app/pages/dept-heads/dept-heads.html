@@ -255,7 +255,17 @@
           (ngModelChange)="onFormDeptChange($event)"
         >
           @for (d of items(); track d.cost_cent) {
-            <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'" />
+            <<<<<<< HEAD
+            <nz-option
+              [nzValue]="d.cost_cent"
+              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
+            />
+            =======
+            <nz-option
+              [nzValue]="d.cost_cent"
+              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
+            />
+            >>>>>>> master
           }
         </nz-select>
       </div>
@@ -279,7 +289,12 @@
                   @for (e of getAvailableEmployees(i); track e.emp_code) {
                     <nz-option
                       [nzValue]="e.emp_code"
-                      [nzLabel]="e.emp_name + (e.nickname ? ' (' + e.nickname + ')' : '') + ' - ' + e.emp_code"
+                      [nzLabel]="
+                        e.emp_name +
+                        (e.nickname ? ' (' + e.nickname + ')' : '') +
+                        ' - ' +
+                        e.emp_code
+                      "
                     />
                   }
                 </nz-select>
@@ -314,12 +329,7 @@
           />
         </div>
         <div class="form-actions">
-          <button
-            type="button"
-            class="btn-search"
-            (click)="saveOverride()"
-            [disabled]="isSaving()"
-          >
+          <button type="button" class="btn-search" (click)="saveOverride()" [disabled]="isSaving()">
             <i class="fas fa-save"></i>
             {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
           </button>
@@ -332,9 +342,7 @@
 
     <!-- Overrides table -->
     <div class="content-card" style="margin-top: 16px">
-      <div class="card-header-title">
-        Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)
-      </div>
+      <div class="card-header-title">Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)</div>
 
       <div class="table-responsive">
         @if (isOverrideLoading()) {
@@ -387,10 +395,7 @@
                 <tr class="group-footer-row">
                   <td colspan="5">
                     <div class="group-actions">
-                      <button
-                        class="btn-group-edit"
-                        (click)="editDeptOverride(group.cost_cent)"
-                      >
+                      <button class="btn-group-edit" (click)="editDeptOverride(group.cost_cent)">
                         <i class="fas fa-pen"></i> แก้ไขแผนกนี้
                       </button>
                       <button
@@ -479,9 +484,11 @@
                 <div class="info-row">
                   <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
                   <span class="value">
-                    {{
-                      group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm'
-                    }}
+                    <<<<<<< HEAD
+                    {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    =======
+                    {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    >>>>>>> master
                   </span>
                 </div>
               </div>
