@@ -31,32 +31,34 @@
       <div class="filter-grid">
         <div class="field-box">
           <label class="field-label">บริษัท</label>
-          <select
-            class="field-input"
-            aria-label="เลือกบริษัท"
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกบริษัท"
             [ngModel]="filterCompany()"
             (ngModelChange)="onCompanyChange($event)"
           >
-            <option value="">ทุกบริษัท</option>
             @for (c of companyList(); track c.code) {
-              <option [value]="c.code">{{ c.name }} ({{ c.code }})</option>
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
             }
-          </select>
+          </nz-select>
         </div>
-        <div class="field-box" [class.disabled]="!filterCompany()">
+        <div class="field-box">
           <label class="field-label">แผนก</label>
-          <select
-            class="field-input"
-            aria-label="เลือกแผนก"
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกแผนก"
             [ngModel]="filterDept()"
             (ngModelChange)="filterDept.set($event)"
-            [disabled]="!filterCompany()"
+            [nzDisabled]="!filterCompany()"
           >
-            <option value="">ทุกแผนก</option>
             @for (d of deptList(); track d.cost_cent) {
-              <option [value]="d.cost_cent">{{ d.name }} ({{ d.cost_cent }})</option>
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
             }
-          </select>
+          </nz-select>
         </div>
         <div class="filter-bottom-row">
           <div class="field-box field-grow">
@@ -244,17 +246,18 @@
       <!-- Department selector -->
       <div class="field-box dept-selector-field">
         <label class="field-label">แผนก *</label>
-        <select
-          class="field-input"
-          aria-label="เลือกแผนก"
+        <nz-select
+          class="field-nz-select"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="-- เลือกแผนก --"
           [ngModel]="formDeptCode()"
           (ngModelChange)="onFormDeptChange($event)"
         >
-          <option value="">-- เลือกแผนก --</option>
           @for (d of items(); track d.cost_cent) {
-            <option [value]="d.cost_cent">{{ d.name_cost_cent }} ({{ d.cost_cent }})</option>
+            <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'" />
           }
-        </select>
+        </nz-select>
       </div>
 
       <!-- Level rows -->
@@ -265,16 +268,21 @@
               <span class="level-num">ระดับ {{ row.level }}</span>
               <div class="field-box row-emp-field">
                 <label class="field-label">พนักงาน (ทุกแผนก)</label>
-                <select
-                  class="field-input"
+                <nz-select
+                  class="field-nz-select"
+                  nzShowSearch
+                  nzAllowClear
+                  nzPlaceHolder="-- เลือกพนักงาน --"
                   [ngModel]="row.empCode"
                   (ngModelChange)="updateRowEmp(i, $event)"
                 >
-                  <option value="">-- เลือกพนักงาน --</option>
-                  @for (e of formEmployees(); track e.emp_code) {
-                    <option [value]="e.emp_code">{{ e.emp_name }} ({{ e.emp_code }})</option>
+                  @for (e of getAvailableEmployees(i); track e.emp_code) {
+                    <nz-option
+                      [nzValue]="e.emp_code"
+                      [nzLabel]="e.emp_name + (e.nickname ? ' (' + e.nickname + ')' : '') + ' - ' + e.emp_code"
+                    />
                   }
-                </select>
+                </nz-select>
               </div>
               <button
                 type="button"

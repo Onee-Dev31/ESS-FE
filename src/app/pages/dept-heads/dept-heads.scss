@@ -91,6 +91,30 @@
     text-transform: uppercase;
   }
 
+  .field-nz-select {
+    width: 100%;
+
+    ::ng-deep .ant-select-selector {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+      height: 36px !important;
+
+      .ant-select-selection-search-input { height: 34px !important; }
+      .ant-select-selection-placeholder,
+      .ant-select-selection-item {
+        line-height: 34px !important;
+        font-size: 0.95rem;
+        color: var(--input-text);
+      }
+    }
+
+    ::ng-deep .ant-select-focused .ant-select-selector {
+      box-shadow: none !important;
+    }
+  }
+
   .field-input {
     width: 100%;
     border: none;

@@ -6,6 +6,7 @@ import { PageHeaderComponent } from '../../components/shared/page-header/page-he
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { PaginationComponent } from '../../components/shared/pagination/pagination';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { SettingService } from '../../services/setting.service';
 import { LoadingService } from '../../services/loading';
 import { AuthService } from '../../services/auth.service';
@@ -64,6 +65,7 @@ interface OverrideGroup {
   imports: [
     CommonModule,
     FormsModule,
+    NzSelectModule,
     PageHeaderComponent,
     SkeletonComponent,
     EmptyStateComponent,
@@ -325,6 +327,14 @@ export class DeptHeadsComponent implements OnInit {
 
   updateRowEmp(index: number, empCode: string) {
     this.formRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, empCode } : r)));
+  }
+
+  getAvailableEmployees(rowIndex: number) {
+    const selectedCodes = this.formRows()
+      .filter((_, i) => i !== rowIndex)
+      .map((r) => r.empCode)
+      .filter(Boolean);
+    return this.formEmployees().filter((e) => !selectedCodes.includes(e.emp_code));
   }
 
   async removeFormRow(index: number) {
