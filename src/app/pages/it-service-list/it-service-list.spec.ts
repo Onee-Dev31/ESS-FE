@@ -23,6 +23,21 @@ const mockActivatedRoute = {
   queryParams: EMPTY,
 };
 
+const mockItServiceService = {
+  getMyTickets: () => EMPTY,
+  getTicketById: () => EMPTY,
+  markTicketRead: () => EMPTY,
+  replyTicket: () => EMPTY,
+  re_open: () => EMPTY,
+  re_submit: () => EMPTY,
+};
+
+const mockAuthService = {
+  userData: () => ({ CODEMPID: 'TEST001', AD_USER: 'test.user' }),
+  currentUser: () => 'test.user',
+  userRole: () => 'user',
+};
+
 describe('ItService', () => {
   let component: ItService;
   let fixture: ComponentFixture<ItService>;
@@ -33,8 +48,8 @@ describe('ItService', () => {
       providers: [
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ItServiceService, useValue: ItServiceService },
-        { provide: AuthService, useValue: AuthService },
+        { provide: ItServiceService, useValue: mockItServiceService },
+        { provide: AuthService, useValue: mockAuthService },
       ],
     }).compileComponents();
 
