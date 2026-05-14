@@ -178,9 +178,10 @@ export class DeptHeadsComponent implements OnInit {
     return Array.from(map.values()).sort((a, b) => a.emp_name.localeCompare(b.emp_name, 'th'));
   });
 
-  isEditingOverride = computed(() =>
-    this.formDeptCode() !== '' &&
-    this.overrides().some((o) => o.cost_cent === this.formDeptCode()),
+  isEditingOverride = computed(
+    () =>
+      this.formDeptCode() !== '' &&
+      this.overrides().some((o) => o.cost_cent === this.formDeptCode()),
   );
 
   groupedOverrides = computed<OverrideGroup[]>(() => {
@@ -322,7 +323,10 @@ export class DeptHeadsComponent implements OnInit {
   addFormRow() {
     const rows = this.formRows();
     const maxLevel = rows.length > 0 ? Math.max(...rows.map((r) => r.level)) : 0;
-    this.formRows.update((rows) => [...rows, { level: maxLevel + 1, empCode: '', isExisting: false }]);
+    this.formRows.update((rows) => [
+      ...rows,
+      { level: maxLevel + 1, empCode: '', isExisting: false },
+    ]);
   }
 
   updateRowEmp(index: number, empCode: string) {
@@ -382,7 +386,10 @@ export class DeptHeadsComponent implements OnInit {
     forkJoin(requests).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.swalService.success('บันทึกสำเร็จ', `บันทึก override ${rows.length} ระดับ เรียบร้อยแล้ว`);
+        this.swalService.success(
+          'บันทึกสำเร็จ',
+          `บันทึก override ${rows.length} ระดับ เรียบร้อยแล้ว`,
+        );
         this.resetForm();
         this.loadOverrides();
         this.loadData();
