@@ -822,6 +822,8 @@ export class DashboardIT implements OnInit {
     window.open(`/employee-Info`, '_blank');
   }
 
+  showRequesterContact = false;
+
   // MODAL
   //>>> function
   updateTicket(
@@ -832,6 +834,8 @@ export class DashboardIT implements OnInit {
     comment?: any,
     attachments?: any[],
   ) {
+    console.log(command, ticketId, ticketTypeId, comment, attachments);
+
     const formData = new FormData();
 
     formData.append('decision', 'ITAnalyze');
@@ -875,7 +879,7 @@ export class DashboardIT implements OnInit {
       });
     }
 
-    // console.log('formData', [...formData.entries()]);
+    console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData);
   }

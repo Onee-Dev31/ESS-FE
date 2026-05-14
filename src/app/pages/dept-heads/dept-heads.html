@@ -255,10 +255,17 @@
           (ngModelChange)="onFormDeptChange($event)"
         >
           @for (d of items(); track d.cost_cent) {
+            <<<<<<< HEAD
             <nz-option
               [nzValue]="d.cost_cent"
               [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
             />
+            =======
+            <nz-option
+              [nzValue]="d.cost_cent"
+              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
+            />
+            >>>>>>> master
           }
         </nz-select>
       </div>
@@ -477,7 +484,11 @@
                 <div class="info-row">
                   <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
                   <span class="value">
+                    <<<<<<< HEAD
                     {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    =======
+                    {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    >>>>>>> master
                   </span>
                 </div>
               </div>
