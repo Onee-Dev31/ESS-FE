@@ -365,7 +365,7 @@ export class ItServiceService {
   }
 
   re_submit(formData: FormData): Observable<any> {
-    return this._http.put<any>(`${this.baseUrl}/tickets/re-open`, formData);
+    return this._http.put<any>(`${this.baseUrl}/tickets/re-submit`, formData);
   }
 
   replyTicket(id: string, formData: FormData): Observable<any> {
