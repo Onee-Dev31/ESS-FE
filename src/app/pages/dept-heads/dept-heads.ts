@@ -130,13 +130,17 @@ export class DeptHeadsComponent implements OnInit {
   isSaving = signal<boolean>(false);
 
   // Override form
+  formCompanyFilter = signal<string>('');
   formDeptCode = signal<string>('');
   formRows = signal<FormRow[]>([]);
   formReason = signal<string>('');
 
   // Emp override state
+  empCompanyFilter = signal<string>('');
   empDeptFilter = signal<string>('');
   empSearchText = signal<string>('');
+  appliedEmpDept = signal<string>('');
+  appliedEmpSearchText = signal<string>('');
   empOverrides = signal<EmpHeadOverride[]>([]);
   isEmpOverrideLoading = this.loadingService.loading('emp-overrides');
 
@@ -210,6 +214,20 @@ export class DeptHeadsComponent implements OnInit {
 
   // ==================== OVERRIDE TAB COMPUTEDS ====================
 
+  formDeptList = computed(() => {
+    const company = this.formCompanyFilter();
+    return this.items()
+      .filter((d) => !company || d.company_code === company)
+      .map((d) => ({ cost_cent: d.cost_cent, name: d.name_cost_cent }));
+  });
+
+  empDeptList = computed(() => {
+    const company = this.empCompanyFilter();
+    return this.items()
+      .filter((d) => !company || d.company_code === company)
+      .map((d) => ({ cost_cent: d.cost_cent, name: d.name_cost_cent }));
+  });
+
   formEmployees = computed(() => {
     const map = new Map<string, DeptEmployee>();
     for (const dept of this.items()) {
@@ -250,11 +268,11 @@ export class DeptHeadsComponent implements OnInit {
   // ==================== EMP OVERRIDE COMPUTEDS ====================
 
   empDisplayEmployees = computed(() => {
-    const dept = this.empDeptFilter();
+    const dept = this.appliedEmpDept();
     if (!dept) return [];
     const deptData = this.items().find((d) => d.cost_cent === dept);
     if (!deptData) return [];
-    const text = this.empSearchText().toLowerCase().trim();
+    const text = this.appliedEmpSearchText().toLowerCase().trim();
     if (!text) return deptData.employees;
     return deptData.employees.filter(
       (e) =>
@@ -282,6 +300,14 @@ export class DeptHeadsComponent implements OnInit {
     if (displayed.length === 0) return false;
     const selected = this.selectedEmpCodes();
     return displayed.every((e) => selected.has(e.emp_code));
+  });
+
+  isPartiallySelected = computed(() => {
+    const displayed = this.empDisplayEmployees();
+    if (displayed.length === 0) return false;
+    const selected = this.selectedEmpCodes();
+    const count = displayed.filter((e) => selected.has(e.emp_code)).length;
+    return count > 0 && count < displayed.length;
   });
 
   selectedEmployees = computed(() =>
@@ -395,6 +421,13 @@ export class DeptHeadsComponent implements OnInit {
 
   // ==================== OVERRIDE FORM METHODS ====================
 
+  onFormCompanyChange(value: string) {
+    this.formCompanyFilter.set(value);
+    this.formDeptCode.set('');
+    this.formRows.set([]);
+    this.formReason.set('');
+  }
+
   onFormDeptChange(code: string) {
     this.formDeptCode.set(code);
     this.formReason.set('');
@@ -497,6 +530,7 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   resetForm() {
+    this.formCompanyFilter.set('');
     this.formDeptCode.set('');
     this.formRows.set([]);
     this.formReason.set('');
@@ -508,6 +542,8 @@ export class DeptHeadsComponent implements OnInit {
     const existing = this.overrides()
       .filter((o) => o.cost_cent === costCent)
       .sort((a, b) => a.level - b.level);
+    const deptItem = this.items().find((d) => d.cost_cent === costCent);
+    if (deptItem) this.formCompanyFilter.set(deptItem.company_code);
     this.formDeptCode.set(costCent);
     this.formReason.set(existing[0]?.reason ?? '');
     this.formRows.set(
@@ -556,9 +592,27 @@ export class DeptHeadsComponent implements OnInit {
 
   // ==================== EMP OVERRIDE METHODS ====================
 
+  onEmpCompanyChange(value: string) {
+    this.empCompanyFilter.set(value);
+    this.empDeptFilter.set('');
+  }
+
   onEmpDeptFilterChange(code: string) {
     this.empDeptFilter.set(code);
+  }
+
+  applyEmpFilter() {
+    this.appliedEmpDept.set(this.empDeptFilter());
+    this.appliedEmpSearchText.set(this.empSearchText());
+    this.selectedEmpCodes.set(new Set());
+  }
+
+  clearEmpFilter() {
+    this.empCompanyFilter.set('');
+    this.empDeptFilter.set('');
     this.empSearchText.set('');
+    this.appliedEmpDept.set('');
+    this.appliedEmpSearchText.set('');
     this.selectedEmpCodes.set(new Set());
   }
 

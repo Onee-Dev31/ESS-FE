@@ -29,9 +29,9 @@
       (click)="setTab('emp-override')"
     >
       <i class="fas fa-user-shield"></i> Override รายบุคคล
-      @if (totalEmpOverrideEmps() > 0) {
+      <!-- @if (totalEmpOverrideEmps() > 0) {
         <span class="tab-badge">{{ totalEmpOverrideEmps() }}</span>
-      }
+      } -->
     </button>
   </div>
 
@@ -254,24 +254,39 @@
         {{ isEditingOverride() ? 'แก้ไข Override' : 'เพิ่ม Override' }} หัวหน้าแผนก
       </div>
 
-      <!-- Department selector -->
-      <div class="field-box dept-selector-field">
-        <label class="field-label">แผนก *</label>
-        <nz-select
-          class="field-nz-select"
-          nzShowSearch
-          nzAllowClear
-          nzPlaceHolder="-- เลือกแผนก --"
-          [ngModel]="formDeptCode()"
-          (ngModelChange)="onFormDeptChange($event)"
-        >
-          @for (d of items(); track d.cost_cent) {
-            <nz-option
-              [nzValue]="d.cost_cent"
-              [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
-            />
-          }
-        </nz-select>
+      <!-- Company + Department selector -->
+      <div class="filter-grid">
+        <div class="field-box">
+          <label class="field-label">บริษัท *</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกบริษัท --"
+            [ngModel]="formCompanyFilter()"
+            (ngModelChange)="onFormCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
+          <label class="field-label">แผนก *</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกแผนก --"
+            [ngModel]="formDeptCode()"
+            (ngModelChange)="onFormDeptChange($event)"
+            [nzDisabled]="!formCompanyFilter()"
+          >
+            @for (d of formDeptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
+            }
+          </nz-select>
+        </div>
       </div>
 
       <!-- Level rows -->
@@ -358,7 +373,7 @@
                 <th>แผนก</th>
                 <th>ระดับ</th>
                 <th>พนักงาน</th>
-                <th>เหตุผล</th>
+                <!-- <th>เหตุผล</th> -->
                 <th>อัปเดตล่าสุด</th>
                 <th class="text-center">จัดการ</th>
               </tr>
@@ -382,7 +397,7 @@
                       <div class="cell-primary">{{ row.emp_name }}</div>
                       <div class="cell-sub">{{ row.codeempid }}</div>
                     </td>
-                    <td class="reason-cell">{{ row.reason || '-' }}</td>
+                    <!-- <td class="reason-cell">{{ row.reason || '-' }}</td> -->
                     <td class="date-cell">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
                     <td class="text-center">
                       <button
@@ -508,11 +523,24 @@
   <!-- ==================== TAB: EMP OVERRIDE ==================== -->
   @if (activeTab() === 'emp-override') {
     <div class="filter-card">
-      <div class="filter-title">
-        <i class="fas fa-user-shield"></i> Override รายบุคคล
-      </div>
+      <div class="filter-title"><i class="fas fa-user-shield"></i> Override รายบุคคล</div>
       <div class="filter-grid">
-        <div class="field-box dept-selector-field">
+        <div class="field-box">
+          <label class="field-label">บริษัท</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกบริษัท --"
+            [ngModel]="empCompanyFilter()"
+            (ngModelChange)="onEmpCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
           <label class="field-label">แผนก</label>
           <nz-select
             class="field-nz-select"
@@ -521,24 +549,31 @@
             nzPlaceHolder="-- เลือกแผนก --"
             [ngModel]="empDeptFilter()"
             (ngModelChange)="onEmpDeptFilterChange($event)"
+            [nzDisabled]="!empCompanyFilter()"
           >
-            @for (d of items(); track d.cost_cent) {
-              <nz-option
-                [nzValue]="d.cost_cent"
-                [nzLabel]="d.name_cost_cent + ' (' + d.cost_cent + ')'"
-              />
+            @for (d of empDeptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
             }
           </nz-select>
         </div>
-        <div class="field-box field-grow">
-          <label class="field-label">ค้นหาพนักงาน</label>
-          <input
-            type="text"
-            class="field-input"
-            placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
-            [ngModel]="empSearchText()"
-            (ngModelChange)="empSearchText.set($event)"
-          />
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหาพนักงาน</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+              [ngModel]="empSearchText()"
+              (ngModelChange)="empSearchText.set($event)"
+              (keyup.enter)="applyEmpFilter()"
+            />
+          </div>
+          <button type="button" class="btn-search" (click)="applyEmpFilter()">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn-clear" (click)="clearEmpFilter()">
+            <i class="fas fa-times"></i> Clear
+          </button>
         </div>
       </div>
     </div>
@@ -546,7 +581,7 @@
     <div class="content-card" style="margin-top: 16px">
       <div class="card-header-title">
         รายชื่อพนักงาน
-        @if (empDeptFilter()) {
+        @if (appliedEmpDept()) {
           ({{ empDisplayEmployees().length }} คน)
         }
       </div>
@@ -554,8 +589,8 @@
       @if (selectedCount() > 0) {
         <div class="bulk-action-bar">
           <span class="bulk-selected-label">
-            <i class="fas fa-check-square"></i>
-            เลือก {{ selectedCount() }} คน
+            <!-- <i class="fas fa-check-square"></i>
+            เลือก {{ selectedCount() }} คน -->
           </span>
           <div class="bulk-actions">
             <button class="btn-bulk-override" (click)="openBulkModal()">
@@ -581,7 +616,8 @@
                     type="checkbox"
                     class="emp-row-checkbox"
                     [checked]="isAllSelected()"
-                    [disabled]="!empDeptFilter() || empDisplayEmployees().length === 0"
+                    [indeterminate]="isPartiallySelected()"
+                    [disabled]="!appliedEmpDept() || empDisplayEmployees().length === 0"
                     (change)="toggleAllSelection()"
                   />
                 </th>
@@ -593,7 +629,7 @@
                 <th class="text-center">จัดการ</th>
               </tr>
             </thead>
-            @if (empDeptFilter()) {
+            @if (appliedEmpDept()) {
               @for (emp of empDisplayEmployees(); track emp.emp_code) {
                 @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
                   <tbody class="emp-override-group">
@@ -699,11 +735,25 @@
               <tbody>
                 <tr>
                   <td colspan="7" class="no-data-cell">
-                    <app-empty-state
-                      title="เลือกแผนก"
-                      description="กรุณาเลือกแผนกเพื่อดูรายชื่อพนักงาน"
-                      icon="fas fa-building"
-                    />
+                    @if (!empCompanyFilter()) {
+                      <app-empty-state
+                        title="เลือกบริษัท"
+                        description="กรุณาเลือกบริษัท แล้วเลือกแผนก และกด Search"
+                        icon="fas fa-building"
+                      />
+                    } @else if (!empDeptFilter()) {
+                      <app-empty-state
+                        title="เลือกแผนก"
+                        description="กรุณาเลือกแผนก แล้วกด Search เพื่อดูรายชื่อพนักงาน"
+                        icon="fas fa-sitemap"
+                      />
+                    } @else {
+                      <app-empty-state
+                        title="กด Search เพื่อค้นหา"
+                        description="เลือกบริษัทและแผนกครบแล้ว กด Search เพื่อแสดงรายชื่อพนักงาน"
+                        icon="fas fa-search"
+                      />
+                    }
                   </td>
                 </tr>
               </tbody>
@@ -783,7 +833,9 @@
               <i class="fas fa-users-cog"></i>
               ตั้ง Override ให้ {{ selectedCount() }} คน
             </div>
-            <div class="modal-subtitle">หัวหน้าที่กำหนดจะถูกใช้เหมือนกันสำหรับพนักงานทุกคนที่เลือก</div>
+            <div class="modal-subtitle">
+              หัวหน้าที่กำหนดจะถูกใช้เหมือนกันสำหรับพนักงานทุกคนที่เลือก
+            </div>
           </div>
           <button
             class="btn-close"
@@ -874,11 +926,7 @@
                 [disabled]="isSavingBulk()"
               >
                 <i class="fas fa-save"></i>
-                {{
-                  isSavingBulk()
-                    ? 'กำลังบันทึก...'
-                    : 'บันทึก (' + selectedCount() + ' คน)'
-                }}
+                {{ isSavingBulk() ? 'กำลังบันทึก...' : 'บันทึก (' + selectedCount() + ' คน)' }}
               </button>
               <button type="button" class="btn-clear" (click)="closeBulkModal()">
                 <i class="fas fa-times"></i> ยกเลิก
