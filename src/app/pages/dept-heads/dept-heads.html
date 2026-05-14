@@ -551,6 +551,24 @@
         }
       </div>
 
+      @if (selectedCount() > 0) {
+        <div class="bulk-action-bar">
+          <span class="bulk-selected-label">
+            <i class="fas fa-check-square"></i>
+            เลือก {{ selectedCount() }} คน
+          </span>
+          <div class="bulk-actions">
+            <button class="btn-bulk-override" (click)="openBulkModal()">
+              <i class="fas fa-user-shield"></i>
+              ตั้ง Override ({{ selectedCount() }} คน)
+            </button>
+            <button class="btn-bulk-clear" (click)="clearSelection()">
+              <i class="fas fa-times"></i> ยกเลิกการเลือก
+            </button>
+          </div>
+        </div>
+      }
+
       <div class="table-responsive">
         @if (isEmpOverrideLoading()) {
           <app-skeleton type="table" [rows]="5" />
@@ -558,6 +576,15 @@
           <table class="modern-table">
             <thead>
               <tr>
+                <th class="checkbox-col">
+                  <input
+                    type="checkbox"
+                    class="emp-row-checkbox"
+                    [checked]="isAllSelected()"
+                    [disabled]="!empDeptFilter() || empDisplayEmployees().length === 0"
+                    (change)="toggleAllSelection()"
+                  />
+                </th>
                 <th>พนักงาน</th>
                 <th>ระดับที่ Override</th>
                 <th>หัวหน้าที่กำหนด</th>
@@ -577,6 +604,17 @@
                     ) {
                       <tr>
                         @if (isFirst) {
+                          <td
+                            class="dept-cell checkbox-cell"
+                            [attr.rowspan]="getEmpOverridesForEmp(emp.emp_code).length + 1"
+                          >
+                            <input
+                              type="checkbox"
+                              class="emp-row-checkbox"
+                              [checked]="isEmpSelected(emp.emp_code)"
+                              (change)="toggleEmpSelection(emp.emp_code)"
+                            />
+                          </td>
                           <td
                             class="dept-cell"
                             [attr.rowspan]="getEmpOverridesForEmp(emp.emp_code).length + 1"
@@ -620,6 +658,14 @@
                 } @else {
                   <tbody>
                     <tr>
+                      <td class="checkbox-cell">
+                        <input
+                          type="checkbox"
+                          class="emp-row-checkbox"
+                          [checked]="isEmpSelected(emp.emp_code)"
+                          (change)="toggleEmpSelection(emp.emp_code)"
+                        />
+                      </td>
                       <td>
                         <div class="cell-primary">{{ emp.emp_name }}</div>
                         @if (emp.nickname) {
@@ -639,7 +685,7 @@
               } @empty {
                 <tbody>
                   <tr>
-                    <td colspan="6" class="no-data-cell">
+                    <td colspan="7" class="no-data-cell">
                       <app-empty-state
                         title="ไม่พบพนักงาน"
                         description="ไม่มีพนักงานในแผนกนี้"
@@ -652,7 +698,7 @@
             } @else {
               <tbody>
                 <tr>
-                  <td colspan="6" class="no-data-cell">
+                  <td colspan="7" class="no-data-cell">
                     <app-empty-state
                       title="เลือกแผนก"
                       description="กรุณาเลือกแผนกเพื่อดูรายชื่อพนักงาน"
@@ -720,6 +766,124 @@
             } @empty {
               <div class="no-emp">ไม่มีพนักงานในแผนกนี้</div>
             }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== BULK EMP OVERRIDE MODAL ==================== -->
+  @if (bulkModalOpen()) {
+    <div class="modal-backdrop" (click)="closeBulkModal()"></div>
+    <div class="modal" (click)="closeBulkModal()">
+      <div class="modal-card bulk-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-users-cog"></i>
+              ตั้ง Override ให้ {{ selectedCount() }} คน
+            </div>
+            <div class="modal-subtitle">หัวหน้าที่กำหนดจะถูกใช้เหมือนกันสำหรับพนักงานทุกคนที่เลือก</div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeBulkModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="section-label">พนักงานที่เลือก ({{ selectedCount() }} คน)</div>
+          <div class="selected-emps-preview">
+            @for (emp of selectedEmployees(); track emp.emp_code) {
+              <span class="emp-chip">
+                {{ emp.emp_name }}
+                @if (emp.nickname) {
+                  ({{ emp.nickname }})
+                }
+                <span class="emp-chip-code">{{ emp.emp_code }}</span>
+              </span>
+            }
+          </div>
+
+          <div class="section-label mt">กำหนดหัวหน้า</div>
+          <div class="form-rows">
+            @for (row of bulkModalRows(); track row.level; let i = $index) {
+              <div class="form-row-item">
+                <span class="level-num">ระดับ {{ row.level }}</span>
+                <div class="field-box row-emp-field">
+                  <label class="field-label">หัวหน้าแผนก (ทุกแผนก)</label>
+                  <nz-select
+                    class="field-nz-select"
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="-- เลือกหัวหน้า --"
+                    [ngModel]="row.headCode"
+                    (ngModelChange)="updateBulkModalRow(i, $event)"
+                  >
+                    @for (e of formEmployees(); track e.emp_code) {
+                      <nz-option
+                        [nzValue]="e.emp_code"
+                        [nzLabel]="
+                          e.emp_name +
+                          (e.nickname ? ' (' + e.nickname + ')' : '') +
+                          ' - ' +
+                          e.emp_code
+                        "
+                      />
+                    }
+                  </nz-select>
+                </div>
+                @if (bulkModalRows().length > 1) {
+                  <button
+                    type="button"
+                    class="btn-icon btn-icon-delete"
+                    (click)="removeBulkModalRow(i)"
+                    title="ลบแถวนี้"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn-add-row" (click)="addBulkModalRow()">
+            <i class="fas fa-plus"></i> เพิ่มระดับ
+          </button>
+
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="bulkModalReason()"
+                (ngModelChange)="bulkModalReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveBulkOverride()"
+                [disabled]="isSavingBulk()"
+              >
+                <i class="fas fa-save"></i>
+                {{
+                  isSavingBulk()
+                    ? 'กำลังบันทึก...'
+                    : 'บันทึก (' + selectedCount() + ' คน)'
+                }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeBulkModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
           </div>
         </div>
       </div>

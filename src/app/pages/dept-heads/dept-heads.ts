@@ -147,6 +147,13 @@ export class DeptHeadsComponent implements OnInit {
   empModalReason = signal<string>('');
   isSavingEmp = signal<boolean>(false);
 
+  // Bulk emp override
+  selectedEmpCodes = signal<Set<string>>(new Set());
+  bulkModalOpen = signal<boolean>(false);
+  bulkModalRows = signal<EmpOverrideFormRow[]>([]);
+  bulkModalReason = signal<string>('');
+  isSavingBulk = signal<boolean>(false);
+
   // ==================== LIST TAB COMPUTEDS ====================
 
   companyList = computed(() => {
@@ -267,6 +274,19 @@ export class DeptHeadsComponent implements OnInit {
     if (!emp) return false;
     return this.empOverrides().some((o) => o.employee_codeempid === emp.emp_code);
   });
+
+  selectedCount = computed(() => this.selectedEmpCodes().size);
+
+  isAllSelected = computed(() => {
+    const displayed = this.empDisplayEmployees();
+    if (displayed.length === 0) return false;
+    const selected = this.selectedEmpCodes();
+    return displayed.every((e) => selected.has(e.emp_code));
+  });
+
+  selectedEmployees = computed(() =>
+    this.empDisplayEmployees().filter((e) => this.selectedEmpCodes().has(e.emp_code)),
+  );
 
   // ==================== LIFECYCLE ====================
 
@@ -539,6 +559,7 @@ export class DeptHeadsComponent implements OnInit {
   onEmpDeptFilterChange(code: string) {
     this.empDeptFilter.set(code);
     this.empSearchText.set('');
+    this.selectedEmpCodes.set(new Set());
   }
 
   getEmpOverridesForEmp(empCode: string): EmpHeadOverride[] {
@@ -639,6 +660,101 @@ export class DeptHeadsComponent implements OnInit {
       },
       error: () => {
         this.isSavingEmp.set(false);
+        this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึก override บางรายการได้');
+      },
+    });
+  }
+
+  isEmpSelected(empCode: string): boolean {
+    return this.selectedEmpCodes().has(empCode);
+  }
+
+  toggleEmpSelection(empCode: string) {
+    const current = new Set(this.selectedEmpCodes());
+    if (current.has(empCode)) current.delete(empCode);
+    else current.add(empCode);
+    this.selectedEmpCodes.set(current);
+  }
+
+  toggleAllSelection() {
+    if (this.isAllSelected()) {
+      this.selectedEmpCodes.set(new Set());
+    } else {
+      this.selectedEmpCodes.set(new Set(this.empDisplayEmployees().map((e) => e.emp_code)));
+    }
+  }
+
+  clearSelection() {
+    this.selectedEmpCodes.set(new Set());
+  }
+
+  openBulkModal() {
+    this.bulkModalRows.set([{ level: 1, headCode: '', isExisting: false }]);
+    this.bulkModalReason.set('');
+    this.bulkModalOpen.set(true);
+  }
+
+  closeBulkModal() {
+    this.bulkModalOpen.set(false);
+    this.bulkModalRows.set([]);
+    this.bulkModalReason.set('');
+  }
+
+  addBulkModalRow() {
+    const rows = this.bulkModalRows();
+    const maxLevel = rows.length > 0 ? Math.max(...rows.map((r) => r.level)) : 0;
+    this.bulkModalRows.update((rows) => [
+      ...rows,
+      { level: maxLevel + 1, headCode: '', isExisting: false },
+    ]);
+  }
+
+  updateBulkModalRow(index: number, headCode: string) {
+    this.bulkModalRows.update((rows) =>
+      rows.map((r, i) => (i === index ? { ...r, headCode } : r)),
+    );
+  }
+
+  removeBulkModalRow(index: number) {
+    this.bulkModalRows.update((rows) => rows.filter((_, i) => i !== index));
+  }
+
+  saveBulkOverride() {
+    const rows = this.bulkModalRows().filter((r) => r.headCode !== '');
+    const empCodes = Array.from(this.selectedEmpCodes());
+    if (empCodes.length === 0 || rows.length === 0) {
+      this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
+      return;
+    }
+
+    const createdBy = this.authService.userData()?.codeempid;
+    const requests = empCodes.flatMap((empCode) =>
+      rows.map((row) => {
+        const payload: Record<string, any> = {
+          employee_codeempid: empCode,
+          level: row.level,
+          head_codeempid: row.headCode,
+        };
+        if (this.bulkModalReason()) payload['reason'] = this.bulkModalReason();
+        if (createdBy) payload['created_by'] = createdBy;
+        return this.settingService.saveEmpHeadOverride(payload as any);
+      }),
+    );
+
+    this.isSavingBulk.set(true);
+    forkJoin(requests).subscribe({
+      next: () => {
+        this.isSavingBulk.set(false);
+        this.swalService.success(
+          'บันทึกสำเร็จ',
+          `บันทึก override ให้ ${empCodes.length} คน (${rows.length} ระดับ) เรียบร้อยแล้ว`,
+        );
+        this.closeBulkModal();
+        this.clearSelection();
+        this.loadEmpOverrides();
+      },
+      error: () => {
+        this.isSavingBulk.set(false);
         this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึก override บางรายการได้');
       },
     });

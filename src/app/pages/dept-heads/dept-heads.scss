@@ -996,3 +996,126 @@
 .emp-modal-card {
   width: min(680px, 100%);
 }
+
+// ==================== BULK EMP OVERRIDE ====================
+.checkbox-col {
+  width: 44px;
+  text-align: center;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.checkbox-cell {
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+.emp-row-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 1.5rem;
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+  border-bottom: 1px solid color-mix(in srgb, var(--primary), transparent 70%);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bulk-selected-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.btn-bulk-override {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary), black 12%);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-bulk-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-table-head);
+  background: transparent;
+  color: var(--text-sub);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--bg-table-head);
+  }
+}
+
+.bulk-modal-card {
+  width: min(720px, 100%);
+}
+
+.selected-emps-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.emp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary), transparent 88%);
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 70%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  .emp-chip-code {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+}
