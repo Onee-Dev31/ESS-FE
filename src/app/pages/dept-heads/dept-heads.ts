@@ -79,6 +79,7 @@ interface EmpOverrideFormRow {
   level: number;
   headCode: string;
   isExisting: boolean;
+  isMixed?: boolean;
 }
 
 @Component({
@@ -743,8 +744,39 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   openBulkModal() {
-    this.bulkModalRows.set([{ level: 1, headCode: '', isExisting: false }]);
-    this.bulkModalReason.set('');
+    const empCodes = Array.from(this.selectedEmpCodes());
+    const allOverrides = this.empOverrides().filter((o) =>
+      empCodes.includes(o.employee_codeempid),
+    );
+
+    if (allOverrides.length === 0) {
+      this.bulkModalRows.set([{ level: 1, headCode: '', isExisting: false }]);
+      this.bulkModalReason.set('');
+    } else {
+      const levelSet = new Set(allOverrides.map((o) => o.level));
+      const levels = Array.from(levelSet).sort((a, b) => a - b);
+
+      const rows: EmpOverrideFormRow[] = levels.map((level) => {
+        const overridesForLevel = allOverrides.filter((o) => o.level === level);
+        const empsWithLevel = new Set(overridesForLevel.map((o) => o.employee_codeempid));
+        const allHaveLevel = empCodes.every((c) => empsWithLevel.has(c));
+        const uniqueHeads = new Set(overridesForLevel.map((o) => o.head_codeempid));
+        const allAgree = allHaveLevel && uniqueHeads.size === 1;
+
+        return {
+          level,
+          headCode: allAgree ? overridesForLevel[0].head_codeempid : '',
+          isExisting: true,
+          isMixed: !allAgree,
+        };
+      });
+
+      this.bulkModalRows.set(rows);
+
+      const reasons = [...new Set(allOverrides.map((o) => o.reason).filter(Boolean))];
+      this.bulkModalReason.set(reasons.length === 1 ? reasons[0] : '');
+    }
+
     this.bulkModalOpen.set(true);
   }
 

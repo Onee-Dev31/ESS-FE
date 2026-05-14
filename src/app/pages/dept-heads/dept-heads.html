@@ -864,15 +864,27 @@
           <div class="section-label mt">กำหนดหัวหน้า</div>
           <div class="form-rows">
             @for (row of bulkModalRows(); track row.level; let i = $index) {
-              <div class="form-row-item">
-                <span class="level-num">ระดับ {{ row.level }}</span>
+              <div class="form-row-item bulk-row-item">
+                <div class="bulk-level-col">
+                  <span class="level-num">ระดับ {{ row.level }}</span>
+                  @if (row.isExisting && !row.isMixed) {
+                    <span class="badge-same" title="ทุกคนที่เลือกมีหัวหน้าระดับนี้เหมือนกัน">
+                      <i class="fas fa-check-circle"></i> เหมือนกัน
+                    </span>
+                  }
+                  @if (row.isMixed) {
+                    <span class="badge-mixed" title="พนักงานที่เลือกมีหัวหน้าระดับนี้ต่างกัน — เลือกเพื่อตั้งค่าใหม่ให้ทุกคน">
+                      <i class="fas fa-exclamation-circle"></i> ต่างกัน
+                    </span>
+                  }
+                </div>
                 <div class="field-box row-emp-field">
                   <label class="field-label">หัวหน้าแผนก (ทุกแผนก)</label>
                   <nz-select
                     class="field-nz-select"
                     nzShowSearch
                     nzAllowClear
-                    nzPlaceHolder="-- เลือกหัวหน้า --"
+                    [nzPlaceHolder]="row.isMixed ? 'ค่าต่างกัน — เลือกเพื่อตั้งใหม่' : '-- เลือกหัวหน้า --'"
                     [ngModel]="row.headCode"
                     (ngModelChange)="updateBulkModalRow(i, $event)"
                   >

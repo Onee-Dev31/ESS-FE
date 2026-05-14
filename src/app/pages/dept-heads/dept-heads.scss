@@ -1171,3 +1171,48 @@
     font-weight: 400;
   }
 }
+
+// ==================== BULK ROW STATUS BADGES ====================
+.bulk-row-item {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bulk-level-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 72px;
+  flex-shrink: 0;
+  padding-top: 10px;
+}
+
+.badge-same {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: color-mix(in srgb, #22c55e, transparent 85%);
+  color: #16a34a;
+  border: 1px solid color-mix(in srgb, #22c55e, transparent 60%);
+}
+
+.badge-mixed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: color-mix(in srgb, #f59e0b, transparent 85%);
+  color: #b45309;
+  border: 1px solid color-mix(in srgb, #f59e0b, transparent 60%);
+}
