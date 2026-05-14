@@ -393,6 +393,28 @@
   color: var(--text);
 }
 
+// ==================== LEVEL COLUMNS ====================
+.level-col {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.level-cell {
+  vertical-align: middle;
+}
+
+.head-name-cell {
+  font-size: 0.82rem;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.no-head {
+  color: var(--text-sub);
+  font-size: 0.8rem;
+}
+
 // ==================== PAGINATION ====================
 .pagination-wrapper {
   padding: 1rem 1.5rem;

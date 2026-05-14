@@ -622,106 +622,74 @@
                   />
                 </th>
                 <th>พนักงาน</th>
-                <th>ระดับที่ Override</th>
-                <th>หัวหน้าที่กำหนด</th>
-                <th>เหตุผล</th>
-                <th>อัปเดตล่าสุด</th>
+                <th class="text-center level-col">ระดับ 1</th>
+                <th class="text-center level-col">ระดับ 2</th>
+                <th class="text-center level-col">ระดับ 3</th>
+                <th class="text-center level-col">ระดับ 4</th>
+                <th class="text-center level-col">ระดับ 5</th>
+                <th class="text-center level-col">ระดับ 6</th>
+                <th>สร้างโดย</th>
+                <th>วันที่สร้าง</th>
                 <th class="text-center">จัดการ</th>
               </tr>
             </thead>
             @if (appliedEmpDept()) {
               @for (emp of empDisplayEmployees(); track emp.emp_code) {
-                @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
-                  <tbody class="emp-override-group">
-                    @for (
-                      ov of getEmpOverridesForEmp(emp.emp_code);
-                      track ov.level;
-                      let isFirst = $first
-                    ) {
-                      <tr>
-                        @if (isFirst) {
-                          <td
-                            class="dept-cell checkbox-cell"
-                            [attr.rowspan]="getEmpOverridesForEmp(emp.emp_code).length + 1"
-                          >
-                            <input
-                              type="checkbox"
-                              class="emp-row-checkbox"
-                              [checked]="isEmpSelected(emp.emp_code)"
-                              (change)="toggleEmpSelection(emp.emp_code)"
-                            />
-                          </td>
-                          <td
-                            class="dept-cell"
-                            [attr.rowspan]="getEmpOverridesForEmp(emp.emp_code).length + 1"
-                          >
-                            <div class="cell-primary">{{ emp.emp_name }}</div>
-                            @if (emp.nickname) {
-                              <div class="cell-sub">({{ emp.nickname }})</div>
-                            }
-                            <div class="cell-sub">{{ emp.emp_code }}</div>
-                          </td>
-                        }
-                        <td>
-                          <span class="level-badge" [class.level-1]="ov.level === 1">
-                            ระดับ {{ ov.level }}
-                          </span>
-                        </td>
-                        <td>
-                          <div class="cell-primary">{{ ov.head_name }}</div>
+                <tbody>
+                  <tr [class.has-override]="getEmpOverridesForEmp(emp.emp_code).length > 0">
+                    <td class="checkbox-cell">
+                      <input
+                        type="checkbox"
+                        class="emp-row-checkbox"
+                        [checked]="isEmpSelected(emp.emp_code)"
+                        (change)="toggleEmpSelection(emp.emp_code)"
+                      />
+                    </td>
+                    <td>
+                      <div class="cell-primary">{{ emp.emp_name }}</div>
+                      @if (emp.nickname) {
+                        <div class="cell-sub">({{ emp.nickname }})</div>
+                      }
+                      <div class="cell-sub">{{ emp.emp_code }}</div>
+                    </td>
+                    @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
+                      <td class="text-center level-cell">
+                        @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                        @if (ov) {
+                          <div class="head-name-cell">{{ ov.head_name }}</div>
                           <div class="cell-sub">{{ ov.head_codeempid }}</div>
-                        </td>
-                        <td class="reason-cell">{{ ov.reason || '-' }}</td>
-                        <td class="date-cell">
-                          {{ ov.updated_at | date: 'dd/MM/yyyy HH:mm' }}
-                        </td>
-                        <td></td>
-                      </tr>
+                        } @else {
+                          <span class="no-head">-</span>
+                        }
+                      </td>
                     }
-                    <tr class="group-footer-row">
-                      <td colspan="5">
+                    @let latest = getLatestEmpOverride(emp.emp_code);
+                    <td class="cell-sub">{{ latest?.created_by || '-' }}</td>
+                    <td class="date-cell">
+                      {{ latest?.created_at | date: 'dd/MM/yyyy' }}
+                    </td>
+                    <td class="text-center">
+                      @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
                         <div class="group-actions">
                           <button class="btn-group-edit" (click)="openEmpModal(emp)">
-                            <i class="fas fa-pen"></i> แก้ไข
+                            <i class="fas fa-pen"></i>
                           </button>
                           <button class="btn-group-delete" (click)="deleteEmpAllOverrides(emp)">
-                            <i class="fas fa-trash-alt"></i> ลบทั้งหมด
+                            <i class="fas fa-trash-alt"></i>
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                } @else {
-                  <tbody>
-                    <tr>
-                      <td class="checkbox-cell">
-                        <input
-                          type="checkbox"
-                          class="emp-row-checkbox"
-                          [checked]="isEmpSelected(emp.emp_code)"
-                          (change)="toggleEmpSelection(emp.emp_code)"
-                        />
-                      </td>
-                      <td>
-                        <div class="cell-primary">{{ emp.emp_name }}</div>
-                        @if (emp.nickname) {
-                          <div class="cell-sub">({{ emp.nickname }})</div>
-                        }
-                        <div class="cell-sub">{{ emp.emp_code }}</div>
-                      </td>
-                      <td colspan="4" class="no-override-cell">ไม่มี Override</td>
-                      <td class="text-center">
+                      } @else {
                         <button class="btn-group-edit" (click)="openEmpModal(emp)">
-                          <i class="fas fa-plus"></i> ตั้ง Override
+                          <i class="fas fa-plus"></i>
                         </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                }
+                      }
+                    </td>
+                  </tr>
+                </tbody>
               } @empty {
                 <tbody>
                   <tr>
-                    <td colspan="7" class="no-data-cell">
+                    <td colspan="11" class="no-data-cell">
                       <app-empty-state
                         title="ไม่พบพนักงาน"
                         description="ไม่มีพนักงานในแผนกนี้"
@@ -734,7 +702,7 @@
             } @else {
               <tbody>
                 <tr>
-                  <td colspan="7" class="no-data-cell">
+                  <td colspan="11" class="no-data-cell">
                     @if (!empCompanyFilter()) {
                       <app-empty-state
                         title="เลือกบริษัท"
@@ -873,7 +841,10 @@
                     </span>
                   }
                   @if (row.isMixed) {
-                    <span class="badge-mixed" title="พนักงานที่เลือกมีหัวหน้าระดับนี้ต่างกัน — เลือกเพื่อตั้งค่าใหม่ให้ทุกคน">
+                    <span
+                      class="badge-mixed"
+                      title="พนักงานที่เลือกมีหัวหน้าระดับนี้ต่างกัน — เลือกเพื่อตั้งค่าใหม่ให้ทุกคน"
+                    >
                       <i class="fas fa-exclamation-circle"></i> ต่างกัน
                     </span>
                     @if (row.mixedEntries && row.mixedEntries.length > 0) {
@@ -899,7 +870,9 @@
                     class="field-nz-select"
                     nzShowSearch
                     nzAllowClear
-                    [nzPlaceHolder]="row.isMixed ? 'ค่าต่างกัน — เลือกเพื่อตั้งใหม่' : '-- เลือกหัวหน้า --'"
+                    [nzPlaceHolder]="
+                      row.isMixed ? 'ค่าต่างกัน — เลือกเพื่อตั้งใหม่' : '-- เลือกหัวหน้า --'
+                    "
                     [ngModel]="row.headCode"
                     (ngModelChange)="updateBulkModalRow(i, $event)"
                   >

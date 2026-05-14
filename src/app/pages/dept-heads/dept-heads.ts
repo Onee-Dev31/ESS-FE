@@ -422,6 +422,10 @@ export class DeptHeadsComponent implements OnInit {
     return [...heads].sort((a, b) => b.level - a.level);
   }
 
+  getHeadByLevel(heads: DeptHeadPerson[], level: number): DeptHeadPerson | undefined {
+    return heads.find((h) => h.level === level);
+  }
+
   getLevelLabel(level: number): string {
     return `ระดับ ${level}`;
   }
@@ -472,6 +476,22 @@ export class DeptHeadsComponent implements OnInit {
     const selectedCodes = this.formRows()
       .filter((_, i) => i !== rowIndex)
       .map((r) => r.empCode)
+      .filter(Boolean);
+    return this.formEmployees().filter((e) => !selectedCodes.includes(e.emp_code));
+  }
+
+  getAvailableHeadsForEmpModal(rowIndex: number) {
+    const selectedCodes = this.empModalRows()
+      .filter((_, i) => i !== rowIndex)
+      .map((r) => r.headCode)
+      .filter(Boolean);
+    return this.formEmployees().filter((e) => !selectedCodes.includes(e.emp_code));
+  }
+
+  getAvailableHeadsForBulkModal(rowIndex: number) {
+    const selectedCodes = this.bulkModalRows()
+      .filter((_, i) => i !== rowIndex)
+      .map((r) => r.headCode)
       .filter(Boolean);
     return this.formEmployees().filter((e) => !selectedCodes.includes(e.emp_code));
   }
@@ -629,6 +649,18 @@ export class DeptHeadsComponent implements OnInit {
       .sort((a, b) => a.level - b.level);
   }
 
+  getEmpOverrideByLevel(empCode: string, level: number): EmpHeadOverride | undefined {
+    return this.empOverrides().find((o) => o.employee_codeempid === empCode && o.level === level);
+  }
+
+  getLatestEmpOverride(empCode: string): EmpHeadOverride | undefined {
+    const overrides = this.getEmpOverridesForEmp(empCode);
+    if (!overrides.length) return undefined;
+    return overrides.reduce((latest, cur) =>
+      new Date(cur.updated_at) > new Date(latest.updated_at) ? cur : latest,
+    );
+  }
+
   openEmpModal(emp: DeptEmployee) {
     const existing = this.getEmpOverridesForEmp(emp.emp_code);
     this.empModalEmp.set(emp);
@@ -661,9 +693,7 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   updateEmpModalRow(index: number, headCode: string) {
-    this.empModalRows.update((rows) =>
-      rows.map((r, i) => (i === index ? { ...r, headCode } : r)),
-    );
+    this.empModalRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, headCode } : r)));
   }
 
   async removeEmpModalRow(index: number) {
@@ -696,7 +726,7 @@ export class DeptHeadsComponent implements OnInit {
       return;
     }
 
-    const createdBy = this.authService.userData()?.codeempid;
+    const executedBy = this.authService.userData()?.CODEMPID;
     const requests = rows.map((row) => {
       const payload: Record<string, any> = {
         employee_codeempid: emp.emp_code,
@@ -704,7 +734,13 @@ export class DeptHeadsComponent implements OnInit {
         head_codeempid: row.headCode,
       };
       if (this.empModalReason()) payload['reason'] = this.empModalReason();
-      if (createdBy) payload['created_by'] = createdBy;
+      // if (createdBy) payload['created_by'] = createdBy;
+
+      if (row.isExisting) {
+        payload['updated_by'] = executedBy;
+      } else {
+        payload['created_by'] = executedBy;
+      }
       return this.settingService.saveEmpHeadOverride(payload as any);
     });
 
@@ -751,9 +787,7 @@ export class DeptHeadsComponent implements OnInit {
 
   openBulkModal() {
     const empCodes = Array.from(this.selectedEmpCodes());
-    const allOverrides = this.empOverrides().filter((o) =>
-      empCodes.includes(o.employee_codeempid),
-    );
+    const allOverrides = this.empOverrides().filter((o) => empCodes.includes(o.employee_codeempid));
 
     if (allOverrides.length === 0) {
       this.bulkModalRows.set([{ level: 1, headCode: '', isExisting: false }]);
@@ -818,9 +852,7 @@ export class DeptHeadsComponent implements OnInit {
   }
 
   updateBulkModalRow(index: number, headCode: string) {
-    this.bulkModalRows.update((rows) =>
-      rows.map((r, i) => (i === index ? { ...r, headCode } : r)),
-    );
+    this.bulkModalRows.update((rows) => rows.map((r, i) => (i === index ? { ...r, headCode } : r)));
   }
 
   removeBulkModalRow(index: number) {
@@ -834,8 +866,8 @@ export class DeptHeadsComponent implements OnInit {
       this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
       return;
     }
-
-    const createdBy = this.authService.userData()?.codeempid;
+    console.log(rows);
+    const executedBy = this.authService.userData()?.CODEMPID;
     const requests = empCodes.flatMap((empCode) =>
       rows.map((row) => {
         const payload: Record<string, any> = {
@@ -844,7 +876,11 @@ export class DeptHeadsComponent implements OnInit {
           head_codeempid: row.headCode,
         };
         if (this.bulkModalReason()) payload['reason'] = this.bulkModalReason();
-        if (createdBy) payload['created_by'] = createdBy;
+        if (row.isExisting) {
+          payload['updated_by'] = executedBy;
+        } else {
+          payload['created_by'] = executedBy;
+        }
         return this.settingService.saveEmpHeadOverride(payload as any);
       }),
     );
