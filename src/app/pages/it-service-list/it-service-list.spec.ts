@@ -1,16 +1,15 @@
-describe('ItServiceList', () => {
-  it('placeholder', () => {
-    expect(true).toBe(true);
-  });
-});
-
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 // import { EMPTY, Subject } from 'rxjs';
 // import { ActivatedRoute } from '@angular/router';
 
 // import { ItService } from './it-service-list';
 // import { SignalrService } from '../../services/signalr.service';
+
+describe('ItServiceList', () => {
+  it('placeholder', () => {
+    expect(true).toBe(true);
+  });
+});
 
 // const mockSignalrService = {
 //   startConnection: () => Promise.resolve(),
@@ -37,7 +36,6 @@ describe('ItServiceList', () => {
 //       providers: [
 //         { provide: SignalrService, useValue: mockSignalrService },
 //         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-
 //       ],
 //     }).compileComponents();
 

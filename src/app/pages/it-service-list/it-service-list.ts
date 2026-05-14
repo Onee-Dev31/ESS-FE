@@ -771,6 +771,16 @@ export class ItService implements OnInit {
               setTimeout(() => {
                 this.selectTicket(String(matched.ticketId));
                 this.cdr.detectChanges();
+
+                const scrollToTop = (id: string, retries = 10) => {
+                  const el = document.getElementById('ticket-' + id);
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  } else if (retries > 0) {
+                    setTimeout(() => scrollToTop(id, retries - 1), 200);
+                  }
+                };
+                scrollToTop(String(matched.ticketId));
               }, 300);
             }
           }
