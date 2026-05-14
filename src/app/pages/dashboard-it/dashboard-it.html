@@ -461,7 +461,7 @@
         <div>{{ requester.company_name }}</div>
       </div>
       <div class="contact-toggle" (click)="showRequesterContact = !showRequesterContact">
-        {{ showRequesterContact ? '▲' : '▼' }}
+        <i [class]="showRequesterContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
       </div>
     </div>
 
@@ -479,7 +479,7 @@
   <!-- Open For -->
   <section class="side-card requester" *ngIf="t.openFor as openFor">
     <div class="side-title">เปิดให้</div>
-    <div class="side-detail">
+    <div class="side-detail openFor">
       <div>
         {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
       </div>
