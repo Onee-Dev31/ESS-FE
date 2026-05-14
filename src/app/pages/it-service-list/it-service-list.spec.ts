@@ -5,6 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 
 import { ItService } from './it-service-list';
 import { SignalrService } from '../../services/signalr.service';
+import { ItServiceService } from '../../services/it-service.service';
+import { AuthService } from '../../services/auth.service';
 
 const mockSignalrService = {
   startConnection: () => Promise.resolve(),
@@ -31,6 +33,8 @@ describe('ItService', () => {
       providers: [
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: ItServiceService, useValue: ItServiceService },
+        { provide: AuthService, useValue: AuthService },
       ],
     }).compileComponents();
 
