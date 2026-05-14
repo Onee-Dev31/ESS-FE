@@ -166,12 +166,15 @@ export class DeptHeadsComponent implements OnInit {
 
   // ==================== OVERRIDE TAB COMPUTEDS ====================
 
-  selectedDeptForForm = computed(() => {
-    const code = this.formDeptCode();
-    return this.items().find((d) => d.cost_cent === code) ?? null;
+  formEmployees = computed(() => {
+    const map = new Map<string, DeptEmployee>();
+    for (const dept of this.items()) {
+      for (const emp of dept.employees) {
+        if (!map.has(emp.emp_code)) map.set(emp.emp_code, emp);
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.emp_name.localeCompare(b.emp_name, 'th'));
   });
-
-  formEmployees = computed(() => this.selectedDeptForForm()?.employees ?? []);
 
   isEditingOverride = computed(() =>
     this.formDeptCode() !== '' &&
