@@ -74,6 +74,19 @@
   color: var(--input-text);
 }
 
+// truncate long selected text (single select)
+.ant-select-single .ant-select-selector {
+  overflow: hidden !important;
+
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 0;
+  }
+}
+
 // select-multiple
 .ant-select-multiple.ant-select .ant-select-selection-item {
   height: 28px;
