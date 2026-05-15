@@ -92,6 +92,21 @@ import { PAGE_META } from '../../../config/page-meta.config';
                         }
                         <span class="time-chip">{{ call.timestamp | date: 'HH:mm:ss' }}</span>
                       </div>
+                      @if (call.storedProcedures.length > 0) {
+                        <div class="call-sp-list">
+                          @for (sp of call.storedProcedures; track sp.name) {
+                            <div class="call-sp-row">
+                              <span class="sp-chip">{{ sp.name }}</span>
+                              @if (sp.tables.length > 0) {
+                                <span class="sp-arrow">→</span>
+                                @for (table of sp.tables; track table) {
+                                  <span class="table-ref-chip">{{ table }}</span>
+                                }
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
                     </div>
                   </div>
                 }
@@ -400,6 +415,51 @@ import { PAGE_META } from '../../../config/page-meta.config';
         font-size: 0.6rem;
         color: var(--text-muted);
         font-family: monospace;
+      }
+
+      .call-sp-list {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-top: 5px;
+        padding-top: 5px;
+        border-top: 1px dashed var(--border-table);
+      }
+
+      .call-sp-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .sp-chip {
+        font-size: 0.6rem;
+        font-weight: 600;
+        font-family: monospace;
+        background: color-mix(in srgb, #a78bfa, transparent 85%);
+        color: #c4b5fd;
+        border: 1px solid color-mix(in srgb, #a78bfa, transparent 55%);
+        border-radius: 4px;
+        padding: 1px 6px;
+        flex-shrink: 0;
+      }
+
+      .sp-arrow {
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+
+      .table-ref-chip {
+        font-size: 0.58rem;
+        font-weight: 500;
+        font-family: monospace;
+        background: color-mix(in srgb, #06b6d4, transparent 88%);
+        color: #67e8f9;
+        border: 1px solid color-mix(in srgb, #06b6d4, transparent 60%);
+        border-radius: 4px;
+        padding: 1px 5px;
       }
 
       .time-chip {
