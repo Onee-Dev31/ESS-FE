@@ -6,12 +6,11 @@ import { Sidebar } from '../sidebar/sidebar.component';
 import { SidebarService } from '../sidebar/sidebar';
 import { ChildrenOutletContexts } from '@angular/router';
 import { fadeSlideAnimation } from '../../animations/animations';
-import { TechInfoComponent } from '../shared/tech-info/tech-info';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent, Sidebar, TechInfoComponent],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, Sidebar],
   animations: [fadeSlideAnimation],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss'],

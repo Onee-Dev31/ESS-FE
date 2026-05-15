@@ -3,13 +3,14 @@ import { RouterOutlet } from '@angular/router';
 import { LoaderComponent } from './components/layout/loader/loader';
 import { ToastComponent } from './components/shared/toast/toast';
 import { ConfirmationDialogComponent } from './components/shared/confirmation-dialog/confirmation-dialog';
+import { TechInfoComponent } from './components/shared/tech-info/tech-info';
 import { SignalrService } from './services/signalr.service';
 import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoaderComponent, ToastComponent, ConfirmationDialogComponent],
+  imports: [RouterOutlet, LoaderComponent, ToastComponent, ConfirmationDialogComponent, TechInfoComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
