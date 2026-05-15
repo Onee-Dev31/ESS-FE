@@ -10,7 +10,13 @@ import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoaderComponent, ToastComponent, ConfirmationDialogComponent, TechInfoComponent],
+  imports: [
+    RouterOutlet,
+    LoaderComponent,
+    ToastComponent,
+    ConfirmationDialogComponent,
+    TechInfoComponent,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -19,16 +19,14 @@ export class TechInfoService {
 
   constructor() {
     this.currentRoute.set(this.router.url.split('?')[0]);
-    this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: any) => {
-        this.currentRoute.set(e.urlAfterRedirects.split('?')[0]);
-        this.capturedCalls.set([]);
-      });
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe((e: any) => {
+      this.currentRoute.set(e.urlAfterRedirects.split('?')[0]);
+      this.capturedCalls.set([]);
+    });
   }
 
   addCall(call: CapturedCall) {
-    this.capturedCalls.update(calls => [call, ...calls].slice(0, 50));
+    this.capturedCalls.update((calls) => [call, ...calls].slice(0, 50));
   }
 
   clearCalls() {
