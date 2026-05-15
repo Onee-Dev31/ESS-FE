@@ -225,9 +225,9 @@
   padding: 0 1.5rem 1.5rem;
   overflow-x: auto;
 
-  // @include tablet {
-  //   display: none !important;
-  // }
+  @include tablet {
+    display: none !important;
+  }
 }
 
 .modern-table {
@@ -761,6 +761,10 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @include mobile {
+    overflow-x: visible;
+  }
 }
 
 .tab-btn {
@@ -790,6 +794,18 @@
     color: var(--primary);
     border-bottom-color: var(--primary);
     background: color-mix(in srgb, var(--primary), transparent 92%);
+  }
+
+  @include mobile {
+    flex: 1;
+    flex-shrink: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 1rem;
+
+    .tab-label {
+      display: none;
+    }
   }
 }
 
@@ -1510,5 +1526,94 @@
     flex-shrink: 0;
     margin-top: 2px;
     color: #d97706;
+  }
+}
+
+// ==================== EMP OVERRIDE MOBILE CARDS ====================
+.emp-card-list {
+  display: none;
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+.mobile-select-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 4px;
+
+  .mobile-select-all {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-sub);
+    user-select: none;
+  }
+}
+
+.emp-override-card {
+  .emp-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .emp-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .emp-card-info {
+    min-width: 0;
+
+    .cell-primary {
+      font-size: 0.9rem;
+    }
+  }
+
+  &.has-override .emp-card-head {
+    border-bottom: 1px solid var(--border-toolbar);
+  }
+}
+
+.emp-level-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.emp-level-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary), transparent 93%);
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 75%);
+
+  .emp-level-head {
+    min-width: 0;
+
+    .head-name-cell {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-header);
+    }
+
+    .cell-sub {
+      margin-top: 1px;
+    }
   }
 }
