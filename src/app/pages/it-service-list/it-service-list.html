@@ -453,9 +453,12 @@
         <div>{{ requester.fullname }} ({{ requester.nickname }})</div>
         <div>{{ requester.department_name }}</div>
         <div>{{ requester.company_name }}</div>
+        <div class="contact-toggle" (click)="showRequesterContact = !showRequesterContact">
+          <i [class]="showRequesterContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
+        </div>
       </div>
     </div>
-    <div class="side-contact">
+    <div class="side-contact" *ngIf="showRequesterContact">
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone || '-' }}</div>

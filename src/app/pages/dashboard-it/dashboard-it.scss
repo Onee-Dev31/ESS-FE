@@ -1403,6 +1403,9 @@
   padding: 12px;
   background: var(--bg-card);
   width: 55%;
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note--they {
@@ -1413,6 +1416,10 @@
   align-self: flex-end;
   width: 55%;
   background: var(--bg-page);
+
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note__top {

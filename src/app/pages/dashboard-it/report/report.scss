@@ -337,6 +337,10 @@
   justify-content: center;
   padding: 28px;
   overflow: auto;
+
+  @include mobile {
+    padding: 0;
+  }
 }
 
 .log-modal {
@@ -345,6 +349,11 @@
   border-radius: 20px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
   overflow: hidden;
+
+  @include mobile {
+    border-radius: 0;
+    width: auto;
+  }
 }
 
 .log-modal-header {
@@ -377,6 +386,10 @@
 
 .log-modal-body {
   padding: 20px 24px 24px;
+
+  @include tablet {
+    padding: 14px;
+  }
 }
 
 .log-summary {
