@@ -59,6 +59,7 @@
 
 .ant-select-item {
   color: var(--input-text);
+  font-size: $font-size-label;
 }
 
 .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
