@@ -56,7 +56,15 @@ interface FormRow {
 interface OverrideGroup {
   cost_cent: string;
   name_cost_cent: string;
+  company_code: string;
+  company_name: string;
   rows: DeptHeadOverride[];
+}
+
+interface CompanyOverrideGroup {
+  company_code: string;
+  company_name: string;
+  groups: OverrideGroup[];
 }
 
 interface EmpHeadOverride {
@@ -277,10 +285,12 @@ export class DeptHeadsComponent implements OnInit {
     const map = new Map<string, OverrideGroup>();
     for (const o of this.overrides()) {
       if (!map.has(o.cost_cent)) {
+        const deptItem = this.items().find((d) => d.cost_cent === o.cost_cent);
         map.set(o.cost_cent, {
           cost_cent: o.cost_cent,
-          name_cost_cent:
-            this.items().find((d) => d.cost_cent === o.cost_cent)?.name_cost_cent ?? o.cost_cent,
+          name_cost_cent: deptItem?.name_cost_cent ?? o.cost_cent,
+          company_code: deptItem?.company_code ?? '',
+          company_name: deptItem?.company_name ?? '',
           rows: [],
         });
       }
@@ -295,19 +305,33 @@ export class DeptHeadsComponent implements OnInit {
     const search = this.appliedOverrideSearch().toLowerCase().trim();
 
     return Array.from(map.values()).filter((group) => {
-      const deptItem = this.items().find((d) => d.cost_cent === group.cost_cent);
-      const matchCompany = !company || deptItem?.company_code === company;
+      const matchCompany = !company || group.company_code === company;
       const matchDept = !dept || group.cost_cent === dept;
       const matchSearch =
         !search ||
         group.name_cost_cent.toLowerCase().includes(search) ||
         group.rows.some(
           (r) =>
-            r.emp_name.toLowerCase().includes(search) ||
-            r.codeempid.toLowerCase().includes(search),
+            r.emp_name.toLowerCase().includes(search) || r.codeempid.toLowerCase().includes(search),
         );
       return matchCompany && matchDept && matchSearch;
     });
+  });
+
+  groupedOverridesByCompany = computed<CompanyOverrideGroup[]>(() => {
+    const companyMap = new Map<string, CompanyOverrideGroup>();
+    for (const group of this.groupedOverrides()) {
+      const key = group.company_code || '__unknown__';
+      if (!companyMap.has(key)) {
+        companyMap.set(key, {
+          company_code: group.company_code,
+          company_name: group.company_name,
+          groups: [],
+        });
+      }
+      companyMap.get(key)!.groups.push(group);
+    }
+    return Array.from(companyMap.values());
   });
 
   totalOverrideDepts = computed(() => this.groupedOverrides().length);
@@ -385,6 +409,7 @@ export class DeptHeadsComponent implements OnInit {
     this.loadingService.start('dept-overrides');
     this.settingService.getDeptHeadOverrides().subscribe({
       next: (res) => {
+        console.log(res);
         this.overrides.set(res.data ?? []);
         this.loadingService.stop('dept-overrides');
       },

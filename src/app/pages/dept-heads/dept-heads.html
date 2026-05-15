@@ -331,61 +331,11 @@
                 <th>แผนก</th>
                 <th>ระดับ</th>
                 <th>หัวหน้างาน</th>
-                <!-- <th>เหตุผล</th> -->
                 <th>อัปเดตล่าสุด</th>
                 <th class="text-center">จัดการ</th>
               </tr>
             </thead>
-            @for (group of groupedOverrides(); track group.cost_cent) {
-              <tbody class="override-group">
-                @for (row of group.rows; track row.level; let isFirst = $first) {
-                  <tr>
-                    @if (isFirst) {
-                      <td class="dept-cell" [attr.rowspan]="group.rows.length + 1">
-                        <div class="cell-primary">{{ group.name_cost_cent }}</div>
-                        <div class="cell-sub">{{ group.cost_cent }}</div>
-                      </td>
-                    }
-                    <td>
-                      <span class="level-badge" [class.level-1]="row.level === 1">
-                        ระดับ {{ row.level }}
-                      </span>
-                    </td>
-                    <td>
-                      <div class="cell-primary">{{ row.emp_name }}</div>
-                      <div class="cell-sub">{{ row.codeempid }}</div>
-                    </td>
-                    <!-- <td class="reason-cell">{{ row.reason || '-' }}</td> -->
-                    <td class="date-cell">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
-                    <td class="text-center">
-                      <button
-                        class="btn-icon btn-icon-delete"
-                        (click)="deleteOverrideLevel(row, group.name_cost_cent)"
-                        title="ลบระดับนี้"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                }
-                <!-- Group footer row -->
-                <tr class="group-footer-row">
-                  <td colspan="5">
-                    <div class="group-actions">
-                      <button class="btn-group-edit" (click)="editDeptOverride(group.cost_cent)">
-                        <i class="fas fa-pen"></i> แก้ไขแผนกนี้
-                      </button>
-                      <button
-                        class="btn-group-delete"
-                        (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
-                      >
-                        <i class="fas fa-trash-alt"></i> ลบทั้งหมด
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            } @empty {
+            @if (groupedOverridesByCompany().length === 0) {
               <tbody>
                 <tr>
                   <td colspan="6" class="no-data-cell">
@@ -397,6 +347,72 @@
                   </td>
                 </tr>
               </tbody>
+            } @else {
+              @for (company of groupedOverridesByCompany(); track company.company_code) {
+                <tbody class="company-header-body">
+                  <tr class="company-header-row">
+                    <td colspan="5">
+                      <div class="company-header-content">
+                        <i class="fas fa-building"></i>
+                        <span class="company-header-name">{{ company.company_name }}</span>
+                        <span class="company-header-code">{{ company.company_code }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                @for (group of company.groups; track group.cost_cent) {
+                  <tbody class="override-group">
+                    @for (row of group.rows; track row.level; let isFirst = $first) {
+                      <tr>
+                        @if (isFirst) {
+                          <td class="dept-cell" [attr.rowspan]="group.rows.length + 1">
+                            <div class="cell-primary">{{ group.name_cost_cent }}</div>
+                            <div class="cell-sub">{{ group.cost_cent }}</div>
+                          </td>
+                        }
+                        <td>
+                          <span class="level-badge" [class.level-1]="row.level === 1">
+                            ระดับ {{ row.level }}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="cell-primary">{{ row.emp_name }}</div>
+                          <div class="cell-sub">{{ row.codeempid }}</div>
+                        </td>
+                        <td class="date-cell">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="text-center">
+                          <button
+                            class="btn-icon btn-icon-delete"
+                            (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                            title="ลบระดับนี้"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                    <!-- Group footer row -->
+                    <tr class="group-footer-row">
+                      <td colspan="5">
+                        <div class="group-actions">
+                          <button
+                            class="btn-group-edit"
+                            (click)="editDeptOverride(group.cost_cent)"
+                          >
+                            <i class="fas fa-pen"></i> แก้ไขแผนกนี้
+                          </button>
+                          <button
+                            class="btn-group-delete"
+                            (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                          >
+                            <i class="fas fa-trash-alt"></i> ลบทั้งหมด
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                }
+              }
             }
           </table>
         }
@@ -407,65 +423,72 @@
         @if (isOverrideLoading()) {
           <app-skeleton type="card" [rows]="3" />
         } @else {
-          @for (group of groupedOverrides(); track group.cost_cent) {
-            <div class="mobile-card">
-              <div class="card-header">
-                <div class="header-content">
-                  <span class="card-dept-name">{{ group.name_cost_cent }}</span>
-                  <div class="card-dept-code">{{ group.cost_cent }}</div>
-                </div>
-                <div class="card-icon-actions">
-                  <button
-                    class="btn-icon btn-icon-edit"
-                    (click)="editDeptOverride(group.cost_cent)"
-                    title="แก้ไข"
-                  >
-                    <i class="fas fa-pen"></i>
-                  </button>
-                  <button
-                    class="btn-icon btn-icon-delete"
-                    (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
-                    title="ลบทั้งหมด"
-                  >
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="card-body">
-                @for (row of group.rows; track row.level) {
-                  <div class="override-level-row">
-                    <div class="level-row-info">
-                      <span class="level-badge" [class.level-1]="row.level === 1">
-                        ระดับ {{ row.level }}
-                      </span>
-                      <div>
-                        <div class="cell-primary">{{ row.emp_name }}</div>
-                        <div class="cell-sub">{{ row.codeempid }}</div>
-                      </div>
-                    </div>
+          @for (company of groupedOverridesByCompany(); track company.company_code) {
+            <div class="company-mobile-header">
+              <i class="fas fa-building"></i>
+              <span class="company-mobile-name">{{ company.company_name }}</span>
+              <span class="company-header-code">{{ company.company_code }}</span>
+            </div>
+            @for (group of company.groups; track group.cost_cent) {
+              <div class="mobile-card">
+                <div class="card-header">
+                  <div class="header-content">
+                    <span class="card-dept-name">{{ group.name_cost_cent }}</span>
+                    <div class="card-dept-code">{{ group.cost_cent }}</div>
+                  </div>
+                  <div class="card-icon-actions">
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="editDeptOverride(group.cost_cent)"
+                      title="แก้ไข"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
                     <button
                       class="btn-icon btn-icon-delete"
-                      (click)="deleteOverrideLevel(row, group.name_cost_cent)"
-                      title="ลบระดับนี้"
+                      (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                      title="ลบทั้งหมด"
                     >
-                      <i class="fas fa-trash"></i>
+                      <i class="fas fa-trash-alt"></i>
                     </button>
                   </div>
-                }
-                @if (group.rows[0]?.reason) {
-                  <div class="info-row" style="margin-top: 10px">
-                    <span class="label"><i class="fas fa-comment-alt"></i> เหตุผล:</span>
-                    <span class="value">{{ group.rows[0].reason }}</span>
+                </div>
+                <div class="card-body">
+                  @for (row of group.rows; track row.level) {
+                    <div class="override-level-row">
+                      <div class="level-row-info">
+                        <span class="level-badge" [class.level-1]="row.level === 1">
+                          ระดับ {{ row.level }}
+                        </span>
+                        <div>
+                          <div class="cell-primary">{{ row.emp_name }}</div>
+                          <div class="cell-sub">{{ row.codeempid }}</div>
+                        </div>
+                      </div>
+                      <button
+                        class="btn-icon btn-icon-delete"
+                        (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                        title="ลบระดับนี้"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  }
+                  @if (group.rows[0]?.reason) {
+                    <div class="info-row" style="margin-top: 10px">
+                      <span class="label"><i class="fas fa-comment-alt"></i> เหตุผล:</span>
+                      <span class="value">{{ group.rows[0].reason }}</span>
+                    </div>
+                  }
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
+                    <span class="value">
+                      {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    </span>
                   </div>
-                }
-                <div class="info-row">
-                  <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
-                  <span class="value">
-                    {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
-                  </span>
                 </div>
               </div>
-            </div>
+            }
           } @empty {
             <app-empty-state
               title="ไม่มี Override"
