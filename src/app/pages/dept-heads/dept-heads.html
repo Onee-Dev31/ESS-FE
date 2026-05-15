@@ -644,6 +644,7 @@
                           <div class="head-name-cell">{{ ov.head_name.split(' ')[1] }}</div>
                           <div class="cell-sub">({{ ov.head_nickname }})</div>
                           <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                          <span class="default-source-badge badge-emp-override">รายบุคคล</span>
                         } @else if (def) {
                           <div class="default-head-cell">
                             <div class="default-head-name">{{ def.name.split(' ')[0] }}</div>
@@ -818,6 +819,7 @@
                           <div class="emp-level-head">
                             <div class="head-name-cell">{{ ov.head_name }}</div>
                             <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                            <span class="default-source-badge badge-emp-override">รายบุคคล</span>
                           </div>
                         </div>
                       } @else if (def) {
@@ -1262,50 +1264,58 @@
                 </span>
                 <div>
                   <div class="help-tab-title">รายชื่อหัวหน้าแผนก</div>
-                  <div class="help-tab-desc">ดูข้อมูลหัวหน้าแผนกที่มาจาก HRMS (ค่า Default)</div>
+                  <div class="help-tab-desc">ภาพรวมหัวหน้าแต่ละแผนก สะท้อนค่าที่ใช้งานจริงในระบบ</div>
                 </div>
               </div>
               <ul class="help-step-list">
                 <li>
-                  ค้นหาและกรองข้อมูลได้ตาม <strong>บริษัท</strong>, <strong>แผนก</strong>, หรือ
-                  <strong>ชื่อพนักงาน</strong>
+                  กรองข้อมูลได้ตาม <strong>บริษัท</strong>, <strong>แผนก</strong> หรือ
+                  <strong>ชื่อพนักงาน</strong> แล้วกด <strong>ค้นหา</strong>
+                </li>
+                <li>
+                  แต่ละแผนกแสดงหัวหน้าเป็นระดับ —
+                  <span class="help-highlight">ระดับ 1</span> คือหัวหน้าโดยตรง,
+                  ระดับสูงขึ้น = ลำดับชั้นถัดไป
                 </li>
                 <li>กดปุ่ม <strong>พนักงาน</strong> เพื่อดูรายชื่อพนักงานทั้งหมดในแผนกนั้น</li>
                 <li>
-                  แต่ละแผนกแสดงหัวหน้าเป็นระดับ โดย
-                  <span class="help-highlight">ระดับ 1</span> คือหัวหน้าโดยตรง
+                  ข้อมูลในตารางนี้สะท้อนค่าที่ใช้งานจริง —
+                  หากมีการตั้ง Override รายแผนกหรือรายบุคคลไว้ จะแสดงค่า Override นั้นแทนค่าเริ่มต้น
                 </li>
-                <li>หากมีการตั้ง Override ไว้ ข้อมูลในตารางนี้จะสะท้อนค่า Override นั้น</li>
               </ul>
             </div>
 
-            <!-- Tab 2: จัดการ Override -->
+            <!-- Tab 2: Override รายแผนก -->
             <div class="help-tab-item">
               <div class="help-tab-header">
                 <span class="help-tab-icon tab-icon-override">
                   <i class="fas fa-user-cog"></i>
                 </span>
                 <div>
-                  <div class="help-tab-title">จัดการ Override</div>
+                  <div class="help-tab-title">Override รายแผนก</div>
                   <div class="help-tab-desc">
-                    แก้ไขหัวหน้าแผนก ระดับแผนก (ใช้กับพนักงานทุกคนในแผนก)
+                    กำหนดหัวหน้าใหม่ระดับแผนก — ใช้กับพนักงานทุกคนในแผนกนั้น
                   </div>
                 </div>
               </div>
               <ul class="help-step-list">
                 <li>
-                  เลือก <strong>บริษัท</strong> แล้วเลือก <strong>แผนก</strong> ที่ต้องการตั้ง
-                  Override
+                  กด <strong><i class="fas fa-plus"></i> เพิ่ม Override</strong> แล้วเลือก
+                  <strong>บริษัท</strong> และ <strong>แผนก</strong> ที่ต้องการ
                 </li>
                 <li>
-                  กำหนดหัวหน้าแต่ละ <strong>ระดับ</strong> (ระดับ 1 = หัวหน้าโดยตรง, ระดับสูงขึ้น =
-                  ลำดับชั้นถัดไป)
+                  กำหนดหัวหน้าแต่ละ <strong>ระดับ</strong> และกดปุ่ม
+                  <strong>เพิ่มระดับ</strong> หากต้องการกำหนดหลายระดับ
                 </li>
-                <li>กดปุ่ม <strong>เพิ่มระดับ</strong> เพื่อเพิ่มหัวหน้าหลายระดับ</li>
-                <li>หาก Override มีอยู่แล้ว ระบบจะ pre-fill ข้อมูลเดิมให้อัตโนมัติ</li>
+                <li>หากแผนกนั้นมี Override อยู่แล้ว กดไอคอน <strong><i class="fas fa-pen"></i></strong> เพื่อแก้ไข</li>
                 <li>
-                  กด <strong>ถังขยะ</strong> ที่ระดับใด เพื่อลบเฉพาะระดับนั้น หรือกด
-                  <strong>ลบทั้งหมด</strong> เพื่อคืนค่า default
+                  กดไอคอน <strong><i class="fas fa-trash-alt"></i></strong> ที่ระดับใด เพื่อลบเฉพาะระดับนั้น
+                  หรือกด <strong>ลบทั้งหมด</strong> เพื่อคืนค่าเริ่มต้น
+                </li>
+                <li>
+                  พนักงานในแผนกที่ตั้ง Override ไว้จะแสดง badge
+                  <span class="default-source-badge badge-dept-override" style="vertical-align: middle;">รายแผนก</span>
+                  ในแท็บ Override รายบุคคล
                 </li>
               </ul>
             </div>
@@ -1325,36 +1335,41 @@
               </div>
               <ul class="help-step-list">
                 <li>
-                  เลือก <strong>บริษัท</strong>, <strong>แผนก</strong> แล้วกด
-                  <strong>Search</strong> เพื่อแสดงรายชื่อพนักงาน
+                  เลือก <strong>บริษัท</strong> และ <strong>แผนก</strong> แล้วกด
+                  <strong>ค้นหา</strong> เพื่อแสดงรายชื่อพนักงาน
                 </li>
                 <li>
-                  กดปุ่ม <strong><i class="fas fa-plus"></i></strong> หน้าชื่อพนักงานเพื่อตั้ง
-                  Override รายบุคคล
+                  ตารางแสดงหัวหน้าแต่ละระดับของพนักงาน พร้อม badge แสดงที่มาของข้อมูล:
+                  <ul style="margin-top: 4px; padding-left: 1rem; display: flex; flex-direction: column; gap: 3px;">
+                    <li>
+                      <span class="default-source-badge" style="vertical-align: middle;">ค่าเริ่มต้น</span>
+                      — ข้อมูลจาก HRMS ยังไม่มีการ Override
+                    </li>
+                    <li>
+                      <span class="default-source-badge badge-dept-override" style="vertical-align: middle;">รายแผนก</span>
+                      — ถูก Override ระดับแผนก (ส่งผลทั้งแผนก)
+                    </li>
+                    <li>
+                      <span class="default-source-badge badge-emp-override" style="vertical-align: middle;">รายบุคคล</span>
+                      — ถูก Override เฉพาะคนนี้ (สูงสุด)
+                    </li>
+                  </ul>
                 </li>
                 <li>
-                  หรือ <strong>ติ๊ก</strong> เลือกพนักงานหลายคน แล้วกด
-                  <strong>ตั้ง Override</strong> เพื่อตั้งพร้อมกัน (Bulk)
+                  กดปุ่ม <strong><i class="fas fa-plus"></i></strong> หรือ
+                  <strong><i class="fas fa-pen"></i></strong> เพื่อตั้ง/แก้ไข Override รายบุคคล
                 </li>
                 <li>
-                  ใน Bulk Modal หากพนักงานที่เลือกมีหัวหน้าต่างกัน จะแสดง badge
+                  <strong>ติ๊ก</strong> เลือกพนักงานหลายคน แล้วกด <strong>ตั้ง Override</strong>
+                  เพื่อตั้งพร้อมกัน (Bulk) — หากหัวหน้าต่างกันจะแสดง
                   <span
                     class="badge-mixed"
-                    style="
-                      font-size: 0.68rem;
-                      padding: 1px 7px;
-                      border-radius: 999px;
-                      vertical-align: middle;
-                    "
-                  >
-                    <i class="fas fa-exclamation-circle"></i> ต่างกัน
-                  </span>
-                  พร้อมรายละเอียด
+                    style="font-size: 0.68rem; padding: 1px 7px; border-radius: 999px; vertical-align: middle;"
+                  ><i class="fas fa-exclamation-circle"></i> ต่างกัน</span>
                 </li>
                 <li>
-                  กดปุ่ม <strong><i class="fas fa-pen"></i></strong> หรือ
-                  <strong><i class="fas fa-trash-alt"></i></strong> เพื่อแก้ไขหรือลบ Override
-                  ของแต่ละคน
+                  กดไอคอน <strong><i class="fas fa-trash-alt"></i></strong> เพื่อลบ Override รายบุคคล
+                  (ระบบจะกลับไปใช้ค่ารายแผนกหรือค่าเริ่มต้นแทน)
                 </li>
               </ul>
             </div>
@@ -1362,8 +1377,13 @@
 
           <div class="help-note">
             <i class="fas fa-info-circle"></i>
-            Override รายบุคคล มีความสำคัญสูงกว่า Override ระดับแผนก หากตั้งไว้ทั้งสองแบบ
-            ระบบจะใช้ค่ารายบุคคลก่อนเสมอ
+            ลำดับความสำคัญของข้อมูล:
+            <span class="default-source-badge badge-emp-override" style="vertical-align: middle;">รายบุคคล</span>
+            &gt;
+            <span class="default-source-badge badge-dept-override" style="vertical-align: middle;">รายแผนก</span>
+            &gt;
+            <span class="default-source-badge" style="vertical-align: middle;">ค่าเริ่มต้น</span>
+            — ระบบเลือกใช้ค่าที่มีความสำคัญสูงสุดเสมอ
           </div>
         </div>
       </div>
