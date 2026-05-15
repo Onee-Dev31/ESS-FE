@@ -220,7 +220,19 @@
       transform: translateY(-30%);
       width: 4px;
       height: 28px;
-      background: #0062ff;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    &.dept::before {
+      content: '';
+      position: absolute;
+      left: 1.5rem;
+      top: 50%;
+      transform: translateY(-30%);
+      width: 4px;
+      height: 28px;
+      background: var(--warning);
       border-radius: 2px;
     }
   }
@@ -299,13 +311,13 @@
 
   .cell-primary {
     font-weight: 600;
-    color: var(--text-header);
+    color: var(--text-header) !important;
     font-size: $font-size-label;
   }
 
   .cell-sub {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--text-muted) !important;
     margin-top: 2px;
   }
 
@@ -1646,20 +1658,34 @@
 
 .default-source-badge {
   display: inline-block;
+  align-self: flex-start;
   margin-top: 3px;
-  padding: 1px 6px;
+  padding: 0px 3px;
   border-radius: 999px;
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   font-weight: 600;
   white-space: nowrap;
-  background: var(--bg-table-head);
-  color: var(--text-muted);
   border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--text-muted), transparent 88%) !important;
+  color: var(--text-muted) !important;
+  border-color: color-mix(in srgb, var(--text-muted), transparent 60%) !important;
 
   &.badge-dept-override {
-    background: color-mix(in srgb, var(--text-sub), transparent 88%);
-    color: var(--text-sub);
-    border-color: color-mix(in srgb, var(--text-sub), transparent 60%);
+    background: color-mix(in srgb, var(--warning), transparent 88%) !important;
+    color: var(--warning) !important;
+    border-color: color-mix(in srgb, var(--warning), transparent 60%) !important;
+  }
+
+  &.individual {
+    background: color-mix(in srgb, var(--primary), transparent 88%) !important;
+    color: var(--primary) !important;
+    border-color: color-mix(in srgb, var(--primary), transparent 60%) !important;
+  }
+
+  &.badge-emp-override {
+    background: color-mix(in srgb, #60a5fa, transparent 85%);
+    color: #93c5fd;
+    border-color: color-mix(in srgb, #60a5fa, transparent 55%);
   }
 }
 
