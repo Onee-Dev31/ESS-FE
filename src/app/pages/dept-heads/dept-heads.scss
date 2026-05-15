@@ -4,6 +4,10 @@
 
 .page {
   padding: 20px;
+
+  @include mobile {
+    padding: 14px;
+  }
 }
 
 // ==================== FILTER CARD ====================
@@ -1444,15 +1448,19 @@
   }
 
   .help-tab-title {
-    font-size: 0.95rem;
+    font-size: $font-size-header;
     font-weight: 700;
     color: var(--text-header);
   }
 
   .help-tab-desc {
-    font-size: 0.8rem;
+    font-size: $font-size-label;
     color: var(--text-muted);
     margin-top: 2px;
+  }
+
+  @include mobile {
+    padding: 10px;
   }
 }
 
@@ -1464,7 +1472,7 @@
   gap: 6px;
 
   li {
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     color: var(--text);
     line-height: 1.55;
 
@@ -1478,7 +1486,7 @@
   display: inline-block;
   padding: 1px 8px;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: $font-size-label;
   font-weight: 600;
   background: color-mix(in srgb, var(--primary), transparent 82%);
   color: var(--primary);
@@ -1494,7 +1502,7 @@
   border-radius: 10px;
   background: color-mix(in srgb, #f59e0b, transparent 88%);
   border: 1px solid color-mix(in srgb, #f59e0b, transparent 60%);
-  font-size: 0.84rem;
+  font-size: $font-size-label;
   color: #92400e;
   line-height: 1.5;
 
