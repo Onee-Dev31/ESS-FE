@@ -773,7 +773,11 @@ export class DeptHeadsComponent implements OnInit {
     );
     let candidate: { name: string; code: string; source: 'dept-override' | 'default' } | undefined;
     if (deptOverride) {
-      candidate = { name: deptOverride.emp_name, code: deptOverride.codeempid, source: 'dept-override' };
+      candidate = {
+        name: deptOverride.emp_name,
+        code: deptOverride.codeempid,
+        source: 'dept-override',
+      };
     } else {
       const deptData = this.items().find((d) => d.cost_cent === costCent);
       if (deptData) {
