@@ -84,6 +84,7 @@ export class NavbarComponent {
   });
 
   constructor() {
+    this.checkScreen();
     this.notifyAudio.volume = 0.55;
 
     effect(() => {

@@ -417,7 +417,6 @@ export class DeptHeadsComponent implements OnInit {
     this.loadingService.start('dept-overrides');
     this.settingService.getDeptHeadOverrides().subscribe({
       next: (res) => {
-        console.log(res);
         this.overrides.set(res.data ?? []);
         this.loadingService.stop('dept-overrides');
       },
