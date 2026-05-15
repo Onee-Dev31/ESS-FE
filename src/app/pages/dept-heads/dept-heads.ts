@@ -1,7 +1,8 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, from, of } from 'rxjs';
+import { concatMap, switchMap, toArray } from 'rxjs/operators';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
@@ -620,16 +621,52 @@ export class DeptHeadsComponent implements OnInit {
       );
       if (!result.isConfirmed) return;
 
-      this.settingService.deleteDeptHeadOverride(this.formDeptCode(), row.level).subscribe({
-        next: () => {
-          this.formRows.update((rows) => rows.filter((_, i) => i !== index));
-          this.loadOverrides();
-          this.loadData();
-        },
-        error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
-      });
+      const subsequentRows = this.formRows().filter(
+        (r) => r.isExisting && r.level > row.level,
+      );
+
+      this.settingService
+        .deleteDeptHeadOverride(this.formDeptCode(), row.level)
+        .pipe(
+          switchMap(() => {
+            if (subsequentRows.length === 0) return of(null);
+            return from(subsequentRows).pipe(
+              concatMap((r) =>
+                this.settingService.saveDeptHeadOverride({
+                  costCent: this.formDeptCode(),
+                  level: r.level - 1,
+                  codeempid: r.empCode,
+                  reason: this.formReason() || undefined,
+                }),
+              ),
+              toArray(),
+            );
+          }),
+          switchMap(() => {
+            if (subsequentRows.length === 0) return of(null);
+            const lastLevel = subsequentRows[subsequentRows.length - 1].level;
+            return this.settingService.deleteDeptHeadOverride(this.formDeptCode(), lastLevel);
+          }),
+        )
+        .subscribe({
+          next: () => {
+            this.formRows.update((rows) =>
+              rows
+                .filter((_, i) => i !== index)
+                .map((r) => (r.level > row.level ? { ...r, level: r.level - 1 } : r)),
+            );
+            this.loadOverrides();
+            this.loadData();
+          },
+          error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+        });
     } else {
-      this.formRows.update((rows) => rows.filter((_, i) => i !== index));
+      // New unsaved row: just remove and shift levels down
+      this.formRows.update((rows) =>
+        rows
+          .filter((_, i) => i !== index)
+          .map((r) => (r.level > row.level ? { ...r, level: r.level - 1 } : r)),
+      );
     }
   }
 
@@ -706,14 +743,44 @@ export class DeptHeadsComponent implements OnInit {
     );
     if (!result.isConfirmed) return;
 
-    this.settingService.deleteDeptHeadOverride(override.cost_cent, override.level).subscribe({
-      next: () => {
-        this.swalService.success('ลบสำเร็จ', `Override ระดับ ${override.level} ถูกลบแล้ว`);
-        this.loadOverrides();
-        this.loadData();
-      },
-      error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
-    });
+    // Levels after the deleted one that need to be shifted down by 1
+    const subsequentOverrides = this.overrides()
+      .filter((o) => o.cost_cent === override.cost_cent && o.level > override.level)
+      .sort((a, b) => a.level - b.level);
+
+    this.settingService
+      .deleteDeptHeadOverride(override.cost_cent, override.level)
+      .pipe(
+        // Renumber subsequent levels sequentially (N+1 → N, N+2 → N+1, ...)
+        switchMap(() => {
+          if (subsequentOverrides.length === 0) return of(null);
+          return from(subsequentOverrides).pipe(
+            concatMap((o) =>
+              this.settingService.saveDeptHeadOverride({
+                costCent: o.cost_cent,
+                level: o.level - 1,
+                codeempid: o.codeempid,
+                reason: o.reason || undefined,
+              }),
+            ),
+            toArray(),
+          );
+        }),
+        // Remove the now-duplicate last level record
+        switchMap(() => {
+          if (subsequentOverrides.length === 0) return of(null);
+          const lastLevel = subsequentOverrides[subsequentOverrides.length - 1].level;
+          return this.settingService.deleteDeptHeadOverride(override.cost_cent, lastLevel);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.swalService.success('ลบสำเร็จ', `Override ระดับ ${override.level} ถูกลบแล้ว`);
+          this.loadOverrides();
+          this.loadData();
+        },
+        error: () => this.swalService.error('เกิดข้อผิดพลาด', 'ไม่สามารถลบ override ได้'),
+      });
   }
 
   async deleteAllOverrides(costCent: string, deptName: string) {
