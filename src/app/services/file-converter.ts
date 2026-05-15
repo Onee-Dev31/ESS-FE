@@ -63,7 +63,7 @@ export class FileConverterService {
 
   buildPreviewFile(file: any) {
     // console.log(file);
-    let url = file.fileUrl || file.filePath || file.url;
+    let url = file.filePath || file.fileUrl || file.url;
 
     if (!url) {
       const actualFile =
@@ -73,7 +73,7 @@ export class FileConverterService {
       }
     }
 
-    // console.log('buildPreviewFile (ก่อน) > ', url);
+    console.log('buildPreviewFile (ก่อน) > ', url);
     if (url && !url.startsWith('http://') && !url.startsWith('https://') && !file.isNew) {
       if (url.startsWith('/uploads/tickets')) {
         url = url.replace('/uploads/tickets', '/ticket');
@@ -90,7 +90,7 @@ export class FileConverterService {
       url = this.FILE_URL + (url.startsWith('/') ? '' : '/') + url;
     }
 
-    // console.log('buildPreviewFile (หลัง)> ', url);
+    console.log('buildPreviewFile (หลัง)> ', url);
 
     const date =
       file.createdDate || file.createdAt
