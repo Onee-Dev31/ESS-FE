@@ -652,7 +652,10 @@
                             <span
                               class="default-source-badge"
                               [class.badge-dept-override]="def.source === 'dept-override'"
-                            >{{ def.source === 'dept-override' ? 'แผนก' : 'ค่าเริ่มต้น' }}</span>
+                              >{{
+                                def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น'
+                              }}</span
+                            >
                           </div>
                         } @else {
                           <span class="no-head">-</span>
@@ -827,7 +830,10 @@
                             <span
                               class="default-source-badge"
                               [class.badge-dept-override]="def.source === 'dept-override'"
-                            >{{ def.source === 'dept-override' ? 'แผนก' : 'ค่าเริ่มต้น' }}</span>
+                              >{{
+                                def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น'
+                              }}</span
+                            >
                           </div>
                         </div>
                       }
