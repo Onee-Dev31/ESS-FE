@@ -101,7 +101,7 @@
     </div>
 
     <div class="content-card">
-      <div class="card-header-title">รายชื่อหัวหน้าแผนก</div>
+      <div class="card-header-title head">รายชื่อหัวหน้าแผนก</div>
 
       <div class="table-responsive">
         @if (isLoading()) {
@@ -315,7 +315,9 @@
     <!-- Overrides table -->
     <div class="content-card">
       <div class="card-header-row">
-        <div class="card-header-title">Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)</div>
+        <div class="card-header-title dept">
+          Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)
+        </div>
         <button type="button" class="btn-search btn-header-action" (click)="openOverrideModal()">
           <i class="fas fa-plus"></i> เพิ่ม Override
         </button>
@@ -644,18 +646,16 @@
                           <div class="head-name-cell">{{ ov.head_name.split(' ')[1] }}</div>
                           <div class="cell-sub">({{ ov.head_nickname }})</div>
                           <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                          <div class="default-source-badge individual">รายบุคคล</div>
                         } @else if (def) {
-                          <div class="default-head-cell">
-                            <div class="default-head-name">{{ def.name.split(' ')[0] }}</div>
-                            <div class="default-head-name">{{ def.name.split(' ')[1] }}</div>
-                            <div class="cell-sub">{{ def.code }}</div>
-                            <span
-                              class="default-source-badge"
-                              [class.badge-dept-override]="def.source === 'dept-override'"
-                              >{{
-                                def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น'
-                              }}</span
-                            >
+                          <div class="default-head-name">{{ def.name.split(' ')[0] }}</div>
+                          <div class="default-head-name">{{ def.name.split(' ')[1] }}</div>
+                          <div class="cell-sub">{{ def.code }}</div>
+                          <div
+                            class="default-source-badge"
+                            [class.badge-dept-override]="def.source === 'dept-override'"
+                          >
+                            {{ def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น' }}
                           </div>
                         } @else {
                           <span class="no-head">-</span>
