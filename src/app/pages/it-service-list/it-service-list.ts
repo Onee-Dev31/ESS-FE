@@ -257,6 +257,7 @@ export class ItService implements OnInit {
     // }
   }
 
+  showRequesterContact = false;
   /**
    *
    * NEW!!
@@ -891,6 +892,8 @@ export class ItService implements OnInit {
         // console.log(pair[0], pair[1]);
       }
       // ยิงจริง
+
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.itServiceService.re_submit(formData).subscribe({
         next: (res) => {
           const codeEmpId = requester.CODEMPID ?? '';
@@ -903,13 +906,7 @@ export class ItService implements OnInit {
             this.signalrService.ticketApprovalNotify(codeEmpId, current.ticketNumber);
           }
 
-          Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ',
-            text: 'Re-Submit Ticket สำเร็จ',
-            timer: 1500,
-            showConfirmButton: false,
-          });
+          this.swalService.success('สำเร็จ', 'Re-Submit Ticket สำเร็จ');
 
           this.deletedAttachmentIds = [];
           this.getMyTicket();

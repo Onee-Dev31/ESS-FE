@@ -10,7 +10,8 @@
         [class.active]="activeTab() === 'list'"
         (click)="setTab('list')"
       >
-        <i class="fas fa-users"></i> รายชื่อหัวหน้าแผนก
+        <i class="fas fa-users"></i>
+        <span class="tab-label">รายชื่อหัวหน้าแผนก</span>
       </button>
       <button
         type="button"
@@ -18,7 +19,8 @@
         [class.active]="activeTab() === 'override'"
         (click)="setTab('override')"
       >
-        <i class="fas fa-user-cog"></i> จัดการ Override
+        <i class="fas fa-user-cog"></i>
+        <span class="tab-label">จัดการ Override</span>
         @if (totalOverrideDepts() > 0) {
           <span class="tab-badge">{{ totalOverrideDepts() }}</span>
         }
@@ -29,10 +31,8 @@
         [class.active]="activeTab() === 'emp-override'"
         (click)="setTab('emp-override')"
       >
-        <i class="fas fa-user-shield"></i> Override รายบุคคล
-        <!-- @if (totalEmpOverrideEmps() > 0) {
-          <span class="tab-badge">{{ totalEmpOverrideEmps() }}</span>
-        } -->
+        <i class="fas fa-user-shield"></i>
+        <span class="tab-label">Override รายบุคคล</span>
       </button>
     </div>
     <button type="button" class="btn-help" (click)="openHelp()" title="คู่มือการใช้งาน">
@@ -735,6 +735,144 @@
               </tbody>
             }
           </table>
+        }
+      </div>
+
+      <!-- Mobile card view for emp-override -->
+      <div class="emp-card-list">
+        @if (isEmpOverrideLoading()) {
+          <app-skeleton type="card" [rows]="4" />
+        } @else if (appliedEmpDept() && empDisplayEmployees().length > 0) {
+          <div class="mobile-select-bar">
+            <label class="mobile-select-all">
+              <input
+                type="checkbox"
+                class="emp-row-checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="isPartiallySelected()"
+                (change)="toggleAllSelection()"
+              />
+              <span>เลือกทั้งหมด ({{ empDisplayEmployees().length }} คน)</span>
+            </label>
+          </div>
+          @for (emp of empDisplayEmployees(); track emp.emp_code) {
+            <div
+              class="mobile-card emp-override-card"
+              [class.has-override]="getEmpOverridesForEmp(emp.emp_code).length > 0"
+            >
+              <div class="card-header emp-card-head">
+                <div class="emp-card-left">
+                  <input
+                    type="checkbox"
+                    class="emp-row-checkbox"
+                    [checked]="isEmpSelected(emp.emp_code)"
+                    (change)="toggleEmpSelection(emp.emp_code)"
+                  />
+                  <div class="emp-card-info">
+                    <div class="emp-name-row">
+                      <div class="cell-primary">{{ emp.emp_name }}</div>
+                      <!-- @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                        <span class="badge-override-count">
+                          <i class="fas fa-shield-alt"></i>
+                          {{ getEmpOverridesForEmp(emp.emp_code).length }} ระดับ
+                        </span>
+                      } @else {
+                        <span class="badge-no-override">ยังไม่ตั้ง</span>
+                      } -->
+                    </div>
+                    @if (emp.nickname) {
+                      <div class="cell-sub">({{ emp.nickname }})</div>
+                    }
+                    <div class="cell-sub">{{ emp.emp_code }}</div>
+                  </div>
+                </div>
+                <div class="card-icon-actions">
+                  @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="openEmpModal(emp)"
+                      title="แก้ไข"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button
+                      class="btn-icon btn-icon-delete"
+                      (click)="deleteEmpAllOverrides(emp)"
+                      title="ลบทั้งหมด"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  } @else {
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="openEmpModal(emp)"
+                      title="ตั้ง Override"
+                    >
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+              @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                <div class="card-body">
+                  <div class="emp-level-grid">
+                    @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
+                      @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                      @if (ov) {
+                        <div class="emp-level-row">
+                          <span class="level-badge level-1">ระดับ {{ lvl }}</span>
+                          <i class="fas fa-arrow-right level-row-arrow"></i>
+                          <div class="emp-level-head">
+                            <div class="head-name-cell">{{ ov.head_name }}</div>
+                            <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                  @let latest = getLatestEmpOverride(emp.emp_code);
+                  @if (latest) {
+                    <div class="card-meta-row">
+                      @if (latest.created_by) {
+                        <span class="meta-item">
+                          <i class="fas fa-user-pen"></i> {{ latest.created_by }}
+                        </span>
+                        <span class="meta-sep">·</span>
+                      }
+                      <span class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        {{ latest.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else if (appliedEmpDept()) {
+          <app-empty-state
+            title="ไม่พบพนักงาน"
+            description="ไม่มีพนักงานในแผนกนี้"
+            icon="fas fa-user-slash"
+          />
+        } @else if (!empCompanyFilter()) {
+          <app-empty-state
+            title="เลือกบริษัท"
+            description="กรุณาเลือกบริษัท แล้วเลือกแผนก และกด Search"
+            icon="fas fa-building"
+          />
+        } @else if (!empDeptFilter()) {
+          <app-empty-state
+            title="เลือกแผนก"
+            description="กรุณาเลือกแผนก แล้วกด Search เพื่อดูรายชื่อพนักงาน"
+            icon="fas fa-sitemap"
+          />
+        } @else {
+          <app-empty-state
+            title="กด Search เพื่อค้นหา"
+            description="เลือกบริษัทและแผนกครบแล้ว กด Search เพื่อแสดงรายชื่อพนักงาน"
+            icon="fas fa-search"
+          />
         }
       </div>
     </div>
