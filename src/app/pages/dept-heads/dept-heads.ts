@@ -621,9 +621,7 @@ export class DeptHeadsComponent implements OnInit {
       );
       if (!result.isConfirmed) return;
 
-      const subsequentRows = this.formRows().filter(
-        (r) => r.isExisting && r.level > row.level,
-      );
+      const subsequentRows = this.formRows().filter((r) => r.isExisting && r.level > row.level);
 
       this.settingService
         .deleteDeptHeadOverride(this.formDeptCode(), row.level)
