@@ -174,6 +174,7 @@ export class Report {
     all: -1,
   };
   private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
+  isExporting = false;
   isLogModalVisible = false;
   currentStatus = '';
   ticketLogs: any[] = [];
@@ -571,9 +572,9 @@ export class Report {
       series: [
         {
           type: 'pie',
-          top: '16px',
+          top: '30px',
           radius: ['55%', '82%'],
-          center: ['50%', '53%'],
+          center: ['50%', '57%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
@@ -585,7 +586,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '46%',
+          top: '57%',
           style: {
             text: String(centerValue),
             fontSize: 28,
@@ -597,7 +598,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '58%',
+          top: '68%',
           style: {
             text: centerLabel,
             fontSize: 12,
@@ -652,9 +653,9 @@ export class Report {
       series: [
         {
           type: 'pie',
-          top: '16px',
+          top: '30px',
           radius: ['55%', '82%'],
-          center: ['50%', '53%'],
+          center: ['50%', '57%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
@@ -666,7 +667,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '46%',
+          top: '57%',
           style: {
             text: String(centerValue),
             fontSize: 28,
@@ -678,7 +679,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '58%',
+          top: '68%',
           style: {
             text: centerLabel,
             fontSize: 12,
@@ -770,7 +771,7 @@ export class Report {
       {
         type: 'text',
         left: 'center',
-        top: '46%',
+        top: '57%',
         style: {
           text: String(centerValue),
           fontSize: 28,
@@ -782,7 +783,7 @@ export class Report {
       {
         type: 'text',
         left: 'center',
-        top: '58%',
+        top: '68%',
         style: {
           text: centerLabel,
           fontSize: 12,
@@ -1100,6 +1101,7 @@ export class Report {
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
 
+    this.isExporting = true;
     this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
@@ -1108,9 +1110,13 @@ export class Report {
         a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
+        this.isExporting = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Export failed:', error);
+        this.isExporting = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -1208,7 +1214,44 @@ export class Report {
     this.deptChart = ec;
   }
 
+  private applyLightModeForExport(): void {
+    const text = '#0f172a';
+    const muted = '#64748b';
+    const bg = '#ffffff';
+
+    // Partial setOption — เฉพาะสี ไม่แตะ label.show
+    // graphic top ปรับให้ตรงกับ center ['50%','55%'] ที่ใช้ตอน export (canvas 420px, series top 30px)
+    const pieColors = {
+      legend: { textStyle: { color: text } },
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      graphic: [
+        { top: '53%', style: { fill: text } },
+        { top: '64%', style: { fill: muted } },
+      ],
+      series: [{ label: { color: text } }],
+    };
+    this.statusChart?.setOption(pieColors);
+    this.serviceChart?.setOption(pieColors);
+
+    this.companyChart?.setOption({
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      xAxis: { axisLabel: { color: text } },
+      series: [{ label: { color: text } }, {}],
+    });
+
+    this.deptChart?.setOption({
+      title: { textStyle: { color: text } },
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      yAxis: { axisLabel: { color: text } },
+      series: [{ label: { color: text } }],
+    });
+  }
+
   async exportCharts() {
+    this.isExporting = true;
+    this.cdr.detectChanges();
+    await new Promise((r) => setTimeout(r, 50)); // รอให้ loading render ก่อน
+
     const PIE_EXPORT = { width: 540, height: 420 };
     const BAR_EXPORT = { width: 540, height: 340 };
 
@@ -1231,22 +1274,29 @@ export class Report {
     const pieExportLabel = {
       series: [
         {
-          label: { show: true, formatter: '{b}: {c}', fontSize: 10 },
-          labelLine: { show: true, length: 10, length2: 8 },
+          label: { show: true, formatter: '{b}: {c}', fontSize: 10, color: '#0f172a' },
+          labelLine: { show: true, length: 12, length2: 8, smooth: true },
           avoidLabelOverlap: true,
-          minShowLabelAngle: 6,
-          labelLayout: { hideOverlap: true },
+          minShowLabelAngle: 2,
+          labelLayout: { moveOverlap: 'shiftY', margin: 5 },
         },
       ],
     };
 
     this.statusChart?.setOption(pieExportLabel);
     this.serviceChart?.setOption(pieExportLabel);
+
+    // ย่อ radius ให้ label มีพื้นที่โผล่รอบวง ไม่ถูก clip
+    this.statusChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
+    this.serviceChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
+
     this.companyChart?.setOption({
       series: [
         { label: { show: true, position: 'top', fontSize: 11, color: '#333', fontWeight: 'bold' } },
       ],
     });
+
+    this.applyLightModeForExport();
 
     await new Promise((r) => setTimeout(r, 600));
 
@@ -1306,7 +1356,7 @@ export class Report {
     a.click();
     document.body.removeChild(a);
 
-    // Restore label และ resize กลับขนาด container เดิม
+    // Restore label, resize กลับขนาด container เดิม และ restore สีตาม theme ปัจจุบัน
     this.statusChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });
@@ -1331,5 +1381,10 @@ export class Report {
     this.serviceChart?.resize(origServiceSize);
     this.companyChart?.resize(origCompanySize);
     this.deptChart?.resize(origDeptSize);
+
+    this.rebuildChartColors();
+
+    this.isExporting = false;
+    this.cdr.detectChanges();
   }
 }
