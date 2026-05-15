@@ -311,7 +311,7 @@
     border-radius: 999px;
     padding: 3px 14px;
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     min-width: 40px;
   }
 
@@ -349,7 +349,7 @@
   flex-wrap: wrap;
 
   .match-name {
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     font-weight: 600;
     color: var(--text-header);
   }
@@ -401,7 +401,7 @@
 }
 
 .head-name {
-  font-size: 0.875rem;
+  font-size: $font-size-label;
   color: var(--text);
 }
 
@@ -492,7 +492,7 @@
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 12px;
-        font-size: 0.875rem;
+        font-size: $font-size-label;
         gap: 8px;
 
         .label {
@@ -529,7 +529,7 @@
           gap: 8px;
           padding: 9px 16px;
           border-radius: 10px;
-          font-size: 0.875rem;
+          font-size: $font-size-label;
           font-weight: 600;
           cursor: pointer;
           background: color-mix(in srgb, var(--primary), transparent 85%);
@@ -543,6 +543,46 @@
         }
       }
     }
+  }
+}
+
+.info-row.override {
+  .label {
+    color: var(--text-muted);
+
+    i {
+      color: var(--text-muted);
+    }
+  }
+}
+
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-toolbar);
+  justify-content: space-between;
+
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+
+    i {
+      font-size: 0.65rem;
+      opacity: 0.7;
+    }
+  }
+
+  .meta-sep {
+    font-size: 0.72rem;
+    color: var(--border-table-head);
+    line-height: 1;
   }
 }
 
@@ -712,7 +752,7 @@
   }
 
   .emp-name {
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     color: var(--text);
     font-weight: 500;
   }
@@ -734,7 +774,7 @@
   padding: 12px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: $font-size-label;
 }
 
 // ==================== TABS ====================
@@ -885,7 +925,7 @@
   }
 
   .level-num {
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     font-weight: 700;
     color: var(--primary);
     white-space: nowrap;
@@ -927,7 +967,7 @@
   border: 1.5px dashed var(--primary);
   background: color-mix(in srgb, var(--primary), transparent 92%);
   color: var(--primary);
-  font-size: 0.875rem;
+  font-size: $font-size-label;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -1259,7 +1299,7 @@
   border: 1px solid var(--border-table-head);
   background: transparent;
   color: var(--text-sub);
-  font-size: 0.875rem;
+  font-size: $font-size-label;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -1551,7 +1591,7 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: $font-size-label;
     font-weight: 600;
     color: var(--text-sub);
     user-select: none;
@@ -1559,6 +1599,25 @@
 }
 
 .emp-override-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &.has-override {
+    border-color: color-mix(in srgb, var(--primary), transparent 60%);
+    box-shadow: 0 3px 12px color-mix(in srgb, var(--primary), transparent 82%);
+
+    .emp-card-head {
+      background: color-mix(in srgb, var(--primary), transparent 95%);
+      border-bottom: 1px solid color-mix(in srgb, var(--primary), transparent 72%);
+    }
+  }
+
   .emp-card-head {
     display: flex;
     align-items: center;
@@ -1576,15 +1635,52 @@
 
   .emp-card-info {
     min-width: 0;
+    font-size: $font-size-label;
 
     .cell-primary {
-      font-size: 0.9rem;
+      font-size: $font-size-label;
     }
   }
 
-  &.has-override .emp-card-head {
-    border-bottom: 1px solid var(--border-toolbar);
+  .card-body {
+    padding: 10px 14px 12px;
   }
+}
+
+.emp-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.badge-override-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--primary), transparent 82%);
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 55%);
+}
+
+.badge-no-override {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: var(--bg-table-head);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
 }
 
 .emp-level-grid {
@@ -1597,23 +1693,32 @@
 .emp-level-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 10px;
   border-radius: 8px;
   background: color-mix(in srgb, var(--primary), transparent 93%);
   border: 1px solid color-mix(in srgb, var(--primary), transparent 75%);
 
+  .level-row-arrow {
+    font-size: 0.65rem;
+    color: var(--primary);
+    opacity: 0.55;
+    flex-shrink: 0;
+  }
+
   .emp-level-head {
     min-width: 0;
+    flex: 1;
 
     .head-name-cell {
-      font-size: 0.875rem;
+      font-size: $font-size-label;
       font-weight: 600;
       color: var(--text-header);
     }
 
     .cell-sub {
       margin-top: 1px;
+      font-size: $font-size-label;
     }
   }
 }

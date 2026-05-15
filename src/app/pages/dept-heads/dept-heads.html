@@ -769,7 +769,17 @@
                     (change)="toggleEmpSelection(emp.emp_code)"
                   />
                   <div class="emp-card-info">
-                    <div class="cell-primary">{{ emp.emp_name }}</div>
+                    <div class="emp-name-row">
+                      <div class="cell-primary">{{ emp.emp_name }}</div>
+                      <!-- @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                        <span class="badge-override-count">
+                          <i class="fas fa-shield-alt"></i>
+                          {{ getEmpOverridesForEmp(emp.emp_code).length }} ระดับ
+                        </span>
+                      } @else {
+                        <span class="badge-no-override">ยังไม่ตั้ง</span>
+                      } -->
+                    </div>
                     @if (emp.nickname) {
                       <div class="cell-sub">({{ emp.nickname }})</div>
                     }
@@ -811,6 +821,7 @@
                       @if (ov) {
                         <div class="emp-level-row">
                           <span class="level-badge level-1">ระดับ {{ lvl }}</span>
+                          <i class="fas fa-arrow-right level-row-arrow"></i>
                           <div class="emp-level-head">
                             <div class="head-name-cell">{{ ov.head_name }}</div>
                             <div class="cell-sub">{{ ov.head_codeempid }}</div>
@@ -821,9 +832,17 @@
                   </div>
                   @let latest = getLatestEmpOverride(emp.emp_code);
                   @if (latest) {
-                    <div class="info-row" style="margin-top: 8px; margin-bottom: 0">
-                      <span class="label"><i class="fas fa-calendar-alt"></i> วันที่สร้าง:</span>
-                      <span class="value">{{ latest.created_at | date: 'dd/MM/yyyy' }}</span>
+                    <div class="card-meta-row">
+                      @if (latest.created_by) {
+                        <span class="meta-item">
+                          <i class="fas fa-user-pen"></i> {{ latest.created_by }}
+                        </span>
+                        <span class="meta-sep">·</span>
+                      }
+                      <span class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        {{ latest.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                      </span>
                     </div>
                   }
                 </div>
