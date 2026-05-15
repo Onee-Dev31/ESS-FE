@@ -621,16 +621,15 @@
                     (change)="toggleAllSelection()"
                   />
                 </th>
-                <th>พนักงาน</th>
+                <th style="min-width: 150px">พนักงาน</th>
                 <th class="text-center level-col">ระดับ 1</th>
                 <th class="text-center level-col">ระดับ 2</th>
                 <th class="text-center level-col">ระดับ 3</th>
                 <th class="text-center level-col">ระดับ 4</th>
                 <th class="text-center level-col">ระดับ 5</th>
                 <th class="text-center level-col">ระดับ 6</th>
-                <th>สร้างโดย</th>
                 <th>วันที่สร้าง</th>
-                <th class="text-center">จัดการ</th>
+                <th class="text-center" style="width: 80px">จัดการ</th>
               </tr>
             </thead>
             @if (appliedEmpDept()) {
@@ -646,17 +645,20 @@
                       />
                     </td>
                     <td>
-                      <div class="cell-primary">{{ emp.emp_name }}</div>
+                      <div class="cell-primary">{{ emp.emp_name.split(' ')[0] }}</div>
+                      <div class="cell-primary">{{ emp.emp_name.split(' ')[1] }}</div>
                       @if (emp.nickname) {
                         <div class="cell-sub">({{ emp.nickname }})</div>
                       }
                       <div class="cell-sub">{{ emp.emp_code }}</div>
                     </td>
                     @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
-                      <td class="text-center level-cell">
+                      <td class="level-cell">
                         @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
                         @if (ov) {
-                          <div class="head-name-cell">{{ ov.head_name }}</div>
+                          <div class="head-name-cell">{{ ov.head_name.split(' ')[0] }}</div>
+                          <div class="head-name-cell">{{ ov.head_name.split(' ')[1] }}</div>
+                          <div class="cell-sub">({{ ov.head_nickname }})</div>
                           <div class="cell-sub">{{ ov.head_codeempid }}</div>
                         } @else {
                           <span class="no-head">-</span>
@@ -664,9 +666,10 @@
                       </td>
                     }
                     @let latest = getLatestEmpOverride(emp.emp_code);
-                    <td class="cell-sub">{{ latest?.created_by || '-' }}</td>
                     <td class="date-cell">
-                      {{ latest?.created_at | date: 'dd/MM/yyyy' }}
+                      <div class="cell-sub">{{ latest?.created_by || '-' }}</div>
+                      <div class="cell-sub">{{ latest?.created_at | date: 'dd/MM/yyyy' }}</div>
+                      <div class="cell-sub">{{ latest?.created_at | date: 'HH:mm' }}</div>
                     </td>
                     <td class="text-center">
                       @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
@@ -876,7 +879,7 @@
                     [ngModel]="row.headCode"
                     (ngModelChange)="updateBulkModalRow(i, $event)"
                   >
-                    @for (e of formEmployees(); track e.emp_code) {
+                    @for (e of getAvailableHeadsForBulkModal(i); track e.emp_code) {
                       <nz-option
                         [nzValue]="e.emp_code"
                         [nzLabel]="
@@ -980,7 +983,7 @@
                     [ngModel]="row.headCode"
                     (ngModelChange)="updateEmpModalRow(i, $event)"
                   >
-                    @for (e of formEmployees(); track e.emp_code) {
+                    @for (e of getAvailableHeadsForEmpModal(i); track e.emp_code) {
                       <nz-option
                         [nzValue]="e.emp_code"
                         [nzLabel]="

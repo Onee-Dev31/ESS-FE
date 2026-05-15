@@ -526,6 +526,11 @@ export class DeptHeadsComponent implements OnInit {
       this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกแผนกและพนักงานอย่างน้อย 1 ระดับ');
       return;
     }
+    const codes = rows.map((r) => r.empCode);
+    if (new Set(codes).size !== codes.length) {
+      this.swalService.warning('ข้อมูลซ้ำ', 'ชื่อหัวหน้าแต่ละระดับต้องไม่ซ้ำกัน');
+      return;
+    }
 
     const createdBy = this.authService.userData()?.codeempid;
     const requests = rows.map((row) => {
@@ -745,6 +750,11 @@ export class DeptHeadsComponent implements OnInit {
       this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
       return;
     }
+    const headCodes = rows.map((r) => r.headCode);
+    if (new Set(headCodes).size !== headCodes.length) {
+      this.swalService.warning('ข้อมูลซ้ำ', 'ชื่อหัวหน้าแต่ละระดับต้องไม่ซ้ำกัน');
+      return;
+    }
 
     const executedBy = this.authService.userData()?.CODEMPID;
     const requests = rows.map((row) => {
@@ -906,6 +916,11 @@ export class DeptHeadsComponent implements OnInit {
     const empCodes = Array.from(this.selectedEmpCodes());
     if (empCodes.length === 0 || (rows.length === 0 && deleteLevels.length === 0)) {
       this.swalService.warning('กรุณากรอกข้อมูลให้ครบ', 'โปรดเลือกหัวหน้าอย่างน้อย 1 ระดับ');
+      return;
+    }
+    const headCodes = rows.map((r) => r.headCode);
+    if (new Set(headCodes).size !== headCodes.length) {
+      this.swalService.warning('ข้อมูลซ้ำ', 'ชื่อหัวหน้าแต่ละระดับต้องไม่ซ้ำกัน');
       return;
     }
 
