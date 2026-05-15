@@ -20,10 +20,10 @@
         (click)="setTab('override')"
       >
         <i class="fas fa-user-cog"></i>
-        <span class="tab-label">จัดการ Override</span>
-        @if (totalOverrideDepts() > 0) {
+        <span class="tab-label">Override รายแผนก</span>
+        <!-- @if (totalOverrideDepts() > 0) {
           <span class="tab-badge">{{ totalOverrideDepts() }}</span>
-        }
+        } -->
       </button>
       <button
         type="button"
@@ -43,7 +43,9 @@
   <!-- ==================== TAB: LIST ==================== -->
   @if (activeTab() === 'list') {
     <div class="filter-card">
-      <div class="filter-title">ตัวเลือกสำหรับการค้นหา</div>
+      <div class="filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
+      </div>
       <div class="filter-grid">
         <div class="field-box">
           <label class="field-label">บริษัท</label>
@@ -252,24 +254,20 @@
 
   <!-- ==================== TAB: OVERRIDE ==================== -->
   @if (activeTab() === 'override') {
-    <!-- Form card -->
-    <div class="filter-card override-form-card">
+    <div class="filter-card">
       <div class="filter-title">
-        <i class="fas fa-user-cog"></i>
-        {{ isEditingOverride() ? 'แก้ไข Override' : 'เพิ่ม Override' }} หัวหน้าแผนก
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
       </div>
-
-      <!-- Company + Department selector -->
       <div class="filter-grid">
         <div class="field-box">
-          <label class="field-label">บริษัท *</label>
+          <label class="field-label">บริษัท</label>
           <nz-select
             class="field-nz-select"
             nzShowSearch
             nzAllowClear
-            nzPlaceHolder="-- เลือกบริษัท --"
-            [ngModel]="formCompanyFilter()"
-            (ngModelChange)="onFormCompanyChange($event)"
+            nzPlaceHolder="ทุกบริษัท"
+            [ngModel]="overrideCompanyFilter()"
+            (ngModelChange)="onOverrideCompanyChange($event)"
           >
             @for (c of companyList(); track c.code) {
               <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
@@ -277,96 +275,51 @@
           </nz-select>
         </div>
         <div class="field-box">
-          <label class="field-label">แผนก *</label>
+          <label class="field-label">แผนก</label>
           <nz-select
             class="field-nz-select"
             nzShowSearch
             nzAllowClear
-            nzPlaceHolder="-- เลือกแผนก --"
-            [ngModel]="formDeptCode()"
-            (ngModelChange)="onFormDeptChange($event)"
-            [nzDisabled]="!formCompanyFilter()"
+            nzPlaceHolder="ทุกแผนก"
+            [ngModel]="overrideDeptFilter()"
+            (ngModelChange)="overrideDeptFilter.set($event)"
+            [nzDisabled]="!overrideCompanyFilter()"
           >
-            @for (d of formDeptList(); track d.cost_cent) {
+            @for (d of overrideFilterDeptList(); track d.cost_cent) {
               <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
             }
           </nz-select>
         </div>
-      </div>
-
-      <!-- Level rows -->
-      @if (formDeptCode()) {
-        <div class="form-rows">
-          @for (row of formRows(); track row.level; let i = $index) {
-            <div class="form-row-item">
-              <span class="level-num">ระดับ {{ row.level }}</span>
-              <div class="field-box row-emp-field">
-                <label class="field-label">พนักงาน (ทุกแผนก)</label>
-                <nz-select
-                  class="field-nz-select"
-                  nzShowSearch
-                  nzAllowClear
-                  nzPlaceHolder="-- เลือกพนักงาน --"
-                  [ngModel]="row.empCode"
-                  (ngModelChange)="updateRowEmp(i, $event)"
-                >
-                  @for (e of getAvailableEmployees(i); track e.emp_code) {
-                    <nz-option
-                      [nzValue]="e.emp_code"
-                      [nzLabel]="
-                        e.emp_name +
-                        (e.nickname ? ' (' + e.nickname + ')' : '') +
-                        ' - ' +
-                        e.emp_code
-                      "
-                    />
-                  }
-                </nz-select>
-              </div>
-              <button
-                type="button"
-                class="btn-icon btn-icon-delete"
-                (click)="removeFormRow(i)"
-                title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          }
-        </div>
-
-        <button type="button" class="btn-add-row" (click)="addFormRow()">
-          <i class="fas fa-plus"></i> เพิ่มระดับ
-        </button>
-      }
-
-      <!-- Reason + actions -->
-      <div class="form-footer">
-        <div class="field-box reason-field">
-          <label class="field-label">เหตุผล (ไม่บังคับ)</label>
-          <input
-            type="text"
-            class="field-input"
-            placeholder="ระบุเหตุผล..."
-            [ngModel]="formReason()"
-            (ngModelChange)="formReason.set($event)"
-          />
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-search" (click)="saveOverride()" [disabled]="isSaving()">
-            <i class="fas fa-save"></i>
-            {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหา</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อแผนก, ชื่อพนักงาน หรือ รหัสพนักงาน..."
+              [ngModel]="overrideSearchText()"
+              (ngModelChange)="overrideSearchText.set($event)"
+              (keyup.enter)="applyOverrideFilter()"
+            />
+          </div>
+          <button type="button" class="btn-search" (click)="applyOverrideFilter()">
+            <i class="fas fa-search"></i> Search
           </button>
-          <button type="button" class="btn-clear" (click)="resetForm()">
-            <i class="fas fa-times"></i> ล้างฟอร์ม
+          <button type="button" class="btn-clear" (click)="clearOverrideFilter()">
+            <i class="fas fa-times"></i> Clear
           </button>
         </div>
       </div>
     </div>
 
     <!-- Overrides table -->
-    <div class="content-card" style="margin-top: 16px">
-      <div class="card-header-title">Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)</div>
+    <div class="content-card">
+      <div class="card-header-row">
+        <div class="card-header-title">Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)</div>
+        <button type="button" class="btn-search btn-header-action" (click)="openOverrideModal()">
+          <i class="fas fa-plus"></i> เพิ่ม Override
+        </button>
+      </div>
 
       <div class="table-responsive">
         @if (isOverrideLoading()) {
@@ -377,7 +330,7 @@
               <tr>
                 <th>แผนก</th>
                 <th>ระดับ</th>
-                <th>พนักงาน</th>
+                <th>หัวหน้างาน</th>
                 <!-- <th>เหตุผล</th> -->
                 <th>อัปเดตล่าสุด</th>
                 <th class="text-center">จัดการ</th>
@@ -528,7 +481,9 @@
   <!-- ==================== TAB: EMP OVERRIDE ==================== -->
   @if (activeTab() === 'emp-override') {
     <div class="filter-card">
-      <div class="filter-title"><i class="fas fa-user-shield"></i> Override รายบุคคล</div>
+      <div class="filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
+      </div>
       <div class="filter-grid">
         <div class="field-box">
           <label class="field-label">บริษัท</label>
@@ -874,6 +829,145 @@
             icon="fas fa-search"
           />
         }
+      </div>
+    </div>
+  }
+
+  <!-- ==================== OVERRIDE MODAL ==================== -->
+  @if (overrideModalOpen()) {
+    <div class="modal-backdrop" (click)="closeOverrideModal()"></div>
+    <div class="modal" (click)="closeOverrideModal()">
+      <div class="modal-card override-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-user-cog"></i>
+              {{ isEditingOverride() ? 'แก้ไข Override' : 'เพิ่ม Override' }} หัวหน้าแผนก
+            </div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeOverrideModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Company + Department selector -->
+          <div class="filter-grid">
+            <div class="field-box">
+              <label class="field-label">บริษัท *</label>
+              <nz-select
+                class="field-nz-select"
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="-- เลือกบริษัท --"
+                [ngModel]="formCompanyFilter()"
+                (ngModelChange)="onFormCompanyChange($event)"
+              >
+                @for (c of companyList(); track c.code) {
+                  <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+                }
+              </nz-select>
+            </div>
+            <div class="field-box">
+              <label class="field-label">แผนก *</label>
+              <nz-select
+                class="field-nz-select"
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="-- เลือกแผนก --"
+                [ngModel]="formDeptCode()"
+                (ngModelChange)="onFormDeptChange($event)"
+                [nzDisabled]="!formCompanyFilter()"
+              >
+                @for (d of formDeptList(); track d.cost_cent) {
+                  <nz-option
+                    [nzValue]="d.cost_cent"
+                    [nzLabel]="d.name + ' (' + d.cost_cent + ')'"
+                  />
+                }
+              </nz-select>
+            </div>
+          </div>
+
+          <!-- Level rows -->
+          @if (formDeptCode()) {
+            <div class="form-rows">
+              @for (row of formRows(); track row.level; let i = $index) {
+                <div class="form-row-item">
+                  <span class="level-num">ระดับ {{ row.level }}</span>
+                  <div class="field-box row-emp-field">
+                    <label class="field-label">พนักงาน (ทุกแผนก)</label>
+                    <nz-select
+                      class="field-nz-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="-- เลือกพนักงาน --"
+                      [ngModel]="row.empCode"
+                      (ngModelChange)="updateRowEmp(i, $event)"
+                    >
+                      @for (e of getAvailableEmployees(i); track e.emp_code) {
+                        <nz-option
+                          [nzValue]="e.emp_code"
+                          [nzLabel]="
+                            e.emp_name +
+                            (e.nickname ? ' (' + e.nickname + ')' : '') +
+                            ' - ' +
+                            e.emp_code
+                          "
+                        />
+                      }
+                    </nz-select>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-icon btn-icon-delete"
+                    (click)="removeFormRow(i)"
+                    title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <button type="button" class="btn-add-row" (click)="addFormRow()">
+              <i class="fas fa-plus"></i> เพิ่มระดับ
+            </button>
+          }
+
+          <!-- Reason + actions -->
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="formReason()"
+                (ngModelChange)="formReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveOverride()"
+                [disabled]="isSaving()"
+              >
+                <i class="fas fa-save"></i>
+                {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeOverrideModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   }

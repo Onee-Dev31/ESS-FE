@@ -158,6 +158,17 @@ export class DeptHeadsComponent implements OnInit {
   empModalReason = signal<string>('');
   isSavingEmp = signal<boolean>(false);
 
+  // Override table filters
+  overrideCompanyFilter = signal<string>('');
+  overrideDeptFilter = signal<string>('');
+  overrideSearchText = signal<string>('');
+  appliedOverrideCompany = signal<string>('');
+  appliedOverrideDept = signal<string>('');
+  appliedOverrideSearch = signal<string>('');
+
+  // Override modal
+  overrideModalOpen = signal<boolean>(false);
+
   // Help modal
   helpModalOpen = signal<boolean>(false);
 
@@ -255,6 +266,13 @@ export class DeptHeadsComponent implements OnInit {
       this.overrides().some((o) => o.cost_cent === this.formDeptCode()),
   );
 
+  overrideFilterDeptList = computed(() => {
+    const company = this.overrideCompanyFilter();
+    return this.items()
+      .filter((d) => !company || d.company_code === company)
+      .map((d) => ({ cost_cent: d.cost_cent, name: d.name_cost_cent }));
+  });
+
   groupedOverrides = computed<OverrideGroup[]>(() => {
     const map = new Map<string, OverrideGroup>();
     for (const o of this.overrides()) {
@@ -271,7 +289,25 @@ export class DeptHeadsComponent implements OnInit {
     for (const group of map.values()) {
       group.rows.sort((a, b) => a.level - b.level);
     }
-    return Array.from(map.values());
+
+    const company = this.appliedOverrideCompany();
+    const dept = this.appliedOverrideDept();
+    const search = this.appliedOverrideSearch().toLowerCase().trim();
+
+    return Array.from(map.values()).filter((group) => {
+      const deptItem = this.items().find((d) => d.cost_cent === group.cost_cent);
+      const matchCompany = !company || deptItem?.company_code === company;
+      const matchDept = !dept || group.cost_cent === dept;
+      const matchSearch =
+        !search ||
+        group.name_cost_cent.toLowerCase().includes(search) ||
+        group.rows.some(
+          (r) =>
+            r.emp_name.toLowerCase().includes(search) ||
+            r.codeempid.toLowerCase().includes(search),
+        );
+      return matchCompany && matchDept && matchSearch;
+    });
   });
 
   totalOverrideDepts = computed(() => this.groupedOverrides().length);
@@ -443,6 +479,40 @@ export class DeptHeadsComponent implements OnInit {
     return `ระดับ ${level}`;
   }
 
+  // ==================== OVERRIDE FILTER METHODS ====================
+
+  onOverrideCompanyChange(value: string) {
+    this.overrideCompanyFilter.set(value);
+    this.overrideDeptFilter.set('');
+  }
+
+  applyOverrideFilter() {
+    this.appliedOverrideCompany.set(this.overrideCompanyFilter());
+    this.appliedOverrideDept.set(this.overrideDeptFilter());
+    this.appliedOverrideSearch.set(this.overrideSearchText());
+  }
+
+  clearOverrideFilter() {
+    this.overrideCompanyFilter.set('');
+    this.overrideDeptFilter.set('');
+    this.overrideSearchText.set('');
+    this.appliedOverrideCompany.set('');
+    this.appliedOverrideDept.set('');
+    this.appliedOverrideSearch.set('');
+  }
+
+  // ==================== OVERRIDE MODAL METHODS ====================
+
+  openOverrideModal() {
+    this.resetForm();
+    this.overrideModalOpen.set(true);
+  }
+
+  closeOverrideModal() {
+    this.overrideModalOpen.set(false);
+    this.resetForm();
+  }
+
   // ==================== OVERRIDE FORM METHODS ====================
 
   onFormCompanyChange(value: string) {
@@ -563,7 +633,7 @@ export class DeptHeadsComponent implements OnInit {
           'บันทึกสำเร็จ',
           `บันทึก override ${rows.length} ระดับ เรียบร้อยแล้ว`,
         );
-        this.resetForm();
+        this.closeOverrideModal();
         this.loadOverrides();
         this.loadData();
       },
@@ -594,7 +664,7 @@ export class DeptHeadsComponent implements OnInit {
     this.formRows.set(
       existing.map((o) => ({ level: o.level, empCode: o.codeempid, isExisting: true })),
     );
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.overrideModalOpen.set(true);
   }
 
   async deleteOverrideLevel(override: DeptHeadOverride, deptName: string) {

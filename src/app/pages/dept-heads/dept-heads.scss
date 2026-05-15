@@ -197,6 +197,13 @@
   padding: 0;
   margin-top: 16px;
 
+  .card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 1.5rem;
+  }
+
   .card-header-title {
     font-size: $font-size-header;
     font-weight: 700;
@@ -621,6 +628,10 @@
   @include mobile {
     max-height: 75vh;
     border-radius: 16px 16px 12px 12px;
+  }
+
+  &.override-modal-card {
+    width: min(900px, 100%);
   }
 }
 
