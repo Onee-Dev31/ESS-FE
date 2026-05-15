@@ -1209,46 +1209,63 @@ export class Report {
   }
 
   async exportCharts() {
-    // override label ก่อน export
-    this.statusChart?.setOption({
+    const PIE_EXPORT = { width: 540, height: 420 };
+    const BAR_EXPORT = { width: 540, height: 340 };
+
+    // บันทึก original size ก่อน resize
+    const getSize = (chart: ECharts | undefined) => {
+      const dom = (chart as any)?.getDom() as HTMLElement | undefined;
+      return { width: dom?.offsetWidth ?? 0, height: dom?.offsetHeight ?? 0 };
+    };
+    const origStatusSize = getSize(this.statusChart);
+    const origServiceSize = getSize(this.serviceChart);
+    const origCompanySize = getSize(this.companyChart);
+    const origDeptSize = getSize(this.deptChart);
+
+    // Resize chart ก่อน export เพื่อให้มีพื้นที่สำหรับ label
+    this.statusChart?.resize(PIE_EXPORT);
+    this.serviceChart?.resize(PIE_EXPORT);
+    this.companyChart?.resize(BAR_EXPORT);
+    this.deptChart?.resize(BAR_EXPORT);
+
+    const pieExportLabel = {
       series: [
-        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
+        {
+          label: { show: true, formatter: '{b}: {c}', fontSize: 10 },
+          labelLine: { show: true, length: 10, length2: 8 },
+          avoidLabelOverlap: true,
+          minShowLabelAngle: 6,
+          labelLayout: { hideOverlap: true },
+        },
       ],
-    });
-    this.serviceChart?.setOption({
-      series: [
-        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
-      ],
-    });
+    };
+
+    this.statusChart?.setOption(pieExportLabel);
+    this.serviceChart?.setOption(pieExportLabel);
     this.companyChart?.setOption({
       series: [
         { label: { show: true, position: 'top', fontSize: 11, color: '#333', fontWeight: 'bold' } },
       ],
     });
 
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 600));
 
     const charts = [
-      { chart: this.statusChart, name: 'Status Distribution' },
-      { chart: this.serviceChart, name: 'Service Type' },
-      { chart: this.companyChart, name: 'Top Companies' },
-      { chart: this.deptChart, name: 'Top Departments' },
+      { chart: this.statusChart, name: 'Status Distribution', size: PIE_EXPORT },
+      { chart: this.serviceChart, name: 'Service Type', size: PIE_EXPORT },
+      { chart: this.companyChart, name: 'Top Companies', size: BAR_EXPORT },
+      { chart: this.deptChart, name: 'Top Departments', size: BAR_EXPORT },
     ];
 
     const validCharts = charts.filter((c) => !!c.chart);
     if (validCharts.length === 0) return;
 
-    const chartSizes = validCharts.map(({ chart }) => {
-      const dom = (chart as any).getDom() as HTMLElement;
-      return { w: dom.offsetWidth, h: dom.offsetHeight };
-    });
-
     const cols = 2;
     const padding = 20;
     const titleH = 30;
     const rows = Math.ceil(validCharts.length / cols);
-    const colW = Math.max(...chartSizes.map((s) => s.w));
-    const rowH = Math.max(...chartSizes.map((s) => s.h));
+    const colW = Math.max(...validCharts.map((c) => c.size.width));
+    const rowH = Math.max(...validCharts.map((c) => c.size.height));
     const totalW = cols * colW + (cols + 1) * padding;
     const totalH = rows * (rowH + titleH) + (rows + 1) * padding;
 
@@ -1261,7 +1278,7 @@ export class Report {
     ctx.fillRect(0, 0, totalW, totalH);
 
     for (let i = 0; i < validCharts.length; i++) {
-      const { chart, name } = validCharts[i];
+      const { chart, name, size } = validCharts[i];
       const col = i % cols;
       const row = Math.floor(i / cols);
       const x = padding + col * (colW + padding);
@@ -1275,7 +1292,7 @@ export class Report {
       await new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => {
-          ctx.drawImage(img, x, y + titleH, colW, rowH);
+          ctx.drawImage(img, x, y + titleH, size.width, size.height);
           resolve();
         };
         img.src = url;
@@ -1289,12 +1306,30 @@ export class Report {
     a.click();
     document.body.removeChild(a);
 
-    // restore กลับ
+    // Restore label และ resize กลับขนาด container เดิม
     this.statusChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });
     this.serviceChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });
+    this.companyChart?.setOption({
+      series: [
+        {
+          label: {
+            show: true,
+            position: 'top',
+            fontWeight: 700,
+            fontSize: 12,
+            color: this.getCssVar('--text-header') || '#0f172a',
+          },
+        },
+      ],
+    });
+
+    this.statusChart?.resize(origStatusSize);
+    this.serviceChart?.resize(origServiceSize);
+    this.companyChart?.resize(origCompanySize);
+    this.deptChart?.resize(origDeptSize);
   }
 }
