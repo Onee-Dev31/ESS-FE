@@ -33,6 +33,9 @@
         <span class="tab-badge">{{ totalEmpOverrideEmps() }}</span>
       } -->
     </button>
+    <button type="button" class="btn-help" (click)="openHelp()" title="คู่มือการใช้งาน">
+      <i class="fas fa-question-circle"></i>
+    </button>
   </div>
 
   <!-- ==================== TAB: LIST ==================== -->
@@ -935,6 +938,105 @@
                 <i class="fas fa-times"></i> ยกเลิก
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== HELP MODAL ==================== -->
+  @if (helpModalOpen()) {
+    <div class="modal-backdrop" (click)="closeHelp()"></div>
+    <div class="modal" (click)="closeHelp()">
+      <div class="modal-card help-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title"><i class="fas fa-question-circle"></i> คู่มือการใช้งาน</div>
+            <div class="modal-subtitle">อธิบายฟีเจอร์แต่ละ Tab ในหน้าหัวหน้าแผนก</div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeHelp()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="help-tab-list">
+
+            <!-- Tab 1: รายชื่อหัวหน้าแผนก -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-list">
+                  <i class="fas fa-users"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">รายชื่อหัวหน้าแผนก</div>
+                  <div class="help-tab-desc">ดูข้อมูลหัวหน้าแผนกที่มาจาก HRMS (ค่า Default)</div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>ค้นหาและกรองข้อมูลได้ตาม <strong>บริษัท</strong>, <strong>แผนก</strong>, หรือ <strong>ชื่อพนักงาน</strong></li>
+                <li>กดปุ่ม <strong>พนักงาน</strong> เพื่อดูรายชื่อพนักงานทั้งหมดในแผนกนั้น</li>
+                <li>แต่ละแผนกแสดงหัวหน้าเป็นระดับ โดย <span class="help-highlight">ระดับ 1</span> คือหัวหน้าโดยตรง</li>
+                <li>หากมีการตั้ง Override ไว้ ข้อมูลในตารางนี้จะสะท้อนค่า Override นั้น</li>
+              </ul>
+            </div>
+
+            <!-- Tab 2: จัดการ Override -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-override">
+                  <i class="fas fa-user-cog"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">จัดการ Override</div>
+                  <div class="help-tab-desc">แก้ไขหัวหน้าแผนก ระดับแผนก (ใช้กับพนักงานทุกคนในแผนก)</div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>เลือก <strong>บริษัท</strong> แล้วเลือก <strong>แผนก</strong> ที่ต้องการตั้ง Override</li>
+                <li>กำหนดหัวหน้าแต่ละ <strong>ระดับ</strong> (ระดับ 1 = หัวหน้าโดยตรง, ระดับสูงขึ้น = ลำดับชั้นถัดไป)</li>
+                <li>กดปุ่ม <strong>เพิ่มระดับ</strong> เพื่อเพิ่มหัวหน้าหลายระดับ</li>
+                <li>หาก Override มีอยู่แล้ว ระบบจะ pre-fill ข้อมูลเดิมให้อัตโนมัติ</li>
+                <li>กด <strong>ถังขยะ</strong> ที่ระดับใด เพื่อลบเฉพาะระดับนั้น หรือกด <strong>ลบทั้งหมด</strong> เพื่อคืนค่า default</li>
+              </ul>
+            </div>
+
+            <!-- Tab 3: Override รายบุคคล -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-emp">
+                  <i class="fas fa-user-shield"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">Override รายบุคคล</div>
+                  <div class="help-tab-desc">กำหนดหัวหน้าเฉพาะพนักงานบางคน โดยไม่กระทบคนอื่นในแผนก</div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>เลือก <strong>บริษัท</strong>, <strong>แผนก</strong> แล้วกด <strong>Search</strong> เพื่อแสดงรายชื่อพนักงาน</li>
+                <li>กดปุ่ม <strong><i class="fas fa-plus"></i></strong> หน้าชื่อพนักงานเพื่อตั้ง Override รายบุคคล</li>
+                <li>หรือ <strong>ติ๊ก</strong> เลือกพนักงานหลายคน แล้วกด <strong>ตั้ง Override</strong> เพื่อตั้งพร้อมกัน (Bulk)</li>
+                <li>
+                  ใน Bulk Modal หากพนักงานที่เลือกมีหัวหน้าต่างกัน จะแสดง badge
+                  <span class="badge-mixed" style="font-size:0.68rem; padding: 1px 7px; border-radius: 999px; vertical-align: middle;">
+                    <i class="fas fa-exclamation-circle"></i> ต่างกัน
+                  </span>
+                  พร้อมรายละเอียด
+                </li>
+                <li>กดปุ่ม <strong><i class="fas fa-pen"></i></strong> หรือ <strong><i class="fas fa-trash-alt"></i></strong> เพื่อแก้ไขหรือลบ Override ของแต่ละคน</li>
+              </ul>
+            </div>
+
+          </div>
+
+          <div class="help-note">
+            <i class="fas fa-info-circle"></i>
+            Override รายบุคคล มีความสำคัญสูงกว่า Override ระดับแผนก หากตั้งไว้ทั้งสองแบบ ระบบจะใช้ค่ารายบุคคลก่อนเสมอ
           </div>
         </div>
       </div>
