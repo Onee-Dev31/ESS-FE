@@ -1,0 +1,530 @@
+import { Component, signal, inject, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TechInfoService } from './tech-info.service';
+import { PAGE_META } from '../../../config/page-meta.config';
+
+@Component({
+  selector: 'app-tech-info',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <button
+      class="tech-fab"
+      (click)="toggle()"
+      title="ข้อมูลทางเทคนิค"
+      [class.fab-active]="isOpen()"
+    >
+      <span class="fab-icon">&lt;/&gt;</span>
+      @if (svc.capturedCalls().length > 0) {
+        <span class="fab-badge">{{ svc.capturedCalls().length }}</span>
+      }
+    </button>
+
+    @if (isOpen()) {
+      <div class="tech-backdrop" (click)="close()"></div>
+      <div class="tech-panel" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="panel-header">
+          <div class="panel-title">
+            <i class="fas fa-code"></i> ข้อมูลทางเทคนิค
+            <span class="route-chip">{{ svc.currentRoute() }}</span>
+          </div>
+          <div class="header-actions">
+            @if (svc.capturedCalls().length > 0) {
+              <button class="btn-clear-calls" (click)="svc.clearCalls()" title="ล้าง">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            }
+            <button class="btn-close" (click)="close()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-tabs">
+          <button class="ptab" [class.ptab-active]="tab() === 'calls'" (click)="tab.set('calls')">
+            <i class="fas fa-exchange-alt"></i> API Calls
+            @if (svc.capturedCalls().length > 0) {
+              <span class="ptab-count">{{ svc.capturedCalls().length }}</span>
+            }
+          </button>
+          <button class="ptab" [class.ptab-active]="tab() === 'tables'" (click)="tab.set('tables')">
+            <i class="fas fa-database"></i> Tables
+            @if (meta()?.tables?.length) {
+              <span class="ptab-count">{{ meta()!.tables.length }}</span>
+            }
+          </button>
+        </div>
+
+        <!-- API Calls Tab (dynamic) -->
+        @if (tab() === 'calls') {
+          <div class="panel-body">
+            @if (svc.capturedCalls().length === 0) {
+              <div class="empty-body">
+                <i class="fas fa-satellite-dish"></i>
+                <div>ยังไม่มี API call ในหน้านี้</div>
+                <div class="empty-sub">จะแสดงอัตโนมัติเมื่อมีการเรียก API</div>
+              </div>
+            } @else {
+              <div class="calls-list">
+                @for (call of svc.capturedCalls(); track call.timestamp) {
+                  <div
+                    class="call-row"
+                    [class.call-error]="call.status !== null && call.status >= 400"
+                  >
+                    <span class="method-badge" [class]="'method-' + call.method.toLowerCase()">
+                      {{ call.method }}
+                    </span>
+                    <div class="call-info">
+                      <div class="call-path">{{ call.path }}</div>
+                      <div class="call-meta">
+                        @if (call.status !== null) {
+                          <span
+                            class="status-chip"
+                            [class.status-ok]="call.status < 400"
+                            [class.status-err]="call.status >= 400"
+                          >
+                            {{ call.status }}
+                          </span>
+                        }
+                        @if (call.duration !== null) {
+                          <span class="duration-chip">{{ call.duration }}ms</span>
+                        }
+                        <span class="time-chip">{{ call.timestamp | date: 'HH:mm:ss' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Tables Tab (static reference) -->
+        @if (tab() === 'tables') {
+          <div class="panel-body">
+            @if (meta()) {
+              @if (meta()!.tables.length > 0) {
+                <div class="table-list">
+                  @for (table of meta()!.tables; track table) {
+                    <span class="table-chip">{{ table }}</span>
+                  }
+                </div>
+              } @else {
+                <div class="empty-body">
+                  <i class="fas fa-database"></i>
+                  <div>ไม่มีข้อมูล table สำหรับหน้านี้</div>
+                </div>
+              }
+              @if (meta()!.notes) {
+                <div class="notes-row"><i class="fas fa-info-circle"></i> {{ meta()!.notes }}</div>
+              }
+            } @else {
+              <div class="empty-body">
+                <i class="fas fa-map-marked-alt"></i>
+                <div>ยังไม่มีข้อมูล table สำหรับหน้านี้</div>
+                <div class="empty-sub">เพิ่มได้ใน page-meta.config.ts</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  `,
+  styles: [
+    `
+      @use '../../../../styles/variables' as *;
+
+      .tech-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 900;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+        &:hover,
+        &.fab-active {
+          color: var(--primary);
+          border-color: var(--primary);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .fab-icon {
+          font-size: 0.7rem;
+          font-weight: 700;
+          font-family: monospace;
+          letter-spacing: -0.05em;
+        }
+
+        .fab-badge {
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          background: var(--primary);
+          color: #fff;
+          font-size: 0.55rem;
+          font-weight: 700;
+          border-radius: 999px;
+          min-width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 3px;
+        }
+      }
+
+      .tech-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+      }
+
+      .tech-panel {
+        position: fixed;
+        bottom: 72px;
+        right: 24px;
+        width: 460px;
+        max-width: calc(100vw - 48px);
+        max-height: 72vh;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-table-head);
+        flex-shrink: 0;
+        gap: 8px;
+      }
+
+      .panel-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-header);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+
+        i {
+          color: var(--primary);
+          flex-shrink: 0;
+        }
+      }
+
+      .route-chip {
+        font-family: monospace;
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .btn-close,
+      .btn-clear-calls {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        transition: all 0.15s;
+
+        &:hover {
+          background: var(--border);
+          color: var(--text);
+        }
+      }
+
+      .panel-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        background: var(--bg-table-head);
+      }
+
+      .ptab {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s;
+
+        &:hover {
+          color: var(--text);
+        }
+
+        &.ptab-active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+          background: color-mix(in srgb, var(--primary), transparent 93%);
+        }
+      }
+
+      .ptab-count {
+        background: var(--primary);
+        color: #fff;
+        font-size: 0.55rem;
+        border-radius: 999px;
+        min-width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+      }
+
+      .panel-body {
+        overflow-y: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+      }
+
+      /* ===== Calls Tab ===== */
+      .calls-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .call-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 6px;
+        background: var(--bg-table-head);
+        border: 1px solid var(--border-table);
+        transition: border-color 0.15s;
+
+        &.call-error {
+          border-color: color-mix(in srgb, #ef4444, transparent 60%);
+        }
+      }
+
+      .call-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .call-path {
+        font-size: 0.72rem;
+        font-weight: 600;
+        font-family: monospace;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .call-meta {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 2px;
+        flex-wrap: wrap;
+      }
+
+      .status-chip {
+        font-size: 0.6rem;
+        font-weight: 700;
+        border-radius: 3px;
+        padding: 1px 4px;
+        &.status-ok {
+          background: color-mix(in srgb, #22c55e, transparent 82%);
+          color: #4ade80;
+        }
+        &.status-err {
+          background: color-mix(in srgb, #ef4444, transparent 82%);
+          color: #f87171;
+        }
+      }
+
+      .duration-chip {
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        font-family: monospace;
+      }
+
+      .time-chip {
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        font-family: monospace;
+        margin-left: auto;
+      }
+
+      /* ===== Tables Tab ===== */
+      .table-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 4px 0;
+      }
+
+      .table-chip {
+        font-size: 0.72rem;
+        font-weight: 500;
+        font-family: monospace;
+        background: color-mix(in srgb, var(--primary), transparent 88%);
+        color: var(--primary);
+        border: 1px solid color-mix(in srgb, var(--primary), transparent 65%);
+        border-radius: 5px;
+        padding: 2px 8px;
+      }
+
+      .notes-row {
+        font-size: 0.7rem;
+        color: var(--text-sub);
+        background: color-mix(in srgb, #f59e0b, transparent 90%);
+        border: 1px solid color-mix(in srgb, #f59e0b, transparent 65%);
+        border-radius: 6px;
+        padding: 7px 10px;
+        display: flex;
+        gap: 7px;
+        align-items: flex-start;
+        line-height: 1.5;
+
+        i {
+          color: #fbbf24;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+      }
+
+      /* ===== Method Badges ===== */
+      .method-badge {
+        font-size: 0.58rem;
+        font-weight: 700;
+        font-family: monospace;
+        border-radius: 4px;
+        padding: 2px 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-top: 2px;
+
+        &.method-get {
+          background: color-mix(in srgb, #22c55e, transparent 82%);
+          color: #4ade80;
+          border: 1px solid color-mix(in srgb, #22c55e, transparent 60%);
+        }
+        &.method-post {
+          background: color-mix(in srgb, #3b82f6, transparent 82%);
+          color: #60a5fa;
+          border: 1px solid color-mix(in srgb, #3b82f6, transparent 60%);
+        }
+        &.method-put {
+          background: color-mix(in srgb, #f59e0b, transparent 82%);
+          color: #fbbf24;
+          border: 1px solid color-mix(in srgb, #f59e0b, transparent 60%);
+        }
+        &.method-patch {
+          background: color-mix(in srgb, #a78bfa, transparent 82%);
+          color: #c4b5fd;
+          border: 1px solid color-mix(in srgb, #a78bfa, transparent 60%);
+        }
+        &.method-delete {
+          background: color-mix(in srgb, #ef4444, transparent 82%);
+          color: #f87171;
+          border: 1px solid color-mix(in srgb, #ef4444, transparent 60%);
+        }
+      }
+
+      /* ===== Empty State ===== */
+      .empty-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        gap: 6px;
+
+        i {
+          font-size: 1.8rem;
+          opacity: 0.35;
+        }
+
+        .empty-sub {
+          font-size: 0.7rem;
+          opacity: 0.7;
+        }
+      }
+    `,
+  ],
+})
+export class TechInfoComponent {
+  svc = inject(TechInfoService);
+  isOpen = signal(false);
+  tab = signal<'calls' | 'tables'>('calls');
+
+  meta = computed(() => {
+    const route = this.svc.currentRoute();
+    const key = Object.keys(PAGE_META).find((k) => route.includes(k));
+    return key ? PAGE_META[key] : null;
+  });
+
+  toggle() {
+    this.isOpen.update((v) => !v);
+  }
+  close() {
+    this.isOpen.set(false);
+  }
+}

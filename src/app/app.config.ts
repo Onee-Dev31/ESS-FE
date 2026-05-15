@@ -10,6 +10,7 @@ import { matSelfImprovement } from '@ng-icons/material-icons/baseline';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { techInfoInterceptor } from './interceptors/tech-info.interceptor';
 import { GlobalErrorHandler } from './core/global-error-handler';
 
 import { LOCALE_ID } from '@angular/core';
@@ -49,7 +50,7 @@ export const appConfig: ApplicationConfig = {
     provideEchartsCore({ echarts }),
     provideBrowserGlobalErrorListeners(),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, techInfoInterceptor])),
     provideRouter(routes),
 
     { provide: LOCALE_ID, useValue: 'th' },
