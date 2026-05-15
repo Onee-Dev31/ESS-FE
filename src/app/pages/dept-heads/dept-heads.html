@@ -660,11 +660,22 @@
                     @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
                       <td class="level-cell">
                         @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                        @let def = getDefaultHeadByLevel(appliedEmpDept(), lvl, emp.emp_code);
                         @if (ov) {
                           <div class="head-name-cell">{{ ov.head_name.split(' ')[0] }}</div>
                           <div class="head-name-cell">{{ ov.head_name.split(' ')[1] }}</div>
                           <div class="cell-sub">({{ ov.head_nickname }})</div>
                           <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                        } @else if (def) {
+                          <div class="default-head-cell">
+                            <div class="default-head-name">{{ def.name.split(' ')[0] }}</div>
+                            <div class="default-head-name">{{ def.name.split(' ')[1] }}</div>
+                            <div class="cell-sub">{{ def.code }}</div>
+                            <span
+                              class="default-source-badge"
+                              [class.badge-dept-override]="def.source === 'dept-override'"
+                            >{{ def.source === 'dept-override' ? 'แผนก' : 'ค่าเริ่มต้น' }}</span>
+                          </div>
                         } @else {
                           <span class="no-head">-</span>
                         }
@@ -813,11 +824,12 @@
                   }
                 </div>
               </div>
-              @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+              @if (getEmpOverridesForEmp(emp.emp_code).length > 0 || currentDeptHasAnyHeads()) {
                 <div class="card-body">
                   <div class="emp-level-grid">
                     @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
                       @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                      @let def = getDefaultHeadByLevel(appliedEmpDept(), lvl, emp.emp_code);
                       @if (ov) {
                         <div class="emp-level-row">
                           <span class="level-badge level-1">ระดับ {{ lvl }}</span>
@@ -825,6 +837,19 @@
                           <div class="emp-level-head">
                             <div class="head-name-cell">{{ ov.head_name }}</div>
                             <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                          </div>
+                        </div>
+                      } @else if (def) {
+                        <div class="emp-level-row emp-level-row--default">
+                          <span class="level-badge">ระดับ {{ lvl }}</span>
+                          <i class="fas fa-arrow-right level-row-arrow"></i>
+                          <div class="emp-level-head">
+                            <div class="default-head-name">{{ def.name }}</div>
+                            <div class="cell-sub">{{ def.code }}</div>
+                            <span
+                              class="default-source-badge"
+                              [class.badge-dept-override]="def.source === 'dept-override'"
+                            >{{ def.source === 'dept-override' ? 'แผนก' : 'ค่าเริ่มต้น' }}</span>
                           </div>
                         </div>
                       }
