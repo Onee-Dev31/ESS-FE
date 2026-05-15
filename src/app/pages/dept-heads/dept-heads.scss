@@ -1219,7 +1219,7 @@
   border: none;
   background: var(--primary);
   color: #fff;
-  font-size: 0.875rem;
+  font-size: $font-size-label;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

@@ -951,7 +951,9 @@ export class DeptHeadsComponent implements OnInit {
     );
 
     const deleteRequests = empCodes.flatMap((empCode) =>
-      deleteLevels.map((level) => this.settingService.deleteEmpHeadOverride(empCode, level)),
+      deleteLevels
+        .filter((level) => !!this.getEmpOverrideByLevel(empCode, level))
+        .map((level) => this.settingService.deleteEmpHeadOverride(empCode, level)),
     );
 
     this.isSavingBulk.set(true);
