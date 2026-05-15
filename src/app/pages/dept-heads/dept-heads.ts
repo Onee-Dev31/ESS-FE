@@ -158,6 +158,9 @@ export class DeptHeadsComponent implements OnInit {
   empModalReason = signal<string>('');
   isSavingEmp = signal<boolean>(false);
 
+  // Help modal
+  helpModalOpen = signal<boolean>(false);
+
   // Bulk emp override
   selectedEmpCodes = signal<Set<string>>(new Set());
   bulkModalOpen = signal<boolean>(false);
@@ -368,6 +371,14 @@ export class DeptHeadsComponent implements OnInit {
 
   setTab(tab: 'list' | 'override' | 'emp-override') {
     this.activeTab.set(tab);
+  }
+
+  openHelp() {
+    this.helpModalOpen.set(true);
+  }
+
+  closeHelp() {
+    this.helpModalOpen.set(false);
   }
 
   onCompanyChange(value: string) {
