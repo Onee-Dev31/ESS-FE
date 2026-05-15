@@ -1630,6 +1630,50 @@
   }
 }
 
+// ==================== DEFAULT HEAD DISPLAY ====================
+.default-head-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.default-head-name {
+  font-size: $font-size-label;
+  color: var(--text-muted);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.default-source-badge {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--bg-table-head);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+
+  &.badge-dept-override {
+    background: color-mix(in srgb, #f59e0b, transparent 88%);
+    color: #b45309;
+    border-color: color-mix(in srgb, #f59e0b, transparent 60%);
+  }
+}
+
+.emp-level-row--default {
+  background: var(--bg-table-head);
+  border-color: var(--border);
+  opacity: 0.75;
+
+  .level-row-arrow {
+    color: var(--text-muted) !important;
+    opacity: 0.7 !important;
+  }
+}
+
 // ==================== EMP OVERRIDE MOBILE CARDS ====================
 .emp-card-list {
   display: none;

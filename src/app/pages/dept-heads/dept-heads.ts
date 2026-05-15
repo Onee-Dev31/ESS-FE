@@ -336,6 +336,14 @@ export class DeptHeadsComponent implements OnInit {
 
   totalOverrideDepts = computed(() => this.groupedOverrides().length);
 
+  currentDeptHasAnyHeads = computed(() => {
+    const dept = this.appliedEmpDept();
+    if (!dept) return false;
+    if (this.overrides().some((o) => o.cost_cent === dept)) return true;
+    const deptData = this.items().find((d) => d.cost_cent === dept);
+    return (deptData?.heads.length ?? 0) > 0;
+  });
+
   // ==================== EMP OVERRIDE COMPUTEDS ====================
 
   empDisplayEmployees = computed(() => {
@@ -754,6 +762,33 @@ export class DeptHeadsComponent implements OnInit {
     this.appliedEmpDept.set('');
     this.appliedEmpSearchText.set('');
     this.selectedEmpCodes.set(new Set());
+  }
+
+  getDefaultHeadByLevel(
+    costCent: string,
+    level: number,
+    empCode?: string,
+  ): { name: string; code: string; source: 'dept-override' | 'default' } | undefined {
+    const deptOverride = this.overrides().find(
+      (o) => o.cost_cent === costCent && o.level === level,
+    );
+    let candidate: { name: string; code: string; source: 'dept-override' | 'default' } | undefined;
+    if (deptOverride) {
+      candidate = { name: deptOverride.emp_name, code: deptOverride.codeempid, source: 'dept-override' };
+    } else {
+      const deptData = this.items().find((d) => d.cost_cent === costCent);
+      if (deptData) {
+        const head = deptData.heads.find((h) => Number(h.level) === Number(level));
+        if (head) candidate = { name: head.name, code: head.code, source: 'default' };
+      }
+    }
+    if (!candidate || !empCode) return candidate;
+    // ซ่อนถ้า head คนนี้เป็นตัวพนักงานเอง (self-approval)
+    if (candidate.code === empCode) return undefined;
+    // ซ่อนถ้า head คนนี้ถูก set เป็น emp override ในระดับอื่นอยู่แล้ว
+    const empOverrides = this.getEmpOverridesForEmp(empCode);
+    if (empOverrides.some((o) => o.head_codeempid === candidate!.code)) return undefined;
+    return candidate;
   }
 
   getEmpOverridesForEmp(empCode: string): EmpHeadOverride[] {
