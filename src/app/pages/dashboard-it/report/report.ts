@@ -250,12 +250,51 @@ export class Report {
         }
       }
 
+      if (opt.xAxis) {
+        const xAxisArr = Array.isArray(opt.xAxis) ? opt.xAxis : [opt.xAxis];
+
+        xAxisArr.forEach((axis: any) => {
+          if (axis.axisLabel) {
+            axis.axisLabel.color = textColor;
+          }
+
+          if (axis.axisLine?.lineStyle) {
+            axis.axisLine.lineStyle.color = borderColor;
+          }
+        });
+      }
+
+      // yAxis
+      if (opt.yAxis) {
+        const yAxisArr = Array.isArray(opt.yAxis) ? opt.yAxis : [opt.yAxis];
+
+        yAxisArr.forEach((axis: any) => {
+          if (axis.axisLabel) {
+            axis.axisLabel.color = textColor;
+          }
+
+          if (axis.splitLine?.lineStyle) {
+            axis.splitLine.lineStyle.color = borderColor;
+          }
+        });
+      }
+
+      // series label
+      if (opt.series) {
+        opt.series.forEach((series: any) => {
+          if (series.label) {
+            series.label.color = textColor;
+          }
+        });
+      }
+
       chart?.setOption(opt);
     };
 
     updateOption(this.statusPieOption, this.statusChart);
     updateOption(this.servicePieOption, this.serviceChart);
-
+    updateOption(this.companyBarOption, this.companyChart);
+    updateOption(this.deptBarOption, this.deptChart);
     // rebuild bar chart เพราะ axisLabel color hardcode ไว้
     if (this.selectedCompany) {
       this.buildDeptBar(this.selectedCompany, this.deptTop5Map[this.selectedCompany] ?? []);
@@ -385,15 +424,16 @@ export class Report {
 
     const labels = chartData.map((x) => x.code);
 
-    const textColor =
-      getComputedStyle(document.body).getPropertyValue('--text-header').trim() || '#0f172a';
-
     this.companyBarOption = {
       grid: { left: 18, right: 18, top: 18, bottom: 26, containLabel: true },
 
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
         formatter: (params: any) => {
           const item = params[0];
           const data = item.data;
@@ -410,7 +450,7 @@ export class Report {
         data: labels,
         axisTick: { show: false },
         axisLine: { show: false },
-        axisLabel: { fontWeight: 700, color: textColor },
+        axisLabel: { fontWeight: 700, color: this.getCssVar('--text-header') || '#0f172a' },
         triggerEvent: true,
       },
 
@@ -433,7 +473,7 @@ export class Report {
             position: 'top',
             fontWeight: 700,
             fontSize: 12,
-            color: textColor,
+            color: this.getCssVar('--text-header') || '#0f172a',
           },
         },
         {
@@ -806,6 +846,10 @@ export class Report {
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
+        backgroundColor: this.getCssVar('--bg-card') || '#ffffff',
+        textStyle: {
+          color: this.getCssVar('--text-header') || '#0f172a',
+        },
         formatter: (params: any) => {
           const item = params?.[0];
           const row = item?.data;

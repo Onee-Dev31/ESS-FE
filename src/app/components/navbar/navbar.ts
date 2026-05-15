@@ -52,6 +52,17 @@ export class NavbarComponent {
   isSearchFocused = signal(false);
   isMobileSearchOpen = signal(false);
 
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreen();
+  }
+
+  isMobile = false;
+  checkScreen() {
+    const width = window.innerWidth;
+    this.isMobile = width <= 620;
+  }
+
   userName = computed(() => {
     const user = this.authService.userData();
     const firstName = user?.NAMFIRSTE || user?.NAMFIRSTT || 'USER';
@@ -73,6 +84,7 @@ export class NavbarComponent {
   });
 
   constructor() {
+    this.checkScreen();
     this.notifyAudio.volume = 0.55;
 
     effect(() => {
