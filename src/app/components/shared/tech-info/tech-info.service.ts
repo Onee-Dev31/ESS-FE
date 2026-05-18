@@ -29,7 +29,6 @@ export class TechInfoService {
       this.currentRoute.set(e.urlAfterRedirects.split('?')[0]);
       this.capturedCalls.set([]);
     });
-
   }
 
   addCall(call: CapturedCall) {

@@ -9,95 +9,95 @@ import { AuthService } from '../../../services/auth.service';
   imports: [CommonModule],
   template: `
     @if (auth.isTech()) {
-    <button
-      class="tech-fab"
-      (click)="toggle()"
-      title="ข้อมูลทางเทคนิค"
-      [class.fab-active]="isOpen()"
-    >
-      <span class="fab-icon">&lt;/&gt;</span>
-      @if (svc.capturedCalls().length > 0) {
-        <span class="fab-badge">{{ svc.capturedCalls().length }}</span>
-      }
-    </button>
+      <button
+        class="tech-fab"
+        (click)="toggle()"
+        title="ข้อมูลทางเทคนิค"
+        [class.fab-active]="isOpen()"
+      >
+        <span class="fab-icon">&lt;/&gt;</span>
+        @if (svc.capturedCalls().length > 0) {
+          <span class="fab-badge">{{ svc.capturedCalls().length }}</span>
+        }
+      </button>
 
-    @if (isOpen()) {
-      <div class="tech-backdrop" (click)="close()"></div>
-      <div class="tech-panel" (click)="$event.stopPropagation()">
-        <div class="panel-header">
-          <div class="panel-title">
-            <i class="fas fa-code"></i> ข้อมูลทางเทคนิค
-            <span class="route-chip">{{ svc.currentRoute() }}</span>
-          </div>
-          <div class="header-actions">
-            @if (svc.capturedCalls().length > 0) {
-              <button class="btn-clear-calls" (click)="svc.clearCalls()" title="ล้าง">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            }
-            <button class="btn-close" (click)="close()">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="panel-body">
-          @if (svc.capturedCalls().length === 0) {
-            <div class="empty-body">
-              <i class="fas fa-satellite-dish"></i>
-              <div>ยังไม่มี API call ในหน้านี้</div>
-              <div class="empty-sub">จะแสดงอัตโนมัติเมื่อมีการเรียก API</div>
+      @if (isOpen()) {
+        <div class="tech-backdrop" (click)="close()"></div>
+        <div class="tech-panel" (click)="$event.stopPropagation()">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fas fa-code"></i> ข้อมูลทางเทคนิค
+              <span class="route-chip">{{ svc.currentRoute() }}</span>
             </div>
-          } @else {
-            <div class="calls-list">
-              @for (call of svc.capturedCalls(); track call.timestamp) {
-                <div
-                  class="call-row"
-                  [class.call-error]="call.status !== null && call.status >= 400"
-                >
-                  <span class="method-badge" [class]="'method-' + call.method.toLowerCase()">
-                    {{ call.method }}
-                  </span>
-                  <div class="call-info">
-                    <div class="call-path">{{ call.path }}</div>
-                    <div class="call-meta">
-                      @if (call.status !== null) {
-                        <span
-                          class="status-chip"
-                          [class.status-ok]="call.status < 400"
-                          [class.status-err]="call.status >= 400"
-                        >
-                          {{ call.status }}
-                        </span>
-                      }
-                      @if (call.duration !== null) {
-                        <span class="duration-chip">{{ call.duration }}ms</span>
-                      }
-                      <span class="time-chip">{{ call.timestamp | date: 'HH:mm:ss' }}</span>
-                    </div>
-                    @if (call.storedProcedures.length > 0) {
-                      <div class="call-sp-list">
-                        @for (sp of call.storedProcedures; track sp.name) {
-                          <div class="call-sp-row">
-                            <span class="sp-chip">{{ sp.name }}</span>
-                            @if (sp.tables.length > 0) {
-                              <span class="sp-arrow">→</span>
-                              @for (table of sp.tables; track table) {
-                                <span class="table-ref-chip">{{ table }}</span>
-                              }
-                            }
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-                </div>
+            <div class="header-actions">
+              @if (svc.capturedCalls().length > 0) {
+                <button class="btn-clear-calls" (click)="svc.clearCalls()" title="ล้าง">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
               }
+              <button class="btn-close" (click)="close()">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
-          }
+          </div>
+
+          <div class="panel-body">
+            @if (svc.capturedCalls().length === 0) {
+              <div class="empty-body">
+                <i class="fas fa-satellite-dish"></i>
+                <div>ยังไม่มี API call ในหน้านี้</div>
+                <div class="empty-sub">จะแสดงอัตโนมัติเมื่อมีการเรียก API</div>
+              </div>
+            } @else {
+              <div class="calls-list">
+                @for (call of svc.capturedCalls(); track call.timestamp) {
+                  <div
+                    class="call-row"
+                    [class.call-error]="call.status !== null && call.status >= 400"
+                  >
+                    <span class="method-badge" [class]="'method-' + call.method.toLowerCase()">
+                      {{ call.method }}
+                    </span>
+                    <div class="call-info">
+                      <div class="call-path">{{ call.path }}</div>
+                      <div class="call-meta">
+                        @if (call.status !== null) {
+                          <span
+                            class="status-chip"
+                            [class.status-ok]="call.status < 400"
+                            [class.status-err]="call.status >= 400"
+                          >
+                            {{ call.status }}
+                          </span>
+                        }
+                        @if (call.duration !== null) {
+                          <span class="duration-chip">{{ call.duration }}ms</span>
+                        }
+                        <span class="time-chip">{{ call.timestamp | date: 'HH:mm:ss' }}</span>
+                      </div>
+                      @if (call.storedProcedures.length > 0) {
+                        <div class="call-sp-list">
+                          @for (sp of call.storedProcedures; track sp.name) {
+                            <div class="call-sp-row">
+                              <span class="sp-chip">{{ sp.name }}</span>
+                              @if (sp.tables.length > 0) {
+                                <span class="sp-arrow">→</span>
+                                @for (table of sp.tables; track table) {
+                                  <span class="table-ref-chip">{{ table }}</span>
+                                }
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
         </div>
-      </div>
-    }
+      }
     }
   `,
   styles: [

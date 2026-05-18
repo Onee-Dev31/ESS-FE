@@ -54,13 +54,19 @@ export class AuthService {
   });
 
   hasRole(role: string): boolean {
-    return this._userRole()?.split(',').map((r) => r.trim()).includes(role) ?? false;
+    return (
+      this._userRole()
+        ?.split(',')
+        .map((r) => r.trim())
+        .includes(role) ?? false
+    );
   }
 
-  isAdmin = computed(() =>
-    this.hasRole(USER_ROLES.HR) ||
-    this.hasRole(USER_ROLES.EXECUTIVE) ||
-    this.hasRole(USER_ROLES.SUPERVISOR),
+  isAdmin = computed(
+    () =>
+      this.hasRole(USER_ROLES.HR) ||
+      this.hasRole(USER_ROLES.EXECUTIVE) ||
+      this.hasRole(USER_ROLES.SUPERVISOR),
   );
   isHR = computed(() => this.hasRole(USER_ROLES.HR));
   isAccounting = computed(() => this.hasRole(USER_ROLES.ACCOUNTING));

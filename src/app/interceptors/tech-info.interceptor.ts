@@ -1,7 +1,10 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap, finalize } from 'rxjs/operators';
-import { TechInfoService, StoredProcedureInfo } from '../components/shared/tech-info/tech-info.service';
+import {
+  TechInfoService,
+  StoredProcedureInfo,
+} from '../components/shared/tech-info/tech-info.service';
 
 export const techInfoInterceptor: HttpInterceptorFn = (req, next) => {
   const service = inject(TechInfoService);
@@ -29,7 +32,11 @@ export const techInfoInterceptor: HttpInterceptorFn = (req, next) => {
                 const colonIdx = entry.indexOf(':');
                 if (colonIdx === -1) continue;
                 const spName = entry.slice(0, colonIdx).trim();
-                const tables = entry.slice(colonIdx + 1).split('|').map((t) => t.trim()).filter(Boolean);
+                const tables = entry
+                  .slice(colonIdx + 1)
+                  .split('|')
+                  .map((t) => t.trim())
+                  .filter(Boolean);
                 tablesMap[spName] = tables;
               }
             }

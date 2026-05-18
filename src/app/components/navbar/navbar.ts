@@ -138,7 +138,11 @@ export class NavbarComponent {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
 
-    const userRoles = this.authService.userRole()?.split(',').map((r) => r.trim()) ?? [];
+    const userRoles =
+      this.authService
+        .userRole()
+        ?.split(',')
+        .map((r) => r.trim()) ?? [];
 
     return this.allSearchMenus
       .filter((item) => {
