@@ -165,6 +165,20 @@ export class NavbarComponent {
     return `${item.notificationRecipientId ?? item.notificationId ?? item.notificationKey}`;
   }
 
+  formatActorName(item: NotificationInboxItem): string {
+    const name = item.actorName ?? '';
+    const titles = ['นางสาว', 'น.ส.', 'นาย', 'นาง', 'ด.ช.', 'ด.ญ.', 'Miss.', 'Mrs.', 'Mr.'];
+    let clean = name.trim();
+    for (const t of titles) {
+      if (clean.startsWith(t)) {
+        clean = clean.slice(t.length).trim();
+        break;
+      }
+    }
+    const firstName = clean.split(' ')[0] || name;
+    return item.actorNickname ? `${firstName} (${item.actorNickname})` : firstName;
+  }
+
   toggleSidebar() {
     this.sidebarService.toggle();
   }

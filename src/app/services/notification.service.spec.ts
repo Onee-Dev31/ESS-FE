@@ -319,6 +319,7 @@ describe('NotificationService', () => {
       ticketId: null,
       ticketNumber: null,
       actorName: null,
+      actorNickname: null,
       targetType: null,
       payload: null,
       recipientRole: null,
