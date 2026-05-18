@@ -233,21 +233,22 @@ export class ItService implements OnInit {
       list.map((t) => {
         if (t.ticketId != ticketId) return t;
         const updated: any = { ...t, IT_Status: itStatus };
-        if (itStatus === 'In Progress' && detail) {
-          updated.ticketType = detail;
-          updated.status = 'Waiting you';
-        } else if (itStatus === 'Rejected') {
-          updated.status = 'Rejected';
-        } else if (itStatus === 'Referred_Back') {
-          updated.status = 'Referred Back';
-        } else if (itStatus === 'Approved') {
-          updated.status = 'Approved';
-        } else if (itStatus === 'ReOpened') {
-          updated.status = 'Re-Opened';
-          updated.user_status = 'ReOpened';
-        } else {
-          updated.status = this.getTicketStatus(updated);
-        }
+        // if (itStatus === 'In Progress' && detail) {
+        //   updated.ticketType = detail;
+        //   updated.status = 'Waiting you';
+        // } else if (itStatus === 'Rejected') {
+        //   updated.status = 'Rejected';
+        // } else if (itStatus === 'Referred_Back') {
+        //   updated.status = 'Referred Back';
+        // } else if (itStatus === 'Approved') {
+        //   updated.status = 'Approved';
+        // } else if (itStatus === 'ReOpened') {
+        //   updated.status = 'Re-Opened';
+        //   updated.user_status = 'ReOpened';
+        // } else {
+        // แก้เรื่อง Waiting_approve
+        updated.status = this.getTicketStatus(updated);
+        // }
         return updated;
       }),
     );
@@ -272,7 +273,7 @@ export class ItService implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
+      // console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -360,7 +361,7 @@ export class ItService implements OnInit {
 
   selectAssignee(item: any) {
     this.isVisibleAssignee.set(true);
-    console.log(item);
+    // console.log(item);
     this.selectedAssignee.set(item);
   }
 
@@ -463,7 +464,7 @@ export class ItService implements OnInit {
   }
 
   submitReOpen(data: any) {
-    console.log(data);
+    // console.log(data);
     const formData = new FormData();
 
     formData.append('TicketId', data.ticket.ticketId);
@@ -728,12 +729,12 @@ export class ItService implements OnInit {
     const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
     const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
-    console.log({
-      searchText: searchText || undefined,
-      requesterAduser: this.userData.AD_USER,
-      dateFrom,
-      dateTo,
-    });
+    // console.log({
+    //   searchText: searchText || undefined,
+    //   requesterAduser: this.userData.AD_USER,
+    //   dateFrom,
+    //   dateTo,
+    // });
 
     this.itServiceService
       .getMyTickets({
@@ -744,7 +745,7 @@ export class ItService implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.Tickets.set(
             res.data.map((ticket: any) => ({
               ...ticket,

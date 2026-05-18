@@ -110,9 +110,12 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   ngOnInit() {
-    const ticketId = Number(this.route.snapshot.queryParamMap.get('ticketId'));
-    const ticketNumber = this.route.snapshot.queryParamMap.get('ticketNumber') ?? '';
-    this.refreshAndFocus(ticketId || null, ticketNumber || null);
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const ticketId = Number(params['ticketId']);
+      const ticketNumber = params['ticketNumber'] ?? '';
+
+      this.refreshAndFocus(ticketId || null, ticketNumber || null);
+    });
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -132,6 +135,7 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
+    // console.log(ticketId, ticketNumber);
     this.loadingService.start('approvals-it-list');
 
     const page = this.listing.currentPage() + 1;
@@ -150,6 +154,12 @@ export class ApprovalItRequestComponent implements OnInit {
           if (res.statusSummary) this.statusCounts.set(res.statusSummary);
           this.loadingService.stop('approvals-it-list');
           this.cdr.markForCheck();
+
+          this.viewRequestDetail(
+            ticketNumber
+              ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null)
+              : null,
+          );
 
           const resolvedId =
             ticketId ??

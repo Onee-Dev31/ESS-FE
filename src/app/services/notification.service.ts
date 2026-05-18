@@ -165,6 +165,7 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
+        // console.log(items);
         const mapped = items.map((item) => this.mapNotification(item));
         this.items.set(mapped);
         this.hasMore.set(this.computeHasMore(mapped.length, total));
@@ -417,18 +418,9 @@ export class NotificationService {
     const isItRole = [...this.itRoles].some((role) => roleText.includes(role));
     const isApprovalRoute =
       [...this.approverRoles].some((role) => roleText.includes(role)) &&
-      ['approval', 'director', 'decision', 'approver'].some((token) => typeText.includes(token));
-
-    if (isItRole) {
-      return {
-        route: '/it-dashboard',
-        queryParams: {
-          ticketId: input.ticketId ?? undefined,
-          focusZone: 'tickets',
-          _t: Date.now(),
-        },
-      };
-    }
+      ['approval', 'director', 'decision', 'approver', 'reopened'].some((token) =>
+        typeText.includes(token),
+      );
 
     if (isApprovalRoute) {
       return {
@@ -436,6 +428,17 @@ export class NotificationService {
         queryParams: {
           ticketId: input.ticketId ?? undefined,
           ticketNumber: input.ticketNumber ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
+
+    if (isItRole) {
+      return {
+        route: '/it-dashboard',
+        queryParams: {
+          ticketId: input.ticketId ?? undefined,
+          focusZone: 'tickets',
           _t: Date.now(),
         },
       };
