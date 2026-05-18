@@ -229,29 +229,32 @@ export class ItService implements OnInit {
 
   private applyStatusChange(ticketId: any, rawStatus: string) {
     const [itStatus, detail] = (rawStatus ?? '').split('|').map((s) => s.trim());
-    this.Tickets.update((list) =>
-      list.map((t) => {
-        if (t.ticketId != ticketId) return t;
-        const updated: any = { ...t, IT_Status: itStatus };
-        // if (itStatus === 'In Progress' && detail) {
-        //   updated.ticketType = detail;
-        //   updated.status = 'Waiting you';
-        // } else if (itStatus === 'Rejected') {
-        //   updated.status = 'Rejected';
-        // } else if (itStatus === 'Referred_Back') {
-        //   updated.status = 'Referred Back';
-        // } else if (itStatus === 'Approved') {
-        //   updated.status = 'Approved';
-        // } else if (itStatus === 'ReOpened') {
-        //   updated.status = 'Re-Opened';
-        //   updated.user_status = 'ReOpened';
-        // } else {
-        // แก้เรื่อง Waiting_approve
-        updated.status = this.getTicketStatus(updated);
-        // }
-        return updated;
-      }),
-    );
+
+    // this.Tickets.update((list) =>
+    //   list.map((t) => {
+    //     if (t.ticketId != ticketId) return t;
+    //     const updated: any = { ...t, IT_Status: itStatus };
+    //     console.log(updated);
+    //     // if (itStatus === 'In Progress' && detail) {
+    //     //   updated.ticketType = detail;
+    //     //   updated.status = 'Waiting you';
+    //     // } else if (itStatus === 'Rejected') {
+    //     //   updated.status = 'Rejected';
+    //     // } else if (itStatus === 'Referred_Back') {
+    //     //   updated.status = 'Referred Back';
+    //     // } else if (itStatus === 'Approved') {
+    //     //   updated.status = 'Approved';
+    //     // } else if (itStatus === 'ReOpened') {
+    //     //   updated.status = 'Re-Opened';
+    //     //   updated.user_status = 'ReOpened';
+    //     // } else {
+    //     // แก้เรื่อง Waiting_approve
+    //     updated.status = this.getTicketStatus(updated);
+    //     // }
+    //     return updated;
+    //   }),
+    // );
+    this.getMyTicket();
     this.selectTicket(ticketId); //เพราะต้องเรียก progress ด้านขวา
     // if (this.selectedTicket()?.ticketId == ticketId) {
     //   this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
@@ -273,7 +276,7 @@ export class ItService implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
 
@@ -656,10 +659,18 @@ export class ItService implements OnInit {
 
   getTicketStatus(ticket: any) {
     if (
-      (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') || //it เปลี่ยน type request
+      (ticket.IT_Status === 'Assigned' &&
+        ticket.user_status === 'Pending' &&
+        ticket.repair_cost_type === 'paid') || //it เปลี่ยน type request
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
+    } else if (
+      ticket.IT_Status === 'Assigned' &&
+      ticket.user_status === 'Pending' &&
+      ticket.repair_cost_type === 'free'
+    ) {
+      return 'In Progress';
     } else if (ticket.user_status === 'Approved') {
       return 'In Progress';
     } else if (ticket.IT_Status === 'In Progress') {
