@@ -141,14 +141,14 @@
     }
 
     &:hover {
-      background: #f9fafb;
-      color: var(--text-muted);
+      background: var(--bg-table-head);
+      color: var(--text);
     }
 
     &.active {
-      background: #eef2ff;
-      border: 1px solid #c7d2fe;
-      color: var(--text-muted);
+      background: color-mix(in srgb, #6366f1, transparent 85%);
+      border: 1px solid color-mix(in srgb, #6366f1, transparent 50%);
+      color: var(--text);
     }
   }
 }
