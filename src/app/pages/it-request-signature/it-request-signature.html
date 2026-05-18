@@ -105,17 +105,17 @@
               </div>
               <div class="section-content">
                 <div class="info-row">
-                  <div class="info-label">ชื่อขอผู้แจ้ง</div>
-                  <div class="info-value highlight">{{ req.requestFor }}</div>
+                  <div class="info-label">ชื่อผู้ขอแจ้ง</div>
+                  <div class="info-value highlight">{{ req.requester }}</div>
                 </div>
-                <div class="info-row">
+                <!-- <div class="info-row">
                   <div class="info-label">ความประสงค์จะซ่อมอุปกรณ์</div>
                   <div class="info-value">{{ req.device }}</div>
                 </div>
                 <div class="info-row">
                   <div class="info-label">ยี่ห้อ / รุ่น</div>
                   <div class="info-value">{{ req.brand || '-' }} / {{ req.model || '-' }}</div>
-                </div>
+                </div> -->
                 <div class="info-row">
                   <div class="info-label align-top">ลักษณะอาการที่พบ</div>
                   <div class="info-value">{{ req.symptom }}</div>
