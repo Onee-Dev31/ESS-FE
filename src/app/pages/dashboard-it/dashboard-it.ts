@@ -1143,6 +1143,9 @@ export class DashboardIT implements OnInit {
           });
         }, 500);
 
+        // ส่ง TicketStatusChanged ให้ employee เพื่อ refresh progress (silent — ไม่มี toast)
+        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Assigned');
+
         this.selectTicket(res.ticketId || ticketId);
         this.getAllTickets();
       },

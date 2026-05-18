@@ -23,6 +23,7 @@ export interface NotificationApiRecord {
   ticketId?: number | string | null;
   ticket_number?: string | null;
   ticketNumber?: string | null;
+  ticket_name_th?: string | null;
   actor_codeempid?: string | null;
   actorCodeempid?: string | null;
   actor_aduser?: string | null;
@@ -78,6 +79,7 @@ export interface NotificationInboxItem {
   ticketNumber: string | null;
   actorName: string | null;
   actorNickname: string | null;
+  ticket_name_th: string | null;
   targetType: string | null;
   payload: Record<string, unknown> | null;
   recipientRole: string | null;
