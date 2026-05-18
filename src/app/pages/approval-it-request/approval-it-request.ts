@@ -134,8 +134,99 @@ export class ApprovalItRequestComponent implements OnInit {
       .subscribe(() => this.refresh());
   }
 
+  // private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
+  //   // console.log(ticketId, ticketNumber);
+
+  //   if (ticketId && ticketNumber) {
+  //     // กรณีที่ไม่ใช่ status Approve
+  //     this.itServiceService.getTicketById(ticketId.toString()).subscribe();
+  //   }
+  //   this.loadingService.start('approvals-it-list');
+
+  //   const page = this.listing.currentPage() + 1;
+  //   const pageSize = this.listing.pageSize();
+  //   const status = this.listing.filterStatus();
+  //   const apiStatus = this.STATUS_API_MAP[status] || status;
+  //   const empNo = this.authService.userData().CODEMPID;
+
+  //   this.itService
+  //     .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
+  //     .subscribe({
+  //       next: (res) => {
+  //         const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
+  //         this.approvals.set(mappedData);
+  //         this.totalItems.set(res.total);
+  //         if (res.statusSummary) this.statusCounts.set(res.statusSummary);
+  //         this.loadingService.stop('approvals-it-list');
+  //         this.cdr.markForCheck();
+
+  //         this.viewRequestDetail(
+  //           ticketNumber
+  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null)
+  //             : null,
+  //         );
+
+  //         const resolvedId =
+  //           ticketId ??
+  //           (ticketNumber
+  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
+  //             : null);
+
+  //         if (resolvedId) {
+  //           setTimeout(() => {
+  //             this.highlightedTicketId.set(resolvedId);
+  //             this.cdr.markForCheck();
+  //             document
+  //               .getElementById(`approval-row-${resolvedId}`)
+  //               ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //             setTimeout(() => {
+  //               this.highlightedTicketId.set(null);
+  //               this.cdr.markForCheck();
+  //             }, 10000);
+  //           }, 100);
+  //         }
+  //       },
+  //     });
+  // }
+
   private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
-    // console.log(ticketId, ticketNumber);
+    if (ticketId) {
+      // ✅ เรียก getTicketById ก่อน เพื่อรู้ status
+      this.itServiceService.getTicketById(ticketId.toString()).subscribe({
+        next: (res: any) => {
+          const ticket = res?.ticket ?? res;
+          const approvalStatus = ticket?.approval_status;
+
+          // map approval_status → tab name
+          const statusTabMap: Record<string, string> = {
+            New: 'Pending',
+            Approved: 'Approved',
+            Rejected: 'Rejected',
+            Referred_Back: 'Referred Back',
+          };
+
+          const targetTab = statusTabMap[approvalStatus] ?? 'Pending';
+
+          // set tab ถ้าต่างจากปัจจุบัน
+          if (this.listing.filterStatus() !== targetTab) {
+            this.listing.filterStatus.set(targetTab);
+            this.listing.currentPage.set(0);
+          }
+
+          // โหลดข้อมูลแล้ว focus
+          this._doRefreshAndFocus(ticketId, ticketNumber);
+        },
+        error: () => {
+          // ถ้า error ก็ refresh ตามปกติ
+          this._doRefreshAndFocus(ticketId, ticketNumber);
+        },
+      });
+    } else {
+      this._doRefreshAndFocus(ticketId, ticketNumber);
+    }
+  }
+
+  private _doRefreshAndFocus(ticketId: number | null, ticketNumber: string | null) {
     this.loadingService.start('approvals-it-list');
 
     const page = this.listing.currentPage() + 1;
