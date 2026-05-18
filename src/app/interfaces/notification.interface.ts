@@ -24,6 +24,7 @@ export interface NotificationApiRecord {
   ticket_number?: string | null;
   ticketNumber?: string | null;
   ticket_name_th?: string | null;
+  user_status?: string | null;
   actor_codeempid?: string | null;
   actorCodeempid?: string | null;
   actor_aduser?: string | null;
@@ -80,6 +81,7 @@ export interface NotificationInboxItem {
   actorName: string | null;
   actorNickname: string | null;
   ticket_name_th?: string | null;
+  user_status?: string | null;
   targetType: string | null;
   payload: Record<string, unknown> | null;
   recipientRole: string | null;
