@@ -285,7 +285,8 @@
                             <span class="ticket-chip">{{ item.ticketNumber }}</span>
                           }
                           @if (item.actorName) {
-                            <span class="actor-name">{{ formatActorName(item) }}</span>
+                            <!-- <span class="actor-name">{{ formatActorName(item) }}</span> -->
+                            <span class="actor-name">{{ item.ticket_name_th }}</span>
                           }
                         </div>
                       }
