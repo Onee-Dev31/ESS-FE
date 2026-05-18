@@ -390,6 +390,7 @@ export class NotificationService {
       ticketNumber,
       actorName: this.toText(item.actor_name ?? item.actorName) ?? null,
       actorNickname: this.toText(item.actor_nickname ?? item.actorNickname) ?? null,
+      ticket_name_th: this.toText(item.ticket_name_th) ?? null,
       targetType: this.toText(item.target_type ?? item.targetType) ?? null,
       payload,
       recipientRole: this.toText(item.recipient_role ?? item.recipientRole) ?? null,
