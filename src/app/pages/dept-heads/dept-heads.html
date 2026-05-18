@@ -1,211 +1,1033 @@
 <div class="page">
   <app-page-header [title]="pageTitle()" />
 
-  <div class="filter-card">
-    <div class="filter-title">ตัวเลือกสำหรับการค้นหา</div>
-    <div class="filter-grid">
-      <div class="field-box">
-        <label class="field-label">บริษัท</label>
-        <select
-          class="field-input"
-          aria-label="เลือกบริษัท"
-          [ngModel]="filterCompany()"
-          (ngModelChange)="onCompanyChange($event)"
-        >
-          <option value="">ทุกบริษัท</option>
-          @for (c of companyList(); track c.code) {
-            <option [value]="c.code">{{ c.name }} ({{ c.code }})</option>
-          }
-        </select>
-      </div>
-      <div class="field-box" [class.disabled]="!filterCompany()">
-        <label class="field-label">แผนก</label>
-        <select
-          class="field-input"
-          aria-label="เลือกแผนก"
-          [ngModel]="filterDept()"
-          (ngModelChange)="filterDept.set($event)"
-          [disabled]="!filterCompany()"
-        >
-          <option value="">ทุกแผนก</option>
-          @for (d of deptList(); track d.cost_cent) {
-            <option [value]="d.cost_cent">{{ d.name }} ({{ d.cost_cent }})</option>
-          }
-        </select>
-      </div>
-      <div class="filter-bottom-row">
-        <div class="field-box field-grow">
-          <label class="field-label">ค้นหาพนักงาน</label>
-          <input
-            type="text"
-            class="field-input"
-            placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
-            [ngModel]="filterText()"
-            (ngModelChange)="filterText.set($event)"
-            (keyup.enter)="applyFilter()"
-          />
-        </div>
-        <button type="button" class="btn-search" (click)="applyFilter()">
-          <i class="fas fa-search"></i> Search
-        </button>
-        <button type="button" class="btn-clear" (click)="clearFilter()">
-          <i class="fas fa-times"></i> Clear
-        </button>
-      </div>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab-bar-scroll">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'list'"
+        (click)="setTab('list')"
+      >
+        <i class="fas fa-users"></i>
+        <span class="tab-label">รายชื่อหัวหน้าแผนก</span>
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'override'"
+        (click)="setTab('override')"
+      >
+        <i class="fas fa-user-cog"></i>
+        <span class="tab-label">Override รายแผนก</span>
+        <!-- @if (totalOverrideDepts() > 0) {
+          <span class="tab-badge">{{ totalOverrideDepts() }}</span>
+        } -->
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'emp-override'"
+        (click)="setTab('emp-override')"
+      >
+        <i class="fas fa-user-shield"></i>
+        <span class="tab-label">Override รายบุคคล</span>
+      </button>
     </div>
+    <button type="button" class="btn-help" (click)="openHelp()" title="คู่มือการใช้งาน">
+      <i class="fas fa-question-circle"></i>
+    </button>
   </div>
 
-  <div class="content-card">
-    <div class="card-header-title">รายชื่อหัวหน้าแผนก</div>
+  <!-- ==================== TAB: LIST ==================== -->
+  @if (activeTab() === 'list') {
+    <div class="filter-card">
+      <div class="filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
+      </div>
+      <div class="filter-grid">
+        <div class="field-box">
+          <label class="field-label">บริษัท</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกบริษัท"
+            [ngModel]="filterCompany()"
+            (ngModelChange)="onCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
+          <label class="field-label">แผนก</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกแผนก"
+            [ngModel]="filterDept()"
+            (ngModelChange)="filterDept.set($event)"
+            [nzDisabled]="!filterCompany()"
+          >
+            @for (d of deptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหาพนักงาน</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+              [ngModel]="filterText()"
+              (ngModelChange)="filterText.set($event)"
+              (keyup.enter)="applyFilter()"
+            />
+          </div>
+          <button type="button" class="btn-search" (click)="applyFilter()">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn-clear" (click)="clearFilter()">
+            <i class="fas fa-times"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
 
-    <div class="table-responsive">
-      @if (isLoading()) {
-        <app-skeleton type="table" [rows]="5" />
-      } @else {
-        <table class="modern-table">
-          <thead>
-            <tr>
-              <th>บริษัท</th>
-              <th>แผนก</th>
-              <th>หัวหน้าแผนก</th>
-              <th class="text-center">พนักงาน</th>
-              <th class="text-center"></th>
-            </tr>
-          </thead>
-          @for (dept of paginatedItems(); track dept.cost_cent) {
-            <tbody>
+    <div class="content-card">
+      <div class="card-header-title head">รายชื่อหัวหน้าแผนก</div>
+
+      <div class="table-responsive">
+        @if (isLoading()) {
+          <app-skeleton type="table" [rows]="5" />
+        } @else {
+          <table class="modern-table">
+            <thead>
               <tr>
-                <td>
-                  <div class="cell-primary">{{ dept.company_name }}</div>
-                  <div class="cell-sub">{{ dept.company_code }}</div>
-                </td>
-                <td>
-                  <div class="cell-primary">{{ dept.name_cost_cent }}</div>
-                  <div class="cell-sub">{{ dept.cost_cent }}</div>
-                </td>
-                <td>
-                  <div class="heads-list">
-                    @for (head of sortedHeads(dept.heads); track head.code) {
-                      <div class="head-item">
-                        <span class="level-badge" [class.level-1]="head.level === 1">
-                          {{ getLevelLabel(head.level) }}
-                        </span>
-                        <span class="head-name">{{ head.name }}</span>
-                      </div>
-                    }
-                  </div>
-                </td>
-                <td>
-                  @if (appliedText()) {
-                    <div class="matching-employees">
-                      @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
-                        <div class="match-emp">
-                          <span class="match-name">{{ emp.emp_name }}</span>
-                          @if (emp.nickname) {
-                            <span class="match-nickname">({{ emp.nickname }})</span>
-                          }
-                          <span class="match-code">{{ emp.emp_code }}</span>
+                <th>บริษัท</th>
+                <th>แผนก</th>
+                <th>หัวหน้าแผนก</th>
+                <th class="text-center">พนักงาน</th>
+                <th class="text-center"></th>
+              </tr>
+            </thead>
+            @for (dept of paginatedItems(); track dept.cost_cent) {
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="cell-primary">{{ dept.company_name }}</div>
+                    <div class="cell-sub">{{ dept.company_code }}</div>
+                  </td>
+                  <td>
+                    <div class="cell-primary">{{ dept.name_cost_cent }}</div>
+                    <div class="cell-sub">{{ dept.cost_cent }}</div>
+                  </td>
+                  <td>
+                    <div class="heads-list">
+                      @for (head of sortedHeads(dept.heads); track head.code) {
+                        <div class="head-item">
+                          <span class="level-badge" [class.level-1]="head.level === 1">
+                            {{ getLevelLabel(head.level) }}
+                          </span>
+                          <span class="head-name">{{ head.name }}</span>
                         </div>
                       }
                     </div>
-                  } @else {
-                    <div class="text-center">
-                      <span class="emp-count">{{ dept.employees.length }}</span>
-                    </div>
-                  }
-                </td>
-                <td class="text-center">
-                  <button class="btn-ghost" (click)="openDetail(dept)">
-                    <i class="fas fa-users"></i> พนักงาน
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          } @empty {
-            <tbody>
-              <tr>
-                <td colspan="5" class="no-data-cell">
-                  <app-empty-state
-                    title="ไม่พบข้อมูล"
-                    description="ไม่พบข้อมูลหัวหน้าแผนก"
-                    icon="fas fa-users-slash"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          }
-        </table>
-      }
-    </div>
+                  </td>
+                  <td>
+                    @if (appliedText()) {
+                      <div class="matching-employees">
+                        @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                          <div class="match-emp">
+                            <span class="match-name">{{ emp.emp_name }}</span>
+                            @if (emp.nickname) {
+                              <span class="match-nickname">({{ emp.nickname }})</span>
+                            }
+                            <span class="match-code">{{ emp.emp_code }}</span>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="text-center">
+                        <span class="emp-count">{{ dept.employees.length }}</span>
+                      </div>
+                    }
+                  </td>
+                  <td class="text-center">
+                    <button class="btn-ghost" (click)="openDetail(dept)">
+                      <i class="fas fa-users"></i> พนักงาน
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            } @empty {
+              <tbody>
+                <tr>
+                  <td colspan="5" class="no-data-cell">
+                    <app-empty-state
+                      title="ไม่พบข้อมูล"
+                      description="ไม่พบข้อมูลหัวหน้าแผนก"
+                      icon="fas fa-users-slash"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            }
+          </table>
+        }
+      </div>
 
-    <div class="card-list-view">
-      @if (isLoading()) {
-        <app-skeleton type="card" [rows]="3" />
-      } @else {
-        @for (dept of paginatedItems(); track dept.cost_cent) {
-          <div class="mobile-card">
-            <div class="card-header">
-              <div class="header-content">
-                <span class="card-dept-name">{{ dept.name_cost_cent }}</span>
-                <div class="card-dept-code">{{ dept.cost_cent }}</div>
-              </div>
-              <span class="company-badge">{{ dept.company_code }}</span>
-            </div>
-            <div class="card-body">
-              @for (head of sortedHeads(dept.heads); track head.code) {
-                <div class="info-row">
-                  <span class="label">
-                    <i class="fas fa-user-tie"></i> {{ getLevelLabel(head.level) }}:
-                  </span>
-                  <span class="value">{{ head.name }}</span>
+      <div class="card-list-view">
+        @if (isLoading()) {
+          <app-skeleton type="card" [rows]="3" />
+        } @else {
+          @for (dept of paginatedItems(); track dept.cost_cent) {
+            <div class="mobile-card">
+              <div class="card-header">
+                <div class="header-content">
+                  <span class="card-dept-name">{{ dept.name_cost_cent }}</span>
+                  <div class="card-dept-code">{{ dept.cost_cent }}</div>
                 </div>
-              }
-              @if (appliedText()) {
-                @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                <span class="company-badge">{{ dept.company_code }}</span>
+              </div>
+              <div class="card-body">
+                @for (head of sortedHeads(dept.heads); track head.code) {
                   <div class="info-row">
-                    <span class="label"><i class="fas fa-user"></i> พนักงาน:</span>
-                    <span class="value">
-                      {{ emp.emp_name }}
-                      @if (emp.nickname) {
-                        ({{ emp.nickname }})
-                      }
+                    <span class="label">
+                      <i class="fas fa-user-tie"></i> {{ getLevelLabel(head.level) }}:
                     </span>
+                    <span class="value">{{ head.name }}</span>
                   </div>
                 }
-              } @else {
-                <div class="info-row">
-                  <span class="label"><i class="fas fa-users"></i> พนักงาน:</span>
-                  <span class="value">{{ dept.employees.length }} คน</span>
+                @if (appliedText()) {
+                  @for (emp of getMatchingEmployees(dept); track emp.emp_code) {
+                    <div class="info-row">
+                      <span class="label"><i class="fas fa-user"></i> พนักงาน:</span>
+                      <span class="value">
+                        {{ emp.emp_name }}
+                        @if (emp.nickname) {
+                          ({{ emp.nickname }})
+                        }
+                      </span>
+                    </div>
+                  }
+                } @else {
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-users"></i> พนักงาน:</span>
+                    <span class="value">{{ dept.employees.length }} คน</span>
+                  </div>
+                }
+                <div class="card-footer-actions">
+                  <button class="btn-detail" (click)="openDetail(dept)">
+                    <i class="fas fa-users"></i> ดูรายชื่อพนักงาน
+                  </button>
                 </div>
-              }
-              <div class="card-footer-actions">
-                <button class="btn-detail" (click)="openDetail(dept)">
-                  <i class="fas fa-users"></i> ดูรายชื่อพนักงาน
-                </button>
               </div>
             </div>
+          } @empty {
+            <app-empty-state
+              title="ไม่พบข้อมูล"
+              description="ไม่พบข้อมูลหัวหน้าแผนก"
+              icon="fas fa-users-slash"
+            />
+          }
+        }
+      </div>
+
+      <div class="pagination-wrapper">
+        <app-pagination
+          [currentPage]="currentPage()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          (onPageChange)="goToPage($event)"
+          (onPageSizeChange)="setPageSize($event)"
+        />
+      </div>
+    </div>
+  }
+
+  <!-- ==================== TAB: OVERRIDE ==================== -->
+  @if (activeTab() === 'override') {
+    <div class="filter-card">
+      <div class="filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
+      </div>
+      <div class="filter-grid">
+        <div class="field-box">
+          <label class="field-label">บริษัท</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกบริษัท"
+            [ngModel]="overrideCompanyFilter()"
+            (ngModelChange)="onOverrideCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
+          <label class="field-label">แผนก</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="ทุกแผนก"
+            [ngModel]="overrideDeptFilter()"
+            (ngModelChange)="overrideDeptFilter.set($event)"
+            [nzDisabled]="!overrideCompanyFilter()"
+          >
+            @for (d of overrideFilterDeptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหา</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อแผนก, ชื่อพนักงาน หรือ รหัสพนักงาน..."
+              [ngModel]="overrideSearchText()"
+              (ngModelChange)="overrideSearchText.set($event)"
+              (keyup.enter)="applyOverrideFilter()"
+            />
           </div>
-        } @empty {
+          <button type="button" class="btn-search" (click)="applyOverrideFilter()">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn-clear" (click)="clearOverrideFilter()">
+            <i class="fas fa-times"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overrides table -->
+    <div class="content-card">
+      <div class="card-header-row">
+        <div class="card-header-title dept">
+          Override ที่ตั้งไว้ ({{ totalOverrideDepts() }} แผนก)
+        </div>
+        <button type="button" class="btn-search btn-header-action" (click)="openOverrideModal()">
+          <i class="fas fa-plus"></i> เพิ่ม Override
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        @if (isOverrideLoading()) {
+          <app-skeleton type="table" [rows]="4" />
+        } @else {
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>แผนก</th>
+                <th>ระดับ</th>
+                <th>หัวหน้างาน</th>
+                <th>อัปเดตล่าสุด</th>
+                <th class="text-center">จัดการ</th>
+              </tr>
+            </thead>
+            @if (groupedOverridesByCompany().length === 0) {
+              <tbody>
+                <tr>
+                  <td colspan="6" class="no-data-cell">
+                    <app-empty-state
+                      title="ไม่มี Override"
+                      description="ยังไม่มีการตั้ง override หัวหน้าแผนก"
+                      icon="fas fa-user-slash"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            } @else {
+              @for (company of groupedOverridesByCompany(); track company.company_code) {
+                <tbody class="company-header-body">
+                  <tr class="company-header-row">
+                    <td colspan="5">
+                      <div class="company-header-content">
+                        <i class="fas fa-building"></i>
+                        <span class="company-header-name">{{ company.company_name }}</span>
+                        <span class="company-header-code">{{ company.company_code }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                @for (group of company.groups; track group.cost_cent) {
+                  <tbody class="override-group">
+                    @for (row of group.rows; track row.level; let isFirst = $first) {
+                      <tr>
+                        @if (isFirst) {
+                          <td class="dept-cell" [attr.rowspan]="group.rows.length + 1">
+                            <div class="cell-primary">{{ group.name_cost_cent }}</div>
+                            <div class="cell-sub">{{ group.cost_cent }}</div>
+                          </td>
+                        }
+                        <td>
+                          <span class="level-badge" [class.level-1]="row.level === 1">
+                            ระดับ {{ row.level }}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="cell-primary">{{ row.emp_name }}</div>
+                          <div class="cell-sub">{{ row.codeempid }}</div>
+                        </td>
+                        <td class="date-cell">{{ row.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="text-center">
+                          <button
+                            class="btn-icon btn-icon-delete"
+                            (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                            title="ลบระดับนี้"
+                          >
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                    <!-- Group footer row -->
+                    <tr class="group-footer-row">
+                      <td colspan="5">
+                        <div class="group-actions">
+                          <button
+                            class="btn-group-edit"
+                            (click)="editDeptOverride(group.cost_cent)"
+                          >
+                            <i class="fas fa-pen"></i> แก้ไขแผนกนี้
+                          </button>
+                          <button
+                            class="btn-group-delete"
+                            (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                          >
+                            <i class="fas fa-trash-alt"></i> ลบทั้งหมด
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                }
+              }
+            }
+          </table>
+        }
+      </div>
+
+      <!-- Mobile cards for override groups -->
+      <div class="card-list-view">
+        @if (isOverrideLoading()) {
+          <app-skeleton type="card" [rows]="3" />
+        } @else {
+          @for (company of groupedOverridesByCompany(); track company.company_code) {
+            <div class="company-mobile-header">
+              <i class="fas fa-building"></i>
+              <span class="company-mobile-name">{{ company.company_name }}</span>
+              <span class="company-header-code">{{ company.company_code }}</span>
+            </div>
+            @for (group of company.groups; track group.cost_cent) {
+              <div class="mobile-card">
+                <div class="card-header">
+                  <div class="header-content">
+                    <span class="card-dept-name">{{ group.name_cost_cent }}</span>
+                    <div class="card-dept-code">{{ group.cost_cent }}</div>
+                  </div>
+                  <div class="card-icon-actions">
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="editDeptOverride(group.cost_cent)"
+                      title="แก้ไข"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button
+                      class="btn-icon btn-icon-delete"
+                      (click)="deleteAllOverrides(group.cost_cent, group.name_cost_cent)"
+                      title="ลบทั้งหมด"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  @for (row of group.rows; track row.level) {
+                    <div class="override-level-row">
+                      <div class="level-row-info">
+                        <span class="level-badge" [class.level-1]="row.level === 1">
+                          ระดับ {{ row.level }}
+                        </span>
+                        <div>
+                          <div class="cell-primary">{{ row.emp_name }}</div>
+                          <div class="cell-sub">{{ row.codeempid }}</div>
+                        </div>
+                      </div>
+                      <button
+                        class="btn-icon btn-icon-delete"
+                        (click)="deleteOverrideLevel(row, group.name_cost_cent)"
+                        title="ลบระดับนี้"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  }
+                  @if (group.rows[0]?.reason) {
+                    <div class="info-row" style="margin-top: 10px">
+                      <span class="label"><i class="fas fa-comment-alt"></i> เหตุผล:</span>
+                      <span class="value">{{ group.rows[0].reason }}</span>
+                    </div>
+                  }
+                  <div class="info-row">
+                    <span class="label"><i class="fas fa-clock"></i> อัปเดต:</span>
+                    <span class="value">
+                      {{ group.rows[group.rows.length - 1].updated_at | date: 'dd/MM/yyyy HH:mm' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+          } @empty {
+            <app-empty-state
+              title="ไม่มี Override"
+              description="ยังไม่มีการตั้ง override หัวหน้าแผนก"
+              icon="fas fa-user-slash"
+            />
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ==================== TAB: EMP OVERRIDE ==================== -->
+  @if (activeTab() === 'emp-override') {
+    <div class="filter-card">
+      <div class="filter-title">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> ตัวเลือกสำหรับการค้นหา
+      </div>
+      <div class="filter-grid">
+        <div class="field-box">
+          <label class="field-label">บริษัท</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกบริษัท --"
+            [ngModel]="empCompanyFilter()"
+            (ngModelChange)="onEmpCompanyChange($event)"
+          >
+            @for (c of companyList(); track c.code) {
+              <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="field-box">
+          <label class="field-label">แผนก</label>
+          <nz-select
+            class="field-nz-select"
+            nzShowSearch
+            nzAllowClear
+            nzPlaceHolder="-- เลือกแผนก --"
+            [ngModel]="empDeptFilter()"
+            (ngModelChange)="onEmpDeptFilterChange($event)"
+            [nzDisabled]="!empCompanyFilter()"
+          >
+            @for (d of empDeptList(); track d.cost_cent) {
+              <nz-option [nzValue]="d.cost_cent" [nzLabel]="d.name + ' (' + d.cost_cent + ')'" />
+            }
+          </nz-select>
+        </div>
+        <div class="filter-bottom-row">
+          <div class="field-box field-grow">
+            <label class="field-label">ค้นหาพนักงาน</label>
+            <input
+              type="text"
+              class="field-input"
+              placeholder="ชื่อ-นามสกุล, ชื่อเล่น หรือ รหัสพนักงาน..."
+              [ngModel]="empSearchText()"
+              (ngModelChange)="empSearchText.set($event)"
+              (keyup.enter)="applyEmpFilter()"
+            />
+          </div>
+          <button type="button" class="btn-search" (click)="applyEmpFilter()">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn-clear" (click)="clearEmpFilter()">
+            <i class="fas fa-times"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card" style="margin-top: 16px">
+      <div class="card-header-title">
+        รายชื่อพนักงาน
+        @if (appliedEmpDept()) {
+          ({{ empDisplayEmployees().length }} คน)
+        }
+      </div>
+
+      @if (selectedCount() > 0) {
+        <div class="bulk-action-bar">
+          <span class="bulk-selected-label">
+            <!-- <i class="fas fa-check-square"></i>
+            เลือก {{ selectedCount() }} คน -->
+          </span>
+          <div class="bulk-actions">
+            <button class="btn-bulk-override" (click)="openBulkModal()">
+              <i class="fas fa-user-shield"></i>
+              ตั้ง Override ({{ selectedCount() }} คน)
+            </button>
+            <button class="btn-bulk-clear" (click)="clearSelection()">
+              <i class="fas fa-times"></i> ยกเลิกการเลือก
+            </button>
+          </div>
+        </div>
+      }
+
+      <div class="table-responsive">
+        @if (isEmpOverrideLoading()) {
+          <app-skeleton type="table" [rows]="5" />
+        } @else {
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th class="checkbox-col">
+                  <input
+                    type="checkbox"
+                    class="emp-row-checkbox"
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isPartiallySelected()"
+                    [disabled]="!appliedEmpDept() || empDisplayEmployees().length === 0"
+                    (change)="toggleAllSelection()"
+                  />
+                </th>
+                <th style="min-width: 150px">พนักงาน</th>
+                <th class="text-center level-col">ระดับ 1</th>
+                <th class="text-center level-col">ระดับ 2</th>
+                <th class="text-center level-col">ระดับ 3</th>
+                <th class="text-center level-col">ระดับ 4</th>
+                <th class="text-center level-col">ระดับ 5</th>
+                <th class="text-center level-col">ระดับ 6</th>
+                <th>วันที่สร้าง</th>
+                <th class="text-center" style="width: 80px">จัดการ</th>
+              </tr>
+            </thead>
+            @if (appliedEmpDept()) {
+              @for (emp of empDisplayEmployees(); track emp.emp_code) {
+                <tbody>
+                  <tr [class.has-override]="getEmpOverridesForEmp(emp.emp_code).length > 0">
+                    <td class="checkbox-cell">
+                      <input
+                        type="checkbox"
+                        class="emp-row-checkbox"
+                        [checked]="isEmpSelected(emp.emp_code)"
+                        (change)="toggleEmpSelection(emp.emp_code)"
+                      />
+                    </td>
+                    <td>
+                      <div class="cell-primary">{{ emp.emp_name.split(' ')[0] }}</div>
+                      <div class="cell-primary">{{ emp.emp_name.split(' ')[1] }}</div>
+                      @if (emp.nickname) {
+                        <div class="cell-sub">({{ emp.nickname }})</div>
+                      }
+                      <div class="cell-sub">{{ emp.emp_code }}</div>
+                    </td>
+                    @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
+                      <td class="level-cell">
+                        @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                        @let def = getDefaultHeadByLevel(appliedEmpDept(), lvl, emp.emp_code);
+                        @if (ov) {
+                          <div class="head-name-cell">{{ ov.head_name.split(' ')[0] }}</div>
+                          <div class="head-name-cell">{{ ov.head_name.split(' ')[1] }}</div>
+                          <div class="cell-sub">({{ ov.head_nickname }})</div>
+                          <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                          <div class="default-source-badge individual">รายบุคคล</div>
+                        } @else if (def) {
+                          <div class="default-head-name">{{ def.name.split(' ')[0] }}</div>
+                          <div class="default-head-name">{{ def.name.split(' ')[1] }}</div>
+                          <div class="cell-sub">{{ def.code }}</div>
+                          <div
+                            class="default-source-badge"
+                            [class.badge-dept-override]="def.source === 'dept-override'"
+                          >
+                            {{ def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น' }}
+                          </div>
+                        } @else {
+                          <span class="no-head">-</span>
+                        }
+                      </td>
+                    }
+                    @let latest = getLatestEmpOverride(emp.emp_code);
+                    <td class="date-cell">
+                      <div class="cell-sub">{{ latest?.created_by || '-' }}</div>
+                      <div class="cell-sub">{{ latest?.created_at | date: 'dd/MM/yyyy' }}</div>
+                      <div class="cell-sub">{{ latest?.created_at | date: 'HH:mm' }}</div>
+                    </td>
+                    <td class="text-center">
+                      @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                        <div class="group-actions">
+                          <button class="btn-group-edit" (click)="openEmpModal(emp)">
+                            <i class="fas fa-pen"></i>
+                          </button>
+                          <button class="btn-group-delete" (click)="deleteEmpAllOverrides(emp)">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      } @else {
+                        <button class="btn-group-edit" (click)="openEmpModal(emp)">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                </tbody>
+              } @empty {
+                <tbody>
+                  <tr>
+                    <td colspan="11" class="no-data-cell">
+                      <app-empty-state
+                        title="ไม่พบพนักงาน"
+                        description="ไม่มีพนักงานในแผนกนี้"
+                        icon="fas fa-user-slash"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              }
+            } @else {
+              <tbody>
+                <tr>
+                  <td colspan="11" class="no-data-cell">
+                    @if (!empCompanyFilter()) {
+                      <app-empty-state
+                        title="เลือกบริษัท"
+                        description="กรุณาเลือกบริษัท แล้วเลือกแผนก และกด Search"
+                        icon="fas fa-building"
+                      />
+                    } @else if (!empDeptFilter()) {
+                      <app-empty-state
+                        title="เลือกแผนก"
+                        description="กรุณาเลือกแผนก แล้วกด Search เพื่อดูรายชื่อพนักงาน"
+                        icon="fas fa-sitemap"
+                      />
+                    } @else {
+                      <app-empty-state
+                        title="กด Search เพื่อค้นหา"
+                        description="เลือกบริษัทและแผนกครบแล้ว กด Search เพื่อแสดงรายชื่อพนักงาน"
+                        icon="fas fa-search"
+                      />
+                    }
+                  </td>
+                </tr>
+              </tbody>
+            }
+          </table>
+        }
+      </div>
+
+      <!-- Mobile card view for emp-override -->
+      <div class="emp-card-list">
+        @if (isEmpOverrideLoading()) {
+          <app-skeleton type="card" [rows]="4" />
+        } @else if (appliedEmpDept() && empDisplayEmployees().length > 0) {
+          <div class="mobile-select-bar">
+            <label class="mobile-select-all">
+              <input
+                type="checkbox"
+                class="emp-row-checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="isPartiallySelected()"
+                (change)="toggleAllSelection()"
+              />
+              <span>เลือกทั้งหมด ({{ empDisplayEmployees().length }} คน)</span>
+            </label>
+          </div>
+          @for (emp of empDisplayEmployees(); track emp.emp_code) {
+            <div
+              class="mobile-card emp-override-card"
+              [class.has-override]="getEmpOverridesForEmp(emp.emp_code).length > 0"
+            >
+              <div class="card-header emp-card-head">
+                <div class="emp-card-left">
+                  <input
+                    type="checkbox"
+                    class="emp-row-checkbox"
+                    [checked]="isEmpSelected(emp.emp_code)"
+                    (change)="toggleEmpSelection(emp.emp_code)"
+                  />
+                  <div class="emp-card-info">
+                    <div class="emp-name-row">
+                      <div class="cell-primary">{{ emp.emp_name }}</div>
+                      <!-- @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                        <span class="badge-override-count">
+                          <i class="fas fa-shield-alt"></i>
+                          {{ getEmpOverridesForEmp(emp.emp_code).length }} ระดับ
+                        </span>
+                      } @else {
+                        <span class="badge-no-override">ยังไม่ตั้ง</span>
+                      } -->
+                    </div>
+                    @if (emp.nickname) {
+                      <div class="cell-sub">({{ emp.nickname }})</div>
+                    }
+                    <div class="cell-sub">{{ emp.emp_code }}</div>
+                  </div>
+                </div>
+                <div class="card-icon-actions">
+                  @if (getEmpOverridesForEmp(emp.emp_code).length > 0) {
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="openEmpModal(emp)"
+                      title="แก้ไข"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    <button
+                      class="btn-icon btn-icon-delete"
+                      (click)="deleteEmpAllOverrides(emp)"
+                      title="ลบทั้งหมด"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  } @else {
+                    <button
+                      class="btn-icon btn-icon-edit"
+                      (click)="openEmpModal(emp)"
+                      title="ตั้ง Override"
+                    >
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+              @if (getEmpOverridesForEmp(emp.emp_code).length > 0 || currentDeptHasAnyHeads()) {
+                <div class="card-body">
+                  <div class="emp-level-grid">
+                    @for (lvl of [1, 2, 3, 4, 5, 6]; track lvl) {
+                      @let ov = getEmpOverrideByLevel(emp.emp_code, lvl);
+                      @let def = getDefaultHeadByLevel(appliedEmpDept(), lvl, emp.emp_code);
+                      @if (ov) {
+                        <div class="emp-level-row">
+                          <span class="level-badge level-1">ระดับ {{ lvl }}</span>
+                          <i class="fas fa-arrow-right level-row-arrow"></i>
+                          <div class="emp-level-head">
+                            <div class="head-name-cell">{{ ov.head_name }}</div>
+                            <div class="cell-sub">{{ ov.head_codeempid }}</div>
+                            <span class="default-source-badge individual">รายบุคคล</span>
+                          </div>
+                        </div>
+                      } @else if (def) {
+                        <div class="emp-level-row emp-level-row--default">
+                          <span class="level-badge">ระดับ {{ lvl }}</span>
+                          <i class="fas fa-arrow-right level-row-arrow"></i>
+                          <div class="emp-level-head">
+                            <div class="default-head-name">{{ def.name }}</div>
+                            <div class="cell-sub">{{ def.code }}</div>
+                            <span
+                              class="default-source-badge"
+                              [class.badge-dept-override]="def.source === 'dept-override'"
+                              >{{
+                                def.source === 'dept-override' ? 'รายแผนก' : 'ค่าเริ่มต้น'
+                              }}</span
+                            >
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                  @let latest = getLatestEmpOverride(emp.emp_code);
+                  @if (latest) {
+                    <div class="card-meta-row">
+                      @if (latest.created_by) {
+                        <span class="meta-item">
+                          <i class="fas fa-user-pen"></i> {{ latest.created_by }}
+                        </span>
+                        <span class="meta-sep">·</span>
+                      }
+                      <span class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        {{ latest.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        } @else if (appliedEmpDept()) {
           <app-empty-state
-            title="ไม่พบข้อมูล"
-            description="ไม่พบข้อมูลหัวหน้าแผนก"
-            icon="fas fa-users-slash"
+            title="ไม่พบพนักงาน"
+            description="ไม่มีพนักงานในแผนกนี้"
+            icon="fas fa-user-slash"
+          />
+        } @else if (!empCompanyFilter()) {
+          <app-empty-state
+            title="เลือกบริษัท"
+            description="กรุณาเลือกบริษัท แล้วเลือกแผนก และกด Search"
+            icon="fas fa-building"
+          />
+        } @else if (!empDeptFilter()) {
+          <app-empty-state
+            title="เลือกแผนก"
+            description="กรุณาเลือกแผนก แล้วกด Search เพื่อดูรายชื่อพนักงาน"
+            icon="fas fa-sitemap"
+          />
+        } @else {
+          <app-empty-state
+            title="กด Search เพื่อค้นหา"
+            description="เลือกบริษัทและแผนกครบแล้ว กด Search เพื่อแสดงรายชื่อพนักงาน"
+            icon="fas fa-search"
           />
         }
-      }
+      </div>
     </div>
+  }
 
-    <div class="pagination-wrapper">
-      <app-pagination
-        [currentPage]="currentPage()"
-        [pageSize]="pageSize()"
-        [totalItems]="totalItems()"
-        (onPageChange)="goToPage($event)"
-        (onPageSizeChange)="setPageSize($event)"
-      />
+  <!-- ==================== OVERRIDE MODAL ==================== -->
+  @if (overrideModalOpen()) {
+    <div class="modal-backdrop" (click)="closeOverrideModal()"></div>
+    <div class="modal" (click)="closeOverrideModal()">
+      <div class="modal-card override-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-user-cog"></i>
+              {{ isEditingOverride() ? 'แก้ไข Override' : 'เพิ่ม Override' }} หัวหน้าแผนก
+            </div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeOverrideModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Company + Department selector -->
+          <div class="filter-grid">
+            <div class="field-box">
+              <label class="field-label">บริษัท *</label>
+              <nz-select
+                class="field-nz-select"
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="-- เลือกบริษัท --"
+                [ngModel]="formCompanyFilter()"
+                (ngModelChange)="onFormCompanyChange($event)"
+              >
+                @for (c of companyList(); track c.code) {
+                  <nz-option [nzValue]="c.code" [nzLabel]="c.name + ' (' + c.code + ')'" />
+                }
+              </nz-select>
+            </div>
+            <div class="field-box">
+              <label class="field-label">แผนก *</label>
+              <nz-select
+                class="field-nz-select"
+                nzShowSearch
+                nzAllowClear
+                nzPlaceHolder="-- เลือกแผนก --"
+                [ngModel]="formDeptCode()"
+                (ngModelChange)="onFormDeptChange($event)"
+                [nzDisabled]="!formCompanyFilter()"
+              >
+                @for (d of formDeptList(); track d.cost_cent) {
+                  <nz-option
+                    [nzValue]="d.cost_cent"
+                    [nzLabel]="d.name + ' (' + d.cost_cent + ')'"
+                  />
+                }
+              </nz-select>
+            </div>
+          </div>
+
+          <!-- Level rows -->
+          @if (formDeptCode()) {
+            <div class="form-rows">
+              @for (row of formRows(); track row.level; let i = $index) {
+                <div class="form-row-item">
+                  <span class="level-num">ระดับ {{ row.level }}</span>
+                  <div class="field-box row-emp-field">
+                    <label class="field-label">พนักงาน (ทุกแผนก)</label>
+                    <nz-select
+                      class="field-nz-select"
+                      nzShowSearch
+                      nzAllowClear
+                      nzPlaceHolder="-- เลือกพนักงาน --"
+                      [ngModel]="row.empCode"
+                      (ngModelChange)="updateRowEmp(i, $event)"
+                    >
+                      @for (e of getAvailableEmployees(i); track e.emp_code) {
+                        <nz-option
+                          [nzValue]="e.emp_code"
+                          [nzLabel]="
+                            e.emp_name +
+                            (e.nickname ? ' (' + e.nickname + ')' : '') +
+                            ' - ' +
+                            e.emp_code
+                          "
+                        />
+                      }
+                    </nz-select>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-icon btn-icon-delete"
+                    (click)="removeFormRow(i)"
+                    title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <button type="button" class="btn-add-row" (click)="addFormRow()">
+              <i class="fas fa-plus"></i> เพิ่มระดับ
+            </button>
+          }
+
+          <!-- Reason + actions -->
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="formReason()"
+                (ngModelChange)="formReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveOverride()"
+                [disabled]="isSaving()"
+              >
+                <i class="fas fa-save"></i>
+                {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeOverrideModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  }
 
+  <!-- ==================== DETAIL MODAL ==================== -->
   @if (selectedDept()) {
     <div class="modal-backdrop" (click)="closeDetail()"></div>
     <div class="modal" (click)="closeDetail()">
@@ -227,7 +1049,6 @@
             <i class="fas fa-times" aria-hidden="true"></i>
           </button>
         </div>
-
         <div class="modal-body">
           <div class="section-label">หัวหน้าแผนก</div>
           <div class="heads-chain">
@@ -243,7 +1064,6 @@
               </div>
             }
           </div>
-
           <div class="section-label mt">พนักงานในแผนก ({{ modalEmployees().length }} คน)</div>
           <div class="employees-list">
             @for (emp of modalEmployees(); track emp.emp_code) {
@@ -259,6 +1079,449 @@
             } @empty {
               <div class="no-emp">ไม่มีพนักงานในแผนกนี้</div>
             }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== BULK EMP OVERRIDE MODAL ==================== -->
+  @if (bulkModalOpen()) {
+    <div class="modal-backdrop" (click)="closeBulkModal()"></div>
+    <div class="modal" (click)="closeBulkModal()">
+      <div class="modal-card bulk-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-users-cog"></i>
+              ตั้ง Override ให้ {{ selectedCount() }} คน
+            </div>
+            <div class="modal-subtitle">
+              หัวหน้าที่กำหนดจะถูกใช้เหมือนกันสำหรับพนักงานทุกคนที่เลือก
+            </div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeBulkModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="section-label">พนักงานที่เลือก ({{ selectedCount() }} คน)</div>
+          <div class="selected-emps-preview">
+            @for (emp of selectedEmployees(); track emp.emp_code) {
+              <span class="emp-chip">
+                {{ emp.emp_name }}
+                @if (emp.nickname) {
+                  ({{ emp.nickname }})
+                }
+                <span class="emp-chip-code">{{ emp.emp_code }}</span>
+              </span>
+            }
+          </div>
+
+          <div class="section-label mt">กำหนดหัวหน้า</div>
+          <div class="form-rows">
+            @for (row of bulkModalRows(); track row.level; let i = $index) {
+              <div class="form-row-item bulk-row-item">
+                <div class="bulk-level-col">
+                  <span class="level-num">ระดับ {{ row.level }}</span>
+                  @if (row.isExisting && !row.isMixed) {
+                    <span class="badge-same" title="ทุกคนที่เลือกมีหัวหน้าระดับนี้เหมือนกัน">
+                      <i class="fas fa-check-circle"></i> เหมือนกัน
+                    </span>
+                  }
+                  @if (row.isMixed) {
+                    <span
+                      class="badge-mixed"
+                      title="พนักงานที่เลือกมีหัวหน้าระดับนี้ต่างกัน — เลือกเพื่อตั้งค่าใหม่ให้ทุกคน"
+                    >
+                      <i class="fas fa-exclamation-circle"></i> ต่างกัน
+                    </span>
+                    @if (row.mixedEntries && row.mixedEntries.length > 0) {
+                      <div class="mixed-names-list">
+                        @for (entry of row.mixedEntries; track entry.empName) {
+                          <div class="mixed-entry">
+                            <span class="mixed-emp-name">{{ entry.empName }}</span>
+                            <span class="mixed-arrow">→</span>
+                            @if (entry.headName) {
+                              <span class="mixed-head-name">{{ entry.headName }}</span>
+                            } @else {
+                              <span class="mixed-head-none">ไม่มี</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+                <div class="field-box row-emp-field">
+                  <label class="field-label">หัวหน้าแผนก (ทุกแผนก)</label>
+                  <nz-select
+                    class="field-nz-select"
+                    nzShowSearch
+                    nzAllowClear
+                    [nzPlaceHolder]="
+                      row.isMixed ? 'ค่าต่างกัน — เลือกเพื่อตั้งใหม่' : '-- เลือกหัวหน้า --'
+                    "
+                    [ngModel]="row.headCode"
+                    (ngModelChange)="updateBulkModalRow(i, $event)"
+                  >
+                    @for (e of getAvailableHeadsForBulkModal(i); track e.emp_code) {
+                      <nz-option
+                        [nzValue]="e.emp_code"
+                        [nzLabel]="
+                          e.emp_name +
+                          (e.nickname ? ' (' + e.nickname + ')' : '') +
+                          ' - ' +
+                          e.emp_code
+                        "
+                      />
+                    }
+                  </nz-select>
+                </div>
+                @if (bulkModalRows().length > 1) {
+                  <button
+                    type="button"
+                    class="btn-icon btn-icon-delete"
+                    (click)="removeBulkModalRow(i)"
+                    title="ลบแถวนี้"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn-add-row" (click)="addBulkModalRow()">
+            <i class="fas fa-plus"></i> เพิ่มระดับ
+          </button>
+
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="bulkModalReason()"
+                (ngModelChange)="bulkModalReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveBulkOverride()"
+                [disabled]="isSavingBulk()"
+              >
+                <i class="fas fa-save"></i>
+                {{ isSavingBulk() ? 'กำลังบันทึก...' : 'บันทึก (' + selectedCount() + ' คน)' }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeBulkModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== HELP MODAL ==================== -->
+  @if (helpModalOpen()) {
+    <div class="modal-backdrop" (click)="closeHelp()"></div>
+    <div class="modal" (click)="closeHelp()">
+      <div class="modal-card help-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title"><i class="fas fa-question-circle"></i> คู่มือการใช้งาน</div>
+            <div class="modal-subtitle">อธิบายฟีเจอร์แต่ละ Tab ในหน้าหัวหน้าแผนก</div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeHelp()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="help-tab-list">
+            <!-- Tab 1: รายชื่อหัวหน้าแผนก -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-list">
+                  <i class="fas fa-users"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">รายชื่อหัวหน้าแผนก</div>
+                  <div class="help-tab-desc">
+                    ภาพรวมหัวหน้าแต่ละแผนก สะท้อนค่าที่ใช้งานจริงในระบบ
+                  </div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>
+                  กรองข้อมูลได้ตาม <strong>บริษัท</strong>, <strong>แผนก</strong> หรือ
+                  <strong>ชื่อพนักงาน</strong> แล้วกด <strong>ค้นหา</strong>
+                </li>
+                <li>
+                  แต่ละแผนกแสดงหัวหน้าเป็นระดับ —
+                  <span class="help-highlight">ระดับ 1</span> คือหัวหน้าโดยตรง, ระดับสูงขึ้น =
+                  ลำดับชั้นถัดไป
+                </li>
+                <li>กดปุ่ม <strong>พนักงาน</strong> เพื่อดูรายชื่อพนักงานทั้งหมดในแผนกนั้น</li>
+                <li>
+                  ข้อมูลในตารางนี้สะท้อนค่าที่ใช้งานจริง — หากมีการตั้ง Override
+                  รายแผนกหรือรายบุคคลไว้ จะแสดงค่า Override นั้นแทนค่าเริ่มต้น
+                </li>
+              </ul>
+            </div>
+
+            <!-- Tab 2: Override รายแผนก -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-override">
+                  <i class="fas fa-user-cog"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">Override รายแผนก</div>
+                  <div class="help-tab-desc">
+                    กำหนดหัวหน้าใหม่ระดับแผนก — ใช้กับพนักงานทุกคนในแผนกนั้น
+                  </div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>
+                  กด <strong><i class="fas fa-plus"></i> เพิ่ม Override</strong> แล้วเลือก
+                  <strong>บริษัท</strong> และ <strong>แผนก</strong> ที่ต้องการ
+                </li>
+                <li>
+                  กำหนดหัวหน้าแต่ละ <strong>ระดับ</strong> และกดปุ่ม
+                  <strong>เพิ่มระดับ</strong> หากต้องการกำหนดหลายระดับ
+                </li>
+                <li>
+                  หากแผนกนั้นมี Override อยู่แล้ว กดไอคอน
+                  <strong><i class="fas fa-pen"></i></strong> เพื่อแก้ไข
+                </li>
+                <li>
+                  กดไอคอน <strong><i class="fas fa-trash-alt"></i></strong> ที่ระดับใด
+                  เพื่อลบเฉพาะระดับนั้น หรือกด <strong>ลบทั้งหมด</strong> เพื่อคืนค่าเริ่มต้น
+                </li>
+                <li>
+                  พนักงานในแผนกที่ตั้ง Override ไว้จะแสดง badge
+                  <span
+                    class="default-source-badge badge-dept-override"
+                    style="vertical-align: middle"
+                    >รายแผนก</span
+                  >
+                  ในแท็บ Override รายบุคคล
+                </li>
+              </ul>
+            </div>
+
+            <!-- Tab 3: Override รายบุคคล -->
+            <div class="help-tab-item">
+              <div class="help-tab-header">
+                <span class="help-tab-icon tab-icon-emp">
+                  <i class="fas fa-user-shield"></i>
+                </span>
+                <div>
+                  <div class="help-tab-title">Override รายบุคคล</div>
+                  <div class="help-tab-desc">
+                    กำหนดหัวหน้าเฉพาะพนักงานบางคน โดยไม่กระทบคนอื่นในแผนก
+                  </div>
+                </div>
+              </div>
+              <ul class="help-step-list">
+                <li>
+                  เลือก <strong>บริษัท</strong> และ <strong>แผนก</strong> แล้วกด
+                  <strong>ค้นหา</strong> เพื่อแสดงรายชื่อพนักงาน
+                </li>
+                <li>
+                  ตารางแสดงหัวหน้าแต่ละระดับของพนักงาน พร้อม badge แสดงที่มาของข้อมูล:
+                  <ul
+                    style="
+                      margin-top: 4px;
+                      padding-left: 1rem;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 3px;
+                    "
+                  >
+                    <li>
+                      <span class="default-source-badge" style="vertical-align: middle"
+                        >ค่าเริ่มต้น</span
+                      >
+                      — ข้อมูลจาก HRMS ยังไม่มีการ Override
+                    </li>
+                    <li>
+                      <span
+                        class="default-source-badge badge-dept-override"
+                        style="vertical-align: middle"
+                        >รายแผนก</span
+                      >
+                      — ถูก Override ระดับแผนก (ส่งผลทั้งแผนก)
+                    </li>
+                    <li>
+                      <span class="default-source-badge individual" style="vertical-align: middle"
+                        >รายบุคคล</span
+                      >
+                      — ถูก Override เฉพาะบุคคล
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  กดปุ่ม <strong><i class="fas fa-plus"></i></strong> หรือ
+                  <strong><i class="fas fa-pen"></i></strong> เพื่อตั้ง/แก้ไข Override รายบุคคล
+                </li>
+                <li>
+                  <strong>ติ๊ก</strong> เลือกพนักงานหลายคน แล้วกด <strong>ตั้ง Override</strong>
+                  เพื่อตั้งพร้อมกัน (Bulk) — หากหัวหน้าต่างกันจะแสดง
+                  <span
+                    class="badge-mixed"
+                    style="
+                      font-size: 0.68rem;
+                      padding: 1px 7px;
+                      border-radius: 999px;
+                      vertical-align: middle;
+                    "
+                    ><i class="fas fa-exclamation-circle"></i> ต่างกัน</span
+                  >
+                </li>
+                <li>
+                  กดไอคอน <strong><i class="fas fa-trash-alt"></i></strong> เพื่อลบ Override
+                  รายบุคคล (ระบบจะกลับไปใช้ค่ารายแผนกหรือค่าเริ่มต้นแทน)
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="help-note">
+            <i class="fas fa-info-circle"></i>
+            ลำดับความสำคัญของข้อมูล:
+            <span class="default-source-badge individual" style="vertical-align: middle"
+              >รายบุคคล</span
+            >
+            &gt;
+            <span class="default-source-badge badge-dept-override" style="vertical-align: middle"
+              >รายแผนก</span
+            >
+            &gt;
+            <span class="default-source-badge" style="vertical-align: middle">ค่าเริ่มต้น</span>
+            — ระบบเลือกใช้ค่าที่มีความสำคัญสูงสุดเสมอ
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ==================== EMP OVERRIDE MODAL ==================== -->
+  @if (empModalOpen()) {
+    <div class="modal-backdrop" (click)="closeEmpModal()"></div>
+    <div class="modal" (click)="closeEmpModal()">
+      <div class="modal-card emp-modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <i class="fas fa-user-shield"></i>
+              {{ isEmpEditing() ? 'แก้ไข Override' : 'ตั้ง Override' }}
+            </div>
+            <div class="modal-subtitle">
+              {{ empModalEmp()?.emp_name }}
+              @if (empModalEmp()?.nickname) {
+                ({{ empModalEmp()?.nickname }})
+              }
+            </div>
+            <div class="modal-subtitle">{{ empModalEmp()?.emp_code }}</div>
+          </div>
+          <button
+            class="btn-close"
+            type="button"
+            title="ปิด"
+            aria-label="ปิด"
+            (click)="closeEmpModal()"
+          >
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-rows">
+            @for (row of empModalRows(); track row.level; let i = $index) {
+              <div class="form-row-item">
+                <span class="level-num">ระดับ {{ row.level }}</span>
+                <div class="field-box row-emp-field">
+                  <label class="field-label">หัวหน้าแผนก (ทุกแผนก)</label>
+                  <nz-select
+                    class="field-nz-select"
+                    nzShowSearch
+                    nzAllowClear
+                    nzPlaceHolder="-- เลือกหัวหน้า --"
+                    [ngModel]="row.headCode"
+                    (ngModelChange)="updateEmpModalRow(i, $event)"
+                  >
+                    @for (e of getAvailableHeadsForEmpModal(i); track e.emp_code) {
+                      <nz-option
+                        [nzValue]="e.emp_code"
+                        [nzLabel]="
+                          e.emp_name +
+                          (e.nickname ? ' (' + e.nickname + ')' : '') +
+                          ' - ' +
+                          e.emp_code
+                        "
+                      />
+                    }
+                  </nz-select>
+                </div>
+                <button
+                  type="button"
+                  class="btn-icon btn-icon-delete"
+                  (click)="removeEmpModalRow(i)"
+                  title="{{ row.isExisting ? 'ลบ override ระดับนี้' : 'ลบแถวนี้' }}"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <button type="button" class="btn-add-row" (click)="addEmpModalRow()">
+            <i class="fas fa-plus"></i> เพิ่มระดับ
+          </button>
+
+          <div class="form-footer">
+            <div class="field-box reason-field">
+              <label class="field-label">เหตุผล (ไม่บังคับ)</label>
+              <input
+                type="text"
+                class="field-input"
+                placeholder="ระบุเหตุผล..."
+                [ngModel]="empModalReason()"
+                (ngModelChange)="empModalReason.set($event)"
+              />
+            </div>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-search"
+                (click)="saveEmpOverride()"
+                [disabled]="isSavingEmp()"
+              >
+                <i class="fas fa-save"></i>
+                {{ isSavingEmp() ? 'กำลังบันทึก...' : 'บันทึก' }}
+              </button>
+              <button type="button" class="btn-clear" (click)="closeEmpModal()">
+                <i class="fas fa-times"></i> ยกเลิก
+              </button>
+            </div>
           </div>
         </div>
       </div>

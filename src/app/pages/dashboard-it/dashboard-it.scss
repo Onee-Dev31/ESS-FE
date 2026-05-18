@@ -787,7 +787,7 @@
           margin-bottom: 4px;
 
           .ticket-number {
-            font-size: 0.8rem;
+            font-size: $font-size-hint;
             color: var(--primary);
             font-weight: 500;
           }
@@ -796,7 +796,7 @@
             display: flex;
             gap: 12px;
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: $font-size-hint;
           }
         }
 
@@ -809,7 +809,7 @@
 
           .ticket-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: $font-size-label;
             color: var(--text);
             white-space: nowrap;
             overflow: hidden;
@@ -824,7 +824,7 @@
 
           .ticket-time {
             color: var(--text-muted);
-            font-size: 0.75rem;
+            font-size: $font-size-hint;
             white-space: nowrap;
             flex-shrink: 0;
             text-align: right;
@@ -835,7 +835,7 @@
           display: flex;
           align-items: center;
           gap: 10px;
-          font-size: 0.8rem;
+          font-size: $font-size-label;
           color: var(--text-sub);
 
           .ticket-type {
@@ -1114,6 +1114,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  font-size: $font-size-label;
 
   &:first-child {
     .card-body {
@@ -1256,6 +1257,7 @@
 
 .tk-card__title {
   font-weight: 900;
+  font-size: $font-size-label;
   color: var(--text-header);
 
   i {
@@ -1328,7 +1330,7 @@
 .tk-text {
   color: var(--text-header);
   line-height: 1.65;
-  font-size: 14px;
+  font-size: $font-size-label;
 }
 
 .att-list {
@@ -1401,6 +1403,9 @@
   padding: 12px;
   background: var(--bg-card);
   width: 55%;
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note--they {
@@ -1411,6 +1416,10 @@
   align-self: flex-end;
   width: 55%;
   background: var(--bg-page);
+
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note__top {
@@ -1468,6 +1477,9 @@
   margin-top: 10px;
   color: var(--text-header);
   line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 /* bottom actions */
@@ -1622,22 +1634,41 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 4px;
+    font-size: $font-size-label;
   }
 
   .side-detail.openFor {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-top: 10px;
+    // align-items: flex-start;
+    margin-top: 4px;
+    text-align: center;
   }
 
   .side-contact {
-    margin-top: 14px;
+    margin-top: 4px;
+    font-size: $font-size-label;
 
     p {
       margin: 0;
       font-weight: 600;
+    }
+  }
+
+  .contact-toggle {
+    margin-top: 3px;
+    font-size: 13px;
+    color: #838383;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    border: 1px solid #d5d5d5;
+    border-radius: 100%;
+    padding: 2px 5px;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -1875,7 +1906,8 @@
 .side-title {
   font-weight: 900;
   color: var(--text-header);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  font-size: $font-size-label;
 }
 
 .side-profile {
@@ -1884,8 +1916,8 @@
   align-items: center;
   text-align: center;
   gap: 6px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+  // padding-bottom: 8px;
+  // border-bottom: 1px solid var(--border-color);
 }
 
 .side-name {

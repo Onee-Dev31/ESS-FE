@@ -16,6 +16,7 @@ type DashboardTicketRecord = {
   approval_status: string;
   priority: string;
   source: string;
+  assignments?: { codeempid: string }[];
 };
 
 const tickets: DashboardTicketRecord[] = [
@@ -56,6 +57,8 @@ const tickets: DashboardTicketRecord[] = [
     approval_status: 'approved',
     priority: 'high',
     source: 'web',
+    // sole-assignee = logged-in user (CODEMPID from cy.login default) → component maps to 'In Progress'
+    assignments: [{ codeempid: 'OTD01072' }],
   },
   {
     id: 303,
@@ -187,11 +190,11 @@ describe('Dashboard IT filters', () => {
     cy.get('.ticket-item').should('have.length', 3);
 
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
-    cy.contains('.ticket-item .ticket-status-inline', 'Assigned').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'In Progress').should('be.visible');
 
     cy.get('.tk-left__select').click();
     cy.contains('nz-option-item', 'Closed').click();
@@ -203,7 +206,7 @@ describe('Dashboard IT filters', () => {
 
   it('ใช้ status filter ร่วมกับ search แล้วเหลือเฉพาะรายการที่ตรงทั้งสองเงื่อนไข', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -218,7 +221,7 @@ describe('Dashboard IT filters', () => {
 
   it('เปลี่ยนกลับ All Tickets แล้วรายการกลับมาครบหลังจากเคย filter status', () => {
     cy.get('.tk-left__select').click();
-    cy.contains('nz-option-item', 'Assigned').click();
+    cy.contains('nz-option-item', 'In Progress').click();
 
     cy.get('.ticket-item').should('have.length', 1);
     cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
@@ -326,7 +329,7 @@ describe('Dashboard IT filters', () => {
 
   it('แสดง status badge ถูกต้องในแต่ละ ticket ใน list', () => {
     cy.get('.ticket-item').eq(0).find('.ticket-status-inline').should('contain', 'New');
-    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'Assigned');
+    cy.get('.ticket-item').eq(1).find('.ticket-status-inline').should('contain', 'In Progress');
     cy.get('.ticket-item').eq(2).find('.ticket-status-inline').should('contain', 'Closed');
   });
 
@@ -398,5 +401,251 @@ describe('Dashboard IT filters', () => {
     cy.contains('.ticket-item .ticket-number', '#IT-00101')
       .closest('.ticket-item')
       .should('not.have.class', 'active');
+  });
+
+  it('summary KPI แสดง count New tickets (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'New tickets')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('summary KPI แสดง count In Progress Ticket (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'In Progress Ticket')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('summary KPI แสดง count Closed Tickets (1) ถูกต้องจาก mock data', () => {
+    cy.contains('.kpi .kpi-title', 'Closed Tickets')
+      .closest('.kpi')
+      .find('.kpi-value')
+      .should('contain', '1');
+  });
+
+  it('กด KPI card New tickets แล้ว ticket list filter เหลือ ticket #IT-00101', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.contains('.kpi .kpi-title', 'New tickets').closest('.kpi').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'New').should('be.visible');
+  });
+
+  it('กด KPI card Closed Tickets แล้ว ticket list filter เหลือ ticket #IT-00303', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
+    cy.contains('.ticket-item .ticket-status-inline', 'Closed').should('be.visible');
+  });
+
+  it('filter Re-Open → ไม่มี ticket ใน mock data → แสดง 0 รายการ', () => {
+    cy.get('.ticket-item').should('have.length', 3);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Re-Opend').click();
+
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('My Ticket แสดงเฉพาะ ticket ของ user ที่ login อยู่', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('Uncheck My Ticket แล้ว ticket list กลับมาครบ 3 รายการ', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 3);
+  });
+
+  it('ค้นหา case-insensitive (พิมพ์ตัวพิมพ์ใหญ่) แล้วยังเจอ ticket ที่ตรง', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('VPN');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+  });
+
+  it('คลิก ticket 101 (New) แล้วเปิด detail ถูกต้อง', () => {
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').closest('.ticket-item').click();
+    cy.wait('@getTicket101');
+    cy.wait('@markTicketRead');
+    cy.get('.tk-hero__title').should('contain', 'Reset VPN access');
+    cy.contains('.tk-hero__sub b.mono', '##IT-00101').should('be.visible');
+  });
+
+  it('คลิก ticket 303 (Closed) แล้วเปิด detail ถูกต้อง', () => {
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').closest('.ticket-item').click();
+    cy.wait('@getTicket303');
+    cy.wait('@markTicketRead');
+    cy.get('.tk-hero__title').should('contain', 'Archive old mailbox');
+    cy.contains('.tk-hero__sub b.mono', '##IT-00303').should('be.visible');
+  });
+
+  it('filter Closed + ค้นหา "mailbox" → เหลือ 1 รายการที่ตรงทั้งสองเงื่อนไข', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Closed').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('mailbox');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
+  });
+
+  it('filter Closed + ค้นหา "vpn" → 0 รายการ (VPN ticket เป็น New ไม่ใช่ Closed)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'Closed').click();
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('กด KPI Closed Tickets → กลับ All Tickets → ticket list กลับมาครบ 3', () => {
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.contains('.kpi .kpi-title', 'All Tickets').closest('.kpi').click({ force: true });
+    cy.get('.ticket-item').should('have.length', 3);
+  });
+
+  it('filter In Progress + ค้นหา "keyboard" → เหลือ 1 รายการ (ticket 202)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'In Progress').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('filter New + ค้นหา "vpn" → 1 รายการ (ticket 101 ตรงทั้ง New status และ keyword)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+  });
+
+  it('filter New + ค้นหา "keyboard" → 0 รายการ (keyboard ticket เป็น In Progress ไม่ใช่ New)', () => {
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('ค้นหา "keyboard" แล้วเปลี่ยน filter เป็น In Progress → ยังแสดง 1 รายการ', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    // filter เปลี่ยน client-side เท่านั้น ไม่ยิง API ใหม่
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'In Progress').click();
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('ค้นหา "keyboard" แล้วเปลี่ยน filter เป็น New → 0 รายการ (keyboard ticket เป็น In Progress)', () => {
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('keyboard');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('.tk-left__select').click();
+    cy.contains('nz-option-item', 'New').click();
+    cy.get('.ticket-item').should('have.length', 0);
+  });
+
+  it('กด KPI Sequential: New tickets → Closed Tickets → แต่ละ filter แสดงถูกต้อง', () => {
+    cy.contains('.kpi .kpi-title', 'New tickets').closest('.kpi').click();
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00101').should('be.visible');
+
+    cy.contains('.kpi .kpi-title', 'Closed Tickets').closest('.kpi').click({ force: true });
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00303').should('be.visible');
+  });
+
+  it('My Ticket + ค้นหา "replace" → 1 รายการ (ticket ของ tester.two ที่ตรง keyword)', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('replace');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 1);
+    cy.contains('.ticket-item .ticket-number', '#IT-00202').should('be.visible');
+  });
+
+  it('My Ticket + ค้นหา "vpn" → 0 รายการ (VPN ticket ไม่ใช่ของ tester.two)', () => {
+    cy.login(undefined, undefined, {
+      adUser: 'tester.two',
+      employee: { CODEMPID: 'OTD01072', USR_MOBILE: '0812345678', AD_USER: 'tester.two' },
+    });
+    cy.visit('/it-dashboard');
+    cy.wait('@getAllTickets');
+    cy.wait('@getUnreadTickets');
+    cy.wait('@getAssignDropdown');
+    cy.wait('@getCompanies');
+    cy.wait('@getDepartments');
+
+    cy.contains('.checkbox-my-ticket', 'My Ticket').click();
+    cy.wait('@getAllTickets');
+
+    cy.get('input[placeholder="Search by Ticket Number and Name"]').type('vpn');
+    cy.wait('@getAllTickets');
+    cy.get('.ticket-item').should('have.length', 0);
   });
 });

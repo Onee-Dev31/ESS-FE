@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   FilePreviewModalComponent,
   FilePreviewItem,
@@ -101,6 +101,7 @@ export class ItService implements OnInit {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private userData = this.authService.userData();
 
   formatText = formatText;
@@ -137,6 +138,15 @@ export class ItService implements OnInit {
 
   dateRange: Date[] | null = null;
   showFilter = false;
+
+  pendingTicketId = '';
+
+  constructor() {
+    this.route.queryParamMap.subscribe((params) => {
+      const ticketId = params.get('ticket') || '';
+      if (ticketId) this.pendingTicketId = ticketId;
+    });
+  }
 
   ngOnInit() {
     this.getMyTicket();
@@ -247,6 +257,7 @@ export class ItService implements OnInit {
     // }
   }
 
+  showRequesterContact = false;
   /**
    *
    * NEW!!
@@ -744,6 +755,36 @@ export class ItService implements OnInit {
               createdDate: new Date(ticket.created_at).toISOString(),
             })),
           );
+
+          if (this.pendingTicketId) {
+            const pending = this.pendingTicketId;
+            this.pendingTicketId = '';
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: {},
+              replaceUrl: true,
+            });
+
+            const matched = this.Tickets().find(
+              (t) => t.ticketNumber === pending || String(t.ticketId) === pending,
+            );
+            if (matched) {
+              setTimeout(() => {
+                this.selectTicket(String(matched.ticketId));
+                this.cdr.detectChanges();
+
+                const scrollToTop = (id: string, retries = 10) => {
+                  const el = document.getElementById('ticket-' + id);
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  } else if (retries > 0) {
+                    setTimeout(() => scrollToTop(id, retries - 1), 200);
+                  }
+                };
+                scrollToTop(String(matched.ticketId));
+              }, 300);
+            }
+          }
         },
         error: (error) => {
           console.error('Error fetching data:', error);
@@ -851,6 +892,8 @@ export class ItService implements OnInit {
         // console.log(pair[0], pair[1]);
       }
       // ยิงจริง
+
+      this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.itServiceService.re_submit(formData).subscribe({
         next: (res) => {
           const codeEmpId = requester.CODEMPID ?? '';
@@ -863,13 +906,7 @@ export class ItService implements OnInit {
             this.signalrService.ticketApprovalNotify(codeEmpId, current.ticketNumber);
           }
 
-          Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ',
-            text: 'Re-Submit Ticket สำเร็จ',
-            timer: 1500,
-            showConfirmButton: false,
-          });
+          this.swalService.success('สำเร็จ', 'Re-Submit Ticket สำเร็จ');
 
           this.deletedAttachmentIds = [];
           this.getMyTicket();

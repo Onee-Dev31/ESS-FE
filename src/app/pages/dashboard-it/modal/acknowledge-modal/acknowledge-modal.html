@@ -47,17 +47,47 @@
               </label>
             </div>
           </div>
-          <div *ngIf="selectedTag === 1" style="margin: 10px; margin-top: 20px">
+          @if (selectedTag === 1) {
+            <div style="margin-top: 16px">
+              <p>ประเภทค่าใช้จ่าย<span class="required">*</span></p>
+              <div class="tag-group">
+                <label class="tag">
+                  <input
+                    type="radio"
+                    name="repairCost"
+                    value="paid"
+                    [(ngModel)]="repairCostType"
+                  />
+                  <span>ขออนุมัติ Budget ต้นสังกัด</span>
+                </label>
+                <label class="tag">
+                  <input
+                    type="radio"
+                    name="repairCost"
+                    value="free"
+                    [(ngModel)]="repairCostType"
+                  />
+                  <span>ดำเนินการตามปกติ</span>
+                </label>
+              </div>
+            </div>
+          }
+
+          <div *ngIf="isTagChanged" style="margin: 10px; margin-top: 20px">
             <textarea
               name="message"
               class="form-input note"
               placeholder="อธิบายรายละเอียด..."
               [(ngModel)]="message"
-              *ngIf="attachments.length > 0"
             ></textarea>
             <!-- Field: ไฟล์แนบ -->
             <input type="file" multiple hidden #fileInput (change)="onFileSelected($event)" />
-            <button type="button" class="attach-btn" (click)="fileInput.click()">
+            <button
+              type="button"
+              class="attach-btn"
+              (click)="fileInput.click()"
+              *ngIf="selectedTag === 1"
+            >
               <i class="fas fa-paperclip"></i>
               แนบไฟล์
             </button>
@@ -94,9 +124,7 @@
           <button
             type="submit"
             class="btn-save-custom"
-            [disabled]="
-              !selectedTag || (selectedTag === 1 && attachments.length > 0 && !message.trim())
-            "
+            [disabled]="!selectedTag || (selectedTag === 1 && !repairCostType) || (isTagChanged && !message.trim())"
           >
             <i class="fas fa-paper-plane"></i> ยืนยัน
           </button>

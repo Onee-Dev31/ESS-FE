@@ -15,24 +15,34 @@
             ระบุรหัสพนักงาน, ชื่อ-นามสกุลภาษาอังกฤษและภาษาไทย พร้อมฟังก์ชั่น เมนู
             หรือสิทธิที่ต้องการ เช่น
           </p>
-          <div class="info-example">
-            <div class="info-row">
-              <span class="info-label">รหัสพนักงาน : ONE000001</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">ชื่อ (EN) : Mr. Onee Sandee</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">ชื่อ (TH) : นายวันอี แสนดี</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">ตำแหน่ง : Admin</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">บริษัท : ONE</span>
+          <div style="position: relative">
+            <button class="btn-copy-all" (click)="copyAll(1)">
+              @if (copied[1]) {
+                <i class="fas fa-check"></i> คัดลอกแล้ว!
+              } @else {
+                <i class="fas fa-copy"></i> คัดลอกทั้งหมด
+              }
+            </button>
+
+            <div class="info-example">
+              <div class="info-row">
+                <span class="info-label">รหัสพนักงาน : ONE000001</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">ชื่อ (EN) : Mr. Onee Sandee</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">ชื่อ (TH) : นายวันอี แสนดี</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">ตำแหน่ง : Admin</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">บริษัท : ONEE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -40,15 +50,25 @@
       @if (type === 2) {
         <div class="info-card">
           <p class="info-hint">ระบุฟังก์ชั่น เมนู หรือสิทธิที่ต้องการ เช่น</p>
-          <div class="info-example">
-            <div class="info-row">
-              <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">ตำแหน่ง : Admin</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">บริษัท : ONEE</span>
+          <div style="position: relative">
+            <button class="btn-copy-all" (click)="copyAll(2)">
+              @if (copied[2]) {
+                <i class="fas fa-check"></i> คัดลอกแล้ว!
+              } @else {
+                <i class="fas fa-copy"></i> คัดลอกทั้งหมด
+              }
+            </button>
+
+            <div class="info-example">
+              <div class="info-row">
+                <span class="info-label">เมนู : ใบเสนอราคา, บันทึกค่าใช้จ่าย</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">ตำแหน่ง : Admin</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">บริษัท : ONEE</span>
+              </div>
             </div>
           </div>
         </div>

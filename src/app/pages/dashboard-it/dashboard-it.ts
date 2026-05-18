@@ -532,7 +532,14 @@ export class DashboardIT implements OnInit {
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
           }, 100);
 
-          this.selectTicket(this.selectedTicket().ticketId);
+          const ticket = this.selectedTicket();
+          this.signalrService.ticketStatusNotify(
+            ticket?.ticketId,
+            ticket?.requesterAduser ?? '',
+            'ReOpened',
+          );
+
+          this.selectTicket(ticket.ticketId);
           this.getAllTickets();
         },
         error: (error) => {
@@ -815,6 +822,8 @@ export class DashboardIT implements OnInit {
     window.open(`/employee-Info`, '_blank');
   }
 
+  showRequesterContact = false;
+
   // MODAL
   //>>> function
   updateTicket(
@@ -824,7 +833,10 @@ export class DashboardIT implements OnInit {
     assignees?: any,
     comment?: any,
     attachments?: any[],
+    repairCostType?: string,
   ) {
+    console.log(command, ticketId, ticketTypeId, comment, attachments);
+
     const formData = new FormData();
 
     formData.append('decision', 'ITAnalyze');
@@ -853,6 +865,9 @@ export class DashboardIT implements OnInit {
 
     if (command === 'acknowledge') {
       formData.append('comment', comment);
+      if (repairCostType) {
+        formData.append('repairCostType', repairCostType);
+      }
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -868,7 +883,7 @@ export class DashboardIT implements OnInit {
       });
     }
 
-    // console.log('formData', [...formData.entries()]);
+    console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData);
   }
@@ -901,7 +916,7 @@ export class DashboardIT implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments).subscribe(
+    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments, data.repairCostType).subscribe(
       {
         next: (res) => {
           if (!res?.success) {
@@ -1121,8 +1136,6 @@ export class DashboardIT implements OnInit {
             error: () => this.msg.error('ไม่สามารถส่ง Notification ให้ผู้รับผิดชอบได้'),
           });
         }, 500);
-
-        this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Assigned');
 
         this.selectTicket(res.ticketId || ticketId);
         this.getAllTickets();

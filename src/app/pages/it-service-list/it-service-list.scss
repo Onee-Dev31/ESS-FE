@@ -1563,12 +1563,18 @@ textarea.form-input {
   padding: 12px;
   background: var(--bg-card);
   width: 55%;
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note--me {
   align-self: flex-end;
   width: 55%;
   background: var(--bg-card);
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .note--new-highlight {
@@ -1746,17 +1752,33 @@ textarea.form-input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 4px;
     font-size: $font-size-label;
   }
 
   .side-contact {
-    margin-top: 14px;
+    margin-top: 4px;
     font-size: $font-size-label;
 
     p {
       margin: 0;
       font-weight: 600;
+    }
+  }
+
+  .contact-toggle {
+    margin-top: 3px;
+    font-size: 13px;
+    color: #838383;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    border: 1px solid #d5d5d5;
+    border-radius: 100%;
+    padding: 2px 5px;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -1996,7 +2018,7 @@ textarea.form-input {
 .side-title {
   font-weight: 900;
   color: var(--text-header);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   font-size: $font-size-label;
 }
 
@@ -2006,8 +2028,8 @@ textarea.form-input {
   align-items: center;
   text-align: center;
   gap: 6px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+  // padding-bottom: 12px;
+  // border-bottom: 1px solid var(--border-color);
 }
 
 .side-name {

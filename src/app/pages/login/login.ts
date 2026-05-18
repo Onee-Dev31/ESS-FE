@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../services/loading';
 import { take, finalize } from 'rxjs/operators';
@@ -18,7 +18,7 @@ export class LoginComponent implements OnDestroy {
   private authService = inject(AuthService);
   private loadingService = inject(LoadingService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+
   private cdr = inject(ChangeDetectorRef);
 
   loginForm = new FormGroup({
@@ -60,7 +60,8 @@ export class LoginComponent implements OnDestroy {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          const returnUrl = localStorage.getItem('returnUrl');
+          localStorage.removeItem('returnUrl');
           if (returnUrl) {
             this.router.navigateByUrl(returnUrl);
           } else {

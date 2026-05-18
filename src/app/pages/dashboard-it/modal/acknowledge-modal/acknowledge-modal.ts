@@ -19,6 +19,9 @@ export class AcknowledgeModal {
   @Output() closeModal = new EventEmitter<void>();
 
   selectedTag: number | null = null;
+  originalTag: number | null = null;
+  repairCostType: 'paid' | 'free' | null = null;
+
   message: string = '';
   attachments: any[] = [];
 
@@ -28,7 +31,12 @@ export class AcknowledgeModal {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ticket'] && this.ticket) {
       this.selectedTag = this.ticket.ticketTypeId;
+      this.originalTag = this.ticket.ticketTypeId;
     }
+  }
+
+  get isTagChanged(): boolean {
+    return this.selectedTag !== this.originalTag;
   }
 
   close() {
@@ -44,15 +52,15 @@ export class AcknowledgeModal {
       ticketTypeId: this.selectedTag,
       message: this.message,
       attachments: this.attachments,
+      ...(this.selectedTag === 1 && { repairCostType: this.repairCostType }),
     };
     this.submitModal.emit(payload);
   }
 
   onTagChange(value: number) {
-    if (value !== 1) {
-      this.message = '';
-      this.attachments = [];
-    }
+    this.message = '';
+    this.attachments = [];
+    this.repairCostType = null;
   }
 
   onFileSelected(event: any) {

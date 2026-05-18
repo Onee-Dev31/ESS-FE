@@ -65,4 +65,51 @@ export class SettingService {
   getDeptHeads(): Observable<any> {
     return this._http.get(`${this.baseUrl}/dept-heads`);
   }
+
+  getDeptHeadOverrides(): Observable<any> {
+    return this._http.get(`${this.baseUrl}/dept-heads/overrides`);
+  }
+
+  saveDeptHeadOverride(payload: {
+    costCent: string;
+    level: number;
+    codeempid: string;
+    reason?: string;
+    createdBy?: string;
+  }): Observable<any> {
+    return this._http.put(`${this.baseUrl}/dept-heads/overrides`, payload);
+  }
+
+  deleteDeptHeadOverride(costCent: string, level?: number): Observable<any> {
+    const url =
+      level !== undefined
+        ? `${this.baseUrl}/dept-heads/overrides/${costCent}/${level}`
+        : `${this.baseUrl}/dept-heads/overrides/${costCent}`;
+    return this._http.delete(url);
+  }
+
+  getEmpHeadOverrides(costCent?: string): Observable<any> {
+    const params: any = {};
+    if (costCent) params.costCent = costCent;
+    return this._http.get(`${this.baseUrl}/dept-heads/employee-overrides`, { params });
+  }
+
+  saveEmpHeadOverride(payload: {
+    employee_codeempid: string;
+    level: number;
+    head_codeempid: string;
+    reason?: string;
+    created_by?: string;
+  }): Observable<any> {
+    console.log(payload);
+    return this._http.put(`${this.baseUrl}/dept-heads/employee-overrides`, payload);
+  }
+
+  deleteEmpHeadOverride(codeempid: string, level?: number): Observable<any> {
+    const url =
+      level !== undefined
+        ? `${this.baseUrl}/dept-heads/employee-overrides/${codeempid}/${level}`
+        : `${this.baseUrl}/dept-heads/employee-overrides/${codeempid}`;
+    return this._http.delete(url);
+  }
 }

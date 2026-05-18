@@ -460,8 +460,12 @@
         <div>{{ requester.department_name }}</div>
         <div>{{ requester.company_name }}</div>
       </div>
+      <div class="contact-toggle" (click)="showRequesterContact = !showRequesterContact">
+        <i [class]="showRequesterContact ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"></i>
+      </div>
     </div>
-    <div class="side-contact">
+
+    <div class="side-contact" *ngIf="showRequesterContact">
       <p>ช่องทางการติดต่อ</p>
       <div>อีเมล: {{ requester.email }}</div>
       <div>ติดต่อ: {{ requester.contact_phone }}</div>
@@ -475,7 +479,7 @@
   <!-- Open For -->
   <section class="side-card requester" *ngIf="t.openFor as openFor">
     <div class="side-title">เปิดให้</div>
-    <div class="side-detail">
+    <div class="side-detail openFor">
       <div>
         {{ openFor.fullname }} <span *ngIf="openFor.nickname">({{ openFor.nickname }})</span>
       </div>

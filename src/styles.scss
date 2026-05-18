@@ -335,14 +335,14 @@ label {
 
 /* Title */
 .swal2-title {
-  font-size: 24px;
+  font-size: $font-size-title;
   font-weight: 600;
   color: var(--text);
 }
 
 /* Text */
 .swal2-html-container {
-  font-size: 18px;
+  font-size: $font-size-header;
   color: var(--text-sub);
 }
 
