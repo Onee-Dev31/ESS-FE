@@ -435,15 +435,33 @@ import { AuthService } from '../../../services/auth.service';
       }
 
       :host-context([data-theme='dark']) {
-        .status-chip.status-ok { color: #4ade80; }
-        .status-chip.status-err { color: #f87171; }
-        .sp-chip { color: #c4b5fd; }
-        .table-ref-chip { color: #67e8f9; }
-        .method-badge.method-get { color: #4ade80; }
-        .method-badge.method-post { color: #60a5fa; }
-        .method-badge.method-put { color: #fbbf24; }
-        .method-badge.method-patch { color: #c4b5fd; }
-        .method-badge.method-delete { color: #f87171; }
+        .status-chip.status-ok {
+          color: #4ade80;
+        }
+        .status-chip.status-err {
+          color: #f87171;
+        }
+        .sp-chip {
+          color: #c4b5fd;
+        }
+        .table-ref-chip {
+          color: #67e8f9;
+        }
+        .method-badge.method-get {
+          color: #4ade80;
+        }
+        .method-badge.method-post {
+          color: #60a5fa;
+        }
+        .method-badge.method-put {
+          color: #fbbf24;
+        }
+        .method-badge.method-patch {
+          color: #c4b5fd;
+        }
+        .method-badge.method-delete {
+          color: #f87171;
+        }
       }
     `,
   ],
