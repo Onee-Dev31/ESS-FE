@@ -79,7 +79,7 @@ export interface NotificationInboxItem {
   ticketNumber: string | null;
   actorName: string | null;
   actorNickname: string | null;
-  ticket_name_th: string | null;
+  ticket_name_th?: string | null;
   targetType: string | null;
   payload: Record<string, unknown> | null;
   recipientRole: string | null;
