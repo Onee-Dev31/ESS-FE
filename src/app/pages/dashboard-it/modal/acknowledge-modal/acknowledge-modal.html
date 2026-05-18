@@ -47,6 +47,32 @@
               </label>
             </div>
           </div>
+          @if (selectedTag === 1) {
+            <div style="margin-top: 16px">
+              <p>ประเภทค่าใช้จ่าย<span class="required">*</span></p>
+              <div class="tag-group">
+                <label class="tag">
+                  <input
+                    type="radio"
+                    name="repairCost"
+                    value="paid"
+                    [(ngModel)]="repairCostType"
+                  />
+                  <span>ขออนุมัติ Budget ต้นสังกัด</span>
+                </label>
+                <label class="tag">
+                  <input
+                    type="radio"
+                    name="repairCost"
+                    value="free"
+                    [(ngModel)]="repairCostType"
+                  />
+                  <span>ดำเนินการตามปกติ</span>
+                </label>
+              </div>
+            </div>
+          }
+
           <div *ngIf="isTagChanged" style="margin: 10px; margin-top: 20px">
             <textarea
               name="message"
@@ -98,7 +124,7 @@
           <button
             type="submit"
             class="btn-save-custom"
-            [disabled]="!selectedTag || (isTagChanged && !message.trim())"
+            [disabled]="!selectedTag || (selectedTag === 1 && !repairCostType) || (isTagChanged && !message.trim())"
           >
             <i class="fas fa-paper-plane"></i> ยืนยัน
           </button>
