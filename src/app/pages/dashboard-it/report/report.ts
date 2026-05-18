@@ -899,8 +899,8 @@ export class Report {
     const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
     const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
-    // getAllTickets_real
-    this.itServiceService.getAllTickets({ dateFrom, dateTo }).subscribe({
+    // getAllTickets : ไม่แสดงในส่วนของขึ้นตอน Approve
+    this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
         console.log(res);
         this.deptTop5Map = {};
