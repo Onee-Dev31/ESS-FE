@@ -53,16 +53,27 @@ export class AuthService {
     return user?.USR_MOBILE ? PhoneUtil.formatPhoneNumber(user.USR_MOBILE) : '';
   });
 
-  isAdmin = computed(() => {
-    const role = this._userRole();
+  hasRole(role: string): boolean {
     return (
-      role === USER_ROLES.HR || role === USER_ROLES.EXECUTIVE || role === USER_ROLES.SUPERVISOR
+      this._userRole()
+        ?.split(',')
+        .map((r) => r.trim())
+        .includes(role) ?? false
     );
-  });
-  isHR = computed(() => this._userRole() === USER_ROLES.HR);
-  isAccounting = computed(() => this._userRole() === USER_ROLES.ACCOUNTING);
-  isSupervisor = computed(() => this._userRole() === USER_ROLES.SUPERVISOR);
-  isExecutive = computed(() => this._userRole() === USER_ROLES.EXECUTIVE);
+  }
+
+  isAdmin = computed(
+    () =>
+      this.hasRole(USER_ROLES.HR) ||
+      this.hasRole(USER_ROLES.EXECUTIVE) ||
+      this.hasRole(USER_ROLES.SUPERVISOR),
+  );
+  isHR = computed(() => this.hasRole(USER_ROLES.HR));
+  isAccounting = computed(() => this.hasRole(USER_ROLES.ACCOUNTING));
+  isTech = computed(() => this.hasRole(USER_ROLES.TECH));
+  isSupervisor = computed(() => this.hasRole(USER_ROLES.SUPERVISOR));
+  isExecutive = computed(() => this.hasRole(USER_ROLES.EXECUTIVE));
+  isAdminRole = computed(() => this.hasRole(USER_ROLES.ADMIN));
 
   private getStoredUser(): any | null {
     const data = localStorage.getItem(STORAGE_KEYS.USER_DATA);
