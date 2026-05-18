@@ -1,12 +1,14 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TechInfoService } from './tech-info.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-tech-info',
   standalone: true,
   imports: [CommonModule],
   template: `
+    @if (auth.isTech()) {
     <button
       class="tech-fab"
       (click)="toggle()"
@@ -95,6 +97,7 @@ import { TechInfoService } from './tech-info.service';
           }
         </div>
       </div>
+    }
     }
   `,
   styles: [
@@ -435,6 +438,7 @@ import { TechInfoService } from './tech-info.service';
 })
 export class TechInfoComponent {
   svc = inject(TechInfoService);
+  auth = inject(AuthService);
   isOpen = signal(false);
 
   toggle() {

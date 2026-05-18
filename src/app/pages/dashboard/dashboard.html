@@ -192,7 +192,7 @@
               >
                 <i class="fas fa-list-alt"></i> ดูรายการ
               </button>
-              @if (userRole() === 'Admin') {
+              @if (isAdminRole()) {
                 <button
                   class="btn-pending-approvals"
                   (click)="navigateTo('/approvals-medicalexpenses')"
@@ -256,7 +256,7 @@
           <div class="welfare-section">
             <div class="section-header-flex">
               <p class="section-title mb-0">สวัสดิการ</p>
-              @if (userRole() === 'Admin') {
+              @if (isAdminRole()) {
                 <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
                   <div class="icon-shake">
                     <i class="fas fa-bell"></i>
@@ -315,7 +315,7 @@
           <div class="leave-section">
             <div class="section-header-flex">
               <p class="section-title">ลาหยุดงาน</p>
-              @if (userRole() === 'Admin') {
+              @if (isAdminRole()) {
                 <button class="btn-pending-approvals" (click)="navigateTo('/approvals')">
                   <div class="icon-shake">
                     <i class="fas fa-bell"></i>

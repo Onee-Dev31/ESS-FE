@@ -138,14 +138,14 @@ export class NavbarComponent {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
 
-    const currentUserRole = this.authService.userRole();
+    const userRoles = this.authService.userRole()?.split(',').map((r) => r.trim()) ?? [];
 
     return this.allSearchMenus
       .filter((item) => {
         if (item.role) {
           if (Array.isArray(item.role)) {
-            if (!item.role.includes(currentUserRole || '')) return false;
-          } else if (item.role !== currentUserRole) {
+            if (!item.role.some((r: string) => userRoles.includes(r))) return false;
+          } else if (!userRoles.includes(item.role)) {
             return false;
           }
         }
