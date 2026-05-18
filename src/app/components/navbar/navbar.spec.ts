@@ -89,6 +89,7 @@ describe('Navbar', () => {
       ticketId: 55,
       ticketNumber: '#IT-00055',
       actorName: 'Admin',
+      actorNickname: null,
       targetType: 'ticket',
       payload: null,
       recipientRole: 'it-staff',
