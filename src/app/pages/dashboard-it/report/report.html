@@ -125,6 +125,16 @@
   </div>
 </div>
 
+<!-- Export Loading -->
+@if (isExporting) {
+  <div class="export-loading-overlay">
+    <div class="export-loading-box">
+      <div class="loader"></div>
+      <span>กำลัง Export...</span>
+    </div>
+  </div>
+}
+
 <!-- overlay -->
 <div class="log-overlay" *ngIf="isLogModalVisible" (click)="handleCancel()">
   <div class="log-modal" (click)="$event.stopPropagation()">
