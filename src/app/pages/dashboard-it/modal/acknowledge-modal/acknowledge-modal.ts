@@ -20,6 +20,7 @@ export class AcknowledgeModal {
 
   selectedTag: number | null = null;
   originalTag: number | null = null;
+  repairCostType: 'paid' | 'free' | null = null;
 
   message: string = '';
   attachments: any[] = [];
@@ -51,6 +52,7 @@ export class AcknowledgeModal {
       ticketTypeId: this.selectedTag,
       message: this.message,
       attachments: this.attachments,
+      ...(this.selectedTag === 1 && { repairCostType: this.repairCostType }),
     };
     this.submitModal.emit(payload);
   }
@@ -58,6 +60,7 @@ export class AcknowledgeModal {
   onTagChange(value: number) {
     this.message = '';
     this.attachments = [];
+    this.repairCostType = null;
   }
 
   onFileSelected(event: any) {
