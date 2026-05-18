@@ -833,6 +833,7 @@ export class DashboardIT implements OnInit {
     assignees?: any,
     comment?: any,
     attachments?: any[],
+    repairCostType?: string,
   ) {
     console.log(command, ticketId, ticketTypeId, comment, attachments);
 
@@ -864,6 +865,9 @@ export class DashboardIT implements OnInit {
 
     if (command === 'acknowledge') {
       formData.append('comment', comment);
+      if (repairCostType) {
+        formData.append('repairCostType', repairCostType);
+      }
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -912,7 +916,7 @@ export class DashboardIT implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments).subscribe(
+    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments, data.repairCostType).subscribe(
       {
         next: (res) => {
           if (!res?.success) {
