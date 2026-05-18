@@ -833,6 +833,7 @@ export class DashboardIT implements OnInit {
     assignees?: any,
     comment?: any,
     attachments?: any[],
+    repairCostType?: string,
   ) {
     console.log(command, ticketId, ticketTypeId, comment, attachments);
 
@@ -864,6 +865,9 @@ export class DashboardIT implements OnInit {
 
     if (command === 'acknowledge') {
       formData.append('comment', comment);
+      if (repairCostType) {
+        formData.append('repairCostType', repairCostType);
+      }
     }
 
     if (command === 'acknowledge' || command === 'assign') {
@@ -912,42 +916,48 @@ export class DashboardIT implements OnInit {
     this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_ACKNOWLEDGE_TICKET.set(false);
 
-    this.updateTicket('acknowledge', ticketId, tag, null, data.message, data.attachments).subscribe(
-      {
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-            return;
-          }
+    this.updateTicket(
+      'acknowledge',
+      ticketId,
+      tag,
+      null,
+      data.message,
+      data.attachments,
+      data.repairCostType,
+    ).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
 
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-          const typeNameMap: Record<number, string> = {
-            1: 'แจ้งซ่อม',
-            2: 'แจ้งปัญหา',
-            3: 'ขอใช้บริการ',
-          };
-          const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
-          this.signalrService.ticketStatusNotify(
-            ticketId,
-            ticket?.requesterAduser ?? '',
-            typeName ? `In Progress|${typeName}` : 'In Progress',
-          );
+        const typeNameMap: Record<number, string> = {
+          1: 'แจ้งซ่อม',
+          2: 'แจ้งปัญหา',
+          3: 'ขอใช้บริการ',
+        };
+        const typeName = typeNameMap[Number(data.ticketTypeId)] ?? '';
+        this.signalrService.ticketStatusNotify(
+          ticketId,
+          ticket?.requesterAduser ?? '',
+          typeName ? `In Progress|${typeName}` : 'In Progress',
+        );
 
-          this.selectTicket(ticketId);
-          this.getAllTickets();
-        },
-
-        error: (error) => {
-          console.error('Acknowledge Ticket Error:', error);
-
-          this.swalService.warning(
-            'เกิดข้อผิดพลาด',
-            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-          );
-        },
+        this.selectTicket(ticketId);
+        this.getAllTickets();
       },
-    );
+
+      error: (error) => {
+        console.error('Acknowledge Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 
   // -- deny --
