@@ -6,4 +6,5 @@ export const USER_ROLES = {
   HR: 'HR',
   EXECUTIVE: 'Executive',
   ACCOUNTING: 'Accounting',
+  TECH: 'Tech',
 } as const;

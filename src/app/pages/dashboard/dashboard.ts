@@ -101,6 +101,7 @@ export class DashboardComponent implements OnInit {
   }
 
   userRole = this.authService.userRole;
+  isAdminRole = this.authService.isAdminRole;
 
   isPolicyModalOpen = signal<boolean>(false);
   isTimeOffModalOpen = signal<boolean>(false);
