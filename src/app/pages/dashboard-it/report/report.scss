@@ -521,7 +521,7 @@
   padding: 5px 10px;
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: end;
   margin-bottom: 12px;
 }
 
@@ -561,8 +561,9 @@
   width: 200px;
 }
 
-.search-select-company {
-  width: 120px;
+.search-select-company,
+.search-select-service-type {
+  width: 180px;
 }
 
 .search-select {

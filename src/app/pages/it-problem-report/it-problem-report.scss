@@ -1427,7 +1427,7 @@ $table-label-bg: var(--border-toolbar);
   .dropzone {
     border: 2px dashed var(--border);
     border-radius: 12px;
-    padding: 28px 20px;
+    padding: 16px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1448,7 +1448,7 @@ $table-label-bg: var(--border-toolbar);
     }
 
     .dropzone-icon {
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: var(--text-muted);
       display: block;
       margin-bottom: 8px;
@@ -1460,6 +1460,9 @@ $table-label-bg: var(--border-toolbar);
       color: var(--text);
       font-weight: 500;
       margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .dropzone-hint {
@@ -1479,7 +1482,7 @@ $table-label-bg: var(--border-toolbar);
       gap: 6px;
 
       span {
-        background: #f0f0f0;
+        background: var(--border-toolbar);
         color: #666;
         padding: 2px 6px;
         border-radius: 4px;
