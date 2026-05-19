@@ -173,4 +173,96 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
     cy.get('app-acknowledge-modal input[name="repairCost"]').should('not.be.checked');
     cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
   });
+
+  // ─── pre-select tag ───────────────────────────────────────────────────────
+
+  it('modal เปิดขึ้นมา pre-select tag แจ้งซ่อม ตามประเภท ticket (ticket_type_id=1)', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal label.tag', 'แจ้งซ่อม')
+      .find('input[name="tag"]')
+      .should('be.checked');
+  });
+
+  it('radio ค่าใช้จ่ายแสดงทันทีเมื่อ modal เปิด โดยไม่ต้อง click tag ใหม่', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal p', 'ประเภทค่าใช้จ่าย').should('be.visible');
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').should('be.visible');
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').should('be.visible');
+  });
+
+  // ─── submit button disabled / enabled logic ────────────────────────────────
+
+  it('เปลี่ยน tag ไป แจ้งปัญหา แต่ยังไม่ใส่ message → ปุ่มยืนยัน disabled', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  it('เปลี่ยน tag ไป แจ้งปัญหา แล้วใส่ message → ปุ่มยืนยัน enabled', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal textarea').type('รายละเอียดปัญหา');
+    cy.get('app-acknowledge-modal button[type="submit"]').should('not.be.disabled');
+  });
+
+  it('เปลี่ยน tag ไป ขอใช้บริการ แต่ยังไม่ใส่ message → ปุ่มยืนยัน disabled', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  // ─── PATCH payload ────────────────────────────────────────────────────────
+
+  it('submit แจ้งปัญหา + message → PATCH ส่ง newTicketTypeId=2', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal textarea').type('รายละเอียดปัญหา');
+    cy.get('app-acknowledge-modal button[type="submit"]').click();
+
+    cy.wait('@approveTicket')
+      .its('request.body')
+      .should('include', 'newTicketTypeId')
+      .and('include', '2');
+  });
+
+  it('submit ขอใช้บริการ + message → PATCH ส่ง newTicketTypeId=3', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
+    cy.get('app-acknowledge-modal textarea').type('รายละเอียดการขอใช้บริการ');
+    cy.get('app-acknowledge-modal button[type="submit"]').click();
+
+    cy.wait('@approveTicket')
+      .its('request.body')
+      .should('include', 'newTicketTypeId')
+      .and('include', '3');
+  });
+
+  // ─── cancel modal ────────────────────────────────────────────────────────
+
+  it('กด ยกเลิก → modal ปิด', () => {
+    openAcknowledgeModal();
+
+    cy.get('app-acknowledge-modal .btn-back-custom').click();
+    cy.get('app-acknowledge-modal').should('not.exist');
+  });
+
+  // ─── message clear on tag switch ──────────────────────────────────────────
+
+  it('message ถูก clear เมื่อสลับ tag', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal textarea').type('ข้อความทดสอบ');
+    cy.get('app-acknowledge-modal textarea').should('have.value', 'ข้อความทดสอบ');
+
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
+    cy.get('app-acknowledge-modal textarea').should('have.value', '');
+  });
 });
