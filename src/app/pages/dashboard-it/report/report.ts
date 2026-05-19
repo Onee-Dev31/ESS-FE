@@ -1030,6 +1030,7 @@ export class Report {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
+    this.textClickFilter = 'status';
     this.filter = {
       ...this.filter,
       dateRange: this.filterAll.dateRange,
@@ -1106,6 +1107,7 @@ export class Report {
     this.listing.currentPage.set(page);
     this.loadTickets();
   }
+
   handleCancel(): void {
     this.isLogModalVisible = false;
     this.filter = {
@@ -1273,13 +1275,26 @@ export class Report {
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
     };
-    console.log(params);
+    console.log(params, this.filteredTicketLogs);
+
+    const head_text =
+      this.textClickFilter === 'serviceType'
+        ? this.filteredTicketLogs[0]?.name_th
+        : this.textClickFilter === 'department'
+          ? this.filteredTicketLogs[0]?.deptName +
+            ' (' +
+            this.filteredTicketLogs[0]?.COMPANY_CODE +
+            ')'
+          : this.textClickFilter === 'status'
+            ? this.filter.status
+            : '';
+
     this.itServiceService.exportTicketByStatus(params).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `tickets_${dayjs(dateFrom).format('YYYY-MM-DD')}_${dayjs(dateTo).format('YYYY-MM-DD')}.xlsx`;
+        a.download = `tickets_${head_text}_${dayjs(dateFrom).format('YYYY-MM-DD')}_${dayjs(dateTo).format('YYYY-MM-DD')}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
       },
