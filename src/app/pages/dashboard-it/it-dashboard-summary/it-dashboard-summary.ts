@@ -164,13 +164,26 @@ export class ItDashboardSummary {
 
   searchKeyword = '';
   filter = {
+    status: '',
     ticketNo: '',
     subject: '',
     requester: '',
     department: '',
     company: '',
-    dateRange: null as [Dayjs, Dayjs] | null,
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
   };
+  filterOriginal = {
+    status: '',
+    ticketNo: '',
+    subject: '',
+    requester: '',
+    department: '',
+    company: '',
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
+  };
+  textClickFilter: string = '';
   departmentList: any[] = [];
   companyList: any[] = [];
   filteredTicketLogs: any[] = [];
@@ -719,6 +732,18 @@ export class ItDashboardSummary {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
+    this.textClickFilter = 'status';
+    this.filter = {
+      ...this.filter,
+      status: status,
+      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      status: status,
+      dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
+    };
     this.loadTickets();
   }
 
@@ -736,6 +761,7 @@ export class ItDashboardSummary {
       department: this.filter.department || undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: false,
     };
     // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
@@ -766,14 +792,7 @@ export class ItDashboardSummary {
   }
 
   clearFilter() {
-    this.filter = {
-      ticketNo: '',
-      subject: '',
-      requester: '',
-      department: '',
-      company: '',
-      dateRange: null,
-    };
+    this.filter = this.filterOriginal;
     this.filteredDepartmentList = [];
     this.loadTickets();
   }
@@ -880,13 +899,50 @@ export class ItDashboardSummary {
   }
 
   exportData() {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
-    const workbook: XLSX.WorkBook = {
-      Sheets: { Tickets: worksheet },
-      SheetNames: ['Tickets'],
+    const params = {
+      status: this.statusLabelApi(this.filter.status),
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: false,
     };
-    XLSX.writeFile(workbook, 'TicketLogs.xlsx');
+    // console.log(params, this.filteredTicketLogs);
+
+    const head_text =
+      this.textClickFilter === 'serviceType'
+        ? this.filteredTicketLogs[0]?.name_th
+        : this.textClickFilter === 'department'
+          ? this.filteredTicketLogs[0]?.deptName +
+            ' (' +
+            this.filteredTicketLogs[0]?.COMPANY_CODE +
+            ')'
+          : this.textClickFilter === 'status'
+            ? this.filter.status
+            : '';
+
+    this.itServiceService.exportTicketByStatus(params).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tickets_${head_text}_${dayjs(dateFrom).format('YYYY-MM-DD')}_${dayjs(dateTo).format('YYYY-MM-DD')}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('loadTickets error:', err);
+        this.ticketLogs = [];
+      },
+    });
   }
 
   getAssignedMembers(members: any[]): any[] {
