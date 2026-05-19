@@ -111,7 +111,7 @@
           (ngModelChange)="problemFormData.set({ ...problemFormData(), detail: $event })"
           class="styled-input"
           [class.textarea-with-chips]="problemFormData().categories.length > 0"
-          rows="5"
+          rows="10"
           placeholder="อธิบายรายละเอียดปัญหาที่พบ..."
         ></textarea>
       </div>
@@ -133,9 +133,9 @@
           (dragover)="onDragOver($event)"
           (drop)="onDrop($event)"
         >
-          <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
-          <p class="dropzone-text">คลิกหรือลากไฟล์มาวางที่นี่</p>
-          <p class="dropzone-hint">รองรับหลายไฟล์พร้อมกัน</p>
+          <p class="dropzone-text">
+            <i class="fas fa-cloud-upload-alt dropzone-icon"></i>คลิกหรือลากไฟล์มาวางที่นี่
+          </p>
           <p class="dropzone-hint2">
             @for (ext of FILE_CONFIG.allowedExtensions; track ext) {
               <span>{{ ext.toUpperCase() }}</span>
