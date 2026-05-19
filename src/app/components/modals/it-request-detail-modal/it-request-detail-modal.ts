@@ -18,6 +18,7 @@ import { AuthService } from '../../../services/auth.service';
 import { SwalService } from '../../../services/swal.service';
 import { formatText } from '../../../utils/formatText';
 import { SignalrService } from '../../../services/signalr.service';
+import { FileConverterService } from '../../../services/file-converter';
 
 @Component({
   selector: 'app-it-request-detail-modal',
@@ -34,6 +35,7 @@ export class ItRequestDetailModal {
   private swalService = inject(SwalService);
   private itServiceService = inject(ItServiceService);
   private signalrService = inject(SignalrService);
+  private fileConverter = inject(FileConverterService);
   formatText = formatText;
 
   @Input({ required: true }) approvalItem!: ApprovalItem;
@@ -107,14 +109,7 @@ export class ItRequestDetailModal {
   }
 
   viewFile(file: any) {
-    this.previewFiles.set([
-      {
-        fileName: file.fileName,
-        date: dayjs().format('DD/MM/YYYY HH:mm'),
-        url: file.filePath,
-        type: file.type || 'image/png',
-      },
-    ]);
+    this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
