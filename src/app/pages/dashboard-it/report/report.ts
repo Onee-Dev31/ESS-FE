@@ -797,7 +797,7 @@ export class Report {
   }
 
   onDepartmentPieClick(e: any) {
-    console.log(e?.data);
+    // console.log(e?.data);
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
@@ -897,12 +897,6 @@ export class Report {
   }
 
   onCompanyBarClick(e: any) {
-    console.log('event:', e);
-    console.log('componentType:', e?.componentType);
-    console.log('value:', e?.value);
-    console.log('data:', e?.data);
-    // // console.log(e.data);
-    // const company = (e?.data.code ?? '').toString();
     let company = '';
 
     if (e?.componentType === 'xAxis') {
@@ -1004,12 +998,10 @@ export class Report {
     const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
     const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
-    console.log(dateFrom, dateTo);
-
     // getAllTickets : ไม่แสดงในส่วนของขึ้นตอน Approve
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -1063,10 +1055,10 @@ export class Report {
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
     };
-    console.log(params);
+    // console.log(params);
     this.itServiceService.getTicketByStatus(params).subscribe({
       next: (res: any) => {
-        console.log(res);
+        // console.log(res);
         this.allRequests.set(res.data);
         this.listing.totalItems.set(res.pagination.total ?? 0);
         this.listing.totalPages.set(res.pagination.totalPages ?? 1);
@@ -1275,7 +1267,7 @@ export class Report {
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
     };
-    console.log(params, this.filteredTicketLogs);
+    // console.log(params, this.filteredTicketLogs);
 
     const head_text =
       this.textClickFilter === 'serviceType'
