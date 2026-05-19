@@ -101,6 +101,7 @@ export class DashboardIT implements OnInit {
   };
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('ticketList') ticketList!: ElementRef;
 
   @HostListener('window:resize')
   onResize() {
@@ -276,6 +277,7 @@ export class DashboardIT implements OnInit {
 
   refreshTickets() {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
+    console.log(this.prevTicketIds);
     this.getAllTickets(true);
   }
 
@@ -733,6 +735,13 @@ export class DashboardIT implements OnInit {
           this.Tickets.set(mapped);
           this.fetchUnreadIds();
 
+          setTimeout(() => {
+            this.ticketList?.nativeElement.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          });
+
           if (trackNew) {
             const pendingNumbers = this.signalrService.pendingTicketNumbers();
             const ids = new Set<number>(
@@ -744,6 +753,8 @@ export class DashboardIT implements OnInit {
                 )
                 .map((t: any) => t.ticketId),
             );
+
+            console.log(ids);
             this.newTicketIds.set(ids);
             this.signalrService.pendingTicketNumbers.set(new Set());
             this.signalrService.pendingNewTickets.set(0);
