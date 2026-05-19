@@ -173,7 +173,10 @@ export class Report {
     denied: 8,
     all: -1,
   };
-  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
+  private deptTop5Map: Record<
+    string,
+    Array<{ label: string; value: number; costcent: string; companyCode: string }>
+  > = {};
   isExporting = false;
   isLogModalVisible = false;
   currentStatus = '';
@@ -184,13 +187,26 @@ export class Report {
 
   searchKeyword = '';
   filter = {
+    status: '',
     ticketNo: '',
     subject: '',
     requester: '',
     department: '',
     company: '',
-    dateRange: null as [Dayjs, Dayjs] | null,
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
   };
+  filterOriginal = {
+    status: '',
+    ticketNo: '',
+    subject: '',
+    requester: '',
+    department: '',
+    company: '',
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
+  };
+  textClickFilter: string = '';
   departmentList: any[] = [];
   companyList: any[] = [];
   filteredTicketLogs: any[] = [];
@@ -502,25 +518,51 @@ export class Report {
   }
 
   private buildDeptTop5Map(rows: any[]) {
-    const map: Record<string, Array<{ label: string; value: number }>> = {};
-    const allMap: Record<string, { value: number; company: string }> = {};
+    const map: Record<
+      string,
+      Array<{ label: string; value: number; costcent: string; companyCode: string }>
+    > = {};
+    const allMap: Record<
+      string,
+      { value: number; company: string; costcent: string; companyCode: string }
+    > = {};
 
     for (const row of rows ?? []) {
       const companyCode = this.remapCompanyCode(row.COMPANY_CODE);
       if (!companyCode) continue;
 
       if (!map[companyCode]) map[companyCode] = [];
-      map[companyCode].push({ label: row.dept_display, value: row.ticket_count });
+      map[companyCode].push({
+        label: row.dept_display,
+        value: row.ticket_count,
+        costcent: row.COSTCENT,
+        companyCode: row.COMPANY_CODE,
+      });
 
       const key = row.dept_display;
       if (!allMap[key]) {
-        allMap[key] = { value: 0, company: companyCode };
+        allMap[key] = {
+          value: 0,
+          company: companyCode,
+          costcent: row.COSTCENT,
+          companyCode: row.COMPANY_CODE,
+        };
       }
       allMap[key].value += row.ticket_count;
     }
 
+    // map['ALL'] = Object.entries(allMap)
+    //   .map(([label, { value, company }]) => ({ label: `${label} (${company})`, value }))
+    //   .sort((a, b) => b.value - a.value)
+    //   .slice(0, 5);
+
     map['ALL'] = Object.entries(allMap)
-      .map(([label, { value, company }]) => ({ label: `${label} (${company})`, value }))
+      .map(([label, { value, company, costcent, companyCode }]) => ({
+        label: `${label} (${company})`,
+        value,
+        costcent,
+        companyCode,
+      }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
 
@@ -690,6 +732,7 @@ export class Report {
       ],
     };
   }
+
   getAllTotal(): number {
     return this.kpis.find((x) => x.status === 'all')?.value ?? 0;
   }
@@ -699,6 +742,7 @@ export class Report {
     if (!total || k.status === 'all') return 100;
     return Math.round((k.value / total) * 100);
   }
+
   onStatusChartInit(ec: any) {
     this.statusChart = ec;
     this.applyStatusCenter('all');
@@ -723,6 +767,62 @@ export class Report {
     this.highlightStatusSlice(k);
 
     this.applyStatusCenter(k);
+  }
+
+  onServiceTypePieClick(e: any) {
+    this.page = 1;
+    this.ticketLogs = [];
+    this.isLogModalVisible = true;
+    const serviceType = e?.data;
+
+    this.textClickFilter = 'serviceType';
+    const serviceTypeMap: Record<string, string> = {
+      แจ้งซ่อมอุปกรณ์: '1',
+      แจ้งปัญหา: '2',
+      ขอใช้บริการ: '3',
+    };
+
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      serviceType: serviceTypeMap[serviceType?.name],
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      serviceType: serviceTypeMap[serviceType?.name],
+    };
+
+    this.loadTickets();
+  }
+
+  onDepartmentPieClick(e: any) {
+    // console.log(e?.data);
+    this.page = 1;
+    this.ticketLogs = [];
+    this.isLogModalVisible = true;
+    const department = e?.data;
+
+    this.textClickFilter = 'department';
+
+    this.filteredDepartmentList = this.departmentList.filter(
+      (d) => d.COMPANY_CODE === department.companyCode,
+    );
+
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      company: department.companyCode,
+      department: department.costcent,
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      company: department.companyCode,
+      department: department.costcent,
+    };
+
+    this.loadTickets();
   }
 
   private highlightStatusSlice(k: string) {
@@ -797,12 +897,6 @@ export class Report {
   }
 
   onCompanyBarClick(e: any) {
-    console.log('event:', e);
-    console.log('componentType:', e?.componentType);
-    console.log('value:', e?.value);
-    console.log('data:', e?.data);
-    // // console.log(e.data);
-    // const company = (e?.data.code ?? '').toString();
     let company = '';
 
     if (e?.componentType === 'xAxis') {
@@ -820,13 +914,18 @@ export class Report {
     this.buildDeptBar(company, depts);
   }
 
-  private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
+  private buildDeptBar(
+    company: string,
+    rows: Array<{ label: string; value: number; costcent?: string; companyCode?: string }>,
+  ) {
     const data = [...rows]
       .sort((a, b) => a.value - b.value)
       .slice(0, 5)
       .map((x) => ({
         name: x.label,
         value: x.value,
+        costcent: x.costcent,
+        companyCode: x.companyCode,
       }));
 
     // console.log(rows, data);
@@ -902,7 +1001,7 @@ export class Report {
     // getAllTickets : ไม่แสดงในส่วนของขึ้นตอน Approve
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -923,6 +1022,18 @@ export class Report {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
+    this.textClickFilter = 'status';
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      status: status,
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      status: status,
+      // dateRange: this.filterAll.dateRange,
+    };
     this.loadTickets();
   }
 
@@ -930,7 +1041,8 @@ export class Report {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {
-      status: this.statusLabelApi(this.currentStatus),
+      status: this.statusLabelApi(this.filter.status),
+      // status: this.statusLabelApi(this.currentStatus),
       page: this.listing.currentPage() + 1,
       pageSize: this.listing.pageSize(),
       ticketNo: this.filter.ticketNo || undefined,
@@ -938,6 +1050,7 @@ export class Report {
       requester: this.filter.requester || undefined,
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
@@ -971,14 +1084,7 @@ export class Report {
   }
 
   clearFilter() {
-    this.filter = {
-      ticketNo: '',
-      subject: '',
-      requester: '',
-      department: '',
-      company: '',
-      dateRange: null,
-    };
+    this.filter = this.filterOriginal;
     this.filteredDepartmentList = [];
     this.loadTickets();
   }
@@ -993,10 +1099,32 @@ export class Report {
     this.listing.currentPage.set(page);
     this.loadTickets();
   }
+
   handleCancel(): void {
     this.isLogModalVisible = false;
+    this.filter = {
+      status: '',
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+      serviceType: '',
+    };
+    this.filterOriginal = {
+      status: '',
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+      serviceType: '',
+    };
     this.ticketLogs = [];
     this.page = 1;
+    this.textClickFilter = '';
   }
 
   viewTicket(data: any): void {
@@ -1122,22 +1250,51 @@ export class Report {
     });
   }
 
-  // clearFilter() {
-  //   this.filterAll = {
-  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
-  //   };
-
-  //   this.getAllTickets();
-  // }
-
   exportData() {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
-    const workbook: XLSX.WorkBook = {
-      Sheets: { Tickets: worksheet },
-      SheetNames: ['Tickets'],
+    const params = {
+      status: this.statusLabelApi(this.filter.status),
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: true,
     };
-    XLSX.writeFile(workbook, 'TicketLogs.xlsx');
+    // console.log(params, this.filteredTicketLogs);
+
+    const head_text =
+      this.textClickFilter === 'serviceType'
+        ? this.filteredTicketLogs[0]?.name_th
+        : this.textClickFilter === 'department'
+          ? this.filteredTicketLogs[0]?.deptName +
+            ' (' +
+            this.filteredTicketLogs[0]?.COMPANY_CODE +
+            ')'
+          : this.textClickFilter === 'status'
+            ? this.filter.status
+            : '';
+
+    this.itServiceService.exportTicketByStatus(params).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tickets_${head_text}_${dayjs(dateFrom).format('YYYY-MM-DD')}_${dayjs(dateTo).format('YYYY-MM-DD')}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('loadTickets error:', err);
+        this.ticketLogs = [];
+      },
+    });
   }
 
   getAssignedMembers(members: any[]): any[] {
