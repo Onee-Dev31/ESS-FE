@@ -518,6 +518,182 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
     cy.get('app-acknowledge-modal .file-chip').should('not.exist');
   });
 
+  // ─── multiple file attachments ────────────────────────────────────────────
+
+  it('แนบ 2 ไฟล์ → 2 chips แสดง', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      [
+        { contents: Cypress.Buffer.from('f1'), fileName: 'quote1.pdf', mimeType: 'application/pdf' },
+        { contents: Cypress.Buffer.from('f2'), fileName: 'quote2.pdf', mimeType: 'application/pdf' },
+      ],
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .file-chip').should('have.length', 2);
+  });
+
+  it('แนบ 2 ไฟล์ → ลบ 1 → เหลือ 1 chip', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      [
+        { contents: Cypress.Buffer.from('f1'), fileName: 'quote1.pdf', mimeType: 'application/pdf' },
+        { contents: Cypress.Buffer.from('f2'), fileName: 'quote2.pdf', mimeType: 'application/pdf' },
+      ],
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .chip-remove').first().click();
+    cy.get('app-acknowledge-modal .file-chip').should('have.length', 1);
+  });
+
+  // ─── warning reappears after file removal ────────────────────────────────
+
+  it('เลือก paid → แนบไฟล์ → ลบไฟล์ → warning กลับมา', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.contains('app-acknowledge-modal p', 'กรุณาแนบไฟล์ใบเสนอราคา').should('not.exist');
+    cy.get('app-acknowledge-modal .chip-remove').click();
+    cy.contains('app-acknowledge-modal p', 'กรุณาแนบไฟล์ใบเสนอราคา').should('be.visible');
+  });
+
+  // ─── attachments persist on repairCostType toggle ────────────────────────
+
+  it('แนบไฟล์ (paid) → สลับ free → กลับ paid → ไฟล์ยังคงอยู่', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal .file-chip').should('have.length', 1);
+  });
+
+  // ─── isTagChanged=true + paid ─────────────────────────────────────────────
+
+  it('ticket_type_id=2 → switch แจ้งซ่อม + paid → warning "กรุณาแนบไฟล์" แสดง (isTagChanged=true)', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 2 },
+      attachments: [], replies: [], services: [], assignGroups: [],
+      assignments: [], timeline: [], timelineAssignees: [], requester: null, requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.contains('app-acknowledge-modal p', 'กรุณาแนบไฟล์ใบเสนอราคา').should('be.visible');
+  });
+
+  it('ticket_type_id=2 → switch แจ้งซ่อม + paid + message → ยังไม่แนบไฟล์ → ปุ่ม disabled', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 2 },
+      attachments: [], replies: [], services: [], assignGroups: [],
+      assignments: [], timeline: [], timelineAssignees: [], requester: null, requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal textarea').type('ต้องขออนุมัติ');
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  // ─── ticket_type_id=3 submit flow ────────────────────────────────────────
+
+  it('ticket_type_id=3 → switch แจ้งซ่อม + free + message → PATCH ส่ง repairCostType=free + newTicketTypeId=1', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 3 },
+      attachments: [], replies: [], services: [], assignGroups: [],
+      assignments: [], timeline: [], timelineAssignees: [], requester: null, requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.get('app-acknowledge-modal textarea').type('เปลี่ยนเป็นแจ้งซ่อม');
+    cy.get('app-acknowledge-modal button[type="submit"]').click();
+
+    cy.wait('@approveTicket')
+      .its('request.body')
+      .should('include', 'repairCostType')
+      .and('include', 'free')
+      .and('include', 'newTicketTypeId')
+      .and('include', '1');
+  });
+
+  // ─── onTagChange clears attachments ──────────────────────────────────────
+
+  it('paid + แนบไฟล์ → เปลี่ยน tag → กลับ แจ้งซ่อม + paid → attachments ถูก clear', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .file-chip').should('have.length', 1);
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal .file-chip').should('not.exist');
+  });
+
+  // ─── file preview modal ───────────────────────────────────────────────────
+
+  it('แนบไฟล์ → click chip → file preview modal เปิด', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .file-chip .file-name').click();
+    cy.get('app-file-preview-modal').should('exist');
+  });
+
+  // ─── message whitespace trim ──────────────────────────────────────────────
+
+  it('เปลี่ยน tag ไป แจ้งปัญหา → ใส่ message เป็น whitespace เท่านั้น → ปุ่มยืนยัน disabled', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal textarea').type('   ');
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
   // ─── PATCH payload completeness ───────────────────────────────────────────
 
   it('submit free (no tag change) → PATCH ส่ง newTicketTypeId=1', () => {
