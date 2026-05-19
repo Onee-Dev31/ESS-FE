@@ -265,4 +265,143 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
     cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
     cy.get('app-acknowledge-modal textarea').should('have.value', '');
   });
+
+  // ─── initial modal state ──────────────────────────────────────────────────
+
+  it('modal เปิดแล้ว ปุ่มยืนยัน disabled ทันที (repairCostType ยังไม่เลือก)', () => {
+    openAcknowledgeModal();
+
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  it('modal เปิดแล้ว header แสดง "รับเรื่อง"', () => {
+    openAcknowledgeModal();
+
+    cy.get('app-acknowledge-modal h2').should('contain', 'รับเรื่อง');
+  });
+
+  it('modal มี tag ครบ 3 ตัว (แจ้งปัญหา / แจ้งซ่อม / ขอใช้บริการ)', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').should('be.visible');
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').should('be.visible');
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').should('be.visible');
+  });
+
+  it('textarea ไม่ปรากฏตอน modal เปิดแรก (isTagChanged=false)', () => {
+    openAcknowledgeModal();
+
+    cy.get('app-acknowledge-modal textarea').should('not.exist');
+  });
+
+  it('ปุ่มแนบไฟล์ไม่แสดงตอน modal เปิดแรก (isTagChanged=false)', () => {
+    openAcknowledgeModal();
+
+    cy.get('app-acknowledge-modal .attach-btn').should('not.exist');
+  });
+
+  // ─── textarea visibility on tag change ────────────────────────────────────
+
+  it('สลับ tag จาก แจ้งซ่อม → แจ้งปัญหา → textarea ปรากฏ', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
+    cy.get('app-acknowledge-modal textarea').should('be.visible');
+  });
+
+  it('สลับ tag จาก แจ้งซ่อม → ขอใช้บริการ → textarea ปรากฏ', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
+    cy.get('app-acknowledge-modal textarea').should('be.visible');
+  });
+
+  // ─── repairCostType reset (additional combination) ────────────────────────
+
+  it('เปลี่ยน tag แจ้งซ่อม + free → ขอใช้บริการ → แจ้งซ่อม → repairCostType reset', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]').click({ force: true });
+
+    cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
+    cy.contains('app-acknowledge-modal p', 'ประเภทค่าใช้จ่าย').should('not.exist');
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.get('app-acknowledge-modal input[name="repairCost"]').should('not.be.checked');
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  // ─── different ticket_type_id fixtures ────────────────────────────────────
+
+  it('ticket_type_id=2 → modal pre-select tag แจ้งปัญหา', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 2 },
+      attachments: [],
+      replies: [],
+      services: [],
+      assignGroups: [],
+      assignments: [],
+      timeline: [],
+      timelineAssignees: [],
+      requester: null,
+      requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal label.tag', 'แจ้งปัญหา')
+      .find('input[name="tag"]')
+      .should('be.checked');
+  });
+
+  it('ticket_type_id=3 → modal pre-select tag ขอใช้บริการ', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 3 },
+      attachments: [],
+      replies: [],
+      services: [],
+      assignGroups: [],
+      assignments: [],
+      timeline: [],
+      timelineAssignees: [],
+      requester: null,
+      requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal label.tag', 'ขอใช้บริการ')
+      .find('input[name="tag"]')
+      .should('be.checked');
+  });
+
+  it('ticket_type_id=2 → switch to แจ้งซ่อม → ปุ่มแนบไฟล์แสดงขึ้น (isTagChanged=true)', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 2 },
+      attachments: [],
+      replies: [],
+      services: [],
+      assignGroups: [],
+      assignments: [],
+      timeline: [],
+      timelineAssignees: [],
+      requester: null,
+      requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.get('app-acknowledge-modal .attach-btn').should('be.visible');
+  });
 });
