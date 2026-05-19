@@ -36,7 +36,8 @@ describe('Login', () => {
 
   it('login สำเร็จแล้ว redirect ไป returnUrl เมื่อมี query param', () => {
     cy.mockLoginApi();
-    cy.visit('/login?returnUrl=%2Fallowance');
+    cy.visit('/login');
+    cy.window().then((win) => win.localStorage.setItem('returnUrl', '/allowance'));
     cy.get('#username').type(Cypress.env('username'));
     cy.get('#password').type(Cypress.env('password'));
     cy.get('.login-button').click();
