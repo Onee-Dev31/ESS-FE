@@ -462,14 +462,15 @@ describe('Notification Inbox', () => {
       cy.get('.dropdown-item').first().find('.unread-dot').should('not.exist');
     });
 
-    it('actor name แสดงใน notification item', () => {
-      setupNotificationApi(1, [makeNotif(1)]);
+    it('user_status แสดงใน notification item เมื่อมีค่า', () => {
+      const notifWithStatus = { ...makeNotif(1), user_status: 'Pending' };
+      setupNotificationApi(1, [notifWithStatus]);
       cy.login();
       cy.visit('/allowance');
       cy.wait('@getUnreadCount');
       openPanel();
       cy.wait('@getNotifications');
-      cy.get('.dropdown-item').first().find('.actor-name').should('contain', 'Admin');
+      cy.get('.dropdown-item').first().find('.user_status').should('contain', 'Pending');
     });
   });
 
