@@ -238,6 +238,88 @@ describe('Notification Inbox', () => {
       cy.wait('@markRead').its('request.body').should('have.property', 'notificationRecipientId', 1);
     });
 
+    it('role it-staff คลิก notification แล้วไป /it-dashboard พร้อม ticketId', () => {
+      setupNotificationApi(1, [makeNotif(1)]);
+
+      cy.login(undefined, undefined, { permission: { Role: 'it-staff' } });
+      cy.window().then((win) => {
+        win.localStorage.setItem('userRole', 'it-staff');
+        const raw = win.localStorage.getItem('allData');
+        if (raw) {
+          const d = JSON.parse(raw);
+          d.permission = { Role: 'it-staff' };
+          win.localStorage.setItem('allData', JSON.stringify(d));
+        }
+      });
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().click();
+      cy.wait('@markRead');
+
+      cy.location('pathname').should('eq', '/it-dashboard');
+      cy.location('search').should('include', 'ticketId=101');
+      cy.location('search').should('include', 'focusZone=tickets');
+    });
+
+    it('role Employee คลิก notification แล้วไป /it-service-list พร้อม ticketId', () => {
+      setupNotificationApi(1, [makeNotif(1, { recipientRole: 'Employee' })]);
+
+      cy.login(undefined, undefined, {
+        permission: { Role: 'Employee' },
+        menus: [
+          { RoutePath: '/welcome' },
+          { RoutePath: '/dashboard' },
+          { RoutePath: '/allowance' },
+          { RoutePath: '/timeoff' },
+          { RoutePath: '/it-dashboard' },
+          { RoutePath: '/it-service-list' },
+        ],
+      });
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().click();
+      cy.wait('@markRead');
+
+      cy.location('pathname').should('eq', '/it-service-list');
+      cy.location('search').should('include', 'ticketId=101');
+    });
+
+    it('role supervisor + approval notification คลิกแล้วไป /approval-it-request', () => {
+      setupNotificationApi(1, [
+        makeNotif(1, {
+          recipientRole: 'supervisor',
+          notificationType: 'approval_pending',
+        }),
+      ]);
+
+      cy.login(undefined, undefined, {
+        permission: { Role: 'supervisor' },
+        menus: [
+          { RoutePath: '/welcome' },
+          { RoutePath: '/dashboard' },
+          { RoutePath: '/allowance' },
+          { RoutePath: '/approval-it-request' },
+        ],
+      });
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().click();
+      cy.wait('@markRead');
+
+      cy.location('pathname').should('eq', '/approval-it-request');
+      cy.location('search').should('include', 'ticketId=101');
+      cy.location('search').should('include', 'ticketNumber=T-001');
+    });
+
     it('badge หายหลัง mark as read รายการสุดท้าย', () => {
       setupNotificationApi(1, [makeNotif(1)]);
       cy.login();
@@ -326,6 +408,25 @@ describe('Notification Inbox', () => {
       cy.get('.filter-toggle input[type="checkbox"]').check();
       cy.wait('@getUnreadOnly');
       cy.get('.dropdown-item').should('have.length', 1);
+    });
+
+    it('toggle unread only แล้วไม่มีรายการค้างอ่าน → แสดง empty state ของ unread only', () => {
+      setupNotificationApi(2, [makeNotif(1), makeNotif(2, { isRead: true })]);
+
+      cy.intercept('GET', /\/notification\/my\?.*unreadOnly=true/, (req) => {
+        req.reply({ success: true, data: [], totalRecords: 0 });
+      }).as('getUnreadOnlyEmpty');
+
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+
+      cy.get('.filter-toggle input[type="checkbox"]').check();
+      cy.wait('@getUnreadOnlyEmpty');
+      cy.get('.notification-empty').should('be.visible');
+      cy.contains('.notification-empty', 'ไม่มีรายการที่ยังไม่อ่าน').should('be.visible');
     });
   });
 
@@ -471,6 +572,17 @@ describe('Notification Inbox', () => {
       openPanel();
       cy.wait('@getNotifications');
       cy.get('.dropdown-item').first().find('.user_status').should('contain', 'Pending');
+    });
+
+    it('ไม่มี ticket-chip เมื่อ notification ไม่มี ticketNumber', () => {
+      const notifWithoutTicketNumber = { ...makeNotif(1), ticket_number: null };
+      setupNotificationApi(1, [notifWithoutTicketNumber]);
+      cy.login();
+      cy.visit('/allowance');
+      cy.wait('@getUnreadCount');
+      openPanel();
+      cy.wait('@getNotifications');
+      cy.get('.dropdown-item').first().find('.ticket-chip').should('not.exist');
     });
   });
 
