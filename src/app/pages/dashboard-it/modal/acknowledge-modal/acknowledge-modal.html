@@ -63,8 +63,12 @@
             </div>
           }
 
-          <div *ngIf="isTagChanged" style="margin: 10px; margin-top: 20px">
+          <div
+            *ngIf="isTagChanged || (selectedTag === 1 && repairCostType === 'paid')"
+            style="margin: 10px; margin-top: 20px"
+          >
             <textarea
+              *ngIf="isTagChanged"
               name="message"
               class="form-input note"
               placeholder="อธิบายรายละเอียด..."

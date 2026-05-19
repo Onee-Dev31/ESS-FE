@@ -114,27 +114,38 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
     cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
   });
 
-  it('เลือก "ขออนุมัติ Budget ต้นสังกัด" แล้วปุ่มยืนยัน enabled', () => {
+  it('เลือก paid และแนบไฟล์ → ปุ่มยืนยัน enabled', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="paid"]').click({ force: true });
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
     cy.get('app-acknowledge-modal button[type="submit"]').should('not.be.disabled');
   });
 
   it('เลือก "ดำเนินการตามปกติ" แล้วปุ่มยืนยัน enabled', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]').click({ force: true });
+    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]')
+      .then(($el) => {
+        ($el[0] as HTMLInputElement).checked = true;
+        $el[0].dispatchEvent(new Event('change', { bubbles: true }));
+      });
     cy.get('app-acknowledge-modal button[type="submit"]').should('not.be.disabled');
   });
 
-  it('submit แจ้งซ่อม + paid → PATCH ส่ง repairCostType=paid', () => {
+  it('submit แจ้งซ่อม + paid + แนบไฟล์ → PATCH ส่ง repairCostType=paid', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="paid"]').click({ force: true });
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
     cy.get('app-acknowledge-modal button[type="submit"]').click();
 
     cy.wait('@approveTicket').its('request.body').should('include', 'repairCostType').and('include', 'paid');
@@ -143,8 +154,11 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
   it('submit แจ้งซ่อม + free → PATCH ส่ง repairCostType=free', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]').click({ force: true });
+    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]')
+      .then(($el) => {
+        ($el[0] as HTMLInputElement).checked = true;
+        $el[0].dispatchEvent(new Event('change', { bubbles: true }));
+      });
     cy.get('app-acknowledge-modal button[type="submit"]').click();
 
     cy.wait('@approveTicket').its('request.body').should('include', 'repairCostType').and('include', 'free');
@@ -163,8 +177,11 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
   it('เปลี่ยน tag จาก แจ้งซ่อม → แจ้งปัญหา → กลับ แจ้งซ่อม → repairCostType reset', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="paid"]').click({ force: true });
+    cy.get('app-acknowledge-modal input[name="repairCost"][value="paid"]')
+      .then(($el) => {
+        ($el[0] as HTMLInputElement).checked = true;
+        $el[0].dispatchEvent(new Event('change', { bubbles: true }));
+      });
 
     cy.contains('app-acknowledge-modal span', 'แจ้งปัญหา').click();
     cy.contains('app-acknowledge-modal p', 'ประเภทค่าใช้จ่าย').should('not.exist');
@@ -321,8 +338,11 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
   it('เปลี่ยน tag แจ้งซ่อม + free → ขอใช้บริการ → แจ้งซ่อม → repairCostType reset', () => {
     openAcknowledgeModal();
 
-    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
-    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]').click({ force: true });
+    cy.get('app-acknowledge-modal input[name="repairCost"][value="free"]')
+      .then(($el) => {
+        ($el[0] as HTMLInputElement).checked = true;
+        $el[0].dispatchEvent(new Event('change', { bubbles: true }));
+      });
 
     cy.contains('app-acknowledge-modal span', 'ขอใช้บริการ').click();
     cy.contains('app-acknowledge-modal p', 'ประเภทค่าใช้จ่าย').should('not.exist');
