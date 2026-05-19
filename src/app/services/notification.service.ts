@@ -30,7 +30,13 @@ export class NotificationService {
   private readonly baseUrl = `${environment.api_url}/notification`;
   private readonly pageSize = 8;
   private readonly itRoles = new Set(['it-staff', 'it-director', 'system-admin']);
-  private readonly approverRoles = new Set(['hr', 'executive', 'supervisor', 'director']);
+  private readonly approverRoles = new Set([
+    'hr',
+    'executive',
+    'supervisor',
+    'director',
+    'approver',
+  ]);
 
   readonly items = signal<NotificationInboxItem[]>([]);
   readonly unreadCount = signal(0);
@@ -425,7 +431,7 @@ export class NotificationService {
         typeText.includes(token),
       );
 
-    if (isApprovalRoute) {
+    if (isApprovalRoute || (isApprovalRoute && input.notificationType === 'ticket_resubmited')) {
       return {
         route: '/approval-it-request',
         queryParams: {
