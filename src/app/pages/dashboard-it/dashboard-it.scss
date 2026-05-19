@@ -65,7 +65,7 @@
   &:hover {
     background-color: var(--new-ticket-banner);
     background-color: color-mix(in srgb, var(--new-ticket-banner), black 15%);
-    box-shadow: 0 6px 16px rgba(22, 119, 255, 0.5);
+    box-shadow: 0 6px 16px #c8ff1666;
   }
 }
 
