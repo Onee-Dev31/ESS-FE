@@ -52,6 +52,17 @@ const setupApi = () => {
   cy.intercept('GET', '**/Master/assign-dropdown*', { data: [] }).as('getAssignDropdown');
   cy.intercept('GET', '**/Master/companies', []).as('getCompanies');
   cy.intercept('GET', '**/Master/company-costcent', []).as('getDepartments');
+
+  cy.intercept('GET', /\/notification\/unread-count/, { success: true, unreadCount: 0 }).as(
+    'getNotifUnreadCount',
+  );
+  cy.intercept('GET', /\/notification\/my/, {
+    success: true,
+    data: [],
+    totalRecords: 0,
+    page: 1,
+    pageSize: 8,
+  }).as('getNotifications');
 };
 
 const openAcknowledgeModal = () => {
