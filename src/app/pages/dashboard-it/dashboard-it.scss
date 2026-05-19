@@ -729,6 +729,12 @@
       border-bottom: 1px solid var(--border-color);
       cursor: pointer;
 
+      &.is-new {
+        border-left: 4px solid var(--primary);
+        padding-left: 16px;
+        animation: highlight-fade 1.2s ease-in-out 3;
+      }
+
       &:hover {
         background-color: var(--bg-slate);
       }

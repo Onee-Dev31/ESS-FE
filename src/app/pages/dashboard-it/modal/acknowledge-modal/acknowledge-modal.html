@@ -82,6 +82,13 @@
               แนบไฟล์
             </button>
 
+            @if (selectedTag === 1 && repairCostType === 'paid' && attachments.length === 0) {
+              <p style="color: var(--danger); font-size: 12px; margin-top: 6px">
+                <i class="fas fa-exclamation-circle"></i>
+                กรุณาแนบไฟล์ใบเสนอราคา / เอกสารประกอบการขออนุมัติ Budget
+              </p>
+            }
+
             @if (attachments.length > 0) {
               <div class="file-chips">
                 @for (file of attachments; track file.name; let i = $index) {
@@ -117,7 +124,8 @@
             [disabled]="
               !selectedTag ||
               (selectedTag === 1 && !repairCostType) ||
-              (isTagChanged && !message.trim())
+              (isTagChanged && !message.trim()) ||
+              (selectedTag === 1 && repairCostType === 'paid' && attachments.length === 0)
             "
           >
             <i class="fas fa-paper-plane"></i> ยืนยัน
