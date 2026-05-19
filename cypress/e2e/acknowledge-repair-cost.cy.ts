@@ -424,4 +424,148 @@ describe('Acknowledge Modal — repairCostType (แจ้งซ่อม)', () =
     cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
     cy.get('app-acknowledge-modal .attach-btn').should('be.visible');
   });
+
+  // ─── template fix: paid + no tag change ──────────────────────────────────
+
+  it('เลือก paid → attach btn แสดงทันที แม้ไม่เปลี่ยน tag (isTagChanged=false)', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal .attach-btn').should('be.visible');
+  });
+
+  it('เลือก paid → warning "กรุณาแนบไฟล์" แสดงก่อนแนบไฟล์', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.contains('app-acknowledge-modal p', 'กรุณาแนบไฟล์ใบเสนอราคา').should('be.visible');
+  });
+
+  it('เลือก paid → แนบไฟล์ → warning หาย', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.contains('app-acknowledge-modal p', 'กรุณาแนบไฟล์ใบเสนอราคา').should('not.exist');
+  });
+
+  it('เลือก paid → แนบไฟล์ → ลบไฟล์ → ปุ่มยืนยัน disabled อีกครั้ง', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .chip-remove').click();
+    cy.get('app-acknowledge-modal button[type="submit"]').should('be.disabled');
+  });
+
+  it('เลือก paid → สลับ free → file section หาย', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal .attach-btn').should('be.visible');
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.get('app-acknowledge-modal .attach-btn').should('not.exist');
+  });
+
+  it('เลือก paid → textarea ไม่ปรากฏ (isTagChanged=false)', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal textarea').should('not.exist');
+  });
+
+  // ─── file chip display ────────────────────────────────────────────────────
+
+  it('แนบไฟล์ → chip แสดงชื่อไฟล์', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      {
+        contents: Cypress.Buffer.from('fake'),
+        fileName: 'budget-quote.pdf',
+        mimeType: 'application/pdf',
+      },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .file-chip .file-name').should('contain', 'budget-quote.pdf');
+  });
+
+  it('แนบไฟล์ → ลบ chip → file chips ว่าง', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal .chip-remove').click();
+    cy.get('app-acknowledge-modal .file-chip').should('not.exist');
+  });
+
+  // ─── PATCH payload completeness ───────────────────────────────────────────
+
+  it('submit free (no tag change) → PATCH ส่ง newTicketTypeId=1', () => {
+    openAcknowledgeModal();
+
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.get('app-acknowledge-modal button[type="submit"]').click();
+
+    cy.wait('@approveTicket')
+      .its('request.body')
+      .should('include', 'newTicketTypeId')
+      .and('include', '1');
+  });
+
+  it('ticket_type_id=2 → แจ้งซ่อม + paid + message + file → PATCH ส่ง repairCostType=paid + newTicketTypeId=1', () => {
+    cy.intercept('GET', '**/tickets/999', {
+      ticket: { ...repairTicket, ticket_type_id: 2 },
+      attachments: [],
+      replies: [],
+      services: [],
+      assignGroups: [],
+      assignments: [],
+      timeline: [],
+      timelineAssignees: [],
+      requester: null,
+      requestFor: {},
+    }).as('getTicket999');
+
+    cy.contains('.ticket-item .ticket-number', '#IT-00999').closest('.ticket-item').click();
+    cy.wait('@getTicket999');
+    cy.wait('@markTicketRead');
+    cy.get('.btn.btn-accept').click();
+
+    cy.contains('app-acknowledge-modal span', 'แจ้งซ่อม').click();
+    cy.contains('app-acknowledge-modal span', 'ดำเนินการตามปกติ').click();
+    cy.contains('app-acknowledge-modal span', 'ขออนุมัติ Budget ต้นสังกัด').click();
+    cy.get('app-acknowledge-modal textarea').type('ต้องขออนุมัติค่าซ่อม');
+    cy.get('app-acknowledge-modal input[type="file"]').selectFile(
+      { contents: Cypress.Buffer.from('fake'), fileName: 'quote.pdf', mimeType: 'application/pdf' },
+      { force: true },
+    );
+    cy.get('app-acknowledge-modal button[type="submit"]').click();
+
+    cy.wait('@approveTicket')
+      .its('request.body')
+      .should('include', 'repairCostType')
+      .and('include', 'paid')
+      .and('include', 'newTicketTypeId')
+      .and('include', '1');
+  });
 });
