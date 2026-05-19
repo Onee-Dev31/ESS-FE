@@ -736,10 +736,15 @@ export class DashboardIT implements OnInit {
           this.fetchUnreadIds();
 
           setTimeout(() => {
-            this.ticketList?.nativeElement.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
+            const el = this.ticketList?.nativeElement;
+
+            if (!el) return;
+
+            if (typeof el.scrollTo === 'function') {
+              el.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              el.scrollTop = 0;
+            }
           });
 
           if (trackNew) {
