@@ -431,7 +431,7 @@ export class NotificationService {
         typeText.includes(token),
       );
 
-    if (isApprovalRoute || (isApprovalRoute && input.notificationType === 'ticket_resubmited')) {
+    if (isApprovalRoute || input.notificationType === 'ticket_resubmited') {
       return {
         route: '/approval-it-request',
         queryParams: {
