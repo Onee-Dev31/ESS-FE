@@ -413,7 +413,7 @@ export class DashboardIT implements OnInit {
 
   refreshTickets() {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
-    console.log(this.prevTicketIds);
+    // console.log(this.prevTicketIds);
     this.getAllTickets(true);
   }
 
@@ -468,7 +468,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
+      // console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -652,7 +652,7 @@ export class DashboardIT implements OnInit {
   }
 
   ReOpen() {
-    console.log('reOpen mock', this.selectedTicket());
+    // console.log('reOpen mock', this.selectedTicket());
 
     this.swalService.confirm('ยืนยันการเปิดงานอีกครั้ง (Re-open)').then((result) => {
       if (!result.isConfirmed) return;
@@ -666,7 +666,7 @@ export class DashboardIT implements OnInit {
       this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.itServiceService.re_open(formData).subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           setTimeout(() => {
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
           }, 100);
@@ -846,7 +846,7 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
@@ -896,7 +896,7 @@ export class DashboardIT implements OnInit {
                 .map((t: any) => t.ticketId),
             );
 
-            console.log(ids);
+            // console.log(ids);
             this.newTicketIds.set(ids);
             this.signalrService.pendingTicketNumbers.set(new Set());
             this.signalrService.pendingNewTickets.set(0);
@@ -988,7 +988,7 @@ export class DashboardIT implements OnInit {
     attachments?: any[],
     repairCostType?: string,
   ) {
-    console.log(command, ticketId, ticketTypeId, comment, attachments);
+    // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
     const formData = new FormData();
 
@@ -1265,11 +1265,11 @@ export class DashboardIT implements OnInit {
 
   // -- assign --
   openAssignModal() {
-    console.log(this.selectedTicket());
+    // console.log(this.selectedTicket());
 
     this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         if (!res?.success) {
           this.swalService.warning(res.message);
           return;

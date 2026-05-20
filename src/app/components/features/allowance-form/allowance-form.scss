@@ -488,10 +488,10 @@
   border: 1px solid $border;
   border-radius: 8px;
 
-  @include large-tablet {
-    border: none;
-    background: transparent;
-  }
+  // @include large-tablet {
+  //   border: none;
+  //   background: transparent;
+  // }
 
   .excel-table {
     $col-select-width: 50px;
@@ -502,7 +502,8 @@
 
     width: 100% !important;
     min-width: 100% !important;
-    display: table;
+    display: none;
+    // display: table;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed !important;
@@ -685,13 +686,10 @@
 // ==========================================
 
 .mobile-cards-view {
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   padding: 4px;
-
-  @include large-tablet {
-    display: grid !important;
-  }
 
   .log-card {
     background: $bg-card;
