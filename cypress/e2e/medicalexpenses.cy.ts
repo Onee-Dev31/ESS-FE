@@ -139,4 +139,27 @@ describe('Medical Expenses', () => {
     cy.get('.btn-create').click();
     cy.get('app-medicalexpenses-form').should('be.visible');
   });
+
+  it('policy modal ปิดได้', () => {
+    cy.get('[title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ"]').click();
+    cy.get('app-medical-policy-modal').should('exist');
+    cy.get('app-medical-policy-modal').find('[title="ปิด"], .close-btn, .btn-close').first().click();
+    cy.get('app-medical-policy-modal').should('not.exist');
+  });
+
+  it('stat-card รอดำเนินการ แสดงตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .eq(1)
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /\d+/);
+  });
+
+  it('stat-card ยอดรวมที่ขอเบิก แสดงค่าตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .last()
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /[\d,.]+/);
+  });
 });
