@@ -40,6 +40,7 @@ import { VehicleService } from '../../../services/vehicle.service';
 import { SwalService } from '../../../services/swal.service';
 import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-vehicle-form',
@@ -71,16 +72,21 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   logs: VehicleLogItem[] = [];
 
   MODE_EDIT: boolean = false;
+  isLoading = true;
 
   ngOnInit(): void {
-    this.masterDataService.getDateConfig().subscribe((config) => {
-      this.thaiMonths = config.months;
-      this.years = config.years;
+    this.masterDataService
+      .getDateConfig()
+      .pipe(delay(0))
+      .subscribe((config) => {
+        this.thaiMonths = config.months;
+        this.years = config.years;
+        this.isLoading = false;
 
-      if (!this.requests) {
-        this.loadData();
-      }
-    });
+        if (!this.requests) {
+          this.loadData();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
