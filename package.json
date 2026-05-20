@@ -12,6 +12,7 @@
     "test": "ng test",
     "e2e": "cypress run --headed",
     "e2e:ci": "cypress run",
+    "e2e:report": "CYPRESS_SHEET_ID=1rT22CvJOBABkOTV7emqC_seO6W9fxL4TxHhoVkZXWio cypress run",
     "cypress:open": "cypress open"
   },
   "prettier": {
@@ -78,6 +79,8 @@
     "@types/file-saver": "^2.0.7",
     "@types/jspdf": "^1.3.3",
     "cypress": "^15.9.0",
+    "dotenv": "^17.4.2",
+    "googleapis": "^171.4.0",
     "jsdom": "^28.0.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

@@ -1,4 +1,6 @@
 import { defineConfig } from 'cypress';
+require('dotenv').config();
+const { setupSheet, uploadSpecResults } = require('./scripts/upload-cypress-results');
 
 export default defineConfig({
   e2e: {
@@ -10,6 +12,14 @@ export default defineConfig({
     video: false,
     screenshotOnRunFailure: true,
     defaultCommandTimeout: 8000,
+    setupNodeEvents(on) {
+      on('before:run', async () => {
+        await setupSheet();
+      });
+      on('after:spec', async (_spec, results) => {
+        await uploadSpecResults(_spec, results);
+      });
+    },
   },
   env: {
     username: 'NoppornEam',

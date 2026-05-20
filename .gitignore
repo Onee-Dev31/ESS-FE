@@ -42,4 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Google Service Account key (never commit this)
+google-credentials.json
+.env
 src/environments/environment.ts
