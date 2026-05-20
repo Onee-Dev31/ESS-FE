@@ -1042,8 +1042,6 @@ export class DashboardIT implements OnInit {
   }
 
   get currentActions() {
-    console.log(this.selectedTicket());
-
     if (this.selectedTicket().repair_cost_type === 'paid') {
       return (
         this.actionConfig['waiting-user-resubmit'] || {
@@ -1267,9 +1265,31 @@ export class DashboardIT implements OnInit {
 
   // -- assign --
   openAssignModal() {
-    this.IS_ASSIGN_TICKET.set(true);
-    this.selectedAssigneeEmpCodes = [];
-    this.assignSearchKeyword = '';
+    console.log(this.selectedTicket());
+
+    this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
+      next: (res) => {
+        console.log(res);
+        if (!res?.success) {
+          this.swalService.warning(res.message);
+          return;
+        }
+        // this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+        this.IS_ASSIGN_TICKET.set(true);
+        this.selectedAssigneeEmpCodes = [];
+        this.assignSearchKeyword = '';
+      },
+
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 
   closeAssignModal() {
