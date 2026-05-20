@@ -624,6 +624,18 @@ $status-cancelled-text: var(--text-table-head);
       width: 100%;
     }
 
+    .select-status {
+      flex: 0 0 260px;
+      min-width: 260px;
+      width: 260px;
+      display: block;
+
+      @include mobile {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+
     @media screen and (max-width: 425px) {
       flex-direction: column;
 
@@ -772,6 +784,77 @@ $status-cancelled-text: var(--text-table-head);
   .error {
     color: rgb(255, 166, 166);
     text-align: center;
+  }
+
+  ::ng-deep .select-status.ant-select {
+    width: 260px;
+    min-width: 260px;
+    height: 44px;
+    line-height: 44px;
+    position: relative;
+
+    @include mobile {
+      width: 100%;
+      min-width: 0;
+      height: 38px;
+      line-height: 38px;
+    }
+
+    @include tablet {
+      height: 42px;
+      line-height: 42px;
+    }
+  }
+
+  ::ng-deep .select-status.ant-select .ant-select-selector {
+    height: 44px !important;
+    padding: 0 44px 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    background: var(--bg-table-head) !important;
+    border: 1.5px solid var(--border-table-head) !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+
+    @include tablet {
+      height: 42px !important;
+    }
+
+    @include mobile {
+      height: 38px !important;
+    }
+  }
+
+  ::ng-deep .select-status.ant-select .ant-select-selection-item,
+  ::ng-deep .select-status.ant-select .ant-select-selection-placeholder {
+    line-height: 42px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    color: var(--text) !important;
+
+    @include tablet {
+      line-height: 40px !important;
+    }
+
+    @include mobile {
+      line-height: 36px !important;
+    }
+  }
+
+  ::ng-deep .select-status.ant-select .ant-select-arrow {
+    top: 50% !important;
+    color: var(--text-muted) !important;
+    right: 16px !important;
+    inset-inline-end: 16px !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
+  }
+
+  ::ng-deep .select-status.ant-select.ant-select-focused .ant-select-selector,
+  ::ng-deep .select-status.ant-select:hover .ant-select-selector {
+    border-color: #a78bfa !important;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
   }
 }
 
