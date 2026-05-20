@@ -168,4 +168,38 @@ describe('Vehicle Taxi', () => {
     cy.get('.btn-create').click();
     cy.get('app-vehicle-taxi-form').should('be.visible');
   });
+
+  it('กด edit เปิด modal พร้อมข้อมูลเดิมได้', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.edit').click();
+        cy.get('app-vehicle-taxi-form').should('be.visible');
+        return false;
+      }
+    });
+  });
+
+  it('filter ตามสถานะ "คำขอใหม่" แล้วแสดงผลถูกต้อง', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('.btn-search').click();
+    cy.wait(1000);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('modal form แสดง label ประจำเดือน และมีปุ่ม btn-submit หลัง loader หาย', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-vehicle-taxi-form .loader').should('not.exist', { timeout: 5000 });
+    cy.contains('app-vehicle-taxi-form', 'ประจำเดือน').should('be.visible');
+    cy.get('app-vehicle-taxi-form .btn-submit').should('exist');
+  });
 });

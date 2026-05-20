@@ -122,13 +122,8 @@ async function setupSheet() {
             fields: 'pixelSize',
           },
         },
-        {
-          updateDimensionProperties: {
-            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 },
-            properties: { pixelSize: 400 },
-            fields: 'pixelSize',
-          },
-        },
+        // Column C (Test Name) — auto-sized after run via finalizeSheet()
+
         {
           updateDimensionProperties: {
             range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 },
@@ -330,4 +325,31 @@ async function uploadSpecResults(spec, results) {
   console.log(`[Sheets] ${specName}: ${passed} pass, ${failed} fail`);
 }
 
-module.exports = { setupSheet, uploadSpecResults };
+async function finalizeSheet() {
+  const sheets = getSheets();
+  if (!sheets) return;
+
+  const tabId = await getTabId(sheets);
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          autoResizeDimensions: {
+            dimensions: {
+              sheetId: tabId,
+              dimension: 'COLUMNS',
+              startIndex: 2,
+              endIndex: 3,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  console.log('[Sheets] Test Name column auto-resized');
+}
+
+module.exports = { setupSheet, uploadSpecResults, finalizeSheet };
