@@ -625,14 +625,13 @@ $status-cancelled-text: var(--text-table-head);
     }
 
     .select-status {
-      flex: 0 0 260px;
       min-width: 260px;
       width: 260px;
       display: block;
 
       @include mobile {
-        flex: 1 1 auto;
         width: 100%;
+        min-width: 0;
       }
     }
 
