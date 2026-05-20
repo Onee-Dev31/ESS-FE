@@ -92,7 +92,7 @@
               @for (p of performanceData()?.evaluations; track p.year) {
                 <div class="perf-item">
                   <span class="perf-year">{{ p.year }}</span>
-                  <span class="perf-grade">{{ p.hr_grade }}</span>
+                  <span class="perf-grade" [class.show-grade]="showGrade">{{ p.hr_grade }}</span>
                 </div>
               }
             </div>
@@ -101,6 +101,14 @@
           <div class="card-footer text-end">
             <button type="button" class="action-btn">
               <i class="fas fa-clipboard-check"></i> ประเมินประจำปี
+            </button>
+            <button
+              type="button"
+              class="eye-btn"
+              (click)="toggleGrade()"
+              *ngIf="performanceData()?.service_info?.service_years !== 0"
+            >
+              <i class="fa-solid" [ngClass]="showGrade ? 'fa-eye' : 'fa-eye-slash'"></i>
             </button>
           </div>
         </div>
@@ -111,7 +119,7 @@
           </div>
           <div class="card-body">
             <div class="profile-info-list">
-              @for (item of itStoryMap(); track item.label) {
+              @for (item of itStoryMap(); track $index) {
                 <div class="profile-display-group">
                   <label class="display-label">{{ item.label }}</label>
                   <div class="display-value">{{ item.value }}</div>

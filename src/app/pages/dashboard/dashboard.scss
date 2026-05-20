@@ -1636,10 +1636,54 @@ $balance: $status-success-text;
           padding: 4px 12px;
           border-radius: 8px;
           font-size: 14px;
+          filter: blur(5px);
+        }
+
+        .show-grade {
+          filter: blur(0);
         }
       }
     }
   }
+}
+
+.eye-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  margin-left: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(135deg, var(--text-reverse), var(--text-reverse));
+
+  color: var(--primary);
+  font-size: 18px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  transition: all 0.25s ease;
+}
+
+.eye-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.eye-btn:active {
+  transform: scale(0.95);
+}
+
+.eye-btn i {
+  transition: 0.25s ease;
+}
+
+.eye-btn:hover i {
+  transform: scale(1.1);
 }
 
 // ==================== IT STORY CARD ====================
