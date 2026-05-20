@@ -12,7 +12,10 @@ interface VersionInfo {
 export class VersionCheckService {
   private currentVersion: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   start() {
     this.fetchVersion().subscribe();
