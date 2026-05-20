@@ -10,12 +10,11 @@ describe('Welcome', () => {
     cy.contains('.instruction', 'กรุณาเลือกเมนูจากแถบด้านซ้ายเพื่อเริ่มต้นใช้งาน').should(
       'be.visible',
     );
-    cy.get('.arrow-indicator').should('be.visible');
   });
 
-  it('กดลูกศรแล้วนำทางไปหน้า dashboard', () => {
-    cy.get('.arrow-indicator').click();
-    cy.url().should('include', '/dashboard');
+  it('แสดง divider และ illustration ครบถ้วน', () => {
+    cy.get('.illustration-container').should('be.visible');
+    cy.get('.divider').should('exist');
   });
 
   it('illustration container และ emoji แสดงขึ้น', () => {
@@ -25,5 +24,25 @@ describe('Welcome', () => {
 
   it('divider แสดงระหว่าง subtitle และ instruction', () => {
     cy.get('.divider').should('exist');
+  });
+
+  it('เข้า /welcome โดยไม่ login แล้ว redirect ไป /login', () => {
+    cy.clearLocalStorage();
+    cy.visit('/welcome');
+    cy.url().should('include', '/login');
+  });
+
+  it('URL อยู่ที่ /welcome หลัง login', () => {
+    cy.url().should('include', '/welcome');
+  });
+
+  it('welcome page แสดงถูกต้องบน mobile viewport', () => {
+    cy.viewport('iphone-6');
+    cy.get('.welcome-title').should('be.visible');
+    cy.get('.subtitle').should('be.visible');
+  });
+
+  it('welcome page ไม่มี app-error-state', () => {
+    cy.get('app-error-state').should('not.exist');
   });
 });

@@ -30,7 +30,13 @@ export class NotificationService {
   private readonly baseUrl = `${environment.api_url}/notification`;
   private readonly pageSize = 8;
   private readonly itRoles = new Set(['it-staff', 'it-director', 'system-admin']);
-  private readonly approverRoles = new Set(['hr', 'executive', 'supervisor', 'director']);
+  private readonly approverRoles = new Set([
+    'hr',
+    'executive',
+    'supervisor',
+    'director',
+    'approver',
+  ]);
 
   readonly items = signal<NotificationInboxItem[]>([]);
   readonly unreadCount = signal(0);
@@ -165,6 +171,7 @@ export class NotificationService {
       unreadOnly: this.unreadOnly(),
     }).subscribe({
       next: ({ items, total }) => {
+        // console.log(items);
         const mapped = items.map((item) => this.mapNotification(item));
         this.items.set(mapped);
         this.hasMore.set(this.computeHasMore(mapped.length, total));
@@ -388,6 +395,9 @@ export class NotificationService {
       ticketId,
       ticketNumber,
       actorName: this.toText(item.actor_name ?? item.actorName) ?? null,
+      actorNickname: this.toText(item.actor_nickname ?? item.actorNickname) ?? null,
+      ticket_name_th: this.toText(item.ticket_name_th) ?? null,
+      user_status: this.toText(item.user_status) ?? null,
       targetType: this.toText(item.target_type ?? item.targetType) ?? null,
       payload,
       recipientRole: this.toText(item.recipient_role ?? item.recipientRole) ?? null,
@@ -417,7 +427,20 @@ export class NotificationService {
     const isItRole = [...this.itRoles].some((role) => roleText.includes(role));
     const isApprovalRoute =
       [...this.approverRoles].some((role) => roleText.includes(role)) &&
-      ['approval', 'director', 'decision', 'approver'].some((token) => typeText.includes(token));
+      ['approval', 'director', 'decision', 'approver', 'reopened'].some((token) =>
+        typeText.includes(token),
+      );
+
+    if (isApprovalRoute || input.notificationType === 'ticket_resubmited') {
+      return {
+        route: '/approval-it-request',
+        queryParams: {
+          ticketId: input.ticketId ?? undefined,
+          ticketNumber: input.ticketNumber ?? undefined,
+          _t: Date.now(),
+        },
+      };
+    }
 
     if (isItRole) {
       return {
@@ -425,17 +448,6 @@ export class NotificationService {
         queryParams: {
           ticketId: input.ticketId ?? undefined,
           focusZone: 'tickets',
-          _t: Date.now(),
-        },
-      };
-    }
-
-    if (isApprovalRoute) {
-      return {
-        route: '/approval-it-request',
-        queryParams: {
-          ticketId: input.ticketId ?? undefined,
-          ticketNumber: input.ticketNumber ?? undefined,
           _t: Date.now(),
         },
       };

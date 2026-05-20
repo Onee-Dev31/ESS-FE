@@ -309,11 +309,11 @@ import { AuthService } from '../../../services/auth.service';
         padding: 1px 4px;
         &.status-ok {
           background: color-mix(in srgb, #22c55e, transparent 82%);
-          color: #4ade80;
+          color: #16a34a;
         }
         &.status-err {
           background: color-mix(in srgb, #ef4444, transparent 82%);
-          color: #f87171;
+          color: #dc2626;
         }
       }
 
@@ -351,7 +351,7 @@ import { AuthService } from '../../../services/auth.service';
         font-weight: 600;
         font-family: monospace;
         background: color-mix(in srgb, #a78bfa, transparent 85%);
-        color: #c4b5fd;
+        color: #7c3aed;
         border: 1px solid color-mix(in srgb, #a78bfa, transparent 55%);
         border-radius: 4px;
         padding: 1px 6px;
@@ -369,7 +369,7 @@ import { AuthService } from '../../../services/auth.service';
         font-weight: 500;
         font-family: monospace;
         background: color-mix(in srgb, #06b6d4, transparent 88%);
-        color: #67e8f9;
+        color: #0891b2;
         border: 1px solid color-mix(in srgb, #06b6d4, transparent 60%);
         border-radius: 4px;
         padding: 1px 5px;
@@ -387,27 +387,27 @@ import { AuthService } from '../../../services/auth.service';
 
         &.method-get {
           background: color-mix(in srgb, #22c55e, transparent 82%);
-          color: #4ade80;
+          color: #16a34a;
           border: 1px solid color-mix(in srgb, #22c55e, transparent 60%);
         }
         &.method-post {
           background: color-mix(in srgb, #3b82f6, transparent 82%);
-          color: #60a5fa;
+          color: #1d4ed8;
           border: 1px solid color-mix(in srgb, #3b82f6, transparent 60%);
         }
         &.method-put {
           background: color-mix(in srgb, #f59e0b, transparent 82%);
-          color: #fbbf24;
+          color: #b45309;
           border: 1px solid color-mix(in srgb, #f59e0b, transparent 60%);
         }
         &.method-patch {
           background: color-mix(in srgb, #a78bfa, transparent 82%);
-          color: #c4b5fd;
+          color: #7c3aed;
           border: 1px solid color-mix(in srgb, #a78bfa, transparent 60%);
         }
         &.method-delete {
           background: color-mix(in srgb, #ef4444, transparent 82%);
-          color: #f87171;
+          color: #dc2626;
           border: 1px solid color-mix(in srgb, #ef4444, transparent 60%);
         }
       }
@@ -431,6 +431,36 @@ import { AuthService } from '../../../services/auth.service';
         .empty-sub {
           font-size: 0.7rem;
           opacity: 0.7;
+        }
+      }
+
+      :host-context([data-theme='dark']) {
+        .status-chip.status-ok {
+          color: #4ade80;
+        }
+        .status-chip.status-err {
+          color: #f87171;
+        }
+        .sp-chip {
+          color: #c4b5fd;
+        }
+        .table-ref-chip {
+          color: #67e8f9;
+        }
+        .method-badge.method-get {
+          color: #4ade80;
+        }
+        .method-badge.method-post {
+          color: #60a5fa;
+        }
+        .method-badge.method-put {
+          color: #fbbf24;
+        }
+        .method-badge.method-patch {
+          color: #c4b5fd;
+        }
+        .method-badge.method-delete {
+          color: #f87171;
         }
       }
     `,

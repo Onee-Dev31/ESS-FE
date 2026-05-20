@@ -23,12 +23,16 @@ export interface NotificationApiRecord {
   ticketId?: number | string | null;
   ticket_number?: string | null;
   ticketNumber?: string | null;
+  ticket_name_th?: string | null;
+  user_status?: string | null;
   actor_codeempid?: string | null;
   actorCodeempid?: string | null;
   actor_aduser?: string | null;
   actorAduser?: string | null;
   actor_name?: string | null;
   actorName?: string | null;
+  actor_nickname?: string | null;
+  actorNickname?: string | null;
   target_type?: string | null;
   targetType?: string | null;
   payload_json?: string | Record<string, unknown> | null;
@@ -75,6 +79,9 @@ export interface NotificationInboxItem {
   ticketId: number | null;
   ticketNumber: string | null;
   actorName: string | null;
+  actorNickname: string | null;
+  ticket_name_th?: string | null;
+  user_status?: string | null;
   targetType: string | null;
   payload: Record<string, unknown> | null;
   recipientRole: string | null;

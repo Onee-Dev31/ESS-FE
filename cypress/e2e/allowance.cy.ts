@@ -189,4 +189,32 @@ describe('Allowance', () => {
     cy.contains('app-allowance-form', 'วันที่').should('be.visible');
     cy.contains('app-allowance-form', 'จำนวนเงิน').should('be.visible');
   });
+
+  it('filter ตามสถานะ "คำขอใหม่" แล้วแสดงเฉพาะรายการใหม่', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('.btn-search').click();
+    cy.wait(1000);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
 });

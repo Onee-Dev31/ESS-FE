@@ -275,6 +275,8 @@ export class ItServiceService {
     pageSize?: number;
     status?: string;
     empno: string;
+    ticketId?: number;
+    focusTicketNumber?: string;
   }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.page) {
@@ -291,6 +293,14 @@ export class ItServiceService {
 
     if (params.empno) {
       httpParams = httpParams.set('empno', params.empno);
+    }
+
+    if (params.ticketId) {
+      httpParams = httpParams.set('ticketId', params.ticketId);
+    }
+
+    if (params.focusTicketNumber) {
+      httpParams = httpParams.set('focusTicketNumber', params.focusTicketNumber);
     }
 
     return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request`, {
@@ -340,10 +350,12 @@ export class ItServiceService {
     requester?: string;
     company?: string;
     department?: string;
+    serviceType?: string;
     dateFrom?: string;
     dateTo?: string;
     isReal?: boolean;
   }) {
+    console.log(params);
     let httpParams = new HttpParams();
     if (params.status) httpParams = httpParams.set('status', params.status);
     if (params.page) httpParams = httpParams.set('page', String(params.page));
@@ -353,11 +365,46 @@ export class ItServiceService {
     if (params.requester) httpParams = httpParams.set('requester', params.requester);
     if (params.company) httpParams = httpParams.set('company', params.company);
     if (params.department) httpParams = httpParams.set('department', params.department);
+    if (params.serviceType) httpParams = httpParams.set('serviceType', params.serviceType);
     if (params.dateFrom) httpParams = httpParams.set('dateFrom', params.dateFrom);
     if (params.dateTo) httpParams = httpParams.set('dateTo', params.dateTo);
     if (params.isReal) httpParams = httpParams.set('isReal', params.isReal);
 
     return this._http.get(`${this.baseUrl}/tickets/by-status`, { params: httpParams });
+  }
+
+  exportTicketByStatus(params: {
+    status?: string;
+    page?: number;
+    pageSize?: number;
+    ticketNo?: string;
+    subject?: string;
+    requester?: string;
+    company?: string;
+    department?: string;
+    serviceType?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    isReal?: boolean;
+  }): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (params.status) httpParams = httpParams.set('status', params.status);
+    if (params.page) httpParams = httpParams.set('page', String(params.page));
+    if (params.pageSize) httpParams = httpParams.set('pageSize', String(params.pageSize));
+    if (params.ticketNo) httpParams = httpParams.set('ticketNo', params.ticketNo);
+    if (params.subject) httpParams = httpParams.set('subject', params.subject);
+    if (params.requester) httpParams = httpParams.set('requester', params.requester);
+    if (params.company) httpParams = httpParams.set('company', params.company);
+    if (params.department) httpParams = httpParams.set('department', params.department);
+    if (params.serviceType) httpParams = httpParams.set('serviceType', params.serviceType);
+    if (params.dateFrom) httpParams = httpParams.set('dateFrom', params.dateFrom);
+    if (params.dateTo) httpParams = httpParams.set('dateTo', params.dateTo);
+    if (params.isReal) httpParams = httpParams.set('isReal', params.isReal);
+
+    return this._http.get(`${this.baseUrl}/tickets/by-status/export`, {
+      params: httpParams,
+      responseType: 'blob',
+    });
   }
 
   updateTicket(id: string, formData: FormData): Observable<any> {
@@ -450,5 +497,9 @@ export class ItServiceService {
       params: queryParams,
       responseType: 'blob',
     });
+  }
+
+  checkItAvalible(ticketId: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/check-it-avalible?ticketId=${ticketId}`);
   }
 }

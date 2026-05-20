@@ -100,6 +100,8 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  showGrade = false;
+
   userRole = this.authService.userRole;
   isAdminRole = this.authService.isAdminRole;
 
@@ -125,6 +127,15 @@ export class DashboardComponent implements OnInit {
   oneeUser = signal<any>(null);
   itStoryMap = signal<any>(null);
   leaveStats = signal<any>([]);
+
+  toggleGrade(): void {
+    this.showGrade = true;
+
+    setTimeout(() => {
+      this.showGrade = false;
+      this.cdr.detectChanges();
+    }, 3000);
+  }
 
   /** แปลงข้อมูลสถิติการเบิกค่ารักษาพยาบาลเพื่อใช้ในการแสดงผล (ProgressBar และสี) */
   medicalStatsDisplay = computed(() => {

@@ -173,7 +173,11 @@ export class Report {
     denied: 8,
     all: -1,
   };
-  private deptTop5Map: Record<string, Array<{ label: string; value: number }>> = {};
+  private deptTop5Map: Record<
+    string,
+    Array<{ label: string; value: number; costcent: string; companyCode: string }>
+  > = {};
+  isExporting = false;
   isLogModalVisible = false;
   currentStatus = '';
   ticketLogs: any[] = [];
@@ -183,13 +187,26 @@ export class Report {
 
   searchKeyword = '';
   filter = {
+    status: '',
     ticketNo: '',
     subject: '',
     requester: '',
     department: '',
     company: '',
-    dateRange: null as [Dayjs, Dayjs] | null,
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
   };
+  filterOriginal = {
+    status: '',
+    ticketNo: '',
+    subject: '',
+    requester: '',
+    department: '',
+    company: '',
+    dateRange: null as [Date, Date] | null,
+    serviceType: '',
+  };
+  textClickFilter: string = '';
   departmentList: any[] = [];
   companyList: any[] = [];
   filteredTicketLogs: any[] = [];
@@ -501,25 +518,51 @@ export class Report {
   }
 
   private buildDeptTop5Map(rows: any[]) {
-    const map: Record<string, Array<{ label: string; value: number }>> = {};
-    const allMap: Record<string, { value: number; company: string }> = {};
+    const map: Record<
+      string,
+      Array<{ label: string; value: number; costcent: string; companyCode: string }>
+    > = {};
+    const allMap: Record<
+      string,
+      { value: number; company: string; costcent: string; companyCode: string }
+    > = {};
 
     for (const row of rows ?? []) {
       const companyCode = this.remapCompanyCode(row.COMPANY_CODE);
       if (!companyCode) continue;
 
       if (!map[companyCode]) map[companyCode] = [];
-      map[companyCode].push({ label: row.dept_display, value: row.ticket_count });
+      map[companyCode].push({
+        label: row.dept_display,
+        value: row.ticket_count,
+        costcent: row.COSTCENT,
+        companyCode: row.COMPANY_CODE,
+      });
 
       const key = row.dept_display;
       if (!allMap[key]) {
-        allMap[key] = { value: 0, company: companyCode };
+        allMap[key] = {
+          value: 0,
+          company: companyCode,
+          costcent: row.COSTCENT,
+          companyCode: row.COMPANY_CODE,
+        };
       }
       allMap[key].value += row.ticket_count;
     }
 
+    // map['ALL'] = Object.entries(allMap)
+    //   .map(([label, { value, company }]) => ({ label: `${label} (${company})`, value }))
+    //   .sort((a, b) => b.value - a.value)
+    //   .slice(0, 5);
+
     map['ALL'] = Object.entries(allMap)
-      .map(([label, { value, company }]) => ({ label: `${label} (${company})`, value }))
+      .map(([label, { value, company, costcent, companyCode }]) => ({
+        label: `${label} (${company})`,
+        value,
+        costcent,
+        companyCode,
+      }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
 
@@ -571,9 +614,9 @@ export class Report {
       series: [
         {
           type: 'pie',
-          top: '16px',
+          top: '30px',
           radius: ['55%', '82%'],
-          center: ['50%', '53%'],
+          center: ['50%', '57%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
@@ -585,7 +628,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '46%',
+          top: '57%',
           style: {
             text: String(centerValue),
             fontSize: 28,
@@ -597,7 +640,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '58%',
+          top: '68%',
           style: {
             text: centerLabel,
             fontSize: 12,
@@ -652,9 +695,9 @@ export class Report {
       series: [
         {
           type: 'pie',
-          top: '16px',
+          top: '30px',
           radius: ['55%', '82%'],
-          center: ['50%', '53%'],
+          center: ['50%', '57%'],
           label: { show: false },
           labelLine: { show: false },
           avoidLabelOverlap: true,
@@ -666,7 +709,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '46%',
+          top: '57%',
           style: {
             text: String(centerValue),
             fontSize: 28,
@@ -678,7 +721,7 @@ export class Report {
         {
           type: 'text',
           left: 'center',
-          top: '58%',
+          top: '68%',
           style: {
             text: centerLabel,
             fontSize: 12,
@@ -689,6 +732,7 @@ export class Report {
       ],
     };
   }
+
   getAllTotal(): number {
     return this.kpis.find((x) => x.status === 'all')?.value ?? 0;
   }
@@ -698,6 +742,7 @@ export class Report {
     if (!total || k.status === 'all') return 100;
     return Math.round((k.value / total) * 100);
   }
+
   onStatusChartInit(ec: any) {
     this.statusChart = ec;
     this.applyStatusCenter('all');
@@ -722,6 +767,62 @@ export class Report {
     this.highlightStatusSlice(k);
 
     this.applyStatusCenter(k);
+  }
+
+  onServiceTypePieClick(e: any) {
+    this.page = 1;
+    this.ticketLogs = [];
+    this.isLogModalVisible = true;
+    const serviceType = e?.data;
+
+    this.textClickFilter = 'serviceType';
+    const serviceTypeMap: Record<string, string> = {
+      แจ้งซ่อมอุปกรณ์: '1',
+      แจ้งปัญหา: '2',
+      ขอใช้บริการ: '3',
+    };
+
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      serviceType: serviceTypeMap[serviceType?.name],
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      serviceType: serviceTypeMap[serviceType?.name],
+    };
+
+    this.loadTickets();
+  }
+
+  onDepartmentPieClick(e: any) {
+    // console.log(e?.data);
+    this.page = 1;
+    this.ticketLogs = [];
+    this.isLogModalVisible = true;
+    const department = e?.data;
+
+    this.textClickFilter = 'department';
+
+    this.filteredDepartmentList = this.departmentList.filter(
+      (d) => d.COMPANY_CODE === department.companyCode,
+    );
+
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      company: department.companyCode,
+      department: department.costcent,
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      company: department.companyCode,
+      department: department.costcent,
+    };
+
+    this.loadTickets();
   }
 
   private highlightStatusSlice(k: string) {
@@ -770,7 +871,7 @@ export class Report {
       {
         type: 'text',
         left: 'center',
-        top: '46%',
+        top: '57%',
         style: {
           text: String(centerValue),
           fontSize: 28,
@@ -782,7 +883,7 @@ export class Report {
       {
         type: 'text',
         left: 'center',
-        top: '58%',
+        top: '68%',
         style: {
           text: centerLabel,
           fontSize: 12,
@@ -796,12 +897,6 @@ export class Report {
   }
 
   onCompanyBarClick(e: any) {
-    console.log('event:', e);
-    console.log('componentType:', e?.componentType);
-    console.log('value:', e?.value);
-    console.log('data:', e?.data);
-    // // console.log(e.data);
-    // const company = (e?.data.code ?? '').toString();
     let company = '';
 
     if (e?.componentType === 'xAxis') {
@@ -819,13 +914,18 @@ export class Report {
     this.buildDeptBar(company, depts);
   }
 
-  private buildDeptBar(company: string, rows: Array<{ label: string; value: number }>) {
+  private buildDeptBar(
+    company: string,
+    rows: Array<{ label: string; value: number; costcent?: string; companyCode?: string }>,
+  ) {
     const data = [...rows]
       .sort((a, b) => a.value - b.value)
       .slice(0, 5)
       .map((x) => ({
         name: x.label,
         value: x.value,
+        costcent: x.costcent,
+        companyCode: x.companyCode,
       }));
 
     // console.log(rows, data);
@@ -898,9 +998,10 @@ export class Report {
     const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
     const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
+    // getAllTickets : ไม่แสดงในส่วนของขึ้นตอน Approve
     this.itServiceService.getAllTickets_real({ dateFrom, dateTo }).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.deptTop5Map = {};
         this.deptBarOption = {};
         this.updateKpis(res.summary);
@@ -921,6 +1022,18 @@ export class Report {
     this.page = 1;
     this.ticketLogs = [];
     this.isLogModalVisible = true;
+    this.textClickFilter = 'status';
+    this.filter = {
+      ...this.filter,
+      dateRange: this.filterAll.dateRange,
+      status: status,
+    };
+
+    this.filterOriginal = {
+      ...this.filterOriginal,
+      status: status,
+      // dateRange: this.filterAll.dateRange,
+    };
     this.loadTickets();
   }
 
@@ -928,7 +1041,8 @@ export class Report {
     const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
     const params = {
-      status: this.statusLabelApi(this.currentStatus),
+      status: this.statusLabelApi(this.filter.status),
+      // status: this.statusLabelApi(this.currentStatus),
       page: this.listing.currentPage() + 1,
       pageSize: this.listing.pageSize(),
       ticketNo: this.filter.ticketNo || undefined,
@@ -936,6 +1050,7 @@ export class Report {
       requester: this.filter.requester || undefined,
       company: this.filter.company || undefined,
       department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
       dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
       dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
       isReal: true,
@@ -969,14 +1084,7 @@ export class Report {
   }
 
   clearFilter() {
-    this.filter = {
-      ticketNo: '',
-      subject: '',
-      requester: '',
-      department: '',
-      company: '',
-      dateRange: null,
-    };
+    this.filter = this.filterOriginal;
     this.filteredDepartmentList = [];
     this.loadTickets();
   }
@@ -991,10 +1099,32 @@ export class Report {
     this.listing.currentPage.set(page);
     this.loadTickets();
   }
+
   handleCancel(): void {
     this.isLogModalVisible = false;
+    this.filter = {
+      status: '',
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+      serviceType: '',
+    };
+    this.filterOriginal = {
+      status: '',
+      ticketNo: '',
+      subject: '',
+      requester: '',
+      department: '',
+      company: '',
+      dateRange: null,
+      serviceType: '',
+    };
     this.ticketLogs = [];
     this.page = 1;
+    this.textClickFilter = '';
   }
 
   viewTicket(data: any): void {
@@ -1100,6 +1230,7 @@ export class Report {
     const dateFrom = dayjs(from).format('YYYY-MM-DD');
     const dateTo = dayjs(to).format('YYYY-MM-DD');
 
+    this.isExporting = true;
     this.itServiceService.exportTicket({ dateFrom, dateTo }).subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
@@ -1108,29 +1239,62 @@ export class Report {
         a.download = `tickets_${dateFrom}_${dateTo}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
+        this.isExporting = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Export failed:', error);
+        this.isExporting = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
-  // clearFilter() {
-  //   this.filterAll = {
-  //     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date],
-  //   };
-
-  //   this.getAllTickets();
-  // }
-
   exportData() {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredTicketLogs);
+    const [dateFrom, dateTo] = this.filter.dateRange ?? [];
 
-    const workbook: XLSX.WorkBook = {
-      Sheets: { Tickets: worksheet },
-      SheetNames: ['Tickets'],
+    const params = {
+      status: this.statusLabelApi(this.filter.status),
+      page: this.listing.currentPage() + 1,
+      pageSize: this.listing.pageSize(),
+      ticketNo: this.filter.ticketNo || undefined,
+      subject: this.filter.subject || undefined,
+      requester: this.filter.requester || undefined,
+      company: this.filter.company || undefined,
+      department: this.filter.department || undefined,
+      serviceType: this.filter.serviceType || undefined,
+      dateFrom: dateFrom ? dayjs(dateFrom).format('YYYY-MM-DD') : undefined,
+      dateTo: dateTo ? dayjs(dateTo).format('YYYY-MM-DD') : undefined,
+      isReal: true,
     };
-    XLSX.writeFile(workbook, 'TicketLogs.xlsx');
+    // console.log(params, this.filteredTicketLogs);
+
+    const head_text =
+      this.textClickFilter === 'serviceType'
+        ? this.filteredTicketLogs[0]?.name_th
+        : this.textClickFilter === 'department'
+          ? this.filteredTicketLogs[0]?.deptName +
+            ' (' +
+            this.filteredTicketLogs[0]?.COMPANY_CODE +
+            ')'
+          : this.textClickFilter === 'status'
+            ? this.filter.status
+            : '';
+
+    this.itServiceService.exportTicketByStatus(params).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tickets_${head_text}_${dayjs(dateFrom).format('YYYY-MM-DD')}_${dayjs(dateTo).format('YYYY-MM-DD')}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('loadTickets error:', err);
+        this.ticketLogs = [];
+      },
+    });
   }
 
   getAssignedMembers(members: any[]): any[] {
@@ -1208,47 +1372,108 @@ export class Report {
     this.deptChart = ec;
   }
 
+  private applyLightModeForExport(): void {
+    const text = '#0f172a';
+    const muted = '#64748b';
+    const bg = '#ffffff';
+
+    // Partial setOption — เฉพาะสี ไม่แตะ label.show
+    // graphic top ปรับให้ตรงกับ center ['50%','55%'] ที่ใช้ตอน export (canvas 420px, series top 30px)
+    const pieColors = {
+      legend: { textStyle: { color: text } },
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      graphic: [
+        { top: '53%', style: { fill: text } },
+        { top: '64%', style: { fill: muted } },
+      ],
+      series: [{ label: { color: text } }],
+    };
+    this.statusChart?.setOption(pieColors);
+    this.serviceChart?.setOption(pieColors);
+
+    this.companyChart?.setOption({
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      xAxis: { axisLabel: { color: text } },
+      series: [{ label: { color: text } }, {}],
+    });
+
+    this.deptChart?.setOption({
+      title: { textStyle: { color: text } },
+      tooltip: { backgroundColor: bg, textStyle: { color: text } },
+      yAxis: { axisLabel: { color: text } },
+      series: [{ label: { color: text } }],
+    });
+  }
+
   async exportCharts() {
-    // override label ก่อน export
-    this.statusChart?.setOption({
+    this.isExporting = true;
+    this.cdr.detectChanges();
+    await new Promise((r) => setTimeout(r, 50)); // รอให้ loading render ก่อน
+
+    const PIE_EXPORT = { width: 540, height: 420 };
+    const BAR_EXPORT = { width: 540, height: 340 };
+
+    // บันทึก original size ก่อน resize
+    const getSize = (chart: ECharts | undefined) => {
+      const dom = (chart as any)?.getDom() as HTMLElement | undefined;
+      return { width: dom?.offsetWidth ?? 0, height: dom?.offsetHeight ?? 0 };
+    };
+    const origStatusSize = getSize(this.statusChart);
+    const origServiceSize = getSize(this.serviceChart);
+    const origCompanySize = getSize(this.companyChart);
+    const origDeptSize = getSize(this.deptChart);
+
+    // Resize chart ก่อน export เพื่อให้มีพื้นที่สำหรับ label
+    this.statusChart?.resize(PIE_EXPORT);
+    this.serviceChart?.resize(PIE_EXPORT);
+    this.companyChart?.resize(BAR_EXPORT);
+    this.deptChart?.resize(BAR_EXPORT);
+
+    const pieExportLabel = {
       series: [
-        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
+        {
+          label: { show: true, formatter: '{b}: {c}', fontSize: 10, color: '#0f172a' },
+          labelLine: { show: true, length: 12, length2: 8, smooth: true },
+          avoidLabelOverlap: true,
+          minShowLabelAngle: 2,
+          labelLayout: { moveOverlap: 'shiftY', margin: 5 },
+        },
       ],
-    });
-    this.serviceChart?.setOption({
-      series: [
-        { label: { show: true, formatter: '{b}: {c}', fontSize: 11 }, labelLine: { show: true } },
-      ],
-    });
+    };
+
+    this.statusChart?.setOption(pieExportLabel);
+    this.serviceChart?.setOption(pieExportLabel);
+
+    // ย่อ radius ให้ label มีพื้นที่โผล่รอบวง ไม่ถูก clip
+    this.statusChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
+    this.serviceChart?.setOption({ series: [{ radius: ['40%', '62%'], center: ['50%', '55%'] }] });
+
     this.companyChart?.setOption({
       series: [
         { label: { show: true, position: 'top', fontSize: 11, color: '#333', fontWeight: 'bold' } },
       ],
     });
 
-    await new Promise((r) => setTimeout(r, 500));
+    this.applyLightModeForExport();
+
+    await new Promise((r) => setTimeout(r, 600));
 
     const charts = [
-      { chart: this.statusChart, name: 'Status Distribution' },
-      { chart: this.serviceChart, name: 'Service Type' },
-      { chart: this.companyChart, name: 'Top Companies' },
-      { chart: this.deptChart, name: 'Top Departments' },
+      { chart: this.statusChart, name: 'Status Distribution', size: PIE_EXPORT },
+      { chart: this.serviceChart, name: 'Service Type', size: PIE_EXPORT },
+      { chart: this.companyChart, name: 'Top Companies', size: BAR_EXPORT },
+      { chart: this.deptChart, name: 'Top Departments', size: BAR_EXPORT },
     ];
 
     const validCharts = charts.filter((c) => !!c.chart);
     if (validCharts.length === 0) return;
 
-    const chartSizes = validCharts.map(({ chart }) => {
-      const dom = (chart as any).getDom() as HTMLElement;
-      return { w: dom.offsetWidth, h: dom.offsetHeight };
-    });
-
     const cols = 2;
     const padding = 20;
     const titleH = 30;
     const rows = Math.ceil(validCharts.length / cols);
-    const colW = Math.max(...chartSizes.map((s) => s.w));
-    const rowH = Math.max(...chartSizes.map((s) => s.h));
+    const colW = Math.max(...validCharts.map((c) => c.size.width));
+    const rowH = Math.max(...validCharts.map((c) => c.size.height));
     const totalW = cols * colW + (cols + 1) * padding;
     const totalH = rows * (rowH + titleH) + (rows + 1) * padding;
 
@@ -1261,7 +1486,7 @@ export class Report {
     ctx.fillRect(0, 0, totalW, totalH);
 
     for (let i = 0; i < validCharts.length; i++) {
-      const { chart, name } = validCharts[i];
+      const { chart, name, size } = validCharts[i];
       const col = i % cols;
       const row = Math.floor(i / cols);
       const x = padding + col * (colW + padding);
@@ -1275,7 +1500,7 @@ export class Report {
       await new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => {
-          ctx.drawImage(img, x, y + titleH, colW, rowH);
+          ctx.drawImage(img, x, y + titleH, size.width, size.height);
           resolve();
         };
         img.src = url;
@@ -1289,12 +1514,35 @@ export class Report {
     a.click();
     document.body.removeChild(a);
 
-    // restore กลับ
+    // Restore label, resize กลับขนาด container เดิม และ restore สีตาม theme ปัจจุบัน
     this.statusChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });
     this.serviceChart?.setOption({
       series: [{ label: { show: false }, labelLine: { show: false } }],
     });
+    this.companyChart?.setOption({
+      series: [
+        {
+          label: {
+            show: true,
+            position: 'top',
+            fontWeight: 700,
+            fontSize: 12,
+            color: this.getCssVar('--text-header') || '#0f172a',
+          },
+        },
+      ],
+    });
+
+    this.statusChart?.resize(origStatusSize);
+    this.serviceChart?.resize(origServiceSize);
+    this.companyChart?.resize(origCompanySize);
+    this.deptChart?.resize(origDeptSize);
+
+    this.rebuildChartColors();
+
+    this.isExporting = false;
+    this.cdr.detectChanges();
   }
 }

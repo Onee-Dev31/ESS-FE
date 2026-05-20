@@ -110,9 +110,12 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   ngOnInit() {
-    const ticketId = Number(this.route.snapshot.queryParamMap.get('ticketId'));
-    const ticketNumber = this.route.snapshot.queryParamMap.get('ticketNumber') ?? '';
-    this.refreshAndFocus(ticketId || null, ticketNumber || null);
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const ticketId = Number(params['ticketId']);
+      const ticketNumber = params['ticketNumber'] ?? '';
+
+      this.refreshAndFocus(ticketId || null, ticketNumber || null);
+    });
 
     this.signalrService.ticketFocusTrigger
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -132,6 +135,72 @@ export class ApprovalItRequestComponent implements OnInit {
   }
 
   private refreshAndFocus(ticketId: number | null, ticketNumber: string | null = null) {
+    if (ticketId) {
+      // เรียก getTicketById ก่อน เพื่อรู้ status (Pending/Approved/Rejected/Referred Back)
+      this.itServiceService.getTicketById(ticketId.toString()).subscribe({
+        next: (res: any) => {
+          const ticket = res?.ticket ?? res;
+          const approvalStatus = ticket?.approval_status;
+
+          // map approval_status → tab name
+          const statusTabMap: Record<string, string> = {
+            New: 'Pending',
+            Approved: 'Approved',
+            Rejected: 'Rejected',
+            Referred_Back: 'Referred Back',
+          };
+
+          const targetTab = statusTabMap[approvalStatus] ?? 'Pending';
+
+          // set tab ถ้าต่างจากปัจจุบัน
+          if (this.listing.filterStatus() !== targetTab) {
+            this.listing.filterStatus.set(targetTab);
+            this.listing.currentPage.set(0);
+          }
+
+          // โหลดข้อมูลแล้ว focus
+          this._doRefreshAndFocus(ticketId, ticketNumber);
+        },
+        error: () => {
+          // ถ้า error ก็ refresh ตามปกติ
+          this._doRefreshAndFocus(ticketId, ticketNumber);
+        },
+      });
+    } else {
+      this._doRefreshAndFocus(ticketId, ticketNumber);
+    }
+  }
+
+  private _doRefreshAndFocus(ticketId: number | null, ticketNumber: string | null) {
+    if (ticketNumber) {
+      // ✅ หา focusPage ก่อน
+      const pageSize = this.listing.pageSize();
+      const status = this.listing.filterStatus();
+      const apiStatus = this.STATUS_API_MAP[status] || status;
+      const empNo = this.authService.userData().CODEMPID;
+
+      this.itService
+        .getApprovalItRequests({
+          page: 1,
+          pageSize,
+          status: apiStatus,
+          empno: empNo,
+          focusTicketNumber: ticketNumber,
+        })
+        .subscribe({
+          next: (res) => {
+            // console.log(res, ticketNumber);
+            const focusPage = res.focusPage ?? 1;
+            this.listing.currentPage.set(focusPage - 1);
+            this._loadPage(ticketId, ticketNumber);
+          },
+        });
+    } else {
+      this._loadPage(ticketId, ticketNumber);
+    }
+  }
+
+  private _loadPage(ticketId: number | null, ticketNumber: string | null) {
     this.loadingService.start('approvals-it-list');
 
     const page = this.listing.currentPage() + 1;
@@ -143,36 +212,90 @@ export class ApprovalItRequestComponent implements OnInit {
     this.itService
       .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
       .subscribe({
-        next: (res) => {
-          const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
-          this.approvals.set(mappedData);
-          this.totalItems.set(res.total);
-          if (res.statusSummary) this.statusCounts.set(res.statusSummary);
-          this.loadingService.stop('approvals-it-list');
-          this.cdr.markForCheck();
-
-          const resolvedId =
-            ticketId ??
-            (ticketNumber
-              ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
-              : null);
-
-          if (resolvedId) {
-            setTimeout(() => {
-              this.highlightedTicketId.set(resolvedId);
-              this.cdr.markForCheck();
-              document
-                .getElementById(`approval-row-${resolvedId}`)
-                ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              setTimeout(() => {
-                this.highlightedTicketId.set(null);
-                this.cdr.markForCheck();
-              }, 10000);
-            }, 100);
-          }
-        },
+        next: (res) => this._applyResults(res, ticketId, ticketNumber),
       });
   }
+
+  private _applyResults(res: any, ticketId: number | null, ticketNumber: string | null) {
+    const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
+    this.approvals.set(mappedData);
+    this.totalItems.set(res.total);
+    if (res.statusSummary) this.statusCounts.set(res.statusSummary);
+    this.loadingService.stop('approvals-it-list');
+    this.cdr.markForCheck();
+
+    this.viewRequestDetail(
+      ticketNumber ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null) : null,
+    );
+
+    const resolvedId =
+      ticketId ??
+      (ticketNumber
+        ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
+        : null);
+
+    if (resolvedId) {
+      setTimeout(() => {
+        this.highlightedTicketId.set(resolvedId);
+        this.cdr.markForCheck();
+        document
+          .getElementById(`approval-row-${resolvedId}`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          this.highlightedTicketId.set(null);
+          this.cdr.markForCheck();
+        }, 10000);
+      }, 100);
+    }
+  }
+  // private _doRefreshAndFocus(ticketId: number | null, ticketNumber: string | null) {
+  //   this.loadingService.start('approvals-it-list');
+
+  //   const page = this.listing.currentPage() + 1;
+  //   const pageSize = this.listing.pageSize();
+  //   const status = this.listing.filterStatus();
+  //   const apiStatus = this.STATUS_API_MAP[status] || status;
+  //   const empNo = this.authService.userData().CODEMPID;
+
+  //   this.itService
+  //     .getApprovalItRequests({ page, pageSize, status: apiStatus, empno: empNo })
+  //     .subscribe({
+  //       next: (res) => {
+  //         const mappedData = (res.data || []).map((item: any) => this.mapToApprovalItem(item));
+  //         this.approvals.set(mappedData);
+  //         this.totalItems.set(res.total);
+  //         if (res.statusSummary) this.statusCounts.set(res.statusSummary);
+  //         this.loadingService.stop('approvals-it-list');
+  //         this.cdr.markForCheck();
+
+  //         this.viewRequestDetail(
+  //           ticketNumber
+  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber) ?? null)
+  //             : null,
+  //         );
+
+  //         const resolvedId =
+  //           ticketId ??
+  //           (ticketNumber
+  //             ? (mappedData.find((r: any) => r.requestNo === ticketNumber)?.requestId ?? null)
+  //             : null);
+
+  //         if (resolvedId) {
+  //           setTimeout(() => {
+  //             this.highlightedTicketId.set(resolvedId);
+  //             this.cdr.markForCheck();
+  //             document
+  //               .getElementById(`approval-row-${resolvedId}`)
+  //               ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //             setTimeout(() => {
+  //               this.highlightedTicketId.set(null);
+  //               this.cdr.markForCheck();
+  //             }, 10000);
+  //           }, 100);
+  //         }
+  //       },
+  //     });
+  // }
 
   refresh() {
     this.loadingService.start('approvals-it-list');

@@ -49,23 +49,23 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--primary);
+  background-color: var(--new-ticket-banner);
   color: #fff;
   padding: 10px 20px;
   border-radius: 24px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.4);
+  box-shadow: 0 4px 12px #c8ff1666;
   transition:
     background-color 0.2s,
     box-shadow 0.2s;
   white-space: nowrap;
 
   &:hover {
-    background-color: var(--primary);
-    background-color: color-mix(in srgb, var(--primary), black 15%);
-    box-shadow: 0 6px 16px rgba(22, 119, 255, 0.5);
+    background-color: var(--new-ticket-banner);
+    background-color: color-mix(in srgb, var(--new-ticket-banner), black 15%);
+    box-shadow: 0 6px 16px #c8ff1666;
   }
 }
 
@@ -728,6 +728,12 @@
       padding: 14px 16px;
       border-bottom: 1px solid var(--border-color);
       cursor: pointer;
+
+      &.is-new {
+        border-left: 4px solid var(--primary);
+        padding-left: 16px;
+        animation: highlight-fade 1.2s ease-in-out 3;
+      }
 
       &:hover {
         background-color: var(--bg-slate);
@@ -1494,6 +1500,10 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+
+    .warning-text {
+      color: var(--danger);
+    }
   }
 
   @media (min-width: 1024px) and (max-width: 1440px) {

@@ -229,28 +229,32 @@ export class ItService implements OnInit {
 
   private applyStatusChange(ticketId: any, rawStatus: string) {
     const [itStatus, detail] = (rawStatus ?? '').split('|').map((s) => s.trim());
-    this.Tickets.update((list) =>
-      list.map((t) => {
-        if (t.ticketId != ticketId) return t;
-        const updated: any = { ...t, IT_Status: itStatus };
-        if (itStatus === 'In Progress' && detail) {
-          updated.ticketType = detail;
-          updated.status = 'Waiting you';
-        } else if (itStatus === 'Rejected') {
-          updated.status = 'Rejected';
-        } else if (itStatus === 'Referred_Back') {
-          updated.status = 'Referred Back';
-        } else if (itStatus === 'Approved') {
-          updated.status = 'Approved';
-        } else if (itStatus === 'ReOpened') {
-          updated.status = 'Re-Opened';
-          updated.user_status = 'ReOpened';
-        } else {
-          updated.status = this.getTicketStatus(updated);
-        }
-        return updated;
-      }),
-    );
+
+    // this.Tickets.update((list) =>
+    //   list.map((t) => {
+    //     if (t.ticketId != ticketId) return t;
+    //     const updated: any = { ...t, IT_Status: itStatus };
+    //     console.log(updated);
+    //     // if (itStatus === 'In Progress' && detail) {
+    //     //   updated.ticketType = detail;
+    //     //   updated.status = 'Waiting you';
+    //     // } else if (itStatus === 'Rejected') {
+    //     //   updated.status = 'Rejected';
+    //     // } else if (itStatus === 'Referred_Back') {
+    //     //   updated.status = 'Referred Back';
+    //     // } else if (itStatus === 'Approved') {
+    //     //   updated.status = 'Approved';
+    //     // } else if (itStatus === 'ReOpened') {
+    //     //   updated.status = 'Re-Opened';
+    //     //   updated.user_status = 'ReOpened';
+    //     // } else {
+    //     // แก้เรื่อง Waiting_approve
+    //     updated.status = this.getTicketStatus(updated);
+    //     // }
+    //     return updated;
+    //   }),
+    // );
+    this.getMyTicket();
     this.selectTicket(ticketId); //เพราะต้องเรียก progress ด้านขวา
     // if (this.selectedTicket()?.ticketId == ticketId) {
     //   this.selectedTicket.update((t) => ({ ...t, IT_Status: status, status }));
@@ -360,7 +364,7 @@ export class ItService implements OnInit {
 
   selectAssignee(item: any) {
     this.isVisibleAssignee.set(true);
-    console.log(item);
+    // console.log(item);
     this.selectedAssignee.set(item);
   }
 
@@ -463,7 +467,7 @@ export class ItService implements OnInit {
   }
 
   submitReOpen(data: any) {
-    console.log(data);
+    // console.log(data);
     const formData = new FormData();
 
     formData.append('TicketId', data.ticket.ticketId);
@@ -655,10 +659,21 @@ export class ItService implements OnInit {
 
   getTicketStatus(ticket: any) {
     if (
-      (ticket.IT_Status === 'Assigned' && ticket.user_status === 'Pending') || //it เปลี่ยน type request
+      (ticket.IT_Status === 'Assigned' &&
+        ticket.user_status === 'Pending' &&
+        ticket.repair_cost_type === 'paid') ||
+      (ticket.IT_Status === 'Assigned' &&
+        ticket.user_status === 'Pending' &&
+        ticket.repair_cost_type !== 'free') || //it เปลี่ยน type request
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
+    } else if (
+      ticket.IT_Status === 'Assigned' &&
+      ticket.user_status === 'Pending' &&
+      ticket.repair_cost_type === 'free'
+    ) {
+      return 'In Progress';
     } else if (ticket.user_status === 'Approved') {
       return 'In Progress';
     } else if (ticket.IT_Status === 'In Progress') {
@@ -728,12 +743,12 @@ export class ItService implements OnInit {
     const dateFrom = from ? dayjs(from).format('YYYY-MM-DD') : undefined;
     const dateTo = to ? dayjs(to).format('YYYY-MM-DD') : undefined;
 
-    console.log({
-      searchText: searchText || undefined,
-      requesterAduser: this.userData.AD_USER,
-      dateFrom,
-      dateTo,
-    });
+    // console.log({
+    //   searchText: searchText || undefined,
+    //   requesterAduser: this.userData.AD_USER,
+    //   dateFrom,
+    //   dateTo,
+    // });
 
     this.itServiceService
       .getMyTickets({
@@ -744,7 +759,7 @@ export class ItService implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.Tickets.set(
             res.data.map((ticket: any) => ({
               ...ticket,

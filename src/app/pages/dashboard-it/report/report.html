@@ -98,6 +98,7 @@
       class="echart"
       [options]="servicePieOption"
       (chartInit)="onServiceChartInit($event)"
+      (chartClick)="onServiceTypePieClick($event)"
     ></div>
   </div>
 
@@ -120,10 +121,21 @@
         class="echart dept"
         [options]="deptBarOption"
         (chartInit)="onDeptChartInit($event)"
+        (chartClick)="onDepartmentPieClick($event)"
       ></div>
     </div>
   </div>
 </div>
+
+<!-- Export Loading -->
+@if (isExporting) {
+  <div class="export-loading-overlay">
+    <div class="export-loading-box">
+      <div class="loader"></div>
+      <span>กำลัง Export...</span>
+    </div>
+  </div>
+}
 
 <!-- overlay -->
 <div class="log-overlay" *ngIf="isLogModalVisible" (click)="handleCancel()">
@@ -143,67 +155,109 @@
         </span>
       </div>
 
-      <!-- <button class="log-close-btn" type="button" (click)="handleCancel()">✕</button> -->
       <button class="log-close-btn" (click)="handleCancel()"><i class="fas fa-times"></i></button>
     </div>
 
     <div class="log-modal-body">
       <div class="log-filter">
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Ticket No"
-          [(ngModel)]="filter.ticketNo"
-          (ngModelChange)="applyFilter()"
-        />
-
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Subject"
-          [(ngModel)]="filter.subject"
-          (ngModelChange)="applyFilter()"
-        />
-
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Requester"
-          [(ngModel)]="filter.requester"
-          (ngModelChange)="applyFilter()"
-        />
-
-        <select
-          class="search-select-company"
-          [(ngModel)]="filter.company"
-          (ngModelChange)="onCompanyChange()"
-        >
-          <option value="">All Company</option>
-          <option *ngFor="let c of companyList" [value]="c.COMPANY_CODE">
-            {{ c.COMPANY_CODE_DISPLAY }}
-          </option>
-        </select>
-
-        <select
-          class="search-select"
-          [(ngModel)]="filter.department"
-          (ngModelChange)="applyFilter()"
-          [disabled]="!filter.company"
-        >
-          <option value="">All Department</option>
-          <option *ngFor="let d of filteredDepartmentList" [value]="d.COSTCENT">
-            {{ d.COSTCENT }} - {{ d.NAMECOSTCENT }}
-          </option>
-        </select>
-
-        <nz-range-picker
-          nzFormat="dd/MM/yyyy"
-          [(ngModel)]="filter.dateRange"
-          (ngModelChange)="applyFilter()"
-          nzDropdownClassName="custom-range-picker-popup"
-          class="custom-range-picker"
-        >
-        </nz-range-picker>
+        <div class="form-field">
+          <label>Ticket No</label>
+          <input
+            type="text"
+            class="form-input search-input"
+            placeholder="Ticket No"
+            [(ngModel)]="filter.ticketNo"
+            (ngModelChange)="applyFilter()"
+          />
+        </div>
+        <div class="form-field">
+          <label>Subject</label>
+          <input
+            type="text"
+            class="form-input search-input"
+            placeholder="Subject"
+            [(ngModel)]="filter.subject"
+            (ngModelChange)="applyFilter()"
+          />
+        </div>
+        <div class="form-field">
+          <label>Requester</label>
+          <input
+            type="text"
+            class="form-input search-input"
+            placeholder="Requester"
+            [(ngModel)]="filter.requester"
+            (ngModelChange)="applyFilter()"
+          />
+        </div>
+        <div class="form-field">
+          <label>บริษัท</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            class="form-input search-select-company"
+            [(ngModel)]="filter.company"
+            (ngModelChange)="onCompanyChange()"
+            [nzDisabled]="textClickFilter === 'department'"
+            [class.disabled]="textClickFilter === 'department'"
+          >
+            <nz-option nzLabel="All Company" nzValue="" />
+            <nz-option
+              *ngFor="let c of companyList"
+              [nzLabel]="c.COMPANY_CODE_DISPLAY"
+              [nzValue]="c.COMPANY_CODE"
+            >
+            </nz-option>
+          </nz-select>
+        </div>
+        <div class="form-field">
+          <label>แผนก</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            class="form-input search-select"
+            [(ngModel)]="filter.department"
+            (ngModelChange)="applyFilter()"
+            [disabled]="!filter.company"
+            [class.disabled]="!filter.company || textClickFilter === 'department'"
+            [nzDisabled]="!filter.company || textClickFilter === 'department'"
+          >
+            <nz-option nzLabel="All Department" nzValue="" />
+            <nz-option
+              *ngFor="let d of filteredDepartmentList"
+              [nzLabel]="d.COSTCENT + '-' + d.NAMECOSTCENT"
+              [nzValue]="d.COSTCENT"
+            >
+            </nz-option>
+          </nz-select>
+        </div>
+        <div class="form-field">
+          <label>Service Type</label>
+          <nz-select
+            nzShowSearch
+            nzAllowClear
+            class="form-input search-select-service-type"
+            [nzDisabled]="textClickFilter === 'serviceType'"
+            [class.disabled]="textClickFilter === 'serviceType'"
+            [(ngModel)]="filter.serviceType"
+            (ngModelChange)="applyFilter()"
+          >
+            <nz-option nzLabel="All Type" nzValue="" />
+            <nz-option nzLabel="แจ้งปัญหา" nzValue="2" />
+            <nz-option nzLabel="แจ้งซ่อมอุปกรณ์" nzValue="1" />
+            <nz-option nzLabel="ขอใช้บริการ" nzValue="3" />
+          </nz-select>
+        </div>
+        <div class="form-field">
+          <label>วันที่เริ่มต้น-วันที่สิ้นสุด</label>
+          <nz-range-picker
+            nzFormat="dd/MM/yyyy"
+            [(ngModel)]="filter.dateRange"
+            (ngModelChange)="applyFilter()"
+            nzDropdownClassName="custom-range-picker-popup"
+            class="form-input custom-range-picker"
+          />
+        </div>
 
         <button class="export-btn" (click)="exportData()">
           <i class="fas fa-file-excel"></i> Export
@@ -300,37 +354,6 @@
         >
         </app-pagination>
       </div>
-      <!-- <div class="pagination-wrap" *ngIf="ticketLogs.length > 0">
-        <button
-          class="page-btn"
-          type="button"
-          [disabled]="page === 1"
-          (click)="onPageIndexChange(page - 1)"
-        >
-          Prev
-        </button>
-
-        <span class="page-info"> Page {{ page }} / {{ totalPages }} </span>
-
-        <button
-          class="page-btn"
-          type="button"
-          [disabled]="page === totalPages"
-          (click)="onPageIndexChange(page + 1)"
-        >
-          Next
-        </button>
-
-        <select
-          class="page-size-select"
-          [ngModel]="pageSize"
-          (ngModelChange)="onPageSizeChange($event)"
-        >
-          <option [ngValue]="10">10</option>
-          <option [ngValue]="20">20</option>
-          <option [ngValue]="50">50</option>
-        </select>
-      </div> -->
     </div>
   </div>
 </div>
