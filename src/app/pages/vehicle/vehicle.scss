@@ -495,7 +495,6 @@
   .filter {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     gap: 10px;
 
     @include tablet {
@@ -518,6 +517,10 @@
       button {
         width: 100%;
       }
+    }
+
+    &:last-child {
+      flex: 1;
     }
 
     .select-status {
