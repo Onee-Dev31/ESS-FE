@@ -162,8 +162,8 @@ describe('Timeoff', () => {
     });
   });
 
-  it('filter ตามสถานะ PENDING แล้วแสดงเฉพาะรายการที่รออนุมัติ', () => {
-    cy.get('.select-status').select('PENDING');
+  it('filter ตามสถานะ PENDING_APPROVAL แล้วแสดงเฉพาะรายการที่รออนุมัติ', () => {
+    cy.get('.select-status').select('PENDING_APPROVAL');
     cy.wait(500);
     cy.get('body').then(($body) => {
       if ($body.find('.status-badge').length > 0) {
@@ -176,13 +176,14 @@ describe('Timeoff', () => {
     });
   });
 
-  it('กดที่ row ใน table แล้วเปิด form รายละเอียดได้', () => {
-    cy.get('body').then(($body) => {
-      if ($body.find('.modern-table tbody tr').length > 0) {
-        cy.get('.modern-table tbody tr').first().click();
-        cy.get('app-time-off-form').should('be.visible');
-      } else {
-        cy.get('app-empty-state').should('be.visible');
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click({ force: true });
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
       }
     });
   });
