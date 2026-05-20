@@ -1269,12 +1269,12 @@ export class DashboardIT implements OnInit {
 
     this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
       next: (res) => {
-        // console.log(res);
         if (!res?.success) {
           this.swalService.warning(res.message);
+          this.getAllTickets();
+          this.selectTicket(this.selectedTicket().ticketId);
           return;
         }
-        // this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
         this.IS_ASSIGN_TICKET.set(true);
         this.selectedAssigneeEmpCodes = [];
