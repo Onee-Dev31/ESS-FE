@@ -181,8 +181,8 @@ describe('Timeoff', () => {
       const statusText = $row.find('.status-badge').text().trim();
       if (statusText === 'คำขอใหม่' || statusText === 'New') {
         cy.wrap($row).find('.btn-icon.delete').click({ force: true });
-        cy.get('.swal2-container').should('be.visible');
-        cy.get('.swal2-cancel').click();
+        cy.get('.dialog-overlay').should('be.visible');
+        cy.get('.btn-cancel').click();
         return false;
       }
     });
