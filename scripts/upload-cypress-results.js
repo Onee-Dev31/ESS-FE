@@ -11,18 +11,18 @@ const BLACK = { red: 0, green: 0, blue: 0 };
 const SPEC_COLORS = [
   { red: 0.67, green: 0.84, blue: 0.97 }, // blue
   { red: 0.82, green: 0.67, blue: 0.97 }, // purple
-  { red: 1.0,  green: 0.78, blue: 0.50 }, // orange
+  { red: 1.0, green: 0.78, blue: 0.5 }, // orange
   { red: 0.55, green: 0.93, blue: 0.85 }, // teal
-  { red: 1.0,  green: 0.67, blue: 0.82 }, // pink
+  { red: 1.0, green: 0.67, blue: 0.82 }, // pink
   { red: 0.72, green: 0.97, blue: 0.55 }, // green
-  { red: 1.0,  green: 0.92, blue: 0.45 }, // yellow
-  { red: 0.97, green: 0.60, blue: 0.60 }, // coral
+  { red: 1.0, green: 0.92, blue: 0.45 }, // yellow
+  { red: 0.97, green: 0.6, blue: 0.6 }, // coral
 ];
 
 const STATUS_COLORS = {
-  passed: { red: 0.60, green: 0.90, blue: 0.60 },
+  passed: { red: 0.6, green: 0.9, blue: 0.6 },
   failed: { red: 0.95, green: 0.55, blue: 0.55 },
-  pending: { red: 1.0,  green: 0.90, blue: 0.45 },
+  pending: { red: 1.0, green: 0.9, blue: 0.45 },
 };
 
 let specIndex = 0;
@@ -62,7 +62,11 @@ async function setupSheet() {
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId: SHEET_ID,
     requestBody: {
-      requests: [{ updateCells: { range: { sheetId: tabId }, fields: 'userEnteredValue,userEnteredFormat' } }],
+      requests: [
+        {
+          updateCells: { range: { sheetId: tabId }, fields: 'userEnteredValue,userEnteredFormat' },
+        },
+      ],
     },
   });
 
@@ -91,19 +95,54 @@ async function setupSheet() {
             cell: {
               userEnteredFormat: {
                 backgroundColor: { red: 0.13, green: 0.19, blue: 0.33 },
-                textFormat: { bold: true, foregroundColor: { red: 1, green: 1, blue: 1 }, fontSize: 11 },
+                textFormat: {
+                  bold: true,
+                  foregroundColor: { red: 1, green: 1, blue: 1 },
+                  fontSize: 11,
+                },
                 horizontalAlignment: 'CENTER',
                 verticalAlignment: 'MIDDLE',
               },
             },
-            fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
+            fields:
+              'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
           },
         },
-        { updateDimensionProperties: { range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 155 }, fields: 'pixelSize' } },
-        { updateDimensionProperties: { range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 210 }, fields: 'pixelSize' } },
-        { updateDimensionProperties: { range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 400 }, fields: 'pixelSize' } },
-        { updateDimensionProperties: { range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 105 }, fields: 'pixelSize' } },
-        { updateDimensionProperties: { range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 90  }, fields: 'pixelSize' } },
+        {
+          updateDimensionProperties: {
+            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 },
+            properties: { pixelSize: 155 },
+            fields: 'pixelSize',
+          },
+        },
+        {
+          updateDimensionProperties: {
+            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 },
+            properties: { pixelSize: 210 },
+            fields: 'pixelSize',
+          },
+        },
+        {
+          updateDimensionProperties: {
+            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 },
+            properties: { pixelSize: 400 },
+            fields: 'pixelSize',
+          },
+        },
+        {
+          updateDimensionProperties: {
+            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 },
+            properties: { pixelSize: 105 },
+            fields: 'pixelSize',
+          },
+        },
+        {
+          updateDimensionProperties: {
+            range: { sheetId: tabId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 },
+            properties: { pixelSize: 90 },
+            fields: 'pixelSize',
+          },
+        },
       ],
     },
   });
@@ -154,41 +193,111 @@ async function uploadSpecResults(spec, results) {
       // Col A — Run Date
       {
         repeatCell: {
-          range: { sheetId: tabId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 0, endColumnIndex: 1 },
-          cell: { userEnteredFormat: { backgroundColor: specColor, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE', textFormat: { foregroundColor: BLACK } } },
-          fields: 'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
+          range: {
+            sheetId: tabId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 0,
+            endColumnIndex: 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: specColor,
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+              textFormat: { foregroundColor: BLACK },
+            },
+          },
+          fields:
+            'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
         },
       },
       // Col B — Spec
       {
         repeatCell: {
-          range: { sheetId: tabId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 1, endColumnIndex: 2 },
-          cell: { userEnteredFormat: { backgroundColor: specColor, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE', textFormat: { foregroundColor: BLACK } } },
-          fields: 'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
+          range: {
+            sheetId: tabId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 1,
+            endColumnIndex: 2,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: specColor,
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+              textFormat: { foregroundColor: BLACK },
+            },
+          },
+          fields:
+            'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
         },
       },
       // Col C — Test Name (LEFT)
       {
         repeatCell: {
-          range: { sheetId: tabId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 2, endColumnIndex: 3 },
-          cell: { userEnteredFormat: { backgroundColor: specColor, horizontalAlignment: 'LEFT', verticalAlignment: 'MIDDLE', textFormat: { foregroundColor: BLACK } } },
-          fields: 'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
+          range: {
+            sheetId: tabId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 2,
+            endColumnIndex: 3,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: specColor,
+              horizontalAlignment: 'LEFT',
+              verticalAlignment: 'MIDDLE',
+              textFormat: { foregroundColor: BLACK },
+            },
+          },
+          fields:
+            'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
         },
       },
       // Col D — Status
       {
         repeatCell: {
-          range: { sheetId: tabId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 3, endColumnIndex: 4 },
-          cell: { userEnteredFormat: { backgroundColor: statusColor, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE', textFormat: { bold: true, foregroundColor: BLACK } } },
-          fields: 'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
+          range: {
+            sheetId: tabId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 3,
+            endColumnIndex: 4,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: statusColor,
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+              textFormat: { bold: true, foregroundColor: BLACK },
+            },
+          },
+          fields:
+            'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
         },
       },
       // Col E — Duration
       {
         repeatCell: {
-          range: { sheetId: tabId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1, startColumnIndex: 4, endColumnIndex: 5 },
-          cell: { userEnteredFormat: { backgroundColor: specColor, horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE', textFormat: { foregroundColor: BLACK } } },
-          fields: 'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
+          range: {
+            sheetId: tabId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 4,
+            endColumnIndex: 5,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: specColor,
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+              textFormat: { foregroundColor: BLACK },
+            },
+          },
+          fields:
+            'userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)',
         },
       },
     ];
@@ -197,11 +306,17 @@ async function uploadSpecResults(spec, results) {
   // Border รอบ spec block
   formatRequests.push({
     updateBorders: {
-      range: { sheetId: tabId, startRowIndex: startRow, endRowIndex: endRow, startColumnIndex: 0, endColumnIndex: 5 },
-      top:    { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
+      range: {
+        sheetId: tabId,
+        startRowIndex: startRow,
+        endRowIndex: endRow,
+        startColumnIndex: 0,
+        endColumnIndex: 5,
+      },
+      top: { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
       bottom: { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
-      left:   { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
-      right:  { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
+      left: { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
+      right: { style: 'SOLID_MEDIUM', color: { red: 0.4, green: 0.4, blue: 0.4 } },
     },
   });
 
