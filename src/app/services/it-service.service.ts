@@ -498,4 +498,8 @@ export class ItServiceService {
       responseType: 'blob',
     });
   }
+
+  checkItAvalible(ticketId: string): Observable<any> {
+    return this._http.get(`${this.baseUrl}/tickets/check-it-avalible?ticketId=${ticketId}`);
+  }
 }

@@ -20,13 +20,13 @@ export class VersionCheckService {
   start() {
     this.fetchVersion().subscribe();
 
-    // ตรวจทุกครั้งที่ user กลับมาที่ tab
-    fromEvent(document, 'visibilitychange')
-      .pipe(
-        filter(() => document.visibilityState === 'visible'),
-        switchMap(() => this.fetchVersion()),
-      )
-      .subscribe();
+    // // ตรวจทุกครั้งที่ user กลับมาที่ tab
+    // fromEvent(document, 'visibilitychange')
+    //   .pipe(
+    //     filter(() => document.visibilityState === 'visible'),
+    //     switchMap(() => this.fetchVersion()),
+    //   )
+    //   .subscribe();
 
     // ตรวจตอน 13:00 และ 18:15 ของทุกวัน 555
     this.scheduleDailyCheck(13, 0);

@@ -1500,6 +1500,10 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+
+    .warning-text {
+      color: var(--danger);
+    }
   }
 
   @media (min-width: 1024px) and (max-width: 1440px) {

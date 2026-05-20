@@ -129,7 +129,8 @@
       }
 
       <div class="table-container">
-        <table class="excel-table desktop-only">
+        <!-- desktop-only -->
+        <table class="excel-table">
           <colgroup>
             <col class="col-50" />
             <col class="col-100" />
@@ -235,7 +236,8 @@
           </tfoot>
         </table>
 
-        <div class="mobile-cards-view mobile-only">
+        <!-- class="mobile-cards-view mobile-only" -->
+        <div class="mobile-cards-view">
           @for (log of logs; track log.date) {
             <div
               class="log-card"

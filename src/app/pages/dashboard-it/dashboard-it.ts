@@ -57,6 +57,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -88,6 +89,141 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 })
 export class DashboardIT implements OnInit {
   allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
+  actionConfig: Record<
+    string,
+    {
+      left: any[];
+      right: any[];
+    }
+  > = {
+    Hold: {
+      left: [
+        {
+          label: 'Resume',
+          icon: 'fa-play',
+          class: 'btn-onhold',
+          action: () => this.resumeTicket(),
+        },
+      ],
+      right: [],
+    },
+
+    Open: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'รับเรื่อง',
+          icon: 'fa-tag',
+          class: 'btn-accept',
+          action: () => this.openAcknowledgeModal(),
+        },
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'In Progress': {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    Assigned: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'waiting-user-resubmit': {
+      left: [],
+
+      right: [
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+  };
 
   private router = inject(Router);
 
@@ -277,7 +413,7 @@ export class DashboardIT implements OnInit {
 
   refreshTickets() {
     this.prevTicketIds = new Set(this.Tickets().map((t: any) => t.ticketId));
-    console.log(this.prevTicketIds);
+    // console.log(this.prevTicketIds);
     this.getAllTickets(true);
   }
 
@@ -332,7 +468,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      console.log(res);
+      // console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -376,6 +512,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
+        repair_cost_type: ticket.repair_cost_type,
         it_satus: getStatusLabel(status_for_it), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
@@ -515,7 +652,7 @@ export class DashboardIT implements OnInit {
   }
 
   ReOpen() {
-    console.log('reOpen mock', this.selectedTicket());
+    // console.log('reOpen mock', this.selectedTicket());
 
     this.swalService.confirm('ยืนยันการเปิดงานอีกครั้ง (Re-open)').then((result) => {
       if (!result.isConfirmed) return;
@@ -529,7 +666,7 @@ export class DashboardIT implements OnInit {
       this.swalService.loading('กำลังบันทึกข้อมูล...');
       this.itServiceService.re_open(formData).subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           setTimeout(() => {
             this.swalService.success(res.message || 'บันทึกสำเร็จ');
           }, 100);
@@ -709,7 +846,7 @@ export class DashboardIT implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          console.log(res);
+          // console.log(res);
           this.summaryRes.set(res);
 
           const mapped = res.data.map((ticket: any) => {
@@ -759,7 +896,7 @@ export class DashboardIT implements OnInit {
                 .map((t: any) => t.ticketId),
             );
 
-            console.log(ids);
+            // console.log(ids);
             this.newTicketIds.set(ids);
             this.signalrService.pendingTicketNumbers.set(new Set());
             this.signalrService.pendingNewTickets.set(0);
@@ -851,7 +988,7 @@ export class DashboardIT implements OnInit {
     attachments?: any[],
     repairCostType?: string,
   ) {
-    console.log(command, ticketId, ticketTypeId, comment, attachments);
+    // console.log(command, ticketId, ticketTypeId, comment, attachments);
 
     const formData = new FormData();
 
@@ -902,6 +1039,23 @@ export class DashboardIT implements OnInit {
     console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData);
+  }
+
+  get currentActions() {
+    if (this.selectedTicket().repair_cost_type === 'paid') {
+      return (
+        this.actionConfig['waiting-user-resubmit'] || {
+          left: [],
+          right: [],
+        }
+      );
+    }
+    return (
+      this.actionConfig[this.selectedTicket().status] || {
+        left: [],
+        right: [],
+      }
+    );
   }
 
   // -- acknowledge --
@@ -1111,9 +1265,31 @@ export class DashboardIT implements OnInit {
 
   // -- assign --
   openAssignModal() {
-    this.IS_ASSIGN_TICKET.set(true);
-    this.selectedAssigneeEmpCodes = [];
-    this.assignSearchKeyword = '';
+    // console.log(this.selectedTicket());
+
+    this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
+      next: (res) => {
+        // console.log(res);
+        if (!res?.success) {
+          this.swalService.warning(res.message);
+          return;
+        }
+        // this.swalService.success(res.message || 'บันทึกสำเร็จ');
+
+        this.IS_ASSIGN_TICKET.set(true);
+        this.selectedAssigneeEmpCodes = [];
+        this.assignSearchKeyword = '';
+      },
+
+      error: (error) => {
+        console.error('Assign Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 
   closeAssignModal() {
