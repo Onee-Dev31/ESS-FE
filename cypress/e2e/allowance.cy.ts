@@ -217,4 +217,25 @@ describe('Allowance', () => {
       }
     });
   });
+
+  it('กดที่ row ใน table แล้วเปิด modal รายละเอียดได้', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.modern-table tbody tr').length > 0) {
+        cy.get('.modern-table tbody tr').first().click();
+        cy.get('app-allowance-form').should('be.visible');
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('claim card แสดง type badge ประเภทเบิกเบี้ยเลี้ยง', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__type-badge').invoke('text').should('match', /เบี้ยเลี้ยง|Allowance/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
 });

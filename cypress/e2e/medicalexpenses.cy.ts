@@ -162,4 +162,28 @@ describe('Medical Expenses', () => {
       .invoke('text')
       .should('match', /[\d,.]+/);
   });
+
+  it('stat-card อนุมัติแล้ว แสดงตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .eq(2)
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /\d+/);
+  });
+
+  it('nz-range-picker แสดงในส่วน filter สำหรับเลือกช่วงเดือน', () => {
+    cy.get('nz-range-picker').should('exist');
+  });
+
+  it('ลบรายการ pending แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim().toLowerCase();
+      if (statusText === 'pending') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
 });
