@@ -75,15 +75,18 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   isLoading = true;
 
   ngOnInit(): void {
-    this.masterDataService.getDateConfig().pipe(delay(0)).subscribe((config) => {
-      this.thaiMonths = config.months;
-      this.years = config.years;
-      this.isLoading = false;
+    this.masterDataService
+      .getDateConfig()
+      .pipe(delay(0))
+      .subscribe((config) => {
+        this.thaiMonths = config.months;
+        this.years = config.years;
+        this.isLoading = false;
 
-      if (!this.requests) {
-        this.loadData();
-      }
-    });
+        if (!this.requests) {
+          this.loadData();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
