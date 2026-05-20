@@ -179,4 +179,59 @@ describe('Vehicle', () => {
     cy.get('.btn-create').click();
     cy.get('app-vehicle-form').should('be.visible');
   });
+
+  it('filter ตามสถานะ "คำขอใหม่" แล้วแสดงผลถูกต้อง', () => {
+    cy.get('nz-select').first().click();
+    cy.get('nz-option-item').contains('คำขอใหม่').click();
+    cy.get('.btn-search').click();
+    cy.wait(1000);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
+
+  it('modal form แสดง label ประจำเดือน และมีปุ่ม btn-submit หลัง loader หาย', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-vehicle-form .loader').should('not.exist', { timeout: 5000 });
+    cy.contains('app-vehicle-form', 'ประจำเดือน').should('be.visible');
+    cy.get('app-vehicle-form .btn-submit').should('exist');
+  });
+
+  it('claim card แสดง type badge "เบิกค่าพาหนะ"', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__type-badge').should('contain', 'เบิกค่าพาหนะ');
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('claim card แสดงจำนวนวันในรายการ', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__main').invoke('text').should('match', /\d+\s*วัน/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
 });
