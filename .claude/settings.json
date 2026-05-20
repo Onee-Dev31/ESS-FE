@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"c:\\\\BackUp Drive D\\\\Fluke\\\\OneProject\\\\ESS\\\\ESS-FE\\\\scripts\" 2>/dev/null; ls \"c:\\\\BackUp Drive D\\\\Fluke\\\\OneProject\\\\ESS\\\\ESS-FE\")",
+      "Bash(node \"c:\\\\BackUp Drive D\\\\Fluke\\\\OneProject\\\\ESS\\\\ESS-FE\\\\scripts\\\\build-version.js\")"
+    ],
+    "additionalDirectories": [
+      "c:\\BackUp Drive D\\Fluke\\OneProject\\ESS\\ESS-FE"
+    ]
+  }
+}
