@@ -661,7 +661,10 @@ export class ItService implements OnInit {
     if (
       (ticket.IT_Status === 'Assigned' &&
         ticket.user_status === 'Pending' &&
-        ticket.repair_cost_type === 'paid') || //it เปลี่ยน type request
+        ticket.repair_cost_type === 'paid') ||
+      (ticket.IT_Status === 'Assigned' &&
+        ticket.user_status === 'Pending' &&
+        ticket.repair_cost_type !== 'free') || //it เปลี่ยน type request
       ticket.user_status === 'Referred_Back'
     ) {
       return 'Waiting you';
