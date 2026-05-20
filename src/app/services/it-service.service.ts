@@ -276,6 +276,7 @@ export class ItServiceService {
     status?: string;
     empno: string;
     ticketId?: number;
+    focusTicketNumber?: string;
   }): Observable<any> {
     let httpParams = new HttpParams();
     if (params.page) {
@@ -296,6 +297,10 @@ export class ItServiceService {
 
     if (params.ticketId) {
       httpParams = httpParams.set('ticketId', params.ticketId);
+    }
+
+    if (params.focusTicketNumber) {
+      httpParams = httpParams.set('focusTicketNumber', params.focusTicketNumber);
     }
 
     return this._http.get<any>(`${this.baseUrl}/it/ticket-all-request`, {
