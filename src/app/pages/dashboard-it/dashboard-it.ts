@@ -57,6 +57,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+
 @Component({
   selector: 'app-dashboard-it',
   standalone: true,
@@ -88,6 +89,141 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 })
 export class DashboardIT implements OnInit {
   allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
+  actionConfig: Record<
+    string,
+    {
+      left: any[];
+      right: any[];
+    }
+  > = {
+    Hold: {
+      left: [
+        {
+          label: 'Resume',
+          icon: 'fa-play',
+          class: 'btn-onhold',
+          action: () => this.resumeTicket(),
+        },
+      ],
+      right: [],
+    },
+
+    Open: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'รับเรื่อง',
+          icon: 'fa-tag',
+          class: 'btn-accept',
+          action: () => this.openAcknowledgeModal(),
+        },
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'In Progress': {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    Assigned: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
+    'waiting-user-resubmit': {
+      left: [],
+
+      right: [
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+  };
 
   private router = inject(Router);
 
@@ -376,6 +512,7 @@ export class DashboardIT implements OnInit {
         requesterPhone: ticket.contact_phone,
         requesterColor: ticketTypyColor.getColor(ticket.ticket_type_id),
         status: ticket.IT_Status,
+        repair_cost_type: ticket.repair_cost_type,
         it_satus: getStatusLabel(status_for_it), //ticket.IT_Status
         approval_status: ticket.approval_status,
         attachments: attachments,
@@ -902,6 +1039,25 @@ export class DashboardIT implements OnInit {
     console.log('formData', [...formData.entries()]);
 
     return this.itServiceService.updateTicket(ticketId, formData);
+  }
+
+  get currentActions() {
+    console.log(this.selectedTicket());
+
+    if (this.selectedTicket().repair_cost_type === 'paid') {
+      return (
+        this.actionConfig['waiting-user-resubmit'] || {
+          left: [],
+          right: [],
+        }
+      );
+    }
+    return (
+      this.actionConfig[this.selectedTicket().status] || {
+        left: [],
+        right: [],
+      }
+    );
   }
 
   // -- acknowledge --

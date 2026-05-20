@@ -396,7 +396,7 @@
   </section>
 
   <!-- ACTIONS -->
-  <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+  <!-- <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
     <div class="btn-group">
       <button class="btn btn-onhold" (click)="resumeTicket()" *ngIf="t.status === 'Hold'">
         <i class="fa-solid fa-play btn-action-icon"></i> Resume
@@ -418,7 +418,6 @@
         (click)="openAcknowledgeModal()"
         *ngIf="t.status !== 'In Progress' && t.status !== 'Assigned' && t.status !== 'ReOpened'"
       >
-        <!-- t.approval_status !== 'Approved' -->
         <i class="fa-solid fa-tag btn-action-icon"></i> รับเรื่อง
       </button>
       <button class="btn btn-send" (click)="openAssignModal()">
@@ -427,6 +426,30 @@
       <button class="btn btn-done" (click)="closeTicket()">
         <i class="fa-solid fa-circle-check btn-action-icon"></i> ปิดงาน
       </button>
+    </div>
+  </section> -->
+
+  <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
+    <!-- LEFT -->
+    <div class="btn-group">
+      @for (btn of currentActions.left; track btn.label) {
+        <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
+          <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
+
+          {{ btn.label }}
+        </button>
+      }
+    </div>
+
+    <!-- RIGHT -->
+    <div class="btn-group">
+      @for (btn of currentActions.right; track btn.label) {
+        <button class="btn" [ngClass]="btn.class" (click)="btn.action()">
+          <i class="fa-solid btn-action-icon" [ngClass]="btn.icon"></i>
+
+          {{ btn.label }}
+        </button>
+      }
     </div>
   </section>
   <section class="tk-actions" *ngIf="t.status === 'Closed'">
