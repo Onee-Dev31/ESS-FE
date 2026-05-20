@@ -1,6 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { interval, switchMap, catchError, EMPTY, tap, fromEvent, filter } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
+import { switchMap, catchError, EMPTY, tap, fromEvent, filter } from 'rxjs';
 import Swal from 'sweetalert2';
 
 interface VersionInfo {
@@ -9,23 +10,37 @@ interface VersionInfo {
 
 @Injectable({ providedIn: 'root' })
 export class VersionCheckService {
-  private http = inject(HttpClient);
   private currentVersion: string | null = null;
-  private readonly POLL_INTERVAL_MS = 3000;
+
+  constructor(private http: HttpClient, private router: Router) {}
 
   start() {
     this.fetchVersion().subscribe();
 
-    interval(this.POLL_INTERVAL_MS)
-      .pipe(switchMap(() => this.fetchVersion()))
-      .subscribe();
-
+    // ตรวจทุกครั้งที่ user กลับมาที่ tab
     fromEvent(document, 'visibilitychange')
       .pipe(
         filter(() => document.visibilityState === 'visible'),
         switchMap(() => this.fetchVersion()),
       )
       .subscribe();
+
+    // ตรวจตอน 13:00 และ 18:15 ของทุกวัน 555
+    this.scheduleDailyCheck(13, 0);
+    this.scheduleDailyCheck(18, 15);
+  }
+
+  private scheduleDailyCheck(hour: number, minute: number) {
+    const now = new Date();
+    const next = new Date();
+    next.setHours(hour, minute, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+
+    const msUntilNext = next.getTime() - now.getTime();
+    setTimeout(() => {
+      this.fetchVersion().subscribe();
+      setInterval(() => this.fetchVersion().subscribe(), 24 * 60 * 60 * 1000);
+    }, msUntilNext);
   }
 
   private fetchVersion() {
