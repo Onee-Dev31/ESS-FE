@@ -6,6 +6,7 @@ import { ConfirmationDialogComponent } from './components/shared/confirmation-di
 import { TechInfoComponent } from './components/shared/tech-info/tech-info';
 import { SignalrService } from './services/signalr.service';
 import { AuthService } from './services/auth.service';
+import { VersionCheckService } from './services/version-check.service';
 
 @Component({
   selector: 'app-root',
@@ -23,12 +24,13 @@ import { AuthService } from './services/auth.service';
 export class App implements OnInit {
   protected readonly title = signal('my-angular-app');
   private signalrService = inject(SignalrService);
-
   private authService = inject(AuthService);
+  private versionCheckService = inject(VersionCheckService);
 
   ngOnInit() {
     // this.authService.initializeFromBackend().subscribe();
     this.signalrService.startConnection();
+    this.versionCheckService.start();
     if ('Notification' in window) {
       Notification.requestPermission();
     }
