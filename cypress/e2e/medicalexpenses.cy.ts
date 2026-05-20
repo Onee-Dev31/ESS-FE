@@ -162,4 +162,58 @@ describe('Medical Expenses', () => {
       .invoke('text')
       .should('match', /[\d,.]+/);
   });
+
+  it('stat-card อนุมัติแล้ว แสดงตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .eq(2)
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /\d+/);
+  });
+
+  it('filter ตามสถานะ Pending แล้วแสดงผลถูกต้อง', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('nz-select').length > 0) {
+        cy.get('nz-select').first().click();
+        cy.get('nz-option-item').contains('รอดำเนินการ').click();
+        cy.get('.btn-search').click();
+        cy.wait(1000);
+        cy.get('body').then(($b) => {
+          if ($b.find('.status-badge').length > 0) {
+            cy.get('.status-badge').each(($badge) => {
+              cy.wrap($badge).invoke('text').invoke('trim').should('match', /รอดำเนินการ|Pending/);
+            });
+          } else {
+            cy.get('app-empty-state').should('be.visible');
+          }
+        });
+      } else {
+        cy.get('.select-status').then(($select) => {
+          cy.wrap($select).select('pending');
+          cy.wait(1000);
+          cy.get('body').then(($b) => {
+            if ($b.find('.status-badge').length > 0) {
+              cy.get('.status-badge').each(($badge) => {
+                cy.wrap($badge).invoke('text').invoke('trim').should('match', /รอดำเนินการ|Pending/);
+              });
+            } else {
+              cy.get('app-empty-state').should('be.visible');
+            }
+          });
+        });
+      }
+    });
+  });
+
+  it('ลบรายการ pending แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim().toLowerCase();
+      if (statusText === 'pending') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
 });

@@ -147,4 +147,43 @@ describe('Timeoff', () => {
       .trigger('change')
       .should('have.value', '2025-12-31');
   });
+
+  it('filter ตามสถานะ NEW แล้วแสดงเฉพาะรายการใหม่', () => {
+    cy.get('.select-status').select('NEW');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('filter ตามสถานะ PENDING แล้วแสดงเฉพาะรายการที่รออนุมัติ', () => {
+    cy.get('.select-status').select('PENDING');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อยู่ระหว่างการอนุมัติ|Pending/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('กดที่ row ใน table แล้วเปิด form รายละเอียดได้', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.modern-table tbody tr').length > 0) {
+        cy.get('.modern-table tbody tr').first().click();
+        cy.get('app-time-off-form').should('be.visible');
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
 });

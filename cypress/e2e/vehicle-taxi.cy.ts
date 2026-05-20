@@ -202,4 +202,36 @@ describe('Vehicle Taxi', () => {
     cy.contains('app-vehicle-taxi-form', 'ประจำเดือน').should('be.visible');
     cy.get('app-vehicle-taxi-form .btn-submit').should('exist');
   });
+
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
+
+  it('claim card แสดง type badge "เบิกค่าพาหนะ (Taxi)"', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__type-badge').invoke('text').should('match', /Taxi|พาหนะ/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
+
+  it('claim card แสดงจำนวนรายการในรายการ', () => {
+    cy.get('body').then(($body) => {
+      if ($body.find('.claim-card').length > 0) {
+        cy.get('.claim-card').first().find('.claim-card__main').invoke('text').should('match', /\d+\s*รายการ/);
+      } else {
+        cy.get('app-empty-state, .modern-table').should('exist');
+      }
+    });
+  });
 });
