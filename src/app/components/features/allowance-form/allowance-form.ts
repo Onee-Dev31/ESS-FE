@@ -69,6 +69,7 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   logs: AllowanceItem[] = [];
 
   MODE_EDIT: boolean = false;
+  isLoading = true;
 
   isPolicyPopupOpen = signal(false);
   rates = signal<MealAllowanceRate[]>([]);
@@ -344,12 +345,16 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   getRates() {
+    this.isLoading = true;
     this.allowanceService.getRates().subscribe({
       next: (res) => {
         // console.log(res);
         this.rates.set(res.data);
+        this.isLoading = false;
       },
-      error: () => {},
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 }

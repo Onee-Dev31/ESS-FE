@@ -607,7 +607,6 @@ $status-cancelled-text: var(--text-table-head);
   .filter {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     gap: 10px;
 
     @include tablet {
@@ -641,6 +640,10 @@ $status-cancelled-text: var(--text-table-head);
       button {
         width: 100%;
       }
+    }
+
+    &:last-child {
+      flex: 1;
     }
 
     .form-field {

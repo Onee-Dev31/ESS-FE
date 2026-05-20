@@ -17,6 +17,11 @@
     </button>
   </header>
 
+  @if (isLoading) {
+    <div class="loading-row">
+      <div class="loader"></div>
+    </div>
+  } @else {
   <main class="content-card">
     <section class="filter-controls" *ngIf="!MODE_EDIT">
       <div class="month-selector">
@@ -142,4 +147,5 @@
       }}
     </button>
   </div>
+  }
 </div>

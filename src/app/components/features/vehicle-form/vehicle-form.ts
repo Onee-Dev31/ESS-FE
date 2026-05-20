@@ -71,11 +71,13 @@ export class VehicleFormComponent implements OnInit, OnChanges {
   logs: VehicleLogItem[] = [];
 
   MODE_EDIT: boolean = false;
+  isLoading = true;
 
   ngOnInit(): void {
     this.masterDataService.getDateConfig().subscribe((config) => {
       this.thaiMonths = config.months;
       this.years = config.years;
+      this.isLoading = false;
 
       if (!this.requests) {
         this.loadData();

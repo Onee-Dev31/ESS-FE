@@ -454,7 +454,6 @@ $border-color: var(--border-color);
   .filter {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     gap: 10px;
 
     @include tablet {
@@ -477,6 +476,10 @@ $border-color: var(--border-color);
       button {
         width: 100%;
       }
+    }
+
+    &:last-child {
+      flex: 1;
     }
 
     .select-status {
