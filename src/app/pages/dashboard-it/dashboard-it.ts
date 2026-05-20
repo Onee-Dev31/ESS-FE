@@ -211,6 +211,38 @@ export class DashboardIT implements OnInit {
       ],
     },
 
+    ReOpened: {
+      left: [
+        {
+          label: 'On Hold',
+          icon: 'fa-pause',
+          class: 'btn-onhold',
+          action: () => this.onHoldTicket(),
+        },
+        {
+          label: 'Deny',
+          icon: 'fa-ban',
+          class: 'btn-deny',
+          action: () => this.openDenyModal(),
+        },
+      ],
+
+      right: [
+        {
+          label: 'ส่งต่อ',
+          icon: 'fa-share',
+          class: 'btn-send',
+          action: () => this.openAssignModal(),
+        },
+        {
+          label: 'ปิดงาน',
+          icon: 'fa-circle-check',
+          class: 'btn-done',
+          action: () => this.closeTicket(),
+        },
+      ],
+    },
+
     'waiting-user-resubmit': {
       left: [],
 
@@ -468,7 +500,7 @@ export class DashboardIT implements OnInit {
 
   selectTicket(ticketId: string) {
     this.getTicketById(ticketId).subscribe(async (res: any) => {
-      // console.log(res);
+      console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
       const replyAttachments = res.attachments?.filter((f: any) => f.reply_id) || [];
       const convertedFiles = await this.fileConverter.convertUrlsToFiles(ticketAttachments);
@@ -528,7 +560,7 @@ export class DashboardIT implements OnInit {
       this.selectedTicket.set(objectData);
       this.scrollToBottom();
 
-      // console.log(objectData);
+      console.log(objectData);
 
       const codeempid = this.authService.userData()?.CODEMPID;
       if (ticketId && codeempid) {
@@ -1058,9 +1090,48 @@ export class DashboardIT implements OnInit {
     );
   }
 
+  private checkBeforeAction(callback: () => void) {
+    const ticketId = this.selectedTicket()?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.itServiceService.checkItAvalible(ticketId).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning(res.message);
+
+          this.getAllTickets();
+          if (res.message.includes('พิจารณา')) {
+            this.selectedTicket.set(undefined);
+          } else {
+            this.selectTicket(this.selectedTicket().ticketId);
+          }
+
+          return;
+        }
+
+        callback();
+      },
+
+      error: (error) => {
+        console.error('Check Ticket Error:', error);
+
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
+  }
+
   // -- acknowledge --
   openAcknowledgeModal() {
-    this.IS_ACKNOWLEDGE_TICKET.set(true);
+    this.checkBeforeAction(() => {
+      this.IS_ACKNOWLEDGE_TICKET.set(true);
+    });
   }
 
   closeAcknowledgeModal() {
@@ -1130,96 +1201,103 @@ export class DashboardIT implements OnInit {
     });
   }
 
-  // -- deny --
-
+  // -- onHold --
   onHoldTicket() {
-    this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
-      if (!result.isConfirmed) return;
+    this.checkBeforeAction(() => {
+      this.swalService.confirm('ยืนยันการหยุดชั่วคราว (On Hold)').then((result) => {
+        if (!result.isConfirmed) return;
 
-      const ticket = this.selectedTicket();
-      const ticketId = ticket?.ticketId;
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
 
-      if (!ticketId) {
-        this.msg.warning('ไม่พบ Ticket');
-        return;
-      }
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
 
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket('onhold', ticketId, '', null, null).subscribe({
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-            return;
-          }
+        this.updateTicket('onhold', ticketId, '', null, null).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
 
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-          this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
+            this.signalrService.ticketStatusNotify(ticketId, ticket?.requesterAduser ?? '', 'Hold');
 
-          this.selectTicket(ticketId);
-          this.getAllTickets();
-        },
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+          },
 
-        error: (error) => {
-          console.error('Acknowledge Ticket Error:', error);
+          error: (error) => {
+            console.error('Acknowledge Ticket Error:', error);
 
-          this.swalService.warning(
-            'เกิดข้อผิดพลาด',
-            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-          );
-        },
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
       });
     });
   }
 
+  // -- resume --
   resumeTicket() {
-    this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)').then((result) => {
-      if (!result.isConfirmed) return;
+    this.checkBeforeAction(() => {
+      this.swalService.confirm('ยืนยันการกลับมาดำเนินการต่อ (Resume)').then((result) => {
+        if (!result.isConfirmed) return;
 
-      const ticket = this.selectedTicket();
-      const ticketId = ticket?.ticketId;
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
 
-      if (!ticketId) {
-        this.msg.warning('ไม่พบ Ticket');
-        return;
-      }
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
 
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket('resume', ticketId, '', null, null).subscribe({
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-            return;
-          }
+        this.updateTicket('resume', ticketId, '', null, null).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
 
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-          this.signalrService.ticketStatusNotify(
-            ticketId,
-            ticket?.requesterAduser ?? '',
-            'In Progress',
-          );
+            this.signalrService.ticketStatusNotify(
+              ticketId,
+              ticket?.requesterAduser ?? '',
+              'In Progress',
+            );
 
-          this.selectTicket(ticketId);
-          this.getAllTickets();
-        },
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+          },
 
-        error: (error) => {
-          console.error('Acknowledge Ticket Error:', error);
+          error: (error) => {
+            console.error('Acknowledge Ticket Error:', error);
 
-          this.swalService.warning(
-            'เกิดข้อผิดพลาด',
-            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-          );
-        },
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
       });
     });
   }
 
+  // -- deny --
   openDenyModal() {
-    this.IS_DENY_TICKET.set(true);
+    this.checkBeforeAction(() => {
+      this.IS_DENY_TICKET.set(true);
+    });
   }
 
   closeDenyModal() {
@@ -1265,31 +1343,38 @@ export class DashboardIT implements OnInit {
 
   // -- assign --
   openAssignModal() {
-    // console.log(this.selectedTicket());
-
-    this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
-      next: (res) => {
-        if (!res?.success) {
-          this.swalService.warning(res.message);
-          this.getAllTickets();
-          this.selectTicket(this.selectedTicket().ticketId);
-          return;
-        }
-
-        this.IS_ASSIGN_TICKET.set(true);
-        this.selectedAssigneeEmpCodes = [];
-        this.assignSearchKeyword = '';
-      },
-
-      error: (error) => {
-        console.error('Assign Ticket Error:', error);
-
-        this.swalService.warning(
-          'เกิดข้อผิดพลาด',
-          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-        );
-      },
+    this.checkBeforeAction(() => {
+      this.IS_ASSIGN_TICKET.set(true);
+      this.selectedAssigneeEmpCodes = [];
+      this.assignSearchKeyword = '';
     });
+    // this.itServiceService.checkItAvalible(this.selectedTicket().ticketId).subscribe({
+    //   next: (res) => {
+    //     if (!res?.success) {
+    //       this.swalService.warning(res.message);
+    //       this.getAllTickets();
+    //       if (res.message.includes('พิจารณา')) {
+    //         this.selectedTicket.set(undefined);
+    //       } else {
+    //         this.selectTicket(this.selectedTicket().ticketId);
+    //       }
+    //       return;
+    //     }
+
+    //     this.IS_ASSIGN_TICKET.set(true);
+    //     this.selectedAssigneeEmpCodes = [];
+    //     this.assignSearchKeyword = '';
+    //   },
+
+    //   error: (error) => {
+    //     console.error('Assign Ticket Error:', error);
+
+    //     this.swalService.warning(
+    //       'เกิดข้อผิดพลาด',
+    //       error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+    //     );
+    //   },
+    // });
   }
 
   closeAssignModal() {
@@ -1356,47 +1441,49 @@ export class DashboardIT implements OnInit {
   // -- close --
 
   closeTicket() {
-    this.swalService.confirm('ยืนยันการปิดงาน').then((result) => {
-      if (!result.isConfirmed) return;
+    this.checkBeforeAction(() => {
+      this.swalService.confirm('ยืนยันการปิดงาน').then((result) => {
+        if (!result.isConfirmed) return;
 
-      const ticket = this.selectedTicket();
-      const ticketId = ticket?.ticketId;
+        const ticket = this.selectedTicket();
+        const ticketId = ticket?.ticketId;
 
-      if (!ticketId) {
-        this.msg.warning('ไม่พบ Ticket');
-        return;
-      }
+        if (!ticketId) {
+          this.msg.warning('ไม่พบ Ticket');
+          return;
+        }
 
-      this.swalService.loading('กำลังบันทึกข้อมูล...');
+        this.swalService.loading('กำลังบันทึกข้อมูล...');
 
-      this.updateTicket('close', ticketId, '', null, null).subscribe({
-        next: (res) => {
-          if (!res?.success) {
-            this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
-            return;
-          }
+        this.updateTicket('close', ticketId, '', null, null).subscribe({
+          next: (res) => {
+            if (!res?.success) {
+              this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+              return;
+            }
 
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+            this.swalService.success(res.message || 'บันทึกสำเร็จ');
 
-          this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
-          this.signalrService.ticketStatusNotify(
-            ticketId,
-            this.selectedTicket()?.requesterAduser ?? '',
-            'Closed',
-          );
+            this.signalrService.ticketStatusTrigger.next({ ticketId, status: 'Closed' });
+            this.signalrService.ticketStatusNotify(
+              ticketId,
+              this.selectedTicket()?.requesterAduser ?? '',
+              'Closed',
+            );
 
-          this.selectTicket(ticketId);
-          this.getAllTickets();
-        },
+            this.selectTicket(ticketId);
+            this.getAllTickets();
+          },
 
-        error: (error) => {
-          console.error('Acknowledge Ticket Error:', error);
+          error: (error) => {
+            console.error('Closed Ticket Error:', error);
 
-          this.swalService.warning(
-            'เกิดข้อผิดพลาด',
-            error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-          );
-        },
+            this.swalService.warning(
+              'เกิดข้อผิดพลาด',
+              error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+            );
+          },
+        });
       });
     });
   }
@@ -1454,7 +1541,6 @@ export class DashboardIT implements OnInit {
         this.selectTicket(data.id);
         this.getAllTickets();
       },
-
       error: (error) => {
         console.error('Assign Ticket Error:', error);
 
