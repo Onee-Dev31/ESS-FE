@@ -68,9 +68,10 @@ export class ApprovalAllowanceComponent implements OnInit {
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
   approvals = signal<any[]>([]);
+  summary = signal<{ pending: number; approved: number; rejected: number; referredBack: number } | null>(null);
   showExportMenu = signal<boolean>(false);
   listing = createListingState();
-  medicalTabs = APPROVAL_STATUS_TABS.filter((t) => t !== 'Referred Back');
+  medicalTabs = APPROVAL_STATUS_TABS;
 
   constructor() {
     this.listing.filterStatus.set('Pending');
@@ -172,7 +173,25 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
+  get showResubmitHint(): boolean {
+    return (
+      this.listing.filterStatus() === 'Pending' &&
+      this.comps.paginatedData().length === 0 &&
+      (this.summary()?.referredBack ?? 0) > 0
+    );
+  }
+
   getTabCount(tab: string) {
+    const s = this.summary();
+    if (s) {
+      const map: Record<string, number> = {
+        Pending: s.pending,
+        Approved: s.approved,
+        Rejected: s.rejected,
+        'Referred Back': s.referredBack,
+      };
+      return map[tab] ?? 0;
+    }
     return this.approvals().filter((item) => item.status === tab).length;
   }
 
@@ -279,7 +298,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   private mapClaimStatus(status: string): 'Pending' | 'Approved' | 'Rejected' | 'Referred Back' {
-    switch (status?.toUpperCase()) {
+    switch (status?.toUpperCase().replace(/ /g, '_')) {
       case 'APPROVED':
         return 'Approved';
       case 'REJECTED':
@@ -303,6 +322,7 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.approvalAllowanceService.getApprovals(adUser, autoOpenVoucherNo).subscribe({
       next: (res) => {
         this.approvals.set(res.data.map((c: any) => this.mapClaimToApproval(c)));
+        if (res.summary) this.summary.set(res.summary);
         this.listing.currentPage.set(0);
         this.loadingService.stop('approvals-list');
         this.isRefreshing.set(false);

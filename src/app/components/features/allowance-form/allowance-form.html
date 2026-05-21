@@ -53,7 +53,7 @@
           </div>
         </section>
         <!-- update -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'New'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'Referred Back'">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -76,7 +76,7 @@
           </div>
         </section>
         <!-- view only -->
-        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'New'">
+        <section class="filter-controls" *ngIf="MODE_EDIT && requests.status !== 'Referred Back'">
           <div class="alert-delete" *ngIf="isDelete()">
             <i class="fa-solid fa-triangle-exclamation"></i>
             รายการที่ยกเลิก {{ isDelete() }} รายการ จะถูกลบถาวรเมื่อกด "ลบรายการเบิกทั้งหมด"
@@ -263,7 +263,7 @@
                 <label class="sr-only-label">
                   <span class="sr-only">เลือกวันที่ {{ log.date }}</span>
                   <input
-                    *ngIf="!MODE_EDIT || requests.status === 'New'"
+                    *ngIf="!MODE_EDIT || requests.status === 'Referred Back'"
                     type="checkbox"
                     [(ngModel)]="log.selected"
                     (change)="onToggleCheck(log, cardDescInput)"
@@ -295,7 +295,7 @@
               <div class="card-input-section">
                 <label
                   >รายละเอียดการเบิก
-                  @if (log.selected && requests?.status === 'New') {
+                  @if (log.selected && requests?.status === 'Referred Back') {
                     <span class="required">*</span>
                   }
                 </label>
@@ -307,7 +307,7 @@
                   placeholder="ระบุรายละเอียด..."
                   [class.is-invalid]="log.selected && !log.description"
                   (ngModelChange)="onInputChange(log)"
-                  [readonly]="(MODE_EDIT && requests?.status !== 'New') || !log.isEligible"
+                  [readonly]="(MODE_EDIT && requests?.status !== 'Referred Back') || !log.isEligible"
                 />
               </div>
             </div>
@@ -316,7 +316,7 @@
       </div>
     </main>
 
-    <div class="form-actions" *ngIf="requests?.status === 'New' || !requests">
+    <div class="form-actions" *ngIf="requests?.status === 'Referred Back' || !requests">
       <button class="btn-submit" (click)="onSubmit()" [disabled]="hasInvalid()">
         <i class="fas fa-check"></i>
         {{
@@ -324,7 +324,9 @@
             ? 'ยืนยันการเบิก'
             : hasDelete()
               ? 'ลบรายการเบิกทั้งหมด'
-              : 'ยืนยันการแก้ไขการเบิก'
+              : requests?.status === 'Referred Back'
+                ? 'ส่งกลับเพื่ออนุมัติ'
+                : 'ยืนยันการแก้ไขการเบิก'
         }}
       </button>
     </div>

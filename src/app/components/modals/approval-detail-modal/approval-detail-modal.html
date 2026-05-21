@@ -13,6 +13,7 @@
       <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
         @if (!isActionConfirm()) {
           <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
+          <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
           <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
         }
       </div>
@@ -317,6 +318,7 @@
     <div class="form-actions-footer" [ngClass]="actionType()?.toLowerCase()?.replace(' ', '-')">
       <div class="header-actions-group" *ngIf="approvalItem.rawStatus === 'pending'">
         <button class="btn-action-green" (click)="openActionConfirm('Approved')">Approve</button>
+        <button class="btn-action-orange" (click)="openActionConfirm('Referred Back')">Refer Back</button>
         <button class="btn-action-red" (click)="openActionConfirm('Rejected')">Reject</button>
       </div>
     </div>

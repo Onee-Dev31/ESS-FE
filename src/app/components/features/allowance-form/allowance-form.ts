@@ -305,7 +305,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         })
         .subscribe({
           next: () => {
-            this.swalService.success('แก้ไขใบเบิกสำเร็จ');
+            const msg =
+              this.requests?.status === 'Referred Back'
+                ? 'ส่งคืนสำเร็จ ระบบเริ่มกระบวนการอนุมัติใหม่และแจ้งเตือนผู้อนุมัติทางอีเมลแล้ว'
+                : 'แก้ไขใบเบิกสำเร็จ';
+            this.swalService.success(msg);
             this.closeModal();
           },
           error: () => this.swalService.error('เกิดข้อผิดพลาดในการแก้ไข'),

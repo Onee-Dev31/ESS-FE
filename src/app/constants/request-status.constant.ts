@@ -10,6 +10,8 @@ export const REQUEST_STATUS = {
 };
 
 export const REQUEST_STATUS_LABEL: Record<string, string> = {
+  Pending: 'Pending',
+  'Referred Back': 'Referred Back',
   [REQUEST_STATUS.NEW]: 'คำขอใหม่',
   [REQUEST_STATUS.VERIFIED]: 'ตรวจสอบแล้ว',
   [REQUEST_STATUS.WAITING_CHECK]: 'รอตรวจสอบ',
