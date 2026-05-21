@@ -387,6 +387,7 @@ $status-danger-text: var(--status-danger-text);
     .table-actions {
       display: flex;
       gap: 6px;
+      justify-content: center;
     }
 
     .budget-bar {
@@ -422,57 +423,47 @@ $status-danger-text: var(--status-danger-text);
   .modern-table {
     @include modern-table;
 
-    th:nth-child(1),
-    td:nth-child(1) {
-      width: 330px;
-    }
+    // th:nth-child(1),
+    // td:nth-child(1) {
+    //   width: 330px;
+    // }
 
     // พนักงาน
-    th:nth-child(2),
-    td:nth-child(2) {
-      width: 180px;
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 250px;
     }
 
     // ประเภท
-    th:nth-child(3),
-    td:nth-child(3) {
-      width: 350px;
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 200px;
     }
 
     // วันที่
-    th:nth-child(4),
-    td:nth-child(4) {
+    th:nth-child(3),
+    td:nth-child(3) {
       width: 150px;
     }
 
-    // โรงพยาบาล
-    th:nth-child(5),
-    td:nth-child(5) {
-      width: 180px;
-    }
-
-    // โรค
-    th:nth-child(6),
-    td:nth-child(6) {
-      width: 160px;
-    }
-
     // จำนวนเงิน
-    th:nth-child(7),
-    td:nth-child(7) {
+    th:nth-child(4),
+    td:nth-child(4) {
       width: 100px;
     }
 
     // สถานะ
-    th:nth-child(8),
-    td:nth-child(8) {
+    th:nth-child(5),
+    td:nth-child(5) {
       width: 50px;
+      text-align: center;
     }
 
-    // เอกสาร
-    th:nth-child(9),
-    td:nth-child(9) {
+    // action
+    th:nth-child(6),
+    td:nth-child(6) {
       width: 120px;
+      text-align: center;
     }
 
     // action
