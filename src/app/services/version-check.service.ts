@@ -30,14 +30,20 @@ export class VersionCheckService {
 
     this.router.events
       .pipe(
-        filter((e) => e instanceof NavigationEnd && (this.isCheckTime() || this.hasMissedCheckTime())),
+        filter(
+          (e) => e instanceof NavigationEnd && (this.isCheckTime() || this.hasMissedCheckTime()),
+        ),
         switchMap(() => this.fetchVersion()),
       )
       .subscribe();
 
     fromEvent(document, 'visibilitychange')
       .pipe(
-        filter(() => document.visibilityState === 'visible' && (this.isCheckTime() || this.hasMissedCheckTime())),
+        filter(
+          () =>
+            document.visibilityState === 'visible' &&
+            (this.isCheckTime() || this.hasMissedCheckTime()),
+        ),
         switchMap(() => this.fetchVersion()),
       )
       .subscribe();
@@ -59,6 +65,19 @@ export class VersionCheckService {
       return checkTime > last && checkTime <= now;
     });
   }
+  // private scheduleDailyCheck(hour: number, minute: number) {
+  //   const now = new Date();
+  //   const next = new Date();
+  //   console.log(hour, minute, next.getDate());
+  //   next.setHours(hour, minute, 0, 0);
+  //   if (next <= now) next.setDate(next.getDate() + 1);
+
+  //   const msUntilNext = next.getTime() - now.getTime();
+  //   setTimeout(() => {
+  //     this.fetchVersion().subscribe();
+  //     setInterval(() => this.fetchVersion().subscribe(), 24 * 60 * 60 * 1000);
+  //   }, msUntilNext);
+  // }
 
   private fetchVersion() {
     this.lastCheckedAt = Date.now();

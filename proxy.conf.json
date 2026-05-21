@@ -17,5 +17,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/uploads-uat": {
+    "target": "http://10.31.1.85:5259",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }
