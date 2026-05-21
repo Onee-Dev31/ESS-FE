@@ -771,7 +771,7 @@
   border-collapse: collapse;
 
   th {
-    background: #f3f4f6;
+    background: var(--bg-table-head);
     padding: 14px;
     text-align: left;
     font-size: 14px;
@@ -779,7 +779,7 @@
 
   td {
     padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border);
   }
 }
 
@@ -792,14 +792,25 @@
   border: 1px solid #d1d5db;
 }
 
-.btn-icon-delete {
+.btn-delete {
+  @include btn-secondary;
   border: none;
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--bg-slate);
+  color: var(--danger);
   width: 36px;
   height: 36px;
   border-radius: 8px;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+  }
+
+  &:hover {
+    color: var(--danger);
+  }
 }
 
 .modal-footer {
@@ -832,7 +843,7 @@
     height: 48px !important;
     padding: 0 20px !important;
     border: 1px solid var(--text-muted) !important;
-    border-radius: 50px !important;
+    border-radius: 10px !important;
     font-size: 0.95rem !important;
     color: var(--text) !important;
     background: var(--bg-card) !important;
@@ -846,7 +857,7 @@
 
     &:focus {
       outline: none;
-      border-color: #a78bfa !important;
+      border-color: var(--primary) !important;
       box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
     }
 

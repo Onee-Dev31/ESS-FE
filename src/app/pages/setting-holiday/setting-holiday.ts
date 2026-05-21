@@ -11,6 +11,9 @@ import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { SwalService } from '../../services/swal.service';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import dayjs from 'dayjs';
+import { AuthService } from '../../services/auth.service';
+import { MasterDataService } from '../../services/master-data.service';
 
 @Component({
   selector: 'app-setting-holiday',
@@ -31,7 +34,9 @@ export class SettingHoliday {
   pageTitle = signal<string>('กำหนดวันหยุด');
 
   private teamCalendarService = inject(TeamCalendarService);
+  private masterService = inject(MasterDataService);
   private swalService = inject(SwalService);
+  private authService = inject(AuthService);
   dateUtil = inject(DateUtilityService);
 
   loading = signal(false);
@@ -39,12 +44,16 @@ export class SettingHoliday {
   futureYears: number[] = [];
   holidays = signal<any[]>([]);
 
-  searchYear: number | null = new Date().getFullYear();
+  searchYear: number = new Date().getFullYear();
   searchHolidayName = '';
 
   isHolidayModalOpen = signal(false);
   selectedYear = new Date().getFullYear() + 1;
   holidayFormList = signal<any[]>([]);
+
+  isEditMode = false;
+  editingYear: number | null = null;
+  originalHolidayList: any[] = [];
 
   formData = {
     year: 2026,
@@ -114,14 +123,50 @@ export class SettingHoliday {
     return res.map((x: any) => ({
       id: x.ID,
       year: x.YEAR,
-      holidayDate: x.HOLIDAY_DATE,
+      holidayDate: x.HOLIDAY_DATE ? new Date(x.HOLIDAY_DATE) : null,
       holidayName: x.HOLIDAY_NAME,
     }));
   }
 
-  addHoliday() {
-    console.log('Holiday');
+  addHoliday(): void {
+    this.isEditMode = false;
+
+    this.selectedYear = new Date().getFullYear() + 1;
+
+    this.holidayFormList.set([]);
+
+    this.addHolidayRow();
+
     this.isHolidayModalOpen.set(true);
+  }
+
+  editHoliday(year: number) {
+    console.log(year);
+    this.isEditMode = true;
+    this.editingYear = year;
+
+    this.selectedYear = year;
+
+    this.loading.set(true);
+
+    this.teamCalendarService.getHoliday(year.toString()).subscribe({
+      next: (res: any) => {
+        const mapped = this.mapHoliday(res).map((x) => ({
+          ...x,
+          holidayDate: new Date(x.holidayDate),
+        }));
+
+        // this.holidayFormList.set(mapped);
+        this.originalHolidayList = this.mapHoliday(res);
+        this.holidayFormList.set(structuredClone(this.originalHolidayList));
+        this.isHolidayModalOpen.set(true);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading.set(false);
+      },
+    });
   }
 
   addHolidayRow(): void {
@@ -163,7 +208,6 @@ export class SettingHoliday {
           };
         });
 
-        console.log(mapped);
         this.holidayFormList.set(mapped);
       },
 
@@ -174,26 +218,81 @@ export class SettingHoliday {
   }
 
   saveHoliday(): void {
-    const payload = this.holidayFormList().map((x) => ({
-      year: this.selectedYear,
-      holidayDate: x.holidayDate,
-      holidayName: x.holidayName,
-    }));
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    const current = this.holidayFormList();
+    const original = this.originalHolidayList;
 
+    const currentMap = new Map(current.map((x) => [x.id, x]));
+    const originalMap = new Map(original.map((x) => [x.id, x]));
+
+    const payload: {
+      year: string;
+      createdBy: string;
+      holidays: any[];
+    } = {
+      year: this.selectedYear.toString(),
+      createdBy: this.authService.userData().AD_USER,
+
+      holidays: [],
+    };
+
+    // 🔵 CREATE + UPDATE
+    for (const item of current) {
+      if (!item.id || typeof item.id === 'string') {
+        payload.holidays.push({
+          action: 'create',
+          holidayDate: dayjs(item.holidayDate).format('YYYY-MM-DD'),
+          holidayName: item.holidayName,
+          remark: '',
+        });
+        continue;
+      }
+
+      const old = originalMap.get(item.id);
+
+      if (!old) continue;
+
+      const isChanged =
+        dayjs(old.holidayDate).format('YYYY-MM-DD') !==
+          dayjs(item.holidayDate).format('YYYY-MM-DD') || old.holidayName !== item.holidayName;
+
+      if (isChanged) {
+        payload.holidays.push({
+          action: 'update',
+          id: item.id,
+          holidayDate: dayjs(item.holidayDate).format('YYYY-MM-DD'),
+          holidayName: item.holidayName,
+          remark: '',
+        });
+      }
+    }
+
+    // 🔴 DELETE (อยู่ original แต่ไม่มีใน current)
+    for (const oldItem of original) {
+      const exists = currentMap.has(oldItem.id);
+
+      if (!exists) {
+        payload.holidays.push({
+          action: 'delete',
+          id: oldItem.id,
+        });
+      }
+    }
     console.log(payload);
-    // this.teamCalendarService.saveHoliday(payload).subscribe({
-    //   next: () => {
-    //     alert('Save Success');
 
-    //     this.closeHolidayModal();
+    this.masterService.manageHolidayMaster(payload).subscribe({
+      next: (res: any) => {
+        console.log(res);
 
-    //     this.getHoliday();
-    //   },
+        this.swalService.success('สำร็จ');
+        this.getHoliday();
+        this.isHolidayModalOpen.set(false);
+      },
 
-    //   error: (err) => {
-    //     console.error(err);
-    //   },
-    // });
+      error: (err) => {
+        console.error('Get Holiday Error : ', err);
+      },
+    });
   }
 
   closeHolidayModal(): void {
@@ -211,12 +310,26 @@ export class SettingHoliday {
   get defaultPickerValue(): Date {
     return new Date(this.selectedYear, 0, 1);
   }
+
+  isPastHoliday(date: Date | string): boolean {
+    const d = new Date(date);
+    const today = new Date();
+
+    d.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return d < today;
+  }
+
+  isLockedRow(item: any): boolean {
+    return this.isEditMode && this.isPastHoliday(item.holidayDate);
+  }
 }
 
 interface Holiday {
   id: number;
   year: number;
-  holidayDate: string;
+  holidayDate: Date;
   holidayName: string;
   description: string;
   createdBy: string;
