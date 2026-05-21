@@ -68,7 +68,12 @@ export class ApprovalAllowanceComponent implements OnInit {
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
   approvals = signal<any[]>([]);
-  summary = signal<{ pending: number; approved: number; rejected: number; referredBack: number } | null>(null);
+  summary = signal<{
+    pending: number;
+    approved: number;
+    rejected: number;
+    referredBack: number;
+  } | null>(null);
   showExportMenu = signal<boolean>(false);
   listing = createListingState();
   medicalTabs = APPROVAL_STATUS_TABS;

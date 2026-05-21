@@ -307,7 +307,9 @@
                   placeholder="ระบุรายละเอียด..."
                   [class.is-invalid]="log.selected && !log.description"
                   (ngModelChange)="onInputChange(log)"
-                  [readonly]="(MODE_EDIT && requests?.status !== 'Referred Back') || !log.isEligible"
+                  [readonly]="
+                    (MODE_EDIT && requests?.status !== 'Referred Back') || !log.isEligible
+                  "
                 />
               </div>
             </div>
