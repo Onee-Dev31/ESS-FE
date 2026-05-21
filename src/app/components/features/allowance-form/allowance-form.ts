@@ -130,11 +130,23 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         selected: true,
         description: item.description,
         shiftCode: item.shift_code,
+        shiftStart: item.scheduled_start,
+        shiftEnd: item.scheduled_end,
         isEligible: true,
         totalHoursText: item.total_hours_text,
         rateId: item.rate_id,
       } as AllowanceItem;
     });
+  }
+
+  dayTypeLabel(code: string | undefined): string {
+    const map: Record<string, string> = {
+      W: 'วันทำงานปกติ',
+      H: 'วันหยุด',
+      T: 'วันหยุดประเพณี',
+      L: 'วันลา',
+    };
+    return code ? (map[code] ?? code) : '-';
   }
 
   formatDuration(hours: number): string {
@@ -218,6 +230,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             selected: false,
             description: '',
             shiftCode: item.shift_code,
+            shiftStart: item.scheduled_start,
+            shiftEnd: item.scheduled_end,
             isEligible: eligible,
             totalHoursText: item.total_hours_text,
             rateId: item.rate_id,
