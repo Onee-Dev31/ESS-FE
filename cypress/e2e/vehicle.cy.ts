@@ -234,4 +234,25 @@ describe('Vehicle', () => {
       }
     });
   });
+
+  it('mobile viewport แสดงหน้า vehicle ถูกต้อง', () => {
+    cy.viewport('iphone-6');
+    cy.contains('รายการเบิกค่าพาหนะ').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('sort column header สองครั้งแล้ว sort icon เปลี่ยนเป็น desc', () => {
+    cy.viewport(1800, 900);
+    cy.get('body').then(($body) => {
+      if ($body.find('thead .sortable-header').length > 0) {
+        cy.get('thead .sortable-header').first().click();
+        cy.get('thead .sortable-header').first().click();
+        cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
+      }
+    });
+  });
+
+  it('vehicle page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
 });
