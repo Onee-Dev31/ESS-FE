@@ -179,6 +179,15 @@
                   </button>
                   <button
                     type="button"
+                    class="act-btn act-refer"
+                    title="ส่งกลับแก้ไข"
+                    *ngIf="req.rawStatus === 'pending'"
+                    (click)="openActionModal(req, 'Referred Back')"
+                  >
+                    <i class="fas fa-undo"></i>
+                  </button>
+                  <button
+                    type="button"
                     class="act-btn act-reject"
                     title="ไม่อนุมัติ"
                     *ngIf="req.rawStatus === 'pending'"
@@ -191,11 +200,19 @@
             </div>
           }
         } @empty {
-          <app-empty-state
-            title="ไม่พบรายการ"
-            description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-            icon="fas fa-inbox"
-          ></app-empty-state>
+          @if (showResubmitHint) {
+            <app-empty-state
+              title="ไม่มีรายการรออนุมัติในขณะนี้"
+              description="มีรายการที่พนักงานส่งคืนแล้ว แต่อยู่ระหว่างรอผู้อนุมัติลำดับแรกก่อน — กดแท็บ 'Referred Back' เพื่อดูรายการเหล่านั้น"
+              icon="fas fa-hourglass-half"
+            ></app-empty-state>
+          } @else {
+            <app-empty-state
+              title="ไม่พบรายการ"
+              description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+              icon="fas fa-inbox"
+            ></app-empty-state>
+          }
         }
       }
     </div>
@@ -287,12 +304,21 @@
                       @if (req.rawStatus === 'pending') {
                         <button
                           class="act-btn act-approve"
+                          title="อนุมัติ"
                           (click)="openActionModal(req, 'Approved')"
                         >
                           <i class="fas fa-check"></i>
                         </button>
                         <button
+                          class="act-btn act-refer"
+                          title="ส่งกลับแก้ไข"
+                          (click)="openActionModal(req, 'Referred Back')"
+                        >
+                          <i class="fas fa-undo"></i>
+                        </button>
+                        <button
                           class="act-btn act-reject"
+                          title="ไม่อนุมัติ"
                           (click)="openActionModal(req, 'Rejected')"
                         >
                           <i class="fas fa-times"></i>
@@ -305,11 +331,19 @@
             } @empty {
               <tr>
                 <td colspan="9">
-                  <app-empty-state
-                    title="ไม่พบรายการ"
-                    description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
-                    icon="fas fa-inbox"
-                  ></app-empty-state>
+                  @if (showResubmitHint) {
+                    <app-empty-state
+                      title="ไม่มีรายการรออนุมัติในขณะนี้"
+                      description="มีรายการที่พนักงานส่งคืนแล้ว แต่อยู่ระหว่างรอผู้อนุมัติลำดับแรกก่อน — กดแท็บ 'Referred Back' เพื่อดูรายการเหล่านั้น"
+                      icon="fas fa-hourglass-half"
+                    ></app-empty-state>
+                  } @else {
+                    <app-empty-state
+                      title="ไม่พบรายการ"
+                      description="ไม่พบรายการที่ตรงกับเงื่อนไขการค้นหา"
+                      icon="fas fa-inbox"
+                    ></app-empty-state>
+                  }
                 </td>
               </tr>
             }

@@ -31,7 +31,8 @@
               (ngModelChange)="listing.filterStatus.set($event)"
             >
               <nz-option nzLabel="ทั้งหมด" nzValue="" />
-              <nz-option nzLabel="คำขอใหม่" nzValue="New" />
+              <nz-option nzLabel="Pending" nzValue="Pending" />
+              <nz-option nzLabel="ส่งกลับแก้ไข" nzValue="Referred Back" />
               <nz-option nzLabel="อนุมัติแล้ว" nzValue="Approved" />
             </nz-select>
           </div>
@@ -77,7 +78,7 @@
                 <span class="status-badge" [ngStyle]="getStatusClass(claim.status)">
                   {{ claim.status | statusLabel }}
                 </span>
-                @if (claim.status === 'New') {
+                @if (claim.status === 'Referred Back') {
                   <button
                     class="btn-icon edit"
                     (click)="$event.stopPropagation(); editRequest(claim.id)"
@@ -174,7 +175,7 @@
                   </div>
                 </td>
                 <td class="text-center" (click)="$event.stopPropagation()">
-                  @if (claim.status === 'New') {
+                  @if (claim.status === 'Referred Back') {
                     <div class="action-btns">
                       <button
                         class="btn-icon edit mr-10"
