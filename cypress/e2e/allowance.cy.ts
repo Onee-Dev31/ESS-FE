@@ -238,4 +238,20 @@ describe('Allowance', () => {
       }
     });
   });
+
+  it('modal form มีปุ่ม btn-close-modal เพื่อปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-allowance-form').should('be.visible');
+    cy.get('app-allowance-form .btn-close-modal').should('exist');
+  });
+
+  it('mobile viewport แสดงหน้า allowance ถูกต้อง', () => {
+    cy.viewport('iphone-6');
+    cy.contains('รายการเบิกเบี้ยเลี้ยง').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('allowance page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
 });

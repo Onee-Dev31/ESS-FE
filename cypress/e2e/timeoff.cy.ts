@@ -187,4 +187,28 @@ describe('Timeoff', () => {
       }
     });
   });
+
+  it('mobile viewport ยังแสดง btn-create', () => {
+    cy.viewport('iphone-6');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('ค้นหาแล้วกด clear แล้วค้นหาใหม่ได้', () => {
+    cy.get('.search-input-group .form-control').type('ไม่พบ_xyz');
+    cy.get('app-empty-state').should('be.visible');
+    cy.get('.btn-clear').click();
+    cy.get('.search-input-group .form-control').should('have.value', '');
+    cy.get('.search-input-group .form-control').type('ไม่พบอีกครั้ง_abc');
+    cy.get('app-empty-state').should('be.visible');
+  });
+
+  it('timeoff page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('form มี section heading อย่างน้อย 2 รายการ เมื่อเปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .section-heading').should('have.length.at.least', 2);
+  });
 });

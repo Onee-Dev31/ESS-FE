@@ -168,4 +168,29 @@ describe('Login', () => {
     cy.get('#username').should('have.attr', 'placeholder', 'Enter your username');
     cy.get('#password').should('have.attr', 'placeholder', 'Enter your password');
   });
+
+  it('กรอก username+password แล้ว clear username ออก ปุ่ม Login กลับมา disabled', () => {
+    cy.get('#username').type(Cypress.env('username'));
+    cy.get('#password').type(Cypress.env('password'));
+    cy.get('.login-button').should('not.be.disabled');
+    cy.get('#username').clear();
+    cy.get('.login-button').should('be.disabled');
+  });
+
+  it('Login API server error (500) แล้วหน้า login ยังแสดงอยู่', () => {
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 500,
+      body: { message: 'Internal Server Error' },
+    }).as('loginServerError');
+    cy.get('#username').type(Cypress.env('username'));
+    cy.get('#password').type(Cypress.env('password'));
+    cy.get('.login-button').click();
+    cy.wait('@loginServerError');
+    cy.url().should('include', '/login');
+  });
+
+  it('กด Enter ใน username field ที่มีแค่ username (ไม่มี password) ต้องไม่ redirect ออกจาก login', () => {
+    cy.get('#username').type(`${Cypress.env('username')}{enter}`);
+    cy.url().should('include', '/login');
+  });
 });

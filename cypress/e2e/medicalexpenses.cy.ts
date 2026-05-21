@@ -186,4 +186,18 @@ describe('Medical Expenses', () => {
       }
     });
   });
+
+  it('mobile viewport แสดงหน้า medicalexpenses ถูกต้อง', () => {
+    cy.viewport('iphone-6');
+    cy.contains('รายการเบิกค่ารักษาพยาบาล').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('medicalexpenses page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('search field แสดง placeholder "ค้นหา..." ในส่วน filter', () => {
+    cy.get('input[placeholder="ค้นหา..."]').should('be.visible');
+  });
 });

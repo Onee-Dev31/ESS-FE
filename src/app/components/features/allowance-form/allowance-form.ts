@@ -78,8 +78,10 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.getRates();
     if (!this.requests) {
       this.loadData();
+    } else {
+      // edit mode: ข้อมูลมาจาก mapData() แล้ว ไม่ต้องรอ getRates() ก่อนแสดง form
+      this.isLoading = false;
     }
-    console.log(this.requests);
   }
 
   ngOnChanges(changes: SimpleChanges) {
