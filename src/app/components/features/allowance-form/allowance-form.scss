@@ -601,6 +601,12 @@
       color: $text-sub;
     }
 
+    .shift-time {
+      font-size: 10px;
+      color: $text-muted;
+      margin-top: 2px;
+    }
+
     .highlight-row td {
       background-color: rgba($warning, 0.05) !important;
     }
@@ -761,6 +767,12 @@
           font-size: 0.75rem;
           color: $text-sub;
           margin-bottom: 4px;
+        }
+
+        .shift-time {
+          font-size: 0.7rem;
+          color: $text-muted;
+          margin-top: 2px;
         }
 
         .val {

@@ -192,13 +192,16 @@
                 </td>
                 <td
                   class="text-center bg-gray"
-                  [class.holiday-label]="log.dayType === 'H'"
+                  [class.holiday-label]="log.dayType === 'H' || log.dayType === 'T'"
                   [class.regular-label]="log.dayType === 'W'"
                 >
-                  {{ log.dayType }}
+                  ({{ log.dayType }} = {{ dayTypeLabel(log.dayType) }})
                 </td>
                 <td class="text-center bg-gray shift-code">
-                  {{ log.shiftCode }}
+                  <div>{{ log.shiftCode }}</div>
+                  @if (log.shiftStart && log.shiftEnd) {
+                    <div class="shift-time">{{ log.shiftStart }}-{{ log.shiftEnd }}</div>
+                  }
                 </td>
                 <td class="p-0">
                   <input
@@ -261,15 +264,23 @@
                 <div class="date-info">
                   <span
                     class="day-dot"
-                    [style.background]="log.dayType === 'H' ? 'var(--danger)' : 'var(--primary)'"
+                    [style.background]="
+                      log.dayType === 'H' || log.dayType === 'T'
+                        ? 'var(--danger)'
+                        : 'var(--primary)'
+                    "
                   ></span>
                   <span class="date">{{
                     dateUtil.formatDateToBE(log.date, 'ddd. DD/MM/YYYY')
                   }}</span>
                   <span
                     class="day-type"
-                    [style.color]="log.dayType === 'H' ? 'var(--danger)' : 'var(--text-muted)'"
-                    >({{ log.dayType }})</span
+                    [style.color]="
+                      log.dayType === 'H' || log.dayType === 'T'
+                        ? 'var(--danger)'
+                        : 'var(--text-muted)'
+                    "
+                    >({{ log.dayType }} = {{ dayTypeLabel(log.dayType) }})</span
                   >
                 </div>
                 <label class="sr-only-label">
@@ -289,6 +300,9 @@
                 <div class="grid-item">
                   <label>รหัสกะ</label>
                   <div class="val">{{ log.shiftCode || '-' }}</div>
+                  @if (log.shiftStart && log.shiftEnd) {
+                    <div class="shift-time">{{ log.shiftStart }}-{{ log.shiftEnd }}</div>
+                  }
                 </div>
                 <div class="grid-item">
                   <label>เวลา เข้า - ออก</label>

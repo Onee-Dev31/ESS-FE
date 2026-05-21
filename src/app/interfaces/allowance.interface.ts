@@ -10,6 +10,8 @@ export interface AllowanceItem {
   amount: number;
   selected: boolean;
   shiftCode?: string;
+  shiftStart?: string;
+  shiftEnd?: string;
   displayHours?: string;
   actualExtraHours?: number;
   isEligible?: boolean;
