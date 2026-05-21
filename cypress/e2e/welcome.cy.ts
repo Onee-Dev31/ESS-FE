@@ -25,4 +25,46 @@ describe('Welcome', () => {
   it('divider แสดงระหว่าง subtitle และ instruction', () => {
     cy.get('.divider').should('exist');
   });
+
+  it('เข้า /welcome โดยไม่ login แล้ว redirect ไป /login', () => {
+    cy.clearLocalStorage();
+    cy.visit('/welcome');
+    cy.url().should('include', '/login');
+  });
+
+  it('URL อยู่ที่ /welcome หลัง login', () => {
+    cy.url().should('include', '/welcome');
+  });
+
+  it('welcome page แสดงถูกต้องบน mobile viewport', () => {
+    cy.viewport('iphone-6');
+    cy.get('.welcome-title').should('be.visible');
+    cy.get('.subtitle').should('be.visible');
+  });
+
+  it('welcome page ไม่มี app-error-state', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('welcome page แสดงถูกต้องบน tablet viewport', () => {
+    cy.viewport('ipad-2');
+    cy.get('.welcome-title').should('be.visible');
+    cy.get('.subtitle').should('be.visible');
+  });
+
+  it('sidebar หรือ nav แสดงขึ้นหลัง login', () => {
+    cy.get('app-sidenav, nav, .sidebar, .side-menu').should('exist');
+  });
+
+  it('welcome page ไม่แสดง .login-button', () => {
+    cy.get('.login-button').should('not.exist');
+  });
+
+  it('welcome page ไม่แสดง .qr-section', () => {
+    cy.get('.qr-section').should('not.exist');
+  });
+
+  it('welcome page ไม่แสดง app-error-state หรือ error message', () => {
+    cy.get('.alert-danger, .error-toast').should('not.exist');
+  });
 });

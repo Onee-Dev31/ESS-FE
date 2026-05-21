@@ -109,4 +109,106 @@ describe('Timeoff', () => {
     cy.get('thead .sortable-header').first().find('.fa-sort-amount-down-alt').should('exist');
     cy.get('thead .sortable-header').first().find('.fa-sort').should('not.exist');
   });
+
+  it('form มีปุ่ม ส่งใบลา สำหรับยืนยันการลา', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form .btn-save-custom').should('exist');
+  });
+
+  it('form แสดง section heading "เลือกประเภทการลา" เมื่อเปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .section-heading').first().should('contain', 'เลือกประเภทการลา');
+  });
+
+  it('filter ตามสถานะ APPROVED แล้วแสดงเฉพาะรายการที่อนุมัติแล้ว', () => {
+    cy.get('.select-status').select('APPROVED');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อนุมัติแล้ว|Approved/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('date filter สามารถกรอก start และ end date ได้', () => {
+    cy.get('.date-input-group .form-control')
+      .first()
+      .invoke('val', '2025-01-01')
+      .trigger('change')
+      .should('have.value', '2025-01-01');
+    cy.get('.date-input-group .form-control')
+      .last()
+      .invoke('val', '2025-12-31')
+      .trigger('change')
+      .should('have.value', '2025-12-31');
+  });
+
+  it('filter ตามสถานะ NEW แล้วแสดงเฉพาะรายการใหม่', () => {
+    cy.get('.select-status').select('NEW');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /คำขอใหม่|New/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('filter ตามสถานะ PENDING_APPROVAL แล้วแสดงเฉพาะรายการที่รออนุมัติ', () => {
+    cy.get('.select-status').select('PENDING_APPROVAL');
+    cy.wait(500);
+    cy.get('body').then(($body) => {
+      if ($body.find('.status-badge').length > 0) {
+        cy.get('.status-badge').each(($badge) => {
+          cy.wrap($badge).invoke('text').invoke('trim').should('match', /อยู่ระหว่างการอนุมัติ|Pending/);
+        });
+      } else {
+        cy.get('app-empty-state').should('be.visible');
+      }
+    });
+  });
+
+  it('ลบรายการสถานะ New แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim();
+      if (statusText === 'คำขอใหม่' || statusText === 'New') {
+        cy.wrap($row).find('.btn-icon.delete').click({ force: true });
+        cy.get('.dialog-overlay').should('be.visible');
+        cy.get('.btn-cancel').click();
+        return false;
+      }
+    });
+  });
+
+  it('mobile viewport ยังแสดง btn-create', () => {
+    cy.viewport('iphone-6');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('ค้นหาแล้วกด clear แล้วค้นหาใหม่ได้', () => {
+    cy.get('.search-input-group .form-control').type('ไม่พบ_xyz');
+    cy.get('app-empty-state').should('be.visible');
+    cy.get('.btn-clear').click();
+    cy.get('.search-input-group .form-control').should('have.value', '');
+    cy.get('.search-input-group .form-control').type('ไม่พบอีกครั้ง_abc');
+    cy.get('app-empty-state').should('be.visible');
+  });
+
+  it('timeoff page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('form มี section heading อย่างน้อย 2 รายการ เมื่อเปิด modal', () => {
+    cy.get('.btn-create').click();
+    cy.get('app-time-off-form').should('be.visible');
+    cy.get('app-time-off-form .section-heading').should('have.length.at.least', 2);
+  });
 });

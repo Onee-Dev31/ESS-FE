@@ -139,4 +139,65 @@ describe('Medical Expenses', () => {
     cy.get('.btn-create').click();
     cy.get('app-medicalexpenses-form').should('be.visible');
   });
+
+  it('policy modal ปิดได้', () => {
+    cy.get('[title="ข้อมูลค่ารักษาพยาบาล/สวัสดิการ"]').click();
+    cy.get('app-medical-policy-modal').should('exist');
+    cy.get('app-medical-policy-modal').find('[title="ปิด"], .close-btn, .btn-close').first().click();
+    cy.get('app-medical-policy-modal').should('not.exist');
+  });
+
+  it('stat-card รอดำเนินการ แสดงตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .eq(1)
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /\d+/);
+  });
+
+  it('stat-card ยอดรวมที่ขอเบิก แสดงค่าตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .last()
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /[\d,.]+/);
+  });
+
+  it('stat-card อนุมัติแล้ว แสดงตัวเลข', () => {
+    cy.get('.stats-bar .stat-card')
+      .eq(2)
+      .find('.stat-value')
+      .invoke('text')
+      .should('match', /\d+/);
+  });
+
+  it('nz-range-picker แสดงในส่วน filter สำหรับเลือกช่วงเดือน', () => {
+    cy.get('nz-range-picker').should('exist');
+  });
+
+  it('ลบรายการ pending แล้ว confirm dialog ปรากฏ', () => {
+    cy.get('.modern-table tbody tr').each(($row): false | void => {
+      const statusText = $row.find('.status-badge').text().trim().toLowerCase();
+      if (statusText === 'pending') {
+        cy.wrap($row).find('.btn-icon.delete').click();
+        cy.get('.swal2-container').should('be.visible');
+        cy.get('.swal2-cancel').click();
+        return false;
+      }
+    });
+  });
+
+  it('mobile viewport แสดงหน้า medicalexpenses ถูกต้อง', () => {
+    cy.viewport('iphone-6');
+    cy.contains('รายการเบิกค่ารักษาพยาบาล').should('be.visible');
+    cy.get('.btn-create').should('exist');
+  });
+
+  it('medicalexpenses page ไม่แสดง app-error-state เมื่อโหลดหน้าปกติ', () => {
+    cy.get('app-error-state').should('not.exist');
+  });
+
+  it('search field แสดง placeholder "ค้นหา..." ในส่วน filter', () => {
+    cy.get('input[placeholder="ค้นหา..."]').should('be.visible');
+  });
 });

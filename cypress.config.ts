@@ -1,6 +1,10 @@
 import { defineConfig } from 'cypress';
 require('dotenv').config();
-const { setupSheet, uploadSpecResults } = require('./scripts/upload-cypress-results');
+const {
+  setupSheet,
+  uploadSpecResults,
+  finalizeSheet,
+} = require('./scripts/upload-cypress-results');
 
 export default defineConfig({
   e2e: {
@@ -18,6 +22,9 @@ export default defineConfig({
       });
       on('after:spec', async (_spec, results) => {
         await uploadSpecResults(_spec, results);
+      });
+      on('after:run', async () => {
+        await finalizeSheet();
       });
     },
   },

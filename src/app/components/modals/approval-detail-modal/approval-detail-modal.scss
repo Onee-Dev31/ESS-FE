@@ -121,6 +121,10 @@
 
       .btn-action-orange {
         background: var(--orange);
+
+        &:hover {
+          background: color-mix(in srgb, var(--orange) 100%, var(--text-reverse) 20%);
+        }
       }
 
       @include mobile {
@@ -769,6 +773,24 @@
 
     &:hover {
       background: color-mix(in srgb, var(--red) 100%, var(--text-reverse) 20%);
+    }
+  }
+
+  .btn-action-orange {
+    @include btn-outline;
+    min-width: 120px;
+
+    @include mobile {
+      width: 100%;
+    }
+
+    border: none;
+    color: #ffffff;
+
+    background: var(--orange);
+
+    &:hover {
+      background: color-mix(in srgb, var(--orange) 100%, var(--text-reverse) 20%);
     }
   }
 }

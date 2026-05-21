@@ -78,8 +78,10 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
     this.getRates();
     if (!this.requests) {
       this.loadData();
+    } else {
+      // edit mode: ข้อมูลมาจาก mapData() แล้ว ไม่ต้องรอ getRates() ก่อนแสดง form
+      this.isLoading = false;
     }
-    console.log(this.requests);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -303,7 +305,11 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         })
         .subscribe({
           next: () => {
-            this.swalService.success('แก้ไขใบเบิกสำเร็จ');
+            const msg =
+              this.requests?.status === 'Referred Back'
+                ? 'ส่งคืนสำเร็จ ระบบเริ่มกระบวนการอนุมัติใหม่และแจ้งเตือนผู้อนุมัติทางอีเมลแล้ว'
+                : 'แก้ไขใบเบิกสำเร็จ';
+            this.swalService.success(msg);
             this.closeModal();
           },
           error: () => this.swalService.error('เกิดข้อผิดพลาดในการแก้ไข'),
