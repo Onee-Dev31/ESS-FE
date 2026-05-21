@@ -172,6 +172,13 @@ export const routes: Routes = [
         data: { animation: 'Dashboard' },
       },
       {
+        path: 'holiday-setting',
+        loadComponent: () =>
+          import('./pages/setting-holiday/setting-holiday').then((m) => m.SettingHoliday),
+        // canActivate: [menuGuard],
+        data: { animation: 'Dashboard' },
+      },
+      {
         path: 'approval-it-request',
         loadComponent: () =>
           import('./pages/approval-it-request/approval-it-request').then(

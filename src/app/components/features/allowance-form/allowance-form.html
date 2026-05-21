@@ -105,6 +105,10 @@
         </section>
       </div>
 
+      <div>W - เวลาทำงานปกติ</div>
+      <div>H - วันหยุด</div>
+      <div>T - วันหยุดประเพณี</div>
+
       @if (isPolicyPopupOpen()) {
         <div class="policy-popup-overlay" (click)="isPolicyPopupOpen.set(false)">
           <div class="policy-popup-content" (click)="$event.stopPropagation()">

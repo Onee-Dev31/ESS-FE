@@ -17,8 +17,16 @@ export class TeamCalendarService {
     // return this._http.get(`${this.baseUrl}?empId=OTV00609`);
   }
 
-  getHoliday(): Observable<any> {
-    return this._http.get(`${this.baseUrlEss}/Master/holiday`);
+  getHoliday(year?: string, search?: string): Observable<any> {
+    // return this._http.get(`${this.baseUrlEss}/Master/holiday`);
+    const queryParams: any = {};
+
+    if (year) queryParams.year = year;
+    if (search) queryParams.search = search;
+
+    return this._http.get(`${this.baseUrlEss}/Master/holiday`, {
+      params: queryParams,
+    });
   }
 
   getHolidayColor(): Observable<any> {

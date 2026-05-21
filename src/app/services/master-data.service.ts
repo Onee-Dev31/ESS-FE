@@ -126,4 +126,9 @@ export class MasterDataService {
   getRoleMaster(): Observable<any> {
     return this._http.get(`${this.baseUrl}/Master/roles/active`);
   }
+
+  manageHolidayMaster(payload: any): Observable<any> {
+    console.log(payload);
+    return this._http.post(`${this.baseUrl}/Master/manage-holiday`, payload);
+  }
 }
