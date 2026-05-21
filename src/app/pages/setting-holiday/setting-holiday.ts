@@ -10,6 +10,7 @@ import { EmptyStateComponent } from '../../components/shared/empty-state/empty-s
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { SwalService } from '../../services/swal.service';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-setting-holiday',
@@ -21,6 +22,7 @@ import { SwalService } from '../../services/swal.service';
     NzSelectModule,
     EmptyStateComponent,
     SkeletonComponent,
+    NzDatePickerModule,
   ],
   templateUrl: './setting-holiday.html',
   styleUrl: './setting-holiday.scss',
@@ -34,13 +36,14 @@ export class SettingHoliday {
 
   loading = signal(false);
   years: number[] = [];
+  futureYears: number[] = [];
   holidays = signal<any[]>([]);
 
   searchYear: number | null = new Date().getFullYear();
   searchHolidayName = '';
 
   isHolidayModalOpen = signal(false);
-  selectedYear = new Date().getFullYear();
+  selectedYear = new Date().getFullYear() + 1;
   holidayFormList = signal<any[]>([]);
 
   formData = {
@@ -52,6 +55,7 @@ export class SettingHoliday {
 
   ngOnInit(): void {
     this.generateYears();
+    this.generateFullYears();
     this.getHoliday();
   }
 
@@ -65,6 +69,19 @@ export class SettingHoliday {
 
     for (let y = start; y <= end; y++) {
       this.years.push(y);
+    }
+  }
+
+  generateFullYears(): void {
+    const currentYear = new Date().getFullYear();
+
+    const start = currentYear - -1;
+    const end = currentYear + 5;
+
+    this.futureYears = [];
+
+    for (let y = start; y <= end; y++) {
+      this.futureYears.push(y);
     }
   }
 
@@ -128,12 +145,12 @@ export class SettingHoliday {
   }
 
   copyPreviousYear(): void {
-    const previousYear = this.selectedYear - 1;
+    const previousYear = new Date().getFullYear();
 
     this.teamCalendarService.getHoliday(previousYear.toString()).subscribe({
       next: (res: any) => {
         const mapped = res.map((x: any) => {
-          const oldDate = new Date(x.holidayDate);
+          const oldDate = new Date(x.HOLIDAY_DATE);
 
           const newDate = new Date(oldDate);
 
@@ -142,10 +159,11 @@ export class SettingHoliday {
           return {
             id: crypto.randomUUID(),
             holidayDate: newDate.toISOString().split('T')[0],
-            holidayName: x.holidayName,
+            holidayName: x.HOLIDAY_NAME,
           };
         });
 
+        console.log(mapped);
         this.holidayFormList.set(mapped);
       },
 
@@ -182,6 +200,16 @@ export class SettingHoliday {
     this.isHolidayModalOpen.set(false);
 
     this.holidayFormList.set([]);
+  }
+
+  disableNotSelectedYear = (current: Date): boolean => {
+    if (!current) return false;
+
+    return current.getFullYear() !== this.selectedYear;
+  };
+
+  get defaultPickerValue(): Date {
+    return new Date(this.selectedYear, 0, 1);
   }
 }
 
