@@ -82,6 +82,7 @@ export class VehicleFormComponent implements OnInit, OnChanges {
         this.thaiMonths = config.months;
         this.years = config.years;
         this.isLoading = false;
+        this.cdr.detectChanges();
 
         if (!this.requests) {
           this.loadData();
