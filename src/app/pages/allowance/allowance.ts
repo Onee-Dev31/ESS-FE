@@ -7,6 +7,7 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AllowanceFormComponent } from '../../components/features/allowance-form/allowance-form';
@@ -78,6 +79,7 @@ export class AllowanceComponent implements OnInit {
   private allowanceService = inject(AllowanceService);
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
 
@@ -103,7 +105,15 @@ export class AllowanceComponent implements OnInit {
     this.i18n.setLocale(en_US);
   }
 
+  private pendingOpenVoucherNo: string | null = null;
+
   ngOnInit() {
+    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo');
+    if (voucherNo) {
+      this.pendingOpenVoucherNo = voucherNo;
+      this.listing.filterStatus.set('');
+      this.listing.searchText.set(voucherNo);
+    }
     this.loadData();
   }
 
@@ -138,8 +148,14 @@ export class AllowanceComponent implements OnInit {
 
   private dataFromApi(res: any) {
     const items = res.data ?? [];
-    // console.log(res)
     this.allRequests.set(this.mapApiData(items));
+    if (this.pendingOpenVoucherNo) {
+      const match = this.allRequests().find((r) => r.claimNo === this.pendingOpenVoucherNo);
+      if (match) {
+        this.pendingOpenVoucherNo = null;
+        this.openModal(match.id);
+      }
+    }
 
     this.listing.totalItems.set(res.pagination.total ?? 0);
     this.listing.totalPages.set(res.pagination.totalPages ?? 1);

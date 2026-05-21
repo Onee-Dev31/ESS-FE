@@ -52,6 +52,18 @@
             </div>
           </div>
         </section>
+        <!-- referred back reason -->
+        <div
+          class="alert-referred-back"
+          *ngIf="MODE_EDIT && requests.status === 'Referred Back' && referredBackReason"
+        >
+          <i class="fas fa-exclamation-circle"></i>
+          <div>
+            <strong>เหตุผลที่ส่งกลับแก้ไข:</strong>
+            <span>{{ referredBackReason }}</span>
+          </div>
+        </div>
+
         <!-- update -->
         <section class="filter-controls" *ngIf="MODE_EDIT && requests.status === 'Referred Back'">
           <div class="alert-delete" *ngIf="isDelete()">

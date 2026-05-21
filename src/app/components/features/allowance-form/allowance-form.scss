@@ -887,3 +887,31 @@
     top: -0.1px;
   }
 }
+
+.alert-referred-back {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  color: #92400e;
+
+  i {
+    color: #d97706;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  span {
+    font-size: 13px;
+  }
+}

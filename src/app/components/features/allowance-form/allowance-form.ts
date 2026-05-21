@@ -71,6 +71,21 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   MODE_EDIT: boolean = false;
   isLoading = true;
 
+  get referredBackReason(): string {
+    const raw = this.requests?.approvals_json;
+    if (!raw) return this.requests?.rejectionReason ?? '';
+    try {
+      const steps = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!Array.isArray(steps)) return '';
+      for (const step of steps) {
+        if (step.remark?.startsWith('ส่งกลับแก้ไข:')) {
+          return step.remark.replace('ส่งกลับแก้ไข:', '').trim();
+        }
+      }
+    } catch {}
+    return '';
+  }
+
   isPolicyPopupOpen = signal(false);
   rates = signal<MealAllowanceRate[]>([]);
 

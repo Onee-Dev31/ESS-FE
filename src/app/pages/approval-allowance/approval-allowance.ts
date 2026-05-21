@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
 import { ToastService } from '../../services/toast';
@@ -47,6 +48,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -67,6 +69,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   selectedItem = signal<ApprovalItem | null>(null);
   initialAction = signal<'Approved' | 'Rejected' | 'Referred Back' | null>(null);
 
+  linkedVoucherNo = signal<string | null>(null);
   approvals = signal<any[]>([]);
   summary = signal<{
     pending: number;
@@ -83,6 +86,8 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   ngOnInit() {
+    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo');
+    if (voucherNo) this.linkedVoucherNo.set(voucherNo);
     this.loadAllowanceClaims();
   }
 
@@ -178,8 +183,17 @@ export class ApprovalAllowanceComponent implements OnInit {
     this.listing.currentPage.set(0);
   }
 
+  get showEmailResubmitHint(): boolean {
+    return (
+      this.listing.filterStatus() === 'Pending' &&
+      this.comps.paginatedData().length === 0 &&
+      this.linkedVoucherNo() !== null
+    );
+  }
+
   get showResubmitHint(): boolean {
     return (
+      !this.showEmailResubmitHint &&
       this.listing.filterStatus() === 'Pending' &&
       this.comps.paginatedData().length === 0 &&
       (this.summary()?.referredBack ?? 0) > 0

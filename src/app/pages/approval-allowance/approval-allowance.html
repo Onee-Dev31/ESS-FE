@@ -200,7 +200,13 @@
             </div>
           }
         } @empty {
-          @if (showResubmitHint) {
+          @if (showEmailResubmitHint) {
+            <app-empty-state
+              title="ใบเบิก {{ linkedVoucherNo() }} ได้รับการแก้ไขและส่งคืนแล้ว"
+              description="ขณะนี้อยู่ระหว่างรอผู้อนุมัติขั้นตอนแรก ระบบจะแจ้งให้คุณทราบอีกครั้งเมื่อถึงขั้นตอนของคุณ"
+              icon="fas fa-hourglass-half"
+            ></app-empty-state>
+          } @else if (showResubmitHint) {
             <app-empty-state
               title="ไม่มีรายการรออนุมัติในขณะนี้"
               description="มีรายการที่พนักงานส่งคืนแล้ว แต่อยู่ระหว่างรอผู้อนุมัติลำดับแรกก่อน — กดแท็บ 'Referred Back' เพื่อดูรายการเหล่านั้น"
