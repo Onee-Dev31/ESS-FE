@@ -71,6 +71,21 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   MODE_EDIT: boolean = false;
   isLoading = true;
 
+  get referredBackReason(): string {
+    const raw = this.requests?.approvals_json;
+    if (!raw) return this.requests?.rejectionReason ?? '';
+    try {
+      const steps = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      if (!Array.isArray(steps)) return '';
+      for (const step of steps) {
+        if (step.remark?.startsWith('ส่งกลับแก้ไข:')) {
+          return step.remark.replace('ส่งกลับแก้ไข:', '').trim();
+        }
+      }
+    } catch {}
+    return '';
+  }
+
   isPolicyPopupOpen = signal(false);
   rates = signal<MealAllowanceRate[]>([]);
 
@@ -115,11 +130,23 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
         selected: true,
         description: item.description,
         shiftCode: item.shift_code,
+        shiftStart: item.scheduled_start,
+        shiftEnd: item.scheduled_end,
         isEligible: true,
         totalHoursText: item.total_hours_text,
         rateId: item.rate_id,
       } as AllowanceItem;
     });
+  }
+
+  dayTypeLabel(code: string | undefined): string {
+    const map: Record<string, string> = {
+      W: 'วันทำงานปกติ',
+      H: 'วันหยุด',
+      T: 'วันหยุดประเพณี',
+      L: 'วันลา',
+    };
+    return code ? (map[code] ?? code) : '-';
   }
 
   formatDuration(hours: number): string {
@@ -203,6 +230,8 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
             selected: false,
             description: '',
             shiftCode: item.shift_code,
+            shiftStart: item.scheduled_start,
+            shiftEnd: item.scheduled_end,
             isEligible: eligible,
             totalHoursText: item.total_hours_text,
             rateId: item.rate_id,
