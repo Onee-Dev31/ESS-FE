@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { inject } from '@angular/core';
@@ -61,6 +61,12 @@ export class SettingHoliday {
     holidayName: '',
     description: '',
   };
+
+  mode: 'manual' | 'excel' = 'manual';
+  selectedExcelFile: File | null = null;
+
+  @ViewChild('fileInput')
+  fileInput!: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     this.generateYears();
@@ -135,8 +141,6 @@ export class SettingHoliday {
 
     this.holidayFormList.set([]);
 
-    this.addHolidayRow();
-
     this.isHolidayModalOpen.set(true);
   }
 
@@ -171,10 +175,11 @@ export class SettingHoliday {
 
   addHolidayRow(): void {
     const data = this.holidayFormList();
+    const selectedYear = Number(this.selectedYear);
 
     data.push({
       id: crypto.randomUUID(),
-      holidayDate: '',
+      holidayDate: new Date(selectedYear, 0, 1), // 1 Jan ของปีที่เลือก
       holidayName: '',
     });
 
@@ -285,26 +290,43 @@ export class SettingHoliday {
         console.log(res);
 
         this.swalService.success('สำร็จ');
+        this.resetHolidayForm();
+
+        this.closeHolidayModal();
+
         this.getHoliday();
-        this.isHolidayModalOpen.set(false);
       },
 
       error: (err) => {
         console.error('Get Holiday Error : ', err);
+        this.swalService.warning(err.error.message);
       },
     });
   }
 
   closeHolidayModal(): void {
-    this.isHolidayModalOpen.set(false);
+    this.resetHolidayForm();
 
-    this.holidayFormList.set([]);
+    this.isHolidayModalOpen.set(false);
   }
 
   disableNotSelectedYear = (current: Date): boolean => {
-    if (!current) return false;
+    if (!current) {
+      return false;
+    }
 
-    return current.getFullYear() !== this.selectedYear;
+    const selectedYear = Number(this.selectedYear);
+
+    const currentYear = dayjs(current).year();
+
+    // ห้ามเลือกปีอื่น
+    const invalidYear = currentYear !== selectedYear;
+
+    // ห้ามเลือกวันย้อนหลัง
+    const today = dayjs().startOf('day');
+    const isPastDate = dayjs(current).isBefore(today);
+
+    return invalidYear || isPastDate;
   };
 
   get defaultPickerValue(): Date {
@@ -312,6 +334,10 @@ export class SettingHoliday {
   }
 
   isPastHoliday(date: Date | string): boolean {
+    if (!date) {
+      return false;
+    }
+
     const d = new Date(date);
     const today = new Date();
 
@@ -323,6 +349,169 @@ export class SettingHoliday {
 
   isLockedRow(item: any): boolean {
     return this.isEditMode && this.isPastHoliday(item.holidayDate);
+  }
+
+  getValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    const holidays = this.holidayFormList();
+
+    // check required
+    holidays.forEach((item, index) => {
+      if (!item.holidayDate) {
+        errors.push(`รายการที่ ${index + 1} กรุณาเลือกวันที่`);
+      }
+
+      if (!item.holidayName || !item.holidayName.trim()) {
+        errors.push(`รายการที่ ${index + 1} กรุณากรอกรายละเอียดวันหยุด`);
+      }
+    });
+
+    // check duplicate date
+    const dateMap = new Map<string, number[]>();
+
+    holidays.forEach((item, index) => {
+      if (!item.holidayDate) return;
+
+      const date = dayjs(item.holidayDate).format('YYYY-MM-DD');
+
+      if (!dateMap.has(date)) {
+        dateMap.set(date, []);
+      }
+
+      dateMap.get(date)?.push(index + 1);
+    });
+
+    dateMap.forEach((rows) => {
+      if (rows.length > 1) {
+        errors.push(`วันที่ซ้ำกันในรายการ ${rows.join(', ')}`);
+      }
+    });
+
+    return errors;
+  }
+
+  isSaveDisabled(): boolean {
+    // manual mode
+    if (this.mode === 'manual') {
+      return this.getValidationErrors().length !== 0 || this.holidayFormList().length === 0;
+    }
+
+    // excel mode
+    if (this.mode === 'excel') {
+      return !this.selectedExcelFile;
+    }
+
+    return true;
+  }
+
+  downloadTemplate(): void {
+    this.masterService.downloadHolidayTemplate(this.selectedYear.toString()).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+
+        a.href = url;
+
+        a.download = 'holiday-template.xlsx';
+
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      },
+
+      error: () => {
+        console.error('ไม่สามารถดาวน์โหลด Template ได้');
+      },
+    });
+  }
+
+  onUploadExcel(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      this.swalService.warning('กรุณาเลือกไฟล์ Excel เท่านั้น');
+
+      return;
+    }
+
+    this.selectedExcelFile = file;
+  }
+
+  importHolidayExcel(): void {
+    if (!this.selectedExcelFile) {
+      this.swalService.warning('กรุณาเลือกไฟล์ Excel');
+
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('File', this.selectedExcelFile);
+    formData.append('Year', this.selectedYear.toString());
+    formData.append('CreatedBy', this.authService.userData().CODEMPID);
+
+    this.masterService.importHolidayExcel(formData).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.swalService.success('Import สำเร็จ');
+
+        this.selectedExcelFile = null;
+
+        this.resetHolidayForm();
+
+        this.closeHolidayModal();
+
+        this.getHoliday();
+      },
+
+      error: (err) => {
+        console.error(err?.error?.message || 'Import ไม่สำเร็จ');
+      },
+    });
+  }
+
+  onSubmitHoliday(): void {
+    if (this.mode === 'manual') {
+      this.saveHoliday();
+
+      return;
+    }
+
+    if (this.mode === 'excel') {
+      this.importHolidayExcel();
+      return;
+    }
+  }
+
+  resetHolidayForm(): void {
+    // reset table
+    this.holidayFormList.set([]);
+
+    // reset excel
+    this.selectedExcelFile = null;
+
+    // reset mode
+    this.mode = 'manual';
+
+    // reset year
+    this.selectedYear = new Date().getFullYear() + 1;
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 }
 
