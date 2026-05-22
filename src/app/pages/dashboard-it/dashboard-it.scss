@@ -1270,7 +1270,7 @@
     padding-right: 20px;
   }
 
-  span {
+  span:not(.category) {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--primary);
@@ -1287,6 +1287,14 @@
       color: var(--primary);
       color: color-mix(in srgb, var(--primary), var(--text) 30%);
     }
+  }
+
+  .category {
+    margin-left: 6px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: default;
   }
 
   .tk-pill {
@@ -1542,6 +1550,32 @@
   font-weight: 800;
 }
 
+.floating-chat__summary {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+
+  i {
+    font-size: 0.72rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
 .floating-chat__close {
   width: 30px;
   height: 30px;
@@ -1719,7 +1753,7 @@
 }
 
 .floating-chat__files {
-  padding: 0 14px 12px;
+  padding: 10px;
   background: var(--bg-card);
   display: flex;
   gap: 8px;

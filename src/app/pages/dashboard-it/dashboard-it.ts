@@ -551,6 +551,7 @@ export class DashboardIT implements OnInit {
         noteForIt: ticket.noteForIt,
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
+        ticketCategory: ticket.sub_category_name,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -900,6 +901,20 @@ export class DashboardIT implements OnInit {
     ]);
 
     this.isPreviewModalOpen.set(true);
+  }
+
+  getChatAttachments(ticket: any): any[] {
+    return (ticket?.itNotes ?? []).flatMap((note: any) => note.attachments ?? []);
+  }
+
+  getChatAttachmentCount(ticket: any): number {
+    return this.getChatAttachments(ticket).length;
+  }
+
+  openChatAttachments(ticket: any) {
+    const files = this.getChatAttachments(ticket);
+    if (files.length === 0) return;
+    this.openAllAttachments(files);
   }
 
   openAllAttachments(files: any) {

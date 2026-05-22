@@ -284,7 +284,10 @@
     "
   >
     <div class="tk-card__head">
-      <div class="tk-card__title"><i class="fa-solid fa-note-sticky"></i>Note for IT</div>
+      <div class="tk-card__title">
+        <i class="fa-solid fa-note-sticky"></i>Note for IT
+        <span class="category">[{{ t.ticketCategory }}]</span>
+      </div>
       <div class="btn-edit" (click)="openNoteForItModal()">
         <i class="fa-solid fa-pen-to-square"></i>
       </div>
@@ -409,6 +412,18 @@
           <div class="floating-chat__title">
             <i class="fa-solid fa-comments"></i>
             <span>Chat</span>
+            @if (getChatAttachmentCount(t) > 0) {
+              <button
+                class="floating-chat__summary"
+                type="button"
+                title="ดูไฟล์แนบในแชททั้งหมด"
+                aria-label="ดูไฟล์แนบในแชททั้งหมด"
+                (click)="openChatAttachments(t)"
+              >
+                <i class="fa-solid fa-paperclip"></i>
+                {{ getChatAttachmentCount(t) }} ไฟล์
+              </button>
+            }
           </div>
           <button
             class="floating-chat__close"
