@@ -92,11 +92,7 @@
                   <div class="profile-name">
                     <div class="profile">
                       <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          emp.empCode.trim() +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(emp.empCode.trim())"
                         (error)="onImgError($event)"
                       />
                     </div>
@@ -255,12 +251,7 @@
                 <td class="col-name">
                   <div class="profile-name">
                     <div class="profile">
-                      <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' + emp.empCode + '.jpg'
-                        "
-                        (error)="onImgError($event)"
-                      />
+                      <img [src]="getEmployeeImage(emp.empCode)" (error)="onImgError($event)" />
                     </div>
                     <div class="name-block">
                       <div class="fullname">
@@ -386,11 +377,7 @@
                   <div class="chip">
                     <div class="profile">
                       <img
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          selected.empCode.trim() +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(selected.empCode.trim())"
                         (error)="onImgError($event)"
                       />
                     </div>

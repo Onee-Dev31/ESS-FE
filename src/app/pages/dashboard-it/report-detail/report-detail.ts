@@ -22,6 +22,7 @@ import { DenyModal } from '../modal/deny-modal/deny-modal';
 import { AcknowledgeModal } from '../modal/acknowledge-modal/acknowledge-modal';
 import { AssignModal } from '../modal/assign-modal/assign-modal';
 import { SignalrService } from '../../../services/signalr.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-report-detail',
@@ -42,6 +43,10 @@ import { SignalrService } from '../../../services/signalr.service';
   styleUrl: './report-detail.scss',
 })
 export class ReportDetail {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
+
   StatusColor = StatusColor;
   StatusColor_Reverse = StatusColor_Reverse;
   Tickets = signal<any[]>(tickets);

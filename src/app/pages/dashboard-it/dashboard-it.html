@@ -88,9 +88,7 @@
         <div class="ticket-item-2">
           <div class="avatar">
             <img
-              [src]="
-                'https://empimg.oneeclick.co:8048/employeeimage/' + ticket.requesterEmpId + '.jpg'
-              "
+              [src]="getEmployeeImage(ticket.requesterEmpId)"
               alt="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
               title="รูปโปรไฟล์ของ {{ ticket.requesterName || ticket.ticketNumber }}"
               (error)="onImgError($event)"
@@ -214,7 +212,7 @@
     <div class="tk-hero__left">
       <div class="avatar">
         <img
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + t.requesterCode + '.jpg'"
+          [src]="getEmployeeImage(t.requesterCode)"
           alt="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           title="รูปโปรไฟล์ของผู้แจ้ง {{ t.requesterName }}"
           (error)="onImgError($event)"
@@ -448,11 +446,7 @@
                 <div class="note__who">
                   <div class="avatar">
                     <app-avatar-preview-modal
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        n.createBy.empCode +
-                        '.jpg'
-                      "
+                      [src]="getEmployeeImage(n.createBy.empCode)"
                       [name]="n.createBy.nickName"
                     />
                   </div>
@@ -557,7 +551,7 @@
     <div class="side-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          [src]="getEmployeeImage(requester.emp_code)"
           [name]="
             requester.nickname
               ? requester.fullname + ' (' + requester.nickname + ')'
@@ -644,7 +638,7 @@
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
-                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  [src]="getEmployeeImage(a.empCode)"
                   alt="รูปโปรไฟล์ของ {{ a.nickName }}"
                   title="รูปโปรไฟล์ของ {{ a.nickName }}"
                   (error)="onImgError($event)"
@@ -671,11 +665,7 @@
                   <div class="assignee-avatar">
                     <div class="side-avatar">
                       <app-avatar-preview-modal
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          selectedAssignee().empCode +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(selectedAssignee().empCode)"
                         [name]="
                           selectedAssignee().nickname
                             ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'

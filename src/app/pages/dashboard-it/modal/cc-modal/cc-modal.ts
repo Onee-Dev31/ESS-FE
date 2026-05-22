@@ -6,6 +6,7 @@ import {
 import dayjs from 'dayjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-cc-modal',
@@ -14,6 +15,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './cc-modal.scss',
 })
 export class CcModal {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
   @Input() ticket: any;
   @Input() isItDashboard: boolean = false;
   @Output() submitModal = new EventEmitter<any>();

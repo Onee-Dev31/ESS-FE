@@ -365,9 +365,7 @@
             <div class="note__who">
               <div class="avatar">
                 <app-avatar-preview-modal
-                  [src]="
-                    'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
-                  "
+                  [src]="getEmployeeImage(n.createBy.empCode)"
                   [name]="n.createBy.nickName"
                 />
               </div>
@@ -465,11 +463,7 @@
                 <div class="note__who">
                   <div class="avatar">
                     <app-avatar-preview-modal
-                      [src]="
-                        'https://empimg.oneeclick.co:8048/employeeimage/' +
-                        n.createBy.empCode +
-                        '.jpg'
-                      "
+                      [src]="getEmployeeImage(n.createBy.empCode)"
                       [name]="n.createBy.nickName"
                     />
                   </div>
@@ -599,7 +593,7 @@
     <div class="side-profile">
       <div class="side-avatar">
         <app-avatar-preview-modal
-          [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + requester.emp_code + '.jpg'"
+          [src]="getEmployeeImage(requester.emp_code)"
           [name]="
             requester.nickname
               ? requester.fullname + ' (' + requester.nickname + ')'
@@ -686,7 +680,7 @@
             <div class="assignee-item" *ngFor="let a of step.Assignee" (click)="selectAssignee(a)">
               <div class="avatar">
                 <img
-                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + a.empCode + '.jpg'"
+                  [src]="getEmployeeImage(a.empCode)"
                   alt="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   title="รูปโปรไฟล์ของ {{ a.nickName || 'ผู้รับผิดชอบ' }}"
                   (error)="onImgError($event)"
@@ -705,11 +699,7 @@
                   <div class="assignee-avatar">
                     <div class="side-avatar">
                       <app-avatar-preview-modal
-                        [src]="
-                          'https://empimg.oneeclick.co:8048/employeeimage/' +
-                          selectedAssignee().empCode +
-                          '.jpg'
-                        "
+                        [src]="getEmployeeImage(selectedAssignee().empCode)"
                         [name]="
                           selectedAssignee().nickname
                             ? selectedAssignee().fullname + ' (' + selectedAssignee().nickname + ')'

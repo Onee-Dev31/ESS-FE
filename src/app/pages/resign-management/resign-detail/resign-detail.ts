@@ -33,6 +33,7 @@ import dayjs from 'dayjs';
 import { AuthService } from '../../../services/auth.service';
 import { FreelanceService } from '../../../services/freelance-management.service';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { environment } from '../../../../environments/environment';
 
 interface EmployeeFormData {
   empCode: string; //CODEMPID
@@ -87,6 +88,9 @@ interface FreelanceFormData {
   styleUrl: './resign-detail.scss',
 })
 export class ResignDetail {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
   pageTitle = signal<string>('รายการพนักงานลาออก');
 
   private loadingService = inject(LoadingService);

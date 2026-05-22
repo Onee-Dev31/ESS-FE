@@ -57,6 +57,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -89,6 +90,10 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 })
 export class DashboardIT implements OnInit {
   allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
 
   actionConfig: Record<
     string,

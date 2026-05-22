@@ -46,6 +46,7 @@ import { CcModal } from '../dashboard-it/modal/cc-modal/cc-modal';
 import { ReOpenModal } from '../dashboard-it/modal/re-open-modal/re-open-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-it-service',
   standalone: true,
@@ -70,6 +71,10 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
   styleUrl: './it-service-list.scss',
 })
 export class ItService implements OnInit {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
+
   isLaptop = false;
   isMobile = false;
   isSmallMobile = false;
