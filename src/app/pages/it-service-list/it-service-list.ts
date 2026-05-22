@@ -392,8 +392,8 @@ export class ItService implements OnInit {
     return (
       ticket?.status !== 'Closed' &&
       ticket?.status_user !== 'Referred_Back' &&
-      ticket?.status_user !== 'Denied' &&
-      ticket?.status_user !== 'Hold'
+      ticket?.status_user !== 'Denied'
+      // && ticket?.status_user !== 'Hold'
     );
   }
 

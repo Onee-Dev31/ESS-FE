@@ -421,7 +421,9 @@ export class ItProblemReportComponent implements OnInit {
     this.itServiceService.getSubProblem().subscribe({
       next: (res) => {
         // console.log(res);
-        this.availableCategories = res.data;
+        this.availableCategories = (res.data ?? []).sort(
+          (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
+        );
         this.cdr.detectChanges();
       },
       error: (error) => {

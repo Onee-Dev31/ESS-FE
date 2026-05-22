@@ -1731,6 +1731,8 @@ export class DashboardIT implements OnInit {
   // -- note for IT --
   openNoteForItModal() {
     // console.log(this.IS_NOTEFORIT_TICKET());
+
+    this.selectTicket(this.selectedTicket().ticketId);
     this.IS_NOTEFORIT_TICKET.set(true);
   }
 

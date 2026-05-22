@@ -1820,6 +1820,19 @@ textarea.form-input {
   }
 }
 
+.floating-chat__service-hours {
+  margin-top: 6px;
+  margin-bottom: 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: $font-size-hint;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .floating-chat__composer {
   min-height: 70px;
   padding: 12px 14px;
