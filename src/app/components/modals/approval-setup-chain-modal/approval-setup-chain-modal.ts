@@ -104,18 +104,19 @@ export class ApprovalSetupChainModal {
       skipApprover4: cat.skipApprover4,
     }));
 
-    this.approvalService.saveApprovalCategories(payload).pipe(
-      finalize(() => this.isSaving.set(false)),
-    ).subscribe({
-      next: () => {
-        this.toastService.success('บันทึกการตั้งค่าสำเร็จ');
-        this.onSaved.emit();
-        this.onClose.emit();
-      },
-      error: (err) => {
-        this.errorService.handle(err, { component: 'ApprovalSetupModal', action: 'save' });
-      },
-    });
+    this.approvalService
+      .saveApprovalCategories(payload)
+      .pipe(finalize(() => this.isSaving.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.success('บันทึกการตั้งค่าสำเร็จ');
+          this.onSaved.emit();
+          this.onClose.emit();
+        },
+        error: (err) => {
+          this.errorService.handle(err, { component: 'ApprovalSetupModal', action: 'save' });
+        },
+      });
   }
 
   close() {

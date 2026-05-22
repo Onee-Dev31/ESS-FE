@@ -51,7 +51,12 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn-outline" (click)="close()">ยกเลิก</button>
-      <button type="button" class="btn-outline btn-reset" (click)="reset()" [disabled]="isLoading()">
+      <button
+        type="button"
+        class="btn-outline btn-reset"
+        (click)="reset()"
+        [disabled]="isLoading()"
+      >
         <i class="fas fa-undo"></i>
         รีเซ็ต
       </button>
