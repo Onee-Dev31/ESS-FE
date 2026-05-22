@@ -228,8 +228,14 @@ export class NotificationService {
     const recipientKey = this.getRecipientKey(item);
     this.activeRecipientIds.update((set) => new Set([...set, recipientKey]));
 
-    const id = item.notificationRecipientId ?? item.notificationId;
-    this.http.patch(`${this.baseUrl}/${id}/read`, {}).subscribe({
+    const requestBody: Record<string, string | number> = {};
+    if (item.notificationRecipientId != null) {
+      requestBody['notificationRecipientId'] = item.notificationRecipientId;
+    } else {
+      if (item.notificationId != null) requestBody['notificationId'] = item.notificationId;
+      if (this.activeUserKey) requestBody['recipientAduser'] = this.activeUserKey;
+    }
+    this.http.post(`${this.baseUrl}/read`, requestBody).subscribe({
       next: () => {
         this.items.update((items) =>
           items
@@ -265,7 +271,7 @@ export class NotificationService {
     if (!this.hasUnread() || this.isMarkingAll()) return;
 
     this.isMarkingAll.set(true);
-    this.http.patch(`${this.baseUrl}/read-all`, {}).subscribe({
+    this.http.post(`${this.baseUrl}/read-all`, { recipientAduser: this.activeUserKey }).subscribe({
       next: () => {
         this.unreadCount.set(0);
         this.items.update((items) =>

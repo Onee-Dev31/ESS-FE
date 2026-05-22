@@ -217,7 +217,9 @@ export class SignalrService {
     }
 
     if (adUser) {
+      const groupName = `user:${adUser.toLowerCase()}`;
       await this.hubConnection.invoke('JoinUserGroup', adUser.toLowerCase());
+      console.log(`[SignalR] joined group "${groupName}"`);
     }
   }
 
