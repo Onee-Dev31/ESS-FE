@@ -144,7 +144,8 @@ export class NotificationService {
     this.isCountLoading.set(true);
     this.countError.set(null);
 
-    this.http.get<any>(`${this.baseUrl}/my/unread-count`).subscribe({
+    const params = new HttpParams().set('recipientAduser', this.activeUserKey);
+    this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
       next: (response) => {
         const unreadCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
         this.unreadCount.set(Number.isFinite(unreadCount) ? unreadCount : 0);
