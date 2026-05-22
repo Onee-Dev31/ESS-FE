@@ -173,6 +173,7 @@ export class SignalrService {
       const subject = new Subject<any>();
       this.eventMap.set(eventName, subject);
       this.hubConnection.on(eventName, (data) => {
+        console.debug(`[SignalR] ← ${eventName}`, data);
         if (eventName === 'NewTicket') {
           if (data.messageId && this.processedIds.has(data.messageId)) return;
           if (data.messageId) {

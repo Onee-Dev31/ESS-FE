@@ -144,8 +144,7 @@ export class NotificationService {
     this.isCountLoading.set(true);
     this.countError.set(null);
 
-    const params = new HttpParams().set('recipientAduser', this.activeUserKey);
-    this.http.get<any>(`${this.baseUrl}/unread-count`, { params }).subscribe({
+    this.http.get<any>(`${this.baseUrl}/my/unread-count`).subscribe({
       next: (response) => {
         const unreadCount = Number(response?.unreadCount ?? response?.count ?? response ?? 0);
         this.unreadCount.set(Number.isFinite(unreadCount) ? unreadCount : 0);
@@ -225,22 +224,11 @@ export class NotificationService {
       return;
     }
 
-    const requestBody: Record<string, string | number> = {};
-    if (item.notificationRecipientId != null) {
-      requestBody['notificationRecipientId'] = item.notificationRecipientId;
-    } else {
-      if (item.notificationId != null) {
-        requestBody['notificationId'] = item.notificationId;
-      }
-      if (this.activeUserKey) {
-        requestBody['recipientAduser'] = this.activeUserKey;
-      }
-    }
-
     const recipientKey = this.getRecipientKey(item);
     this.activeRecipientIds.update((set) => new Set([...set, recipientKey]));
 
-    this.http.post(`${this.baseUrl}/read`, requestBody).subscribe({
+    const id = item.notificationRecipientId ?? item.notificationId;
+    this.http.patch(`${this.baseUrl}/${id}/read`, {}).subscribe({
       next: () => {
         this.items.update((items) =>
           items
@@ -276,7 +264,7 @@ export class NotificationService {
     if (!this.hasUnread() || this.isMarkingAll()) return;
 
     this.isMarkingAll.set(true);
-    this.http.post(`${this.baseUrl}/read-all`, { recipientAduser: this.activeUserKey }).subscribe({
+    this.http.patch(`${this.baseUrl}/read-all`, {}).subscribe({
       next: () => {
         this.unreadCount.set(0);
         this.items.update((items) =>
