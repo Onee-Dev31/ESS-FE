@@ -89,9 +89,14 @@ export class ApprovalAllowanceComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const voucherNo = params['voucherNo'];
-      if (voucherNo) this.linkedVoucherNo.set(voucherNo);
-      this.loadAllowanceClaims();
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.listing.filterStatus.set('Pending');
+        this.listing.searchText.set('');
+        this.listing.currentPage.set(0);
+      }
+      this.linkedVoucherNo.set(voucherNo ?? null);
+      this.loadAllowanceClaims(voucherNo);
     });
   }
 

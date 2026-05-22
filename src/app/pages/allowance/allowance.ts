@@ -7,6 +7,7 @@ import {
   DestroyRef,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -80,6 +81,7 @@ export class AllowanceComponent implements OnInit {
   private swalService = inject(SwalService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   dateUtil = inject(DateUtilityService);
   private loadingService = inject(LoadingService);
 
@@ -108,13 +110,16 @@ export class AllowanceComponent implements OnInit {
   private pendingOpenVoucherNo: string | null = null;
 
   ngOnInit() {
-    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo');
-    if (voucherNo) {
-      this.pendingOpenVoucherNo = voucherNo;
-      this.listing.filterStatus.set('');
-      this.listing.searchText.set(voucherNo);
-    }
-    this.loadData();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.pendingOpenVoucherNo = voucherNo ?? null;
+        this.listing.filterStatus.set('');
+        this.listing.searchText.set(voucherNo ?? '');
+        this.listing.currentPage.set(0);
+      }
+      this.loadData();
+    });
   }
 
   loadData() {

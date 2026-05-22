@@ -362,6 +362,8 @@ export class NotificationService {
       this.toText(
         item.ticket_number ??
           item.ticketNumber ??
+          payload?.['voucherNo'] ??
+          payload?.['voucher_no'] ??
           payload?.['ticketNumber'] ??
           payload?.['ticket_number'],
       ) ?? null;
@@ -420,7 +422,10 @@ export class NotificationService {
       const isApprover = [...this.approverRoles].some((role) => roleText.includes(role));
       return {
         route: isApprover ? '/approvals-allowance' : '/allowance',
-        queryParams: { _t: Date.now() },
+        queryParams: {
+          voucherNo: input.ticketNumber ?? undefined,
+          _t: Date.now(),
+        },
       };
     }
 
