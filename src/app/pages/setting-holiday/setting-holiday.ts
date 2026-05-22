@@ -2,6 +2,7 @@ import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { TeamCalendarService } from '../../services/team-calendar.service';
 import { PageHeaderComponent } from '../../components/shared/page-header/page-header';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -43,11 +44,17 @@ export class SettingHoliday {
   years: number[] = [];
   futureYears: number[] = [];
   holidays = signal<any[]>([]);
+  exportHolidayList = signal<any[]>([]);
 
   searchYear: number = new Date().getFullYear();
   searchHolidayName = '';
+  exportYear: number = new Date().getFullYear();
+  exportAnnouncementNo = `2/${new Date().getFullYear() + 543}`;
+  exportAnnouncementDate: Date | null = new Date();
 
   isHolidayModalOpen = signal(false);
+  isExportModalOpen = signal(false);
+  isExporting = signal(false);
   selectedYear = new Date().getFullYear() + 1;
   holidayFormList = signal<any[]>([]);
 
@@ -129,9 +136,109 @@ export class SettingHoliday {
     return res.map((x: any) => ({
       id: x.ID,
       year: x.YEAR,
+      day: x.Day,
       holidayDate: x.HOLIDAY_DATE ? new Date(x.HOLIDAY_DATE) : null,
       holidayName: x.HOLIDAY_NAME,
     }));
+  }
+
+  openExportHolidayModal(): void {
+    this.exportYear = Number(this.searchYear || new Date().getFullYear());
+    this.exportAnnouncementDate = new Date();
+    this.exportAnnouncementNo = `2/${this.getBuddhistYear(this.exportAnnouncementDate)}`;
+    this.exportHolidayList.set([]);
+    this.isExportModalOpen.set(true);
+  }
+
+  closeExportHolidayModal(): void {
+    if (this.isExporting()) return;
+    this.isExportModalOpen.set(false);
+    this.exportHolidayList.set([]);
+  }
+
+  private async prepareHolidayPdfData(): Promise<boolean> {
+    if (!this.exportYear) {
+      this.swalService.warning('กรุณาเลือกปี');
+      return false;
+    }
+
+    if (!this.exportAnnouncementDate) {
+      this.swalService.warning('กรุณาเลือกวันที่ประกาศ');
+      return false;
+    }
+
+    try {
+      const res = await firstValueFrom(
+        this.teamCalendarService.getHoliday(this.exportYear.toString()),
+      );
+      const holidays = this.mapHoliday(res).sort(
+        (a, b) => new Date(a.holidayDate).getTime() - new Date(b.holidayDate).getTime(),
+      );
+
+      if (!holidays.length) {
+        this.swalService.warning('ไม่พบข้อมูลวันหยุดของปีที่เลือก');
+        return false;
+      }
+
+      this.exportHolidayList.set(holidays);
+      return true;
+    } catch (err) {
+      console.error('Prepare Holiday PDF Error : ', err);
+      this.swalService.warning('Export PDF ไม่สำเร็จ');
+      return false;
+    }
+  }
+
+  async downloadHolidayPdf(): Promise<void> {
+    this.isExporting.set(true);
+
+    try {
+      const isReady = await this.prepareHolidayPdfData();
+      if (!isReady) {
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const element = document.getElementById('holiday-export-document');
+      if (!element) {
+        this.swalService.warning('ไม่พบรูปแบบเอกสารสำหรับ Export');
+        return;
+      }
+
+      element.classList.add('pdf-capture-mode');
+      await document.fonts?.ready;
+
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
+
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+      pdf.save(`holiday-${this.exportYear}.pdf`);
+      this.isExportModalOpen.set(false);
+    } catch (err) {
+      console.error('Export Holiday PDF Error : ', err);
+      this.swalService.warning('Export PDF ไม่สำเร็จ');
+    } finally {
+      document.getElementById('holiday-export-document')?.classList.remove('pdf-capture-mode');
+      this.isExporting.set(false);
+    }
   }
 
   addHoliday(): void {
@@ -331,6 +438,71 @@ export class SettingHoliday {
 
   get defaultPickerValue(): Date {
     return new Date(this.selectedYear, 0, 1);
+  }
+
+  get exportAnnouncementText(): string {
+    return this.exportAnnouncementDate ? this.formatThaiFullDate(this.exportAnnouncementDate) : '';
+  }
+
+  get exportSubjectYear(): number {
+    return Number(this.exportYear) + 543;
+  }
+
+  getHolidayDayName(item: any): string {
+    if (item.day) {
+      return item.day;
+    }
+
+    return this.getThaiDayName(item.holidayDate);
+  }
+
+  getHolidayDateDay(item: any): string {
+    return item.holidayDate ? dayjs(item.holidayDate).date().toString() : '';
+  }
+
+  getHolidayDateMonth(item: any): string {
+    return item.holidayDate ? this.getThaiMonthName(item.holidayDate) : '';
+  }
+
+  private getBuddhistYear(date: Date): number {
+    return dayjs(date).year() + 543;
+  }
+
+  private formatThaiFullDate(date: Date): string {
+    return `${dayjs(date).date()} ${this.getThaiMonthName(date)} ${this.getBuddhistYear(date)}`;
+  }
+
+  private getThaiDayName(date: Date | string): string {
+    const days = [
+      'วันอาทิตย์',
+      'วันจันทร์',
+      'วันอังคาร',
+      'วันพุธ',
+      'วันพฤหัสบดี',
+      'วันศุกร์',
+      'วันเสาร์',
+    ];
+
+    return days[dayjs(date).day()] ?? '';
+  }
+
+  private getThaiMonthName(date: Date | string): string {
+    const months = [
+      'มกราคม',
+      'กุมภาพันธ์',
+      'มีนาคม',
+      'เมษายน',
+      'พฤษภาคม',
+      'มิถุนายน',
+      'กรกฎาคม',
+      'สิงหาคม',
+      'กันยายน',
+      'ตุลาคม',
+      'พฤศจิกายน',
+      'ธันวาคม',
+    ];
+
+    return months[dayjs(date).month()] ?? '';
   }
 
   isPastHoliday(date: Date | string): boolean {

@@ -2,6 +2,22 @@
 @use '../../../styles/mixins' as *;
 @use 'sass:color';
 
+@font-face {
+  font-family: 'DB Heavent';
+  src: url('/font/DB Heavent v3.2.1.ttf') format('truetype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DB Heavent Bold';
+  src: url('/font/DB Heavent Bd v3.2.1.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 // Content Card Mixin
 @mixin content-card {
   background: var(--bg-card);
@@ -922,6 +938,264 @@
 
 .btn-add {
   @include btn-outline;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.export-modal {
+  width: min(560px, 95vw) !important;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+
+  .export-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 24px;
+    overflow: visible;
+  }
+}
+
+.holiday-export-stage {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 794px;
+  height: 1123px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.holiday-export-document {
+  position: relative;
+  width: 794px;
+  min-height: 1123px;
+  display: grid;
+  grid-template-rows: 142px 1fr 72px;
+  padding: 0;
+  background: #ffffff;
+  color: #5d5d5d;
+  font-family: 'DB Heavent', 'Angsana New', 'Sarabun', Tahoma, Arial, sans-serif;
+  font-size: 24px;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+.holiday-export-document.pdf-capture-mode {
+  font-size: 20px;
+  line-height: 1.46;
+
+  .export-body-inner {
+    max-width: 580px;
+    padding-top: 30px;
+  }
+
+  .export-title-block {
+    font-weight: 300;
+    line-height: 1.62;
+    margin-bottom: 30px;
+
+    div {
+      font-weight: 300;
+    }
+  }
+
+  .holiday-export-table {
+    td {
+      line-height: 1.46;
+      padding: 2px 0 4px;
+    }
+
+    .export-index {
+      width: 34px;
+      padding-right: 14px;
+    }
+
+    .export-day {
+      width: 118px;
+      font-size: 18px;
+      font-weight: 300;
+    }
+
+    .export-date {
+      width: 38px;
+      padding-right: 14px;
+    }
+
+    .export-month {
+      width: 112px;
+    }
+  }
+
+  .export-signature {
+    width: 300px;
+    margin-top: 34px;
+  }
+
+  .signature-space {
+    height: 68px;
+  }
+
+  .export-logo {
+    width: 90px;
+    height: 90px;
+  }
+
+  .export-footer {
+    font-size: 7px;
+  }
+}
+
+.export-header {
+  position: relative;
+}
+
+.export-logo {
+  position: absolute;
+  top: 31px;
+  right: 35px;
+  width: 110px;
+  height: auto;
+}
+
+.export-body {
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+
+.export-body-inner {
+  width: 100%;
+  max-width: 724px;
+  padding: 30px 20px 0;
+  box-sizing: border-box;
+}
+
+.export-title-block {
+  text-align: center;
+  margin: 0 0 34px;
+  line-height: 1.56;
+
+  div:nth-child(1),
+  div:nth-child(2) {
+    font-weight: 300;
+  }
+
+  .export-title-bold {
+    font-family:
+      'DB Heavent Bold', 'DB Heavent', 'Angsana New', 'Sarabun', Tahoma, Arial, sans-serif;
+    font-weight: 700;
+  }
+
+  div:nth-child(3) {
+    white-space: nowrap;
+  }
+}
+
+.holiday-export-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  td {
+    padding: 2px 0 3px;
+    vertical-align: top;
+    line-height: 1.35;
+  }
+
+  .export-index {
+    width: 38px;
+    text-align: right;
+    padding-right: 16px;
+  }
+
+  .export-day {
+    width: 136px;
+    font-size: 16px;
+    font-weight: 100;
+  }
+
+  .export-date {
+    width: 42px;
+    text-align: right;
+    padding-right: 18px;
+  }
+
+  .export-month {
+    width: 132px;
+  }
+
+  .export-name {
+    width: auto;
+  }
+}
+
+.export-closing {
+  margin-top: 34px;
+}
+
+.export-signature {
+  width: 360px;
+  margin: 36px 0 0 auto;
+  text-align: center;
+  line-height: 1.28;
+}
+
+.signature-space {
+  height: 74px;
+}
+
+.export-footer {
+  align-self: end;
+  position: relative;
+  margin: 0 24px 20px;
+  color: #8b8b8b;
+  font-family: Arial, Tahoma, sans-serif;
+  font-size: 8px;
+  line-height: 1.3;
+  padding: 9px 4px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.rainbow-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #8e2de2 0%,
+    #2f80ed 18%,
+    #00bcd4 35%,
+    #2ecc71 51%,
+    #f4d03f 66%,
+    #f39c12 82%,
+    #e74c3c 100%
+  );
+  z-index: 1;
+}
+
+.footer-th,
+.footer-en {
+  white-space: normal;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.footer-th:not(.footer-official),
+.footer-en:not(.footer-official) {
+  display: none;
+}
+
+.footer-en {
+  margin-top: 3px;
 }
 
 .validation-error-box {
