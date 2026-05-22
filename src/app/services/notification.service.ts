@@ -225,21 +225,16 @@ export class NotificationService {
       return;
     }
 
+    const recipientKey = this.getRecipientKey(item);
+    this.activeRecipientIds.update((set) => new Set([...set, recipientKey]));
+
     const requestBody: Record<string, string | number> = {};
     if (item.notificationRecipientId != null) {
       requestBody['notificationRecipientId'] = item.notificationRecipientId;
     } else {
-      if (item.notificationId != null) {
-        requestBody['notificationId'] = item.notificationId;
-      }
-      if (this.activeUserKey) {
-        requestBody['recipientAduser'] = this.activeUserKey;
-      }
+      if (item.notificationId != null) requestBody['notificationId'] = item.notificationId;
+      if (this.activeUserKey) requestBody['recipientAduser'] = this.activeUserKey;
     }
-
-    const recipientKey = this.getRecipientKey(item);
-    this.activeRecipientIds.update((set) => new Set([...set, recipientKey]));
-
     this.http.post(`${this.baseUrl}/read`, requestBody).subscribe({
       next: () => {
         this.items.update((items) =>
@@ -322,27 +317,14 @@ export class NotificationService {
   private handleRealtimeNotification(payload: unknown) {
     if (!this.activeUserKey) return;
 
-    const record = this.extractRealtimeRecord(payload);
     this.realtimeTick.update((tick) => tick + 1);
-    this.refreshUnreadCount();
+    this.refreshAll();
 
-    if (!record) {
-      this.loadFirstPage();
-      return;
-    }
-
-    const mapped = this.mapNotification(record);
-    this.items.update((items) => {
-      const prepended = [mapped, ...items.filter((item) => !this.isSameRecipient(item, mapped))];
-      const filtered = this.unreadOnly() ? prepended.filter((item) => !item.isRead) : prepended;
-      return filtered.slice(0, Math.max(filtered.length, this.pageSize));
-    });
-
-    const summaryText = mapped.ticketNumber
-      ? `${mapped.title} • ${mapped.ticketNumber}`
-      : mapped.title;
+    const record = this.extractRealtimeRecord(payload);
+    const title =
+      this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
     this.lastToastTime = Date.now();
-    this.toastService.info(summaryText);
+    if (!document.hidden) this.toastService.info(title);
   }
 
   private extractRealtimeRecord(payload: unknown): NotificationApiRecord | null {
@@ -367,6 +349,8 @@ export class NotificationService {
       this.toText(
         item.ticket_number ??
           item.ticketNumber ??
+          payload?.['voucherNo'] ??
+          payload?.['voucher_no'] ??
           payload?.['ticketNumber'] ??
           payload?.['ticket_number'],
       ) ?? null;
@@ -425,7 +409,10 @@ export class NotificationService {
       const isApprover = [...this.approverRoles].some((role) => roleText.includes(role));
       return {
         route: isApprover ? '/approvals-allowance' : '/allowance',
-        queryParams: { _t: Date.now() },
+        queryParams: {
+          voucherNo: input.ticketNumber ?? undefined,
+          _t: Date.now(),
+        },
       };
     }
 
