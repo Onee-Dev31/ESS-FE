@@ -91,9 +91,9 @@
           {{ isEditMode ? 'แก้ไขวันหยุด' : 'ตั้งค่าวันหยุด' }}
         </h2>
 
-        <button class="btn-close-modal" (click)="closeHolidayModal()">
+        <!-- <button class="btn-close-modal" (click)="closeHolidayModal()">
           <i class="fas fa-times"></i>
-        </button>
+        </button> -->
       </div>
 
       <!-- Body -->
@@ -105,7 +105,12 @@
             คีย์ข้อมูล
           </button>
 
-          <button class="tab-btn" [class.active]="mode === 'excel'" (click)="mode = 'excel'">
+          <button
+            class="tab-btn"
+            [class.active]="mode === 'excel'"
+            (click)="mode = 'excel'"
+            *ngIf="!isEditMode"
+          >
             <i class="fas fa-file-excel"></i>
             Import Excel
           </button>
@@ -206,9 +211,25 @@
             </button>
           </div>
         }
-        @if (mode === 'excel') {
-          <div class="excel-upload-section">
-            <div class="upload-description">Upload ไฟล์ Excel สำหรับนำเข้าวันหยุดประจำปี</div>
+        @if (mode === 'excel' && !isEditMode) {
+          <div class="top-action">
+            <!-- Select Year -->
+
+            <div class="form-field">
+              <label>ปี</label>
+
+              <nz-select
+                nzShowSearch
+                nzPlaceHolder="เลือกปี"
+                [(ngModel)]="selectedYear"
+                name="selectedYear"
+                class="form-control"
+              >
+                @for (year of futureYears; track year) {
+                  <nz-option [nzLabel]="year" [nzValue]="year"> </nz-option>
+                }
+              </nz-select>
+            </div>
 
             <!-- Download Template -->
 
@@ -216,6 +237,10 @@
               <i class="fas fa-download"></i>
               Download Template
             </button>
+          </div>
+
+          <div class="excel-upload-section">
+            <div class="upload-description">Upload ไฟล์ Excel สำหรับนำเข้าวันหยุดประจำปี</div>
 
             <!-- Upload -->
 
@@ -269,7 +294,7 @@
           </div>
         }
 
-        <button class="btn-save" (click)="saveHoliday()" [disabled]="!canSave()">
+        <button class="btn-save" (click)="onSubmitHoliday()" [disabled]="isSaveDisabled()">
           <i class="fas fa-save"></i>
           บันทึก
         </button>

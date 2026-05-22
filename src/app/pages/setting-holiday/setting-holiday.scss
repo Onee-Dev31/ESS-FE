@@ -523,7 +523,7 @@
 
   .modal-body {
     flex: 1;
-    padding: 30px;
+    padding: 20px;
     max-height: 70vh;
     overflow-y: auto;
     background-color: var(--bg-card);
@@ -759,7 +759,7 @@
   justify-content: space-between;
   align-items: end;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .holiday-table-wrapper {
@@ -942,7 +942,7 @@
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
-  padding: 0 24px;
+  // padding: 0 24px;
 }
 
 .tab-btn {
@@ -1010,7 +1010,7 @@
 
   background: #f0f5ff;
 
-  padding: 36px 24px;
+  padding: 24px 24px;
 
   display: flex;
   flex-direction: column;
@@ -1031,7 +1031,7 @@
 }
 
 .upload-icon {
-  font-size: 54px;
+  font-size: 34px;
   color: #1d6f42;
   margin-bottom: 16px;
 }

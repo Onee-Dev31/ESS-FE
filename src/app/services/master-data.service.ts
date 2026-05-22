@@ -6,7 +6,7 @@ import { LEAVE_TYPES, LeaveType } from '../interfaces/time-off.interface';
 
 import { DateConfig } from '../interfaces/core.interface';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpContext } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
 export interface ClaimType {
@@ -134,8 +134,11 @@ export class MasterDataService {
     });
   }
 
-  downloadHolidayTemplate(): Observable<Blob> {
+  downloadHolidayTemplate(year?: string): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (year) httpParams = httpParams.set('year', year);
     return this._http.get(`${this.baseUrl}/Master/manage-holiday/template`, {
+      params: httpParams,
       responseType: 'blob',
     });
   }

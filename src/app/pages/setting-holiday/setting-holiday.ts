@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { inject } from '@angular/core';
@@ -64,6 +64,9 @@ export class SettingHoliday {
 
   mode: 'manual' | 'excel' = 'manual';
   selectedExcelFile: File | null = null;
+
+  @ViewChild('fileInput')
+  fileInput!: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     this.generateYears();
@@ -287,8 +290,11 @@ export class SettingHoliday {
         console.log(res);
 
         this.swalService.success('สำร็จ');
+        this.resetHolidayForm();
+
+        this.closeHolidayModal();
+
         this.getHoliday();
-        this.isHolidayModalOpen.set(false);
       },
 
       error: (err) => {
@@ -299,9 +305,9 @@ export class SettingHoliday {
   }
 
   closeHolidayModal(): void {
-    this.isHolidayModalOpen.set(false);
+    this.resetHolidayForm();
 
-    this.holidayFormList.set([]);
+    this.isHolidayModalOpen.set(false);
   }
 
   disableNotSelectedYear = (current: Date): boolean => {
@@ -328,6 +334,10 @@ export class SettingHoliday {
   }
 
   isPastHoliday(date: Date | string): boolean {
+    if (!date) {
+      return false;
+    }
+
     const d = new Date(date);
     const today = new Date();
 
@@ -381,12 +391,22 @@ export class SettingHoliday {
     return errors;
   }
 
-  canSave(): boolean {
-    return this.getValidationErrors().length === 0;
+  isSaveDisabled(): boolean {
+    // manual mode
+    if (this.mode === 'manual') {
+      return this.getValidationErrors().length !== 0 || this.holidayFormList().length === 0;
+    }
+
+    // excel mode
+    if (this.mode === 'excel') {
+      return !this.selectedExcelFile;
+    }
+
+    return true;
   }
 
   downloadTemplate(): void {
-    this.masterService.downloadHolidayTemplate().subscribe({
+    this.masterService.downloadHolidayTemplate(this.selectedYear.toString()).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
 
@@ -416,9 +436,6 @@ export class SettingHoliday {
 
     const file = input.files[0];
 
-    this.selectedExcelFile = file;
-
-    // validate file
     const allowedTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
@@ -430,25 +447,71 @@ export class SettingHoliday {
       return;
     }
 
-    const selectYear = '2027';
+    this.selectedExcelFile = file;
+  }
+
+  importHolidayExcel(): void {
+    if (!this.selectedExcelFile) {
+      this.swalService.warning('กรุณาเลือกไฟล์ Excel');
+
+      return;
+    }
 
     const formData = new FormData();
 
-    formData.append('File', file);
-    formData.append('Year', selectYear);
-    formData.append('CreatedBy', '');
+    formData.append('File', this.selectedExcelFile);
+    formData.append('Year', this.selectedYear.toString());
+    formData.append('CreatedBy', this.authService.userData().CODEMPID);
 
     this.masterService.importHolidayExcel(formData).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log(res);
         this.swalService.success('Import สำเร็จ');
+
+        this.selectedExcelFile = null;
+
+        this.resetHolidayForm();
+
+        this.closeHolidayModal();
 
         this.getHoliday();
       },
 
       error: (err) => {
-        console.error('Get Holiday Error : ', err?.error?.message || 'Import ไม่สำเร็จ');
+        console.error(err?.error?.message || 'Import ไม่สำเร็จ');
       },
     });
+  }
+
+  onSubmitHoliday(): void {
+    if (this.mode === 'manual') {
+      this.saveHoliday();
+
+      return;
+    }
+
+    if (this.mode === 'excel') {
+      this.importHolidayExcel();
+      return;
+    }
+  }
+
+  resetHolidayForm(): void {
+    // reset table
+    this.holidayFormList.set([]);
+
+    // reset excel
+    this.selectedExcelFile = null;
+
+    // reset mode
+    this.mode = 'manual';
+
+    // reset year
+    this.selectedYear = new Date().getFullYear() + 1;
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 }
 
