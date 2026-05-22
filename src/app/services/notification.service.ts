@@ -418,12 +418,21 @@ export class NotificationService {
     ticketId: number | null;
     ticketNumber: string | null;
   }) {
+    const roleText = `${this.authService.userRole() ?? ''},${input.recipientRole}`.toLowerCase();
+    const typeText = `${input.notificationType} ${input.targetType}`.toLowerCase();
+
+    if (input.notificationType === 'allowance_email') {
+      const isApprover = [...this.approverRoles].some((role) => roleText.includes(role));
+      return {
+        route: isApprover ? '/approvals-allowance' : '/allowance',
+        queryParams: { _t: Date.now() },
+      };
+    }
+
     if (!input.ticketId && !input.ticketNumber) {
       return { route: null, queryParams: null };
     }
 
-    const roleText = `${this.authService.userRole() ?? ''},${input.recipientRole}`.toLowerCase();
-    const typeText = `${input.notificationType} ${input.targetType}`.toLowerCase();
     const isItRole = [...this.itRoles].some((role) => roleText.includes(role));
     const isApprovalRoute =
       [...this.approverRoles].some((role) => roleText.includes(role)) &&
