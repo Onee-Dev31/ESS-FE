@@ -237,6 +237,8 @@ export class NavbarComponent {
   }
 
   getNotificationIcon(item: NotificationInboxItem) {
+    if (item.notificationType === 'allowance_email') return 'fa-money-bill-wave';
+
     const typeText = `${item.notificationType} ${item.targetType ?? ''}`.toLowerCase();
     if (typeText.includes('reply') || typeText.includes('note')) return 'fa-comment-dots';
     if (typeText.includes('assign')) return 'fa-user-plus';
@@ -250,6 +252,8 @@ export class NavbarComponent {
 
   getNotificationAccent(item: NotificationInboxItem) {
     if (!item.isRead) return 'accent-unread';
+
+    if (item.notificationType === 'allowance_email') return 'accent-info';
 
     const typeText = `${item.notificationType} ${item.targetType ?? ''}`.toLowerCase();
     if (typeText.includes('closed') || typeText.includes('approved')) return 'accent-success';
