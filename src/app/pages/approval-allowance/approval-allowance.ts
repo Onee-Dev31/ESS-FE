@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { DateUtilityService } from '../../services/date-utility.service';
 import { ExportService } from '../../services/export';
@@ -49,6 +50,7 @@ export class ApprovalAllowanceComponent implements OnInit {
   private errorService = inject(ErrorService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   isLoading = this.loadingService.loading('approvals-list');
   isExporting = this.loadingService.loading('export');
@@ -86,9 +88,16 @@ export class ApprovalAllowanceComponent implements OnInit {
   }
 
   ngOnInit() {
-    const voucherNo = this.route.snapshot.queryParamMap.get('voucherNo');
-    if (voucherNo) this.linkedVoucherNo.set(voucherNo);
-    this.loadAllowanceClaims();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const voucherNo = params['voucherNo'] || params['ticketNumber'];
+      if (voucherNo || params['_t']) {
+        this.listing.filterStatus.set('Pending');
+        this.listing.searchText.set('');
+        this.listing.currentPage.set(0);
+      }
+      this.linkedVoucherNo.set(voucherNo ?? null);
+      this.loadAllowanceClaims(voucherNo);
+    });
   }
 
   refresh() {
