@@ -168,7 +168,9 @@ export class SettingHoliday {
     }
 
     try {
-      const res = await firstValueFrom(this.teamCalendarService.getHoliday(this.exportYear.toString()));
+      const res = await firstValueFrom(
+        this.teamCalendarService.getHoliday(this.exportYear.toString()),
+      );
       const holidays = this.mapHoliday(res).sort(
         (a, b) => new Date(a.holidayDate).getTime() - new Date(b.holidayDate).getTime(),
       );
@@ -439,9 +441,7 @@ export class SettingHoliday {
   }
 
   get exportAnnouncementText(): string {
-    return this.exportAnnouncementDate
-      ? this.formatThaiFullDate(this.exportAnnouncementDate)
-      : '';
+    return this.exportAnnouncementDate ? this.formatThaiFullDate(this.exportAnnouncementDate) : '';
   }
 
   get exportSubjectYear(): number {
