@@ -1,4 +1,5 @@
 import { Component, inject, output, signal } from '@angular/core';
+import { Observable, finalize } from 'rxjs';
 import { ToastService } from '../../../services/toast';
 import { LoadingService } from '../../../services/loading';
 import { ErrorService } from '../../../services/error';
@@ -20,7 +21,7 @@ export class ApprovalSetupChainModal {
   onClose = output<void>();
   onSaved = output<void>();
 
-  isVisible: boolean = false;
+  isVisible: boolean = true;
 
   private approvalService = inject(ApprovalSetupService);
   private swalService = inject(SwalService);
@@ -46,13 +47,18 @@ export class ApprovalSetupChainModal {
   }
 
   loadCategories() {
-    this.loadingService.start('setup-modal');
+    this.fetchCategories(this.approvalService.getApprovalSetupChainCurrent());
+  }
 
-    this.approvalService.getApprovalSetupChain().subscribe({
+  reset() {
+    this.fetchCategories(this.approvalService.getApprovalSetupChain());
+  }
+
+  private fetchCategories(source$: Observable<any>) {
+    this.loadingService.start('setup-modal');
+    source$.subscribe({
       next: (res) => {
         const mapped = (res?.data ?? []).map((emp: any) => this.mapCategory(emp));
-
-        // const mapped = res?.data ?? [];
         this.categories.set(mapped);
         this.loadingService.stop('setup-modal');
       },
@@ -88,19 +94,28 @@ export class ApprovalSetupChainModal {
     );
   }
 
-  async save() {
+  save() {
     this.isSaving.set(true);
-    try {
-      // TODO: เปลี่ยนเป็น API call จริง
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      this.toastService.success('บันทึก mock การตั้งค่าสำเร็จ');
-      this.onSaved.emit();
-      this.onClose.emit();
-    } catch (error) {
-      this.errorService.handle(error, { component: 'ApprovalSetupModal', action: 'save' });
-    } finally {
-      this.isSaving.set(false);
-    }
+    const payload = this.categories().map((cat) => ({
+      categoryId: cat.categoryId,
+      skipApprover1: cat.skipApprover1,
+      skipApprover2: cat.skipApprover2,
+      skipApprover3: cat.skipApprover3,
+      skipApprover4: cat.skipApprover4,
+    }));
+
+    this.approvalService.saveApprovalCategories(payload).pipe(
+      finalize(() => this.isSaving.set(false)),
+    ).subscribe({
+      next: () => {
+        this.toastService.success('บันทึกการตั้งค่าสำเร็จ');
+        this.onSaved.emit();
+        this.onClose.emit();
+      },
+      error: (err) => {
+        this.errorService.handle(err, { component: 'ApprovalSetupModal', action: 'save' });
+      },
+    });
   }
 
   close() {

@@ -20,7 +20,7 @@
             <tr>
               <th>ประเภท</th>
               @for (step of approverSteps; track step.key) {
-                <th class="text-center">ข้าม {{ step.label }}</th>
+                <th class="text-center">{{ step.label }}</th>
               }
             </tr>
           </thead>
@@ -35,7 +35,7 @@
                   <td class="text-center">
                     <div
                       class="toggle"
-                      [class.on]="cat[step.key]"
+                      [class.on]="!cat[step.key]"
                       [class.readonly]="!isVisible"
                       (click)="toggle(cat.categoryId, step.key)"
                     >
@@ -51,6 +51,10 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn-outline" (click)="close()">ยกเลิก</button>
+      <button type="button" class="btn-outline btn-reset" (click)="reset()" [disabled]="isLoading()">
+        <i class="fas fa-undo"></i>
+        รีเซ็ต
+      </button>
       <button type="button" class="btn-primary" (click)="save()" [disabled]="isSaving()">
         <i [class]="isSaving() ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
         {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}
