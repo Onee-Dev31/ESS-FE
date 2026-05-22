@@ -551,6 +551,13 @@ describe('NotificationService', () => {
   // ─── SignalR NotificationCreated ──────────────────────────────────────────
 
   describe('SignalR — NotificationCreated', () => {
+    function flushRealtimeRequests(unreadCount = 1) {
+      httpMock.expectOne((r) => r.url.includes('/unread-count')).flush({ unreadCount });
+      httpMock
+        .expectOne((r) => r.url.includes('/my'))
+        .flush({ data: [], totalRecords: 0 });
+    }
+
     it('เพิ่ม realtimeTick และ refresh unread count', () => {
       activate();
       const beforeTick = service.realtimeTick();
@@ -567,16 +574,11 @@ describe('NotificationService', () => {
       });
 
       expect(service.realtimeTick()).toBe(beforeTick + 1);
-
-      // flush unread-count ที่ถูก call จาก refreshUnreadCount
-      httpMock.expectOne((r) => r.url.includes('/unread-count')).flush({ unreadCount: 1 });
+      flushRealtimeRequests();
     });
 
-    it('prepend notification ใหม่เข้า items list', () => {
+    it('โหลด items ใหม่จาก API เมื่อได้รับ notification', () => {
       activate();
-      service['items'].set([
-        service['mapNotification']({ ...snakeCaseRecord, recipient_id: 1, notification_id: 1 }),
-      ]);
 
       notificationCreated$.next({
         notificationRecipientId: 99,
@@ -589,6 +591,9 @@ describe('NotificationService', () => {
       });
 
       httpMock.expectOne((r) => r.url.includes('/unread-count')).flush({ unreadCount: 2 });
+      httpMock
+        .expectOne((r) => r.url.includes('/my'))
+        .flush({ data: [{ ...snakeCaseRecord, notification_id: 999 }], totalRecords: 1 });
 
       expect(service.items()[0].notificationId).toBe(999);
     });
@@ -606,7 +611,7 @@ describe('NotificationService', () => {
         is_read: false,
       });
 
-      httpMock.expectOne((r) => r.url.includes('/unread-count')).flush({ unreadCount: 1 });
+      flushRealtimeRequests();
       expect(mockToastService.info).toHaveBeenCalled();
     });
   });

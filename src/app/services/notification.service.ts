@@ -321,7 +321,8 @@ export class NotificationService {
     this.refreshAll();
 
     const record = this.extractRealtimeRecord(payload);
-    const title = this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
+    const title =
+      this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
     this.lastToastTime = Date.now();
     if (!document.hidden) this.toastService.info(title);
   }
