@@ -74,6 +74,24 @@ export class ItService implements OnInit {
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+  IS_CHAT_OPEN = signal(false);
+  chatMessage = '';
+  chatAttachments: { name: string; size: number; file: File }[] = [];
+
+  readonly CHAT_FILE_CONFIG = {
+    maxFiles: 5,
+    maxSizeMB: 5,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
+  };
 
   @HostListener('window:resize')
   onResize() {
@@ -275,6 +293,8 @@ export class ItService implements OnInit {
   }
 
   selectTicket(ticketId: string) {
+    const previousTicketId = this.selectedTicket()?.ticketId;
+
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
@@ -331,6 +351,9 @@ export class ItService implements OnInit {
       // console.log(objectData);
 
       this.selectedTicket.set(objectData);
+      if (previousTicketId !== objectData.ticketId) {
+        this.clearChatDraft();
+      }
       this.scrollToBottom();
 
       const codeempid = this.authService.userData()?.CODEMPID;
@@ -348,6 +371,119 @@ export class ItService implements OnInit {
 
   closeTicketDetail() {
     this.isTicketDetailOpen.set(false);
+    this.closeChat();
+  }
+
+  toggleChat() {
+    this.IS_CHAT_OPEN.update((isOpen) => {
+      const next = !isOpen;
+      if (next) {
+        this.scrollToBottom();
+      }
+      return next;
+    });
+  }
+
+  closeChat() {
+    this.IS_CHAT_OPEN.set(false);
+  }
+
+  canSendChat(ticket: any) {
+    return (
+      ticket?.status !== 'Closed' &&
+      ticket?.status_user !== 'Referred_Back' &&
+      ticket?.status_user !== 'Denied' &&
+      ticket?.status_user !== 'Hold'
+    );
+  }
+
+  sendChatMessage(ticket: any) {
+    const message = this.chatMessage.trim();
+
+    if (!message) {
+      this.swalService.warning('กรุณากรอกข้อความ');
+      return;
+    }
+
+    const attachments = [...this.chatAttachments];
+    this.chatMessage = '';
+    this.chatAttachments = [];
+    this.submitNote({
+      id: ticket.ticketId,
+      message,
+      attachments,
+    });
+  }
+
+  handleChatEnter(event: Event, ticket: any) {
+    const keyboardEvent = event as KeyboardEvent;
+
+    if (keyboardEvent.shiftKey) {
+      return;
+    }
+
+    keyboardEvent.preventDefault();
+    this.sendChatMessage(ticket);
+  }
+
+  onChatFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addChatFiles(input.files);
+    }
+    input.value = '';
+  }
+
+  removeChatAttachment(index: number) {
+    this.chatAttachments.splice(index, 1);
+  }
+
+  private clearChatDraft() {
+    this.chatMessage = '';
+    this.chatAttachments = [];
+  }
+
+  private addChatFiles(files: FileList) {
+    if (!files || files.length === 0) return;
+
+    const errors: string[] = [];
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      if (this.chatAttachments.length + validFiles.length >= this.CHAT_FILE_CONFIG.maxFiles) {
+        reasons.push(`เกินจำนวนสูงสุด ${this.CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      const sizeMB = file.size / (1024 * 1024);
+      if (sizeMB > this.CHAT_FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.CHAT_FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.CHAT_FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.CHAT_FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length > 0) {
+        errors.push(`${file.name} (${reasons.join(', ')})`);
+        continue;
+      }
+
+      validFiles.push({ name: file.name, size: file.size, file });
+    }
+
+    if (errors.length > 0) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length > 0) {
+      this.chatAttachments = [...this.chatAttachments, ...validFiles];
+    }
   }
 
   showAllServices: boolean = false;
@@ -404,7 +540,7 @@ export class ItService implements OnInit {
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
 
-    data.attachments.forEach((item: any) => {
+    (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {
         formData.append('Files', item.file);
       }
@@ -578,6 +714,22 @@ export class ItService implements OnInit {
   viewFile(file: any) {
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
+  }
+
+  getFileIcon(fileName: string): string {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    const iconMap: Record<string, string> = {
+      pdf: 'fas fa-file-pdf',
+      jpg: 'fas fa-file-image',
+      jpeg: 'fas fa-file-image',
+      png: 'fas fa-file-image',
+      gif: 'fas fa-file-image',
+      doc: 'fas fa-file-word',
+      docx: 'fas fa-file-word',
+      xls: 'fas fa-file-excel',
+      xlsx: 'fas fa-file-excel',
+    };
+    return iconMap[ext ?? ''] ?? 'fas fa-file';
   }
 
   closePreview() {

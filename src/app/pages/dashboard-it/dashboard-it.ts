@@ -263,6 +263,24 @@ export class DashboardIT implements OnInit {
   isMobile = false;
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
+  IS_CHAT_OPEN = signal(false);
+  chatMessage = '';
+  chatAttachments: { name: string; size: number; file: File }[] = [];
+
+  readonly CHAT_FILE_CONFIG = {
+    maxFiles: 5,
+    maxSizeMB: 5,
+    allowedTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'xlsx', 'xls'],
+  };
 
   filter = {
     dateRange: [dayjs().subtract(3, 'month').toDate(), dayjs().toDate()] as [Date, Date] | null,
@@ -499,6 +517,8 @@ export class DashboardIT implements OnInit {
   }
 
   selectTicket(ticketId: string) {
+    const previousTicketId = this.selectedTicket()?.ticketId;
+
     this.getTicketById(ticketId).subscribe(async (res: any) => {
       console.log(res);
       const ticketAttachments = res.attachments?.filter((f: any) => !f.reply_id) || [];
@@ -558,6 +578,9 @@ export class DashboardIT implements OnInit {
         ccList: ccList || [],
       };
       this.selectedTicket.set(objectData);
+      if (previousTicketId !== objectData.ticketId) {
+        this.clearChatDraft();
+      }
       this.scrollToBottom();
 
       console.log(objectData);
@@ -592,6 +615,110 @@ export class DashboardIT implements OnInit {
 
   closeTicketDetail() {
     this.isTicketDetailOpen.set(false);
+    this.closeChat();
+  }
+
+  toggleChat() {
+    this.IS_CHAT_OPEN.update((isOpen) => {
+      const next = !isOpen;
+      if (next) {
+        this.scrollToBottom();
+      }
+      return next;
+    });
+  }
+
+  closeChat() {
+    this.IS_CHAT_OPEN.set(false);
+  }
+
+  private clearChatDraft() {
+    this.chatMessage = '';
+    this.chatAttachments = [];
+  }
+
+  sendChatMessage(ticket: any) {
+    const message = this.chatMessage.trim();
+
+    if (!message) {
+      this.msg.warning('กรุณากรอกข้อความ');
+      return;
+    }
+
+    const attachments = [...this.chatAttachments];
+    this.chatMessage = '';
+    this.chatAttachments = [];
+    this.submitNote({
+      id: ticket.ticketId,
+      message,
+      attachments,
+    });
+  }
+
+  handleChatEnter(event: Event, ticket: any) {
+    const keyboardEvent = event as KeyboardEvent;
+
+    if (keyboardEvent.shiftKey) {
+      return;
+    }
+
+    keyboardEvent.preventDefault();
+    this.sendChatMessage(ticket);
+  }
+
+  onChatFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      this.addChatFiles(input.files);
+    }
+    input.value = '';
+  }
+
+  removeChatAttachment(index: number) {
+    this.chatAttachments.splice(index, 1);
+  }
+
+  private addChatFiles(files: FileList) {
+    if (!files || files.length === 0) return;
+
+    const errors: string[] = [];
+    const validFiles: { name: string; size: number; file: File }[] = [];
+
+    for (const file of Array.from(files)) {
+      const reasons: string[] = [];
+
+      if (this.chatAttachments.length + validFiles.length >= this.CHAT_FILE_CONFIG.maxFiles) {
+        reasons.push(`เกินจำนวนสูงสุด ${this.CHAT_FILE_CONFIG.maxFiles} ไฟล์`);
+      }
+
+      const sizeMB = file.size / (1024 * 1024);
+      if (sizeMB > this.CHAT_FILE_CONFIG.maxSizeMB) {
+        reasons.push(`ขนาดเกิน ${this.CHAT_FILE_CONFIG.maxSizeMB} MB`);
+      }
+
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (
+        !this.CHAT_FILE_CONFIG.allowedTypes.includes(file.type) &&
+        !this.CHAT_FILE_CONFIG.allowedExtensions.includes(ext)
+      ) {
+        reasons.push('ประเภทไฟล์ไม่รองรับ');
+      }
+
+      if (reasons.length > 0) {
+        errors.push(`${file.name} (${reasons.join(', ')})`);
+        continue;
+      }
+
+      validFiles.push({ name: file.name, size: file.size, file });
+    }
+
+    if (errors.length > 0) {
+      this.swalService.warning(errors.join('\n'));
+    }
+
+    if (validFiles.length > 0) {
+      this.chatAttachments = [...this.chatAttachments, ...validFiles];
+    }
   }
 
   showAllServices: boolean = false;
@@ -746,7 +873,32 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
+    console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  viewFileChat(file: any) {
+    console.log(file);
+    let url = '';
+
+    if (file.file) {
+      // ไฟล์ที่ user upload
+      url = URL.createObjectURL(file.file);
+    } else if (file.filePath) {
+      // ไฟล์จาก server
+      url = file.filePath;
+    }
+
+    this.previewFiles.set([
+      {
+        fileName: file.name || file.fileName,
+        date: dayjs().format('DD/MM/YYYY HH:mm'),
+        url: url,
+        type: file.file?.type || file.type || 'application/octet-stream',
+      },
+    ]);
+
     this.isPreviewModalOpen.set(true);
   }
 
@@ -1502,7 +1654,7 @@ export class DashboardIT implements OnInit {
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
 
-    data.attachments.forEach((item: any) => {
+    (data.attachments ?? []).forEach((item: any) => {
       if (item?.file instanceof File) {
         formData.append('Files', item.file);
       }
