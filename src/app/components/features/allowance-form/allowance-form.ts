@@ -113,24 +113,27 @@ export class AllowanceFormComponent implements OnInit, OnChanges {
   }
 
   private mapData() {
-    this.logs = this.requests.details.map((item: any) => ({
-      date: (item.work_date ?? '').split('T')[0],
-      dayType: item.day_type,
-      timeIn: item.actual_checkin,
-      timeOut: item.actual_checkout,
-      hours: item.extra_hours,
-      amount: item.rate_amount ?? 0,
-      actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
-      displayHours: this.formatDuration(item.extra_hours),
-      selected: true,
-      description: item.description,
-      shiftCode: item.shift_code,
-      shiftStart: item.scheduled_start,
-      shiftEnd: item.scheduled_end,
-      isEligible: true,
-      totalHoursText: item.total_hours_text,
-      rateId: item.rate_id,
-    } as AllowanceItem));
+    this.logs = this.requests.details.map(
+      (item: any) =>
+        ({
+          date: (item.work_date ?? '').split('T')[0],
+          dayType: item.day_type,
+          timeIn: item.actual_checkin,
+          timeOut: item.actual_checkout,
+          hours: item.extra_hours,
+          amount: item.rate_amount ?? 0,
+          actualExtraHours: item.extra_hours ?? item.total_hours ?? 0,
+          displayHours: this.formatDuration(item.extra_hours),
+          selected: true,
+          description: item.description,
+          shiftCode: item.shift_code,
+          shiftStart: item.scheduled_start,
+          shiftEnd: item.scheduled_end,
+          isEligible: true,
+          totalHoursText: item.total_hours_text,
+          rateId: item.rate_id,
+        }) as AllowanceItem,
+    );
   }
 
   private enrichShiftTimes() {
