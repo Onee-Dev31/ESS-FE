@@ -135,8 +135,6 @@ export class SettingHoliday {
 
     this.holidayFormList.set([]);
 
-    this.addHolidayRow();
-
     this.isHolidayModalOpen.set(true);
   }
 
@@ -171,10 +169,11 @@ export class SettingHoliday {
 
   addHolidayRow(): void {
     const data = this.holidayFormList();
+    const selectedYear = Number(this.selectedYear);
 
     data.push({
       id: crypto.randomUUID(),
-      holidayDate: '',
+      holidayDate: new Date(selectedYear, 0, 1), // 1 Jan ของปีที่เลือก
       holidayName: '',
     });
 
@@ -291,6 +290,7 @@ export class SettingHoliday {
 
       error: (err) => {
         console.error('Get Holiday Error : ', err);
+        this.swalService.warning(err.error.message);
       },
     });
   }
@@ -302,9 +302,22 @@ export class SettingHoliday {
   }
 
   disableNotSelectedYear = (current: Date): boolean => {
-    if (!current) return false;
+    if (!current) {
+      return false;
+    }
 
-    return current.getFullYear() !== this.selectedYear;
+    const selectedYear = Number(this.selectedYear);
+
+    const currentYear = dayjs(current).year();
+
+    // ห้ามเลือกปีอื่น
+    const invalidYear = currentYear !== selectedYear;
+
+    // ห้ามเลือกวันย้อนหลัง
+    const today = dayjs().startOf('day');
+    const isPastDate = dayjs(current).isBefore(today);
+
+    return invalidYear || isPastDate;
   };
 
   get defaultPickerValue(): Date {
@@ -323,6 +336,50 @@ export class SettingHoliday {
 
   isLockedRow(item: any): boolean {
     return this.isEditMode && this.isPastHoliday(item.holidayDate);
+  }
+
+  getValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    const holidays = this.holidayFormList();
+
+    // check required
+    holidays.forEach((item, index) => {
+      if (!item.holidayDate) {
+        errors.push(`รายการที่ ${index + 1} กรุณาเลือกวันที่`);
+      }
+
+      if (!item.holidayName || !item.holidayName.trim()) {
+        errors.push(`รายการที่ ${index + 1} กรุณากรอกรายละเอียดวันหยุด`);
+      }
+    });
+
+    // check duplicate date
+    const dateMap = new Map<string, number[]>();
+
+    holidays.forEach((item, index) => {
+      if (!item.holidayDate) return;
+
+      const date = dayjs(item.holidayDate).format('YYYY-MM-DD');
+
+      if (!dateMap.has(date)) {
+        dateMap.set(date, []);
+      }
+
+      dateMap.get(date)?.push(index + 1);
+    });
+
+    dateMap.forEach((rows) => {
+      if (rows.length > 1) {
+        errors.push(`วันที่ซ้ำกันในรายการ ${rows.join(', ')}`);
+      }
+    });
+
+    return errors;
+  }
+
+  canSave(): boolean {
+    return this.getValidationErrors().length === 0;
   }
 }
 

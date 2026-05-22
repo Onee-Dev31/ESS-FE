@@ -150,16 +150,6 @@
 
                   <td>
                     <div class="form-field">
-                      <!-- <nz-date-picker
-                        [(ngModel)]="item.holidayDate"
-                        nzFormat="dd/MM/yyyy"
-                        class="form-input custom-picker"
-                        nzDropdownClassName="custom-picker-popup"
-                        [nzDisabledDate]="disableNotSelectedYear"
-                        [nzDisabled]="isLockedRow(item)"
-                        [class.disabled]="isLockedRow(item)"
-                      >
-                      </nz-date-picker> -->
                       <nz-date-picker
                         [(ngModel)]="item.holidayDate"
                         nzFormat="dd/MM/yyyy"
@@ -168,7 +158,6 @@
                         [nzDisabledDate]="disableNotSelectedYear"
                         [nzDisabled]="isLockedRow(item)"
                         [class.disabled]="isLockedRow(item)"
-                        [nzDefaultPickerValue]="defaultPickerValue"
                       >
                       </nz-date-picker>
                     </div>
@@ -218,7 +207,15 @@
       <div class="modal-footer">
         <button class="btn-cancel" (click)="closeHolidayModal()">ยกเลิก</button>
 
-        <button class="btn-save" (click)="saveHoliday()">
+        @if (getValidationErrors().length > 0) {
+          <div class="validation-error-box">
+            @for (error of getValidationErrors(); track error) {
+              <div class="error-text">• {{ error }}</div>
+            }
+          </div>
+        }
+
+        <button class="btn-save" (click)="saveHoliday()" [disabled]="!canSave()">
           <i class="fas fa-save"></i>
           บันทึก
         </button>

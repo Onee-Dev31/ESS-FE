@@ -923,3 +923,17 @@
 .btn-add {
   @include btn-outline;
 }
+
+.validation-error-box {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+}
+
+.error-text {
+  color: #cf1322;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
