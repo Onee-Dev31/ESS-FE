@@ -511,6 +511,11 @@
               </ul>
             </div>
           </div>
+          @if (t.status_user !== 'Referred_Back') {
+            <div class="floating-chat__service-hours">
+              เวลาให้บริการวันจันทร์ – ศุกร์ 09:00 – 18:00 น. หยุดเสาร์ อาทิตย์ และนักขัตฤกษ์
+            </div>
+          }
           <ng-template #noNoteFloating>
             <div class="tk-empty">ยังไม่มีข้อความ</div>
           </ng-template>
