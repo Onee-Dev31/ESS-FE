@@ -317,27 +317,13 @@ export class NotificationService {
   private handleRealtimeNotification(payload: unknown) {
     if (!this.activeUserKey) return;
 
-    const record = this.extractRealtimeRecord(payload);
     this.realtimeTick.update((tick) => tick + 1);
-    this.refreshUnreadCount();
+    this.refreshAll();
 
-    if (!record) {
-      this.loadFirstPage();
-      return;
-    }
-
-    const mapped = this.mapNotification(record);
-    this.items.update((items) => {
-      const prepended = [mapped, ...items.filter((item) => !this.isSameRecipient(item, mapped))];
-      const filtered = this.unreadOnly() ? prepended.filter((item) => !item.isRead) : prepended;
-      return filtered.slice(0, Math.max(filtered.length, this.pageSize));
-    });
-
-    const summaryText = mapped.ticketNumber
-      ? `${mapped.title} • ${mapped.ticketNumber}`
-      : mapped.title;
+    const record = this.extractRealtimeRecord(payload);
+    const title = this.toText((record as any)?.title ?? (record as any)?.notification_title) ?? 'แจ้งเตือนใหม่';
     this.lastToastTime = Date.now();
-    this.toastService.info(summaryText);
+    if (!document.hidden) this.toastService.info(title);
   }
 
   private extractRealtimeRecord(payload: unknown): NotificationApiRecord | null {
