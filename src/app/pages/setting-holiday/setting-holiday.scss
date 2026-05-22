@@ -937,3 +937,179 @@
   font-size: 14px;
   margin-bottom: 4px;
 }
+
+.mode-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 0 24px;
+}
+
+.tab-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid #d9d9d9;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tab-btn.active {
+  background: #1677ff;
+  color: white;
+  border-color: #1677ff;
+}
+.excel-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Description */
+
+.upload-description {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Template Button */
+
+.btn-template {
+  width: fit-content;
+  height: 42px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #1677ff;
+  color: white;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+.btn-template:hover {
+  background: #0958d9;
+  transform: translateY(-1px);
+}
+
+/* Upload Box */
+
+.upload-box {
+  border: 2px dashed #91caff;
+  border-radius: 16px;
+
+  background: #f0f5ff;
+
+  padding: 36px 24px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.upload-box:hover {
+  border-color: #1677ff;
+  background: #e6f4ff;
+  transform: translateY(-2px);
+}
+
+.upload-icon {
+  font-size: 54px;
+  color: #1d6f42;
+  margin-bottom: 16px;
+}
+
+.upload-box div:nth-child(2) {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.upload-subtext {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+/* Selected File */
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+
+  color: #389e0d;
+
+  animation: fadeIn 0.2s ease;
+}
+
+.selected-file span {
+  flex: 1;
+  margin-left: 12px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-weight: 500;
+}
+
+/* Remove Button */
+
+.btn-remove-file {
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #fff1f0;
+  color: #ff4d4f;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.btn-remove-file:hover {
+  background: #ff4d4f;
+  color: white;
+}
+
+/* Animation */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -99,107 +99,161 @@
       <!-- Body -->
 
       <div class="modal-body">
-        <!-- Top Action -->
+        <div class="mode-tabs">
+          <button class="tab-btn" [class.active]="mode === 'manual'" (click)="mode = 'manual'">
+            <i class="fas fa-keyboard"></i>
+            คีย์ข้อมูล
+          </button>
 
-        <div class="top-action" *ngIf="!isEditMode">
-          <!-- Select Year -->
+          <button class="tab-btn" [class.active]="mode === 'excel'" (click)="mode = 'excel'">
+            <i class="fas fa-file-excel"></i>
+            Import Excel
+          </button>
+        </div>
 
-          <div class="form-field">
-            <label>ปี</label>
+        @if (mode === 'manual') {
+          <div class="top-action" *ngIf="!isEditMode">
+            <!-- Select Year -->
 
-            <nz-select
-              nzShowSearch
-              nzPlaceHolder="เลือกปี"
-              [(ngModel)]="selectedYear"
-              name="selectedYear"
-              class="form-control"
-            >
-              @for (year of futureYears; track year) {
-                <nz-option [nzLabel]="year" [nzValue]="year"> </nz-option>
-              }
-            </nz-select>
+            <div class="form-field">
+              <label>ปี</label>
+
+              <nz-select
+                nzShowSearch
+                nzPlaceHolder="เลือกปี"
+                [(ngModel)]="selectedYear"
+                name="selectedYear"
+                class="form-control"
+              >
+                @for (year of futureYears; track year) {
+                  <nz-option [nzLabel]="year" [nzValue]="year"> </nz-option>
+                }
+              </nz-select>
+            </div>
+
+            <!-- Copy Previous Year -->
+
+            <button class="btn-get-old-year" (click)="copyPreviousYear()">
+              <i class="fas fa-copy"></i>
+              ดึงวันหยุดปีที่แล้ว
+            </button>
           </div>
-
-          <!-- Copy Previous Year -->
-
-          <button class="btn-get-old-year" (click)="copyPreviousYear()">
-            <i class="fas fa-copy"></i>
-            ดึงวันหยุดปีที่แล้ว
-          </button>
-        </div>
-
-        <!-- Table -->
-
-        <div class="holiday-table-wrapper">
-          <table class="holiday-table">
-            <thead>
-              <tr>
-                <th width="80">#</th>
-                <th width="220">วันที่วันหยุด</th>
-                <th>รายละเอียดวันหยุด</th>
-                <th width="100"></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              @for (item of holidayFormList(); track item.id; let i = $index) {
+          <div class="holiday-table-wrapper">
+            <table class="holiday-table">
+              <thead>
                 <tr>
-                  <td>
-                    {{ i + 1 }}
-                  </td>
-
-                  <td>
-                    <div class="form-field">
-                      <nz-date-picker
-                        [(ngModel)]="item.holidayDate"
-                        nzFormat="dd/MM/yyyy"
-                        class="form-input custom-picker"
-                        nzDropdownClassName="custom-picker-popup"
-                        [nzDisabledDate]="disableNotSelectedYear"
-                        [nzDisabled]="isLockedRow(item)"
-                        [class.disabled]="isLockedRow(item)"
-                      >
-                      </nz-date-picker>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div class="form-field">
-                      <input
-                        type="text"
-                        [(ngModel)]="item.holidayName"
-                        class="form-input"
-                        placeholder="รายละเอียดวันหยุด"
-                        [disabled]="isLockedRow(item)"
-                      />
-                    </div>
-                  </td>
-
-                  <!-- Delete -->
-
-                  <td>
-                    <button
-                      class="btn-delete"
-                      (click)="removeHolidayRow(i)"
-                      [disabled]="isLockedRow(item)"
-                    >
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </td>
+                  <th width="80">#</th>
+                  <th width="220">วันที่วันหยุด</th>
+                  <th>รายละเอียดวันหยุด</th>
+                  <th width="100"></th>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
 
-        <!-- Add Row -->
+              <tbody>
+                @for (item of holidayFormList(); track item.id; let i = $index) {
+                  <tr>
+                    <td>
+                      {{ i + 1 }}
+                    </td>
 
-        <div class="add-row-section">
-          <button class="btn-add" (click)="addHolidayRow()">
-            <i class="fas fa-plus"></i>
-            เพิ่มรายการ
-          </button>
-        </div>
+                    <td>
+                      <div class="form-field">
+                        <nz-date-picker
+                          [(ngModel)]="item.holidayDate"
+                          nzFormat="dd/MM/yyyy"
+                          class="form-input custom-picker"
+                          nzDropdownClassName="custom-picker-popup"
+                          [nzDisabledDate]="disableNotSelectedYear"
+                          [nzDisabled]="isLockedRow(item)"
+                          [class.disabled]="isLockedRow(item)"
+                        >
+                        </nz-date-picker>
+                      </div>
+                    </td>
+
+                    <td>
+                      <div class="form-field">
+                        <input
+                          type="text"
+                          [(ngModel)]="item.holidayName"
+                          class="form-input"
+                          placeholder="รายละเอียดวันหยุด"
+                          [disabled]="isLockedRow(item)"
+                        />
+                      </div>
+                    </td>
+
+                    <!-- Delete -->
+
+                    <td>
+                      <button
+                        class="btn-delete"
+                        (click)="removeHolidayRow(i)"
+                        [disabled]="isLockedRow(item)"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="add-row-section">
+            <button class="btn-add" (click)="addHolidayRow()">
+              <i class="fas fa-plus"></i>
+              เพิ่มรายการ
+            </button>
+          </div>
+        }
+        @if (mode === 'excel') {
+          <div class="excel-upload-section">
+            <div class="upload-description">Upload ไฟล์ Excel สำหรับนำเข้าวันหยุดประจำปี</div>
+
+            <!-- Download Template -->
+
+            <button class="btn-template" (click)="downloadTemplate()">
+              <i class="fas fa-download"></i>
+              Download Template
+            </button>
+
+            <!-- Upload -->
+
+            <div class="upload-box" (click)="fileInput.click()">
+              <i class="fas fa-file-excel upload-icon"></i>
+
+              <div>คลิกเพื่อเลือกไฟล์ Excel</div>
+
+              <div class="upload-subtext">รองรับ .xlsx และ .xls</div>
+            </div>
+
+            @if (selectedExcelFile) {
+              <div class="selected-file">
+                <i class="fas fa-file-excel"></i>
+
+                <span>
+                  {{ selectedExcelFile.name }}
+                </span>
+
+                <button
+                  type="button"
+                  class="btn-remove-file"
+                  (click)="selectedExcelFile = null; fileInput.value = ''"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            }
+
+            <input
+              #fileInput
+              type="file"
+              hidden
+              accept=".xlsx,.xls"
+              (change)="onUploadExcel($event)"
+            />
+          </div>
+        }
       </div>
 
       <!-- Footer -->

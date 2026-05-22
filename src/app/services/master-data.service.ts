@@ -133,4 +133,16 @@ export class MasterDataService {
       context: new HttpContext().set(SKIP_ERROR_TOAST, true),
     });
   }
+
+  downloadHolidayTemplate(): Observable<Blob> {
+    return this._http.get(`${this.baseUrl}/Master/manage-holiday/template`, {
+      responseType: 'blob',
+    });
+  }
+
+  importHolidayExcel(formData: FormData): Observable<any> {
+    return this._http.post(`${this.baseUrl}/Master/manage-holiday/import`, formData, {
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
+  }
 }

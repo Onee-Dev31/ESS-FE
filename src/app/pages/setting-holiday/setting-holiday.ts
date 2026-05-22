@@ -62,6 +62,9 @@ export class SettingHoliday {
     description: '',
   };
 
+  mode: 'manual' | 'excel' = 'manual';
+  selectedExcelFile: File | null = null;
+
   ngOnInit(): void {
     this.generateYears();
     this.generateFullYears();
@@ -380,6 +383,72 @@ export class SettingHoliday {
 
   canSave(): boolean {
     return this.getValidationErrors().length === 0;
+  }
+
+  downloadTemplate(): void {
+    this.masterService.downloadHolidayTemplate().subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+
+        a.href = url;
+
+        a.download = 'holiday-template.xlsx';
+
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+      },
+
+      error: () => {
+        console.error('ไม่สามารถดาวน์โหลด Template ได้');
+      },
+    });
+  }
+
+  onUploadExcel(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    this.selectedExcelFile = file;
+
+    // validate file
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      this.swalService.warning('กรุณาเลือกไฟล์ Excel เท่านั้น');
+
+      return;
+    }
+
+    const selectYear = '2027';
+
+    const formData = new FormData();
+
+    formData.append('File', file);
+    formData.append('Year', selectYear);
+    formData.append('CreatedBy', '');
+
+    this.masterService.importHolidayExcel(formData).subscribe({
+      next: () => {
+        this.swalService.success('Import สำเร็จ');
+
+        this.getHoliday();
+      },
+
+      error: (err) => {
+        console.error('Get Holiday Error : ', err?.error?.message || 'Import ไม่สำเร็จ');
+      },
+    });
   }
 }
 
