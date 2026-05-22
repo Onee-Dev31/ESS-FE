@@ -553,9 +553,7 @@ describe('NotificationService', () => {
   describe('SignalR — NotificationCreated', () => {
     function flushRealtimeRequests(unreadCount = 1) {
       httpMock.expectOne((r) => r.url.includes('/unread-count')).flush({ unreadCount });
-      httpMock
-        .expectOne((r) => r.url.includes('/my'))
-        .flush({ data: [], totalRecords: 0 });
+      httpMock.expectOne((r) => r.url.includes('/my')).flush({ data: [], totalRecords: 0 });
     }
 
     it('เพิ่ม realtimeTick และ refresh unread count', () => {
