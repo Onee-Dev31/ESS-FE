@@ -240,6 +240,24 @@
         color: var(--text);
       }
 
+      &.btn-reset {
+        border-color: var(--warning, #f59e0b);
+        color: var(--warning, #f59e0b);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+          background: rgba(245, 158, 11, 0.1);
+          color: var(--warning, #f59e0b);
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+      }
+
       &.btn-reject {
         border-color: var(--danger);
         color: var(--danger);

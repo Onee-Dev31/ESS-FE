@@ -45,8 +45,26 @@ export class ApprovalSetupService {
     });
   }
 
-  // GET /api/approval/setup/:costCent
+  // GET /api/approval/categories (default/reset)
   getApprovalSetupChain(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/categories`);
+  }
+
+  // GET /api/approval/categories/current (latest saved)
+  getApprovalSetupChainCurrent(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/categories/current`);
+  }
+
+  // PUT /api/approval/categories
+  saveApprovalCategories(
+    categories: {
+      categoryId: number;
+      skipApprover1: boolean;
+      skipApprover2: boolean;
+      skipApprover3: boolean;
+      skipApprover4: boolean;
+    }[],
+  ): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/categories`, { categories });
   }
 }
