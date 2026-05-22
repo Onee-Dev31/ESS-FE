@@ -284,7 +284,10 @@
     "
   >
     <div class="tk-card__head">
-      <div class="tk-card__title"><i class="fa-solid fa-note-sticky"></i>Note for IT</div>
+      <div class="tk-card__title">
+        <i class="fa-solid fa-note-sticky"></i>Note for IT
+        <span class="category">[{{ t.ticketCategory }}]</span>
+      </div>
       <div class="btn-edit" (click)="openNoteForItModal()">
         <i class="fa-solid fa-pen-to-square"></i>
       </div>
@@ -333,67 +336,6 @@
       </ng-template>
     </div>
   </section> -->
-
-  <!-- NOTES -->
-  <section class="tk-card note">
-    <div class="tk-card__head">
-      <div class="tk-card__title"><i class="fa-solid fa-comments"></i>Chat</div>
-      <button
-        class="btn-note-add"
-        nz-button
-        nzType="primary"
-        (click)="openAddNote()"
-        *ngIf="t.status !== 'Closed' && isAssigned()"
-      >
-        <nz-icon nzType="plus-circle" nzTheme="outline"></nz-icon>
-        เพิ่มข้อความ
-      </button>
-    </div>
-    <div class="tk-card__body" #cardBody>
-      <div class="note-list" *ngIf="t.itNotes.length; else noNote">
-        <div
-          class="note"
-          *ngFor="let n of t.itNotes.slice()"
-          [class.note--me]="n.createBy.empCode === currentUserEmpCode"
-          [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
-        >
-          <div class="note__top">
-            <div class="note__who">
-              <div class="avatar">
-                <app-avatar-preview-modal
-                  [src]="
-                    'https://empimg.oneeclick.co:8048/employeeimage/' + n.createBy.empCode + '.jpg'
-                  "
-                  [name]="n.createBy.nickName"
-                />
-              </div>
-              <div>
-                <b>{{ n.createBy.nickName }}</b>
-              </div>
-            </div>
-            <div class="muted">
-              @if (isToday(n.createdDate)) {
-                {{ n.createdDate | date: 'HH:mm' }}
-              } @else {
-                {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
-              }
-            </div>
-          </div>
-          <div class="note__msg">{{ n.message }}</div>
-          <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
-            <li *ngFor="let file of n.attachments" class="attachment-item" (click)="viewFile(file)">
-              <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
-              <span class="file-name">{{ file.name }}</span>
-              <i class="fas fa-download download-small"></i>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <ng-template #noNote>
-        <div class="tk-empty">ยังไม่มีข้อความ</div>
-      </ng-template>
-    </div>
-  </section>
 
   <!-- ACTIONS -->
   <!-- <section class="tk-actions" *ngIf="t.status !== 'Closed' && t.status !== 'Denied'">
@@ -461,6 +403,151 @@
     </ng-container>
   </section>
 </ng-template>
+
+@if ((!isMobile || isTicketDetailOpen()) && selectedTicket(); as t) {
+  <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()">
+    @if (IS_CHAT_OPEN()) {
+      <section class="floating-chat__panel" aria-label="Ticket chat">
+        <div class="floating-chat__header">
+          <div class="floating-chat__title">
+            <i class="fa-solid fa-comments"></i>
+            <span>Chat</span>
+            @if (getChatAttachmentCount(t) > 0) {
+              <button
+                class="floating-chat__summary"
+                type="button"
+                title="ดูไฟล์แนบในแชททั้งหมด"
+                aria-label="ดูไฟล์แนบในแชททั้งหมด"
+                (click)="openChatAttachments(t)"
+              >
+                <i class="fa-solid fa-paperclip"></i>
+                {{ getChatAttachmentCount(t) }} ไฟล์
+              </button>
+            }
+          </div>
+          <button
+            class="floating-chat__close"
+            type="button"
+            title="ปิดแชท"
+            aria-label="ปิดแชท"
+            (click)="closeChat()"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="floating-chat__body" #cardBody>
+          <div class="note-list" *ngIf="t.itNotes.length; else noNoteFloating">
+            <div
+              class="note"
+              *ngFor="let n of t.itNotes.slice()"
+              [class.note--me]="n.createBy.empCode === currentUserEmpCode"
+              [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
+            >
+              <div class="note__top">
+                <div class="note__who">
+                  <div class="avatar">
+                    <app-avatar-preview-modal
+                      [src]="
+                        'https://empimg.oneeclick.co:8048/employeeimage/' +
+                        n.createBy.empCode +
+                        '.jpg'
+                      "
+                      [name]="n.createBy.nickName"
+                    />
+                  </div>
+                  <div>
+                    <b>{{ n.createBy.nickName }}</b>
+                  </div>
+                </div>
+                <div class="muted">
+                  @if (isToday(n.createdDate)) {
+                    {{ n.createdDate | date: 'HH:mm' }}
+                  } @else {
+                    {{ n.createdDate | date: 'EEE dd, HH:mm' : '' : 'en' }}
+                  }
+                </div>
+              </div>
+              <div class="note__msg">{{ n.message }}</div>
+              <ul class="attachment-list" *ngIf="n.attachments?.length > 0">
+                <li
+                  *ngFor="let file of n.attachments"
+                  class="attachment-item"
+                  (click)="viewFile(file)"
+                >
+                  <div class="file-icon-box"><i class="far fa-file-alt"></i></div>
+                  <span class="file-name">{{ file.name }}</span>
+                  <i class="fas fa-download download-small"></i>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <ng-template #noNoteFloating>
+            <div class="tk-empty">ยังไม่มีข้อความ</div>
+          </ng-template>
+        </div>
+
+        <div class="floating-chat__composer" *ngIf="t.status !== 'Closed' && isAssigned()">
+          <input type="file" multiple hidden #chatFileInput (change)="onChatFileSelected($event)" />
+          <button
+            class="floating-chat__attach"
+            type="button"
+            title="แนบไฟล์"
+            aria-label="แนบไฟล์"
+            (click)="chatFileInput.click()"
+            [disabled]="chatAttachments.length >= CHAT_FILE_CONFIG.maxFiles"
+          >
+            <i class="fa-solid fa-paperclip"></i>
+          </button>
+          <textarea
+            [(ngModel)]="chatMessage"
+            rows="1"
+            placeholder="พิมพ์ข้อความ..."
+            aria-label="พิมพ์ข้อความ"
+            (keydown.enter)="handleChatEnter($event, t)"
+          ></textarea>
+          <button
+            class="floating-chat__send"
+            type="button"
+            title="ส่งข้อความ"
+            aria-label="ส่งข้อความ"
+            [disabled]="!chatMessage.trim()"
+            (click)="sendChatMessage(t)"
+          >
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+        @if (chatAttachments.length > 0 && t.status !== 'Closed' && isAssigned()) {
+          <div class="floating-chat__files">
+            @for (file of chatAttachments; track file.name; let i = $index) {
+              <button class="floating-chat__file" type="button" (click)="viewFileChat(file)">
+                <i [class]="getFileIcon(file.name)"></i>
+                <span>{{ file.name }}</span>
+                <i
+                  class="fas fa-times"
+                  (click)="removeChatAttachment(i); $event.stopPropagation()"
+                ></i>
+              </button>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <button
+      class="floating-chat__button"
+      type="button"
+      title="เปิดแชท"
+      aria-label="เปิดแชท"
+      (click)="toggleChat()"
+    >
+      <i class="fa-solid" [ngClass]="IS_CHAT_OPEN() ? 'fa-times' : 'fa-comments'"></i>
+      @if (!IS_CHAT_OPEN() && t.itNotes.length > 0) {
+        <span class="floating-chat__badge">{{ t.itNotes.length }}</span>
+      }
+    </button>
+  </div>
+}
 
 <!-- RIGHT TEMPLATE -->
 <ng-template #ticketRight let-t="t">
