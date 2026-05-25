@@ -217,6 +217,47 @@
       }
     }
   }
+
+  .form-actions-footer {
+    padding: 18px 26px;
+    border-top: 1px solid var(--border-toolbar);
+    background: var(--bg-card);
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+
+    .btn-back-custom {
+      @include btn-secondary;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: $font-size-label;
+    }
+
+    .btn-save-custom {
+      @include btn-primary;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+      font-size: $font-size-label;
+
+      &:hover {
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+      }
+
+      &:disabled {
+        background: var(--border-color);
+        border-color: var(--border-color);
+        color: var(--text-muted);
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 0.8;
+      }
+    }
+  }
 }
 
 .modal-overlay.expandDetail {
@@ -1297,8 +1338,75 @@
     cursor: default;
   }
 
+  .category-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 4px;
+    padding: 2px 7px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font: inherit;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+
+    .category {
+      margin-left: 0;
+    }
+
+    i {
+      padding-right: 0;
+      font-size: 0.72rem;
+      color: var(--primary);
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary), transparent 90%);
+      border-color: color-mix(in srgb, var(--primary), transparent 70%);
+      color: var(--primary);
+
+      .category {
+        color: var(--primary);
+      }
+    }
+  }
+
   .tk-pill {
     cursor: default;
+  }
+}
+
+.modal-overlay.categoryTicket {
+  .modal-container {
+    width: min(520px, calc(100vw - 32px)) !important;
+  }
+
+  .modal-container > * {
+    flex-direction: row;
+  }
+
+  .top-header-strip {
+    padding: 12px 20px;
+
+    h2 {
+      font-size: $font-size-body;
+    }
+
+    &::after,
+    h2::before {
+      display: none;
+    }
+  }
+
+  .content-card {
+    padding: 22px 24px;
+    box-shadow: none;
+    max-height: none;
   }
 }
 

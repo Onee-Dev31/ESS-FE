@@ -334,6 +334,7 @@ export class DashboardIT implements OnInit {
   selectedAssignee = signal<any | undefined>(undefined);
 
   assigneeGroups: any[] = [];
+  subProblemOptions: any[] = [];
 
   IS_OPEN_IT_SERVICE = signal(0);
   newTicketIds = signal<Set<number>>(new Set());
@@ -351,6 +352,8 @@ export class DashboardIT implements OnInit {
   IS_NOTE_TICKET = signal(false);
   IS_ASSIGN_TICKET = signal(false);
   IS_NOTEFORIT_TICKET = signal(false);
+  IS_CATEGORY_TICKET = signal(false);
+  selectedSubCategoryId: number | null = null;
   isCcModalVisible = false;
 
   keyword = '';
@@ -390,6 +393,7 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
+    this.getSubProblem();
     (this.route.queryParams ?? EMPTY)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
@@ -557,6 +561,7 @@ export class DashboardIT implements OnInit {
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         ticketCategory: ticket.sub_category_name,
+        ticketSubCategoryId: ticket.sub_category_id,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -1169,6 +1174,19 @@ export class DashboardIT implements OnInit {
     });
   }
 
+  getSubProblem() {
+    this.itServiceService.getSubProblem().subscribe({
+      next: (res) => {
+        this.subProblemOptions = (res.data ?? []).sort(
+          (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
+        );
+      },
+      error: (error) => {
+        console.error('Error fetching sub problem:', error);
+      },
+    });
+  }
+
   viewApproveResign() {
     window.open(`/resign-management/detail`, '_blank');
 
@@ -1743,6 +1761,72 @@ export class DashboardIT implements OnInit {
 
   closeNoteForItModal() {
     this.IS_NOTEFORIT_TICKET.set(false);
+  }
+
+  openCategoryModal() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.selectedSubCategoryId = ticket.ticketSubCategoryId ?? null;
+    if (this.subProblemOptions.length === 0) {
+      this.getSubProblem();
+    }
+    this.IS_CATEGORY_TICKET.set(true);
+  }
+
+  closeCategoryModal() {
+    this.IS_CATEGORY_TICKET.set(false);
+    this.selectedSubCategoryId = null;
+  }
+
+  submitCategory() {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!this.selectedSubCategoryId) {
+      this.msg.warning('กรุณาเลือก Category');
+      return;
+    }
+
+    const payload = {
+      subCategoryId: this.selectedSubCategoryId,
+      updatedBy: this.authService.userData()?.CODEMPID ?? '',
+      role: 'it-staff',
+    };
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.itServiceService.updateTicketSubCategory(ticketId, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning(res?.message || 'ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+
+        this.swalService.close();
+        this.closeCategoryModal();
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+      error: (error) => {
+        console.error('Update category error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.error?.message || error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 
   submitNoteForIt(data: any) {

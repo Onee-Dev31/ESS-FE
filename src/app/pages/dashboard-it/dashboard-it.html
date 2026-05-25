@@ -284,7 +284,16 @@
     <div class="tk-card__head">
       <div class="tk-card__title">
         <i class="fa-solid fa-note-sticky"></i>Note for IT
-        <span class="category">[{{ t.ticketCategory }}]</span>
+        <button
+          class="category-edit-btn"
+          type="button"
+          title="Change category"
+          aria-label="Change category"
+          (click)="openCategoryModal()"
+        >
+          <span class="category">[{{ t.ticketCategory || '-' }}]</span>
+          <i class="fa-solid fa-gear"></i>
+        </button>
       </div>
       <div class="btn-edit" (click)="openNoteForItModal()">
         <i class="fa-solid fa-pen-to-square"></i>
@@ -808,6 +817,49 @@
     (closeModal)="closeNoteForItModal()"
     (submitModal)="submitNoteForIt($event)"
   ></app-note-for-it-modal>
+}
+
+@if (IS_CATEGORY_TICKET()) {
+  <div class="modal-overlay categoryTicket" (click)="closeCategoryModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <header class="top-header-strip">
+        <h2>เปลี่ยนหมวดหมู่ปัญหา</h2>
+        <div class="header-right-meta">
+          <button type="button" class="btn-close-modal" (click)="closeCategoryModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </header>
+      <div class="content-card">
+        <div class="form-field" style="width: 100%">
+          <label>Category</label>
+          <nz-select
+            nzShowSearch
+            nzPlaceHolder="Select category"
+            [(ngModel)]="selectedSubCategoryId"
+            class="form-input"
+          >
+            @for (cat of subProblemOptions; track cat.id) {
+              <nz-option [nzLabel]="cat.sub_category_name" [nzValue]="cat.id"></nz-option>
+            }
+          </nz-select>
+        </div>
+      </div>
+      <div class="form-actions-footer">
+        <button class="btn-back-custom" type="button" (click)="closeCategoryModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button
+          class="btn-save-custom"
+          type="button"
+          (click)="submitCategory()"
+          [disabled]="!selectedSubCategoryId"
+        >
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
 }
 
 @if (isDetailModalOpen()) {
