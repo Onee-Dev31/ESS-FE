@@ -460,6 +460,8 @@
               class="note"
               *ngFor="let n of t.itNotes.slice(); let i = index"
               [class.note--me]="n.createBy.empCode === currentUserEmpCode"
+              [class.note--requester]="n.createBy.senderRole === 'requester'"
+              [class.note--it-staff]="n.createBy.senderRole === 'it-staff'"
               [class.note--new-highlight]="i === 0 && highlightedNoteTicketId() === t.ticketId"
             >
               <div class="note__top">
@@ -528,20 +530,27 @@
               <button
                 class="floating-chat__mention-item"
                 [class.is-active]="i === mentionActiveIndex"
+                [class.is-all]="emp.CODEEMPID === '__all__'"
                 type="button"
                 role="option"
                 (mousedown)="$event.preventDefault()"
                 (click)="selectMention(emp)"
               >
-                <img
-                  class="mention-avatar"
-                  [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + (emp.CODEEMPID || emp.codeempid) + '.jpg'"
-                  [alt]="emp.Nickname || emp.FullNameThai"
-                  (error)="onImgError($event)"
-                />
+                @if (emp.CODEEMPID === '__all__') {
+                  <div class="mention-avatar mention-avatar--all">
+                    <i class="fas fa-users"></i>
+                  </div>
+                } @else {
+                  <img
+                    class="mention-avatar"
+                    [src]="'https://empimg.oneeclick.co:8048/employeeimage/' + (emp.CODEEMPID || emp.codeempid) + '.jpg'"
+                    [alt]="emp.Nickname || emp.FullNameThai"
+                    (error)="onImgError($event)"
+                  />
+                }
                 <div class="mention-info">
                   <span class="mention-name">{{ emp.Nickname || emp.FullNameThai }}</span>
-                  @if (emp.Nickname && emp.FullNameThai) {
+                  @if (emp.FullNameThai && emp.CODEEMPID !== '__all__') {
                     <span class="mention-sub">{{ emp.FullNameThai }}</span>
                   }
                 </div>

@@ -443,6 +443,8 @@
               *ngFor="let n of t.itNotes.slice()"
               [class.note--me]="n.createBy.empCode === currentUserEmpCode"
               [class.note--they]="n.createBy.empCode !== currentUserEmpCode"
+              [class.note--requester]="n.createBy.senderRole === 'requester'"
+              [class.note--it-staff]="n.createBy.senderRole === 'it-staff'"
             >
               <div class="note__top">
                 <div class="note__who">

@@ -131,6 +131,7 @@ export class ItService implements OnInit {
   private mentionQuery = '';
   private mentionAtIndex = -1;
   private mentionDebounce: ReturnType<typeof setTimeout> | null = null;
+  private pendingMentionAdUsers = new Set<string>();
 
   readonly CHAT_FILE_CONFIG = {
     maxFiles: 5,
@@ -326,7 +327,7 @@ export class ItService implements OnInit {
     try {
       const res: any = await firstValueFrom(this.itServiceService.getTicketById(String(ticket.ticketId)));
       const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
-      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments);
+      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
@@ -404,7 +405,7 @@ export class ItService implements OnInit {
       const ccList = res.ccList;
       this.desNew = ticket.description;
 
-      const itNotes = await this.buildItNotes(replies, replyAttachments);
+      const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
       let status = this.getTicketStatus(ticket);
 
@@ -513,9 +514,11 @@ export class ItService implements OnInit {
     if (!message) return;
 
     const attachments = [...this.chatAttachments];
+    const mentionedAdUsers = [...this.pendingMentionAdUsers];
     this.chatMessage = '';
     this.chatAttachments = [];
-    this.submitNote({ id: ticket.ticketId, message, attachments }, { silent: true });
+    this.pendingMentionAdUsers.clear();
+    this.submitNote({ id: ticket.ticketId, message, attachments, mentionedAdUsers }, { silent: true });
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
@@ -614,22 +617,29 @@ export class ItService implements OnInit {
         Nickname: ticket.requester.nickname || ticket.requester.fullname || '',
         FullNameThai: ticket.requester.fullname || '',
         CODEEMPID: ticket.requester.emp_code,
+        adUser: ticket.requesterAduser || ticket.requester.aduser || '',
       });
     }
 
-    for (const step of ticket.assignTimeline || []) {
-      for (const a of step.Assignee || []) {
+    const timeline: any[] = ticket.assignTimeline || [];
+    const latestStep = timeline.length > 0 ? timeline[timeline.length - 1] : null;
+    if (latestStep) {
+      for (const a of latestStep.Assignee || []) {
         if (a.empCode && !seen.has(a.empCode)) {
           seen.add(a.empCode);
           participants.push({
             Nickname: a.nickName || a.fullName || '',
             FullNameThai: a.fullName || '',
             CODEEMPID: a.empCode,
+            adUser: a.adUser || a.aduser || '',
           });
         }
       }
     }
 
+    if (participants.length > 1) {
+      return [{ Nickname: 'All', FullNameThai: 'แจ้งทุกคน', CODEEMPID: '__all__' }, ...participants];
+    }
     return participants;
   }
 
@@ -637,7 +647,18 @@ export class ItService implements OnInit {
     const name = emp.Nickname || emp.nickname || emp.FullNameThai || emp.fullname || '';
     const before = this.chatMessage.substring(0, this.mentionAtIndex);
     const after = this.chatMessage.substring(this.mentionAtIndex + 1 + this.mentionQuery.length);
-    this.chatMessage = `${before}@${name} ${after}`;
+    this._chatMessage = `${before}@${name} ${after}`;
+
+    if (emp.CODEEMPID === '__all__') {
+      for (const p of this.getTicketParticipants()) {
+        const au = (p.adUser || '').toLowerCase();
+        if (au && p.CODEEMPID !== '__all__') this.pendingMentionAdUsers.add(au);
+      }
+    } else {
+      const au = (emp.adUser || emp.AD_USER || emp.aduser || '').toLowerCase();
+      if (au) this.pendingMentionAdUsers.add(au);
+    }
+
     this.closeMention();
     setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 0);
   }
@@ -668,6 +689,7 @@ export class ItService implements OnInit {
   private clearChatDraft() {
     this.chatMessage = '';
     this.chatAttachments = [];
+    this.pendingMentionAdUsers.clear();
   }
 
   private addChatFiles(files: FileList) {
@@ -796,13 +818,14 @@ export class ItService implements OnInit {
           const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
             .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
             .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
+          const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
           this.signalrService.noteNotify(
             data.id,
             requesterAdUser,
             senderAdUser,
             senderName,
             data.message,
-            assigneeAdUsers,
+            allRecipients,
           );
         }
 
@@ -1000,11 +1023,16 @@ export class ItService implements OnInit {
     });
   }
 
-  async buildItNotes(replies: any[], attachments: any[]) {
+  async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+        const senderRole =
+          requesterAduser &&
+          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+            ? 'requester'
+            : 'it-staff';
 
         return {
           id: r.id,
@@ -1017,6 +1045,7 @@ export class ItService implements OnInit {
             empCode: r.user_code,
             adUser: r.user_aduser,
             role: 'user',
+            senderRole,
           },
           referred_title: r.Referred_Title,
           isReferred: r.IsReferred,

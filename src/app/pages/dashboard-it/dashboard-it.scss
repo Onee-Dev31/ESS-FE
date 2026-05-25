@@ -1639,6 +1639,16 @@
     }
   }
 
+  .note--requester {
+    background: color-mix(in srgb, #3b82f6 10%, var(--bg-card));
+    border-color: color-mix(in srgb, #3b82f6 30%, var(--border));
+  }
+
+  .note--it-staff {
+    background: color-mix(in srgb, #7c3aed 10%, var(--bg-card));
+    border-color: color-mix(in srgb, #7c3aed 30%, var(--border));
+  }
+
   .attachment-list {
     display: grid;
     gap: 8px;

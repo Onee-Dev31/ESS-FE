@@ -600,7 +600,7 @@ export class DashboardIT implements OnInit {
       const assignments = res.assignments;
       const ccList = res.ccList;
 
-      const itNotes = await this.buildItNotes(replies, replyAttachments);
+      const itNotes = await this.buildItNotes(replies, replyAttachments, ticket.requester_aduser);
       const result = this.buildTimeline(res.timeline, res.timelineAssignees);
 
       const status_for_it =
@@ -1200,11 +1200,16 @@ export class DashboardIT implements OnInit {
     });
   }
 
-  async buildItNotes(replies: any[], attachments: any[]) {
+  async buildItNotes(replies: any[], attachments: any[], requesterAduser?: string) {
     const notes = await Promise.all(
       replies.map(async (r) => {
         const files = attachments.filter((a) => a.reply_id === r.id);
         const convertedFiles = await this.fileConverter.convertUrlsToFiles(files);
+        const senderRole =
+          requesterAduser &&
+          (r.user_aduser || '').toLowerCase() === requesterAduser.toLowerCase()
+            ? 'requester'
+            : 'it-staff';
 
         return {
           id: r.id,
@@ -1217,12 +1222,12 @@ export class DashboardIT implements OnInit {
             empCode: r.user_code,
             adUser: r.user_aduser,
             role: 'user',
+            senderRole,
           },
         };
       }),
     );
 
-    // console.log(notes);
     return notes;
   }
 
@@ -1232,7 +1237,7 @@ export class DashboardIT implements OnInit {
     try {
       const res: any = await firstValueFrom(this.getTicketById(String(ticket.ticketId)));
       const replyAttachments = (res.attachments ?? []).filter((f: any) => f.reply_id);
-      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments);
+      const itNotes = await this.buildItNotes(res.replies ?? [], replyAttachments, ticket.requesterAduser);
       const currentIds = new Set((ticket.itNotes ?? []).map((n: any) => n.id));
       const hasNew = itNotes.some((n: any) => !currentIds.has(n.id));
       if (!hasNew) return;
