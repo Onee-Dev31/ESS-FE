@@ -440,20 +440,12 @@ export class ItService implements OnInit {
 
   sendChatMessage(ticket: any) {
     const message = this.chatMessage.trim();
-
-    if (!message) {
-      this.swalService.warning('กรุณากรอกข้อความ');
-      return;
-    }
+    if (!message) return;
 
     const attachments = [...this.chatAttachments];
     this.chatMessage = '';
     this.chatAttachments = [];
-    this.submitNote({
-      id: ticket.ticketId,
-      message,
-      attachments,
-    });
+    this.submitNote({ id: ticket.ticketId, message, attachments }, { silent: true });
   }
 
   handleChatKeydown(event: KeyboardEvent, ticket: any) {
@@ -700,7 +692,8 @@ export class ItService implements OnInit {
     this.IS_NOTE_TICKET.set(false);
   }
 
-  submitNote(data: any) {
+  submitNote(data: any, options?: { silent?: boolean }) {
+    const silent = options?.silent ?? false;
     const formData = new FormData();
     formData.append('Message', data.message);
     formData.append('ExecutedBy', this.authService.userData().CODEMPID);
@@ -710,24 +703,17 @@ export class ItService implements OnInit {
         formData.append('Files', item.file);
       }
     });
-    // console.log('formData', [...formData.entries()]);
 
-    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    if (!silent) this.swalService.loading('กำลังบันทึกข้อมูล...');
     this.IS_NOTE_TICKET.set(false);
     this.itServiceService.replyTicket(data.id, formData).subscribe({
       next: (res) => {
-        // console.log(res);
-
         if (!res?.success) {
-          this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
+          if (!silent) this.swalService.warning('ไม่สามารถบันทึกข้อมูลได้');
           return;
         }
 
-        this.swalService.close();
-
-        setTimeout(() => {
-          this.swalService.success(res.message || 'บันทึกสำเร็จ');
-        }, 100);
+        if (!silent) this.swalService.close();
 
         const ticket = this.selectedTicket();
         const requesterAdUser = ticket?.requesterAduser;
@@ -748,17 +734,15 @@ export class ItService implements OnInit {
           );
         }
 
+        if (!silent) setTimeout(() => this.swalService.success(res.message || 'บันทึกสำเร็จ'), 100);
+
         this.selectTicket(data.id);
         this.getMyTicket();
       },
 
       error: (error) => {
         console.error('Assign Ticket Error:', error);
-
-        this.swalService.warning(
-          'เกิดข้อผิดพลาด',
-          error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
-        );
+        if (!silent) this.swalService.warning('เกิดข้อผิดพลาด', error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้');
       },
     });
   }
