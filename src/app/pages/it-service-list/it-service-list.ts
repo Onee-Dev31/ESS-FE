@@ -104,6 +104,18 @@ export class ItService implements OnInit {
     return Math.max(0, total - read);
   });
 
+  canAccessChat = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return false;
+    const myAdUser = (this.authService.currentUser() ?? '').toLowerCase();
+    if ((ticket.requesterAduser ?? '').toLowerCase() === myAdUser) return true;
+    const timeline: any[] = ticket.assignTimeline ?? [];
+    const latestStep = timeline[timeline.length - 1];
+    return (latestStep?.Assignee ?? []).some(
+      (a: any) => (a.adUser || a.aduser || '').toLowerCase() === myAdUser,
+    );
+  });
+
   private _chatMessage = '';
   get chatMessage() { return this._chatMessage; }
   set chatMessage(value: string) {
@@ -435,7 +447,7 @@ export class ItService implements OnInit {
       if (previousTicketId !== objectData.ticketId) {
         this.clearChatDraft();
       }
-      if (options?.openChat) {
+      if (options?.openChat && this.canAccessChat()) {
         this.IS_CHAT_OPEN.set(true);
         this.markChatAsRead();
         setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);

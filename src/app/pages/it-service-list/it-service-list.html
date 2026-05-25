@@ -435,6 +435,7 @@
 
 @if ((!isMobile || isTicketDetailOpen()) && selectedTicket(); as t) {
   <div class="floating-chat" [class.is-open]="IS_CHAT_OPEN()" #floatingChatRef>
+    @if (canAccessChat()) {
     @if (IS_CHAT_OPEN()) {
       <section class="floating-chat__panel" aria-label="Ticket chat">
         <div class="floating-chat__header">
@@ -617,6 +618,7 @@
         <span class="floating-chat__badge">{{ unreadChatCount() }}</span>
       }
     </button>
+    }
   </div>
 }
 
