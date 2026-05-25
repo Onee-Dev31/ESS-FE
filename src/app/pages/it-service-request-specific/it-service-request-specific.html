@@ -1,5 +1,5 @@
 <div
-  class="it-request-page specific-request-page"
+  class="it-request-page"
   [style]="
     openBy === 'IT'
       ? 'padding: 0; height: fit-content; background-color: transparent;'
@@ -65,14 +65,17 @@
             }
           </div>
 
-          <div class="specific-grid highlight-blue">
-            <div class="specific-field">
-              <label>ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label>
+          <div class="form-section two-col highlight-blue" style="padding-bottom: 24px">
+            <div class="form-field" style="gap: 0.75rem">
+              <label class="form-label"
+                >ชื่อ / รหัสพนักงาน <span class="required-badge">*</span></label
+              >
+              <!-- <div class="input-pair-row"> -->
               <nz-select
                 nzShowSearch
                 nzAllowClear
                 nzPlaceHolder="เลือกพนักงาน"
-                class="form-control-select"
+                class="form-input"
                 [ngModel]="person.openFor"
                 (ngModelChange)="onSpecificOpenForChange(person, $event)"
                 [name]="'openFor' + person.id"
@@ -81,10 +84,11 @@
                   <nz-option [nzLabel]="opt.label" [nzValue]="opt.value" />
                 }
               </nz-select>
+              <!-- </div> -->
             </div>
 
-            <div class="specific-field">
-              <label>เบอร์ติดต่อ <span class="required-badge">*</span></label>
+            <div class="form-group">
+              <label class="form-label">เบอร์ติดต่อ <span class="required-badge">*</span></label>
               <input
                 class="form-control"
                 type="text"
@@ -96,148 +100,165 @@
             </div>
           </div>
 
-          <div class="specific-field">
-            <label>เลือกระบบเฉพาะ <span class="required-badge">*</span></label>
-            <div class="specific-system-buttons">
-              @for (system of specificSystemChoices; track system.key) {
-                <button
-                  type="button"
-                  class="system-choice"
-                  [class.active]="person.systems.includes(system.key)"
-                  (click)="togglePersonSystem(person, system.key)"
-                >
-                  <i class="fas" [class]="system.icon"></i>
-                  {{ system.label }}
-                </button>
-              }
+          <div class="form-section" style="padding-bottom: 24px">
+            <div class="form-group">
+              <label class="form-label">เลือกระบบเฉพาะ <span class="required-badge">*</span></label>
+              <div class="specific-system-buttons">
+                @for (system of specificSystemChoices; track system.key) {
+                  <button
+                    type="button"
+                    class="system-choice"
+                    [class.active]="person.systems.includes(system.key)"
+                    (click)="togglePersonSystem(person, system.key)"
+                  >
+                    <i class="fas" [class]="system.icon"></i>
+                    {{ system.label }}
+                  </button>
+                }
+              </div>
             </div>
-          </div>
 
-          @if (person.systems.length) {
-            <div class="system-detail-grid">
-              @if (person.systems.includes('bms')) {
-                <div class="system-detail-card">
-                  <h6>BMS</h6>
-                  <input
-                    class="form-control"
-                    placeholder="บริษัทที่รับผิดชอบ"
-                    [(ngModel)]="person.bmsCompany"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'bmsCompany' + person.id"
-                  />
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.bmsTeam"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'bmsTeam' + person.id"
-                  >
-                    <option value="">Team / สิทธิ์เหมือนใคร</option>
-                    @for (item of bmsTeams; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.bmsRight"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'bmsRight' + person.id"
-                  >
-                    <option value="">สิทธิ์</option>
-                    @for (item of bmsRights; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                </div>
-              }
+            @if (person.systems.length) {
+              <div class="system-detail-grid">
+                @if (person.systems.includes('bms')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">BMS</h6>
+                    <div class="form-field">
+                      <nz-select
+                        nzShowSearch
+                        nzAllowClear
+                        nzMode="multiple"
+                        nzPlaceHolder="เลือกบริษัท"
+                        [(ngModel)]="formData.bms_company"
+                        name="company"
+                        class="form-input multiple"
+                        (ngModelChange)="onCompanyChange($event, true)"
+                        required
+                        #company="ngModel"
+                        [class.input-error]="company.invalid && company.touched"
+                      >
+                        <!-- <nz-option nzLabel="เลือกบริษัท" nzValue="" nzDisabled /> -->
+                        <nz-option
+                          *ngFor="let company of companyList"
+                          [nzLabel]="company.COMPANY_NAME + ' (' + company.COMPANY_CODE + ')'"
+                          [nzValue]="company"
+                        />
+                      </nz-select>
+                    </div>
 
-              @if (person.systems.includes('oracle')) {
-                <div class="system-detail-card">
-                  <h6>Oracle</h6>
-                  <input
-                    class="form-control"
-                    placeholder="บริษัทที่รับผิดชอบ"
-                    [(ngModel)]="person.oracleCompany"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'oracleCompany' + person.id"
-                  />
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.oracleModule"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'oracleModule' + person.id"
-                  >
-                    <option value="">Module</option>
-                    @for (item of oracleModules; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.oracleRight"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'oracleRight' + person.id"
-                  >
-                    <option value="">สิทธิ์</option>
-                    @for (item of oracleRights; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                </div>
-              }
+                    <div class="form-field">
+                      <input
+                        class="form-input"
+                        placeholder="สิทธิ์เหมือนใคร"
+                        [(ngModel)]="formData.bms_detail"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'bmsCompany' + person.id"
+                      />
+                    </div>
+                  </div>
+                }
 
-              @if (person.systems.includes('onee')) {
-                <div class="system-detail-card">
-                  <h6>OneE</h6>
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.oneePermission"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'oneePermission' + person.id"
-                  >
-                    <option value="">Permission ที่ต้องการ</option>
-                    @for (item of oneePermissions; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                </div>
-              }
+                @if (person.systems.includes('oracle')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">Oracle</h6>
+                    <div class="form-field">
+                      <input
+                        class="form-input"
+                        placeholder="บริษัทที่รับผิดชอบ"
+                        [(ngModel)]="person.oracleCompany"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'oracleCompany' + person.id"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <nz-select
+                        class="w-full form-input"
+                        nzPlaceHolder="Module"
+                        [(ngModel)]="person.oracleModule"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'oracleModule' + person.id"
+                      >
+                        @for (item of oracleModules; track item) {
+                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
+                        }
+                      </nz-select>
+                    </div>
+                    <div class="form-field">
+                      <nz-select
+                        class="w-full form-input"
+                        nzPlaceHolder="สิทธิ์"
+                        [(ngModel)]="person.bmsRight"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'bmsRight' + person.id"
+                      >
+                        @for (item of bmsRights; track item) {
+                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
+                        }
+                      </nz-select>
+                    </div>
+                  </div>
+                }
 
-              @if (person.systems.includes('onePortal')) {
-                <div class="system-detail-card">
-                  <h6>One Portal</h6>
-                  <input
-                    class="form-control"
-                    placeholder="บริษัทที่รับผิดชอบ"
-                    [(ngModel)]="person.onePortalCompany"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'onePortalCompany' + person.id"
-                  />
-                  <select
-                    class="form-control"
-                    [(ngModel)]="person.onePortalResponseType"
-                    (ngModelChange)="touchSpecificPeople()"
-                    [name]="'onePortalResponseType' + person.id"
-                  >
-                    <option value="">Response Type</option>
-                    @for (item of onePortalResponseTypes; track item) {
-                      <option [value]="item">{{ item }}</option>
-                    }
-                  </select>
-                </div>
-              }
+                @if (person.systems.includes('onee')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">OneE</h6>
+                    <div class="form-field">
+                      <nz-select
+                        class="w-full form-input"
+                        nzPlaceHolder="Permission ที่ต้องการ"
+                        [(ngModel)]="person.oneePermission"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'oneePermission' + person.id"
+                      >
+                        @for (item of oneePermissions; track item) {
+                          <nz-option [nzValue]="item" [nzLabel]="item"></nz-option>
+                        }
+                      </nz-select>
+                    </div>
+                  </div>
+                }
+
+                @if (person.systems.includes('onePortal')) {
+                  <div class="system-detail-card">
+                    <h6 class="form-label">One Portal</h6>
+                    <div class="form-field">
+                      <input
+                        class="form-input"
+                        placeholder="บริษัทที่รับผิดชอบ"
+                        [(ngModel)]="person.onePortalCompany"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'onePortalCompany' + person.id"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <select
+                        class="form-input"
+                        [(ngModel)]="person.onePortalResponseType"
+                        (ngModelChange)="touchSpecificPeople()"
+                        [name]="'onePortalResponseType' + person.id"
+                      >
+                        <option value="">Response Type</option>
+                        @for (item of onePortalResponseTypes; track item) {
+                          <option [value]="item">{{ item }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="form-group" style="margin-top: 14px">
+              <label class="form-label">หมายเหตุเพิ่มเติม</label>
+              <textarea
+                class="form-control note-control"
+                rows="3"
+                placeholder="รายละเอียดเพิ่มเติมของคนนี้..."
+                [(ngModel)]="person.note"
+                (ngModelChange)="touchSpecificPeople()"
+                [name]="'note' + person.id"
+              ></textarea>
             </div>
-          }
-
-          <div class="specific-field">
-            <label>หมายเหตุเพิ่มเติม</label>
-            <textarea
-              class="form-control note-control"
-              rows="3"
-              placeholder="รายละเอียดเพิ่มเติมของคนนี้..."
-              [(ngModel)]="person.note"
-              (ngModelChange)="touchSpecificPeople()"
-              [name]="'note' + person.id"
-            ></textarea>
           </div>
         </section>
       }
@@ -299,7 +320,10 @@
           @if (requestDetails()) {
             <div class="summary-section">
               <h3>รายละเอียดที่จะบันทึก</h3>
-              <div class="detail-text p-3 bg-light rounded text-muted" style="white-space: pre-wrap">
+              <div
+                class="detail-text p-3 bg-light rounded text-muted"
+                style="white-space: pre-wrap"
+              >
                 {{ requestDetails() }}
               </div>
             </div>

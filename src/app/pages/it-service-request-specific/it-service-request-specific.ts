@@ -23,6 +23,7 @@ import { finalize } from 'rxjs';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { decryptValue } from '../../utils/crypto.js ';
 import { SignalrService } from '../../services/signalr.service';
+import { MasterDataService } from '../../services/master-data.service';
 
 type SpecificSystemKey = 'bms' | 'oracle' | 'onee' | 'onePortal';
 
@@ -46,18 +47,14 @@ interface SpecificPersonRequest {
 @Component({
   selector: 'app-it-service-request',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    PageHeaderComponent,
-    NzSelectModule,
-  ],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, NzSelectModule],
   templateUrl: './it-service-request-specific.html',
   styleUrl: './it-service-request-specific.scss',
 })
 export class ITServiceRequestSpecificComponent implements OnInit {
   // Inject Services
   private swalService = inject(SwalService);
+  private masterService = inject(MasterDataService);
   private userService = inject(UserService);
   private itServiceMock = inject(ItServiceMockService);
   private itServiceService = inject(ItServiceService);
@@ -119,6 +116,7 @@ export class ITServiceRequestSpecificComponent implements OnInit {
   ngOnInit() {
     this.getServiceType();
     this.getOpenFor();
+    this.getCompanies();
 
     const userData = this.authService.userData();
     if (userData?.TELOFF) {
@@ -691,7 +689,11 @@ export class ITServiceRequestSpecificComponent implements OnInit {
     }
 
     this.setDefaultSpecificService();
-    const selectedLabels = new Set(people.flatMap((person) => person.systems.flatMap((system) => this.getSpecificSystemAliases(system))));
+    const selectedLabels = new Set(
+      people.flatMap((person) =>
+        person.systems.flatMap((system) => this.getSpecificSystemAliases(system)),
+      ),
+    );
 
     this.systemSubOptions.update((items) =>
       items.map((item) => ({
@@ -748,5 +750,65 @@ export class ITServiceRequestSpecificComponent implements OnInit {
       onePortal: ['one portal', 'oneportal'],
     };
     return aliases[system];
+  }
+
+  // NEW!
+
+  formData: any = {
+    bms_company: [],
+    bms_detail: '',
+  };
+
+  companyList: any[] = [];
+  departmentList: any[] = [];
+  filteredDepartmentList: any[] = [];
+
+  // function
+  onCompanyChange(company: any, isUserChange = true) {
+    if (isUserChange) {
+      this.formData.department = '';
+    }
+
+    if (!company) {
+      this.filteredDepartmentList = [];
+      return;
+    }
+
+    this.filteredDepartmentList = this.departmentList.filter(
+      (dept) => dept.COMPANY_CODE === company.COMPANY_CODE,
+    );
+  }
+
+  private remapCompanyCode(code: string): string {
+    if (code === 'OTD') return 'ONEE';
+    if (code === 'OTV') return 'ONE31';
+    return code;
+  }
+
+  getCompanies() {
+    this.masterService.getCompanyMaster().subscribe({
+      next: (data) => {
+        console.log(data);
+        this.companyList = data.map((item: any) => ({
+          ...item,
+          COMPANY_CODE: this.remapCompanyCode(item.COMPANY_CODE),
+        }));
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  getDepartments() {
+    this.masterService.getDepartmentMaster().subscribe({
+      next: (data) => {
+        // console.log(data);
+        this.departmentList = data;
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
   }
 }
