@@ -4,7 +4,7 @@ export const environment = {
   api_url: 'https://localhost:7081/api',
   previewUrl: 'http://10.31.1.85:5259',
   api_ONEEJOB_url: 'https://localhost:7113/api',
-  emp_img_url: 'https://empimg.oneeclick.co:8048/employeeimage',
+  employeeImageUrl: 'https://imgemp.oneeclick.co/employeeimage',
   file_base_url: 'http://10.88.0.31:5258',
   frontend_url: 'http://10.88.0.31:4200',
 };

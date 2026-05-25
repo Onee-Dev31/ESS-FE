@@ -22,6 +22,7 @@ import {
 import { onImgError } from '../../utils/image.util';
 import { SkeletonComponent } from '../../components/shared/skeleton/skeleton';
 import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-chain-modal/approval-setup-chain-modal';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-approval-setup',
@@ -44,6 +45,10 @@ import { ApprovalSetupChainModal } from '../../components/modals/approval-setup-
   styleUrl: './approval-setup.scss',
 })
 export class ApprovalSetup implements OnInit {
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
+
   private approvalService = inject(ApprovalSetupService);
   private swalService = inject(SwalService);
   private authService = inject(AuthService);

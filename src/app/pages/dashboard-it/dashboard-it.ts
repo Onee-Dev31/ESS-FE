@@ -57,6 +57,7 @@ import { NoteForItModal } from './modal/note-for-it-modal/note-for-it-modal';
 import { AvatarPreviewModal } from '../../components/modals/avatar-preview-modal/avatar-preview-modal';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard-it',
@@ -89,6 +90,10 @@ import { en_US, NzI18nService } from 'ng-zorro-antd/i18n';
 })
 export class DashboardIT implements OnInit {
   allDataUserLogin: any = JSON.parse(localStorage.getItem('allData') ?? '{}');
+
+  getEmployeeImage(empCode: string): string {
+    return `${environment.employeeImageUrl}/${empCode}.jpg`;
+  }
 
   actionConfig: Record<
     string,
@@ -287,11 +292,30 @@ export class DashboardIT implements OnInit {
   };
 
   @ViewChild('cardBody') cardBodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('chatTextarea') chatTextareaEl?: ElementRef<HTMLTextAreaElement>;
   @ViewChild('ticketList') ticketList!: ElementRef;
 
   @HostListener('window:resize')
   onResize() {
     this.checkScreen();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeydown(event: KeyboardEvent) {
+    if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+      return;
+    }
+
+    if (event.code !== 'KeyC' && event.key.toLowerCase() !== 'c') {
+      return;
+    }
+
+    if (!this.selectedTicket() || (this.isMobile && !this.isTicketDetailOpen())) {
+      return;
+    }
+
+    event.preventDefault();
+    this.toggleChat();
   }
 
   checkScreen() {
@@ -329,6 +353,7 @@ export class DashboardIT implements OnInit {
   selectedAssignee = signal<any | undefined>(undefined);
 
   assigneeGroups: any[] = [];
+  subProblemOptions: any[] = [];
 
   IS_OPEN_IT_SERVICE = signal(0);
   newTicketIds = signal<Set<number>>(new Set());
@@ -346,6 +371,8 @@ export class DashboardIT implements OnInit {
   IS_NOTE_TICKET = signal(false);
   IS_ASSIGN_TICKET = signal(false);
   IS_NOTEFORIT_TICKET = signal(false);
+  IS_CATEGORY_TICKET = signal(false);
+  selectedSubCategoryId: number | null = null;
   isCcModalVisible = false;
 
   keyword = '';
@@ -385,6 +412,7 @@ export class DashboardIT implements OnInit {
     }
     this.initialized = true;
     this.getAssignItDropdown();
+    this.getSubProblem();
     (this.route.queryParams ?? EMPTY)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
@@ -514,6 +542,7 @@ export class DashboardIT implements OnInit {
       return new Set(s);
     });
     this.selectTicket(String(ticketId));
+    this.IS_CHAT_OPEN.set(true);
   }
 
   selectTicket(ticketId: string) {
@@ -552,6 +581,7 @@ export class DashboardIT implements OnInit {
         ticketType: ticket.ticket_type_name_th,
         ticketTypeId: ticket.ticket_type_id,
         ticketCategory: ticket.sub_category_name,
+        ticketSubCategoryId: ticket.sub_category_id,
         priority: ticket.priority,
         source: ticket.source,
         createdDate: new Date(ticket.created_at).toISOString(),
@@ -624,6 +654,7 @@ export class DashboardIT implements OnInit {
       const next = !isOpen;
       if (next) {
         this.scrollToBottom();
+        this.focusChatComposer();
       }
       return next;
     });
@@ -636,6 +667,12 @@ export class DashboardIT implements OnInit {
   private clearChatDraft() {
     this.chatMessage = '';
     this.chatAttachments = [];
+  }
+
+  private focusChatComposer() {
+    requestAnimationFrame(() => {
+      setTimeout(() => this.chatTextareaEl?.nativeElement.focus(), 0);
+    });
   }
 
   sendChatMessage(ticket: any) {
@@ -874,13 +911,13 @@ export class DashboardIT implements OnInit {
   }
 
   viewFile(file: any) {
-    console.log(file);
+    // console.log(file);
     this.previewFiles.set([this.fileConverter.buildPreviewFile(file)]);
     this.isPreviewModalOpen.set(true);
   }
 
   viewFileChat(file: any) {
-    console.log(file);
+    // console.log(file);
     let url = '';
 
     if (file.file) {
@@ -1160,6 +1197,19 @@ export class DashboardIT implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  getSubProblem() {
+    this.itServiceService.getSubProblem().subscribe({
+      next: (res) => {
+        this.subProblemOptions = (res.data ?? []).sort(
+          (a: any, b: any) => Number(a.display_order ?? 0) - Number(b.display_order ?? 0),
+        );
+      },
+      error: (error) => {
+        console.error('Error fetching sub problem:', error);
       },
     });
   }
@@ -1738,6 +1788,72 @@ export class DashboardIT implements OnInit {
 
   closeNoteForItModal() {
     this.IS_NOTEFORIT_TICKET.set(false);
+  }
+
+  openCategoryModal() {
+    const ticket = this.selectedTicket();
+    if (!ticket?.ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    this.selectedSubCategoryId = ticket.ticketSubCategoryId ?? null;
+    if (this.subProblemOptions.length === 0) {
+      this.getSubProblem();
+    }
+    this.IS_CATEGORY_TICKET.set(true);
+  }
+
+  closeCategoryModal() {
+    this.IS_CATEGORY_TICKET.set(false);
+    this.selectedSubCategoryId = null;
+  }
+
+  submitCategory() {
+    const ticket = this.selectedTicket();
+    const ticketId = ticket?.ticketId;
+
+    if (!ticketId) {
+      this.msg.warning('ไม่พบ Ticket');
+      return;
+    }
+
+    if (!this.selectedSubCategoryId) {
+      this.msg.warning('กรุณาเลือก Category');
+      return;
+    }
+
+    const payload = {
+      subCategoryId: this.selectedSubCategoryId,
+      updatedBy: this.authService.userData()?.CODEMPID ?? '',
+      role: 'it-staff',
+    };
+
+    this.swalService.loading('กำลังบันทึกข้อมูล...');
+    this.itServiceService.updateTicketSubCategory(ticketId, payload).subscribe({
+      next: (res) => {
+        if (!res?.success) {
+          this.swalService.warning(res?.message || 'ไม่สามารถบันทึกข้อมูลได้');
+          return;
+        }
+
+        this.swalService.close();
+        this.closeCategoryModal();
+        setTimeout(() => {
+          this.swalService.success(res.message || 'บันทึกสำเร็จ');
+        }, 100);
+
+        this.selectTicket(ticketId);
+        this.getAllTickets();
+      },
+      error: (error) => {
+        console.error('Update category error:', error);
+        this.swalService.warning(
+          'เกิดข้อผิดพลาด',
+          error?.error?.message || error?.message || 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+        );
+      },
+    });
   }
 
   submitNoteForIt(data: any) {
