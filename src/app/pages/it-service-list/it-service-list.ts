@@ -1,6 +1,7 @@
 import {
   Component,
   signal,
+  computed,
   inject,
   ChangeDetectorRef,
   OnInit,
@@ -76,6 +77,17 @@ export class ItService implements OnInit {
   isSmallMobile = false;
   isTicketDetailOpen = signal(false);
   IS_CHAT_OPEN = signal(false);
+
+  // ticketId → number of notes that were visible when chat was last opened/read
+  private chatReadCounts = signal<Map<number, number>>(new Map());
+
+  unreadChatCount = computed(() => {
+    const ticket = this.selectedTicket();
+    if (!ticket) return 0;
+    const total = (ticket.itNotes ?? []).length;
+    const read = this.chatReadCounts().get(ticket.ticketId) ?? 0;
+    return Math.max(0, total - read);
+  });
 
   private _chatMessage = '';
   get chatMessage() { return this._chatMessage; }
@@ -281,6 +293,7 @@ export class ItService implements OnInit {
       if (!hasNew) return;
       this.selectedTicket.update((t) => (t ? { ...t, itNotes } : t));
       this.scrollToBottom();
+      if (this.IS_CHAT_OPEN()) this.markChatAsRead();
     } catch {
       // silent fail
     }
@@ -415,11 +428,23 @@ export class ItService implements OnInit {
     this.closeChat();
   }
 
+  private markChatAsRead() {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    const total = (ticket.itNotes ?? []).length;
+    this.chatReadCounts.update((m) => {
+      const next = new Map(m);
+      next.set(ticket.ticketId, total);
+      return next;
+    });
+  }
+
   toggleChat() {
     this.IS_CHAT_OPEN.update((isOpen) => {
       const next = !isOpen;
       if (next) {
         this.scrollToBottom();
+        this.markChatAsRead();
       }
       return next;
     });
