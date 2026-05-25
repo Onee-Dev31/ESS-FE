@@ -229,6 +229,7 @@ export class ItService implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         const ticketId = params['ticketId'];
+        const openChat = params['openChat'] === 'true';
         if (ticketId) {
           const id = Number(ticketId);
           this.highlightedTicketId.set(id);
@@ -236,7 +237,7 @@ export class ItService implements OnInit {
             s.delete(id);
             return new Set(s);
           });
-          this.selectTicket(ticketId);
+          this.selectTicket(ticketId, { openChat });
 
           // ✅ Scroll to ticket in sidebar (with retry logic)
           const scrollToTicket = (id: string, retries = 10) => {
@@ -372,7 +373,7 @@ export class ItService implements OnInit {
     this.selectTicket(String(ticketId));
   }
 
-  selectTicket(ticketId: string) {
+  selectTicket(ticketId: string, options?: { openChat?: boolean }) {
     const previousTicketId = this.selectedTicket()?.ticketId;
 
     this.getTicketById(ticketId).subscribe(async (res: any) => {
@@ -433,6 +434,11 @@ export class ItService implements OnInit {
       this.selectedTicket.set(objectData);
       if (previousTicketId !== objectData.ticketId) {
         this.clearChatDraft();
+      }
+      if (options?.openChat) {
+        this.IS_CHAT_OPEN.set(true);
+        this.markChatAsRead();
+        setTimeout(() => this.chatTextareaRef?.nativeElement.focus(), 100);
       }
       this.scrollToBottom();
 
