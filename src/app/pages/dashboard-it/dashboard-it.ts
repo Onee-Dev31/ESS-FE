@@ -1951,9 +1951,11 @@ export class DashboardIT implements OnInit {
         const senderName = `${userData?.NAMFIRSTT ?? ''} ${userData?.NAMLASTT ?? ''}`.trim();
 
         if (requesterAdUser && senderAdUser) {
-          const assigneeAdUsers = ((ticket?.assignments ?? []) as any[])
-            .map((a) => (a.aduser || a.adUser || '').toLowerCase())
-            .filter((u) => !!u && u !== senderAdUser.toLowerCase());
+          const timeline: any[] = ticket?.assignTimeline ?? [];
+          const latestStep = timeline[timeline.length - 1];
+          const assigneeAdUsers = ((latestStep?.Assignee ?? []) as any[])
+            .map((a: any) => (a.adUser || a.aduser || '').toLowerCase())
+            .filter((u: string) => !!u && u !== senderAdUser.toLowerCase());
           const allRecipients = [...new Set([...assigneeAdUsers, ...(data.mentionedAdUsers ?? [])])];
           this.signalrService.noteNotify(
             data.id,
